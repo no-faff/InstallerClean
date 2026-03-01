@@ -15,6 +15,14 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        DispatcherUnhandledException += (_, args) =>
+        {
+            MessageBox.Show(
+                $"An unexpected error occurred:\n\n{args.Exception.Message}",
+                "InstallerClean", MessageBoxButton.OK, MessageBoxImage.Error);
+            args.Handled = true;
+        };
+
         // Force dark titlebar on all windows
         EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
             new RoutedEventHandler((s, _) =>

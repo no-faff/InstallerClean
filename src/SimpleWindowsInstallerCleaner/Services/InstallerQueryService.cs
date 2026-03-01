@@ -137,7 +137,25 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 throw new UnauthorizedAccessException(
                     "Access denied enumerating installed products. Run as administrator.");
 
-            if (error == MsiError.Success || error == MsiError.MoreData)
+            if (error == MsiError.MoreData)
+            {
+                // SID buffer was too small — retry with the required size.
+                sidLen++; // space for null terminator
+                sidBuffer.Clear();
+                sidBuffer.EnsureCapacity((int)sidLen);
+
+                error = MsiNativeMethods.MsiEnumProductsEx(
+                    szProductCode: null,
+                    szUserSid: AllUsersSid,
+                    dwContext: MsiInstallContext.All,
+                    dwIndex: index,
+                    szInstalledProductCode: productCode,
+                    pdwInstalledContext: out installedContext,
+                    szSid: sidBuffer,
+                    pcchSid: ref sidLen);
+            }
+
+            if (error == MsiError.Success)
             {
                 var sid = (installedContext != MsiInstallContext.Machine && sidLen > 0)
                     ? sidBuffer.ToString()

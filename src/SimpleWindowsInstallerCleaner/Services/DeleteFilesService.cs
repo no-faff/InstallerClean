@@ -1,3 +1,4 @@
+using Microsoft.VisualBasic.FileIO;
 using SimpleWindowsInstallerCleaner.Models;
 
 namespace SimpleWindowsInstallerCleaner.Services;
@@ -30,7 +31,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     }
                     var fileName = Path.GetFileName(filePath);
                     progress?.Report(new OperationProgress(i + 1, total, fileName));
-                    File.Delete(filePath);
+                    FileSystem.DeleteFile(filePath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
                     deleted++;
                 }
                 catch (Exception ex)

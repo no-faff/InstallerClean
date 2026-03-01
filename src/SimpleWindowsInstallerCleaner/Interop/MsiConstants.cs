@@ -45,8 +45,17 @@ public enum MsiPatchFilter : uint
     /// <summary>Include applied patches.</summary>
     Applied = 0x00000001,
 
+    /// <summary>Include superseded patches (replaced by a newer patch).</summary>
+    Superseded = 0x00000002,
+
+    /// <summary>Include obsoleted patches.</summary>
+    Obsoleted = 0x00000004,
+
+    /// <summary>Include registered but not yet applied patches.</summary>
+    Registered = 0x00000008,
+
     /// <summary>All patch states.</summary>
-    All = Applied
+    All = Applied | Superseded | Obsoleted | Registered
 }
 
 /// <summary>

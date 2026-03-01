@@ -6,7 +6,8 @@
         Width="950" Height="680"
         MinWidth="700" MinHeight="500"
         WindowStartupLocation="CenterOwner"
-        Background="{StaticResource Base100}">
+        Background="{StaticResource Base100}"
+        Loaded="Window_Loaded">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -16,22 +17,23 @@
     <Grid Margin="24">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
-                <RowDefinition Height="*"/><RowDefinition Height="12"/>
-                <RowDefinition Height="*"/><RowDefinition Height="12"/>
+                <RowDefinition Height="2*"/><RowDefinition Height="20"/>
+                <RowDefinition Height="3*"/><RowDefinition Height="12"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="PRODUCTS" Foreground="#94a3b8"
+            <TextBlock Grid.Row="0" Text="PRODUCTS" Foreground="#cbd5e1"
                        FontSize="14"/>
 
             <Border Grid.Row="2" Style="{StaticResource CardNoPad}" ClipToBounds="True">
-                <ListView ItemsSource="{Binding Products}"
+                <ListView x:Name="ProductsList" ItemsSource="{Binding Products}"
                           SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
                           BorderThickness="0" Background="Transparent"
+                          Padding="0" Margin="0,-1,0,-6"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="Product name" Width="260">
+                            <GridViewColumn Header="Product name" Width="520">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding ProductName}" Foreground="#f8fafc"
@@ -40,7 +42,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="File" Width="150">
+                            <GridViewColumn Header="File" Width="170">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding FileName}" Foreground="#cbd5e1"
@@ -49,7 +51,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Size" Width="80">
+                            <GridViewColumn Header="Size" Width="90">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding SizeDisplay}" Foreground="#cbd5e1"
@@ -57,7 +59,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Patches" Width="60">
+                            <GridViewColumn Header="Patches" Width="80">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding PatchCount}" Foreground="#cbd5e1"
@@ -81,7 +83,7 @@
                         <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="PATCHES" Foreground="#94a3b8"
+                    <TextBlock Grid.Row="0" Text="PATCHES" Foreground="#cbd5e1"
                                FontSize="14"/>
                     <Border Grid.Row="2" Style="{StaticResource CardNoPad}">
                         <Grid>
@@ -131,7 +133,7 @@
                         <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="PRODUCT DETAILS" Foreground="#94a3b8"
+                    <TextBlock Grid.Row="0" Text="PRODUCT DETAILS" Foreground="#cbd5e1"
                                FontSize="14"/>
                     <Border Grid.Row="2" Style="{StaticResource Card}">
                         <Grid>
