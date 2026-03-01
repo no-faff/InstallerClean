@@ -1,7 +1,7 @@
-# Simple Windows installer cleaner
+# InstallerClean
 
 A modern, open source replacement for PatchCleaner (last released 3/3/2016).
-Target release: 3 March 2026 — 10 years to the day.
+Released: 3 March 2026 — 10 years to the day.
 
 Part of the **No faff** suite of small Windows utilities (github.com/no-faff).
 
@@ -22,22 +22,24 @@ user-chosen location so they can be restored if anything breaks.
 ## Tech stack
 
 - **Language:** C#
-- **UI:** WPF (.NET 8)
+- **UI:** WPF (.NET 8), dark theme inspired by Upscayl
+- **Font:** Poppins (bundled)
 - **Windows API:** Windows Installer COM (msi.dll) via P/Invoke
-  - `MsiEnumProducts()`, `MsiGetProductInfo()`, `MsiSourceListEnumSources()`
+  - `MsiEnumProductsEx()`, `MsiGetProductInfo()`, `MsiSourceListEnumSources()`
   - `MsiEnumPatches()` for .msp patch files
-- **Distribution:** TBD (standalone .exe vs requiring .NET runtime)
-- **Licence:** Open source (MIT or similar)
+- **Licence:** MIT
 
 ---
 
 ## Brand / conventions
 
 - **Studio:** No faff (`github.com/no-faff`)
-- **Tool name:** Simple Windows installer cleaner
+- **App name:** InstallerClean
 - **Sentence case throughout** — no title case anywhere
 - **British English** — colour, organise, etc.
 - No Oxford comma
+- No em dashes in UI text
+- No gradient "AI slop" — solid colours only
 
 ---
 
@@ -45,50 +47,79 @@ user-chosen location so they can be restored if anything breaks.
 
 - Platform: Windows 11
 - Terminal: PowerShell — use `$env:VAR = "value"` not `export`
-- IDE: TBD
+- Build: `dotnet build src/SimpleWindowsInstallerCleaner/SimpleWindowsInstallerCleaner.csproj`
+- Test: `dotnet test src/SimpleWindowsInstallerCleaner.Tests/`
+- Run (elevated terminal): `dotnet run --project src/SimpleWindowsInstallerCleaner`
+- Run (explorer): `src/SimpleWindowsInstallerCleaner/bin/Debug/net8.0-windows/InstallerClean.exe` (triggers UAC)
+
+---
+
+## Architecture
+
+MVVM with CommunityToolkit.Mvvm. Manual composition in App.xaml.cs (no DI container).
+
+**Startup flow:** splash screen → scan → main window. Dark titlebar set via
+DwmSetWindowAttribute class handler. App icon set on all windows via same handler.
+
+**Services:** FileSystemScanService, InstallerQueryService, MoveFilesService,
+DeleteFilesService, ExclusionService, SettingsService, PendingRebootService,
+MsiFileInfoService.
+
+**Windows:** MainWindow, RegisteredFilesWindow, OrphanedFilesWindow,
+SettingsWindow (titled "Filters"), AboutWindow, SplashWindow,
+ConfirmDeleteWindow, ConfirmMoveWindow.
+
+**Styles (App.xaml):** Pill buttons (AccentPill, PrimaryPill, GhostPill),
+PillTextBox, Card/CardNoPad, LinkButton, SubtleLink, WarningTooltip,
+custom thin ScrollBar (8px, rounded), dark ListViewItem/ListBoxItem selection.
+
+**Text colour tiers:**
+| Tier | Colour | Usage |
+|------|--------|-------|
+| Heading | #f8fafc | Titles, headings, primary labels |
+| Body | #cbd5e1 | Body text, descriptions, section labels |
+| Muted | #94a3b8 | Secondary info, size displays, footer |
+| Dim | #64748b | Metadata labels in detail panels |
+
+**22 tests passing (xUnit + Moq).**
 
 ---
 
 ## Key decisions
 
-- Move orphaned files (don't delete) as the safe default — user can delete from the move destination later
-- Adobe products can appear orphaned when they aren't — flag these with a warning
-- Show both products (.msi) and patches (.msp)
+- Move orphaned files (don't delete) as the safe default
+- Delete sends to Recycle Bin (not permanent)
+- Adobe/Acrobat 32-bit filter — their patches appear orphaned but aren't
+- Move and delete both have confirmation dialogs
+- Cancel button on move/delete progress overlay
+- Exclusion filtering runs on background thread (async)
+- Atomic settings save (write .tmp then rename)
 - Must run as administrator to access Windows Installer API fully
 
 ---
 
-## Origin
+## Commit conventions
 
-This project started by looking at PatchCleaner and asking: can we make a
-better version? PatchCleaner works fine — this is not fixing something broken.
-The improvements are: no VBScript dependency, open source (MIT), .NET 8,
-potentially more accurate detection via MSI API rather than WMI.
-
-The full research brief is at `docs/project-brief.md`. Read it before
-making significant design decisions. The current app (v0.1.0-alpha) has the
-right data layer but a completely wrong UI and a broken Phase 2 scan that
-takes 3+ minutes.
-
-## Known open questions (see docs/project-brief.md section 8 for full list)
-
-- Does Phase 2 (component scan, the slow part) need to exist at all?
-- Should there be a Delete button or move-only?
-- Office 2010 SP2 false positive — does our MSI API approach fix this?
-- MSI OLE Summary Information Stream — implement or skip?
-
-## Opus sessions
-
-Opus is available whenever it would give better results. Sonnet will write a
-detailed prompt for Opus at the time. The Opus prompt template lives at
-`docs/opus-prompt.md`.
+- Prefixes: `feat:` / `fix:` / `refactor:` / `chore:` / `test:` / `docs:`
+- Always: `dotnet test` + `dotnet build` before committing
 
 ---
 
-## Other No faff projects (for context)
+## Project structure
 
-| Tool | Location | Stack |
-|---|---|---|
-| Simple video downloader | `C:\Simple-claude` | Firefox extension + Python server |
-| Transcribe app | `C:\transcribe-app` | PyQt6, faster-whisper, CUDA |
-| immijjenerator | `C:\immijjenerator` | PyQt6, diffusers |
+```
+src/SimpleWindowsInstallerCleaner/          # Main WPF app
+src/SimpleWindowsInstallerCleaner.Tests/    # xUnit tests
+docs/                                       # Briefs, plans, screenshots
+docs/icons/                                 # Icon source files
+```
+
+---
+
+## Remaining work
+
+- **README** for GitHub launch
+- **GitHub repo** setup (fresh clean repo under no-faff org)
+- **Portfolio:** ko-fi/PayPal, Reddit account, landing pages
+- **Post-launch:** extract MessageBox from ViewModels (testability),
+  scan subdirectories of C:\Windows\Installer, more test coverage
