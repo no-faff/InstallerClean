@@ -50,5 +50,11 @@
             </TextBlock>
             <Button Grid.Row="8" Style="{StaticResource PrimaryPill}"
                     Content="Close" IsCancel="True" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Row="8" HorizontalAlignment="Left"
+                       VerticalAlignment="Center" Foreground="#94a3b8" FontSize="12">
+                <Hyperlink NavigateUri="https://github.com/no-faff/windows-installer-cleaner/discussions"
+                           Click="Hyperlink_Click"
+                           Style="{StaticResource SubtleLink}">Send feedback</Hyperlink>
+            </TextBlock>
     </Grid>
 </Window>
