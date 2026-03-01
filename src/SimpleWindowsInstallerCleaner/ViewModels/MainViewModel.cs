@@ -249,9 +249,10 @@ public partial class MainViewModel : ObservableObject
             });
             var result = await _moveService.MoveFilesAsync(filePaths, MoveDestination, progress, _operationCts.Token);
 
+            var movedLabel = DisplayHelpers.Pluralise(result.MovedCount, "file", "files");
             OperationProgress = result.Errors.Count == 0
-                ? $"Moved {result.MovedCount} {DisplayHelpers.Pluralise(result.MovedCount, "file", "files")} to {MoveDestination}."
-                : $"Moved {result.MovedCount} {DisplayHelpers.Pluralise(result.MovedCount, "file", "files")}. {result.Errors.Count} {DisplayHelpers.Pluralise(result.Errors.Count, "error", "errors")}.";
+                ? $"Moved {result.MovedCount} {movedLabel}. To restore, copy them back from {MoveDestination}."
+                : $"Moved {result.MovedCount} {movedLabel}. {result.Errors.Count} {DisplayHelpers.Pluralise(result.Errors.Count, "error", "errors")}.";
 
             await ScanAsync();
         }
