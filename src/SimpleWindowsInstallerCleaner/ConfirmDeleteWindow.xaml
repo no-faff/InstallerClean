@@ -28,7 +28,7 @@
             </StackPanel>
 
             <TextBlock x:Name="RecycleBinNote"
-                       Text="Files will be sent to the Recycle Bin. Use Move instead to keep backup copies."
+                       Text="Files will be sent to the Recycle Bin. Use Move instead if you'd like to keep backup copies."
                        Foreground="#94a3b8" FontSize="12" TextWrapping="Wrap"
                        Margin="0,0,0,20"/>
             <TextBlock x:Name="LargeSizeWarning"

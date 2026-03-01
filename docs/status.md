@@ -82,7 +82,9 @@ SettingsWindow, AboutWindow, SplashWindow, ConfirmDeleteWindow, ConfirmMoveWindo
 - [ ] GitHub repo setup (fresh clean repo under no-faff org)
 - [ ] Portfolio: ko-fi/PayPal, Reddit account, landing pages
 - [ ] Check Move button disabled appearance
-- [ ] Post-launch: I1 (dialog service), I8 (subdirectory scan), test coverage
+- [ ] I1: Extract MessageBox from ViewModels (testability)
+- [ ] I8: Scan subdirectories of C:\Windows\Installer
+- [ ] More test coverage (ViewModels, edge cases)
 
 ---
 

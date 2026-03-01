@@ -121,5 +121,6 @@ docs/icons/                                 # Icon source files
 - **README** for GitHub launch
 - **GitHub repo** setup (fresh clean repo under no-faff org)
 - **Portfolio:** ko-fi/PayPal, Reddit account, landing pages
-- **Post-launch:** extract MessageBox from ViewModels (testability),
-  scan subdirectories of C:\Windows\Installer, more test coverage
+- Extract MessageBox from ViewModels (testability)
+- Scan subdirectories of C:\Windows\Installer
+- More test coverage
