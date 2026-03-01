@@ -27,9 +27,14 @@
                            TextWrapping="Wrap" VerticalAlignment="Center"/>
             </StackPanel>
 
-            <TextBlock Text="Files will be sent to the Recycle Bin. Use Move instead to keep backup copies."
+            <TextBlock x:Name="RecycleBinNote"
+                       Text="Files will be sent to the Recycle Bin. Use Move instead to keep backup copies."
                        Foreground="#94a3b8" FontSize="12" TextWrapping="Wrap"
                        Margin="0,0,0,20"/>
+            <TextBlock x:Name="LargeSizeWarning"
+                       Text="Large files may be permanently deleted if the Recycle Bin is full."
+                       Foreground="#f59e0b" FontSize="12" TextWrapping="Wrap"
+                       Margin="0,-12,0,20" Visibility="Collapsed"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Style="{StaticResource PrimaryPill}" Content="Cancel"

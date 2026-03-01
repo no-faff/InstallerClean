@@ -54,6 +54,8 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _operationCurrentFileName = string.Empty;
     [ObservableProperty] private double _operationProgressPercent;
 
+    private CancellationTokenSource? _operationCts;
+
     // Whether scan has completed at least once
     [ObservableProperty] private bool _hasScanned;
 
@@ -117,8 +119,10 @@ public partial class MainViewModel : ObservableObject
 
         _lastScanResult = await _scanService.ScanAsync(progress);
 
-        _lastFilteredResult = _exclusionService.ApplyFilters(
-            _lastScanResult.OrphanedFiles, _settings.ExclusionFilters, _msiInfoService);
+        // Run filter application on background thread — GetSummaryInfo reads MSI
+        // metadata synchronously and can freeze the UI with many orphaned files.
+        _lastFilteredResult = await Task.Run(() => _exclusionService.ApplyFilters(
+            _lastScanResult.OrphanedFiles, _settings.ExclusionFilters, _msiInfoService));
 
         RegisteredFileCount = _lastScanResult.RegisteredPackages.Count;
         RegisteredSizeDisplay = DisplayHelpers.FormatSize(_lastScanResult.RegisteredTotalBytes);
@@ -198,12 +202,16 @@ public partial class MainViewModel : ObservableObject
     private static readonly string InstallerFolder =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer");
 
+    [RelayCommand]
+    private void CancelOperation()
+    {
+        _operationCts?.Cancel();
+    }
+
     [RelayCommand(CanExecute = nameof(CanMove))]
     private async Task MoveAllAsync()
     {
-        IsOperating = true;
-
-        if (_lastFilteredResult is null) { IsOperating = false; return; }
+        if (_lastFilteredResult is null) return;
 
         var dest = MoveDestination;
         if (dest.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
@@ -212,12 +220,22 @@ public partial class MainViewModel : ObservableObject
             MessageBox.Show(
                 "The destination cannot be the Windows Installer folder itself.",
                 "Invalid destination", MessageBoxButton.OK, MessageBoxImage.Warning);
-            IsOperating = false;
             return;
         }
 
         var filePaths = _lastFilteredResult.Actionable.Select(f => f.FullPath).ToList();
-        OperationProgress = $"Moving {filePaths.Count} {DisplayHelpers.Pluralise(filePaths.Count, "file", "files")}...";
+        var count = filePaths.Count;
+        var sizeDisplay = OrphanedSizeDisplay;
+
+        var confirmDialog = new ConfirmMoveWindow(count, sizeDisplay, MoveDestination)
+        {
+            Owner = Application.Current.MainWindow
+        };
+        if (confirmDialog.ShowDialog() != true) return;
+
+        IsOperating = true;
+        _operationCts = new CancellationTokenSource();
+        OperationProgress = $"Moving {count} {DisplayHelpers.Pluralise(count, "file", "files")}...";
 
         try
         {
@@ -229,12 +247,17 @@ public partial class MainViewModel : ObservableObject
                 OperationProgressPercent = (double)p.CurrentFile / p.TotalFiles * 100;
                 OperationProgress = $"{p.CurrentFile} of {p.TotalFiles} files";
             });
-            var result = await _moveService.MoveFilesAsync(filePaths, MoveDestination, progress);
+            var result = await _moveService.MoveFilesAsync(filePaths, MoveDestination, progress, _operationCts.Token);
 
             OperationProgress = result.Errors.Count == 0
                 ? $"Moved {result.MovedCount} {DisplayHelpers.Pluralise(result.MovedCount, "file", "files")} to {MoveDestination}."
                 : $"Moved {result.MovedCount} {DisplayHelpers.Pluralise(result.MovedCount, "file", "files")}. {result.Errors.Count} {DisplayHelpers.Pluralise(result.Errors.Count, "error", "errors")}.";
 
+            await ScanAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            OperationProgress = "Move cancelled.";
             await ScanAsync();
         }
         catch (Exception ex)
@@ -243,6 +266,8 @@ public partial class MainViewModel : ObservableObject
         }
         finally
         {
+            _operationCts?.Dispose();
+            _operationCts = null;
             IsOperating = false;
             OperationProgressPercent = 0;
         }
@@ -255,14 +280,16 @@ public partial class MainViewModel : ObservableObject
 
         var count = _lastFilteredResult.Actionable.Count;
         var sizeDisplay = OrphanedSizeDisplay;
+        var totalBytes = _lastFilteredResult.Actionable.Sum(f => f.SizeBytes);
 
-        var dialog = new ConfirmDeleteWindow(count, sizeDisplay)
+        var dialog = new ConfirmDeleteWindow(count, sizeDisplay, totalBytes)
         {
             Owner = Application.Current.MainWindow
         };
         if (dialog.ShowDialog() != true) return;
 
         IsOperating = true;
+        _operationCts = new CancellationTokenSource();
         var filePaths = _lastFilteredResult.Actionable.Select(f => f.FullPath).ToList();
         OperationProgress = $"Deleting {filePaths.Count} {DisplayHelpers.Pluralise(filePaths.Count, "file", "files")}...";
 
@@ -276,12 +303,17 @@ public partial class MainViewModel : ObservableObject
                 OperationProgressPercent = (double)p.CurrentFile / p.TotalFiles * 100;
                 OperationProgress = $"{p.CurrentFile} of {p.TotalFiles} files";
             });
-            var result = await _deleteService.DeleteFilesAsync(filePaths, progress);
+            var result = await _deleteService.DeleteFilesAsync(filePaths, progress, _operationCts.Token);
 
             OperationProgress = result.Errors.Count == 0
                 ? $"Deleted {result.DeletedCount} {DisplayHelpers.Pluralise(result.DeletedCount, "file", "files")}."
                 : $"Deleted {result.DeletedCount} {DisplayHelpers.Pluralise(result.DeletedCount, "file", "files")}. {result.Errors.Count} {DisplayHelpers.Pluralise(result.Errors.Count, "error", "errors")}.";
 
+            await ScanAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            OperationProgress = "Delete cancelled.";
             await ScanAsync();
         }
         catch (Exception ex)
@@ -290,6 +322,8 @@ public partial class MainViewModel : ObservableObject
         }
         finally
         {
+            _operationCts?.Dispose();
+            _operationCts = null;
             IsOperating = false;
             OperationProgressPercent = 0;
         }
