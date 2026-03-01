@@ -6,4 +6,5 @@ public sealed class AppSettings
 
     public string MoveDestination { get; set; } = string.Empty;
     public List<string> ExclusionFilters { get; set; } = new() { DefaultExclusionFilter };
+    public bool ShortcutOffered { get; set; }
 }
