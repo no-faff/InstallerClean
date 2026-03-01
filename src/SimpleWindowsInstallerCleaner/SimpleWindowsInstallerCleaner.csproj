@@ -9,7 +9,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>SimpleWindowsInstallerCleaner</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <AssemblyName>SimpleWindowsInstallerCleaner</AssemblyName>
+    <AssemblyName>InstallerClean</AssemblyName>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,7 @@
     <Resource Include="Fonts\Poppins-Medium.ttf" />
     <Resource Include="Fonts\Poppins-SemiBold.ttf" />
     <Resource Include="Fonts\Poppins-Bold.ttf" />
+    <Resource Include="Assets\splash-icon.png" />
   </ItemGroup>
 
 </Project>

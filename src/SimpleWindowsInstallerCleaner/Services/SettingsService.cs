@@ -46,6 +46,8 @@ public sealed class SettingsService : ISettingsService
     {
         Directory.CreateDirectory(Path.GetDirectoryName(_settingsFile)!);
         var json = JsonSerializer.Serialize(settings, JsonOptions);
-        File.WriteAllText(_settingsFile, json);
+        var tempFile = _settingsFile + ".tmp";
+        File.WriteAllText(tempFile, json);
+        File.Move(tempFile, _settingsFile, overwrite: true);
     }
 }

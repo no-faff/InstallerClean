@@ -8,6 +8,19 @@
         ShowInTaskbar="False"
         Background="{StaticResource Base100}">
 
+    <Window.Resources>
+        <Style x:Key="SubtleLink" TargetType="Hyperlink">
+            <Setter Property="Foreground" Value="#94a3b8"/>
+            <Setter Property="TextDecorations" Value="None"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#f8fafc"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid Margin="24">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -21,22 +34,19 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="Windows installer cleaner"
+            <TextBlock Grid.Row="0" Text="InstallerClean"
                        Foreground="#f8fafc" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap"/>
-            <TextBlock Grid.Row="2" Text="Version 0.1.0-alpha"
+            <TextBlock Grid.Row="2" Text="Version 1.0.0"
                        Foreground="#cbd5e1" FontSize="12"/>
-            <TextBlock Grid.Row="4" Foreground="#cbd5e1" FontSize="12">
-                <Run Text="Part of the "/>
+            <TextBlock Grid.Row="4" Foreground="#94a3b8" FontSize="12">
+                <Hyperlink NavigateUri="https://github.com/no-faff/windows-installer-cleaner/blob/main/LICENSE"
+                           Click="Hyperlink_Click"
+                           Style="{StaticResource SubtleLink}">MIT licence</Hyperlink>
+            </TextBlock>
+            <TextBlock Grid.Row="6" Foreground="#94a3b8" FontSize="12">
                 <Hyperlink NavigateUri="https://github.com/no-faff"
                            Click="Hyperlink_Click"
-                           Foreground="#818cf8" TextDecorations="None">No faff</Hyperlink>
-                <Run Text=" suite"/>
-            </TextBlock>
-            <TextBlock Grid.Row="6" Foreground="#cbd5e1" FontSize="12">
-                <Run Text="MIT licence · "/>
-                <Hyperlink NavigateUri="https://github.com/no-faff/windows-installer-cleaner"
-                           Click="Hyperlink_Click"
-                           Foreground="#818cf8" TextDecorations="None">github.com/no-faff/windows-installer-cleaner</Hyperlink>
+                           Style="{StaticResource SubtleLink}">github.com/no-faff</Hyperlink>
             </TextBlock>
             <Button Grid.Row="8" Style="{StaticResource PrimaryPill}"
                     Content="Close" IsCancel="True" HorizontalAlignment="Right"/>

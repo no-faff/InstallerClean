@@ -27,7 +27,8 @@
                            TextWrapping="Wrap" VerticalAlignment="Center"/>
             </StackPanel>
 
-            <TextBlock Text="This cannot be undone." Foreground="#94a3b8" FontSize="12"
+            <TextBlock Text="Files will be sent to the Recycle Bin. Use Move instead to keep backup copies."
+                       Foreground="#94a3b8" FontSize="12" TextWrapping="Wrap"
                        Margin="0,0,0,20"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

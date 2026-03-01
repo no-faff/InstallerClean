@@ -26,9 +26,7 @@ public class SettingsServiceTests : IDisposable
         var settings = svc.Load();
 
         Assert.Equal(string.Empty, settings.MoveDestination);
-        Assert.Contains("Adobe", settings.ExclusionFilters);
         Assert.Contains("Acrobat", settings.ExclusionFilters);
-        Assert.True(settings.CheckPendingReboot);
     }
 
     [Fact]
@@ -38,16 +36,14 @@ public class SettingsServiceTests : IDisposable
         var original = new AppSettings
         {
             MoveDestination = @"D:\Backup",
-            ExclusionFilters = new List<string> { "Adobe", "Norton" },
-            CheckPendingReboot = false
+            ExclusionFilters = new List<string> { "Acrobat", "Norton" }
         };
 
         svc.Save(original);
         var loaded = svc.Load();
 
         Assert.Equal(@"D:\Backup", loaded.MoveDestination);
-        Assert.Equal(new[] { "Adobe", "Norton" }, loaded.ExclusionFilters);
-        Assert.False(loaded.CheckPendingReboot);
+        Assert.Equal(new[] { "Acrobat", "Norton" }, loaded.ExclusionFilters);
     }
 
     [Fact]
@@ -59,6 +55,6 @@ public class SettingsServiceTests : IDisposable
         var settings = svc.Load();
 
         Assert.Equal(string.Empty, settings.MoveDestination);
-        Assert.Contains("Adobe", settings.ExclusionFilters);
+        Assert.Contains("Acrobat", settings.ExclusionFilters);
     }
 }

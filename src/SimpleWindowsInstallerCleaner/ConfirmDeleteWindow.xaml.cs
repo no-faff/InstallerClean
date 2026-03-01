@@ -1,4 +1,5 @@
 using System.Windows;
+using SimpleWindowsInstallerCleaner.Helpers;
 
 namespace SimpleWindowsInstallerCleaner;
 
@@ -7,7 +8,8 @@ public partial class ConfirmDeleteWindow : Window
     public ConfirmDeleteWindow(int fileCount, string sizeDisplay)
     {
         InitializeComponent();
-        MessageText.Text = $"Permanently delete {fileCount} {(fileCount == 1 ? "file" : "files")} ({sizeDisplay})?";
+        var label = DisplayHelpers.Pluralise(fileCount, "file", "files");
+        MessageText.Text = $"Delete {fileCount} {label} ({sizeDisplay})?";
     }
 
     private void OnDelete(object sender, RoutedEventArgs e)

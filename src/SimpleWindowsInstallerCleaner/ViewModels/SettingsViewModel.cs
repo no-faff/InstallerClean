@@ -14,7 +14,6 @@ public partial class SettingsViewModel : ObservableObject
     public ObservableCollection<string> Filters { get; } = new();
 
     [ObservableProperty] private string _newFilter = string.Empty;
-    [ObservableProperty] private bool _checkPendingReboot;
 
     public event Action<bool?>? CloseRequested;
 
@@ -25,7 +24,6 @@ public partial class SettingsViewModel : ObservableObject
         foreach (var filter in currentSettings.ExclusionFilters)
             Filters.Add(filter);
 
-        CheckPendingReboot = currentSettings.CheckPendingReboot;
     }
 
     [RelayCommand]
@@ -48,7 +46,6 @@ public partial class SettingsViewModel : ObservableObject
     {
         var settings = _settingsService.Load();
         settings.ExclusionFilters = Filters.ToList();
-        settings.CheckPendingReboot = CheckPendingReboot;
 
         try
         {

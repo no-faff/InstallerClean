@@ -22,12 +22,16 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
             var subject  = GetStringProperty(hSummary, MsiSummaryProperty.Subject);
             var author   = GetStringProperty(hSummary, MsiSummaryProperty.Author);
             var comments = GetStringProperty(hSummary, MsiSummaryProperty.Comments);
-            var sig      = GetDigitalSignature(filePath);
+
+            // Signature retrieval can fail independently (locked file etc.)
+            // — don't lose the metadata we already have.
+            var sig = GetDigitalSignature(filePath);
 
             return new MsiSummaryInfo(title, subject, author, comments, sig);
         }
         catch (Exception)
         {
+            // MSI handle operations failed — no metadata available at all.
             return null;
         }
         finally

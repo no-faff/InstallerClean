@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using SimpleWindowsInstallerCleaner.ViewModels;
 
 namespace SimpleWindowsInstallerCleaner;
@@ -13,7 +14,14 @@ public partial class OrphanedFilesWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        ActionableList.Focus();
+        if (ActionableList.Items.Count > 0)
+        {
+            ActionableList.SelectedIndex = 0;
+            ActionableList.ScrollIntoView(ActionableList.Items[0]);
+            var container = (ListBoxItem?)ActionableList.ItemContainerGenerator
+                .ContainerFromIndex(0);
+            container?.Focus();
+        }
     }
 
     private void ActionableList_GotFocus(object sender, RoutedEventArgs e)

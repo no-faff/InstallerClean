@@ -113,8 +113,7 @@ public partial class MainViewModel : ObservableObject
 
     private async Task RunScanCoreAsync(IProgress<string>? progress)
     {
-        if (_settings.CheckPendingReboot)
-            HasPendingReboot = _rebootService.HasPendingReboot();
+        HasPendingReboot = _rebootService.HasPendingReboot();
 
         _lastScanResult = await _scanService.ScanAsync(progress);
 
@@ -196,13 +195,28 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private static readonly string InstallerFolder =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer");
+
     [RelayCommand(CanExecute = nameof(CanMove))]
     private async Task MoveAllAsync()
     {
-        if (_lastFilteredResult is null) return;
+        IsOperating = true;
+
+        if (_lastFilteredResult is null) { IsOperating = false; return; }
+
+        var dest = MoveDestination;
+        if (dest.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            .Equals(InstallerFolder.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
+        {
+            MessageBox.Show(
+                "The destination cannot be the Windows Installer folder itself.",
+                "Invalid destination", MessageBoxButton.OK, MessageBoxImage.Warning);
+            IsOperating = false;
+            return;
+        }
 
         var filePaths = _lastFilteredResult.Actionable.Select(f => f.FullPath).ToList();
-        IsOperating = true;
         OperationProgress = $"Moving {filePaths.Count} {DisplayHelpers.Pluralise(filePaths.Count, "file", "files")}...";
 
         try
@@ -248,8 +262,8 @@ public partial class MainViewModel : ObservableObject
         };
         if (dialog.ShowDialog() != true) return;
 
-        var filePaths = _lastFilteredResult.Actionable.Select(f => f.FullPath).ToList();
         IsOperating = true;
+        var filePaths = _lastFilteredResult.Actionable.Select(f => f.FullPath).ToList();
         OperationProgress = $"Deleting {filePaths.Count} {DisplayHelpers.Pluralise(filePaths.Count, "file", "files")}...";
 
         try
