@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media.Imaging;
 using SimpleWindowsInstallerCleaner.Services;
 using SimpleWindowsInstallerCleaner.ViewModels;
 
@@ -23,7 +24,8 @@ public partial class App : Application
             args.Handled = true;
         };
 
-        // Force dark titlebar on all windows
+        // Force dark titlebar and app icon on all windows
+        var appIcon = new BitmapImage(new Uri("pack://application:,,,/Assets/splash-icon.png"));
         EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
             new RoutedEventHandler((s, _) =>
             {
@@ -32,6 +34,7 @@ public partial class App : Application
                     var hwnd = new WindowInteropHelper(w).Handle;
                     int value = 1;
                     DwmSetWindowAttribute(hwnd, 20, ref value, sizeof(int));
+                    w.Icon = appIcon;
                 }
             }));
 
