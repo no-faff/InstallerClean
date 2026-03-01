@@ -227,6 +227,10 @@
                             <Run Text=" files"/>
                         </TextBlock>
                     </DockPanel>
+                    <Button Style="{StaticResource GhostPill}" Content="Cancel"
+                            Command="{Binding CancelOperationCommand}"
+                            HorizontalAlignment="Center" Margin="0,10,0,0"
+                            Height="28" Padding="16,0" FontSize="12"/>
                 </StackPanel>
             </Border>
         </Grid>
