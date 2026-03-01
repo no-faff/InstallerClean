@@ -27,7 +27,12 @@
       "Bash(tasklist:*)",
       "Bash(cat:*)",
       "Bash(gh repo:*)",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "WebFetch(domain:helpx.adobe.com)",
+      "WebFetch(domain:uxwing.com)",
+      "WebFetch(domain:iconduck.com)",
+      "WebFetch(domain:icon-icons.com)",
+      "WebFetch(domain:www.iconarchive.com)"
     ]
   }
 }
