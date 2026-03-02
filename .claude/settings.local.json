@@ -32,7 +32,13 @@
       "WebFetch(domain:uxwing.com)",
       "WebFetch(domain:iconduck.com)",
       "WebFetch(domain:icon-icons.com)",
-      "WebFetch(domain:www.iconarchive.com)"
+      "WebFetch(domain:www.iconarchive.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(powershell:*)",
+      "Bash(gh search:*)",
+      "WebFetch(domain:more.ko-fi.com)",
+      "Bash(curl:*)",
+      "WebFetch(domain:proton.me)"
     ]
   }
 }
