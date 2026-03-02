@@ -444,6 +444,16 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void StarOnGitHub()
+    {
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = "https://github.com/no-faff/windows-installer-cleaner",
+            UseShellExecute = true
+        });
+    }
+
+    [RelayCommand]
     private void Donate()
     {
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
