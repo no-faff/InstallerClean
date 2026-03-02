@@ -94,7 +94,7 @@ public partial class RegisteredFilesViewModel : ObservableObject
             SelectedProduct = Products[0];
     }
 
-    partial void OnSelectedProductChanged(ProductRow? value)
+    async partial void OnSelectedProductChanged(ProductRow? value)
     {
         if (value is null)
         {
@@ -102,13 +102,20 @@ public partial class RegisteredFilesViewModel : ObservableObject
             return;
         }
 
-        if (!_cache.TryGetValue(value.FullPath, out var info))
+        if (_cache.TryGetValue(value.FullPath, out var cached))
         {
-            info = _infoService.GetSummaryInfo(value.FullPath);
-            _cache[value.FullPath] = info;
+            SelectedDetails = cached;
+            return;
         }
 
-        SelectedDetails = info;
+        var info = await Task.Run(() => _infoService.GetSummaryInfo(value.FullPath));
+
+        // Selection may have changed while we were reading
+        if (SelectedProduct == value)
+        {
+            _cache[value.FullPath] = info;
+            SelectedDetails = info;
+        }
     }
 
     private static string GetSizeDisplay(string path)

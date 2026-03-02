@@ -51,7 +51,7 @@ public partial class OrphanedFilesViewModel : ObservableObject
             SelectedFile = ActionableFiles[0];
     }
 
-    partial void OnSelectedFileChanged(OrphanedFile? value)
+    async partial void OnSelectedFileChanged(OrphanedFile? value)
     {
         if (value is null)
         {
@@ -59,13 +59,20 @@ public partial class OrphanedFilesViewModel : ObservableObject
             return;
         }
 
-        if (!_cache.TryGetValue(value.FullPath, out var info))
+        if (_cache.TryGetValue(value.FullPath, out var cached))
         {
-            info = _infoService.GetSummaryInfo(value.FullPath);
-            _cache[value.FullPath] = info;
+            SelectedDetails = cached;
+            return;
         }
 
-        SelectedDetails = info;
+        var info = await Task.Run(() => _infoService.GetSummaryInfo(value.FullPath));
+
+        // Selection may have changed while we were reading
+        if (SelectedFile == value)
+        {
+            _cache[value.FullPath] = info;
+            SelectedDetails = info;
+        }
     }
 
 }

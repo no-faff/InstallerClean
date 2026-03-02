@@ -240,9 +240,38 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
+        // Validate destination exists and is writable
+        try
+        {
+            Directory.CreateDirectory(dest);
+            var testFile = Path.Combine(dest, ".installerclean-write-test");
+            File.WriteAllText(testFile, "");
+            File.Delete(testFile);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Cannot write to {dest}:\n{ex.Message}",
+                "Invalid destination", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
         var filePaths = _lastFilteredResult.Actionable.Select(f => f.FullPath).ToList();
         var count = filePaths.Count;
+        var totalBytes = _lastFilteredResult.Actionable.Sum(f => f.SizeBytes);
         var sizeDisplay = OrphanedSizeDisplay;
+
+        // Check free space
+        var driveInfo = new DriveInfo(Path.GetPathRoot(dest)!);
+        if (driveInfo.AvailableFreeSpace < totalBytes)
+        {
+            MessageBox.Show(
+                $"Not enough space on {driveInfo.Name}\n\n" +
+                $"Required: {DisplayHelpers.FormatSize(totalBytes)}\n" +
+                $"Available: {DisplayHelpers.FormatSize(driveInfo.AvailableFreeSpace)}",
+                "Not enough space", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
 
         var confirmDialog = new ConfirmMoveWindow(count, sizeDisplay, MoveDestination)
         {
