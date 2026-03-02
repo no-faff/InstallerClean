@@ -131,11 +131,10 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bg" Property="Background" Value="#1e293b"/>
                                     <Setter Property="Foreground" Value="#f8fafc"/>
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="Bg" Property="Background" Value="#0f172a"/>
+                                    <Setter Property="Foreground" Value="#cbd5e1"/>
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="False">
                                     <Setter TargetName="Bg" Property="Opacity" Value="0.5"/>
