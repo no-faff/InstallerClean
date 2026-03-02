@@ -38,28 +38,27 @@ public partial class App : Application
             Shutdown(1);
         };
 
-        // Force dark titlebar and app icon on all windows
-        var appIcon = new BitmapImage(new Uri("pack://application:,,,/Assets/splash-icon.png"));
-        EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
-            new RoutedEventHandler((s, _) =>
-            {
-                if (s is Window w)
-                {
-                    var hwnd = new WindowInteropHelper(w).Handle;
-                    int value = 1;
-                    DwmSetWindowAttribute(hwnd, 20, ref value, sizeof(int));
-                    w.Icon = appIcon;
-                }
-            }));
-
-        // Show splash immediately and force a render so it paints before scan work begins
-        var splash = new SplashWindow();
-        splash.Show();
-        await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Render);
-
+        SplashWindow? splash = null;
         try
         {
-            // Step 1: show immediately while services are constructed
+            // Dark titlebar and app icon on all windows
+            var appIcon = new BitmapImage(new Uri("pack://application:,,,/Assets/splash-icon.png"));
+            EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
+                new RoutedEventHandler((s, _) =>
+                {
+                    if (s is Window w)
+                    {
+                        var hwnd = new WindowInteropHelper(w).Handle;
+                        int value = 1;
+                        DwmSetWindowAttribute(hwnd, 20, ref value, sizeof(int));
+                        w.Icon = appIcon;
+                    }
+                }));
+
+            splash = new SplashWindow();
+            splash.Show();
+
+            // Step 1: construct services
             splash.UpdateStep("Step 1/5: Initialising...", 10);
 
             var settingsService = new SettingsService();
@@ -76,9 +75,8 @@ public partial class App : Application
                 exclusionService, settingsService, rebootService, msiInfoService);
 
             // Step 2: the actual scan (this is where the time is spent)
-            splash.UpdateStep("Step 2/5: Enumerating installed products...", 20);
+            splash.UpdateStep("Step 2/5: Scanning installed products...", 20);
             var scanTask = viewModel.ScanWithProgressAsync(null);
-            // Ensure step 2 shows for at least 400ms even on very fast machines
             await Task.WhenAll(scanTask, Task.Delay(400));
 
             // Steps 3–5: post-scan, blaze through visibly
@@ -98,7 +96,7 @@ public partial class App : Application
         }
         catch (UnauthorizedAccessException)
         {
-            splash.Close();
+            splash?.Close();
             MessageBox.Show(
                 "This app requires administrator privileges.\n\nPlease right-click and choose 'Run as administrator'.",
                 "Administrator rights required",
@@ -108,7 +106,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            splash.Close();
+            splash?.Close();
             MessageBox.Show(
                 $"Failed to start: {ex.Message}",
                 "Startup error",
