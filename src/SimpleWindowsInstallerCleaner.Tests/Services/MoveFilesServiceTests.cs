@@ -1,3 +1,4 @@
+using SimpleWindowsInstallerCleaner.Models;
 using SimpleWindowsInstallerCleaner.Services;
 
 namespace SimpleWindowsInstallerCleaner.Tests.Services;
@@ -55,9 +56,38 @@ public class MoveFilesServiceTests : IDisposable
         Assert.Equal(file, results.Errors[0].FilePath);
     }
 
+    [Fact]
+    public async Task MoveFilesAsync_stops_when_cancelled()
+    {
+        var files = new List<string>();
+        for (int i = 0; i < 3; i++)
+        {
+            var file = Path.Combine(_sourceDir, $"test{i}.msi");
+            await File.WriteAllTextAsync(file, "content");
+            files.Add(file);
+        }
+
+        var cts = new CancellationTokenSource();
+        var progress = new SyncProgress<OperationProgress>(p => { if (p.CurrentFile == 1) cts.Cancel(); });
+
+        var svc = new MoveFilesService();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => svc.MoveFilesAsync(files, _destDir, progress, cts.Token));
+
+        var remaining = Directory.GetFiles(_sourceDir).Length;
+        Assert.True(remaining > 0, "Cancellation should have stopped before moving all files");
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_sourceDir)) Directory.Delete(_sourceDir, recursive: true);
         if (Directory.Exists(_destDir)) Directory.Delete(_destDir, recursive: true);
+    }
+
+    private sealed class SyncProgress<T> : IProgress<T>
+    {
+        private readonly Action<T> _handler;
+        public SyncProgress(Action<T> handler) => _handler = handler;
+        public void Report(T value) => _handler(value);
     }
 }
