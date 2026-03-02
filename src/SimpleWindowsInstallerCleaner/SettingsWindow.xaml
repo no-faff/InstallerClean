@@ -8,6 +8,10 @@
         ResizeMode="CanResizeWithGrip"
         Background="{StaticResource Base100}">
 
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
+
     <Window.InputBindings>
         <KeyBinding Key="Escape" Command="{Binding CancelCommand}"/>
     </Window.InputBindings>
@@ -56,26 +60,33 @@
         <!-- Filter list — plain Border, NO CardNoPad (avoids wpfui overrides) -->
         <Border Grid.Row="6" Background="#0f172a" CornerRadius="12"
                 MinHeight="90">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="4">
-                <ItemsControl ItemsSource="{Binding Filters}" Padding="8,4">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="0,2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding}"
-                                           Foreground="#f8fafc" FontSize="14" VerticalAlignment="Center"/>
-                                <Button Grid.Column="1" Style="{StaticResource GhostPill}"
-                                        Content="&#x00D7;" Height="28" Padding="8,0" FontSize="15"
-                                        Command="{Binding DataContext.RemoveFilterCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+            <Grid>
+                <!-- Empty state -->
+                <TextBlock Text="No filters. All orphaned files will be included."
+                           Foreground="#64748b" FontSize="12" FontStyle="Italic"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Visibility="{Binding HasNoFilters, Converter={StaticResource BoolToVis}}"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="4">
+                    <ItemsControl ItemsSource="{Binding Filters}" Padding="8,4">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding}"
+                                               Foreground="#f8fafc" FontSize="14" VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1" Style="{StaticResource GhostPill}"
+                                            Content="&#x00D7;" Height="28" Padding="8,0" FontSize="15"
+                                            Command="{Binding DataContext.RemoveFilterCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
         </Border>
 
         <!-- Save / Cancel -->

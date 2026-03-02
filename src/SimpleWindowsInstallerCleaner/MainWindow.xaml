@@ -10,6 +10,9 @@
 
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding ScanCommand}"/>
+        <KeyBinding Modifiers="Alt" Key="M" Command="{Binding MoveAllCommand}"/>
+        <KeyBinding Modifiers="Alt" Key="D" Command="{Binding DeleteAllCommand}"/>
+        <KeyBinding Modifiers="Alt" Key="B" Command="{Binding BrowseDestinationCommand}"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -190,7 +193,14 @@
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     Content="About" Command="{Binding ShowAboutCommand}" Margin="8,0,0,0"/>
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
-                    Content="GitHub" Command="{Binding OpenGitHubCommand}"/>
+                    Command="{Binding DonateCommand}"
+                    Padding="6,0" Height="28">
+                <Image Source="Assets/kofi-cup.png" Width="18" Height="18"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                <Button.ToolTip>
+                    <ToolTip Style="{StaticResource WarningTooltip}" Content="Buy me a cuppa"/>
+                </Button.ToolTip>
+            </Button>
         </DockPanel>
 
         <!-- ── Scanning overlay ──────────────────────────────────── -->
@@ -263,6 +273,23 @@
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="0,0,0,24"/>
 
+                    <!-- Error details (only visible when there are errors) -->
+                    <TextBlock Text="{Binding CompletionErrors}"
+                               Foreground="#f59e0b" FontSize="11"
+                               TextWrapping="Wrap" Margin="0,0,0,24"
+                               MaxHeight="80">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CompletionErrors}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
                     <!-- Close button -->
                     <Button Style="{StaticResource AccentPill}"
                             Content="Close" Command="{Binding CloseAppCommand}"
@@ -274,6 +301,7 @@
                             Content="Run again" Command="{Binding DismissCompletionCommand}"
                             HorizontalAlignment="Center"
                             Height="28" Padding="16,0" FontSize="12"/>
+
                 </StackPanel>
             </Border>
         </Grid>

@@ -36,7 +36,7 @@
 
             <TextBlock Grid.Row="0" Text="InstallerClean"
                        Foreground="#f8fafc" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap"/>
-            <TextBlock Grid.Row="2" Text="Version 1.0.0"
+            <TextBlock Grid.Row="2" x:Name="VersionText"
                        Foreground="#cbd5e1" FontSize="12"/>
             <TextBlock Grid.Row="4" Foreground="#94a3b8" FontSize="12">
                 <Hyperlink NavigateUri="https://github.com/no-faff/windows-installer-cleaner/blob/main/LICENSE"

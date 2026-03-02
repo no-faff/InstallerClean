@@ -311,20 +311,18 @@
                 </Style.Triggers>
             </Style>
 
-            <!-- Warning tooltip (Upscayl-style, indigo background) -->
+            <!-- Tooltip (Upscayl-style: indigo bg, slight rounding) -->
             <Style x:Key="WarningTooltip" TargetType="ToolTip">
-                <Setter Property="Background" Value="#4f46e5"/>
-                <Setter Property="Foreground" Value="#f8fafc"/>
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="Padding" Value="12,8"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="MaxWidth" Value="280"/>
-                <Setter Property="Placement" Value="Left"/>
+                <Setter Property="Placement" Value="Top"/>
                 <Setter Property="HasDropShadow" Value="False"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ToolTip">
-                            <Border Background="#4f46e5" CornerRadius="8"
-                                    Padding="{TemplateBinding Padding}">
+                            <Border Background="#4f46e5" CornerRadius="4"
+                                    Padding="10,6">
                                 <TextBlock Text="{TemplateBinding Content}"
                                            Foreground="#f8fafc" FontSize="12"
                                            TextWrapping="Wrap"/>

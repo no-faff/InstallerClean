@@ -58,7 +58,7 @@
 
             <!-- Version (bottom right, overlaid) -->
             <TextBlock Grid.Row="8"
-                       Text="Version 1.0.0"
+                       x:Name="VersionText"
                        Foreground="#64748b"
                        FontSize="11"
                        HorizontalAlignment="Right"

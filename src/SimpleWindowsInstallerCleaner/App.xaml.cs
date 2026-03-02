@@ -32,9 +32,10 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             MessageBox.Show(
-                $"An unexpected error occurred:\n\n{args.Exception.Message}",
+                $"An unexpected error occurred and InstallerClean needs to close.\n\n{args.Exception.Message}",
                 "InstallerClean", MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
+            Shutdown(1);
         };
 
         // Force dark titlebar and app icon on all windows
@@ -94,22 +95,6 @@ public partial class App : Application
             Application.Current.MainWindow = window;
             window.Show();
             splash.Close();
-
-            // Offer Start Menu shortcut on first launch
-            var settings = settingsService.Load();
-            if (!settings.ShortcutOffered)
-            {
-                settings.ShortcutOffered = true;
-                settingsService.Save(settings);
-
-                var shortcutDialog = new ShortcutOfferWindow { Owner = window };
-                if (shortcutDialog.ShowDialog() == true)
-                {
-                    Services.ShortcutService.CreateStartMenuShortcut();
-                    if (shortcutDialog.CreateDesktopShortcut)
-                        Services.ShortcutService.CreateDesktopShortcut();
-                }
-            }
         }
         catch (UnauthorizedAccessException)
         {
