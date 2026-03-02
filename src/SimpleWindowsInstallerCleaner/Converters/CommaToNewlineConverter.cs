@@ -8,7 +8,7 @@ public class CommaToNewlineConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is string s && !string.IsNullOrEmpty(s))
-            return s.Replace(", ", "\n");
+            return string.Join("\n", s.Split(',').Select(p => p.Trim()));
 
         return value ?? string.Empty;
     }

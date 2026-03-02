@@ -17,6 +17,8 @@ public partial class SettingsViewModel : ObservableObject
 
     public event Action<bool?>? CloseRequested;
 
+    public bool HasNoFilters => Filters.Count == 0;
+
     public SettingsViewModel(AppSettings currentSettings, ISettingsService settingsService)
     {
         _settingsService = settingsService;
@@ -24,6 +26,7 @@ public partial class SettingsViewModel : ObservableObject
         foreach (var filter in currentSettings.ExclusionFilters)
             Filters.Add(filter);
 
+        Filters.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasNoFilters));
     }
 
     [RelayCommand]

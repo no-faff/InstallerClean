@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media.Animation;
 
@@ -8,6 +9,8 @@ public partial class SplashWindow : Window
     public SplashWindow()
     {
         InitializeComponent();
+        var version = Assembly.GetExecutingAssembly().GetName().Version;
+        VersionText.Text = version is not null ? $"Version {version.Major}.{version.Minor}.{version.Build}" : string.Empty;
     }
 
     public void UpdateStep(string message, double progressPercent)

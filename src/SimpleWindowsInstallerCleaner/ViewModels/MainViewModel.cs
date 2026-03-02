@@ -64,6 +64,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _completionHeading = string.Empty;
     [ObservableProperty] private string _completionSummary = string.Empty;
     [ObservableProperty] private string _completionRestore = string.Empty;
+    [ObservableProperty] private string _completionErrors = string.Empty;
 
     private ScanResult? _lastScanResult;
     private FilteredResult? _lastFilteredResult;
@@ -158,6 +159,16 @@ public partial class MainViewModel : ObservableObject
 
             sw.Stop();
             ScanProgress = $"Scan complete ({sw.Elapsed.TotalSeconds:F1}s)";
+
+            // Show "all clear" when no orphaned files and not mid-operation
+            if (OrphanedFileCount == 0 && !IsOperating)
+            {
+                CompletionHeading = "All clear";
+                CompletionSummary = "No orphaned files found in C:\\Windows\\Installer";
+                CompletionRestore = "Nothing to clean up. You're all good.";
+                CompletionErrors = string.Empty;
+                IsComplete = true;
+            }
         }
         catch (UnauthorizedAccessException)
         {
@@ -268,6 +279,9 @@ public partial class MainViewModel : ObservableObject
                 ? $"{movedCount} {movedLabel} ({movedSize}) moved to {movedDest}"
                 : $"{movedCount} {movedLabel} ({movedSize}) moved. {errorCount} {DisplayHelpers.Pluralise(errorCount, "error", "errors")}.";
             CompletionRestore = $"If anything stops working, copy them back from {movedDest}";
+            CompletionErrors = errorCount > 0
+                ? string.Join("\n", result.Errors.Select(e => $"{Path.GetFileName(e.FilePath)}: {e.Message}"))
+                : string.Empty;
             IsComplete = true;
         }
         catch (OperationCanceledException)
@@ -333,6 +347,9 @@ public partial class MainViewModel : ObservableObject
                 ? $"{deletedCount} {deletedLabel} ({deletedSize}) sent to Recycle Bin"
                 : $"{deletedCount} {deletedLabel} ({deletedSize}) deleted. {errorCount} {DisplayHelpers.Pluralise(errorCount, "error", "errors")}.";
             CompletionRestore = "Files are in your Recycle Bin if you need them back";
+            CompletionErrors = errorCount > 0
+                ? string.Join("\n", result.Errors.Select(e => $"{Path.GetFileName(e.FilePath)}: {e.Message}"))
+                : string.Empty;
             IsComplete = true;
         }
         catch (OperationCanceledException)
@@ -427,11 +444,11 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void OpenGitHub()
+    private void Donate()
     {
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
         {
-            FileName = "https://github.com/no-faff/windows-installer-cleaner",
+            FileName = "https://ko-fi.com/nofaff",
             UseShellExecute = true
         });
     }
@@ -442,12 +459,22 @@ public partial class MainViewModel : ObservableObject
         await RunScanCoreAsync(progress);
         sw.Stop();
         ScanProgress = $"Scan complete ({sw.Elapsed.TotalSeconds:F1}s)";
+
+        if (OrphanedFileCount == 0)
+        {
+            CompletionHeading = "All clear";
+            CompletionSummary = "No orphaned files found in C:\\Windows\\Installer";
+            CompletionRestore = "Nothing to clean up. You're all good.";
+            CompletionErrors = string.Empty;
+            IsComplete = true;
+        }
     }
 
     [RelayCommand]
     private void DismissCompletion()
     {
         IsComplete = false;
+        CompletionErrors = string.Empty;
     }
 
     [RelayCommand]
