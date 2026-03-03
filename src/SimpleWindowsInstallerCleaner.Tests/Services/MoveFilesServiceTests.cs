@@ -1,5 +1,6 @@
 using SimpleWindowsInstallerCleaner.Models;
 using SimpleWindowsInstallerCleaner.Services;
+using SimpleWindowsInstallerCleaner.Tests.Helpers;
 
 namespace SimpleWindowsInstallerCleaner.Tests.Services;
 
@@ -84,10 +85,4 @@ public class MoveFilesServiceTests : IDisposable
         if (Directory.Exists(_destDir)) Directory.Delete(_destDir, recursive: true);
     }
 
-    private sealed class SyncProgress<T> : IProgress<T>
-    {
-        private readonly Action<T> _handler;
-        public SyncProgress(Action<T> handler) => _handler = handler;
-        public void Report(T value) => _handler(value);
-    }
 }

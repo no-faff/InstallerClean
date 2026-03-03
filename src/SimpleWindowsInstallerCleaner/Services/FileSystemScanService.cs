@@ -6,9 +6,6 @@ namespace SimpleWindowsInstallerCleaner.Services;
 
 public sealed class FileSystemScanService : IFileSystemScanService
 {
-    private static readonly string InstallerFolder =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer");
-
     private readonly IInstallerQueryService _queryService;
     private readonly IEnumerable<string>? _overrideFiles;
 
@@ -97,10 +94,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
     private static IEnumerable<string> GetInstallerFiles()
     {
-        if (!Directory.Exists(InstallerFolder))
+        if (!Directory.Exists(InstallerCacheHelpers.InstallerFolder))
             return Enumerable.Empty<string>();
 
-        return Directory.EnumerateFiles(InstallerFolder, "*.msi", SearchOption.AllDirectories)
-            .Concat(Directory.EnumerateFiles(InstallerFolder, "*.msp", SearchOption.AllDirectories));
+        return Directory.EnumerateFiles(InstallerCacheHelpers.InstallerFolder, "*.msi", SearchOption.AllDirectories)
+            .Concat(Directory.EnumerateFiles(InstallerCacheHelpers.InstallerFolder, "*.msp", SearchOption.AllDirectories));
     }
 }

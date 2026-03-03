@@ -102,7 +102,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         progress?.Report("Checking registry for additional packages...");
         try
         {
-            var udKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+            using var udKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData");
             if (udKey is not null)
             {
@@ -111,12 +111,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     ct.ThrowIfCancellationRequested();
 
                     // Products
-                    var productsKey = udKey.OpenSubKey($@"{sidName}\Products");
+                    using var productsKey = udKey.OpenSubKey($@"{sidName}\Products");
                     if (productsKey is not null)
                     {
                         foreach (var prodGuid in productsKey.GetSubKeyNames())
                         {
-                            var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
+                            using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
                             var localPkg = ipKey?.GetValue("LocalPackage") as string;
                             if (!string.IsNullOrEmpty(localPkg))
                                 claimed.TryAdd(localPkg, new RegisteredPackage(localPkg, "", ""));
@@ -124,12 +124,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     }
 
                     // Patches
-                    var patchesKey = udKey.OpenSubKey($@"{sidName}\Patches");
+                    using var patchesKey = udKey.OpenSubKey($@"{sidName}\Patches");
                     if (patchesKey is not null)
                     {
                         foreach (var patchGuid in patchesKey.GetSubKeyNames())
                         {
-                            var patchKey = patchesKey.OpenSubKey(patchGuid);
+                            using var patchKey = patchesKey.OpenSubKey(patchGuid);
                             var localPkg = patchKey?.GetValue("LocalPackage") as string;
                             if (!string.IsNullOrEmpty(localPkg))
                                 claimed.TryAdd(localPkg, new RegisteredPackage(localPkg, "", ""));
@@ -138,7 +138,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 }
             }
         }
-        catch { /* registry fallback is best-effort */ }
+        catch (Exception) { /* registry fallback is best-effort */ }
 
         progress?.Report($"Scan complete. {claimed.Count} registered package(s) found.");
 

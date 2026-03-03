@@ -56,13 +56,21 @@ public partial class OrphanedFilesViewModel : ObservableObject
             return;
         }
 
-        var info = await Task.Run(() => _infoService.GetSummaryInfo(value.FullPath));
-
-        // Selection may have changed while we were reading
-        if (SelectedFile == value)
+        try
         {
-            _cache[value.FullPath] = info;
-            SelectedDetails = info;
+            var info = await Task.Run(() => _infoService.GetSummaryInfo(value.FullPath));
+
+            // Selection may have changed while we were reading
+            if (SelectedFile == value)
+            {
+                _cache[value.FullPath] = info;
+                SelectedDetails = info;
+            }
+        }
+        catch
+        {
+            if (SelectedFile == value)
+                SelectedDetails = null;
         }
     }
 

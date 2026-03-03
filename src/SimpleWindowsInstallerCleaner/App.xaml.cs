@@ -38,6 +38,21 @@ public partial class App : Application
             Shutdown(1);
         };
 
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            if (args.ExceptionObject is Exception ex)
+            {
+                MessageBox.Show(
+                    $"An unexpected error occurred and InstallerClean needs to close.\n\n{ex.Message}",
+                    "InstallerClean", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        };
+
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            args.SetObserved();
+        };
+
         SplashWindow? splash = null;
         try
         {
@@ -122,6 +137,8 @@ public partial class App : Application
         var arg = args[0].ToLowerInvariant();
         if (arg is not "/d" and not "/m" and not "--help" and not "/?" and not "-h")
         {
+            Console.WriteLine($"Unknown argument: {args[0]}");
+            Console.WriteLine();
             Console.WriteLine("InstallerClean — clean up C:\\Windows\\Installer");
             Console.WriteLine();
             Console.WriteLine("Usage:");
@@ -130,7 +147,7 @@ public partial class App : Application
             Console.WriteLine("  InstallerClean.exe /m       Move to saved default location");
             Console.WriteLine("  InstallerClean.exe /m PATH  Move to specified path");
             Console.WriteLine();
-            Shutdown();
+            Shutdown(1);
             return;
         }
 

@@ -192,8 +192,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private static readonly string InstallerFolder =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer");
+    private static string InstallerFolder => InstallerCacheHelpers.InstallerFolder;
 
     [RelayCommand]
     private void CancelOperation()
@@ -232,9 +231,10 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var filePaths = _lastScanResult.RemovableFiles.Select(f => f.FullPath).ToList();
+        var removableFiles = _lastScanResult.RemovableFiles;
+        var filePaths = removableFiles.Select(f => f.FullPath).ToList();
         var count = filePaths.Count;
-        var totalBytes = _lastScanResult.RemovableFiles.Sum(f => f.SizeBytes);
+        var totalBytes = removableFiles.Sum(f => f.SizeBytes);
         var sizeDisplay = OrphanedSizeDisplay;
 
         // Check free space
@@ -270,15 +270,23 @@ public partial class MainViewModel : ObservableObject
                 OperationProgress = $"{p.CurrentFile} of {p.TotalFiles} files";
             });
             var result = await _moveService.MoveFilesAsync(filePaths, MoveDestination, progress, _operationCts.Token);
-            var movedSize = sizeDisplay;
             var movedCount = result.MovedCount;
             var movedDest = MoveDestination;
             var errorCount = result.Errors.Count;
 
+            long movedBytes;
+            if (errorCount == 0)
+                movedBytes = totalBytes;
+            else
+            {
+                var errorPaths = new HashSet<string>(result.Errors.Select(e => e.FilePath), StringComparer.OrdinalIgnoreCase);
+                movedBytes = removableFiles.Where(f => !errorPaths.Contains(f.FullPath)).Sum(f => f.SizeBytes);
+            }
+
             await ScanAsync();
 
             // Show completion screen
-            CompletionHeading = $"{movedSize} cleared";
+            CompletionHeading = $"{DisplayHelpers.FormatSize(movedBytes)} cleared";
             var movedLabel = DisplayHelpers.Pluralise(movedCount, "file", "files");
             CompletionSummary = errorCount == 0
                 ? $"{movedCount} {movedLabel} moved to {movedDest}"
@@ -313,9 +321,10 @@ public partial class MainViewModel : ObservableObject
     {
         if (_lastScanResult is null) return;
 
-        var count = _lastScanResult.RemovableFiles.Count;
+        var removableFiles = _lastScanResult.RemovableFiles;
+        var count = removableFiles.Count;
+        var totalBytes = removableFiles.Sum(f => f.SizeBytes);
         var sizeDisplay = OrphanedSizeDisplay;
-        var totalBytes = _lastScanResult.RemovableFiles.Sum(f => f.SizeBytes);
 
         var dialog = new ConfirmDeleteWindow(count, sizeDisplay, totalBytes)
         {
@@ -325,7 +334,7 @@ public partial class MainViewModel : ObservableObject
 
         IsOperating = true;
         _operationCts = new CancellationTokenSource();
-        var filePaths = _lastScanResult.RemovableFiles.Select(f => f.FullPath).ToList();
+        var filePaths = removableFiles.Select(f => f.FullPath).ToList();
         OperationProgress = $"Deleting {filePaths.Count} {DisplayHelpers.Pluralise(filePaths.Count, "file", "files")}...";
 
         try
@@ -339,14 +348,22 @@ public partial class MainViewModel : ObservableObject
                 OperationProgress = $"{p.CurrentFile} of {p.TotalFiles} files";
             });
             var result = await _deleteService.DeleteFilesAsync(filePaths, progress, _operationCts.Token);
-            var deletedSize = sizeDisplay;
             var deletedCount = result.DeletedCount;
             var errorCount = result.Errors.Count;
+
+            long deletedBytes;
+            if (errorCount == 0)
+                deletedBytes = totalBytes;
+            else
+            {
+                var errorPaths = new HashSet<string>(result.Errors.Select(e => e.FilePath), StringComparer.OrdinalIgnoreCase);
+                deletedBytes = removableFiles.Where(f => !errorPaths.Contains(f.FullPath)).Sum(f => f.SizeBytes);
+            }
 
             await ScanAsync();
 
             // Show completion screen
-            CompletionHeading = $"{deletedSize} cleared";
+            CompletionHeading = $"{DisplayHelpers.FormatSize(deletedBytes)} cleared";
             var deletedLabel = DisplayHelpers.Pluralise(deletedCount, "file", "files");
             CompletionSummary = errorCount == 0
                 ? $"{deletedCount} {deletedLabel} sent to Recycle Bin"

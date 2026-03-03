@@ -1,7 +1,15 @@
+using System.Reflection;
+
 namespace SimpleWindowsInstallerCleaner.Helpers;
 
 internal static class DisplayHelpers
 {
+    internal static string GetVersionString()
+    {
+        var version = Assembly.GetExecutingAssembly().GetName().Version;
+        return version is not null ? $"Version {version.Major}.{version.Minor}.{version.Build}" : string.Empty;
+    }
+
     internal static string FormatSize(long bytes) => bytes switch
     {
         >= 1_073_741_824 => $"{bytes / 1_073_741_824.0:F2} GB",
