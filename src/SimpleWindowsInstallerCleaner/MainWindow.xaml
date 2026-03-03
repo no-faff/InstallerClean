@@ -42,13 +42,15 @@
                 <TextBlock TextWrapping="Wrap" Foreground="#94a3b8" FontSize="12" Margin="0,0,0,16"
                            Text="C:\Windows\Installer contains cached files used by Windows to repair and update software. Orphaned files are no longer needed by any installed product. Superseded patches have been replaced by newer updates. Both are safe to move or delete to free up space."/>
 
-                <!-- Pending reboot warning -->
-                <TextBlock Margin="0,0,0,18"
-                           Visibility="{Binding HasPendingReboot, Converter={StaticResource BoolToVis}}">
-                    <Run Text="&#x26A0;" Foreground="#f59e0b"/>
-                    <Run Text=" Windows has pending updates. Restart before moving or deleting files."
-                         Foreground="#cbd5e1"/>
-                </TextBlock>
+                <!-- Pending reboot warning (Phosphor fill, tweaked !) -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,18"
+                            Visibility="{Binding HasPendingReboot, Converter={StaticResource BoolToVis}}">
+                    <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
+                          Fill="#f59e0b" Width="16" Height="16" Stretch="Uniform"
+                          VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBlock Text="Windows has pending updates. Restart before moving or deleting files."
+                               Foreground="#cbd5e1" VerticalAlignment="Center"/>
+                </StackPanel>
 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -176,7 +178,7 @@
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     Content="Re-scan" Command="{Binding RefreshCommand}"/>
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
-                    Content="About" Command="{Binding ShowAboutCommand}" Margin="8,0,0,0"/>
+                    Content="About" Command="{Binding ShowAboutCommand}" Margin="12,0,0,0"/>
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
                     Command="{Binding DonateCommand}"
                     ToolTipService.InitialShowDelay="0"
@@ -190,7 +192,7 @@
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
                     Command="{Binding StarOnGitHubCommand}"
                     ToolTipService.InitialShowDelay="0"
-                    Padding="6,0" Height="28" Margin="0,0,4,0">
+                    Padding="6,0" Height="28" Margin="0,0,12,0">
                 <Path Data="m12.672.668 3.059 6.197 6.838.993a.75.75 0 0 1 .416 1.28l-4.948 4.823 1.168 6.812a.75.75 0 0 1-1.088.79L12 18.347l-6.116 3.216a.75.75 0 0 1-1.088-.791l1.168-6.811-4.948-4.823a.749.749 0 0 1 .416-1.279l6.838-.994L11.327.668a.75.75 0 0 1 1.345 0Z"
                       Fill="#f59e0b" Width="18" Height="18" Stretch="Uniform"/>
                 <Button.ToolTip>

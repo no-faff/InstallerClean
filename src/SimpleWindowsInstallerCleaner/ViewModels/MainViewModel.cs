@@ -278,12 +278,12 @@ public partial class MainViewModel : ObservableObject
             await ScanAsync();
 
             // Show completion screen
-            CompletionHeading = "All done";
+            CompletionHeading = $"{movedSize} cleared";
             var movedLabel = DisplayHelpers.Pluralise(movedCount, "file", "files");
             CompletionSummary = errorCount == 0
-                ? $"{movedCount} {movedLabel} ({movedSize}) moved to {movedDest}"
-                : $"{movedCount} {movedLabel} ({movedSize}) moved. {errorCount} {DisplayHelpers.Pluralise(errorCount, "error", "errors")}.";
-            CompletionRestore = $"If anything stops working, copy them back from {movedDest}";
+                ? $"{movedCount} {movedLabel} moved to {movedDest}"
+                : $"{movedCount} {movedLabel} moved to {movedDest}. {errorCount} {DisplayHelpers.Pluralise(errorCount, "error", "errors")}.";
+            CompletionRestore = "Copy them back if anything stops working";
             CompletionErrors = errorCount > 0
                 ? string.Join("\n", result.Errors.Select(e => $"{Path.GetFileName(e.FilePath)}: {e.Message}"))
                 : string.Empty;
@@ -346,11 +346,11 @@ public partial class MainViewModel : ObservableObject
             await ScanAsync();
 
             // Show completion screen
-            CompletionHeading = "All done";
+            CompletionHeading = $"{deletedSize} cleared";
             var deletedLabel = DisplayHelpers.Pluralise(deletedCount, "file", "files");
             CompletionSummary = errorCount == 0
-                ? $"{deletedCount} {deletedLabel} ({deletedSize}) sent to Recycle Bin"
-                : $"{deletedCount} {deletedLabel} ({deletedSize}) deleted. {errorCount} {DisplayHelpers.Pluralise(errorCount, "error", "errors")}.";
+                ? $"{deletedCount} {deletedLabel} sent to Recycle Bin"
+                : $"{deletedCount} {deletedLabel} deleted. {errorCount} {DisplayHelpers.Pluralise(errorCount, "error", "errors")}.";
             CompletionRestore = "Files are in your Recycle Bin if you need them back";
             CompletionErrors = errorCount > 0
                 ? string.Join("\n", result.Errors.Select(e => $"{Path.GetFileName(e.FilePath)}: {e.Message}"))
