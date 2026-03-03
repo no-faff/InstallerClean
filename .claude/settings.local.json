@@ -48,7 +48,9 @@
       "WebFetch(domain:gist.github.com)",
       "WebFetch(domain:www.mcbsys.com)",
       "WebFetch(domain:yomotherboard.com)",
-      "WebFetch(domain:www.adobe.com)"
+      "WebFetch(domain:www.adobe.com)",
+      "WebFetch(domain:lucide.dev)",
+      "WebFetch(domain:heroicons.com)"
     ]
   }
 }
