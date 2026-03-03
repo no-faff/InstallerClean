@@ -141,7 +141,7 @@ public partial class MainViewModel : ObservableObject
             {
                 CompletionHeading = "All clear";
                 CompletionSummary = "Nothing to clean up in C:\\Windows\\Installer";
-                CompletionRestore = "Nothing to clean up. You're all good.";
+                CompletionRestore = string.Empty;
                 CompletionErrors = string.Empty;
                 IsComplete = true;
             }
@@ -351,7 +351,7 @@ public partial class MainViewModel : ObservableObject
             CompletionSummary = errorCount == 0
                 ? $"{deletedCount} {deletedLabel} sent to Recycle Bin"
                 : $"{deletedCount} {deletedLabel} deleted. {errorCount} {DisplayHelpers.Pluralise(errorCount, "error", "errors")}.";
-            CompletionRestore = "Files are in your Recycle Bin if you need them back";
+            CompletionRestore = "Restore them if anything stops working";
             CompletionErrors = errorCount > 0
                 ? string.Join("\n", result.Errors.Select(e => $"{Path.GetFileName(e.FilePath)}: {e.Message}"))
                 : string.Empty;
@@ -450,7 +450,7 @@ public partial class MainViewModel : ObservableObject
         {
             CompletionHeading = "All clear";
             CompletionSummary = "Nothing to clean up in C:\\Windows\\Installer";
-            CompletionRestore = "Nothing to clean up. You're all good.";
+            CompletionRestore = string.Empty;
             CompletionErrors = string.Empty;
             IsComplete = true;
         }
