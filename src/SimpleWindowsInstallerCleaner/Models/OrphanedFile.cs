@@ -1,4 +1,5 @@
 using System.IO;
+using SimpleWindowsInstallerCleaner.Helpers;
 
 namespace SimpleWindowsInstallerCleaner.Models;
 
@@ -20,13 +21,7 @@ public record OrphanedFile(
     public string FileName => Path.GetFileName(FullPath);
 
     /// <summary>Human-readable file size (e.g. "14.2 MB").</summary>
-    public string SizeDisplay => SizeBytes switch
-    {
-        >= 1_073_741_824 => $"{SizeBytes / 1_073_741_824.0:F1} GB",
-        >= 1_048_576 => $"{SizeBytes / 1_048_576.0:F1} MB",
-        >= 1_024 => $"{SizeBytes / 1_024.0:F1} KB",
-        _ => $"{SizeBytes} B"
-    };
+    public string SizeDisplay => DisplayHelpers.FormatSize(SizeBytes);
 
     /// <summary>File type label: ".msp" for patches, ".msi" for installer packages.</summary>
     public string TypeLabel => IsPatch ? ".msp" : ".msi";

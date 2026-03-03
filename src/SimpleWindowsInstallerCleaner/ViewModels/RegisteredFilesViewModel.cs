@@ -108,13 +108,21 @@ public partial class RegisteredFilesViewModel : ObservableObject
             return;
         }
 
-        var info = await Task.Run(() => _infoService.GetSummaryInfo(value.FullPath));
-
-        // Selection may have changed while we were reading
-        if (SelectedProduct == value)
+        try
         {
-            _cache[value.FullPath] = info;
-            SelectedDetails = info;
+            var info = await Task.Run(() => _infoService.GetSummaryInfo(value.FullPath));
+
+            // Selection may have changed while we were reading
+            if (SelectedProduct == value)
+            {
+                _cache[value.FullPath] = info;
+                SelectedDetails = info;
+            }
+        }
+        catch
+        {
+            if (SelectedProduct == value)
+                SelectedDetails = null;
         }
     }
 

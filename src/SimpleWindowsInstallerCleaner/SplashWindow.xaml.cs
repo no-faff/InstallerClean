@@ -1,6 +1,6 @@
-using System.Reflection;
 using System.Windows;
 using System.Windows.Media.Animation;
+using SimpleWindowsInstallerCleaner.Helpers;
 
 namespace SimpleWindowsInstallerCleaner;
 
@@ -9,8 +9,7 @@ public partial class SplashWindow : Window
     public SplashWindow()
     {
         InitializeComponent();
-        var version = Assembly.GetExecutingAssembly().GetName().Version;
-        VersionText.Text = version is not null ? $"Version {version.Major}.{version.Minor}.{version.Build}" : string.Empty;
+        VersionText.Text = DisplayHelpers.GetVersionString();
     }
 
     public void UpdateStep(string message, double progressPercent)
@@ -35,5 +34,4 @@ public partial class SplashWindow : Window
         SplashProgressBorder.BeginAnimation(WidthProperty, animation);
     }
 
-    public void UpdateStep(string message) => UpdateStep(message, 0);
 }

@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using System.Reflection;
 using System.Windows;
+using SimpleWindowsInstallerCleaner.Helpers;
 
 namespace SimpleWindowsInstallerCleaner;
 
@@ -9,8 +9,7 @@ public partial class AboutWindow : Window
     public AboutWindow()
     {
         InitializeComponent();
-        var version = Assembly.GetExecutingAssembly().GetName().Version;
-        VersionText.Text = version is not null ? $"Version {version.Major}.{version.Minor}.{version.Build}" : string.Empty;
+        VersionText.Text = DisplayHelpers.GetVersionString();
     }
 
     private void Hyperlink_Click(object sender, RoutedEventArgs e)

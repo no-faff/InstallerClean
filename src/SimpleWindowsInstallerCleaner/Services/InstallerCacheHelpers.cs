@@ -2,7 +2,7 @@ namespace SimpleWindowsInstallerCleaner.Services;
 
 internal static class InstallerCacheHelpers
 {
-    private static readonly string InstallerFolder =
+    internal static readonly string InstallerFolder =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer");
 
     /// <summary>

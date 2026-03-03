@@ -21,8 +21,9 @@
             BorderBrush="#334155" BorderThickness="1">
         <StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                <TextBlock Text="&#x26A0;" Foreground="#f59e0b" FontSize="18"
-                           VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
+                      Fill="#f59e0b" Width="16" Height="16" Stretch="Uniform"
+                      VerticalAlignment="Center" Margin="0,0,10,0"/>
                 <TextBlock x:Name="MessageText" Foreground="#f8fafc" FontSize="14"
                            TextWrapping="Wrap" VerticalAlignment="Center"/>
             </StackPanel>
