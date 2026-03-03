@@ -27,6 +27,12 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private int _orphanedFileCount;
     [ObservableProperty] private string _orphanedSizeDisplay = string.Empty;
 
+    public string RegisteredSummaryText =>
+        $"{RegisteredFileCount} {DisplayHelpers.Pluralise(RegisteredFileCount, "file", "files")} still used";
+
+    public string OrphanedSummaryText =>
+        $"{OrphanedFileCount} {DisplayHelpers.Pluralise(OrphanedFileCount, "file", "files")} to clean up";
+
     // Pending reboot
     [ObservableProperty] private bool _hasPendingReboot;
 
@@ -87,10 +93,16 @@ public partial class MainViewModel : ObservableObject
         DeleteAllCommand.NotifyCanExecuteChanged();
     }
 
+    partial void OnRegisteredFileCountChanged(int value)
+    {
+        OnPropertyChanged(nameof(RegisteredSummaryText));
+    }
+
     partial void OnOrphanedFileCountChanged(int value)
     {
         MoveAllCommand.NotifyCanExecuteChanged();
         DeleteAllCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(OrphanedSummaryText));
     }
 
     partial void OnMoveDestinationChanged(string value)
