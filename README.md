@@ -2,7 +2,7 @@
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![Windows 10/11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg)](https://github.com/no-faff/InstallerClean/releases)
 [![VirusTotal](https://img.shields.io/badge/VirusTotal-1%2F70-brightgreen.svg)](https://www.virustotal.com/gui/file/1071868cec10bbc10556c618d037e0b240a383dd20ef6a96f7c867a6b771ac26)
-<!-- [![GitHub Release](https://img.shields.io/github/v/release/no-faff/InstallerClean)](https://github.com/no-faff/InstallerClean/releases/latest) -->
+[![GitHub Release](https://img.shields.io/github/v/release/no-faff/InstallerClean)](https://github.com/no-faff/InstallerClean/releases/latest)
 
 # InstallerClean
 
