@@ -10,10 +10,10 @@
 
 ![Screenshot of InstallerClean](docs/screenshot.png)
 
-> **What:** Finds and removes unneeded files from `C:\Windows\Installer`, the hidden folder Windows never cleans up.<br>
-> **How much space:** People report finding 20-50 GB; with Adobe Acrobat it can pass 100 GB.<br>
-> **Is it safe:** Only removes files Windows itself says it no longer needs. Delete sends to Recycle Bin. Move lets you keep them somewhere safe.<br>
-> **Get it:** [Download the latest release](../../releases), run it, done.
+- **What:** Finds and removes unneeded files from `C:\Windows\Installer`, the hidden folder Windows never cleans up.
+- **How much space:** People report finding 20-50 GB; with Adobe Acrobat it can pass 100 GB.
+- **Is it safe:** Only removes files Windows itself says it no longer needs. Delete sends to Recycle Bin. Move lets you keep them somewhere safe.
+- **Get it:** [Download the latest release](../../releases), run it, done.
 
 ---
 
