@@ -13,7 +13,7 @@
 - **What:** Finds and removes unneeded files from `C:\Windows\Installer`, the hidden folder Windows never cleans up.
 - **How much space:** Depends on your software. People report 20-50 GB; with Adobe Acrobat it can pass 100 GB.
 - **Is it safe:** Yes. Only removes files Windows itself says it no longer needs. Delete sends to Recycle Bin. Move lets you keep them somewhere safe.
-- **Get it:** [Download the latest release](../../releases), run it, done.
+- **Get it:** [Download the latest release](../../releases/latest), run it, done.
 
 ---
 
@@ -68,7 +68,7 @@ This is something PatchCleaner can't do. PatchCleaner excludes Adobe by default 
 
 ## Is it safe?
 
-We query the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, we trust it. We don't guess based on filenames or dates.
+Yes. We query the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, we trust it. We don't guess based on filenames or dates.
 
 - **Delete** sends files to the Recycle Bin, so you can restore them if needed
 - **Move** copies files to a location you choose first, if you'd rather be cautious
@@ -80,7 +80,7 @@ We query the same database Windows itself uses to track what's installed. If Win
 
 ## Getting started
 
-1. Download the latest release from the [releases page](../../releases)
+1. Download the latest release from the [releases page](../../releases/latest)
 2. Run the exe. Windows will prompt for administrator access
 3. The app scans automatically on startup
 4. Review the results, then click **Delete** or **Move**
@@ -89,7 +89,7 @@ We query the same database Windows itself uses to track what's installed. If Win
 
 ## Compared to PatchCleaner
 
-PatchCleaner served the community well for a decade. InstallerClean picks up where it left off.
+PatchCleaner has served the community well, and it still works. But ten years on from its last release, InstallerClean picks up where it left off.
 
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
@@ -169,7 +169,7 @@ dotnet test src/SimpleWindowsInstallerCleaner.Tests/
 
 ## Contributing
 
-Found a bug or have a suggestion? [Open an issue](../../issues). Pull requests welcome. Please run the tests before submitting.
+Found a bug or have a suggestion? [Open an issue](../../issues) or start a [discussion](../../discussions). Pull requests welcome. Please run the tests before submitting.
 
 ## Part of the No Faff suite
 
