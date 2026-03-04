@@ -81,7 +81,7 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 ## Getting started
 
 1. Download **InstallerClean.exe** from the [releases page](../../releases/latest)
-2. Run it. Windows will prompt for administrator access
+2. Run it. Windows SmartScreen may say "Unknown publisher" — click **More info** then **Run anyway**. This is normal for any unsigned open source app. After that, Windows will prompt for administrator access
 3. The app scans automatically on startup
 4. Review the results, then click **Delete** or **Move**
 
