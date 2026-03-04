@@ -417,3 +417,22 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Internal docs — not for the public repo
+docs/README-files/
+docs/plans/
+docs/PatchCleaner-files/
+docs/PatchCleaner-screenshots/
+docs/Upscayl-screenshots/
+docs/splash-screen-stills/
+docs/dribble-windows-apps/
+docs/for-claude-(I-will-try-to-curate-this-folder)/
+docs/New folder/
+docs/project-brief.md
+docs/launch-strategy.md
+docs/status.md
+complete Upscayl styling breakdown with exact values.txt
+
+# Claude Code config
+.claude/
+CLAUDE.md
