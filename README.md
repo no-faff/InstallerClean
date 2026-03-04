@@ -85,7 +85,7 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 3. The app scans automatically on startup
 4. Review the results, then click **Delete** or **Move**
 
-> **Tip:** If Windows has pending updates, restart and install them first. A pending update might reference files that appear removable but aren't yet fully registered. The app will warn you if it detects this.
+> **Tip:** If Windows has pending updates, the app will warn you to restart and install them first. A pending update might reference files that appear removable but aren't yet fully registered.
 
 ## Compared to PatchCleaner
 
