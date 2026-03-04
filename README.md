@@ -6,41 +6,81 @@
 
 # InstallerClean
 
-Find and remove unneeded `.msi` and `.msp` files from `C:\Windows\Installer`.
+**Safely clean up `C:\Windows\Installer`, the hidden Windows folder that quietly eats your disk space.**
 
 ![Screenshot of InstallerClean](docs/screenshot.png)
 
+## The folder nobody tells you about
+
+There's a hidden folder on every Windows PC called `C:\Windows\Installer`. Every time you install software that uses the Windows Installer system, or apply a patch to Microsoft Office, Adobe Acrobat, Visual Studio or any other `.msi`-based application, a copy of that installer or `.msp` patch file goes into this folder. And stays there.
+
+When you uninstall the software, the files stay. When a newer patch replaces an older one, both stay. Windows never cleans them up. Disk Cleanup doesn't touch them. DISM is for a different folder entirely. Over the years, the folder grows: 10 GB, 30 GB, 50 GB. On machines with Adobe Acrobat, it can reach [well over 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
+
+These aren't temp files that get recreated the moment you close a cleaning tool. They're genuine dead weight: old installers from software you uninstalled years ago and patches that have been replaced three times over. Once they're gone, they don't come back.
+
+If you're looking for an easy way to free up disk space on Windows, this folder is one of the best places to start. InstallerClean finds the unneeded files and removes them safely.
+
+## The search for help
+
+If you've ever searched for help with this folder, you know how it goes. Someone asks how to clean it. They're told to run Disk Cleanup. They try it. It frees up [600 MB of a 180 GB folder](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb). The thread goes quiet.
+
+> *"All of the threads I've found tend to recommend the same things which don't solve the problem, and then go dead."*
+>
+> ksparks519, r/Windows10
+
+Or they're told not to touch it at all. In one thread, someone with a 60 GB Installer folder was told to ["don't mess with it."](https://www.reddit.com/r/techsupport/comments/1hw4suq/my_windows_installer_folder_is_like_60gb_so_i/) When they asked what they should do instead, the reply was: *"I just told you."*
+
+The standard advice confuses deleting files at random (which genuinely is dangerous) with removing files that Windows itself says it no longer needs (which isn't). InstallerClean does the latter.
+
+[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) was the answer for a long time, and it helped a lot of people. But it hasn't been updated since 2016, it's closed source, and it excludes Adobe files by default. On machines where Adobe is the biggest offender, that means PatchCleaner leaves the vast majority of removable files untouched:
+
+> *"I've downloaded Patchcleaner to delete the orphaned .msp files... 29 GB of the files are 'excluded by filters', so Patchcleaner doesn't seem to help."*
+>
+> HeatherBunny1111, [r/techsupport](https://www.reddit.com/r/techsupport/comments/1qc4tcf/how_to_delete_msp_files_safely/)
+
+InstallerClean handles Adobe patches properly by detecting which ones have been superseded by newer updates.
+
 ## What it does
 
-Windows caches every installer and patch it uses in `C:\Windows\Installer`. When you uninstall software or apply newer updates, the old files stay behind. Over time the folder grows, sometimes to tens or hundreds of gigabytes.
+1. **Scans** `C:\Windows\Installer` for `.msi` and `.msp` files
+2. **Queries** the Windows Installer API to find which files are still registered
+3. **Shows** what's needed and what's not, with sizes
+4. **Removes** the unneeded files: delete to the Recycle Bin, or move to a folder you choose
 
-InstallerClean scans the folder, asks the Windows Installer API which files are still needed, and lets you remove the ones that aren't. That's it.
+No wizards, no subscriptions, no account required.
 
-1. **Scan** `C:\Windows\Installer` for `.msi` and `.msp` files
-2. **Query** the Windows Installer API to find which files are still registered
-3. **Show** what's needed and what's not, with sizes
-4. **Remove** the unneeded files (delete or move to a location you choose)
+## How it knows what's safe to remove
 
-## Why it exists
+InstallerClean identifies two kinds of unneeded files:
 
-If you've ever found `C:\Windows\Installer` eating your disk space, you've probably been told to "just run Disk Cleanup" (doesn't touch this folder), "use DISM" (wrong tool, that's for the component store), or simply "don't touch it". None of that helps when your drive is full.
+**Orphaned files** are installers and patches left behind after you uninstall software. Windows no longer references them, but the files sit in the folder taking up space. These are safe to remove.
 
-[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) solved this problem for years, but it hasn't been updated since 3 March 2016. It relies on VBScript and WMI, it's closed source, and it occasionally gets flagged by antivirus software.
+**Superseded patches** are old `.msp` patches that have been replaced by newer ones. Windows marks them as superseded in its own database but never deletes them. This is especially common with Adobe Acrobat, which delivers roughly 1.1 GB patch files and accumulates superseded ones indefinitely. InstallerClean reads the patch state directly from the Windows Installer API and flags these as removable too.
 
-InstallerClean is a modern, open-source replacement. Same job, built for today.
+This is something PatchCleaner can't do. PatchCleaner excludes Adobe by default because Adobe patches appear registered even when they've been superseded. InstallerClean goes deeper: it checks whether a patch has actually been replaced, regardless of the manufacturer.
 
-<!-- TODO: Real-world examples section
-     Add sourced quotes from Reddit threads and Microsoft forum posts,
-     with links to the original threads and screenshots where available.
-     The user has bookmarked URLs to provide. -->
+## Is it safe?
 
-## How it identifies files
+We query the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, we trust it. We don't guess based on filenames or dates.
 
-**Orphaned files:** When you uninstall software, the `.msi` installer (and any `.msp` patches) often stays behind in `C:\Windows\Installer`. The Windows Installer API no longer references it, but the file remains. These are safe to remove.
+- **Delete** sends files to the Recycle Bin, so you can restore them if needed
+- **Move** copies files to a location you choose first, if you'd rather be cautious
+- Nothing is touched until you click Delete or Move and confirm
+- The app warns you if Windows has pending updates that could affect results
+- Every line of code is on GitHub. Read it, build it, audit it
 
-**Superseded patches:** When a newer patch replaces an older one, Windows marks the old patch as superseded in its own database but never deletes it. InstallerClean reads this status (the `State` property from `MsiGetPatchInfoEx`) and flags these as removable too. This is something PatchCleaner doesn't do. It's particularly useful for Adobe Acrobat, which delivers large patches and accumulates superseded ones over time. PatchCleaner excludes Adobe by default, so those files never get cleaned.
+<!-- - [VirusTotal scan](VIRUSTOTAL_URL): 0/70 detections. -->
 
-## Compared to other tools
+## Getting started
+
+1. Download the latest release from the [releases page](../../releases)
+2. Run the exe. Windows will prompt for administrator access
+3. The app scans automatically on startup
+4. Review the results, then click **Delete** or **Move**
+
+> **Tip:** If Windows has pending updates, restart and install them first. A pending update might reference files that appear removable but aren't yet fully registered.
+
+## Compared to PatchCleaner
 
 PatchCleaner served the community well for a decade. InstallerClean picks up where it left off.
 
@@ -48,7 +88,7 @@ PatchCleaner served the community well for a decade. InstallerClean picks up whe
 |---|---|---|
 | Last updated | 2026 (active) | 3 March 2016 |
 | Source code | Open source (MIT) | Closed source |
-| Runtime | .NET 8 | .NET + VBScript |
+| Runtime | .NET 8 (self-contained) | .NET + VBScript |
 | API | Windows Installer COM (direct) | WMI (`Win32_Product`) |
 | Superseded patch detection | Yes | No |
 | Adobe handling | Detects superseded patches | Excludes by default |
@@ -57,16 +97,7 @@ PatchCleaner served the community well for a decade. InstallerClean picks up whe
 
 > **A note on WMI:** PatchCleaner uses `Win32_Product`, which is known to [trigger MSI repair operations](https://gregramsey.net/2012/02/20/win32_product-is-evil/) during enumeration. InstallerClean calls the Windows Installer COM interface directly with no side effects.
 
-[Ultra Virus Killer (UVK)](https://www.carifred.com/uvk/) also has an Installer cleanup feature buried inside its System Booster module, but it's a paid tool ($15-25) and the cleanup is one small part of a much larger application. InstallerClean is free, focused and open source.
-
-## Getting started
-
-1. Download the latest release from the [releases page](../../releases)
-2. Run the exe. Windows will prompt for administrator access.
-3. The app scans automatically on startup
-4. Review the results, then click **Delete** or **Move**
-
-> **Tip:** If Windows has pending updates, InstallerClean will warn you. Restart and install updates first. A pending update might reference files that appear removable but aren't yet fully registered.
+[Ultra Virus Killer (UVK)](https://www.carifred.com/uvk/) also offers Installer cleanup as part of its System Booster module, but it's a paid tool ($15-25) and the cleanup is one small feature inside a much larger application. InstallerClean is free, focused and open source.
 
 ## Command line
 
@@ -84,17 +115,16 @@ Usage:
 
 Also accepts `--help`, `/?` and `-h`.
 
-## Is it safe?
+## Features
 
-We query the Windows Installer API, the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, we trust it. We don't guess based on filenames or dates.
-
-- **Delete** sends files to the Recycle Bin, so you can restore them if needed.
-- **Move** copies files to a location you choose first, if you prefer to be cautious.
-- Nothing is touched until you explicitly click Delete or Move and confirm.
-- The app warns you if Windows has pending updates that could affect accuracy.
-- Every line of code is on GitHub. Read it, audit it, build it yourself.
-
-<!-- - [VirusTotal scan](VIRUSTOTAL_URL): 0/70 detections. -->
+- **Delete or move.** Delete sends to the Recycle Bin. Move lets you keep files somewhere safe.
+- **Superseded patch detection.** Finds patches Windows itself has marked as replaced.
+- **Detail views.** Inspect individual files with product name, size, reason and digital signature.
+- **Pending reboot detection.** Warns if pending updates might affect scan results.
+- **Subfolder cleanup.** Prunes empty subfolders left behind by old installer operations.
+- **Command line mode.** `/d`, `/m` and `/m PATH` for scripting and automation.
+- **No installer needed.** Download, run, done.
+- **No data collection.** Doesn't phone home, collect data or require an account.
 
 ## Under the hood
 
@@ -109,16 +139,6 @@ Any `.msi` or `.msp` file in `C:\Windows\Installer` that isn't claimed by a regi
 If the API returns incomplete data (which can happen with corrupted installer state), we fall back to reading the registry (`HKLM\Software\Microsoft\Windows\CurrentVersion\Installer`). The fallback is conservative: it only adds files to the "still needed" set, never to the "removable" set.
 
 We never call `Win32_Product`. That WMI class triggers MSI consistency checks on every installed product during enumeration.
-
-## Features
-
-- **Delete or move.** Delete sends to the Recycle Bin. Move lets you keep files somewhere safe.
-- **Superseded patch detection.** Finds patches that Windows itself has marked as replaced.
-- **Detail views.** Inspect individual files with product name, size, reason and digital signature.
-- **Pending reboot detection.** Warns if pending updates might affect scan results.
-- **Command line mode.** `/d`, `/m` and `/m PATH` for scripting and automation.
-- **No installer needed.** Download, run, done.
-- **No data collection.** Doesn't phone home, collect data or require an account.
 
 ## Requirements
 
@@ -142,7 +162,7 @@ dotnet test src/SimpleWindowsInstallerCleaner.Tests/
 
 ## Contributing
 
-Found a bug or have a suggestion? [Open an issue](../../issues). Pull requests are welcome. Please run the tests before submitting.
+Found a bug or have a suggestion? [Open an issue](../../issues). Pull requests welcome. Please run the tests before submitting.
 
 ## Part of the No Faff suite
 
