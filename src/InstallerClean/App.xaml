@@ -310,7 +310,7 @@
                 </Style.Triggers>
             </Style>
 
-            <!-- Caption button (title bar minimize) -->
+            <!-- Caption button (title bar minimise) -->
             <Style x:Key="CaptionButton" TargetType="Button">
                 <Setter Property="Foreground" Value="#94a3b8"/>
                 <Setter Property="FontSize" Value="13"/>
