@@ -453,7 +453,7 @@ public partial class MainViewModel : ObservableObject
     {
         Process.Start(new ProcessStartInfo
         {
-            FileName = "https://github.com/no-faff/windows-installer-cleaner",
+            FileName = "https://github.com/no-faff/InstallerClean",
             UseShellExecute = true
         });
     }
