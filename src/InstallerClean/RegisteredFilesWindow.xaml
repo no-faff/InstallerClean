@@ -9,23 +9,41 @@
         Background="{StaticResource Base100}"
         Loaded="Window_Loaded">
 
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" GlassFrameThickness="-1"
+                      ResizeBorderThickness="4"/>
+    </WindowChrome.WindowChrome>
+
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <conv:CommaToNewlineConverter x:Key="CommaToNewline"/>
     </Window.Resources>
 
-    <Grid Margin="24">
+    <Grid Margin="24,4,24,24">
         <Grid.RowDefinitions>
+            <RowDefinition Height="44"/>
             <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
             <RowDefinition Height="2*"/><RowDefinition Height="20"/>
             <RowDefinition Height="3*"/><RowDefinition Height="12"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="PRODUCTS" Foreground="#cbd5e1"
+        <!-- Title bar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal"
+                    VerticalAlignment="Top" Margin="-8,8,0,0">
+            <Image Source="Assets/splash-icon.png" Width="16" Height="16"
+                   RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,8,0"/>
+            <TextBlock Text="Registered files" Foreground="#cbd5e1"
+                       FontSize="14" FontWeight="Medium"/>
+        </StackPanel>
+        <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#x2715;"
+                Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
+                Margin="0,-4,-24,0"/>
+
+        <TextBlock Grid.Row="1" Text="PRODUCTS" Foreground="#cbd5e1"
                    FontSize="14"/>
 
-        <Border Grid.Row="2" Style="{StaticResource CardNoPad}" ClipToBounds="True">
+        <Border Grid.Row="3" Style="{StaticResource CardNoPad}" ClipToBounds="True">
             <ListView x:Name="ProductsList" ItemsSource="{Binding Products}"
                       SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
                       BorderThickness="0" Background="Transparent"
@@ -72,7 +90,7 @@
             </ListView>
         </Border>
 
-        <Grid Grid.Row="4">
+        <Grid Grid.Row="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="220"/><ColumnDefinition Width="12"/>
                 <ColumnDefinition Width="*"/>
@@ -191,7 +209,7 @@
             </Grid>
         </Grid>
 
-        <DockPanel Grid.Row="6" LastChildFill="False">
+        <DockPanel Grid.Row="7" LastChildFill="False">
             <TextBlock DockPanel.Dock="Left" Text="{Binding Summary}"
                        Foreground="#cbd5e1" FontSize="12" VerticalAlignment="Center"/>
             <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"

@@ -8,6 +8,11 @@
         ShowInTaskbar="False"
         Background="{StaticResource Base100}">
 
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" GlassFrameThickness="-1"
+                      ResizeBorderThickness="0"/>
+    </WindowChrome.WindowChrome>
+
     <Window.Resources>
         <Style x:Key="SubtleLink" TargetType="Hyperlink">
             <Setter Property="Foreground" Value="#94a3b8"/>
@@ -21,8 +26,9 @@
         </Style>
     </Window.Resources>
 
-    <Grid Margin="24">
+    <Grid Margin="24,4,24,24">
         <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="6"/>
             <RowDefinition Height="Auto"/>
@@ -34,23 +40,35 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="InstallerClean"
+        <!-- Title bar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal"
+                    VerticalAlignment="Center" Margin="-8,0,0,0">
+            <Image Source="Assets/splash-icon.png" Width="16" Height="16"
+                   RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,8,0"/>
+            <TextBlock Text="About" Foreground="#cbd5e1"
+                       FontSize="14" FontWeight="Medium"/>
+        </StackPanel>
+        <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#x2715;"
+                Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
+                Margin="0,-4,-24,0"/>
+
+        <TextBlock Grid.Row="1" Text="InstallerClean"
                    Foreground="#f8fafc" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap"/>
-        <TextBlock Grid.Row="2" x:Name="VersionText"
+        <TextBlock Grid.Row="3" x:Name="VersionText"
                    Foreground="#cbd5e1" FontSize="12"/>
-        <TextBlock Grid.Row="4" Foreground="#94a3b8" FontSize="12">
+        <TextBlock Grid.Row="5" Foreground="#94a3b8" FontSize="12">
             <Hyperlink NavigateUri="https://github.com/no-faff/windows-installer-cleaner/blob/main/LICENSE"
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}">MIT licence</Hyperlink>
         </TextBlock>
-        <TextBlock Grid.Row="6" Foreground="#94a3b8" FontSize="12">
+        <TextBlock Grid.Row="7" Foreground="#94a3b8" FontSize="12">
             <Hyperlink NavigateUri="https://github.com/no-faff"
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}">github.com/no-faff</Hyperlink>
         </TextBlock>
-        <Button Grid.Row="8" Style="{StaticResource PrimaryPill}"
+        <Button Grid.Row="9" Style="{StaticResource PrimaryPill}"
                 Content="Close" IsCancel="True" HorizontalAlignment="Right"/>
-        <TextBlock Grid.Row="8" HorizontalAlignment="Left"
+        <TextBlock Grid.Row="9" HorizontalAlignment="Left"
                    VerticalAlignment="Center" Foreground="#94a3b8" FontSize="12">
             <Hyperlink NavigateUri="https://github.com/no-faff/windows-installer-cleaner/discussions"
                        Click="Hyperlink_Click"

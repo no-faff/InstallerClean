@@ -12,6 +12,8 @@ public partial class RegisteredFilesWindow : Window
         DataContext = viewModel;
     }
 
+    private void CloseClick(object sender, RoutedEventArgs e) => Close();
+
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         if (ProductsList.Items.Count > 0)

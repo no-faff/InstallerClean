@@ -6,21 +6,40 @@
         Width="920" Height="540"
         MinWidth="600" MinHeight="380"
         WindowStartupLocation="CenterOwner"
-        Background="{StaticResource Base100}">
+        Background="{StaticResource Base100}"
+        Loaded="Window_Loaded">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" GlassFrameThickness="-1"
+                      ResizeBorderThickness="4"/>
+    </WindowChrome.WindowChrome>
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <conv:CommaToNewlineConverter x:Key="CommaToNewline"/>
     </Window.Resources>
 
-    <Grid Margin="24">
+    <Grid Margin="24,4,24,24">
         <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="12"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+        <!-- Title bar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal"
+                    VerticalAlignment="Center" Margin="-8,0,0,0">
+            <Image Source="Assets/splash-icon.png" Width="16" Height="16"
+                   RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,8,0"/>
+            <TextBlock Text="Files to clean up" Foreground="#cbd5e1"
+                       FontSize="14" FontWeight="Medium"/>
+        </StackPanel>
+        <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#x2715;"
+                Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
+                Margin="0,-4,-24,0"/>
+
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="12"/>
@@ -28,7 +47,7 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Style="{StaticResource CardNoPad}">
-                <ListBox ItemsSource="{Binding Files}"
+                <ListBox x:Name="FilesList" ItemsSource="{Binding Files}"
                          SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
                          Background="Transparent" BorderThickness="0"
                          Margin="14,10,0,10" HorizontalContentAlignment="Stretch">
@@ -115,7 +134,7 @@
             </Border>
         </Grid>
 
-        <DockPanel Grid.Row="2" LastChildFill="False">
+        <DockPanel Grid.Row="3" LastChildFill="False">
             <TextBlock DockPanel.Dock="Left" Text="{Binding Summary}"
                        Foreground="#cbd5e1" FontSize="12" VerticalAlignment="Center"/>
             <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"

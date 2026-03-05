@@ -8,6 +8,11 @@
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource Base100}">
 
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" GlassFrameThickness="-1"
+                      ResizeBorderThickness="0"/>
+    </WindowChrome.WindowChrome>
+
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding ScanCommand}"/>
         <KeyBinding Modifiers="Alt" Key="M" Command="{Binding MoveAllCommand}"/>
@@ -21,12 +26,29 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="36"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Grid.RowSpan="2" Margin="24,0,24,48" VerticalAlignment="Center">
+        <!-- Title bar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal"
+                    VerticalAlignment="Center" Margin="12,0,0,0">
+            <Image Source="Assets/splash-icon.png" Width="16" Height="16"
+                   RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,8,0"/>
+            <TextBlock Text="InstallerClean" Foreground="#cbd5e1"
+                       FontSize="14" FontWeight="Medium"/>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Orientation="Horizontal"
+                    HorizontalAlignment="Right" VerticalAlignment="Top">
+            <Button Style="{StaticResource CaptionButton}" Content="&#x2015;"
+                    Click="MinimizeClick"/>
+            <Button Style="{StaticResource CaptionCloseButton}" Content="&#x2715;"
+                    Click="CloseClick"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Grid.RowSpan="2" Margin="24,0,24,48" VerticalAlignment="Center">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="16"/>
@@ -169,7 +191,7 @@
         </Grid>
 
         <!-- ── Bottom nav ────────────────────────────────────── -->
-        <DockPanel Grid.Row="2" LastChildFill="False" Margin="4,8,24,8">
+        <DockPanel Grid.Row="3" LastChildFill="False" Margin="4,8,24,8">
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     Content="Re-scan" Command="{Binding RefreshCommand}"/>
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
@@ -198,7 +220,7 @@
         </DockPanel>
 
         <!-- ── Scanning overlay ──────────────────────────────────── -->
-        <Grid Grid.RowSpan="3" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.RowSpan="4" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}">
             <Rectangle Fill="{StaticResource Overlay}"/>
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <ProgressBar IsIndeterminate="True" Width="240" Height="8" Margin="0,0,0,12"/>
@@ -208,7 +230,7 @@
         </Grid>
 
         <!-- ── Operating overlay ─────────────────────────────────── -->
-        <Grid Grid.RowSpan="3" Visibility="{Binding IsOperating, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.RowSpan="4" Visibility="{Binding IsOperating, Converter={StaticResource BoolToVis}}">
             <Rectangle Fill="{StaticResource Overlay}"/>
             <Border Background="{StaticResource Base200}" CornerRadius="20"
                     Padding="28,22" MinWidth="260"
@@ -239,7 +261,7 @@
             </Border>
         </Grid>
         <!-- ── Completion overlay ────────────────────────────────── -->
-        <Grid Grid.RowSpan="3" Visibility="{Binding IsComplete, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.RowSpan="4" Visibility="{Binding IsComplete, Converter={StaticResource BoolToVis}}">
             <Border Background="{StaticResource Base200}" CornerRadius="20"
                     Padding="36,32" MinWidth="340" MaxWidth="420"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
