@@ -434,6 +434,9 @@ docs/launch-strategy.md
 docs/status.md
 complete Upscayl styling breakdown with exact values.txt
 
+# Notes from Claude chats — useful reference, not for public repo
+docs/notes/
+
 # Claude Code config
 .claude/
 CLAUDE.md

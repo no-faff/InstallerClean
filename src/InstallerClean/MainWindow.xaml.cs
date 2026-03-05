@@ -10,4 +10,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = viewModel;
     }
+
+    private void MinimizeClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+    private void CloseClick(object sender, RoutedEventArgs e) => Close();
 }
