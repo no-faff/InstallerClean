@@ -53,7 +53,7 @@ public partial class RegisteredFilesWindow : Window
         {
             "Product name" => "ProductName",
             "File" => "FileName",
-            "Size" => "SizeDisplay",
+            "Size" => "SizeBytes",
             "Patches" => "PatchCount",
             _ => null
         };
