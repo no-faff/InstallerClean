@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using InstallerClean.Services;
 using InstallerClean.ViewModels;
 
 namespace InstallerClean;
@@ -11,10 +12,22 @@ public partial class RegisteredFilesWindow : Window
     private string? _lastSortProperty;
     private ListSortDirection _lastSortDirection;
 
-    public RegisteredFilesWindow(RegisteredFilesViewModel viewModel)
+    private readonly ISettingsService? _settingsService;
+
+    public RegisteredFilesWindow(RegisteredFilesViewModel viewModel, ISettingsService? settingsService = null)
     {
         InitializeComponent();
         DataContext = viewModel;
+        _settingsService = settingsService;
+
+        var saved = settingsService?.Load().RegisteredWindowSize;
+        if (saved is { Width: > 0, Height: > 0 })
+        {
+            Width = saved.Width;
+            Height = saved.Height;
+        }
+
+        Closed += OnClosed;
     }
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
@@ -57,5 +70,13 @@ public partial class RegisteredFilesWindow : Window
 
         _lastSortProperty = sortProperty;
         _lastSortDirection = direction;
+    }
+
+    private void OnClosed(object? sender, EventArgs e)
+    {
+        if (_settingsService is null) return;
+        var settings = _settingsService.Load();
+        settings.RegisteredWindowSize = new Models.WindowSize { Width = ActualWidth, Height = ActualHeight };
+        _settingsService.Save(settings);
     }
 }
