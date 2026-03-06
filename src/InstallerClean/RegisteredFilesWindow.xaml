@@ -38,7 +38,7 @@
         </StackPanel>
         <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#x2715;"
                 Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
-                Margin="0,-4,-24,0"/>
+                Margin="0,-4,-24,0" AutomationProperties.Name="Close"/>
 
         <TextBlock Grid.Row="1" Text="PRODUCTS" Foreground="#cbd5e1"
                    FontSize="14"/>

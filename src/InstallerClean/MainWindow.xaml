@@ -40,9 +40,9 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal"
                     HorizontalAlignment="Right" VerticalAlignment="Top">
             <Button Style="{StaticResource CaptionButton}" Content="&#x2015;"
-                    Click="MinimizeClick"/>
+                    Click="MinimizeClick" AutomationProperties.Name="Minimise"/>
             <Button Style="{StaticResource CaptionCloseButton}" Content="&#x2715;"
-                    Click="CloseClick"/>
+                    Click="CloseClick" AutomationProperties.Name="Close"/>
         </StackPanel>
 
         <Grid Grid.Row="1" Grid.RowSpan="2" Margin="24,0,24,48" VerticalAlignment="Center">
@@ -195,6 +195,7 @@
                     Content="_About" Command="{Binding ShowAboutCommand}" Margin="4,0,0,0"/>
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
                     Command="{Binding DonateCommand}"
+                    AutomationProperties.Name="Buy me a cuppa on Ko-fi"
                     ToolTipService.InitialShowDelay="0"
                     Padding="6,0" Height="28">
                 <Image Source="Assets/kofi-cup.png" Width="21" Height="21"
@@ -205,6 +206,7 @@
             </Button>
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
                     Command="{Binding StarOnGitHubCommand}"
+                    AutomationProperties.Name="Leave a star on GitHub"
                     ToolTipService.InitialShowDelay="0"
                     Padding="6,0" Height="28" Margin="0,0,12,0">
                 <Path Data="m12.672.668 3.059 6.197 6.838.993a.75.75 0 0 1 .416 1.28l-4.948 4.823 1.168 6.812a.75.75 0 0 1-1.088.79L12 18.347l-6.116 3.216a.75.75 0 0 1-1.088-.791l1.168-6.811-4.948-4.823a.749.749 0 0 1 .416-1.279l6.838-.994L11.327.668a.75.75 0 0 1 1.345 0Z"
@@ -220,7 +222,8 @@
         <Grid Grid.RowSpan="4" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}">
             <Rectangle Fill="{StaticResource Overlay}"/>
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <ProgressBar IsIndeterminate="True" Width="240" Height="8" Margin="0,0,0,12"/>
+                <ProgressBar IsIndeterminate="True" Width="240" Height="8" Margin="0,0,0,12"
+                             AutomationProperties.Name="Scanning progress"/>
                 <TextBlock Text="{Binding ScanProgress}" Foreground="#f8fafc"
                            FontSize="14" HorizontalAlignment="Center"/>
             </StackPanel>
@@ -238,7 +241,8 @@
                                HorizontalAlignment="Center" Margin="0,0,0,14"/>
                     <ProgressBar Value="{Binding OperationProgressPercent}"
                                  Minimum="0" Maximum="100"
-                                 Width="200" Height="8" Margin="0,0,0,8"/>
+                                 Width="200" Height="8" Margin="0,0,0,8"
+                                 AutomationProperties.Name="Operation progress"/>
                     <DockPanel Margin="0,0,0,2">
                         <TextBlock DockPanel.Dock="Right" Foreground="#64748b" FontSize="11">
                             <Run Text="{Binding OperationProgressPercent, Mode=OneWay, StringFormat='{}{0:F0}%'}"/>
