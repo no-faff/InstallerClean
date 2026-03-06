@@ -8,14 +8,6 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
 
-    <Window.InputBindings>
-        <KeyBinding Key="Escape" Command="{x:Static SystemCommands.CloseWindowCommand}"/>
-    </Window.InputBindings>
-
-    <Window.CommandBindings>
-        <CommandBinding Command="{x:Static SystemCommands.CloseWindowCommand}" Executed="OnCancel"/>
-    </Window.CommandBindings>
-
     <Border Background="#0f172a" CornerRadius="16" Padding="32,28"
             MaxWidth="440" MinWidth="320"
             BorderBrush="#334155" BorderThickness="1">
@@ -27,9 +19,9 @@
                        TextWrapping="Wrap" Margin="0,0,0,20"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource PrimaryPill}" Content="Cancel"
-                        Click="OnCancel" Margin="0,0,8,0"/>
-                <Button Style="{StaticResource AccentPill}" Content="Move"
+                <Button Style="{StaticResource PrimaryPill}" Content="_Cancel"
+                        Click="OnCancel" IsCancel="True" Margin="0,0,8,0"/>
+                <Button Style="{StaticResource AccentPill}" Content="_Move"
                         Click="OnMove"/>
             </StackPanel>
         </StackPanel>

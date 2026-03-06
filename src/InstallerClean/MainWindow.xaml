@@ -15,9 +15,6 @@
 
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding ScanCommand}"/>
-        <KeyBinding Modifiers="Alt" Key="M" Command="{Binding MoveAllCommand}"/>
-        <KeyBinding Modifiers="Alt" Key="D" Command="{Binding DeleteAllCommand}"/>
-        <KeyBinding Modifiers="Alt" Key="B" Command="{Binding BrowseDestinationCommand}"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -169,16 +166,16 @@
                     </Grid>
 
                     <Button Grid.Column="2" Style="{StaticResource PrimaryPill}"
-                            Content="Browse..." Command="{Binding BrowseDestinationCommand}"/>
+                            Content="_Browse..." Command="{Binding BrowseDestinationCommand}"/>
                 </Grid>
 
                 <!-- Buttons row -->
                 <DockPanel Grid.Row="6">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
-                            Content="Move" Command="{Binding MoveAllCommand}"/>
+                            Content="_Move" Command="{Binding MoveAllCommand}"/>
 
                     <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
-                            Content="Delete" Command="{Binding DeleteAllCommand}"
+                            Content="_Delete" Command="{Binding DeleteAllCommand}"
                             Margin="0,0,8,0"/>
 
                     <TextBlock DockPanel.Dock="Left" Text="{Binding OperationProgress}"
@@ -193,9 +190,9 @@
         <!-- ── Bottom nav ────────────────────────────────────── -->
         <DockPanel Grid.Row="3" LastChildFill="False" Margin="4,8,24,8">
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
-                    Content="Re-scan" Command="{Binding RefreshCommand}"/>
+                    Content="_Re-scan" Command="{Binding RefreshCommand}"/>
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
-                    Content="About" Command="{Binding ShowAboutCommand}" Margin="4,0,0,0"/>
+                    Content="_About" Command="{Binding ShowAboutCommand}" Margin="4,0,0,0"/>
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
                     Command="{Binding DonateCommand}"
                     ToolTipService.InitialShowDelay="0"
@@ -253,7 +250,7 @@
                             <Run Text=" files"/>
                         </TextBlock>
                     </DockPanel>
-                    <Button Style="{StaticResource GhostPill}" Content="Cancel"
+                    <Button x:Name="OperationCancelButton" Style="{StaticResource GhostPill}" Content="Cancel"
                             Command="{Binding CancelOperationCommand}"
                             HorizontalAlignment="Center" Margin="0,10,0,0"
                             Height="28" Padding="16,0" FontSize="12"/>
@@ -261,7 +258,7 @@
             </Border>
         </Grid>
         <!-- ── Completion overlay ────────────────────────────────── -->
-        <Grid Grid.RowSpan="4" Visibility="{Binding IsComplete, Converter={StaticResource BoolToVis}}">
+        <Grid x:Name="CompletionOverlay" Grid.RowSpan="4" Visibility="{Binding IsComplete, Converter={StaticResource BoolToVis}}">
             <Border Background="{StaticResource Base200}" CornerRadius="20"
                     Padding="36,32" MinWidth="340" MaxWidth="420"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -307,7 +304,7 @@
                     </TextBlock>
 
                     <!-- Close button -->
-                    <Button Style="{StaticResource AccentPill}"
+                    <Button x:Name="CompletionCloseButton" Style="{StaticResource AccentPill}"
                             Content="Close" Command="{Binding CloseAppCommand}"
                             HorizontalAlignment="Center" MinWidth="120"
                             Margin="0,0,0,8"/>
