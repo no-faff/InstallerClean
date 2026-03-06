@@ -50,7 +50,9 @@
                 <ListBox x:Name="FilesList" ItemsSource="{Binding Files}"
                          SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
                          Background="Transparent" BorderThickness="0"
-                         Margin="14,10,0,10" HorizontalContentAlignment="Stretch">
+                         Margin="14,10,0,10" HorizontalContentAlignment="Stretch"
+                         VirtualizingStackPanel.IsVirtualizing="True"
+                         VirtualizingStackPanel.VirtualizationMode="Recycling">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="0,1,14,1">
