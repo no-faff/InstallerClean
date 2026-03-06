@@ -11,6 +11,7 @@ public sealed record ProductRow(
     string FileName,
     string FullPath,
     string SizeDisplay,
+    long SizeBytes,
     int PatchCount,
     IReadOnlyList<PatchRow> Patches);
 
@@ -83,6 +84,7 @@ public partial class RegisteredFilesViewModel : ObservableObject
                 Path.GetFileName(msiPath),
                 msiPath,
                 GetSizeDisplay(msiPath),
+                GetSizeBytes(msiPath),
                 patches.Count,
                 patches));
         }
@@ -130,5 +132,11 @@ public partial class RegisteredFilesViewModel : ObservableObject
     {
         try { return DisplayHelpers.FormatSize(new FileInfo(path).Length); }
         catch (Exception) { return string.Empty; }
+    }
+
+    private static long GetSizeBytes(string path)
+    {
+        try { return new FileInfo(path).Length; }
+        catch (Exception) { return 0; }
     }
 }
