@@ -414,7 +414,7 @@ public partial class MainViewModel : ObservableObject
             _lastScanResult.RemovableFiles,
             _msiInfoService);
 
-        var window = new OrphanedFilesWindow(viewModel)
+        var window = new OrphanedFilesWindow(viewModel, _settingsService)
         {
             Owner = Application.Current.MainWindow
         };
@@ -431,7 +431,7 @@ public partial class MainViewModel : ObservableObject
             _lastScanResult.RegisteredTotalBytes,
             _msiInfoService);
 
-        var window = new RegisteredFilesWindow(viewModel)
+        var window = new RegisteredFilesWindow(viewModel, _settingsService)
         {
             Owner = Application.Current.MainWindow
         };
