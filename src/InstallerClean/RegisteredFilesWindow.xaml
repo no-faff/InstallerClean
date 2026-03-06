@@ -48,7 +48,9 @@
                       SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
                       BorderThickness="0" Background="Transparent"
                       Padding="0" Margin="0,-1,0,-6"
-                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      VirtualizingStackPanel.IsVirtualizing="True"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Product name" Width="520">
