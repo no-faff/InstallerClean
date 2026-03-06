@@ -332,6 +332,10 @@
                                 <Trigger Property="IsPressed" Value="True">
                                     <Setter TargetName="Bg" Property="Background" Value="#475569"/>
                                 </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="#334155"/>
+                                    <Setter Property="Foreground" Value="#f8fafc"/>
+                                </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
@@ -359,6 +363,10 @@
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
                                     <Setter TargetName="Bg" Property="Background" Value="#a93226"/>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="#c0392b"/>
+                                    <Setter Property="Foreground" Value="#f8fafc"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
