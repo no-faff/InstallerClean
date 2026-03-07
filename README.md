@@ -85,7 +85,7 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 3. The app scans automatically on startup
 4. Review the results, then click **Delete** or **Move**
 
-> **Prefer not to install?** Download **InstallerClean.exe** instead — it's a single portable file, no install needed. Just download, run and delete it when you're done.
+> **Prefer not to install?** Download **InstallerClean-portable.exe** instead — it's a single file, no install needed. Just download, run and delete it when you're done.
 
 > **Tip:** If Windows has pending updates, the app will warn you to restart and install them first. A pending update might reference files that appear removable but aren't yet fully registered.
 
@@ -154,7 +154,7 @@ We never call `Win32_Product`. That WMI class triggers MSI consistency checks on
 - Windows 10 or 11
 - Administrator privileges (to access `C:\Windows\Installer`)
 - Self-contained — everything is bundled in, no .NET runtime install needed. The download is around 76 MB because it includes the runtime
-- Already have .NET 8 Desktop Runtime? Grab **InstallerClean-framework-dependent.exe** (8 MB) from the releases page instead
+- Already have .NET 8 Desktop Runtime? Grab **InstallerClean-portable-requires-dotnet8.exe** (8 MB) from the releases page instead
 
 ## Building from source
 
