@@ -154,7 +154,7 @@ We never call `Win32_Product`. That WMI class triggers MSI consistency checks on
 - Windows 10 or 11
 - Administrator privileges (to access `C:\Windows\Installer`)
 - Self-contained — everything is bundled in, no .NET runtime install needed. The download is around 76 MB because it includes the runtime
-- Already have .NET 8 Desktop Runtime? Grab **InstallerClean-portable-requires-dotnet8.exe** (8 MB) from the releases page instead
+- Already have .NET 8 Desktop Runtime? Grab **InstallerClean-slim.exe** (8 MB) from the releases page instead
 
 ## Building from source
 
