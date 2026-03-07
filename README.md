@@ -1,7 +1,7 @@
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![Windows 10/11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg)](https://github.com/no-faff/InstallerClean/releases)
-[![VirusTotal](https://img.shields.io/badge/VirusTotal-1%2F70-brightgreen.svg)](https://www.virustotal.com/gui/file/60a1c4eaf85fa7253c2773ac394bbc92f98186d3766bb2ae0ad7859d54b08b8a)
+[![VirusTotal](https://img.shields.io/badge/VirusTotal-0%2F69-brightgreen.svg)](https://www.virustotal.com/gui/file/ea70be2b10dfcdec3a9f9423b69aa06d8052aacffdf4d027410ded65365d57f0)
 [![GitHub Release](https://img.shields.io/github/v/release/no-faff/InstallerClean)](https://github.com/no-faff/InstallerClean/releases/latest)
 
 # InstallerClean
@@ -76,7 +76,7 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 - The app warns you if Windows has pending updates that could affect results
 - Every line of code is on GitHub. Read it, build it, audit it
 
-- [VirusTotal scan](https://www.virustotal.com/gui/file/60a1c4eaf85fa7253c2773ac394bbc92f98186d3766bb2ae0ad7859d54b08b8a): 1/70 detections (Zillya, known for false positives on .NET single-file executables).
+- [VirusTotal scan](https://www.virustotal.com/gui/file/ea70be2b10dfcdec3a9f9423b69aa06d8052aacffdf4d027410ded65365d57f0): 0/69 detections.
 
 ## Getting started
 
