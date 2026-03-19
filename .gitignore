@@ -449,3 +449,7 @@ docs/pre-launch-hardening.md
 HANDOFF.md
 /non-repo-files
 /exports
+
+# Chat exports and personal files
+exports/
+non-repo-files/
