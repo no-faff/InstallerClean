@@ -16,6 +16,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ISettingsService _settingsService;
     private readonly IPendingRebootService _rebootService;
     private readonly IMsiFileInfoService _msiInfoService;
+    private readonly IUpdateCheckService _updateCheckService;
     // Scan state
     [ObservableProperty] private bool _isScanning;
     [ObservableProperty] private string _scanProgress = string.Empty;
@@ -31,6 +32,10 @@ public partial class MainViewModel : ObservableObject
 
     public string OrphanedSummaryText =>
         $"{OrphanedFileCount} {DisplayHelpers.Pluralise(OrphanedFileCount, "file", "files")} to clean up";
+
+    // Update check
+    [ObservableProperty] private string _updateAvailable = string.Empty;
+    public bool HasUpdate => !string.IsNullOrEmpty(UpdateAvailable);
 
     // Pending reboot
     [ObservableProperty] private bool _hasPendingReboot;
@@ -67,7 +72,8 @@ public partial class MainViewModel : ObservableObject
         IDeleteFilesService deleteService,
         ISettingsService settingsService,
         IPendingRebootService rebootService,
-        IMsiFileInfoService msiInfoService)
+        IMsiFileInfoService msiInfoService,
+        IUpdateCheckService updateCheckService)
     {
         _scanService = scanService;
         _moveService = moveService;
@@ -75,9 +81,15 @@ public partial class MainViewModel : ObservableObject
         _settingsService = settingsService;
         _rebootService = rebootService;
         _msiInfoService = msiInfoService;
+        _updateCheckService = updateCheckService;
 
         _settings = settingsService.Load();
         MoveDestination = _settings.MoveDestination;
+    }
+
+    partial void OnUpdateAvailableChanged(string value)
+    {
+        OnPropertyChanged(nameof(HasUpdate));
     }
 
     partial void OnIsScanningChanged(bool value)
@@ -441,11 +453,29 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ShowAbout()
     {
-        var window = new AboutWindow
+        var window = new AboutWindow(_settingsService, _updateCheckService)
         {
             Owner = Application.Current.MainWindow
         };
         window.ShowDialog();
+    }
+
+    [RelayCommand]
+    private void OpenReleasePage()
+    {
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = "https://github.com/no-faff/InstallerClean/releases",
+            UseShellExecute = true
+        });
+    }
+
+    public async Task CheckForUpdatesAsync()
+    {
+        if (!_settings.CheckForUpdates) return;
+        var latest = await _updateCheckService.GetLatestVersionAsync();
+        if (!string.IsNullOrEmpty(latest))
+            UpdateAvailable = latest;
     }
 
     [RelayCommand]

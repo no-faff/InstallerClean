@@ -101,7 +101,7 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 | Superseded patch detection | Yes | No |
 | Adobe handling | Detects superseded patches | Excludes by default |
 | UI | Dark theme (WPF) | Windows Forms |
-| Data collection | None | None |
+| Data collection | None (optional update check contacts GitHub) | None |
 
 > **A note on WMI:** PatchCleaner uses `Win32_Product`, which is known to [trigger MSI repair operations](https://gregramsey.net/2012/02/20/win32_product-is-evil/) during enumeration. InstallerClean calls the Windows Installer COM interface directly with no side effects.
 
@@ -139,7 +139,7 @@ All three require an elevated (administrator) command prompt.
 - **Subfolder cleanup.** Prunes empty subfolders left behind by old installer operations.
 - **Command line mode.** `/s` to scan, `/d` to delete, `/m` to move - for scripting and automation.
 - **No installer needed.** Download, run, done.
-- **No data collection.** Doesn't phone home, collect data or require an account.
+- **Update notifications.** Checks GitHub for new releases on startup. Can be turned off in About.
 
 ## Under the hood
 
