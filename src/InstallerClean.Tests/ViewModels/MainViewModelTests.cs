@@ -14,6 +14,7 @@ public class MainViewModelTests
     private readonly ISettingsService _settingsService = Substitute.For<ISettingsService>();
     private readonly IPendingRebootService _rebootService = Substitute.For<IPendingRebootService>();
     private readonly IMsiFileInfoService _msiInfoService = Substitute.For<IMsiFileInfoService>();
+    private readonly IUpdateCheckService _updateCheckService = Substitute.For<IUpdateCheckService>();
 
     private MainViewModel CreateViewModel()
     {
@@ -21,7 +22,7 @@ public class MainViewModelTests
 
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
-            _settingsService, _rebootService, _msiInfoService);
+            _settingsService, _rebootService, _msiInfoService, _updateCheckService);
     }
 
     private static ScanResult EmptyScanResult() =>
@@ -103,7 +104,7 @@ public class MainViewModelTests
 
         var vm = new MainViewModel(
             _scanService, _moveService, _deleteService,
-            _settingsService, _rebootService, _msiInfoService);
+            _settingsService, _rebootService, _msiInfoService, _updateCheckService);
 
         Assert.Equal(@"D:\Backup", vm.MoveDestination);
     }

@@ -71,6 +71,16 @@
                                Foreground="#cbd5e1" VerticalAlignment="Center"/>
                 </StackPanel>
 
+                <!-- Update available notification -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,18"
+                            Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding UpdateAvailable, StringFormat='{}{0} available'}"
+                               Foreground="#4ade80" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <Button Style="{StaticResource GhostPill}"
+                            Content="Download" Command="{Binding OpenReleasePageCommand}"
+                            Height="24" Padding="10,0" FontSize="12"/>
+                </StackPanel>
+
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

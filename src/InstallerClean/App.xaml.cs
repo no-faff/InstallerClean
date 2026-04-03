@@ -82,10 +82,11 @@ public partial class App : Application
             var deleteService = new DeleteFilesService();
             var rebootService = new PendingRebootService();
             var msiInfoService = new MsiFileInfoService();
+            var updateCheckService = new UpdateCheckService();
 
             var viewModel = new MainViewModel(
                 scanService, moveService, deleteService,
-                settingsService, rebootService, msiInfoService);
+                settingsService, rebootService, msiInfoService, updateCheckService);
 
             var splashProgress = new Progress<string>(splash.OnScanProgress);
             var scanTask = viewModel.ScanWithProgressAsync(splashProgress);
@@ -97,6 +98,8 @@ public partial class App : Application
             Application.Current.MainWindow = window;
             window.Show();
             splash.Close();
+
+            _ = viewModel.CheckForUpdatesAsync();
         }
         catch (UnauthorizedAccessException)
         {
