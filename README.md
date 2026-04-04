@@ -28,7 +28,7 @@ These aren't temp files that get recreated the moment you close a cleaning tool.
 
 **If you're looking for an easy way to free up disk space on Windows, this folder is one of the best places to start.** InstallerClean finds the unneeded files and removes them safely.
 
-[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) has been the go-to tool for this since 2013, but it hasn't been updated in exactly ten years and it's closed source. InstallerClean is a new open source alternative for 2026, with Adobe patch handling (often the main culprit) and a modern UI.
+[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) has been the go-to tool for this, but it hasn't been updated since March 2016 and it's closed source. InstallerClean is a new open source alternative for 2026, with Adobe patch handling (often the main culprit) and a modern UI.
 
 ## The search for help
 
