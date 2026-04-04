@@ -1,34 +1,22 @@
 using System.Diagnostics;
 using System.Windows;
 using InstallerClean.Helpers;
-using InstallerClean.Models;
 using InstallerClean.Services;
 
 namespace InstallerClean;
 
 public partial class AboutWindow : Window
 {
-    private readonly ISettingsService _settingsService;
     private readonly IUpdateCheckService _updateCheckService;
-    private readonly AppSettings _settings;
 
-    public AboutWindow(ISettingsService settingsService, IUpdateCheckService updateCheckService)
+    public AboutWindow(IUpdateCheckService updateCheckService)
     {
         InitializeComponent();
-        _settingsService = settingsService;
         _updateCheckService = updateCheckService;
-        _settings = settingsService.Load();
         VersionText.Text = DisplayHelpers.GetVersionString();
-        CheckForUpdatesCheckBox.IsChecked = _settings.CheckForUpdates;
     }
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
-
-    private void CheckForUpdatesChanged(object sender, RoutedEventArgs e)
-    {
-        _settings.CheckForUpdates = CheckForUpdatesCheckBox.IsChecked == true;
-        try { _settingsService.Save(_settings); } catch { }
-    }
 
     private async void CheckNowClick(object sender, RoutedEventArgs e)
     {
@@ -49,7 +37,7 @@ public partial class AboutWindow : Window
         finally
         {
             CheckNowButton.IsEnabled = true;
-            CheckNowButton.Content = "Check now";
+            CheckNowButton.Content = "Check for updates";
         }
     }
 

@@ -3,7 +3,6 @@ namespace InstallerClean.Models;
 public sealed class AppSettings
 {
     public string MoveDestination { get; set; } = string.Empty;
-    public bool CheckForUpdates { get; set; } = true;
     public WindowSize? OrphanedWindowSize { get; set; }
     public WindowSize? RegisteredWindowSize { get; set; }
 }
