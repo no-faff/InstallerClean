@@ -33,10 +33,6 @@ public partial class MainViewModel : ObservableObject
     public string OrphanedSummaryText =>
         $"{OrphanedFileCount} {DisplayHelpers.Pluralise(OrphanedFileCount, "file", "files")} to clean up";
 
-    // Update check
-    [ObservableProperty] private string _updateAvailable = string.Empty;
-    public bool HasUpdate => !string.IsNullOrEmpty(UpdateAvailable);
-
     // Pending reboot
     [ObservableProperty] private bool _hasPendingReboot;
 
@@ -85,11 +81,6 @@ public partial class MainViewModel : ObservableObject
 
         _settings = settingsService.Load();
         MoveDestination = _settings.MoveDestination;
-    }
-
-    partial void OnUpdateAvailableChanged(string value)
-    {
-        OnPropertyChanged(nameof(HasUpdate));
     }
 
     partial void OnIsScanningChanged(bool value)
@@ -453,29 +444,11 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ShowAbout()
     {
-        var window = new AboutWindow(_settingsService, _updateCheckService)
+        var window = new AboutWindow(_updateCheckService)
         {
             Owner = Application.Current.MainWindow
         };
         window.ShowDialog();
-    }
-
-    [RelayCommand]
-    private void OpenReleasePage()
-    {
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = "https://github.com/no-faff/InstallerClean/releases",
-            UseShellExecute = true
-        });
-    }
-
-    public async Task CheckForUpdatesAsync()
-    {
-        if (!_settings.CheckForUpdates) return;
-        var latest = await _updateCheckService.GetLatestVersionAsync();
-        if (!string.IsNullOrEmpty(latest))
-            UpdateAvailable = latest;
     }
 
     [RelayCommand]

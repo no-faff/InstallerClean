@@ -99,7 +99,6 @@ public partial class App : Application
             window.Show();
             splash.Close();
 
-            _ = viewModel.CheckForUpdatesAsync();
         }
         catch (UnauthorizedAccessException)
         {

@@ -68,19 +68,12 @@
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}">github.com/no-faff</Hyperlink>
         </TextBlock>
-        <!-- Update check row -->
-        <DockPanel Grid.Row="9">
-            <Button x:Name="CheckNowButton" DockPanel.Dock="Right"
-                    Style="{StaticResource GhostPill}"
-                    Content="Check now" Click="CheckNowClick"
-                    Height="24" Padding="10,0" FontSize="12"/>
-            <CheckBox x:Name="CheckForUpdatesCheckBox"
-                      Content="Check for updates on startup"
-                      Foreground="#cbd5e1" FontSize="12"
-                      VerticalAlignment="Center"
-                      Checked="CheckForUpdatesChanged"
-                      Unchecked="CheckForUpdatesChanged"/>
-        </DockPanel>
+        <!-- Update check -->
+        <Button x:Name="CheckNowButton" Grid.Row="9"
+                Style="{StaticResource GhostPill}"
+                Content="Check for updates" Click="CheckNowClick"
+                Height="28" Padding="12,0" FontSize="12"
+                HorizontalAlignment="Left"/>
 
         <Button Grid.Row="11" Style="{StaticResource PrimaryPill}"
                 Content="Close" IsCancel="True" HorizontalAlignment="Right"/>
