@@ -28,7 +28,7 @@ These aren't temp files that get recreated the moment you close a cleaning tool.
 
 **If you're looking for an easy way to free up disk space on Windows, this folder is one of the best places to start.** InstallerClean finds the unneeded files and removes them safely.
 
-[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) has been the go-to tool for this, but it hasn't been updated since March 2016 and it's closed source. InstallerClean is a new open source alternative for 2026, with Adobe patch handling (often the main culprit) and a modern UI.
+[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) has been the go-to tool for this, but it hasn't been updated since March 2016 and it's closed source. InstallerClean is a new open source alternative, with Adobe patch handling (often the main culprit) and a modern UI.
 
 ## The search for help
 
@@ -57,17 +57,25 @@ InstallerClean detects which Adobe patches have been superseded by newer updates
 3. **Shows** what's needed and what's not, with sizes
 4. **Removes** the unneeded files: delete to the Recycle Bin, or move to a folder you choose
 
-No wizards, no subscriptions, no account required.
+No telemetry. No network activity unless you click Check for updates (in the About window).
 
-## How it knows what's safe to remove
+## How it works
 
-InstallerClean identifies two kinds of unneeded files:
+InstallerClean identifies two kinds of unneeded files.
 
-**Orphaned files** are installers and patches left behind after you uninstall software. Windows no longer references them, but the files sit in the folder taking up space. These are safe to remove.
+**Orphaned files** are installers and patches left behind after you uninstall software. Windows no longer references them, but the files sit in the folder taking up space.
 
-**Superseded patches** are old `.msp` patches that have been replaced by newer ones. Windows marks them as superseded in its own database but never deletes them. This is especially common with Adobe Acrobat, which delivers roughly 1.1 GB patch files and accumulates superseded ones indefinitely. InstallerClean reads the patch state directly from the Windows Installer API and flags these as removable too.
+**Superseded patches** are old `.msp` patches that have been replaced by newer ones. Windows marks them as superseded in its own database but never deletes them. This is especially common with Adobe Acrobat, which delivers roughly 1.1 GB patch files and accumulates superseded ones indefinitely.
 
-PatchCleaner doesn't do this. It excludes Adobe by default because Adobe patches appear registered even when they've been superseded. InstallerClean checks whether a patch has actually been replaced, regardless of the manufacturer.
+To find them, InstallerClean calls the Windows Installer COM interface directly via P/Invoke:
+
+- `MsiEnumProductsEx` to enumerate every installed product
+- `MsiEnumPatchesEx` to find all registered patches for each product
+- `MsiGetPatchInfoEx` to read patch state (applied, superseded or obsoleted)
+
+Any `.msi` or `.msp` file in `C:\Windows\Installer` that isn't claimed by a registered product is orphaned. Any patch marked as superseded and not required for uninstall is flagged as removable.
+
+If the API returns incomplete data (rare, but it can happen with corrupted installer state), we fall back to reading the registry. The fallback only adds files to the "still needed" set, never to the "removable" set.
 
 ## Is it safe?
 
@@ -77,11 +85,12 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 - **Move** copies files to a location you choose first, if you'd rather be cautious
 - Nothing is touched until you click Delete or Move and confirm
 - The app warns you if Windows has pending updates that could affect results
+- 99 automated tests cover the core logic and run on every commit (see the green CI badge above)
 - [VirusTotal scan](https://www.virustotal.com/gui/file/4e42eba0da04c9e823c97aa79339cdbd91ed8c92aff71d5206f459030a555a1b): 0/70 detections. Source code is all on GitHub
 
 ## Download
 
-1. Download **InstallerClean-setup.exe** from the [releases page](../../releases/latest) and run the installer. Windows SmartScreen may say "Unknown publisher". Click **More info** then **Run anyway**. This is normal for unsigned open source software
+1. Download **InstallerClean-setup.exe** from the [releases page](../../releases/latest) and run the installer. Windows SmartScreen will say "Unknown publisher". Click **More info** then **Run anyway**. This is normal for unsigned open source software
 2. The app scans automatically on startup. Review the results, then click **Delete** or **Move**
 
 > **Prefer not to install?** Download **InstallerClean-portable.exe** instead. It's a single file, no install needed. Just download, run and delete it when you're done.
@@ -138,20 +147,6 @@ All three require an elevated (administrator) command prompt.
 - **Command line mode.** `/s` to scan, `/d` to delete, `/m` to move - for scripting and automation.
 - **No installer needed.** Download the portable or slim version, run, done.
 - **Update check.** Check for new releases from the About window.
-
-## How it works
-
-InstallerClean calls the Windows Installer COM interface directly via P/Invoke:
-
-- `MsiEnumProductsEx` to enumerate every installed product across all user contexts
-- `MsiEnumPatchesEx` to find all registered patches for each product
-- `MsiGetPatchInfoEx` to read patch state (applied, superseded or obsoleted)
-
-Any `.msi` or `.msp` file in `C:\Windows\Installer` that isn't claimed by a registered product is orphaned. Any patch marked as superseded and not required for uninstall is flagged as removable.
-
-If the API returns incomplete data (which can happen with corrupted installer state), we fall back to reading the registry (`HKLM\Software\Microsoft\Windows\CurrentVersion\Installer`). The fallback is conservative: it only adds files to the "still needed" set, never to the "removable" set.
-
-We never call `Win32_Product`. That WMI class triggers MSI consistency checks on every installed product during enumeration.
 
 ## Requirements
 
