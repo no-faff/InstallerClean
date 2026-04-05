@@ -97,8 +97,6 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 
 ## Compared to PatchCleaner
 
-InstallerClean was inspired by [PatchCleaner](https://www.homedev.com.au/free/patchcleaner), built by Aussie [John Crawford](https://www.homedev.com.au/). I found PatchCleaner because my C: drive went red in File Explorer, I found this strange `C:\Windows\Installer` folder taking up tens of GB, so I Googled the folder name, found PatchCleaner and bingo: a ton of space back in a couple of clicks. Then I noticed that PatchCleaner was closed source and it hadn't been updated in exactly ten years. So I built a new open source version for 2026 with superseded patch detection - the key feature PatchCleaner is missing, and the reason Adobe Acrobat patches (the biggest source of dead weight on most machines) get left behind.
-
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | Last updated | 2026 (active) | 3 March 2016 |
