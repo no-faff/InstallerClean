@@ -13,7 +13,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
     public FileSystemScanService(IInstallerQueryService queryService)
         : this(queryService, null) { }
 
-    /// <summary>Test constructor — injects a fake file list.</summary>
+    /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)
     {
         _queryService = queryService;

@@ -7,7 +7,7 @@ namespace InstallerClean.Services;
 /// <summary>
 /// Queries the Windows Installer API to build the complete set of registered
 /// .msi and .msp files across all installation contexts. This service only
-/// talks to the MSI API — it does not touch the filesystem.
+/// talks to the MSI API. It does not touch the filesystem.
 /// </summary>
 public sealed class InstallerQueryService : IInstallerQueryService
 {
@@ -44,10 +44,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         IProgress<string>? progress,
         CancellationToken ct)
     {
-        // Key = case-insensitive local package path → value = RegisteredPackage.
-        // We use a dictionary so that if two different code paths claim the
-        // same file, we keep the first entry (which will be the non-Adobe one
-        // from the primary enumeration).
+        // Accumulator: local package path (case-insensitive) to the registered
+        // package record. TryAdd semantics mean that if the same path is
+        // reported by both the API enumeration and the registry fallback, the
+        // API entry wins because it carries product metadata the fallback lacks.
         var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
 
         // ------------------------------------------------------------------
@@ -189,7 +189,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             if (error == MsiError.MoreData)
             {
-                // SID buffer was too small — retry with the required size.
+                // SID buffer was too small. Retry with the required size.
                 sidLen++; // space for null terminator
                 sidBuffer.Clear();
                 sidBuffer.EnsureCapacity((int)sidLen);
@@ -213,7 +213,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 results.Add((productCode.ToString(), sid, installedContext));
             }
             // Skip products with other errors (e.g. bad config) but don't spin
-            // forever — if we've seen too many consecutive failures, bail out.
+            // forever. If we've seen too many consecutive failures, bail out.
             else if (results.Count == 0 && index > 10)
             {
                 throw new InvalidOperationException(

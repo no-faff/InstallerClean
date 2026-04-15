@@ -11,7 +11,7 @@ public partial class ConfirmDeleteWindow : Window
         var label = DisplayHelpers.Pluralise(fileCount, "file", "files");
         MessageText.Text = $"Delete {fileCount} {label} ({sizeDisplay})?";
 
-        // Warn if total size exceeds 1 GB — Recycle Bin may permanently delete large files
+        // Warn if total size exceeds 1 GB. Recycle Bin may permanently delete large files.
         if (totalBytes > 1_073_741_824)
             LargeSizeWarning.Visibility = Visibility.Visible;
     }

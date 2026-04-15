@@ -33,10 +33,8 @@ public partial class MainViewModel : ObservableObject
     public string OrphanedSummaryText =>
         $"{OrphanedFileCount} {DisplayHelpers.Pluralise(OrphanedFileCount, "file", "files")} to clean up";
 
-    // Pending reboot
     [ObservableProperty] private bool _hasPendingReboot;
 
-    // Move destination (persisted)
     [ObservableProperty] private string _moveDestination = string.Empty;
 
     // Busy state for move/delete operations
@@ -49,7 +47,6 @@ public partial class MainViewModel : ObservableObject
 
     private CancellationTokenSource? _operationCts;
 
-    // Whether scan has completed at least once
     [ObservableProperty] private bool _hasScanned;
 
     // Completion screen state
@@ -252,7 +249,6 @@ public partial class MainViewModel : ObservableObject
         var totalBytes = removableFiles.Sum(f => f.SizeBytes);
         var sizeDisplay = OrphanedSizeDisplay;
 
-        // Check free space
         var driveInfo = new DriveInfo(Path.GetPathRoot(dest)!);
         if (driveInfo.AvailableFreeSpace < totalBytes)
         {
