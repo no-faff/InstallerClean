@@ -1,6 +1,8 @@
+using InstallerClean.Models;
+
 namespace InstallerClean.Services;
 
 public interface IUpdateCheckService
 {
-    Task<string?> GetLatestVersionAsync();
+    Task<UpdateCheckResult> GetLatestVersionAsync();
 }

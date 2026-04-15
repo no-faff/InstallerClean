@@ -16,6 +16,9 @@ public class SettingsServiceTests : IDisposable
     {
         if (File.Exists(_tempFile))
             File.Delete(_tempFile);
+        var badFile = _tempFile + ".bad";
+        if (File.Exists(badFile))
+            File.Delete(badFile);
     }
 
     [Fact]
@@ -52,5 +55,31 @@ public class SettingsServiceTests : IDisposable
         var settings = svc.Load();
 
         Assert.Equal(string.Empty, settings.MoveDestination);
+    }
+
+    [Fact]
+    public void Load_renames_corrupt_file_to_dot_bad()
+    {
+        File.WriteAllText(_tempFile, "this is not valid json {{{");
+        var svc = new SettingsService(_tempFile);
+
+        svc.Load();
+
+        Assert.False(File.Exists(_tempFile), "Corrupt file should have been moved away");
+        Assert.True(File.Exists(_tempFile + ".bad"), "Corrupt content should be preserved in a .bad file for recovery");
+    }
+
+    [Fact]
+    public void Load_overwrites_existing_bad_file()
+    {
+        var badFile = _tempFile + ".bad";
+        File.WriteAllText(badFile, "previous bad");
+        File.WriteAllText(_tempFile, "new corrupt {{{");
+        var svc = new SettingsService(_tempFile);
+
+        svc.Load();
+
+        Assert.True(File.Exists(badFile));
+        Assert.Equal("new corrupt {{{", File.ReadAllText(badFile));
     }
 }

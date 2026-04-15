@@ -24,10 +24,14 @@ public partial class AboutWindow : Window
         CheckNowButton.Content = "Checking...";
         try
         {
-            var latest = await _updateCheckService.GetLatestVersionAsync();
-            if (latest is not null)
+            var result = await _updateCheckService.GetLatestVersionAsync();
+            if (result.CheckFailed)
                 MessageBox.Show(
-                    $"{latest} is available.\n\ngithub.com/no-faff/InstallerClean/releases",
+                    "Couldn't check for updates. Make sure you're connected to the internet, then try again.",
+                    "Check failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+            else if (result.LatestVersion is not null)
+                MessageBox.Show(
+                    $"{result.LatestVersion} is available.\n\ngithub.com/no-faff/InstallerClean/releases",
                     "Update available", MessageBoxButton.OK, MessageBoxImage.Information);
             else
                 MessageBox.Show(

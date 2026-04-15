@@ -28,16 +28,27 @@ public sealed class SettingsService : ISettingsService
 
     public AppSettings Load()
     {
+        if (!File.Exists(_settingsFile))
+            return new AppSettings();
+
         try
         {
-            if (!File.Exists(_settingsFile))
-                return new AppSettings();
-
             var json = File.ReadAllText(_settingsFile);
             return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
         }
         catch (Exception)
         {
+            // Back up the unreadable file so the user can recover it manually
+            // if they want to, then start fresh.
+            try
+            {
+                var badFile = _settingsFile + ".bad";
+                File.Move(_settingsFile, badFile, overwrite: true);
+            }
+            catch
+            {
+                // Best effort; if we can't move it we still return defaults.
+            }
             return new AppSettings();
         }
     }
