@@ -50,6 +50,11 @@ public sealed class MoveFilesService : IMoveFilesService
         }, cancellationToken);
     }
 
+    // GetUniqueDestPath uses File.Exists + counter to find a free name.
+    // If another process creates the chosen name between this check and
+    // File.Move (the destination is a user folder so it's theoretically
+    // possible), File.Move throws IOException and the caller's catch
+    // reports a per-file error. No data is lost.
     private static string GetUniqueDestPath(string folder, string fileName)
     {
         var candidate = Path.Combine(folder, fileName);

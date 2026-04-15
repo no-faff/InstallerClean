@@ -5,6 +5,13 @@ using InstallerClean.Models;
 
 namespace InstallerClean.Services;
 
+/// <summary>
+/// Fetches optional display metadata for an individual .msi or .msp file.
+/// All failure paths here are intentionally silent (return null / empty).
+/// This metadata is decorative in the detail panels. A missing or
+/// unreadable file should degrade the UI gracefully, not raise errors the
+/// user would need to action.
+/// </summary>
 public sealed class MsiFileInfoService : IMsiFileInfoService
 {
     public MsiSummaryInfo? GetSummaryInfo(string filePath)
@@ -23,15 +30,15 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
             var author   = GetStringProperty(hSummary, MsiSummaryProperty.Author);
             var comments = GetStringProperty(hSummary, MsiSummaryProperty.Comments);
 
-            // Signature retrieval can fail independently (locked file etc.)
-            // — don't lose the metadata we already have.
+            // Signature retrieval can fail independently (locked file etc.).
+            // Don't lose the metadata we already have if that happens.
             var sig = GetDigitalSignature(filePath);
 
             return new MsiSummaryInfo(title, subject, author, comments, sig);
         }
         catch (Exception)
         {
-            // MSI handle operations failed — no metadata available at all.
+            // MSI handle operations failed. No metadata available at all.
             return null;
         }
         finally
