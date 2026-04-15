@@ -31,8 +31,9 @@ public partial class App : Application
 
         DispatcherUnhandledException += (_, args) =>
         {
+            var logPath = CrashLog.Write(args.Exception);
             MessageBox.Show(
-                $"An unexpected error occurred and InstallerClean needs to close.\n\n{args.Exception.Message}",
+                $"An unexpected error occurred and InstallerClean needs to close.\n\n{args.Exception.Message}\n\nDetails written to:\n{logPath}",
                 "InstallerClean", MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
             Shutdown(1);
@@ -42,8 +43,9 @@ public partial class App : Application
         {
             if (args.ExceptionObject is Exception ex)
             {
+                var logPath = CrashLog.Write(ex);
                 MessageBox.Show(
-                    $"An unexpected error occurred and InstallerClean needs to close.\n\n{ex.Message}",
+                    $"An unexpected error occurred and InstallerClean needs to close.\n\n{ex.Message}\n\nDetails written to:\n{logPath}",
                     "InstallerClean", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         };
@@ -143,13 +145,23 @@ public partial class App : Application
             return;
         }
 
+        using var cts = new CancellationTokenSource();
+        ConsoleCancelEventHandler cancelHandler = (_, cancelArgs) =>
+        {
+            cancelArgs.Cancel = true; // keep the app running long enough to stop gracefully
+            Console.WriteLine();
+            Console.WriteLine("Cancelling...");
+            cts.Cancel();
+        };
+        Console.CancelKeyPress += cancelHandler;
+
         try
         {
             var queryService = new InstallerQueryService();
             var scanService = new FileSystemScanService(queryService);
 
             Console.WriteLine("Scanning C:\\Windows\\Installer...");
-            var scanResult = await scanService.ScanAsync();
+            var scanResult = await scanService.ScanAsync(cancellationToken: cts.Token);
 
             var count = scanResult.RemovableFiles.Count;
             var size = DisplayHelpers.FormatSize(scanResult.RemovableFiles.Sum(f => f.SizeBytes));
@@ -177,7 +189,7 @@ public partial class App : Application
             {
                 var deleteService = new DeleteFilesService();
                 Console.WriteLine($"Deleting {count} files...");
-                var result = await deleteService.DeleteFilesAsync(filePaths, null, CancellationToken.None);
+                var result = await deleteService.DeleteFilesAsync(filePaths, null, cts.Token);
                 Console.WriteLine($"Deleted {result.DeletedCount} {DisplayHelpers.Pluralise(result.DeletedCount, "file", "files")}.");
                 if (result.Errors.Count > 0)
                 {
@@ -201,7 +213,7 @@ public partial class App : Application
 
                 var moveService = new MoveFilesService();
                 Console.WriteLine($"Moving {count} files to {dest}...");
-                var result = await moveService.MoveFilesAsync(filePaths, dest, null, CancellationToken.None);
+                var result = await moveService.MoveFilesAsync(filePaths, dest, null, cts.Token);
                 Console.WriteLine($"Moved {result.MovedCount} {DisplayHelpers.Pluralise(result.MovedCount, "file", "files")}.");
                 if (result.Errors.Count > 0)
                 {
@@ -212,6 +224,11 @@ public partial class App : Application
                 Shutdown(result.Errors.Count > 0 ? 1 : 0);
             }
         }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("Cancelled.");
+            Shutdown(130); // convention: exit 130 for Ctrl+C
+        }
         catch (UnauthorizedAccessException)
         {
             Console.WriteLine("Error: administrator privileges required. Run from an elevated command prompt.");
@@ -221,6 +238,10 @@ public partial class App : Application
         {
             Console.WriteLine($"Error: {ex.Message}");
             Shutdown(1);
+        }
+        finally
+        {
+            Console.CancelKeyPress -= cancelHandler;
         }
     }
 

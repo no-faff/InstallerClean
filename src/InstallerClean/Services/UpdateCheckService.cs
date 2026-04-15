@@ -1,6 +1,7 @@
 using System.Net.Http;
 using System.Reflection;
 using System.Text.Json;
+using InstallerClean.Models;
 
 namespace InstallerClean.Services;
 
@@ -8,31 +9,57 @@ public sealed class UpdateCheckService : IUpdateCheckService
 {
     private const string ApiUrl = "https://api.github.com/repos/no-faff/InstallerClean/releases/latest";
 
-    public async Task<string?> GetLatestVersionAsync()
+    private readonly HttpClient _httpClient;
+
+    public UpdateCheckService()
     {
+        _httpClient = new HttpClient();
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", "InstallerClean");
+        _httpClient.Timeout = TimeSpan.FromSeconds(10);
+    }
+
+    internal UpdateCheckService(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+
+    public async Task<UpdateCheckResult> GetLatestVersionAsync()
+    {
+        string json;
         try
         {
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", "InstallerClean");
-            client.Timeout = TimeSpan.FromSeconds(10);
+            json = await _httpClient.GetStringAsync(ApiUrl);
+        }
+        catch
+        {
+            // Network unreachable, timeout, DNS failure, HTTP error, etc.
+            return UpdateCheckResult.Failed();
+        }
 
-            var json = await client.GetStringAsync(ApiUrl);
+        try
+        {
             using var doc = JsonDocument.Parse(json);
             var tagName = doc.RootElement.GetProperty("tag_name").GetString();
-            if (tagName is null) return null;
+            if (string.IsNullOrEmpty(tagName))
+                return UpdateCheckResult.Failed();
 
             var latestVersion = Version.Parse(tagName.TrimStart('v'));
             var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            if (assemblyVersion is null) return null;
+            if (assemblyVersion is null)
+                return UpdateCheckResult.Failed();
 
             var currentVersion = new Version(assemblyVersion.Major, assemblyVersion.Minor,
                 assemblyVersion.Build < 0 ? 0 : assemblyVersion.Build);
 
-            return latestVersion > currentVersion ? tagName : null;
+            return latestVersion > currentVersion
+                ? UpdateCheckResult.Available(tagName)
+                : UpdateCheckResult.UpToDate();
         }
         catch
         {
-            return null;
+            // Malformed JSON or unparseable version. Treat as failure rather
+            // than a false "up to date" signal.
+            return UpdateCheckResult.Failed();
         }
     }
 }
