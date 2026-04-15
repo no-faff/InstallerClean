@@ -16,6 +16,7 @@
     <Authors>No Faff</Authors>
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <ItemGroup>
