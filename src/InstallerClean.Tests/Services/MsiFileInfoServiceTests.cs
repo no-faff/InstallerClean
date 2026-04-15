@@ -1,4 +1,3 @@
-using InstallerClean.Models;
 using InstallerClean.Services;
 
 namespace InstallerClean.Tests.Services;
@@ -88,20 +87,6 @@ public class MsiFileInfoServiceTests : IDisposable
 
         // Should return null without throwing (the MsiGetSummaryInformation call will fail)
         Assert.Null(result);
-    }
-
-    [Fact]
-    public void GetSummaryInfo_result_has_all_properties_when_valid()
-    {
-        // If we get a valid result, all properties should be non-null strings
-        // (possibly empty, but not null). We test this against the MsiSummaryInfo record.
-        var info = new MsiSummaryInfo("Title", "Subject", "Author", "Comments", "Sig");
-
-        Assert.NotNull(info.Title);
-        Assert.NotNull(info.Subject);
-        Assert.NotNull(info.Author);
-        Assert.NotNull(info.Comments);
-        Assert.NotNull(info.DigitalSignature);
     }
 
     [Fact]
