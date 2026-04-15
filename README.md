@@ -95,6 +95,13 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 
 > **Prefer not to install?** Download **InstallerClean-portable.exe** instead. It's a single file, no install needed. Just download, run and delete it when you're done.
 
+Or install via [Scoop](https://scoop.sh):
+
+```
+scoop bucket add no-faff https://github.com/no-faff/scoop-bucket
+scoop install installerclean
+```
+
 ## Compared to PatchCleaner
 
 | | **InstallerClean** | **PatchCleaner** |
