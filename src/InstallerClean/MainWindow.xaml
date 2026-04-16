@@ -373,6 +373,7 @@
                     <!-- Close button -->
                     <Button x:Name="CompletionCloseButton" Style="{StaticResource AccentPill}"
                             Content="Close" Command="{Binding CloseAppCommand}"
+                            IsDefault="True"
                             HorizontalAlignment="Center" MinWidth="120"
                             Margin="0,0,0,8"/>
 
