@@ -204,8 +204,6 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private static string InstallerFolder => InstallerCacheHelpers.InstallerFolder;
-
     [RelayCommand]
     private void CancelOperation()
     {
@@ -218,11 +216,10 @@ public partial class MainViewModel : ObservableObject
         if (_lastScanResult is null) return;
 
         var dest = MoveDestination;
-        if (dest.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-            .Equals(InstallerFolder.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
+        if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
         {
             MessageBox.Show(
-                "The destination cannot be the Windows Installer folder itself.",
+                "The destination cannot be inside the Windows Installer folder.",
                 "Invalid destination", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }

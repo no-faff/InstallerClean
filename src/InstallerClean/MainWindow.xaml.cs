@@ -16,6 +16,14 @@ public partial class MainWindow : Window
         DataContext = _vm = viewModel;
         _vm.PropertyChanged += OnViewModelPropertyChanged;
         PreviewKeyDown += OnPreviewKeyDown;
+        Closed += OnClosed;
+    }
+
+    private void OnClosed(object? sender, EventArgs e)
+    {
+        _vm.PropertyChanged -= OnViewModelPropertyChanged;
+        PreviewKeyDown -= OnPreviewKeyDown;
+        Closed -= OnClosed;
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)

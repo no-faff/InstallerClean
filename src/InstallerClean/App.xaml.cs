@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -18,9 +19,30 @@ public partial class App : Application
 
     private const int ATTACH_PARENT_PROCESS = -1;
 
+    private static Mutex? _singleInstanceMutex;
+
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        _singleInstanceMutex = new Mutex(true, @"Global\InstallerClean_SingleInstance", out bool isFirstInstance);
+        if (!isFirstInstance)
+        {
+            if (e.Args.Length > 0)
+            {
+                AttachConsole(ATTACH_PARENT_PROCESS);
+                Console.WriteLine("Another instance of InstallerClean is already running.");
+                Shutdown(1);
+            }
+            else
+            {
+                MessageBox.Show(
+                    "InstallerClean is already running.",
+                    "InstallerClean", MessageBoxButton.OK, MessageBoxImage.Information);
+                Shutdown();
+            }
+            return;
+        }
 
         // CLI mode: /d (delete), /m (move to saved location), /m <path> (move to path)
         if (e.Args.Length > 0)
@@ -207,6 +229,13 @@ public partial class App : Application
                 if (string.IsNullOrWhiteSpace(dest))
                 {
                     Console.WriteLine("Error: no move destination specified. Use /m PATH or set a default in the GUI.");
+                    Shutdown(1);
+                    return;
+                }
+
+                if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
+                {
+                    Console.WriteLine("Error: destination cannot be inside the Windows Installer folder.");
                     Shutdown(1);
                     return;
                 }
