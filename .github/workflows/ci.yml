@@ -16,10 +16,20 @@ jobs:
       - name: Setup .NET 8
         uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
         with:
-          dotnet-version: 8.0.x
+          global-json-file: global.json
 
       - name: Build
         run: dotnet build src/InstallerClean/InstallerClean.csproj
 
       - name: Test
         run: dotnet test src/InstallerClean.Tests/
+
+      - name: Smoke-publish self-contained
+        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/self-contained
+
+      - name: Smoke-publish framework-dependent
+        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish/framework-dependent
+
+      - name: Audit vulnerable packages
+        run: dotnet list src/InstallerClean/InstallerClean.csproj package --vulnerable --include-transitive
+        continue-on-error: true

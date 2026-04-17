@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <!-- Single source of truth for the product version.
+         InstallerClean.csproj picks this up via <Version> inheritance,
+         and the release script reads it from here to pass /DAppVersion
+         to the Inno Setup compiler, so the installer never drifts from
+         the assembly. -->
+    <Version>1.5.2</Version>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+</Project>

@@ -22,7 +22,7 @@ jobs:
       - name: Setup .NET 8
         uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
         with:
-          dotnet-version: 8.0.x
+          global-json-file: global.json
 
       - name: Initialise CodeQL
         uses: github/codeql-action/init@b25d0ebf40e5b63ee81e1bd6e5d2a12b7c2aeb61 # v4

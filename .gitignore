@@ -195,6 +195,7 @@ DocProject/Help/html
 # Click-Once directory
 publish/
 publish-fw/
+publish-repro/
 
 # Publish Web Output
 *.[Pp]ublish.xml
@@ -453,3 +454,6 @@ HANDOFF.md
 # Chat exports and personal files
 exports/
 non-repo-files/
+
+# /export command drops timestamped transcripts at repo root
+/20*-*-*.txt
