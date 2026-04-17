@@ -32,15 +32,14 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
             var keywords = GetStringProperty(hSummary, MsiSummaryProperty.Keywords);
             var appName  = GetStringProperty(hSummary, MsiSummaryProperty.AppName);
 
-            // Signature retrieval can fail independently (locked file etc.).
-            // Don't lose the metadata we already have if that happens.
+            // Signature retrieval can fail independently of the summary
+            // properties, so capture it separately to avoid losing them.
             var sig = GetDigitalSignature(filePath);
 
             return new MsiSummaryInfo(title, subject, author, comments, sig, keywords, appName);
         }
         catch (Exception)
         {
-            // MSI handle operations failed. No metadata available at all.
             return null;
         }
         finally
@@ -56,13 +55,12 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
         int intValue;
         uint bufferLen = 0;
 
-        // First call: get required buffer size.
         var error = MsiNativeMethods.MsiSummaryInfoGetProperty(
             hSummary, propertyId,
             out dataType, out intValue, IntPtr.Zero,
             null, ref bufferLen);
 
-        // The first call returns MoreData (234) or Success when there is a value.
+        // MoreData is the first-call "tell me the buffer size" code.
         if (error != MsiError.Success && error != MsiError.MoreData)
             return string.Empty;
 
@@ -86,9 +84,8 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
         {
             using var cert = new X509Certificate2(
                 X509Certificate.CreateFromSignedFile(filePath));
-            // X500DistinguishedName.Format respects quoted commas and other
-            // RFC-4514 escapes; naive String.Split(',') would corrupt
-            // subjects like CN="Acme, Inc.", O=Acme.
+            // Format() respects RFC-4514 escapes; naive String.Split(',')
+            // would corrupt subjects like CN="Acme, Inc.", O=Acme.
             return cert.SubjectName.Format(multiLine: true).TrimEnd('\r', '\n');
         }
         catch (Exception)

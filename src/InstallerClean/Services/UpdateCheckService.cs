@@ -18,8 +18,8 @@ public sealed class UpdateCheckService : IUpdateCheckService, IDisposable
         _httpClient = new HttpClient
         {
             Timeout = TimeSpan.FromSeconds(10),
-            // GitHub's real response is ~10 KB. Cap the buffer to defend
-            // against an unexpectedly large or malicious body.
+            // GitHub's real response is ~10 KB; the cap defends against a
+            // malicious or misbehaving endpoint serving a much larger body.
             MaxResponseContentBufferSize = 256 * 1024,
         };
         _httpClient.DefaultRequestHeaders.Add("User-Agent", "InstallerClean");
@@ -43,7 +43,6 @@ public sealed class UpdateCheckService : IUpdateCheckService, IDisposable
         }
         catch
         {
-            // Network unreachable, timeout, DNS failure, HTTP error, etc.
             return UpdateCheckResult.Failed();
         }
 
@@ -68,8 +67,8 @@ public sealed class UpdateCheckService : IUpdateCheckService, IDisposable
         }
         catch
         {
-            // Malformed JSON or unparseable version. Treat as failure rather
-            // than a false "up to date" signal.
+            // Malformed JSON or unparseable version must not become a false
+            // "up to date" signal.
             return UpdateCheckResult.Failed();
         }
     }

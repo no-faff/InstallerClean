@@ -72,7 +72,7 @@ public partial class OrphanedFilesViewModel : ObservableObject, IDisposable
         }
         catch (OperationCanceledException)
         {
-            // Window closed mid-read; drop the result silently.
+            // Window closed; drop the result.
         }
         catch
         {

@@ -18,9 +18,7 @@ public partial class SplashWindow : Window
 
     public void OnScanProgress(string message)
     {
-        // Asymptote to 95%. The closing UpdateStep("Done", 100) from App
-        // brings the bar to full on completion, so progress actually
-        // reaches 100 rather than stalling at 90.
+        // Asymptote to 95; the closing UpdateStep("Done", 100) finishes the fill.
         _progressMessageCount++;
         var percent = 10 + 85.0 * _progressMessageCount / (_progressMessageCount + 15);
         UpdateStep(message, percent);

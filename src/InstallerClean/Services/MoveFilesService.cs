@@ -10,11 +10,9 @@ public sealed class MoveFilesService : IMoveFilesService
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        // Defence in depth: the UI (MainViewModel.MoveAllAsync) and the CLI
-        // (App.RunCliAsync) already check this, but the service must not
-        // trust callers. If we somehow end up here with a destination that
-        // resolves into C:\Windows\Installer, the whole safety model
-        // collapses.
+        // Defence in depth: the whole safety model collapses if files move
+        // back inside C:\Windows\Installer, so the service refuses directly
+        // rather than trusting upstream callers to have checked.
         if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
             throw new InvalidOperationException(
                 $"Refusing to move files into the Windows Installer folder (destination: {destinationFolder}).");
@@ -62,10 +60,8 @@ public sealed class MoveFilesService : IMoveFilesService
 
     private static void ProbeDestinationWriteable(string folder)
     {
-        // Write one random-named probe file and delete it. This fails fast
-        // with a single clean error when the destination is read-only or
-        // lacks write permission, instead of collecting per-file errors
-        // for every one of potentially thousands of source files.
+        // Fail fast with one clean error rather than collecting per-file
+        // errors for every source when the destination is read-only.
         var probe = Path.Combine(folder, Path.GetRandomFileName());
         try
         {
@@ -79,15 +75,10 @@ public sealed class MoveFilesService : IMoveFilesService
         }
     }
 
-    // GetUniqueDestPath uses File.Exists + counter to find a free name.
-    // If another process creates the chosen name between this check and
-    // File.Move (the destination is a user folder so it's theoretically
-    // possible), File.Move throws IOException because it refuses to
-    // overwrite existing targets. The caller's catch reports a per-file
-    // error; no data is lost and no symlink follow-through can occur.
-    // DO NOT switch to File.Move(src, dst, overwrite: true) here without
-    // also defending against a reparse-point planted at destPath during
-    // that race.
+    // DO NOT switch to File.Move(src, dst, overwrite: true) without also
+    // defending against a reparse-point planted at destPath during the
+    // unique-name race. Current File.Move refuses existing targets so the
+    // race ends in a per-file error, not a symlink follow-through.
     private static string GetUniqueDestPath(string folder, string fileName)
     {
         var candidate = Path.Combine(folder, fileName);

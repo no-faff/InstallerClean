@@ -34,9 +34,8 @@ internal static class InstallerCacheHelpers
         try { normalised = Path.GetFullPath(path); }
         catch { return path; }
 
-        // Walk up parents until we find something that exists on disk.
-        // GetFinalPathNameByHandle needs an open handle, which needs
-        // something to open.
+        // GetFinalPathNameByHandle needs an existing target; walk up until
+        // an ancestor exists and open that.
         var probe = normalised;
         while (probe.Length > 0 && !Directory.Exists(probe) && !File.Exists(probe))
         {
@@ -70,8 +69,7 @@ internal static class InstallerCacheHelpers
 
             var resolved = StripLongPathPrefix(buffer.ToString());
 
-            // If we walked up to resolve a still-uncreated subtree,
-            // re-attach the suffix the caller asked about.
+            // Reattach the not-yet-created suffix the caller asked about.
             if (probe.Length < normalised.Length)
             {
                 var suffix = normalised.Substring(probe.Length);

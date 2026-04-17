@@ -35,18 +35,15 @@ internal static class EventLogWriter
         }
         catch
         {
-            // Best effort. Silent failure keeps the CLI robust in environments
-            // where the event log isn't writable (restricted containers,
-            // deprecated OS builds, policy-locked machines).
+            // Stdout is the primary channel; silent failure here keeps the
+            // CLI working on hosts where the event log isn't writable.
         }
     }
 
     private static void EnsureSource()
     {
-        // Source registration is per-machine and requires admin on first
-        // run. InstallerClean's manifest always elevates, so this normally
-        // succeeds. On subsequent runs SourceExists returns true and we
-        // skip the registration call.
+        // First-run registration requires admin (our manifest guarantees it);
+        // subsequent runs short-circuit via SourceExists.
         if (!EventLog.SourceExists(SourceName))
             EventLog.CreateEventSource(SourceName, "Application");
     }

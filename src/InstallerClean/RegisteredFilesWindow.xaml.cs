@@ -47,8 +47,7 @@ public partial class RegisteredFilesWindow : Window
             container?.Focus();
         }
 
-        // The VM constructor pre-sorts by product name ascending, so show the
-        // arrow matching that order rather than leaving the header unadorned.
+        // VM pre-sorts by product name ascending; show the arrow to match.
         _lastSortProperty = nameof(ProductRow.ProductName);
         _lastSortDirection = ListSortDirection.Ascending;
         _lastSortColumn = ColProductName;
