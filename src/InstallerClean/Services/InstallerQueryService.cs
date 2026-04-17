@@ -16,7 +16,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// MsiEnumPatchesEx / MsiEnumComponentsEx, the API enumerates across
     /// every user profile on the machine. Requires admin elevation.
     /// </summary>
-    private const string AllUsersSid = "s-1-1-0";
+    private const string AllUsersSid = "S-1-1-0";
 
     /// <summary>
     /// A GUID is 38 chars ({xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}) plus a
@@ -140,6 +140,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
         catch (Exception) { /* registry fallback is best-effort */ }
 
+        // Zero products on a real Windows machine means the Installer
+        // database is corrupt or the MSI API is returning empty results for
+        // reasons we shouldn't paper over. Even a fresh Windows install
+        // enumerates OS-level MSI products. Refuse to proceed rather than
+        // report a false "all clear" scan.
+        if (claimed.Count == 0)
+            throw new InvalidOperationException(
+                "The Windows Installer database appears to be empty or inaccessible. " +
+                "This is unusual even on a fresh Windows install and typically means " +
+                "the database is corrupt or a third-party tool has cleared it. " +
+                "Running 'sfc /scannow' from an elevated prompt usually repairs it.");
+
         progress?.Report($"Scan complete. {claimed.Count} registered package(s) found.");
 
         return claimed.Values.ToList().AsReadOnly();
@@ -153,21 +165,23 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Enumerates all installed products across all users and contexts.
     /// Returns a list of (productCode, userSid, context) tuples.
     /// </summary>
+    private const int MaxProductIndex = 10_000;
+    private const int MaxConsecutiveNonSuccess = 20;
+
     private static List<(string ProductCode, string? UserSid, MsiInstallContext Context)> EnumerateProducts(
         CancellationToken ct)
     {
         var results = new List<(string, string?, MsiInstallContext)>();
         var productCode = new StringBuilder(GuidBufferLength);
         var sidBuffer = new StringBuilder(SidBufferLength);
+        int consecutiveNonSuccess = 0;
 
-        for (uint index = 0; ; index++)
+        for (uint index = 0; index < MaxProductIndex; index++)
         {
             ct.ThrowIfCancellationRequested();
 
             productCode.Clear();
-            productCode.EnsureCapacity(GuidBufferLength);
             sidBuffer.Clear();
-            sidBuffer.EnsureCapacity(SidBufferLength);
             uint sidLen = (uint)(SidBufferLength - 1);
 
             var error = MsiNativeMethods.MsiEnumProductsEx(
@@ -189,7 +203,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             if (error == MsiError.MoreData)
             {
-                // SID buffer was too small. Retry with the required size.
+                // SID buffer was too small. Retry the same index with a
+                // buffer sized to what the API just told us it needed.
+                // productCode fits in GuidBufferLength; only the SID
+                // dimension of this double-call pattern varies.
                 sidLen++; // space for null terminator
                 sidBuffer.Clear();
                 sidBuffer.EnsureCapacity((int)sidLen);
@@ -207,17 +224,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             if (error == MsiError.Success)
             {
+                consecutiveNonSuccess = 0;
                 var sid = (installedContext != MsiInstallContext.Machine && sidLen > 0)
                     ? sidBuffer.ToString()
                     : null;
                 results.Add((productCode.ToString(), sid, installedContext));
             }
-            // Skip products with other errors (e.g. bad config) but don't spin
-            // forever. If we've seen too many consecutive failures, bail out.
-            else if (results.Count == 0 && index > 10)
+            else
             {
-                throw new InvalidOperationException(
-                    $"Windows Installer API returned error {error}. Unable to enumerate products.");
+                consecutiveNonSuccess++;
+                if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
+                    throw new InvalidOperationException(
+                        $"Windows Installer API returned {consecutiveNonSuccess} consecutive non-Success responses (last error {error}). Unable to enumerate products.");
             }
         }
 

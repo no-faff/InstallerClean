@@ -5,10 +5,11 @@ using InstallerClean.Services;
 
 namespace InstallerClean.ViewModels;
 
-public partial class OrphanedFilesViewModel : ObservableObject
+public partial class OrphanedFilesViewModel : ObservableObject, IDisposable
 {
     private readonly IMsiFileInfoService _infoService;
     private readonly Dictionary<string, MsiSummaryInfo?> _cache = new();
+    private readonly CancellationTokenSource _lifetimeCts = new();
 
     public IReadOnlyList<OrphanedFile> Files { get; }
     public string Summary { get; }
@@ -56,22 +57,32 @@ public partial class OrphanedFilesViewModel : ObservableObject
             return;
         }
 
+        var ct = _lifetimeCts.Token;
         try
         {
-            var info = await Task.Run(() => _infoService.GetSummaryInfo(value.FullPath));
+            var info = await Task.Run(() => _infoService.GetSummaryInfo(value.FullPath), ct);
 
-            // Selection may have changed while we were reading
+            if (ct.IsCancellationRequested) return;
             if (SelectedFile == value)
             {
                 _cache[value.FullPath] = info;
                 SelectedDetails = info;
             }
         }
+        catch (OperationCanceledException)
+        {
+            // Window closed mid-read; drop the result silently.
+        }
         catch
         {
-            if (SelectedFile == value)
+            if (!ct.IsCancellationRequested && SelectedFile == value)
                 SelectedDetails = null;
         }
     }
 
+    public void Dispose()
+    {
+        _lifetimeCts.Cancel();
+        _lifetimeCts.Dispose();
+    }
 }

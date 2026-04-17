@@ -29,12 +29,14 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
             var subject  = GetStringProperty(hSummary, MsiSummaryProperty.Subject);
             var author   = GetStringProperty(hSummary, MsiSummaryProperty.Author);
             var comments = GetStringProperty(hSummary, MsiSummaryProperty.Comments);
+            var keywords = GetStringProperty(hSummary, MsiSummaryProperty.Keywords);
+            var appName  = GetStringProperty(hSummary, MsiSummaryProperty.AppName);
 
             // Signature retrieval can fail independently (locked file etc.).
             // Don't lose the metadata we already have if that happens.
             var sig = GetDigitalSignature(filePath);
 
-            return new MsiSummaryInfo(title, subject, author, comments, sig);
+            return new MsiSummaryInfo(title, subject, author, comments, sig, keywords, appName);
         }
         catch (Exception)
         {
@@ -82,8 +84,12 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
     {
         try
         {
-            var cert = X509Certificate.CreateFromSignedFile(filePath);
-            return cert.Subject;
+            using var cert = new X509Certificate2(
+                X509Certificate.CreateFromSignedFile(filePath));
+            // X500DistinguishedName.Format respects quoted commas and other
+            // RFC-4514 escapes; naive String.Split(',') would corrupt
+            // subjects like CN="Acme, Inc.", O=Acme.
+            return cert.SubjectName.Format(multiLine: true).TrimEnd('\r', '\n');
         }
         catch (Exception)
         {

@@ -22,7 +22,7 @@
 
 There's a hidden folder on every Windows PC called `C:\Windows\Installer`. Every time you install software that uses the Windows Installer system, or apply a patch to Microsoft Office, Adobe Acrobat, Visual Studio or any other `.msi`-based application, a copy of that installer or `.msp` patch file goes into this folder. And stays there.
 
-When you uninstall the software, the files stay. When a newer patch replaces an older one, both stay. Windows never cleans them up. Disk Cleanup doesn't touch them. DISM is for a different folder entirely. Over the years, the folder grows: 10 GB, 30 GB, 50 GB. On machines with Adobe Acrobat, it can reach [well over 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
+When you uninstall the software, the files stay. When a newer patch replaces an older one, both stay. Windows never cleans them up. Disk Cleanup doesn't touch them. DISM is for a different folder entirely. Over the years, the folder grows: 10 GB, 30 GB, 50 GB. On machines with Adobe Acrobat, it can reach [more than 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
 
 These aren't temp files that get recreated the moment you close a cleaning tool. They're genuine dead weight: old installers from software you uninstalled years ago and patches that have been replaced three times over. Once they're gone, they don't come back.
 
@@ -85,7 +85,7 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 - **Move** copies files to a location you choose first, if you'd rather be cautious
 - Nothing is touched until you click Delete or Move and confirm
 - The app warns you if Windows has pending updates that could affect results
-- 99 automated tests cover the core logic and run on every commit (see the green CI badge above)
+- More than 140 automated tests cover the core logic and run on every commit (see the green CI badge above)
 - [VirusTotal scan](https://www.virustotal.com/gui/file/4e42eba0da04c9e823c97aa79339cdbd91ed8c92aff71d5206f459030a555a1b): 0/70 detections. Source code is all on GitHub
 
 ## Download
@@ -124,14 +124,12 @@ scoop install installerclean
 InstallerClean supports headless operation for scripting and sysadmin use:
 
 ```
-InstallerClean - clean up C:\Windows\Installer
-
 Usage:
-  InstallerClean.exe          Launch the GUI
-  InstallerClean.exe /s       Scan only - list removable files
-  InstallerClean.exe /d       Delete removable files (Recycle Bin)
-  InstallerClean.exe /m       Move to saved default location
-  InstallerClean.exe /m PATH  Move to specified path
+  installerclean-cli           Launch the GUI
+  installerclean-cli /s        Scan only - list removable files
+  installerclean-cli /d        Delete removable files (Recycle Bin)
+  installerclean-cli /m        Move to saved default location
+  installerclean-cli /m PATH   Move to specified path
 ```
 
 Also accepts `--help`, `/?` and `-h`.
@@ -141,6 +139,16 @@ Also accepts `--help`, `/?` and `-h`.
 `/d` and `/m` scan and then act. `/d` sends removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit code is 0 on success, 1 if any files failed.
 
 All three require an elevated (administrator) command prompt.
+
+### Why `installerclean-cli` and not `installerclean.exe`?
+
+InstallerClean is a WPF app so PowerShell and cmd do not wait for it when you run the raw `InstallerClean.exe /s`, which makes CLI output interleave with your shell prompt. `installerclean-cli.exe` is a tiny console launcher (under 50 KB) that forwards its arguments to the real app and blocks until the scan completes. You'll find it alongside `InstallerClean.exe` in the install directory. Its source is in `cli-launcher/launcher.c` in the repository.
+
+Portable and slim downloads are single-file and don't include the launcher. To use them from PowerShell, wrap the invocation yourself:
+
+```powershell
+Start-Process -Wait -NoNewWindow .\InstallerClean-portable.exe -ArgumentList '/s'
+```
 
 ## Features
 

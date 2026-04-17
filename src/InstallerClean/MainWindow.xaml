@@ -4,13 +4,13 @@
         Title="InstallerClean"
         Width="720" Height="480"
         MinWidth="520" MinHeight="400"
-        ResizeMode="CanMinimize"
+        ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource Base100}">
 
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="32" GlassFrameThickness="-1"
-                      ResizeBorderThickness="0"/>
+                      ResizeBorderThickness="6"/>
     </WindowChrome.WindowChrome>
 
     <Window.InputBindings>
@@ -33,19 +33,22 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal"
                     VerticalAlignment="Center" Margin="12,0,0,0">
             <Image Source="Assets/splash-icon.png" Width="16" Height="16"
-                   RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,8,0"/>
-            <TextBlock Text="InstallerClean" Foreground="#cbd5e1"
+                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"/>
+            <TextBlock Text="InstallerClean" Foreground="{StaticResource Body}"
                        FontSize="14" FontWeight="Medium"/>
         </StackPanel>
         <StackPanel Grid.Row="0" Orientation="Horizontal"
                     HorizontalAlignment="Right" VerticalAlignment="Top">
             <Button Style="{StaticResource CaptionButton}" Content="&#x2015;"
                     Click="MinimizeClick" AutomationProperties.Name="Minimise"/>
+            <Button Style="{StaticResource CaptionButton}" Content="&#x25A1;"
+                    Click="MaximizeClick" AutomationProperties.Name="Maximise"/>
             <Button Style="{StaticResource CaptionCloseButton}" Content="&#x2715;"
                     Click="CloseClick" AutomationProperties.Name="Close"/>
         </StackPanel>
 
-        <Grid Grid.Row="1" Grid.RowSpan="2" Margin="24,0,24,48" VerticalAlignment="Center">
+        <Grid Grid.Row="1" Grid.RowSpan="2" Margin="24,0,24,48" VerticalAlignment="Center"
+              MaxWidth="720" HorizontalAlignment="Center">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="16"/>
@@ -58,7 +61,7 @@
             <StackPanel Grid.Row="0">
 
                 <!-- Explanatory text -->
-                <TextBlock TextWrapping="Wrap" Foreground="#94a3b8" FontSize="12" Margin="0,0,0,16"
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Muted}" FontSize="12" Margin="{StaticResource GapBottom.Lg}"
                            Text="C:\Windows\Installer contains cached files used by Windows to repair and update software. Orphaned files are no longer needed by any installed product. Superseded patches have been replaced by newer updates. Both are safe to move or delete to free up space."/>
 
                 <!-- Pending reboot warning (Phosphor fill, tweaked !) -->
@@ -68,7 +71,18 @@
                           Fill="{StaticResource Warning}" Width="16" Height="16" Stretch="Uniform"
                           VerticalAlignment="Center" Margin="0,0,6,0"/>
                     <TextBlock Text="Windows has pending updates. Restart before moving or deleting files."
-                               Foreground="#cbd5e1" VerticalAlignment="Center"/>
+                               Foreground="{StaticResource Body}" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Registered files missing from disk -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,18"
+                            Visibility="{Binding HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
+                    <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
+                          Fill="{StaticResource Warning}" Width="16" Height="16" Stretch="Uniform"
+                          VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBlock Text="{Binding MissingFromDiskSummaryText}"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource Body}" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <Grid>
@@ -83,22 +97,23 @@
 
                     <!-- Still used -->
                     <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
-                               Foreground="#94a3b8" FontSize="14"
+                               Foreground="{StaticResource Muted}" FontSize="14"
                                Text="{Binding RegisteredSummaryText}"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding RegisteredSizeDisplay}"
-                               Foreground="#94a3b8" FontSize="14"
+                               Foreground="{StaticResource Muted}" FontSize="14"
                                VerticalAlignment="Center" MinWidth="72" TextAlignment="Right"
                                Margin="12,0"/>
                     <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource GhostPill}"
                             Content="Details" Command="{Binding OpenRegisteredDetailsCommand}"
                             Height="28" Padding="12,0" FontSize="14"
-                            VerticalAlignment="Center" Margin="12,0,0,0"/>
+                            VerticalAlignment="Center" Margin="12,0,0,0"
+                            AutomationProperties.Name="View registered files"/>
                 </Grid>
 
             </StackPanel>
 
             <!-- ── Separator ────────────────────────────────────── -->
-            <Border Grid.Row="2" BorderBrush="#334155" BorderThickness="0,1,0,0"/>
+            <Border Grid.Row="2" BorderBrush="{StaticResource Primary}" BorderThickness="0,1,0,0"/>
 
             <!-- ── Action zone: orphaned + move/delete ──────────── -->
             <Grid Grid.Row="4">
@@ -120,21 +135,22 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" VerticalAlignment="Center"
-                               Foreground="#f8fafc" FontSize="14"
+                               Foreground="{StaticResource Fg}" FontSize="14"
                                Text="{Binding OrphanedSummaryText}"/>
                     <TextBlock Grid.Column="1" Text="{Binding OrphanedSizeDisplay}"
-                               Foreground="#f8fafc" FontSize="14"
+                               Foreground="{StaticResource Fg}" FontSize="14"
                                VerticalAlignment="Center" MinWidth="72" TextAlignment="Right"
                                Margin="12,0"/>
                     <Button Grid.Column="2" Style="{StaticResource GhostPill}"
                             Content="Details" Command="{Binding OpenOrphanedDetailsCommand}"
                             Height="28" Padding="12,0" FontSize="14"
-                            VerticalAlignment="Center" Margin="12,0,0,0"/>
+                            VerticalAlignment="Center" Margin="12,0,0,0"
+                            AutomationProperties.Name="View orphaned files"/>
                 </Grid>
 
                 <!-- Move location label -->
                 <TextBlock Grid.Row="2" Text="MOVE LOCATION"
-                           Foreground="#cbd5e1" FontSize="14"/>
+                           Foreground="{StaticResource Body}" FontSize="14"/>
 
                 <!-- Move destination -->
                 <Grid Grid.Row="4">
@@ -146,11 +162,13 @@
 
                     <Grid Grid.Column="0">
                         <TextBox Style="{StaticResource PillTextBox}"
-                                 Text="{Binding MoveDestination, Mode=OneWay}"
-                                 IsReadOnly="True"/>
+                                 Text="{Binding MoveDestination, Mode=TwoWay,
+                                                UpdateSourceTrigger=LostFocus}"
+                                 AutomationProperties.Name="Move destination folder"
+                                 ToolTip="Where the orphaned files will be moved. Type a path, paste one, or click Browse."/>
                         <TextBlock Text="Move destination..."
                                    Foreground="{StaticResource Dim}" FontSize="12" FontStyle="Italic"
-                                   Padding="16,0" VerticalAlignment="Center"
+                                   Padding="12,0" VerticalAlignment="Center"
                                    IsHitTestVisible="False">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
@@ -176,10 +194,10 @@
 
                     <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
                             Content="_Delete" Command="{Binding DeleteAllCommand}"
-                            Margin="0,0,8,0"/>
+                            Margin="{StaticResource GapRight.Sm}"/>
 
                     <TextBlock DockPanel.Dock="Left" Text="{Binding OperationProgress}"
-                               VerticalAlignment="Center" Foreground="#94a3b8"
+                               VerticalAlignment="Center" Foreground="{StaticResource Muted}"
                                FontSize="12"
                                TextTrimming="CharacterEllipsis"/>
                 </DockPanel>
@@ -190,7 +208,7 @@
         <!-- ── Bottom nav ────────────────────────────────────── -->
         <DockPanel Grid.Row="3" LastChildFill="False" Margin="4,8,24,8">
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
-                    Content="_Re-scan" Command="{Binding RefreshCommand}"/>
+                    Content="_Re-scan" Command="{Binding ScanCommand}"/>
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     Content="_About" Command="{Binding ShowAboutCommand}" Margin="4,0,0,0"/>
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
@@ -199,7 +217,7 @@
                     ToolTipService.InitialShowDelay="0"
                     Padding="6,0" Height="28">
                 <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                      Fill="#ef4444" Width="18" Height="18" Stretch="Uniform"
+                      Fill="{StaticResource Heart}" Width="18" Height="18" Stretch="Uniform"
                       RenderTransformOrigin="0.5,0.5">
                     <Path.RenderTransform>
                         <ScaleTransform ScaleX="1" ScaleY="1"/>
@@ -239,7 +257,7 @@
                     Command="{Binding StarOnGitHubCommand}"
                     AutomationProperties.Name="Leave a star on GitHub"
                     ToolTipService.InitialShowDelay="0"
-                    Padding="6,0" Height="28" Margin="0,0,12,0">
+                    Padding="6,0" Height="28" Margin="{StaticResource GapRight.Md}">
                 <Path Data="m12.672.668 3.059 6.197 6.838.993a.75.75 0 0 1 .416 1.28l-4.948 4.823 1.168 6.812a.75.75 0 0 1-1.088.79L12 18.347l-6.116 3.216a.75.75 0 0 1-1.088-.791l1.168-6.811-4.948-4.823a.749.749 0 0 1 .416-1.279l6.838-.994L11.327.668a.75.75 0 0 1 1.345 0Z"
                       Fill="{StaticResource Warning}" Width="18" Height="18" Stretch="Uniform"
                       RenderTransformOrigin="0.5,0.5">
@@ -284,10 +302,15 @@
         <Grid Grid.RowSpan="4" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}">
             <Rectangle Fill="{StaticResource Overlay}"/>
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <ProgressBar IsIndeterminate="True" Width="240" Height="8" Margin="0,0,0,12"
+                <ProgressBar IsIndeterminate="True" Width="240" Height="8" Margin="{StaticResource GapBottom.Md}"
                              AutomationProperties.Name="Scanning progress"/>
-                <TextBlock Text="{Binding ScanProgress}" Foreground="#f8fafc"
-                           FontSize="14" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding ScanProgress}" Foreground="{StaticResource Fg}"
+                           FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,14"/>
+                <Button x:Name="ScanCancelButton" Style="{StaticResource GhostPill}"
+                        Content="_Cancel" Command="{Binding CancelScanCommand}"
+                        Height="28" Padding="16,0" FontSize="12"
+                        HorizontalAlignment="Center"
+                        AutomationProperties.Name="Cancel scan"/>
             </StackPanel>
         </Grid>
 
@@ -298,12 +321,12 @@
                     Padding="28,22" MinWidth="260"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel>
-                    <TextBlock Text="{Binding OperationProgress}" Foreground="#f8fafc"
+                    <TextBlock Text="{Binding OperationProgress}" Foreground="{StaticResource Fg}"
                                FontSize="14" FontWeight="SemiBold"
                                HorizontalAlignment="Center" Margin="0,0,0,14"/>
                     <ProgressBar Value="{Binding OperationProgressPercent}"
                                  Minimum="0" Maximum="100"
-                                 Width="200" Height="8" Margin="0,0,0,8"
+                                 Width="200" Height="8" Margin="{StaticResource GapBottom.Sm}"
                                  AutomationProperties.Name="Operation progress"/>
                     <DockPanel Margin="0,0,0,2">
                         <TextBlock DockPanel.Dock="Right" Foreground="{StaticResource Dim}" FontSize="11">
@@ -316,8 +339,9 @@
                             <Run Text=" files"/>
                         </TextBlock>
                     </DockPanel>
-                    <Button x:Name="OperationCancelButton" Style="{StaticResource GhostPill}" Content="Cancel"
+                    <Button x:Name="OperationCancelButton" Style="{StaticResource GhostPill}" Content="_Cancel"
                             Command="{Binding CancelOperationCommand}"
+                            AutomationProperties.Name="Cancel operation"
                             HorizontalAlignment="Center" Margin="0,10,0,0"
                             Height="28" Padding="16,0" FontSize="12"/>
                 </StackPanel>
@@ -333,27 +357,27 @@
                     <Image Source="Assets/splash-icon.png"
                            Width="64" Height="64" HorizontalAlignment="Center"
                            RenderOptions.BitmapScalingMode="HighQuality"
-                           Margin="0,0,0,16"/>
+                           Margin="{StaticResource GapBottom.Lg}"/>
 
                     <!-- Heading -->
                     <TextBlock Text="{Binding CompletionHeading}"
-                               Foreground="#4ade80" FontSize="22" FontWeight="Bold"
-                               HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                               Foreground="{StaticResource Success}" FontSize="22" FontWeight="Bold"
+                               HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Sm}"/>
 
                     <!-- Summary -->
                     <TextBlock Text="{Binding CompletionSummary}"
-                               Foreground="#cbd5e1" FontSize="14"
+                               Foreground="{StaticResource Body}" FontSize="14"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="0,0,0,6"/>
 
                     <!-- Restore guidance -->
                     <TextBlock Text="{Binding CompletionRestore}"
-                               Foreground="#94a3b8" FontSize="12"
+                               Foreground="{StaticResource Muted}" FontSize="12"
                                HorizontalAlignment="Center" TextAlignment="Center"
-                               TextWrapping="Wrap" Margin="0,0,0,24"/>
+                               TextWrapping="Wrap" Margin="{StaticResource GapBottom.Xl}"/>
 
                     <!-- Error details (only visible when there are errors) -->
-                    <Border Margin="0,0,0,24" MaxHeight="80">
+                    <Border Margin="{StaticResource GapBottom.Xl}" MaxHeight="80">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Visibility" Value="Visible"/>
@@ -372,16 +396,18 @@
 
                     <!-- Close button -->
                     <Button x:Name="CompletionCloseButton" Style="{StaticResource AccentPill}"
-                            Content="Close" Command="{Binding CloseAppCommand}"
+                            Content="_Close" Command="{Binding CloseAppCommand}"
                             IsDefault="True"
                             HorizontalAlignment="Center" MinWidth="120"
-                            Margin="0,0,0,8"/>
+                            Margin="{StaticResource GapBottom.Sm}"
+                            AutomationProperties.Name="Close InstallerClean"/>
 
-                    <!-- Run again -->
+                    <!-- Scan again -->
                     <Button Style="{StaticResource GhostPill}"
-                            Content="Run again" Command="{Binding DismissCompletionCommand}"
+                            Content="_Scan again" Command="{Binding RescanAfterCompletionCommand}"
                             HorizontalAlignment="Center"
-                            Height="28" Padding="16,0" FontSize="12"/>
+                            Height="28" Padding="16,0" FontSize="12"
+                            AutomationProperties.Name="Scan C:\Windows\Installer again"/>
 
                 </StackPanel>
             </Border>

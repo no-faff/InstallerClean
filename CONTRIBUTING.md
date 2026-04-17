@@ -15,35 +15,28 @@ The app requires **administrator privileges** to run because it accesses
 elevated terminal with `dotnet run --project src/InstallerClean` or launch the
 built exe (which triggers a UAC prompt).
 
+### CLI launcher
+
+`InstallerClean-cli.exe` in the installer is a small console stub that the
+Windows Installer builds from `cli-launcher/launcher.c`. The binary is
+committed to the repo because rebuilding it requires mingw-w64, which most
+contributors don't need.
+
+To rebuild it on Linux:
+
+```
+sudo dnf install mingw64-gcc   # Fedora; use your distro's equivalent
+cli-launcher/build.sh
+```
+
+The resulting `cli-launcher/InstallerClean-cli.exe` is deterministic and
+approximately 44 KB.
+
 ## Commit conventions
 
 Use a prefix: `feat:` / `fix:` / `refactor:` / `chore:` / `test:` / `docs:`
 
 Always run both `dotnet build` and `dotnet test` before committing.
-
-## Known constraints
-
-### Antivirus heuristic sensitivity
-
-This project has been through VirusTotal scanning and two patterns are known to
-trigger heuristic antivirus detections. PRs that reintroduce either pattern will
-be rejected.
-
-**1. No interface-wrapped MessageBox**
-
-ViewModels call `MessageBox.Show` directly rather than going through an
-`IDialogService` interface. This is intentional. The interface-plus-implementation
-pattern (extracting an `IDialogService` with a concrete `DialogService` class) was
-tested and triggered antivirus heuristic detection, confirmed by VirusTotal scan.
-
-`Func<>` delegates were also tested and trigger the same heuristic. Any
-alternative pattern **must pass a clean VirusTotal scan** before it can be merged.
-
-**2. No full paths in console loop output**
-
-Console output must not print full system directory paths
-(e.g. `C:\Windows\Installer\filename.msi`) in a loop. This also triggers
-heuristic AV detection. Print filenames only, without the directory prefix.
 
 ## Filing issues
 

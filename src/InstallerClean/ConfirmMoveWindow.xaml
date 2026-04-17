@@ -8,19 +8,24 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
 
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" GlassFrameThickness="0"
+                      ResizeBorderThickness="0"/>
+    </WindowChrome.WindowChrome>
+
     <Border Background="{StaticResource Base200}" CornerRadius="16" Padding="32,28"
             MaxWidth="440" MinWidth="320"
             BorderBrush="{StaticResource Primary}" BorderThickness="1">
         <StackPanel>
-            <TextBlock x:Name="MessageText" Foreground="#f8fafc" FontSize="14"
-                       TextWrapping="Wrap" Margin="0,0,0,8"/>
+            <TextBlock x:Name="MessageText" Foreground="{StaticResource Fg}" FontSize="14"
+                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Sm}"/>
 
-            <TextBlock x:Name="DestinationText" Foreground="#94a3b8" FontSize="12"
+            <TextBlock x:Name="DestinationText" Foreground="{StaticResource Muted}" FontSize="12"
                        TextWrapping="Wrap" Margin="0,0,0,20"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Style="{StaticResource PrimaryPill}" Content="_Cancel"
-                        Click="OnCancel" IsCancel="True" Margin="0,0,8,0"/>
+                        Click="OnCancel" IsCancel="True" Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource AccentPill}" Content="_Move"
                         Click="OnMove"/>
             </StackPanel>

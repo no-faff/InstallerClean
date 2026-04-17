@@ -1,4 +1,4 @@
-using Microsoft.VisualBasic.FileIO;
+using InstallerClean.Interop;
 using InstallerClean.Models;
 
 namespace InstallerClean.Services;
@@ -26,12 +26,22 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 {
                     if (!File.Exists(filePath))
                     {
-                        errors.Add(new DeleteError(filePath, "File not found."));
+                        errors.Add(new DeleteError(filePath, "File no longer exists."));
                         continue;
                     }
                     var fileName = Path.GetFileName(filePath);
                     progress?.Report(new OperationProgress(i + 1, total, fileName));
-                    FileSystem.DeleteFile(filePath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+
+                    // Native SHFileOperationW avoids VB's FileSystem.DeleteFile
+                    // which can try to show error dialogs from a non-STA thread.
+                    var result = ShellFileOperations.SendToRecycleBin(filePath);
+                    if (result != 0)
+                    {
+                        errors.Add(new DeleteError(
+                            filePath,
+                            $"Windows shell reported error {result} while recycling the file."));
+                        continue;
+                    }
                     deleted++;
                 }
                 catch (Exception ex)
@@ -40,7 +50,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 }
             }
 
-            InstallerCacheHelpers.PruneEmptySubdirectories();
+            InstallerCacheHelpers.PruneEmptySubdirectories(cancellationToken);
             return new DeleteResult(deleted, errors.AsReadOnly());
         }, cancellationToken);
     }

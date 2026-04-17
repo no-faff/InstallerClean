@@ -2,6 +2,8 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using InstallerClean.Helpers;
+using InstallerClean.Models;
 using InstallerClean.Services;
 using InstallerClean.ViewModels;
 
@@ -11,6 +13,7 @@ public partial class RegisteredFilesWindow : Window
 {
     private string? _lastSortProperty;
     private ListSortDirection _lastSortDirection;
+    private GridViewColumn? _lastSortColumn;
 
     private readonly ISettingsService? _settingsService;
 
@@ -28,6 +31,7 @@ public partial class RegisteredFilesWindow : Window
         }
 
         Closed += OnClosed;
+        this.EnableAltSpaceSystemMenu();
     }
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
@@ -42,21 +46,33 @@ public partial class RegisteredFilesWindow : Window
                 .ContainerFromIndex(0);
             container?.Focus();
         }
+
+        // The VM constructor pre-sorts by product name ascending, so show the
+        // arrow matching that order rather than leaving the header unadorned.
+        _lastSortProperty = nameof(ProductRow.ProductName);
+        _lastSortDirection = ListSortDirection.Ascending;
+        _lastSortColumn = ColProductName;
+        UpdateSortIndicators();
     }
+
+    private (string Plain, GridViewColumn Col)[] SortableColumns => new[]
+    {
+        ("Product name", ColProductName),
+        ("File",         ColFileName),
+        ("Size",         ColSizeBytes),
+        ("Patches",      ColPatchCount),
+    };
 
     private void ColumnHeader_Click(object sender, RoutedEventArgs e)
     {
         if (e.OriginalSource is not GridViewColumnHeader header || header.Column is null)
             return;
 
-        var sortProperty = header.Column.Header switch
-        {
-            "Product name" => "ProductName",
-            "File" => "FileName",
-            "Size" => "SizeBytes",
-            "Patches" => "PatchCount",
-            _ => null
-        };
+        string? sortProperty = null;
+        if (ReferenceEquals(header.Column, ColProductName)) sortProperty = nameof(ProductRow.ProductName);
+        else if (ReferenceEquals(header.Column, ColFileName)) sortProperty = nameof(ProductRow.FileName);
+        else if (ReferenceEquals(header.Column, ColSizeBytes)) sortProperty = nameof(ProductRow.SizeBytes);
+        else if (ReferenceEquals(header.Column, ColPatchCount)) sortProperty = nameof(ProductRow.PatchCount);
 
         if (sortProperty is null) return;
 
@@ -70,10 +86,23 @@ public partial class RegisteredFilesWindow : Window
 
         _lastSortProperty = sortProperty;
         _lastSortDirection = direction;
+        _lastSortColumn = header.Column;
+        UpdateSortIndicators();
+    }
+
+    private void UpdateSortIndicators()
+    {
+        var arrow = _lastSortDirection == ListSortDirection.Ascending ? "  \u25B2" : "  \u25BC";
+        foreach (var (plain, col) in SortableColumns)
+        {
+            col.Header = ReferenceEquals(col, _lastSortColumn) ? plain + arrow : plain;
+        }
     }
 
     private void OnClosed(object? sender, EventArgs e)
     {
+        Closed -= OnClosed;
+        if (DataContext is IDisposable vm) vm.Dispose();
         if (_settingsService is null) return;
         var settings = _settingsService.Load();
         settings.RegisteredWindowSize = new Models.WindowSize { Width = ActualWidth, Height = ActualHeight };

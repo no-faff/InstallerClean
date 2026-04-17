@@ -11,6 +11,7 @@ public partial class ConfirmMoveWindow : Window
         var label = DisplayHelpers.Pluralise(fileCount, "file", "files");
         MessageText.Text = $"Move {fileCount} {label} ({sizeDisplay})?";
         DestinationText.Text = $"Files will be moved to {destination}";
+        this.EnableAltSpaceSystemMenu();
     }
 
     private void OnMove(object sender, RoutedEventArgs e)

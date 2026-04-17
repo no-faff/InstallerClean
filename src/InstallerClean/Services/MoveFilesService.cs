@@ -10,9 +10,19 @@ public sealed class MoveFilesService : IMoveFilesService
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
+        // Defence in depth: the UI (MainViewModel.MoveAllAsync) and the CLI
+        // (App.RunCliAsync) already check this, but the service must not
+        // trust callers. If we somehow end up here with a destination that
+        // resolves into C:\Windows\Installer, the whole safety model
+        // collapses.
+        if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
+            throw new InvalidOperationException(
+                $"Refusing to move files into the Windows Installer folder (destination: {destinationFolder}).");
+
         return Task.Run(() =>
         {
             Directory.CreateDirectory(destinationFolder);
+            ProbeDestinationWriteable(destinationFolder);
 
             int moved = 0;
             var errors = new List<MoveError>();
@@ -26,14 +36,14 @@ public sealed class MoveFilesService : IMoveFilesService
 
                 try
                 {
-                    var fileName = Path.GetFileName(sourcePath);
-                    progress?.Report(new OperationProgress(i + 1, total, fileName));
-
                     if (!File.Exists(sourcePath))
                     {
                         errors.Add(new MoveError(sourcePath, "File no longer exists."));
                         continue;
                     }
+
+                    var fileName = Path.GetFileName(sourcePath);
+                    progress?.Report(new OperationProgress(i + 1, total, fileName));
 
                     var destPath = GetUniqueDestPath(destinationFolder, fileName);
                     File.Move(sourcePath, destPath);
@@ -45,9 +55,28 @@ public sealed class MoveFilesService : IMoveFilesService
                 }
             }
 
-            InstallerCacheHelpers.PruneEmptySubdirectories();
+            InstallerCacheHelpers.PruneEmptySubdirectories(cancellationToken);
             return new MoveResult(moved, errors.AsReadOnly());
         }, cancellationToken);
+    }
+
+    private static void ProbeDestinationWriteable(string folder)
+    {
+        // Write one random-named probe file and delete it. This fails fast
+        // with a single clean error when the destination is read-only or
+        // lacks write permission, instead of collecting per-file errors
+        // for every one of potentially thousands of source files.
+        var probe = Path.Combine(folder, Path.GetRandomFileName());
+        try
+        {
+            File.WriteAllBytes(probe, Array.Empty<byte>());
+            File.Delete(probe);
+        }
+        catch (Exception ex)
+        {
+            throw new UnauthorizedAccessException(
+                $"Cannot write to {folder}: {ex.Message}", ex);
+        }
     }
 
     // GetUniqueDestPath uses File.Exists + counter to find a free name.

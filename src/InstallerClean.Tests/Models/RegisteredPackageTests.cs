@@ -2,11 +2,6 @@ using InstallerClean.Models;
 
 namespace InstallerClean.Tests.Models;
 
-/// <summary>
-/// Tests the RegisteredPackage record, which models the data transformation
-/// logic produced by InstallerQueryService. The patch state and removability
-/// rules are critical to safe orphan detection.
-/// </summary>
 public class RegisteredPackageTests
 {
     [Fact]

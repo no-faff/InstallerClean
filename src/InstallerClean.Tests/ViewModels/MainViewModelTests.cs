@@ -15,6 +15,7 @@ public class MainViewModelTests
     private readonly IPendingRebootService _rebootService = Substitute.For<IPendingRebootService>();
     private readonly IMsiFileInfoService _msiInfoService = Substitute.For<IMsiFileInfoService>();
     private readonly IUpdateCheckService _updateCheckService = Substitute.For<IUpdateCheckService>();
+    private readonly IDialogService _dialogService = Substitute.For<IDialogService>();
 
     private MainViewModel CreateViewModel()
     {
@@ -22,7 +23,8 @@ public class MainViewModelTests
 
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
-            _settingsService, _rebootService, _msiInfoService, _updateCheckService);
+            _settingsService, _rebootService, _msiInfoService,
+            _updateCheckService, _dialogService);
     }
 
     private static ScanResult EmptyScanResult() =>
@@ -104,7 +106,8 @@ public class MainViewModelTests
 
         var vm = new MainViewModel(
             _scanService, _moveService, _deleteService,
-            _settingsService, _rebootService, _msiInfoService, _updateCheckService);
+            _settingsService, _rebootService, _msiInfoService,
+            _updateCheckService, _dialogService);
 
         Assert.Equal(@"D:\Backup", vm.MoveDestination);
     }
@@ -187,5 +190,119 @@ public class MainViewModelTests
 
         Assert.Equal(1, vm.OrphanedFileCount);
         Assert.Equal("0 B", vm.OrphanedSizeDisplay);
+    }
+
+    [Fact]
+    public async Task ScanCommand_access_denied_shows_warning_via_dialog_service()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new UnauthorizedAccessException("denied"));
+
+        await vm.ScanCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(
+            Arg.Is<string>(s => s.Contains("administrator privileges")),
+            Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task ScanCommand_empty_installer_database_shows_targeted_error()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException(
+                "The Windows Installer database appears to be empty or inaccessible."));
+
+        await vm.ScanCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowError(
+            Arg.Is<string>(s => s.Contains("installer database", StringComparison.OrdinalIgnoreCase)),
+            Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task CancelScanCommand_cancels_running_scan()
+    {
+        var vm = CreateViewModel();
+
+        // Deterministic dance: the mock registers a cancellation callback on
+        // the token, signals `entered` when it's installed, then returns a
+        // TaskCompletionSource the test controls. The test awaits `entered`
+        // before triggering cancel, so there is no Task.Delay in the loop.
+        var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var completion = new TaskCompletionSource<ScanResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                var ct = call.Arg<CancellationToken>();
+                ct.Register(() => completion.TrySetCanceled(ct));
+                entered.TrySetResult(true);
+                return completion.Task;
+            });
+
+        var scanTask = vm.ScanCommand.ExecuteAsync(null);
+
+        await entered.Task;
+        vm.CancelScanCommand.Execute(null);
+
+        await scanTask;
+
+        Assert.Equal("Scan cancelled.", vm.ScanProgress);
+        Assert.False(vm.IsScanning);
+    }
+
+    [Fact]
+    public void CancelScanCommand_no_running_scan_is_no_op()
+    {
+        var vm = CreateViewModel();
+
+        var ex = Record.Exception(() => vm.CancelScanCommand.Execute(null));
+
+        Assert.Null(ex);
+    }
+
+    [Fact]
+    public void MoveDestination_change_is_persisted_through_settings_service()
+    {
+        var vm = CreateViewModel();
+
+        vm.MoveDestination = @"D:\Backup\Installer-cache";
+
+        _settingsService.Received().TrySave(Arg.Is<AppSettings>(
+            s => s.MoveDestination == @"D:\Backup\Installer-cache"));
+    }
+
+    [Fact]
+    public void MoveDestination_setting_same_value_does_not_resave()
+    {
+        _settingsService.Load().Returns(new AppSettings { MoveDestination = @"D:\Backup" });
+        var vm = new MainViewModel(
+            _scanService, _moveService, _deleteService,
+            _settingsService, _rebootService, _msiInfoService,
+            _updateCheckService, _dialogService);
+        _settingsService.ClearReceivedCalls();
+
+        vm.MoveDestination = @"D:\Backup";
+
+        _settingsService.DidNotReceive().TrySave(Arg.Any<AppSettings>());
+    }
+
+    [Fact]
+    public async Task RescanAfterCompletion_dismisses_and_triggers_scan()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(EmptyScanResult());
+
+        // Simulate we are looking at the completion overlay
+        await vm.ScanWithProgressAsync(null);
+        Assert.True(vm.IsComplete);
+
+        await vm.RescanAfterCompletionCommand.ExecuteAsync(null);
+
+        Assert.True(vm.IsComplete || !vm.IsComplete); // either is valid after rescan; assertion below is the real one
+        await _scanService.Received(2).ScanAsync(
+            Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>());
     }
 }

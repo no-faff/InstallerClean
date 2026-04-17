@@ -20,6 +20,7 @@ public partial class App : Application
     private const int ATTACH_PARENT_PROCESS = -1;
 
     private static Mutex? _singleInstanceMutex;
+    private UpdateCheckService? _updateCheckService;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -64,16 +65,14 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
         {
             if (args.ExceptionObject is Exception ex)
-            {
-                var logPath = CrashLog.Write(ex);
-                MessageBox.Show(
-                    $"An unexpected error occurred and InstallerClean needs to close.\n\n{ex.Message}\n\nDetails written to:\n{logPath}",
-                    "InstallerClean", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                CrashLog.Write(ex);
         };
 
         TaskScheduler.UnobservedTaskException += (_, args) =>
         {
+            // Observe so the exception doesn't tear the process down in .NET 4.x-style
+            // behaviour. Log for diagnosability; a silent swallow is worse than a one-line log.
+            CrashLog.Write(args.Exception);
             args.SetObserved();
         };
 
@@ -106,15 +105,30 @@ public partial class App : Application
             var deleteService = new DeleteFilesService();
             var rebootService = new PendingRebootService();
             var msiInfoService = new MsiFileInfoService();
-            var updateCheckService = new UpdateCheckService();
+            var dialogService = new DialogService();
+            _updateCheckService = new UpdateCheckService();
 
             var viewModel = new MainViewModel(
                 scanService, moveService, deleteService,
-                settingsService, rebootService, msiInfoService, updateCheckService);
+                settingsService, rebootService, msiInfoService,
+                _updateCheckService, dialogService);
+
+            using var startupCts = new CancellationTokenSource();
+            splash.CancelRequested += (_, _) => startupCts.Cancel();
 
             var splashProgress = new Progress<string>(splash.OnScanProgress);
-            var scanTask = viewModel.ScanWithProgressAsync(splashProgress);
-            await Task.WhenAll(scanTask, Task.Delay(800));
+            try
+            {
+                var scanTask = viewModel.ScanWithProgressAsync(splashProgress, startupCts.Token);
+                await Task.WhenAll(scanTask, Task.Delay(800, startupCts.Token));
+            }
+            catch (OperationCanceledException)
+            {
+                splash.Close();
+                Shutdown(0);
+                return;
+            }
+
             splash.UpdateStep("Done", 100);
             await Task.Delay(200);
 
@@ -122,7 +136,6 @@ public partial class App : Application
             Application.Current.MainWindow = window;
             window.Show();
             splash.Close();
-
         }
         catch (UnauthorizedAccessException)
         {
@@ -137,6 +150,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             splash?.Close();
+            CrashLog.Write(ex);
             MessageBox.Show(
                 $"Failed to start: {ex.Message}",
                 "Startup error",
@@ -146,8 +160,19 @@ public partial class App : Application
         }
     }
 
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _updateCheckService?.Dispose();
+        _singleInstanceMutex?.Dispose();
+        base.OnExit(e);
+    }
+
     private async Task RunCliAsync(string[] args)
     {
+        // AttachConsole may legitimately fail (e.g. launched from Explorer
+        // with args, or from a GUI shell that has no parent console).
+        // Console.WriteLine is a no-op in that case, which is the correct
+        // behaviour for a WinExe. We intentionally don't check the return.
         AttachConsole(ATTACH_PARENT_PROCESS);
 
         var arg = args[0].ToLowerInvariant();
@@ -186,12 +211,15 @@ public partial class App : Application
             var scanResult = await scanService.ScanAsync(cancellationToken: cts.Token);
 
             var count = scanResult.RemovableFiles.Count;
-            var size = DisplayHelpers.FormatSize(scanResult.RemovableFiles.Sum(f => f.SizeBytes));
+            var totalBytes = scanResult.RemovableFiles.Sum(f => f.SizeBytes);
+            var size = DisplayHelpers.FormatSize(totalBytes);
             Console.WriteLine($"Found {count} {DisplayHelpers.Pluralise(count, "file", "files")} to clean up ({size}).");
 
             if (count == 0)
             {
                 Console.WriteLine("Nothing to do.");
+                EventLogWriter.Write(EventLogWriter.Level.Information,
+                    $"Scan mode ({arg}): no orphaned files. Installer database has {scanResult.RegisteredPackages.Count} registered package(s).");
                 Shutdown(0);
                 return;
             }
@@ -201,6 +229,8 @@ public partial class App : Application
                 Console.WriteLine(string.Join(Environment.NewLine,
                     scanResult.RemovableFiles.Select(f =>
                         $"  {f.FileName}  ({f.SizeDisplay}, {f.Reason})")));
+                EventLogWriter.Write(EventLogWriter.Level.Information,
+                    $"Scan mode (/s): {count} orphaned file(s) found, {size}. No action taken.");
                 Shutdown(0);
                 return;
             }
@@ -219,6 +249,9 @@ public partial class App : Application
                     foreach (var err in result.Errors)
                         Console.WriteLine($"  {err}");
                 }
+                var level = result.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
+                EventLogWriter.Write(level,
+                    $"Delete mode (/d): {result.DeletedCount} of {count} file(s) sent to Recycle Bin, {size} recovered, {result.Errors.Count} error(s).");
                 Shutdown(result.Errors.Count > 0 ? 1 : 0);
             }
             else if (arg == "/m")
@@ -229,6 +262,8 @@ public partial class App : Application
                 if (string.IsNullOrWhiteSpace(dest))
                 {
                     Console.WriteLine("Error: no move destination specified. Use /m PATH or set a default in the GUI.");
+                    EventLogWriter.Write(EventLogWriter.Level.Warning,
+                        "Move mode (/m) aborted: no destination specified.");
                     Shutdown(1);
                     return;
                 }
@@ -236,6 +271,8 @@ public partial class App : Application
                 if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
                 {
                     Console.WriteLine("Error: destination cannot be inside the Windows Installer folder.");
+                    EventLogWriter.Write(EventLogWriter.Level.Warning,
+                        $"Move mode (/m) aborted: destination {dest} is inside C:\\Windows\\Installer.");
                     Shutdown(1);
                     return;
                 }
@@ -250,6 +287,9 @@ public partial class App : Application
                     foreach (var err in result.Errors)
                         Console.WriteLine($"  {err}");
                 }
+                var level = result.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
+                EventLogWriter.Write(level,
+                    $"Move mode (/m): {result.MovedCount} of {count} file(s) moved to {dest}, {size} relocated, {result.Errors.Count} error(s).");
                 Shutdown(result.Errors.Count > 0 ? 1 : 0);
             }
         }
@@ -279,11 +319,16 @@ public partial class App : Application
         Console.WriteLine("InstallerClean - clean up C:\\Windows\\Installer");
         Console.WriteLine();
         Console.WriteLine("Usage:");
-        Console.WriteLine("  InstallerClean.exe          Launch the GUI");
-        Console.WriteLine("  InstallerClean.exe /s       Scan only - list removable files");
-        Console.WriteLine("  InstallerClean.exe /d       Delete removable files (Recycle Bin)");
-        Console.WriteLine("  InstallerClean.exe /m       Move to saved default location");
-        Console.WriteLine("  InstallerClean.exe /m PATH  Move to specified path");
+        Console.WriteLine("  installerclean-cli          Launch the GUI");
+        Console.WriteLine("  installerclean-cli /s       Scan only - list removable files");
+        Console.WriteLine("  installerclean-cli /d       Delete removable files (Recycle Bin)");
+        Console.WriteLine("  installerclean-cli /m       Move to saved default location");
+        Console.WriteLine("  installerclean-cli /m PATH  Move to specified path");
+        Console.WriteLine();
+        Console.WriteLine("The installer ships installerclean-cli.cmd alongside the exe so");
+        Console.WriteLine("PowerShell and cmd wait for output synchronously. If you're using");
+        Console.WriteLine("the portable or slim exe, wrap it yourself:");
+        Console.WriteLine("  Start-Process -Wait -NoNewWindow .\\InstallerClean.exe /s");
         Console.WriteLine();
     }
 }

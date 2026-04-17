@@ -1,7 +1,10 @@
 [Setup]
+#ifndef AppVersion
+  #define AppVersion "1.5.2"
+#endif
 AppId=InstallerClean
 AppName=InstallerClean
-AppVersion=1.5.1
+AppVersion={#AppVersion}
 AppPublisher=No Faff
 AppPublisherURL=https://github.com/no-faff/InstallerClean
 AppSupportURL=https://github.com/no-faff/InstallerClean/discussions
@@ -34,6 +37,7 @@ ClickFinish=Click Finish to close setup.
 
 [Files]
 Source: "..\publish\self-contained\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\cli-launcher\InstallerClean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\InstallerClean"; Filename: "{app}\InstallerClean.exe"; IconFilename: "{app}\InstallerClean.exe"

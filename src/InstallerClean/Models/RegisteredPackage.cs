@@ -10,4 +10,6 @@ public record RegisteredPackage(
     string ProductName,
     string ProductCode,
     int PatchState = 0,
-    bool IsRemovable = false);
+    bool IsRemovable = false,
+    long FileSizeBytes = 0,
+    bool FileExists = true);

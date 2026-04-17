@@ -1,4 +1,3 @@
-using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
@@ -6,24 +5,11 @@ using InstallerClean.Services;
 
 namespace InstallerClean.ViewModels;
 
-public sealed record ProductRow(
-    string ProductName,
-    string FileName,
-    string FullPath,
-    string SizeDisplay,
-    long SizeBytes,
-    int PatchCount,
-    IReadOnlyList<PatchRow> Patches);
-
-public sealed record PatchRow(
-    string FileName,
-    string FullPath,
-    string SizeDisplay);
-
-public partial class RegisteredFilesViewModel : ObservableObject
+public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
 {
     private readonly IMsiFileInfoService _infoService;
     private readonly Dictionary<string, MsiSummaryInfo?> _cache = new();
+    private readonly CancellationTokenSource _lifetimeCts = new();
 
     public IReadOnlyList<ProductRow> Products { get; }
     public string Summary { get; }
@@ -54,7 +40,13 @@ public partial class RegisteredFilesViewModel : ObservableObject
     {
         _infoService = infoService;
 
-        var groups = packages.GroupBy(p => p.ProductCode, StringComparer.OrdinalIgnoreCase);
+        // Registry-fallback entries all have empty ProductCode and would
+        // otherwise collapse into a single "(unknown)" row. Use the
+        // package path as a fallback group key so each fallback entry
+        // becomes its own product.
+        var groups = packages.GroupBy(
+            p => string.IsNullOrEmpty(p.ProductCode) ? p.LocalPackagePath : p.ProductCode,
+            StringComparer.OrdinalIgnoreCase);
 
         var products = new List<ProductRow>();
         foreach (var group in groups.OrderBy(g => g.First().ProductName, StringComparer.OrdinalIgnoreCase))
@@ -69,7 +61,7 @@ public partial class RegisteredFilesViewModel : ObservableObject
                 .Select(p => new PatchRow(
                     Path.GetFileName(p.LocalPackagePath),
                     p.LocalPackagePath,
-                    GetSizeDisplay(p.LocalPackagePath)))
+                    DisplayHelpers.FormatSize(p.FileSizeBytes)))
                 .ToList();
 
             if (msi is null && patches.Count == 0) continue;
@@ -77,14 +69,14 @@ public partial class RegisteredFilesViewModel : ObservableObject
             var productName = items.First().ProductName;
             if (string.IsNullOrEmpty(productName)) productName = "(unknown)";
 
-            var msiPath = msi?.LocalPackagePath ?? items.First().LocalPackagePath;
+            var representative = msi ?? items.First();
 
             products.Add(new ProductRow(
                 productName,
-                Path.GetFileName(msiPath),
-                msiPath,
-                GetSizeDisplay(msiPath),
-                GetSizeBytes(msiPath),
+                Path.GetFileName(representative.LocalPackagePath),
+                representative.LocalPackagePath,
+                DisplayHelpers.FormatSize(representative.FileSizeBytes),
+                representative.FileSizeBytes,
                 patches.Count,
                 patches));
         }
@@ -110,33 +102,32 @@ public partial class RegisteredFilesViewModel : ObservableObject
             return;
         }
 
+        var ct = _lifetimeCts.Token;
         try
         {
-            var info = await Task.Run(() => _infoService.GetSummaryInfo(value.FullPath));
+            var info = await Task.Run(() => _infoService.GetSummaryInfo(value.FullPath), ct);
 
-            // Selection may have changed while we were reading
+            if (ct.IsCancellationRequested) return;
             if (SelectedProduct == value)
             {
                 _cache[value.FullPath] = info;
                 SelectedDetails = info;
             }
         }
+        catch (OperationCanceledException)
+        {
+            // Window closed mid-read; drop the result silently.
+        }
         catch
         {
-            if (SelectedProduct == value)
+            if (!ct.IsCancellationRequested && SelectedProduct == value)
                 SelectedDetails = null;
         }
     }
 
-    private static string GetSizeDisplay(string path)
+    public void Dispose()
     {
-        try { return DisplayHelpers.FormatSize(new FileInfo(path).Length); }
-        catch (Exception) { return string.Empty; }
-    }
-
-    private static long GetSizeBytes(string path)
-    {
-        try { return new FileInfo(path).Length; }
-        catch (Exception) { return 0; }
+        _lifetimeCts.Cancel();
+        _lifetimeCts.Dispose();
     }
 }
