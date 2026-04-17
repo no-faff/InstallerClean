@@ -27,7 +27,7 @@
                 <Button Style="{StaticResource PrimaryPill}" Content="_Cancel"
                         Click="OnCancel" IsCancel="True" Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource AccentPill}" Content="_Move"
-                        Click="OnMove"/>
+                        Click="OnMove" IsDefault="True"/>
             </StackPanel>
         </StackPanel>
     </Border>

@@ -138,7 +138,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 }
             }
         }
-        catch (Exception) { /* registry fallback is best-effort */ }
+        catch (Exception ex)
+        {
+            // Registry fallback is best effort. Log so a user who complains
+            // about missing products has a diagnostic trail rather than a
+            // silent partial enumeration.
+            Helpers.CrashLog.Write(ex);
+        }
 
         // Zero products on a real Windows machine means the Installer
         // database is corrupt or the MSI API is returning empty results for
@@ -249,6 +255,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// Enumerates all patches applied to a given product.
     /// </summary>
+    private const int MaxPatchIndex = 10_000;
+
     private static List<(string PatchCode, string? UserSid, MsiInstallContext Context)> EnumeratePatches(
         string productCode,
         string? userSid,
@@ -258,15 +266,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var results = new List<(string, string?, MsiInstallContext)>();
         var patchCode = new StringBuilder(GuidBufferLength);
         var targetProductCode = new StringBuilder(GuidBufferLength);
+        int consecutiveNonSuccess = 0;
 
-        for (uint index = 0; ; index++)
+        for (uint index = 0; index < MaxPatchIndex; index++)
         {
             ct.ThrowIfCancellationRequested();
 
             patchCode.Clear();
-            patchCode.EnsureCapacity(GuidBufferLength);
             targetProductCode.Clear();
-            targetProductCode.EnsureCapacity(GuidBufferLength);
             uint sidLen = 0;
 
             var error = MsiNativeMethods.MsiEnumPatchesEx(
@@ -289,9 +296,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             if (error == MsiError.Success || error == MsiError.MoreData)
             {
-                // The patch inherits the user SID and context from its
-                // target product in most cases.
+                consecutiveNonSuccess = 0;
                 results.Add((patchCode.ToString(), userSid, patchContext));
+            }
+            else
+            {
+                consecutiveNonSuccess++;
+                if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
+                    break;
             }
         }
 

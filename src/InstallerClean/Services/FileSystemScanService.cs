@@ -117,7 +117,18 @@ public sealed class FileSystemScanService : IFileSystemScanService
         if (!Directory.Exists(folder))
             return Enumerable.Empty<string>();
 
-        return Directory.EnumerateFiles(folder, "*.msi", SearchOption.AllDirectories)
-            .Concat(Directory.EnumerateFiles(folder, "*.msp", SearchOption.AllDirectories));
+        // Explicitly skip reparse points so a junction planted inside the
+        // Installer folder cannot redirect our enumeration outside it.
+        // Hidden and System files stay included because real installer
+        // cache entries sometimes carry those attributes.
+        var options = new EnumerationOptions
+        {
+            RecurseSubdirectories = true,
+            AttributesToSkip = FileAttributes.ReparsePoint,
+            IgnoreInaccessible = true,
+        };
+
+        return Directory.EnumerateFiles(folder, "*.msi", options)
+            .Concat(Directory.EnumerateFiles(folder, "*.msp", options));
     }
 }

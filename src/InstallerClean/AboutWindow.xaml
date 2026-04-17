@@ -26,7 +26,7 @@
         </Style>
     </Window.Resources>
 
-    <Grid Margin="24,4,24,24">
+    <Grid Margin="{StaticResource DetailWindowMargin}">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition Height="Auto"/>

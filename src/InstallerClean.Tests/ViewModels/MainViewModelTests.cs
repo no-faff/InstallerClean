@@ -16,6 +16,7 @@ public class MainViewModelTests
     private readonly IMsiFileInfoService _msiInfoService = Substitute.For<IMsiFileInfoService>();
     private readonly IUpdateCheckService _updateCheckService = Substitute.For<IUpdateCheckService>();
     private readonly IDialogService _dialogService = Substitute.For<IDialogService>();
+    private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
 
     private MainViewModel CreateViewModel()
     {
@@ -24,7 +25,7 @@ public class MainViewModelTests
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
-            _updateCheckService, _dialogService);
+            _updateCheckService, _dialogService, _confirmationService);
     }
 
     private static ScanResult EmptyScanResult() =>
@@ -107,7 +108,7 @@ public class MainViewModelTests
         var vm = new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
-            _updateCheckService, _dialogService);
+            _updateCheckService, _dialogService, _confirmationService);
 
         Assert.Equal(@"D:\Backup", vm.MoveDestination);
     }
@@ -280,7 +281,7 @@ public class MainViewModelTests
         var vm = new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
-            _updateCheckService, _dialogService);
+            _updateCheckService, _dialogService, _confirmationService);
         _settingsService.ClearReceivedCalls();
 
         vm.MoveDestination = @"D:\Backup";
@@ -301,8 +302,104 @@ public class MainViewModelTests
 
         await vm.RescanAfterCompletionCommand.ExecuteAsync(null);
 
-        Assert.True(vm.IsComplete || !vm.IsComplete); // either is valid after rescan; assertion below is the real one
         await _scanService.Received(2).ScanAsync(
             Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_happy_path_moves_files_and_shows_completion()
+    {
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new MoveResult(2, Array.Empty<MoveError>()));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+
+        await vm.ScanWithProgressAsync(null);
+        vm.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move");
+
+        await vm.MoveAllCommand.ExecuteAsync(null);
+
+        _confirmationService.Received(1).ConfirmMove(2, Arg.Any<string>(), vm.MoveDestination);
+        await _moveService.Received(1).MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), vm.MoveDestination,
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.True(vm.IsComplete);
+        Assert.Contains("cleared", vm.CompletionHeading);
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_confirmation_cancelled_does_not_invoke_service()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(3));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(false);
+
+        await vm.ScanWithProgressAsync(null);
+        vm.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move");
+
+        await vm.MoveAllCommand.ExecuteAsync(null);
+
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_happy_path_deletes_and_shows_completion()
+    {
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\x.msi", 524_288, false),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new DeleteResult(1, Array.Empty<DeleteError>()));
+        _confirmationService.ConfirmDelete(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+
+        await vm.ScanWithProgressAsync(null);
+
+        await vm.DeleteAllCommand.ExecuteAsync(null);
+
+        _confirmationService.Received(1).ConfirmDelete(1, Arg.Any<string>(), 524_288, 524_288);
+        await _deleteService.Received(1).DeleteFilesAsync(
+            Arg.Any<IEnumerable<string>>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.True(vm.IsComplete);
+        Assert.Contains("Recycle Bin", vm.CompletionSummary);
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_confirmation_cancelled_does_not_invoke_service()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+        _confirmationService.ConfirmDelete(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(false);
+
+        await vm.ScanWithProgressAsync(null);
+
+        await vm.DeleteAllCommand.ExecuteAsync(null);
+
+        await _deleteService.DidNotReceive().DeleteFilesAsync(
+            Arg.Any<IEnumerable<string>>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 }

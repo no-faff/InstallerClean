@@ -106,12 +106,13 @@ public partial class App : Application
             var rebootService = new PendingRebootService();
             var msiInfoService = new MsiFileInfoService();
             var dialogService = new DialogService();
+            var confirmationService = new ConfirmationService();
             _updateCheckService = new UpdateCheckService();
 
             var viewModel = new MainViewModel(
                 scanService, moveService, deleteService,
                 settingsService, rebootService, msiInfoService,
-                _updateCheckService, dialogService);
+                _updateCheckService, dialogService, confirmationService);
 
             using var startupCts = new CancellationTokenSource();
             splash.CancelRequested += (_, _) => startupCts.Cancel();
@@ -251,7 +252,7 @@ public partial class App : Application
                 }
                 var level = result.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
                 EventLogWriter.Write(level,
-                    $"Delete mode (/d): {result.DeletedCount} of {count} file(s) sent to Recycle Bin, {size} recovered, {result.Errors.Count} error(s).");
+                    $"Delete mode (/d): {result.DeletedCount} of {count} file(s) sent to the Recycle Bin, {size} recovered, {result.Errors.Count} error(s).");
                 Shutdown(result.Errors.Count > 0 ? 1 : 0);
             }
             else if (arg == "/m")
