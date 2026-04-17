@@ -35,8 +35,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
         IProgress<string>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        // Run the entire enumeration on a thread-pool thread so the caller
-        // (typically the UI thread) stays responsive.
         return Task.Run(() => GetRegisteredPackagesCore(progress, cancellationToken), cancellationToken);
     }
 
@@ -44,15 +42,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         IProgress<string>? progress,
         CancellationToken ct)
     {
-        // Accumulator: local package path (case-insensitive) to the registered
-        // package record. TryAdd semantics mean that if the same path is
-        // reported by both the API enumeration and the registry fallback, the
-        // API entry wins because it carries product metadata the fallback lacks.
+        // TryAdd on this dictionary means the API enumeration wins over the
+        // registry fallback when both report the same path, because the
+        // API entry carries product metadata the fallback lacks.
         var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
 
-        // ------------------------------------------------------------------
-        // Phase 1: enumerate all products via MsiEnumProductsEx
-        // ------------------------------------------------------------------
         progress?.Report("Enumerating installed products...");
 
         var products = EnumerateProducts(ct);
@@ -64,8 +58,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
             ct.ThrowIfCancellationRequested();
 
             var productName = GetProductProperty(productCode, userSid, context, MsiInstallProperty.ProductName);
-
-            // Get the product's cached .msi path
             var localPackage = GetProductProperty(productCode, userSid, context, MsiInstallProperty.LocalPackage);
 
             if (!string.IsNullOrEmpty(localPackage))
@@ -74,7 +66,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 claimed.TryAdd(localPackage, new RegisteredPackage(localPackage, productName, productCode));
             }
 
-            // Enumerate patches for this product
             var patches = EnumeratePatches(productCode, userSid, context, ct);
 
             foreach (var (patchCode, patchUserSid, patchContext) in patches)
@@ -98,7 +89,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
         }
 
-        // Registry fallback: catch packages the API might miss
         progress?.Report("Checking registry for additional packages...");
         try
         {
@@ -110,7 +100,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 {
                     ct.ThrowIfCancellationRequested();
 
-                    // Products
                     using var productsKey = udKey.OpenSubKey($@"{sidName}\Products");
                     if (productsKey is not null)
                     {
@@ -123,7 +112,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         }
                     }
 
-                    // Patches
                     using var patchesKey = udKey.OpenSubKey($@"{sidName}\Patches");
                     if (patchesKey is not null)
                     {
@@ -140,17 +128,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
         catch (Exception ex)
         {
-            // Registry fallback is best effort. Log so a user who complains
-            // about missing products has a diagnostic trail rather than a
-            // silent partial enumeration.
+            // Best effort; logged so a user report about missing products
+            // has a diagnostic trail.
             Helpers.CrashLog.Write(ex);
         }
 
-        // Zero products on a real Windows machine means the Installer
-        // database is corrupt or the MSI API is returning empty results for
-        // reasons we shouldn't paper over. Even a fresh Windows install
-        // enumerates OS-level MSI products. Refuse to proceed rather than
-        // report a false "all clear" scan.
+        // Even a fresh Windows install has OS-level MSI products. Zero
+        // here means the database is corrupt or inaccessible; silently
+        // reporting "all clear" would be worse than failing.
         if (claimed.Count == 0)
             throw new InvalidOperationException(
                 "The Windows Installer database appears to be empty or inaccessible. " +
@@ -163,14 +148,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
         return claimed.Values.ToList().AsReadOnly();
     }
 
-    // ==================================================================
-    //  Product enumeration
-    // ==================================================================
-
-    /// <summary>
-    /// Enumerates all installed products across all users and contexts.
-    /// Returns a list of (productCode, userSid, context) tuples.
-    /// </summary>
     private const int MaxProductIndex = 10_000;
     private const int MaxConsecutiveNonSuccess = 20;
 
@@ -209,11 +186,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             if (error == MsiError.MoreData)
             {
-                // SID buffer was too small. Retry the same index with a
-                // buffer sized to what the API just told us it needed.
-                // productCode fits in GuidBufferLength; only the SID
-                // dimension of this double-call pattern varies.
-                sidLen++; // space for null terminator
+                // Only the SID dimension varies in this double-call pattern;
+                // productCode fits in the fixed GuidBufferLength.
+                sidLen++; // null terminator
                 sidBuffer.Clear();
                 sidBuffer.EnsureCapacity((int)sidLen);
 
@@ -248,13 +223,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
         return results;
     }
 
-    // ==================================================================
-    //  Patch enumeration
-    // ==================================================================
-
-    /// <summary>
-    /// Enumerates all patches applied to a given product.
-    /// </summary>
     private const int MaxPatchIndex = 10_000;
 
     private static List<(string PatchCode, string? UserSid, MsiInstallContext Context)> EnumeratePatches(
@@ -310,10 +278,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
         return results;
     }
 
-    // ==================================================================
-    //  Property retrieval helpers (double-call buffer pattern)
-    // ==================================================================
-
     /// <summary>
     /// Retrieves a product property using the double-call buffer pattern.
     /// Returns an empty string if the property cannot be read.
@@ -326,7 +290,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         uint bufferLen = 0;
 
-        // First call: get required buffer size.
         var error = MsiNativeMethods.MsiGetProductInfoEx(
             szProductCode: productCode,
             szUserSid: userSid,
@@ -368,7 +331,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         uint bufferLen = 0;
 
-        // First call: get required buffer size.
         var error = MsiNativeMethods.MsiGetPatchInfoEx(
             szPatchCode: patchCode,
             szProductCode: productCode,

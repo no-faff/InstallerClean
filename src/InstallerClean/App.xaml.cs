@@ -45,7 +45,6 @@ public partial class App : Application
             return;
         }
 
-        // CLI mode: /d (delete), /m (move to saved location), /m <path> (move to path)
         if (e.Args.Length > 0)
         {
             await RunCliAsync(e.Args);
@@ -70,8 +69,6 @@ public partial class App : Application
 
         TaskScheduler.UnobservedTaskException += (_, args) =>
         {
-            // Observe so the exception doesn't tear the process down in .NET 4.x-style
-            // behaviour. Log for diagnosability; a silent swallow is worse than a one-line log.
             CrashLog.Write(args.Exception);
             args.SetObserved();
         };
@@ -79,7 +76,6 @@ public partial class App : Application
         SplashWindow? splash = null;
         try
         {
-            // Dark titlebar and app icon on all windows
             var appIcon = new BitmapImage(new Uri("pack://application:,,,/Assets/splash-icon.png"));
             EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
                 new RoutedEventHandler((s, _) =>
@@ -170,10 +166,8 @@ public partial class App : Application
 
     private async Task RunCliAsync(string[] args)
     {
-        // AttachConsole may legitimately fail (e.g. launched from Explorer
-        // with args, or from a GUI shell that has no parent console).
-        // Console.WriteLine is a no-op in that case, which is the correct
-        // behaviour for a WinExe. We intentionally don't check the return.
+        // Return ignored: no parent console (Explorer, scheduled task) is a
+        // valid case and Console.WriteLine is a no-op there.
         AttachConsole(ATTACH_PARENT_PROCESS);
 
         var arg = args[0].ToLowerInvariant();

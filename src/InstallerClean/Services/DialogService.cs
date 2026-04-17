@@ -15,8 +15,7 @@ public sealed class DialogService : IDialogService
 
     private static void Show(string message, string caption, MessageBoxImage icon)
     {
-        // MessageBox must be called on the UI thread. Callers from
-        // background tasks are marshalled onto the Dispatcher automatically.
+        // MessageBox requires the UI thread; marshal there if a background caller invokes us.
         var app = Application.Current;
         if (app is null || app.Dispatcher.CheckAccess())
         {

@@ -64,11 +64,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase)));
         }
 
-        // Single pass over all registered packages: stat the file once,
-        // attach the size so the Details window doesn't have to hit disk
-        // on the UI thread, flag files missing from disk (indicates a
-        // corrupt install), and either add to removable (superseded) or
-        // accumulate the still-used total.
+        // Stat every registered package once here so the Details window
+        // doesn't have to hit disk on the UI thread when it opens.
         long stillUsedBytes = 0;
         int missingFromDisk = 0;
         var sizedPackages = new List<RegisteredPackage>(registered.Count);
@@ -117,10 +114,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         if (!Directory.Exists(folder))
             return Enumerable.Empty<string>();
 
-        // Explicitly skip reparse points so a junction planted inside the
-        // Installer folder cannot redirect our enumeration outside it.
-        // Hidden and System files stay included because real installer
-        // cache entries sometimes carry those attributes.
+        // Reparse points are skipped so a junction planted inside the
+        // Installer folder cannot redirect enumeration outside it; Hidden
+        // and System stay included because real installer-cache entries
+        // sometimes carry those attributes.
         var options = new EnumerationOptions
         {
             RecurseSubdirectories = true,

@@ -27,14 +27,13 @@ public static class CrashLog
         {
             Directory.CreateDirectory(LogFolder);
             RotateIfNeeded();
-            // Offset-aware timestamp so logs from users in different
-            // timezones remain unambiguous when shared for diagnosis.
+            // Offset-aware timestamp so shared logs are unambiguous across timezones.
             var entry = $"---- {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";
             File.AppendAllText(LogFile, entry);
         }
         catch
         {
-            // best effort
+            // A crash handler must never itself throw.
         }
         return LogFile;
     }
@@ -50,9 +49,7 @@ public static class CrashLog
         }
         catch
         {
-            // If rotation fails, the next Write will still try to append.
-            // Worst case the log grows a bit larger than MaxBytes before
-            // rotation succeeds.
+            // Next Write retries; worst case the log briefly exceeds MaxBytes.
         }
     }
 }

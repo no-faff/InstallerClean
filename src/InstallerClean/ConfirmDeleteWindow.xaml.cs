@@ -14,9 +14,8 @@ public partial class ConfirmDeleteWindow : Window
         var label = DisplayHelpers.Pluralise(fileCount, "file", "files");
         MessageText.Text = $"Delete {fileCount} {label} ({sizeDisplay})?";
 
-        // Windows silently permanently-deletes files that exceed the Recycle
-        // Bin's configured quota. That can happen either because the total
-        // exceeds the bin or because a single file does. Warn on either.
+        // Windows silently skips the Recycle Bin when either a single file or
+        // the total exceeds the per-drive quota.
         if (totalBytes > TotalWarnThreshold || maxSingleFileBytes > SingleFileWarnThreshold)
             LargeSizeWarning.Visibility = Visibility.Visible;
 

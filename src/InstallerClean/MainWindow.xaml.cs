@@ -60,9 +60,7 @@ public partial class MainWindow : Window
             _vm.DismissCompletionCommand.Execute(null);
             e.Handled = true;
         }
-        // Intentionally no else branch: Esc on an idle main window should
-        // do nothing. The previous behaviour closed the app which was
-        // surprising for a top-level window.
+        // No else branch: Esc on an idle top-level window must not close the app.
     }
 
     private void MinimizeClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;

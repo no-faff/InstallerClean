@@ -227,10 +227,8 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
 
-        // Deterministic dance: the mock registers a cancellation callback on
-        // the token, signals `entered` when it's installed, then returns a
-        // TaskCompletionSource the test controls. The test awaits `entered`
-        // before triggering cancel, so there is no Task.Delay in the loop.
+        // The test awaits `entered` before triggering cancel so there is no
+        // sleep-based race on when the mock has registered for the token.
         var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var completion = new TaskCompletionSource<ScanResult>(TaskCreationOptions.RunContinuationsAsynchronously);
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
@@ -296,7 +294,6 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(EmptyScanResult());
 
-        // Simulate we are looking at the completion overlay
         await vm.ScanWithProgressAsync(null);
         Assert.True(vm.IsComplete);
 

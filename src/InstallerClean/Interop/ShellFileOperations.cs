@@ -47,9 +47,8 @@ internal static class ShellFileOperations
         if (string.IsNullOrEmpty(path))
             throw new ArgumentException("Path must not be empty", nameof(path));
 
-        // SHFileOperation expects pFrom to be a double-null-terminated
-        // sequence of paths. The marshaller adds the terminating null for
-        // LPWStr; we append one to make it double-null.
+        // pFrom requires a double-null terminator; the LPWStr marshaller
+        // adds one automatically so we only need to append one here.
         var op = new SHFILEOPSTRUCT
         {
             wFunc = FO_DELETE,

@@ -41,9 +41,7 @@ public partial class AboutWindow : Window
         }
         catch (Exception ex)
         {
-            // GetLatestVersionAsync is fully try/catched internally, so this
-            // catch is a belt-and-braces guard against future refactors that
-            // might let an exception escape. async void needs it.
+            // Belt-and-braces: async void must not let an exception escape.
             MessageBox.Show(
                 $"Couldn't check for updates: {ex.Message}",
                 "Check failed", MessageBoxButton.OK, MessageBoxImage.Warning);

@@ -19,11 +19,10 @@ public partial class MainViewModel : ObservableObject
     private readonly IUpdateCheckService _updateCheckService;
     private readonly IDialogService _dialogService;
     private readonly IConfirmationService _confirmationService;
-    // Scan state
+
     [ObservableProperty] private bool _isScanning;
     [ObservableProperty] private string _scanProgress = string.Empty;
 
-    // Summary line data
     [ObservableProperty] private int _registeredFileCount;
     [ObservableProperty] private string _registeredSizeDisplay = string.Empty;
     [ObservableProperty] private int _orphanedFileCount;
@@ -48,7 +47,6 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private string _moveDestination = string.Empty;
 
-    // Busy state for move/delete operations
     [ObservableProperty] private bool _isOperating;
     [ObservableProperty] private string _operationProgress = string.Empty;
     [ObservableProperty] private int _operationCurrentFile;
@@ -61,7 +59,6 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private bool _hasScanned;
 
-    // Completion screen state
     [ObservableProperty] private bool _isComplete;
     [ObservableProperty] private string _completionHeading = string.Empty;
     [ObservableProperty] private string _completionSummary = string.Empty;
@@ -255,8 +252,7 @@ public partial class MainViewModel : ObservableObject
         };
         if (dialog.ShowDialog() == true)
         {
-            // Setting MoveDestination triggers OnMoveDestinationChanged
-            // which persists the new value via _settingsService.TrySave.
+            // OnMoveDestinationChanged persists the new value via TrySave.
             MoveDestination = dialog.FolderName;
         }
     }
@@ -264,17 +260,10 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void CancelOperation()
     {
-        // Guard against a race with the finally block that disposes the
-        // token source: a Cancel click landing between
-        // _operationCts = null and cts.Dispose() can hit a disposed token.
-        try
-        {
-            _operationCts?.Cancel();
-        }
-        catch (ObjectDisposedException)
-        {
-            // Operation already finished. Nothing to cancel.
-        }
+        // Races the finally block that disposes _operationCts; ObjectDisposedException
+        // here just means the operation already finished.
+        try { _operationCts?.Cancel(); }
+        catch (ObjectDisposedException) { }
     }
 
     [RelayCommand(CanExecute = nameof(CanMove))]
@@ -348,8 +337,8 @@ public partial class MainViewModel : ObservableObject
                 movedBytes = removableFiles.Where(f => !errorPaths.Contains(f.FullPath)).Sum(f => f.SizeBytes);
             }
 
-            // Refresh counts without flipping IsScanning (the operating overlay
-            // is already up; we don't want both overlays layered).
+            // Refresh directly so IsScanning stays false and the scan overlay
+            // doesn't stack on top of the still-visible operating overlay.
             await RunScanCoreAsync(null);
 
             CompletionHeading = $"{DisplayHelpers.FormatSize(movedBytes)} cleared";
@@ -416,8 +405,8 @@ public partial class MainViewModel : ObservableObject
                 deletedBytes = removableFiles.Where(f => !errorPaths.Contains(f.FullPath)).Sum(f => f.SizeBytes);
             }
 
-            // Refresh counts without flipping IsScanning (the operating overlay
-            // is already up; we don't want both overlays layered).
+            // Refresh directly so IsScanning stays false and the scan overlay
+            // doesn't stack on top of the still-visible operating overlay.
             await RunScanCoreAsync(null);
 
             CompletionHeading = $"{DisplayHelpers.FormatSize(deletedBytes)} cleared";

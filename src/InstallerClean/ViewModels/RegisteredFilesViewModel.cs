@@ -41,10 +41,8 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
     {
         _infoService = infoService;
 
-        // Registry-fallback entries all have empty ProductCode and would
-        // otherwise collapse into a single "(unknown)" row. Use the
-        // package path as a fallback group key so each fallback entry
-        // becomes its own product.
+        // Registry-fallback entries share an empty ProductCode; keying on
+        // path gives each its own group instead of a single "(unknown)" pile.
         var groups = packages.GroupBy(
             p => string.IsNullOrEmpty(p.ProductCode) ? p.LocalPackagePath : p.ProductCode,
             StringComparer.OrdinalIgnoreCase);
@@ -117,7 +115,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         }
         catch (OperationCanceledException)
         {
-            // Window closed mid-read; drop the result silently.
+            // Window closed; drop the result.
         }
         catch
         {

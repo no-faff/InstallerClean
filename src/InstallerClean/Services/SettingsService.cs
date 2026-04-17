@@ -38,17 +38,9 @@ public sealed class SettingsService : ISettingsService
         }
         catch (Exception)
         {
-            // Back up the unreadable file so the user can recover it manually
-            // if they want to, then start fresh.
-            try
-            {
-                var badFile = _settingsFile + ".bad";
-                File.Move(_settingsFile, badFile, overwrite: true);
-            }
-            catch
-            {
-                // Best effort; if we can't move it we still return defaults.
-            }
+            // Preserve the unreadable file for manual recovery before starting fresh.
+            try { File.Move(_settingsFile, _settingsFile + ".bad", overwrite: true); }
+            catch { }
             return new AppSettings();
         }
     }
@@ -78,9 +70,7 @@ public sealed class SettingsService : ISettingsService
         }
         catch (Exception)
         {
-            // Leave no debris if the atomic move failed partway. Best
-            // effort; we don't care if Delete itself fails (disk full
-            // scenarios often fail Delete too).
+            // Clean up the temp file so a disk-full save leaves no debris.
             try { if (File.Exists(tempFile)) File.Delete(tempFile); } catch { }
             return false;
         }
