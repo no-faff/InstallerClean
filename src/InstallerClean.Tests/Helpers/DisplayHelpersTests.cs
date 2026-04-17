@@ -1,3 +1,4 @@
+using System.Globalization;
 using InstallerClean.Helpers;
 
 namespace InstallerClean.Tests.Helpers;
@@ -15,8 +16,9 @@ public class DisplayHelpersTests
     [InlineData(1_073_741_824, "1.00 GB")]
     [InlineData(5_368_709_120, "5.00 GB")]
     [InlineData(107_374_182_400, "100.00 GB")]
-    public void FormatSize_formats_correctly(long bytes, string expected)
+    public void FormatSize_formats_correctly_in_en_US(long bytes, string expected)
     {
+        using var scope = new CultureScope(CultureInfo.GetCultureInfo("en-US"));
         Assert.Equal(expected, DisplayHelpers.FormatSize(bytes));
     }
 
@@ -28,5 +30,40 @@ public class DisplayHelpersTests
     public void Pluralise_returns_correct_form(int count, string expected)
     {
         Assert.Equal(expected, DisplayHelpers.Pluralise(count, "file", "files"));
+    }
+
+    [Theory]
+    [InlineData("de-DE", "1,0 KB")]
+    [InlineData("fr-FR", "1,0 KB")]
+    [InlineData("en-GB", "1.0 KB")]
+    [InlineData("ja-JP", "1.0 KB")]
+    public void FormatSize_follows_system_culture_for_decimal_separator(string cultureName, string expected)
+    {
+        using var scope = new CultureScope(CultureInfo.GetCultureInfo(cultureName));
+        Assert.Equal(expected, DisplayHelpers.FormatSize(1024));
+    }
+
+    [Fact]
+    public void FormatSize_never_throws_across_many_cultures()
+    {
+        var cultures = new[] { "en-US", "en-GB", "de-DE", "fr-FR", "ja-JP", "tr-TR", "ar-SA", "hi-IN" };
+        foreach (var name in cultures)
+        {
+            using var scope = new CultureScope(CultureInfo.GetCultureInfo(name));
+            var _ = DisplayHelpers.FormatSize(1_073_741_824);
+        }
+    }
+
+    private sealed class CultureScope : IDisposable
+    {
+        private readonly CultureInfo _previous;
+
+        public CultureScope(CultureInfo culture)
+        {
+            _previous = CultureInfo.CurrentCulture;
+            CultureInfo.CurrentCulture = culture;
+        }
+
+        public void Dispose() => CultureInfo.CurrentCulture = _previous;
     }
 }

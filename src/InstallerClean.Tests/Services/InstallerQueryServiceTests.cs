@@ -4,14 +4,6 @@ using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services;
 
-/// <summary>
-/// Tests for InstallerQueryService. The service calls the Windows Installer
-/// API (MsiEnumProductsEx etc.) which requires admin elevation for the
-/// "all users" SID. Tests here exercise the cancellation path and the
-/// non-elevated error path. The data transformation logic (patch state
-/// classification, removability rules, path deduplication) is tested via
-/// RegisteredPackageTests and FileSystemScanServiceTests.
-/// </summary>
 public class InstallerQueryServiceTests
 {
     [Fact]

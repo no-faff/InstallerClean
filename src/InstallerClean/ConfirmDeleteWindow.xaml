@@ -8,32 +8,37 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
 
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" GlassFrameThickness="0"
+                      ResizeBorderThickness="0"/>
+    </WindowChrome.WindowChrome>
+
     <Border Background="{StaticResource Base200}" CornerRadius="16" Padding="32,28"
             MaxWidth="400" MinWidth="320"
             BorderBrush="{StaticResource Primary}" BorderThickness="1">
         <StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource GapBottom.Md}">
                 <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
                       Fill="{StaticResource Warning}" Width="16" Height="16" Stretch="Uniform"
                       VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <TextBlock x:Name="MessageText" Foreground="#f8fafc" FontSize="14"
+                <TextBlock x:Name="MessageText" Foreground="{StaticResource Fg}" FontSize="14"
                            TextWrapping="Wrap" VerticalAlignment="Center"/>
             </StackPanel>
 
             <TextBlock
                        Text="Files will be sent to the Recycle Bin. Use Move instead if you'd like to keep backup copies."
-                       Foreground="#94a3b8" FontSize="12" TextWrapping="Wrap"
+                       Foreground="{StaticResource Muted}" FontSize="12" TextWrapping="Wrap"
                        Margin="0,0,0,20"/>
             <TextBlock x:Name="LargeSizeWarning"
-                       Text="Large files may be permanently deleted if the Recycle Bin is full."
+                       Text="At this size some files may skip the Recycle Bin and be deleted permanently. Windows does this automatically when a file exceeds the Recycle Bin's free space. Use Move instead if you want guaranteed backup copies."
                        Foreground="{StaticResource Warning}" FontSize="12" TextWrapping="Wrap"
                        Margin="0,-12,0,20" Visibility="Collapsed"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Style="{StaticResource PrimaryPill}" Content="_Cancel"
-                        Click="OnCancel" IsCancel="True" Margin="0,0,8,0"/>
+                        Click="OnCancel" IsCancel="True" Margin="{StaticResource GapRight.Sm}"/>
                 <Button Content="_Delete" Click="OnDelete"
-                        Foreground="#f8fafc" FontSize="14" FontWeight="Medium"
+                        Foreground="{StaticResource Fg}" FontSize="14" FontWeight="Medium"
                         Padding="28,8" Height="40" MinWidth="120" Cursor="Hand">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">

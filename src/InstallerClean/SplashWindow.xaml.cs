@@ -8,6 +8,8 @@ public partial class SplashWindow : Window
 {
     private int _progressMessageCount;
 
+    public event EventHandler? CancelRequested;
+
     public SplashWindow()
     {
         InitializeComponent();
@@ -16,8 +18,11 @@ public partial class SplashWindow : Window
 
     public void OnScanProgress(string message)
     {
+        // Asymptote to 95%. The closing UpdateStep("Done", 100) from App
+        // brings the bar to full on completion, so progress actually
+        // reaches 100 rather than stalling at 90.
         _progressMessageCount++;
-        var percent = 10 + 80.0 * _progressMessageCount / (_progressMessageCount + 15);
+        var percent = 10 + 85.0 * _progressMessageCount / (_progressMessageCount + 15);
         UpdateStep(message, percent);
     }
 
@@ -40,4 +45,11 @@ public partial class SplashWindow : Window
         SplashProgressBorder.BeginAnimation(WidthProperty, animation);
     }
 
+    private void CancelClick(object sender, RoutedEventArgs e)
+    {
+        CancelButton.IsEnabled = false;
+        CancelButton.Content = "Cancelling...";
+        StepText.Text = "Cancelling...";
+        CancelRequested?.Invoke(this, EventArgs.Empty);
+    }
 }

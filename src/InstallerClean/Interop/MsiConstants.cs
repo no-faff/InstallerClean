@@ -82,10 +82,12 @@ public static class MsiInstallProperty
 /// </summary>
 public static class MsiSummaryProperty
 {
-    public const uint Title    = 2;  // PID_TITLE
-    public const uint Subject  = 3;  // PID_SUBJECT
-    public const uint Author   = 4;  // PID_AUTHOR
-    public const uint Comments = 6;  // PID_COMMENTS
+    public const uint Title    = 2;   // PID_TITLE
+    public const uint Subject  = 3;   // PID_SUBJECT
+    public const uint Author   = 4;   // PID_AUTHOR
+    public const uint Keywords = 5;   // PID_KEYWORDS
+    public const uint Comments = 6;   // PID_COMMENTS
+    public const uint AppName  = 18;  // PID_APPNAME
 }
 
 /// <summary>

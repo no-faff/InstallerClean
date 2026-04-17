@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using InstallerClean.Helpers;
 using InstallerClean.Services;
 using InstallerClean.ViewModels;
 
@@ -23,6 +24,7 @@ public partial class OrphanedFilesWindow : Window
         }
 
         Closed += OnClosed;
+        this.EnableAltSpaceSystemMenu();
     }
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
@@ -41,6 +43,8 @@ public partial class OrphanedFilesWindow : Window
 
     private void OnClosed(object? sender, EventArgs e)
     {
+        Closed -= OnClosed;
+        if (DataContext is IDisposable vm) vm.Dispose();
         if (_settingsService is null) return;
         var settings = _settingsService.Load();
         settings.OrphanedWindowSize = new Models.WindowSize { Width = ActualWidth, Height = ActualHeight };

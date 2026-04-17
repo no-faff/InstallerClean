@@ -2,10 +2,6 @@ using InstallerClean.Models;
 
 namespace InstallerClean.Tests.Models;
 
-/// <summary>
-/// Tests the MsiSummaryInfo record, which holds metadata read from
-/// MSI/MSP files by MsiFileInfoService.
-/// </summary>
 public class MsiSummaryInfoTests
 {
     [Fact]
@@ -16,13 +12,26 @@ public class MsiSummaryInfoTests
             "Microsoft Office",
             "Microsoft Corporation",
             "This is a comment",
-            "CN=Microsoft");
+            "CN=Microsoft",
+            "office;productivity;suite",
+            "Microsoft Office Installer");
 
         Assert.Equal("Installation Database", info.Title);
         Assert.Equal("Microsoft Office", info.Subject);
         Assert.Equal("Microsoft Corporation", info.Author);
         Assert.Equal("This is a comment", info.Comments);
         Assert.Equal("CN=Microsoft", info.DigitalSignature);
+        Assert.Equal("office;productivity;suite", info.Keywords);
+        Assert.Equal("Microsoft Office Installer", info.AppName);
+    }
+
+    [Fact]
+    public void Keywords_and_AppName_default_to_empty()
+    {
+        var info = new MsiSummaryInfo("T", "S", "A", "C", "D");
+
+        Assert.Equal(string.Empty, info.Keywords);
+        Assert.Equal(string.Empty, info.AppName);
     }
 
     [Fact]

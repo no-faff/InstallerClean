@@ -8,16 +8,22 @@ public sealed class FileSystemScanService : IFileSystemScanService
 {
     private readonly IInstallerQueryService _queryService;
     private readonly IEnumerable<string>? _overrideFiles;
+    private readonly string? _installerFolderOverride;
 
     /// <summary>Production constructor.</summary>
     public FileSystemScanService(IInstallerQueryService queryService)
-        : this(queryService, null) { }
+        : this(queryService, null, null) { }
 
     /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)
+        : this(queryService, overrideFiles, null) { }
+
+    /// <summary>Test constructor. Points enumeration at a real directory.</summary>
+    internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
     {
         _queryService = queryService;
         _overrideFiles = overrideFiles;
+        _installerFolderOverride = installerFolderOverride;
     }
 
     public async Task<ScanResult> ScanAsync(
@@ -34,7 +40,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         progress?.Report("Scanning installer cache folder...");
 
-        var diskFiles = _overrideFiles ?? GetInstallerFiles();
+        var diskFiles = _overrideFiles ?? GetInstallerFiles(_installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder);
         var removable = new List<OrphanedFile>();
 
         foreach (var filePath in diskFiles)
@@ -58,46 +64,60 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase)));
         }
 
-        // Superseded registered patches that are safe to remove
-        foreach (var pkg in registered.Where(p => p.IsRemovable))
+        // Single pass over all registered packages: stat the file once,
+        // attach the size so the Details window doesn't have to hit disk
+        // on the UI thread, flag files missing from disk (indicates a
+        // corrupt install), and either add to removable (superseded) or
+        // accumulate the still-used total.
+        long stillUsedBytes = 0;
+        int missingFromDisk = 0;
+        var sizedPackages = new List<RegisteredPackage>(registered.Count);
+        foreach (var pkg in registered)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             long size = 0;
-            try { if (File.Exists(pkg.LocalPackagePath)) size = new FileInfo(pkg.LocalPackagePath).Length; }
-            catch (Exception) { }
-
-            var ext = Path.GetExtension(pkg.LocalPackagePath);
-            removable.Add(new OrphanedFile(
-                FullPath: pkg.LocalPackagePath,
-                SizeBytes: size,
-                IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
-                Reason: "Superseded"));
-        }
-
-        // Filter removable packages out of the registered list for the "still used" count
-        var stillUsed = registered.Where(p => !p.IsRemovable).ToList().AsReadOnly();
-        long stillUsedBytes = 0;
-        foreach (var pkg in stillUsed)
-        {
+            bool exists = false;
             try
             {
                 if (File.Exists(pkg.LocalPackagePath))
-                    stillUsedBytes += new FileInfo(pkg.LocalPackagePath).Length;
+                {
+                    exists = true;
+                    size = new FileInfo(pkg.LocalPackagePath).Length;
+                }
             }
             catch (Exception) { }
+
+            if (!exists) missingFromDisk++;
+
+            sizedPackages.Add(pkg with { FileSizeBytes = size, FileExists = exists });
+
+            if (pkg.IsRemovable)
+            {
+                var ext = Path.GetExtension(pkg.LocalPackagePath);
+                removable.Add(new OrphanedFile(
+                    FullPath: pkg.LocalPackagePath,
+                    SizeBytes: size,
+                    IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
+                    Reason: "Superseded"));
+            }
+            else
+            {
+                stillUsedBytes += size;
+            }
         }
+        var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
 
         progress?.Report($"Found {removable.Count} {DisplayHelpers.Pluralise(removable.Count, "file", "files")} to clean up.");
-        return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes);
+        return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingFromDisk);
     }
 
-    private static IEnumerable<string> GetInstallerFiles()
+    private static IEnumerable<string> GetInstallerFiles(string folder)
     {
-        if (!Directory.Exists(InstallerCacheHelpers.InstallerFolder))
+        if (!Directory.Exists(folder))
             return Enumerable.Empty<string>();
 
-        return Directory.EnumerateFiles(InstallerCacheHelpers.InstallerFolder, "*.msi", SearchOption.AllDirectories)
-            .Concat(Directory.EnumerateFiles(InstallerCacheHelpers.InstallerFolder, "*.msp", SearchOption.AllDirectories));
+        return Directory.EnumerateFiles(folder, "*.msi", SearchOption.AllDirectories)
+            .Concat(Directory.EnumerateFiles(folder, "*.msp", SearchOption.AllDirectories));
     }
 }

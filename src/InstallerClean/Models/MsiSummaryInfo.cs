@@ -8,4 +8,6 @@ public record MsiSummaryInfo(
     string Subject,
     string Author,
     string Comments,
-    string DigitalSignature);
+    string DigitalSignature,
+    string Keywords = "",
+    string AppName  = "");

@@ -17,6 +17,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IPendingRebootService _rebootService;
     private readonly IMsiFileInfoService _msiInfoService;
     private readonly IUpdateCheckService _updateCheckService;
+    private readonly IDialogService _dialogService;
     // Scan state
     [ObservableProperty] private bool _isScanning;
     [ObservableProperty] private string _scanProgress = string.Empty;
@@ -35,6 +36,15 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private bool _hasPendingReboot;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasMissingFromDisk))]
+    [NotifyPropertyChangedFor(nameof(MissingFromDiskSummaryText))]
+    private int _missingFromDiskCount;
+
+    public bool HasMissingFromDisk => MissingFromDiskCount > 0;
+    public string MissingFromDiskSummaryText =>
+        $"{MissingFromDiskCount} registered {DisplayHelpers.Pluralise(MissingFromDiskCount, "file is", "files are")} missing from disk. Your Windows Installer database references installers that no longer exist.";
+
     [ObservableProperty] private string _moveDestination = string.Empty;
 
     // Busy state for move/delete operations
@@ -46,6 +56,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private double _operationProgressPercent;
 
     private CancellationTokenSource? _operationCts;
+    private CancellationTokenSource? _scanCts;
 
     [ObservableProperty] private bool _hasScanned;
 
@@ -66,7 +77,8 @@ public partial class MainViewModel : ObservableObject
         ISettingsService settingsService,
         IPendingRebootService rebootService,
         IMsiFileInfoService msiInfoService,
-        IUpdateCheckService updateCheckService)
+        IUpdateCheckService updateCheckService,
+        IDialogService dialogService)
     {
         _scanService = scanService;
         _moveService = moveService;
@@ -75,6 +87,7 @@ public partial class MainViewModel : ObservableObject
         _rebootService = rebootService;
         _msiInfoService = msiInfoService;
         _updateCheckService = updateCheckService;
+        _dialogService = dialogService;
 
         _settings = settingsService.Load();
         MoveDestination = _settings.MoveDestination;
@@ -107,6 +120,12 @@ public partial class MainViewModel : ObservableObject
     partial void OnMoveDestinationChanged(string value)
     {
         MoveAllCommand.NotifyCanExecuteChanged();
+
+        if (!string.Equals(_settings.MoveDestination, value, StringComparison.Ordinal))
+        {
+            _settings.MoveDestination = value;
+            _settingsService.TrySave(_settings);
+        }
     }
 
     private bool CanMove() =>
@@ -115,17 +134,19 @@ public partial class MainViewModel : ObservableObject
     private bool CanDelete() =>
         !IsScanning && !IsOperating && OrphanedFileCount > 0;
 
-    private async Task RunScanCoreAsync(IProgress<string>? progress)
+    private async Task RunScanCoreAsync(IProgress<string>? progress, CancellationToken cancellationToken = default)
     {
         HasPendingReboot = _rebootService.HasPendingReboot();
 
-        _lastScanResult = await _scanService.ScanAsync(progress);
+        _lastScanResult = await _scanService.ScanAsync(progress, cancellationToken);
 
         RegisteredFileCount = _lastScanResult.RegisteredPackages.Count;
         RegisteredSizeDisplay = DisplayHelpers.FormatSize(_lastScanResult.RegisteredTotalBytes);
 
         OrphanedFileCount = _lastScanResult.RemovableFiles.Count;
         OrphanedSizeDisplay = DisplayHelpers.FormatSize(_lastScanResult.RemovableFiles.Sum(f => f.SizeBytes));
+
+        MissingFromDiskCount = _lastScanResult.MissingFromDiskCount;
 
         HasScanned = true;
     }
@@ -135,12 +156,14 @@ public partial class MainViewModel : ObservableObject
     {
         ScanProgress = "Starting scan...";
         var sw = Stopwatch.StartNew();
+        var cts = new CancellationTokenSource();
+        _scanCts = cts;
 
         try
         {
-            var progress = new Progress<string>(msg => ScanProgress = msg);
-            var scanTask = RunScanCoreAsync(progress);
-            if (await Task.WhenAny(scanTask, Task.Delay(200)) != scanTask)
+            var progress = new Progress<string>(OnScanProgressUpdate);
+            var scanTask = RunScanCoreAsync(progress, cts.Token);
+            if (await Task.WhenAny(scanTask, Task.Delay(200, cts.Token)) != scanTask)
                 IsScanning = true;
             await scanTask;
 
@@ -148,7 +171,6 @@ public partial class MainViewModel : ObservableObject
             ScanProgress = $"Scan complete ({sw.Elapsed.TotalSeconds:F1}s)";
             OperationProgress = ScanProgress;
 
-            // Show "all clear" when no orphaned files and not mid-operation
             if (OrphanedFileCount == 0 && !IsOperating)
             {
                 CompletionHeading = "All clear";
@@ -158,23 +180,67 @@ public partial class MainViewModel : ObservableObject
                 IsComplete = true;
             }
         }
+        catch (OperationCanceledException)
+        {
+            ScanProgress = "Scan cancelled.";
+        }
         catch (UnauthorizedAccessException)
         {
-            MessageBox.Show(
+            _dialogService.ShowWarning(
                 "This app requires administrator privileges.\n\nPlease right-click and choose 'Run as administrator'.",
-                "Administrator rights required",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+                "Administrator rights required");
             ScanProgress = "Access denied. Run as administrator.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            _dialogService.ShowError(ex.Message, "Installer database unavailable");
+            ScanProgress = "Scan failed: installer database unavailable.";
         }
         catch (Exception ex)
         {
-            ScanProgress = $"Scan failed: {ex.Message}";
+            var logPath = CrashLog.Write(ex);
+            ScanProgress = $"Scan failed: {ex.Message}. Details in {logPath}.";
         }
         finally
         {
+            _scanCts = null;
+            cts.Dispose();
             IsScanning = false;
         }
+    }
+
+    [RelayCommand]
+    private void CancelScan()
+    {
+        try { _scanCts?.Cancel(); }
+        catch (ObjectDisposedException) { /* scan already finished */ }
+    }
+
+    internal static string DescribeWriteFailure(string dest, Exception ex) => ex switch
+    {
+        UnauthorizedAccessException =>
+            $"You don't have permission to write to {dest}.\nTry a folder in your user profile, or run as a different administrator.",
+        System.IO.PathTooLongException =>
+            $"The path {dest} is too long for Windows. Pick a shorter path.",
+        System.IO.DirectoryNotFoundException =>
+            $"The folder {dest} does not exist and could not be created. Check the drive letter or network path.",
+        System.IO.IOException io =>
+            $"Windows cannot write to {dest}:\n{io.Message}",
+        _ =>
+            $"Cannot write to {dest}:\n{ex.Message}"
+    };
+
+    private void OnScanProgressUpdate(string message) => ScanProgress = message;
+
+    private void OnOperationProgressUpdate(Models.OperationProgress p)
+    {
+        OperationCurrentFile = p.CurrentFile;
+        OperationTotalFiles = p.TotalFiles;
+        OperationCurrentFileName = p.CurrentFileName;
+        OperationProgressPercent = p.TotalFiles > 0
+            ? (double)p.CurrentFile / p.TotalFiles * 100
+            : 0;
+        OperationProgress = $"{p.CurrentFile} of {p.TotalFiles} files";
     }
 
     [RelayCommand]
@@ -186,28 +252,26 @@ public partial class MainViewModel : ObservableObject
         };
         if (dialog.ShowDialog() == true)
         {
+            // Setting MoveDestination triggers OnMoveDestinationChanged
+            // which persists the new value via _settingsService.TrySave.
             MoveDestination = dialog.FolderName;
-            _settings.MoveDestination = MoveDestination;
-
-            try
-            {
-                _settingsService.Save(_settings);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"Could not save settings: {ex.Message}",
-                    "Settings",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
         }
     }
 
     [RelayCommand]
     private void CancelOperation()
     {
-        _operationCts?.Cancel();
+        // Guard against a race with the finally block that disposes the
+        // token source: a Cancel click landing between
+        // _operationCts = null and cts.Dispose() can hit a disposed token.
+        try
+        {
+            _operationCts?.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+            // Operation already finished. Nothing to cancel.
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanMove))]
@@ -218,25 +282,24 @@ public partial class MainViewModel : ObservableObject
         var dest = MoveDestination;
         if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
         {
-            MessageBox.Show(
+            _dialogService.ShowWarning(
                 "The destination cannot be inside the Windows Installer folder.",
-                "Invalid destination", MessageBoxButton.OK, MessageBoxImage.Warning);
+                "Invalid destination");
             return;
         }
 
-        // Validate destination exists and is writable
         try
         {
             Directory.CreateDirectory(dest);
-            var testFile = Path.Combine(dest, ".installerclean-write-test");
-            File.WriteAllText(testFile, "");
-            File.Delete(testFile);
+            var probe = Path.Combine(dest, Path.GetRandomFileName());
+            File.WriteAllBytes(probe, Array.Empty<byte>());
+            File.Delete(probe);
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
-                $"Cannot write to {dest}:\n{ex.Message}",
-                "Invalid destination", MessageBoxButton.OK, MessageBoxImage.Warning);
+            _dialogService.ShowWarning(
+                DescribeWriteFailure(dest, ex),
+                "Invalid destination");
             return;
         }
 
@@ -246,14 +309,16 @@ public partial class MainViewModel : ObservableObject
         var totalBytes = removableFiles.Sum(f => f.SizeBytes);
         var sizeDisplay = OrphanedSizeDisplay;
 
-        var driveInfo = new DriveInfo(Path.GetPathRoot(dest)!);
-        if (driveInfo.AvailableFreeSpace < totalBytes)
+        // Free-space check. Skip silently for paths we can't measure
+        // (UNC shares where the caller lacks query rights, etc).
+        var availableFreeSpace = StorageHelpers.GetAvailableFreeSpace(dest);
+        if (availableFreeSpace is long free && free < totalBytes)
         {
-            MessageBox.Show(
-                $"Not enough space on {driveInfo.Name}\n\n" +
+            _dialogService.ShowWarning(
+                $"Not enough space at {dest}\n\n" +
                 $"Required: {DisplayHelpers.FormatSize(totalBytes)}\n" +
-                $"Available: {DisplayHelpers.FormatSize(driveInfo.AvailableFreeSpace)}",
-                "Not enough space", MessageBoxButton.OK, MessageBoxImage.Warning);
+                $"Available: {DisplayHelpers.FormatSize(free)}",
+                "Not enough space");
             return;
         }
 
@@ -269,14 +334,7 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            var progress = new Progress<Models.OperationProgress>(p =>
-            {
-                OperationCurrentFile = p.CurrentFile;
-                OperationTotalFiles = p.TotalFiles;
-                OperationCurrentFileName = p.CurrentFileName;
-                OperationProgressPercent = (double)p.CurrentFile / p.TotalFiles * 100;
-                OperationProgress = $"{p.CurrentFile} of {p.TotalFiles} files";
-            });
+            var progress = new Progress<Models.OperationProgress>(OnOperationProgressUpdate);
             var result = await _moveService.MoveFilesAsync(filePaths, MoveDestination, progress, _operationCts.Token);
             var movedCount = result.MovedCount;
             var movedDest = MoveDestination;
@@ -291,9 +349,10 @@ public partial class MainViewModel : ObservableObject
                 movedBytes = removableFiles.Where(f => !errorPaths.Contains(f.FullPath)).Sum(f => f.SizeBytes);
             }
 
-            await ScanAsync();
+            // Refresh counts without flipping IsScanning (the operating overlay
+            // is already up; we don't want both overlays layered).
+            await RunScanCoreAsync(null);
 
-            // Show completion screen
             CompletionHeading = $"{DisplayHelpers.FormatSize(movedBytes)} cleared";
             var movedLabel = DisplayHelpers.Pluralise(movedCount, "file", "files");
             CompletionSummary = errorCount == 0
@@ -308,7 +367,7 @@ public partial class MainViewModel : ObservableObject
         catch (OperationCanceledException)
         {
             OperationProgress = "Move cancelled.";
-            await ScanAsync();
+            try { await RunScanCoreAsync(null); } catch { /* best effort refresh */ }
         }
         catch (Exception ex)
         {
@@ -332,9 +391,10 @@ public partial class MainViewModel : ObservableObject
         var removableFiles = _lastScanResult.RemovableFiles;
         var count = removableFiles.Count;
         var totalBytes = removableFiles.Sum(f => f.SizeBytes);
+        var maxSingleFileBytes = removableFiles.Count > 0 ? removableFiles.Max(f => f.SizeBytes) : 0;
         var sizeDisplay = OrphanedSizeDisplay;
 
-        var dialog = new ConfirmDeleteWindow(count, sizeDisplay, totalBytes)
+        var dialog = new ConfirmDeleteWindow(count, sizeDisplay, totalBytes, maxSingleFileBytes)
         {
             Owner = Application.Current.MainWindow
         };
@@ -347,14 +407,7 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            var progress = new Progress<Models.OperationProgress>(p =>
-            {
-                OperationCurrentFile = p.CurrentFile;
-                OperationTotalFiles = p.TotalFiles;
-                OperationCurrentFileName = p.CurrentFileName;
-                OperationProgressPercent = (double)p.CurrentFile / p.TotalFiles * 100;
-                OperationProgress = $"{p.CurrentFile} of {p.TotalFiles} files";
-            });
+            var progress = new Progress<Models.OperationProgress>(OnOperationProgressUpdate);
             var result = await _deleteService.DeleteFilesAsync(filePaths, progress, _operationCts.Token);
             var deletedCount = result.DeletedCount;
             var errorCount = result.Errors.Count;
@@ -368,9 +421,10 @@ public partial class MainViewModel : ObservableObject
                 deletedBytes = removableFiles.Where(f => !errorPaths.Contains(f.FullPath)).Sum(f => f.SizeBytes);
             }
 
-            await ScanAsync();
+            // Refresh counts without flipping IsScanning (the operating overlay
+            // is already up; we don't want both overlays layered).
+            await RunScanCoreAsync(null);
 
-            // Show completion screen
             CompletionHeading = $"{DisplayHelpers.FormatSize(deletedBytes)} cleared";
             var deletedLabel = DisplayHelpers.Pluralise(deletedCount, "file", "files");
             CompletionSummary = errorCount == 0
@@ -385,7 +439,7 @@ public partial class MainViewModel : ObservableObject
         catch (OperationCanceledException)
         {
             OperationProgress = "Delete cancelled.";
-            await ScanAsync();
+            try { await RunScanCoreAsync(null); } catch { /* best effort refresh */ }
         }
         catch (Exception ex)
         {
@@ -464,10 +518,10 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
-    public async Task ScanWithProgressAsync(IProgress<string>? progress)
+    public async Task ScanWithProgressAsync(IProgress<string>? progress, CancellationToken cancellationToken = default)
     {
         var sw = Stopwatch.StartNew();
-        await RunScanCoreAsync(progress);
+        await RunScanCoreAsync(progress, cancellationToken);
         sw.Stop();
         ScanProgress = $"Scan complete ({sw.Elapsed.TotalSeconds:F1}s)";
 
@@ -489,12 +543,17 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task RescanAfterCompletionAsync()
+    {
+        IsComplete = false;
+        CompletionErrors = string.Empty;
+        await ScanAsync();
+    }
+
+    [RelayCommand]
     private void CloseApp()
     {
         Application.Current.MainWindow?.Close();
     }
-
-    [RelayCommand]
-    private async Task RefreshAsync() => await ScanAsync();
 
 }

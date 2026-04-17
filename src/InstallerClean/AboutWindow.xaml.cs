@@ -14,6 +14,7 @@ public partial class AboutWindow : Window
         InitializeComponent();
         _updateCheckService = updateCheckService;
         VersionText.Text = DisplayHelpers.GetVersionString();
+        this.EnableAltSpaceSystemMenu();
     }
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
@@ -37,6 +38,15 @@ public partial class AboutWindow : Window
                 MessageBox.Show(
                     "InstallerClean is up to date.",
                     "Up to date", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            // GetLatestVersionAsync is fully try/catched internally, so this
+            // catch is a belt-and-braces guard against future refactors that
+            // might let an exception escape. async void needs it.
+            MessageBox.Show(
+                $"Couldn't check for updates: {ex.Message}",
+                "Check failed", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         finally
         {

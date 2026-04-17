@@ -5,26 +5,37 @@ using InstallerClean.Models;
 
 namespace InstallerClean.Services;
 
-public sealed class UpdateCheckService : IUpdateCheckService
+public sealed class UpdateCheckService : IUpdateCheckService, IDisposable
 {
     private const string ApiUrl = "https://api.github.com/repos/no-faff/InstallerClean/releases/latest";
 
     private readonly HttpClient _httpClient;
+    private readonly bool _ownsClient;
+    private bool _disposed;
 
     public UpdateCheckService()
     {
-        _httpClient = new HttpClient();
+        _httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(10),
+            // GitHub's real response is ~10 KB. Cap the buffer to defend
+            // against an unexpectedly large or malicious body.
+            MaxResponseContentBufferSize = 256 * 1024,
+        };
         _httpClient.DefaultRequestHeaders.Add("User-Agent", "InstallerClean");
-        _httpClient.Timeout = TimeSpan.FromSeconds(10);
+        _ownsClient = true;
     }
 
     internal UpdateCheckService(HttpClient httpClient)
     {
         _httpClient = httpClient;
+        _ownsClient = false;
     }
 
     public async Task<UpdateCheckResult> GetLatestVersionAsync()
     {
+        if (_disposed) return UpdateCheckResult.Failed();
+
         string json;
         try
         {
@@ -61,5 +72,12 @@ public sealed class UpdateCheckService : IUpdateCheckService
             // than a false "up to date" signal.
             return UpdateCheckResult.Failed();
         }
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        if (_ownsClient) _httpClient.Dispose();
     }
 }

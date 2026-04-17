@@ -82,4 +82,39 @@ public class SettingsServiceTests : IDisposable
         Assert.True(File.Exists(badFile));
         Assert.Equal("new corrupt {{{", File.ReadAllText(badFile));
     }
+
+    [Fact]
+    public void TrySave_returns_true_on_success()
+    {
+        var svc = new SettingsService(_tempFile);
+
+        var result = svc.TrySave(new AppSettings { MoveDestination = @"D:\Backup" });
+
+        Assert.True(result);
+        Assert.True(File.Exists(_tempFile));
+    }
+
+    [Fact]
+    public void TrySave_returns_false_when_path_is_invalid()
+    {
+        var invalidPath = Path.Combine(_tempFile, "sub", "settings.json");
+        File.WriteAllText(_tempFile, "not a directory");
+        var svc = new SettingsService(invalidPath);
+
+        var result = svc.TrySave(new AppSettings());
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void Save_never_throws_even_when_target_is_unreachable()
+    {
+        var invalidPath = Path.Combine(_tempFile, "sub", "settings.json");
+        File.WriteAllText(_tempFile, "not a directory");
+        var svc = new SettingsService(invalidPath);
+
+        var ex = Record.Exception(() => svc.Save(new AppSettings()));
+
+        Assert.Null(ex);
+    }
 }

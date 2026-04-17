@@ -15,12 +15,12 @@
 
     <Window.Resources>
         <Style x:Key="SubtleLink" TargetType="Hyperlink">
-            <Setter Property="Foreground" Value="#94a3b8"/>
+            <Setter Property="Foreground" Value="{StaticResource Muted}"/>
             <Setter Property="TextDecorations" Value="None"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Foreground" Value="#f8fafc"/>
+                    <Setter Property="Foreground" Value="{StaticResource Fg}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -46,8 +46,8 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal"
                     VerticalAlignment="Center" Margin="-8,0,0,0">
             <Image Source="Assets/splash-icon.png" Width="16" Height="16"
-                   RenderOptions.BitmapScalingMode="HighQuality" Margin="0,0,8,0"/>
-            <TextBlock Text="About" Foreground="#cbd5e1"
+                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"/>
+            <TextBlock Text="About" Foreground="{StaticResource Body}"
                        FontSize="14" FontWeight="Medium"/>
         </StackPanel>
         <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#x2715;"
@@ -55,15 +55,15 @@
                 Margin="0,-4,-24,0" AutomationProperties.Name="Close"/>
 
         <TextBlock Grid.Row="1" Text="InstallerClean"
-                   Foreground="#f8fafc" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                   Foreground="{StaticResource Fg}" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap"/>
         <TextBox Grid.Row="3" x:Name="VersionText"
-                 Style="{StaticResource SelectableText}" Foreground="#cbd5e1" FontSize="12"/>
-        <TextBlock Grid.Row="5" Foreground="#94a3b8" FontSize="12">
+                 Style="{StaticResource SelectableText}" Foreground="{StaticResource Body}" FontSize="12"/>
+        <TextBlock Grid.Row="5" Foreground="{StaticResource Muted}" FontSize="12">
             <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/blob/main/LICENSE"
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}">MIT licence</Hyperlink>
         </TextBlock>
-        <TextBlock Grid.Row="7" Foreground="#94a3b8" FontSize="12">
+        <TextBlock Grid.Row="7" Foreground="{StaticResource Muted}" FontSize="12">
             <Hyperlink NavigateUri="https://github.com/no-faff"
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}">github.com/no-faff</Hyperlink>
@@ -71,14 +71,14 @@
         <!-- Update check -->
         <Button x:Name="CheckNowButton" Grid.Row="9"
                 Style="{StaticResource GhostPill}"
-                Content="Check for updates" Click="CheckNowClick"
+                Content="_Check for updates" Click="CheckNowClick"
                 Height="28" Padding="12,0" FontSize="12"
                 HorizontalAlignment="Left"/>
 
         <Button Grid.Row="11" Style="{StaticResource PrimaryPill}"
-                Content="Close" IsCancel="True" HorizontalAlignment="Right"/>
+                Content="_Close" IsCancel="True" HorizontalAlignment="Right"/>
         <TextBlock Grid.Row="11" HorizontalAlignment="Left"
-                   VerticalAlignment="Center" Foreground="#94a3b8" FontSize="12">
+                   VerticalAlignment="Center" Foreground="{StaticResource Muted}" FontSize="12">
             <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/discussions"
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}">Send feedback</Hyperlink>

@@ -10,7 +10,7 @@
         ResizeMode="NoResize"
         ShowInTaskbar="False">
 
-    <Border Background="#1e293b" CornerRadius="12">
+    <Border Background="{StaticResource Base100}" CornerRadius="12">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>     <!-- top spacer -->
@@ -21,6 +21,8 @@
                 <RowDefinition Height="Auto"/>  <!-- progress bar -->
                 <RowDefinition Height="8"/>     <!-- gap -->
                 <RowDefinition Height="Auto"/>  <!-- step text -->
+                <RowDefinition Height="12"/>    <!-- gap -->
+                <RowDefinition Height="Auto"/>  <!-- cancel button -->
                 <RowDefinition Height="*"/>     <!-- bottom spacer -->
             </Grid.RowDefinitions>
 
@@ -32,28 +34,39 @@
 
             <!-- App name -->
             <TextBlock Grid.Row="3" Text="InstallerClean"
-                       Foreground="#f8fafc"
+                       Foreground="{StaticResource Fg}"
                        FontSize="28"
                        FontWeight="Bold"
                        HorizontalAlignment="Center"/>
 
             <!-- Progress bar -->
-            <Border Grid.Row="5" CornerRadius="12" Background="#0f172a"
+            <Border Grid.Row="5" CornerRadius="12" Background="{StaticResource Base200}"
                     Height="20" Margin="48,0">
                 <Border x:Name="SplashProgressBorder" CornerRadius="12"
                         HorizontalAlignment="Left" Width="0"
-                        Background="#4f46e5"/>
+                        Background="{StaticResource Secondary}"/>
             </Border>
             <!-- Step text -->
             <TextBlock Grid.Row="7"
                        x:Name="StepText"
                        Text="Scanning..."
-                       Foreground="#cbd5e1"
+                       Foreground="{StaticResource Body}"
                        FontSize="12"
                        HorizontalAlignment="Center"/>
 
+            <!-- Cancel button -->
+            <Button Grid.Row="9"
+                    x:Name="CancelButton"
+                    Content="_Cancel"
+                    Click="CancelClick"
+                    IsCancel="True"
+                    Style="{StaticResource GhostPill}"
+                    Height="28" Padding="16,0" FontSize="12"
+                    HorizontalAlignment="Center"
+                    AutomationProperties.Name="Cancel startup scan"/>
+
             <!-- Version (bottom right, overlaid) -->
-            <TextBlock Grid.Row="8"
+            <TextBlock Grid.Row="10"
                        x:Name="VersionText"
                        Foreground="{StaticResource Dim}"
                        FontSize="11"
