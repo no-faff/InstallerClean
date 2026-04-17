@@ -18,6 +18,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IMsiFileInfoService _msiInfoService;
     private readonly IUpdateCheckService _updateCheckService;
     private readonly IDialogService _dialogService;
+    private readonly IConfirmationService _confirmationService;
     // Scan state
     [ObservableProperty] private bool _isScanning;
     [ObservableProperty] private string _scanProgress = string.Empty;
@@ -78,7 +79,8 @@ public partial class MainViewModel : ObservableObject
         IPendingRebootService rebootService,
         IMsiFileInfoService msiInfoService,
         IUpdateCheckService updateCheckService,
-        IDialogService dialogService)
+        IDialogService dialogService,
+        IConfirmationService confirmationService)
     {
         _scanService = scanService;
         _moveService = moveService;
@@ -88,6 +90,7 @@ public partial class MainViewModel : ObservableObject
         _msiInfoService = msiInfoService;
         _updateCheckService = updateCheckService;
         _dialogService = dialogService;
+        _confirmationService = confirmationService;
 
         _settings = settingsService.Load();
         MoveDestination = _settings.MoveDestination;
@@ -322,11 +325,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var confirmDialog = new ConfirmMoveWindow(count, sizeDisplay, MoveDestination)
-        {
-            Owner = Application.Current.MainWindow
-        };
-        if (confirmDialog.ShowDialog() != true) return;
+        if (!_confirmationService.ConfirmMove(count, sizeDisplay, MoveDestination)) return;
 
         IsOperating = true;
         _operationCts = new CancellationTokenSource();
@@ -394,11 +393,7 @@ public partial class MainViewModel : ObservableObject
         var maxSingleFileBytes = removableFiles.Count > 0 ? removableFiles.Max(f => f.SizeBytes) : 0;
         var sizeDisplay = OrphanedSizeDisplay;
 
-        var dialog = new ConfirmDeleteWindow(count, sizeDisplay, totalBytes, maxSingleFileBytes)
-        {
-            Owner = Application.Current.MainWindow
-        };
-        if (dialog.ShowDialog() != true) return;
+        if (!_confirmationService.ConfirmDelete(count, sizeDisplay, totalBytes, maxSingleFileBytes)) return;
 
         IsOperating = true;
         _operationCts = new CancellationTokenSource();
@@ -428,7 +423,7 @@ public partial class MainViewModel : ObservableObject
             CompletionHeading = $"{DisplayHelpers.FormatSize(deletedBytes)} cleared";
             var deletedLabel = DisplayHelpers.Pluralise(deletedCount, "file", "files");
             CompletionSummary = errorCount == 0
-                ? $"{deletedCount} {deletedLabel} sent to Recycle Bin"
+                ? $"{deletedCount} {deletedLabel} sent to the Recycle Bin"
                 : $"{deletedCount} {deletedLabel} deleted. {errorCount} {DisplayHelpers.Pluralise(errorCount, "error", "errors")}.";
             CompletionRestore = "Restore them if anything stops working";
             CompletionErrors = errorCount > 0

@@ -131,11 +131,13 @@ int wmain(int argc, wchar_t **argv)
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
+    /* bInheritHandles = FALSE so a future file or socket opened here
+     * cannot leak into the child WinExe. */
     BOOL ok = CreateProcessW(
         target,
         cmdline,
         NULL, NULL,
-        TRUE,
+        FALSE,
         0,
         NULL, NULL,
         &si, &pi);

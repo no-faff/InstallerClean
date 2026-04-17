@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using CommunityToolkit.Mvvm.ComponentModel;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
@@ -8,7 +9,7 @@ namespace InstallerClean.ViewModels;
 public partial class OrphanedFilesViewModel : ObservableObject, IDisposable
 {
     private readonly IMsiFileInfoService _infoService;
-    private readonly Dictionary<string, MsiSummaryInfo?> _cache = new();
+    private readonly ConcurrentDictionary<string, MsiSummaryInfo?> _cache = new();
     private readonly CancellationTokenSource _lifetimeCts = new();
 
     public IReadOnlyList<OrphanedFile> Files { get; }

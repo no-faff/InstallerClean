@@ -31,7 +31,7 @@
 
         <!-- Title bar -->
         <StackPanel Grid.Row="0" Orientation="Horizontal"
-                    VerticalAlignment="Center" Margin="12,0,0,0">
+                    VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}">
             <Image Source="Assets/splash-icon.png" Width="16" Height="16"
                    RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"/>
             <TextBlock Text="InstallerClean" Foreground="{StaticResource Body}"
@@ -106,7 +106,7 @@
                     <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource GhostPill}"
                             Content="Details" Command="{Binding OpenRegisteredDetailsCommand}"
                             Height="28" Padding="12,0" FontSize="14"
-                            VerticalAlignment="Center" Margin="12,0,0,0"
+                            VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
                             AutomationProperties.Name="View registered files"/>
                 </Grid>
 
@@ -144,7 +144,7 @@
                     <Button Grid.Column="2" Style="{StaticResource GhostPill}"
                             Content="Details" Command="{Binding OpenOrphanedDetailsCommand}"
                             Height="28" Padding="12,0" FontSize="14"
-                            VerticalAlignment="Center" Margin="12,0,0,0"
+                            VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
                             AutomationProperties.Name="View orphaned files"/>
                 </Grid>
 
@@ -167,7 +167,7 @@
                                  AutomationProperties.Name="Move destination folder"
                                  ToolTip="Where the orphaned files will be moved. Type a path, paste one, or click Browse."/>
                         <TextBlock Text="Move destination..."
-                                   Foreground="{StaticResource Dim}" FontSize="12" FontStyle="Italic"
+                                   Foreground="{StaticResource Muted}" FontSize="12" FontStyle="Italic"
                                    Padding="12,0" VerticalAlignment="Center"
                                    IsHitTestVisible="False">
                             <TextBlock.Style>
@@ -339,6 +339,10 @@
                             <Run Text=" files"/>
                         </TextBlock>
                     </DockPanel>
+                    <TextBlock Text="{Binding OperationCurrentFileName}"
+                               Foreground="{StaticResource Dim}" FontSize="11"
+                               HorizontalAlignment="Center" Margin="0,4,0,0"
+                               TextTrimming="CharacterEllipsis" MaxWidth="240"/>
                     <Button x:Name="OperationCancelButton" Style="{StaticResource GhostPill}" Content="_Cancel"
                             Command="{Binding CancelOperationCommand}"
                             AutomationProperties.Name="Cancel operation"

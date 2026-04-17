@@ -17,7 +17,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
 
-    <Grid Margin="24,4,24,24">
+    <Grid Margin="{StaticResource DetailWindowMargin}">
         <Grid.RowDefinitions>
             <RowDefinition Height="44"/>
             <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
