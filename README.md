@@ -91,7 +91,7 @@ VirusTotal scans for the current release:
 
 - [Setup](https://www.virustotal.com/gui/file/eb1807b716ba6c6c8b4a33026789e36cf83b624a872324d5792e61a68acb2639): 0/71 clean
 - [Portable](https://www.virustotal.com/gui/file/3eb1f76733a1e03d54f72e14f8d1f8767d30598b79b581a4e3f51f889e627ef4): 0/71 clean
-- [Slim](https://www.virustotal.com/gui/file/5c8301a73fd72bc32062756d1beb6ef6b7412c67f869c0565a160026ccae53af): 1/72, SecureAge. The other 71 engines score it clean. SecureAge uses undocumented ML heuristics and tends to flag recurring false positives on unsigned binaries; Slim has been through this exact flag since v1.5.0
+- [Slim](https://www.virustotal.com/gui/file/5c8301a73fd72bc32062756d1beb6ef6b7412c67f869c0565a160026ccae53af): 71 engines clean, SecureAge flagged. The same flag has been on the slim build since v1.5.0
 
 ## Download
 
