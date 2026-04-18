@@ -16,7 +16,6 @@ public partial class MainViewModel : ObservableObject
     private readonly ISettingsService _settingsService;
     private readonly IPendingRebootService _rebootService;
     private readonly IMsiFileInfoService _msiInfoService;
-    private readonly IUpdateCheckService _updateCheckService;
     private readonly IDialogService _dialogService;
     private readonly IConfirmationService _confirmationService;
 
@@ -75,7 +74,6 @@ public partial class MainViewModel : ObservableObject
         ISettingsService settingsService,
         IPendingRebootService rebootService,
         IMsiFileInfoService msiInfoService,
-        IUpdateCheckService updateCheckService,
         IDialogService dialogService,
         IConfirmationService confirmationService)
     {
@@ -85,7 +83,6 @@ public partial class MainViewModel : ObservableObject
         _settingsService = settingsService;
         _rebootService = rebootService;
         _msiInfoService = msiInfoService;
-        _updateCheckService = updateCheckService;
         _dialogService = dialogService;
         _confirmationService = confirmationService;
 
@@ -475,7 +472,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ShowAbout()
     {
-        var window = new AboutWindow(_updateCheckService)
+        var window = new AboutWindow
         {
             Owner = Application.Current.MainWindow
         };

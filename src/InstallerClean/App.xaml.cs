@@ -20,7 +20,6 @@ public partial class App : Application
     private const int ATTACH_PARENT_PROCESS = -1;
 
     private static Mutex? _singleInstanceMutex;
-    private UpdateCheckService? _updateCheckService;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -103,12 +102,11 @@ public partial class App : Application
             var msiInfoService = new MsiFileInfoService();
             var dialogService = new DialogService();
             var confirmationService = new ConfirmationService();
-            _updateCheckService = new UpdateCheckService();
 
             var viewModel = new MainViewModel(
                 scanService, moveService, deleteService,
                 settingsService, rebootService, msiInfoService,
-                _updateCheckService, dialogService, confirmationService);
+                dialogService, confirmationService);
 
             using var startupCts = new CancellationTokenSource();
             splash.CancelRequested += (_, _) => startupCts.Cancel();
@@ -159,7 +157,6 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        _updateCheckService?.Dispose();
         _singleInstanceMutex?.Dispose();
         base.OnExit(e);
     }
