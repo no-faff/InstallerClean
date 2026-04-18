@@ -85,7 +85,13 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 - Nothing is touched until you click Delete or Move and confirm
 - The app warns you if Windows has pending updates that could affect results
 - More than 150 automated tests cover the core logic and run on every commit (see the green CI badge above)
-- [VirusTotal scan of the latest setup.exe](https://www.virustotal.com/gui/file/eb1807b716ba6c6c8b4a33026789e36cf83b624a872324d5792e61a68acb2639). Source code is all on GitHub
+- Source code is all on GitHub
+
+VirusTotal scans for the current release:
+
+- [Setup](https://www.virustotal.com/gui/file/eb1807b716ba6c6c8b4a33026789e36cf83b624a872324d5792e61a68acb2639): 0/71 clean
+- [Portable](https://www.virustotal.com/gui/file/3eb1f76733a1e03d54f72e14f8d1f8767d30598b79b581a4e3f51f889e627ef4): 0/71 clean
+- [Slim](https://www.virustotal.com/gui/file/5c8301a73fd72bc32062756d1beb6ef6b7412c67f869c0565a160026ccae53af): 1/72, SecureAge. SecureAge is a whitelist-based engine that defaults to flagging any small unsigned framework-dependent .NET launcher. It's a known false positive shape, not a detection of anything malicious
 
 ## Download
 
