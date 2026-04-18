@@ -168,7 +168,7 @@ public partial class MainViewModel : ObservableObject
             await scanTask;
 
             sw.Stop();
-            ScanProgress = $"Scan complete ({sw.Elapsed.TotalSeconds:F1}s)";
+            ScanProgress = $"Scan complete ({DisplayHelpers.FormatElapsed(sw.Elapsed)})";
             OperationProgress = ScanProgress;
 
             if (OrphanedFileCount == 0 && !IsOperating)
@@ -507,7 +507,7 @@ public partial class MainViewModel : ObservableObject
         var sw = Stopwatch.StartNew();
         await RunScanCoreAsync(progress, cancellationToken);
         sw.Stop();
-        ScanProgress = $"Scan complete ({sw.Elapsed.TotalSeconds:F1}s)";
+        ScanProgress = $"Scan complete ({DisplayHelpers.FormatElapsed(sw.Elapsed)})";
 
         if (OrphanedFileCount == 0)
         {
