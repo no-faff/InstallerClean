@@ -57,7 +57,7 @@ InstallerClean detects which Adobe patches have been superseded by newer updates
 3. **Shows** what's needed and what's not, with sizes
 4. **Removes** the unneeded files: delete to the Recycle Bin, or move to a folder you choose
 
-No telemetry. No network activity unless you click Check for updates (in the About window).
+No telemetry. No network activity. The About window has a Check for updates link that opens the releases page in your browser.
 
 ## How it works
 
@@ -85,7 +85,7 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 - **Move** copies files to a location you choose first, if you'd rather be cautious
 - Nothing is touched until you click Delete or Move and confirm
 - The app warns you if Windows has pending updates that could affect results
-- More than 140 automated tests cover the core logic and run on every commit (see the green CI badge above)
+- More than 150 automated tests cover the core logic and run on every commit (see the green CI badge above)
 - [VirusTotal scan](https://www.virustotal.com/gui/file/4e42eba0da04c9e823c97aa79339cdbd91ed8c92aff71d5206f459030a555a1b): 0/70 detections. Source code is all on GitHub
 
 ## Download
@@ -159,13 +159,13 @@ Start-Process -Wait -NoNewWindow .\InstallerClean-portable.exe -ArgumentList '/s
 - **Subfolder cleanup.** Prunes empty subfolders left behind by old installer operations.
 - **Command line mode.** `/s` to scan, `/d` to delete, `/m` to move - for scripting and automation.
 - **No installer needed.** Download the portable or slim version, run, done.
-- **Update check.** Check for new releases from the About window.
+- **Latest release link.** Jump to the releases page from the About window.
 
 ## Requirements
 
 - Windows 10 or 11
 - Administrator privileges (to access `C:\Windows\Installer`)
-- The setup installer and portable exe are around 72-76 MB because they bundle the .NET 8 runtime so nothing else needs to be installed. Choose portable unless you want an installer
+- The setup installer (~69 MB) and portable exe (~76 MB) bundle the .NET 8 runtime so nothing else needs to be installed. Choose portable unless you want an installer
 - Already have [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)? You do if you have Visual Studio installed (not to be confused with VS Code). Grab **InstallerClean-slim.exe** (7.7 MB) from the releases page instead
 
 ## Building from source
