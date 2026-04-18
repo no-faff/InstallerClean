@@ -2,7 +2,6 @@
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![CI](https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg)](https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml)
 [![Windows 10/11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg)](https://github.com/no-faff/InstallerClean/releases)
-[![VirusTotal](https://img.shields.io/badge/VirusTotal-0%2F70-brightgreen.svg)](https://www.virustotal.com/gui/file/4e42eba0da04c9e823c97aa79339cdbd91ed8c92aff71d5206f459030a555a1b)
 [![GitHub Release](https://img.shields.io/github/v/release/no-faff/InstallerClean)](https://github.com/no-faff/InstallerClean/releases/latest)
 
 # InstallerClean
@@ -86,7 +85,7 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 - Nothing is touched until you click Delete or Move and confirm
 - The app warns you if Windows has pending updates that could affect results
 - More than 150 automated tests cover the core logic and run on every commit (see the green CI badge above)
-- [VirusTotal scan](https://www.virustotal.com/gui/file/4e42eba0da04c9e823c97aa79339cdbd91ed8c92aff71d5206f459030a555a1b): 0/70 detections. Source code is all on GitHub
+- [VirusTotal scan of the latest setup.exe](https://www.virustotal.com/gui/file/eb1807b716ba6c6c8b4a33026789e36cf83b624a872324d5792e61a68acb2639). Source code is all on GitHub
 
 ## Download
 
