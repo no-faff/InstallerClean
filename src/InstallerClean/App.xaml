@@ -210,9 +210,74 @@
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource Fg}"/>
                                 </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource Body}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Bg" Property="Opacity" Value="0.5"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="CompactPill" TargetType="Button">
+                <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="Medium"/>
+                <Setter Property="Padding" Value="14,0"/>
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bg" Background="{StaticResource Primary}" CornerRadius="15"
+                                    Padding="{TemplateBinding Padding}"
+                                    Height="{TemplateBinding Height}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  RecognizesAccessKey="True"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource PrimaryHover}"/>
+                                </Trigger>
                                 <Trigger Property="IsKeyboardFocused" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource PrimaryHover}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource PrimaryPressed}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Bg" Property="Opacity" Value="0.5"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="CompactGhostPill" TargetType="Button">
+                <Setter Property="Foreground" Value="{StaticResource Muted}"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="Medium"/>
+                <Setter Property="Padding" Value="12,0"/>
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bg" Background="Transparent" CornerRadius="15"
+                                    Padding="{TemplateBinding Padding}"
+                                    Height="{TemplateBinding Height}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  RecognizesAccessKey="True"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource Fg}"/>
-                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource Base200}"/>
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource Body}"/>
@@ -331,6 +396,17 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+            </Style>
+
+            <Style x:Key="SubtleLink" TargetType="Hyperlink">
+                <Setter Property="Foreground" Value="{StaticResource Muted}"/>
+                <Setter Property="TextDecorations" Value="None"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
 
             <!-- Upscayl-style thin scrollbar: 8px, rounded, subtle thumb -->

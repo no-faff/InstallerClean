@@ -56,12 +56,15 @@ public partial class AboutWindow : Window
     private void Hyperlink_Click(object sender, RoutedEventArgs e)
     {
         if (sender is System.Windows.Documents.Hyperlink link && link.NavigateUri is not null)
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = link.NavigateUri.AbsoluteUri,
-                UseShellExecute = true
-            });
-        }
+            OpenUrl(link.NavigateUri.AbsoluteUri);
     }
+
+    private void StarClick(object sender, RoutedEventArgs e) =>
+        OpenUrl("https://github.com/no-faff/InstallerClean");
+
+    private void DonateClick(object sender, RoutedEventArgs e) =>
+        OpenUrl("https://nofaff.netlify.app");
+
+    private static void OpenUrl(string url) =>
+        Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
 }
