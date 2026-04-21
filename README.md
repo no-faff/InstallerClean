@@ -188,6 +188,16 @@ Found a bug or have a suggestion? [Open an issue](../../issues) or start a [disc
 
 If InstallerClean helped, consider [supporting No Faff](https://nofaff.netlify.app) or leaving a star on GitHub.
 
+## Star history
+
+<a href="https://www.star-history.com/?repos=no-faff%2FInstallerClean&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=no-faff/InstallerClean&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=no-faff/InstallerClean&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=no-faff/InstallerClean&type=date&legend=top-left" />
+ </picture>
+</a>
+
 ## Licence
 
 [MIT](LICENSE)
