@@ -613,6 +613,176 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+
+            <!-- ============================================================
+                 Replacement implicit styles for the controls that wpfui's
+                 ControlsDictionary currently styles automatically. Declared
+                 after the MergedDictionaries so they take precedence while
+                 wpfui is still loaded; they become the sole providers once
+                 wpfui is removed.
+                 ============================================================ -->
+
+            <!-- Default focus visual for any control without an explicit
+                 FocusVisualStyle. Pill buttons override this with their own
+                 PillFocusVisual; this is the fallback for plain Buttons,
+                 LinkButtons, Hyperlinks and anything else that takes focus. -->
+            <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Rectangle RadiusX="2" RadiusY="2"
+                                       Stroke="{DynamicResource Body}"
+                                       StrokeThickness="1"
+                                       SnapsToDevicePixels="True"
+                                       Margin="-1"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Slim dark ProgressBar.
+                 Used by both the indeterminate scan bar (240 wide) in
+                 MainWindow and the determinate operation bar (200 wide).
+                 The indeterminate animation slides an 80px indicator from
+                 -80 to 320, which fully covers any bar up to ~240 wide.
+                 If a wider indeterminate bar is ever introduced, increase
+                 the To value of the storyboard accordingly. -->
+            <Style TargetType="ProgressBar">
+                <Setter Property="Background" Value="{StaticResource Base100}"/>
+                <Setter Property="Foreground" Value="{StaticResource Secondary}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ProgressBar">
+                            <Border CornerRadius="4"
+                                    Background="{TemplateBinding Background}"
+                                    ClipToBounds="True">
+                                <Grid>
+                                    <Border x:Name="PART_Track"/>
+                                    <Border x:Name="PART_Indicator"
+                                            CornerRadius="4"
+                                            HorizontalAlignment="Left"
+                                            Background="{TemplateBinding Foreground}"/>
+                                    <Border x:Name="IndeterminateBar"
+                                            Width="80" CornerRadius="4"
+                                            HorizontalAlignment="Left"
+                                            Background="{TemplateBinding Foreground}"
+                                            Visibility="Collapsed"
+                                            RenderTransformOrigin="0,0">
+                                        <Border.RenderTransform>
+                                            <TranslateTransform x:Name="IndeterminateTransform"/>
+                                        </Border.RenderTransform>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsIndeterminate" Value="True">
+                                    <Setter TargetName="PART_Indicator" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="IndeterminateBar" Property="Visibility" Value="Visible"/>
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard RepeatBehavior="Forever">
+                                                <DoubleAnimation Storyboard.TargetName="IndeterminateTransform"
+                                                                 Storyboard.TargetProperty="X"
+                                                                 From="-80" To="320"
+                                                                 Duration="0:0:1.4"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Dark ContextMenu (used by SelectableText right-click Copy). -->
+            <Style TargetType="ContextMenu">
+                <Setter Property="Background" Value="{StaticResource Base100}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource Primary}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+                <Setter Property="Padding" Value="2"/>
+                <Setter Property="HasDropShadow" Value="False"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ContextMenu">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="4"
+                                    Padding="{TemplateBinding Padding}">
+                                <StackPanel IsItemsHost="True"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Dark MenuItem matching the ContextMenu style. -->
+            <Style TargetType="MenuItem">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{StaticResource Body}"/>
+                <Setter Property="Padding" Value="12,6"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="MenuItem">
+                            <Border x:Name="Bg" Background="{TemplateBinding Background}"
+                                    Padding="{TemplateBinding Padding}"
+                                    CornerRadius="2">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ContentPresenter ContentSource="Header" RecognizesAccessKey="True"
+                                                      VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="{TemplateBinding InputGestureText}"
+                                               Margin="20,0,0,0" Foreground="{StaticResource Dim}"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsHighlighted" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="{StaticResource Primary}"/>
+                                    <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Foreground" Value="{StaticResource Dim}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Dark default ToolTip (for attribute-syntax ToolTip="..." usages
+                 like the move destination textbox and file-list rows).
+                 The keyed WarningTooltip style above is used explicitly for the
+                 indigo accent tooltips on the heart/star buttons. -->
+            <Style TargetType="ToolTip">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="HasDropShadow" Value="False"/>
+                <Setter Property="MaxWidth" Value="320"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToolTip">
+                            <Border Background="{StaticResource Base100}"
+                                    BorderBrush="{StaticResource Primary}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="10,6">
+                                <TextBlock Text="{TemplateBinding Content}"
+                                           Foreground="{StaticResource Body}"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
