@@ -216,6 +216,7 @@
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
                     Command="{Binding DonateCommand}"
                     AutomationProperties.Name="Buy me a cuppa"
+                    FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     ToolTipService.InitialShowDelay="0"
                     Padding="6,0" Height="28">
                 <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
@@ -258,6 +259,7 @@
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
                     Command="{Binding StarOnGitHubCommand}"
                     AutomationProperties.Name="Leave a star on GitHub"
+                    FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     ToolTipService.InitialShowDelay="0"
                     Padding="6,0" Height="28" Margin="{StaticResource GapRight.Md}">
                 <Path Data="m12.672.668 3.059 6.197 6.838.993a.75.75 0 0 1 .416 1.28l-4.948 4.823 1.168 6.812a.75.75 0 0 1-1.088.79L12 18.347l-6.116 3.216a.75.75 0 0 1-1.088-.791l1.168-6.811-4.948-4.823a.749.749 0 0 1 .416-1.279l6.838-.994L11.327.668a.75.75 0 0 1 1.345 0Z"
@@ -312,6 +314,7 @@
                         Content="_Cancel" Command="{Binding CancelScanCommand}"
                         Height="28" Padding="16,0" FontSize="12"
                         HorizontalAlignment="Center"
+                        FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                         AutomationProperties.Name="Cancel scan"/>
             </StackPanel>
         </Grid>
@@ -348,6 +351,7 @@
                     <Button x:Name="OperationCancelButton" Style="{StaticResource GhostPill}" Content="_Cancel"
                             Command="{Binding CancelOperationCommand}"
                             AutomationProperties.Name="Cancel operation"
+                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             HorizontalAlignment="Center" Margin="0,10,0,0"
                             Height="28" Padding="16,0" FontSize="12"/>
                 </StackPanel>
@@ -413,6 +417,7 @@
                             Content="_Scan again" Command="{Binding RescanAfterCompletionCommand}"
                             HorizontalAlignment="Center"
                             Height="28" Padding="16,0" FontSize="12"
+                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             AutomationProperties.Name="Scan C:\Windows\Installer again"/>
 
                 </StackPanel>
