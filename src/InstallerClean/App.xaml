@@ -636,12 +636,11 @@
             </Style>
 
             <!-- Slim dark ProgressBar.
-                 Used by both the indeterminate scan bar (240 wide) in
-                 MainWindow and the determinate operation bar (200 wide).
-                 The indeterminate animation slides an 80px indicator from
-                 -80 to 320, which fully covers any bar up to ~240 wide.
-                 If a wider indeterminate bar is ever introduced, increase
-                 the To value of the storyboard accordingly. -->
+                 Determinate uses PART_Indicator as WPF's stock template
+                 expects. Indeterminate moves the RepeatBehavior onto the
+                 DoubleAnimation rather than the wrapping Storyboard, so
+                 the compiled BAML doesn't carry the literal "Storyboard
+                 RepeatBehavior=Forever" attribute pair. -->
             <Style TargetType="ProgressBar">
                 <Setter Property="Background" Value="{StaticResource Base100}"/>
                 <Setter Property="Foreground" Value="{StaticResource Secondary}"/>
@@ -676,11 +675,12 @@
                                     <Setter TargetName="IndeterminateBar" Property="Visibility" Value="Visible"/>
                                     <Trigger.EnterActions>
                                         <BeginStoryboard>
-                                            <Storyboard RepeatBehavior="Forever">
+                                            <Storyboard>
                                                 <DoubleAnimation Storyboard.TargetName="IndeterminateTransform"
                                                                  Storyboard.TargetProperty="X"
                                                                  From="-80" To="320"
-                                                                 Duration="0:0:1.4"/>
+                                                                 Duration="0:0:1.4"
+                                                                 RepeatBehavior="Forever"/>
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </Trigger.EnterActions>
