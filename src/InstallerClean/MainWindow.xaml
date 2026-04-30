@@ -190,10 +190,12 @@
                 <!-- Buttons row -->
                 <DockPanel Grid.Row="6">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
-                            Content="_Move" Command="{Binding MoveAllCommand}"/>
+                            Content="_Move" Command="{Binding MoveAllCommand}"
+                            AutomationProperties.HelpText="Move all orphaned installer files to the chosen destination folder"/>
 
                     <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
                             Content="_Delete" Command="{Binding DeleteAllCommand}"
+                            AutomationProperties.HelpText="Send all orphaned installer files to the Recycle Bin"
                             Margin="{StaticResource GapRight.Sm}"/>
 
                     <TextBlock DockPanel.Dock="Left" Text="{Binding OperationProgress}"

@@ -39,7 +39,9 @@
                         Click="OnCancel" IsCancel="True" Margin="{StaticResource GapRight.Sm}"/>
                 <Button Content="_Delete" Click="OnDelete"
                         Foreground="{StaticResource Fg}" FontSize="14" FontWeight="Medium"
-                        Padding="28,8" Height="40" MinWidth="120" Cursor="Hand">
+                        Padding="28,8" Height="40" MinWidth="120" Cursor="Hand"
+                        FocusVisualStyle="{StaticResource PillFocusVisual}"
+                        AutomationProperties.HelpText="Confirm sending the orphaned files to the Recycle Bin">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border x:Name="Bg" Background="{StaticResource Danger}" CornerRadius="20"
@@ -50,6 +52,9 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bg" Property="Background" Value="#7f1d1d"/>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
                                     <Setter TargetName="Bg" Property="Background" Value="#7f1d1d"/>
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
