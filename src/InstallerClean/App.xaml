@@ -111,15 +111,17 @@
             </Style>
 
             <!-- Focus visual for pill controls (40px tall, 20px inner radius).
-                 Drawn 2px outside the control bounds in Secondary indigo so
-                 keyboard focus is visible against any background. -->
+                 Drawn 2px outside the control bounds in Body slate so keyboard
+                 focus stays visible regardless of the button's own colour
+                 (handles the indigo-on-indigo case for AccentPill, and the
+                 indigo-on-red case for the bespoke Delete button). -->
             <Style x:Key="PillFocusVisual">
                 <Setter Property="Control.Template">
                     <Setter.Value>
                         <ControlTemplate>
                             <Border CornerRadius="22"
                                     BorderThickness="2"
-                                    BorderBrush="{DynamicResource Secondary}"
+                                    BorderBrush="{DynamicResource Body}"
                                     Margin="-2"
                                     SnapsToDevicePixels="True"/>
                         </ControlTemplate>
@@ -134,7 +136,25 @@
                         <ControlTemplate>
                             <Border CornerRadius="17"
                                     BorderThickness="2"
-                                    BorderBrush="{DynamicResource Secondary}"
+                                    BorderBrush="{DynamicResource Body}"
+                                    Margin="-2"
+                                    SnapsToDevicePixels="True"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Focus visual for small pill buttons (28px tall: heart, star,
+                 cancel-overlay buttons, scan-again, splash cancel).
+                 Explicit CornerRadius=16 sized for the smaller bounds so the
+                 ring renders correctly without relying on WPF auto-clamp. -->
+            <Style x:Key="SmallPillFocusVisual">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Border CornerRadius="16"
+                                    BorderThickness="2"
+                                    BorderBrush="{DynamicResource Body}"
                                     Margin="-2"
                                     SnapsToDevicePixels="True"/>
                         </ControlTemplate>

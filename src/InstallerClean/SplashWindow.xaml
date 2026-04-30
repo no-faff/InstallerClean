@@ -63,6 +63,7 @@
                     Style="{StaticResource GhostPill}"
                     Height="28" Padding="16,0" FontSize="12"
                     HorizontalAlignment="Center"
+                    FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     AutomationProperties.Name="Cancel startup scan"/>
 
             <!-- Version (bottom right, overlaid) -->
