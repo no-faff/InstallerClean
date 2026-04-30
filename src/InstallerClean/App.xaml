@@ -110,6 +110,38 @@
                 <Setter Property="CornerRadius" Value="20"/>
             </Style>
 
+            <!-- Focus visual for pill controls (40px tall, 20px inner radius).
+                 Drawn 2px outside the control bounds in Secondary indigo so
+                 keyboard focus is visible against any background. -->
+            <Style x:Key="PillFocusVisual">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Border CornerRadius="22"
+                                    BorderThickness="2"
+                                    BorderBrush="{DynamicResource Secondary}"
+                                    Margin="-2"
+                                    SnapsToDevicePixels="True"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Focus visual for compact pill buttons (30px tall, 15px inner radius). -->
+            <Style x:Key="CompactPillFocusVisual">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Border CornerRadius="17"
+                                    BorderThickness="2"
+                                    BorderBrush="{DynamicResource Secondary}"
+                                    Margin="-2"
+                                    SnapsToDevicePixels="True"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <!-- Pill buttons: rounded-btn 2rem (32px), h-10 (40px) -->
 
             <!-- CTA / accent pill (Move, Save) /indigo #4f46e5 -->
@@ -121,7 +153,7 @@
                 <Setter Property="Height" Value="40"/>
                 <Setter Property="MinWidth" Value="120"/>
                 <Setter Property="Cursor" Value="Hand"/>
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="FocusVisualStyle" Value="{StaticResource PillFocusVisual}"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
@@ -159,7 +191,7 @@
                 <Setter Property="Height" Value="40"/>
                 <Setter Property="MinWidth" Value="120"/>
                 <Setter Property="Cursor" Value="Hand"/>
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="FocusVisualStyle" Value="{StaticResource PillFocusVisual}"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
@@ -196,7 +228,7 @@
                 <Setter Property="Padding" Value="20,8"/>
                 <Setter Property="Height" Value="40"/>
                 <Setter Property="Cursor" Value="Hand"/>
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="FocusVisualStyle" Value="{StaticResource PillFocusVisual}"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
@@ -208,6 +240,9 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource Fg}"/>
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
@@ -229,7 +264,7 @@
                 <Setter Property="Padding" Value="14,0"/>
                 <Setter Property="Height" Value="30"/>
                 <Setter Property="Cursor" Value="Hand"/>
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="FocusVisualStyle" Value="{StaticResource CompactPillFocusVisual}"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
@@ -265,7 +300,7 @@
                 <Setter Property="Padding" Value="12,0"/>
                 <Setter Property="Height" Value="30"/>
                 <Setter Property="Cursor" Value="Hand"/>
-                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="FocusVisualStyle" Value="{StaticResource CompactPillFocusVisual}"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
@@ -277,6 +312,9 @@
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource Fg}"/>
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
@@ -300,6 +338,7 @@
                 <Setter Property="Height" Value="40"/>
                 <Setter Property="Padding" Value="12,0"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="FocusVisualStyle" Value="{StaticResource PillFocusVisual}"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TextBox">
@@ -387,6 +426,9 @@
                                        VerticalAlignment="Center"/>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Tx" Property="TextDecorations" Value="Underline"/>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="True">
                                     <Setter TargetName="Tx" Property="TextDecorations" Value="Underline"/>
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="False">
