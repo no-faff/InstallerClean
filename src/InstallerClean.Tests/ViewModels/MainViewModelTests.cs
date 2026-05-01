@@ -46,9 +46,9 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(EmptyScanResult());
 
-        Assert.False(vm.HasScanned);
+        Assert.False(vm.Scan.HasScanned);
         await vm.ScanWithProgressAsync(null);
-        Assert.True(vm.HasScanned);
+        Assert.True(vm.Scan.HasScanned);
     }
 
     [Fact]
@@ -69,10 +69,10 @@ public class MainViewModelTests
 
         await vm.ScanWithProgressAsync(null);
 
-        Assert.Equal(2, vm.OrphanedFileCount);
-        Assert.Equal(1, vm.RegisteredFileCount);
-        Assert.Equal("3.0 MB", vm.OrphanedSizeDisplay);
-        Assert.Equal("4.8 MB", vm.RegisteredSizeDisplay);
+        Assert.Equal(2, vm.Scan.OrphanedFileCount);
+        Assert.Equal(1, vm.Scan.RegisteredFileCount);
+        Assert.Equal("3.0 MB", vm.Scan.OrphanedSizeDisplay);
+        Assert.Equal("4.8 MB", vm.Scan.RegisteredSizeDisplay);
     }
 
     [Fact]
@@ -84,8 +84,8 @@ public class MainViewModelTests
 
         await vm.ScanWithProgressAsync(null);
 
-        Assert.True(vm.IsComplete);
-        Assert.Equal("All clear", vm.CompletionHeading);
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Equal("All clear", vm.Completion.Heading);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public class MainViewModelTests
 
         await vm.ScanWithProgressAsync(null);
 
-        Assert.False(vm.IsComplete);
+        Assert.False(vm.Completion.IsComplete);
     }
 
     [Fact]
@@ -110,17 +110,17 @@ public class MainViewModelTests
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService);
 
-        Assert.Equal(@"D:\Backup", vm.MoveDestination);
+        Assert.Equal(@"D:\Backup", vm.Cleanup.MoveDestination);
     }
 
     [Fact]
     public void DismissCompletion_clears_state()
     {
         var vm = CreateViewModel();
-        vm.DismissCompletionCommand.Execute(null);
+        vm.Completion.DismissCommand.Execute(null);
 
-        Assert.False(vm.IsComplete);
-        Assert.Equal(string.Empty, vm.CompletionErrors);
+        Assert.False(vm.Completion.IsComplete);
+        Assert.Equal(string.Empty, vm.Completion.Errors);
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public class MainViewModelTests
 
         await vm.ScanWithProgressAsync(null);
 
-        Assert.Equal("1 file to clean up", vm.OrphanedSummaryText);
+        Assert.Equal("1 file to clean up", vm.Scan.OrphanedSummaryText);
     }
 
     [Fact]
@@ -144,9 +144,9 @@ public class MainViewModelTests
 
         await vm.ScanWithProgressAsync(null);
 
-        Assert.Equal(10_000, vm.OrphanedFileCount);
-        Assert.Equal("10000 files to clean up", vm.OrphanedSummaryText);
-        Assert.False(vm.IsComplete);
+        Assert.Equal(10_000, vm.Scan.OrphanedFileCount);
+        Assert.Equal("10000 files to clean up", vm.Scan.OrphanedSummaryText);
+        Assert.False(vm.Completion.IsComplete);
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public class MainViewModelTests
 
         await vm.ScanWithProgressAsync(null);
 
-        Assert.Equal("100.00 GB", vm.OrphanedSizeDisplay);
+        Assert.Equal("100.00 GB", vm.Scan.OrphanedSizeDisplay);
     }
 
     [Fact]
@@ -189,8 +189,8 @@ public class MainViewModelTests
 
         await vm.ScanWithProgressAsync(null);
 
-        Assert.Equal(1, vm.OrphanedFileCount);
-        Assert.Equal("0 B", vm.OrphanedSizeDisplay);
+        Assert.Equal(1, vm.Scan.OrphanedFileCount);
+        Assert.Equal("0 B", vm.Scan.OrphanedSizeDisplay);
     }
 
     [Fact]
@@ -200,7 +200,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new UnauthorizedAccessException("denied"));
 
-        await vm.ScanCommand.ExecuteAsync(null);
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
 
         _dialogService.Received(1).ShowWarning(
             Arg.Is<string>(s => s.Contains("administrator privileges")),
@@ -215,7 +215,7 @@ public class MainViewModelTests
             .ThrowsAsync(new InvalidOperationException(
                 "The Windows Installer database appears to be empty or inaccessible."));
 
-        await vm.ScanCommand.ExecuteAsync(null);
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
 
         _dialogService.Received(1).ShowError(
             Arg.Is<string>(s => s.Contains("installer database", StringComparison.OrdinalIgnoreCase)),
@@ -240,15 +240,15 @@ public class MainViewModelTests
                 return completion.Task;
             });
 
-        var scanTask = vm.ScanCommand.ExecuteAsync(null);
+        var scanTask = vm.Scan.ScanCommand.ExecuteAsync(null);
 
         await entered.Task;
-        vm.CancelScanCommand.Execute(null);
+        vm.Scan.CancelScanCommand.Execute(null);
 
         await scanTask;
 
-        Assert.Equal("Scan cancelled.", vm.ScanProgress);
-        Assert.False(vm.IsScanning);
+        Assert.Equal("Scan cancelled.", vm.Scan.ScanProgress);
+        Assert.False(vm.Scan.IsScanning);
     }
 
     [Fact]
@@ -256,7 +256,7 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
 
-        var ex = Record.Exception(() => vm.CancelScanCommand.Execute(null));
+        var ex = Record.Exception(() => vm.Scan.CancelScanCommand.Execute(null));
 
         Assert.Null(ex);
     }
@@ -266,7 +266,7 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
 
-        vm.MoveDestination = @"D:\Backup\Installer-cache";
+        vm.Cleanup.MoveDestination = @"D:\Backup\Installer-cache";
 
         _settingsService.Received().TrySave(Arg.Is<AppSettings>(
             s => s.MoveDestination == @"D:\Backup\Installer-cache"));
@@ -282,7 +282,7 @@ public class MainViewModelTests
             _dialogService, _confirmationService, _windowService);
         _settingsService.ClearReceivedCalls();
 
-        vm.MoveDestination = @"D:\Backup";
+        vm.Cleanup.MoveDestination = @"D:\Backup";
 
         _settingsService.DidNotReceive().TrySave(Arg.Any<AppSettings>());
     }
@@ -295,9 +295,9 @@ public class MainViewModelTests
             .Returns(EmptyScanResult());
 
         await vm.ScanWithProgressAsync(null);
-        Assert.True(vm.IsComplete);
+        Assert.True(vm.Completion.IsComplete);
 
-        await vm.RescanAfterCompletionCommand.ExecuteAsync(null);
+        await vm.Completion.RescanAfterCompletionCommand.ExecuteAsync(null);
 
         await _scanService.Received(2).ScanAsync(
             Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>());
@@ -322,16 +322,16 @@ public class MainViewModelTests
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
 
         await vm.ScanWithProgressAsync(null);
-        vm.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move");
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move");
 
-        await vm.MoveAllCommand.ExecuteAsync(null);
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
-        _confirmationService.Received(1).ConfirmMove(2, Arg.Any<string>(), vm.MoveDestination);
+        _confirmationService.Received(1).ConfirmMove(2, Arg.Any<string>(), vm.Cleanup.MoveDestination);
         await _moveService.Received(1).MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), vm.MoveDestination,
+            Arg.Any<IEnumerable<string>>(), vm.Cleanup.MoveDestination,
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
-        Assert.True(vm.IsComplete);
-        Assert.Contains("cleared", vm.CompletionHeading);
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Contains("cleared", vm.Completion.Heading);
     }
 
     [Fact]
@@ -344,9 +344,9 @@ public class MainViewModelTests
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
         await vm.ScanWithProgressAsync(null);
-        vm.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move");
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move");
 
-        await vm.MoveAllCommand.ExecuteAsync(null);
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
@@ -372,14 +372,14 @@ public class MainViewModelTests
 
         await vm.ScanWithProgressAsync(null);
 
-        await vm.DeleteAllCommand.ExecuteAsync(null);
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         _confirmationService.Received(1).ConfirmDelete(1, Arg.Any<string>(), 524_288, 524_288);
         await _deleteService.Received(1).DeleteFilesAsync(
             Arg.Any<IEnumerable<string>>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
-        Assert.True(vm.IsComplete);
-        Assert.Contains("Recycle Bin", vm.CompletionSummary);
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Contains("Recycle Bin", vm.Completion.Summary);
     }
 
     [Fact]
@@ -393,7 +393,7 @@ public class MainViewModelTests
 
         await vm.ScanWithProgressAsync(null);
 
-        await vm.DeleteAllCommand.ExecuteAsync(null);
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         await _deleteService.DidNotReceive().DeleteFilesAsync(
             Arg.Any<IEnumerable<string>>(),
@@ -408,7 +408,7 @@ public class MainViewModelTests
             .Returns(ScanResultWithOrphans(2));
         await vm.ScanWithProgressAsync(null);
 
-        vm.OpenOrphanedDetailsCommand.Execute(null);
+        vm.Chrome.OpenOrphanedDetailsCommand.Execute(null);
 
         _windowService.Received(1).ShowOrphanedDetails(
             Arg.Is<OrphanedFilesViewModel>(v => v.Files.Count == 2));
@@ -419,7 +419,7 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
 
-        vm.OpenOrphanedDetailsCommand.Execute(null);
+        vm.Chrome.OpenOrphanedDetailsCommand.Execute(null);
 
         _windowService.DidNotReceive().ShowOrphanedDetails(Arg.Any<OrphanedFilesViewModel>());
     }
@@ -437,7 +437,7 @@ public class MainViewModelTests
             .Returns(new ScanResult(Array.Empty<OrphanedFile>(), packages, 3072));
         await vm.ScanWithProgressAsync(null);
 
-        vm.OpenRegisteredDetailsCommand.Execute(null);
+        vm.Chrome.OpenRegisteredDetailsCommand.Execute(null);
 
         _windowService.Received(1).ShowRegisteredDetails(
             Arg.Is<RegisteredFilesViewModel>(v => v.Products.Count == 2));
@@ -448,7 +448,7 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
 
-        vm.ShowAboutCommand.Execute(null);
+        vm.Chrome.ShowAboutCommand.Execute(null);
 
         _windowService.Received(1).ShowAbout();
     }
@@ -458,7 +458,7 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
 
-        vm.CloseAppCommand.Execute(null);
+        vm.Chrome.CloseAppCommand.Execute(null);
 
         _windowService.Received(1).CloseMainWindow();
     }
@@ -468,7 +468,7 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
 
-        vm.StarOnGitHubCommand.Execute(null);
+        vm.Chrome.StarOnGitHubCommand.Execute(null);
 
         _windowService.Received(1).OpenUrl("https://github.com/no-faff/InstallerClean");
     }
@@ -478,7 +478,7 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
 
-        vm.DonateCommand.Execute(null);
+        vm.Chrome.DonateCommand.Execute(null);
 
         _windowService.Received(1).OpenUrl("https://nofaff.netlify.app");
     }

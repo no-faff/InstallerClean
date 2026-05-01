@@ -15,7 +15,12 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = _vm = viewModel;
-        _vm.PropertyChanged += OnViewModelPropertyChanged;
+        // Each child VM raises its own PropertyChanged stream. Listen
+        // on all three so the window can move keyboard focus to the
+        // most-relevant Cancel button as overlays appear.
+        _vm.Completion.PropertyChanged += OnCompletionPropertyChanged;
+        _vm.Cleanup.PropertyChanged += OnCleanupPropertyChanged;
+        _vm.Scan.PropertyChanged += OnScanPropertyChanged;
         PreviewKeyDown += OnPreviewKeyDown;
         Closed += OnClosed;
         this.EnableAltSpaceSystemMenu();
@@ -23,20 +28,28 @@ public partial class MainWindow : Window
 
     private void OnClosed(object? sender, EventArgs e)
     {
-        _vm.PropertyChanged -= OnViewModelPropertyChanged;
+        _vm.Completion.PropertyChanged -= OnCompletionPropertyChanged;
+        _vm.Cleanup.PropertyChanged -= OnCleanupPropertyChanged;
+        _vm.Scan.PropertyChanged -= OnScanPropertyChanged;
         PreviewKeyDown -= OnPreviewKeyDown;
         Closed -= OnClosed;
     }
 
-    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnCompletionPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainViewModel.IsComplete) && _vm.IsComplete)
+        if (e.PropertyName == nameof(CompletionViewModel.IsComplete) && _vm.Completion.IsComplete)
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
+    }
 
-        if (e.PropertyName == nameof(MainViewModel.IsOperating) && _vm.IsOperating)
+    private void OnCleanupPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(CleanupViewModel.IsOperating) && _vm.Cleanup.IsOperating)
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => OperationCancelButton.Focus());
+    }
 
-        if (e.PropertyName == nameof(MainViewModel.IsScanning) && _vm.IsScanning)
+    private void OnScanPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ScanViewModel.IsScanning) && _vm.Scan.IsScanning)
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => ScanCancelButton.Focus());
     }
 
@@ -45,19 +58,19 @@ public partial class MainWindow : Window
         if (e.Key != Key.Escape)
             return;
 
-        if (_vm.IsOperating && _vm.CancelOperationCommand.CanExecute(null))
+        if (_vm.Cleanup.IsOperating && _vm.Cleanup.CancelOperationCommand.CanExecute(null))
         {
-            _vm.CancelOperationCommand.Execute(null);
+            _vm.Cleanup.CancelOperationCommand.Execute(null);
             e.Handled = true;
         }
-        else if (_vm.IsScanning && _vm.CancelScanCommand.CanExecute(null))
+        else if (_vm.Scan.IsScanning && _vm.Scan.CancelScanCommand.CanExecute(null))
         {
-            _vm.CancelScanCommand.Execute(null);
+            _vm.Scan.CancelScanCommand.Execute(null);
             e.Handled = true;
         }
-        else if (_vm.IsComplete && _vm.DismissCompletionCommand.CanExecute(null))
+        else if (_vm.Completion.IsComplete && _vm.Completion.DismissCommand.CanExecute(null))
         {
-            _vm.DismissCompletionCommand.Execute(null);
+            _vm.Completion.DismissCommand.Execute(null);
             e.Handled = true;
         }
         // No else branch: Esc on an idle top-level window must not close the app.
