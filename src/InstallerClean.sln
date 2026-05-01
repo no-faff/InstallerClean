@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallerClean", "Installer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallerClean.Tests", "InstallerClean.Tests\InstallerClean.Tests.csproj", "{CE157DFB-4C8B-4B08-85B1-329CBA771A06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallerClean.Core", "InstallerClean.Core\InstallerClean.Core.csproj", "{6E886C63-3C10-48DD-AC7D-1904FBDCD4B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallerClean.Cli", "InstallerClean.Cli\InstallerClean.Cli.csproj", "{716BC634-4723-49B8-9093-C71B08EEB5B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{CE157DFB-4C8B-4B08-85B1-329CBA771A06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE157DFB-4C8B-4B08-85B1-329CBA771A06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE157DFB-4C8B-4B08-85B1-329CBA771A06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E886C63-3C10-48DD-AC7D-1904FBDCD4B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E886C63-3C10-48DD-AC7D-1904FBDCD4B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E886C63-3C10-48DD-AC7D-1904FBDCD4B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E886C63-3C10-48DD-AC7D-1904FBDCD4B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{716BC634-4723-49B8-9093-C71B08EEB5B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{716BC634-4723-49B8-9093-C71B08EEB5B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{716BC634-4723-49B8-9093-C71B08EEB5B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{716BC634-4723-49B8-9093-C71B08EEB5B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

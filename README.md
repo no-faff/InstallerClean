@@ -140,13 +140,9 @@ All three require an elevated (administrator) command prompt.
 
 ### Why `installerclean-cli` and not `installerclean.exe`?
 
-InstallerClean is a WPF app so PowerShell and cmd do not wait for it when you run the raw `InstallerClean.exe /s`, which makes CLI output interleave with your shell prompt. `installerclean-cli.exe` is a tiny console launcher (under 50 KB) that forwards its arguments to the real app and blocks until the scan completes. You'll find it alongside `InstallerClean.exe` in the install directory. Its source is in `cli-launcher/launcher.c` in the repository.
+`InstallerClean.exe` is the WPF GUI; it does not respond to command-line arguments. `installerclean-cli.exe` is a separate console executable that ships in the same install directory and exposes the same scan / move / delete operations to PowerShell, cmd and scheduled tasks. Because it is a real console process, it blocks the prompt until it finishes; redirect or pipe its output as you would any other console exe.
 
-Portable and slim downloads are single-file and don't include the launcher. To use them from PowerShell, wrap the invocation yourself:
-
-```powershell
-Start-Process -Wait -NoNewWindow .\InstallerClean-portable.exe -ArgumentList '/s'
-```
+Portable and slim downloads bundle only the GUI exe. To run the CLI operations from those, install via the setup or install the CLI separately.
 
 ## Features
 

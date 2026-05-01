@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    InstallerClean.Core: headless library shared by the WPF app
+    (InstallerClean) and the console CLI (InstallerClean.Cli).
+
+    Targets net8.0 (NOT net8.0-windows): everything in here must run
+    without a WPF dispatcher, without HWND ownership, and without the
+    PresentationFramework / PresentationCore assemblies. Win32 P/Invoke
+    is fine (msi.dll, kernel32, shell32) because those work in any
+    process subsystem.
+
+    Anything that needs MessageBox, Window, WindowChrome or a
+    XAML-bound view-model goes in InstallerClean (the WPF project),
+    not here.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>InstallerClean</RootNamespace>
+    <AssemblyName>InstallerClean.Core</AssemblyName>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <!-- AllowUnsafeBlocks lets the LibraryImport source generator emit
+         the pointer-handling stubs it needs. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Abstractions" Version="21.0.29" />
+    <!-- Abstractions only: callers register Core's services into their
+         own IServiceCollection. The Core library itself doesn't pick
+         a container implementation. -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <!-- EventLog is only available on Windows but the source builds
+         for any platform; we guard the actual EventLog calls with
+         RuntimeInformation.IsOSPlatform(OSPlatform.Windows). -->
+    <PackageReference Include="System.Diagnostics.EventLog" Version="8.0.1" />
+  </ItemGroup>
+
+  <!-- Localisation: the typed Strings accessor is hand-managed via
+       scripts/regenerate-strings-designer.sh; the .resx files are
+       embedded resources so satellite assemblies build for each
+       culture variant. -->
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <ManifestResourceName>InstallerClean.Resources.Strings</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Strings.en-GB.resx" />
+  </ItemGroup>
+
+</Project>

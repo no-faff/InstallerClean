@@ -72,7 +72,11 @@ public sealed class SettingsService : ISettingsService
     /// <summary>Persists settings. Returns true on success.</summary>
     public bool TrySave(AppSettings settings)
     {
-        var tempFile = _settingsFile + ".tmp";
+        // Random temp file name so concurrent saves (e.g. GUI's debounced
+        // save racing a CLI /m write) don't collide on the same .tmp
+        // path: each call writes its own bytes and the rename is atomic
+        // per-process.
+        var tempFile = _settingsFile + "." + Path.GetRandomFileName() + ".tmp";
         try
         {
             // Refuse to write through a redirected path. Both the temp file

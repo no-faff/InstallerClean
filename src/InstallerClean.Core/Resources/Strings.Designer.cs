@@ -86,8 +86,8 @@ public static class Strings
     public static string Cli_FoundOrphans => Get("Cli.FoundOrphans");
     public static string Cli_GenericError => Get("Cli.GenericError");
     public static string Cli_Help_Delete => Get("Cli.Help.Delete");
-    public static string Cli_Help_Gui => Get("Cli.Help.Gui");
     public static string Cli_Help_Header => Get("Cli.Help.Header");
+    public static string Cli_Help_Help => Get("Cli.Help.Help");
     public static string Cli_Help_MoveDefault => Get("Cli.Help.MoveDefault");
     public static string Cli_Help_MovePath => Get("Cli.Help.MovePath");
     public static string Cli_Help_NoteLine1 => Get("Cli.Help.NoteLine1");
@@ -95,7 +95,6 @@ public static class Strings
     public static string Cli_Help_NoteLine3 => Get("Cli.Help.NoteLine3");
     public static string Cli_Help_ScanOnly => Get("Cli.Help.ScanOnly");
     public static string Cli_Help_Usage => Get("Cli.Help.Usage");
-    public static string Cli_Help_WrapExample => Get("Cli.Help.WrapExample");
     public static string Cli_MoveDestinationInsideInstaller => Get("Cli.MoveDestinationInsideInstaller");
     public static string Cli_MovedFiles => Get("Cli.MovedFiles");
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
@@ -166,7 +165,6 @@ public static class Strings
     public static string Section_Registered_Patches => Get("Section.Registered.Patches");
     public static string Section_Registered_Products => Get("Section.Registered.Products");
     public static string Startup_AlreadyRunningBody => Get("Startup.AlreadyRunningBody");
-    public static string Startup_AlreadyRunningCli => Get("Startup.AlreadyRunningCli");
     public static string Startup_AlreadyRunningTitle => Get("Startup.AlreadyRunningTitle");
     public static string Startup_ErrorTitle => Get("Startup.ErrorTitle");
     public static string Startup_FailedToStart => Get("Startup.FailedToStart");

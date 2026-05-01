@@ -37,7 +37,10 @@ ClickFinish=Click Finish to close setup.
 
 [Files]
 Source: "..\publish\self-contained\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\cli-launcher\InstallerClean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
+; The CLI is now a real .NET console exe published from
+; src/InstallerClean.Cli; it ships alongside the GUI exe so PowerShell
+; and cmd block on the process naturally without any launcher fudge.
+Source: "..\publish\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\InstallerClean"; Filename: "{app}\InstallerClean.exe"; IconFilename: "{app}\InstallerClean.exe"
