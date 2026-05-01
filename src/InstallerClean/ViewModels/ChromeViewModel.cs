@@ -12,7 +12,10 @@ namespace InstallerClean.ViewModels;
 ///
 /// Reads <see cref="ScanViewModel.LastScanResult"/> for the details
 /// commands so the detail windows always show the same scan the main
-/// window is currently summarising.
+/// window is currently summarising. The details commands' CanExecute
+/// reflects whether a scan has completed at all, so the buttons are
+/// disabled (greyed out via the standard pill IsEnabled trigger) until
+/// the user has data to view.
 /// </summary>
 public partial class ChromeViewModel : ObservableObject
 {
@@ -28,9 +31,24 @@ public partial class ChromeViewModel : ObservableObject
         _windowService = windowService;
         _msiInfoService = msiInfoService;
         _scan = scan;
+
+        // Surface scan-complete signals to the details commands so the
+        // Details buttons enable as soon as the first scan finishes
+        // and disable again if a future feature ever clears the result.
+        _scan.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(ScanViewModel.LastScanResult)
+                || e.PropertyName == nameof(ScanViewModel.HasScanned))
+            {
+                OpenOrphanedDetailsCommand.NotifyCanExecuteChanged();
+                OpenRegisteredDetailsCommand.NotifyCanExecuteChanged();
+            }
+        };
     }
 
-    [RelayCommand]
+    private bool HasScanResult => _scan.LastScanResult is not null;
+
+    [RelayCommand(CanExecute = nameof(HasScanResult))]
     private void OpenOrphanedDetails()
     {
         if (_scan.LastScanResult is null) return;
@@ -42,7 +60,7 @@ public partial class ChromeViewModel : ObservableObject
         _windowService.ShowOrphanedDetails(viewModel);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(HasScanResult))]
     private void OpenRegisteredDetails()
     {
         if (_scan.LastScanResult is null) return;

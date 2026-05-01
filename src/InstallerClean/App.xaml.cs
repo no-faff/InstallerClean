@@ -108,7 +108,7 @@ public partial class App : Application
             var splashProgress = new Progress<string>(splash.OnScanProgress);
             try
             {
-                var scanTask = viewModel.ScanWithProgressAsync(splashProgress, startupCts.Token);
+                var scanTask = viewModel.Scan.ScanWithProgressAsync(splashProgress, startupCts.Token);
                 await Task.WhenAll(scanTask, Task.Delay(800, startupCts.Token));
             }
             catch (OperationCanceledException)

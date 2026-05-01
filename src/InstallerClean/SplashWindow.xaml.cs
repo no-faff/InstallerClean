@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Media.Animation;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
 
@@ -27,7 +28,17 @@ public partial class SplashWindow : Window
     public void UpdateStep(string message, double progressPercent)
     {
         StepText.Text = message;
-        SplashProgress.Value = progressPercent;
+        // ProgressBar.Value isn't implicitly animated; on a fast scan
+        // the bar would jump 0 -> ~95 -> 100 in two frames. Ease each
+        // step over 250ms so the splash feels like a deliberate motion
+        // rather than a sequence of instantaneous frames.
+        var animation = new DoubleAnimation
+        {
+            To = progressPercent,
+            Duration = TimeSpan.FromMilliseconds(250),
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut },
+        };
+        SplashProgress.BeginAnimation(System.Windows.Controls.ProgressBar.ValueProperty, animation);
     }
 
     private void CancelClick(object sender, RoutedEventArgs e)

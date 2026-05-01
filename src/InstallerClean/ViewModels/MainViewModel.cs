@@ -62,12 +62,4 @@ public partial class MainViewModel : ObservableObject
         // the resulting scan.
         Completion.RescanRequested = () => Scan.ScanCommand.ExecuteAsync(null);
     }
-
-    /// <summary>
-    /// Forwarded to <see cref="ScanViewModel.ScanWithProgressAsync"/>
-    /// so App.xaml.cs can keep its existing splash-driven startup
-    /// scan call site without reaching into the child VM directly.
-    /// </summary>
-    public Task ScanWithProgressAsync(IProgress<string>? progress, CancellationToken cancellationToken = default) =>
-        Scan.ScanWithProgressAsync(progress, cancellationToken);
 }

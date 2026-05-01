@@ -455,5 +455,7 @@ HANDOFF.md
 exports/
 non-repo-files/
 
-# /export command drops timestamped transcripts at repo root
-/20*-*-*.txt
+# /export command drops timestamped transcripts; ignore at any depth
+# so an open IDE file can sit anywhere under the tree without risk of
+# being picked up by a sloppy `git add -A`.
+20*-*-*.txt

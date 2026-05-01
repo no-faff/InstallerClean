@@ -2,7 +2,7 @@ using NSubstitute;
 using InstallerClean.Models;
 using InstallerClean.Services;
 
-namespace InstallerClean.Tests.Services;
+namespace InstallerClean.Tests.Services.Integration;
 
 public class FileSystemScanServiceIntegrationTests : IDisposable
 {

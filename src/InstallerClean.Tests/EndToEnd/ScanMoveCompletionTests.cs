@@ -1,3 +1,4 @@
+using System.IO.Abstractions.TestingHelpers;
 using NSubstitute;
 using InstallerClean.Models;
 using InstallerClean.Services;
@@ -58,7 +59,7 @@ public class ScanMoveCompletionTests
 
         // Stage 1: scan finds two orphans. Completion overlay must NOT
         // appear yet (orphans exist), Cleanup commands become available.
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
         Assert.False(vm.Completion.IsComplete);
         Assert.Equal(2, vm.Scan.OrphanedFileCount);
         Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
@@ -84,7 +85,7 @@ public class ScanMoveCompletionTests
             .Returns(new ScanResult(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0));
 
         var vm = CreateMain();
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.True(vm.Completion.IsComplete);
         Assert.Equal("All clear", vm.Completion.Heading);
@@ -109,7 +110,7 @@ public class ScanMoveCompletionTests
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
 
         var vm = CreateMain();
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         Assert.True(vm.Completion.IsComplete);
@@ -123,13 +124,87 @@ public class ScanMoveCompletionTests
             .Returns(new ScanResult(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0));
 
         var vm = CreateMain();
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
         Assert.True(vm.Completion.IsComplete);
 
         await vm.Completion.RescanAfterCompletionCommand.ExecuteAsync(null);
 
         await _scanService.Received(2).ScanAsync(
             Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Real_scan_then_real_move_against_in_memory_filesystem_produces_correct_summary()
+    {
+        // This test stands up production FileSystemScanService and
+        // MoveFilesService instances against an in-memory IFileSystem,
+        // with only the MSI API and the user-input services
+        // substituted. It is the only test in the suite that exercises
+        // the full production wiring (scan -> orphan detection ->
+        // move pipeline -> completion summary) end to end.
+        const string installerFolder = @"C:\Windows\Installer";
+        const string destFolder = @"D:\backup\installer";
+
+        var fs = new MockFileSystem();
+        fs.AddFile($@"{installerFolder}\registered.msi", new MockFileData(new byte[1024]));
+        fs.AddFile($@"{installerFolder}\orphan-a.msi",   new MockFileData(new byte[2048]));
+        fs.AddFile($@"{installerFolder}\orphan-b.msi",   new MockFileData(new byte[4096]));
+        fs.AddDirectory(destFolder);
+
+        // Only the registered.msi is claimed by the MSI API; the two
+        // orphans remain unaccounted for and become removables.
+        var queryService = Substitute.For<IInstallerQueryService>();
+        queryService.GetRegisteredPackagesAsync(
+                Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<RegisteredPackage>
+            {
+                new($@"{installerFolder}\registered.msi", "Registered", "{AAA}", FileSizeBytes: 1024),
+            }.AsReadOnly());
+
+        // Real scan service over the in-memory FS.
+        var scanService = new FileSystemScanService(queryService, fs, null, installerFolder);
+        // Real move service over the in-memory FS.
+        var moveService = new MoveFilesService(fs);
+        var deleteService = new DeleteFilesService(fs);
+
+        // External concerns stay substituted.
+        var settingsService = Substitute.For<ISettingsService>();
+        settingsService.Load().Returns(new AppSettings());
+        var rebootService = Substitute.For<IPendingRebootService>();
+        var msiInfoService = Substitute.For<IMsiFileInfoService>();
+        var dialogService = Substitute.For<IDialogService>();
+        var confirmationService = Substitute.For<IConfirmationService>();
+        confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+        var windowService = Substitute.For<IWindowService>();
+
+        var vm = new MainViewModel(
+            scanService, moveService, deleteService,
+            settingsService, rebootService, msiInfoService,
+            dialogService, confirmationService, windowService);
+
+        // Stage 1: real scan finds the two orphans.
+        await vm.Scan.ScanWithProgressAsync(null);
+        Assert.Equal(2, vm.Scan.OrphanedFileCount);
+        Assert.False(vm.Completion.IsComplete);
+
+        // Stage 2: real move relocates them to the in-memory dest.
+        vm.Cleanup.MoveDestination = destFolder;
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // Verify the in-memory filesystem actually changed: the two
+        // orphans are gone from the source and present at the dest.
+        Assert.False(fs.File.Exists($@"{installerFolder}\orphan-a.msi"));
+        Assert.False(fs.File.Exists($@"{installerFolder}\orphan-b.msi"));
+        Assert.True(fs.File.Exists($@"{destFolder}\orphan-a.msi"));
+        Assert.True(fs.File.Exists($@"{destFolder}\orphan-b.msi"));
+        // Registered file untouched.
+        Assert.True(fs.File.Exists($@"{installerFolder}\registered.msi"));
+
+        // Completion overlay rendered and reads "0 orphans" after refresh.
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Contains(destFolder, vm.Completion.Summary);
+        Assert.Equal(0, vm.Scan.OrphanedFileCount);
     }
 
     [Fact]
@@ -158,15 +233,23 @@ public class ScanMoveCompletionTests
             .Returns(new MoveResult(1, errors));
 
         var vm = CreateMain();
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = @"D:\backup";
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
         Assert.True(vm.Completion.IsComplete);
-        // The breakdown groups by category and lists each file by name
-        // under its category header.
-        Assert.Contains("(2)", vm.Completion.Errors);
-        Assert.Contains("b.msi", vm.Completion.Errors);
-        Assert.Contains("c.msi", vm.Completion.Errors);
+
+        // The breakdown groups by category: a header line
+        // ("File no longer exists. (2)") followed by indented filenames.
+        // Verify the structural ordering, not just substring presence,
+        // so a regression where one of the files lands in a different
+        // bucket (e.g. IOFailure) would be caught.
+        var lines = vm.Completion.Errors.Split('\n').Select(l => l.TrimEnd('\r')).ToArray();
+        var headerIndex = Array.FindIndex(lines, l => l.Contains("(2)"));
+        Assert.True(headerIndex >= 0, "expected a category header with count (2)");
+        var followingFilenames = lines.Skip(headerIndex + 1).Take(2).ToArray();
+        Assert.Equal(2, followingFilenames.Length);
+        Assert.Contains("b.msi", followingFilenames[0] + followingFilenames[1]);
+        Assert.Contains("c.msi", followingFilenames[0] + followingFilenames[1]);
     }
 }

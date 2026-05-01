@@ -25,7 +25,18 @@ public partial class CleanupViewModel : ObservableObject
     private readonly CompletionViewModel _completion;
 
     private CancellationTokenSource? _operationCts;
+    private CancellationTokenSource? _moveDestinationSaveCts;
     private AppSettings _settings;
+
+    /// <summary>
+    /// Debounce window for write-back of MoveDestination edits to disk.
+    /// Each keystroke cancels the previous pending save and starts a
+    /// new timer; the actual TrySave runs only if the user stops
+    /// typing for this long. 400ms is roughly half a comfortable
+    /// keystroke interval, so a normal typist never triggers more
+    /// than one save per pause.
+    /// </summary>
+    private static readonly TimeSpan MoveDestinationSaveDelay = TimeSpan.FromMilliseconds(400);
 
     [ObservableProperty] private string _moveDestination = string.Empty;
 
@@ -57,6 +68,17 @@ public partial class CleanupViewModel : ObservableObject
         MoveDestination = _settings.MoveDestination;
 
         // Wake up CanExecute when scan/operating state changes upstream.
+        //
+        // LIFETIME CONTRACT: this subscription is intentionally never
+        // unhooked. Both VMs are constructed by MainViewModel and
+        // share its lifetime; MainViewModel is constructed once per
+        // MainWindow in App.xaml.OnStartup and dies with the process.
+        // If a future test or feature ever creates throwaway
+        // MainViewModel instances around a longer-lived ScanViewModel
+        // (for example by hoisting Scan into a DI singleton), convert
+        // this to a named handler stored on a field and detach it in
+        // an IDisposable.Dispose. The handler does not capture mutable
+        // state, only `this`.
         _scan.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||
@@ -78,11 +100,42 @@ public partial class CleanupViewModel : ObservableObject
     {
         MoveAllCommand.NotifyCanExecuteChanged();
 
-        if (!string.Equals(_settings.MoveDestination, value, StringComparison.Ordinal))
+        if (string.Equals(_settings.MoveDestination, value, StringComparison.Ordinal))
+            return;
+
+        _settings.MoveDestination = value;
+        ScheduleMoveDestinationSave();
+    }
+
+    /// <summary>
+    /// Debounced write-back of <see cref="MoveDestination"/> to disk.
+    /// Each call cancels the previous pending save so a typist who
+    /// pastes or types a path doesn't fire a TrySave per character.
+    /// The save happens once they stop changing the value for
+    /// <see cref="MoveDestinationSaveDelay"/>.
+    /// </summary>
+    private void ScheduleMoveDestinationSave()
+    {
+        var previous = _moveDestinationSaveCts;
+        var cts = new CancellationTokenSource();
+        _moveDestinationSaveCts = cts;
+        previous?.Cancel();
+        previous?.Dispose();
+
+        _ = SaveAfterDelayAsync(cts.Token);
+    }
+
+    private async Task SaveAfterDelayAsync(CancellationToken token)
+    {
+        try
         {
-            _settings.MoveDestination = value;
-            _settingsService.TrySave(_settings);
+            await Task.Delay(MoveDestinationSaveDelay, token);
         }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        _settingsService.TrySave(_settings);
     }
 
     private bool CanMove() =>
@@ -280,6 +333,22 @@ public partial class CleanupViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Localised "{current} of {total} files" line shown beneath the
+    /// progress bar in the operating overlay. Recomputed from
+    /// CurrentFile/TotalFiles via the partial-changed hooks below so
+    /// XAML can bind to a single property and never assemble the line
+    /// from concatenated <c>&lt;Run&gt;</c> literals.
+    /// </summary>
+    public string OperationProgressDetail =>
+        string.Format(Strings.Summary_OperationFiles, OperationCurrentFile, OperationTotalFiles);
+
+    partial void OnOperationCurrentFileChanged(int value) =>
+        OnPropertyChanged(nameof(OperationProgressDetail));
+
+    partial void OnOperationTotalFilesChanged(int value) =>
+        OnPropertyChanged(nameof(OperationProgressDetail));
+
     private void OnOperationProgressUpdate(OperationProgress p)
     {
         OperationCurrentFile = p.CurrentFile;
@@ -288,7 +357,10 @@ public partial class CleanupViewModel : ObservableObject
         OperationProgressPercent = p.TotalFiles > 0
             ? (double)p.CurrentFile / p.TotalFiles * 100
             : 0;
-        OperationProgress = string.Format(Strings.Summary_OperationFiles, p.CurrentFile, p.TotalFiles);
+        // Heading stays at the original "Moving N files..." / "Deleting
+        // N files..." action verb for the operation's duration; the
+        // DockPanel below the bar shows the live count via
+        // OperationProgressDetail.
     }
 
     /// <summary>

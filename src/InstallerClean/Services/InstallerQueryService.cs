@@ -160,11 +160,19 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             ct.ThrowIfCancellationRequested();
 
+            // Zero the GUID buffer between iterations so a previous
+            // call's longer GUID can't leak via BufferToString's null-
+            // scan if the next call wrote a shorter string. The MSI
+            // API zero-terminates so this is belt-and-braces, but the
+            // belt is cheap.
+            Array.Clear(productCode);
+
             // pcchSid is the buffer size in characters including the
-            // null terminator, per the MsiEnumProductsExW docs. Pass
-            // the full SidBufferLength so the SID is reported correctly
-            // without needing the MoreData realloc path for any
-            // plausible SID size.
+            // null terminator on the Win32 input. On Success the API
+            // updates it to the count EXCLUDING the terminator. Pass
+            // the full SidBufferLength so any plausible SID fits on
+            // the first call and the MoreData branch below stays as
+            // a safety net.
             uint sidLen = SidBufferLength;
 
             var error = Msi.MsiEnumProductsEx(
@@ -186,13 +194,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             if (error == MsiError.MoreData)
             {
-                // Defensive only. Real-world SIDs are ~45 chars and the
-                // first call passes a 256-char buffer, so this branch
-                // isn't exercised in normal use. Kept as a safety net
-                // for any future unusually-long SID format. Only the
-                // SID dimension varies; productCode fits in the fixed
-                // GuidBufferLength.
-                sidLen++; // null terminator
+                // Defensive only. Real-world SIDs are ~45 chars and
+                // the first call passes a 256-char buffer, so this
+                // branch isn't exercised in normal use. On MoreData
+                // pcchSid carries the size required INCLUDING the
+                // terminator, so we allocate exactly that and pass
+                // the same value back as the new buffer size.
                 sidBuffer = new char[sidLen];
 
                 error = Msi.MsiEnumProductsEx(
@@ -210,8 +217,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
             if (error == MsiError.Success)
             {
                 consecutiveNonSuccess = 0;
-                var sid = (installedContext != MsiInstallContext.Machine && sidLen > 0)
-                    ? new string(sidBuffer, 0, (int)sidLen)
+                // Clamp sidLen against the buffer length defensively
+                // in case the API ever returns a value larger than the
+                // buffer accepted (which would be a Win32 bug, but
+                // bounding it here means an unbounded read can never
+                // reach the managed string constructor).
+                var safeSidLen = (int)Math.Min(sidLen, (uint)sidBuffer.Length);
+                var sid = (installedContext != MsiInstallContext.Machine && safeSidLen > 0)
+                    ? new string(sidBuffer, 0, safeSidLen)
                     : null;
                 results.Add((BufferToString(productCode), sid, installedContext));
             }
@@ -331,8 +344,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
             szValue: buffer,
             pcchValue: ref bufferLen);
 
+        // Defensive clamp: a successful Msi*GetInfoEx returns
+        // bufferLen as the count excluding the terminator and never
+        // larger than the input. Math.Min bounds an unbounded read
+        // even if the API ever violates that contract.
         return error == MsiError.Success
-            ? new string(buffer, 0, (int)bufferLen)
+            ? new string(buffer, 0, (int)Math.Min(bufferLen, (uint)buffer.Length))
             : string.Empty;
     }
 
@@ -377,8 +394,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
             szValue: buffer,
             pcchValue: ref bufferLen);
 
+        // Defensive clamp: a successful Msi*GetInfoEx returns
+        // bufferLen as the count excluding the terminator and never
+        // larger than the input. Math.Min bounds an unbounded read
+        // even if the API ever violates that contract.
         return error == MsiError.Success
-            ? new string(buffer, 0, (int)bufferLen)
+            ? new string(buffer, 0, (int)Math.Min(bufferLen, (uint)buffer.Length))
             : string.Empty;
     }
 }

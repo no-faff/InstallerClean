@@ -1,8 +1,10 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Input;
 using System.Windows.Threading;
 using InstallerClean.Helpers;
+using InstallerClean.Resources;
 using InstallerClean.ViewModels;
 
 namespace InstallerClean;
@@ -81,7 +83,12 @@ public partial class MainWindow : Window
     private void MaximizeClick(object sender, RoutedEventArgs e)
     {
         WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-        MaximizeButton.ToolTip = WindowState == WindowState.Maximized ? "Restore" : "Maximise";
+        var maximised = WindowState == WindowState.Maximized;
+        // Toggle the tooltip and the screen-reader name through the resx
+        // so a non-en-GB UI doesn't suddenly show "Restore" in English.
+        MaximizeButton.ToolTip = maximised ? Strings.Tooltip_Restore : Strings.Tooltip_Maximise;
+        AutomationProperties.SetName(MaximizeButton,
+            maximised ? Strings.Tooltip_Restore : Strings.Automation_Maximise);
     }
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();

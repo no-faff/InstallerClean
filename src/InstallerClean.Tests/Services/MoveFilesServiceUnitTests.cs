@@ -10,9 +10,20 @@ namespace InstallerClean.Tests.Services;
 /// real-filesystem integration tests under
 /// InstallerClean.Tests.Services.Integration: integration tests prove
 /// the service works against actual Windows filesystem behaviour
-/// (case-insensitivity, locked files, junction handling); these unit
-/// tests prove the per-file error categorisation and the unique-name
-/// fallback logic without touching the disk at all.
+/// (case-insensitivity, locked files, junction handling, read-only
+/// destinations); these unit tests prove the per-file error
+/// categorisation, the unique-name fallback logic, and the cancellation
+/// path without touching the disk at all.
+///
+/// Deliberately uncovered: the ProbeDestinationWriteable failure
+/// path. MockFileSystem does not enforce a read-only directory
+/// attribute, and the real-filesystem test would require dropping
+/// the test process's write permission on a temp folder, which CI on
+/// shared agents may refuse. The probe is exercised indirectly by
+/// the existing destination-write integration tests; if a regression
+/// reaches the production read-only path the user sees the localised
+/// "cannot write to {dest}" message via DescribeWriteFailure, not a
+/// silent swallow.
 /// </summary>
 public class MoveFilesServiceUnitTests
 {
@@ -126,6 +137,35 @@ public class MoveFilesServiceUnitTests
         Assert.Equal(1, reports[0].CurrentFile);
         Assert.Equal(3, reports[2].CurrentFile);
         Assert.All(reports, r => Assert.Equal(3, r.TotalFiles));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_throws_when_cancelled_mid_batch()
+    {
+        var fs = new MockFileSystem();
+        var sources = new[] { "a.msi", "b.msi", "c.msi" }
+            .Select(n => $@"{SourceDir}\{n}").ToArray();
+        foreach (var s in sources) fs.AddFile(s, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+
+        // Cancel after the first progress report so the second
+        // iteration's ThrowIfCancellationRequested fires.
+        var cts = new CancellationTokenSource();
+        var progress = new Helpers.SyncProgress<InstallerClean.Models.OperationProgress>(p =>
+        {
+            if (p.CurrentFile == 1) cts.Cancel();
+        });
+
+        var svc = new MoveFilesService(fs);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => svc.MoveFilesAsync(sources, DestDir, progress, cts.Token));
+
+        // First file should already have moved before cancellation
+        // landed; the rest stay in the source folder.
+        Assert.True(fs.File.Exists($@"{DestDir}\a.msi"));
+        Assert.True(fs.File.Exists($@"{SourceDir}\b.msi"));
+        Assert.True(fs.File.Exists($@"{SourceDir}\c.msi"));
     }
 
     [Fact]

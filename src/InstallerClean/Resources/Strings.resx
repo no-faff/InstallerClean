@@ -108,6 +108,7 @@
        ACTIONS (button labels; underscore prefixes are WPF mnemonics)
        ============================================================ -->
   <data name="Action.About" xml:space="preserve"><value>_About</value></data>
+  <data name="Action.Copy" xml:space="preserve"><value>Copy</value></data>
   <data name="Action.Browse" xml:space="preserve"><value>_Browse...</value></data>
   <data name="Action.Cancel" xml:space="preserve"><value>_Cancel</value></data>
   <data name="Action.CheckForUpdates" xml:space="preserve"><value>_Check for updates</value></data>
@@ -275,6 +276,14 @@ Try a folder in your user profile, or run as a different administrator.</value><
   <data name="Error.WriteDestination" xml:space="preserve"><value>Cannot write to {0}:
 {1}</value></data>
   <data name="Error.MissingSourceFile" xml:space="preserve"><value>File no longer exists.</value></data>
+  <!-- Category-only sentences for FileOperationError.LocalisedMessage.
+       These intentionally do NOT include a path or framework message
+       fragment: with the app running elevated, the per-file
+       UnauthorizedAccessException / IOException messages can carry
+       paths from other users' profiles into the displayed error list. -->
+  <data name="Error.AccessDenied" xml:space="preserve"><value>Access denied.</value></data>
+  <data name="Error.IOFailure" xml:space="preserve"><value>The operation failed. Try again or restart Windows.</value></data>
+  <data name="Error.UnknownError" xml:space="preserve"><value>Unknown error.</value></data>
   <!-- 0 = shell error code -->
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Windows shell reported error {0} while recycling the file.</value></data>
   <!-- 0 = destination -->

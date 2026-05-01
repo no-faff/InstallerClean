@@ -67,9 +67,14 @@
     <EmbeddedResource Update="Resources\Strings.resx">
       <ManifestResourceName>InstallerClean.Resources.Strings</ManifestResourceName>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Strings.en-GB.resx">
-      <ManifestResourceName>InstallerClean.Resources.Strings.en-GB</ManifestResourceName>
-    </EmbeddedResource>
+    <!-- Strings.en-GB.resx is left without a ManifestResourceName
+         override so MSBuild routes it to a per-culture satellite
+         assembly (bin/<config>/<tfm>/en-GB/InstallerClean.resources.dll)
+         instead of embedding it in the main assembly under a literal
+         name. With the override the satellite was never built; without
+         it, .NET's CurrentUICulture-driven satellite probing finds
+         en-GB content correctly when a future translation lands. -->
+    <EmbeddedResource Update="Resources\Strings.en-GB.resx" />
   </ItemGroup>
 
 
