@@ -20,12 +20,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
     private const string AllUsersSid = "S-1-1-0";
 
     /// <summary>
-    /// A GUID is 38 chars ({xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}) plus a
-    /// null terminator. We allocate 39 to be safe.
-    /// </summary>
-    private const int GuidBufferLength = 39;
-
-    /// <summary>
     /// SIDs are typically ~45 chars (e.g. S-1-5-21-xxx-xxx-xxx-xxxx).
     /// Pre-allocating 256 avoids re-enumerating just to get the SID.
     /// </summary>
@@ -162,7 +156,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         CancellationToken ct)
     {
         var results = new List<(string, string?, MsiInstallContext)>();
-        var productCode = new char[GuidBufferLength];
+        var productCode = new char[Msi.GuidBufferLength];
         var sidBuffer = new char[SidBufferLength];
         int consecutiveNonSuccess = 0;
 
@@ -193,8 +187,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 szInstalledProductCode: productCode,
                 pdwInstalledContext: out var installedContext,
                 szSid: sidBuffer,
-                pcchSid: ref sidLen,
-                cchInstalledProductCode: GuidBufferLength);
+                pcchSid: ref sidLen);
 
             if (error == MsiError.NoMoreItems)
                 break;
@@ -220,8 +213,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     szInstalledProductCode: productCode,
                     pdwInstalledContext: out installedContext,
                     szSid: sidBuffer,
-                    pcchSid: ref sidLen,
-                    cchInstalledProductCode: GuidBufferLength);
+                    pcchSid: ref sidLen);
             }
 
             if (error == MsiError.Success)
@@ -270,8 +262,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         CancellationToken ct)
     {
         var results = new List<(string, string?, MsiInstallContext)>();
-        var patchCode = new char[GuidBufferLength];
-        var targetProductCode = new char[GuidBufferLength];
+        var patchCode = new char[Msi.GuidBufferLength];
+        var targetProductCode = new char[Msi.GuidBufferLength];
         int consecutiveNonSuccess = 0;
 
         for (uint index = 0; index < MaxPatchIndex; index++)
@@ -290,9 +282,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 szTargetProductCode: targetProductCode,
                 pdwTargetProductContext: out var patchContext,
                 szTargetUserSid: null,
-                pcchTargetUserSid: ref sidLen,
-                cchPatchCode: GuidBufferLength,
-                cchTargetProductCode: GuidBufferLength);
+                pcchTargetUserSid: ref sidLen);
 
             if (error == MsiError.NoMoreItems)
                 break;

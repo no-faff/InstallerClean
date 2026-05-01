@@ -64,7 +64,16 @@ public sealed class FileSystemScanService : IFileSystemScanService
     {
         progress?.Report(Strings.Status_QueryingApi);
 
-        var registered = await _queryService.GetRegisteredPackagesAsync(progress, cancellationToken);
+        // ConfigureAwait(false): the rest of this method does a directory
+        // walk and per-file stat across every file in C:\Windows\Installer.
+        // Without ConfigureAwait(false), the await continuation runs on
+        // the caller's SynchronizationContext - which is the WPF dispatcher
+        // when called from the splash startup path or the user-driven
+        // scan command - and the heavy I/O blocks the UI thread for the
+        // entire scan duration. Core services should never assume a UI
+        // thread; ConfigureAwait(false) is the contract.
+        var registered = await _queryService.GetRegisteredPackagesAsync(progress, cancellationToken)
+            .ConfigureAwait(false);
 
         var registeredPaths = new HashSet<string>(
             registered.Select(p => p.LocalPackagePath),

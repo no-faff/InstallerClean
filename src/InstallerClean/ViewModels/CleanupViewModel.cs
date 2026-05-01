@@ -416,6 +416,15 @@ public partial class CleanupViewModel : ObservableObject
     /// user can act on. Internal so MainViewModelTests can exercise
     /// the mapping directly.
     /// </summary>
+    /// <remarks>
+    /// SECURITY: io.Message and ex.Message are exposed to the dialog
+    /// only because the failing operation is a write probe to a path
+    /// the CURRENT user just typed (or browsed to via OpenFolderDialog).
+    /// Any path the IO exception names is therefore one the user
+    /// already knows about - this does not violate the cross-user
+    /// path-leakage rule that applies to elevated operations on shared
+    /// surfaces (C:\Windows\Installer, etc).
+    /// </remarks>
     internal static string DescribeWriteFailure(string dest, Exception ex) => ex switch
     {
         UnauthorizedAccessException =>

@@ -1,6 +1,18 @@
+; InstallerClean Inno Setup script.
+;
+; AppId is intentionally constant across versions ("InstallerClean") so
+; Windows treats every shipped version as the same product and the
+; uninstall entry stays at HKLM\Software\Microsoft\Windows\CurrentVersion\
+; Uninstall\InstallerClean_is1. Do NOT change AppId.
+;
+; AppVersion is normally provided by the release script via
+; "ISCC.exe /DAppVersion=1.5.4 ...". The fallback below is for ad-hoc
+; local builds; keep it in sync with the current shipping target so a
+; from-source install doesn't claim to be an older version on the user's
+; Add/Remove Programs entry.
 [Setup]
 #ifndef AppVersion
-  #define AppVersion "1.5.2"
+  #define AppVersion "1.5.4"
 #endif
 AppId=InstallerClean
 AppName=InstallerClean

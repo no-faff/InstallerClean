@@ -81,6 +81,7 @@ public static class Strings
     public static string Cli_EventLogMoveDestinationInsideInstaller => Get("Cli.EventLogMoveDestinationInsideInstaller");
     public static string Cli_EventLogMoveNoDestination => Get("Cli.EventLogMoveNoDestination");
     public static string Cli_EventLogMoveSummary => Get("Cli.EventLogMoveSummary");
+    public static string Cli_EventLogPendingRebootBlocked => Get("Cli.EventLogPendingRebootBlocked");
     public static string Cli_EventLogScanFound => Get("Cli.EventLogScanFound");
     public static string Cli_EventLogScanNoOrphans => Get("Cli.EventLogScanNoOrphans");
     public static string Cli_FoundOrphans => Get("Cli.FoundOrphans");
@@ -100,6 +101,7 @@ public static class Strings
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_NoMoveDestination => Get("Cli.NoMoveDestination");
     public static string Cli_NothingToDo => Get("Cli.NothingToDo");
+    public static string Cli_PendingRebootBlocked => Get("Cli.PendingRebootBlocked");
     public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_UnknownArgument => Get("Cli.UnknownArgument");
     public static string Completion_AllClear => Get("Completion.AllClear");
