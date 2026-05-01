@@ -65,8 +65,11 @@ public partial class MainWindow : Window
 
     private void MinimizeClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
-    private void MaximizeClick(object sender, RoutedEventArgs e) =>
+    private void MaximizeClick(object sender, RoutedEventArgs e)
+    {
         WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+        MaximizeButton.ToolTip = WindowState == WindowState.Maximized ? "Restore" : "Maximise";
+    }
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
 }

@@ -1,5 +1,6 @@
 using System.Windows;
 using InstallerClean.Helpers;
+using InstallerClean.Resources;
 
 namespace InstallerClean;
 
@@ -8,9 +9,9 @@ public partial class ConfirmMoveWindow : Window
     public ConfirmMoveWindow(int fileCount, string sizeDisplay, string destination)
     {
         InitializeComponent();
-        var label = DisplayHelpers.Pluralise(fileCount, "file", "files");
-        MessageText.Text = $"Move {fileCount} {label} ({sizeDisplay})?";
-        DestinationText.Text = $"Files will be moved to {destination}";
+        var label = DisplayHelpers.PluraliseFile(fileCount);
+        MessageText.Text = string.Format(Strings.Confirm_MoveTitle, fileCount, label, sizeDisplay);
+        DestinationText.Text = string.Format(Strings.Confirm_MoveDestination, destination);
         this.EnableAltSpaceSystemMenu();
     }
 

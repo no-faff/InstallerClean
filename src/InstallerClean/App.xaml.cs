@@ -1,9 +1,10 @@
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using InstallerClean.Helpers;
+using InstallerClean.Interop.Native;
+using InstallerClean.Resources;
 using InstallerClean.Services;
 using InstallerClean.ViewModels;
 
@@ -11,14 +12,6 @@ namespace InstallerClean;
 
 public partial class App : Application
 {
-    [DllImport("dwmapi.dll", PreserveSig = true)]
-    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int value, int size);
-
-    [DllImport("kernel32.dll")]
-    private static extern bool AttachConsole(int dwProcessId);
-
-    private const int ATTACH_PARENT_PROCESS = -1;
-
     private static Mutex? _singleInstanceMutex;
 
     protected override async void OnStartup(StartupEventArgs e)
@@ -30,15 +23,15 @@ public partial class App : Application
         {
             if (e.Args.Length > 0)
             {
-                AttachConsole(ATTACH_PARENT_PROCESS);
-                Console.WriteLine("Another instance of InstallerClean is already running.");
+                Kernel32.AttachConsole(Kernel32.ATTACH_PARENT_PROCESS);
+                Console.WriteLine(Strings.Startup_AlreadyRunningCli);
                 Shutdown(1);
             }
             else
             {
                 MessageBox.Show(
-                    "InstallerClean is already running.",
-                    "InstallerClean", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Strings.Startup_AlreadyRunningBody,
+                    Strings.Startup_AlreadyRunningTitle, MessageBoxButton.OK, MessageBoxImage.Information);
                 Shutdown();
             }
             return;
@@ -54,8 +47,8 @@ public partial class App : Application
         {
             var logPath = CrashLog.Write(args.Exception);
             MessageBox.Show(
-                $"An unexpected error occurred and InstallerClean needs to close.\n\n{args.Exception.Message}\n\nDetails written to:\n{logPath}",
-                "InstallerClean", MessageBoxButton.OK, MessageBoxImage.Error);
+                string.Format(Strings.Startup_UnhandledBody, args.Exception.Message, logPath),
+                Strings.Startup_UnhandledTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
             Shutdown(1);
         };
@@ -83,7 +76,7 @@ public partial class App : Application
                     {
                         var hwnd = new WindowInteropHelper(w).Handle;
                         int value = 1;
-                        DwmSetWindowAttribute(hwnd, 20, ref value, sizeof(int));
+                        Dwmapi.DwmSetWindowAttribute(hwnd, Dwmapi.DWMWA_USE_IMMERSIVE_DARK_MODE, ref value, sizeof(int));
                         w.Icon = appIcon;
                     }
                 }));
@@ -91,7 +84,7 @@ public partial class App : Application
             splash = new SplashWindow();
             splash.Show();
 
-            splash.UpdateStep("Scanning...", 10);
+            splash.UpdateStep(Strings.Status_Scanning, 10);
 
             var settingsService = new SettingsService();
             var queryService = new InstallerQueryService();
@@ -102,11 +95,12 @@ public partial class App : Application
             var msiInfoService = new MsiFileInfoService();
             var dialogService = new DialogService();
             var confirmationService = new ConfirmationService();
+            var windowService = new WindowService(settingsService);
 
             var viewModel = new MainViewModel(
                 scanService, moveService, deleteService,
                 settingsService, rebootService, msiInfoService,
-                dialogService, confirmationService);
+                dialogService, confirmationService, windowService);
 
             using var startupCts = new CancellationTokenSource();
             splash.CancelRequested += (_, _) => startupCts.Cancel();
@@ -124,7 +118,7 @@ public partial class App : Application
                 return;
             }
 
-            splash.UpdateStep("Done", 100);
+            splash.UpdateStep(Strings.Status_Done, 100);
             await Task.Delay(200);
 
             var window = new MainWindow(viewModel);
@@ -136,8 +130,8 @@ public partial class App : Application
         {
             splash?.Close();
             MessageBox.Show(
-                "This app requires administrator privileges.\n\nPlease right-click and choose 'Run as administrator'.",
-                "Administrator rights required",
+                Strings.Error_AdminRequiredBody,
+                Strings.Error_AdminRequiredTitle,
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
             Shutdown();
@@ -147,8 +141,8 @@ public partial class App : Application
             splash?.Close();
             CrashLog.Write(ex);
             MessageBox.Show(
-                $"Failed to start: {ex.Message}",
-                "Startup error",
+                string.Format(Strings.Startup_FailedToStart, ex.Message),
+                Strings.Startup_ErrorTitle,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
             Shutdown();
@@ -165,12 +159,12 @@ public partial class App : Application
     {
         // Return ignored: no parent console (Explorer, scheduled task) is a
         // valid case and Console.WriteLine is a no-op there.
-        AttachConsole(ATTACH_PARENT_PROCESS);
+        Kernel32.AttachConsole(Kernel32.ATTACH_PARENT_PROCESS);
 
         var arg = args[0].ToLowerInvariant();
         if (arg is not "/d" and not "/m" and not "/s" and not "--help" and not "/?" and not "-h")
         {
-            Console.WriteLine($"Unknown argument: {args[0]}");
+            Console.WriteLine(string.Format(Strings.Cli_UnknownArgument, args[0]));
             Console.WriteLine();
             PrintUsage();
             Shutdown(1);
@@ -189,7 +183,7 @@ public partial class App : Application
         {
             cancelArgs.Cancel = true; // keep the app running long enough to stop gracefully
             Console.WriteLine();
-            Console.WriteLine("Cancelling...");
+            Console.WriteLine(Strings.Cli_Cancelling);
             cts.Cancel();
         };
         Console.CancelKeyPress += cancelHandler;
@@ -199,19 +193,20 @@ public partial class App : Application
             var queryService = new InstallerQueryService();
             var scanService = new FileSystemScanService(queryService);
 
-            Console.WriteLine("Scanning C:\\Windows\\Installer...");
+            Console.WriteLine(Strings.Cli_ScanningInstaller);
             var scanResult = await scanService.ScanAsync(cancellationToken: cts.Token);
 
             var count = scanResult.RemovableFiles.Count;
             var totalBytes = scanResult.RemovableFiles.Sum(f => f.SizeBytes);
             var size = DisplayHelpers.FormatSize(totalBytes);
-            Console.WriteLine($"Found {count} {DisplayHelpers.Pluralise(count, "file", "files")} to clean up ({size}).");
+            Console.WriteLine(string.Format(Strings.Cli_FoundOrphans,
+                count, DisplayHelpers.PluraliseFile(count), size));
 
             if (count == 0)
             {
-                Console.WriteLine("Nothing to do.");
+                Console.WriteLine(Strings.Cli_NothingToDo);
                 EventLogWriter.Write(EventLogWriter.Level.Information,
-                    $"Scan mode ({arg}): no orphaned files. Installer database has {scanResult.RegisteredPackages.Count} registered package(s).");
+                    string.Format(Strings.Cli_EventLogScanNoOrphans, arg, scanResult.RegisteredPackages.Count));
                 Shutdown(0);
                 return;
             }
@@ -222,7 +217,7 @@ public partial class App : Application
                     scanResult.RemovableFiles.Select(f =>
                         $"  {f.FileName}  ({f.SizeDisplay}, {f.Reason})")));
                 EventLogWriter.Write(EventLogWriter.Level.Information,
-                    $"Scan mode (/s): {count} orphaned file(s) found, {size}. No action taken.");
+                    string.Format(Strings.Cli_EventLogScanFound, count, size));
                 Shutdown(0);
                 return;
             }
@@ -232,18 +227,20 @@ public partial class App : Application
             if (arg == "/d")
             {
                 var deleteService = new DeleteFilesService();
-                Console.WriteLine($"Deleting {count} files...");
+                Console.WriteLine(string.Format(Strings.Cli_DeletingFiles, count));
                 var result = await deleteService.DeleteFilesAsync(filePaths, null, cts.Token);
-                Console.WriteLine($"Deleted {result.DeletedCount} {DisplayHelpers.Pluralise(result.DeletedCount, "file", "files")}.");
+                Console.WriteLine(string.Format(Strings.Cli_DeletedFiles,
+                    result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
                 if (result.Errors.Count > 0)
                 {
-                    Console.WriteLine($"{result.Errors.Count} {DisplayHelpers.Pluralise(result.Errors.Count, "error", "errors")}:");
+                    Console.WriteLine($"{result.Errors.Count} {DisplayHelpers.PluraliseError(result.Errors.Count)}:");
                     foreach (var err in result.Errors)
-                        Console.WriteLine($"  {err}");
+                        Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
                 }
                 var level = result.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
                 EventLogWriter.Write(level,
-                    $"Delete mode (/d): {result.DeletedCount} of {count} file(s) sent to the Recycle Bin, {size} recovered, {result.Errors.Count} error(s).");
+                    string.Format(Strings.Cli_EventLogDeleteSummary,
+                        result.DeletedCount, count, size, result.Errors.Count));
                 Shutdown(result.Errors.Count > 0 ? 1 : 0);
             }
             else if (arg == "/m")
@@ -253,51 +250,53 @@ public partial class App : Application
                 var dest = args.Length > 1 ? args[1] : settings.MoveDestination;
                 if (string.IsNullOrWhiteSpace(dest))
                 {
-                    Console.WriteLine("Error: no move destination specified. Use /m PATH or set a default in the GUI.");
+                    Console.WriteLine(Strings.Cli_NoMoveDestination);
                     EventLogWriter.Write(EventLogWriter.Level.Warning,
-                        "Move mode (/m) aborted: no destination specified.");
+                        Strings.Cli_EventLogMoveNoDestination);
                     Shutdown(1);
                     return;
                 }
 
                 if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
                 {
-                    Console.WriteLine("Error: destination cannot be inside the Windows Installer folder.");
+                    Console.WriteLine(Strings.Cli_MoveDestinationInsideInstaller);
                     EventLogWriter.Write(EventLogWriter.Level.Warning,
-                        $"Move mode (/m) aborted: destination {dest} is inside C:\\Windows\\Installer.");
+                        string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, dest));
                     Shutdown(1);
                     return;
                 }
 
                 var moveService = new MoveFilesService();
-                Console.WriteLine($"Moving {count} files to {dest}...");
+                Console.WriteLine(string.Format(Strings.Cli_MovingFiles, count, dest));
                 var result = await moveService.MoveFilesAsync(filePaths, dest, null, cts.Token);
-                Console.WriteLine($"Moved {result.MovedCount} {DisplayHelpers.Pluralise(result.MovedCount, "file", "files")}.");
+                Console.WriteLine(string.Format(Strings.Cli_MovedFiles,
+                    result.MovedCount, DisplayHelpers.PluraliseFile(result.MovedCount)));
                 if (result.Errors.Count > 0)
                 {
-                    Console.WriteLine($"{result.Errors.Count} {DisplayHelpers.Pluralise(result.Errors.Count, "error", "errors")}:");
+                    Console.WriteLine($"{result.Errors.Count} {DisplayHelpers.PluraliseError(result.Errors.Count)}:");
                     foreach (var err in result.Errors)
-                        Console.WriteLine($"  {err}");
+                        Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
                 }
                 var level = result.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
                 EventLogWriter.Write(level,
-                    $"Move mode (/m): {result.MovedCount} of {count} file(s) moved to {dest}, {size} relocated, {result.Errors.Count} error(s).");
+                    string.Format(Strings.Cli_EventLogMoveSummary,
+                        result.MovedCount, count, dest, size, result.Errors.Count));
                 Shutdown(result.Errors.Count > 0 ? 1 : 0);
             }
         }
         catch (OperationCanceledException)
         {
-            Console.WriteLine("Cancelled.");
+            Console.WriteLine(Strings.Cli_Cancelled);
             Shutdown(130); // convention: exit 130 for Ctrl+C
         }
         catch (UnauthorizedAccessException)
         {
-            Console.WriteLine("Error: administrator privileges required. Run from an elevated command prompt.");
+            Console.WriteLine(Strings.Cli_AdminRequired);
             Shutdown(1);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine(string.Format(Strings.Cli_GenericError, ex.Message));
             Shutdown(1);
         }
         finally
@@ -308,19 +307,19 @@ public partial class App : Application
 
     private static void PrintUsage()
     {
-        Console.WriteLine("InstallerClean - clean up C:\\Windows\\Installer");
+        Console.WriteLine(Strings.Cli_Help_Header);
         Console.WriteLine();
-        Console.WriteLine("Usage:");
-        Console.WriteLine("  installerclean-cli          Launch the GUI");
-        Console.WriteLine("  installerclean-cli /s       Scan only - list removable files");
-        Console.WriteLine("  installerclean-cli /d       Delete removable files (Recycle Bin)");
-        Console.WriteLine("  installerclean-cli /m       Move to saved default location");
-        Console.WriteLine("  installerclean-cli /m PATH  Move to specified path");
+        Console.WriteLine(Strings.Cli_Help_Usage);
+        Console.WriteLine(Strings.Cli_Help_Gui);
+        Console.WriteLine(Strings.Cli_Help_ScanOnly);
+        Console.WriteLine(Strings.Cli_Help_Delete);
+        Console.WriteLine(Strings.Cli_Help_MoveDefault);
+        Console.WriteLine(Strings.Cli_Help_MovePath);
         Console.WriteLine();
-        Console.WriteLine("The installer ships installerclean-cli.cmd alongside the exe so");
-        Console.WriteLine("PowerShell and cmd wait for output synchronously. If you're using");
-        Console.WriteLine("the portable or slim exe, wrap it yourself:");
-        Console.WriteLine("  Start-Process -Wait -NoNewWindow .\\InstallerClean.exe /s");
+        Console.WriteLine(Strings.Cli_Help_NoteLine1);
+        Console.WriteLine(Strings.Cli_Help_NoteLine2);
+        Console.WriteLine(Strings.Cli_Help_NoteLine3);
+        Console.WriteLine(Strings.Cli_Help_WrapExample);
         Console.WriteLine();
     }
 }

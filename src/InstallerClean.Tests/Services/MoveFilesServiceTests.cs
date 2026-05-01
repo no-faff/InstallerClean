@@ -55,6 +55,28 @@ public class MoveFilesServiceTests : IDisposable
 
         Assert.Single(results.Errors);
         Assert.Equal(file, results.Errors[0].FilePath);
+        Assert.IsType<MissingSourceFile>(results.Errors[0]);
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_continues_after_per_file_error_in_mixed_batch()
+    {
+        var ok1 = Path.Combine(_sourceDir, "ok1.msi");
+        var missing = Path.Combine(_sourceDir, "gone.msi");
+        var ok2 = Path.Combine(_sourceDir, "ok2.msi");
+        await File.WriteAllTextAsync(ok1, "content");
+        await File.WriteAllTextAsync(ok2, "content");
+
+        var svc = new MoveFilesService();
+        var result = await svc.MoveFilesAsync(new[] { ok1, missing, ok2 }, _destDir);
+
+        Assert.Equal(2, result.MovedCount);
+        Assert.Single(result.Errors);
+        Assert.Equal(missing, result.Errors[0].FilePath);
+        Assert.True(File.Exists(Path.Combine(_destDir, "ok1.msi")));
+        Assert.True(File.Exists(Path.Combine(_destDir, "ok2.msi")));
+        Assert.False(File.Exists(ok1));
+        Assert.False(File.Exists(ok2));
     }
 
     [Fact]

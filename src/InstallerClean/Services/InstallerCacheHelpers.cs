@@ -1,6 +1,4 @@
-using System.Runtime.InteropServices;
-using System.Text;
-using Microsoft.Win32.SafeHandles;
+using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Services;
 
@@ -9,6 +7,13 @@ internal static class InstallerCacheHelpers
     internal static readonly string InstallerFolder =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer");
 
+    /// <summary>
+    /// True if <paramref name="path"/> resolves to <c>C:\Windows\Installer</c>
+    /// or any descendant after symlinks/junctions/subst-mapped drives are
+    /// expanded. Used as the bottom-line safety check before any move:
+    /// the entire restore-after-mistakes story collapses if files end up
+    /// back inside the Installer folder.
+    /// </summary>
     internal static bool IsInstallerFolderOrChild(string path)
     {
         if (string.IsNullOrWhiteSpace(path)) return false;
@@ -23,10 +28,11 @@ internal static class InstallerCacheHelpers
     }
 
     /// <summary>
-    /// Expands symlinks, NTFS junctions and `subst`-mapped drives to the
-    /// real on-disk path. Required so a destination check can't be bypassed
-    /// by picking a junction that points inside C:\Windows\Installer.
-    /// Falls back to Path.GetFullPath if the resolution call fails.
+    /// Expands symlinks, NTFS junctions and subst-mapped drives to the
+    /// real on-disk path. Required so a destination check cannot be
+    /// bypassed by picking a junction that points inside
+    /// C:\Windows\Installer. Falls back to Path.GetFullPath if the
+    /// kernel32 resolution call fails.
     /// </summary>
     internal static string ResolveFinalPath(string path)
     {
@@ -34,8 +40,8 @@ internal static class InstallerCacheHelpers
         try { normalised = Path.GetFullPath(path); }
         catch { return path; }
 
-        // GetFinalPathNameByHandle needs an existing target; walk up until
-        // an ancestor exists and open that.
+        // GetFinalPathNameByHandle needs an existing target; walk up
+        // until an ancestor exists and open that.
         var probe = normalised;
         while (probe.Length > 0 && !Directory.Exists(probe) && !File.Exists(probe))
         {
@@ -46,30 +52,37 @@ internal static class InstallerCacheHelpers
 
         try
         {
-            using var handle = CreateFile(
+            using var handle = Kernel32.CreateFile(
                 probe,
                 0,
-                FileShareAll,
+                Kernel32.FILE_SHARE_ALL,
                 IntPtr.Zero,
-                OpenExisting,
-                FileFlagBackupSemantics,
+                Kernel32.OPEN_EXISTING,
+                Kernel32.FILE_FLAG_BACKUP_SEMANTICS,
                 IntPtr.Zero);
 
             if (handle.IsInvalid) return normalised;
 
-            var buffer = new StringBuilder(PathBufferLength);
-            var length = GetFinalPathNameByHandle(handle, buffer, (uint)buffer.Capacity, VolumeNameDos);
+            var buffer = new char[PathBufferLength];
+            var length = Kernel32.GetFinalPathNameByHandle(
+                handle, buffer, (uint)buffer.Length, Kernel32.VOLUME_NAME_DOS);
             if (length == 0) return normalised;
-            if (length >= buffer.Capacity)
+            if (length >= buffer.Length)
             {
-                buffer = new StringBuilder((int)length + 1);
-                length = GetFinalPathNameByHandle(handle, buffer, (uint)buffer.Capacity, VolumeNameDos);
+                // Buffer too small. The returned length includes the
+                // null terminator in the required-size case, so allocate
+                // exactly that many chars and retry.
+                buffer = new char[length];
+                length = Kernel32.GetFinalPathNameByHandle(
+                    handle, buffer, (uint)buffer.Length, Kernel32.VOLUME_NAME_DOS);
                 if (length == 0) return normalised;
             }
 
-            var resolved = StripLongPathPrefix(buffer.ToString());
+            var resolved = StripLongPathPrefix(new string(buffer, 0, (int)length));
 
-            // Reattach the not-yet-created suffix the caller asked about.
+            // Reattach the not-yet-created suffix the caller asked
+            // about so unborn destination paths still resolve to the
+            // correct real-folder root.
             if (probe.Length < normalised.Length)
             {
                 var suffix = normalised.Substring(probe.Length);
@@ -84,6 +97,11 @@ internal static class InstallerCacheHelpers
         }
     }
 
+    /// <summary>
+    /// Strips the <c>\\?\</c> long-path prefix the kernel adds. Keeps
+    /// the path comparable to user-typed paths and to the value of
+    /// <see cref="InstallerFolder"/>.
+    /// </summary>
     private static string StripLongPathPrefix(string path)
     {
         const string uncPrefix = @"\\?\UNC\";
@@ -97,15 +115,25 @@ internal static class InstallerCacheHelpers
 
     /// <summary>
     /// Deletes empty subdirectories inside C:\Windows\Installer.
-    /// Processes deepest first so nested empty trees collapse in one pass.
-    /// Cancellable because a deeply nested Installer tree can take several
-    /// seconds to walk.
+    /// Processes deepest first so nested empty trees collapse in one
+    /// pass. Cancellable because a deeply nested Installer tree can
+    /// take several seconds to walk.
     /// </summary>
     internal static void PruneEmptySubdirectories(CancellationToken cancellationToken = default)
     {
         if (!Directory.Exists(InstallerFolder)) return;
 
-        foreach (var dir in Directory.EnumerateDirectories(InstallerFolder, "*", SearchOption.AllDirectories)
+        // Match FileSystemScanService: skip reparse points so a junction
+        // planted inside the Installer folder cannot redirect the prune
+        // pass to delete empty directories outside the cache.
+        var options = new EnumerationOptions
+        {
+            RecurseSubdirectories = true,
+            AttributesToSkip = FileAttributes.ReparsePoint,
+            IgnoreInaccessible = true,
+        };
+
+        foreach (var dir in Directory.EnumerateDirectories(InstallerFolder, "*", options)
             .OrderByDescending(d => d.Length))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -118,28 +146,8 @@ internal static class InstallerCacheHelpers
         }
     }
 
-    // ---- P/Invoke surface ----
-
-    private const uint OpenExisting          = 3;
-    private const uint FileShareAll          = 0x00000007;
-    private const uint FileFlagBackupSemantics = 0x02000000;
-    private const uint VolumeNameDos         = 0x0;
-    private const int  PathBufferLength      = 520;
-
-    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "CreateFileW")]
-    private static extern SafeFileHandle CreateFile(
-        string lpFileName,
-        uint dwDesiredAccess,
-        uint dwShareMode,
-        IntPtr lpSecurityAttributes,
-        uint dwCreationDisposition,
-        uint dwFlagsAndAttributes,
-        IntPtr hTemplateFile);
-
-    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode, EntryPoint = "GetFinalPathNameByHandleW")]
-    private static extern uint GetFinalPathNameByHandle(
-        SafeFileHandle hFile,
-        StringBuilder lpszFilePath,
-        uint cchFilePath,
-        uint dwFlags);
+    // 520 chars covers any practical Windows long path (260 standard +
+    // headroom for the \\?\ prefix and the not-yet-created suffix the
+    // caller may attach).
+    private const int PathBufferLength = 520;
 }

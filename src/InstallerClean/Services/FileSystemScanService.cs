@@ -1,6 +1,7 @@
 using System.IO;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
+using InstallerClean.Resources;
 
 namespace InstallerClean.Services;
 
@@ -30,7 +31,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         IProgress<string>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        progress?.Report("Querying Windows Installer API...");
+        progress?.Report(Strings.Status_QueryingApi);
 
         var registered = await _queryService.GetRegisteredPackagesAsync(progress, cancellationToken);
 
@@ -38,7 +39,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             registered.Select(p => p.LocalPackagePath),
             StringComparer.OrdinalIgnoreCase);
 
-        progress?.Report("Scanning installer cache folder...");
+        progress?.Report(Strings.Status_ScanningCache);
 
         var diskFiles = _overrideFiles ?? GetInstallerFiles(_installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder);
         var removable = new List<OrphanedFile>();
@@ -96,7 +97,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     FullPath: pkg.LocalPackagePath,
                     SizeBytes: size,
                     IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
-                    Reason: "Superseded"));
+                    Reason: Strings.Reason_Superseded));
             }
             else
             {
@@ -105,7 +106,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         }
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
 
-        progress?.Report($"Found {removable.Count} {DisplayHelpers.Pluralise(removable.Count, "file", "files")} to clean up.");
+        progress?.Report(string.Format(Strings.Status_FoundOrphans,
+            removable.Count, DisplayHelpers.PluraliseFile(removable.Count)));
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingFromDisk);
     }
 

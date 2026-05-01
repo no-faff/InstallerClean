@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using InstallerClean.Helpers;
+using InstallerClean.Resources;
 using InstallerClean.Models;
 using InstallerClean.Services;
 using InstallerClean.ViewModels;
@@ -56,10 +57,10 @@ public partial class RegisteredFilesWindow : Window
 
     private (string Plain, GridViewColumn Col)[] SortableColumns => new[]
     {
-        ("Product name", ColProductName),
-        ("File",         ColFileName),
-        ("Size",         ColSizeBytes),
-        ("Patches",      ColPatchCount),
+        (Strings.Field_ProductName, ColProductName),
+        (Strings.Field_File,        ColFileName),
+        (Strings.Field_Size,        ColSizeBytes),
+        (Strings.Field_Patches,     ColPatchCount),
     };
 
     private void ColumnHeader_Click(object sender, RoutedEventArgs e)

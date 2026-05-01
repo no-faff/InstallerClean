@@ -25,6 +25,14 @@ public static class CrashLog
     {
         try
         {
+            // Refuse to write through a redirected path. Both the log file
+            // AND its parent folder are checked; either being a junction
+            // or symlink would let an attacker who controlled %LOCALAPPDATA%
+            // redirect the append into a sensitive location. The crash
+            // detail is silently dropped instead.
+            if (StorageHelpers.IsRedirected(LogFile))
+                return LogFile;
+
             Directory.CreateDirectory(LogFolder);
             RotateIfNeeded();
             // Offset-aware timestamp so shared logs are unambiguous across timezones.
@@ -45,6 +53,9 @@ public static class CrashLog
             if (!File.Exists(LogFile)) return;
             var info = new FileInfo(LogFile);
             if (info.Length < MaxBytes) return;
+            // Re-check the archive target so a swap-in symlink can't
+            // redirect the rotation.
+            if (StorageHelpers.IsRedirected(ArchiveFile)) return;
             File.Move(LogFile, ArchiveFile, overwrite: true);
         }
         catch

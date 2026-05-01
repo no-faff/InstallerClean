@@ -10,5 +10,13 @@ public interface IDeleteFilesService
         CancellationToken cancellationToken = default);
 }
 
-public record DeleteResult(int DeletedCount, IReadOnlyList<DeleteError> Errors);
-public record DeleteError(string FilePath, string Message);
+/// <summary>
+/// Outcome of a Delete operation. <see cref="DeletedCount"/> counts
+/// files successfully sent to the Recycle Bin; <see cref="Errors"/>
+/// contains one categorised <see cref="FileOperationError"/> per file
+/// the service could not delete. The two together always sum to the
+/// input count.
+/// </summary>
+public record DeleteResult(
+    int DeletedCount,
+    IReadOnlyList<FileOperationError> Errors);

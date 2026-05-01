@@ -1,7 +1,8 @@
 <Window x:Class="InstallerClean.ConfirmDeleteWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Confirm delete"
+        xmlns:loc="clr-namespace:InstallerClean.Resources"
+        Title="{loc:Translate Window.ConfirmDelete.Title}"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent"
         SizeToContent="WidthAndHeight"
@@ -13,57 +14,32 @@
                       ResizeBorderThickness="0"/>
     </WindowChrome.WindowChrome>
 
-    <Border Background="{StaticResource Base200}" CornerRadius="16" Padding="32,28"
+    <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="32,28"
             MaxWidth="400" MinWidth="320"
-            BorderBrush="{StaticResource Primary}" BorderThickness="1">
+            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="1">
         <StackPanel>
             <StackPanel Orientation="Horizontal" Margin="{StaticResource GapBottom.Md}">
                 <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
-                      Fill="{StaticResource Warning}" Width="16" Height="16" Stretch="Uniform"
-                      VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <TextBlock x:Name="MessageText" Foreground="{StaticResource Fg}" FontSize="14"
+                      Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
+                      VerticalAlignment="Center" Margin="{StaticResource GapRight.Sm}"/>
+                <TextBlock x:Name="MessageText" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
                            TextWrapping="Wrap" VerticalAlignment="Center"/>
             </StackPanel>
 
             <TextBlock
-                       Text="Files will be sent to the Recycle Bin. Use Move instead if you'd like to keep backup copies."
-                       Foreground="{StaticResource Muted}" FontSize="12" TextWrapping="Wrap"
-                       Margin="0,0,0,20"/>
+                       Text="{loc:Translate Confirm.DeleteToRecycleBin}"
+                       Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"
+                       Margin="{StaticResource GapBottom.Lg}"/>
             <TextBlock x:Name="LargeSizeWarning"
-                       Text="At this size some files may skip the Recycle Bin and be deleted permanently. Windows does this automatically when a file exceeds the Recycle Bin's free space. Use Move instead if you want guaranteed backup copies."
-                       Foreground="{StaticResource Warning}" FontSize="12" TextWrapping="Wrap"
-                       Margin="0,-12,0,20" Visibility="Collapsed"/>
+                       Text="{loc:Translate Confirm.DeleteLargeWarning}"
+                       Foreground="{StaticResource Status.Warning}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"
+                       Margin="0,-12,0,16" Visibility="Collapsed"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource PrimaryPill}" Content="_Cancel"
+                <Button Style="{StaticResource PrimaryPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True" Margin="{StaticResource GapRight.Sm}"/>
-                <Button Content="_Delete" Click="OnDelete"
-                        Foreground="{StaticResource Fg}" FontSize="14" FontWeight="Medium"
-                        Padding="28,8" Height="40" MinWidth="120" Cursor="Hand"
-                        FocusVisualStyle="{StaticResource PillFocusVisual}"
-                        AutomationProperties.HelpText="Confirm sending the orphaned files to the Recycle Bin">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="Bg" Background="{StaticResource Danger}" CornerRadius="20"
-                                    Padding="{TemplateBinding Padding}"
-                                    Height="{TemplateBinding Height}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                  RecognizesAccessKey="True"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bg" Property="Background" Value="#7f1d1d"/>
-                                </Trigger>
-                                <Trigger Property="IsKeyboardFocused" Value="True">
-                                    <Setter TargetName="Bg" Property="Background" Value="#7f1d1d"/>
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="Bg" Property="Background" Value="#6b1a1a"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                <Button Style="{StaticResource DangerPill}" Content="{loc:Translate Action.Delete}" Click="OnDelete"
+                        AutomationProperties.HelpText="{loc:Translate Automation.ConfirmDelete}"/>
             </StackPanel>
         </StackPanel>
     </Border>

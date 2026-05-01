@@ -16,6 +16,7 @@ public class MainViewModelTests
     private readonly IMsiFileInfoService _msiInfoService = Substitute.For<IMsiFileInfoService>();
     private readonly IDialogService _dialogService = Substitute.For<IDialogService>();
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
+    private readonly IWindowService _windowService = Substitute.For<IWindowService>();
 
     private MainViewModel CreateViewModel()
     {
@@ -24,7 +25,7 @@ public class MainViewModelTests
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
-            _dialogService, _confirmationService);
+            _dialogService, _confirmationService, _windowService);
     }
 
     private static ScanResult EmptyScanResult() =>
@@ -107,7 +108,7 @@ public class MainViewModelTests
         var vm = new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
-            _dialogService, _confirmationService);
+            _dialogService, _confirmationService, _windowService);
 
         Assert.Equal(@"D:\Backup", vm.MoveDestination);
     }
@@ -278,7 +279,7 @@ public class MainViewModelTests
         var vm = new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
-            _dialogService, _confirmationService);
+            _dialogService, _confirmationService, _windowService);
         _settingsService.ClearReceivedCalls();
 
         vm.MoveDestination = @"D:\Backup";
@@ -316,7 +317,7 @@ public class MainViewModelTests
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new MoveResult(2, Array.Empty<MoveError>()));
+            .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
 
@@ -365,7 +366,7 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new DeleteResult(1, Array.Empty<DeleteError>()));
+            .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
 
@@ -397,5 +398,88 @@ public class MainViewModelTests
         await _deleteService.DidNotReceive().DeleteFilesAsync(
             Arg.Any<IEnumerable<string>>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task OpenOrphanedDetails_after_scan_invokes_window_service_with_scanned_files()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+        await vm.ScanWithProgressAsync(null);
+
+        vm.OpenOrphanedDetailsCommand.Execute(null);
+
+        _windowService.Received(1).ShowOrphanedDetails(
+            Arg.Is<OrphanedFilesViewModel>(v => v.Files.Count == 2));
+    }
+
+    [Fact]
+    public void OpenOrphanedDetails_without_scan_is_noop()
+    {
+        var vm = CreateViewModel();
+
+        vm.OpenOrphanedDetailsCommand.Execute(null);
+
+        _windowService.DidNotReceive().ShowOrphanedDetails(Arg.Any<OrphanedFilesViewModel>());
+    }
+
+    [Fact]
+    public async Task OpenRegisteredDetails_after_scan_invokes_window_service_with_scanned_packages()
+    {
+        var vm = CreateViewModel();
+        var packages = new List<RegisteredPackage>
+        {
+            new(@"C:\Windows\Installer\a.msi", "Product A", "{aaa}", FileSizeBytes: 1024),
+            new(@"C:\Windows\Installer\b.msi", "Product B", "{bbb}", FileSizeBytes: 2048),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(Array.Empty<OrphanedFile>(), packages, 3072));
+        await vm.ScanWithProgressAsync(null);
+
+        vm.OpenRegisteredDetailsCommand.Execute(null);
+
+        _windowService.Received(1).ShowRegisteredDetails(
+            Arg.Is<RegisteredFilesViewModel>(v => v.Products.Count == 2));
+    }
+
+    [Fact]
+    public void ShowAbout_invokes_window_service()
+    {
+        var vm = CreateViewModel();
+
+        vm.ShowAboutCommand.Execute(null);
+
+        _windowService.Received(1).ShowAbout();
+    }
+
+    [Fact]
+    public void CloseApp_invokes_window_service()
+    {
+        var vm = CreateViewModel();
+
+        vm.CloseAppCommand.Execute(null);
+
+        _windowService.Received(1).CloseMainWindow();
+    }
+
+    [Fact]
+    public void StarOnGitHub_opens_repo_url()
+    {
+        var vm = CreateViewModel();
+
+        vm.StarOnGitHubCommand.Execute(null);
+
+        _windowService.Received(1).OpenUrl("https://github.com/no-faff/InstallerClean");
+    }
+
+    [Fact]
+    public void Donate_opens_no_faff_url()
+    {
+        var vm = CreateViewModel();
+
+        vm.DonateCommand.Execute(null);
+
+        _windowService.Received(1).OpenUrl("https://nofaff.netlify.app");
     }
 }

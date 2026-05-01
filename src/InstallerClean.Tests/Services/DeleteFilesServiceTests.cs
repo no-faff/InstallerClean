@@ -38,6 +38,29 @@ public class DeleteFilesServiceTests : IDisposable
         Assert.Equal(0, result.DeletedCount);
         Assert.Single(result.Errors);
         Assert.Equal(file, result.Errors[0].FilePath);
+        // Typed category check: a missing source file produces a
+        // MissingSourceFile entry (not a generic UnknownError) so the
+        // UI can group/count by cause.
+        Assert.IsType<MissingSourceFile>(result.Errors[0]);
+    }
+
+    [Fact]
+    public async Task DeleteFilesAsync_continues_after_per_file_error_in_mixed_batch()
+    {
+        var ok1 = Path.Combine(_tempDir, "ok1.msi");
+        var missing = Path.Combine(_tempDir, "gone.msi");
+        var ok2 = Path.Combine(_tempDir, "ok2.msi");
+        await File.WriteAllTextAsync(ok1, "content");
+        await File.WriteAllTextAsync(ok2, "content");
+
+        var svc = new DeleteFilesService();
+        var result = await svc.DeleteFilesAsync(new[] { ok1, missing, ok2 });
+
+        Assert.Equal(2, result.DeletedCount);
+        Assert.Single(result.Errors);
+        Assert.Equal(missing, result.Errors[0].FilePath);
+        Assert.False(File.Exists(ok1));
+        Assert.False(File.Exists(ok2));
     }
 
     [Fact]

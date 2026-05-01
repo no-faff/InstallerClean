@@ -1,4 +1,5 @@
 using System.Text.Json;
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 
 namespace InstallerClean.Services;
@@ -28,6 +29,13 @@ public sealed class SettingsService : ISettingsService
 
     public AppSettings Load()
     {
+        // Refuse to read through a redirected path; same threat model as
+        // TrySave: an attacker who controlled %LOCALAPPDATA% could plant a
+        // symlink to read a sensitive file as us, or redirect the .bad
+        // recovery rename below into a sensitive location.
+        if (StorageHelpers.IsRedirected(_settingsFile))
+            return new AppSettings();
+
         if (!File.Exists(_settingsFile))
             return new AppSettings();
 
@@ -38,8 +46,15 @@ public sealed class SettingsService : ISettingsService
         }
         catch (Exception)
         {
-            // Preserve the unreadable file for manual recovery before starting fresh.
-            try { File.Move(_settingsFile, _settingsFile + ".bad", overwrite: true); }
+            // Preserve the unreadable file for manual recovery before
+            // starting fresh. Re-check the .bad target path in case an
+            // attacker planted a file-level symlink there specifically.
+            var badFile = _settingsFile + ".bad";
+            try
+            {
+                if (!StorageHelpers.IsRedirected(badFile))
+                    File.Move(_settingsFile, badFile, overwrite: true);
+            }
             catch { }
             return new AppSettings();
         }
@@ -60,9 +75,18 @@ public sealed class SettingsService : ISettingsService
         var tempFile = _settingsFile + ".tmp";
         try
         {
+            // Refuse to write through a redirected path. Both the temp file
+            // AND the final settings file are checked; either being a
+            // junction or symlink would let an attacker who controlled
+            // %LOCALAPPDATA% redirect the write into a sensitive location.
+            if (StorageHelpers.IsRedirected(_settingsFile) ||
+                StorageHelpers.IsRedirected(tempFile))
+                return false;
+
             var folder = Path.GetDirectoryName(_settingsFile);
             if (!string.IsNullOrEmpty(folder))
                 Directory.CreateDirectory(folder);
+
             var json = JsonSerializer.Serialize(settings, JsonOptions);
             File.WriteAllText(tempFile, json);
             File.Move(tempFile, _settingsFile, overwrite: true);

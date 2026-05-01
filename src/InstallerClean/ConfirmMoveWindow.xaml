@@ -1,7 +1,8 @@
 <Window x:Class="InstallerClean.ConfirmMoveWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Confirm move"
+        xmlns:loc="clr-namespace:InstallerClean.Resources"
+        Title="{loc:Translate Window.ConfirmMove.Title}"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent"
         SizeToContent="WidthAndHeight"
@@ -13,20 +14,20 @@
                       ResizeBorderThickness="0"/>
     </WindowChrome.WindowChrome>
 
-    <Border Background="{StaticResource Base200}" CornerRadius="16" Padding="32,28"
+    <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="32,28"
             MaxWidth="440" MinWidth="320"
-            BorderBrush="{StaticResource Primary}" BorderThickness="1">
+            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="1">
         <StackPanel>
-            <TextBlock x:Name="MessageText" Foreground="{StaticResource Fg}" FontSize="14"
+            <TextBlock x:Name="MessageText" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
                        TextWrapping="Wrap" Margin="{StaticResource GapBottom.Sm}"/>
 
-            <TextBlock x:Name="DestinationText" Foreground="{StaticResource Muted}" FontSize="12"
-                       TextWrapping="Wrap" Margin="0,0,0,20"/>
+            <TextBlock x:Name="DestinationText" Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
+                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource PrimaryPill}" Content="_Cancel"
+                <Button Style="{StaticResource PrimaryPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True" Margin="{StaticResource GapRight.Sm}"/>
-                <Button Style="{StaticResource AccentPill}" Content="_Move"
+                <Button Style="{StaticResource AccentPill}" Content="{loc:Translate Action.Move}"
                         Click="OnMove" IsDefault="True"/>
             </StackPanel>
         </StackPanel>

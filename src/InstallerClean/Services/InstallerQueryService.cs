@@ -1,6 +1,7 @@
-using System.Text;
 using InstallerClean.Interop;
+using InstallerClean.Interop.Native;
 using InstallerClean.Models;
+using InstallerClean.Resources;
 
 namespace InstallerClean.Services;
 
@@ -47,11 +48,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // API entry carries product metadata the fallback lacks.
         var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
 
-        progress?.Report("Enumerating installed products...");
+        progress?.Report(Strings.Status_EnumeratingProducts);
 
         var products = EnumerateProducts(ct);
 
-        progress?.Report($"Found {products.Count} installed product(s). Scanning local packages...");
+        progress?.Report(string.Format(Strings.Status_FoundProducts, products.Count));
 
         foreach (var (productCode, userSid, context) in products)
         {
@@ -89,7 +90,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
         }
 
-        progress?.Report("Checking registry for additional packages...");
+        progress?.Report(Strings.Status_CheckingRegistry);
         try
         {
             using var udKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
@@ -137,13 +138,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // here means the database is corrupt or inaccessible; silently
         // reporting "all clear" would be worse than failing.
         if (claimed.Count == 0)
-            throw new InvalidOperationException(
-                "The Windows Installer database appears to be empty or inaccessible. " +
-                "This is unusual even on a fresh Windows install and typically means " +
-                "the database is corrupt or a third-party tool has cleared it. " +
-                "Running 'sfc /scannow' from an elevated prompt usually repairs it.");
+            throw new InvalidOperationException(Strings.Error_InstallerDbEmpty);
 
-        progress?.Report($"Scan complete. {claimed.Count} registered package(s) found.");
+        progress?.Report(string.Format(Strings.Status_RegistryScanComplete, claimed.Count));
 
         return claimed.Values.ToList().AsReadOnly();
     }
@@ -155,19 +152,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
         CancellationToken ct)
     {
         var results = new List<(string, string?, MsiInstallContext)>();
-        var productCode = new StringBuilder(GuidBufferLength);
-        var sidBuffer = new StringBuilder(SidBufferLength);
+        var productCode = new char[GuidBufferLength];
+        var sidBuffer = new char[SidBufferLength];
         int consecutiveNonSuccess = 0;
 
         for (uint index = 0; index < MaxProductIndex; index++)
         {
             ct.ThrowIfCancellationRequested();
 
-            productCode.Clear();
-            sidBuffer.Clear();
-            uint sidLen = (uint)(SidBufferLength - 1);
+            // pcchSid is the buffer size in characters including the
+            // null terminator, per the MsiEnumProductsExW docs. Pass
+            // the full SidBufferLength so the SID is reported correctly
+            // without needing the MoreData realloc path for any
+            // plausible SID size.
+            uint sidLen = SidBufferLength;
 
-            var error = MsiNativeMethods.MsiEnumProductsEx(
+            var error = Msi.MsiEnumProductsEx(
                 szProductCode: null,
                 szUserSid: AllUsersSid,
                 dwContext: MsiInstallContext.All,
@@ -175,24 +175,27 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 szInstalledProductCode: productCode,
                 pdwInstalledContext: out var installedContext,
                 szSid: sidBuffer,
-                pcchSid: ref sidLen);
+                pcchSid: ref sidLen,
+                cchInstalledProductCode: GuidBufferLength);
 
             if (error == MsiError.NoMoreItems)
                 break;
 
             if (error == MsiError.AccessDenied)
-                throw new UnauthorizedAccessException(
-                    "Access denied enumerating installed products. Run as administrator.");
+                throw new UnauthorizedAccessException(Strings.Error_MsiAccessDenied);
 
             if (error == MsiError.MoreData)
             {
-                // Only the SID dimension varies in this double-call pattern;
-                // productCode fits in the fixed GuidBufferLength.
+                // Defensive only. Real-world SIDs are ~45 chars and the
+                // first call passes a 256-char buffer, so this branch
+                // isn't exercised in normal use. Kept as a safety net
+                // for any future unusually-long SID format. Only the
+                // SID dimension varies; productCode fits in the fixed
+                // GuidBufferLength.
                 sidLen++; // null terminator
-                sidBuffer.Clear();
-                sidBuffer.EnsureCapacity((int)sidLen);
+                sidBuffer = new char[sidLen];
 
-                error = MsiNativeMethods.MsiEnumProductsEx(
+                error = Msi.MsiEnumProductsEx(
                     szProductCode: null,
                     szUserSid: AllUsersSid,
                     dwContext: MsiInstallContext.All,
@@ -200,27 +203,39 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     szInstalledProductCode: productCode,
                     pdwInstalledContext: out installedContext,
                     szSid: sidBuffer,
-                    pcchSid: ref sidLen);
+                    pcchSid: ref sidLen,
+                    cchInstalledProductCode: GuidBufferLength);
             }
 
             if (error == MsiError.Success)
             {
                 consecutiveNonSuccess = 0;
                 var sid = (installedContext != MsiInstallContext.Machine && sidLen > 0)
-                    ? sidBuffer.ToString()
+                    ? new string(sidBuffer, 0, (int)sidLen)
                     : null;
-                results.Add((productCode.ToString(), sid, installedContext));
+                results.Add((BufferToString(productCode), sid, installedContext));
             }
             else
             {
                 consecutiveNonSuccess++;
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                     throw new InvalidOperationException(
-                        $"Windows Installer API returned {consecutiveNonSuccess} consecutive non-Success responses (last error {error}). Unable to enumerate products.");
+                        string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));
             }
         }
 
         return results;
+    }
+
+    /// <summary>
+    /// Converts a fixed-size MSI char[] buffer to a managed string by
+    /// trimming at the first null terminator. Used for fixed-size GUID
+    /// out-buffers where the API doesn't return a length count.
+    /// </summary>
+    private static string BufferToString(char[] buffer)
+    {
+        var len = Array.IndexOf(buffer, '\0');
+        return len < 0 ? new string(buffer) : new string(buffer, 0, len);
     }
 
     private const int MaxPatchIndex = 10_000;
@@ -232,19 +247,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
         CancellationToken ct)
     {
         var results = new List<(string, string?, MsiInstallContext)>();
-        var patchCode = new StringBuilder(GuidBufferLength);
-        var targetProductCode = new StringBuilder(GuidBufferLength);
+        var patchCode = new char[GuidBufferLength];
+        var targetProductCode = new char[GuidBufferLength];
         int consecutiveNonSuccess = 0;
 
         for (uint index = 0; index < MaxPatchIndex; index++)
         {
             ct.ThrowIfCancellationRequested();
 
-            patchCode.Clear();
-            targetProductCode.Clear();
             uint sidLen = 0;
 
-            var error = MsiNativeMethods.MsiEnumPatchesEx(
+            var error = Msi.MsiEnumPatchesEx(
                 szProductCode: productCode,
                 szUserSid: userSid,
                 dwContext: context,
@@ -254,7 +267,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 szTargetProductCode: targetProductCode,
                 pdwTargetProductContext: out var patchContext,
                 szTargetUserSid: null,
-                pcchTargetUserSid: ref sidLen);
+                pcchTargetUserSid: ref sidLen,
+                cchPatchCode: GuidBufferLength,
+                cchTargetProductCode: GuidBufferLength);
 
             if (error == MsiError.NoMoreItems)
                 break;
@@ -265,7 +280,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             if (error == MsiError.Success || error == MsiError.MoreData)
             {
                 consecutiveNonSuccess = 0;
-                results.Add((patchCode.ToString(), userSid, patchContext));
+                results.Add((BufferToString(patchCode), userSid, patchContext));
             }
             else
             {
@@ -279,8 +294,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     /// <summary>
-    /// Retrieves a product property using the double-call buffer pattern.
-    /// Returns an empty string if the property cannot be read.
+    /// Retrieves a product property using the double-call buffer
+    /// pattern. Returns an empty string if the property cannot be
+    /// read.
     /// </summary>
     private static string GetProductProperty(
         string productCode,
@@ -290,7 +306,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         uint bufferLen = 0;
 
-        var error = MsiNativeMethods.MsiGetProductInfoEx(
+        var error = Msi.MsiGetProductInfoEx(
             szProductCode: productCode,
             szUserSid: userSid,
             dwContext: context,
@@ -305,9 +321,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
             return string.Empty;
 
         bufferLen++; // space for null terminator
-        var buffer = new StringBuilder((int)bufferLen);
+        var buffer = new char[bufferLen];
 
-        error = MsiNativeMethods.MsiGetProductInfoEx(
+        error = Msi.MsiGetProductInfoEx(
             szProductCode: productCode,
             szUserSid: userSid,
             dwContext: context,
@@ -315,12 +331,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
             szValue: buffer,
             pcchValue: ref bufferLen);
 
-        return error == MsiError.Success ? buffer.ToString() : string.Empty;
+        return error == MsiError.Success
+            ? new string(buffer, 0, (int)bufferLen)
+            : string.Empty;
     }
 
     /// <summary>
-    /// Retrieves a patch property using the double-call buffer pattern.
-    /// Returns an empty string if the property cannot be read.
+    /// Retrieves a patch property using the double-call buffer
+    /// pattern. Returns an empty string if the property cannot be
+    /// read.
     /// </summary>
     private static string GetPatchProperty(
         string patchCode,
@@ -331,7 +350,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         uint bufferLen = 0;
 
-        var error = MsiNativeMethods.MsiGetPatchInfoEx(
+        var error = Msi.MsiGetPatchInfoEx(
             szPatchCode: patchCode,
             szProductCode: productCode,
             szUserSid: userSid,
@@ -347,9 +366,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
             return string.Empty;
 
         bufferLen++; // space for null terminator
-        var buffer = new StringBuilder((int)bufferLen);
+        var buffer = new char[bufferLen];
 
-        error = MsiNativeMethods.MsiGetPatchInfoEx(
+        error = Msi.MsiGetPatchInfoEx(
             szPatchCode: patchCode,
             szProductCode: productCode,
             szUserSid: userSid,
@@ -358,6 +377,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             szValue: buffer,
             pcchValue: ref bufferLen);
 
-        return error == MsiError.Success ? buffer.ToString() : string.Empty;
+        return error == MsiError.Success
+            ? new string(buffer, 0, (int)bufferLen)
+            : string.Empty;
     }
 }

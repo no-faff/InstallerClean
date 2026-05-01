@@ -1,4 +1,5 @@
 using InstallerClean.Models;
+using InstallerClean.Resources;
 
 namespace InstallerClean.Services;
 
@@ -10,12 +11,15 @@ public sealed class MoveFilesService : IMoveFilesService
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        // Defence in depth: the whole safety model collapses if files move
-        // back inside C:\Windows\Installer, so the service refuses directly
-        // rather than trusting upstream callers to have checked.
+        // SECURITY: the entire restore-after-mistakes story collapses
+        // if files move back inside C:\Windows\Installer. The service
+        // refuses directly rather than trusting upstream callers to
+        // have checked, and ResolveFinalPath inside
+        // IsInstallerFolderOrChild expands junctions so the destination
+        // can't sneak through behind a reparse point.
         if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
             throw new InvalidOperationException(
-                $"Refusing to move files into the Windows Installer folder (destination: {destinationFolder}).");
+                string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
 
         return Task.Run(() =>
         {
@@ -23,7 +27,7 @@ public sealed class MoveFilesService : IMoveFilesService
             ProbeDestinationWriteable(destinationFolder);
 
             int moved = 0;
-            var errors = new List<MoveError>();
+            var errors = new List<FileOperationError>();
             var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
             var total = pathList.Count;
 
@@ -36,7 +40,7 @@ public sealed class MoveFilesService : IMoveFilesService
                 {
                     if (!File.Exists(sourcePath))
                     {
-                        errors.Add(new MoveError(sourcePath, "File no longer exists."));
+                        errors.Add(new MissingSourceFile(sourcePath));
                         continue;
                     }
 
@@ -47,9 +51,21 @@ public sealed class MoveFilesService : IMoveFilesService
                     File.Move(sourcePath, destPath);
                     moved++;
                 }
+                catch (DestinationCollisionException ex)
+                {
+                    errors.Add(new DestinationCollision(sourcePath, ex.FileName));
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    errors.Add(new AccessDenied(sourcePath, ex.Message));
+                }
+                catch (IOException ex)
+                {
+                    errors.Add(new IOFailure(sourcePath, ex.Message));
+                }
                 catch (Exception ex)
                 {
-                    errors.Add(new MoveError(sourcePath, ex.Message));
+                    errors.Add(new UnknownError(sourcePath, ex.GetType().Name, ex.Message));
                 }
             }
 
@@ -71,14 +87,15 @@ public sealed class MoveFilesService : IMoveFilesService
         catch (Exception ex)
         {
             throw new UnauthorizedAccessException(
-                $"Cannot write to {folder}: {ex.Message}", ex);
+                string.Format(Strings.Error_CannotWriteFolder, folder, ex.Message), ex);
         }
     }
 
-    // DO NOT switch to File.Move(src, dst, overwrite: true) without also
-    // defending against a reparse-point planted at destPath during the
-    // unique-name race. Current File.Move refuses existing targets so the
-    // race ends in a per-file error, not a symlink follow-through.
+    // SECURITY: do not switch to File.Move(src, dst, overwrite: true)
+    // without also defending against a reparse-point planted at
+    // destPath during the unique-name race. The current File.Move
+    // refuses existing targets, so the race ends in a per-file error
+    // rather than a symlink follow-through to a sensitive location.
     private static string GetUniqueDestPath(string folder, string fileName)
     {
         var candidate = Path.Combine(folder, fileName);
@@ -93,7 +110,20 @@ public sealed class MoveFilesService : IMoveFilesService
             if (!File.Exists(candidate)) return candidate;
         }
 
-        throw new InvalidOperationException(
-            $"Could not find a unique filename for '{fileName}' after 10,000 attempts.");
+        throw new DestinationCollisionException(fileName);
+    }
+
+    /// <summary>
+    /// Thrown by <see cref="GetUniqueDestPath"/> when 10,000 unique-
+    /// suffix attempts all collide. Caught one frame up and converted
+    /// to a <see cref="DestinationCollision"/> entry in the result so
+    /// the rest of the batch keeps moving. Private because no other
+    /// code path needs to see it.
+    /// </summary>
+    private sealed class DestinationCollisionException : Exception
+    {
+        public string FileName { get; }
+        public DestinationCollisionException(string fileName) =>
+            FileName = fileName;
     }
 }

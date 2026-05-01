@@ -1,0 +1,185 @@
+<!--
+    Semantic design tokens. Each entry is a *role* in the UI vocabulary.
+
+    Colour roles resolve to a Color in Primitives.xaml. Numeric roles
+    (typography, radius, border, spacing) are defined directly with a
+    literal value, with a comment naming the corresponding step in the
+    primitive scale so the canonical scale is still legible.
+
+    Rule: window XAML and component styles consume tokens from this
+    file, never primitives. When a colour or scale needs to change,
+    edit the token here, not the consumer. When a new role appears
+    that has no token, add one rather than reaching into the primitive
+    layer.
+
+    Naming: <category>.<role>[.<state>].
+        Surface.*, Text.*, Action.<intent>.<state>, Status.*,
+        Decoration.*, Link.*, Selection.*, Scrollbar.*, Type.*,
+        Radius.*, Border.*, Spacing.*, Gap.*, GapBottom.*, GapRight.*,
+        GapLeft.*.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Primitives.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- ============================================================
+         SURFACES
+         The three layered backgrounds (window, sidebar-level, card)
+         plus the modal overlay tint.
+         ============================================================ -->
+    <SolidColorBrush x:Key="Surface.AppBackground" Color="{StaticResource Primitive.Slate.950}"/>
+    <SolidColorBrush x:Key="Surface.Sidebar"       Color="{StaticResource Primitive.Slate.800}"/>
+    <SolidColorBrush x:Key="Surface.Card"          Color="{StaticResource Primitive.Slate.900}"/>
+    <SolidColorBrush x:Key="Surface.Overlay"       Color="{StaticResource Primitive.Slate.950.Alpha50}"/>
+
+    <!-- ============================================================
+         TEXT TIERS
+         Heading > Body > Muted > Dim. Use the lowest tier that still
+         reads at the size the text is being rendered.
+         ============================================================ -->
+    <SolidColorBrush x:Key="Text.Heading" Color="{StaticResource Primitive.Slate.50}"/>
+    <SolidColorBrush x:Key="Text.Body"    Color="{StaticResource Primitive.Slate.300}"/>
+    <SolidColorBrush x:Key="Text.Muted"   Color="{StaticResource Primitive.Slate.400}"/>
+    <SolidColorBrush x:Key="Text.Dim"     Color="{StaticResource Primitive.Slate.500}"/>
+
+    <!-- ============================================================
+         ACTIONS
+         Each action role has Default / Hover / Pressed states. Buttons
+         consume these via component styles in Components.xaml; raw
+         window XAML should not reach for them directly except for the
+         rare one-off (e.g. Selection.Background on a list item).
+         ============================================================ -->
+
+    <!-- Primary: standard button (slate). -->
+    <SolidColorBrush x:Key="Action.Primary.Background" Color="{StaticResource Primitive.Slate.700}"/>
+    <SolidColorBrush x:Key="Action.Primary.Hover"      Color="{StaticResource Primitive.Slate.700.Hover}"/>
+    <SolidColorBrush x:Key="Action.Primary.Pressed"    Color="{StaticResource Primitive.Slate.700.Pressed}"/>
+
+    <!-- Secondary: CTA / accent (indigo). -->
+    <SolidColorBrush x:Key="Action.Secondary.Background" Color="{StaticResource Primitive.Indigo.600}"/>
+    <SolidColorBrush x:Key="Action.Secondary.Hover"      Color="{StaticResource Primitive.Indigo.700}"/>
+    <SolidColorBrush x:Key="Action.Secondary.Pressed"    Color="{StaticResource Primitive.Indigo.800}"/>
+
+    <!-- Danger: destructive (red). -->
+    <SolidColorBrush x:Key="Action.Danger.Background" Color="{StaticResource Primitive.Red.900}"/>
+    <SolidColorBrush x:Key="Action.Danger.Hover"      Color="{StaticResource Primitive.Red.950}"/>
+    <SolidColorBrush x:Key="Action.Danger.Pressed"    Color="{StaticResource Primitive.Red.950.Pressed}"/>
+
+    <!-- Caption-close: distinct red used only on the title-bar X button.
+         Different shade from Action.Danger so the chrome reads
+         consistently with Windows close-button conventions. -->
+    <SolidColorBrush x:Key="Action.CaptionClose.Hover"   Color="{StaticResource Primitive.Red.700.CaptionHover}"/>
+    <SolidColorBrush x:Key="Action.CaptionClose.Pressed" Color="{StaticResource Primitive.Red.700.CaptionPressed}"/>
+
+    <!-- Neutral: badges, dividers, low-emphasis fills. -->
+    <SolidColorBrush x:Key="Action.Neutral" Color="{StaticResource Primitive.Slate.600}"/>
+
+    <!-- ============================================================
+         STATUS
+         Outcome and state colours. Reserved meanings:
+           Warning - imminent risk requires user attention.
+           Success - completion / positive outcome.
+         ============================================================ -->
+    <SolidColorBrush x:Key="Status.Warning" Color="{StaticResource Primitive.Amber.500}"/>
+    <SolidColorBrush x:Key="Status.Success" Color="{StaticResource Primitive.Green.400}"/>
+
+    <!-- ============================================================
+         DECORATION
+         Brand-flavour icons. Distinct from Status colours so they can
+         coexist on screen without semantic collision.
+         ============================================================ -->
+    <SolidColorBrush x:Key="Decoration.Heart" Color="{StaticResource Primitive.Red.500}"/>
+    <SolidColorBrush x:Key="Decoration.Star"  Color="{StaticResource Primitive.Amber.400}"/>
+
+    <!-- ============================================================
+         LINKS
+         Default for explicit "Link"-styled buttons; Inline for
+         hyperlinks embedded in body text where full Link colour would
+         shout. Hover brings Inline up to full Link.
+         ============================================================ -->
+    <SolidColorBrush x:Key="Link.Default" Color="{StaticResource Primitive.Indigo.400}"/>
+    <SolidColorBrush x:Key="Link.Inline"  Color="{StaticResource Primitive.Indigo.400.Alpha66}"/>
+
+    <!-- ============================================================
+         SELECTION & SCROLLBAR
+         ============================================================ -->
+    <SolidColorBrush x:Key="Selection.Background"   Color="{StaticResource Primitive.Violet.700}"/>
+    <SolidColorBrush x:Key="Scrollbar.Thumb"        Color="{StaticResource Primitive.Slate.50.Alpha20}"/>
+    <SolidColorBrush x:Key="Scrollbar.Thumb.Hover"  Color="{StaticResource Primitive.Slate.50.Alpha50}"/>
+
+    <!-- ============================================================
+         TYPOGRAPHY
+         Six-step hierarchy. Each role is named for the *job* it does,
+         not the size: changing the size means changing this token,
+         not renaming consumers.
+         ============================================================ -->
+    <FontFamily x:Key="Type.FontFamily">pack://application:,,,/Fonts/#Poppins</FontFamily>
+
+    <sys:Double x:Key="Type.Display">28</sys:Double>     <!-- splash hero -->
+    <sys:Double x:Key="Type.Heading.Lg">22</sys:Double>  <!-- completion heading -->
+    <sys:Double x:Key="Type.Heading.Md">20</sys:Double>  <!-- about title -->
+    <sys:Double x:Key="Type.Heading.Sm">14</sys:Double>  <!-- window titles, status -->
+    <sys:Double x:Key="Type.Body">12</sys:Double>        <!-- body copy, descriptions -->
+    <sys:Double x:Key="Type.Caption">11</sys:Double>     <!-- metadata labels, footer -->
+
+    <!-- ============================================================
+         RADIUS
+         Five roles cover the app:
+           Pill      - fully rounded action buttons.
+           Card      - rounded cards and overlay containers.
+           CardSm    - smaller rounded surfaces (splash card border).
+           Chip      - context menus, tooltips, list rows.
+           Tight     - menu-item highlight chip.
+         ============================================================ -->
+    <CornerRadius x:Key="Radius.Pill">20</CornerRadius>
+    <CornerRadius x:Key="Radius.Card">16</CornerRadius>
+    <CornerRadius x:Key="Radius.CardSm">12</CornerRadius>
+    <CornerRadius x:Key="Radius.Chip">4</CornerRadius>
+    <CornerRadius x:Key="Radius.Tight">2</CornerRadius>
+
+    <!-- ============================================================
+         BORDER THICKNESS
+         ============================================================ -->
+    <sys:Double x:Key="Border.None">0</sys:Double>
+    <sys:Double x:Key="Border.Hairline">1</sys:Double>
+    <sys:Double x:Key="Border.Standard">2</sys:Double>
+    <sys:Double x:Key="Border.Heavy">4</sys:Double>
+
+    <!-- ============================================================
+         SPACING
+         Doubles for scalar uses (Width/Height/raw padding). Thicknesses
+         for Margin/Padding. Directional thicknesses (GapBottom,
+         GapRight, GapLeft) for the common one-sided spacing patterns;
+         reserve multi-sided literal Margins for genuine one-offs.
+         ============================================================ -->
+    <sys:Double x:Key="Spacing.Xs">4</sys:Double>
+    <sys:Double x:Key="Spacing.Sm">8</sys:Double>
+    <sys:Double x:Key="Spacing.Md">12</sys:Double>
+    <sys:Double x:Key="Spacing.Lg">16</sys:Double>
+    <sys:Double x:Key="Spacing.Xl">24</sys:Double>
+    <sys:Double x:Key="Spacing.Xxl">32</sys:Double>
+
+    <Thickness x:Key="Gap.Sm">8</Thickness>
+    <Thickness x:Key="Gap.Md">12</Thickness>
+    <Thickness x:Key="Gap.Lg">16</Thickness>
+    <Thickness x:Key="Gap.Xl">24</Thickness>
+
+    <Thickness x:Key="GapBottom.Sm">0,0,0,8</Thickness>
+    <Thickness x:Key="GapBottom.Md">0,0,0,12</Thickness>
+    <Thickness x:Key="GapBottom.Lg">0,0,0,16</Thickness>
+    <Thickness x:Key="GapBottom.Xl">0,0,0,24</Thickness>
+
+    <Thickness x:Key="GapRight.Sm">0,0,8,0</Thickness>
+    <Thickness x:Key="GapRight.Md">0,0,12,0</Thickness>
+
+    <Thickness x:Key="GapLeft.Md">12,0,0,0</Thickness>
+
+    <!-- Outer margin shared by the detail windows (Orphaned, Registered,
+         About) so they share a consistent inset. -->
+    <Thickness x:Key="DetailWindowMargin">24,4,24,24</Thickness>
+
+</ResourceDictionary>

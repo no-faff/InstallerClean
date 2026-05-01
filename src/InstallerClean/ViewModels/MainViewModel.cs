@@ -1,9 +1,9 @@
 using System.Diagnostics;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
+using InstallerClean.Resources;
 using InstallerClean.Services;
 
 namespace InstallerClean.ViewModels;
@@ -18,6 +18,7 @@ public partial class MainViewModel : ObservableObject
     private readonly IMsiFileInfoService _msiInfoService;
     private readonly IDialogService _dialogService;
     private readonly IConfirmationService _confirmationService;
+    private readonly IWindowService _windowService;
 
     [ObservableProperty] private bool _isScanning;
     [ObservableProperty] private string _scanProgress = string.Empty;
@@ -28,10 +29,12 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _orphanedSizeDisplay = string.Empty;
 
     public string RegisteredSummaryText =>
-        $"{RegisteredFileCount} {DisplayHelpers.Pluralise(RegisteredFileCount, "file", "files")} still used";
+        string.Format(Strings.Summary_RegisteredStillUsed,
+            RegisteredFileCount, DisplayHelpers.PluraliseFileVerb(RegisteredFileCount));
 
     public string OrphanedSummaryText =>
-        $"{OrphanedFileCount} {DisplayHelpers.Pluralise(OrphanedFileCount, "file", "files")} to clean up";
+        string.Format(Strings.Summary_OrphanedToCleanUp,
+            OrphanedFileCount, DisplayHelpers.PluraliseFile(OrphanedFileCount));
 
     [ObservableProperty] private bool _hasPendingReboot;
 
@@ -42,7 +45,8 @@ public partial class MainViewModel : ObservableObject
 
     public bool HasMissingFromDisk => MissingFromDiskCount > 0;
     public string MissingFromDiskSummaryText =>
-        $"{MissingFromDiskCount} registered {DisplayHelpers.Pluralise(MissingFromDiskCount, "file is", "files are")} missing from disk. Your Windows Installer database references installers that no longer exist.";
+        string.Format(Strings.Summary_MissingFromDisk,
+            MissingFromDiskCount, DisplayHelpers.PluraliseFileVerb(MissingFromDiskCount));
 
     [ObservableProperty] private string _moveDestination = string.Empty;
 
@@ -75,7 +79,8 @@ public partial class MainViewModel : ObservableObject
         IPendingRebootService rebootService,
         IMsiFileInfoService msiInfoService,
         IDialogService dialogService,
-        IConfirmationService confirmationService)
+        IConfirmationService confirmationService,
+        IWindowService windowService)
     {
         _scanService = scanService;
         _moveService = moveService;
@@ -85,6 +90,7 @@ public partial class MainViewModel : ObservableObject
         _msiInfoService = msiInfoService;
         _dialogService = dialogService;
         _confirmationService = confirmationService;
+        _windowService = windowService;
 
         _settings = settingsService.Load();
         MoveDestination = _settings.MoveDestination;
@@ -151,7 +157,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task ScanAsync()
     {
-        ScanProgress = "Starting scan...";
+        ScanProgress = Strings.Status_StartingScan;
         var sw = Stopwatch.StartNew();
         var cts = new CancellationTokenSource();
         _scanCts = cts;
@@ -165,13 +171,13 @@ public partial class MainViewModel : ObservableObject
             await scanTask;
 
             sw.Stop();
-            ScanProgress = $"Scan complete ({DisplayHelpers.FormatElapsed(sw.Elapsed)})";
+            ScanProgress = string.Format(Strings.Status_ScanComplete, DisplayHelpers.FormatElapsed(sw.Elapsed));
             OperationProgress = ScanProgress;
 
             if (OrphanedFileCount == 0 && !IsOperating)
             {
-                CompletionHeading = "All clear";
-                CompletionSummary = "Nothing to clean up in C:\\Windows\\Installer";
+                CompletionHeading = Strings.Completion_AllClear;
+                CompletionSummary = Strings.Completion_NothingToCleanUp;
                 CompletionRestore = string.Empty;
                 CompletionErrors = string.Empty;
                 IsComplete = true;
@@ -179,24 +185,24 @@ public partial class MainViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            ScanProgress = "Scan cancelled.";
+            ScanProgress = Strings.Status_ScanCancelled;
         }
         catch (UnauthorizedAccessException)
         {
             _dialogService.ShowWarning(
-                "This app requires administrator privileges.\n\nPlease right-click and choose 'Run as administrator'.",
-                "Administrator rights required");
-            ScanProgress = "Access denied. Run as administrator.";
+                Strings.Error_AdminRequiredBody,
+                Strings.Error_AdminRequiredTitle);
+            ScanProgress = Strings.Status_ScanAccessDenied;
         }
         catch (InvalidOperationException ex)
         {
-            _dialogService.ShowError(ex.Message, "Installer database unavailable");
-            ScanProgress = "Scan failed: installer database unavailable.";
+            _dialogService.ShowError(ex.Message, Strings.Error_InstallerDbUnavailableTitle);
+            ScanProgress = Strings.Status_ScanFailedDb;
         }
         catch (Exception ex)
         {
             var logPath = CrashLog.Write(ex);
-            ScanProgress = $"Scan failed: {ex.Message}. Details in {logPath}.";
+            ScanProgress = string.Format(Strings.Status_ScanFailedDetails, ex.Message, logPath);
         }
         finally
         {
@@ -216,16 +222,48 @@ public partial class MainViewModel : ObservableObject
     internal static string DescribeWriteFailure(string dest, Exception ex) => ex switch
     {
         UnauthorizedAccessException =>
-            $"You don't have permission to write to {dest}.\nTry a folder in your user profile, or run as a different administrator.",
+            string.Format(Strings.Error_AccessDeniedDestination, dest),
         System.IO.PathTooLongException =>
-            $"The path {dest} is too long for Windows. Pick a shorter path.",
+            string.Format(Strings.Error_PathTooLong, dest),
         System.IO.DirectoryNotFoundException =>
-            $"The folder {dest} does not exist and could not be created. Check the drive letter or network path.",
+            string.Format(Strings.Error_DestinationMissing, dest),
         System.IO.IOException io =>
-            $"Windows cannot write to {dest}:\n{io.Message}",
+            string.Format(Strings.Error_IOWriteDestination, dest, io.Message),
         _ =>
-            $"Cannot write to {dest}:\n{ex.Message}"
+            string.Format(Strings.Error_WriteDestination, dest, ex.Message)
     };
+
+    /// <summary>
+    /// Renders the per-file error list shown on the completion screen.
+    /// Errors are grouped by category so the user sees "Access denied
+    /// (3): a.msi, b.msi, c.msi" rather than a flat list of identical
+    /// sentences. Inside each category, files are listed by name with
+    /// the category-specific detail appearing once at the top.
+    /// </summary>
+    internal static string FormatErrorBreakdown(IReadOnlyList<FileOperationError> errors)
+    {
+        if (errors.Count == 0) return string.Empty;
+
+        // Group by runtime type so MissingSourceFile, ShellRefused etc.
+        // each get their own bucket. Within a bucket the LocalisedMessage
+        // is identical for stateless categories (e.g. MissingSourceFile)
+        // and varies per-file for stateful ones (e.g. AccessDenied with
+        // its captured Detail), so we list each file with its own message.
+        var buckets = errors
+            .GroupBy(e => e.GetType())
+            .OrderByDescending(g => g.Count());
+
+        var sb = new System.Text.StringBuilder();
+        foreach (var bucket in buckets)
+        {
+            // Header line: category sample + count.
+            var sample = bucket.First().LocalisedMessage;
+            sb.Append(sample).Append(" (").Append(bucket.Count()).Append(')').AppendLine();
+            foreach (var err in bucket)
+                sb.Append("  ").Append(Path.GetFileName(err.FilePath)).AppendLine();
+        }
+        return sb.ToString().TrimEnd();
+    }
 
     private void OnScanProgressUpdate(string message) => ScanProgress = message;
 
@@ -237,7 +275,7 @@ public partial class MainViewModel : ObservableObject
         OperationProgressPercent = p.TotalFiles > 0
             ? (double)p.CurrentFile / p.TotalFiles * 100
             : 0;
-        OperationProgress = $"{p.CurrentFile} of {p.TotalFiles} files";
+        OperationProgress = string.Format(Strings.Summary_OperationFiles, p.CurrentFile, p.TotalFiles);
     }
 
     [RelayCommand]
@@ -245,7 +283,7 @@ public partial class MainViewModel : ObservableObject
     {
         var dialog = new Microsoft.Win32.OpenFolderDialog
         {
-            Title = "Choose destination folder for moved files"
+            Title = Strings.FilePicker_ChooseDestinationTitle
         };
         if (dialog.ShowDialog() == true)
         {
@@ -272,8 +310,8 @@ public partial class MainViewModel : ObservableObject
         if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
         {
             _dialogService.ShowWarning(
-                "The destination cannot be inside the Windows Installer folder.",
-                "Invalid destination");
+                Strings.Error_DestinationInsideInstaller,
+                Strings.Error_InvalidDestinationTitle);
             return;
         }
 
@@ -288,7 +326,7 @@ public partial class MainViewModel : ObservableObject
         {
             _dialogService.ShowWarning(
                 DescribeWriteFailure(dest, ex),
-                "Invalid destination");
+                Strings.Error_InvalidDestinationTitle);
             return;
         }
 
@@ -304,10 +342,11 @@ public partial class MainViewModel : ObservableObject
         if (availableFreeSpace is long free && free < totalBytes)
         {
             _dialogService.ShowWarning(
-                $"Not enough space at {dest}\n\n" +
-                $"Required: {DisplayHelpers.FormatSize(totalBytes)}\n" +
-                $"Available: {DisplayHelpers.FormatSize(free)}",
-                "Not enough space");
+                string.Format(Strings.Error_NotEnoughSpaceBody,
+                    dest,
+                    DisplayHelpers.FormatSize(totalBytes),
+                    DisplayHelpers.FormatSize(free)),
+                Strings.Error_NotEnoughSpaceTitle);
             return;
         }
 
@@ -315,7 +354,7 @@ public partial class MainViewModel : ObservableObject
 
         IsOperating = true;
         _operationCts = new CancellationTokenSource();
-        OperationProgress = $"Moving {count} {DisplayHelpers.Pluralise(count, "file", "files")}...";
+        OperationProgress = string.Format(Strings.Status_Moving, count, DisplayHelpers.PluraliseFile(count));
 
         try
         {
@@ -338,25 +377,26 @@ public partial class MainViewModel : ObservableObject
             // doesn't stack on top of the still-visible operating overlay.
             await RunScanCoreAsync(null);
 
-            CompletionHeading = $"{DisplayHelpers.FormatSize(movedBytes)} cleared";
-            var movedLabel = DisplayHelpers.Pluralise(movedCount, "file", "files");
+            CompletionHeading = string.Format(Strings.Completion_Cleared, DisplayHelpers.FormatSize(movedBytes));
+            var movedLabel = DisplayHelpers.PluraliseFile(movedCount);
             CompletionSummary = errorCount == 0
-                ? $"{movedCount} {movedLabel} moved to {movedDest}"
-                : $"{movedCount} {movedLabel} moved to {movedDest}. {errorCount} {DisplayHelpers.Pluralise(errorCount, "error", "errors")}.";
-            CompletionRestore = "Copy them back if anything stops working";
+                ? string.Format(Strings.Completion_MoveSummary, movedCount, movedLabel, movedDest)
+                : string.Format(Strings.Completion_MoveSummaryWithErrors,
+                    movedCount, movedLabel, movedDest, errorCount, DisplayHelpers.PluraliseError(errorCount));
+            CompletionRestore = Strings.Completion_MoveRestoreHint;
             CompletionErrors = errorCount > 0
-                ? string.Join("\n", result.Errors.Select(e => $"{Path.GetFileName(e.FilePath)}: {e.Message}"))
+                ? FormatErrorBreakdown(result.Errors)
                 : string.Empty;
             IsComplete = true;
         }
         catch (OperationCanceledException)
         {
-            OperationProgress = "Move cancelled.";
+            OperationProgress = Strings.Status_MoveCancelled;
             try { await RunScanCoreAsync(null); } catch { /* best effort refresh */ }
         }
         catch (Exception ex)
         {
-            OperationProgress = $"Move failed: {ex.Message}";
+            OperationProgress = string.Format(Strings.Status_MoveFailed, ex.Message);
         }
         finally
         {
@@ -384,7 +424,8 @@ public partial class MainViewModel : ObservableObject
         IsOperating = true;
         _operationCts = new CancellationTokenSource();
         var filePaths = removableFiles.Select(f => f.FullPath).ToList();
-        OperationProgress = $"Deleting {filePaths.Count} {DisplayHelpers.Pluralise(filePaths.Count, "file", "files")}...";
+        OperationProgress = string.Format(Strings.Status_Deleting,
+            filePaths.Count, DisplayHelpers.PluraliseFile(filePaths.Count));
 
         try
         {
@@ -406,25 +447,26 @@ public partial class MainViewModel : ObservableObject
             // doesn't stack on top of the still-visible operating overlay.
             await RunScanCoreAsync(null);
 
-            CompletionHeading = $"{DisplayHelpers.FormatSize(deletedBytes)} cleared";
-            var deletedLabel = DisplayHelpers.Pluralise(deletedCount, "file", "files");
+            CompletionHeading = string.Format(Strings.Completion_Cleared, DisplayHelpers.FormatSize(deletedBytes));
+            var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
             CompletionSummary = errorCount == 0
-                ? $"{deletedCount} {deletedLabel} sent to the Recycle Bin"
-                : $"{deletedCount} {deletedLabel} deleted. {errorCount} {DisplayHelpers.Pluralise(errorCount, "error", "errors")}.";
-            CompletionRestore = "Restore them if anything stops working";
+                ? string.Format(Strings.Completion_DeleteSummary, deletedCount, deletedLabel)
+                : string.Format(Strings.Completion_DeleteSummaryWithErrors,
+                    deletedCount, deletedLabel, errorCount, DisplayHelpers.PluraliseError(errorCount));
+            CompletionRestore = Strings.Completion_DeleteRestoreHint;
             CompletionErrors = errorCount > 0
-                ? string.Join("\n", result.Errors.Select(e => $"{Path.GetFileName(e.FilePath)}: {e.Message}"))
+                ? FormatErrorBreakdown(result.Errors)
                 : string.Empty;
             IsComplete = true;
         }
         catch (OperationCanceledException)
         {
-            OperationProgress = "Delete cancelled.";
+            OperationProgress = Strings.Status_DeleteCancelled;
             try { await RunScanCoreAsync(null); } catch { /* best effort refresh */ }
         }
         catch (Exception ex)
         {
-            OperationProgress = $"Delete failed: {ex.Message}";
+            OperationProgress = string.Format(Strings.Status_DeleteFailed, ex.Message);
         }
         finally
         {
@@ -445,11 +487,7 @@ public partial class MainViewModel : ObservableObject
             _lastScanResult.RemovableFiles,
             _msiInfoService);
 
-        var window = new OrphanedFilesWindow(viewModel, _settingsService)
-        {
-            Owner = Application.Current.MainWindow
-        };
-        window.ShowDialog();
+        _windowService.ShowOrphanedDetails(viewModel);
     }
 
     [RelayCommand]
@@ -462,54 +500,29 @@ public partial class MainViewModel : ObservableObject
             _lastScanResult.RegisteredTotalBytes,
             _msiInfoService);
 
-        var window = new RegisteredFilesWindow(viewModel, _settingsService)
-        {
-            Owner = Application.Current.MainWindow
-        };
-        window.ShowDialog();
+        _windowService.ShowRegisteredDetails(viewModel);
     }
 
     [RelayCommand]
-    private void ShowAbout()
-    {
-        var window = new AboutWindow
-        {
-            Owner = Application.Current.MainWindow
-        };
-        window.ShowDialog();
-    }
+    private void ShowAbout() => _windowService.ShowAbout();
 
     [RelayCommand]
-    private void StarOnGitHub()
-    {
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = "https://github.com/no-faff/InstallerClean",
-            UseShellExecute = true
-        });
-    }
+    private void StarOnGitHub() => _windowService.OpenUrl("https://github.com/no-faff/InstallerClean");
 
     [RelayCommand]
-    private void Donate()
-    {
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = "https://nofaff.netlify.app",
-            UseShellExecute = true
-        });
-    }
+    private void Donate() => _windowService.OpenUrl("https://nofaff.netlify.app");
 
     public async Task ScanWithProgressAsync(IProgress<string>? progress, CancellationToken cancellationToken = default)
     {
         var sw = Stopwatch.StartNew();
         await RunScanCoreAsync(progress, cancellationToken);
         sw.Stop();
-        ScanProgress = $"Scan complete ({DisplayHelpers.FormatElapsed(sw.Elapsed)})";
+        ScanProgress = string.Format(Strings.Status_ScanComplete, DisplayHelpers.FormatElapsed(sw.Elapsed));
 
         if (OrphanedFileCount == 0)
         {
-            CompletionHeading = "All clear";
-            CompletionSummary = "Nothing to clean up in C:\\Windows\\Installer";
+            CompletionHeading = Strings.Completion_AllClear;
+            CompletionSummary = Strings.Completion_NothingToCleanUp;
             CompletionRestore = string.Empty;
             CompletionErrors = string.Empty;
             IsComplete = true;
@@ -532,9 +545,6 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void CloseApp()
-    {
-        Application.Current.MainWindow?.Close();
-    }
+    private void CloseApp() => _windowService.CloseMainWindow();
 
 }
