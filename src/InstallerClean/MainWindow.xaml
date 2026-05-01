@@ -114,6 +114,7 @@
                             Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenRegisteredDetailsCommand}"
                             Height="28" Padding="12,0" FontSize="{StaticResource Type.Heading.Sm}"
                             VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
+                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             AutomationProperties.Name="{loc:Translate Automation.ViewRegisteredFiles}"/>
                 </Grid>
 
@@ -152,6 +153,7 @@
                             Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenOrphanedDetailsCommand}"
                             Height="28" Padding="12,0" FontSize="{StaticResource Type.Heading.Sm}"
                             VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
+                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             AutomationProperties.Name="{loc:Translate Automation.ViewOrphanedFiles}"/>
                 </Grid>
 
