@@ -2,6 +2,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using Microsoft.Extensions.DependencyInjection;
 using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 using InstallerClean.Resources;
@@ -13,6 +14,7 @@ namespace InstallerClean;
 public partial class App : Application
 {
     private static Mutex? _singleInstanceMutex;
+    private static ServiceProvider? _services;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -86,21 +88,13 @@ public partial class App : Application
 
             splash.UpdateStep(Strings.Status_Scanning, 10);
 
-            var settingsService = new SettingsService();
-            var queryService = new InstallerQueryService();
-            var scanService = new FileSystemScanService(queryService);
-            var moveService = new MoveFilesService();
-            var deleteService = new DeleteFilesService();
-            var rebootService = new PendingRebootService();
-            var msiInfoService = new MsiFileInfoService();
-            var dialogService = new DialogService();
-            var confirmationService = new ConfirmationService();
-            var windowService = new WindowService(settingsService);
-
-            var viewModel = new MainViewModel(
-                scanService, moveService, deleteService,
-                settingsService, rebootService, msiInfoService,
-                dialogService, confirmationService, windowService);
+            // Build the service container once and resolve the entire
+            // view-model graph from it. The container is disposed in
+            // OnExit; no registered service is currently IDisposable,
+            // but disposing the container is forward-looking against
+            // a future service that does need cleanup.
+            _services = Composition.BuildServiceProvider();
+            var viewModel = _services.GetRequiredService<MainViewModel>();
 
             using var startupCts = new CancellationTokenSource();
             splash.CancelRequested += (_, _) => startupCts.Cancel();
@@ -151,6 +145,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _services?.Dispose();
         _singleInstanceMutex?.Dispose();
         base.OnExit(e);
     }
@@ -190,8 +185,11 @@ public partial class App : Application
 
         try
         {
-            var queryService = new InstallerQueryService();
-            var scanService = new FileSystemScanService(queryService);
+            // Same DI container as the GUI path. The CLI doesn't need
+            // the view-model graph but resolving services through the
+            // container keeps the construction logic in one place.
+            using var services = Composition.BuildServiceProvider();
+            var scanService = services.GetRequiredService<IFileSystemScanService>();
 
             Console.WriteLine(Strings.Cli_ScanningInstaller);
             var scanResult = await scanService.ScanAsync(cancellationToken: cts.Token);
@@ -226,7 +224,7 @@ public partial class App : Application
 
             if (arg == "/d")
             {
-                var deleteService = new DeleteFilesService();
+                var deleteService = services.GetRequiredService<IDeleteFilesService>();
                 Console.WriteLine(string.Format(Strings.Cli_DeletingFiles, count));
                 var result = await deleteService.DeleteFilesAsync(filePaths, null, cts.Token);
                 Console.WriteLine(string.Format(Strings.Cli_DeletedFiles,
@@ -245,7 +243,7 @@ public partial class App : Application
             }
             else if (arg == "/m")
             {
-                var settingsService = new SettingsService();
+                var settingsService = services.GetRequiredService<ISettingsService>();
                 var settings = settingsService.Load();
                 var dest = args.Length > 1 ? args[1] : settings.MoveDestination;
                 if (string.IsNullOrWhiteSpace(dest))
@@ -266,7 +264,7 @@ public partial class App : Application
                     return;
                 }
 
-                var moveService = new MoveFilesService();
+                var moveService = services.GetRequiredService<IMoveFilesService>();
                 Console.WriteLine(string.Format(Strings.Cli_MovingFiles, count, dest));
                 var result = await moveService.MoveFilesAsync(filePaths, dest, null, cts.Token);
                 Console.WriteLine(string.Format(Strings.Cli_MovedFiles,

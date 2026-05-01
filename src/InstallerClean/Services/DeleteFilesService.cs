@@ -8,18 +8,16 @@ public sealed class DeleteFilesService : IDeleteFilesService
 {
     private readonly IFileSystem _fs;
 
-    /// <summary>Production constructor: real on-disk filesystem.</summary>
-    public DeleteFilesService() : this(new FileSystem()) { }
-
     /// <summary>
-    /// Test constructor: inject a <see cref="MockFileSystem"/> (or any
-    /// other <see cref="IFileSystem"/>) so unit tests can verify the
-    /// File.Exists pre-check and per-file error categorisation
-    /// without touching <c>%TEMP%</c>. Note that the actual recycle-
-    /// bin send still goes through SHFileOperationW; that call cannot
-    /// be virtualised and is exercised only in the integration tests.
+    /// Constructor. The DI container injects the registered
+    /// <see cref="IFileSystem"/> singleton in production; tests pass
+    /// a <see cref="MockFileSystem"/> so the File.Exists pre-check
+    /// and per-file error categorisation can be verified without
+    /// touching <c>%TEMP%</c>. The recycle-bin send itself still
+    /// goes through SHFileOperationW, which is exercised only in
+    /// the integration tests.
     /// </summary>
-    internal DeleteFilesService(IFileSystem fileSystem)
+    public DeleteFilesService(IFileSystem fileSystem)
     {
         _fs = fileSystem;
     }

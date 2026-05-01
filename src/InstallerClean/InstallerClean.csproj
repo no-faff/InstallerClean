@@ -34,6 +34,12 @@
          %TEMP%. The package is the de-facto .NET standard wrapper for
          System.IO; using it avoids a hand-rolled abstraction. -->
     <PackageReference Include="System.IO.Abstractions" Version="21.0.29" />
+    <!-- Microsoft's stock dependency-injection container. Used to wire
+         every service the main view-model graph needs in App.xaml.cs.
+         The container is created once at startup, resolves MainViewModel,
+         and disposes with the host on shutdown. Zero ceremony, no
+         third-party magic. -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>

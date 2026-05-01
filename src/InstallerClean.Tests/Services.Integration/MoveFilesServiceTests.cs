@@ -15,13 +15,23 @@ public class MoveFilesServiceTests : IDisposable
         Directory.CreateDirectory(_destDir);
     }
 
+    /// <summary>
+    /// Constructs a MoveFilesService against the real filesystem. The
+    /// integration tests run against actual %TEMP% directories so a
+    /// real <see cref="System.IO.Abstractions.FileSystem"/> is what
+    /// they want; the unit-suite under InstallerClean.Tests.Services
+    /// uses MockFileSystem instead.
+    /// </summary>
+    private static MoveFilesService NewService() =>
+        new(new System.IO.Abstractions.FileSystem());
+
     [Fact]
     public async Task MoveFilesAsync_moves_file_to_destination()
     {
         var file = Path.Combine(_sourceDir, "test.msi");
         await File.WriteAllTextAsync(file, "content");
 
-        var svc = new MoveFilesService();
+        var svc = NewService();
         var results = await svc.MoveFilesAsync(new[] { file }, _destDir);
 
         Assert.Empty(results.Errors);
@@ -37,7 +47,7 @@ public class MoveFilesServiceTests : IDisposable
         await File.WriteAllTextAsync(file1, "source");
         await File.WriteAllTextAsync(existing, "existing");
 
-        var svc = new MoveFilesService();
+        var svc = NewService();
         var results = await svc.MoveFilesAsync(new[] { file1 }, _destDir);
 
         Assert.Empty(results.Errors);
@@ -50,7 +60,7 @@ public class MoveFilesServiceTests : IDisposable
     {
         var file = Path.Combine(_sourceDir, "nonexistent.msi");
 
-        var svc = new MoveFilesService();
+        var svc = NewService();
         var results = await svc.MoveFilesAsync(new[] { file }, _destDir);
 
         Assert.Single(results.Errors);
@@ -67,7 +77,7 @@ public class MoveFilesServiceTests : IDisposable
         await File.WriteAllTextAsync(ok1, "content");
         await File.WriteAllTextAsync(ok2, "content");
 
-        var svc = new MoveFilesService();
+        var svc = NewService();
         var result = await svc.MoveFilesAsync(new[] { ok1, missing, ok2 }, _destDir);
 
         Assert.Equal(2, result.MovedCount);
@@ -93,7 +103,7 @@ public class MoveFilesServiceTests : IDisposable
         var cts = new CancellationTokenSource();
         var progress = new SyncProgress<OperationProgress>(p => { if (p.CurrentFile == 1) cts.Cancel(); });
 
-        var svc = new MoveFilesService();
+        var svc = NewService();
         await Assert.ThrowsAnyAsync<OperationCanceledException>(
             () => svc.MoveFilesAsync(files, _destDir, progress, cts.Token));
 
