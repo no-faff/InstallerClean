@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Regenerates src/InstallerClean/Resources/Strings.Designer.cs from
+# Regenerates src/InstallerClean.Core/Resources/Strings.Designer.cs from
 # Strings.resx. Run after adding, removing, or renaming a key in the
 # .resx so the typed accessor surface stays in sync.
 set -euo pipefail
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-RESX=$ROOT/src/InstallerClean/Resources/Strings.resx
-OUT=$ROOT/src/InstallerClean/Resources/Strings.Designer.cs
+RESX=$ROOT/src/InstallerClean.Core/Resources/Strings.resx
+OUT=$ROOT/src/InstallerClean.Core/Resources/Strings.Designer.cs
 
 [[ -f $RESX ]] || { echo "Missing $RESX" >&2; exit 1; }
 

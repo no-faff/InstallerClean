@@ -20,6 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Reference both production projects directly. The tests need
+         Core for the headless surface (Models, Services, Helpers,
+         Interop) and the WPF assembly for MainViewModel and the
+         GUI-only services. Listing both makes the dependency graph
+         explicit; otherwise Core would only flow in transitively. -->
+    <ProjectReference Include="..\InstallerClean.Core\InstallerClean.Core.csproj" />
     <ProjectReference Include="..\InstallerClean\InstallerClean.csproj" />
   </ItemGroup>
 

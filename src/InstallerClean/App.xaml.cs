@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 using InstallerClean.Resources;
-using InstallerClean.Services;
 using InstallerClean.ViewModels;
 
 namespace InstallerClean;
@@ -20,28 +19,17 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        // The WPF binary handles the GUI only. CLI args are owned by
+        // installerclean-cli.exe (a real console-subsystem .NET exe
+        // that ships in the same folder). If a user double-clicks the
+        // GUI exe with stray args, ignore them.
         _singleInstanceMutex = new Mutex(true, @"Global\InstallerClean_SingleInstance", out bool isFirstInstance);
         if (!isFirstInstance)
         {
-            if (e.Args.Length > 0)
-            {
-                Kernel32.AttachConsole(Kernel32.ATTACH_PARENT_PROCESS);
-                Console.WriteLine(Strings.Startup_AlreadyRunningCli);
-                Shutdown(1);
-            }
-            else
-            {
-                MessageBox.Show(
-                    Strings.Startup_AlreadyRunningBody,
-                    Strings.Startup_AlreadyRunningTitle, MessageBoxButton.OK, MessageBoxImage.Information);
-                Shutdown();
-            }
-            return;
-        }
-
-        if (e.Args.Length > 0)
-        {
-            await RunCliAsync(e.Args);
+            MessageBox.Show(
+                Strings.Startup_AlreadyRunningBody,
+                Strings.Startup_AlreadyRunningTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+            Shutdown();
             return;
         }
 
@@ -148,176 +136,5 @@ public partial class App : Application
         _services?.Dispose();
         _singleInstanceMutex?.Dispose();
         base.OnExit(e);
-    }
-
-    private async Task RunCliAsync(string[] args)
-    {
-        // Return ignored: no parent console (Explorer, scheduled task) is a
-        // valid case and Console.WriteLine is a no-op there.
-        Kernel32.AttachConsole(Kernel32.ATTACH_PARENT_PROCESS);
-
-        var arg = args[0].ToLowerInvariant();
-        if (arg is not "/d" and not "/m" and not "/s" and not "--help" and not "/?" and not "-h")
-        {
-            Console.WriteLine(string.Format(Strings.Cli_UnknownArgument, args[0]));
-            Console.WriteLine();
-            PrintUsage();
-            Shutdown(1);
-            return;
-        }
-
-        if (arg is "--help" or "/?" or "-h")
-        {
-            PrintUsage();
-            Shutdown();
-            return;
-        }
-
-        using var cts = new CancellationTokenSource();
-        ConsoleCancelEventHandler cancelHandler = (_, cancelArgs) =>
-        {
-            cancelArgs.Cancel = true; // keep the app running long enough to stop gracefully
-            Console.WriteLine();
-            Console.WriteLine(Strings.Cli_Cancelling);
-            cts.Cancel();
-        };
-        Console.CancelKeyPress += cancelHandler;
-
-        try
-        {
-            // Same DI container as the GUI path. The CLI doesn't need
-            // the view-model graph but resolving services through the
-            // container keeps the construction logic in one place.
-            using var services = Composition.BuildServiceProvider();
-            var scanService = services.GetRequiredService<IFileSystemScanService>();
-
-            Console.WriteLine(Strings.Cli_ScanningInstaller);
-            var scanResult = await scanService.ScanAsync(cancellationToken: cts.Token);
-
-            var count = scanResult.RemovableFiles.Count;
-            var totalBytes = scanResult.RemovableFiles.Sum(f => f.SizeBytes);
-            var size = DisplayHelpers.FormatSize(totalBytes);
-            Console.WriteLine(string.Format(Strings.Cli_FoundOrphans,
-                count, DisplayHelpers.PluraliseFile(count), size));
-
-            if (count == 0)
-            {
-                Console.WriteLine(Strings.Cli_NothingToDo);
-                EventLogWriter.Write(EventLogWriter.Level.Information,
-                    string.Format(Strings.Cli_EventLogScanNoOrphans, arg, scanResult.RegisteredPackages.Count));
-                Shutdown(0);
-                return;
-            }
-
-            if (arg == "/s")
-            {
-                Console.WriteLine(string.Join(Environment.NewLine,
-                    scanResult.RemovableFiles.Select(f =>
-                        $"  {f.FileName}  ({f.SizeDisplay}, {f.Reason})")));
-                EventLogWriter.Write(EventLogWriter.Level.Information,
-                    string.Format(Strings.Cli_EventLogScanFound, count, size));
-                Shutdown(0);
-                return;
-            }
-
-            var filePaths = scanResult.RemovableFiles.Select(f => f.FullPath).ToList();
-
-            if (arg == "/d")
-            {
-                var deleteService = services.GetRequiredService<IDeleteFilesService>();
-                Console.WriteLine(string.Format(Strings.Cli_DeletingFiles, count));
-                var result = await deleteService.DeleteFilesAsync(filePaths, null, cts.Token);
-                Console.WriteLine(string.Format(Strings.Cli_DeletedFiles,
-                    result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
-                if (result.Errors.Count > 0)
-                {
-                    Console.WriteLine($"{result.Errors.Count} {DisplayHelpers.PluraliseError(result.Errors.Count)}:");
-                    foreach (var err in result.Errors)
-                        Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
-                }
-                var level = result.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
-                EventLogWriter.Write(level,
-                    string.Format(Strings.Cli_EventLogDeleteSummary,
-                        result.DeletedCount, count, size, result.Errors.Count));
-                Shutdown(result.Errors.Count > 0 ? 1 : 0);
-            }
-            else if (arg == "/m")
-            {
-                var settingsService = services.GetRequiredService<ISettingsService>();
-                var settings = settingsService.Load();
-                var dest = args.Length > 1 ? args[1] : settings.MoveDestination;
-                if (string.IsNullOrWhiteSpace(dest))
-                {
-                    Console.WriteLine(Strings.Cli_NoMoveDestination);
-                    EventLogWriter.Write(EventLogWriter.Level.Warning,
-                        Strings.Cli_EventLogMoveNoDestination);
-                    Shutdown(1);
-                    return;
-                }
-
-                if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
-                {
-                    Console.WriteLine(Strings.Cli_MoveDestinationInsideInstaller);
-                    EventLogWriter.Write(EventLogWriter.Level.Warning,
-                        string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, dest));
-                    Shutdown(1);
-                    return;
-                }
-
-                var moveService = services.GetRequiredService<IMoveFilesService>();
-                Console.WriteLine(string.Format(Strings.Cli_MovingFiles, count, dest));
-                var result = await moveService.MoveFilesAsync(filePaths, dest, null, cts.Token);
-                Console.WriteLine(string.Format(Strings.Cli_MovedFiles,
-                    result.MovedCount, DisplayHelpers.PluraliseFile(result.MovedCount)));
-                if (result.Errors.Count > 0)
-                {
-                    Console.WriteLine($"{result.Errors.Count} {DisplayHelpers.PluraliseError(result.Errors.Count)}:");
-                    foreach (var err in result.Errors)
-                        Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
-                }
-                var level = result.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
-                EventLogWriter.Write(level,
-                    string.Format(Strings.Cli_EventLogMoveSummary,
-                        result.MovedCount, count, dest, size, result.Errors.Count));
-                Shutdown(result.Errors.Count > 0 ? 1 : 0);
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            Console.WriteLine(Strings.Cli_Cancelled);
-            Shutdown(130); // convention: exit 130 for Ctrl+C
-        }
-        catch (UnauthorizedAccessException)
-        {
-            Console.WriteLine(Strings.Cli_AdminRequired);
-            Shutdown(1);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(string.Format(Strings.Cli_GenericError, ex.Message));
-            Shutdown(1);
-        }
-        finally
-        {
-            Console.CancelKeyPress -= cancelHandler;
-        }
-    }
-
-    private static void PrintUsage()
-    {
-        Console.WriteLine(Strings.Cli_Help_Header);
-        Console.WriteLine();
-        Console.WriteLine(Strings.Cli_Help_Usage);
-        Console.WriteLine(Strings.Cli_Help_Gui);
-        Console.WriteLine(Strings.Cli_Help_ScanOnly);
-        Console.WriteLine(Strings.Cli_Help_Delete);
-        Console.WriteLine(Strings.Cli_Help_MoveDefault);
-        Console.WriteLine(Strings.Cli_Help_MovePath);
-        Console.WriteLine();
-        Console.WriteLine(Strings.Cli_Help_NoteLine1);
-        Console.WriteLine(Strings.Cli_Help_NoteLine2);
-        Console.WriteLine(Strings.Cli_Help_NoteLine3);
-        Console.WriteLine(Strings.Cli_Help_WrapExample);
-        Console.WriteLine();
     }
 }

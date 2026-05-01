@@ -298,7 +298,6 @@ Try a folder in your user profile, or run as a different administrator.</value><
        ============================================================ -->
   <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
   <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean is already running.</value></data>
-  <data name="Startup.AlreadyRunningCli" xml:space="preserve"><value>Another instance of InstallerClean is already running.</value></data>
   <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
   <!-- 0 = exception message, 1 = crash log path -->
   <data name="Startup.UnhandledBody" xml:space="preserve"><value>An unexpected error occurred and InstallerClean needs to close.
@@ -378,14 +377,13 @@ Details written to:
        ============================================================ -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - clean up C:\Windows\Installer</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Usage:</value></data>
-  <data name="Cli.Help.Gui" xml:space="preserve"><value>  installerclean-cli          Launch the GUI</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli /?       Show this help</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       Scan only - list removable files</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       Delete removable files (Recycle Bin)</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       Move to saved default location</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PATH  Move to specified path</value></data>
-  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>The installer ships installerclean-cli.exe alongside the GUI exe so</value></data>
-  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>PowerShell and cmd wait for output synchronously. If you're using</value></data>
-  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>the portable or slim exe, wrap it yourself:</value></data>
-  <data name="Cli.Help.WrapExample" xml:space="preserve"><value>  Start-Process -Wait -NoNewWindow .\InstallerClean.exe /s</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli is a real console process and blocks the prompt</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>until it finishes; redirect or pipe its output as you would any</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>other console exe. The GUI lives in InstallerClean.exe alongside it.</value></data>
 
 </root>

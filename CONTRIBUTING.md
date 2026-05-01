@@ -15,22 +15,13 @@ The app requires **administrator privileges** to run because it accesses
 elevated terminal with `dotnet run --project src/InstallerClean` or launch the
 built exe (which triggers a UAC prompt).
 
-### CLI launcher
+### CLI
 
-`InstallerClean-cli.exe` in the installer is a small console stub that the
-Windows Installer builds from `cli-launcher/launcher.c`. The binary is
-committed to the repo because rebuilding it requires mingw-w64, which most
-contributors don't need.
-
-To rebuild it on Linux:
-
-```
-sudo dnf install mingw64-gcc   # Fedora; use your distro's equivalent
-cli-launcher/build.sh
-```
-
-The resulting `cli-launcher/InstallerClean-cli.exe` is deterministic and
-approximately 44 KB.
+`installerclean-cli.exe` is a real .NET 8 console exe published from
+`src/InstallerClean.Cli`. It builds with the rest of the solution
+(`dotnet build src/InstallerClean.sln`) and is bundled into the
+Inno-built setup.exe by the Stage-1 release script. No external
+toolchain (mingw etc) is required.
 
 ## Commit conventions
 

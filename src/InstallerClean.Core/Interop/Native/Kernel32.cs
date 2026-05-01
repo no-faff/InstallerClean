@@ -14,17 +14,6 @@ internal static partial class Kernel32
     private const string Library = "kernel32.dll";
 
     /// <summary>
-    /// Attaches the calling process's stdout/stderr to the parent's
-    /// console, if any. Used by the WPF host so CLI mode prints
-    /// synchronously into the terminal that launched it.
-    /// </summary>
-    [LibraryImport(Library)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool AttachConsole(int dwProcessId);
-
-    public const int ATTACH_PARENT_PROCESS = -1;
-
-    /// <summary>
     /// Opens a file or directory and returns a handle suitable for
     /// passing to <see cref="GetFinalPathNameByHandle"/>.
     /// </summary>

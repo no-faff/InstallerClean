@@ -1,0 +1,53 @@
+using System.IO.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace InstallerClean.Services;
+
+/// <summary>
+/// DI registration helper for the headless service surface in
+/// <c>InstallerClean.Core</c>. Both the WPF host (InstallerClean) and
+/// the console host (InstallerClean.Cli) call <see cref="AddInstallerCleanCore"/>
+/// from their composition roots so the same service graph is wired
+/// identically in both subsystems.
+///
+/// The GUI host then layers WPF-only services on top
+/// (<c>IDialogService</c>, <c>IConfirmationService</c>, <c>IWindowService</c>,
+/// <c>MainViewModel</c>); the CLI host doesn't need any of those.
+/// </summary>
+public static class CoreComposition
+{
+    /// <summary>
+    /// Registers every headless service as a singleton on the given
+    /// <see cref="IServiceCollection"/>. Lifetime rationale matches
+    /// the GUI's <c>Composition</c> root: services are stateless aside
+    /// from disk paths they read/write, so a single instance per
+    /// process is the simplest correct choice.
+    /// </summary>
+    /// <remarks>
+    /// Every registration here is Singleton. Do not change any to
+    /// Scoped without coordinating with the WPF host's
+    /// <c>Composition.BuildServiceProvider(validateScopes: true)</c>
+    /// flag, which will throw at startup if a Scoped service is
+    /// captured by a Singleton.
+    /// </remarks>
+    public static IServiceCollection AddInstallerCleanCore(this IServiceCollection services)
+    {
+        // Stateless infrastructure.
+        services.AddSingleton<IFileSystem, FileSystem>();
+
+        // Win32 / registry / MSI-API wrappers.
+        services.AddSingleton<IInstallerQueryService, InstallerQueryService>();
+        services.AddSingleton<IPendingRebootService, PendingRebootService>();
+        services.AddSingleton<IMsiFileInfoService, MsiFileInfoService>();
+
+        // File-mutating services.
+        services.AddSingleton<IFileSystemScanService, FileSystemScanService>();
+        services.AddSingleton<IMoveFilesService, MoveFilesService>();
+        services.AddSingleton<IDeleteFilesService, DeleteFilesService>();
+
+        // Persistence.
+        services.AddSingleton<ISettingsService, SettingsService>();
+
+        return services;
+    }
+}

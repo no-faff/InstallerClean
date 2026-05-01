@@ -1,4 +1,3 @@
-using System.IO.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using InstallerClean.Services;
 using InstallerClean.ViewModels;
@@ -6,46 +5,43 @@ using InstallerClean.ViewModels;
 namespace InstallerClean;
 
 /// <summary>
-/// Composition root for the application's service graph. Wires every
-/// interface to its concrete implementation in one place; <see cref="App"/>
-/// builds the container, resolves <see cref="MainViewModel"/>, and
-/// disposes the container on shutdown.
+/// Composition root for the WPF application's service graph. Wires
+/// every interface to its concrete implementation in one place;
+/// <see cref="App"/> builds the container, resolves
+/// <see cref="MainViewModel"/>, and disposes the container on
+/// shutdown.
+///
+/// The headless service surface (file operations, settings, MSI query,
+/// pending-reboot) is registered via
+/// <see cref="CoreComposition.AddInstallerCleanCore(IServiceCollection)"/>
+/// from <c>InstallerClean.Core</c> so the CLI host (which has no
+/// MainWindow, no MessageBox, no DataContext bindings) shares the
+/// same registrations. The WPF host then layers in the surfaces it
+/// uniquely needs.
 ///
 /// Every registration is Singleton. The services are stateless aside
-/// from the file paths they read/write (SettingsService reads from
-/// disk on every Load, no in-memory cache); the view-model graph
-/// matches the single MainWindow which lives for the process's
-/// lifetime; nothing here would benefit from per-call instantiation.
+/// from the file paths they read/write; the view-model graph matches
+/// the single MainWindow which lives for the process's lifetime;
+/// nothing here would benefit from per-call instantiation.
 /// </summary>
 internal static class Composition
 {
     /// <summary>
-    /// Builds and returns the DI container for the running application.
-    /// Caller owns disposal: the GUI path holds it in a static field
-    /// and disposes in <c>App.OnExit</c>; the CLI path uses a
-    /// <c>using var</c> for the duration of the command.
+    /// Builds and returns the DI container for the running WPF
+    /// application. Caller owns disposal: <see cref="App.OnStartup"/>
+    /// holds the container in a static field and disposes in
+    /// <see cref="App.OnExit"/>.
     /// </summary>
     public static ServiceProvider BuildServiceProvider()
     {
         var services = new ServiceCollection();
 
-        // Stateless infrastructure.
-        services.AddSingleton<IFileSystem, FileSystem>();
+        // Headless surface (Models, Services, Helpers, Interop) lives
+        // in InstallerClean.Core and is registered via the extension.
+        services.AddInstallerCleanCore();
 
-        // Win32 / registry / MSI-API wrappers.
-        services.AddSingleton<IInstallerQueryService, InstallerQueryService>();
-        services.AddSingleton<IPendingRebootService, PendingRebootService>();
-        services.AddSingleton<IMsiFileInfoService, MsiFileInfoService>();
-
-        // File-mutating services. Each takes the IFileSystem singleton
-        // above plus its own constructor dependencies; the container
-        // resolves them automatically.
-        services.AddSingleton<IFileSystemScanService, FileSystemScanService>();
-        services.AddSingleton<IMoveFilesService, MoveFilesService>();
-        services.AddSingleton<IDeleteFilesService, DeleteFilesService>();
-
-        // Persistence and user-interaction surfaces.
-        services.AddSingleton<ISettingsService, SettingsService>();
+        // WPF-only surfaces. These wrap MessageBox / Window types and
+        // therefore cannot run without a WPF dispatcher.
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<IConfirmationService, ConfirmationService>();
         services.AddSingleton<IWindowService, WindowService>();

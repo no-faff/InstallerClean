@@ -17,29 +17,25 @@
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    <!-- en-GB is the source-of-truth language. The neutral Strings.resx
-         holds en-GB content so an end user with no matching satellite
-         assembly still sees correct English. -->
+    <!-- en-GB is the source-of-truth language; the neutral Strings.resx
+         in InstallerClean.Core holds the source content. -->
     <NeutralLanguage>en-GB</NeutralLanguage>
-    <!-- AllowUnsafeBlocks lets the LibraryImport source generator emit
-         the pointer-handling stubs it needs. The unsafe code only ever
-         lives in the generated marshallers, never in our own code. -->
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <!-- WPF-only dependencies. Headless services, models, helpers,
+       interop and the localisation resx live in InstallerClean.Core
+       and flow in via the project reference below. -->
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <!-- IFileSystem abstraction so file-mutating services can be unit-
-         tested against an in-memory filesystem instead of writing into
-         %TEMP%. The package is the de-facto .NET standard wrapper for
-         System.IO; using it avoids a hand-rolled abstraction. -->
-    <PackageReference Include="System.IO.Abstractions" Version="21.0.29" />
-    <!-- Microsoft's stock dependency-injection container. Used to wire
-         every service the main view-model graph needs in App.xaml.cs.
-         The container is created once at startup, resolves MainViewModel,
-         and disposes with the host on shutdown. Zero ceremony, no
-         third-party magic. -->
+    <!-- Microsoft's stock dependency-injection container. The GUI uses
+         it to wire every service the main view-model graph needs.
+         InstallerClean.Core only needs the Abstractions package
+         (callers register Core's services into their own collection). -->
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InstallerClean.Core\InstallerClean.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,39 +45,5 @@
     <Resource Include="Fonts\Poppins-Bold.ttf" />
     <Resource Include="Assets\splash-icon.png" />
   </ItemGroup>
-
-  <!-- Localisation resources. The neutral Strings.resx is en-GB; satellite
-       Strings.<culture>.resx files build into satellite assemblies that
-       .NET selects automatically based on CurrentUICulture.
-
-       The strongly-typed accessor class (InstallerClean.Resources.Strings)
-       is generated into the obj/ tree on every build by the MSBuild
-       CreateCSharpManifestResourceName + StronglyTypedClassName tasks,
-       so the typed surface never drifts from the .resx contents. -->
-  <ItemGroup>
-    <!-- The .resx files compile into both the main assembly's default
-         resources stream and per-culture satellite assemblies that .NET
-         selects automatically based on CurrentUICulture.
-
-         Strings.Designer.cs is hand-managed (committed to source control)
-         rather than auto-generated, because WPF's MarkupCompilePass1
-         runs in a temporary shadow project where MSBuild metadata-driven
-         StronglyTypedFileName generation does not propagate. Pre-existing
-         a Designer file gives every build path (main, wpftmp, IDE design
-         time) a stable typed surface to compile against. To regenerate
-         after editing the .resx, run scripts/regenerate-strings-designer.sh. -->
-    <EmbeddedResource Update="Resources\Strings.resx">
-      <ManifestResourceName>InstallerClean.Resources.Strings</ManifestResourceName>
-    </EmbeddedResource>
-    <!-- Strings.en-GB.resx is left without a ManifestResourceName
-         override so MSBuild routes it to a per-culture satellite
-         assembly (bin/<config>/<tfm>/en-GB/InstallerClean.resources.dll)
-         instead of embedding it in the main assembly under a literal
-         name. With the override the satellite was never built; without
-         it, .NET's CurrentUICulture-driven satellite probing finds
-         en-GB content correctly when a future translation lands. -->
-    <EmbeddedResource Update="Resources\Strings.en-GB.resx" />
-  </ItemGroup>
-
 
 </Project>

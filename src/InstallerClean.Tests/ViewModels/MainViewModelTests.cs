@@ -18,9 +18,17 @@ public class MainViewModelTests
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
 
-    private MainViewModel CreateViewModel()
+    private MainViewModel CreateViewModel() => CreateViewModel(new AppSettings());
+
+    /// <summary>
+    /// Build a MainViewModel against the substituted services with a
+    /// caller-provided initial AppSettings. Single construction site
+    /// so any future ctor parameter change touches one line, not the
+    /// 9-arg `new MainViewModel(...)` site repeated across tests.
+    /// </summary>
+    private MainViewModel CreateViewModel(AppSettings settings)
     {
-        _settingsService.Load().Returns(new AppSettings());
+        _settingsService.Load().Returns(settings);
 
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
@@ -103,12 +111,7 @@ public class MainViewModelTests
     [Fact]
     public void MoveDestination_loads_from_settings()
     {
-        _settingsService.Load().Returns(new AppSettings { MoveDestination = @"D:\Backup" });
-
-        var vm = new MainViewModel(
-            _scanService, _moveService, _deleteService,
-            _settingsService, _rebootService, _msiInfoService,
-            _dialogService, _confirmationService, _windowService);
+        var vm = CreateViewModel(new AppSettings { MoveDestination = @"D:\Backup" });
 
         Assert.Equal(@"D:\Backup", vm.Cleanup.MoveDestination);
     }
@@ -275,11 +278,7 @@ public class MainViewModelTests
     [Fact]
     public void MoveDestination_setting_same_value_does_not_resave()
     {
-        _settingsService.Load().Returns(new AppSettings { MoveDestination = @"D:\Backup" });
-        var vm = new MainViewModel(
-            _scanService, _moveService, _deleteService,
-            _settingsService, _rebootService, _msiInfoService,
-            _dialogService, _confirmationService, _windowService);
+        var vm = CreateViewModel(new AppSettings { MoveDestination = @"D:\Backup" });
         _settingsService.ClearReceivedCalls();
 
         vm.Cleanup.MoveDestination = @"D:\Backup";
