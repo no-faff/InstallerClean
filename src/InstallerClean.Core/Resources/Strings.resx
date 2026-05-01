@@ -212,7 +212,9 @@
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scan cancelled.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Done</value></data>
   <!-- 0 = exception message, 1 = crash log path -->
-  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Scan failed: {0}. Details in {1}.</value></data>
+  <!-- 0 = exception type name (full message + stack trace go to the
+       crash log; never put .Message in this string), 1 = crash log path. -->
+  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Scan failed ({0}). Details in {1}.</value></data>
 
   <!-- ============================================================
        COMPLETION SCREEN
@@ -369,8 +371,11 @@ Details written to:
   <data name="Cli.Cancelling" xml:space="preserve"><value>Cancelling...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Cancelled.</value></data>
   <data name="Cli.AdminRequired" xml:space="preserve"><value>Error: administrator privileges required. Run from an elevated command prompt.</value></data>
-  <!-- 0 = exception message -->
-  <data name="Cli.GenericError" xml:space="preserve"><value>Error: {0}</value></data>
+  <!-- 0 = exception type name (full message + stack trace go to the
+       crash log; the CLI runs elevated so .Message could include paths
+       from another user's profile if logged to a shared file).
+       1 = crash log path. -->
+  <data name="Cli.GenericError" xml:space="preserve"><value>Error: {0}. Details written to {1}.</value></data>
   <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Scanning C:\Windows\Installer...</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>Found {0} {1} to clean up ({2}).</value></data>
@@ -390,6 +395,8 @@ Details written to:
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Error: destination cannot be inside the Windows Installer folder.</value></data>
   <!-- 0 = destination -->
   <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve"><value>Move mode (/m) aborted: destination {0} is inside C:\Windows\Installer.</value></data>
+  <data name="Cli.PendingRebootBlocked" xml:space="preserve"><value>Error: Windows is waiting to restart. Cleaning the installer cache mid-update can break the pending repair, so Move and Delete are blocked. Restart the machine and run again.</value></data>
+  <data name="Cli.EventLogPendingRebootBlocked" xml:space="preserve"><value>{0} mode aborted: Windows reports a pending reboot.</value></data>
   <!-- 0 = file count, 1 = destination -->
   <data name="Cli.MovingFiles" xml:space="preserve"><value>Moving {0} files to {1}...</value></data>
   <!-- 0 = moved count, 1 = pluralised noun -->

@@ -22,6 +22,15 @@ internal static class ShellFileOperations
         if (string.IsNullOrEmpty(path))
             throw new ArgumentException(Strings.Error_MissingSourceFile, nameof(path));
 
+        // SECURITY: refuse paths that contain an embedded null. SHFILEOPSTRUCT.pFrom
+        // is a list-of-strings encoding (each entry null-terminated, list end
+        // marked by a second null). An embedded \0 in path would split the input
+        // into two list entries, so the shell would attempt to delete both. Real
+        // Windows file paths cannot contain \0, so any caller passing one is a
+        // bug; fail fast rather than over-delete.
+        if (path.Contains('\0'))
+            throw new ArgumentException(Strings.Error_MissingSourceFile, nameof(path));
+
         // SHFILEOPSTRUCT.pFrom requires a DOUBLE-null-terminated UTF-16
         // string (Windows file-list-string convention). We construct
         // it explicitly:

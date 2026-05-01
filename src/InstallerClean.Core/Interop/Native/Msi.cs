@@ -19,10 +19,27 @@ internal static partial class Msi
     private const string Library = "msi.dll";
 
     /// <summary>
+    /// Fixed buffer size for the szInstalledProductCode / szPatchCode /
+    /// szTargetProductCode out-buffers of the MsiEnum*Ex functions. The
+    /// Windows Installer API documents these as <c>WCHAR[39]</c>: a
+    /// 38-char canonical GUID surface form plus a null terminator.
+    /// </summary>
+    public const int GuidBufferLength = 39;
+
+    /// <summary>
     /// Enumerates installed products across the user contexts allowed
     /// by <paramref name="dwContext"/>. Returns one product GUID per
     /// call until <see cref="InstallerClean.Interop.MsiError.NoMoreItems"/>.
     /// </summary>
+    /// <remarks>
+    /// szInstalledProductCode is a fixed 39-char buffer in the native
+    /// signature (a GUID + null terminator); the native function does
+    /// NOT take a count parameter for it. Use ConstantElementCount, not
+    /// CountElementName, so the C# signature exactly matches the
+    /// 8-parameter native signature - a CountElementName-derived 9th
+    /// parameter would be passed harmlessly under the x64 calling
+    /// convention but is undefined behaviour and would crash on x86.
+    /// </remarks>
     [LibraryImport(Library, EntryPoint = "MsiEnumProductsExW",
                    StringMarshalling = StringMarshalling.Utf16)]
     public static partial uint MsiEnumProductsEx(
@@ -30,11 +47,10 @@ internal static partial class Msi
         string? szUserSid,
         MsiInstallContext dwContext,
         uint dwIndex,
-        [MarshalUsing(CountElementName = nameof(cchInstalledProductCode))] char[]? szInstalledProductCode,
+        [MarshalUsing(ConstantElementCount = GuidBufferLength)] char[]? szInstalledProductCode,
         out MsiInstallContext pdwInstalledContext,
         [MarshalUsing(CountElementName = nameof(pcchSid))] char[]? szSid,
-        ref uint pcchSid,
-        uint cchInstalledProductCode);
+        ref uint pcchSid);
 
     /// <summary>
     /// Reads a property (e.g. "ProductName", "LocalPackage") for a
@@ -55,6 +71,12 @@ internal static partial class Msi
     /// Enumerates patches against a product, returning patch and
     /// product-target GUIDs plus the user SID context.
     /// </summary>
+    /// <remarks>
+    /// szPatchCode and szTargetProductCode are both fixed 39-char
+    /// buffers in the native signature; the native function takes no
+    /// count parameter for them. See MsiEnumProductsEx remarks for the
+    /// rationale on ConstantElementCount vs CountElementName here.
+    /// </remarks>
     [LibraryImport(Library, EntryPoint = "MsiEnumPatchesExW",
                    StringMarshalling = StringMarshalling.Utf16)]
     public static partial uint MsiEnumPatchesEx(
@@ -63,13 +85,11 @@ internal static partial class Msi
         MsiInstallContext dwContext,
         MsiPatchFilter dwFilter,
         uint dwIndex,
-        [MarshalUsing(CountElementName = nameof(cchPatchCode))] char[]? szPatchCode,
-        [MarshalUsing(CountElementName = nameof(cchTargetProductCode))] char[]? szTargetProductCode,
+        [MarshalUsing(ConstantElementCount = GuidBufferLength)] char[]? szPatchCode,
+        [MarshalUsing(ConstantElementCount = GuidBufferLength)] char[]? szTargetProductCode,
         out MsiInstallContext pdwTargetProductContext,
         [MarshalUsing(CountElementName = nameof(pcchTargetUserSid))] char[]? szTargetUserSid,
-        ref uint pcchTargetUserSid,
-        uint cchPatchCode,
-        uint cchTargetProductCode);
+        ref uint pcchTargetUserSid);
 
     /// <summary>
     /// Reads a property (e.g. "LocalPackage", "State") for a single

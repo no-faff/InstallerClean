@@ -21,13 +21,16 @@ internal static class Program
 
     public static async Task<int> Main(string[] args)
     {
-        if (args.Length == 0 || args[0] is "--help" or "/?" or "-h")
+        // Lowercase up front so every later comparison (--help, /?, -h,
+        // /s, /d, /m) is case-insensitive. PowerShell users frequently
+        // type /S in upper case.
+        var arg = args.Length == 0 ? string.Empty : args[0].ToLowerInvariant();
+
+        if (args.Length == 0 || arg is "--help" or "/?" or "-h")
         {
             PrintUsage();
             return ExitOk;
         }
-
-        var arg = args[0].ToLowerInvariant();
 
         if (arg is not "/d" and not "/m" and not "/s")
         {
@@ -113,6 +116,25 @@ internal static class Program
                 return ExitOk;
             }
 
+            // SECURITY/CORRECTNESS: gate /d and /m on pending-reboot just
+            // like the GUI does after step 10. Cleaning the installer
+            // cache while Windows Update is mid-staging breaks the
+            // pending repair / rollback sequence; the risk is the same
+            // whether the user clicked Move in the GUI or scheduled
+            // installerclean-cli /d in a Task. /s is unaffected because
+            // it only reads.
+            if (arg is "/d" or "/m")
+            {
+                var rebootService = services.GetRequiredService<IPendingRebootService>();
+                if (rebootService.HasPendingReboot())
+                {
+                    Console.WriteLine(Strings.Cli_PendingRebootBlocked);
+                    EventLogWriter.Write(EventLogWriter.Level.Warning,
+                        string.Format(Strings.Cli_EventLogPendingRebootBlocked, arg));
+                    return ExitError;
+                }
+            }
+
             var filePaths = scanResult.RemovableFiles.Select(f => f.FullPath).ToList();
 
             if (arg == "/d")
@@ -184,7 +206,15 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine(string.Format(Strings.Cli_GenericError, ex.Message));
+            // SECURITY: write the full exception (message + stack trace)
+            // to the crash log; print only the type name to stdout. The
+            // CLI runs elevated and stdout often gets redirected into a
+            // log file by Task Scheduler or RMM tooling - putting the
+            // raw .Message there would risk leaking paths from another
+            // user's profile that the elevated process happened to
+            // touch on this user's behalf.
+            var logPath = Helpers.CrashLog.Write(ex);
+            Console.WriteLine(string.Format(Strings.Cli_GenericError, ex.GetType().Name, logPath));
             return ExitError;
         }
         finally

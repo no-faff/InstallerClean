@@ -158,13 +158,26 @@ public partial class ScanViewModel : ObservableObject
         }
         catch (InvalidOperationException ex)
         {
+            // SECURITY: ex.Message is shown to the user only because every
+            // InvalidOperationException thrown by InstallerQueryService is
+            // constructed with a resx-sourced message (Error_InstallerDbEmpty,
+            // Error_MsiNonSuccess) - so the text is pre-vetted, contains no
+            // paths, and is meant for the user. If a future contributor adds
+            // a path-bearing throw site, switch this to the type-name+crashlog
+            // pattern used in the generic catch below.
             _dialogService.ShowError(ex.Message, Strings.Error_InstallerDbUnavailableTitle);
             ScanProgress = Strings.Status_ScanFailedDb;
         }
         catch (Exception ex)
         {
+            // Mirror Cleanup{Move,Delete}AllAsync and App.xaml.cs catch
+            // blocks: full exception detail to the crash log, only the
+            // type name into UI text. Framework exception messages can
+            // include absolute paths from another user's profile when
+            // the process runs elevated, so .Message must never reach
+            // the status pill.
             var logPath = CrashLog.Write(ex);
-            ScanProgress = string.Format(Strings.Status_ScanFailedDetails, ex.Message, logPath);
+            ScanProgress = string.Format(Strings.Status_ScanFailedDetails, ex.GetType().Name, logPath);
         }
         finally
         {
