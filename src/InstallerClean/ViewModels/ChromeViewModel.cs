@@ -35,6 +35,18 @@ public partial class ChromeViewModel : ObservableObject
         // Surface scan-complete signals to the details commands so the
         // Details buttons enable as soon as the first scan finishes
         // and disable again if a future feature ever clears the result.
+        //
+        // LIFETIME CONTRACT: this subscription is intentionally never
+        // unhooked. Both VMs are constructed by MainViewModel and share
+        // its lifetime; MainViewModel is a singleton resolved exactly
+        // once via Composition.cs and dies with the process. If a
+        // future test or feature ever creates throwaway MainViewModel
+        // instances around a longer-lived ScanViewModel (for example
+        // by hoisting Scan into a separate DI singleton), convert this
+        // to a named handler stored on a field and detach it in an
+        // IDisposable.Dispose. The handler does not capture mutable
+        // state, only `this`. Mirrors the same contract on
+        // CleanupViewModel.
         _scan.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(ScanViewModel.LastScanResult)
