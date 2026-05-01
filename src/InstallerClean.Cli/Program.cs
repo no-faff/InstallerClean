@@ -46,7 +46,20 @@ internal static class Program
         if (arg is "/d" or "/m")
         {
             mutex = new System.Threading.Mutex(initiallyOwned: false, @"Global\InstallerClean_SingleInstance");
-            holdsMutex = mutex.WaitOne(TimeSpan.Zero);
+            try
+            {
+                holdsMutex = mutex.WaitOne(TimeSpan.Zero);
+            }
+            catch (AbandonedMutexException)
+            {
+                // The previous owner (GUI or CLI) crashed without
+                // releasing. .NET transfers ownership to us; treat that
+                // as a successful acquisition rather than surfacing a
+                // confusing generic error. The crashed process has
+                // already exited, so the kernel state we now hold is
+                // safe to use.
+                holdsMutex = true;
+            }
             if (!holdsMutex)
             {
                 Console.WriteLine(Strings.Startup_AlreadyRunningBody);

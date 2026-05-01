@@ -94,6 +94,20 @@ public sealed class SettingsService : ISettingsService
             var json = JsonSerializer.Serialize(settings, JsonOptions);
             File.WriteAllText(tempFile, json);
             File.Move(tempFile, _settingsFile, overwrite: true);
+
+            // SECURITY: between the pre-write IsRedirected check and the
+            // rename above, an attacker who shares the user's account
+            // could swap _settingsFile for a symlink targeting a
+            // sensitive location. File.Move(overwrite:true) follows
+            // symlinks, so the rename would replace the target's
+            // content instead of settings.json. After the rename,
+            // verify the final path is not a reparse point and roll
+            // back the save flag if it is. Lifetime is best-effort: we
+            // don't undelete the previous settings.json (it's already
+            // gone), but we tell the caller the save did not succeed.
+            if (StorageHelpers.IsRedirected(_settingsFile))
+                return false;
+
             return true;
         }
         catch (Exception)

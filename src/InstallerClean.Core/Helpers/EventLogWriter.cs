@@ -19,15 +19,16 @@ internal static class EventLogWriter
 
     /// <summary>
     /// Writes the summary entry. Never throws; a failed write (source
-    /// creation denied, event log service stopped, non-Windows host) is
-    /// swallowed because the primary output channel is stdout, not the
-    /// event log.
+    /// creation denied, event log service stopped, non-Windows host,
+    /// source mapped to a non-Application log) is swallowed because the
+    /// primary output channel is stdout, not the event log.
     /// </summary>
     internal static void Write(Level level, string summary)
     {
         try
         {
-            EnsureSource();
+            if (!EnsureSourceMappedToApplicationLog())
+                return;
             var entryType = level == Level.Warning
                 ? EventLogEntryType.Warning
                 : EventLogEntryType.Information;
@@ -40,11 +41,25 @@ internal static class EventLogWriter
         }
     }
 
-    private static void EnsureSource()
+    /// <summary>
+    /// Ensures the InstallerClean event source exists and is registered
+    /// against the Application log. Returns false if the source is
+    /// pre-registered against a different log (e.g. an older install
+    /// pointed it at System): writing summaries containing user-typed
+    /// paths into an attacker-readable log is an information-disclosure
+    /// path even on otherwise correct DACLs, so the writer skips
+    /// silently rather than mis-routing the entry.
+    /// </summary>
+    private static bool EnsureSourceMappedToApplicationLog()
     {
         // First-run registration requires admin (our manifest guarantees it);
         // subsequent runs short-circuit via SourceExists.
         if (!EventLog.SourceExists(SourceName))
+        {
             EventLog.CreateEventSource(SourceName, "Application");
+            return true;
+        }
+        var existingLog = EventLog.LogNameFromSourceName(SourceName, ".");
+        return string.Equals(existingLog, "Application", StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -1,6 +1,7 @@
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using InstallerClean.Models;
+using InstallerClean.Resources;
 using InstallerClean.Services;
 using InstallerClean.ViewModels;
 
@@ -8,6 +9,8 @@ namespace InstallerClean.Tests.ViewModels;
 
 public class MainViewModelTests
 {
+    private static readonly string Orphaned = Strings.Reason_Orphaned;
+
     private readonly IFileSystemScanService _scanService = Substitute.For<IFileSystemScanService>();
     private readonly IMoveFilesService _moveService = Substitute.For<IMoveFilesService>();
     private readonly IDeleteFilesService _deleteService = Substitute.For<IDeleteFilesService>();
@@ -42,7 +45,7 @@ public class MainViewModelTests
     private static ScanResult ScanResultWithOrphans(int count)
     {
         var files = Enumerable.Range(0, count)
-            .Select(i => new OrphanedFile($@"C:\Windows\Installer\orphan{i}.msi", 1024 * (i + 1), false))
+            .Select(i => new OrphanedFile($@"C:\Windows\Installer\orphan{i}.msi", 1024 * (i + 1), false, InstallerClean.Resources.Strings.Reason_Orphaned))
             .ToList();
         return new ScanResult(files, Array.Empty<RegisteredPackage>(), 0);
     }
@@ -65,8 +68,8 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msi", 1_048_576, false),
-            new(@"C:\Windows\Installer\b.msi", 2_097_152, false),
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, Orphaned),
         };
         var registered = new List<RegisteredPackage>
         {
@@ -158,7 +161,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\huge.msi", 107_374_182_400, false), // 100 GB
+            new(@"C:\Windows\Installer\huge.msi", 107_374_182_400, false, Orphaned), // 100 GB
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -185,7 +188,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\empty.msi", 0, false),
+            new(@"C:\Windows\Installer\empty.msi", 0, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -315,8 +318,8 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msi", 1_048_576, false),
-            new(@"C:\Windows\Installer\b.msi", 2_097_152, false),
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -365,7 +368,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\x.msi", 524_288, false),
+            new(@"C:\Windows\Installer\x.msi", 524_288, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -428,6 +431,26 @@ public class MainViewModelTests
         vm.Chrome.OpenOrphanedDetailsCommand.Execute(null);
 
         _windowService.DidNotReceive().ShowOrphanedDetails(Arg.Any<OrphanedFilesViewModel>());
+    }
+
+    [Fact]
+    public async Task OpenDetails_CanExecute_flips_after_first_scan()
+    {
+        // The Details buttons are bound through CanExecute. If the
+        // ChromeViewModel ever stops listening for the right scan-VM
+        // PropertyChanged event, the buttons stay greyed forever in
+        // the UI even though the rest of the app works. Drive the
+        // CanExecute path explicitly so a regression is loud.
+        var vm = CreateViewModel();
+        Assert.False(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+        Assert.False(vm.Chrome.OpenRegisteredDetailsCommand.CanExecute(null));
+
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(1));
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.True(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+        Assert.True(vm.Chrome.OpenRegisteredDetailsCommand.CanExecute(null));
     }
 
     [Fact]

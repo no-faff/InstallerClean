@@ -21,6 +21,7 @@ namespace InstallerClean;
 public partial class App : Application
 {
     private static Mutex? _singleInstanceMutex;
+    private static bool _holdsSingleInstanceMutex;
     private static ServiceProvider? _services;
 
     protected override async void OnStartup(StartupEventArgs e)
@@ -31,8 +32,25 @@ public partial class App : Application
         // installerclean-cli.exe (a real console-subsystem .NET exe
         // that ships in the same folder). If a user double-clicks the
         // GUI exe with stray args, ignore them.
-        _singleInstanceMutex = new Mutex(true, @"Global\InstallerClean_SingleInstance", out bool isFirstInstance);
-        if (!isFirstInstance)
+        //
+        // Single-instance pattern matches Cli/Program.cs: open the
+        // named mutex without taking ownership at construction, then
+        // try to acquire it with WaitOne(0). Releasing explicitly in
+        // OnExit (instead of relying on Dispose to release) means a
+        // process that crashes between WaitOne and Dispose still hands
+        // the mutex to the next instance via the AbandonedMutexException
+        // path, rather than leaking the kernel object until the OS
+        // garbage-collects it.
+        _singleInstanceMutex = new Mutex(initiallyOwned: false, @"Global\InstallerClean_SingleInstance");
+        try
+        {
+            _holdsSingleInstanceMutex = _singleInstanceMutex.WaitOne(TimeSpan.Zero);
+        }
+        catch (AbandonedMutexException)
+        {
+            _holdsSingleInstanceMutex = true;
+        }
+        if (!_holdsSingleInstanceMutex)
         {
             MessageBox.Show(
                 Strings.Startup_AlreadyRunningBody,
@@ -44,8 +62,14 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             var logPath = CrashLog.Write(args.Exception);
+            // SECURITY: pass the exception type name only, never the
+            // .Message. With the app running elevated, framework
+            // exception messages can include absolute paths the
+            // process touched on behalf of one user that another user
+            // sharing the workstation should not see. Full detail
+            // (message + stack trace) is in the crash log.
             MessageBox.Show(
-                string.Format(Strings.Startup_UnhandledBody, args.Exception.Message, logPath),
+                string.Format(Strings.Startup_UnhandledBody, args.Exception.GetType().Name, logPath),
                 Strings.Startup_UnhandledTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
             Shutdown(1);
@@ -129,9 +153,11 @@ public partial class App : Application
         catch (Exception ex)
         {
             splash?.Close();
-            CrashLog.Write(ex);
+            var logPath = CrashLog.Write(ex);
+            // SECURITY: same rule as DispatcherUnhandledException above:
+            // type name in the dialog, full detail in the crash log.
             MessageBox.Show(
-                string.Format(Strings.Startup_FailedToStart, ex.Message),
+                string.Format(Strings.Startup_FailedToStart, ex.GetType().Name, logPath),
                 Strings.Startup_ErrorTitle,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -142,6 +168,17 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         _services?.Dispose();
+        // Release before Dispose. Same rationale as Cli/Program.cs:
+        // a clean release lets the next instance acquire without
+        // hitting AbandonedMutexException; if we crashed before this
+        // point, the next instance still gets the mutex via the
+        // abandoned-mutex transfer path so single-instance still
+        // works either way.
+        if (_holdsSingleInstanceMutex)
+        {
+            try { _singleInstanceMutex?.ReleaseMutex(); }
+            catch (ApplicationException) { /* not the owning thread; harmless on shutdown */ }
+        }
         _singleInstanceMutex?.Dispose();
         base.OnExit(e);
     }

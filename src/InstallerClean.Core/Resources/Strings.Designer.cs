@@ -111,6 +111,7 @@ public static class Strings
     public static string Completion_MoveSummary => Get("Completion.MoveSummary");
     public static string Completion_MoveSummaryWithErrors => Get("Completion.MoveSummaryWithErrors");
     public static string Completion_NothingToCleanUp => Get("Completion.NothingToCleanUp");
+    public static string Completion_PartlyCleared => Get("Completion.PartlyCleared");
     public static string Confirm_DeleteLargeWarning => Get("Confirm.DeleteLargeWarning");
     public static string Confirm_DeleteTitle => Get("Confirm.DeleteTitle");
     public static string Confirm_DeleteToRecycleBin => Get("Confirm.DeleteToRecycleBin");
@@ -137,6 +138,7 @@ public static class Strings
     public static string Error_NoUniqueFilename => Get("Error.NoUniqueFilename");
     public static string Error_PathTooLong => Get("Error.PathTooLong");
     public static string Error_ShellRecycleFailed => Get("Error.ShellRecycleFailed");
+    public static string Error_SourceIsReparsePoint => Get("Error.SourceIsReparsePoint");
     public static string Error_UnknownError => Get("Error.UnknownError");
     public static string Error_WriteDestination => Get("Error.WriteDestination");
     public static string Field_Application => Get("Field.Application");
@@ -160,6 +162,7 @@ public static class Strings
     public static string Plural_File_Singular => Get("Plural.File.Singular");
     public static string Plural_FileVerb_Plural => Get("Plural.FileVerb.Plural");
     public static string Plural_FileVerb_Singular => Get("Plural.FileVerb.Singular");
+    public static string Reason_Orphaned => Get("Reason.Orphaned");
     public static string Reason_Superseded => Get("Reason.Superseded");
     public static string Section_Move_Location => Get("Section.Move.Location");
     public static string Section_Registered_Details => Get("Section.Registered.Details");
@@ -183,6 +186,7 @@ public static class Strings
     public static string Status_MoveCancelled => Get("Status.MoveCancelled");
     public static string Status_MoveFailed => Get("Status.MoveFailed");
     public static string Status_Moving => Get("Status.Moving");
+    public static string Status_PreparingDestination => Get("Status.PreparingDestination");
     public static string Status_QueryingApi => Get("Status.QueryingApi");
     public static string Status_RegistryScanComplete => Get("Status.RegistryScanComplete");
     public static string Status_ScanAccessDenied => Get("Status.ScanAccessDenied");
@@ -201,10 +205,12 @@ public static class Strings
     public static string Summary_RegisteredWindow => Get("Summary.RegisteredWindow");
     public static string Tooltip_BuyMeACuppa => Get("Tooltip.BuyMeACuppa");
     public static string Tooltip_Close => Get("Tooltip.Close");
+    public static string Tooltip_DeleteDisabledHint => Get("Tooltip.DeleteDisabledHint");
     public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");
     public static string Tooltip_Maximise => Get("Tooltip.Maximise");
     public static string Tooltip_Minimise => Get("Tooltip.Minimise");
     public static string Tooltip_MoveDestination => Get("Tooltip.MoveDestination");
+    public static string Tooltip_MoveDisabledHint => Get("Tooltip.MoveDisabledHint");
     public static string Tooltip_OpenProjectOnGitHub => Get("Tooltip.OpenProjectOnGitHub");
     public static string Tooltip_Restore => Get("Tooltip.Restore");
     public static string Tooltip_SigningCertificate => Get("Tooltip.SigningCertificate");

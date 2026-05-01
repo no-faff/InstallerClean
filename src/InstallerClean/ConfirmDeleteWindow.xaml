@@ -36,9 +36,10 @@
                        Margin="0,-12,0,16" Visibility="Collapsed"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource PrimaryPill}" Content="{loc:Translate Action.Cancel}"
+                <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True" Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource DangerPill}" Content="{loc:Translate Action.Delete}" Click="OnDelete"
+                        IsDefault="True"
                         AutomationProperties.HelpText="{loc:Translate Automation.ConfirmDelete}"/>
             </StackPanel>
         </StackPanel>

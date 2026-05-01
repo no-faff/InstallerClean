@@ -25,8 +25,13 @@ namespace InstallerClean.Resources;
 [MarkupExtensionReturnType(typeof(string))]
 public sealed class TranslateExtension : MarkupExtension
 {
-    private static readonly ResourceManager ResourceManager =
-        new("InstallerClean.Resources.Strings", typeof(TranslateExtension).Assembly);
+    // Reuse the auto-generated Strings class's ResourceManager instead of
+    // constructing a parallel one. This pins the lookup to the assembly
+    // that embeds the resx (InstallerClean.Core, since the project split
+    // in step 8); a fresh `new ResourceManager(..., typeof(this).Assembly)`
+    // would resolve to InstallerClean.dll and fail to find the resources,
+    // returning literal keys for every XAML binding.
+    private static readonly ResourceManager ResourceManager = Strings.ResourceManager;
 
     public TranslateExtension() { }
 

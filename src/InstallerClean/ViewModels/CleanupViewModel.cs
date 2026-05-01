@@ -82,7 +82,8 @@ public partial class CleanupViewModel : ObservableObject
         _scan.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||
-                e.PropertyName == nameof(ScanViewModel.OrphanedFileCount))
+                e.PropertyName == nameof(ScanViewModel.OrphanedFileCount) ||
+                e.PropertyName == nameof(ScanViewModel.HasPendingReboot))
             {
                 MoveAllCommand.NotifyCanExecuteChanged();
                 DeleteAllCommand.NotifyCanExecuteChanged();
@@ -136,15 +137,36 @@ public partial class CleanupViewModel : ObservableObject
             return;
         }
         _settingsService.TrySave(_settings);
+
+        // Dispose the CTS now that this scheduled save has completed.
+        // ScheduleMoveDestinationSave disposes the previous CTS on each
+        // new keystroke, which covers the common path; without this
+        // success-path dispose, a user who types once and then never
+        // types again would leak one CTS until process exit. The Token
+        // closure captures the CTS we created back in the schedule
+        // call; if that same CTS is still the current one, drop it.
+        if (_moveDestinationSaveCts is { } current && current.Token == token)
+        {
+            _moveDestinationSaveCts = null;
+            current.Dispose();
+        }
     }
 
+    // Move and Delete are gated on HasPendingReboot because cleaning
+    // the installer cache while Windows Update is mid-staging can break
+    // the pending repair / rollback sequence (see IPendingRebootService).
+    // The banner above the buttons explains the gate; without this
+    // check the warning was purely informational and the user could
+    // proceed regardless.
     private bool CanMove() =>
         !_scan.IsScanning && !IsOperating
+        && !_scan.HasPendingReboot
         && _scan.OrphanedFileCount > 0
         && !string.IsNullOrWhiteSpace(MoveDestination);
 
     private bool CanDelete() =>
         !_scan.IsScanning && !IsOperating
+        && !_scan.HasPendingReboot
         && _scan.OrphanedFileCount > 0;
 
     [RelayCommand]
@@ -190,20 +212,39 @@ public partial class CleanupViewModel : ObservableObject
             return;
         }
 
+        // The pre-flight (CreateDirectory + write probe) used to run
+        // synchronously on the UI thread. For a UNC destination on a
+        // slow share this could freeze the main window for the SMB
+        // timeout (tens of seconds) before the user saw any feedback.
+        // Show the operating overlay first so the user has visible
+        // progress text, then run the probe on a thread-pool task; on
+        // local paths the probe finishes before the next layout pass
+        // so the overlay flicker is invisible. The overlay is cleared
+        // after the probe returns so the free-space check and the
+        // confirmation dialog run with the main UI visible again.
+        IsOperating = true;
+        OperationProgress = Strings.Status_PreparingDestination;
         try
         {
-            Directory.CreateDirectory(dest);
-            var probe = Path.Combine(dest, Path.GetRandomFileName());
-            File.WriteAllBytes(probe, Array.Empty<byte>());
-            File.Delete(probe);
+            await Task.Run(() =>
+            {
+                Directory.CreateDirectory(dest);
+                var probe = Path.Combine(dest, Path.GetRandomFileName());
+                File.WriteAllBytes(probe, Array.Empty<byte>());
+                File.Delete(probe);
+            });
         }
         catch (Exception ex)
         {
+            IsOperating = false;
+            OperationProgress = string.Empty;
             _dialogService.ShowWarning(
                 DescribeWriteFailure(dest, ex),
                 Strings.Error_InvalidDestinationTitle);
             return;
         }
+        IsOperating = false;
+        OperationProgress = string.Empty;
 
         var removableFiles = _scan.LastScanResult.RemovableFiles;
         var filePaths = removableFiles.Select(f => f.FullPath).ToList();
@@ -263,7 +304,11 @@ public partial class CleanupViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            OperationProgress = string.Format(Strings.Status_MoveFailed, ex.Message);
+            // Write the full exception to the crash log; surface only
+            // the type name in the status pill so framework messages
+            // can't leak absolute paths into the UI.
+            CrashLog.Write(ex);
+            OperationProgress = string.Format(Strings.Status_MoveFailed, ex.GetType().Name);
         }
         finally
         {
@@ -321,7 +366,10 @@ public partial class CleanupViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            OperationProgress = string.Format(Strings.Status_DeleteFailed, ex.Message);
+            // Mirror MoveAllAsync: full detail to crash log, type name
+            // only in the status pill (see CrashLog rationale there).
+            CrashLog.Write(ex);
+            OperationProgress = string.Format(Strings.Status_DeleteFailed, ex.GetType().Name);
         }
         finally
         {
