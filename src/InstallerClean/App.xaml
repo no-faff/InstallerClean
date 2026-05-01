@@ -8,8 +8,9 @@
                                    from windows or component styles.
           Themes/Tokens.xaml     - semantic roles (Surface.*, Text.*,
                                    Action.*, Type.*, Radius.*, Border.*,
-                                   Spacing.*, Gap.*) consumed by both
-                                   components and windows.
+                                   BorderThickness.*, Gap.*, GapBottom.*,
+                                   GapRight.*, GapLeft.*) consumed by
+                                   both components and windows.
           Themes/Components.xaml - control styles (PrimaryPill, Card,
                                    ProgressBar, etc) consuming tokens.
 

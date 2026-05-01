@@ -15,8 +15,8 @@
     Naming: <category>.<role>[.<state>].
         Surface.*, Text.*, Action.<intent>.<state>, Status.*,
         Decoration.*, Link.*, Selection.*, Scrollbar.*, Type.*,
-        Radius.*, Border.*, Spacing.*, Gap.*, GapBottom.*, GapRight.*,
-        GapLeft.*.
+        Radius.*, Border.*, BorderThickness.*, Gap.*, GapBottom.*,
+        GapRight.*, GapLeft.*.
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -143,11 +143,22 @@
 
     <!-- ============================================================
          BORDER THICKNESS
+         Two flavours: the Double tokens are for properties that take a
+         scalar (Path.StrokeThickness, etc); the Thickness tokens are
+         for properties that take a Thickness struct (Border.BorderThickness,
+         Control.BorderThickness). XAML resource lookups don't run the
+         ThicknessConverter, so a Double resource cannot satisfy a
+         Thickness setter; using the wrong key raises a XamlParseException
+         the first time the consuming template is realised at runtime.
          ============================================================ -->
     <sys:Double x:Key="Border.None">0</sys:Double>
     <sys:Double x:Key="Border.Hairline">1</sys:Double>
     <sys:Double x:Key="Border.Standard">2</sys:Double>
     <sys:Double x:Key="Border.Heavy">4</sys:Double>
+    <Thickness x:Key="BorderThickness.None">0</Thickness>
+    <Thickness x:Key="BorderThickness.Hairline">1</Thickness>
+    <Thickness x:Key="BorderThickness.Standard">2</Thickness>
+    <Thickness x:Key="BorderThickness.Heavy">4</Thickness>
 
     <!-- ============================================================
          SPACING

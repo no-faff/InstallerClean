@@ -1,18 +1,20 @@
 <!--
-    Primitive design atoms.
+    Primitive design atoms (colour only).
 
-    WPF resource pragma: only Color resources can be cleanly referenced
-    by name from later-bound resources (a SolidColorBrush takes a Color
-    via {StaticResource}). Numeric primitives (Double, Thickness,
-    CornerRadius) cannot — the value has to be literal at parse time.
-    So this file holds the colour ramps; the canonical numeric scales
-    live in Tokens.xaml under their semantic names, with a comment
-    pinning them to a Tailwind-style step number for context.
+    Layering rule: Tokens.xaml maps semantic roles to primitives;
+    component styles and window XAML consume the semantic roles, never
+    a Primitive.* key directly. If a non-Tokens file references
+    Primitive.*, that is a smell to fix.
 
-    Rule: never reference a Primitive.* key from a window or component
-    style. The semantic layer (Tokens.xaml) maps roles to primitives
-    and components consume those roles. If a window file references
-    a Primitive.* key, that is a smell.
+    XAML resource type-matching: a property consuming
+    {StaticResource X} requires X's runtime type to match the property's
+    declared type exactly. The XAML resource lookup does not run any
+    TypeConverter (ThicknessConverter etc), so a Double resource will
+    not satisfy a Thickness setter. Numeric tokens with multiple
+    consumer-property types therefore need parallel resources of each
+    type (see BorderThickness.* / Border.* in Tokens.xaml). Inline
+    attribute syntax does run TypeConverters, so BorderThickness="1"
+    is fine; only StaticResource lookups have the strict-typing rule.
 
     Naming: <ramp>.<step>. Steps follow Tailwind's convention so that
     swapping a primitive for a different shade reads as a numeric move

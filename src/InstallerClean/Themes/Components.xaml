@@ -79,7 +79,7 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Border CornerRadius="22"
-                            BorderThickness="{StaticResource Border.Standard}"
+                            BorderThickness="{StaticResource BorderThickness.Standard}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
                             SnapsToDevicePixels="True"/>
@@ -101,7 +101,7 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Border CornerRadius="17"
-                            BorderThickness="{StaticResource Border.Standard}"
+                            BorderThickness="{StaticResource BorderThickness.Standard}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
                             SnapsToDevicePixels="True"/>
@@ -115,7 +115,7 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Border CornerRadius="{StaticResource Radius.Card}"
-                            BorderThickness="{StaticResource Border.Standard}"
+                            BorderThickness="{StaticResource BorderThickness.Standard}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
                             SnapsToDevicePixels="True"/>
@@ -689,7 +689,7 @@
                 <ControlTemplate TargetType="ToolTip">
                     <Border Background="{StaticResource Surface.Sidebar}"
                             BorderBrush="{StaticResource Action.Primary.Background}"
-                            BorderThickness="{StaticResource Border.Hairline}"
+                            BorderThickness="{StaticResource BorderThickness.Hairline}"
                             CornerRadius="{StaticResource Radius.Chip}"
                             Padding="10,6">
                         <TextBlock Text="{TemplateBinding Content}"
@@ -801,7 +801,7 @@
     <Style TargetType="ContextMenu">
         <Setter Property="Background" Value="{StaticResource Surface.Sidebar}"/>
         <Setter Property="BorderBrush" Value="{StaticResource Action.Primary.Background}"/>
-        <Setter Property="BorderThickness" Value="{StaticResource Border.Hairline}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource BorderThickness.Hairline}"/>
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <Setter Property="Padding" Value="2"/>
         <Setter Property="HasDropShadow" Value="False"/>
