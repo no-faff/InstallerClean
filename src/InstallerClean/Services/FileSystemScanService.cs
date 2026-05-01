@@ -1,4 +1,4 @@
-using System.IO;
+using System.IO.Abstractions;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Resources;
@@ -8,21 +8,32 @@ namespace InstallerClean.Services;
 public sealed class FileSystemScanService : IFileSystemScanService
 {
     private readonly IInstallerQueryService _queryService;
+    private readonly IFileSystem _fs;
     private readonly IEnumerable<string>? _overrideFiles;
     private readonly string? _installerFolderOverride;
 
     /// <summary>Production constructor.</summary>
     public FileSystemScanService(IInstallerQueryService queryService)
-        : this(queryService, null, null) { }
+        : this(queryService, new FileSystem(), null, null) { }
 
     /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)
-        : this(queryService, overrideFiles, null) { }
+        : this(queryService, new FileSystem(), overrideFiles, null) { }
 
     /// <summary>Test constructor. Points enumeration at a real directory.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles, string? installerFolderOverride)
+        : this(queryService, new FileSystem(), overrideFiles, installerFolderOverride) { }
+
+    /// <summary>
+    /// Test constructor. Inject an <see cref="IFileSystem"/> so unit
+    /// tests can verify the scan-against-registered-set logic without
+    /// touching <c>C:\Windows\Installer</c> on the host machine.
+    /// </summary>
+    internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
+        IEnumerable<string>? overrideFiles, string? installerFolderOverride)
     {
         _queryService = queryService;
+        _fs = fileSystem;
         _overrideFiles = overrideFiles;
         _installerFolderOverride = installerFolderOverride;
     }
@@ -51,13 +62,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
             if (registeredPaths.Contains(filePath))
                 continue;
 
-            var ext = Path.GetExtension(filePath);
+            var ext = _fs.Path.GetExtension(filePath);
             if (!ext.Equals(".msi", StringComparison.OrdinalIgnoreCase)
                 && !ext.Equals(".msp", StringComparison.OrdinalIgnoreCase))
                 continue;
 
             long size = 0;
-            try { size = new FileInfo(filePath).Length; } catch (Exception) { /* skip inaccessible files */ }
+            try { size = _fs.FileInfo.New(filePath).Length; } catch (Exception) { /* skip inaccessible files */ }
 
             removable.Add(new OrphanedFile(
                 FullPath: filePath,
@@ -78,10 +89,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
             bool exists = false;
             try
             {
-                if (File.Exists(pkg.LocalPackagePath))
+                if (_fs.File.Exists(pkg.LocalPackagePath))
                 {
                     exists = true;
-                    size = new FileInfo(pkg.LocalPackagePath).Length;
+                    size = _fs.FileInfo.New(pkg.LocalPackagePath).Length;
                 }
             }
             catch (Exception) { }
@@ -92,7 +103,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
             if (pkg.IsRemovable)
             {
-                var ext = Path.GetExtension(pkg.LocalPackagePath);
+                var ext = _fs.Path.GetExtension(pkg.LocalPackagePath);
                 removable.Add(new OrphanedFile(
                     FullPath: pkg.LocalPackagePath,
                     SizeBytes: size,
@@ -111,9 +122,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingFromDisk);
     }
 
-    private static IEnumerable<string> GetInstallerFiles(string folder)
+    private IEnumerable<string> GetInstallerFiles(string folder)
     {
-        if (!Directory.Exists(folder))
+        if (!_fs.Directory.Exists(folder))
             return Enumerable.Empty<string>();
 
         // Reparse points are skipped so a junction planted inside the
@@ -127,7 +138,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             IgnoreInaccessible = true,
         };
 
-        return Directory.EnumerateFiles(folder, "*.msi", options)
-            .Concat(Directory.EnumerateFiles(folder, "*.msp", options));
+        return _fs.Directory.EnumerateFiles(folder, "*.msi", options)
+            .Concat(_fs.Directory.EnumerateFiles(folder, "*.msp", options));
     }
 }

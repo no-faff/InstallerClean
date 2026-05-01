@@ -344,12 +344,9 @@
                         <TextBlock DockPanel.Dock="Right" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}">
                             <Run Text="{Binding Cleanup.OperationProgressPercent, Mode=OneWay, StringFormat='{}{0:F0}%'}"/>
                         </TextBlock>
-                        <TextBlock Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}">
-                            <Run Text="{Binding Cleanup.OperationCurrentFile, Mode=OneWay}"/>
-                            <Run Text=" of "/>
-                            <Run Text="{Binding Cleanup.OperationTotalFiles, Mode=OneWay}"/>
-                            <Run Text=" files"/>
-                        </TextBlock>
+                        <TextBlock Text="{Binding Cleanup.OperationProgressDetail}"
+                                   Foreground="{StaticResource Text.Dim}"
+                                   FontSize="{StaticResource Type.Caption}"/>
                     </DockPanel>
                     <TextBlock Text="{Binding Cleanup.OperationCurrentFileName}"
                                Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"

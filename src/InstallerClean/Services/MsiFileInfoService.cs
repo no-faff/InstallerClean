@@ -73,8 +73,12 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
             out dataType, out _, IntPtr.Zero,
             buffer, ref bufferLen);
 
+        // Defensive clamp: a successful MsiSummaryInfoGetProperty
+        // returns bufferLen as the count excluding the terminator and
+        // never larger than the input. Math.Min bounds an unbounded
+        // read even if the API ever violates that contract.
         return error == MsiError.Success
-            ? new string(buffer, 0, (int)bufferLen)
+            ? new string(buffer, 0, (int)Math.Min(bufferLen, (uint)buffer.Length))
             : string.Empty;
     }
 

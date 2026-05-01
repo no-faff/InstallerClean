@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using InstallerClean.Interop;
 using InstallerClean.Models;
 
@@ -5,6 +6,24 @@ namespace InstallerClean.Services;
 
 public sealed class DeleteFilesService : IDeleteFilesService
 {
+    private readonly IFileSystem _fs;
+
+    /// <summary>Production constructor: real on-disk filesystem.</summary>
+    public DeleteFilesService() : this(new FileSystem()) { }
+
+    /// <summary>
+    /// Test constructor: inject a <see cref="MockFileSystem"/> (or any
+    /// other <see cref="IFileSystem"/>) so unit tests can verify the
+    /// File.Exists pre-check and per-file error categorisation
+    /// without touching <c>%TEMP%</c>. Note that the actual recycle-
+    /// bin send still goes through SHFileOperationW; that call cannot
+    /// be virtualised and is exercised only in the integration tests.
+    /// </summary>
+    internal DeleteFilesService(IFileSystem fileSystem)
+    {
+        _fs = fileSystem;
+    }
+
     public Task<DeleteResult> DeleteFilesAsync(
         IEnumerable<string> filePaths,
         IProgress<OperationProgress>? progress = null,
@@ -24,12 +43,12 @@ public sealed class DeleteFilesService : IDeleteFilesService
 
                 try
                 {
-                    if (!File.Exists(filePath))
+                    if (!_fs.File.Exists(filePath))
                     {
                         errors.Add(new MissingSourceFile(filePath));
                         continue;
                     }
-                    var fileName = Path.GetFileName(filePath);
+                    var fileName = _fs.Path.GetFileName(filePath);
                     progress?.Report(new OperationProgress(i + 1, total, fileName));
 
                     // Native SHFileOperationW avoids VB's FileSystem.DeleteFile

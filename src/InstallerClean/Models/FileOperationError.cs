@@ -32,13 +32,17 @@ public sealed record MissingSourceFile(string FilePath)
 
 /// <summary>
 /// Windows refused the operation due to permission, sharing or path
-/// constraints. <see cref="Detail"/> carries the underlying
-/// exception message for diagnosis.
+/// constraints. <see cref="Detail"/> carries the underlying exception
+/// message for diagnosis but is NEVER returned to the UI: with the
+/// app running elevated, framework-provided messages can include
+/// paths from other users' profiles. The displayed message is
+/// category-only via the resx; the Detail is captured for crash log
+/// / telemetry consumers.
 /// </summary>
 public sealed record AccessDenied(string FilePath, string Detail)
     : FileOperationError(FilePath)
 {
-    public override string LocalisedMessage => Detail;
+    public override string LocalisedMessage => Strings.Error_AccessDenied;
 }
 
 /// <summary>
@@ -64,21 +68,28 @@ public sealed record ShellRefused(string FilePath, int ShellResult)
         string.Format(Strings.Error_ShellRecycleFailed, ShellResult);
 }
 
-/// <summary>Generic IO failure (disk full, sharing violation, etc).</summary>
+/// <summary>
+/// Generic IO failure (disk full, sharing violation, etc).
+/// <see cref="Detail"/> stays for crash-log / telemetry; the UI sees
+/// only a category-only sentence so framework-provided paths stay
+/// out of the displayed error list (see <see cref="AccessDenied"/>).
+/// </summary>
 public sealed record IOFailure(string FilePath, string Detail)
     : FileOperationError(FilePath)
 {
-    public override string LocalisedMessage => Detail;
+    public override string LocalisedMessage => Strings.Error_IOFailure;
 }
 
 /// <summary>
 /// Catch-all for exception types not covered by the specific
 /// categories. <see cref="ExceptionTypeName"/> is the runtime type
 /// name, useful for telemetry; <see cref="Detail"/> is the exception
-/// message.
+/// message. Both stay out of the UI; <see cref="LocalisedMessage"/>
+/// returns a category-only sentence (see <see cref="AccessDenied"/>
+/// for the path-leak rationale).
 /// </summary>
 public sealed record UnknownError(string FilePath, string ExceptionTypeName, string Detail)
     : FileOperationError(FilePath)
 {
-    public override string LocalisedMessage => Detail;
+    public override string LocalisedMessage => Strings.Error_UnknownError;
 }

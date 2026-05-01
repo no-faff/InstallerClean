@@ -15,7 +15,7 @@ using System.Resources;
 /// <summary>
 /// Strongly-typed accessor over Strings.resx. C# code paths use these
 /// properties for compile-time safety; XAML uses {loc:Translate Key}
-/// (LocExtension) which resolves the same keys at runtime.
+/// (see TranslateExtension) which resolves the same keys at runtime.
 /// </summary>
 [global::System.CodeDom.Compiler.GeneratedCodeAttribute("InstallerClean.ResxGen", "1.0.0.0")]
 public static class Strings
@@ -37,6 +37,7 @@ public static class Strings
     public static string Action_Cancel => Get("Action.Cancel");
     public static string Action_CheckForUpdates => Get("Action.CheckForUpdates");
     public static string Action_Close => Get("Action.Close");
+    public static string Action_Copy => Get("Action.Copy");
     public static string Action_Delete => Get("Action.Delete");
     public static string Action_Details => Get("Action.Details");
     public static string Action_Donate => Get("Action.Donate");
@@ -116,6 +117,7 @@ public static class Strings
     public static string Confirm_DeleteToRecycleBin => Get("Confirm.DeleteToRecycleBin");
     public static string Confirm_MoveDestination => Get("Confirm.MoveDestination");
     public static string Confirm_MoveTitle => Get("Confirm.MoveTitle");
+    public static string Error_AccessDenied => Get("Error.AccessDenied");
     public static string Error_AccessDeniedDestination => Get("Error.AccessDeniedDestination");
     public static string Error_AdminRequiredBody => Get("Error.AdminRequiredBody");
     public static string Error_AdminRequiredTitle => Get("Error.AdminRequiredTitle");
@@ -125,6 +127,7 @@ public static class Strings
     public static string Error_InstallerDbEmpty => Get("Error.InstallerDbEmpty");
     public static string Error_InstallerDbUnavailableTitle => Get("Error.InstallerDbUnavailableTitle");
     public static string Error_InvalidDestinationTitle => Get("Error.InvalidDestinationTitle");
+    public static string Error_IOFailure => Get("Error.IOFailure");
     public static string Error_IOWriteDestination => Get("Error.IOWriteDestination");
     public static string Error_MissingSourceFile => Get("Error.MissingSourceFile");
     public static string Error_MoveIntoInstaller => Get("Error.MoveIntoInstaller");
@@ -135,6 +138,7 @@ public static class Strings
     public static string Error_NoUniqueFilename => Get("Error.NoUniqueFilename");
     public static string Error_PathTooLong => Get("Error.PathTooLong");
     public static string Error_ShellRecycleFailed => Get("Error.ShellRecycleFailed");
+    public static string Error_UnknownError => Get("Error.UnknownError");
     public static string Error_WriteDestination => Get("Error.WriteDestination");
     public static string Field_Application => Get("Field.Application");
     public static string Field_Author => Get("Field.Author");

@@ -9,7 +9,8 @@
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    xmlns:loc="clr-namespace:InstallerClean.Resources">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Tokens.xaml"/>
@@ -43,7 +44,7 @@
         <Setter Property="ContextMenu">
             <Setter.Value>
                 <ContextMenu>
-                    <MenuItem Header="Copy" Command="ApplicationCommands.Copy"/>
+                    <MenuItem Header="{loc:Translate Action.Copy}" Command="ApplicationCommands.Copy"/>
                 </ContextMenu>
             </Setter.Value>
         </Setter>
@@ -87,6 +88,14 @@
         </Setter>
     </Style>
 
+    <!-- CompactPillFocusVisual radius is derived geometry, not a token:
+         a 30px-tall pill has a 15px inner radius, and the focus ring
+         sits 2px outside (Margin="-2"), so the matching outer radius is
+         15 + 2 = 17. The Tight/Chip/CardSm/Card/Pill ramp doesn't apply
+         to off-by-Margin focus geometry. Same calc for SmallPillFocusVisual
+         below at 16 (a 28px pill -> 14 inner -> 14 + 2 outer ... but
+         WPF auto-clamps a smaller radius to the bounding rect so we use
+         16 from the Radius scale to keep the ring visibly rounded). -->
     <Style x:Key="CompactPillFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
@@ -572,6 +581,12 @@
 
     <Style x:Key="CaptionButton" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
+        <!-- 13 is a deliberate off-scale glyph size: the title-bar
+             characters (- HORIZONTAL BAR / WHITE SQUARE / MULTIPLICATION
+             SIGN) read crowded at 14 (Type.Heading.Sm) and pinched at
+             12 (Type.Body). Used only by the two caption styles below;
+             not promoted to a Type.* token because no other control
+             needs this size. -->
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Width" Value="46"/>
         <Setter Property="Height" Value="32"/>

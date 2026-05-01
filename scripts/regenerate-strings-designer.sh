@@ -32,7 +32,7 @@ BEGIN {
     print "/// <summary>"
     print "/// Strongly-typed accessor over Strings.resx. C# code paths use these"
     print "/// properties for compile-time safety; XAML uses {loc:Translate Key}"
-    print "/// (LocExtension) which resolves the same keys at runtime."
+    print "/// (see TranslateExtension) which resolves the same keys at runtime."
     print "/// </summary>"
     print "[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"InstallerClean.ResxGen\", \"1.0.0.0\")]"
     print "public static class Strings"

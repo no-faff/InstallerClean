@@ -20,16 +20,18 @@
 
     <Grid Margin="{StaticResource DetailWindowMargin}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="44"/>
+            <RowDefinition Height="32"/>
             <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
             <RowDefinition Height="2*"/><RowDefinition Height="20"/>
             <RowDefinition Height="3*"/><RowDefinition Height="12"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Title bar -->
+        <!-- Title bar. Row 0 height matches WindowChrome.CaptionHeight
+             (32) so the icon and 32px close button share a centerline,
+             matching About / Orphaned. -->
         <StackPanel Grid.Row="0" Orientation="Horizontal"
-                    VerticalAlignment="Top" Margin="-8,4,0,0">
+                    VerticalAlignment="Center" Margin="-8,-4,0,0">
             <Image Source="Assets/splash-icon.png" Width="16" Height="16"
                    RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"/>
             <TextBlock Text="{loc:Translate Window.Registered.Title}" Foreground="{StaticResource Text.Body}"

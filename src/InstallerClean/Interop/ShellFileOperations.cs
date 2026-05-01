@@ -22,11 +22,20 @@ internal static class ShellFileOperations
         if (string.IsNullOrEmpty(path))
             throw new ArgumentException(Strings.Error_MissingSourceFile, nameof(path));
 
-        // SHFILEOPSTRUCT.pFrom requires a double-null-terminated UTF-16
-        // string. We allocate the buffer ourselves under
-        // DisableRuntimeMarshalling: the trailing '\0' here gives one
-        // null, StringToCoTaskMemUni adds a second, satisfying the
-        // double-null contract.
+        // SHFILEOPSTRUCT.pFrom requires a DOUBLE-null-terminated UTF-16
+        // string (Windows file-list-string convention). We construct
+        // it explicitly:
+        //   - `path + "\0"` adds the inner null between the file path
+        //     and the (zero-element) next entry.
+        //   - Marshal.StringToCoTaskMemUni's documented behaviour is to
+        //     append a trailing null to whatever string it receives,
+        //     producing the second null on the unmanaged side.
+        // This depends on StringToCoTaskMemUni's implicit termination.
+        // Do NOT swap to an allocator that returns the raw UTF-16 bytes
+        // of the input string (e.g. a hypothetical Marshal.StringToHGlobalUni
+        // variant that doesn't terminate) without explicitly writing
+        // the second null yourself, or SHFileOperationW will read past
+        // the end of the buffer.
         var pFrom = Marshal.StringToCoTaskMemUni(path + "\0");
         try
         {

@@ -96,18 +96,26 @@ public partial class ScanViewModel : ObservableObject
     /// </summary>
     private async Task RunScanCoreAsync(IProgress<string>? progress, CancellationToken cancellationToken = default)
     {
-        HasPendingReboot = _rebootService.HasPendingReboot();
+        // Compute everything off the call results before touching any
+        // observable property. If the scan throws (or cancellation
+        // fires) the VM stays at its prior consistent state rather
+        // than a half-updated mix of counts and stale LastScanResult.
+        var pendingReboot = _rebootService.HasPendingReboot();
+        var result = await _scanService.ScanAsync(progress, cancellationToken);
 
-        LastScanResult = await _scanService.ScanAsync(progress, cancellationToken);
+        var registeredCount = result.RegisteredPackages.Count;
+        var registeredSize = DisplayHelpers.FormatSize(result.RegisteredTotalBytes);
+        var orphanedCount = result.RemovableFiles.Count;
+        var orphanedSize = DisplayHelpers.FormatSize(result.RemovableFiles.Sum(f => f.SizeBytes));
+        var missingCount = result.MissingFromDiskCount;
 
-        RegisteredFileCount = LastScanResult.RegisteredPackages.Count;
-        RegisteredSizeDisplay = DisplayHelpers.FormatSize(LastScanResult.RegisteredTotalBytes);
-
-        OrphanedFileCount = LastScanResult.RemovableFiles.Count;
-        OrphanedSizeDisplay = DisplayHelpers.FormatSize(LastScanResult.RemovableFiles.Sum(f => f.SizeBytes));
-
-        MissingFromDiskCount = LastScanResult.MissingFromDiskCount;
-
+        HasPendingReboot = pendingReboot;
+        LastScanResult = result;
+        RegisteredFileCount = registeredCount;
+        RegisteredSizeDisplay = registeredSize;
+        OrphanedFileCount = orphanedCount;
+        OrphanedSizeDisplay = orphanedSize;
+        MissingFromDiskCount = missingCount;
         HasScanned = true;
     }
 

@@ -155,13 +155,13 @@
          for Margin/Padding. Directional thicknesses (GapBottom,
          GapRight, GapLeft) for the common one-sided spacing patterns;
          reserve multi-sided literal Margins for genuine one-offs.
+
+         The Gap.* / GapBottom.* / GapRight.* / GapLeft.* thicknesses
+         cover every spacing site in the codebase. A Spacing.Xs..Xxl
+         scalar ramp existed earlier but had zero consumers; it was
+         removed rather than left dangling. Add a scalar token only if
+         a real Width / Height / scalar Padding consumer surfaces.
          ============================================================ -->
-    <sys:Double x:Key="Spacing.Xs">4</sys:Double>
-    <sys:Double x:Key="Spacing.Sm">8</sys:Double>
-    <sys:Double x:Key="Spacing.Md">12</sys:Double>
-    <sys:Double x:Key="Spacing.Lg">16</sys:Double>
-    <sys:Double x:Key="Spacing.Xl">24</sys:Double>
-    <sys:Double x:Key="Spacing.Xxl">32</sys:Double>
 
     <Thickness x:Key="Gap.Sm">8</Thickness>
     <Thickness x:Key="Gap.Md">12</Thickness>

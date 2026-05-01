@@ -1,6 +1,6 @@
 using InstallerClean.Helpers;
 
-namespace InstallerClean.Tests.Helpers;
+namespace InstallerClean.Tests.Helpers.Integration;
 
 public class CrashLogTests
 {

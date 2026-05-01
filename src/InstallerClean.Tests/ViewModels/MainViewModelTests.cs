@@ -47,7 +47,7 @@ public class MainViewModelTests
             .Returns(EmptyScanResult());
 
         Assert.False(vm.Scan.HasScanned);
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
         Assert.True(vm.Scan.HasScanned);
     }
 
@@ -67,7 +67,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, registered, 5_000_000));
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.Equal(2, vm.Scan.OrphanedFileCount);
         Assert.Equal(1, vm.Scan.RegisteredFileCount);
@@ -82,7 +82,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(EmptyScanResult());
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.True(vm.Completion.IsComplete);
         Assert.Equal("All clear", vm.Completion.Heading);
@@ -95,7 +95,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(3));
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.False(vm.Completion.IsComplete);
     }
@@ -130,7 +130,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(1));
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.Equal("1 file to clean up", vm.Scan.OrphanedSummaryText);
     }
@@ -142,7 +142,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(10_000));
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.Equal(10_000, vm.Scan.OrphanedFileCount);
         Assert.Equal("10000 files to clean up", vm.Scan.OrphanedSummaryText);
@@ -160,7 +160,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.Equal("100.00 GB", vm.Scan.OrphanedSizeDisplay);
     }
@@ -173,7 +173,7 @@ public class MainViewModelTests
             .ThrowsAsync(new UnauthorizedAccessException("denied"));
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(
-            () => vm.ScanWithProgressAsync(null));
+            () => vm.Scan.ScanWithProgressAsync(null));
     }
 
     [Fact]
@@ -187,7 +187,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.Equal(1, vm.Scan.OrphanedFileCount);
         Assert.Equal("0 B", vm.Scan.OrphanedSizeDisplay);
@@ -294,7 +294,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(EmptyScanResult());
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
         Assert.True(vm.Completion.IsComplete);
 
         await vm.Completion.RescanAfterCompletionCommand.ExecuteAsync(null);
@@ -321,7 +321,7 @@ public class MainViewModelTests
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move");
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
@@ -343,7 +343,7 @@ public class MainViewModelTests
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move");
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
@@ -370,7 +370,7 @@ public class MainViewModelTests
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
@@ -391,7 +391,7 @@ public class MainViewModelTests
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(false);
 
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
@@ -406,7 +406,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         vm.Chrome.OpenOrphanedDetailsCommand.Execute(null);
 
@@ -435,7 +435,7 @@ public class MainViewModelTests
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(Array.Empty<OrphanedFile>(), packages, 3072));
-        await vm.ScanWithProgressAsync(null);
+        await vm.Scan.ScanWithProgressAsync(null);
 
         vm.Chrome.OpenRegisteredDetailsCommand.Execute(null);
 

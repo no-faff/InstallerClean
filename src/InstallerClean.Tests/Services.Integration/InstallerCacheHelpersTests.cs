@@ -1,6 +1,6 @@
 using InstallerClean.Services;
 
-namespace InstallerClean.Tests.Services;
+namespace InstallerClean.Tests.Services.Integration;
 
 public class InstallerCacheHelpersTests
 {

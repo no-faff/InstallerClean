@@ -2,7 +2,7 @@ using InstallerClean.Models;
 using InstallerClean.Services;
 using InstallerClean.Tests.Helpers;
 
-namespace InstallerClean.Tests.Services;
+namespace InstallerClean.Tests.Services.Integration;
 
 public class MoveFilesServiceTests : IDisposable
 {
