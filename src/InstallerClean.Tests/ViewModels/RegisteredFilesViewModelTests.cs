@@ -73,7 +73,7 @@ public class RegisteredFilesViewModelTests
 
         var vm = new RegisteredFilesViewModel(packages, 0, NullInfoService());
 
-        Assert.Equal("(unknown)", vm.Products[0].ProductName);
+        Assert.Equal(InstallerClean.Resources.Strings.Field_UnknownProductName, vm.Products[0].ProductName);
     }
 
     [Fact]

@@ -8,10 +8,9 @@ namespace InstallerClean.Cli;
 /// <summary>
 /// Console entry point. A real .NET console exe (subsystem CONSOLE)
 /// so PowerShell, cmd and scheduled tasks block on the process
-/// naturally. Logic mirrors the previous <c>App.xaml.cs.RunCliAsync</c>
-/// path one-for-one but resolves services from a CLI-only DI
-/// container that knows nothing about MessageBox, Window or
-/// MainViewModel.
+/// naturally. Resolves services from a CLI-only DI container that
+/// knows nothing about MessageBox, Window or MainViewModel: the only
+/// shared surface with the GUI is <see cref="Services.CoreComposition.AddInstallerCleanCore"/>.
 /// </summary>
 internal static class Program
 {

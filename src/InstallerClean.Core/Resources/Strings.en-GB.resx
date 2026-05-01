@@ -233,6 +233,9 @@
   <data name="Summary.OrphanedToCleanUp" xml:space="preserve"><value>{0} {1} to clean up</value></data>
   <data name="Summary.MissingFromDisk" xml:space="preserve"><value>{0} registered {1} missing from disk. Your Windows Installer database references installers that no longer exist.</value></data>
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} files</value></data>
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} {1} ({2})</value></data>
+  <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} registered {1} ({2})</value></data>
+  <data name="Field.UnknownProductName" xml:space="preserve"><value>(unknown)</value></data>
 
   <!-- ============================================================
        CONFIRMATION DIALOGS

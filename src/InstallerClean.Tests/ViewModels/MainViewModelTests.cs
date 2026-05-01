@@ -264,24 +264,31 @@ public class MainViewModelTests
         Assert.Null(ex);
     }
 
+    // The MoveDestination write-back is debounced (CleanupViewModel.MoveDestinationSaveDelay,
+    // currently 400 ms). Both tests wait one debounce window plus a small margin
+    // before asserting on the mock, so a fast machine doesn't race the timer.
+    private static readonly TimeSpan DebounceWait = TimeSpan.FromMilliseconds(700);
+
     [Fact]
-    public void MoveDestination_change_is_persisted_through_settings_service()
+    public async Task MoveDestination_change_is_persisted_through_settings_service()
     {
         var vm = CreateViewModel();
 
         vm.Cleanup.MoveDestination = @"D:\Backup\Installer-cache";
+        await Task.Delay(DebounceWait);
 
         _settingsService.Received().TrySave(Arg.Is<AppSettings>(
             s => s.MoveDestination == @"D:\Backup\Installer-cache"));
     }
 
     [Fact]
-    public void MoveDestination_setting_same_value_does_not_resave()
+    public async Task MoveDestination_setting_same_value_does_not_resave()
     {
         var vm = CreateViewModel(new AppSettings { MoveDestination = @"D:\Backup" });
         _settingsService.ClearReceivedCalls();
 
         vm.Cleanup.MoveDestination = @"D:\Backup";
+        await Task.Delay(DebounceWait);
 
         _settingsService.DidNotReceive().TrySave(Arg.Any<AppSettings>());
     }
