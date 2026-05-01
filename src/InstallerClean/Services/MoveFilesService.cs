@@ -8,15 +8,13 @@ public sealed class MoveFilesService : IMoveFilesService
 {
     private readonly IFileSystem _fs;
 
-    /// <summary>Production constructor: real on-disk filesystem.</summary>
-    public MoveFilesService() : this(new FileSystem()) { }
-
     /// <summary>
-    /// Test constructor: inject a <see cref="MockFileSystem"/> (or any
-    /// other <see cref="IFileSystem"/>) so unit tests can verify the
-    /// move pipeline without touching <c>%TEMP%</c>.
+    /// Constructor. The DI container injects the registered
+    /// <see cref="IFileSystem"/> singleton in production; tests pass
+    /// a <see cref="MockFileSystem"/> so the move pipeline can be
+    /// verified without touching <c>%TEMP%</c>.
     /// </summary>
-    internal MoveFilesService(IFileSystem fileSystem)
+    public MoveFilesService(IFileSystem fileSystem)
     {
         _fs = fileSystem;
     }

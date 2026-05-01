@@ -12,9 +12,21 @@ public sealed class FileSystemScanService : IFileSystemScanService
     private readonly IEnumerable<string>? _overrideFiles;
     private readonly string? _installerFolderOverride;
 
-    /// <summary>Production constructor.</summary>
-    public FileSystemScanService(IInstallerQueryService queryService)
-        : this(queryService, new FileSystem(), null, null) { }
+    /// <summary>
+    /// Production constructor. The DI container injects both
+    /// dependencies; the override fields stay null so production
+    /// enumeration walks the real Installer folder via the injected
+    /// <see cref="IFileSystem"/>.
+    /// </summary>
+    /// <remarks>
+    /// DI uses this constructor: it is the only public ctor on the
+    /// class and Microsoft.Extensions.DependencyInjection picks the
+    /// public ctor with the most resolvable parameters. Keep the
+    /// test ctors below <c>internal</c> so they cannot be picked up
+    /// accidentally if a future change widens DI's resolver.
+    /// </remarks>
+    public FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem)
+        : this(queryService, fileSystem, null, null) { }
 
     /// <summary>Test constructor. Injects a fake file list.</summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IEnumerable<string>? overrideFiles)

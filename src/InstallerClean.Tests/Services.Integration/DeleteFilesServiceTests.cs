@@ -13,13 +13,23 @@ public class DeleteFilesServiceTests : IDisposable
         Directory.CreateDirectory(_tempDir);
     }
 
+    /// <summary>
+    /// Constructs a DeleteFilesService against the real filesystem.
+    /// Integration tests need real %TEMP% so the recycle-bin send
+    /// against SHFileOperationW exercises the full pipeline; the
+    /// unit-suite under InstallerClean.Tests.Services uses MockFileSystem
+    /// for the File.Exists pre-check coverage instead.
+    /// </summary>
+    private static DeleteFilesService NewService() =>
+        new(new System.IO.Abstractions.FileSystem());
+
     [Fact]
     public async Task DeleteFilesAsync_deletes_file()
     {
         var file = Path.Combine(_tempDir, "test.msi");
         await File.WriteAllTextAsync(file, "content");
 
-        var svc = new DeleteFilesService();
+        var svc = NewService();
         var result = await svc.DeleteFilesAsync(new[] { file });
 
         Assert.Equal(1, result.DeletedCount);
@@ -32,7 +42,7 @@ public class DeleteFilesServiceTests : IDisposable
     {
         var file = Path.Combine(_tempDir, "nonexistent.msi");
 
-        var svc = new DeleteFilesService();
+        var svc = NewService();
         var result = await svc.DeleteFilesAsync(new[] { file });
 
         Assert.Equal(0, result.DeletedCount);
@@ -53,7 +63,7 @@ public class DeleteFilesServiceTests : IDisposable
         await File.WriteAllTextAsync(ok1, "content");
         await File.WriteAllTextAsync(ok2, "content");
 
-        var svc = new DeleteFilesService();
+        var svc = NewService();
         var result = await svc.DeleteFilesAsync(new[] { ok1, missing, ok2 });
 
         Assert.Equal(2, result.DeletedCount);
@@ -77,7 +87,7 @@ public class DeleteFilesServiceTests : IDisposable
         var cts = new CancellationTokenSource();
         var progress = new SyncProgress<OperationProgress>(p => { if (p.CurrentFile == 1) cts.Cancel(); });
 
-        var svc = new DeleteFilesService();
+        var svc = NewService();
         await Assert.ThrowsAnyAsync<OperationCanceledException>(
             () => svc.DeleteFilesAsync(files, progress, cts.Token));
 
