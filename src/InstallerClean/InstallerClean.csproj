@@ -17,6 +17,14 @@
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <!-- en-GB is the source-of-truth language. The neutral Strings.resx
+         holds en-GB content so an end user with no matching satellite
+         assembly still sees correct English. -->
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <!-- AllowUnsafeBlocks lets the LibraryImport source generator emit
+         the pointer-handling stubs it needs. The unsafe code only ever
+         lives in the generated marshallers, never in our own code. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,5 +38,34 @@
     <Resource Include="Fonts\Poppins-Bold.ttf" />
     <Resource Include="Assets\splash-icon.png" />
   </ItemGroup>
+
+  <!-- Localisation resources. The neutral Strings.resx is en-GB; satellite
+       Strings.<culture>.resx files build into satellite assemblies that
+       .NET selects automatically based on CurrentUICulture.
+
+       The strongly-typed accessor class (InstallerClean.Resources.Strings)
+       is generated into the obj/ tree on every build by the MSBuild
+       CreateCSharpManifestResourceName + StronglyTypedClassName tasks,
+       so the typed surface never drifts from the .resx contents. -->
+  <ItemGroup>
+    <!-- The .resx files compile into both the main assembly's default
+         resources stream and per-culture satellite assemblies that .NET
+         selects automatically based on CurrentUICulture.
+
+         Strings.Designer.cs is hand-managed (committed to source control)
+         rather than auto-generated, because WPF's MarkupCompilePass1
+         runs in a temporary shadow project where MSBuild metadata-driven
+         StronglyTypedFileName generation does not propagate. Pre-existing
+         a Designer file gives every build path (main, wpftmp, IDE design
+         time) a stable typed surface to compile against. To regenerate
+         after editing the .resx, run scripts/regenerate-strings-designer.sh. -->
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <ManifestResourceName>InstallerClean.Resources.Strings</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Strings.en-GB.resx">
+      <ManifestResourceName>InstallerClean.Resources.Strings.en-GB</ManifestResourceName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 
 </Project>

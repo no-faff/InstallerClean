@@ -1,6 +1,6 @@
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using InstallerClean.Interop;
+using InstallerClean.Interop.Native;
 using InstallerClean.Models;
 
 namespace InstallerClean.Services;
@@ -19,7 +19,7 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
         IntPtr hSummary = IntPtr.Zero;
         try
         {
-            var error = MsiNativeMethods.MsiGetSummaryInformation(
+            var error = Msi.MsiGetSummaryInformation(
                 IntPtr.Zero, filePath, 0, out hSummary);
 
             if (error != MsiError.Success)
@@ -45,19 +45,17 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
         finally
         {
             if (hSummary != IntPtr.Zero)
-                MsiNativeMethods.MsiCloseHandle(hSummary);
+                Msi.MsiCloseHandle(hSummary);
         }
     }
 
     private static string GetStringProperty(IntPtr hSummary, uint propertyId)
     {
-        uint dataType;
-        int intValue;
         uint bufferLen = 0;
 
-        var error = MsiNativeMethods.MsiSummaryInfoGetProperty(
+        var error = Msi.MsiSummaryInfoGetProperty(
             hSummary, propertyId,
-            out dataType, out intValue, IntPtr.Zero,
+            out var dataType, out _, IntPtr.Zero,
             null, ref bufferLen);
 
         // MoreData is the first-call "tell me the buffer size" code.
@@ -68,16 +66,22 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
             return string.Empty;
 
         bufferLen++; // null terminator
-        var buffer = new StringBuilder((int)bufferLen);
+        var buffer = new char[bufferLen];
 
-        error = MsiNativeMethods.MsiSummaryInfoGetProperty(
+        error = Msi.MsiSummaryInfoGetProperty(
             hSummary, propertyId,
-            out dataType, out intValue, IntPtr.Zero,
+            out dataType, out _, IntPtr.Zero,
             buffer, ref bufferLen);
 
-        return error == MsiError.Success ? buffer.ToString() : string.Empty;
+        return error == MsiError.Success
+            ? new string(buffer, 0, (int)bufferLen)
+            : string.Empty;
     }
 
+    // Returns the certificate Subject string only. The signature chain is
+    // NOT validated and the file's hash is NOT verified against the cert.
+    // Treat this purely as descriptive metadata, not a trust indicator;
+    // the matching UI label is "Signing certificate", not "Verified by".
     private static string GetDigitalSignature(string filePath)
     {
         try

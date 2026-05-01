@@ -1,11 +1,12 @@
 <Window x:Class="InstallerClean.RegisteredFilesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Registered files"
+        xmlns:loc="clr-namespace:InstallerClean.Resources"
+        Title="{loc:Translate Window.Registered.Title}"
         Width="950" Height="680"
         MinWidth="700" MinHeight="500"
         WindowStartupLocation="CenterOwner"
-        Background="{StaticResource Base100}"
+        Background="{StaticResource Surface.Sidebar}"
         Loaded="Window_Loaded">
 
     <WindowChrome.WindowChrome>
@@ -28,18 +29,18 @@
 
         <!-- Title bar -->
         <StackPanel Grid.Row="0" Orientation="Horizontal"
-                    VerticalAlignment="Top" Margin="-8,8,0,0">
+                    VerticalAlignment="Top" Margin="-8,4,0,0">
             <Image Source="Assets/splash-icon.png" Width="16" Height="16"
                    RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"/>
-            <TextBlock Text="Registered files" Foreground="{StaticResource Body}"
-                       FontSize="14" FontWeight="Medium"/>
+            <TextBlock Text="{loc:Translate Window.Registered.Title}" Foreground="{StaticResource Text.Body}"
+                       FontSize="{StaticResource Type.Heading.Sm}" FontWeight="Medium"/>
         </StackPanel>
         <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#x2715;"
                 Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
-                Margin="0,-4,-24,0" AutomationProperties.Name="Close"/>
+                Margin="0,-4,-24,0" AutomationProperties.Name="{loc:Translate Automation.Close}" ToolTip="{loc:Translate Tooltip.Close}"/>
 
-        <TextBlock Grid.Row="1" Text="PRODUCTS" Foreground="{StaticResource Body}"
-                   FontSize="14"/>
+        <TextBlock Grid.Row="1" Text="{loc:Translate Section.Registered.Products}" Foreground="{StaticResource Text.Body}"
+                   FontSize="{StaticResource Type.Heading.Sm}"/>
 
         <Border Grid.Row="3" Style="{StaticResource CardNoPad}" ClipToBounds="True">
             <ListView x:Name="ProductsList" ItemsSource="{Binding Products}"
@@ -52,41 +53,41 @@
                       VirtualizingStackPanel.VirtualizationMode="Recycling">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Product name" Width="520"
+                        <GridViewColumn Header="{loc:Translate Field.ProductName}" Width="520"
                                         x:Name="ColProductName">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding ProductName}" Foreground="{StaticResource Fg}"
-                                               FontSize="14" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{Binding ProductName}" Foreground="{StaticResource Text.Heading}"
+                                               FontSize="{StaticResource Type.Heading.Sm}" TextTrimming="CharacterEllipsis"
                                                ToolTip="{Binding ProductName}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="File" Width="170"
+                        <GridViewColumn Header="{loc:Translate Field.File}" Width="170"
                                         x:Name="ColFileName">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding FileName}" Foreground="{StaticResource Body}"
-                                               FontSize="12" TextTrimming="CharacterEllipsis"
+                                    <TextBlock Text="{Binding FileName}" Foreground="{StaticResource Text.Body}"
+                                               FontSize="{StaticResource Type.Body}" TextTrimming="CharacterEllipsis"
                                                ToolTip="{Binding FullPath}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Size" Width="90"
+                        <GridViewColumn Header="{loc:Translate Field.Size}" Width="90"
                                         x:Name="ColSizeBytes">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Body}"
-                                               FontSize="12" TextAlignment="Right"/>
+                                    <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Text.Body}"
+                                               FontSize="{StaticResource Type.Body}" TextAlignment="Right"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Patches" Width="80"
+                        <GridViewColumn Header="{loc:Translate Field.Patches}" Width="80"
                                         x:Name="ColPatchCount">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding PatchCount}" Foreground="{StaticResource Body}"
-                                               FontSize="12" TextAlignment="Right"/>
+                                    <TextBlock Text="{Binding PatchCount}" Foreground="{StaticResource Text.Body}"
+                                               FontSize="{StaticResource Type.Body}" TextAlignment="Right"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -106,11 +107,11 @@
                     <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="PATCHES" Foreground="{StaticResource Body}"
-                           FontSize="14"/>
+                <TextBlock Grid.Row="0" Text="{loc:Translate Section.Registered.Patches}" Foreground="{StaticResource Text.Body}"
+                           FontSize="{StaticResource Type.Heading.Sm}"/>
                 <Border Grid.Row="2" Style="{StaticResource CardNoPad}">
                     <Grid>
-                        <TextBlock Text="(none)" Foreground="{StaticResource Dim}" FontSize="12"
+                        <TextBlock Text="{loc:Translate Body.NoPatches}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Body}"
                                    FontStyle="Italic" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
@@ -125,7 +126,7 @@
                         </TextBlock>
                         <ListBox ItemsSource="{Binding SelectedPatches}"
                                  BorderThickness="0" Background="Transparent"
-                                 Padding="12,10" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                 Padding="12,8" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListBox.Style>
                                 <Style TargetType="ListBox">
                                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -139,10 +140,10 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Margin="0,3">
-                                        <TextBlock Text="{Binding FileName}" Foreground="{StaticResource Fg}"
-                                                   FontSize="14" TextTrimming="CharacterEllipsis"
+                                        <TextBlock Text="{Binding FileName}" Foreground="{StaticResource Text.Heading}"
+                                                   FontSize="{StaticResource Type.Heading.Sm}" TextTrimming="CharacterEllipsis"
                                                    ToolTip="{Binding FullPath}"/>
-                                        <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Dim}" FontSize="11"/>
+                                        <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -156,12 +157,12 @@
                     <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="PRODUCT DETAILS" Foreground="{StaticResource Body}"
-                           FontSize="14"/>
+                <TextBlock Grid.Row="0" Text="{loc:Translate Section.Registered.Details}" Foreground="{StaticResource Text.Body}"
+                           FontSize="{StaticResource Type.Heading.Sm}"/>
                 <Border Grid.Row="2" Style="{StaticResource Card}">
                     <Grid>
-                        <TextBlock Text="Select a product to view details."
-                                   Foreground="{StaticResource Dim}" FontSize="12" FontStyle="Italic"
+                        <TextBlock Text="{loc:Translate Body.NoProductSelected}"
+                                   Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Body}" FontStyle="Italic"
                                    VerticalAlignment="Center" HorizontalAlignment="Center"
                                    TextAlignment="Center" TextWrapping="Wrap">
                             <TextBlock.Style>
@@ -175,8 +176,8 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <TextBlock Text="No metadata available."
-                                   Foreground="{StaticResource Dim}" FontSize="12" FontStyle="Italic"
+                        <TextBlock Text="{loc:Translate Body.NoMetadata}"
+                                   Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Body}" FontStyle="Italic"
                                    VerticalAlignment="Center" HorizontalAlignment="Center"
                                    TextAlignment="Center"
                                    Visibility="{Binding ShowNoMetadata, Converter={StaticResource BoolToVis}}"/>
@@ -197,22 +198,23 @@
                                     <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Author" Foreground="{StaticResource Dim}" FontSize="11"/>
-                                <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SelectedDetails.Author, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Fg}" FontSize="12" TextWrapping="Wrap"/>
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Application" Foreground="{StaticResource Dim}" FontSize="11"/>
-                                <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding SelectedDetails.AppName, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Fg}" FontSize="12" TextWrapping="Wrap"/>
-                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Title" Foreground="{StaticResource Dim}" FontSize="11"/>
-                                <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding SelectedDetails.Title, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Fg}" FontSize="12" TextWrapping="Wrap"/>
-                                <TextBlock Grid.Row="6" Grid.Column="0" Text="Subject" Foreground="{StaticResource Dim}" FontSize="11"/>
-                                <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding SelectedDetails.Subject, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Fg}" FontSize="12" TextWrapping="Wrap"/>
-                                <TextBlock Grid.Row="8" Grid.Column="0" Text="Keywords" Foreground="{StaticResource Dim}" FontSize="11"/>
-                                <TextBox Grid.Row="8" Grid.Column="2" Text="{Binding SelectedDetails.Keywords, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Fg}" FontSize="12" TextWrapping="Wrap"/>
-                                <TextBlock Grid.Row="10" Grid.Column="0" Text="Digital signature" Foreground="{StaticResource Dim}" FontSize="11"/>
-                                <TextBox Grid.Row="10" Grid.Column="2" Text="{Binding SelectedDetails.DigitalSignature, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Fg}" FontSize="12" TextWrapping="Wrap"/>
-                                <TextBlock Grid.Row="12" Grid.Column="0" Text="File size" Foreground="{StaticResource Dim}" FontSize="11"/>
-                                <TextBox Grid.Row="12" Grid.Column="2" Text="{Binding SelectedProduct.SizeDisplay, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Fg}" FontSize="12"/>
-                                <TextBlock Grid.Row="14" Grid.Column="0" Text="Comment" Foreground="{StaticResource Dim}" FontSize="11"/>
-                                <TextBox Grid.Row="14" Grid.Column="2" Text="{Binding SelectedDetails.Comments, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Fg}" FontSize="12" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Translate Field.Author}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
+                                <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SelectedDetails.Author, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Translate Field.Application}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
+                                <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding SelectedDetails.AppName, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Translate Field.Title}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
+                                <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding SelectedDetails.Title, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="6" Grid.Column="0" Text="{loc:Translate Field.Subject}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
+                                <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding SelectedDetails.Subject, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="8" Grid.Column="0" Text="{loc:Translate Field.Keywords}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
+                                <TextBox Grid.Row="8" Grid.Column="2" Text="{Binding SelectedDetails.Keywords, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="10" Grid.Column="0" Text="{loc:Translate Field.SigningCertificate}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"
+                                           ToolTip="{loc:Translate Tooltip.SigningCertificate}"/>
+                                <TextBox Grid.Row="10" Grid.Column="2" Text="{Binding SelectedDetails.DigitalSignature, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="12" Grid.Column="0" Text="{loc:Translate Field.FileSize}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
+                                <TextBox Grid.Row="12" Grid.Column="2" Text="{Binding SelectedProduct.SizeDisplay, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}"/>
+                                <TextBlock Grid.Row="14" Grid.Column="0" Text="{loc:Translate Field.Comment}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
+                                <TextBox Grid.Row="14" Grid.Column="2" Text="{Binding SelectedDetails.Comments, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"/>
                             </Grid>
                         </ScrollViewer>
                     </Grid>
@@ -222,9 +224,9 @@
 
         <DockPanel Grid.Row="7" LastChildFill="False">
             <TextBlock DockPanel.Dock="Left" Text="{Binding Summary}"
-                       Foreground="{StaticResource Body}" FontSize="12" VerticalAlignment="Center"/>
+                       Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}" VerticalAlignment="Center"/>
             <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
-                    Content="_Close" IsCancel="True"/>
+                    Content="{loc:Translate Action.Close}" IsCancel="True"/>
         </DockPanel>
     </Grid>
 </Window>

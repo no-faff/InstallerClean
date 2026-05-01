@@ -1,0 +1,69 @@
+<!--
+    Primitive design atoms.
+
+    WPF resource pragma: only Color resources can be cleanly referenced
+    by name from later-bound resources (a SolidColorBrush takes a Color
+    via {StaticResource}). Numeric primitives (Double, Thickness,
+    CornerRadius) cannot — the value has to be literal at parse time.
+    So this file holds the colour ramps; the canonical numeric scales
+    live in Tokens.xaml under their semantic names, with a comment
+    pinning them to a Tailwind-style step number for context.
+
+    Rule: never reference a Primitive.* key from a window or component
+    style. The semantic layer (Tokens.xaml) maps roles to primitives
+    and components consume those roles. If a window file references
+    a Primitive.* key, that is a smell.
+
+    Naming: <ramp>.<step>. Steps follow Tailwind's convention so that
+    swapping a primitive for a different shade reads as a numeric move
+    (Slate.700 darker than Slate.500). Alpha-blended variants use a
+    trailing AlphaNN suffix indicating the intended opacity.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Slate ramp. Surface, structure, text. -->
+    <Color x:Key="Primitive.Slate.50">#f8fafc</Color>
+    <Color x:Key="Primitive.Slate.300">#cbd5e1</Color>
+    <Color x:Key="Primitive.Slate.400">#94a3b8</Color>
+    <Color x:Key="Primitive.Slate.500">#8494a7</Color>
+    <Color x:Key="Primitive.Slate.600">#475569</Color>
+    <Color x:Key="Primitive.Slate.700">#334155</Color>
+    <Color x:Key="Primitive.Slate.800">#1e293b</Color>
+    <Color x:Key="Primitive.Slate.900">#0f172a</Color>
+    <Color x:Key="Primitive.Slate.950">#020617</Color>
+
+    <!-- Custom slate steps used for hover/pressed states on Primary
+         buttons. Sit between Slate.700 and Slate.800; not on the
+         Tailwind ramp. -->
+    <Color x:Key="Primitive.Slate.700.Hover">#2b3749</Color>
+    <Color x:Key="Primitive.Slate.700.Pressed">#232e3d</Color>
+
+    <Color x:Key="Primitive.Slate.50.Alpha20">#33f8fafc</Color>
+    <Color x:Key="Primitive.Slate.50.Alpha50">#80f8fafc</Color>
+    <Color x:Key="Primitive.Slate.950.Alpha50">#80020617</Color>
+
+    <!-- Indigo ramp. Accent, CTA, links. -->
+    <Color x:Key="Primitive.Indigo.400">#818cf8</Color>
+    <Color x:Key="Primitive.Indigo.400.Alpha66">#A8818cf8</Color>
+    <Color x:Key="Primitive.Indigo.600">#4f46e5</Color>
+    <Color x:Key="Primitive.Indigo.700">#443cc7</Color>
+    <Color x:Key="Primitive.Indigo.800">#3b34af</Color>
+
+    <!-- Violet. One step only — used for the selection accent. -->
+    <Color x:Key="Primitive.Violet.700">#6d28d9</Color>
+
+    <!-- Red ramp. Destructive actions and the close-window caption. -->
+    <Color x:Key="Primitive.Red.500">#ef4444</Color>
+    <Color x:Key="Primitive.Red.700.CaptionHover">#c0392b</Color>
+    <Color x:Key="Primitive.Red.700.CaptionPressed">#a93226</Color>
+    <Color x:Key="Primitive.Red.900">#991b1b</Color>
+    <Color x:Key="Primitive.Red.950">#7f1d1d</Color>
+    <Color x:Key="Primitive.Red.950.Pressed">#6b1a1a</Color>
+
+    <!-- Status colours. -->
+    <Color x:Key="Primitive.Amber.400">#fbbf24</Color>
+    <Color x:Key="Primitive.Amber.500">#f59e0b</Color>
+    <Color x:Key="Primitive.Green.400">#4ade80</Color>
+
+</ResourceDictionary>

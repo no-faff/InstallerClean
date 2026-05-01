@@ -1,6 +1,6 @@
 using System.Windows;
-using System.Windows.Media.Animation;
 using InstallerClean.Helpers;
+using InstallerClean.Resources;
 
 namespace InstallerClean;
 
@@ -27,27 +27,14 @@ public partial class SplashWindow : Window
     public void UpdateStep(string message, double progressPercent)
     {
         StepText.Text = message;
-
-        var container = SplashProgressBorder.Parent as FrameworkElement;
-        if (container == null) return;
-
-        container.UpdateLayout();
-        var targetWidth = container.ActualWidth * (progressPercent / 100.0);
-
-        var animation = new DoubleAnimation
-        {
-            To = targetWidth,
-            Duration = TimeSpan.FromMilliseconds(300),
-            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-        };
-        SplashProgressBorder.BeginAnimation(WidthProperty, animation);
+        SplashProgress.Value = progressPercent;
     }
 
     private void CancelClick(object sender, RoutedEventArgs e)
     {
         CancelButton.IsEnabled = false;
-        CancelButton.Content = "Cancelling...";
-        StepText.Text = "Cancelling...";
+        CancelButton.Content = Strings.Status_Cancelling;
+        StepText.Text = Strings.Status_Cancelling;
         CancelRequested?.Invoke(this, EventArgs.Empty);
     }
 }

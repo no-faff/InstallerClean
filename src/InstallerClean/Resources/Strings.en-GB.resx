@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    InstallerClean string resources. Source-of-truth language: en-GB.
+
+    Naming convention: dot-delimited categories, generated as underscore-
+    delimited C# property names (Window.Main.Title becomes
+    Strings.Window_Main_Title). Categories used:
+      Window.*       window titles and chrome strings
+      Section.*      heading text inside windows
+      Field.*        labels for metadata fields
+      Action.*       button labels and verbs
+      Tooltip.*      hover tooltips
+      Status.*       transient status / progress text
+      Body.*         multi-sentence body copy
+      Confirm.*      confirmation dialog text
+      Error.*        user-facing error messages
+      Cli.*          console output for the CLI launcher
+      Plural.*       singular/plural fragments used by DisplayHelpers
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- ============================================================
+       WINDOW TITLES
+       ============================================================ -->
+  <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Window.About.Title" xml:space="preserve"><value>About</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>Registered files</value></data>
+  <data name="Window.Orphaned.Title" xml:space="preserve"><value>Orphaned files</value></data>
+  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Confirm move</value></data>
+  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Confirm delete</value></data>
+
+  <!-- ============================================================
+       SECTION HEADINGS
+       ============================================================ -->
+  <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUCTS</value></data>
+  <data name="Section.Registered.Patches" xml:space="preserve"><value>PATCHES</value></data>
+  <data name="Section.Registered.Details" xml:space="preserve"><value>PRODUCT DETAILS</value></data>
+  <data name="Section.Move.Location" xml:space="preserve"><value>MOVE LOCATION</value></data>
+
+  <!-- ============================================================
+       FIELD LABELS (used in detail panels)
+       ============================================================ -->
+  <data name="Field.Reason" xml:space="preserve"><value>Reason</value></data>
+  <data name="Field.Author" xml:space="preserve"><value>Author</value></data>
+  <data name="Field.Application" xml:space="preserve"><value>Application</value></data>
+  <data name="Field.Title" xml:space="preserve"><value>Title</value></data>
+  <data name="Field.Subject" xml:space="preserve"><value>Subject</value></data>
+  <data name="Field.Keywords" xml:space="preserve"><value>Keywords</value></data>
+  <data name="Field.SigningCertificate" xml:space="preserve"><value>Signing certificate</value></data>
+  <data name="Field.FileSize" xml:space="preserve"><value>File size</value></data>
+  <data name="Field.Comment" xml:space="preserve"><value>Comment</value></data>
+  <data name="Field.ProductName" xml:space="preserve"><value>Product name</value></data>
+  <data name="Field.File" xml:space="preserve"><value>File</value></data>
+  <data name="Field.Size" xml:space="preserve"><value>Size</value></data>
+  <data name="Field.Patches" xml:space="preserve"><value>Patches</value></data>
+
+  <!-- ============================================================
+       ACTIONS (button labels; underscore prefixes are WPF mnemonics)
+       ============================================================ -->
+  <data name="Action.About" xml:space="preserve"><value>_About</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>_Browse...</value></data>
+  <data name="Action.Cancel" xml:space="preserve"><value>_Cancel</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>_Check for updates</value></data>
+  <data name="Action.Close" xml:space="preserve"><value>_Close</value></data>
+  <data name="Action.Delete" xml:space="preserve"><value>_Delete</value></data>
+  <data name="Action.Details" xml:space="preserve"><value>Details</value></data>
+  <data name="Action.Donate" xml:space="preserve"><value>Donate</value></data>
+  <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Star on GitHub</value></data>
+  <data name="Action.MITLicence" xml:space="preserve"><value>MIT licence</value></data>
+  <data name="Action.Move" xml:space="preserve"><value>_Move</value></data>
+  <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Move destination...</value></data>
+  <data name="Action.Rescan" xml:space="preserve"><value>_Re-scan</value></data>
+  <data name="Action.ScanAgain" xml:space="preserve"><value>_Scan again</value></data>
+
+  <!-- ============================================================
+       AUTOMATION NAMES (screen reader / accessibility)
+       ============================================================ -->
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Buy me a cuppa</value></data>
+  <data name="Automation.CancelOperation" xml:space="preserve"><value>Cancel operation</value></data>
+  <data name="Automation.CancelScan" xml:space="preserve"><value>Cancel scan</value></data>
+  <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Cancel startup scan</value></data>
+  <data name="Automation.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Automation.CloseInstallerClean" xml:space="preserve"><value>Close InstallerClean</value></data>
+  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
+  <data name="Automation.Maximise" xml:space="preserve"><value>Maximise</value></data>
+  <data name="Automation.Minimise" xml:space="preserve"><value>Minimise</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Move all orphaned installer files to the chosen destination folder</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all orphaned installer files to the Recycle Bin</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Confirm sending the orphaned files to the Recycle Bin</value></data>
+  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Move destination folder</value></data>
+  <data name="Automation.OperationProgress" xml:space="preserve"><value>Operation progress</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Scan C:\Windows\Installer again</value></data>
+  <data name="Automation.ScanningProgress" xml:space="preserve"><value>Scanning progress</value></data>
+  <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Startup scan progress</value></data>
+  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>View orphaned files</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>View registered files</value></data>
+
+  <!-- ============================================================
+       TOOLTIPS
+       ============================================================ -->
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Buy me a cuppa</value></data>
+  <data name="Tooltip.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
+  <data name="Tooltip.Maximise" xml:space="preserve"><value>Maximise</value></data>
+  <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
+  <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the orphaned files will be moved. Type a path, paste one, or click Browse.</value></data>
+  <data name="Tooltip.OpenProjectOnGitHub" xml:space="preserve"><value>Open the project on GitHub</value></data>
+  <data name="Tooltip.Restore" xml:space="preserve"><value>Restore</value></data>
+  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Subject name from the embedded Authenticode certificate. Not chain-verified.</value></data>
+
+  <!-- ============================================================
+       BODY COPY
+       ============================================================ -->
+  <data name="Body.MainExplanation" xml:space="preserve">
+    <value>C:\Windows\Installer contains cached files used by Windows to repair and update software. Orphaned files are no longer needed by any installed product. Superseded patches have been replaced by newer updates. Both are safe to move or delete to free up space.</value>
+  </data>
+  <data name="Body.PendingReboot" xml:space="preserve"><value>Windows has pending updates. Restart before moving or deleting files.</value></data>
+  <data name="Body.NoFileSelected" xml:space="preserve"><value>Select a file to view details.</value></data>
+  <data name="Body.NoProductSelected" xml:space="preserve"><value>Select a product to view details.</value></data>
+  <data name="Body.NoMetadata" xml:space="preserve"><value>No metadata available.</value></data>
+  <data name="Body.NoPatches" xml:space="preserve"><value>(none)</value></data>
+  <!-- "Reason" column value shown next to a superseded patch in the
+       orphaned files list. -->
+  <data name="Reason.Superseded" xml:space="preserve"><value>Superseded</value></data>
+
+  <!-- ============================================================
+       STATUS / PROGRESS TEXT
+       ============================================================ -->
+  <data name="Status.Scanning" xml:space="preserve"><value>Scanning...</value></data>
+  <data name="Status.Cancelling" xml:space="preserve"><value>Cancelling...</value></data>
+  <data name="Status.StartingScan" xml:space="preserve"><value>Starting scan...</value></data>
+  <data name="Status.QueryingApi" xml:space="preserve"><value>Querying Windows Installer API...</value></data>
+  <data name="Status.ScanningCache" xml:space="preserve"><value>Scanning installer cache folder...</value></data>
+  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Enumerating installed products...</value></data>
+  <data name="Status.CheckingRegistry" xml:space="preserve"><value>Checking registry for additional packages...</value></data>
+  <!-- 0 = registered package count -->
+  <data name="Status.RegistryScanComplete" xml:space="preserve"><value>Scan complete. {0} registered package(s) found.</value></data>
+  <!-- 0 = elapsed time text (e.g. "1.2s") -->
+  <data name="Status.ScanComplete" xml:space="preserve"><value>Scan complete ({0})</value></data>
+  <!-- 0 = product count -->
+  <data name="Status.FoundProducts" xml:space="preserve"><value>Found {0} installed product(s). Scanning local packages...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
+  <data name="Status.FoundOrphans" xml:space="preserve"><value>Found {0} {1} to clean up.</value></data>
+  <!-- 0 = file count, 1 = pluralised noun -->
+  <data name="Status.Moving" xml:space="preserve"><value>Moving {0} {1}...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Deleting {0} {1}...</value></data>
+  <data name="Status.MoveCancelled" xml:space="preserve"><value>Move cancelled.</value></data>
+  <data name="Status.DeleteCancelled" xml:space="preserve"><value>Delete cancelled.</value></data>
+  <!-- 0 = exception message -->
+  <data name="Status.MoveFailed" xml:space="preserve"><value>Move failed: {0}</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>Delete failed: {0}</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Run as administrator.</value></data>
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scan failed: installer database unavailable.</value></data>
+  <data name="Status.ScanCancelled" xml:space="preserve"><value>Scan cancelled.</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>Done</value></data>
+  <!-- 0 = exception message, 1 = crash log path -->
+  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Scan failed: {0}. Details in {1}.</value></data>
+
+  <!-- ============================================================
+       COMPLETION SCREEN
+       ============================================================ -->
+  <data name="Completion.AllClear" xml:space="preserve"><value>All clear</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them if anything stops working</value></data>
+  <!-- 0 = size cleared (e.g. "120.5 MB") -->
+  <data name="Completion.Cleared" xml:space="preserve"><value>{0} cleared</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
+  <data name="Completion.MoveSummary" xml:space="preserve"><value>{0} {1} moved to {2}</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
+  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>{0} {1} moved to {2}. {3} {4}.</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} sent to the Recycle Bin</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} deleted. {2} {3}.</value></data>
+
+  <!-- ============================================================
+       SUMMARIES
+       ============================================================ -->
+  <!-- 0 = file count, 1 = pluralised "file is"/"files are" -->
+  <data name="Summary.RegisteredStillUsed" xml:space="preserve"><value>{0} {1} still used</value></data>
+  <data name="Summary.OrphanedToCleanUp" xml:space="preserve"><value>{0} {1} to clean up</value></data>
+  <data name="Summary.MissingFromDisk" xml:space="preserve"><value>{0} registered {1} missing from disk. Your Windows Installer database references installers that no longer exist.</value></data>
+  <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} files</value></data>
+
+  <!-- ============================================================
+       CONFIRMATION DIALOGS
+       ============================================================ -->
+  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
+  <data name="Confirm.MoveTitle" xml:space="preserve"><value>Move {0} {1} ({2})?</value></data>
+  <!-- 0 = destination path -->
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Files will be moved to {0}</value></data>
+  <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Delete {0} {1} ({2})?</value></data>
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Files will be sent to the Recycle Bin. Use Move instead if you'd like to keep backup copies.</value></data>
+  <data name="Confirm.DeleteLargeWarning" xml:space="preserve"><value>At this size some files may skip the Recycle Bin and be deleted permanently. Windows does this automatically when a file exceeds the Recycle Bin's free space. Use Move instead if you want guaranteed backup copies.</value></data>
+
+  <!-- ============================================================
+       ERROR MESSAGES
+       ============================================================ -->
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Administrator rights required</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>This app requires administrator privileges.
+
+Please right-click and choose 'Run as administrator'.</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Installer database unavailable</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Access denied enumerating installed products. Run as administrator.</value></data>
+  <!-- 0 = consecutive failure count, 1 = last MSI error code -->
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer API returned {0} consecutive non-Success responses (last error {1}). Unable to enumerate products.</value></data>
+  <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Invalid destination</value></data>
+  <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>The destination cannot be inside the Windows Installer folder.</value></data>
+  <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Not enough space</value></data>
+  <!-- 0 = destination, 1 = required size, 2 = available size -->
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Not enough space at {0}
+
+Required: {1}
+Available: {2}</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>You don't have permission to write to {0}.
+Try a folder in your user profile, or run as a different administrator.</value></data>
+  <data name="Error.PathTooLong" xml:space="preserve"><value>The path {0} is too long for Windows. Pick a shorter path.</value></data>
+  <data name="Error.DestinationMissing" xml:space="preserve"><value>The folder {0} does not exist and could not be created. Check the drive letter or network path.</value></data>
+  <!-- 0 = destination, 1 = io exception message -->
+  <data name="Error.IOWriteDestination" xml:space="preserve"><value>Windows cannot write to {0}:
+{1}</value></data>
+  <data name="Error.WriteDestination" xml:space="preserve"><value>Cannot write to {0}:
+{1}</value></data>
+  <data name="Error.MissingSourceFile" xml:space="preserve"><value>File no longer exists.</value></data>
+  <!-- 0 = shell error code -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Windows shell reported error {0} while recycling the file.</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Refusing to move files into the Windows Installer folder (destination: {0}).</value></data>
+  <!-- 0 = folder, 1 = inner exception message -->
+  <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Cannot write to {0}: {1}</value></data>
+  <!-- 0 = file name -->
+  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Could not find a unique filename for '{0}' after 10,000 attempts.</value></data>
+
+  <!-- ============================================================
+       SINGLE INSTANCE / STARTUP / CRASH
+       ============================================================ -->
+  <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean is already running.</value></data>
+  <data name="Startup.AlreadyRunningCli" xml:space="preserve"><value>Another instance of InstallerClean is already running.</value></data>
+  <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <!-- 0 = exception message, 1 = crash log path -->
+  <data name="Startup.UnhandledBody" xml:space="preserve"><value>An unexpected error occurred and InstallerClean needs to close.
+
+{0}
+
+Details written to:
+{1}</value></data>
+  <data name="Startup.ErrorTitle" xml:space="preserve"><value>Startup error</value></data>
+  <!-- 0 = exception message -->
+  <data name="Startup.FailedToStart" xml:space="preserve"><value>Failed to start: {0}</value></data>
+
+  <!-- ============================================================
+       FILE PICKER
+       ============================================================ -->
+  <data name="FilePicker.ChooseDestinationTitle" xml:space="preserve"><value>Choose destination folder for moved files</value></data>
+
+  <!-- ============================================================
+       VERSION DISPLAY
+       ============================================================ -->
+  <!-- 0 = major.minor.patch (e.g. "1.5.4") -->
+  <data name="Version.Display" xml:space="preserve"><value>Version {0}</value></data>
+
+  <!-- ============================================================
+       PLURAL FRAGMENTS
+       Used by DisplayHelpers.Pluralise. The singular/plural pair is
+       English-style (n != 1 -> plural). For Slavic / Arabic / etc.
+       a richer pluraliser would replace this; consumers wouldn't change.
+       ============================================================ -->
+  <data name="Plural.File.Singular" xml:space="preserve"><value>file</value></data>
+  <data name="Plural.File.Plural" xml:space="preserve"><value>files</value></data>
+  <data name="Plural.FileVerb.Singular" xml:space="preserve"><value>file is</value></data>
+  <data name="Plural.FileVerb.Plural" xml:space="preserve"><value>files are</value></data>
+  <data name="Plural.Error.Singular" xml:space="preserve"><value>error</value></data>
+  <data name="Plural.Error.Plural" xml:space="preserve"><value>errors</value></data>
+
+  <!-- ============================================================
+       CLI OUTPUT
+       Console messages emitted by installerclean-cli.exe. Localised
+       so non-English sysadmins reading scripted output get text
+       matching their UI culture.
+       ============================================================ -->
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Unknown argument: {0}</value></data>
+  <data name="Cli.Cancelling" xml:space="preserve"><value>Cancelling...</value></data>
+  <data name="Cli.Cancelled" xml:space="preserve"><value>Cancelled.</value></data>
+  <data name="Cli.AdminRequired" xml:space="preserve"><value>Error: administrator privileges required. Run from an elevated command prompt.</value></data>
+  <!-- 0 = exception message -->
+  <data name="Cli.GenericError" xml:space="preserve"><value>Error: {0}</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Scanning C:\Windows\Installer...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Found {0} {1} to clean up ({2}).</value></data>
+  <data name="Cli.NothingToDo" xml:space="preserve"><value>Nothing to do.</value></data>
+  <!-- 0 = mode arg ("/s"), 1 = registered package count -->
+  <data name="Cli.EventLogScanNoOrphans" xml:space="preserve"><value>Scan mode ({0}): no orphaned files. Installer database has {1} registered package(s).</value></data>
+  <!-- 0 = file count, 1 = size display -->
+  <data name="Cli.EventLogScanFound" xml:space="preserve"><value>Scan mode (/s): {0} orphaned file(s) found, {1}. No action taken.</value></data>
+  <!-- 0 = file count -->
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Deleting {0} files...</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Deleted {0} {1}.</value></data>
+  <!-- 0 = deleted count, 1 = total count, 2 = size display, 3 = error count -->
+  <data name="Cli.EventLogDeleteSummary" xml:space="preserve"><value>Delete mode (/d): {0} of {1} file(s) sent to the Recycle Bin, {2} recovered, {3} error(s).</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH or set a default in the GUI.</value></data>
+  <data name="Cli.EventLogMoveNoDestination" xml:space="preserve"><value>Move mode (/m) aborted: no destination specified.</value></data>
+  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Error: destination cannot be inside the Windows Installer folder.</value></data>
+  <!-- 0 = destination -->
+  <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve"><value>Move mode (/m) aborted: destination {0} is inside C:\Windows\Installer.</value></data>
+  <!-- 0 = file count, 1 = destination -->
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Moving {0} files to {1}...</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun -->
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>Moved {0} {1}.</value></data>
+  <!-- 0 = moved count, 1 = total, 2 = destination, 3 = size display, 4 = error count -->
+  <data name="Cli.EventLogMoveSummary" xml:space="preserve"><value>Move mode (/m): {0} of {1} file(s) moved to {2}, {3} relocated, {4} error(s).</value></data>
+
+  <!-- ============================================================
+       CLI HELP TEXT (printed by /? -? /h)
+       ============================================================ -->
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - clean up C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Usage" xml:space="preserve"><value>Usage:</value></data>
+  <data name="Cli.Help.Gui" xml:space="preserve"><value>  installerclean-cli          Launch the GUI</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       Scan only - list removable files</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       Delete removable files (Recycle Bin)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       Move to saved default location</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PATH  Move to specified path</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>The installer ships installerclean-cli.exe alongside the GUI exe so</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>PowerShell and cmd wait for output synchronously. If you're using</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>the portable or slim exe, wrap it yourself:</value></data>
+  <data name="Cli.Help.WrapExample" xml:space="preserve"><value>  Start-Process -Wait -NoNewWindow .\InstallerClean.exe /s</value></data>
+
+</root>

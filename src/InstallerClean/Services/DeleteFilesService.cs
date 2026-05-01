@@ -13,7 +13,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
         return Task.Run(() =>
         {
             int deleted = 0;
-            var errors = new List<DeleteError>();
+            var errors = new List<FileOperationError>();
             var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
             var total = pathList.Count;
 
@@ -26,7 +26,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 {
                     if (!File.Exists(filePath))
                     {
-                        errors.Add(new DeleteError(filePath, "File no longer exists."));
+                        errors.Add(new MissingSourceFile(filePath));
                         continue;
                     }
                     var fileName = Path.GetFileName(filePath);
@@ -37,16 +37,22 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     var result = ShellFileOperations.SendToRecycleBin(filePath);
                     if (result != 0)
                     {
-                        errors.Add(new DeleteError(
-                            filePath,
-                            $"Windows shell reported error {result} while recycling the file."));
+                        errors.Add(new ShellRefused(filePath, result));
                         continue;
                     }
                     deleted++;
                 }
+                catch (UnauthorizedAccessException ex)
+                {
+                    errors.Add(new AccessDenied(filePath, ex.Message));
+                }
+                catch (IOException ex)
+                {
+                    errors.Add(new IOFailure(filePath, ex.Message));
+                }
                 catch (Exception ex)
                 {
-                    errors.Add(new DeleteError(filePath, ex.Message));
+                    errors.Add(new UnknownError(filePath, ex.GetType().Name, ex.Message));
                 }
             }
 
