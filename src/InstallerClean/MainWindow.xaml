@@ -15,7 +15,7 @@
     </WindowChrome.WindowChrome>
 
     <Window.InputBindings>
-        <KeyBinding Key="F5" Command="{Binding ScanCommand}"/>
+        <KeyBinding Key="F5" Command="{Binding Scan.ScanCommand}"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -73,7 +73,7 @@
 
                 <!-- Pending reboot warning (Phosphor fill, tweaked !) -->
                 <StackPanel Orientation="Horizontal" Margin="{StaticResource GapBottom.Lg}"
-                            Visibility="{Binding HasPendingReboot, Converter={StaticResource BoolToVis}}">
+                            Visibility="{Binding Scan.HasPendingReboot, Converter={StaticResource BoolToVis}}">
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
                           Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
                           VerticalAlignment="Center" Margin="0,0,6,0"/>
@@ -83,11 +83,11 @@
 
                 <!-- Registered files missing from disk -->
                 <StackPanel Orientation="Horizontal" Margin="{StaticResource GapBottom.Lg}"
-                            Visibility="{Binding HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
+                            Visibility="{Binding Scan.HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
                           Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
                           VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <TextBlock Text="{Binding MissingFromDiskSummaryText}"
+                    <TextBlock Text="{Binding Scan.MissingFromDiskSummaryText}"
                                TextWrapping="Wrap"
                                Foreground="{StaticResource Text.Body}" VerticalAlignment="Center"/>
                 </StackPanel>
@@ -105,13 +105,13 @@
                     <!-- Still used -->
                     <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
                                Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Heading.Sm}"
-                               Text="{Binding RegisteredSummaryText}"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding RegisteredSizeDisplay}"
+                               Text="{Binding Scan.RegisteredSummaryText}"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Scan.RegisteredSizeDisplay}"
                                Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Heading.Sm}"
                                VerticalAlignment="Center" MinWidth="72" TextAlignment="Right"
                                Margin="12,0"/>
                     <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource GhostPill}"
-                            Content="{loc:Translate Action.Details}" Command="{Binding OpenRegisteredDetailsCommand}"
+                            Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenRegisteredDetailsCommand}"
                             Height="28" Padding="12,0" FontSize="{StaticResource Type.Heading.Sm}"
                             VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
                             AutomationProperties.Name="{loc:Translate Automation.ViewRegisteredFiles}"/>
@@ -143,13 +143,13 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" VerticalAlignment="Center"
                                Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
-                               Text="{Binding OrphanedSummaryText}"/>
-                    <TextBlock Grid.Column="1" Text="{Binding OrphanedSizeDisplay}"
+                               Text="{Binding Scan.OrphanedSummaryText}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Scan.OrphanedSizeDisplay}"
                                Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
                                VerticalAlignment="Center" MinWidth="72" TextAlignment="Right"
                                Margin="12,0"/>
                     <Button Grid.Column="2" Style="{StaticResource GhostPill}"
-                            Content="{loc:Translate Action.Details}" Command="{Binding OpenOrphanedDetailsCommand}"
+                            Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenOrphanedDetailsCommand}"
                             Height="28" Padding="12,0" FontSize="{StaticResource Type.Heading.Sm}"
                             VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
                             AutomationProperties.Name="{loc:Translate Automation.ViewOrphanedFiles}"/>
@@ -169,7 +169,7 @@
 
                     <Grid Grid.Column="0">
                         <TextBox Style="{StaticResource PillTextBox}"
-                                 Text="{Binding MoveDestination, Mode=TwoWay,
+                                 Text="{Binding Cleanup.MoveDestination, Mode=TwoWay,
                                                 UpdateSourceTrigger=LostFocus}"
                                  AutomationProperties.Name="{loc:Translate Automation.MoveDestinationFolder}"
                                  ToolTip="{loc:Translate Tooltip.MoveDestination}"/>
@@ -181,7 +181,7 @@
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Visibility" Value="Collapsed"/>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding MoveDestination}" Value="">
+                                        <DataTrigger Binding="{Binding Cleanup.MoveDestination}" Value="">
                                             <Setter Property="Visibility" Value="Visible"/>
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -191,21 +191,21 @@
                     </Grid>
 
                     <Button Grid.Column="2" Style="{StaticResource PrimaryPill}"
-                            Content="{loc:Translate Action.Browse}" Command="{Binding BrowseDestinationCommand}"/>
+                            Content="{loc:Translate Action.Browse}" Command="{Binding Cleanup.BrowseDestinationCommand}"/>
                 </Grid>
 
                 <!-- Buttons row -->
                 <DockPanel Grid.Row="6">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
-                            Content="{loc:Translate Action.Move}" Command="{Binding MoveAllCommand}"
+                            Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
                             AutomationProperties.HelpText="{loc:Translate Automation.MoveAllFiles}"/>
 
                     <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
-                            Content="{loc:Translate Action.Delete}" Command="{Binding DeleteAllCommand}"
+                            Content="{loc:Translate Action.Delete}" Command="{Binding Cleanup.DeleteAllCommand}"
                             AutomationProperties.HelpText="{loc:Translate Automation.DeleteAllFiles}"
                             Margin="{StaticResource GapRight.Sm}"/>
 
-                    <TextBlock DockPanel.Dock="Left" Text="{Binding OperationProgress}"
+                    <TextBlock DockPanel.Dock="Left" Text="{Binding Cleanup.OperationProgress}"
                                VerticalAlignment="Center" Foreground="{StaticResource Text.Muted}"
                                FontSize="{StaticResource Type.Body}"
                                TextTrimming="CharacterEllipsis"/>
@@ -217,11 +217,11 @@
         <!-- ── Bottom nav ────────────────────────────────────── -->
         <DockPanel Grid.Row="3" LastChildFill="False" Margin="4,8,24,8">
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
-                    Content="{loc:Translate Action.Rescan}" Command="{Binding ScanCommand}"/>
+                    Content="{loc:Translate Action.Rescan}" Command="{Binding Scan.ScanCommand}"/>
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
-                    Content="{loc:Translate Action.About}" Command="{Binding ShowAboutCommand}" Margin="4,0,0,0"/>
+                    Content="{loc:Translate Action.About}" Command="{Binding Chrome.ShowAboutCommand}" Margin="4,0,0,0"/>
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
-                    Command="{Binding DonateCommand}"
+                    Command="{Binding Chrome.DonateCommand}"
                     AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa}"
                     FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     ToolTipService.InitialShowDelay="0"
@@ -264,7 +264,7 @@
                 </Button.ToolTip>
             </Button>
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
-                    Command="{Binding StarOnGitHubCommand}"
+                    Command="{Binding Chrome.StarOnGitHubCommand}"
                     AutomationProperties.Name="{loc:Translate Automation.LeaveStarOnGitHub}"
                     FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     ToolTipService.InitialShowDelay="0"
@@ -310,15 +310,15 @@
         </DockPanel>
 
         <!-- ── Scanning overlay ──────────────────────────────────── -->
-        <Grid Grid.RowSpan="4" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.RowSpan="4" Visibility="{Binding Scan.IsScanning, Converter={StaticResource BoolToVis}}">
             <Rectangle Fill="{StaticResource Surface.Overlay}"/>
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <ProgressBar IsIndeterminate="True" Width="240" Height="8" Margin="{StaticResource GapBottom.Md}"
                              AutomationProperties.Name="{loc:Translate Automation.ScanningProgress}"/>
-                <TextBlock Text="{Binding ScanProgress}" Foreground="{StaticResource Text.Heading}"
+                <TextBlock Text="{Binding Scan.ScanProgress}" Foreground="{StaticResource Text.Heading}"
                            FontSize="{StaticResource Type.Heading.Sm}" HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"/>
                 <Button x:Name="ScanCancelButton" Style="{StaticResource GhostPill}"
-                        Content="{loc:Translate Action.Cancel}" Command="{Binding CancelScanCommand}"
+                        Content="{loc:Translate Action.Cancel}" Command="{Binding Scan.CancelScanCommand}"
                         Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
                         HorizontalAlignment="Center"
                         FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
@@ -327,36 +327,36 @@
         </Grid>
 
         <!-- ── Operating overlay ─────────────────────────────────── -->
-        <Grid Grid.RowSpan="4" Visibility="{Binding IsOperating, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.RowSpan="4" Visibility="{Binding Cleanup.IsOperating, Converter={StaticResource BoolToVis}}">
             <Rectangle Fill="{StaticResource Surface.Overlay}"/>
             <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Pill}"
                     Padding="28,22" MinWidth="260"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel>
-                    <TextBlock Text="{Binding OperationProgress}" Foreground="{StaticResource Text.Heading}"
+                    <TextBlock Text="{Binding Cleanup.OperationProgress}" Foreground="{StaticResource Text.Heading}"
                                FontSize="{StaticResource Type.Heading.Sm}" FontWeight="SemiBold"
                                HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"/>
-                    <ProgressBar Value="{Binding OperationProgressPercent}"
+                    <ProgressBar Value="{Binding Cleanup.OperationProgressPercent}"
                                  Minimum="0" Maximum="100"
                                  Width="200" Height="8" Margin="{StaticResource GapBottom.Sm}"
                                  AutomationProperties.Name="{loc:Translate Automation.OperationProgress}"/>
                     <DockPanel Margin="0,0,0,2">
                         <TextBlock DockPanel.Dock="Right" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}">
-                            <Run Text="{Binding OperationProgressPercent, Mode=OneWay, StringFormat='{}{0:F0}%'}"/>
+                            <Run Text="{Binding Cleanup.OperationProgressPercent, Mode=OneWay, StringFormat='{}{0:F0}%'}"/>
                         </TextBlock>
                         <TextBlock Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}">
-                            <Run Text="{Binding OperationCurrentFile, Mode=OneWay}"/>
+                            <Run Text="{Binding Cleanup.OperationCurrentFile, Mode=OneWay}"/>
                             <Run Text=" of "/>
-                            <Run Text="{Binding OperationTotalFiles, Mode=OneWay}"/>
+                            <Run Text="{Binding Cleanup.OperationTotalFiles, Mode=OneWay}"/>
                             <Run Text=" files"/>
                         </TextBlock>
                     </DockPanel>
-                    <TextBlock Text="{Binding OperationCurrentFileName}"
+                    <TextBlock Text="{Binding Cleanup.OperationCurrentFileName}"
                                Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"
                                HorizontalAlignment="Center" Margin="0,4,0,0"
                                TextTrimming="CharacterEllipsis" MaxWidth="240"/>
                     <Button x:Name="OperationCancelButton" Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
-                            Command="{Binding CancelOperationCommand}"
+                            Command="{Binding Cleanup.CancelOperationCommand}"
                             AutomationProperties.Name="{loc:Translate Automation.CancelOperation}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             HorizontalAlignment="Center" Margin="0,8,0,0"
@@ -365,7 +365,7 @@
             </Border>
         </Grid>
         <!-- ── Completion overlay ────────────────────────────────── -->
-        <Grid x:Name="CompletionOverlay" Grid.RowSpan="4" Visibility="{Binding IsComplete, Converter={StaticResource BoolToVis}}">
+        <Grid x:Name="CompletionOverlay" Grid.RowSpan="4" Visibility="{Binding Completion.IsComplete, Converter={StaticResource BoolToVis}}">
             <Rectangle Fill="{StaticResource Surface.Overlay}"/>
             <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Pill}"
                     Padding="36,32" MinWidth="340" MaxWidth="420"
@@ -378,18 +378,18 @@
                            Margin="{StaticResource GapBottom.Lg}"/>
 
                     <!-- Heading -->
-                    <TextBlock Text="{Binding CompletionHeading}"
+                    <TextBlock Text="{Binding Completion.Heading}"
                                Foreground="{StaticResource Status.Success}" FontSize="{StaticResource Type.Heading.Lg}" FontWeight="Bold"
                                HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Sm}"/>
 
                     <!-- Summary -->
-                    <TextBlock Text="{Binding CompletionSummary}"
+                    <TextBlock Text="{Binding Completion.Summary}"
                                Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Heading.Sm}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="0,0,0,6"/>
 
                     <!-- Restore guidance -->
-                    <TextBlock Text="{Binding CompletionRestore}"
+                    <TextBlock Text="{Binding Completion.Restore}"
                                Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="{StaticResource GapBottom.Xl}"/>
@@ -400,13 +400,13 @@
                             <Style TargetType="Border">
                                 <Setter Property="Visibility" Value="Visible"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding CompletionErrors}" Value="">
+                                    <DataTrigger Binding="{Binding Completion.Errors}" Value="">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
-                        <TextBox Text="{Binding CompletionErrors, Mode=OneWay}"
+                        <TextBox Text="{Binding Completion.Errors, Mode=OneWay}"
                                  Style="{StaticResource SelectableText}"
                                  Foreground="{StaticResource Status.Warning}" FontSize="{StaticResource Type.Caption}"
                                  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
@@ -414,7 +414,7 @@
 
                     <!-- Close button -->
                     <Button x:Name="CompletionCloseButton" Style="{StaticResource AccentPill}"
-                            Content="{loc:Translate Action.Close}" Command="{Binding CloseAppCommand}"
+                            Content="{loc:Translate Action.Close}" Command="{Binding Chrome.CloseAppCommand}"
                             IsDefault="True"
                             HorizontalAlignment="Center" MinWidth="120"
                             Margin="{StaticResource GapBottom.Sm}"
@@ -422,7 +422,7 @@
 
                     <!-- Scan again -->
                     <Button Style="{StaticResource GhostPill}"
-                            Content="{loc:Translate Action.ScanAgain}" Command="{Binding RescanAfterCompletionCommand}"
+                            Content="{loc:Translate Action.ScanAgain}" Command="{Binding Completion.RescanAfterCompletionCommand}"
                             HorizontalAlignment="Center"
                             Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
