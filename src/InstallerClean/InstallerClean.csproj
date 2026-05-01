@@ -29,6 +29,11 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <!-- IFileSystem abstraction so file-mutating services can be unit-
+         tested against an in-memory filesystem instead of writing into
+         %TEMP%. The package is the de-facto .NET standard wrapper for
+         System.IO; using it avoids a hand-rolled abstraction. -->
+    <PackageReference Include="System.IO.Abstractions" Version="21.0.29" />
   </ItemGroup>
 
   <ItemGroup>
