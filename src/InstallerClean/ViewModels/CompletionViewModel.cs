@@ -48,7 +48,12 @@ public partial class CompletionViewModel : ObservableObject
     public void ShowMoveSummary(int movedCount, long movedBytes, string destination,
         IReadOnlyList<FileOperationError> errors)
     {
-        Heading = string.Format(Strings.Completion_Cleared, DisplayHelpers.FormatSize(movedBytes));
+        // Distinct heading on partial-failure paths so a user whose
+        // Move only half-completed doesn't see a green "120 MB cleared"
+        // banner that hides the per-file error list below it.
+        Heading = string.Format(
+            errors.Count == 0 ? Strings.Completion_Cleared : Strings.Completion_PartlyCleared,
+            DisplayHelpers.FormatSize(movedBytes));
         var movedLabel = DisplayHelpers.PluraliseFile(movedCount);
         Summary = errors.Count == 0
             ? string.Format(Strings.Completion_MoveSummary, movedCount, movedLabel, destination)
@@ -63,7 +68,9 @@ public partial class CompletionViewModel : ObservableObject
     public void ShowDeleteSummary(int deletedCount, long deletedBytes,
         IReadOnlyList<FileOperationError> errors)
     {
-        Heading = string.Format(Strings.Completion_Cleared, DisplayHelpers.FormatSize(deletedBytes));
+        Heading = string.Format(
+            errors.Count == 0 ? Strings.Completion_Cleared : Strings.Completion_PartlyCleared,
+            DisplayHelpers.FormatSize(deletedBytes));
         var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
         Summary = errors.Count == 0
             ? string.Format(Strings.Completion_DeleteSummary, deletedCount, deletedLabel)

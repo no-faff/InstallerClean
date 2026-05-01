@@ -13,6 +13,7 @@
       Tooltip.*      hover tooltips
       Status.*       transient status / progress text
       Body.*         multi-sentence body copy
+      Reason.*       Reason column values in the orphaned files list
       Confirm.*      confirmation dialog text
       Error.*        user-facing error messages
       Cli.*          console output for the CLI launcher
@@ -111,7 +112,7 @@
   <data name="Action.Copy" xml:space="preserve"><value>Copy</value></data>
   <data name="Action.Browse" xml:space="preserve"><value>_Browse...</value></data>
   <data name="Action.Cancel" xml:space="preserve"><value>_Cancel</value></data>
-  <data name="Action.CheckForUpdates" xml:space="preserve"><value>_Check for updates</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Check for _updates</value></data>
   <data name="Action.Close" xml:space="preserve"><value>_Close</value></data>
   <data name="Action.Delete" xml:space="preserve"><value>_Delete</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Details</value></data>
@@ -155,6 +156,8 @@
   <data name="Tooltip.Maximise" xml:space="preserve"><value>Maximise</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the orphaned files will be moved. Type a path, paste one, or click Browse.</value></data>
+  <data name="Tooltip.MoveDisabledHint" xml:space="preserve"><value>Move is unavailable: pick a destination folder, run a fresh scan that finds orphans, or wait for any running scan or operation to finish. While Windows has a pending reboot, both Move and Delete are blocked.</value></data>
+  <data name="Tooltip.DeleteDisabledHint" xml:space="preserve"><value>Delete is unavailable: run a fresh scan that finds orphans, or wait for any running scan or operation to finish. While Windows has a pending reboot, both Move and Delete are blocked.</value></data>
   <data name="Tooltip.OpenProjectOnGitHub" xml:space="preserve"><value>Open the project on GitHub</value></data>
   <data name="Tooltip.Restore" xml:space="preserve"><value>Restore</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Subject name from the embedded Authenticode certificate. Not chain-verified.</value></data>
@@ -163,15 +166,18 @@
        BODY COPY
        ============================================================ -->
   <data name="Body.MainExplanation" xml:space="preserve">
-    <value>C:\Windows\Installer contains cached files used by Windows to repair and update software. Orphaned files are no longer needed by any installed product. Superseded patches have been replaced by newer updates. Both are safe to move or delete to free up space.</value>
+    <value>C:\Windows\Installer contains cached files used by Windows to repair and update software. Orphaned files are no longer needed by any installed product. Superseded patches have been replaced by newer updates. Move them somewhere safe first, or delete to the Recycle Bin once you're confident.</value>
   </data>
-  <data name="Body.PendingReboot" xml:space="preserve"><value>Windows has pending updates. Restart before moving or deleting files.</value></data>
+  <data name="Body.PendingReboot" xml:space="preserve"><value>Windows is waiting to restart. Move and Delete are blocked until you reboot, because cleaning the cache mid-update can break the pending repair.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Select a file to view details.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Select a product to view details.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>No metadata available.</value></data>
   <data name="Body.NoPatches" xml:space="preserve"><value>(none)</value></data>
-  <!-- "Reason" column value shown next to a superseded patch in the
-       orphaned files list. -->
+
+  <!-- ============================================================
+       REASONS (Reason column in the orphaned-files list)
+       ============================================================ -->
+  <data name="Reason.Orphaned" xml:space="preserve"><value>Orphaned</value></data>
   <data name="Reason.Superseded" xml:space="preserve"><value>Superseded</value></data>
 
   <!-- ============================================================
@@ -180,7 +186,7 @@
   <data name="Status.Scanning" xml:space="preserve"><value>Scanning...</value></data>
   <data name="Status.Cancelling" xml:space="preserve"><value>Cancelling...</value></data>
   <data name="Status.StartingScan" xml:space="preserve"><value>Starting scan...</value></data>
-  <data name="Status.QueryingApi" xml:space="preserve"><value>Querying Windows Installer API...</value></data>
+  <data name="Status.QueryingApi" xml:space="preserve"><value>Asking Windows about installed software...</value></data>
   <data name="Status.ScanningCache" xml:space="preserve"><value>Scanning installer cache folder...</value></data>
   <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Enumerating installed products...</value></data>
   <data name="Status.CheckingRegistry" xml:space="preserve"><value>Checking registry for additional packages...</value></data>
@@ -192,14 +198,15 @@
   <data name="Status.FoundProducts" xml:space="preserve"><value>Found {0} installed product(s). Scanning local packages...</value></data>
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
   <data name="Status.FoundOrphans" xml:space="preserve"><value>Found {0} {1} to clean up.</value></data>
+  <data name="Status.PreparingDestination" xml:space="preserve"><value>Preparing destination folder...</value></data>
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>Moving {0} {1}...</value></data>
   <data name="Status.Deleting" xml:space="preserve"><value>Deleting {0} {1}...</value></data>
   <data name="Status.MoveCancelled" xml:space="preserve"><value>Move cancelled.</value></data>
   <data name="Status.DeleteCancelled" xml:space="preserve"><value>Delete cancelled.</value></data>
-  <!-- 0 = exception message -->
-  <data name="Status.MoveFailed" xml:space="preserve"><value>Move failed: {0}</value></data>
-  <data name="Status.DeleteFailed" xml:space="preserve"><value>Delete failed: {0}</value></data>
+  <!-- 0 = exception type name (full detail goes to crash log) -->
+  <data name="Status.MoveFailed" xml:space="preserve"><value>Move failed ({0}). See the crash log for details.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>Delete failed ({0}). See the crash log for details.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Run as administrator.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scan failed: installer database unavailable.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scan cancelled.</value></data>
@@ -213,9 +220,12 @@
   <data name="Completion.AllClear" xml:space="preserve"><value>All clear</value></data>
   <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer</value></data>
   <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working</value></data>
-  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them if anything stops working</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working. Larger files may have been deleted permanently.</value></data>
   <!-- 0 = size cleared (e.g. "120.5 MB") -->
   <data name="Completion.Cleared" xml:space="preserve"><value>{0} cleared</value></data>
+  <!-- Heading shown when an operation succeeded for SOME files but
+       errored for others. 0 = total size cleared (e.g. "120.5 MB"). -->
+  <data name="Completion.PartlyCleared" xml:space="preserve"><value>{0} cleared, some files could not be processed</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
   <data name="Completion.MoveSummary" xml:space="preserve"><value>{0} {1} moved to {2}</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
@@ -261,7 +271,10 @@ Please right-click and choose 'Run as administrator'.</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Access denied enumerating installed products. Run as administrator.</value></data>
   <!-- 0 = consecutive failure count, 1 = last MSI error code -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer API returned {0} consecutive non-Success responses (last error {1}). Unable to enumerate products.</value></data>
+  <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
+       in the message because a sysadmin reading the dialog may want
+       to look it up). -->
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer keeps refusing to list products (last error code {1}). Try restarting Windows, or run sfc /scannow from an elevated prompt.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Invalid destination</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>The destination cannot be inside the Windows Installer folder.</value></data>
   <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Not enough space</value></data>
@@ -272,7 +285,7 @@ Required: {1}
 Available: {2}</value></data>
   <!-- 0 = destination -->
   <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>You don't have permission to write to {0}.
-Try a folder in your user profile, or run as a different administrator.</value></data>
+Try a folder in your user profile or on a drive you own.</value></data>
   <data name="Error.PathTooLong" xml:space="preserve"><value>The path {0} is too long for Windows. Pick a shorter path.</value></data>
   <data name="Error.DestinationMissing" xml:space="preserve"><value>The folder {0} does not exist and could not be created. Check the drive letter or network path.</value></data>
   <!-- 0 = destination, 1 = io exception message -->
@@ -281,6 +294,7 @@ Try a folder in your user profile, or run as a different administrator.</value><
   <data name="Error.WriteDestination" xml:space="preserve"><value>Cannot write to {0}:
 {1}</value></data>
   <data name="Error.MissingSourceFile" xml:space="preserve"><value>File no longer exists.</value></data>
+  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Source file is a symlink or junction; refused for safety.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file
@@ -304,7 +318,11 @@ Try a folder in your user profile, or run as a different administrator.</value><
   <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
   <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean is already running.</value></data>
   <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
-  <!-- 0 = exception message, 1 = crash log path -->
+  <!-- 0 = exception type name (e.g. "IOException"), 1 = crash log path.
+       The full exception message is intentionally NOT formatted in here:
+       framework-provided messages can carry absolute paths from other
+       users' profiles into a dialog the current user reads. The full
+       detail is written to the crash log instead. -->
   <data name="Startup.UnhandledBody" xml:space="preserve"><value>An unexpected error occurred and InstallerClean needs to close.
 
 {0}
@@ -312,8 +330,10 @@ Try a folder in your user profile, or run as a different administrator.</value><
 Details written to:
 {1}</value></data>
   <data name="Startup.ErrorTitle" xml:space="preserve"><value>Startup error</value></data>
-  <!-- 0 = exception message -->
-  <data name="Startup.FailedToStart" xml:space="preserve"><value>Failed to start: {0}</value></data>
+  <!-- 0 = exception type name (see Startup.UnhandledBody for why this
+       is the type name and not the message), 1 = crash log path. -->
+  <data name="Startup.FailedToStart" xml:space="preserve"><value>Failed to start ({0}). Details written to:
+{1}</value></data>
 
   <!-- ============================================================
        FILE PICKER

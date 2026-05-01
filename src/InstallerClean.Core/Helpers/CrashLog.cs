@@ -35,6 +35,17 @@ public static class CrashLog
 
             Directory.CreateDirectory(LogFolder);
             RotateIfNeeded();
+
+            // SECURITY: re-check after CreateDirectory and rotation. A
+            // same-account attacker could swap LogFile for a symlink
+            // between the initial IsRedirected and the AppendAllText.
+            // File.AppendAllText follows symlinks, so an attacker-
+            // chosen target would receive the stack trace (which
+            // contains absolute paths the user typed) appended to it.
+            // Drop the entry rather than write through a swapped path.
+            if (StorageHelpers.IsRedirected(LogFile))
+                return LogFile;
+
             // Offset-aware timestamp so shared logs are unambiguous across timezones.
             var entry = $"---- {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";
             File.AppendAllText(LogFile, entry);

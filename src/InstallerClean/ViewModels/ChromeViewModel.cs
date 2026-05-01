@@ -33,8 +33,10 @@ public partial class ChromeViewModel : ObservableObject
         _scan = scan;
 
         // Surface scan-complete signals to the details commands so the
-        // Details buttons enable as soon as the first scan finishes
-        // and disable again if a future feature ever clears the result.
+        // Details buttons enable as soon as the first scan finishes.
+        // We listen on HasScanned (an observable property) rather than
+        // LastScanResult (a plain auto-property that never raises
+        // PropertyChanged), so HasScanned is the single trigger.
         //
         // LIFETIME CONTRACT: this subscription is intentionally never
         // unhooked. Both VMs are constructed by MainViewModel and share
@@ -49,8 +51,7 @@ public partial class ChromeViewModel : ObservableObject
         // CleanupViewModel.
         _scan.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName == nameof(ScanViewModel.LastScanResult)
-                || e.PropertyName == nameof(ScanViewModel.HasScanned))
+            if (e.PropertyName == nameof(ScanViewModel.HasScanned))
             {
                 OpenOrphanedDetailsCommand.NotifyCanExecuteChanged();
                 OpenRegisteredDetailsCommand.NotifyCanExecuteChanged();

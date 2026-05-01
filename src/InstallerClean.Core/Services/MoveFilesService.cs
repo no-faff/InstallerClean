@@ -42,6 +42,17 @@ public sealed class MoveFilesService : IMoveFilesService
         return Task.Run(() =>
         {
             _fs.Directory.CreateDirectory(destinationFolder);
+
+            // SECURITY: re-check after CreateDirectory. An attacker who
+            // controls any ancestor of the destination could swap the
+            // leaf to a junction pointing into C:\Windows\Installer
+            // between the first check and now. ResolveFinalPath expands
+            // junctions on the real filesystem, so the second check
+            // catches a swap that happened in the TOCTOU window.
+            if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
+                throw new InvalidOperationException(
+                    string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
+
             ProbeDestinationWriteable(destinationFolder);
 
             int moved = 0;
@@ -59,6 +70,21 @@ public sealed class MoveFilesService : IMoveFilesService
                     if (!_fs.File.Exists(sourcePath))
                     {
                         errors.Add(new MissingSourceFile(sourcePath));
+                        continue;
+                    }
+
+                    // SECURITY: refuse to follow a reparse point at the
+                    // source. C:\Windows\Installer is admin-write so
+                    // this is mostly defence-in-depth, but a junction
+                    // planted between scan and move would otherwise let
+                    // File.Move yank an attacker-chosen target out of
+                    // System32 (or any other readable location) into
+                    // the user's destination folder. Uses the real
+                    // filesystem regardless of the injected IFileSystem
+                    // so a MockFileSystem cannot bypass this check.
+                    if (Helpers.StorageHelpers.IsReparsePoint(sourcePath))
+                    {
+                        errors.Add(new IOFailure(sourcePath, Strings.Error_SourceIsReparsePoint));
                         continue;
                     }
 

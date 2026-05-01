@@ -25,7 +25,7 @@
                        TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource PrimaryPill}" Content="{loc:Translate Action.Cancel}"
+                <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True" Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource AccentPill}" Content="{loc:Translate Action.Move}"
                         Click="OnMove" IsDefault="True"/>

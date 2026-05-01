@@ -93,7 +93,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
         progress?.Report(Strings.Status_CheckingRegistry);
         try
         {
-            using var udKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+            // Pin to the 64-bit registry view explicitly. Today this
+            // matches the default for our x64 host process; if a future
+            // build ever ships an x86 variant (or AnyCPU+Prefer32Bit
+            // got flipped on), Registry.LocalMachine would silently
+            // route through WOW6432Node and miss real entries. Always
+            // reading Registry64 keeps the fallback path correct
+            // regardless of process bitness.
+            using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
+                Microsoft.Win32.RegistryHive.LocalMachine,
+                Microsoft.Win32.RegistryView.Registry64);
+            using var udKey = hklm.OpenSubKey(
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData");
             if (udKey is not null)
             {

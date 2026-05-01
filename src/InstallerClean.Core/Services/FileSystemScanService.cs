@@ -93,7 +93,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
             removable.Add(new OrphanedFile(
                 FullPath: filePath,
                 SizeBytes: size,
-                IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase)));
+                IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
+                Reason: Strings.Reason_Orphaned));
         }
 
         // Stat every registered package once here so the Details window

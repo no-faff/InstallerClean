@@ -198,11 +198,15 @@
                 <DockPanel Grid.Row="6">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
                             Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
-                            AutomationProperties.HelpText="{loc:Translate Automation.MoveAllFiles}"/>
+                            AutomationProperties.HelpText="{loc:Translate Automation.MoveAllFiles}"
+                            ToolTip="{loc:Translate Tooltip.MoveDisabledHint}"
+                            ToolTipService.ShowOnDisabled="True"/>
 
                     <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
                             Content="{loc:Translate Action.Delete}" Command="{Binding Cleanup.DeleteAllCommand}"
                             AutomationProperties.HelpText="{loc:Translate Automation.DeleteAllFiles}"
+                            ToolTip="{loc:Translate Tooltip.DeleteDisabledHint}"
+                            ToolTipService.ShowOnDisabled="True"
                             Margin="{StaticResource GapRight.Sm}"/>
 
                     <TextBlock DockPanel.Dock="Left" Text="{Binding Cleanup.OperationProgress}"
