@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using InstallerClean.Models;
 using InstallerClean.Resources;
 
@@ -5,6 +6,21 @@ namespace InstallerClean.Services;
 
 public sealed class MoveFilesService : IMoveFilesService
 {
+    private readonly IFileSystem _fs;
+
+    /// <summary>Production constructor: real on-disk filesystem.</summary>
+    public MoveFilesService() : this(new FileSystem()) { }
+
+    /// <summary>
+    /// Test constructor: inject a <see cref="MockFileSystem"/> (or any
+    /// other <see cref="IFileSystem"/>) so unit tests can verify the
+    /// move pipeline without touching <c>%TEMP%</c>.
+    /// </summary>
+    internal MoveFilesService(IFileSystem fileSystem)
+    {
+        _fs = fileSystem;
+    }
+
     public Task<MoveResult> MoveFilesAsync(
         IEnumerable<string> filePaths,
         string destinationFolder,
@@ -16,14 +32,18 @@ public sealed class MoveFilesService : IMoveFilesService
         // refuses directly rather than trusting upstream callers to
         // have checked, and ResolveFinalPath inside
         // IsInstallerFolderOrChild expands junctions so the destination
-        // can't sneak through behind a reparse point.
+        // can't sneak through behind a reparse point. Note that the
+        // junction resolution lives in InstallerCacheHelpers and uses
+        // the real filesystem regardless of the injected IFileSystem;
+        // production callers always pass a real path so this stays
+        // correct.
         if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
             throw new InvalidOperationException(
                 string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
 
         return Task.Run(() =>
         {
-            Directory.CreateDirectory(destinationFolder);
+            _fs.Directory.CreateDirectory(destinationFolder);
             ProbeDestinationWriteable(destinationFolder);
 
             int moved = 0;
@@ -38,17 +58,17 @@ public sealed class MoveFilesService : IMoveFilesService
 
                 try
                 {
-                    if (!File.Exists(sourcePath))
+                    if (!_fs.File.Exists(sourcePath))
                     {
                         errors.Add(new MissingSourceFile(sourcePath));
                         continue;
                     }
 
-                    var fileName = Path.GetFileName(sourcePath);
+                    var fileName = _fs.Path.GetFileName(sourcePath);
                     progress?.Report(new OperationProgress(i + 1, total, fileName));
 
                     var destPath = GetUniqueDestPath(destinationFolder, fileName);
-                    File.Move(sourcePath, destPath);
+                    _fs.File.Move(sourcePath, destPath);
                     moved++;
                 }
                 catch (DestinationCollisionException ex)
@@ -74,15 +94,15 @@ public sealed class MoveFilesService : IMoveFilesService
         }, cancellationToken);
     }
 
-    private static void ProbeDestinationWriteable(string folder)
+    private void ProbeDestinationWriteable(string folder)
     {
         // Fail fast with one clean error rather than collecting per-file
         // errors for every source when the destination is read-only.
-        var probe = Path.Combine(folder, Path.GetRandomFileName());
+        var probe = _fs.Path.Combine(folder, _fs.Path.GetRandomFileName());
         try
         {
-            File.WriteAllBytes(probe, Array.Empty<byte>());
-            File.Delete(probe);
+            _fs.File.WriteAllBytes(probe, Array.Empty<byte>());
+            _fs.File.Delete(probe);
         }
         catch (Exception ex)
         {
@@ -96,18 +116,18 @@ public sealed class MoveFilesService : IMoveFilesService
     // destPath during the unique-name race. The current File.Move
     // refuses existing targets, so the race ends in a per-file error
     // rather than a symlink follow-through to a sensitive location.
-    private static string GetUniqueDestPath(string folder, string fileName)
+    private string GetUniqueDestPath(string folder, string fileName)
     {
-        var candidate = Path.Combine(folder, fileName);
-        if (!File.Exists(candidate)) return candidate;
+        var candidate = _fs.Path.Combine(folder, fileName);
+        if (!_fs.File.Exists(candidate)) return candidate;
 
-        var nameWithout = Path.GetFileNameWithoutExtension(fileName);
-        var ext = Path.GetExtension(fileName);
+        var nameWithout = _fs.Path.GetFileNameWithoutExtension(fileName);
+        var ext = _fs.Path.GetExtension(fileName);
 
         for (int i = 1; i <= 10_000; i++)
         {
-            candidate = Path.Combine(folder, $"{nameWithout} ({i}){ext}");
-            if (!File.Exists(candidate)) return candidate;
+            candidate = _fs.Path.Combine(folder, $"{nameWithout} ({i}){ext}");
+            if (!_fs.File.Exists(candidate)) return candidate;
         }
 
         throw new DestinationCollisionException(fileName);
