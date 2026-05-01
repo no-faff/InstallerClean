@@ -152,6 +152,7 @@ public static class Strings
     public static string Field_Size => Get("Field.Size");
     public static string Field_Subject => Get("Field.Subject");
     public static string Field_Title => Get("Field.Title");
+    public static string Field_UnknownProductName => Get("Field.UnknownProductName");
     public static string FilePicker_ChooseDestinationTitle => Get("FilePicker.ChooseDestinationTitle");
     public static string Plural_Error_Plural => Get("Plural.Error.Plural");
     public static string Plural_Error_Singular => Get("Plural.Error.Singular");
@@ -195,7 +196,9 @@ public static class Strings
     public static string Summary_MissingFromDisk => Get("Summary.MissingFromDisk");
     public static string Summary_OperationFiles => Get("Summary.OperationFiles");
     public static string Summary_OrphanedToCleanUp => Get("Summary.OrphanedToCleanUp");
+    public static string Summary_OrphanedWindow => Get("Summary.OrphanedWindow");
     public static string Summary_RegisteredStillUsed => Get("Summary.RegisteredStillUsed");
+    public static string Summary_RegisteredWindow => Get("Summary.RegisteredWindow");
     public static string Tooltip_BuyMeACuppa => Get("Tooltip.BuyMeACuppa");
     public static string Tooltip_Close => Get("Tooltip.Close");
     public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");

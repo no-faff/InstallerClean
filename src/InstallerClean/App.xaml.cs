@@ -10,6 +10,14 @@ using InstallerClean.ViewModels;
 
 namespace InstallerClean;
 
+/// <summary>
+/// WPF application entry point. Builds the DI container, takes the
+/// single-instance mutex, runs the splash-driven startup scan, hands
+/// the resolved <see cref="ViewModels.MainViewModel"/> to a freshly
+/// constructed <see cref="MainWindow"/>, and registers the global
+/// last-resort exception handlers so any unhandled crash lands in the
+/// user's <see cref="Helpers.CrashLog"/> file before the process exits.
+/// </summary>
 public partial class App : Application
 {
     private static Mutex? _singleInstanceMutex;

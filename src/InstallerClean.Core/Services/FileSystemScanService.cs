@@ -5,6 +5,14 @@ using InstallerClean.Resources;
 
 namespace InstallerClean.Services;
 
+/// <summary>
+/// Default <see cref="IFileSystemScanService"/> implementation. Pairs the
+/// API output from <see cref="IInstallerQueryService"/> with a directory
+/// walk of <c>C:\Windows\Installer</c> via the injected
+/// <see cref="IFileSystem"/>, so tests can substitute a mock filesystem
+/// and a mock query service to drive every code path without touching
+/// the real Installer folder.
+/// </summary>
 public sealed class FileSystemScanService : IFileSystemScanService
 {
     private readonly IInstallerQueryService _queryService;

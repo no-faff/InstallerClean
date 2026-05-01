@@ -2,10 +2,18 @@ using System.Collections.Concurrent;
 using CommunityToolkit.Mvvm.ComponentModel;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
+using InstallerClean.Resources;
 using InstallerClean.Services;
 
 namespace InstallerClean.ViewModels;
 
+/// <summary>
+/// Backs the orphaned-files detail window. Holds the displayable file
+/// list (sorted largest-first), the currently selected file, and a lazy
+/// per-file metadata cache that reads MSI summary information off the
+/// UI thread. The cache survives selection cycles so a user clicking
+/// back through previously selected files sees instant detail panels.
+/// </summary>
 public partial class OrphanedFilesViewModel : ObservableObject, IDisposable
 {
     private readonly IMsiFileInfoService _infoService;
@@ -38,7 +46,8 @@ public partial class OrphanedFilesViewModel : ObservableObject, IDisposable
         Files = files.OrderByDescending(f => f.SizeBytes).ToList();
 
         var totalSize = DisplayHelpers.FormatSize(files.Sum(f => f.SizeBytes));
-        Summary = $"{files.Count} {DisplayHelpers.Pluralise(files.Count, "file", "files")} ({totalSize})";
+        Summary = string.Format(Strings.Summary_OrphanedWindow,
+            files.Count, DisplayHelpers.PluraliseFile(files.Count), totalSize);
 
         if (Files.Count > 0)
             SelectedFile = Files[0];

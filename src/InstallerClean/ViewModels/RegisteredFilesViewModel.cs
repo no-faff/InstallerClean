@@ -2,10 +2,17 @@ using System.Collections.Concurrent;
 using CommunityToolkit.Mvvm.ComponentModel;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
+using InstallerClean.Resources;
 using InstallerClean.Services;
 
 namespace InstallerClean.ViewModels;
 
+/// <summary>
+/// Backs the registered-files detail window. Groups packages by product
+/// (so an MSI and its patches show as a single row), sorts alphabetically
+/// by product name, and lazy-loads MSI summary metadata for the
+/// selected row off the UI thread. The cache survives selection cycles.
+/// </summary>
 public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
 {
     private readonly IMsiFileInfoService _infoService;
@@ -66,7 +73,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
             if (msi is null && patches.Count == 0) continue;
 
             var productName = items.First().ProductName;
-            if (string.IsNullOrEmpty(productName)) productName = "(unknown)";
+            if (string.IsNullOrEmpty(productName)) productName = Strings.Field_UnknownProductName;
 
             var representative = msi ?? items.First();
 
@@ -81,7 +88,10 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         }
 
         Products = products;
-        Summary = $"{packages.Count} registered {DisplayHelpers.Pluralise(packages.Count, "file", "files")} ({DisplayHelpers.FormatSize(totalBytes)})";
+        Summary = string.Format(Strings.Summary_RegisteredWindow,
+            packages.Count,
+            DisplayHelpers.PluraliseFile(packages.Count),
+            DisplayHelpers.FormatSize(totalBytes));
 
         if (Products.Count > 0)
             SelectedProduct = Products[0];
