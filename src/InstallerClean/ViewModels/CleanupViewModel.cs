@@ -139,7 +139,7 @@ public partial class CleanupViewModel : ObservableObject
         var fresh = _settingsService.Load();
         fresh.MoveDestination = _settings.MoveDestination;
         _settings = fresh;
-        _settingsService.Save(_settings);
+        _ = _settingsService.TrySave(_settings);
 
         // Dispose the type-once-and-stop case (every other path is
         // covered by the next schedule call replacing the field).

@@ -40,8 +40,10 @@ public partial class MainViewModel : ObservableObject
         IWindowService windowService,
         IFileSystem fileSystem)
     {
-        Scan = new ScanViewModel(scanService, rebootService, dialogService);
-        // Closure reads Scan at invocation time, after the ctor runs.
+        // Closures read Cleanup / Completion at invocation time, after
+        // the ctor runs.
+        Scan = new ScanViewModel(scanService, rebootService, dialogService,
+            isExternallyBlocked: () => Cleanup?.IsOperating == true || Completion?.IsComplete == true);
         Completion = new CompletionViewModel(() => Scan.ScanCommand.ExecuteAsync(null));
         Cleanup = new CleanupViewModel(
             moveService, deleteService, settingsService,
@@ -85,8 +87,8 @@ public partial class MainViewModel : ObservableObject
         {
             OnPropertyChanged(nameof(IsMainContentInteractive));
             // Block F5 / Re-scan while a Move/Delete or completion is
-            // up, otherwise a parallel scan would race the operation.
-            Scan.IsExternallyBlocked = Cleanup.IsOperating || Completion.IsComplete;
+            // up so a parallel scan can't race the operation.
+            Scan.NotifyExternallyBlockedChanged();
         }
     }
 }

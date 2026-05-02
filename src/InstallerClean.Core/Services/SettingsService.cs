@@ -53,16 +53,9 @@ public sealed class SettingsService : ISettingsService
         }
     }
 
-    /// <summary>
-    /// Persists settings using a write-temp-then-rename for atomicity.
-    /// Swallows IO errors (disk full, OneDrive lock, read-only profile)
-    /// so a failed save can never crash an operation that triggered it.
-    /// Callers that need to know whether the save succeeded should use
-    /// <see cref="TrySave"/> instead.
-    /// </summary>
-    public void Save(AppSettings settings) => TrySave(settings);
-
-    /// <summary>Persists settings. Returns true on success.</summary>
+    /// <summary>Persists settings via write-temp-then-rename. Returns true on
+    /// success. Never throws (disk full / OneDrive lock / read-only profile
+    /// all return false).</summary>
     public bool TrySave(AppSettings settings)
     {
         // Random temp name is belt-and-braces; the single-instance

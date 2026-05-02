@@ -728,14 +728,9 @@
          attribute pair.
 
          The indeterminate animation translates the 80px bar from
-         X=-80 to X=320, which gives a clean off-screen-to-off-screen
-         travel for any ProgressBar up to 240px wide (the only current
-         consumer is the scan overlay at 240px). Wider hosts will
-         leave the bar visible at the right edge when the cycle
-         restarts; if a wider indeterminate bar is ever introduced,
-         raise the To value to match. WPF DoubleAnimation can't
-         template-bind to ActualWidth, so this stays a documented
-         constant rather than dynamic.
+         X=-80 to X=320 (max bar width 240px). DoubleAnimation can't
+         template-bind ActualWidth; raise the To value if a wider
+         indeterminate consumer appears.
          ============================================================ -->
     <Style TargetType="ProgressBar">
         <Setter Property="Background" Value="{StaticResource Surface.Sidebar}"/>

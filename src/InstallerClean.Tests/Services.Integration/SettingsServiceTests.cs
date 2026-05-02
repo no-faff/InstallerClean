@@ -40,7 +40,7 @@ public class SettingsServiceTests : IDisposable
             MoveDestination = @"D:\Backup"
         };
 
-        svc.Save(original);
+        svc.TrySave(original);
         var loaded = svc.Load();
 
         Assert.Equal(@"D:\Backup", loaded.MoveDestination);
@@ -107,13 +107,13 @@ public class SettingsServiceTests : IDisposable
     }
 
     [Fact]
-    public void Save_never_throws_even_when_target_is_unreachable()
+    public void TrySave_never_throws_even_when_target_is_unreachable()
     {
         var invalidPath = Path.Combine(_tempFile, "sub", "settings.json");
         File.WriteAllText(_tempFile, "not a directory");
         var svc = new SettingsService(invalidPath);
 
-        var ex = Record.Exception(() => svc.Save(new AppSettings()));
+        var ex = Record.Exception(() => svc.TrySave(new AppSettings()));
 
         Assert.Null(ex);
     }

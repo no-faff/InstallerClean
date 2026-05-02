@@ -105,8 +105,9 @@ public partial class MainWindow : Window
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
 
     // Title-bar glyph swap matches Windows's own caption buttons.
-    private const string MaximizeGlyph = "□";
-    private const string RestoreGlyph = "❐";
+    // \u escapes so source-file encoding isn't a load-bearing assumption.
+    private const string MaximizeGlyph = "\u25A1";   // WHITE SQUARE
+    private const string RestoreGlyph = "\u2750";    // UPPER RIGHT SHADOWED WHITE SQUARE
 
     /// <summary>
     /// Keeps the caption button's glyph, tooltip and automation name

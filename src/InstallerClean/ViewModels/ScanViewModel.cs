@@ -23,6 +23,7 @@ public partial class ScanViewModel : ObservableObject
     private readonly IFileSystemScanService _scanService;
     private readonly IPendingRebootService _rebootService;
     private readonly IDialogService _dialogService;
+    private readonly Func<bool> _isExternallyBlocked;
 
     private CancellationTokenSource? _scanCts;
 
@@ -31,15 +32,6 @@ public partial class ScanViewModel : ObservableObject
     private bool _isScanning;
     [ObservableProperty] private string _scanProgress = string.Empty;
     [ObservableProperty] private bool _hasScanned;
-
-    /// <summary>
-    /// Set by MainViewModel while another overlay is up. Gates the
-    /// user-driven Scan command only; ScanWithProgressAsync (splash)
-    /// and RefreshAsync (post-Move/Delete) bypass it.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(ScanCommand))]
-    private bool _isExternallyBlocked;
 
     [ObservableProperty] private int _registeredFileCount;
     [ObservableProperty] private string _registeredSizeDisplay = string.Empty;
@@ -70,12 +62,22 @@ public partial class ScanViewModel : ObservableObject
     public ScanViewModel(
         IFileSystemScanService scanService,
         IPendingRebootService rebootService,
-        IDialogService dialogService)
+        IDialogService dialogService,
+        Func<bool>? isExternallyBlocked = null)
     {
         _scanService = scanService;
         _rebootService = rebootService;
         _dialogService = dialogService;
+        _isExternallyBlocked = isExternallyBlocked ?? (() => false);
     }
+
+    /// <summary>
+    /// Tells the Scan command to re-evaluate its CanExecute. MainViewModel
+    /// calls this when the externally-blocked predicate's inputs change
+    /// (Cleanup.IsOperating or Completion.IsComplete).
+    /// </summary>
+    public void NotifyExternallyBlockedChanged() =>
+        ScanCommand.NotifyCanExecuteChanged();
 
     public string RegisteredSummaryText =>
         string.Format(Strings.Summary_RegisteredStillUsed,
@@ -138,7 +140,7 @@ public partial class ScanViewModel : ObservableObject
     /// to the dialog service, and updates <see cref="ScanProgress"/>
     /// throughout.
     /// </summary>
-    private bool CanScan() => !IsScanning && !IsExternallyBlocked;
+    private bool CanScan() => !IsScanning && !_isExternallyBlocked();
 
     [RelayCommand(CanExecute = nameof(CanScan))]
     private async Task ScanAsync()
