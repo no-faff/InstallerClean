@@ -16,12 +16,10 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
 {
     public MsiSummaryInfo? GetSummaryInfo(string filePath)
     {
-        // SECURITY: defence-in-depth. Today the only caller path is
-        // OrphanedFilesViewModel / RegisteredFilesViewModel, both
-        // sourced from the scan service which already filters reparse
-        // points during enumeration. Refuse here too so a future
-        // caller that feeds an arbitrary path can't trick MSI into
-        // following a junction into a sensitive location.
+        // Defence-in-depth: refuse symlinks at the API entry. Current
+        // callers (the detail-window VMs) feed scan-derived paths
+        // which the scan already filtered, so this is paranoia for
+        // future callers.
         if (Helpers.StorageHelpers.IsReparsePoint(filePath))
             return null;
 
