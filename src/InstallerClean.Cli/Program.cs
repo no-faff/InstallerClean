@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using InstallerClean.Helpers;
+using InstallerClean.Models;
 using InstallerClean.Resources;
 using InstallerClean.Services;
 
@@ -106,6 +107,13 @@ internal static class Program
             }
         }
 
+        // Tracks the highest CurrentFile reported by the move/delete
+        // progress reporter. On a Ctrl+C mid-loop the OCE catch reads
+        // this to write an EventLog summary and pick ExitPartial vs
+        // ExitCancelled.
+        int processedCount = 0;
+        int totalToProcess = 0;
+
         try
         {
             using var services = new ServiceCollection()
@@ -159,12 +167,22 @@ internal static class Program
 
             var filePaths = scanResult.RemovableFiles.Select(f => f.FullPath).ToList();
 
+            // Per-file progress: prints the file name to stdout and
+            // updates processedCount so the OCE catch can attribute
+            // the cancellation correctly.
+            totalToProcess = count;
+            var progress = new Progress<OperationProgress>(p =>
+            {
+                processedCount = p.CurrentFile;
+                Console.WriteLine($"  [{p.CurrentFile}/{p.TotalFiles}] {p.CurrentFileName}");
+            });
+
             if (arg == "/d")
             {
                 var deleteService = services.GetRequiredService<IDeleteFilesService>();
                 Console.WriteLine(string.Format(Strings.Cli_DeletingFiles,
                     count, DisplayHelpers.PluraliseFile(count)));
-                var result = await deleteService.DeleteFilesAsync(filePaths, null, cts.Token);
+                var result = await deleteService.DeleteFilesAsync(filePaths, progress, cts.Token);
                 Console.WriteLine(string.Format(Strings.Cli_DeletedFiles,
                     result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
                 if (result.Errors.Count > 0)
@@ -176,7 +194,8 @@ internal static class Program
                 var level = result.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
                 EventLogWriter.Write(level,
                     string.Format(Strings.Cli_EventLogDeleteSummary,
-                        result.DeletedCount, count, size, result.Errors.Count));
+                        arg, result.DeletedCount, count, DisplayHelpers.PluraliseFile(count),
+                        size, result.Errors.Count, DisplayHelpers.PluraliseError(result.Errors.Count)));
                 // 0 / 2 / 1: full / partial / total failure (see
                 // ExitOk / ExitPartial / ExitError).
                 if (result.Errors.Count == 0) return ExitOk;
@@ -185,14 +204,21 @@ internal static class Program
             }
 
             // arg == "/m"
-            var settingsService = services.GetRequiredService<ISettingsService>();
-            var settings = settingsService.Load();
-            var dest = args.Length > 1 ? args[1] : settings.MoveDestination;
+            string dest;
+            if (args.Length > 1)
+            {
+                dest = args[1].Trim();
+            }
+            else
+            {
+                var settingsService = services.GetRequiredService<ISettingsService>();
+                dest = settingsService.Load().MoveDestination;
+            }
             if (string.IsNullOrWhiteSpace(dest))
             {
                 Console.WriteLine(Strings.Cli_NoMoveDestination);
                 EventLogWriter.Write(EventLogWriter.Level.Warning,
-                    Strings.Cli_EventLogMoveNoDestination);
+                    string.Format(Strings.Cli_EventLogMoveNoDestination, arg));
                 return ExitError;
             }
 
@@ -207,7 +233,7 @@ internal static class Program
             var moveService = services.GetRequiredService<IMoveFilesService>();
             Console.WriteLine(string.Format(Strings.Cli_MovingFiles,
                 count, DisplayHelpers.PluraliseFile(count), dest));
-            var moveResult = await moveService.MoveFilesAsync(filePaths, dest, null, cts.Token);
+            var moveResult = await moveService.MoveFilesAsync(filePaths, dest, progress, cts.Token);
             Console.WriteLine(string.Format(Strings.Cli_MovedFiles,
                 moveResult.MovedCount, DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
             if (moveResult.Errors.Count > 0)
@@ -219,7 +245,8 @@ internal static class Program
             var moveLevel = moveResult.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
             EventLogWriter.Write(moveLevel,
                 string.Format(Strings.Cli_EventLogMoveSummary,
-                    moveResult.MovedCount, count, dest, size, moveResult.Errors.Count));
+                    arg, moveResult.MovedCount, count, DisplayHelpers.PluraliseFile(count),
+                    dest, size, moveResult.Errors.Count, DisplayHelpers.PluraliseError(moveResult.Errors.Count)));
             if (moveResult.Errors.Count == 0) return ExitOk;
             if (moveResult.MovedCount > 0) return ExitPartial;
             return ExitError;
@@ -227,6 +254,17 @@ internal static class Program
         catch (OperationCanceledException)
         {
             Console.WriteLine(Strings.Cli_Cancelled);
+            // EventLog the cancellation so a Task Scheduler audit can
+            // see how far the run got, and pick ExitPartial when work
+            // committed before the Ctrl+C arrived.
+            if (processedCount > 0)
+            {
+                EventLogWriter.Write(EventLogWriter.Level.Warning,
+                    string.Format(Strings.Cli_EventLogCancelledPartial,
+                        arg, processedCount, totalToProcess,
+                        DisplayHelpers.PluraliseFile(totalToProcess)));
+                return ExitPartial;
+            }
             return ExitCancelled;
         }
         catch (UnauthorizedAccessException)
