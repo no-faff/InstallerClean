@@ -6,7 +6,7 @@
 
 # InstallerClean
 
-**Safely clean up `C:\Windows\Installer`, the hidden Windows folder that quietly eats your disk space.**
+**A modern, open-source replacement for [PatchCleaner](https://www.homedev.com.au/free/patchcleaner). Safely clean up `C:\Windows\Installer`, the hidden Windows folder that quietly eats your disk space.**
 
 ![Screenshot of InstallerClean](docs/InstallerClean-done.png)
 
@@ -85,6 +85,47 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 - Nothing is touched until you click Delete or Move and confirm
 - The app warns you if Windows has pending updates that could affect results
 - More than 150 automated tests cover the core logic and run on every commit (see the green CI badge above)
+
+## What it doesn't do
+
+Just to be explicit, because picky-tool-skeptic territory:
+
+- **Doesn't touch WinSxS** (`C:\Windows\WinSxS`). That's a different folder with different rules. Use Windows's built-in Disk Cleanup or `Dism /Online /Cleanup-Image /StartComponentCleanup`.
+- **Doesn't run during Windows Update.** If a reboot is pending, Move and Delete are blocked (banner shown, CLI exits with an error). Cleaning the cache mid-update can break the pending repair sequence.
+- **Doesn't auto-clean on a schedule.** No background service, no scheduled task installed. You run it when you want to.
+- **Doesn't run unattended without `/d` or `/m`.** Launch the GUI or the CLI explicitly; no surprises.
+- **Doesn't modify the registry.** Reads only, never writes. Windows owns the installer database; we just read it.
+- **Doesn't phone home.** No telemetry, no usage reporting, no version-check ping. The "Check for updates" link in About just opens the GitHub releases page in your browser.
+- **Doesn't bundle anything.** No "optional" toolbars, no third-party offers, no nag screens.
+- **Doesn't ask for any permissions beyond Administrator.** Required because `C:\Windows\Installer` is admin-only.
+
+## For sysadmins: verifying the binary
+
+InstallerClean is unsigned (no Authenticode certificate). This is deliberate; signing certificates cost annually and we'd rather keep the project free, open and donations-funded.
+
+- SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
+- VirusTotal links for setup, portable and slim builds are published with each release. Setup and portable builds have consistently scored 0/71 since v1.5.0.
+- Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
+
+## FAQ
+
+**Will I actually free up GBs of space?** Depends on your machine. A clean Windows 11 install with no extra software has very little to remove. A long-running developer workstation, or any machine with Adobe Acrobat installed, often has tens of GB. Run `installerclean-cli /s` to see exactly what would be removed before you commit.
+
+**Why does it want Administrator?** `C:\Windows\Installer` is owned by SYSTEM and locked down to admins only. Reading the folder, writing to the Installer-database query API, and moving or deleting files all require elevation. There's no user-mode path.
+
+**Why does my antivirus flag the slim download?** The slim build is a small unsigned framework-dependent .NET single-file launcher. Some whitelist-biased ML antivirus engines (SecureAge in particular) flag any small unsigned single-file .NET launcher regardless of content. If this affects you, use the setup or portable build instead, which have consistently scored 0/71 on VirusTotal.
+
+**What's the difference between setup, portable and slim?** Setup is a regular Windows installer, portable is a single self-contained exe, slim is the smallest download but needs the .NET 8 Desktop Runtime already installed (which you have if you have Visual Studio).
+
+**Can I undo a Delete?** Yes. Delete sends files to the Recycle Bin. Restore them from there. If you emptied the Recycle Bin, the files are gone, but you can also use Move first to a folder you choose, then verify nothing breaks before deleting from there.
+
+**Will Windows complain if I remove these files?** No. We only remove files Windows itself reports as no-longer-needed via its own installer-database API. The next install / uninstall / patch cycle proceeds normally.
+
+**Why no `Win32_Product` (WMI)?** [`Win32_Product` triggers MSI repair operations on every product during enumeration](https://gregramsey.net/2012/02/20/win32_product-is-evil/), which can take minutes and load the disk hard. We use the Windows Installer COM API directly with no side effects.
+
+**Does it work on Windows 7 or 8?** Untested and not supported. Targets Windows 10 and 11.
+
+**Is it suitable for RMM / mass deployment?** Yes. The CLI exits with three-state codes (0 / 2 / 1 = full success / partial / failure; 130 for Ctrl+C), writes a per-run summary to the Application event log, and respects the same single-instance mutex as the GUI. See the Command line section.
 
 ## Download
 
