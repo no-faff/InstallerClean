@@ -17,13 +17,27 @@ public static class CrashLog
     private static readonly string LogFile = Path.Combine(LogFolder, "crash.log");
     private static readonly string ArchiveFile = Path.Combine(LogFolder, "crash.log.old");
 
+    /// <summary>Path of the log file (may not exist yet).</summary>
+    public static string Path => LogFile;
+
     /// <summary>
-    /// Appends the full exception detail (type, message, stack trace,
-    /// inner exceptions) to crash.log and returns the log path so it
-    /// can be shown to the user. Swallows IO errors silently: a crash
-    /// handler must never itself throw.
+    /// Appends the exception to crash.log and returns the log path.
+    /// Swallows IO errors (a crash handler must never throw); use
+    /// <see cref="TryWrite"/> to also learn whether the write
+    /// succeeded.
     /// </summary>
     public static string Write(Exception ex)
+    {
+        TryWrite(ex);
+        return LogFile;
+    }
+
+    /// <summary>
+    /// Like <see cref="Write"/> but also reports whether the entry was
+    /// persisted, so dialog text doesn't claim "details written to X"
+    /// when the write failed (symlinked log file, read-only profile).
+    /// </summary>
+    public static (string Path, bool Written) TryWrite(Exception ex)
     {
         try
         {
@@ -34,7 +48,7 @@ public static class CrashLog
             // entry rather than append into the symlink's target.
             using var handle = StorageHelpers.OpenAtomic(
                 LogFile, FileAccess.Write, StorageHelpers.AtomicOpenMode.OpenAlways);
-            if (handle is null) return LogFile;
+            if (handle is null) return (LogFile, false);
 
             using var fs = new FileStream(handle, FileAccess.Write);
             fs.Seek(0, SeekOrigin.End);
@@ -42,12 +56,13 @@ public static class CrashLog
             var entry = $"---- {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";
             using var writer = new StreamWriter(fs, Encoding.UTF8, leaveOpen: false);
             writer.Write(entry);
+            return (LogFile, true);
         }
         catch
         {
             // Swallow: a crash handler must never itself throw.
+            return (LogFile, false);
         }
-        return LogFile;
     }
 
     private static void RotateIfNeeded()

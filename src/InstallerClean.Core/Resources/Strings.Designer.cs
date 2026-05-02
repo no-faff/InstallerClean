@@ -86,6 +86,7 @@ public static class Strings
     public static string Cli_EventLogScanNoOrphans => Get("Cli.EventLogScanNoOrphans");
     public static string Cli_FoundOrphans => Get("Cli.FoundOrphans");
     public static string Cli_GenericError => Get("Cli.GenericError");
+    public static string Cli_GenericError_NoLog => Get("Cli.GenericError.NoLog");
     public static string Cli_Help_Delete => Get("Cli.Help.Delete");
     public static string Cli_Help_ExitCodeCancelled => Get("Cli.Help.ExitCodeCancelled");
     public static string Cli_Help_ExitCodeError => Get("Cli.Help.ExitCodeError");
@@ -180,12 +181,15 @@ public static class Strings
     public static string Startup_AlreadyRunningTitle => Get("Startup.AlreadyRunningTitle");
     public static string Startup_ErrorTitle => Get("Startup.ErrorTitle");
     public static string Startup_FailedToStart => Get("Startup.FailedToStart");
+    public static string Startup_FailedToStart_NoLog => Get("Startup.FailedToStart.NoLog");
     public static string Startup_UnhandledBody => Get("Startup.UnhandledBody");
+    public static string Startup_UnhandledBody_NoLog => Get("Startup.UnhandledBody.NoLog");
     public static string Startup_UnhandledTitle => Get("Startup.UnhandledTitle");
     public static string Status_Cancelling => Get("Status.Cancelling");
     public static string Status_CheckingRegistry => Get("Status.CheckingRegistry");
     public static string Status_DeleteCancelled => Get("Status.DeleteCancelled");
     public static string Status_DeleteFailed => Get("Status.DeleteFailed");
+    public static string Status_DeleteFailed_NoLog => Get("Status.DeleteFailed.NoLog");
     public static string Status_Deleting => Get("Status.Deleting");
     public static string Status_Done => Get("Status.Done");
     public static string Status_EnumeratingProducts => Get("Status.EnumeratingProducts");
@@ -193,6 +197,7 @@ public static class Strings
     public static string Status_FoundProducts => Get("Status.FoundProducts");
     public static string Status_MoveCancelled => Get("Status.MoveCancelled");
     public static string Status_MoveFailed => Get("Status.MoveFailed");
+    public static string Status_MoveFailed_NoLog => Get("Status.MoveFailed.NoLog");
     public static string Status_Moving => Get("Status.Moving");
     public static string Status_PreparingDestination => Get("Status.PreparingDestination");
     public static string Status_QueryingApi => Get("Status.QueryingApi");
@@ -202,6 +207,7 @@ public static class Strings
     public static string Status_ScanComplete => Get("Status.ScanComplete");
     public static string Status_ScanFailedDb => Get("Status.ScanFailedDb");
     public static string Status_ScanFailedDetails => Get("Status.ScanFailedDetails");
+    public static string Status_ScanFailedDetails_NoLog => Get("Status.ScanFailedDetails.NoLog");
     public static string Status_Scanning => Get("Status.Scanning");
     public static string Status_ScanningCache => Get("Status.ScanningCache");
     public static string Status_StartingScan => Get("Status.StartingScan");

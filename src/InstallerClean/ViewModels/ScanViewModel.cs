@@ -182,14 +182,14 @@ public partial class ScanViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            // Full detail to crash log; type name + log path to status
-            // pill AND dialog (the pill alone gets clipped by
-            // TextTrimming). ex.Message never reaches UI.
-            var logPath = CrashLog.Write(ex);
-            ScanProgress = string.Format(Strings.Status_ScanFailedDetails, ex.GetType().Name, logPath);
-            _dialogService.ShowError(
-                string.Format(Strings.Status_ScanFailedDetails, ex.GetType().Name, logPath),
-                Strings.Error_ScanFailedTitle);
+            // ex.Message never reaches UI: type name + log path only.
+            var crash = CrashLog.TryWrite(ex);
+            var typeName = ex.GetType().Name;
+            var msg = crash.Written
+                ? string.Format(Strings.Status_ScanFailedDetails, typeName, crash.Path)
+                : string.Format(Strings.Status_ScanFailedDetails_NoLog, typeName);
+            ScanProgress = msg;
+            _dialogService.ShowError(msg, Strings.Error_ScanFailedTitle);
         }
         finally
         {

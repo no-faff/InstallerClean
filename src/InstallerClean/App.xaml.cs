@@ -27,6 +27,10 @@ public partial class App : Application
     // exception could fire DispatcherUnhandledException recursively.
     private static bool _handlingUnhandledException;
 
+    /// <remarks>
+    /// <c>async void</c> is the WPF override contract; sync and post-
+    /// await throws both reach the catch blocks below.
+    /// </remarks>
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
@@ -75,11 +79,14 @@ public partial class App : Application
             _handlingUnhandledException = true;
             try
             {
-                var logPath = CrashLog.Write(args.Exception);
-                // Type name only to UI; ex.Message could carry paths
-                // from another user's profile under elevation.
-                MessageBox.Show(
-                    string.Format(Strings.Startup_UnhandledBody, args.Exception.GetType().Name, logPath),
+                var crash = CrashLog.TryWrite(args.Exception);
+                var typeName = args.Exception.GetType().Name;
+                // Type name only; ex.Message can carry cross-profile paths
+                // under elevation.
+                var body = crash.Written
+                    ? string.Format(Strings.Startup_UnhandledBody, typeName, crash.Path)
+                    : string.Format(Strings.Startup_UnhandledBody_NoLog, typeName);
+                MessageBox.Show(body,
                     Strings.Startup_UnhandledTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                 args.Handled = true;
                 Shutdown(1);
@@ -168,10 +175,12 @@ public partial class App : Application
         catch (Exception ex)
         {
             splash?.Close();
-            var logPath = CrashLog.Write(ex);
-            // Type name only to UI (see DispatcherUnhandledException).
-            MessageBox.Show(
-                string.Format(Strings.Startup_FailedToStart, ex.GetType().Name, logPath),
+            var crash = CrashLog.TryWrite(ex);
+            var typeName = ex.GetType().Name;
+            var body = crash.Written
+                ? string.Format(Strings.Startup_FailedToStart, typeName, crash.Path)
+                : string.Format(Strings.Startup_FailedToStart_NoLog, typeName);
+            MessageBox.Show(body,
                 Strings.Startup_ErrorTitle,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
