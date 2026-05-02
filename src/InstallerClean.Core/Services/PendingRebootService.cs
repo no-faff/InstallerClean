@@ -6,52 +6,47 @@ public sealed class PendingRebootService : IPendingRebootService
 {
     public bool HasPendingReboot()
     {
-        return HasWindowsUpdateReboot()
-            || HasComponentBasedServicingReboot()
-            || HasPendingFileRenames()
-            || HasPostRebootReporting();
+        // Pin Registry64. Today the app ships x64-only and the CBS /
+        // WindowsUpdate / Session Manager keys live in the 64-bit view,
+        // but a future bitness flip would silently redirect via
+        // Wow6432Node and miss real entries. Matches InstallerQueryService.
+        using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+
+        return KeyExists(hive, @"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired")
+            || KeyExists(hive, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending")
+            || HasPendingFileRenames(hive)
+            || KeyExists(hive, @"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\PostRebootReporting");
     }
 
-    private static bool HasWindowsUpdateReboot() => TryKeyExists(
-        @"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired");
-
-    private static bool HasComponentBasedServicingReboot() => TryKeyExists(
-        @"SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending");
-
-    private static bool HasPendingFileRenames()
+    private static bool HasPendingFileRenames(RegistryKey hive)
     {
         try
         {
-            using var key = Registry.LocalMachine.OpenSubKey(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager");
+            using var key = hive.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager");
             if (key is null) return false;
 
             // PendingFileRenameOperations is a REG_MULTI_SZ; some writers
             // leave an empty array after clearing, which we treat as "no pending".
             var raw = key.GetValue("PendingFileRenameOperations");
-            if (raw is string[] arr && arr.Any(s => !string.IsNullOrEmpty(s)))
-                return true;
+            return raw is string[] arr && arr.Any(s => !string.IsNullOrEmpty(s));
         }
         catch (Exception)
         {
             // fail open; a failed registry read must not block the user.
+            return false;
         }
-        return false;
     }
 
-    private static bool HasPostRebootReporting() => TryKeyExists(
-        @"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\PostRebootReporting");
-
-    private static bool TryKeyExists(string path)
+    private static bool KeyExists(RegistryKey hive, string path)
     {
         try
         {
-            using var key = Registry.LocalMachine.OpenSubKey(path);
+            using var key = hive.OpenSubKey(path);
             return key is not null;
         }
         catch (Exception)
         {
-            return false; // fail open, don't block the user
+            return false;
         }
     }
 }
