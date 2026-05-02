@@ -80,12 +80,9 @@ internal static class InstallerCacheHelpers
 
             var resolved = StripLongPathPrefix(new string(buffer, 0, (int)length));
 
-            // Reattach the not-yet-created suffix the caller asked
-            // about so unborn destination paths still resolve to the
-            // correct real-folder root. Path.Combine handles the
-            // separator boundary in both directions: probe = "C:\"
-            // produces a suffix without a leading separator, every
-            // other probe produces one with.
+            // Reattach the not-yet-created suffix to the resolved root.
+            // Path.Combine handles the separator boundary; probe = "C:\"
+            // gives a suffix without a leading separator, others with.
             if (probe.Length < normalised.Length)
             {
                 var suffix = normalised.Substring(probe.Length)

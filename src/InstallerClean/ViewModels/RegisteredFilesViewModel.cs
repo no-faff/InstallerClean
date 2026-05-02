@@ -54,8 +54,12 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
             p => string.IsNullOrEmpty(p.ProductCode) ? p.LocalPackagePath : p.ProductCode,
             StringComparer.OrdinalIgnoreCase);
 
+        // Path tiebreaker so the (unknown) cluster orders by path
+        // rather than GroupBy-iteration order.
         var products = new List<ProductRow>();
-        foreach (var group in groups.OrderBy(g => g.First().ProductName, StringComparer.OrdinalIgnoreCase))
+        foreach (var group in groups
+            .OrderBy(g => g.First().ProductName, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(g => g.First().LocalPackagePath, StringComparer.OrdinalIgnoreCase))
         {
             var items = group.ToList();
 

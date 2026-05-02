@@ -25,14 +25,17 @@ public partial class CompletionViewModel : ObservableObject
     [ObservableProperty] private string _restore = string.Empty;
     [ObservableProperty] private string _errors = string.Empty;
 
+    private readonly Func<Task>? _rescanRequested;
+
     /// <summary>
-    /// Awaitable hook used by the rescan command. MainViewModel sets
-    /// this to a delegate that runs <see cref="ScanViewModel.ScanCommand"/>;
-    /// keeping it as a Func keeps this VM ignorant of the scan service
-    /// while letting the rescan command propagate the scan's task to
-    /// callers (notably tests that await a rescan).
+    /// <paramref name="rescanRequested"/> is an awaitable run-a-scan
+    /// hook. Func not a service reference so this VM stays ignorant of
+    /// the scan service.
     /// </summary>
-    public Func<Task>? RescanRequested { get; set; }
+    public CompletionViewModel(Func<Task>? rescanRequested = null)
+    {
+        _rescanRequested = rescanRequested;
+    }
 
     /// <summary>Shows the "All clear" state after a scan finds no orphans.</summary>
     public void ShowAllClear()
@@ -93,7 +96,7 @@ public partial class CompletionViewModel : ObservableObject
     {
         IsComplete = false;
         Errors = string.Empty;
-        if (RescanRequested is { } request)
+        if (_rescanRequested is { } request)
             await request();
     }
 

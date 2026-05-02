@@ -69,9 +69,8 @@ public sealed record ShellRefused(string FilePath, int ShellResult)
 }
 
 /// <summary>
-/// The source file is a symlink or junction. Move only refuses these so
-/// a single moved entry can't pull an OS file out of System32 via an
-/// attacker-planted reparse point inside C:\Windows\Installer.
+/// Source file is a symlink or junction. Move refuses these so the
+/// move can't follow a reparse point out of C:\Windows\Installer.
 /// </summary>
 public sealed record SourceIsReparsePoint(string FilePath)
     : FileOperationError(FilePath)

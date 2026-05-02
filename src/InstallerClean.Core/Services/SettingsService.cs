@@ -65,9 +65,8 @@ public sealed class SettingsService : ISettingsService
     /// <summary>Persists settings. Returns true on success.</summary>
     public bool TrySave(AppSettings settings)
     {
-        // Random temp filename so two writers (e.g. future concurrent
-        // CLI /s instances that skip the single-instance mutex) don't
-        // collide on the same .tmp path.
+        // Random temp name is belt-and-braces; the single-instance
+        // mutex already prevents GUI and CLI /d|/m racing this file.
         var tempFile = _settingsFile + "." + Path.GetRandomFileName() + ".tmp";
         try
         {
