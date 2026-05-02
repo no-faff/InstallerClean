@@ -51,11 +51,8 @@ internal static class Composition
         // resolve MainViewModel itself.
         services.AddSingleton<MainViewModel>();
 
-        // validateScopes: true is defensive against a future scoped
-        // registration accidentally being captured by a singleton.
-        // Today every registration is Singleton so the validator has
-        // nothing to flag, but the flag costs nothing and prevents a
-        // class of bug if a maintainer ever adds a scoped service.
+        // validateScopes: true catches a Scoped registration captured
+        // by a Singleton; today every registration is Singleton.
         return services.BuildServiceProvider(validateScopes: true);
     }
 }
