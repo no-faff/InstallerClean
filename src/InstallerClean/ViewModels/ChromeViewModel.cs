@@ -32,23 +32,13 @@ public partial class ChromeViewModel : ObservableObject
         _msiInfoService = msiInfoService;
         _scan = scan;
 
-        // Surface scan-complete signals to the details commands so the
-        // Details buttons enable as soon as the first scan finishes.
-        // We listen on HasScanned (an observable property) rather than
-        // LastScanResult (a plain auto-property that never raises
-        // PropertyChanged), so HasScanned is the single trigger.
+        // Re-evaluate the Details buttons when a scan finishes.
+        // HasScanned is observable; LastScanResult is a plain auto-
+        // property and won't raise PropertyChanged.
         //
-        // LIFETIME CONTRACT: this subscription is intentionally never
-        // unhooked. Both VMs are constructed by MainViewModel and share
-        // its lifetime; MainViewModel is a singleton resolved exactly
-        // once via Composition.cs and dies with the process. If a
-        // future test or feature ever creates throwaway MainViewModel
-        // instances around a longer-lived ScanViewModel (for example
-        // by hoisting Scan into a separate DI singleton), convert this
-        // to a named handler stored on a field and detach it in an
-        // IDisposable.Dispose. The handler does not capture mutable
-        // state, only `this`. Mirrors the same contract on
-        // CleanupViewModel.
+        // Subscription is never unhooked: ScanViewModel and ChromeViewModel
+        // share MainViewModel's process-lifetime. If that ever stops
+        // being true, switch to a named handler in an IDisposable.
         _scan.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(ScanViewModel.HasScanned))
