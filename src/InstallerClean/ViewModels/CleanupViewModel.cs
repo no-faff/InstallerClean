@@ -146,32 +146,18 @@ public partial class CleanupViewModel : ObservableObject
             return;
         }
 
-        // Re-load the on-disk settings before writing so the save
-        // doesn't clobber updates made by other writers (the orphaned-
-        // and registered-files detail windows persist their window
-        // size on close via a fresh Load+Save through the same
-        // ISettingsService instance). Without this re-load, a user who
-        // typed in MoveDestination, opened a detail window, resized
-        // it, closed it (triggering a window-size save), then waited
-        // for the debounce to fire, would lose the window-size update
-        // because we'd write our cached _settings over the top.
+        // Reload before writing so this save doesn't clobber updates
+        // made by other writers (the detail windows persist their
+        // window size on close via the same ISettingsService).
         var fresh = _settingsService.Load();
         fresh.MoveDestination = _settings.MoveDestination;
         _settings = fresh;
-        // Use Save (fire-and-forget) rather than TrySave because the
-        // bool return is unused here and Save matches the contract the
-        // detail-window code-behinds use on close. Save itself
-        // delegates to TrySave internally and never throws.
         _settingsService.Save(_settings);
 
-        // Dispose the CTS now that this scheduled save has completed.
-        // The "type once and never type again" case is the only path
-        // that needs this: every other save is followed by another
-        // ScheduleMoveDestinationSave call which disposes the previous
-        // CTS as part of replacing it. Token equality ensures we only
-        // dispose if THIS scheduled save's CTS is still the current
-        // one (i.e. no further keystroke replaced it while we were
-        // awaiting the delay).
+        // Dispose the type-once-and-stop case (every other path is
+        // covered by the next schedule call replacing the field).
+        // Token equality skips disposal if a fresh keystroke already
+        // installed a new CTS while we were awaiting the delay.
         if (_moveDestinationSaveCts is { } current && current.Token == token)
         {
             _moveDestinationSaveCts = null;
@@ -239,25 +225,12 @@ public partial class CleanupViewModel : ObservableObject
             return;
         }
 
-        // The pre-flight (CreateDirectory + write probe) used to run
-        // synchronously on the UI thread. For a UNC destination on a
-        // slow share this could freeze the main window for the SMB
-        // timeout (tens of seconds) before the user saw any feedback.
-        // Show the operating overlay first so the user has visible
-        // progress text, then run the probe on a thread-pool task; on
-        // local paths the probe finishes before the next layout pass
-        // so the overlay flicker is invisible. The overlay is cleared
-        // after the probe returns so the free-space check and the
-        // confirmation dialog run with the main UI visible again.
-        //
-        // The probe goes through the injected IFileSystem so unit tests
-        // running against MockFileSystem don't hit real disk for the
-        // probe (the rest of the move pipeline already does). The
-        // CTS is created BEFORE the probe so the Cancel button on the
-        // operating overlay actually cancels: previously _operationCts
-        // was created after the probe, leaving the user staring at a
-        // Cancel button that did nothing while a slow share blocked
-        // for the SMB timeout.
+        // Pre-flight: CreateDirectory + write probe. Runs on a
+        // worker thread so a slow UNC share doesn't freeze the UI for
+        // the SMB timeout. The CTS is created BEFORE the probe so
+        // the operating overlay's Cancel button can interrupt it.
+        // Goes through IFileSystem so MockFileSystem-backed tests
+        // don't hit real disk.
         _operationCts = new CancellationTokenSource();
         IsOperating = true;
         OperationProgress = Strings.Status_PreparingDestination;
@@ -276,9 +249,6 @@ public partial class CleanupViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            // User cancelled before the operation started. Treat this
-            // exactly like cancelling during the move loop: clear the
-            // overlay, set the status pill, return.
             IsOperating = false;
             OperationProgress = Strings.Status_MoveCancelled;
             var cts = _operationCts;
@@ -290,12 +260,8 @@ public partial class CleanupViewModel : ObservableObject
         {
             IsOperating = false;
             OperationProgress = string.Empty;
-            // Write the full exception to the crash log; route the safe
-            // parts of the failure (destination + log path) through
-            // DescribeWriteFailure. The framework exception's .Message
-            // is intentionally not surfaced in the dialog; under
-            // elevation it could carry paths from another user's
-            // profile.
+            // Full detail to crash log; dest + log path to dialog. ex.Message
+            // is intentionally never surfaced (path-leak risk under elevation).
             var logPath = CrashLog.Write(ex);
             var cts = _operationCts;
             _operationCts = null;

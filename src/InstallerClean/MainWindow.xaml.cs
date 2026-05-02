@@ -104,17 +104,13 @@ public partial class MainWindow : Window
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
 
-    // Caption-button glyphs. WHITE SQUARE for Maximise; WHITE SQUARE WITH
-    // UPPER-RIGHT QUADRANT (a "two-rectangle" shape) for Restore. Convention
-    // matches Windows' own title-bar buttons: when the window is maximised,
-    // the button shape changes to indicate "click to restore".
+    // Title-bar glyph swap matches Windows' own caption buttons.
     private const string MaximizeGlyph = "□";
     private const string RestoreGlyph = "❐";
 
     /// <summary>
-    /// Keeps the Maximise/Restore button glyph, tooltip, and screen-
-    /// reader name in sync regardless of how the window state changed
-    /// (button click, title-bar double-click, Win+Up keyboard shortcut).
+    /// Keeps the caption button's glyph, tooltip and automation name
+    /// in sync with the window state regardless of how it was changed.
     /// </summary>
     protected override void OnStateChanged(EventArgs e)
     {

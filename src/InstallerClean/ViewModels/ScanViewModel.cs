@@ -33,14 +33,9 @@ public partial class ScanViewModel : ObservableObject
     [ObservableProperty] private bool _hasScanned;
 
     /// <summary>
-    /// Set to true by MainViewModel while a Move/Delete or completion
-    /// overlay is up. Blocks the user-driven Scan command's CanExecute,
-    /// so F5 / the Re-scan button / the Scan again button can't start
-    /// a parallel scan that would race the active operation. Only
-    /// gates the user-facing command; the splash startup scan and the
-    /// internal RefreshAsync after Move/Delete still run because they
-    /// go through ScanWithProgressAsync / RefreshAsync directly, not
-    /// the relay command.
+    /// Set by MainViewModel while another overlay is up. Gates the
+    /// user-driven Scan command only; ScanWithProgressAsync (splash)
+    /// and RefreshAsync (post-Move/Delete) bypass it.
     /// </summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ScanCommand))]
@@ -113,16 +108,12 @@ public partial class ScanViewModel : ObservableObject
     private async Task RunScanCoreAsync(IProgress<string>? progress, CancellationToken cancellationToken = default)
     {
         // Compute everything off the call results before touching any
-        // observable property. If the scan throws (or cancellation
-        // fires) the VM stays at its prior consistent state rather
-        // than a half-updated mix of counts and stale LastScanResult.
+        // observable property; on throw or cancel the VM stays at its
+        // prior consistent state.
         var result = await _scanService.ScanAsync(progress, cancellationToken);
-        // Sample HasPendingReboot AFTER the scan, not before. Windows
-        // Update can queue a reboot during a multi-second scan; sampling
-        // before the await would publish a stale "no pending reboot"
-        // and let the Move/Delete buttons re-enable on a state that
-        // changed while we were busy. The CLI samples in the same place
-        // for the same reason.
+        // Sample reboot AFTER the scan. A Windows Update queued during
+        // a multi-second scan would otherwise let Move/Delete re-enable
+        // on stale state.
         var pendingReboot = _rebootService.HasPendingReboot();
 
         var registeredCount = result.RegisteredPackages.Count;
@@ -182,30 +173,18 @@ public partial class ScanViewModel : ObservableObject
         }
         catch (InvalidOperationException ex)
         {
-            // SECURITY: ex.Message is shown to the user only because every
-            // InvalidOperationException thrown by InstallerQueryService is
-            // constructed with a resx-sourced message (Error_InstallerDbEmpty,
-            // Error_MsiNonSuccess) - so the text is pre-vetted, contains no
-            // paths, and is meant for the user. If a future contributor adds
-            // a path-bearing throw site, switch this to the type-name+crashlog
-            // pattern used in the generic catch below.
+            // ex.Message is safe here only because every
+            // InstallerQueryService throw uses a resx-sourced message.
+            // A path-bearing throw site would need to switch to the
+            // type-name+crashlog pattern used in the generic catch.
             _dialogService.ShowError(ex.Message, Strings.Error_InstallerDbUnavailableTitle);
             ScanProgress = Strings.Status_ScanFailedDb;
         }
         catch (Exception ex)
         {
-            // Mirror Cleanup{Move,Delete}AllAsync and App.xaml.cs catch
-            // blocks: full exception detail to the crash log, only the
-            // type name into UI text. Framework exception messages can
-            // include absolute paths from another user's profile when
-            // the process runs elevated, so .Message must never reach
-            // the status pill.
-            //
-            // ALSO show a dialog. The status pill alone is too easy to
-            // miss (TextTrimming clips it on small windows) and a user
-            // hitting a generic scan failure with no visible feedback
-            // ends up reporting "the app didn't do anything" with no
-            // pointer to the crash log.
+            // Full detail to crash log; type name + log path to status
+            // pill AND dialog (the pill alone gets clipped by
+            // TextTrimming). ex.Message never reaches UI.
             var logPath = CrashLog.Write(ex);
             ScanProgress = string.Format(Strings.Status_ScanFailedDetails, ex.GetType().Name, logPath);
             _dialogService.ShowError(

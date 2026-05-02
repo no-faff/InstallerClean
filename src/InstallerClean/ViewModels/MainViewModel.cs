@@ -48,38 +48,25 @@ public partial class MainViewModel : ObservableObject
             Scan, Completion);
         Chrome = new ChromeViewModel(windowService, msiInfoService, Scan);
 
-        // After every successful scan, if there are no orphans and no
-        // operation is in flight, surface the all-clear completion
-        // overlay. The IsOperating guard prevents the all-clear from
-        // hiding a freshly-painted Move/Delete summary when the
-        // post-operation refresh runs.
-        //
-        // TIMING DEPENDENCY: this guard relies on Cleanup setting
-        // IsOperating=false in its finally block AFTER the post-
-        // operation RefreshAsync raises ScanCompleted. If a future
-        // change reorders Cleanup's finally so IsOperating clears
-        // BEFORE RefreshAsync runs, this handler would fire while
-        // IsOperating is already false, painting all-clear over the
-        // completion summary. Don't move IsOperating=false above the
-        // refresh await without rethinking this guard.
+        // Surface the all-clear overlay when a scan finishes with no
+        // orphans. The IsOperating guard depends on Cleanup setting
+        // IsOperating=false AFTER the post-operation refresh fires
+        // ScanCompleted; reordering that flow would let an all-clear
+        // overpaint a Move/Delete summary.
         Scan.ScanCompleted += (_, _) =>
         {
             if (Scan.OrphanedFileCount == 0 && !Cleanup.IsOperating)
                 Completion.ShowAllClear();
         };
 
-        // Completion's "Scan again" button doesn't know about the scan
-        // service; route the request through to the scan VM's command
-        // and propagate its task so callers (notably tests) can await
-        // the resulting scan.
+        // Func rather than a direct call so CompletionViewModel doesn't
+        // need to know about the scan service. Returns the scan task
+        // so test code can await a triggered rescan.
         Completion.RescanRequested = () => Scan.ScanCommand.ExecuteAsync(null);
 
-        // IsMainContentInteractive is a derived bool the main-window XAML
-        // binds to IsEnabled on the body content + bottom nav so neither
-        // mouse nor keyboard can reach those buttons while any of the
-        // three full-window overlays (scanning, operating, completion)
-        // is up. Caption buttons (Min / Max / Close) stay enabled
-        // because the user must always be able to close the window.
+        // Drive IsMainContentInteractive off the three overlay states.
+        // Caption buttons stay enabled regardless: the user must always
+        // be able to close the window.
         Scan.PropertyChanged += OnChildPropertyChanged;
         Cleanup.PropertyChanged += OnChildPropertyChanged;
         Completion.PropertyChanged += OnChildPropertyChanged;
@@ -101,13 +88,8 @@ public partial class MainViewModel : ObservableObject
             e.PropertyName == nameof(CompletionViewModel.IsComplete))
         {
             OnPropertyChanged(nameof(IsMainContentInteractive));
-
-            // While a Move/Delete or a completion overlay is up, block
-            // the user-driven Scan command (the F5 keybinding and any
-            // other Re-scan / Scan-again click). Without this, F5
-            // pressed during a Move starts a parallel scan that races
-            // the in-flight file operation, and the Scanning overlay
-            // paints over the Operating overlay.
+            // Block F5 / Re-scan while a Move/Delete or completion is
+            // up, otherwise a parallel scan would race the operation.
             Scan.IsExternallyBlocked = Cleanup.IsOperating || Completion.IsComplete;
         }
     }
