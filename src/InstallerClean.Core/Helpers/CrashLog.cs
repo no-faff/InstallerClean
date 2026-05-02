@@ -17,9 +17,6 @@ public static class CrashLog
     private static readonly string LogFile = Path.Combine(LogFolder, "crash.log");
     private static readonly string ArchiveFile = Path.Combine(LogFolder, "crash.log.old");
 
-    /// <summary>Path of the log file (may not exist yet).</summary>
-    public static string Path => LogFile;
-
     /// <summary>
     /// Appends the exception to crash.log and returns the log path.
     /// Swallows IO errors (a crash handler must never throw); use
