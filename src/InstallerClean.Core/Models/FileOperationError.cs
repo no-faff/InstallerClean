@@ -69,6 +69,17 @@ public sealed record ShellRefused(string FilePath, int ShellResult)
 }
 
 /// <summary>
+/// The source file is a symlink or junction. Move only refuses these so
+/// a single moved entry can't pull an OS file out of System32 via an
+/// attacker-planted reparse point inside C:\Windows\Installer.
+/// </summary>
+public sealed record SourceIsReparsePoint(string FilePath)
+    : FileOperationError(FilePath)
+{
+    public override string LocalisedMessage => Strings.Error_SourceIsReparsePoint;
+}
+
+/// <summary>
 /// Generic IO failure (disk full, sharing violation, etc).
 /// <see cref="Detail"/> stays for crash-log / telemetry; the UI sees
 /// only a category-only sentence so framework-provided paths stay

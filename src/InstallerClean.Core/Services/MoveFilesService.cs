@@ -82,7 +82,7 @@ public sealed class MoveFilesService : IMoveFilesService
                     // and that's same-trust as us.
                     if (Helpers.StorageHelpers.IsReparsePoint(sourcePath))
                     {
-                        errors.Add(new IOFailure(sourcePath, Strings.Error_SourceIsReparsePoint));
+                        errors.Add(new SourceIsReparsePoint(sourcePath));
                         continue;
                     }
 
