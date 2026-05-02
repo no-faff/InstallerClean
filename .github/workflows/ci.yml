@@ -21,6 +21,9 @@ jobs:
       - name: Build
         run: dotnet build src/InstallerClean/InstallerClean.csproj
 
+      - name: Build CLI
+        run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj
+
       - name: Test
         run: dotnet test src/InstallerClean.Tests/
 
@@ -29,6 +32,9 @@ jobs:
 
       - name: Smoke-publish framework-dependent
         run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish/framework-dependent
+
+      - name: Smoke-publish CLI framework-dependent
+        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish/cli
 
       - name: Audit vulnerable packages
         run: dotnet list src/InstallerClean/InstallerClean.csproj package --vulnerable --include-transitive
