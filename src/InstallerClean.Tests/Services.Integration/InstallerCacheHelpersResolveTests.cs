@@ -51,6 +51,26 @@ public class InstallerCacheHelpersResolveTests
     }
 
     [Fact]
+    public void ResolveFinalPath_walk_up_to_drive_root_keeps_separator()
+    {
+        // Probe that lands at "C:\" (existing-ancestor walk-up case where
+        // the only existing ancestor is the drive root itself) used to
+        // produce drive-relative paths like "C:NewFolder\Sub" because the
+        // suffix attachment trimmed the trailing separator off "C:\" then
+        // concatenated a separator-less suffix.
+        var systemDrive = Path.GetPathRoot(Environment.SystemDirectory);
+        if (string.IsNullOrEmpty(systemDrive)) return;
+        var unborn = Path.Combine(systemDrive, "ic-resolve-nonexistent-" + Guid.NewGuid(), "leaf");
+
+        var resolved = InstallerCacheHelpers.ResolveFinalPath(unborn);
+
+        Assert.False(string.IsNullOrEmpty(resolved));
+        Assert.StartsWith(systemDrive, resolved, StringComparison.OrdinalIgnoreCase);
+        // Sanity: no drive-relative shape ("C:foo" without backslash).
+        Assert.NotEqual(systemDrive[0] + ":" + Path.GetFileName(unborn), resolved);
+    }
+
+    [Fact]
     public void ResolveFinalPath_empty_input_does_not_throw()
     {
         var ex = Record.Exception(() => InstallerCacheHelpers.ResolveFinalPath(string.Empty));
