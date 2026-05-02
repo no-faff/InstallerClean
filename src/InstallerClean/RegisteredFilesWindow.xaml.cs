@@ -106,6 +106,6 @@ public partial class RegisteredFilesWindow : Window
         if (_settingsService is null) return;
         var settings = _settingsService.Load();
         settings.RegisteredWindowSize = new Models.WindowSize { Width = ActualWidth, Height = ActualHeight };
-        _settingsService.Save(settings);
+        _ = _settingsService.TrySave(settings);
     }
 }

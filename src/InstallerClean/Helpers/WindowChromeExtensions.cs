@@ -13,7 +13,7 @@ internal static class WindowChromeExtensions
     /// </summary>
     public static void EnableAltSpaceSystemMenu(this Window window)
     {
-        window.PreviewKeyDown += (s, e) =>
+        KeyEventHandler handler = (s, e) =>
         {
             if (e.Key == Key.System && e.SystemKey == Key.Space)
             {
@@ -23,5 +23,7 @@ internal static class WindowChromeExtensions
                 e.Handled = true;
             }
         };
+        window.PreviewKeyDown += handler;
+        window.Closed += (_, _) => window.PreviewKeyDown -= handler;
     }
 }
