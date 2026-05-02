@@ -72,10 +72,14 @@ public sealed class SettingsService : ISettingsService
     /// <summary>Persists settings. Returns true on success.</summary>
     public bool TrySave(AppSettings settings)
     {
-        // Random temp file name so concurrent saves (e.g. GUI's debounced
-        // save racing a CLI /m write) don't collide on the same .tmp
-        // path: each call writes its own bytes and the rename is atomic
-        // per-process.
+        // Random temp file name. Concurrent GUI + CLI access to the
+        // same settings file is structurally prevented by the
+        // Global\InstallerClean_SingleInstance mutex (CLI /d and /m
+        // hold it; GUI holds it for its whole lifetime). The
+        // randomness is therefore belt-and-braces: it covers a future
+        // feature that lets multiple CLI /s instances run concurrently
+        // (today /s skips the mutex but doesn't write settings, so
+        // there's no actual race).
         var tempFile = _settingsFile + "." + Path.GetRandomFileName() + ".tmp";
         try
         {
@@ -95,16 +99,17 @@ public sealed class SettingsService : ISettingsService
             File.WriteAllText(tempFile, json);
             File.Move(tempFile, _settingsFile, overwrite: true);
 
-            // SECURITY: between the pre-write IsRedirected check and the
-            // rename above, an attacker who shares the user's account
-            // could swap _settingsFile for a symlink targeting a
-            // sensitive location. File.Move(overwrite:true) follows
-            // symlinks, so the rename would replace the target's
-            // content instead of settings.json. After the rename,
-            // verify the final path is not a reparse point and roll
-            // back the save flag if it is. Lifetime is best-effort: we
-            // don't undelete the previous settings.json (it's already
-            // gone), but we tell the caller the save did not succeed.
+            // Best-effort post-write sanity check. File.Move(overwrite:true)
+            // with MOVEFILE_REPLACE_EXISTING deletes the target (which
+            // could include a swapped-in symlink) before performing the
+            // rename, so a same-account attacker swap exactly between
+            // the pre-write check and this point would have already been
+            // overwritten by the rename - the resulting file is real
+            // content, not a redirect, and IsRedirected returns false.
+            // The post-check therefore catches a narrower case: a
+            // junction or symlink that appeared at the parent directory
+            // (NoFaff or InstallerClean) at write time, which IsRedirected
+            // does scan. Treat it as defence-in-depth, not a guarantee.
             if (StorageHelpers.IsRedirected(_settingsFile))
                 return false;
 

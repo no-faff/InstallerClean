@@ -10,7 +10,10 @@
   </trustInfo>
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
     <application>
-      <!-- Windows 10 and 11 -->
+      <!-- Windows 10 and 11. Microsoft never published a separate
+           compatibility GUID for Windows 11; apps target the Windows 10
+           GUID and report as compatible with Windows 11 automatically.
+           Don't add an extra GUID here. -->
       <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"/>
     </application>
   </compatibility>

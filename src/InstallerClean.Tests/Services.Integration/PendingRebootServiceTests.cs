@@ -4,17 +4,10 @@ namespace InstallerClean.Tests.Services.Integration;
 
 public class PendingRebootServiceTests
 {
-    [Fact]
-    public void HasPendingReboot_returns_bool_without_throwing()
-    {
-        var svc = new PendingRebootService();
-
-        // Should not throw regardless of elevation or registry state.
-        // The result depends on the machine state, so we just check it returns.
-        var result = svc.HasPendingReboot();
-
-        Assert.IsType<bool>(result);
-    }
+    // Removed tautological "returns_bool_without_throwing" test - the
+    // method's return type IS bool so Assert.IsType<bool>(result) is
+    // always true. The "doesn't throw" intent is covered by
+    // HasPendingReboot_can_be_called_from_non_elevated_context below.
 
     [Fact]
     public void HasPendingReboot_returns_consistent_result_on_repeated_calls()

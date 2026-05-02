@@ -73,7 +73,8 @@
                 </StackPanel>
             </Button>
             <Button DockPanel.Dock="Right" Style="{StaticResource CompactPill}"
-                    Content="{loc:Translate Action.Close}" IsCancel="True"/>
+                    Content="{loc:Translate Action.Close}" IsCancel="True"
+                    AutomationProperties.Name="{loc:Translate Automation.Close}"/>
             <Button DockPanel.Dock="Right" Style="{StaticResource CompactPill}"
                     x:Name="CheckNowButton"
                     Content="{loc:Translate Action.CheckForUpdates}" Click="CheckNowClick"

@@ -25,11 +25,11 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
         if (Helpers.StorageHelpers.IsReparsePoint(filePath))
             return null;
 
-        IntPtr hSummary = IntPtr.Zero;
+        uint hSummary = 0;
         try
         {
             var error = Msi.MsiGetSummaryInformation(
-                IntPtr.Zero, filePath, 0, out hSummary);
+                hDatabase: 0, filePath, 0, out hSummary);
 
             if (error != MsiError.Success)
                 return null;
@@ -53,12 +53,12 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
         }
         finally
         {
-            if (hSummary != IntPtr.Zero)
+            if (hSummary != 0)
                 Msi.MsiCloseHandle(hSummary);
         }
     }
 
-    private static string GetStringProperty(IntPtr hSummary, uint propertyId)
+    private static string GetStringProperty(uint hSummary, uint propertyId)
     {
         uint bufferLen = 0;
 
@@ -99,8 +99,14 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
     {
         try
         {
-            using var cert = new X509Certificate2(
-                X509Certificate.CreateFromSignedFile(filePath));
+            // Both certificates need disposing: X509Certificate.CreateFromSignedFile
+            // returns a fresh cert handle, and the X509Certificate2 ctor
+            // duplicates that handle into a new instance. Without the
+            // explicit using on the inner cert, the original handle leaks
+            // until finalisation. Belt and braces, since both Disposes
+            // are cheap.
+            using var inner = X509Certificate.CreateFromSignedFile(filePath);
+            using var cert = new X509Certificate2(inner);
             // Format() respects RFC-4514 escapes; naive String.Split(',')
             // would corrupt subjects like CN="Acme, Inc.", O=Acme.
             return cert.SubjectName.Format(multiLine: true).TrimEnd('\r', '\n');

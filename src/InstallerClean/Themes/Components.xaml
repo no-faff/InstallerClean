@@ -496,8 +496,13 @@
         <Setter Property="TextDecorations" Value="None"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
+            <!-- Underline AND brighten on hover so the link is
+                 discoverable. Without an underline change, hover-only
+                 reveals the link by colour shift, which fails for users
+                 with reduced colour vision. -->
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Foreground" Value="{StaticResource Link.Default}"/>
+                <Setter Property="TextDecorations" Value="Underline"/>
             </Trigger>
         </Style.Triggers>
     </Style>

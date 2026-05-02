@@ -1,3 +1,4 @@
+using System.IO.Abstractions.TestingHelpers;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using InstallerClean.Models;
@@ -20,6 +21,7 @@ public class MainViewModelTests
     private readonly IDialogService _dialogService = Substitute.For<IDialogService>();
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
+    private readonly MockFileSystem _fileSystem = new();
 
     private MainViewModel CreateViewModel() => CreateViewModel(new AppSettings());
 
@@ -27,7 +29,7 @@ public class MainViewModelTests
     /// Build a MainViewModel against the substituted services with a
     /// caller-provided initial AppSettings. Single construction site
     /// so any future ctor parameter change touches one line, not the
-    /// 9-arg `new MainViewModel(...)` site repeated across tests.
+    /// 10-arg <c>new MainViewModel(...)</c> site repeated across tests.
     /// </summary>
     private MainViewModel CreateViewModel(AppSettings settings)
     {
@@ -36,7 +38,8 @@ public class MainViewModelTests
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
-            _dialogService, _confirmationService, _windowService);
+            _dialogService, _confirmationService, _windowService,
+            _fileSystem);
     }
 
     private static ScanResult EmptyScanResult() =>
@@ -267,10 +270,12 @@ public class MainViewModelTests
         Assert.Null(ex);
     }
 
-    // The MoveDestination write-back is debounced (CleanupViewModel.MoveDestinationSaveDelay,
-    // currently 400 ms). Both tests wait one debounce window plus a small margin
-    // before asserting on the mock, so a fast machine doesn't race the timer.
-    private static readonly TimeSpan DebounceWait = TimeSpan.FromMilliseconds(700);
+    // Wait one debounce window plus a 300 ms margin so a fast machine
+    // doesn't race the timer. Reads the constant from the production
+    // VM rather than hardcoding 700, so a future tune of the debounce
+    // doesn't silently drift the test out of sync.
+    private static readonly TimeSpan DebounceWait =
+        CleanupViewModel.MoveDestinationSaveDelay + TimeSpan.FromMilliseconds(300);
 
     [Fact]
     public async Task MoveDestination_change_is_persisted_through_settings_service()

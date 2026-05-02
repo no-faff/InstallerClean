@@ -14,8 +14,21 @@ namespace InstallerClean.Cli;
 /// </summary>
 internal static class Program
 {
+    /// <summary>0 = the operation completed and every file the scan
+    /// flagged was successfully processed.</summary>
     private const int ExitOk = 0;
+
+    /// <summary>1 = total failure: scan failed, mutex contention, bad
+    /// args, or every file in the batch failed. Sysadmin scripts
+    /// should treat this as "the run accomplished nothing".</summary>
     private const int ExitError = 1;
+
+    /// <summary>2 = partial success: the operation processed some
+    /// files but at least one failed. Distinguishable from ExitError
+    /// so a Task Scheduler retry policy can decide whether to retry
+    /// (probably yes on partial; probably no on full failure).</summary>
+    private const int ExitPartial = 2;
+
     /// <summary>POSIX convention: 130 == 128 + SIGINT (Ctrl+C).</summary>
     private const int ExitCancelled = 130;
 
@@ -39,6 +52,36 @@ internal static class Program
             PrintUsage();
             return ExitError;
         }
+
+        // Reject extra positional arguments. /m takes an optional second
+        // arg (the destination path) and silently truncates from there;
+        // an unquoted path with spaces ("/m D:\My Backup") would
+        // otherwise become "D:\My" with no warning. /s and /d take no
+        // positional args at all.
+        var maxArgs = arg == "/m" ? 2 : 1;
+        if (args.Length > maxArgs)
+        {
+            Console.WriteLine(string.Format(Strings.Cli_UnknownArgument, args[maxArgs]));
+            Console.WriteLine();
+            PrintUsage();
+            return ExitError;
+        }
+
+        // Register the Ctrl+C handler BEFORE acquiring the mutex so a
+        // signal arriving in the gap between mutex acquisition and
+        // handler registration prints "Cancelling..." gracefully
+        // rather than terminating via the default handler. The OS
+        // would still release the abandoned mutex on a default-handler
+        // termination, but the user wouldn't see graceful output.
+        using var cts = new CancellationTokenSource();
+        ConsoleCancelEventHandler cancelHandler = (_, cancelArgs) =>
+        {
+            cancelArgs.Cancel = true; // keep the process running long enough to stop gracefully
+            Console.WriteLine();
+            Console.WriteLine(Strings.Cli_Cancelling);
+            cts.Cancel();
+        };
+        Console.CancelKeyPress += cancelHandler;
 
         // Mutate-the-cache operations (/d and /m) take the same singleton
         // mutex the WPF GUI uses, so a CLI invocation cannot race the
@@ -67,19 +110,10 @@ internal static class Program
             {
                 Console.WriteLine(Strings.Startup_AlreadyRunningBody);
                 mutex.Dispose();
+                Console.CancelKeyPress -= cancelHandler;
                 return ExitError;
             }
         }
-
-        using var cts = new CancellationTokenSource();
-        ConsoleCancelEventHandler cancelHandler = (_, cancelArgs) =>
-        {
-            cancelArgs.Cancel = true; // keep the process running long enough to stop gracefully
-            Console.WriteLine();
-            Console.WriteLine(Strings.Cli_Cancelling);
-            cts.Cancel();
-        };
-        Console.CancelKeyPress += cancelHandler;
 
         try
         {
@@ -140,7 +174,8 @@ internal static class Program
             if (arg == "/d")
             {
                 var deleteService = services.GetRequiredService<IDeleteFilesService>();
-                Console.WriteLine(string.Format(Strings.Cli_DeletingFiles, count));
+                Console.WriteLine(string.Format(Strings.Cli_DeletingFiles,
+                    count, DisplayHelpers.PluraliseFile(count)));
                 var result = await deleteService.DeleteFilesAsync(filePaths, null, cts.Token);
                 Console.WriteLine(string.Format(Strings.Cli_DeletedFiles,
                     result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
@@ -154,7 +189,13 @@ internal static class Program
                 EventLogWriter.Write(level,
                     string.Format(Strings.Cli_EventLogDeleteSummary,
                         result.DeletedCount, count, size, result.Errors.Count));
-                return result.Errors.Count > 0 ? ExitError : ExitOk;
+                // Three-state exit: full success, partial success, full
+                // failure. Sysadmin retry policies can use this to decide
+                // whether to retry: partial usually merits a retry,
+                // full failure rarely does.
+                if (result.Errors.Count == 0) return ExitOk;
+                if (result.DeletedCount > 0) return ExitPartial;
+                return ExitError;
             }
 
             // arg == "/m"
@@ -178,7 +219,8 @@ internal static class Program
             }
 
             var moveService = services.GetRequiredService<IMoveFilesService>();
-            Console.WriteLine(string.Format(Strings.Cli_MovingFiles, count, dest));
+            Console.WriteLine(string.Format(Strings.Cli_MovingFiles,
+                count, DisplayHelpers.PluraliseFile(count), dest));
             var moveResult = await moveService.MoveFilesAsync(filePaths, dest, null, cts.Token);
             Console.WriteLine(string.Format(Strings.Cli_MovedFiles,
                 moveResult.MovedCount, DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
@@ -192,7 +234,10 @@ internal static class Program
             EventLogWriter.Write(moveLevel,
                 string.Format(Strings.Cli_EventLogMoveSummary,
                     moveResult.MovedCount, count, dest, size, moveResult.Errors.Count));
-            return moveResult.Errors.Count > 0 ? ExitError : ExitOk;
+            // See /d branch for the three-state exit-code rationale.
+            if (moveResult.Errors.Count == 0) return ExitOk;
+            if (moveResult.MovedCount > 0) return ExitPartial;
+            return ExitError;
         }
         catch (OperationCanceledException)
         {
@@ -235,6 +280,12 @@ internal static class Program
         Console.WriteLine(Strings.Cli_Help_Delete);
         Console.WriteLine(Strings.Cli_Help_MoveDefault);
         Console.WriteLine(Strings.Cli_Help_MovePath);
+        Console.WriteLine();
+        Console.WriteLine(Strings.Cli_Help_ExitCodesHeader);
+        Console.WriteLine(Strings.Cli_Help_ExitCodeOk);
+        Console.WriteLine(Strings.Cli_Help_ExitCodePartial);
+        Console.WriteLine(Strings.Cli_Help_ExitCodeError);
+        Console.WriteLine(Strings.Cli_Help_ExitCodeCancelled);
         Console.WriteLine();
         Console.WriteLine(Strings.Cli_Help_NoteLine1);
         Console.WriteLine(Strings.Cli_Help_NoteLine2);

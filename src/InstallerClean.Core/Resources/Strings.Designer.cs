@@ -87,6 +87,11 @@ public static class Strings
     public static string Cli_FoundOrphans => Get("Cli.FoundOrphans");
     public static string Cli_GenericError => Get("Cli.GenericError");
     public static string Cli_Help_Delete => Get("Cli.Help.Delete");
+    public static string Cli_Help_ExitCodeCancelled => Get("Cli.Help.ExitCodeCancelled");
+    public static string Cli_Help_ExitCodeError => Get("Cli.Help.ExitCodeError");
+    public static string Cli_Help_ExitCodeOk => Get("Cli.Help.ExitCodeOk");
+    public static string Cli_Help_ExitCodePartial => Get("Cli.Help.ExitCodePartial");
+    public static string Cli_Help_ExitCodesHeader => Get("Cli.Help.ExitCodesHeader");
     public static string Cli_Help_Header => Get("Cli.Help.Header");
     public static string Cli_Help_Help => Get("Cli.Help.Help");
     public static string Cli_Help_MoveDefault => Get("Cli.Help.MoveDefault");

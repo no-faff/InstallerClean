@@ -26,9 +26,25 @@ public partial class ScanViewModel : ObservableObject
 
     private CancellationTokenSource? _scanCts;
 
-    [ObservableProperty] private bool _isScanning;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ScanCommand))]
+    private bool _isScanning;
     [ObservableProperty] private string _scanProgress = string.Empty;
     [ObservableProperty] private bool _hasScanned;
+
+    /// <summary>
+    /// Set to true by MainViewModel while a Move/Delete or completion
+    /// overlay is up. Blocks the user-driven Scan command's CanExecute,
+    /// so F5 / the Re-scan button / the Scan again button can't start
+    /// a parallel scan that would race the active operation. Only
+    /// gates the user-facing command; the splash startup scan and the
+    /// internal RefreshAsync after Move/Delete still run because they
+    /// go through ScanWithProgressAsync / RefreshAsync directly, not
+    /// the relay command.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ScanCommand))]
+    private bool _isExternallyBlocked;
 
     [ObservableProperty] private int _registeredFileCount;
     [ObservableProperty] private string _registeredSizeDisplay = string.Empty;
@@ -100,8 +116,14 @@ public partial class ScanViewModel : ObservableObject
         // observable property. If the scan throws (or cancellation
         // fires) the VM stays at its prior consistent state rather
         // than a half-updated mix of counts and stale LastScanResult.
-        var pendingReboot = _rebootService.HasPendingReboot();
         var result = await _scanService.ScanAsync(progress, cancellationToken);
+        // Sample HasPendingReboot AFTER the scan, not before. Windows
+        // Update can queue a reboot during a multi-second scan; sampling
+        // before the await would publish a stale "no pending reboot"
+        // and let the Move/Delete buttons re-enable on a state that
+        // changed while we were busy. The CLI samples in the same place
+        // for the same reason.
+        var pendingReboot = _rebootService.HasPendingReboot();
 
         var registeredCount = result.RegisteredPackages.Count;
         var registeredSize = DisplayHelpers.FormatSize(result.RegisteredTotalBytes);
@@ -125,7 +147,9 @@ public partial class ScanViewModel : ObservableObject
     /// to the dialog service, and updates <see cref="ScanProgress"/>
     /// throughout.
     /// </summary>
-    [RelayCommand]
+    private bool CanScan() => !IsScanning && !IsExternallyBlocked;
+
+    [RelayCommand(CanExecute = nameof(CanScan))]
     private async Task ScanAsync()
     {
         ScanProgress = Strings.Status_StartingScan;
@@ -176,8 +200,17 @@ public partial class ScanViewModel : ObservableObject
             // include absolute paths from another user's profile when
             // the process runs elevated, so .Message must never reach
             // the status pill.
+            //
+            // ALSO show a dialog. The status pill alone is too easy to
+            // miss (TextTrimming clips it on small windows) and a user
+            // hitting a generic scan failure with no visible feedback
+            // ends up reporting "the app didn't do anything" with no
+            // pointer to the crash log.
             var logPath = CrashLog.Write(ex);
             ScanProgress = string.Format(Strings.Status_ScanFailedDetails, ex.GetType().Name, logPath);
+            _dialogService.ShowError(
+                string.Format(Strings.Status_ScanFailedDetails, ex.GetType().Name, logPath),
+                Strings.Error_InstallerDbUnavailableTitle);
         }
         finally
         {

@@ -7,6 +7,14 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+
+    <!-- Pin test-package versions in packages.lock.json so test
+         dependency drift can't mask production behaviour. The three
+         shipping projects already do this; without it on Tests the
+         versions of xunit / NSubstitute / coverlet floated and a
+         minor-version refresh could change assertion semantics
+         silently. -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <ItemGroup>

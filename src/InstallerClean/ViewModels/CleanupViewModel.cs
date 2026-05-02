@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using InstallerClean.Helpers;
@@ -21,6 +22,7 @@ public partial class CleanupViewModel : ObservableObject
     private readonly ISettingsService _settingsService;
     private readonly IDialogService _dialogService;
     private readonly IConfirmationService _confirmationService;
+    private readonly IFileSystem _fs;
     private readonly ScanViewModel _scan;
     private readonly CompletionViewModel _completion;
 
@@ -36,7 +38,12 @@ public partial class CleanupViewModel : ObservableObject
     /// keystroke interval, so a normal typist never triggers more
     /// than one save per pause.
     /// </summary>
-    private static readonly TimeSpan MoveDestinationSaveDelay = TimeSpan.FromMilliseconds(400);
+    /// <remarks>
+    /// Exposed as <c>internal</c> so MainViewModelTests can wait on this
+    /// value plus a small margin instead of hardcoding 700 ms (which
+    /// drifts silently if the constant is ever tuned).
+    /// </remarks>
+    internal static readonly TimeSpan MoveDestinationSaveDelay = TimeSpan.FromMilliseconds(400);
 
     [ObservableProperty] private string _moveDestination = string.Empty;
 
@@ -53,6 +60,7 @@ public partial class CleanupViewModel : ObservableObject
         ISettingsService settingsService,
         IDialogService dialogService,
         IConfirmationService confirmationService,
+        IFileSystem fileSystem,
         ScanViewModel scan,
         CompletionViewModel completion)
     {
@@ -61,6 +69,7 @@ public partial class CleanupViewModel : ObservableObject
         _settingsService = settingsService;
         _dialogService = dialogService;
         _confirmationService = confirmationService;
+        _fs = fileSystem;
         _scan = scan;
         _completion = completion;
 
@@ -136,15 +145,33 @@ public partial class CleanupViewModel : ObservableObject
         {
             return;
         }
-        _settingsService.TrySave(_settings);
+
+        // Re-load the on-disk settings before writing so the save
+        // doesn't clobber updates made by other writers (the orphaned-
+        // and registered-files detail windows persist their window
+        // size on close via a fresh Load+Save through the same
+        // ISettingsService instance). Without this re-load, a user who
+        // typed in MoveDestination, opened a detail window, resized
+        // it, closed it (triggering a window-size save), then waited
+        // for the debounce to fire, would lose the window-size update
+        // because we'd write our cached _settings over the top.
+        var fresh = _settingsService.Load();
+        fresh.MoveDestination = _settings.MoveDestination;
+        _settings = fresh;
+        // Use Save (fire-and-forget) rather than TrySave because the
+        // bool return is unused here and Save matches the contract the
+        // detail-window code-behinds use on close. Save itself
+        // delegates to TrySave internally and never throws.
+        _settingsService.Save(_settings);
 
         // Dispose the CTS now that this scheduled save has completed.
-        // ScheduleMoveDestinationSave disposes the previous CTS on each
-        // new keystroke, which covers the common path; without this
-        // success-path dispose, a user who types once and then never
-        // types again would leak one CTS until process exit. The Token
-        // closure captures the CTS we created back in the schedule
-        // call; if that same CTS is still the current one, drop it.
+        // The "type once and never type again" case is the only path
+        // that needs this: every other save is followed by another
+        // ScheduleMoveDestinationSave call which disposes the previous
+        // CTS as part of replacing it. Token equality ensures we only
+        // dispose if THIS scheduled save's CTS is still the current
+        // one (i.e. no further keystroke replaced it while we were
+        // awaiting the delay).
         if (_moveDestinationSaveCts is { } current && current.Token == token)
         {
             _moveDestinationSaveCts = null;
@@ -222,24 +249,59 @@ public partial class CleanupViewModel : ObservableObject
         // so the overlay flicker is invisible. The overlay is cleared
         // after the probe returns so the free-space check and the
         // confirmation dialog run with the main UI visible again.
+        //
+        // The probe goes through the injected IFileSystem so unit tests
+        // running against MockFileSystem don't hit real disk for the
+        // probe (the rest of the move pipeline already does). The
+        // CTS is created BEFORE the probe so the Cancel button on the
+        // operating overlay actually cancels: previously _operationCts
+        // was created after the probe, leaving the user staring at a
+        // Cancel button that did nothing while a slow share blocked
+        // for the SMB timeout.
+        _operationCts = new CancellationTokenSource();
         IsOperating = true;
         OperationProgress = Strings.Status_PreparingDestination;
         try
         {
+            var probeToken = _operationCts.Token;
             await Task.Run(() =>
             {
-                Directory.CreateDirectory(dest);
-                var probe = Path.Combine(dest, Path.GetRandomFileName());
-                File.WriteAllBytes(probe, Array.Empty<byte>());
-                File.Delete(probe);
-            });
+                _fs.Directory.CreateDirectory(dest);
+                probeToken.ThrowIfCancellationRequested();
+                var probe = _fs.Path.Combine(dest, _fs.Path.GetRandomFileName());
+                _fs.File.WriteAllBytes(probe, Array.Empty<byte>());
+                probeToken.ThrowIfCancellationRequested();
+                _fs.File.Delete(probe);
+            }, probeToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // User cancelled before the operation started. Treat this
+            // exactly like cancelling during the move loop: clear the
+            // overlay, set the status pill, return.
+            IsOperating = false;
+            OperationProgress = Strings.Status_MoveCancelled;
+            var cts = _operationCts;
+            _operationCts = null;
+            cts?.Dispose();
+            return;
         }
         catch (Exception ex)
         {
             IsOperating = false;
             OperationProgress = string.Empty;
+            // Write the full exception to the crash log; route the safe
+            // parts of the failure (destination + log path) through
+            // DescribeWriteFailure. The framework exception's .Message
+            // is intentionally not surfaced in the dialog; under
+            // elevation it could carry paths from another user's
+            // profile.
+            var logPath = CrashLog.Write(ex);
+            var cts = _operationCts;
+            _operationCts = null;
+            cts?.Dispose();
             _dialogService.ShowWarning(
-                DescribeWriteFailure(dest, ex),
+                DescribeWriteFailure(dest, ex, logPath),
                 Strings.Error_InvalidDestinationTitle);
             return;
         }
@@ -257,6 +319,10 @@ public partial class CleanupViewModel : ObservableObject
         var availableFreeSpace = StorageHelpers.GetAvailableFreeSpace(dest);
         if (availableFreeSpace is long free && free < totalBytes)
         {
+            // Pre-flight CTS no longer needed; dispose before returning.
+            var cts = _operationCts;
+            _operationCts = null;
+            cts?.Dispose();
             _dialogService.ShowWarning(
                 string.Format(Strings.Error_NotEnoughSpaceBody,
                     dest,
@@ -266,18 +332,33 @@ public partial class CleanupViewModel : ObservableObject
             return;
         }
 
-        if (!_confirmationService.ConfirmMove(count, sizeDisplay, MoveDestination)) return;
+        // Use the captured `dest` consistently from here through the
+        // move call. Reading MoveDestination live would re-read whatever
+        // is in the textbox at that instant; if the user managed to
+        // change it between the IsInstallerFolderOrChild validation and
+        // here, the validated path and the moved-to path would diverge.
+        if (!_confirmationService.ConfirmMove(count, sizeDisplay, dest))
+        {
+            // User cancelled at the confirmation dialog. The pre-flight
+            // CTS is no longer needed; dispose it before returning.
+            var cts = _operationCts;
+            _operationCts = null;
+            cts?.Dispose();
+            return;
+        }
 
         IsOperating = true;
-        _operationCts = new CancellationTokenSource();
         OperationProgress = string.Format(Strings.Status_Moving, count, DisplayHelpers.PluraliseFile(count));
 
         try
         {
+            // _operationCts was created in the pre-flight block above;
+            // reuse it through the move so a single Cancel signal
+            // covers both the pre-flight and the move loop.
             var progress = new Progress<OperationProgress>(OnOperationProgressUpdate);
-            var result = await _moveService.MoveFilesAsync(filePaths, MoveDestination, progress, _operationCts.Token);
+            var result = await _moveService.MoveFilesAsync(filePaths, dest, progress, _operationCts!.Token);
             var movedCount = result.MovedCount;
-            var movedDest = MoveDestination;
+            var movedDest = dest;
             var errorCount = result.Errors.Count;
 
             long movedBytes;
@@ -418,15 +499,19 @@ public partial class CleanupViewModel : ObservableObject
     /// the mapping directly.
     /// </summary>
     /// <remarks>
-    /// SECURITY: io.Message and ex.Message are exposed to the dialog
-    /// only because the failing operation is a write probe to a path
-    /// the CURRENT user just typed (or browsed to via OpenFolderDialog).
-    /// Any path the IO exception names is therefore one the user
-    /// already knows about - this does not violate the cross-user
-    /// path-leakage rule that applies to elevated operations on shared
-    /// surfaces (C:\Windows\Installer, etc).
+    /// SECURITY: <paramref name="dest"/> is exposed to the dialog
+    /// because the failing operation is a write probe to a path the
+    /// CURRENT user just typed (or browsed to via OpenFolderDialog),
+    /// so echoing it back is safe. The framework exception's .Message
+    /// is NOT routed through this method's text - even an IOException
+    /// .Message can include paths beyond <paramref name="dest"/> (lock-
+    /// holder process paths, NTFS resolution chains) which under
+    /// elevation could be paths from another user's profile. The full
+    /// exception is written to crash.log by the caller and the path
+    /// is surfaced as <paramref name="logPath"/> so the user can find
+    /// the detail without it leaking into the dialog body.
     /// </remarks>
-    internal static string DescribeWriteFailure(string dest, Exception ex) => ex switch
+    internal static string DescribeWriteFailure(string dest, Exception ex, string logPath) => ex switch
     {
         UnauthorizedAccessException =>
             string.Format(Strings.Error_AccessDeniedDestination, dest),
@@ -434,9 +519,9 @@ public partial class CleanupViewModel : ObservableObject
             string.Format(Strings.Error_PathTooLong, dest),
         DirectoryNotFoundException =>
             string.Format(Strings.Error_DestinationMissing, dest),
-        IOException io =>
-            string.Format(Strings.Error_IOWriteDestination, dest, io.Message),
+        IOException =>
+            string.Format(Strings.Error_IOWriteDestination, dest, logPath),
         _ =>
-            string.Format(Strings.Error_WriteDestination, dest, ex.Message),
+            string.Format(Strings.Error_WriteDestination, dest, logPath),
     };
 }
