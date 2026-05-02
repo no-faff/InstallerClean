@@ -25,16 +25,9 @@ public sealed class MoveFilesService : IMoveFilesService
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        // SECURITY: the entire restore-after-mistakes story collapses
-        // if files move back inside C:\Windows\Installer. The service
-        // refuses directly rather than trusting upstream callers to
-        // have checked, and ResolveFinalPath inside
-        // IsInstallerFolderOrChild expands junctions so the destination
-        // can't sneak through behind a reparse point. Note that the
-        // junction resolution lives in InstallerCacheHelpers and uses
-        // the real filesystem regardless of the injected IFileSystem;
-        // production callers always pass a real path so this stays
-        // correct.
+        // Destination must not resolve inside C:\Windows\Installer;
+        // ResolveFinalPath expands junctions so a reparse-point
+        // destination cannot smuggle the batch into the cache folder.
         if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
             throw new InvalidOperationException(
                 string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
@@ -43,12 +36,8 @@ public sealed class MoveFilesService : IMoveFilesService
         {
             _fs.Directory.CreateDirectory(destinationFolder);
 
-            // SECURITY: re-check after CreateDirectory. An attacker who
-            // controls any ancestor of the destination could swap the
-            // leaf to a junction pointing into C:\Windows\Installer
-            // between the first check and now. ResolveFinalPath expands
-            // junctions on the real filesystem, so the second check
-            // catches a swap that happened in the TOCTOU window.
+            // Re-check after CreateDirectory closes the TOCTOU window
+            // where a junction could be swapped into the leaf.
             if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
                 throw new InvalidOperationException(
                     string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
@@ -65,6 +54,11 @@ public sealed class MoveFilesService : IMoveFilesService
                 cancellationToken.ThrowIfCancellationRequested();
                 var sourcePath = pathList[i];
 
+                // Report progress before the skip checks so the
+                // visible counter advances on missing / reparse-point
+                // entries instead of jumping over them.
+                progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(sourcePath)));
+
                 try
                 {
                     if (!_fs.File.Exists(sourcePath))
@@ -73,13 +67,10 @@ public sealed class MoveFilesService : IMoveFilesService
                         continue;
                     }
 
-                    // Defence-in-depth: refuse a source that's been
-                    // replaced by a symlink; moving the symlink would
-                    // pull an OS file out of System32. The check uses
-                    // the real filesystem so a MockFileSystem cannot
-                    // bypass it. Race window is theoretical: only an
-                    // admin attacker can write to C:\Windows\Installer,
-                    // and that's same-trust as us.
+                    // Refuse a source that's a symlink or junction:
+                    // moving the symlink would pull an OS file out of
+                    // System32. Real-FS check (MockFileSystem cannot
+                    // bypass).
                     if (Helpers.StorageHelpers.IsReparsePoint(sourcePath))
                     {
                         errors.Add(new SourceIsReparsePoint(sourcePath));
@@ -87,8 +78,6 @@ public sealed class MoveFilesService : IMoveFilesService
                     }
 
                     var fileName = _fs.Path.GetFileName(sourcePath);
-                    progress?.Report(new OperationProgress(i + 1, total, fileName));
-
                     var destPath = GetUniqueDestPath(destinationFolder, fileName);
                     _fs.File.Move(sourcePath, destPath);
                     moved++;
