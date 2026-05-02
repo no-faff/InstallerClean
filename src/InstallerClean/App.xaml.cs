@@ -35,19 +35,10 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // The WPF binary handles the GUI only. CLI args are owned by
-        // installerclean-cli.exe (a real console-subsystem .NET exe
-        // that ships in the same folder). If a user double-clicks the
-        // GUI exe with stray args, ignore them.
-        //
-        // Single-instance pattern matches Cli/Program.cs: open the
-        // named mutex without taking ownership at construction, then
-        // try to acquire it with WaitOne(0). Releasing explicitly in
-        // OnExit (instead of relying on Dispose to release) means a
-        // process that crashes between WaitOne and Dispose still hands
-        // the mutex to the next instance via the AbandonedMutexException
-        // path, rather than leaking the kernel object until the OS
-        // garbage-collects it.
+        // Single-instance pattern: open the mutex without taking
+        // ownership, acquire via WaitOne(0), release explicitly in
+        // OnExit. A process that crashes mid-run hands the mutex to
+        // the next instance via AbandonedMutexException.
         _singleInstanceMutex = new Mutex(initiallyOwned: false, @"Global\InstallerClean_SingleInstance");
         try
         {
@@ -113,6 +104,9 @@ public partial class App : Application
         try
         {
             var appIcon = new BitmapImage(new Uri("pack://application:,,,/Assets/splash-icon.png"));
+            // Freeze so the same instance can be assigned to many windows
+            // safely without a per-window copy.
+            appIcon.Freeze();
             EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
                 new RoutedEventHandler((s, _) =>
                 {
@@ -191,17 +185,12 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         _services?.Dispose();
-        // Release before Dispose. Same rationale as Cli/Program.cs:
-        // a clean release lets the next instance acquire without
-        // hitting AbandonedMutexException; if we crashed before this
-        // point, the next instance still gets the mutex via the
-        // abandoned-mutex transfer path so single-instance still
-        // works either way.
+        // Release-before-Dispose: a clean release lets the next instance
+        // skip the AbandonedMutexException path. OnExit runs on the
+        // dispatcher thread (same thread that took the mutex in
+        // OnStartup), so ReleaseMutex can't throw ApplicationException.
         if (_holdsSingleInstanceMutex)
-        {
-            try { _singleInstanceMutex?.ReleaseMutex(); }
-            catch (ApplicationException) { /* not the owning thread; harmless on shutdown */ }
-        }
+            _singleInstanceMutex?.ReleaseMutex();
         _singleInstanceMutex?.Dispose();
         base.OnExit(e);
     }
