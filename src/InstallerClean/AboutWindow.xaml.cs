@@ -30,6 +30,19 @@ public partial class AboutWindow : Window
     private void DonateClick(object sender, RoutedEventArgs e) =>
         OpenUrl("https://nofaff.netlify.app");
 
-    private static void OpenUrl(string url) =>
-        Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+    private static void OpenUrl(string url)
+    {
+        // Misconfigured URL handler (rare but observed) would otherwise
+        // bubble out of a click handler and crash the app. The button
+        // is non-essential; silent fail with crash log is the right
+        // tradeoff.
+        try
+        {
+            Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            CrashLog.Write(ex);
+        }
+    }
 }
