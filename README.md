@@ -88,8 +88,6 @@ Yes. We query the same database Windows itself uses to track what's installed. I
 
 ## What it doesn't do
 
-Just to be explicit, because picky-tool-skeptic territory:
-
 - **Doesn't touch WinSxS** (`C:\Windows\WinSxS`). That's a different folder with different rules. Use Windows's built-in Disk Cleanup or `Dism /Online /Cleanup-Image /StartComponentCleanup`.
 - **Doesn't run during Windows Update.** If a reboot is pending, Move and Delete are blocked (banner shown, CLI exits with an error). Cleaning the cache mid-update can break the pending repair sequence.
 - **Doesn't auto-clean on a schedule.** No background service, no scheduled task installed. You run it when you want to.
