@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using System.Windows;
+using InstallerClean.Helpers;
 using InstallerClean.ViewModels;
 
 namespace InstallerClean.Services;
@@ -48,23 +48,5 @@ public sealed class WindowService : IWindowService
         Application.Current?.MainWindow?.Close();
     }
 
-    public void OpenUrl(string url)
-    {
-        // Swallow: a misconfigured URL handler is a common cause of
-        // Process.Start throw, and the user clicked a non-essential
-        // button (Donate / Star / Check for updates). Tearing the app
-        // down to surface "no browser" is worse than the silent fail.
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = url,
-                UseShellExecute = true,
-            });
-        }
-        catch (Exception ex)
-        {
-            Helpers.CrashLog.Write(ex);
-        }
-    }
+    public void OpenUrl(string url) => UnelevatedLauncher.OpenUrl(url);
 }
