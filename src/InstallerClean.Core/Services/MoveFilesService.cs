@@ -113,7 +113,13 @@ public sealed class MoveFilesService : IMoveFilesService
                 }
             }
 
-            InstallerCacheHelpers.PruneEmptySubdirectories(cancellationToken);
+            // Pass CancellationToken.None: the prune is best-effort
+            // post-operation cleanup. If the user pressed Cancel during
+            // the prune (after all moves completed), propagating their
+            // token would throw OperationCanceledException out of a
+            // batch that actually succeeded - the caller would re-label
+            // the run as "Move cancelled" even though every file moved.
+            InstallerCacheHelpers.PruneEmptySubdirectories(CancellationToken.None);
             return new MoveResult(moved, errors.AsReadOnly());
         }, cancellationToken);
     }

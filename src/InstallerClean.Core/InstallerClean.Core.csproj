@@ -44,14 +44,16 @@
   </ItemGroup>
 
   <!-- Localisation: the typed Strings accessor is hand-managed via
-       scripts/regenerate-strings-designer.sh; the .resx files are
-       embedded resources so satellite assemblies build for each
-       culture variant. -->
+       scripts/regenerate-strings-designer.sh; Strings.resx is the
+       neutral resx for the assembly's NeutralLanguage (en-GB). No
+       satellite assembly is produced because no other culture has a
+       resx; .NET resource fallback returns the neutral resx for any
+       requested culture. Add a Strings.<culture>.resx if a real
+       translation is needed. -->
   <ItemGroup>
     <EmbeddedResource Update="Resources\Strings.resx">
       <ManifestResourceName>InstallerClean.Resources.Strings</ManifestResourceName>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Strings.en-GB.resx" />
   </ItemGroup>
 
 </Project>

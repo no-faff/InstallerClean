@@ -111,13 +111,21 @@ internal static partial class Msi
     /// Opens an MSI summary-information stream for a .msi or .msp file.
     /// The returned handle MUST be closed via <see cref="MsiCloseHandle"/>.
     /// </summary>
+    /// <remarks>
+    /// MSIHANDLE is <c>typedef unsigned long MSIHANDLE</c> in msi.h; on
+    /// Windows <c>unsigned long</c> is a 4-byte type regardless of
+    /// architecture. Using IntPtr (8 bytes on x64) for these handles
+    /// is x64-only-by-luck (the lower 32 bits land in the right place
+    /// in argument registers) and would crash on x86 where pushing
+    /// 8 bytes for a 4-byte argument breaks the stack frame.
+    /// </remarks>
     [LibraryImport(Library, EntryPoint = "MsiGetSummaryInformationW",
                    StringMarshalling = StringMarshalling.Utf16)]
     public static partial uint MsiGetSummaryInformation(
-        IntPtr hDatabase,
+        uint hDatabase,
         string? szDatabasePath,
         uint uiUpdateCount,
-        out IntPtr phSummaryInfo);
+        out uint phSummaryInfo);
 
     /// <summary>
     /// Reads one property out of an open summary-information stream.
@@ -127,7 +135,7 @@ internal static partial class Msi
     [LibraryImport(Library, EntryPoint = "MsiSummaryInfoGetPropertyW",
                    StringMarshalling = StringMarshalling.Utf16)]
     public static partial uint MsiSummaryInfoGetProperty(
-        IntPtr hSummaryInfo,
+        uint hSummaryInfo,
         uint uiProperty,
         out uint puiDataType,
         out int piValue,
@@ -137,8 +145,8 @@ internal static partial class Msi
 
     /// <summary>
     /// Closes any handle returned by an Msi* function. Safe to call
-    /// with <see cref="IntPtr.Zero"/>; returns success in that case.
+    /// with 0; returns success in that case.
     /// </summary>
     [LibraryImport(Library, EntryPoint = "MsiCloseHandle")]
-    public static partial uint MsiCloseHandle(IntPtr hAny);
+    public static partial uint MsiCloseHandle(uint hAny);
 }

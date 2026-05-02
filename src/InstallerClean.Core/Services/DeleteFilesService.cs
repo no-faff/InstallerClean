@@ -73,7 +73,9 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 }
             }
 
-            InstallerCacheHelpers.PruneEmptySubdirectories(cancellationToken);
+            // CancellationToken.None: best-effort cleanup. See the
+            // matching comment in MoveFilesService for the rationale.
+            InstallerCacheHelpers.PruneEmptySubdirectories(CancellationToken.None);
             return new DeleteResult(deleted, errors.AsReadOnly());
         }, cancellationToken);
     }

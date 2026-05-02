@@ -173,7 +173,7 @@
                     <Grid Grid.Column="0">
                         <TextBox Style="{StaticResource PillTextBox}"
                                  Text="{Binding Cleanup.MoveDestination, Mode=TwoWay,
-                                                UpdateSourceTrigger=LostFocus}"
+                                                UpdateSourceTrigger=PropertyChanged}"
                                  AutomationProperties.Name="{loc:Translate Automation.MoveDestinationFolder}"
                                  ToolTip="{loc:Translate Tooltip.MoveDestination}"/>
                         <TextBlock Text="{loc:Translate Action.MoveDestinationPlaceholder}"
@@ -428,8 +428,16 @@
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
+                        <!-- Override SelectableText's IsTabStop=False
+                             locally so a keyboard user can Tab onto the
+                             error list to read it via screen reader.
+                             The error text can run beyond the 80px
+                             MaxHeight and need scrolling, which is only
+                             reachable by keyboard if the TextBox is
+                             focusable. -->
                         <TextBox Text="{Binding Completion.Errors, Mode=OneWay}"
                                  Style="{StaticResource SelectableText}"
+                                 IsTabStop="True"
                                  Foreground="{StaticResource Status.Warning}" FontSize="{StaticResource Type.Caption}"
                                  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                     </Border>

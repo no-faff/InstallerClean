@@ -36,13 +36,15 @@ public static class CrashLog
             Directory.CreateDirectory(LogFolder);
             RotateIfNeeded();
 
-            // SECURITY: re-check after CreateDirectory and rotation. A
-            // same-account attacker could swap LogFile for a symlink
-            // between the initial IsRedirected and the AppendAllText.
-            // File.AppendAllText follows symlinks, so an attacker-
-            // chosen target would receive the stack trace (which
-            // contains absolute paths the user typed) appended to it.
-            // Drop the entry rather than write through a swapped path.
+            // Best-effort re-check after CreateDirectory and rotation.
+            // File.AppendAllText follows symlinks, so a swap between
+            // the initial IsRedirected and AppendAllText would receive
+            // the stack trace (which contains paths the user typed).
+            // The check narrows the race window but cannot eliminate
+            // it: a symlink swapped in AFTER this re-check and BEFORE
+            // AppendAllText would still get appended to. The realistic
+            // attack window is narrow because LOCALAPPDATA is owner-
+            // only DACL.
             if (StorageHelpers.IsRedirected(LogFile))
                 return LogFile;
 

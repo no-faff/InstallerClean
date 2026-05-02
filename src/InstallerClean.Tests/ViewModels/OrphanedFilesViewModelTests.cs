@@ -111,22 +111,22 @@ public class OrphanedFilesViewModelTests
         // handler on the window code-behind would silently leak per-
         // open Tasks into the process lifetime.
         //
-        // Pattern: gate the substituted info service on a ManualResetEventSlim
-        // (synchronous wait, sub-second timeout) rather than awaiting a
-        // TaskCompletionSource inside the Do() callback. xUnit1031 forbids
-        // task blocking inside test bodies, but synchronous synchronisation
-        // primitives in a worker callback are fine: the Do() runs on the
-        // thread-pool task spun up by OrphanedFilesViewModel.OnSelectedFileChanged,
-        // not the test thread.
-        var infoServiceStarted = new ManualResetEventSlim(initialState: false);
+        // Test-side wait uses a TaskCompletionSource the worker callback
+        // signals via TrySetResult. The test body awaits that TCS task
+        // (no polling, no fixed-time deadline). The worker callback
+        // still uses ManualResetEventSlim because it has to BLOCK
+        // synchronously inside NSubstitute's Do() (which has no async
+        // overload) to keep the metadata load "in flight" while the
+        // test calls Dispose.
+        var infoServiceStarted = new TaskCompletionSource();
         var allowComplete = new ManualResetEventSlim(initialState: false);
         var infoService = Substitute.For<IMsiFileInfoService>();
         infoService
             .When(s => s.GetSummaryInfo(Arg.Any<string>()))
             .Do(_ =>
             {
-                infoServiceStarted.Set();
-                allowComplete.Wait(TimeSpan.FromSeconds(2));
+                infoServiceStarted.TrySetResult();
+                allowComplete.Wait(TimeSpan.FromSeconds(5));
             });
         infoService.GetSummaryInfo(Arg.Any<string>()).Returns((MsiSummaryInfo?)null);
 
@@ -136,13 +136,15 @@ public class OrphanedFilesViewModelTests
         };
         var vm = new OrphanedFilesViewModel(files, infoService);
 
-        // Wait for the worker to enter the substituted info service via
-        // a polling loop with an async sleep, so the test thread itself
-        // never blocks on a Task.
-        var deadline = DateTime.UtcNow.AddSeconds(2);
-        while (!infoServiceStarted.IsSet && DateTime.UtcNow < deadline)
-            await Task.Delay(10);
-        Assert.True(infoServiceStarted.IsSet, "Worker never entered the info service.");
+        // Wait for the worker to enter the substituted info service.
+        // No polling: just await the TCS the callback set above. Bound
+        // by a generous 5s timeout via Task.WhenAny so a regression
+        // that fails to call the info service at all surfaces as a
+        // test failure rather than hanging the suite.
+        var firstToFinish = await Task.WhenAny(
+            infoServiceStarted.Task,
+            Task.Delay(TimeSpan.FromSeconds(5)));
+        Assert.Same(infoServiceStarted.Task, firstToFinish);
 
         vm.Dispose();
         allowComplete.Set();

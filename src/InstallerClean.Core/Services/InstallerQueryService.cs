@@ -270,6 +270,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             ct.ThrowIfCancellationRequested();
 
+            // Match EnumerateProducts: zero the GUID buffers between
+            // iterations so a previous call's longer GUID can't leak via
+            // BufferToString's null-scan if the next call wrote a shorter
+            // string. The MSI API zero-terminates so this is belt-and-
+            // braces; the belt is cheap.
+            Array.Clear(patchCode);
+            Array.Clear(targetProductCode);
+
             uint sidLen = 0;
 
             var error = Msi.MsiEnumPatchesEx(
@@ -298,8 +306,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
             else
             {
                 consecutiveNonSuccess++;
+                // Match EnumerateProducts: throw rather than silently
+                // truncate. A patch enumeration that returns a few real
+                // entries then collapses to non-success would otherwise
+                // leave real-but-superseded patches missing from the
+                // result set, classifying them as orphaned and offering
+                // them for cleanup. Throwing surfaces the API failure
+                // to the caller (the scan command's catch shows an
+                // error and the user can investigate).
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
-                    break;
+                    throw new InvalidOperationException(
+                        string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));
             }
         }
 

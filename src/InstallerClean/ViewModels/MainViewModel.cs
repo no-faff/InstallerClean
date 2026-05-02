@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.IO.Abstractions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using InstallerClean.Services;
 
@@ -36,13 +37,14 @@ public partial class MainViewModel : ObservableObject
         IMsiFileInfoService msiInfoService,
         IDialogService dialogService,
         IConfirmationService confirmationService,
-        IWindowService windowService)
+        IWindowService windowService,
+        IFileSystem fileSystem)
     {
         Scan = new ScanViewModel(scanService, rebootService, dialogService);
         Completion = new CompletionViewModel();
         Cleanup = new CleanupViewModel(
             moveService, deleteService, settingsService,
-            dialogService, confirmationService,
+            dialogService, confirmationService, fileSystem,
             Scan, Completion);
         Chrome = new ChromeViewModel(windowService, msiInfoService, Scan);
 
@@ -51,6 +53,15 @@ public partial class MainViewModel : ObservableObject
         // overlay. The IsOperating guard prevents the all-clear from
         // hiding a freshly-painted Move/Delete summary when the
         // post-operation refresh runs.
+        //
+        // TIMING DEPENDENCY: this guard relies on Cleanup setting
+        // IsOperating=false in its finally block AFTER the post-
+        // operation RefreshAsync raises ScanCompleted. If a future
+        // change reorders Cleanup's finally so IsOperating clears
+        // BEFORE RefreshAsync runs, this handler would fire while
+        // IsOperating is already false, painting all-clear over the
+        // completion summary. Don't move IsOperating=false above the
+        // refresh await without rethinking this guard.
         Scan.ScanCompleted += (_, _) =>
         {
             if (Scan.OrphanedFileCount == 0 && !Cleanup.IsOperating)
@@ -90,6 +101,14 @@ public partial class MainViewModel : ObservableObject
             e.PropertyName == nameof(CompletionViewModel.IsComplete))
         {
             OnPropertyChanged(nameof(IsMainContentInteractive));
+
+            // While a Move/Delete or a completion overlay is up, block
+            // the user-driven Scan command (the F5 keybinding and any
+            // other Re-scan / Scan-again click). Without this, F5
+            // pressed during a Move starts a parallel scan that races
+            // the in-flight file operation, and the Scanning overlay
+            // paints over the Operating overlay.
+            Scan.IsExternallyBlocked = Cleanup.IsOperating || Completion.IsComplete;
         }
     }
 }

@@ -37,7 +37,19 @@ internal static partial class Shell32
     /// free it with <see cref="Marshal.FreeCoTaskMem(IntPtr)"/>
     /// after the call.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    /// <remarks>
+    /// The Windows SDK declares SHFILEOPSTRUCTW inside
+    /// <c>#include &lt;pshpack1.h&gt;</c>, i.e. the native struct is
+    /// 1-byte packed: there is NO compiler-inserted padding before
+    /// pFrom, fFlags or hNameMappings. Pack = 1 here matches that.
+    /// Pack = 8 (the .NET default on x64) would insert 4 bytes of
+    /// padding before pFrom on x64, putting our struct's pFrom at
+    /// offset 16 while the kernel reads it at offset 12 - undefined
+    /// behaviour that happens to be harmless today only because the
+    /// shell reads field-aligned bytes that just so happen to look
+    /// right.
+    /// </remarks>
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SHFILEOPSTRUCT
     {
         public IntPtr hwnd;

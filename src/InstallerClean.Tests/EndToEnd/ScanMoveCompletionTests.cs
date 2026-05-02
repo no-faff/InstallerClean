@@ -29,13 +29,16 @@ public class ScanMoveCompletionTests
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
 
+    private readonly MockFileSystem _fileSystem = new();
+
     private MainViewModel CreateMain()
     {
         _settingsService.Load().Returns(new AppSettings());
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
-            _dialogService, _confirmationService, _windowService);
+            _dialogService, _confirmationService, _windowService,
+            _fileSystem);
     }
 
     [Fact]
@@ -181,7 +184,8 @@ public class ScanMoveCompletionTests
         var vm = new MainViewModel(
             scanService, moveService, deleteService,
             settingsService, rebootService, msiInfoService,
-            dialogService, confirmationService, windowService);
+            dialogService, confirmationService, windowService,
+            new MockFileSystem());
 
         // Stage 1: real scan finds the two orphans.
         await vm.Scan.ScanWithProgressAsync(null);

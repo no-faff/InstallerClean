@@ -23,6 +23,11 @@ public partial class App : Application
     private static Mutex? _singleInstanceMutex;
     private static bool _holdsSingleInstanceMutex;
     private static ServiceProvider? _services;
+    // Guards against the DispatcherUnhandledException handler re-entering
+    // itself if the MessageBox below pumps messages and a second
+    // exception fires from one of those queued continuations. Without
+    // this, two stacked dialogs and two crash-log entries result.
+    private static bool _handlingUnhandledException;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -61,18 +66,36 @@ public partial class App : Application
 
         DispatcherUnhandledException += (_, args) =>
         {
-            var logPath = CrashLog.Write(args.Exception);
-            // SECURITY: pass the exception type name only, never the
-            // .Message. With the app running elevated, framework
-            // exception messages can include absolute paths the
-            // process touched on behalf of one user that another user
-            // sharing the workstation should not see. Full detail
-            // (message + stack trace) is in the crash log.
-            MessageBox.Show(
-                string.Format(Strings.Startup_UnhandledBody, args.Exception.GetType().Name, logPath),
-                Strings.Startup_UnhandledTitle, MessageBoxButton.OK, MessageBoxImage.Error);
-            args.Handled = true;
-            Shutdown(1);
+            // Re-entry guard: MessageBox.Show pumps messages so a second
+            // exception in a queued continuation could fire this handler
+            // again. Log silently on the recursive case rather than
+            // stacking two dialogs and two log entries.
+            if (_handlingUnhandledException)
+            {
+                CrashLog.Write(args.Exception);
+                args.Handled = true;
+                return;
+            }
+            _handlingUnhandledException = true;
+            try
+            {
+                var logPath = CrashLog.Write(args.Exception);
+                // SECURITY: pass the exception type name only, never the
+                // .Message. With the app running elevated, framework
+                // exception messages can include absolute paths the
+                // process touched on behalf of one user that another user
+                // sharing the workstation should not see. Full detail
+                // (message + stack trace) is in the crash log.
+                MessageBox.Show(
+                    string.Format(Strings.Startup_UnhandledBody, args.Exception.GetType().Name, logPath),
+                    Strings.Startup_UnhandledTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                args.Handled = true;
+                Shutdown(1);
+            }
+            finally
+            {
+                _handlingUnhandledException = false;
+            }
         };
 
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
