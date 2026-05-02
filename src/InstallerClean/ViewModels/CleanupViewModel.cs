@@ -31,12 +31,10 @@ public partial class CleanupViewModel : ObservableObject
     private AppSettings _settings;
 
     /// <summary>
-    /// Debounce window for write-back of MoveDestination edits to disk.
-    /// Each keystroke cancels the previous pending save and starts a
-    /// new timer; the actual TrySave runs only if the user stops
-    /// typing for this long. 400ms is roughly half a comfortable
-    /// keystroke interval, so a normal typist never triggers more
-    /// than one save per pause.
+    /// Debounce window for write-back of MoveDestination edits. Each
+    /// keystroke cancels the previous pending save; the save runs only
+    /// if the user stops typing for this long. 400ms is roughly half a
+    /// comfortable keystroke interval.
     /// </summary>
     /// <remarks>
     /// Exposed as <c>internal</c> so MainViewModelTests can wait on this
@@ -109,11 +107,9 @@ public partial class CleanupViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Debounced write-back of <see cref="MoveDestination"/> to disk.
-    /// Each call cancels the previous pending save so a typist who
-    /// pastes or types a path doesn't fire a TrySave per character.
-    /// The save happens once they stop changing the value for
-    /// <see cref="MoveDestinationSaveDelay"/>.
+    /// Debounced write-back. Each call cancels the previous pending
+    /// save so a typist doesn't fire a save per character; the actual
+    /// save fires after <see cref="MoveDestinationSaveDelay"/>.
     /// </summary>
     private void ScheduleMoveDestinationSave()
     {
@@ -182,7 +178,7 @@ public partial class CleanupViewModel : ObservableObject
         };
         if (dialog.ShowDialog() == true)
         {
-            // OnMoveDestinationChanged persists the new value via TrySave.
+            // OnMoveDestinationChanged persists the new value.
             MoveDestination = dialog.FolderName;
         }
     }
