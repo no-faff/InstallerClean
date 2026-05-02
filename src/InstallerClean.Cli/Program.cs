@@ -53,11 +53,9 @@ internal static class Program
             return ExitError;
         }
 
-        // Reject extra positional arguments. /m takes an optional second
-        // arg (the destination path) and silently truncates from there;
-        // an unquoted path with spaces ("/m D:\My Backup") would
-        // otherwise become "D:\My" with no warning. /s and /d take no
-        // positional args at all.
+        // /m takes an optional second arg (the destination); /s and /d
+        // take none. Reject anything beyond so an unquoted path with
+        // spaces ("/m D:\My Backup") doesn't silently become "D:\My".
         var maxArgs = arg == "/m" ? 2 : 1;
         if (args.Length > maxArgs)
         {
@@ -67,12 +65,9 @@ internal static class Program
             return ExitError;
         }
 
-        // Register the Ctrl+C handler BEFORE acquiring the mutex so a
-        // signal arriving in the gap between mutex acquisition and
-        // handler registration prints "Cancelling..." gracefully
-        // rather than terminating via the default handler. The OS
-        // would still release the abandoned mutex on a default-handler
-        // termination, but the user wouldn't see graceful output.
+        // Cancel handler before mutex: a Ctrl+C in the gap should
+        // print "Cancelling..." rather than terminate via the default
+        // handler.
         using var cts = new CancellationTokenSource();
         ConsoleCancelEventHandler cancelHandler = (_, cancelArgs) =>
         {
@@ -98,12 +93,8 @@ internal static class Program
             }
             catch (AbandonedMutexException)
             {
-                // The previous owner (GUI or CLI) crashed without
-                // releasing. .NET transfers ownership to us; treat that
-                // as a successful acquisition rather than surfacing a
-                // confusing generic error. The crashed process has
-                // already exited, so the kernel state we now hold is
-                // safe to use.
+                // Previous owner crashed without releasing; .NET hands
+                // us ownership and we proceed.
                 holdsMutex = true;
             }
             if (!holdsMutex)
@@ -150,13 +141,9 @@ internal static class Program
                 return ExitOk;
             }
 
-            // SECURITY/CORRECTNESS: gate /d and /m on pending-reboot just
-            // like the GUI does after step 10. Cleaning the installer
-            // cache while Windows Update is mid-staging breaks the
-            // pending repair / rollback sequence; the risk is the same
-            // whether the user clicked Move in the GUI or scheduled
-            // installerclean-cli /d in a Task. /s is unaffected because
-            // it only reads.
+            // Match the GUI: cleaning the cache mid-update can break
+            // the pending repair sequence regardless of how it was
+            // launched. /s reads only, so it skips the gate.
             if (arg is "/d" or "/m")
             {
                 var rebootService = services.GetRequiredService<IPendingRebootService>();
@@ -189,10 +176,8 @@ internal static class Program
                 EventLogWriter.Write(level,
                     string.Format(Strings.Cli_EventLogDeleteSummary,
                         result.DeletedCount, count, size, result.Errors.Count));
-                // Three-state exit: full success, partial success, full
-                // failure. Sysadmin retry policies can use this to decide
-                // whether to retry: partial usually merits a retry,
-                // full failure rarely does.
+                // 0 / 2 / 1: full / partial / total failure (see
+                // ExitOk / ExitPartial / ExitError).
                 if (result.Errors.Count == 0) return ExitOk;
                 if (result.DeletedCount > 0) return ExitPartial;
                 return ExitError;
@@ -234,7 +219,6 @@ internal static class Program
             EventLogWriter.Write(moveLevel,
                 string.Format(Strings.Cli_EventLogMoveSummary,
                     moveResult.MovedCount, count, dest, size, moveResult.Errors.Count));
-            // See /d branch for the three-state exit-code rationale.
             if (moveResult.Errors.Count == 0) return ExitOk;
             if (moveResult.MovedCount > 0) return ExitPartial;
             return ExitError;
