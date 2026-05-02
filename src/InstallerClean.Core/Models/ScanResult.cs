@@ -12,9 +12,10 @@ namespace InstallerClean.Models;
 /// recycle.
 /// </param>
 /// <param name="RegisteredPackages">
-/// Every <c>LocalPackage</c> path the API still claims, with metadata
-/// for the registered-files window. Drives both the registered list and
-/// the totals on the main screen.
+/// <c>LocalPackage</c> paths the API still claims that aren't marked
+/// superseded or obsoleted. Superseded patches go into
+/// <see cref="RemovableFiles"/> instead. Drives the registered list
+/// and the totals on the main screen.
 /// </param>
 /// <param name="RegisteredTotalBytes">
 /// Sum of <see cref="RegisteredPackage.FileSizeBytes"/> across

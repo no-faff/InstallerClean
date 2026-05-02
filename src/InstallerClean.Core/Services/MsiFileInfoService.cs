@@ -39,8 +39,6 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
             var keywords = GetStringProperty(hSummary, MsiSummaryProperty.Keywords);
             var appName  = GetStringProperty(hSummary, MsiSummaryProperty.AppName);
 
-            // Signature retrieval can fail independently of the summary
-            // properties, so capture it separately to avoid losing them.
             var sig = GetDigitalSignature(filePath);
 
             return new MsiSummaryInfo(title, subject, author, comments, sig, keywords, appName);
