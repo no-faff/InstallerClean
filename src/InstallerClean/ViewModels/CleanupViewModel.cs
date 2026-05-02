@@ -242,9 +242,7 @@ public partial class CleanupViewModel : ObservableObject
         {
             IsOperating = false;
             OperationProgress = Strings.Status_MoveCancelled;
-            var cts = _operationCts;
-            _operationCts = null;
-            cts?.Dispose();
+            DisposeOperationCts();
             return;
         }
         catch (Exception ex)
@@ -254,9 +252,7 @@ public partial class CleanupViewModel : ObservableObject
             // Full detail to crash log; dest + log path to dialog. ex.Message
             // is intentionally never surfaced (path-leak risk under elevation).
             var logPath = CrashLog.Write(ex);
-            var cts = _operationCts;
-            _operationCts = null;
-            cts?.Dispose();
+            DisposeOperationCts();
             _dialogService.ShowWarning(
                 DescribeWriteFailure(dest, ex, logPath),
                 Strings.Error_InvalidDestinationTitle);
@@ -277,9 +273,7 @@ public partial class CleanupViewModel : ObservableObject
         if (availableFreeSpace is long free && free < totalBytes)
         {
             // Pre-flight CTS no longer needed; dispose before returning.
-            var cts = _operationCts;
-            _operationCts = null;
-            cts?.Dispose();
+            DisposeOperationCts();
             _dialogService.ShowWarning(
                 string.Format(Strings.Error_NotEnoughSpaceBody,
                     dest,
@@ -298,9 +292,7 @@ public partial class CleanupViewModel : ObservableObject
         {
             // User cancelled at the confirmation dialog. The pre-flight
             // CTS is no longer needed; dispose it before returning.
-            var cts = _operationCts;
-            _operationCts = null;
-            cts?.Dispose();
+            DisposeOperationCts();
             return;
         }
 
@@ -351,9 +343,7 @@ public partial class CleanupViewModel : ObservableObject
         }
         finally
         {
-            var cts = _operationCts;
-            _operationCts = null;
-            cts?.Dispose();
+            DisposeOperationCts();
             IsOperating = false;
             OperationProgressPercent = 0;
         }
@@ -412,9 +402,7 @@ public partial class CleanupViewModel : ObservableObject
         }
         finally
         {
-            var cts = _operationCts;
-            _operationCts = null;
-            cts?.Dispose();
+            DisposeOperationCts();
             IsOperating = false;
             OperationProgressPercent = 0;
         }
@@ -435,6 +423,18 @@ public partial class CleanupViewModel : ObservableObject
 
     partial void OnOperationTotalFilesChanged(int value) =>
         OnPropertyChanged(nameof(OperationProgressDetail));
+
+    /// <summary>
+    /// Null-then-dispose <see cref="_operationCts"/>. Order matters: a
+    /// concurrent CancelOperationCommand reading the field after the
+    /// null sees no CTS and no-ops, instead of racing the dispose.
+    /// </summary>
+    private void DisposeOperationCts()
+    {
+        var cts = _operationCts;
+        _operationCts = null;
+        cts?.Dispose();
+    }
 
     private void OnOperationProgressUpdate(OperationProgress p)
     {
