@@ -41,7 +41,8 @@ public partial class MainViewModel : ObservableObject
         IFileSystem fileSystem)
     {
         Scan = new ScanViewModel(scanService, rebootService, dialogService);
-        Completion = new CompletionViewModel();
+        // Closure reads Scan at invocation time, after the ctor runs.
+        Completion = new CompletionViewModel(() => Scan.ScanCommand.ExecuteAsync(null));
         Cleanup = new CleanupViewModel(
             moveService, deleteService, settingsService,
             dialogService, confirmationService, fileSystem,
@@ -58,11 +59,6 @@ public partial class MainViewModel : ObservableObject
             if (Scan.OrphanedFileCount == 0 && !Cleanup.IsOperating)
                 Completion.ShowAllClear();
         };
-
-        // Func rather than a direct call so CompletionViewModel doesn't
-        // need to know about the scan service. Returns the scan task
-        // so test code can await a triggered rescan.
-        Completion.RescanRequested = () => Scan.ScanCommand.ExecuteAsync(null);
 
         // Drive IsMainContentInteractive off the three overlay states.
         // Caption buttons stay enabled regardless: the user must always
