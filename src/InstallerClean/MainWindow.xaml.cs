@@ -25,6 +25,20 @@ public partial class MainWindow : Window
         _vm.Scan.PropertyChanged += OnScanPropertyChanged;
         PreviewKeyDown += OnPreviewKeyDown;
         Closed += OnClosed;
+
+        // The splash-driven startup scan can complete (and Completion
+        // .ShowAllClear() can already have set IsComplete=true) before
+        // this window is constructed. The PropertyChanged subscription
+        // above only catches state changes from now on, so it doesn't
+        // replay the all-clear that already fired. Replay it manually:
+        // if the overlay is already up at construction, route focus into
+        // it so Tab lands inside the overlay (and the overlay's
+        // KeyboardNavigation.TabNavigation="Cycle" keeps it there)
+        // rather than starting on a main-window button behind the
+        // overlay.
+        if (_vm.Completion.IsComplete)
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
+
         this.EnableAltSpaceSystemMenu();
     }
 
@@ -83,13 +97,39 @@ public partial class MainWindow : Window
     private void MaximizeClick(object sender, RoutedEventArgs e)
     {
         WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+        // Tooltip + automation name update happens in OnStateChanged so
+        // double-click-on-title-bar (which bypasses this handler) keeps
+        // the labels in sync too.
+    }
+
+    private void CloseClick(object sender, RoutedEventArgs e) => Close();
+
+    /// <summary>
+    /// Keeps the Maximise/Restore button tooltip and screen-reader name
+    /// in sync regardless of how the window state changed (button click,
+    /// title-bar double-click, Win+Up keyboard shortcut, etc).
+    /// </summary>
+    protected override void OnStateChanged(EventArgs e)
+    {
+        base.OnStateChanged(e);
         var maximised = WindowState == WindowState.Maximized;
-        // Toggle the tooltip and the screen-reader name through the resx
-        // so a non-en-GB UI doesn't suddenly show "Restore" in English.
         MaximizeButton.ToolTip = maximised ? Strings.Tooltip_Restore : Strings.Tooltip_Maximise;
         AutomationProperties.SetName(MaximizeButton,
             maximised ? Strings.Tooltip_Restore : Strings.Automation_Maximise);
     }
 
-    private void CloseClick(object sender, RoutedEventArgs e) => Close();
+    /// <summary>
+    /// Click-outside-to-dismiss for the result overlay. Routed via
+    /// the dim Rectangle's MouseLeftButtonDown so only a click on the
+    /// dim margin triggers it; clicks on the inner content card are
+    /// absorbed by their own hit-testing.
+    /// </summary>
+    private void CompletionDimAreaClick(object sender, MouseButtonEventArgs e)
+    {
+        if (_vm.Completion.IsComplete && _vm.Completion.DismissCommand.CanExecute(null))
+        {
+            _vm.Completion.DismissCommand.Execute(null);
+            e.Handled = true;
+        }
+    }
 }

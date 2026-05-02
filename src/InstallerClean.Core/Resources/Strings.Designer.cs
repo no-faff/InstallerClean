@@ -52,7 +52,7 @@ public static class Strings
     public static string Automation_CancelScan => Get("Automation.CancelScan");
     public static string Automation_CancelStartupScan => Get("Automation.CancelStartupScan");
     public static string Automation_Close => Get("Automation.Close");
-    public static string Automation_CloseInstallerClean => Get("Automation.CloseInstallerClean");
+    public static string Automation_CloseResult => Get("Automation.CloseResult");
     public static string Automation_ConfirmDelete => Get("Automation.ConfirmDelete");
     public static string Automation_DeleteAllFiles => Get("Automation.DeleteAllFiles");
     public static string Automation_LeaveStarOnGitHub => Get("Automation.LeaveStarOnGitHub");
