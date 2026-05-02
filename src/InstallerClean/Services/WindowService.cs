@@ -50,10 +50,21 @@ public sealed class WindowService : IWindowService
 
     public void OpenUrl(string url)
     {
-        Process.Start(new ProcessStartInfo
+        // Swallow: a misconfigured URL handler is a common cause of
+        // Process.Start throw, and the user clicked a non-essential
+        // button (Donate / Star / Check for updates). Tearing the app
+        // down to surface "no browser" is worse than the silent fail.
+        try
         {
-            FileName = url,
-            UseShellExecute = true,
-        });
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true,
+            });
+        }
+        catch (Exception ex)
+        {
+            Helpers.CrashLog.Write(ex);
+        }
     }
 }
