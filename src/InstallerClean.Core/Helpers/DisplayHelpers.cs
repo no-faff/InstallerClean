@@ -48,4 +48,8 @@ internal static class DisplayHelpers
     /// <summary>"error"/"errors" pair, sourced from Strings.resx.</summary>
     internal static string PluraliseError(int count) =>
         Pluralise(count, Strings.Plural_Error_Singular, Strings.Plural_Error_Plural);
+
+    /// <summary>"package"/"packages" pair, sourced from Strings.resx.</summary>
+    internal static string PluralisePackage(int count) =>
+        Pluralise(count, Strings.Plural_Package_Singular, Strings.Plural_Package_Plural);
 }

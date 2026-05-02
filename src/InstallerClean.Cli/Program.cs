@@ -137,7 +137,8 @@ internal static class Program
                     scanResult.RemovableFiles.Select(f =>
                         $"  {f.FileName}  ({f.SizeDisplay}, {f.Reason})")));
                 EventLogWriter.Write(EventLogWriter.Level.Information,
-                    string.Format(Strings.Cli_EventLogScanFound, count, size));
+                    string.Format(Strings.Cli_EventLogScanFound,
+                        arg, count, DisplayHelpers.PluraliseFile(count), size));
                 return ExitOk;
             }
 
@@ -199,7 +200,7 @@ internal static class Program
             {
                 Console.WriteLine(Strings.Cli_MoveDestinationInsideInstaller);
                 EventLogWriter.Write(EventLogWriter.Level.Warning,
-                    string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, dest));
+                    string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, arg, dest));
                 return ExitError;
             }
 
