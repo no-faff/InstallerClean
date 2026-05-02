@@ -73,15 +73,13 @@ public sealed class MoveFilesService : IMoveFilesService
                         continue;
                     }
 
-                    // SECURITY: refuse to follow a reparse point at the
-                    // source. C:\Windows\Installer is admin-write so
-                    // this is mostly defence-in-depth, but a junction
-                    // planted between scan and move would otherwise let
-                    // File.Move yank an attacker-chosen target out of
-                    // System32 (or any other readable location) into
-                    // the user's destination folder. Uses the real
-                    // filesystem regardless of the injected IFileSystem
-                    // so a MockFileSystem cannot bypass this check.
+                    // Defence-in-depth: refuse a source that's been
+                    // replaced by a symlink; moving the symlink would
+                    // pull an OS file out of System32. The check uses
+                    // the real filesystem so a MockFileSystem cannot
+                    // bypass it. Race window is theoretical: only an
+                    // admin attacker can write to C:\Windows\Installer,
+                    // and that's same-trust as us.
                     if (Helpers.StorageHelpers.IsReparsePoint(sourcePath))
                     {
                         errors.Add(new IOFailure(sourcePath, Strings.Error_SourceIsReparsePoint));
