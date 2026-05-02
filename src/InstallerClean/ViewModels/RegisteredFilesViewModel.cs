@@ -79,16 +79,35 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
             var productName = items.First().ProductName;
             if (string.IsNullOrEmpty(productName)) productName = Strings.Field_UnknownProductName;
 
-            var representative = msi ?? items.First();
-
-            products.Add(new ProductRow(
-                productName,
-                Path.GetFileName(representative.LocalPackagePath),
-                representative.LocalPackagePath,
-                DisplayHelpers.FormatSize(representative.FileSizeBytes),
-                representative.FileSizeBytes,
-                patches.Count,
-                patches));
+            ProductRow row;
+            if (msi is not null)
+            {
+                row = new ProductRow(
+                    productName,
+                    Path.GetFileName(msi.LocalPackagePath),
+                    msi.LocalPackagePath,
+                    DisplayHelpers.FormatSize(msi.FileSizeBytes),
+                    msi.FileSizeBytes,
+                    patches.Count,
+                    patches);
+            }
+            else
+            {
+                // No .msi for this product - render a synthetic main row
+                // showing the patch total so the first patch isn't
+                // duplicated as both the product line AND the first
+                // patch-list entry.
+                var patchBytes = items.Sum(p => p.FileSizeBytes);
+                row = new ProductRow(
+                    productName,
+                    Strings.Field_PatchesOnly,
+                    items.First().LocalPackagePath,
+                    DisplayHelpers.FormatSize(patchBytes),
+                    patchBytes,
+                    patches.Count,
+                    patches);
+            }
+            products.Add(row);
         }
 
         Products = products;
@@ -131,8 +150,11 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         {
             // Window closed; drop the result.
         }
-        catch
+        catch (Exception ex)
         {
+            // _infoService is contracted not to throw, but log if it
+            // ever does so a future regression isn't silently lost.
+            CrashLog.Write(ex);
             if (!ct.IsCancellationRequested && SelectedProduct == value)
                 SelectedDetails = null;
         }

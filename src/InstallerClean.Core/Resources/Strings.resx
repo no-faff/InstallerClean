@@ -255,6 +255,7 @@
   <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} registered {1} ({2})</value></data>
   <!-- Placeholder name shown for a registered package whose API ProductName is empty. -->
   <data name="Field.UnknownProductName" xml:space="preserve"><value>(unknown)</value></data>
+  <data name="Field.PatchesOnly" xml:space="preserve"><value>(patches only)</value></data>
 
   <!-- ============================================================
        CONFIRMATION DIALOGS

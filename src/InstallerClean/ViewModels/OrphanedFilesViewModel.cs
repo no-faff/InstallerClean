@@ -83,8 +83,11 @@ public partial class OrphanedFilesViewModel : ObservableObject, IDisposable
         {
             // Window closed; drop the result.
         }
-        catch
+        catch (Exception ex)
         {
+            // _infoService is contracted not to throw, but log if it
+            // ever does so a future regression isn't silently lost.
+            CrashLog.Write(ex);
             if (!ct.IsCancellationRequested && SelectedFile == value)
                 SelectedDetails = null;
         }
