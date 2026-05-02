@@ -78,7 +78,7 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border CornerRadius="22"
+                    <Border CornerRadius="{StaticResource Radius.PillFocus}"
                             BorderThickness="{StaticResource BorderThickness.Standard}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
@@ -88,19 +88,11 @@
         </Setter>
     </Style>
 
-    <!-- CompactPillFocusVisual radius is derived geometry, not a token:
-         a 30px-tall pill has a 15px inner radius, and the focus ring
-         sits 2px outside (Margin="-2"), so the matching outer radius is
-         15 + 2 = 17. The Tight/Chip/CardSm/Card/Pill ramp doesn't apply
-         to off-by-Margin focus geometry. Same calc for SmallPillFocusVisual
-         below at 16 (a 28px pill -> 14 inner -> 14 + 2 outer ... but
-         WPF auto-clamps a smaller radius to the bounding rect so we use
-         16 from the Radius scale to keep the ring visibly rounded). -->
     <Style x:Key="CompactPillFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border CornerRadius="17"
+                    <Border CornerRadius="{StaticResource Radius.CompactPillFocus}"
                             BorderThickness="{StaticResource BorderThickness.Standard}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
