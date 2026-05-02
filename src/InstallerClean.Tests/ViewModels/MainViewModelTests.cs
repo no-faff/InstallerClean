@@ -285,7 +285,7 @@ public class MainViewModelTests
         vm.Cleanup.MoveDestination = @"D:\Backup\Installer-cache";
         await Task.Delay(DebounceWait);
 
-        _settingsService.Received().TrySave(Arg.Is<AppSettings>(
+        _settingsService.Received().Save(Arg.Is<AppSettings>(
             s => s.MoveDestination == @"D:\Backup\Installer-cache"));
     }
 
@@ -298,7 +298,7 @@ public class MainViewModelTests
         vm.Cleanup.MoveDestination = @"D:\Backup";
         await Task.Delay(DebounceWait);
 
-        _settingsService.DidNotReceive().TrySave(Arg.Any<AppSettings>());
+        _settingsService.DidNotReceive().Save(Arg.Any<AppSettings>());
     }
 
     [Fact]
