@@ -55,7 +55,8 @@
         </StackPanel>
 
         <Grid Grid.Row="1" Grid.RowSpan="2" Margin="24,0,24,48" VerticalAlignment="Center"
-              MaxWidth="720" HorizontalAlignment="Center">
+              MaxWidth="720" HorizontalAlignment="Center"
+              IsEnabled="{Binding IsMainContentInteractive}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="16"/>
@@ -221,7 +222,8 @@
         </Grid>
 
         <!-- ── Bottom nav ────────────────────────────────────── -->
-        <DockPanel Grid.Row="3" LastChildFill="False" Margin="4,8,24,8">
+        <DockPanel Grid.Row="3" LastChildFill="False" Margin="4,8,24,8"
+                   IsEnabled="{Binding IsMainContentInteractive}">
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     Content="{loc:Translate Action.Rescan}" Command="{Binding Scan.ScanCommand}"/>
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
@@ -367,10 +369,27 @@
                 </StackPanel>
             </Border>
         </Grid>
-        <!-- ── Completion overlay ────────────────────────────────── -->
-        <Grid x:Name="CompletionOverlay" Grid.RowSpan="4" Visibility="{Binding Completion.IsComplete, Converter={StaticResource BoolToVis}}">
-            <Rectangle Fill="{StaticResource Surface.Overlay}"/>
+        <!-- ── Completion overlay ──────────────────────────────────
+             KeyboardNavigation.TabNavigation="Cycle" keeps Tab focus
+             inside the overlay (Close <-> Scan again <-> back) instead
+             of reaching the visible-but-conceptually-unreachable
+             buttons of the main window behind it.
+             BorderBrush + BorderThickness="1" matches the 1px slate
+             outline the confirm dialogs use, so the overlay reads as
+             a window-on-top instead of a free-floating block. -->
+        <Grid x:Name="CompletionOverlay" Grid.RowSpan="4" Visibility="{Binding Completion.IsComplete, Converter={StaticResource BoolToVis}}"
+              KeyboardNavigation.TabNavigation="Cycle"
+              KeyboardNavigation.ControlTabNavigation="Cycle">
+            <!-- Click-on-dim-area dismisses the overlay, matching the
+                 muscle memory most users have for click-outside-modal-
+                 to-dismiss. The Rectangle covers the whole grid; the
+                 inner Border absorbs clicks via its own hit-testing so
+                 only clicks on the actual dim margin trigger this. -->
+            <Rectangle Fill="{StaticResource Surface.Overlay}"
+                       MouseLeftButtonDown="CompletionDimAreaClick"
+                       Cursor="Arrow"/>
             <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Pill}"
+                    BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="1"
                     Padding="36,32" MinWidth="340" MaxWidth="420"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel HorizontalAlignment="Center">
@@ -415,13 +434,20 @@
                                  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                     </Border>
 
-                    <!-- Close button -->
+                    <!-- Close button. Dismisses this result screen and
+                         returns the user to the main window with the
+                         updated counts. NOT bound to CloseApp: exiting
+                         the app from a result screen the user just
+                         landed on locks them out of Re-scan / Details /
+                         About. The label still reads "Close" because
+                         that is what the user is closing - this screen,
+                         not the app. -->
                     <Button x:Name="CompletionCloseButton" Style="{StaticResource AccentPill}"
-                            Content="{loc:Translate Action.Close}" Command="{Binding Chrome.CloseAppCommand}"
+                            Content="{loc:Translate Action.Close}" Command="{Binding Completion.DismissCommand}"
                             IsDefault="True"
                             HorizontalAlignment="Center" MinWidth="120"
                             Margin="{StaticResource GapBottom.Sm}"
-                            AutomationProperties.Name="{loc:Translate Automation.CloseInstallerClean}"/>
+                            AutomationProperties.Name="{loc:Translate Automation.CloseResult}"/>
 
                     <!-- Scan again -->
                     <Button Style="{StaticResource GhostPill}"

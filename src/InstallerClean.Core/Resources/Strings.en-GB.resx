@@ -131,7 +131,7 @@
   <data name="Automation.CancelScan" xml:space="preserve"><value>Cancel scan</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Cancel startup scan</value></data>
   <data name="Automation.Close" xml:space="preserve"><value>Close</value></data>
-  <data name="Automation.CloseInstallerClean" xml:space="preserve"><value>Close InstallerClean</value></data>
+  <data name="Automation.CloseResult" xml:space="preserve"><value>Close result and return to main window</value></data>
   <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
   <data name="Automation.Maximise" xml:space="preserve"><value>Maximise</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimise</value></data>
@@ -203,8 +203,8 @@
   <data name="Status.Deleting" xml:space="preserve"><value>Deleting {0} {1}...</value></data>
   <data name="Status.MoveCancelled" xml:space="preserve"><value>Move cancelled.</value></data>
   <data name="Status.DeleteCancelled" xml:space="preserve"><value>Delete cancelled.</value></data>
-  <data name="Status.MoveFailed" xml:space="preserve"><value>Move failed ({0}). See the crash log for details.</value></data>
-  <data name="Status.DeleteFailed" xml:space="preserve"><value>Delete failed ({0}). See the crash log for details.</value></data>
+  <data name="Status.MoveFailed" xml:space="preserve"><value>Move failed ({0}). Details in {1}.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>Delete failed ({0}). Details in {1}.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Run as administrator.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scan failed: installer database unavailable.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scan cancelled.</value></data>

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using InstallerClean.Services;
 
@@ -61,5 +62,34 @@ public partial class MainViewModel : ObservableObject
         // and propagate its task so callers (notably tests) can await
         // the resulting scan.
         Completion.RescanRequested = () => Scan.ScanCommand.ExecuteAsync(null);
+
+        // IsMainContentInteractive is a derived bool the main-window XAML
+        // binds to IsEnabled on the body content + bottom nav so neither
+        // mouse nor keyboard can reach those buttons while any of the
+        // three full-window overlays (scanning, operating, completion)
+        // is up. Caption buttons (Min / Max / Close) stay enabled
+        // because the user must always be able to close the window.
+        Scan.PropertyChanged += OnChildPropertyChanged;
+        Cleanup.PropertyChanged += OnChildPropertyChanged;
+        Completion.PropertyChanged += OnChildPropertyChanged;
+    }
+
+    /// <summary>
+    /// True iff none of the three overlays (scanning, operating,
+    /// completion) is showing. Bound to the main-window body's
+    /// IsEnabled so an active overlay disables Tab/click on every
+    /// control behind it.
+    /// </summary>
+    public bool IsMainContentInteractive =>
+        !Scan.IsScanning && !Cleanup.IsOperating && !Completion.IsComplete;
+
+    private void OnChildPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||
+            e.PropertyName == nameof(CleanupViewModel.IsOperating) ||
+            e.PropertyName == nameof(CompletionViewModel.IsComplete))
+        {
+            OnPropertyChanged(nameof(IsMainContentInteractive));
+        }
     }
 }
