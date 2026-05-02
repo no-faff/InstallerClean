@@ -134,8 +134,11 @@ public sealed class MoveFilesService : IMoveFilesService
         }
         catch (Exception ex)
         {
+            // ex.Message stays out of the thrown message (path-leak risk
+            // under elevation); the inner exception preserves it for
+            // crash-log consumers via .InnerException.
             throw new UnauthorizedAccessException(
-                string.Format(Strings.Error_CannotWriteFolder, folder, ex.Message), ex);
+                string.Format(Strings.Error_CannotWriteFolder, folder), ex);
         }
     }
 

@@ -219,22 +219,4 @@ public static class Strings
     public static string Summary_OrphanedWindow => Get("Summary.OrphanedWindow");
     public static string Summary_RegisteredStillUsed => Get("Summary.RegisteredStillUsed");
     public static string Summary_RegisteredWindow => Get("Summary.RegisteredWindow");
-    public static string Tooltip_BuyMeACuppa => Get("Tooltip.BuyMeACuppa");
-    public static string Tooltip_Close => Get("Tooltip.Close");
-    public static string Tooltip_DeleteDisabledHint => Get("Tooltip.DeleteDisabledHint");
-    public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");
-    public static string Tooltip_Maximise => Get("Tooltip.Maximise");
-    public static string Tooltip_Minimise => Get("Tooltip.Minimise");
-    public static string Tooltip_MoveDestination => Get("Tooltip.MoveDestination");
-    public static string Tooltip_MoveDisabledHint => Get("Tooltip.MoveDisabledHint");
-    public static string Tooltip_OpenProjectOnGitHub => Get("Tooltip.OpenProjectOnGitHub");
-    public static string Tooltip_Restore => Get("Tooltip.Restore");
-    public static string Tooltip_SigningCertificate => Get("Tooltip.SigningCertificate");
-    public static string Version_Display => Get("Version.Display");
-    public static string Window_About_Title => Get("Window.About.Title");
-    public static string Window_ConfirmDelete_Title => Get("Window.ConfirmDelete.Title");
-    public static string Window_ConfirmMove_Title => Get("Window.ConfirmMove.Title");
-    public static string Window_Main_Title => Get("Window.Main.Title");
-    public static string Window_Orphaned_Title => Get("Window.Orphaned.Title");
-    public static string Window_Registered_Title => Get("Window.Registered.Title");
-}
+  

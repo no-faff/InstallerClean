@@ -321,7 +321,7 @@ Details in {1}.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Refusing to move files into the Windows Installer folder (destination: {0}).</value></data>
   <!-- 0 = folder, 1 = inner exception message -->
-  <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Cannot write to {0}: {1}</value></data>
+  <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Cannot write to {0}.</value></data>
   <!-- 0 = file name -->
   <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Could not find a unique filename for '{0}' after 10,000 attempts.</value></data>
 
