@@ -144,7 +144,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (claimed.Count == 0)
             throw new InvalidOperationException(Strings.Error_InstallerDbEmpty);
 
-        progress?.Report(string.Format(Strings.Status_RegistryScanComplete, claimed.Count));
+        progress?.Report(string.Format(Strings.Status_RegistryScanComplete,
+            claimed.Count, Helpers.DisplayHelpers.PluralisePackage(claimed.Count)));
 
         return claimed.Values.ToList().AsReadOnly();
     }
