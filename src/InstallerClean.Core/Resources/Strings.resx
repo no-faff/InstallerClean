@@ -208,7 +208,9 @@
        the status pill so the user can find the log; full message +
        stack trace go to the log itself. -->
   <data name="Status.MoveFailed" xml:space="preserve"><value>Move failed ({0}). Details in {1}.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Move failed ({0}). The crash log could not be written.</value></data>
   <data name="Status.DeleteFailed" xml:space="preserve"><value>Delete failed ({0}). Details in {1}.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Delete failed ({0}). The crash log could not be written.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Run as administrator.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scan failed: installer database unavailable.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scan cancelled.</value></data>
@@ -217,6 +219,7 @@
   <!-- 0 = exception type name (full message + stack trace go to the
        crash log; never put .Message in this string), 1 = crash log path. -->
   <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Scan failed ({0}). Details in {1}.</value></data>
+  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Scan failed ({0}). The crash log could not be written.</value></data>
 
   <!-- ============================================================
        COMPLETION SCREEN
@@ -337,11 +340,17 @@ Details in {1}.</value></data>
 
 Details written to:
 {1}</value></data>
+  <data name="Startup.UnhandledBody.NoLog" xml:space="preserve"><value>An unexpected error occurred and InstallerClean needs to close.
+
+{0}
+
+The crash log could not be written.</value></data>
   <data name="Startup.ErrorTitle" xml:space="preserve"><value>Startup error</value></data>
   <!-- 0 = exception type name (see Startup.UnhandledBody for why this
        is the type name and not the message), 1 = crash log path. -->
   <data name="Startup.FailedToStart" xml:space="preserve"><value>Failed to start ({0}). Details written to:
 {1}</value></data>
+  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>Failed to start ({0}). The crash log could not be written.</value></data>
 
   <!-- ============================================================
        FILE PICKER
@@ -382,6 +391,7 @@ Details written to:
        from another user's profile if logged to a shared file).
        1 = crash log path. -->
   <data name="Cli.GenericError" xml:space="preserve"><value>Error: {0}. Details written to {1}.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Error: {0}. The crash log could not be written.</value></data>
   <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Scanning C:\Windows\Installer...</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>Found {0} {1} to clean up ({2}).</value></data>

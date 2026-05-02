@@ -235,15 +235,14 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            // SECURITY: write the full exception (message + stack trace)
-            // to the crash log; print only the type name to stdout. The
-            // CLI runs elevated and stdout often gets redirected into a
-            // log file by Task Scheduler or RMM tooling - putting the
-            // raw .Message there would risk leaking paths from another
-            // user's profile that the elevated process happened to
-            // touch on this user's behalf.
-            var logPath = Helpers.CrashLog.Write(ex);
-            Console.WriteLine(string.Format(Strings.Cli_GenericError, ex.GetType().Name, logPath));
+            // ex.Message stays out of stdout: under elevation it can carry
+            // cross-profile paths, and Task Scheduler / RMM tooling
+            // routinely captures stdout to disk.
+            var crash = Helpers.CrashLog.TryWrite(ex);
+            var typeName = ex.GetType().Name;
+            Console.WriteLine(crash.Written
+                ? string.Format(Strings.Cli_GenericError, typeName, crash.Path)
+                : string.Format(Strings.Cli_GenericError_NoLog, typeName));
             return ExitError;
         }
         finally

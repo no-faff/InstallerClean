@@ -334,12 +334,12 @@ public partial class CleanupViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            // Write the full exception to the crash log; surface only
-            // the type name + log path in the status pill so framework
-            // messages can't leak absolute paths into the UI but the
-            // user still has somewhere to look.
-            var logPath = CrashLog.Write(ex);
-            OperationProgress = string.Format(Strings.Status_MoveFailed, ex.GetType().Name, logPath);
+            // Type name + log path only; ex.Message can leak paths under elevation.
+            var crash = CrashLog.TryWrite(ex);
+            var typeName = ex.GetType().Name;
+            OperationProgress = crash.Written
+                ? string.Format(Strings.Status_MoveFailed, typeName, crash.Path)
+                : string.Format(Strings.Status_MoveFailed_NoLog, typeName);
         }
         finally
         {
@@ -395,10 +395,11 @@ public partial class CleanupViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            // Mirror MoveAllAsync: full detail to crash log, type name +
-            // log path in the status pill.
-            var logPath = CrashLog.Write(ex);
-            OperationProgress = string.Format(Strings.Status_DeleteFailed, ex.GetType().Name, logPath);
+            var crash = CrashLog.TryWrite(ex);
+            var typeName = ex.GetType().Name;
+            OperationProgress = crash.Written
+                ? string.Format(Strings.Status_DeleteFailed, typeName, crash.Path)
+                : string.Format(Strings.Status_DeleteFailed_NoLog, typeName);
         }
         finally
         {
