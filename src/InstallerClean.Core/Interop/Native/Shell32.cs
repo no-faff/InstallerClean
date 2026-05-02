@@ -25,31 +25,28 @@ internal static partial class Shell32
     public static partial int SHFileOperation(ref SHFILEOPSTRUCT lpFileOp);
 
     /// <summary>
-    /// SHFILEOPSTRUCT for SHFileOperationW. The struct is fully
-    /// blittable so it works under <c>DisableRuntimeMarshalling</c>:
-    /// string fields become <see cref="IntPtr"/> handles to caller-
-    /// allocated unmanaged buffers, and the BOOL field becomes an
-    /// <see cref="int"/> (Win32 BOOL is a 32-bit integer).
-    ///
-    /// Callers must allocate the path buffer themselves, e.g. via
-    /// <see cref="Marshal.StringToCoTaskMemUni(string)"/>, ensure it
-    /// ends with a double null (the Win32 contract for pFrom), and
-    /// free it with <see cref="Marshal.FreeCoTaskMem(IntPtr)"/>
-    /// after the call.
+    /// SHFILEOPSTRUCT for SHFileOperationW. Fully blittable so it
+    /// works under <c>DisableRuntimeMarshalling</c>: string fields
+    /// are <see cref="IntPtr"/> handles to caller-allocated unmanaged
+    /// buffers, and BOOL is an <see cref="int"/>. Callers allocate
+    /// the path buffer (<see cref="Marshal.StringToCoTaskMemUni(string)"/>),
+    /// ensure double-null termination (the Win32 list-string
+    /// convention for pFrom), and free with
+    /// <see cref="Marshal.FreeCoTaskMem(IntPtr)"/>.
     /// </summary>
     /// <remarks>
-    /// The Windows SDK declares SHFILEOPSTRUCTW inside
-    /// <c>#include &lt;pshpack1.h&gt;</c>, i.e. the native struct is
-    /// 1-byte packed: there is NO compiler-inserted padding before
-    /// pFrom, fFlags or hNameMappings. Pack = 1 here matches that.
-    /// Pack = 8 (the .NET default on x64) would insert 4 bytes of
-    /// padding before pFrom on x64, putting our struct's pFrom at
-    /// offset 16 while the kernel reads it at offset 12 - undefined
-    /// behaviour that happens to be harmless today only because the
-    /// shell reads field-aligned bytes that just so happen to look
-    /// right.
+    /// Pack = 8 (the .NET x64 default) is correct for SHFILEOPSTRUCT
+    /// despite the shellapi.h header wrapping the native declaration
+    /// in <c>#include &lt;pshpack1.h&gt;</c>. The pshpack1 directive
+    /// is a 16-bit-Windows relic; the modern Win32 ABI on x64 uses
+    /// natural alignment, so pFrom sits at offset 16 (not 12). A
+    /// previous attempt to set Pack = 1 to "match" the header
+    /// produced AccessViolationException at runtime - the kernel
+    /// read pFrom from offset 16 while we'd written it at offset 12.
+    /// Do not change Pack without verifying with a real call to
+    /// SHFileOperationW.
     /// </remarks>
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct SHFILEOPSTRUCT
     {
         public IntPtr hwnd;
