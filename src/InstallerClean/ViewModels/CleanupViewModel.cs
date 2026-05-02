@@ -76,18 +76,9 @@ public partial class CleanupViewModel : ObservableObject
         _settings = settingsService.Load();
         MoveDestination = _settings.MoveDestination;
 
-        // Wake up CanExecute when scan/operating state changes upstream.
-        //
-        // LIFETIME CONTRACT: this subscription is intentionally never
-        // unhooked. Both VMs are constructed by MainViewModel and
-        // share its lifetime; MainViewModel is constructed once per
-        // MainWindow in App.xaml.OnStartup and dies with the process.
-        // If a future test or feature ever creates throwaway
-        // MainViewModel instances around a longer-lived ScanViewModel
-        // (for example by hoisting Scan into a DI singleton), convert
-        // this to a named handler stored on a field and detach it in
-        // an IDisposable.Dispose. The handler does not capture mutable
-        // state, only `this`.
+        // Re-evaluate Move/Delete CanExecute when the upstream scan
+        // VM's state changes. Subscription is never unhooked: see the
+        // matching note in ChromeViewModel.
         _scan.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||
