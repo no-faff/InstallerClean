@@ -55,11 +55,52 @@ internal static partial class Kernel32
         out ulong lpTotalNumberOfBytes,
         out ulong lpTotalNumberOfFreeBytes);
 
-    // CreateFile flags used by the reparse-point resolver. Centralised
-    // here because they belong to the kernel32 surface, not the caller.
-    public const uint OPEN_EXISTING = 3;
-    public const uint FILE_SHARE_ALL = 0x00000007;
-    public const uint FILE_FLAG_BACKUP_SEMANTICS = 0x02000000;
+    /// <summary>
+    /// Reads basic file metadata (attributes, size, timestamps) from an
+    /// open handle. Used to detect whether a CreateFile-with-OPEN_REPARSE_POINT
+    /// handle is pointing at a reparse point or a real file.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "GetFileInformationByHandle", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool GetFileInformationByHandle(
+        SafeFileHandle hFile,
+        out BY_HANDLE_FILE_INFORMATION lpFileInformation);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct BY_HANDLE_FILE_INFORMATION
+    {
+        public uint dwFileAttributes;
+        public FILETIME ftCreationTime;
+        public FILETIME ftLastAccessTime;
+        public FILETIME ftLastWriteTime;
+        public uint dwVolumeSerialNumber;
+        public uint nFileSizeHigh;
+        public uint nFileSizeLow;
+        public uint nNumberOfLinks;
+        public uint nFileIndexHigh;
+        public uint nFileIndexLow;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FILETIME
+    {
+        public uint dwLowDateTime;
+        public uint dwHighDateTime;
+    }
+
+    public const uint GENERIC_READ           = 0x80000000;
+    public const uint GENERIC_WRITE          = 0x40000000;
+
+    public const uint CREATE_ALWAYS          = 2;
+    public const uint OPEN_EXISTING          = 3;
+    public const uint OPEN_ALWAYS            = 4;
+
+    public const uint FILE_SHARE_ALL         = 0x00000007;
+
+    public const uint FILE_FLAG_BACKUP_SEMANTICS    = 0x02000000;
+    public const uint FILE_FLAG_OPEN_REPARSE_POINT  = 0x00200000;
+
+    public const uint FILE_ATTRIBUTE_REPARSE_POINT  = 0x00000400;
 
     // GetFinalPathNameByHandle flags. VolumeNameDos returns a path of
     // the form "X:\Folder\..." rather than the raw NT-namespace

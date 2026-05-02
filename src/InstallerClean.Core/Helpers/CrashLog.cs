@@ -1,12 +1,14 @@
+using System.Text;
+
 namespace InstallerClean.Helpers;
 
 /// <summary>
-/// Writes unhandled exceptions to a persistent log file so crashes can be
-/// diagnosed after the fact.
+/// Writes unhandled exceptions to a persistent log file so crashes can
+/// be diagnosed after the fact.
 /// </summary>
 public static class CrashLog
 {
-    private const long MaxBytes = 512 * 1024; // 512 KB
+    private const long MaxBytes = 512 * 1024;
 
     private static readonly string LogFolder = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -16,45 +18,34 @@ public static class CrashLog
     private static readonly string ArchiveFile = Path.Combine(LogFolder, "crash.log.old");
 
     /// <summary>
-    /// Appends the full exception detail (type, message, stack trace, inner
-    /// exceptions) to crash.log and returns the log path so it can be shown
-    /// to the user. Swallows any IO errors silently. A crash handler must
-    /// never itself throw.
+    /// Appends the full exception detail (type, message, stack trace,
+    /// inner exceptions) to crash.log and returns the log path so it
+    /// can be shown to the user. Swallows IO errors silently: a crash
+    /// handler must never itself throw.
     /// </summary>
     public static string Write(Exception ex)
     {
         try
         {
-            // Refuse to write through a redirected path. Both the log file
-            // AND its parent folder are checked; either being a junction
-            // or symlink would let an attacker who controlled %LOCALAPPDATA%
-            // redirect the append into a sensitive location. The crash
-            // detail is silently dropped instead.
-            if (StorageHelpers.IsRedirected(LogFile))
-                return LogFile;
-
             Directory.CreateDirectory(LogFolder);
             RotateIfNeeded();
 
-            // Best-effort re-check after CreateDirectory and rotation.
-            // File.AppendAllText follows symlinks, so a swap between
-            // the initial IsRedirected and AppendAllText would receive
-            // the stack trace (which contains paths the user typed).
-            // The check narrows the race window but cannot eliminate
-            // it: a symlink swapped in AFTER this re-check and BEFORE
-            // AppendAllText would still get appended to. The realistic
-            // attack window is narrow because LOCALAPPDATA is owner-
-            // only DACL.
-            if (StorageHelpers.IsRedirected(LogFile))
-                return LogFile;
+            // OpenAtomic returns null if LogFile is a symlink; drop the
+            // entry rather than append into the symlink's target.
+            using var handle = StorageHelpers.OpenAtomic(
+                LogFile, FileAccess.Write, createIfMissing: true);
+            if (handle is null) return LogFile;
 
-            // Offset-aware timestamp so shared logs are unambiguous across timezones.
+            using var fs = new FileStream(handle, FileAccess.Write);
+            fs.Seek(0, SeekOrigin.End);
+
             var entry = $"---- {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";
-            File.AppendAllText(LogFile, entry);
+            using var writer = new StreamWriter(fs, Encoding.UTF8, leaveOpen: false);
+            writer.Write(entry);
         }
         catch
         {
-            // A crash handler must never itself throw.
+            // Swallow: a crash handler must never itself throw.
         }
         return LogFile;
     }
@@ -64,16 +55,15 @@ public static class CrashLog
         try
         {
             if (!File.Exists(LogFile)) return;
-            var info = new FileInfo(LogFile);
-            if (info.Length < MaxBytes) return;
-            // Re-check the archive target so a swap-in symlink can't
-            // redirect the rotation.
-            if (StorageHelpers.IsRedirected(ArchiveFile)) return;
+            if (new FileInfo(LogFile).Length < MaxBytes) return;
+            // File.Move with overwrite uses MOVEFILE_REPLACE_EXISTING,
+            // which replaces a symlink rather than following it.
             File.Move(LogFile, ArchiveFile, overwrite: true);
         }
         catch
         {
-            // Next Write retries; worst case the log briefly exceeds MaxBytes.
+            // Best-effort: next Write retries; worst case the log
+            // briefly exceeds MaxBytes.
         }
     }
 }

@@ -29,32 +29,25 @@ public sealed class SettingsService : ISettingsService
 
     public AppSettings Load()
     {
-        // Refuse to read through a redirected path; same threat model as
-        // TrySave: an attacker who controlled %LOCALAPPDATA% could plant a
-        // symlink to read a sensitive file as us, or redirect the .bad
-        // recovery rename below into a sensitive location.
-        if (StorageHelpers.IsRedirected(_settingsFile))
-            return new AppSettings();
-
-        if (!File.Exists(_settingsFile))
-            return new AppSettings();
-
         try
         {
-            var json = File.ReadAllText(_settingsFile);
+            // OpenAtomic returns null if the file is missing or a
+            // symlink; both cases fall back to defaults.
+            using var handle = StorageHelpers.OpenAtomic(
+                _settingsFile, FileAccess.Read, createIfMissing: false);
+            if (handle is null)
+                return new AppSettings();
+
+            using var fs = new FileStream(handle, FileAccess.Read);
+            using var reader = new StreamReader(fs);
+            var json = reader.ReadToEnd();
             return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
         }
         catch (Exception)
         {
-            // Preserve the unreadable file for manual recovery before
-            // starting fresh. Re-check the .bad target path in case an
-            // attacker planted a file-level symlink there specifically.
+            // Rename the unreadable file to .bad for manual recovery.
             var badFile = _settingsFile + ".bad";
-            try
-            {
-                if (!StorageHelpers.IsRedirected(badFile))
-                    File.Move(_settingsFile, badFile, overwrite: true);
-            }
+            try { File.Move(_settingsFile, badFile, overwrite: true); }
             catch { }
             return new AppSettings();
         }
@@ -72,52 +65,33 @@ public sealed class SettingsService : ISettingsService
     /// <summary>Persists settings. Returns true on success.</summary>
     public bool TrySave(AppSettings settings)
     {
-        // Random temp file name. Concurrent GUI + CLI access to the
-        // same settings file is structurally prevented by the
-        // Global\InstallerClean_SingleInstance mutex (CLI /d and /m
-        // hold it; GUI holds it for its whole lifetime). The
-        // randomness is therefore belt-and-braces: it covers a future
-        // feature that lets multiple CLI /s instances run concurrently
-        // (today /s skips the mutex but doesn't write settings, so
-        // there's no actual race).
+        // Random temp filename so two writers (e.g. future concurrent
+        // CLI /s instances that skip the single-instance mutex) don't
+        // collide on the same .tmp path.
         var tempFile = _settingsFile + "." + Path.GetRandomFileName() + ".tmp";
         try
         {
-            // Refuse to write through a redirected path. Both the temp file
-            // AND the final settings file are checked; either being a
-            // junction or symlink would let an attacker who controlled
-            // %LOCALAPPDATA% redirect the write into a sensitive location.
-            if (StorageHelpers.IsRedirected(_settingsFile) ||
-                StorageHelpers.IsRedirected(tempFile))
-                return false;
-
             var folder = Path.GetDirectoryName(_settingsFile);
             if (!string.IsNullOrEmpty(folder))
                 Directory.CreateDirectory(folder);
 
-            var json = JsonSerializer.Serialize(settings, JsonOptions);
-            File.WriteAllText(tempFile, json);
+            // OpenAtomic + MoveFileEx(MOVEFILE_REPLACE_EXISTING) gives a
+            // race-free save: atomic open at the temp file (refuses
+            // symlinks), atomic rename onto the real file (replaces
+            // symlinks rather than following them).
+            using (var handle = StorageHelpers.OpenAtomic(
+                       tempFile, FileAccess.Write, createIfMissing: true))
+            {
+                if (handle is null) return false;
+                using var fs = new FileStream(handle, FileAccess.Write);
+                JsonSerializer.Serialize(fs, settings, JsonOptions);
+            }
+
             File.Move(tempFile, _settingsFile, overwrite: true);
-
-            // Best-effort post-write sanity check. File.Move(overwrite:true)
-            // with MOVEFILE_REPLACE_EXISTING deletes the target (which
-            // could include a swapped-in symlink) before performing the
-            // rename, so a same-account attacker swap exactly between
-            // the pre-write check and this point would have already been
-            // overwritten by the rename - the resulting file is real
-            // content, not a redirect, and IsRedirected returns false.
-            // The post-check therefore catches a narrower case: a
-            // junction or symlink that appeared at the parent directory
-            // (NoFaff or InstallerClean) at write time, which IsRedirected
-            // does scan. Treat it as defence-in-depth, not a guarantee.
-            if (StorageHelpers.IsRedirected(_settingsFile))
-                return false;
-
             return true;
         }
         catch (Exception)
         {
-            // Clean up the temp file so a disk-full save leaves no debris.
             try { if (File.Exists(tempFile)) File.Delete(tempFile); } catch { }
             return false;
         }

@@ -1,9 +1,50 @@
+using Microsoft.Win32.SafeHandles;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Helpers;
 
 internal static class StorageHelpers
 {
+    /// <summary>
+    /// Opens <paramref name="path"/> with FILE_FLAG_OPEN_REPARSE_POINT
+    /// and returns the handle only if the file is real, not a reparse
+    /// point. Returns null on any failure (open fails, attribute read
+    /// fails, file is a reparse point). Final-component-only:
+    /// directory symlinks in parents are still followed.
+    /// </summary>
+    internal static SafeFileHandle? OpenAtomic(
+        string path, FileAccess access, bool createIfMissing)
+    {
+        if (string.IsNullOrEmpty(path)) return null;
+
+        uint desired = access switch
+        {
+            FileAccess.Read => Kernel32.GENERIC_READ,
+            FileAccess.Write => Kernel32.GENERIC_WRITE,
+            FileAccess.ReadWrite => Kernel32.GENERIC_READ | Kernel32.GENERIC_WRITE,
+            _ => Kernel32.GENERIC_READ,
+        };
+        uint disposition = createIfMissing ? Kernel32.OPEN_ALWAYS : Kernel32.OPEN_EXISTING;
+        uint flags = Kernel32.FILE_FLAG_OPEN_REPARSE_POINT;
+
+        var handle = Kernel32.CreateFile(
+            path, desired, Kernel32.FILE_SHARE_ALL, IntPtr.Zero,
+            disposition, flags, IntPtr.Zero);
+        if (handle.IsInvalid) return null;
+
+        if (!Kernel32.GetFileInformationByHandle(handle, out var info))
+        {
+            handle.Dispose();
+            return null;
+        }
+        if ((info.dwFileAttributes & Kernel32.FILE_ATTRIBUTE_REPARSE_POINT) != 0)
+        {
+            handle.Dispose();
+            return null;
+        }
+        return handle;
+    }
+
     /// <summary>
     /// Returns the number of bytes available to the current user at
     /// <paramref name="path"/>, or null if the space cannot be
@@ -27,10 +68,12 @@ internal static class StorageHelpers
     }
 
     /// <summary>
-    /// True if <paramref name="path"/> exists and is a reparse point
-    /// (NTFS junction or symlink). Used to refuse elevated writes
-    /// through paths an attacker could redirect into a sensitive
-    /// location.
+    /// True if <paramref name="path"/> is a junction or symlink. Used
+    /// by Move/Delete to refuse source files in C:\Windows\Installer
+    /// that have been replaced with a symlink (moving the symlink
+    /// would silently relocate an OS file out of System32). New
+    /// callers should prefer <see cref="OpenAtomic"/> which is
+    /// race-free.
     /// </summary>
     internal static bool IsReparsePoint(string path)
     {
@@ -45,35 +88,4 @@ internal static class StorageHelpers
         }
     }
 
-    /// <summary>
-    /// True if either <paramref name="targetPath"/> or its IMMEDIATE parent
-    /// directory is a reparse point. Use this immediately before any
-    /// elevated write to a predictable %LOCALAPPDATA% path so neither a
-    /// folder-level junction nor a file-level symlink at that depth can
-    /// redirect the write into a sensitive location.
-    /// </summary>
-    /// <remarks>
-    /// SCOPE: this is intentionally a TWO-LEVEL check (file + parent),
-    /// not a full chain-to-root walk. The threat model is "same-account
-    /// attacker plants a junction in our owned folder"; a junction at a
-    /// deeper ancestor (e.g. at %LOCALAPPDATA% itself or at the user
-    /// profile) is outside the threat model because that ancestor is
-    /// owner-only DACL'd by Windows and the same-account attacker
-    /// already owns it. Callers protecting paths with deeper ownership
-    /// boundaries should walk further themselves; for InstallerClean's
-    /// settings + crash log, file + parent is the right depth.
-    /// LIMITATION: check-then-write is not atomic; a sufficiently fast
-    /// attacker could swap between the check and the write. The DACL on
-    /// %LOCALAPPDATA% closes the realistic race window in practice, but
-    /// the guarantee is best-effort rather than absolute.
-    /// </remarks>
-    internal static bool IsRedirected(string targetPath)
-    {
-        if (string.IsNullOrEmpty(targetPath)) return false;
-        if (IsReparsePoint(targetPath)) return true;
-        var folder = Path.GetDirectoryName(targetPath);
-        return !string.IsNullOrEmpty(folder)
-            && Directory.Exists(folder)
-            && IsReparsePoint(folder);
-    }
 }
