@@ -104,7 +104,7 @@ public partial class MainWindow : Window
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
 
-    // Title-bar glyph swap matches Windows' own caption buttons.
+    // Title-bar glyph swap matches Windows's own caption buttons.
     private const string MaximizeGlyph = "□";
     private const string RestoreGlyph = "❐";
 
