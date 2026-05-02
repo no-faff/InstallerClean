@@ -9,13 +9,9 @@ namespace InstallerClean.ViewModels;
 /// <summary>
 /// Completion-screen slice. Holds the heading / summary / restore-hint
 /// / errors block shown after a scan-with-no-orphans, a successful
-/// move or a successful delete.
-///
-/// Other slices push state into this VM via the <c>Show*</c> methods;
-/// this VM does not pull from them. The dismiss command clears the
-/// state; the rescan command requests another scan via the
-/// <see cref="RescanRequested"/> event so this VM stays decoupled from
-/// the scan service.
+/// move or a successful delete. The rescan command runs the
+/// <c>rescanRequested</c> constructor delegate so this VM stays
+/// ignorant of the scan service.
 /// </summary>
 public partial class CompletionViewModel : ObservableObject
 {
