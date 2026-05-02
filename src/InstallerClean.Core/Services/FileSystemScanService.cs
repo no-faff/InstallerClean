@@ -125,7 +125,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     size = _fs.FileInfo.New(pkg.LocalPackagePath).Length;
                 }
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                // Inaccessible package: treat as missing-from-disk
+                // (size=0, exists=false) so the count surfaces but
+                // doesn't break the scan.
+            }
 
             if (!exists) missingFromDisk++;
 

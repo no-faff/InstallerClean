@@ -12,8 +12,16 @@ internal static class StorageHelpers
     /// fails, file is a reparse point). Final-component-only:
     /// directory symlinks in parents are still followed.
     /// </summary>
+    /// <param name="mode">Caller picks the FileMode:
+    /// <list type="bullet">
+    ///   <item>OpenExisting: read or read/write an existing real file.</item>
+    ///   <item>OpenAlways: open existing, create if missing (e.g. append-only log).</item>
+    ///   <item>CreateAlways: create a fresh real file, truncating any
+    ///   pre-existing content (e.g. write to a freshly-named temp file).</item>
+    /// </list>
+    /// </param>
     internal static SafeFileHandle? OpenAtomic(
-        string path, FileAccess access, bool createIfMissing)
+        string path, FileAccess access, AtomicOpenMode mode)
     {
         if (string.IsNullOrEmpty(path)) return null;
 
@@ -24,7 +32,13 @@ internal static class StorageHelpers
             FileAccess.ReadWrite => Kernel32.GENERIC_READ | Kernel32.GENERIC_WRITE,
             _ => Kernel32.GENERIC_READ,
         };
-        uint disposition = createIfMissing ? Kernel32.OPEN_ALWAYS : Kernel32.OPEN_EXISTING;
+        uint disposition = mode switch
+        {
+            AtomicOpenMode.OpenExisting => Kernel32.OPEN_EXISTING,
+            AtomicOpenMode.OpenAlways   => Kernel32.OPEN_ALWAYS,
+            AtomicOpenMode.CreateAlways => Kernel32.CREATE_ALWAYS,
+            _ => Kernel32.OPEN_EXISTING,
+        };
         uint flags = Kernel32.FILE_FLAG_OPEN_REPARSE_POINT;
 
         var handle = Kernel32.CreateFile(
@@ -43,6 +57,18 @@ internal static class StorageHelpers
             return null;
         }
         return handle;
+    }
+
+    internal enum AtomicOpenMode
+    {
+        /// <summary>Fail if the file does not exist.</summary>
+        OpenExisting,
+        /// <summary>Open existing or create empty if missing. Existing
+        /// content is preserved (typical for append-only logs).</summary>
+        OpenAlways,
+        /// <summary>Always create a fresh file, truncating any
+        /// pre-existing content.</summary>
+        CreateAlways,
     }
 
     /// <summary>

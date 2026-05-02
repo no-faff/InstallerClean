@@ -34,7 +34,7 @@ public sealed class SettingsService : ISettingsService
             // OpenAtomic returns null if the file is missing or a
             // symlink; both cases fall back to defaults.
             using var handle = StorageHelpers.OpenAtomic(
-                _settingsFile, FileAccess.Read, createIfMissing: false);
+                _settingsFile, FileAccess.Read, StorageHelpers.AtomicOpenMode.OpenExisting);
             if (handle is null)
                 return new AppSettings();
 
@@ -80,7 +80,7 @@ public sealed class SettingsService : ISettingsService
             // symlinks), atomic rename onto the real file (replaces
             // symlinks rather than following them).
             using (var handle = StorageHelpers.OpenAtomic(
-                       tempFile, FileAccess.Write, createIfMissing: true))
+                       tempFile, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateAlways))
             {
                 if (handle is null) return false;
                 using var fs = new FileStream(handle, FileAccess.Write);

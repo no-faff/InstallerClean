@@ -33,7 +33,7 @@ public static class CrashLog
             // OpenAtomic returns null if LogFile is a symlink; drop the
             // entry rather than append into the symlink's target.
             using var handle = StorageHelpers.OpenAtomic(
-                LogFile, FileAccess.Write, createIfMissing: true);
+                LogFile, FileAccess.Write, StorageHelpers.AtomicOpenMode.OpenAlways);
             if (handle is null) return LogFile;
 
             using var fs = new FileStream(handle, FileAccess.Write);
