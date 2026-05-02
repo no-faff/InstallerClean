@@ -302,8 +302,10 @@ Try a folder in your user profile or on a drive you own.</value></data>
        Detail goes to the crash log; the user is pointed at it. -->
   <data name="Error.IOWriteDestination" xml:space="preserve"><value>Windows cannot write to {0}.
 Details in {1}.</value></data>
+  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows cannot write to {0}. The crash log could not be written.</value></data>
   <data name="Error.WriteDestination" xml:space="preserve"><value>Cannot write to {0}.
 Details in {1}.</value></data>
+  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Cannot write to {0}. The crash log could not be written.</value></data>
   <data name="Error.MissingSourceFile" xml:space="preserve"><value>File no longer exists.</value></data>
   <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Source file is a symlink or junction; refused for safety.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.

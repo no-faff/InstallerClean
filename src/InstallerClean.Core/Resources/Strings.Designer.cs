@@ -137,6 +137,7 @@ public static class Strings
     public static string Error_InvalidDestinationTitle => Get("Error.InvalidDestinationTitle");
     public static string Error_IOFailure => Get("Error.IOFailure");
     public static string Error_IOWriteDestination => Get("Error.IOWriteDestination");
+    public static string Error_IOWriteDestination_NoLog => Get("Error.IOWriteDestination.NoLog");
     public static string Error_MissingSourceFile => Get("Error.MissingSourceFile");
     public static string Error_MoveIntoInstaller => Get("Error.MoveIntoInstaller");
     public static string Error_MsiAccessDenied => Get("Error.MsiAccessDenied");
@@ -150,6 +151,7 @@ public static class Strings
     public static string Error_SourceIsReparsePoint => Get("Error.SourceIsReparsePoint");
     public static string Error_UnknownError => Get("Error.UnknownError");
     public static string Error_WriteDestination => Get("Error.WriteDestination");
+    public static string Error_WriteDestination_NoLog => Get("Error.WriteDestination.NoLog");
     public static string Field_Application => Get("Field.Application");
     public static string Field_Author => Get("Field.Author");
     public static string Field_Comment => Get("Field.Comment");

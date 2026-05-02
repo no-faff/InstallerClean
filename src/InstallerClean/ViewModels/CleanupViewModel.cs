@@ -245,12 +245,11 @@ public partial class CleanupViewModel : ObservableObject
         {
             IsOperating = false;
             OperationProgress = string.Empty;
-            // Full detail to crash log; dest + log path to dialog. ex.Message
-            // is intentionally never surfaced (path-leak risk under elevation).
-            var logPath = CrashLog.Write(ex);
+            // ex.Message stays out of the dialog: path-leak risk under elevation.
+            var crash = CrashLog.TryWrite(ex);
             DisposeOperationCts();
             _dialogService.ShowWarning(
-                DescribeWriteFailure(dest, ex, logPath),
+                DescribeWriteFailure(dest, ex, crash.Path, crash.Written),
                 Strings.Error_InvalidDestinationTitle);
             return;
         }
@@ -448,24 +447,12 @@ public partial class CleanupViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Maps a destination-write failure to a localised explanation the
-    /// user can act on. Internal so MainViewModelTests can exercise
-    /// the mapping directly.
+    /// Maps a destination-write failure to a localised explanation.
+    /// <paramref name="dest"/> is the user's own typed path so echoing
+    /// it back is safe; <paramref name="ex"/>.Message is never routed
+    /// through this method (path-leak risk under elevation).
     /// </summary>
-    /// <remarks>
-    /// SECURITY: <paramref name="dest"/> is exposed to the dialog
-    /// because the failing operation is a write probe to a path the
-    /// CURRENT user just typed (or browsed to via OpenFolderDialog),
-    /// so echoing it back is safe. The framework exception's .Message
-    /// is NOT routed through this method's text - even an IOException
-    /// .Message can include paths beyond <paramref name="dest"/> (lock-
-    /// holder process paths, NTFS resolution chains) which under
-    /// elevation could be paths from another user's profile. The full
-    /// exception is written to crash.log by the caller and the path
-    /// is surfaced as <paramref name="logPath"/> so the user can find
-    /// the detail without it leaking into the dialog body.
-    /// </remarks>
-    internal static string DescribeWriteFailure(string dest, Exception ex, string logPath) => ex switch
+    internal static string DescribeWriteFailure(string dest, Exception ex, string logPath, bool logWritten) => ex switch
     {
         UnauthorizedAccessException =>
             string.Format(Strings.Error_AccessDeniedDestination, dest),
@@ -473,9 +460,11 @@ public partial class CleanupViewModel : ObservableObject
             string.Format(Strings.Error_PathTooLong, dest),
         DirectoryNotFoundException =>
             string.Format(Strings.Error_DestinationMissing, dest),
-        IOException =>
-            string.Format(Strings.Error_IOWriteDestination, dest, logPath),
-        _ =>
-            string.Format(Strings.Error_WriteDestination, dest, logPath),
+        IOException => logWritten
+            ? string.Format(Strings.Error_IOWriteDestination, dest, logPath)
+            : string.Format(Strings.Error_IOWriteDestination_NoLog, dest),
+        _ => logWritten
+            ? string.Format(Strings.Error_WriteDestination, dest, logPath)
+            : string.Format(Strings.Error_WriteDestination_NoLog, dest),
     };
 }
