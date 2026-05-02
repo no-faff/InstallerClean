@@ -7,6 +7,13 @@ namespace InstallerClean.Helpers;
 /// CLI run, so sysadmins running InstallerClean under Task Scheduler can
 /// audit what happened without trawling stdout redirects.
 /// </summary>
+/// <remarks>
+/// Some summary lines include the user's typed destination path. The
+/// Application log is readable by every authenticated user, so under a
+/// multi-user threat model this leaks the path. Accepted: the path is
+/// the calling user's own input (not a cross-profile reference) and
+/// Task Scheduler audit needs the path for diagnosis.
+/// </remarks>
 internal static class EventLogWriter
 {
     private const string SourceName = "InstallerClean";
