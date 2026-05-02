@@ -113,5 +113,9 @@ internal static partial class Kernel32
         [MarshalAs(UnmanagedType.Bool)] bool inheritHandle,
         uint processId);
 
+    [LibraryImport(Library, EntryPoint = "CloseHandle", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool CloseHandle(IntPtr hObject);
+
     public const uint PROCESS_QUERY_INFORMATION = 0x0400;
 }
