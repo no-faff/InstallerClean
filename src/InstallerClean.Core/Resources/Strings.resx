@@ -272,6 +272,7 @@
 
 Please right-click and choose 'Run as administrator'.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Installer database unavailable</value></data>
+  <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scan failed</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Access denied enumerating installed products. Run as administrator.</value></data>
   <!-- 0 = consecutive failure count, 1 = last MSI error code -->
