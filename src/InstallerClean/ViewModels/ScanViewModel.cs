@@ -189,7 +189,7 @@ public partial class ScanViewModel : ObservableObject
             ScanProgress = string.Format(Strings.Status_ScanFailedDetails, ex.GetType().Name, logPath);
             _dialogService.ShowError(
                 string.Format(Strings.Status_ScanFailedDetails, ex.GetType().Name, logPath),
-                Strings.Error_InstallerDbUnavailableTitle);
+                Strings.Error_ScanFailedTitle);
         }
         finally
         {
