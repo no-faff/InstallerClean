@@ -182,7 +182,8 @@ public class InstallerQueryServiceTests
             var packages = await svc.GetRegisteredPackagesAsync(progress);
 
             var completionMsg = messages.Last();
-            Assert.Contains($"{packages.Count} registered package(s) found", completionMsg);
+            var noun = packages.Count == 1 ? "package" : "packages";
+            Assert.Contains($"{packages.Count} registered {noun} found", completionMsg);
         }
         catch (UnauthorizedAccessException)
         {
