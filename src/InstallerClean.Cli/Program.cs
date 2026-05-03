@@ -135,7 +135,9 @@ internal static class Program
             {
                 Console.WriteLine(Strings.Cli_NothingToDo);
                 EventLogWriter.Write(EventLogWriter.Level.Information,
-                    string.Format(Strings.Cli_EventLogScanNoOrphans, arg, scanResult.RegisteredPackages.Count));
+                    string.Format(Strings.Cli_EventLogScanNoOrphans,
+                        arg, scanResult.RegisteredPackages.Count,
+                        DisplayHelpers.PluralisePackage(scanResult.RegisteredPackages.Count)));
                 return ExitOk;
             }
 
