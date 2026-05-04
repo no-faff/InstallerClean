@@ -101,6 +101,11 @@ InstallerClean is unsigned (no Authenticode certificate). This is deliberate; si
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
 - VirusTotal links for setup, portable and slim builds are published with each release.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
+- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) tests each release for viruses, spyware and adware.
+
+[![Softpedia certified 100% clean](docs/badges/softpedia_100_free.webp)](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml)
+
+If a single SecureAge flag on the slim build looks worrying, here is the comparator. PatchCleaner has been [downloaded over 890,000 times](https://www.homedev.com.au/Free/PatchCleaner) since 2015 and holds a [SourceForge Open Source Excellence](https://sourceforge.net/projects/patchcleaner/) badge; it is also flagged on VirusTotal by SecureAge and by Trapmine. InstallerClean's setup and portable builds score clean across every engine on the same scan.
 
 ## FAQ
 
