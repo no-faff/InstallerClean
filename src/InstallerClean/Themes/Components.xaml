@@ -369,14 +369,12 @@
         <Setter Property="Padding" Value="12,0"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource PillFocusVisual}"/>
-        <!-- TextBox's default behaviour, when ContextMenu is unset, is
-             to generate one in code at right-click time. WPF builds it
-             outside the implicit-style scope of Application.Resources,
-             so the implicit ContextMenu / MenuItem styles below never
-             reach it and the user sees the system's light-themed shell
-             menu in the middle of an otherwise dark UI. Setting an
-             explicit ContextMenu here pins the four standard editing
-             commands and routes them through our themed surfaces. -->
+        <!-- WPF auto-generates the TextBox right-click ContextMenu in
+             code at show-time. That code path bypasses the implicit-
+             style scope in Application.Resources, so the themed
+             ContextMenu / MenuItem styles defined elsewhere in this
+             file never reach it. An explicit ContextMenu Setter is
+             the only route for the dark theme to apply. -->
         <Setter Property="ContextMenu">
             <Setter.Value>
                 <ContextMenu>
@@ -596,15 +594,15 @@
 
     <Style x:Key="CaptionButton" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
-        <!-- Segoe MDL2 Assets ships with every Windows 10+ install and
-             is the canonical font for the title-bar chrome glyphs
-             (E921 minimise, E922 maximise, E923 restore, E8BB close).
-             Using a body font here previously left the maximise /
-             restore swap invisible because Poppins doesn't include the
-             U+2750 shadowed-square restore glyph and WPF fell back to
-             a plain square that looked identical to the maximise one.
-             10pt matches the Windows default chrome-button glyph size.
-             Used only by the two caption styles below. -->
+        <!-- Segoe MDL2 Assets is the canonical font for the title-bar
+             chrome glyphs (E921 minimise, E922 maximise, E923 restore,
+             E8BB close); it ships with every Windows 10+ install.
+             Using a body font here leaves the maximise / restore swap
+             invisible because Poppins (the bundled body font) does
+             not include U+2750 (UPPER RIGHT SHADOWED WHITE SQUARE)
+             and the WPF fallback chain renders a plain square
+             indistinguishable from the maximise glyph. 10pt is the
+             Windows chrome-button default. -->
         <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
         <Setter Property="FontSize" Value="10"/>
         <Setter Property="Width" Value="46"/>
