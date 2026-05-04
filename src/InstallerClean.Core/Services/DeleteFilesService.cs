@@ -39,6 +39,10 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 cancellationToken.ThrowIfCancellationRequested();
                 var filePath = pathList[i];
 
+                // Report progress before the skip check so a missing file
+                // still advances the visible counter, matching MoveFilesService.
+                progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(filePath)));
+
                 try
                 {
                     if (!_fs.File.Exists(filePath))
@@ -46,8 +50,6 @@ public sealed class DeleteFilesService : IDeleteFilesService
                         errors.Add(new MissingSourceFile(filePath));
                         continue;
                     }
-                    var fileName = _fs.Path.GetFileName(filePath);
-                    progress?.Report(new OperationProgress(i + 1, total, fileName));
 
                     // Native SHFileOperationW avoids VB's FileSystem.DeleteFile
                     // which can try to show error dialogs from a non-STA thread.
