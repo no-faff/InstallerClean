@@ -609,6 +609,14 @@
         <Setter Property="Width" Value="46"/>
         <Setter Property="Height" Value="32"/>
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+        <!-- Caption buttons match Windows native chrome and stay out
+             of the keyboard focus path: Focusable=False avoids a click
+             leaving the indigo accent on the button after minimise +
+             Alt+Tab restore (the click would otherwise transfer focus
+             to the button and the next paint would see IsKeyboardFocused
+             still true). FocusVisualStyle is null because no focus path
+             ever reaches them. -->
+        <Setter Property="Focusable" Value="False"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -627,10 +635,6 @@
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Neutral}"/>
                         </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Background}"/>
-                            <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
-                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -642,6 +646,7 @@
         <Setter Property="Width" Value="46"/>
         <Setter Property="Height" Value="32"/>
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+        <Setter Property="Focusable" Value="False"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -659,10 +664,6 @@
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.CaptionClose.Pressed}"/>
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.CaptionClose.Hover}"/>
-                            <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
