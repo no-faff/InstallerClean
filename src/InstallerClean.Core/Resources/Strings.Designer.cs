@@ -228,11 +228,11 @@ public static class Strings
     public static string Summary_RegisteredWindow => Get("Summary.RegisteredWindow");
     public static string Tooltip_BuyMeACuppa => Get("Tooltip.BuyMeACuppa");
     public static string Tooltip_Close => Get("Tooltip.Close");
-    public static string Tooltip_DeleteDisabledHint => Get("Tooltip.DeleteDisabledHint");
+    public static string Tooltip_Delete => Get("Tooltip.Delete");
     public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");
     public static string Tooltip_Minimise => Get("Tooltip.Minimise");
+    public static string Tooltip_Move => Get("Tooltip.Move");
     public static string Tooltip_MoveDestination => Get("Tooltip.MoveDestination");
-    public static string Tooltip_MoveDisabledHint => Get("Tooltip.MoveDisabledHint");
     public static string Tooltip_OpenProjectOnGitHub => Get("Tooltip.OpenProjectOnGitHub");
     public static string Tooltip_SigningCertificate => Get("Tooltip.SigningCertificate");
     public static string Version_Display => Get("Version.Display");

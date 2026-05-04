@@ -205,6 +205,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // already finished.
         try { _operationCts?.Cancel(); }
         catch (ObjectDisposedException) { }
+        // The async move/delete loop only updates OperationProgress on
+        // its next iteration; without a synchronous write here the
+        // overlay holds "Moving 23 of 100..." for one iteration after
+        // Esc, which reads as an unresponsive UI. The async progress
+        // reporter overwrites this with "Move cancelled." or
+        // "Delete cancelled." once the loop observes the cancellation.
+        OperationProgress = Strings.Status_Cancelling;
     }
 
     [RelayCommand(CanExecute = nameof(CanMove))]

@@ -206,6 +206,11 @@ public partial class ScanViewModel : ObservableObject
     {
         try { _scanCts?.Cancel(); }
         catch (ObjectDisposedException) { /* scan already finished */ }
+        // The progress reporter inside ScanAsync only fires on its
+        // next callback; without a synchronous write the overlay
+        // holds the previous step's text after Esc until that
+        // callback runs. ScanAsync overwrites this on its next step.
+        ScanProgress = Strings.Status_Cancelling;
     }
 
     /// <summary>

@@ -199,13 +199,13 @@
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
                             Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
                             AutomationProperties.HelpText="{loc:Translate Automation.MoveAllFiles}"
-                            ToolTip="{loc:Translate Tooltip.MoveDisabledHint}"
+                            ToolTip="{loc:Translate Tooltip.Move}"
                             ToolTipService.ShowOnDisabled="True"/>
 
                     <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
                             Content="{loc:Translate Action.Delete}" Command="{Binding Cleanup.DeleteAllCommand}"
                             AutomationProperties.HelpText="{loc:Translate Automation.DeleteAllFiles}"
-                            ToolTip="{loc:Translate Tooltip.DeleteDisabledHint}"
+                            ToolTip="{loc:Translate Tooltip.Delete}"
                             ToolTipService.ShowOnDisabled="True"
                             Margin="{StaticResource GapRight.Sm}"/>
 
