@@ -430,9 +430,19 @@
                     <!-- Closes this result screen, NOT the app: exiting
                          from here would trap the user with no way to
                          re-scan or open About. -->
+                    <!-- The completion overlay auto-focuses this button so
+                         Esc and Enter dismiss cleanly and screen readers
+                         announce the action's result; FocusVisualStyle is
+                         null because the focused-button ring around a
+                         centred IsDefault button on a result screen reads
+                         as a stuck "selected" state, especially after the
+                         user Alt+Tabs away and back. Enter still activates
+                         from anywhere via IsDefault, Esc dismisses through
+                         OnPreviewKeyDown, Tab moves to "Scan again" which
+                         carries its own focus ring as the visible target. -->
                     <Button x:Name="CompletionCloseButton" Style="{StaticResource AccentPill}"
                             Content="{loc:Translate Action.Close}" Command="{Binding Completion.DismissCommand}"
-                            IsDefault="True"
+                            IsDefault="True" FocusVisualStyle="{x:Null}"
                             HorizontalAlignment="Center" MinWidth="120"
                             Margin="{StaticResource GapBottom.Sm}"
                             AutomationProperties.Name="{loc:Translate Automation.CloseResult}"/>
