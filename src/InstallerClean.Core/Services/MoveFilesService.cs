@@ -131,11 +131,12 @@ public sealed class MoveFilesService : IMoveFilesService
         }
     }
 
-    // SECURITY: do not switch to File.Move(src, dst, overwrite: true)
-    // without also defending against a reparse-point planted at
-    // destPath during the unique-name race. The current File.Move
-    // refuses existing targets, so the race ends in a per-file error
-    // rather than a symlink follow-through to a sensitive location.
+    // SECURITY: File.Move with overwrite=true would follow a reparse
+    // point planted at destPath during the unique-name race. The
+    // non-overwriting form refuses existing targets, ending the race
+    // in a per-file error rather than a symlink follow-through to a
+    // sensitive location. Switching to overwrite=true requires a
+    // reparse-point check on destPath immediately before the move.
     private string GetUniqueDestPath(string folder, string fileName)
     {
         var candidate = _fs.Path.Combine(folder, fileName);

@@ -28,8 +28,8 @@ public class FileSystemScanServiceTests
 
         var fakeFiles = new[]
         {
-            @"C:\Windows\Installer\aaa.msi",   // registered — should NOT appear
-            @"C:\Windows\Installer\bbb.msi",   // orphaned — should appear
+            @"C:\Windows\Installer\aaa.msi",   // registered, should NOT appear
+            @"C:\Windows\Installer\bbb.msi",   // orphaned, should appear
         };
 
         var svc = new FileSystemScanService(mockQuery, fakeFiles);
@@ -102,7 +102,7 @@ public class FileSystemScanServiceTests
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
-        // No orphaned files on disk — only the registered ones
+        // No orphaned files on disk; only the registered ones
         var fakeFiles = Array.Empty<string>();
 
         var svc = new FileSystemScanService(mockQuery, fakeFiles);

@@ -52,7 +52,7 @@
     <Color x:Key="Primitive.Indigo.700">#443cc7</Color>
     <Color x:Key="Primitive.Indigo.800">#3b34af</Color>
 
-    <!-- Violet. One step only — used for the selection accent. -->
+    <!-- Violet. One step only, used for the selection accent. -->
     <Color x:Key="Primitive.Violet.700">#6d28d9</Color>
 
     <!-- Red ramp. Destructive actions and the close-window caption. -->

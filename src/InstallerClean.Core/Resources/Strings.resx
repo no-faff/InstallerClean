@@ -215,8 +215,10 @@
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scan failed: installer database unavailable.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scan cancelled.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Done</value></data>
-  <!-- 0 = exception type name (full message + stack trace go to the
-       crash log; never put .Message in this string), 1 = crash log path. -->
+  <!-- 0 = exception type name. Full message + stack trace go only to
+       the crash log because exception messages from elevated framework
+       calls can contain paths from another user's profile. 1 = crash
+       log path. -->
   <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Scan failed ({0}). Details in {1}.</value></data>
   <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Scan failed ({0}). The crash log could not be written.</value></data>
 

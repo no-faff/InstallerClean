@@ -16,12 +16,11 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
 {
     public MsiSummaryInfo? GetSummaryInfo(string filePath)
     {
-        // Refuse symlinks at the API entry. The scan already filters
-        // reparse points out of the cache enumeration so production
-        // callers never reach this branch with a symlinked path; the
-        // check is defence-in-depth against any non-scan caller (a
-        // CLI subcommand, a future details-window invocation against a
-        // user-typed path) that hasn't gone through the same filter.
+        // Refuse symlinks at the API entry. The scan filters reparse
+        // points out of the cache enumeration before reaching here,
+        // but this is a public service surface: the boundary check
+        // defends in depth against any caller that hasn't filtered
+        // the path itself.
         if (Helpers.StorageHelpers.IsReparsePoint(filePath))
             return null;
 
@@ -89,28 +88,29 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
             : string.Empty;
     }
 
-    // Returns the certificate Subject string only. The signature chain
-    // is NOT validated and the file's hash is NOT verified against the
-    // cert. Treat this purely as descriptive metadata, not a trust
-    // indicator; the matching UI label is "Signing certificate", not
-    // "Verified by".
+    // Returns the certificate Subject string only. The signature
+    // chain is NOT validated and the file's hash is NOT verified
+    // against the cert; this is descriptive metadata, not a trust
+    // indicator. The matching UI label is "Signing certificate",
+    // not "Verified by".
     private static string GetDigitalSignature(string filePath)
     {
         try
         {
             // CreateFromSignedFile is the BCL's managed Authenticode
             // cert-extraction entry point: it wraps Win32
-            // CryptQueryObject + CryptMsgGetParam + a cert-store lookup
-            // for the signer. .NET 10 marked the X509Certificate
-            // constructors and Import methods obsolete (SYSLIB0057) in
-            // favour of X509CertificateLoader, but X509CertificateLoader
+            // CryptQueryObject + CryptMsgGetParam + a cert-store
+            // lookup for the signer. .NET 10 marked the
+            // X509Certificate constructors and Import methods obsolete
+            // (SYSLIB0057) in favour of X509CertificateLoader, which
             // has no Authenticode entry point. The only managed-free
-            // alternative today is direct P/Invoke into CryptQueryObject,
+            // alternative is direct P/Invoke into CryptQueryObject,
             // which is a substantial amount of interop for a
             // descriptive-only metadata field. The suppression is
-            // deliberate; the API still works in .NET 10, and the catch
-            // below means a future removal degrades to an empty
-            // signing-cert field rather than a crash.
+            // deliberate; the API still works in .NET 10, and the
+            // catch below degrades to an empty signing-cert field
+            // rather than a crash if the API is removed in a later
+            // runtime.
             //
             // Both certs are explicitly disposed: CreateFromSignedFile
             // returns a fresh cert handle, and the X509Certificate2
