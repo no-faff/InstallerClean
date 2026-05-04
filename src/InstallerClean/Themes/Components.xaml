@@ -149,9 +149,6 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Secondary.Hover}"/>
                         </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Secondary.Hover}"/>
-                        </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Secondary.Pressed}"/>
                         </Trigger>
@@ -185,9 +182,6 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Hover}"/>
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Hover}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
@@ -225,9 +219,6 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Danger.Hover}"/>
                         </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Danger.Hover}"/>
-                        </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Danger.Pressed}"/>
                         </Trigger>
@@ -260,9 +251,6 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
@@ -304,9 +292,6 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Hover}"/>
                         </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Hover}"/>
-                        </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Pressed}"/>
                         </Trigger>
@@ -339,9 +324,6 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
