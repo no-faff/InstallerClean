@@ -4,20 +4,17 @@ All notable changes to InstallerClean. Format follows [Keep a Changelog](https:/
 
 ## [1.6.0] - Unreleased
 
-The first release since v1.5.3 in April. Most of the work is structural: the codebase is split into three projects, the WPF host no longer depends on a third-party theme library, the Windows Installer P/Invoke surface has been audited end to end, and the runtime has moved from .NET 8 LTS to .NET 10 LTS. Headline behaviour matches v1.5.3 from the user's perspective.
+The first release since v1.5.3. Most of the work is structural: the codebase is split into three projects, the WPF host no longer depends on a third-party theme library, the Windows Installer P/Invoke surface has been audited end to end, and the runtime has moved from .NET 8 LTS to .NET 10 LTS. The day-to-day flow (scan, review, move or recycle) is unchanged; the user-visible additions and fixes are listed below.
 
 ### Added
 
 - All-clear and completion overlays. After a scan with no orphans, "All clear" with a Scan again button. After a successful Move or Delete, the bytes recovered, the destination, and a per-file error breakdown grouped by cause.
 - CLI per-file progress (`[5/100] foo.msi` per line) on `/d` and `/m` so a sysadmin can tell a slow run isn't hung.
-- CLI three-state exit codes: 0 = full success, 2 = partial (some files processed, some failed), 1 = total failure (bad args, scan failed, every file failed). 130 reserved for `Ctrl+C` with no committed work; cancellation after partial work returns 2.
+- CLI three-state exit codes: 0 = full success, 1 = total failure (bad args, scan failed, every file failed), 2 = partial (some files processed, some failed). 130 is reserved for `Ctrl+C` with no committed work; cancellation after partial work returns 2.
 - CLI writes a single summary entry to the Application event log per run under source `InstallerClean`. The writer refuses to run if the source has been pre-mapped to a non-Application log.
 - CLI arguments are case-insensitive (`/D`, `--HELP`, `/S`).
-- Maximize / Restore button glyph swaps when the window is maximised, with matching tooltip and AutomationProperties.Name.
 - Pending-reboot detection now disables Move and Delete in the GUI and blocks `/d` and `/m` in the CLI; in v1.5.3 it was warning-only.
-- Corrupted `settings.json` is renamed to `settings.json.bad` for manual recovery before the loader returns defaults.
 - Three-layer design system in the WPF host: Primitives (raw colours), Tokens (semantic roles), Components (control styles).
-- Embedded-null test for `ShellFileOperations.SendToRecycleBin` to pin the path-list-encoding guard against regression.
 
 ### Changed
 
@@ -44,8 +41,9 @@ The first release since v1.5.3 in April. Most of the work is structural: the cod
 - CLI generic catch for `UnauthorizedAccessException` now echoes the resx-sourced exception message, so a probe-failure path on a read-only destination shows the right reason instead of "administrator privileges required" (the message is safe under elevation; both throw sites use bounded, resx-sourced messages).
 - `Status.FoundProducts` resx now parameterises the noun via `PluraliseProduct`, replacing the literal "(s)" plural.
 - `DeleteFilesService` reports per-file progress before the file-exists check so a missing source still advances the counter, matching `MoveFilesService`.
-- `EventLogWriter.EnsureSourceMappedToApplicationLog` documents the benign `SourceExists` / `CreateEventSource` race so a future tightening of the catch doesn't miss the window.
 - WPF-UI dependency removed. Every control style is now defined locally in `Themes/Components.xaml`. Default styles for `ToolTip`, `ContextMenu`, `MenuItem`, `ProgressBar` and the focus visual are written in the same file. Smaller dependency surface, no inherited theming surprises, no third-party update churn to track.
+- Caption buttons render in Segoe MDL2 Assets, the canonical Windows chrome font. Previous Unicode codepoints were resolved by the WPF font fallback chain from a body font that does not include them, which left the maximise / restore swap visually identical and depended on whatever font Windows fell back to.
+- Main window: maximise removed. The 720-wide centred-column layout does not fill a maximised viewport, so the chrome offers Minimise and Close only. Title-bar double-click, Win+Up and the system menu's Maximize item are all intercepted at WM_SYSCOMMAND so the misshapen state is not reachable. Detail windows (Orphaned files, Registered files) keep default Windows resize and maximise.
 
 ### Fixed
 
@@ -61,6 +59,7 @@ The first release since v1.5.3 in April. Most of the work is structural: the cod
 - `App.xaml.cs` BitmapImage for window icons is frozen so the same instance is safely shared across windows.
 - `PendingRebootService` reads keys via `RegistryView.Registry64` for parity with `InstallerQueryService`.
 - About window's MIT licence Hyperlink shows the underline on hover (was colour-only, fails for users with reduced colour vision).
+- Move destination textbox right-click menu uses the dark theme. Default WPF builds the textbox context menu outside the implicit-style scope of `Application.Resources`, which rendered the system light-themed shell menu in an otherwise dark UI; the textbox style now sets an explicit themed `ContextMenu` with the four standard editing commands.
 
 ### Removed
 
