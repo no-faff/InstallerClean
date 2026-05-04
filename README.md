@@ -58,6 +58,43 @@ InstallerClean detects which Adobe patches have been superseded by newer updates
 
 No telemetry. No network activity. The About window has a Check for updates link that opens the releases page in your browser.
 
+## Screenshots
+
+<details>
+<summary>Click to expand</summary>
+
+<br>
+
+<img src="docs/screenshots/03-scan.webp" alt="Splash screen showing the scan in progress, having found 68 files to clean up" width="600">
+
+*Initial scan. This is very quick.*
+
+<img src="docs/screenshots/04-main-window.webp" alt="Main window showing 114 files still used and 68 files to clean up" width="820">
+
+*Results: how much is in use, how much is removable.*
+
+<img src="docs/screenshots/05-keep-details.webp" alt="Registered files window listing installed products and their installer-database metadata" width="820">
+
+*The files still in use, with metadata read from the installer database.*
+
+<img src="docs/screenshots/06-delete-details.webp" alt="Orphaned files window listing removable .msi files with reasons" width="820">
+
+*The files no longer needed.*
+
+<img src="docs/screenshots/08-delete.webp" alt="Delete confirmation dialog showing 68 files (965 MB) will go to the Recycle Bin" width="820">
+
+*Confirmation before either action. Delete sends to the Recycle Bin; Move puts the files somewhere of your choice.*
+
+<img src="docs/screenshots/10-moved-done-success.webp" alt="Success overlay showing 965 MB cleared after a move operation" width="820">
+
+*After a successful Move.*
+
+<img src="docs/screenshots/12-all-clear.webp" alt="All-clear overlay shown when nothing is removable on a subsequent scan" width="820">
+
+*Nothing left to clean.*
+
+</details>
+
 ## How it works
 
 InstallerClean identifies two kinds of unneeded files.
