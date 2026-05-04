@@ -110,6 +110,9 @@
        ============================================================ -->
   <data name="Action.About" xml:space="preserve"><value>_About</value></data>
   <data name="Action.Copy" xml:space="preserve"><value>Copy</value></data>
+  <data name="Action.Cut" xml:space="preserve"><value>Cut</value></data>
+  <data name="Action.Paste" xml:space="preserve"><value>Paste</value></data>
+  <data name="Action.SelectAll" xml:space="preserve"><value>Select all</value></data>
   <data name="Action.Browse" xml:space="preserve"><value>_Browse...</value></data>
   <data name="Action.Cancel" xml:space="preserve"><value>_Cancel</value></data>
   <data name="Action.CheckForUpdates" xml:space="preserve"><value>Check for _updates</value></data>

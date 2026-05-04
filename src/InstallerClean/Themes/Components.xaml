@@ -369,6 +369,24 @@
         <Setter Property="Padding" Value="12,0"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource PillFocusVisual}"/>
+        <!-- TextBox's default behaviour, when ContextMenu is unset, is
+             to generate one in code at right-click time. WPF builds it
+             outside the implicit-style scope of Application.Resources,
+             so the implicit ContextMenu / MenuItem styles below never
+             reach it and the user sees the system's light-themed shell
+             menu in the middle of an otherwise dark UI. Setting an
+             explicit ContextMenu here pins the four standard editing
+             commands and routes them through our themed surfaces. -->
+        <Setter Property="ContextMenu">
+            <Setter.Value>
+                <ContextMenu>
+                    <MenuItem Header="{loc:Translate Action.Cut}" Command="ApplicationCommands.Cut" InputGestureText="Ctrl+X"/>
+                    <MenuItem Header="{loc:Translate Action.Copy}" Command="ApplicationCommands.Copy" InputGestureText="Ctrl+C"/>
+                    <MenuItem Header="{loc:Translate Action.Paste}" Command="ApplicationCommands.Paste" InputGestureText="Ctrl+V"/>
+                    <MenuItem Header="{loc:Translate Action.SelectAll}" Command="ApplicationCommands.SelectAll" InputGestureText="Ctrl+A"/>
+                </ContextMenu>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
@@ -578,13 +596,17 @@
 
     <Style x:Key="CaptionButton" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
-        <!-- 13 is a deliberate off-scale glyph size: the title-bar
-             characters (- HORIZONTAL BAR / WHITE SQUARE / MULTIPLICATION
-             SIGN) read crowded at 14 (Type.Heading.Sm) and pinched at
-             12 (Type.Body). Used only by the two caption styles below;
-             not promoted to a Type.* token because no other control
-             needs this size. -->
-        <Setter Property="FontSize" Value="13"/>
+        <!-- Segoe MDL2 Assets ships with every Windows 10+ install and
+             is the canonical font for the title-bar chrome glyphs
+             (E921 minimise, E922 maximise, E923 restore, E8BB close).
+             Using a body font here previously left the maximise /
+             restore swap invisible because Poppins doesn't include the
+             U+2750 shadowed-square restore glyph and WPF fell back to
+             a plain square that looked identical to the maximise one.
+             10pt matches the Windows default chrome-button glyph size.
+             Used only by the two caption styles below. -->
+        <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+        <Setter Property="FontSize" Value="10"/>
         <Setter Property="Width" Value="46"/>
         <Setter Property="Height" Value="32"/>
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
@@ -615,7 +637,8 @@
 
     <Style x:Key="CaptionCloseButton" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+        <Setter Property="FontSize" Value="10"/>
         <Setter Property="Width" Value="46"/>
         <Setter Property="Height" Value="32"/>
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>

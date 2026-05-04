@@ -104,10 +104,18 @@ public partial class MainWindow : Window
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
 
-    // Title-bar glyph swap matches Windows's own caption buttons.
-    // \u escapes so source-file encoding isn't a load-bearing assumption.
-    private const string MaximizeGlyph = "\u25A1";   // WHITE SQUARE
-    private const string RestoreGlyph = "\u2750";    // UPPER RIGHT SHADOWED WHITE SQUARE
+    // Segoe MDL2 Assets glyph code points for the chrome maximise /
+    // restore button. The font ships with every Windows 10+ install
+    // and renders both glyphs identically in size and weight, which a
+    // Unicode-symbol pair sourced from an arbitrary body font cannot
+    // guarantee (Poppins, the bundled body font, has no
+    // U+2750 SHADOWED WHITE SQUARE; the WPF fallback chain renders a
+    // plain square so the swap was visually invisible). The CaptionButton
+    // style sets FontFamily="Segoe MDL2 Assets" so these characters
+    // resolve as the chrome glyphs even from inside a code-behind
+    // assignment that bypasses the static XAML Content attribute.
+    private const string MaximizeGlyph = "\uE922";   // ChromeMaximize
+    private const string RestoreGlyph = "\uE923";    // ChromeRestore
 
     /// <summary>
     /// Keeps the caption button's glyph, tooltip and automation name

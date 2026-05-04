@@ -38,6 +38,7 @@ public static class Strings
     public static string Action_CheckForUpdates => Get("Action.CheckForUpdates");
     public static string Action_Close => Get("Action.Close");
     public static string Action_Copy => Get("Action.Copy");
+    public static string Action_Cut => Get("Action.Cut");
     public static string Action_Delete => Get("Action.Delete");
     public static string Action_Details => Get("Action.Details");
     public static string Action_Donate => Get("Action.Donate");
@@ -45,8 +46,10 @@ public static class Strings
     public static string Action_MITLicence => Get("Action.MITLicence");
     public static string Action_Move => Get("Action.Move");
     public static string Action_MoveDestinationPlaceholder => Get("Action.MoveDestinationPlaceholder");
+    public static string Action_Paste => Get("Action.Paste");
     public static string Action_Rescan => Get("Action.Rescan");
     public static string Action_ScanAgain => Get("Action.ScanAgain");
+    public static string Action_SelectAll => Get("Action.SelectAll");
     public static string Automation_BuyMeACuppa => Get("Automation.BuyMeACuppa");
     public static string Automation_CancelOperation => Get("Automation.CancelOperation");
     public static string Automation_CancelScan => Get("Automation.CancelScan");
