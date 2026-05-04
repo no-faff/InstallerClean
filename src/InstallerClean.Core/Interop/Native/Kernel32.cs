@@ -5,9 +5,10 @@ using Microsoft.Win32.SafeHandles;
 namespace InstallerClean.Interop.Native;
 
 /// <summary>
-/// P/Invoke surface for kernel32.dll. Uses the .NET 8 source-generated
-/// <see cref="LibraryImportAttribute"/> stubs (faster, AOT-friendly,
-/// no marshalling reflection at runtime).
+/// P/Invoke surface for kernel32.dll. Uses the source-generated
+/// <see cref="LibraryImportAttribute"/> stubs rather than DllImport so
+/// the marshalling code is emitted at compile time, free of runtime
+/// reflection and friendly to AOT.
 /// </summary>
 internal static partial class Kernel32
 {

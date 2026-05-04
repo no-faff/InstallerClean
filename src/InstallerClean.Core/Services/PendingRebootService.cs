@@ -6,10 +6,10 @@ public sealed class PendingRebootService : IPendingRebootService
 {
     public bool HasPendingReboot()
     {
-        // Pin Registry64. Today the app ships x64-only and the CBS /
-        // WindowsUpdate / Session Manager keys live in the 64-bit view,
-        // but a future bitness flip would silently redirect via
-        // Wow6432Node and miss real entries. Matches InstallerQueryService.
+        // Registry64 is pinned explicitly so an x86-process rebuild
+        // wouldn't silently redirect to WOW6432Node and miss the CBS /
+        // WindowsUpdate / Session Manager keys (all of which are
+        // unwowed). Matches the same pin in InstallerQueryService.
         using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
 
         return KeyExists(hive, @"SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired")

@@ -155,10 +155,12 @@ public sealed class MoveFilesService : IMoveFilesService
 
     /// <summary>
     /// Thrown by <see cref="GetUniqueDestPath"/> when 10,000 unique-
-    /// suffix attempts all collide. Caught one frame up and converted
-    /// to a <see cref="DestinationCollision"/> entry in the result so
-    /// the rest of the batch keeps moving. Private because no other
-    /// code path needs to see it.
+    /// suffix attempts all collide. The MoveFilesAsync loop catches
+    /// it one frame up and folds it into the result as a
+    /// <see cref="DestinationCollision"/> entry so the rest of the
+    /// batch continues; nothing outside this class observes the
+    /// exception type, so the sealed-private scope keeps it from
+    /// leaking into the public surface.
     /// </summary>
     private sealed class DestinationCollisionException : Exception
     {

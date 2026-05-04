@@ -59,8 +59,16 @@ internal static class EventLogWriter
     /// </summary>
     private static bool EnsureSourceMappedToApplicationLog()
     {
-        // First-run registration requires admin (our manifest guarantees it);
-        // subsequent runs short-circuit via SourceExists.
+        // First-run registration requires admin (our manifest guarantees
+        // it); subsequent runs short-circuit via SourceExists.
+        //
+        // SourceExists then CreateEventSource is a check-then-act pair,
+        // not atomic: a different process can register the source against
+        // a different log between the two calls and CreateEventSource
+        // throws ArgumentException. The outer Write try/catch swallows
+        // the throw; the next run's SourceExists branch catches the
+        // cross-log mapping via LogNameFromSourceName below and refuses
+        // to write. The race is benign and recovers on the next call.
         if (!EventLog.SourceExists(SourceName))
         {
             EventLog.CreateEventSource(SourceName, "Application");

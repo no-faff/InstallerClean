@@ -27,11 +27,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
     /// <see cref="IFileSystem"/>.
     /// </summary>
     /// <remarks>
-    /// DI uses this constructor: it is the only public ctor on the
-    /// class and Microsoft.Extensions.DependencyInjection picks the
-    /// public ctor with the most resolvable parameters. Keep the
-    /// test ctors below <c>internal</c> so they cannot be picked up
-    /// accidentally if a future change widens DI's resolver.
+    /// This is the only public ctor and the only one DI picks:
+    /// Microsoft.Extensions.DependencyInjection resolves the public
+    /// ctor with the most resolvable parameters and ignores internal
+    /// ctors. The test ctors below stay <c>internal</c> for that
+    /// reason; widening one to public would let DI pick it during
+    /// resolution and inject defaults the production code never expects.
     /// </remarks>
     public FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem)
         : this(queryService, fileSystem, null, null) { }

@@ -85,8 +85,12 @@ public partial class OrphanedFilesViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            // _infoService is contracted not to throw, but log if it
-            // ever does so a future regression isn't silently lost.
+            // IMsiFileInfoService is contracted never to throw (the
+            // production implementation wraps everything in its own
+            // try/catch). The catch logs anything that does break the
+            // contract instead of swallowing silently, so a regression
+            // surfaces in crash.log rather than as a "no metadata"
+            // panel with no diagnostic trail.
             CrashLog.Write(ex);
             if (!ct.IsCancellationRequested && SelectedFile == value)
                 SelectedDetails = null;

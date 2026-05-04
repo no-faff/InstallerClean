@@ -94,12 +94,12 @@ internal static class StorageHelpers
     }
 
     /// <summary>
-    /// True if <paramref name="path"/> is a junction or symlink. Used
-    /// by Move/Delete to refuse source files in C:\Windows\Installer
-    /// that have been replaced with a symlink (moving the symlink
-    /// would silently relocate an OS file out of System32). New
-    /// callers should prefer <see cref="OpenAtomic"/> which is
-    /// race-free.
+    /// True if <paramref name="path"/> is a junction or symlink. Move
+    /// and Delete refuse source files in C:\Windows\Installer that
+    /// have been replaced with a symlink because following the link
+    /// would silently relocate an OS file out of System32. The check
+    /// is best-effort against a TOCTOU swap; <see cref="OpenAtomic"/>
+    /// is the race-free path for the write side.
     /// </summary>
     internal static bool IsReparsePoint(string path)
     {

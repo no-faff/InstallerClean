@@ -4,18 +4,16 @@ namespace InstallerClean.Models;
 
 /// <summary>
 /// Categorised per-file failure produced by Move and Delete operations.
-///
-/// The Move and Delete services collect these into a list and let the
-/// caller decide how to surface them. The categorisation lets the UI
-/// (and a future telemetry hook) group failures by cause - e.g. "3
-/// access denied, 1 missing source" - rather than scrolling a list of
-/// free-form sentences.
+/// The services collect these into a result list and let the caller
+/// decide how to surface them. The categorisation lets the completion
+/// overlay group failures by cause ("3 access denied, 1 missing
+/// source") rather than scrolling a list of free-form sentences.
 ///
 /// Each subtype carries the structured fields needed to reconstruct
 /// the message, plus a <see cref="LocalisedMessage"/> property that
-/// produces a culture-appropriate sentence for display. Consumers
-/// should bind to <see cref="LocalisedMessage"/> for the UI string;
-/// they should pattern-match on the subtype for grouping/counting.
+/// produces a culture-appropriate sentence for display. The UI binds
+/// to <see cref="LocalisedMessage"/>; counters and grouping pattern-
+/// match on the subtype.
 /// </summary>
 public abstract record FileOperationError(string FilePath)
 {
