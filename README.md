@@ -99,7 +99,7 @@ Delete sends files to the Recycle Bin so you can restore them if needed; Move co
 InstallerClean is unsigned (no Authenticode certificate). This is deliberate; signing certificates cost annually and we'd rather keep the project free, open and donations-funded.
 
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
-- VirusTotal links for setup, portable and slim builds are published with each release. Setup and portable builds have consistently scored 0/71 since v1.5.0.
+- VirusTotal links for setup, portable and slim builds are published with each release.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
 
 ## FAQ
@@ -107,8 +107,6 @@ InstallerClean is unsigned (no Authenticode certificate). This is deliberate; si
 **Will I actually free up GBs of space?** Depends on your machine. A clean Windows 11 install with no extra software has very little to remove. A long-running developer workstation, or any machine with Adobe Acrobat installed, often has tens of GB. Run `installerclean-cli /s` to see exactly what would be removed before you commit.
 
 **Why does it want Administrator?** `C:\Windows\Installer` is owned by SYSTEM and locked down to admins only. Reading the folder, writing to the Installer-database query API, and moving or deleting files all require elevation. There's no user-mode path.
-
-**Why does my antivirus flag the slim download?** The slim build is a small unsigned framework-dependent .NET single-file launcher. Some whitelist-biased ML antivirus engines (SecureAge in particular) flag any small unsigned single-file .NET launcher regardless of content. If the flag bothers you, use the setup or portable build instead, which have consistently scored 0/71 on VirusTotal.
 
 **What's the difference between setup, portable and slim?** Setup is a regular Windows installer, portable is a single self-contained exe, slim is the smallest download but needs the .NET 10 Desktop Runtime already installed (which you have if you have Visual Studio).
 
