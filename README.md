@@ -27,7 +27,7 @@ These aren't temp files that get recreated the moment you close a cleaning tool.
 
 **If you're looking for an easy way to free up disk space on Windows, this folder is one of the best places to start.** InstallerClean finds the unneeded files and removes them safely.
 
-[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) has been the go-to tool for this, but it hasn't been updated since March 2016 and it's closed source. InstallerClean is a new open source alternative, with Adobe patch handling (often the main culprit) and a modern UI.
+[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) has been the go-to tool for this, but it hasn't been updated since March 2016 and it's closed source. InstallerClean is an open source alternative, with Adobe patch handling (often the main culprit) and a modern UI.
 
 ## The search for help
 
@@ -64,7 +64,7 @@ InstallerClean identifies two kinds of unneeded files.
 
 **Orphaned files** are installers and patches left behind after you uninstall software. Windows no longer references them, but the files sit in the folder taking up space.
 
-**Superseded patches** are old `.msp` patches that have been replaced by newer ones. Windows marks them as superseded in its own database but never deletes them. This is especially common with Adobe Acrobat, which delivers roughly 1.1 GB patch files and accumulates superseded ones indefinitely.
+**Superseded patches** are old `.msp` patches that have been replaced by newer ones. Windows marks them as superseded in its own database but never deletes them. This is especially common with Adobe Acrobat, which ships frequent large patches and accumulates superseded ones indefinitely.
 
 To find them, InstallerClean calls the Windows Installer COM interface directly via P/Invoke:
 
@@ -162,14 +162,14 @@ InstallerClean supports headless operation for scripting and sysadmin use:
 
 ```
 Usage:
-  installerclean-cli           Launch the GUI
+  installerclean-cli           Print this usage and exit
   installerclean-cli /s        Scan only - list removable files
   installerclean-cli /d        Delete removable files (Recycle Bin)
   installerclean-cli /m        Move to saved default location
   installerclean-cli /m PATH   Move to specified path
 ```
 
-Also accepts `--help`, `/?` and `-h`.
+Also accepts `--help`, `/?` and `-h`. To launch the GUI, run `InstallerClean.exe` (or use the Start-menu shortcut from the setup install).
 
 `/s` is a dry run: it scans, lists what it would remove with filenames and sizes, then exits. Useful for auditing before cleanup. Exit code is always 0. All files are in `C:\Windows\Installer`.
 
