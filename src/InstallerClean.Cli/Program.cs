@@ -269,9 +269,18 @@ internal static class Program
             }
             return ExitCancelled;
         }
-        catch (UnauthorizedAccessException)
+        catch (UnauthorizedAccessException ex)
         {
-            Console.WriteLine(Strings.Cli_AdminRequired);
+            // Two production sites throw UnauthorizedAccessException with
+            // resx-sourced messages safe to print under elevation: the MSI
+            // enumerator on AccessDenied (Strings.Error_MsiAccessDenied,
+            // which itself names the admin requirement) and the Move
+            // pre-flight probe on a non-writable destination
+            // (Strings.Error_CannotWriteFolder, naming the destination).
+            // Echoing ex.Message directly distinguishes the two; printing
+            // a static "AdminRequired" line for both made a read-only
+            // destination look like a privilege failure.
+            Console.WriteLine(ex.Message);
             return ExitError;
         }
         catch (Exception ex)
