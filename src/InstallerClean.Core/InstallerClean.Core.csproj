@@ -40,7 +40,7 @@
          GlobalUsings.cs; EventLogWriter additionally wraps the call in
          a try/catch so a non-Windows host (or a Windows host with the
          service stopped) can't throw out of a logging call. -->
-    <PackageReference Include="System.Diagnostics.EventLog" Version="8.0.1" />
+    <PackageReference Include="System.Diagnostics.EventLog" Version="10.0.7" />
   </ItemGroup>
 
   <!-- Localisation: the typed Strings accessor is hand-managed via
