@@ -166,7 +166,7 @@
        BODY COPY
        ============================================================ -->
   <data name="Body.MainExplanation" xml:space="preserve">
-    <value>C:\Windows\Installer contains cached files used by Windows to repair and update software. Orphaned files are no longer needed by any installed product. Superseded patches have been replaced by newer updates. Move them somewhere safe first, or delete to the Recycle Bin once you're confident.</value>
+    <value>C:\Windows\Installer contains cached files used by Windows to repair and update software. Orphaned files are no longer needed by any installed product. Superseded patches have been replaced by newer updates. Delete them to the Recycle Bin or move them somewhere safe so you can restore them if something breaks.</value>
   </data>
   <data name="Body.PendingReboot" xml:space="preserve"><value>Windows is waiting to restart. Move and Delete are blocked until you reboot, because cleaning the cache mid-update can break the pending repair.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Select a file to view details.</value></data>

@@ -82,7 +82,7 @@ After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer`
 
 Yes. We query the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, we trust it. We don't guess based on filenames or dates.
 
-Delete sends files to the Recycle Bin so you can restore them if needed; Move copies them to a folder you choose first, if you'd rather have a backup before letting go. Nothing is touched until you confirm. If Windows has pending updates that could affect the result, both buttons are disabled and the reason is shown. The core logic is covered by 180+ automated tests that run on every commit (see the CI badge above).
+Delete sends files to the Recycle Bin. Move puts them in a folder you choose. Either way you can restore them if something breaks. Nothing is touched until you confirm. If Windows has pending updates that could affect the result, both buttons are disabled and the reason is shown. The core logic is covered by 180+ automated tests that run on every commit (see the CI badge above).
 
 ## What it doesn't do
 
