@@ -27,4 +27,16 @@ public class ShellFileOperationsTests
         // non-zero failure that came back cleanly without throwing.
         Assert.NotEqual(0, result);
     }
+
+    [Fact]
+    public void Embedded_null_throws_argument_exception()
+    {
+        // SHFILEOPSTRUCT.pFrom is a list-of-strings encoding (entries
+        // split on null, list end = double null). An embedded null in
+        // the path would be parsed as two entries and over-delete; the
+        // guard must reject the path before the marshalling happens.
+        var bad = Path.Combine(Path.GetTempPath(), "a\0b.msi");
+
+        Assert.Throws<ArgumentException>(() => ShellFileOperations.SendToRecycleBin(bad));
+    }
 }
