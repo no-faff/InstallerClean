@@ -137,7 +137,6 @@
   <data name="Automation.Close" xml:space="preserve"><value>Close</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Close result and return to main window</value></data>
   <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
-  <data name="Automation.Maximise" xml:space="preserve"><value>Maximise</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Move all orphaned installer files to the chosen destination folder</value></data>
   <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all orphaned installer files to the Recycle Bin</value></data>
@@ -156,13 +155,11 @@
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Buy me a cuppa</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Close</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
-  <data name="Tooltip.Maximise" xml:space="preserve"><value>Maximise</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the orphaned files will be moved. Type a path, paste one, or click Browse.</value></data>
   <data name="Tooltip.MoveDisabledHint" xml:space="preserve"><value>Move is unavailable: pick a destination folder, run a fresh scan that finds orphans, or wait for any running scan or operation to finish. While Windows has a pending reboot, both Move and Delete are blocked.</value></data>
   <data name="Tooltip.DeleteDisabledHint" xml:space="preserve"><value>Delete is unavailable: run a fresh scan that finds orphans, or wait for any running scan or operation to finish. While Windows has a pending reboot, both Move and Delete are blocked.</value></data>
   <data name="Tooltip.OpenProjectOnGitHub" xml:space="preserve"><value>Open the project on GitHub</value></data>
-  <data name="Tooltip.Restore" xml:space="preserve"><value>Restore</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Subject name from the embedded Authenticode certificate. Not chain-verified.</value></data>
 
   <!-- ============================================================

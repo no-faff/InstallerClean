@@ -59,7 +59,6 @@ public static class Strings
     public static string Automation_ConfirmDelete => Get("Automation.ConfirmDelete");
     public static string Automation_DeleteAllFiles => Get("Automation.DeleteAllFiles");
     public static string Automation_LeaveStarOnGitHub => Get("Automation.LeaveStarOnGitHub");
-    public static string Automation_Maximise => Get("Automation.Maximise");
     public static string Automation_Minimise => Get("Automation.Minimise");
     public static string Automation_MoveAllFiles => Get("Automation.MoveAllFiles");
     public static string Automation_MoveDestinationFolder => Get("Automation.MoveDestinationFolder");
@@ -232,12 +231,10 @@ public static class Strings
     public static string Tooltip_Close => Get("Tooltip.Close");
     public static string Tooltip_DeleteDisabledHint => Get("Tooltip.DeleteDisabledHint");
     public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");
-    public static string Tooltip_Maximise => Get("Tooltip.Maximise");
     public static string Tooltip_Minimise => Get("Tooltip.Minimise");
     public static string Tooltip_MoveDestination => Get("Tooltip.MoveDestination");
     public static string Tooltip_MoveDisabledHint => Get("Tooltip.MoveDisabledHint");
     public static string Tooltip_OpenProjectOnGitHub => Get("Tooltip.OpenProjectOnGitHub");
-    public static string Tooltip_Restore => Get("Tooltip.Restore");
     public static string Tooltip_SigningCertificate => Get("Tooltip.SigningCertificate");
     public static string Version_Display => Get("Version.Display");
     public static string Window_About_Title => Get("Window.About.Title");

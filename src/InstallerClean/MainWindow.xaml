@@ -46,9 +46,6 @@
             <Button Style="{StaticResource CaptionButton}" Content="&#xE921;"
                     Click="MinimizeClick" AutomationProperties.Name="{loc:Translate Automation.Minimise}"
                     ToolTip="{loc:Translate Tooltip.Minimise}"/>
-            <Button x:Name="MaximizeButton" Style="{StaticResource CaptionButton}" Content="&#xE922;"
-                    Click="MaximizeClick" AutomationProperties.Name="{loc:Translate Automation.Maximise}"
-                    ToolTip="{loc:Translate Tooltip.Maximise}"/>
             <Button Style="{StaticResource CaptionCloseButton}" Content="&#xE8BB;"
                     Click="CloseClick" AutomationProperties.Name="{loc:Translate Automation.Close}"
                     ToolTip="{loc:Translate Tooltip.Close}"/>

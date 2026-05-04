@@ -1,10 +1,9 @@
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Automation;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using InstallerClean.Helpers;
-using InstallerClean.Resources;
 using InstallerClean.ViewModels;
 
 namespace InstallerClean;
@@ -94,41 +93,32 @@ public partial class MainWindow : Window
 
     private void MinimizeClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
-    private void MaximizeClick(object sender, RoutedEventArgs e)
-    {
-        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
-        // Tooltip + automation name update happens in OnStateChanged so
-        // double-click-on-title-bar (which bypasses this handler) keeps
-        // the labels in sync too.
-    }
-
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
 
-    // Segoe MDL2 Assets glyphs for the chrome maximise (E922) and
-    // restore (E923) buttons. The font ships with every Windows 10+
-    // install and renders both at the same metrics, which a plain
-    // Unicode pair sourced from a body font cannot guarantee:
-    // Poppins (the bundled body font) does not include
-    // U+2750 (UPPER RIGHT SHADOWED WHITE SQUARE) and the WPF fallback
-    // chain renders a plain square indistinguishable from the
-    // maximise glyph, leaving the swap invisible. The CaptionButton
-    // style pins FontFamily="Segoe MDL2 Assets" so these glyphs
-    // resolve in that font from any assignment site.
-    private const string MaximizeGlyph = "\uE922";   // ChromeMaximize
-    private const string RestoreGlyph = "\uE923";    // ChromeRestore
-
-    /// <summary>
-    /// Keeps the caption button's glyph, tooltip and automation name
-    /// in sync with the window state regardless of how it was changed.
-    /// </summary>
-    protected override void OnStateChanged(EventArgs e)
+    protected override void OnSourceInitialized(EventArgs e)
     {
-        base.OnStateChanged(e);
-        var maximised = WindowState == WindowState.Maximized;
-        MaximizeButton.Content = maximised ? RestoreGlyph : MaximizeGlyph;
-        MaximizeButton.ToolTip = maximised ? Strings.Tooltip_Restore : Strings.Tooltip_Maximise;
-        AutomationProperties.SetName(MaximizeButton,
-            maximised ? Strings.Tooltip_Restore : Strings.Automation_Maximise);
+        base.OnSourceInitialized(e);
+        var hwnd = new WindowInteropHelper(this).Handle;
+        HwndSource.FromHwnd(hwnd)?.AddHook(SuppressMaximize);
+    }
+
+    // The main window's centred-column layout caps at 720px and does
+    // not fill a maximised viewport: the content stays in the middle
+    // with the dark sidebar surface around it. The custom chrome
+    // therefore offers Minimise and Close only, but title-bar
+    // double-click, Win+Up and the system menu's Maximize item still
+    // dispatch SC_MAXIMIZE through WM_SYSCOMMAND. Silencing the
+    // command at the message pump removes those paths to the
+    // misshapen state. The low four bits of wParam are reserved for
+    // menu state (WM_SYSCOMMAND documentation), so the mask 0xFFF0
+    // is required before comparing the command code.
+    private static IntPtr SuppressMaximize(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        const int WM_SYSCOMMAND = 0x0112;
+        const int SC_MAXIMIZE = 0xF030;
+        if (msg == WM_SYSCOMMAND && (wParam.ToInt32() & 0xFFF0) == SC_MAXIMIZE)
+            handled = true;
+        return IntPtr.Zero;
     }
 
     /// <summary>
