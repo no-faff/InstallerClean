@@ -2,21 +2,22 @@
 
 All notable changes to InstallerClean. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.4] - Unreleased
+## [1.6.0] - Unreleased
 
-A 10-step architectural rebuild plus two ship-readiness review passes (60 + 43 findings, both actioned bar the documented deferrals). Most of v1.5.4 is plumbing rather than user-visible features; the headline behaviour matches v1.5.3.
+The first release since v1.5.3 in April. Most of the work is structural: the codebase is split into three projects, the WPF host no longer depends on a third-party theme library, the Windows Installer P/Invoke surface has been audited end to end, and the runtime has moved from .NET 8 LTS to .NET 10 LTS. Headline behaviour matches v1.5.3 from the user's perspective.
 
 ### Added
 
-- All-clear / completion overlay after a scan with no orphans, and a summary overlay after Move and Delete with bytes recovered, destination and per-file errors grouped by reason.
-- CLI per-file progress (`[5/100] foo.msi` per file) so a sysadmin watching a long run can tell it's alive.
-- CLI three-state exit codes (0 = full success, 1 = full failure, 2 = partial success with errors). 130 = Ctrl+C with no committed work; partial cancellation returns 2 and writes an Event Log summary.
-- CLI writes a single summary entry to the Application event log per run (mode, counts, destination if any, error count). Source name `InstallerClean`; refuses to write if the source is mapped to a non-Application log.
-- CLI args are case-insensitive (`/D`, `--HELP`, `/S` all work).
+- All-clear and completion overlays. After a scan with no orphans, "All clear" with a Scan again button. After a successful Move or Delete, the bytes recovered, the destination, and a per-file error breakdown grouped by cause.
+- CLI per-file progress (`[5/100] foo.msi` per line) on `/d` and `/m` so a sysadmin can tell a slow run isn't hung.
+- CLI three-state exit codes: 0 = full success, 2 = partial (some files processed, some failed), 1 = total failure (bad args, scan failed, every file failed). 130 reserved for `Ctrl+C` with no committed work; cancellation after partial work returns 2.
+- CLI writes a single summary entry to the Application event log per run under source `InstallerClean`. The writer refuses to run if the source has been pre-mapped to a non-Application log.
+- CLI arguments are case-insensitive (`/D`, `--HELP`, `/S`).
 - Maximize / Restore button glyph swaps when the window is maximised, with matching tooltip and AutomationProperties.Name.
-- Pending-reboot detection now disables Move and Delete in the GUI and blocks `/d` and `/m` in the CLI (in v1.5.3 it was warning-only).
-- Settings file `.bad` rename: a corrupt settings.json is renamed for manual recovery before the loader returns defaults.
-- Three-tier design system in the WPF host: Primitives (raw colours) → Tokens (semantic roles) → Components (control styles).
+- Pending-reboot detection now disables Move and Delete in the GUI and blocks `/d` and `/m` in the CLI; in v1.5.3 it was warning-only.
+- Corrupted `settings.json` is renamed to `settings.json.bad` for manual recovery before the loader returns defaults.
+- Three-layer design system in the WPF host: Primitives (raw colours), Tokens (semantic roles), Components (control styles).
+- Embedded-null test for `ShellFileOperations.SendToRecycleBin` to pin the path-list-encoding guard against regression.
 
 ### Changed
 
@@ -33,11 +34,18 @@ A 10-step architectural rebuild plus two ship-readiness review passes (60 + 43 f
 - Settings save uses write-temp-then-rename for atomicity. The temp file is created via `OpenAtomic` so a symlink at the temp path can't redirect the write.
 - `App.xaml.cs` `DispatcherUnhandledException` handler has a re-entry guard so a second exception fired during the dialog pump can't stack dialogs.
 - `OrphanedFilesViewModel` and `RegisteredFilesViewModel` lazy-load MSI summary metadata off the UI thread; the cache survives selection cycles.
+- Runtime moved from .NET 8 LTS to .NET 10 LTS. The slim build now requires the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0). Setup and portable builds bundle the runtime so nothing else is needed. End-of-life pushed from November 2026 (.NET 8) to November 2028 (.NET 10).
 - `InstallerQueryService` `MsiEnumProductsExW` and `MsiEnumPatchesExW` stubs use `ConstantElementCount = 39` for the fixed GUID buffers (matches the native signatures exactly; the previous `CountElementName` form added a phantom parameter that worked on x64 by ABI luck and would have crashed on x86).
 - `MsiFileInfoService` MSIHANDLE marshalled as `uint` (matches `unsigned long MSIHANDLE` in `msi.h`); the previous `IntPtr` form was 8 bytes on x64 instead of 4.
 - `ShellFileOperations.SendToRecycleBin` rejects paths containing an embedded null (`SHFILEOPSTRUCT.pFrom` is a list-of-strings encoding; an embedded null would cause over-deletion).
 - The CLI's CancelKeyPress handler is registered before mutex acquisition so a Ctrl+C in that window prints "Cancelling..." rather than terminating via the default handler.
 - Browser-opening calls go through a defensive try/catch so a misconfigured URL handler can't crash the app over a Donate click.
+- `MainViewModel`, `CleanupViewModel` and `ChromeViewModel` implement `IDisposable`. The singleton container disposes them at process shutdown so PropertyChanged subscriptions on `ScanViewModel` are unhooked rather than relying on the process-lifetime invariant.
+- CLI generic catch for `UnauthorizedAccessException` now echoes the resx-sourced exception message, so a probe-failure path on a read-only destination shows the right reason instead of "administrator privileges required" (the message is safe under elevation; both throw sites use bounded, resx-sourced messages).
+- `Status.FoundProducts` resx now parameterises the noun via `PluraliseProduct`, replacing the literal "(s)" plural.
+- `DeleteFilesService` reports per-file progress before the file-exists check so a missing source still advances the counter, matching `MoveFilesService`.
+- `EventLogWriter.EnsureSourceMappedToApplicationLog` documents the benign `SourceExists` / `CreateEventSource` race so a future tightening of the catch doesn't miss the window.
+- WPF-UI dependency removed. Every control style is now defined locally in `Themes/Components.xaml`. Default styles for `ToolTip`, `ContextMenu`, `MenuItem`, `ProgressBar` and the focus visual are written in the same file. Smaller dependency surface, no inherited theming surprises, no third-party update churn to track.
 
 ### Fixed
 

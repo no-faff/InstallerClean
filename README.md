@@ -1,5 +1,5 @@
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
-[![.NET 8](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
+[![.NET 10](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/10.0)
 [![CI](https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg)](https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml)
 [![Windows 10/11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg)](https://github.com/no-faff/InstallerClean/releases)
 [![GitHub Release](https://img.shields.io/github/v/release/no-faff/InstallerClean)](https://github.com/no-faff/InstallerClean/releases/latest)
@@ -76,26 +76,23 @@ Any `.msi` or `.msp` file in `C:\Windows\Installer` that isn't claimed by a regi
 
 If the API returns incomplete data (rare, but it can happen with corrupted installer state), we fall back to reading the registry. The fallback only adds files to the "still needed" set, never to the "removable" set.
 
+After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer` (the directories the cache leaves behind once their contents are gone) are pruned in the same pass. Reparse points are skipped during the prune so a junction planted inside the cache cannot redirect the cleanup outside it.
+
 ## Is it safe?
 
 Yes. We query the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, we trust it. We don't guess based on filenames or dates.
 
-- **Delete** sends files to the Recycle Bin, so you can restore them if needed
-- **Move** copies files to a location you choose first, if you'd rather be cautious
-- Nothing is touched until you click Delete or Move and confirm
-- The app warns you if Windows has pending updates that could affect results
-- More than 150 automated tests cover the core logic and run on every commit (see the green CI badge above)
+Delete sends files to the Recycle Bin so you can restore them if needed; Move copies them to a folder you choose first, if you'd rather have a backup before letting go. Nothing is touched until you confirm. If Windows has pending updates that could affect the result, both buttons are disabled and the reason is shown. The core logic is covered by 180+ automated tests that run on every commit (see the CI badge above).
 
 ## What it doesn't do
 
-- **Doesn't touch WinSxS** (`C:\Windows\WinSxS`). That's a different folder with different rules. Use Windows's built-in Disk Cleanup or `Dism /Online /Cleanup-Image /StartComponentCleanup`.
-- **Doesn't run during Windows Update.** If a reboot is pending, Move and Delete are blocked (banner shown, CLI exits with an error). Cleaning the cache mid-update can break the pending repair sequence.
-- **Doesn't auto-clean on a schedule.** No background service, no scheduled task installed. You run it when you want to.
-- **Doesn't run unattended without `/d` or `/m`.** Launch the GUI or the CLI explicitly; no surprises.
-- **Doesn't modify the registry.** Reads only, never writes. Windows owns the installer database; we just read it.
-- **Doesn't phone home.** No telemetry, no usage reporting, no version-check ping. The "Check for updates" link in About just opens the GitHub releases page in your browser.
-- **Doesn't bundle anything.** No "optional" toolbars, no third-party offers, no nag screens.
-- **Doesn't ask for any permissions beyond Administrator.** Required because `C:\Windows\Installer` is admin-only.
+- WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, use Windows's built-in Disk Cleanup or `Dism /Online /Cleanup-Image /StartComponentCleanup`.
+- If a reboot is pending, Move and Delete are blocked (with a banner explaining why; the CLI exits with an error). Cleaning the cache mid-update can break the pending repair sequence.
+- No background service, no scheduled task, no auto-clean. The app runs when you launch it.
+- The registry is read-only from our side. We query the Windows Installer database; we don't change it.
+- No telemetry, no usage reporting, no version-check ping. The "Check for updates" link in About opens the GitHub releases page in your browser.
+- No bundled extras. No toolbars, no third-party offers, no nag screens.
+- The only permission asked for beyond launching is Administrator, which is required because `C:\Windows\Installer` is admin-only.
 
 ## For sysadmins: verifying the binary
 
@@ -111,9 +108,9 @@ InstallerClean is unsigned (no Authenticode certificate). This is deliberate; si
 
 **Why does it want Administrator?** `C:\Windows\Installer` is owned by SYSTEM and locked down to admins only. Reading the folder, writing to the Installer-database query API, and moving or deleting files all require elevation. There's no user-mode path.
 
-**Why does my antivirus flag the slim download?** The slim build is a small unsigned framework-dependent .NET single-file launcher. Some whitelist-biased ML antivirus engines (SecureAge in particular) flag any small unsigned single-file .NET launcher regardless of content. If this affects you, use the setup or portable build instead, which have consistently scored 0/71 on VirusTotal.
+**Why does my antivirus flag the slim download?** The slim build is a small unsigned framework-dependent .NET single-file launcher. Some whitelist-biased ML antivirus engines (SecureAge in particular) flag any small unsigned single-file .NET launcher regardless of content. If the flag bothers you, use the setup or portable build instead, which have consistently scored 0/71 on VirusTotal.
 
-**What's the difference between setup, portable and slim?** Setup is a regular Windows installer, portable is a single self-contained exe, slim is the smallest download but needs the .NET 8 Desktop Runtime already installed (which you have if you have Visual Studio).
+**What's the difference between setup, portable and slim?** Setup is a regular Windows installer, portable is a single self-contained exe, slim is the smallest download but needs the .NET 10 Desktop Runtime already installed (which you have if you have Visual Studio).
 
 **Can I undo a Delete?** Yes. Delete sends files to the Recycle Bin. Restore them from there. If you emptied the Recycle Bin, the files are gone, but you can also use Move first to a folder you choose, then verify nothing breaks before deleting from there.
 
@@ -145,7 +142,7 @@ scoop install installerclean
 |---|---|---|
 | Last updated | 2026 (active) | 3 March 2016 |
 | Source code | Open source (MIT) | Closed source |
-| Runtime | .NET 8 (self-contained) | .NET + VBScript |
+| Runtime | .NET 10 (self-contained) | .NET + VBScript |
 | API | Windows Installer COM (direct) | WMI (`Win32_Product`) |
 | Superseded patch detection | Yes | No |
 | Adobe handling | Detects superseded patches | Excludes by default |
@@ -183,23 +180,12 @@ All three require an elevated (administrator) command prompt.
 
 Portable and slim downloads bundle only the GUI exe. To run the CLI operations from those, install via the setup or install the CLI separately.
 
-## Features
-
-- **Delete or move.** Delete sends to the Recycle Bin. Move lets you keep files somewhere safe.
-- **Superseded patch detection.** Finds patches Windows itself has marked as replaced.
-- **Detail views.** Inspect individual files with product name, size, reason and digital signature.
-- **Pending reboot detection.** Warns if pending updates might affect scan results.
-- **Subfolder cleanup.** Prunes empty subfolders left behind by old installer operations.
-- **Command line mode.** `/s` to scan, `/d` to delete, `/m` to move - for scripting and automation.
-- **No installer needed.** Download the portable or slim version, run, done.
-- **Latest release link.** Jump to the releases page from the About window.
-
 ## Requirements
 
 - Windows 10 or 11
 - Administrator privileges (to access `C:\Windows\Installer`)
-- The setup installer (~69 MB) and portable exe (~76 MB) bundle the .NET 8 runtime so nothing else needs to be installed. Choose portable unless you want an installer
-- Already have [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)? You do if you have Visual Studio installed (not to be confused with VS Code). Grab **InstallerClean-slim.exe** (7.7 MB) from the releases page instead
+- The setup installer and portable exe bundle the .NET 10 runtime so nothing else needs to be installed. Choose portable unless you want an installer
+- Already have [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)? You do if you have Visual Studio installed (not to be confused with VS Code). Grab **InstallerClean-slim.exe** from the releases page instead
 
 ## Building from source
 
