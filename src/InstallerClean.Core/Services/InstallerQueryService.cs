@@ -46,7 +46,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         var products = EnumerateProducts(ct);
 
-        progress?.Report(string.Format(Strings.Status_FoundProducts, products.Count));
+        progress?.Report(string.Format(Strings.Status_FoundProducts,
+            products.Count, Helpers.DisplayHelpers.PluraliseProduct(products.Count)));
 
         foreach (var (productCode, userSid, context) in products)
         {
@@ -87,13 +88,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
         progress?.Report(Strings.Status_CheckingRegistry);
         try
         {
-            // Pin to the 64-bit registry view explicitly. Today this
-            // matches the default for our x64 host process; if a future
-            // build ever ships an x86 variant (or AnyCPU+Prefer32Bit
-            // got flipped on), Registry.LocalMachine would silently
-            // route through WOW6432Node and miss real entries. Always
-            // reading Registry64 keeps the fallback path correct
-            // regardless of process bitness.
+            // Registry64 is pinned explicitly. Registry.LocalMachine
+            // resolves to the process-bitness view, which redirects to
+            // WOW6432Node under an x86 process and silently misses
+            // installer-cache entries written by 64-bit installers.
+            // Pinning to Registry64 keeps the fallback path correct
+            // regardless of host bitness; it matches the 64-bit view
+            // anyway for the current x64 ship.
             using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
                 Microsoft.Win32.RegistryHive.LocalMachine,
                 Microsoft.Win32.RegistryView.Registry64);

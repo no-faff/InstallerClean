@@ -177,6 +177,8 @@ public static class Strings
     public static string Plural_FileVerb_Singular => Get("Plural.FileVerb.Singular");
     public static string Plural_Package_Plural => Get("Plural.Package.Plural");
     public static string Plural_Package_Singular => Get("Plural.Package.Singular");
+    public static string Plural_Product_Plural => Get("Plural.Product.Plural");
+    public static string Plural_Product_Singular => Get("Plural.Product.Singular");
     public static string Reason_Orphaned => Get("Reason.Orphaned");
     public static string Reason_Superseded => Get("Reason.Superseded");
     public static string Section_Move_Location => Get("Section.Move.Location");

@@ -28,11 +28,11 @@ internal static class DisplayHelpers
             : $"{elapsed.TotalSeconds:F1}s";
 
     /// <summary>
-    /// English plural rule (n != 1 takes the plural form). Consumers pass
-    /// resx-sourced singular and plural fragments; this helper has no
-    /// hardcoded English nouns of its own. For a future Slavic / Arabic
-    /// translation a richer pluraliser would replace the body without
-    /// touching call sites.
+    /// Picks the singular or plural fragment per the English n != 1
+    /// rule. Consumers pass resx-sourced fragments; this helper holds
+    /// no English nouns of its own, so the body is the only site a
+    /// richer pluraliser (Slavic case selection, Arabic dual, etc)
+    /// would need to replace.
     /// </summary>
     internal static string Pluralise(int count, string singular, string plural) =>
         count == 1 ? singular : plural;
@@ -52,4 +52,8 @@ internal static class DisplayHelpers
     /// <summary>"package"/"packages" pair, sourced from Strings.resx.</summary>
     internal static string PluralisePackage(int count) =>
         Pluralise(count, Strings.Plural_Package_Singular, Strings.Plural_Package_Plural);
+
+    /// <summary>"product"/"products" pair, sourced from Strings.resx.</summary>
+    internal static string PluraliseProduct(int count) =>
+        Pluralise(count, Strings.Plural_Product_Singular, Strings.Plural_Product_Plural);
 }
