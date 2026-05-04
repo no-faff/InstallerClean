@@ -4,7 +4,7 @@
     InstallerClean.Core: headless library shared by the WPF app
     (InstallerClean) and the console CLI (InstallerClean.Cli).
 
-    Targets net8.0 (NOT net8.0-windows): everything in here must run
+    Targets net10.0 (NOT net10.0-windows): everything in here must run
     without a WPF dispatcher, without HWND ownership, and without the
     PresentationFramework / PresentationCore assemblies. Win32 P/Invoke
     is fine (msi.dll, kernel32, shell32) because those work in any
@@ -15,7 +15,7 @@
     not here.
   -->
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>12</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -29,18 +29,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.IO.Abstractions" Version="21.0.29" />
+    <PackageReference Include="System.IO.Abstractions" Version="22.1.1" />
     <!-- Abstractions only: callers register Core's services into their
          own IServiceCollection. The Core library itself doesn't pick
          a container implementation. -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
     <!-- EventLog is only available on Windows but the source builds
          for any platform. The platform analyser is satisfied by the
          assembly-wide [SupportedOSPlatform("windows7.0")] attribute in
          GlobalUsings.cs; EventLogWriter additionally wraps the call in
          a try/catch so a non-Windows host (or a Windows host with the
          service stopped) can't throw out of a logging call. -->
-    <PackageReference Include="System.Diagnostics.EventLog" Version="8.0.1" />
+    <PackageReference Include="System.Diagnostics.EventLog" Version="10.0.7" />
   </ItemGroup>
 
   <!-- Localisation: the typed Strings accessor is hand-managed via

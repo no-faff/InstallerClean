@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <LangVersion>12</LangVersion>
     <Nullable>enable</Nullable>
@@ -26,12 +26,12 @@
        interop and the localisation resx live in InstallerClean.Core
        and flow in via the project reference below. -->
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <!-- Microsoft's stock dependency-injection container. The GUI uses
          it to wire every service the main view-model graph needs.
          InstallerClean.Core only needs the Abstractions package
          (callers register Core's services into their own collection). -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>
