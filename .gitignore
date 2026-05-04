@@ -420,42 +420,6 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
-# Internal docs — not for the public repo
-docs/README-files/
-docs/plans/
-docs/PatchCleaner-files/
-docs/PatchCleaner-screenshots/
-docs/Upscayl-screenshots/
-docs/splash-screen-stills/
-docs/dribble-windows-apps/
-docs/for-claude-(I-will-try-to-curate-this-folder)/
-docs/New folder/
-docs/project-brief.md
-docs/launch-strategy.md
-docs/status.md
-complete Upscayl styling breakdown with exact values.txt
-
-# Working files — design research, rejects, old screenshots, icon sources
-docs/setup-window/
-docs/icons/
-docs/screenshotOLD.png
-
-# Notes from Claude chats — useful reference, not for public repo
-docs/notes/
-
-# Claude Code config
-.claude/
 CLAUDE.md
-docs/pre-launch-hardening.md
-HANDOFF.md
-/non-repo-files
 /exports
-
-# Chat exports and personal files
-exports/
-non-repo-files/
-
-# /export command drops timestamped transcripts; ignore at any depth
-# so an open IDE file can sit anywhere under the tree without risk of
-# being picked up by a sloppy `git add -A`.
-20*-*-*.txt
+/non-repo-files
