@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - name: Setup .NET 8
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
         with:
           global-json-file: global.json
@@ -36,6 +36,18 @@ jobs:
       - name: Smoke-publish CLI framework-dependent
         run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish/cli
 
-      - name: Audit vulnerable packages
+      - name: Audit vulnerable packages (GUI)
         run: dotnet list src/InstallerClean/InstallerClean.csproj package --vulnerable --include-transitive
+        continue-on-error: true
+
+      - name: Audit vulnerable packages (Core)
+        run: dotnet list src/InstallerClean.Core/InstallerClean.Core.csproj package --vulnerable --include-transitive
+        continue-on-error: true
+
+      - name: Audit vulnerable packages (CLI)
+        run: dotnet list src/InstallerClean.Cli/InstallerClean.Cli.csproj package --vulnerable --include-transitive
+        continue-on-error: true
+
+      - name: Audit vulnerable packages (Tests)
+        run: dotnet list src/InstallerClean.Tests/InstallerClean.Tests.csproj package --vulnerable --include-transitive
         continue-on-error: true
