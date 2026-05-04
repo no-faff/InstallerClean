@@ -74,7 +74,6 @@ public static class Strings
     public static string Body_NoPatches => Get("Body.NoPatches");
     public static string Body_NoProductSelected => Get("Body.NoProductSelected");
     public static string Body_PendingReboot => Get("Body.PendingReboot");
-    public static string Cli_AdminRequired => Get("Cli.AdminRequired");
     public static string Cli_Cancelled => Get("Cli.Cancelled");
     public static string Cli_Cancelling => Get("Cli.Cancelling");
     public static string Cli_DeletedFiles => Get("Cli.DeletedFiles");

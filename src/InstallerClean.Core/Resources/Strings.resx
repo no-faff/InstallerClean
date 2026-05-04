@@ -392,7 +392,6 @@ The crash log could not be written.</value></data>
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Unknown argument: {0}</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Cancelling...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Cancelled.</value></data>
-  <data name="Cli.AdminRequired" xml:space="preserve"><value>Error: administrator privileges required. Run from an elevated command prompt.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
        crash log; the CLI runs elevated so .Message could include paths
        from another user's profile if logged to a shared file).

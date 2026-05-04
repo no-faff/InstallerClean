@@ -66,8 +66,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Scan.ScanCompleted += _scanCompletedHandler;
 
         // Drive IsMainContentInteractive off the three overlay states.
-        // Caption buttons stay enabled regardless: the user must always
-        // be able to close the window.
+        // The caption buttons themselves remain IsEnabled=true, but the
+        // scanning and operating overlays span all four grid rows so
+        // their dim Rectangle absorbs clicks on the title bar. Esc is
+        // wired through MainWindow.OnPreviewKeyDown for each overlay,
+        // and Alt+F4 reaches the window's normal SC_CLOSE path through
+        // WM_SYSCOMMAND (only SC_MAXIMIZE is intercepted).
         Scan.PropertyChanged += OnChildPropertyChanged;
         Cleanup.PropertyChanged += OnChildPropertyChanged;
         Completion.PropertyChanged += OnChildPropertyChanged;
