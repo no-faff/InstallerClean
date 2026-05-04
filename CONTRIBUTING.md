@@ -17,7 +17,7 @@ built exe (which triggers a UAC prompt).
 
 ### CLI
 
-`installerclean-cli.exe` is a real .NET 8 console exe published from
+`installerclean-cli.exe` is a real .NET 10 console exe published from
 `src/InstallerClean.Cli`. It builds with the rest of the solution
 (`dotnet build src/InstallerClean.sln`) and is bundled into the
 Inno-built setup.exe by the Stage-1 release script. No external
