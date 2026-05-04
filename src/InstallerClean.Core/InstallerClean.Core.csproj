@@ -29,7 +29,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.IO.Abstractions" Version="21.0.29" />
+    <PackageReference Include="System.IO.Abstractions" Version="22.1.1" />
     <!-- Abstractions only: callers register Core's services into their
          own IServiceCollection. The Core library itself doesn't pick
          a container implementation. -->
