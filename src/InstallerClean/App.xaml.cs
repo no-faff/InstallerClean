@@ -125,10 +125,11 @@ public partial class App : Application
             splash.UpdateStep(Strings.Status_Scanning, 10);
 
             // Build the service container once and resolve the entire
-            // view-model graph from it. The container is disposed in
-            // OnExit; no registered service is currently IDisposable,
-            // but disposing the container is forward-looking against
-            // a future service that does need cleanup.
+            // view-model graph from it. OnExit disposes the container
+            // which in turn disposes any IDisposable singletons the
+            // graph holds (today MainViewModel, ChromeViewModel and
+            // CleanupViewModel, which need to unhook PropertyChanged
+            // subscriptions from ScanViewModel for clean teardown).
             _services = Composition.BuildServiceProvider();
             var viewModel = _services.GetRequiredService<MainViewModel>();
 

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using InstallerClean.Services;
@@ -17,11 +18,12 @@ namespace InstallerClean.ViewModels;
 /// disabled (greyed out via the standard pill IsEnabled trigger) until
 /// the user has data to view.
 /// </summary>
-public partial class ChromeViewModel : ObservableObject
+public partial class ChromeViewModel : ObservableObject, IDisposable
 {
     private readonly IWindowService _windowService;
     private readonly IMsiFileInfoService _msiInfoService;
     private readonly ScanViewModel _scan;
+    private readonly PropertyChangedEventHandler _scanHandler;
 
     public ChromeViewModel(
         IWindowService windowService,
@@ -34,20 +36,23 @@ public partial class ChromeViewModel : ObservableObject
 
         // Re-evaluate the Details buttons when a scan finishes.
         // HasScanned is observable; LastScanResult is a plain auto-
-        // property and won't raise PropertyChanged.
-        //
-        // Subscription is never unhooked: ScanViewModel and ChromeViewModel
-        // share MainViewModel's process-lifetime. If that ever stops
-        // being true, switch to a named handler in an IDisposable.
-        _scan.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(ScanViewModel.HasScanned))
-            {
-                OpenOrphanedDetailsCommand.NotifyCanExecuteChanged();
-                OpenRegisteredDetailsCommand.NotifyCanExecuteChanged();
-            }
-        };
+        // property and won't raise PropertyChanged. Held as a field
+        // so Dispose can unhook it; the singleton container disposes
+        // this VM on shutdown.
+        _scanHandler = OnScanPropertyChanged;
+        _scan.PropertyChanged += _scanHandler;
     }
+
+    private void OnScanPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ScanViewModel.HasScanned))
+        {
+            OpenOrphanedDetailsCommand.NotifyCanExecuteChanged();
+            OpenRegisteredDetailsCommand.NotifyCanExecuteChanged();
+        }
+    }
+
+    public void Dispose() => _scan.PropertyChanged -= _scanHandler;
 
     private bool HasScanResult => _scan.LastScanResult is not null;
 

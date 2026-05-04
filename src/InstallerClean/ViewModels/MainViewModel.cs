@@ -21,12 +21,14 @@ namespace InstallerClean.ViewModels;
 /// (<c>{Binding Scan.IsScanning}</c>, <c>{Binding Cleanup.MoveDestination}</c>,
 /// etc).
 /// </summary>
-public partial class MainViewModel : ObservableObject
+public partial class MainViewModel : ObservableObject, IDisposable
 {
     public ScanViewModel Scan { get; }
     public CleanupViewModel Cleanup { get; }
     public CompletionViewModel Completion { get; }
     public ChromeViewModel Chrome { get; }
+
+    private readonly EventHandler _scanCompletedHandler;
 
     public MainViewModel(
         IFileSystemScanService scanService,
@@ -56,11 +58,12 @@ public partial class MainViewModel : ObservableObject
         // IsOperating=false AFTER the post-operation refresh fires
         // ScanCompleted; reordering that flow would let an all-clear
         // overpaint a Move/Delete summary.
-        Scan.ScanCompleted += (_, _) =>
+        _scanCompletedHandler = (_, _) =>
         {
             if (Scan.OrphanedFileCount == 0 && !Cleanup.IsOperating)
                 Completion.ShowAllClear();
         };
+        Scan.ScanCompleted += _scanCompletedHandler;
 
         // Drive IsMainContentInteractive off the three overlay states.
         // Caption buttons stay enabled regardless: the user must always
@@ -68,6 +71,16 @@ public partial class MainViewModel : ObservableObject
         Scan.PropertyChanged += OnChildPropertyChanged;
         Cleanup.PropertyChanged += OnChildPropertyChanged;
         Completion.PropertyChanged += OnChildPropertyChanged;
+    }
+
+    public void Dispose()
+    {
+        Scan.PropertyChanged -= OnChildPropertyChanged;
+        Cleanup.PropertyChanged -= OnChildPropertyChanged;
+        Completion.PropertyChanged -= OnChildPropertyChanged;
+        Scan.ScanCompleted -= _scanCompletedHandler;
+        Chrome.Dispose();
+        Cleanup.Dispose();
     }
 
     /// <summary>

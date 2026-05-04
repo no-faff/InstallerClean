@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.IO.Abstractions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -15,7 +16,7 @@ namespace InstallerClean.ViewModels;
 /// <see cref="CompletionViewModel"/>, and asks the scan VM to refresh
 /// after each successful operation.
 /// </summary>
-public partial class CleanupViewModel : ObservableObject
+public partial class CleanupViewModel : ObservableObject, IDisposable
 {
     private readonly IMoveFilesService _moveService;
     private readonly IDeleteFilesService _deleteService;
@@ -25,6 +26,7 @@ public partial class CleanupViewModel : ObservableObject
     private readonly IFileSystem _fs;
     private readonly ScanViewModel _scan;
     private readonly CompletionViewModel _completion;
+    private readonly PropertyChangedEventHandler _scanHandler;
 
     private CancellationTokenSource? _operationCts;
     private CancellationTokenSource? _moveDestinationSaveCts;
@@ -75,18 +77,30 @@ public partial class CleanupViewModel : ObservableObject
         MoveDestination = _settings.MoveDestination;
 
         // Re-evaluate Move/Delete CanExecute when the upstream scan
-        // VM's state changes. Subscription is never unhooked: see the
-        // matching note in ChromeViewModel.
-        _scan.PropertyChanged += (_, e) =>
+        // VM's state changes. Held as a field so Dispose can unhook it;
+        // the singleton container disposes this VM on shutdown.
+        _scanHandler = OnScanPropertyChanged;
+        _scan.PropertyChanged += _scanHandler;
+    }
+
+    private void OnScanPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||
+            e.PropertyName == nameof(ScanViewModel.OrphanedFileCount) ||
+            e.PropertyName == nameof(ScanViewModel.HasPendingReboot))
         {
-            if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||
-                e.PropertyName == nameof(ScanViewModel.OrphanedFileCount) ||
-                e.PropertyName == nameof(ScanViewModel.HasPendingReboot))
-            {
-                MoveAllCommand.NotifyCanExecuteChanged();
-                DeleteAllCommand.NotifyCanExecuteChanged();
-            }
-        };
+            MoveAllCommand.NotifyCanExecuteChanged();
+            DeleteAllCommand.NotifyCanExecuteChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        _scan.PropertyChanged -= _scanHandler;
+        DisposeOperationCts();
+        var saveCts = _moveDestinationSaveCts;
+        _moveDestinationSaveCts = null;
+        saveCts?.Dispose();
     }
 
     partial void OnIsOperatingChanged(bool value)
