@@ -16,10 +16,12 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
 {
     public MsiSummaryInfo? GetSummaryInfo(string filePath)
     {
-        // Defence-in-depth: refuse symlinks at the API entry. Current
-        // callers (the detail-window VMs) feed scan-derived paths
-        // which the scan already filtered, so this is paranoia for
-        // future callers.
+        // Refuse symlinks at the API entry. The scan already filters
+        // reparse points out of the cache enumeration so production
+        // callers never reach this branch with a symlinked path; the
+        // check is defence-in-depth against any non-scan caller (a
+        // CLI subcommand, a future details-window invocation against a
+        // user-typed path) that hasn't gone through the same filter.
         if (Helpers.StorageHelpers.IsReparsePoint(filePath))
             return null;
 
@@ -87,23 +89,39 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
             : string.Empty;
     }
 
-    // Returns the certificate Subject string only. The signature chain is
-    // NOT validated and the file's hash is NOT verified against the cert.
-    // Treat this purely as descriptive metadata, not a trust indicator;
-    // the matching UI label is "Signing certificate", not "Verified by".
+    // Returns the certificate Subject string only. The signature chain
+    // is NOT validated and the file's hash is NOT verified against the
+    // cert. Treat this purely as descriptive metadata, not a trust
+    // indicator; the matching UI label is "Signing certificate", not
+    // "Verified by".
     private static string GetDigitalSignature(string filePath)
     {
         try
         {
-            // Both certificates need disposing: X509Certificate.CreateFromSignedFile
-            // returns a fresh cert handle, and the X509Certificate2 ctor
-            // duplicates that handle into a new instance. Without the
-            // explicit using on the inner cert, the original handle leaks
-            // until finalisation. Belt and braces, since both Disposes
-            // are cheap.
+            // CreateFromSignedFile is the BCL's managed Authenticode
+            // cert-extraction entry point: it wraps Win32
+            // CryptQueryObject + CryptMsgGetParam + a cert-store lookup
+            // for the signer. .NET 10 marked the X509Certificate
+            // constructors and Import methods obsolete (SYSLIB0057) in
+            // favour of X509CertificateLoader, but X509CertificateLoader
+            // has no Authenticode entry point. The only managed-free
+            // alternative today is direct P/Invoke into CryptQueryObject,
+            // which is a substantial amount of interop for a
+            // descriptive-only metadata field. The suppression is
+            // deliberate; the API still works in .NET 10, and the catch
+            // below means a future removal degrades to an empty
+            // signing-cert field rather than a crash.
+            //
+            // Both certs are explicitly disposed: CreateFromSignedFile
+            // returns a fresh cert handle, and the X509Certificate2
+            // constructor duplicates that handle into a new instance,
+            // so without the inner Dispose the original handle leaks
+            // until finalisation.
+#pragma warning disable SYSLIB0057
             using var inner = X509Certificate.CreateFromSignedFile(filePath);
+#pragma warning restore SYSLIB0057
             using var cert = new X509Certificate2(inner);
-            // Format() respects RFC-4514 escapes; naive String.Split(',')
+            // Format() respects RFC-4514 escapes; a naive String.Split(',')
             // would corrupt subjects like CN="Acme, Inc.", O=Acme.
             return cert.SubjectName.Format(multiLine: true).TrimEnd('\r', '\n');
         }
