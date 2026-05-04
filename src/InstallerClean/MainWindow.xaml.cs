@@ -104,16 +104,16 @@ public partial class MainWindow : Window
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
 
-    // Segoe MDL2 Assets glyph code points for the chrome maximise /
-    // restore button. The font ships with every Windows 10+ install
-    // and renders both glyphs identically in size and weight, which a
-    // Unicode-symbol pair sourced from an arbitrary body font cannot
-    // guarantee (Poppins, the bundled body font, has no
-    // U+2750 SHADOWED WHITE SQUARE; the WPF fallback chain renders a
-    // plain square so the swap was visually invisible). The CaptionButton
-    // style sets FontFamily="Segoe MDL2 Assets" so these characters
-    // resolve as the chrome glyphs even from inside a code-behind
-    // assignment that bypasses the static XAML Content attribute.
+    // Segoe MDL2 Assets glyphs for the chrome maximise (E922) and
+    // restore (E923) buttons. The font ships with every Windows 10+
+    // install and renders both at the same metrics, which a plain
+    // Unicode pair sourced from a body font cannot guarantee:
+    // Poppins (the bundled body font) does not include
+    // U+2750 (UPPER RIGHT SHADOWED WHITE SQUARE) and the WPF fallback
+    // chain renders a plain square indistinguishable from the
+    // maximise glyph, leaving the swap invisible. The CaptionButton
+    // style pins FontFamily="Segoe MDL2 Assets" so these glyphs
+    // resolve in that font from any assignment site.
     private const string MaximizeGlyph = "\uE922";   // ChromeMaximize
     private const string RestoreGlyph = "\uE923";    // ChromeRestore
 
