@@ -33,7 +33,7 @@
     <!-- Abstractions only: callers register Core's services into their
          own IServiceCollection. The Core library itself doesn't pick
          a container implementation. -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
     <!-- EventLog is only available on Windows but the source builds
          for any platform. The platform analyser is satisfied by the
          assembly-wide [SupportedOSPlatform("windows7.0")] attribute in
