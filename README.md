@@ -142,7 +142,7 @@ InstallerClean is unsigned (no Authenticode certificate). This is deliberate; si
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
-If a single SecureAge flag on the slim build looks worrying, here is the comparator. PatchCleaner has been [downloaded over 890,000 times](https://www.homedev.com.au/Free/PatchCleaner) since 2015 and holds a [SourceForge Open Source Excellence](https://sourceforge.net/projects/patchcleaner/) badge; it is also flagged on VirusTotal by SecureAge and by Trapmine. InstallerClean's setup and portable builds score clean across every engine on the same scan.
+Setup and portable builds score clean across every engine on VirusTotal. The slim build has two flags, both from the same generic ML classifier shared between Avast and AVG; false-positive reports have been filed with both vendors. PatchCleaner, which has been [downloaded more than 890,000 times](https://www.homedev.com.au/Free/PatchCleaner) since 2015, also has two flags on [VirusTotal](https://www.virustotal.com/gui/file/6472de894c5cb6050fd80cdd893b8772aef71f8bdb5c65a0175cf7cbb90e6ec6).
 
 ## FAQ
 
