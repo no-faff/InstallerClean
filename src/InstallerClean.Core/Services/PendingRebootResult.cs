@@ -1,13 +1,25 @@
 namespace InstallerClean.Services;
 
 /// <summary>Result of a pending-reboot check: a verdict, and when blocking, the specific reason.</summary>
-public sealed record PendingRebootResult(
-    PendingRebootVerdict Verdict,
-    PendingRebootReason? Reason,
-    string? Detail)
+public sealed record PendingRebootResult
 {
+    public PendingRebootVerdict Verdict { get; }
+    public PendingRebootReason? Reason { get; }
+    public string? Detail { get; }
+
+    private PendingRebootResult(PendingRebootVerdict verdict, PendingRebootReason? reason, string? detail)
+    {
+        Verdict = verdict;
+        Reason = reason;
+        Detail = detail;
+    }
+
     public static PendingRebootResult Clean { get; } =
         new(PendingRebootVerdict.Clean, null, null);
+
+    /// <summary>Construct a Block verdict. Reason is required so the type cannot represent Block-with-null-Reason.</summary>
+    public static PendingRebootResult Block(PendingRebootReason reason, string? detail = null) =>
+        new(PendingRebootVerdict.Block, reason, detail);
 
     /// <summary>True when the verdict is Block.</summary>
     public bool IsBlocked => Verdict == PendingRebootVerdict.Block;

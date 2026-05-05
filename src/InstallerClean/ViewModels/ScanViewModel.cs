@@ -39,7 +39,10 @@ public partial class ScanViewModel : ObservableObject
     [ObservableProperty] private string _orphanedSizeDisplay = string.Empty;
 
     /// <summary>Last pending-reboot probe result; null until the first scan.</summary>
-    [ObservableProperty] private PendingRebootResult? _pendingRebootResult;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPendingReboot))]
+    [NotifyPropertyChangedFor(nameof(PendingRebootBannerText))]
+    private PendingRebootResult? _pendingRebootResult;
 
     /// <summary>True when the last probe returned Block.</summary>
     public bool HasPendingReboot => PendingRebootResult?.IsBlocked == true;
@@ -50,14 +53,11 @@ public partial class ScanViewModel : ObservableObject
         PendingRebootReason.MsiExecuteMutexHeld => Strings.Body_PendingReboot_MsiExecuteMutex,
         PendingRebootReason.InstallerInProgress => Strings.Body_PendingReboot_InstallerInProgress,
         PendingRebootReason.PendingRenameInCache => Strings.Body_PendingReboot_PendingRenameInCache,
-        _ => string.Empty,
+        null => string.Empty,
+        _ => throw new InvalidOperationException(
+            $"Unhandled PendingRebootReason: {PendingRebootResult?.Reason}. " +
+            "A new enum value was added without updating PendingRebootBannerText."),
     };
-
-    partial void OnPendingRebootResultChanged(PendingRebootResult? value)
-    {
-        OnPropertyChanged(nameof(HasPendingReboot));
-        OnPropertyChanged(nameof(PendingRebootBannerText));
-    }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasMissingFromDisk))]
@@ -132,9 +132,9 @@ public partial class ScanViewModel : ObservableObject
         // observable property; on throw or cancel the VM stays at its
         // prior consistent state.
         var result = await _scanService.ScanAsync(progress, cancellationToken);
-        // Sample reboot AFTER the scan. A Windows Update queued during
-        // a multi-second scan would otherwise let Move/Delete re-enable
-        // on stale state.
+        // Sample reboot after the scan; ordering matters. An MSI install
+        // starting mid-scan could flip the _MSIExecute mutex, and
+        // probing first would miss it.
         var pendingRebootResult = _rebootService.Check();
 
         var registeredCount = result.RegisteredPackages.Count;

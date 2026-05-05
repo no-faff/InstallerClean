@@ -166,10 +166,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
     }
 
-    // Move and Delete are gated on HasPendingReboot when an MSI is in flight,
-    // a previous transaction is suspended, or a queued post-reboot rename
-    // targets the cache (see IPendingRebootService). The banner shows the
-    // specific reason; this CanExecute mirror enforces it on the buttons.
+    // Move and Delete are gated on HasPendingReboot for three reasons:
+    // an MSI is in flight, a previous transaction is suspended, or a queued
+    // post-reboot rename targets the cache (see IPendingRebootService).
+    // The banner is informational only; the CanExecute predicate is what
+    // stops a click from reaching the service.
     private bool CanMove() =>
         !_scan.IsScanning && !IsOperating
         && !_scan.HasPendingReboot

@@ -159,7 +159,9 @@ internal static class Program
                 var rebootCheck = rebootService.Check();
                 if (rebootCheck.IsBlocked)
                 {
-                    var stdoutMessage = rebootCheck.Reason switch
+                    // Block + null Reason is unreachable per the PendingRebootResult.Block
+                    // factory contract; .Value is safe inside this IsBlocked branch.
+                    var stdoutMessage = rebootCheck.Reason!.Value switch
                     {
                         PendingRebootReason.MsiExecuteMutexHeld =>
                             Strings.Cli_PendingRebootBlocked_MsiExecuteMutex,
@@ -169,7 +171,9 @@ internal static class Program
                             string.Format(
                                 Strings.Cli_PendingRebootBlocked_PendingRenameInCache,
                                 rebootCheck.Detail ?? string.Empty),
-                        _ => Strings.Cli_PendingRebootBlocked_Generic,
+                        _ => throw new InvalidOperationException(
+                            $"Unhandled PendingRebootReason: {rebootCheck.Reason!.Value}. " +
+                            "A new enum value was added without updating the CLI message switch."),
                     };
                     Console.WriteLine(stdoutMessage);
                     EventLogWriter.Write(EventLogWriter.Level.Warning,
@@ -212,14 +216,13 @@ internal static class Program
                     string.Format(Strings.Cli_EventLogDeleteSummary,
                         arg, result.DeletedCount, count, DisplayHelpers.PluraliseFile(count),
                         size, result.Errors.Count, DisplayHelpers.PluraliseError(result.Errors.Count)));
-                // 0 / 2 / 1: full / partial / total failure (see
-                // ExitOk / ExitPartial / ExitError).
+                // All-deleted is full success; any-deleted-with-errors is partial; nothing-deleted is total failure.
                 if (result.Errors.Count == 0) return ExitOk;
                 if (result.DeletedCount > 0) return ExitPartial;
                 return ExitError;
             }
 
-            // arg == "/m"
+            // /d and /s already returned; everything below this point runs only for /m.
             string dest;
             if (args.Length > 1)
             {

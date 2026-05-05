@@ -43,7 +43,8 @@ public sealed class PendingRebootService : IPendingRebootService
 
     public PendingRebootResult Check()
     {
-        // Cheapest probe (no registry hit), so it goes first.
+        // Mutex first because an active install is the most decisive signal; if it
+        // fires, the InProgress and PendingFileRenameOperations probes are skipped.
         bool mutexHeld;
         try
         {
@@ -54,10 +55,12 @@ public sealed class PendingRebootService : IPendingRebootService
             mutexHeld = false;
         }
         if (mutexHeld)
-            return new PendingRebootResult(PendingRebootVerdict.Block, PendingRebootReason.MsiExecuteMutexHeld, null);
+            return PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld);
 
-        // IRegistryReader documents "never throws"; the wrap defends against a buggy implementation
-        // without changing the contract.
+        // IRegistryReader documents "never throws", but the unit tests deliberately
+        // substitute throwing fakes to exercise the fail-open path; this wrap keeps
+        // Check's contract intact whether the bound implementation honours the
+        // interface contract or not.
         bool installerInProgress;
         try
         {
@@ -68,7 +71,7 @@ public sealed class PendingRebootService : IPendingRebootService
             installerInProgress = false;
         }
         if (installerInProgress)
-            return new PendingRebootResult(PendingRebootVerdict.Block, PendingRebootReason.InstallerInProgress, null);
+            return PendingRebootResult.Block(PendingRebootReason.InstallerInProgress);
 
         // Bare PendingFileRenameOperations is too broad (any third-party uninstaller writes
         // to it); refine to "source path inside %SystemRoot%\Installer".
@@ -87,17 +90,36 @@ public sealed class PendingRebootService : IPendingRebootService
             var windowsRoot = _windowsRootOverride
                 ?? Environment.GetFolderPath(Environment.SpecialFolder.Windows);
             var installerRoot = Path.Combine(windowsRoot, "Installer");
+            var installerRootBoundary = installerRoot + Path.DirectorySeparatorChar;
 
             foreach (var raw in renames)
             {
                 if (string.IsNullOrEmpty(raw)) continue;
                 var cleaned = StripNtPathPrefix(raw);
-                if (cleaned.StartsWith(installerRoot, StringComparison.OrdinalIgnoreCase))
+
+                // Path.GetFullPath resolves \..\ traversal so a poisoned entry like
+                // "C:\Windows\Installer\..\..\Users\Other\secret" cannot pass the prefix
+                // check and reach the Detail field.
+                string canonical;
+                try
                 {
-                    return new PendingRebootResult(
-                        PendingRebootVerdict.Block,
+                    canonical = Path.GetFullPath(cleaned);
+                }
+                catch (Exception ex) when (ex is ArgumentException
+                                        or PathTooLongException
+                                        or NotSupportedException)
+                {
+                    continue;
+                }
+
+                // Equality OR separator-anchored prefix; bare StartsWith would match a
+                // sibling like C:\Windows\InstallerExtra against C:\Windows\Installer.
+                if (canonical.Equals(installerRoot, StringComparison.OrdinalIgnoreCase) ||
+                    canonical.StartsWith(installerRootBoundary, StringComparison.OrdinalIgnoreCase))
+                {
+                    return PendingRebootResult.Block(
                         PendingRebootReason.PendingRenameInCache,
-                        cleaned);
+                        canonical);
                 }
             }
         }

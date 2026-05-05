@@ -1,16 +1,23 @@
+using System.Security.AccessControl;
+using System.Threading;
+
 namespace InstallerClean.Services;
 
-/// <summary>Production IMutexProbe via Mutex.OpenExisting.</summary>
+/// <summary>Production IMutexProbe via MutexAcl.OpenExisting with READ_CONTROL only.</summary>
 internal sealed class MutexProbe : IMutexProbe
 {
     public bool Exists(string name)
     {
         try
         {
-            using var m = System.Threading.Mutex.OpenExisting(name);
+            // READ_CONTROL is sufficient to test for existence; MUTEX_MODIFY_STATE
+            // and SYNCHRONIZE are not needed and could be denied by a tighter DACL.
+            // Mutex.OpenExisting(string) requests both implicitly, so the AccessControl
+            // overload is the route that maps to bare OpenMutexW(READ_CONTROL).
+            using var m = MutexAcl.OpenExisting(name, MutexRights.ReadPermissions);
             return true;
         }
-        catch (System.Threading.WaitHandleCannotBeOpenedException)
+        catch (WaitHandleCannotBeOpenedException)
         {
             return false;
         }

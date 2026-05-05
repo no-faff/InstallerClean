@@ -30,8 +30,9 @@ public class PendingRebootServiceTests
         var first = svc.Check();
         var second = svc.Check();
 
-        // Real registry state is stable across two immediate calls (rare CI flap if a Windows
-        // Update commits between calls).
+        // Real registry and mutex state is stable across two immediate calls (rare CI flap if
+        // an MSI install starts or completes between them, or if PendingFileRenameOperations
+        // is touched in the gap).
         Assert.Equal(first.Verdict, second.Verdict);
         Assert.Equal(first.Reason, second.Reason);
     }

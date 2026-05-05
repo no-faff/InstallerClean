@@ -18,7 +18,7 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Mutex_held_blocks()
     {
-        _mutex.Exists(@"Global\_MSIExecute").Returns(true);
+        _mutex.Exists(PendingRebootService.MsiExecuteMutexName).Returns(true);
 
         var result = Build().Check();
 
@@ -30,7 +30,7 @@ public class PendingRebootServiceUnitTests
     public void InProgress_key_exists_blocks()
     {
         _registry.LocalMachineKeyExists(
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\InProgress")
+                PendingRebootService.InstallerInProgressKey)
             .Returns(true);
 
         var result = Build().Check();
@@ -43,8 +43,8 @@ public class PendingRebootServiceUnitTests
     public void Rename_targets_cache_blocks()
     {
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns(new[] { @"\??\C:\Windows\Installer\1234.msi", "" });
 
         var result = Build().Check();
@@ -58,8 +58,8 @@ public class PendingRebootServiceUnitTests
     public void Multiple_renames_blocks_on_first_cache_match()
     {
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns(new[]
             {
                 @"\??\C:\Users\foo.tmp", "",
@@ -77,8 +77,8 @@ public class PendingRebootServiceUnitTests
     public void Long_path_prefix_still_matches()
     {
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns(new[] { @"\\?\C:\Windows\Installer\1234.msi", "" });
 
         var result = Build().Check();
@@ -92,8 +92,8 @@ public class PendingRebootServiceUnitTests
     public void Rename_targets_per_product_folder_blocks()
     {
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns(new[]
             {
                 @"\??\C:\Windows\Installer\{12345678-1234-1234-1234-123456789abc}\foo.dll", "",
@@ -135,8 +135,8 @@ public class PendingRebootServiceUnitTests
     public void Pending_renames_not_in_cache_returns_clean()
     {
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns(new[]
             {
                 @"\??\C:\Users\foo.tmp", "",
@@ -148,12 +148,57 @@ public class PendingRebootServiceUnitTests
         Assert.Equal(PendingRebootVerdict.Clean, result.Verdict);
     }
 
+    /// <summary>
+    /// A poisoned entry that lexically starts with the cache prefix but resolves
+    /// outside it (via \..\ traversal) must canonicalise before the boundary check.
+    /// Without GetFullPath, the literal C:\Windows\Installer\..\..\Users\Other\secret
+    /// would StartsWith-match the prefix and surface the user-profile path through
+    /// the Detail field on the way to the CLI / event log.
+    /// </summary>
+    [Fact]
+    public void Pending_rename_with_traversal_outside_cache_returns_clean()
+    {
+        _registry.LocalMachineMultiStringValue(
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
+            .Returns(new[]
+            {
+                @"\??\C:\Windows\Installer\..\..\Users\Other\secret.txt", "",
+            });
+
+        var result = Build().Check();
+
+        Assert.Equal(PendingRebootVerdict.Clean, result.Verdict);
+        Assert.Null(result.Reason);
+    }
+
+    /// <summary>
+    /// The boundary check rejects sibling folders that share the cache's name as a prefix.
+    /// Without the trailing-separator anchor, C:\Windows\InstallerExtra would match
+    /// C:\Windows\Installer.
+    /// </summary>
+    [Fact]
+    public void Pending_rename_in_sibling_folder_returns_clean()
+    {
+        _registry.LocalMachineMultiStringValue(
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
+            .Returns(new[]
+            {
+                @"\??\C:\Windows\InstallerExtra\foo.dll", "",
+            });
+
+        var result = Build().Check();
+
+        Assert.Equal(PendingRebootVerdict.Clean, result.Verdict);
+    }
+
     [Fact]
     public void Empty_pending_file_renames_returns_clean()
     {
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns(Array.Empty<string>());
 
         var result = Build().Check();
@@ -165,8 +210,8 @@ public class PendingRebootServiceUnitTests
     public void Missing_pending_file_renames_value_returns_clean()
     {
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns((string[]?)null);
 
         var result = Build().Check();
@@ -178,7 +223,7 @@ public class PendingRebootServiceUnitTests
     public void Missing_in_progress_key_returns_clean()
     {
         _registry.LocalMachineKeyExists(
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\InProgress")
+                PendingRebootService.InstallerInProgressKey)
             .Returns(false);
 
         var result = Build().Check();
@@ -207,7 +252,7 @@ public class PendingRebootServiceUnitTests
         _mutex.Exists(Arg.Any<string>())
             .Returns(_ => throw new InvalidOperationException("transient"));
         _registry.LocalMachineKeyExists(
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\InProgress")
+                PendingRebootService.InstallerInProgressKey)
             .Returns(true);
 
         var result = Build().Check();
@@ -222,8 +267,8 @@ public class PendingRebootServiceUnitTests
         _mutex.Exists(Arg.Any<string>())
             .Returns(_ => throw new UnauthorizedAccessException("denied"));
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns(new[] { @"\??\C:\Windows\Installer\foo.msi", "" });
 
         var result = Build().Check();
@@ -236,8 +281,8 @@ public class PendingRebootServiceUnitTests
     public void Malformed_pending_rename_does_not_crash()
     {
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns(new[]
             {
                 "this is not a path",
@@ -257,8 +302,8 @@ public class PendingRebootServiceUnitTests
         // Production RegistryReader returns null when GetValue surfaces a non-string[]
         // via `as string[]`. Simulate the contract here.
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns((string[]?)null);
 
         var result = Build().Check();
@@ -270,8 +315,8 @@ public class PendingRebootServiceUnitTests
     public void Windows_on_different_drive_still_detects_cache_rename()
     {
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns(new[] { @"\??\D:\Windows\Installer\foo.msi", "" });
 
         var result = Build(windowsRoot: @"D:\Windows").Check();
@@ -286,13 +331,13 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Mutex_wins_over_in_progress_and_pending_rename()
     {
-        _mutex.Exists(@"Global\_MSIExecute").Returns(true);
+        _mutex.Exists(PendingRebootService.MsiExecuteMutexName).Returns(true);
         _registry.LocalMachineKeyExists(
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\InProgress")
+                PendingRebootService.InstallerInProgressKey)
             .Returns(true);
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns(new[] { @"\??\C:\Windows\Installer\foo.msi", "" });
 
         var result = Build().Check();
@@ -307,11 +352,11 @@ public class PendingRebootServiceUnitTests
     public void In_progress_wins_over_pending_rename()
     {
         _registry.LocalMachineKeyExists(
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\InProgress")
+                PendingRebootService.InstallerInProgressKey)
             .Returns(true);
         _registry.LocalMachineMultiStringValue(
-                @"SYSTEM\CurrentControlSet\Control\Session Manager",
-                "PendingFileRenameOperations")
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
             .Returns(new[] { @"\??\C:\Windows\Installer\foo.msi", "" });
 
         var result = Build().Check();
