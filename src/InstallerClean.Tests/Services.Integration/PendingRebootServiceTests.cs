@@ -1,54 +1,51 @@
 using InstallerClean.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InstallerClean.Tests.Services.Integration;
 
+/// <summary>Smoke coverage: PendingRebootService composes through DI and doesn't throw against the real registry and mutex.</summary>
 public class PendingRebootServiceTests
 {
-    // Removed tautological "returns_bool_without_throwing" test - the
-    // method's return type IS bool so Assert.IsType<bool>(result) is
-    // always true. The "doesn't throw" intent is covered by
-    // HasPendingReboot_can_be_called_from_non_elevated_context below.
-
-    [Fact]
-    public void HasPendingReboot_returns_consistent_result_on_repeated_calls()
+    private static IPendingRebootService BuildFromDi()
     {
-        var svc = new PendingRebootService();
-
-        var first = svc.HasPendingReboot();
-        var second = svc.HasPendingReboot();
-
-        // Registry state shouldn't change between two immediate calls
-        Assert.Equal(first, second);
+        var services = new ServiceCollection().AddInstallerCleanCore().BuildServiceProvider();
+        return services.GetRequiredService<IPendingRebootService>();
     }
 
     [Fact]
-    public void HasPendingReboot_separate_instances_agree()
+    public void Check_does_not_throw_against_the_real_registry_and_mutex()
     {
-        var svc1 = new PendingRebootService();
-        var svc2 = new PendingRebootService();
+        var svc = BuildFromDi();
 
-        // Two independent instances should read the same registry state
-        Assert.Equal(svc1.HasPendingReboot(), svc2.HasPendingReboot());
-    }
-
-    [Fact]
-    public void Implements_IPendingRebootService()
-    {
-        var svc = new PendingRebootService();
-
-        Assert.IsAssignableFrom<IPendingRebootService>(svc);
-    }
-
-    [Fact]
-    public void HasPendingReboot_can_be_called_from_non_elevated_context()
-    {
-        // The service catches exceptions and returns false when registry
-        // access fails. This test ensures it doesn't throw even if
-        // the keys are protected.
-        var svc = new PendingRebootService();
-
-        var exception = Record.Exception(() => svc.HasPendingReboot());
+        var exception = Record.Exception(() => svc.Check());
 
         Assert.Null(exception);
+    }
+
+    [Fact]
+    public void Check_returns_consistent_result_on_repeated_calls()
+    {
+        var svc = BuildFromDi();
+
+        var first = svc.Check();
+        var second = svc.Check();
+
+        // Real registry state is stable across two immediate calls (rare CI flap if a Windows
+        // Update commits between calls).
+        Assert.Equal(first.Verdict, second.Verdict);
+        Assert.Equal(first.Reason, second.Reason);
+    }
+
+    [Fact]
+    public void Check_two_independent_instances_agree()
+    {
+        var svc1 = BuildFromDi();
+        var svc2 = BuildFromDi();
+
+        var r1 = svc1.Check();
+        var r2 = svc2.Check();
+
+        Assert.Equal(r1.Verdict, r2.Verdict);
+        Assert.Equal(r1.Reason, r2.Reason);
     }
 }

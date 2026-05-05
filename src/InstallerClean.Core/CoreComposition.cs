@@ -34,6 +34,8 @@ public static class CoreComposition
     {
         // Stateless infrastructure.
         services.AddSingleton<IFileSystem, FileSystem>();
+        services.AddSingleton<IRegistryReader, RegistryReader>();
+        services.AddSingleton<IMutexProbe, MutexProbe>();
 
         // Win32 / registry / MSI-API wrappers.
         services.AddSingleton<IInstallerQueryService, InstallerQueryService>();

@@ -38,7 +38,26 @@ public partial class ScanViewModel : ObservableObject
     [ObservableProperty] private int _orphanedFileCount;
     [ObservableProperty] private string _orphanedSizeDisplay = string.Empty;
 
-    [ObservableProperty] private bool _hasPendingReboot;
+    /// <summary>Last pending-reboot probe result; null until the first scan.</summary>
+    [ObservableProperty] private PendingRebootResult? _pendingRebootResult;
+
+    /// <summary>True when the last probe returned Block.</summary>
+    public bool HasPendingReboot => PendingRebootResult?.IsBlocked == true;
+
+    /// <summary>Localised banner text for the current Block reason; empty otherwise.</summary>
+    public string PendingRebootBannerText => PendingRebootResult?.Reason switch
+    {
+        PendingRebootReason.MsiExecuteMutexHeld => Strings.Body_PendingReboot_MsiExecuteMutex,
+        PendingRebootReason.InstallerInProgress => Strings.Body_PendingReboot_InstallerInProgress,
+        PendingRebootReason.PendingRenameInCache => Strings.Body_PendingReboot_PendingRenameInCache,
+        _ => string.Empty,
+    };
+
+    partial void OnPendingRebootResultChanged(PendingRebootResult? value)
+    {
+        OnPropertyChanged(nameof(HasPendingReboot));
+        OnPropertyChanged(nameof(PendingRebootBannerText));
+    }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasMissingFromDisk))]
@@ -116,7 +135,7 @@ public partial class ScanViewModel : ObservableObject
         // Sample reboot AFTER the scan. A Windows Update queued during
         // a multi-second scan would otherwise let Move/Delete re-enable
         // on stale state.
-        var pendingReboot = _rebootService.HasPendingReboot();
+        var pendingRebootResult = _rebootService.Check();
 
         var registeredCount = result.RegisteredPackages.Count;
         var registeredSize = DisplayHelpers.FormatSize(result.RegisteredTotalBytes);
@@ -124,7 +143,7 @@ public partial class ScanViewModel : ObservableObject
         var orphanedSize = DisplayHelpers.FormatSize(result.RemovableFiles.Sum(f => f.SizeBytes));
         var missingCount = result.MissingFromDiskCount;
 
-        HasPendingReboot = pendingReboot;
+        PendingRebootResult = pendingRebootResult;
         LastScanResult = result;
         RegisteredFileCount = registeredCount;
         RegisteredSizeDisplay = registeredSize;

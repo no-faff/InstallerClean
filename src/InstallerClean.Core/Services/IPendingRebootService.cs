@@ -1,18 +1,8 @@
 namespace InstallerClean.Services;
 
-/// <summary>
-/// Detects whether Windows has queued a reboot. Used to gate the
-/// Move and Delete pills with a warning banner: cleaning up the
-/// installer cache while updates are mid-staging can break the
-/// pending repair / rollback sequence.
-/// </summary>
+/// <summary>Detects whether the MSI cache is at risk from a Windows Installer operation in flight or queued for next reboot.</summary>
 public interface IPendingRebootService
 {
-    /// <summary>
-    /// True if any of the four well-known reboot-pending registry
-    /// keys is present (Component Based Servicing, Auto Update,
-    /// PendingFileRenameOperations, PostRebootReporting). Reads only;
-    /// no registry mutation.
-    /// </summary>
-    bool HasPendingReboot();
+    /// <summary>Probes the three signals and returns a result. Reads only. Never throws; failed reads are treated as no signal.</summary>
+    PendingRebootResult Check();
 }

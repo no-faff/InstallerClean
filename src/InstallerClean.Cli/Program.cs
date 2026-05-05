@@ -152,17 +152,31 @@ internal static class Program
                 return ExitOk;
             }
 
-            // Match the GUI: cleaning the cache mid-update can break
-            // the pending repair sequence regardless of how it was
-            // launched. /s reads only, so it skips the gate.
+            // /s reads only, so it skips the gate.
             if (arg is "/d" or "/m")
             {
                 var rebootService = services.GetRequiredService<IPendingRebootService>();
-                if (rebootService.HasPendingReboot())
+                var rebootCheck = rebootService.Check();
+                if (rebootCheck.IsBlocked)
                 {
-                    Console.WriteLine(Strings.Cli_PendingRebootBlocked);
+                    var stdoutMessage = rebootCheck.Reason switch
+                    {
+                        PendingRebootReason.MsiExecuteMutexHeld =>
+                            Strings.Cli_PendingRebootBlocked_MsiExecuteMutex,
+                        PendingRebootReason.InstallerInProgress =>
+                            Strings.Cli_PendingRebootBlocked_InstallerInProgress,
+                        PendingRebootReason.PendingRenameInCache =>
+                            string.Format(
+                                Strings.Cli_PendingRebootBlocked_PendingRenameInCache,
+                                rebootCheck.Detail ?? string.Empty),
+                        _ => Strings.Cli_PendingRebootBlocked_Generic,
+                    };
+                    Console.WriteLine(stdoutMessage);
                     EventLogWriter.Write(EventLogWriter.Level.Warning,
-                        string.Format(Strings.Cli_EventLogPendingRebootBlocked, arg));
+                        string.Format(Strings.Cli_EventLogPendingRebootBlocked,
+                            arg,
+                            rebootCheck.Reason?.ToString() ?? "Unknown",
+                            rebootCheck.Detail ?? string.Empty));
                     return ExitError;
                 }
             }

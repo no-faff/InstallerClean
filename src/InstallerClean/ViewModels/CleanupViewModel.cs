@@ -166,12 +166,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
     }
 
-    // Move and Delete are gated on HasPendingReboot because cleaning
-    // the installer cache while Windows Update is mid-staging can break
-    // the pending repair / rollback sequence (see IPendingRebootService).
-    // The banner above the buttons explains the gate; without this
-    // check the warning was purely informational and the user could
-    // proceed regardless.
+    // Move and Delete are gated on HasPendingReboot when an MSI is in flight,
+    // a previous transaction is suspended, or a queued post-reboot rename
+    // targets the cache (see IPendingRebootService). The banner shows the
+    // specific reason; this CanExecute mirror enforces it on the buttons.
     private bool CanMove() =>
         !_scan.IsScanning && !IsOperating
         && !_scan.HasPendingReboot

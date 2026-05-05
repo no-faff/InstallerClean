@@ -73,7 +73,9 @@ public static class Strings
     public static string Body_NoMetadata => Get("Body.NoMetadata");
     public static string Body_NoPatches => Get("Body.NoPatches");
     public static string Body_NoProductSelected => Get("Body.NoProductSelected");
-    public static string Body_PendingReboot => Get("Body.PendingReboot");
+    public static string Body_PendingReboot_InstallerInProgress => Get("Body.PendingReboot.InstallerInProgress");
+    public static string Body_PendingReboot_MsiExecuteMutex => Get("Body.PendingReboot.MsiExecuteMutex");
+    public static string Body_PendingReboot_PendingRenameInCache => Get("Body.PendingReboot.PendingRenameInCache");
     public static string Cli_Cancelled => Get("Cli.Cancelled");
     public static string Cli_Cancelling => Get("Cli.Cancelling");
     public static string Cli_DeletedFiles => Get("Cli.DeletedFiles");
@@ -109,7 +111,10 @@ public static class Strings
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_NoMoveDestination => Get("Cli.NoMoveDestination");
     public static string Cli_NothingToDo => Get("Cli.NothingToDo");
-    public static string Cli_PendingRebootBlocked => Get("Cli.PendingRebootBlocked");
+    public static string Cli_PendingRebootBlocked_Generic => Get("Cli.PendingRebootBlocked.Generic");
+    public static string Cli_PendingRebootBlocked_InstallerInProgress => Get("Cli.PendingRebootBlocked.InstallerInProgress");
+    public static string Cli_PendingRebootBlocked_MsiExecuteMutex => Get("Cli.PendingRebootBlocked.MsiExecuteMutex");
+    public static string Cli_PendingRebootBlocked_PendingRenameInCache => Get("Cli.PendingRebootBlocked.PendingRenameInCache");
     public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_UnknownArgument => Get("Cli.UnknownArgument");
     public static string Completion_AllClear => Get("Completion.AllClear");
