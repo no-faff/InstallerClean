@@ -2,7 +2,7 @@
 
 All notable changes to InstallerClean. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
-## [1.6.0] - Unreleased
+## [1.6.0] - 2026-05-05
 
 The first release since v1.5.3. Most of the work is structural: the codebase is split into three projects, the WPF host no longer depends on a third-party theme library, the Windows Installer P/Invoke surface has been audited end to end, and the runtime has moved from .NET 8 LTS to .NET 10 LTS. The day-to-day flow (scan, review, move or recycle) is unchanged; the user-visible additions and fixes are listed below.
 
