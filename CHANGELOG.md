@@ -2,7 +2,7 @@
 
 All notable changes to InstallerClean. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
-## [1.7.0] - Unreleased
+## [1.7.0] - 2026-05-05
 
 Pending-reboot detection rewritten to fix spurious "Windows is waiting to restart" banners on machines with no actual Windows update pending. Closes [#12](https://github.com/no-faff/InstallerClean/issues/12).
 
