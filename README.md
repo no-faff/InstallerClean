@@ -1,16 +1,18 @@
 <p align="center">
-  <img src="docs/icon.png" width="320" alt="InstallerClean">
+  <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
 
-[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
-[![.NET 10](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/10.0)
-[![CI](https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg)](https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml)
-[![Windows 10/11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg)](https://github.com/no-faff/InstallerClean/releases)
-[![GitHub Release](https://img.shields.io/github/v/release/no-faff/InstallerClean)](https://github.com/no-faff/InstallerClean/releases/latest)
+<h1 align="center">InstallerClean</h1>
 
-# InstallerClean
+<p align="center"><strong>A modern, open-source replacement for <a href="https://www.homedev.com.au/free/patchcleaner">PatchCleaner</a>. Safely clean up <code>C:\Windows\Installer</code>, the hidden Windows folder that quietly eats your disk space.</strong></p>
 
-**A modern, open-source replacement for [PatchCleaner](https://www.homedev.com.au/free/patchcleaner). Safely clean up `C:\Windows\Installer`, the hidden Windows folder that quietly eats your disk space.**
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licence: MIT"></a>
+  <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
+  <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/github/v/release/no-faff/InstallerClean" alt="GitHub Release"></a>
+</p>
 
 ![Screenshot of InstallerClean after a successful clean-up: 965 MB cleared, 68 files moved](docs/screenshots/10-moved-done-success.webp)
 
@@ -25,13 +27,13 @@
 
 There's a hidden folder on every Windows PC called `C:\Windows\Installer`. Every time you install software that uses the Windows Installer system, or apply a patch to Microsoft Office, Adobe Acrobat, Visual Studio or any other `.msi`-based application, a copy of that installer or `.msp` patch file goes into this folder. And stays there.
 
-When you uninstall the software, the files stay. When a newer patch replaces an older one, both stay. Windows never cleans them up. Disk Cleanup doesn't touch them. DISM is for a different folder entirely. Over the years, the folder grows: 10 GB, 30 GB, 50 GB. On machines with Adobe Acrobat, it can reach [more than 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
+When you uninstall the software, the files stay. When a newer patch replaces an older one, both stay. Windows never cleans them up. Disk Cleanup doesn't touch them. DISM is for a different folder entirely. Over the years, the folder grows: 10 GB, 30 GB, 50 GB. On machines with heavy MSI-using software (Acrobat is a frequent culprit), it can [pass 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
 
 These aren't temp files that get recreated the moment you close a cleaning tool. They're genuine dead weight: old installers from software you uninstalled years ago and patches that have been replaced three times over. Once they're gone, they don't come back.
 
 **If you're looking for an easy way to free up disk space on Windows, this folder is one of the best places to start.** InstallerClean finds the unneeded files and removes them safely.
 
-[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) has been the go-to tool for this, but it hasn't been updated since March 2016 and it's closed source. InstallerClean is an open source alternative, with Adobe patch handling (often the main culprit) and a modern UI.
+[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) has been the go-to tool for this, but it hasn't been updated since March 2016 and it's closed source. InstallerClean is an open-source alternative, with superseded-patch detection (which catches the Acrobat patches PatchCleaner excludes) and a modern UI.
 
 ## The search for help
 
@@ -45,13 +47,13 @@ Or they're told not to touch it at all. In one thread, someone with a 60 GB Inst
 
 The standard advice confuses deleting files at random (which genuinely is dangerous) with removing files that Windows itself says it no longer needs (which isn't). InstallerClean does the latter.
 
-If you've searched for help with this before, you've probably already found [PatchCleaner](https://www.homedev.com.au/free/patchcleaner) by [John Crawford](https://www.homedev.com.au/). It's a fantastic app - I downloaded it and it did exactly what it said, freed up a ton of space. The one thing it doesn't handle is Adobe patches - it excludes them by default, and on machines where Adobe is the biggest offender, that means a lot of removable files get left behind:
+If you've searched for help with this before, you've probably already found [PatchCleaner](https://www.homedev.com.au/free/patchcleaner) by [John Crawford](https://www.homedev.com.au/). It's a fantastic app. I downloaded it and it did exactly what it said: freed up a ton of space. The one thing it doesn't handle is Adobe patches; it excludes them by default, and on machines where Adobe is the biggest offender, a lot of removable files get left behind:
 
 > *"I've downloaded Patchcleaner to delete the orphaned .msp files... 29 GB of the files are 'excluded by filters', so Patchcleaner doesn't seem to help."*
 >
 > HeatherBunny1111, [r/techsupport](https://www.reddit.com/r/techsupport/comments/1qc4tcf/how_to_delete_msp_files_safely/)
 
-InstallerClean detects which Adobe patches have been superseded by newer updates, so it can flag them as removable.
+InstallerClean detects which patches have been superseded by newer updates and flags them as removable, including the Acrobat patches PatchCleaner excludes.
 
 ## What it does
 
@@ -69,33 +71,40 @@ No telemetry. No network activity. The About window has a Check for updates link
 
 <br>
 
-<img src="docs/screenshots/03-scan.webp" alt="Splash screen showing the scan in progress, having found 68 files to clean up" width="900">
+<p>
+  <img src="docs/screenshots/03-scan.webp" alt="Splash screen showing the scan in progress, having found 68 files to clean up" width="900"><br>
+  <em>Initial scan. This is very quick.</em>
+</p>
 
-*Initial scan. This is very quick.*
+<p>
+  <img src="docs/screenshots/04-main-window.webp" alt="Main window showing 114 files still used and 68 files to clean up" width="900"><br>
+  <em>Results: how much is in use, how much is removable.</em>
+</p>
 
-<img src="docs/screenshots/04-main-window.webp" alt="Main window showing 114 files still used and 68 files to clean up" width="900">
+<p>
+  <img src="docs/screenshots/05-keep-details.webp" alt="Registered files window listing installed products and their installer-database metadata" width="900"><br>
+  <em>The files still in use, with metadata read from the installer database.</em>
+</p>
 
-*Results: how much is in use, how much is removable.*
+<p>
+  <img src="docs/screenshots/06-delete-details.webp" alt="Orphaned files window listing removable .msi files with reasons" width="900"><br>
+  <em>The files no longer needed.</em>
+</p>
 
-<img src="docs/screenshots/05-keep-details.webp" alt="Registered files window listing installed products and their installer-database metadata" width="900">
+<p>
+  <img src="docs/screenshots/08-delete.webp" alt="Delete confirmation dialog showing 68 files (965 MB) will go to the Recycle Bin" width="900"><br>
+  <em>Confirmation before either action. Delete sends to the Recycle Bin; Move puts the files somewhere of your choice.</em>
+</p>
 
-*The files still in use, with metadata read from the installer database.*
+<p>
+  <img src="docs/screenshots/10-moved-done-success.webp" alt="Success overlay showing 965 MB cleared after a move operation" width="900"><br>
+  <em>After a successful Move.</em>
+</p>
 
-<img src="docs/screenshots/06-delete-details.webp" alt="Orphaned files window listing removable .msi files with reasons" width="900">
-
-*The files no longer needed.*
-
-<img src="docs/screenshots/08-delete.webp" alt="Delete confirmation dialog showing 68 files (965 MB) will go to the Recycle Bin" width="900">
-
-*Confirmation before either action. Delete sends to the Recycle Bin; Move puts the files somewhere of your choice.*
-
-<img src="docs/screenshots/10-moved-done-success.webp" alt="Success overlay showing 965 MB cleared after a move operation" width="900">
-
-*After a successful Move.*
-
-<img src="docs/screenshots/12-all-clear.webp" alt="All-clear overlay shown when nothing is removable on a subsequent scan" width="900">
-
-*Nothing left to clean.*
+<p>
+  <img src="docs/screenshots/12-all-clear.webp" alt="All-clear overlay shown when nothing is removable on a subsequent scan" width="900"><br>
+  <em>After scanning again. Nothing left to clean.</em>
+</p>
 
 </details>
 
@@ -105,7 +114,7 @@ InstallerClean identifies two kinds of unneeded files.
 
 **Orphaned files** are installers and patches left behind after you uninstall software. Windows no longer references them, but the files sit in the folder taking up space.
 
-**Superseded patches** are old `.msp` patches that have been replaced by newer ones. Windows marks them as superseded in its own database but never deletes them. This is especially common with Adobe Acrobat, which ships frequent large patches and accumulates superseded ones indefinitely.
+**Superseded patches** are old `.msp` patches that have been replaced by newer ones. Windows marks them as superseded in its own database but never deletes them. Vendors that ship frequent patches (Acrobat, Office, large dev tools) accumulate superseded ones indefinitely.
 
 To find them, InstallerClean calls the Windows Installer COM interface directly via P/Invoke:
 
@@ -115,29 +124,17 @@ To find them, InstallerClean calls the Windows Installer COM interface directly 
 
 Any `.msi` or `.msp` file in `C:\Windows\Installer` that isn't claimed by a registered product is orphaned. Any patch marked as superseded and not required for uninstall is flagged as removable.
 
-If the API returns incomplete data (rare, but it can happen with corrupted installer state), we fall back to reading the registry. The fallback only adds files to the "still needed" set, never to the "removable" set.
+If the API returns incomplete data (rare, but it can happen with corrupted installer state), the app falls back to reading the registry. The fallback only adds files to the "still needed" set, never to the "removable" set.
 
 After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer` (the directories the cache leaves behind once their contents are gone) are pruned in the same pass. Reparse points are skipped during the prune so a junction planted inside the cache cannot redirect the cleanup outside it.
 
 ## Is it safe?
 
-Yes. We query the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, we trust it. We don't guess based on filenames or dates.
+Yes. InstallerClean queries the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, the app trusts it; it doesn't guess based on filenames or dates.
 
-Delete sends files to the Recycle Bin. Move puts them in a folder you choose. Either way you can restore them if something breaks. Nothing is touched until you confirm. If Windows has pending updates that could affect the result, both buttons are disabled and the reason is shown. The core logic is covered by 180+ automated tests that run on every commit (see the CI badge above).
+**In the app.** Delete sends files to the Recycle Bin. Move puts them in a folder you choose. Either way the files can be restored if anything breaks. Nothing is touched until you confirm. If Windows Installer is currently writing to the cache, has a previous transaction suspended, or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown. The core logic is covered by 200+ automated tests that run on every commit (see the CI badge above).
 
-## What it doesn't do
-
-- WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, use Windows's built-in Disk Cleanup or `Dism /Online /Cleanup-Image /StartComponentCleanup`.
-- If a reboot is pending, Move and Delete are blocked (with a banner explaining why; the CLI exits with an error). Cleaning the cache mid-update can break the pending repair sequence.
-- No background service, no scheduled task, no auto-clean. The app runs when you launch it.
-- The registry is read-only from our side. We query the Windows Installer database; we don't change it.
-- No telemetry, no usage reporting, no version-check ping. The "Check for updates" link in About opens the GitHub releases page in your browser.
-- No bundled extras. No toolbars, no third-party offers, no nag screens.
-- The only permission asked for beyond launching is Administrator, which is required because `C:\Windows\Installer` is admin-only.
-
-## For sysadmins: verifying the binary
-
-InstallerClean is unsigned (no Authenticode certificate). This is deliberate; signing certificates cost annually and we'd rather keep the project free, open and donations-funded.
+**Verifying the binary.** InstallerClean is unsigned. Code-signing certificates cost money annually and I'd rather keep the project free, open and donations-funded.
 
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
 - VirusTotal links for setup, portable and slim builds are published with each release.
@@ -146,21 +143,28 @@ InstallerClean is unsigned (no Authenticode certificate). This is deliberate; si
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
-Setup and portable builds score clean across every engine on VirusTotal. The slim build has two flags, both from the same generic ML classifier shared between Avast and AVG; false-positive reports have been filed with both vendors. PatchCleaner, which has been [downloaded more than 890,000 times](https://www.homedev.com.au/Free/PatchCleaner) since 2015, also has two flags on [VirusTotal](https://www.virustotal.com/gui/file/6472de894c5cb6050fd80cdd893b8772aef71f8bdb5c65a0175cf7cbb90e6ec6).
+Setup and portable builds score clean across every engine on VirusTotal. The slim build has two flags from the same generic ML classifier shared between Avast and AVG; false-positive reports have been filed with both vendors. (For comparison, PatchCleaner with [890,000+ downloads](https://www.homedev.com.au/Free/PatchCleaner) since 2015 also has [two flags on VirusTotal](https://www.virustotal.com/gui/file/6472de894c5cb6050fd80cdd893b8772aef71f8bdb5c65a0175cf7cbb90e6ec6).)
+
+## What it doesn't do
+
+- WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, use Windows's built-in Disk Cleanup or `Dism /Online /Cleanup-Image /StartComponentCleanup`.
+- No background service, no scheduled task, no auto-clean. The app runs when you launch it.
+- The registry is read-only. The app queries the Windows Installer database; it doesn't change it.
+- No telemetry, no usage reporting, no version-check ping. The "Check for updates" link in About opens the GitHub releases page in your browser.
+- No bundled extras. No toolbars, no third-party offers, no nag screens.
+- The only permission asked for beyond launching is Administrator, which is required because `C:\Windows\Installer` is admin-only.
 
 ## FAQ
 
-**Will I actually free up GBs of space?** Depends on your machine. A clean Windows 11 install with no extra software has very little to remove. A long-running developer workstation, or any machine with Adobe Acrobat installed, often has tens of GB. Run `installerclean-cli /s` to see exactly what would be removed before you commit.
+**Will I actually free up GBs of space?** Depends on your machine. A clean Windows 11 install with no extra software has nothing to remove. A long-running developer workstation, or any machine with heavy MSI-based software (Acrobat, Office, LibreOffice, large dev tools), can have tens of GB. Run `installerclean-cli /s` to see exactly what would be removed before you commit.
 
 **Why does it want Administrator?** `C:\Windows\Installer` is owned by SYSTEM and locked down to admins only. Reading the folder, writing to the Installer-database query API, and moving or deleting files all require elevation. There's no user-mode path.
 
-**What's the difference between setup, portable and slim?** Setup is a regular Windows installer, portable is a single self-contained exe, slim is the smallest download but needs the .NET 10 Desktop Runtime already installed (which you have if you have Visual Studio).
+**Can I undo a Delete?** Yes. Delete sends files to the Recycle Bin. Restore them from there. If you emptied the Recycle Bin, the files are gone, but you can instead use Move to put them in a folder you choose, then verify nothing breaks before deleting from there.
 
-**Can I undo a Delete?** Yes. Delete sends files to the Recycle Bin. Restore them from there. If you emptied the Recycle Bin, the files are gone, but you can also use Move first to a folder you choose, then verify nothing breaks before deleting from there.
+**Will Windows complain if I remove these files?** No. InstallerClean only removes files Windows itself reports as no-longer-needed via its own installer-database API. The next install / uninstall / patch cycle proceeds normally.
 
-**Will Windows complain if I remove these files?** No. We only remove files Windows itself reports as no-longer-needed via its own installer-database API. The next install / uninstall / patch cycle proceeds normally.
-
-**Why no `Win32_Product` (WMI)?** [`Win32_Product` triggers MSI repair operations on every product during enumeration](https://gregramsey.net/2012/02/20/win32_product-is-evil/), which can take minutes and load the disk hard. We use the Windows Installer COM API directly with no side effects.
+**Why no `Win32_Product` (WMI)?** [`Win32_Product` triggers MSI repair operations on every product during enumeration](https://gregramsey.net/2012/02/20/win32_product-is-evil/), which can take minutes and load the disk hard. InstallerClean calls the Windows Installer COM API directly with no side effects.
 
 **Does it work on Windows 7 or 8?** Untested and not supported. Targets Windows 10 and 11.
 
@@ -168,10 +172,15 @@ Setup and portable builds score clean across every engine on VirusTotal. The sli
 
 ## Download
 
-1. Download **InstallerClean-setup.exe** from the [releases page](../../releases/latest) and run the installer. Windows SmartScreen will say "Unknown publisher". Click **More info** then **Run anyway**. This is normal for unsigned open source software
-2. The app scans automatically on startup. Review the results, then click **Delete** or **Move**
+Three builds, choose one:
 
-> **Prefer not to install?** Download **InstallerClean-portable.exe** instead. It's a single file, no install needed. Just download, run and delete it when you're done.
+- **Setup** (`InstallerClean-setup.exe`): regular Windows installer, bundles the .NET 10 runtime. Best for most users.
+- **Portable** (`InstallerClean-portable.exe`): single self-contained exe, no install. Bundles the runtime. Run, use, delete.
+- **Slim** (`InstallerClean-slim.exe`): smallest download. Requires the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) to be installed already (which you have if you have an up-to-date Visual Studio).
+
+Download from the [releases page](../../releases/latest), then run. Windows SmartScreen will say "Unknown publisher". Click **More info** then **Run anyway**. This is normal for unsigned open-source software.
+
+The app scans automatically on startup. Review the results, then click **Delete** or **Move**.
 
 Or install via [Scoop](https://scoop.sh):
 
@@ -227,9 +236,9 @@ Portable and slim downloads bundle only the GUI exe. To run the CLI operations f
 ## Requirements
 
 - Windows 10 or 11
-- Administrator privileges (to access `C:\Windows\Installer`)
-- The setup installer and portable exe bundle the .NET 10 runtime so nothing else needs to be installed. Choose portable unless you want an installer
-- Already have [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)? You do if you have Visual Studio installed (not to be confused with VS Code). Grab **InstallerClean-slim.exe** from the releases page instead
+- Administrator privileges (`C:\Windows\Installer` is admin-only)
+
+See [Download](#download) for setup, portable and slim build options.
 
 ## Building from source
 
