@@ -2,6 +2,24 @@
 
 All notable changes to InstallerClean. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - Unreleased
+
+Pending-reboot detection rewritten to fix spurious "Windows is waiting to restart" banners on machines with no actual Windows update pending. Closes [#12](https://github.com/no-faff/InstallerClean/issues/12).
+
+### Changed
+
+- The pending-reboot gate now checks three narrow Windows Installer signals instead of the previous four broad pending-reboot signals:
+  - The `Global\_MSIExecute` mutex is held (Windows Installer is currently writing to the cache).
+  - The `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\InProgress` key exists (a previous Windows Installer transaction is suspended).
+  - A queued post-reboot file rename targets a path under `%SystemRoot%\Installer` (a pending operation will touch the cache we are about to clean).
+
+  Three of the four previously-checked signals (`WindowsUpdate\Auto Update\RebootRequired`, `Component Based Servicing\RebootPending`, `WindowsUpdate\Auto Update\PostRebootReporting`) had no documented relationship to Windows Installer cache safety; the fourth (`PendingFileRenameOperations`) was checked too coarsely and fired on any non-empty entry regardless of contents.
+- Banner copy and CLI message are reason-specific, so the user can tell which signal is firing and what to do about it.
+
+### Fixed
+
+- Spurious "Windows is waiting to restart" banner on Windows 11 with no Windows update pending. The previous detection fired on any non-empty `PendingFileRenameOperations`, which includes routine non-Windows-Update entries (Microsoft Defender platform updates, Microsoft Edge updates, Steam game launcher files, anti-cheat installers, etc). Closes [#12](https://github.com/no-faff/InstallerClean/issues/12).
+
 ## [1.6.0] - 2026-05-05
 
 The first release since v1.5.3. Most of the work is structural: the codebase is split into three projects, the WPF host no longer depends on a third-party theme library, the Windows Installer P/Invoke surface has been audited end to end, and the runtime has moved from .NET 8 LTS to .NET 10 LTS. The day-to-day flow (scan, review, move or recycle) is unchanged; the user-visible additions and fixes are listed below.

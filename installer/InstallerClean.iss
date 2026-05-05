@@ -6,13 +6,13 @@
 ; Uninstall\InstallerClean_is1. Do NOT change AppId.
 ;
 ; AppVersion is normally provided by the release script via
-; "ISCC.exe /DAppVersion=1.6.0 ...". The fallback below is for ad-hoc
+; "ISCC.exe /DAppVersion=1.7.0 ...". The fallback below is for ad-hoc
 ; local builds; keep it in sync with the current shipping target so a
 ; from-source install doesn't claim to be an older version on the user's
 ; Add/Remove Programs entry.
 [Setup]
 #ifndef AppVersion
-  #define AppVersion "1.6.0"
+  #define AppVersion "1.7.0"
 #endif
 AppId=InstallerClean
 AppName=InstallerClean

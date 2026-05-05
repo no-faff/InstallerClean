@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
   <!-- See src/InstallerClean/app.manifest for the bump rule. -->
-  <assemblyIdentity version="1.6.0.0" name="InstallerClean.cli"/>
+  <assemblyIdentity version="1.7.0.0" name="InstallerClean.cli"/>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
