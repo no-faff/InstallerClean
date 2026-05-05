@@ -6,7 +6,7 @@ Only the latest release gets fixes. Older versions are not patched. Check the [r
 
 ## Reporting a vulnerability
 
-Please do **not** open a public GitHub issue for security problems. Email [redacted] with:
+Please do **not** open a public GitHub issue for security problems. [Open a private security advisory](../../security/advisories/new) with:
 
 - A description of the issue
 - Steps to reproduce
