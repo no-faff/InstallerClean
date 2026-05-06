@@ -5,27 +5,47 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      nuget:
+        patterns:
+          - "*"
 
   - package-ecosystem: nuget
     directory: /src/InstallerClean.Core
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      nuget:
+        patterns:
+          - "*"
 
   - package-ecosystem: nuget
     directory: /src/InstallerClean.Cli
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      nuget:
+        patterns:
+          - "*"
 
   - package-ecosystem: nuget
     directory: /src/InstallerClean.Tests
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      nuget:
+        patterns:
+          - "*"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns:
+          - "*"
