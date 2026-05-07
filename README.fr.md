@@ -22,7 +22,7 @@
 ![Capture d'écran d'InstallerClean après un nettoyage réussi : 965 Mo libérés, 68 fichiers déplacés](docs/screenshots/10-moved-done-success.webp)
 
 - **En bref :** Trouve et supprime les fichiers inutiles dans `C:\Windows\Installer`, le dossier caché que Windows ne nettoie jamais.
-- **Combien d'espace :** Ça dépend de vos logiciels. Sur ma machine, c'était presque 1 Go. Des utilisateurs rapportent 20 à 50 Go ; avec Adobe Acrobat installé, ça peut dépasser 100 Go. Ça peut aussi être nul. L'idée, c'est que c'est rapide et gratuit ; tout ce qui peut être supprimé le sera.
+- **Combien d'espace :** Ça dépend de vos logiciels. Sur ma machine, c'était presque 1 Go. Un utilisateur d'InstallerClean a [rapporté](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 Go. Avec Adobe Acrobat installé, ça peut dépasser 100 Go. Ça peut aussi être nul. L'idée, c'est que c'est rapide et gratuit ; tout ce qui peut être supprimé le sera.
 - **Est-ce sûr :** Oui. Ne supprime que les fichiers que Windows lui-même déclare inutiles. La suppression envoie à la Corbeille. Le déplacement vous permet de garder les fichiers ailleurs en lieu sûr.
 - **Comment l'avoir :** [Téléchargez la dernière version](../../releases/latest), lancez-la, c'est tout.
 

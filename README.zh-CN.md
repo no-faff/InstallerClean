@@ -22,7 +22,7 @@
 ![InstallerClean 完成清理后的截图：释放 965 MB，移动 68 个文件](docs/screenshots/10-moved-done-success.webp)
 
 - **简介：** 在 `C:\Windows\Installer` 中查找并删除不需要的文件，这是 Windows 从不清理的隐藏文件夹。
-- **能释放多少空间：** 取决于您的软件。在我的电脑上接近 1 GB。用户报告过 20 至 50 GB 的情况；安装了 Adobe Acrobat 时可能超过 100 GB。也可能完全没有。关键是它既快又免费；凡是能清理的，都会被清理掉。
+- **能释放多少空间：** 取决于您的软件。在我的电脑上接近 1 GB。一位 InstallerClean 用户[报告](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816)清理出 25 GB。安装了 Adobe Acrobat 时可能超过 100 GB。也可能完全没有。关键是它既快又免费；凡是能清理的，都会被清理掉。
 - **是否安全：** 是的。仅删除 Windows 自身确认不再需要的文件。删除会将文件发送到回收站。移动会让您把文件保存到安全的位置。
 - **如何获取：** [下载最新版本](../../releases/latest)，运行，搞定。
 
