@@ -6,6 +6,8 @@
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
 
+<p align="center"><em>🎵 What's my line? I'm happy <a href="https://www.youtube.com/watch?v=HM-jHhUZfFI">cleaning Windows</a> 🎶</em></p>
+
 <h1 align="center">InstallerClean</h1>
 
 <p align="center"><strong>A modern, open-source replacement for <a href="https://www.homedev.com.au/free/patchcleaner">PatchCleaner</a>. Safely clean up <code>C:\Windows\Installer</code>, the hidden Windows folder that quietly eats your disk space.</strong></p>
@@ -283,3 +285,7 @@ If InstallerClean helped, consider [supporting No Faff](https://nofaff.netlify.a
 ## Licence
 
 [MIT](LICENSE)
+
+---
+
+🎵 [George Formby - When I'm Cleaning Windows](https://www.youtube.com/watch?v=sfmAeijj5cM). Enjoy!
