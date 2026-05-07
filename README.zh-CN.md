@@ -149,7 +149,7 @@ InstallerClean 识别两类不需要的文件。
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 认证 100% 干净" width="190"></a>
 
-三个构建（setup、portable 和 slim）在 VirusTotal 上均为 0/70 干净。
+三个构建（setup、portable 和 slim）在 VirusTotal 上均为干净，没有任何引擎检出。
 
 ## 它不做什么
 

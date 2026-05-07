@@ -149,7 +149,7 @@ Yes. InstallerClean queries the same database Windows itself uses to track what'
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
-All three builds (setup, portable and slim) score 0/70 clean on VirusTotal.
+All three builds (setup, portable and slim) are clean on VirusTotal, with zero detections from any engine.
 
 ## What it doesn't do
 

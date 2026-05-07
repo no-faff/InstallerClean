@@ -149,7 +149,7 @@ Oui. InstallerClean interroge la même base que Windows utilise lui-même pour s
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
-Les trois builds (setup, portable et slim) sont propres à 0/70 sur VirusTotal.
+Les trois builds (setup, portable et slim) sont propres sur VirusTotal, aucune détection d'aucun moteur.
 
 ## Ce qu'il ne fait pas
 
