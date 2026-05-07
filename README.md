@@ -1,4 +1,8 @@
 <p align="center">
+  <strong>English</strong> · <a href="README.fr.md">Français</a>
+</p>
+
+<p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
 
@@ -145,7 +149,7 @@ Yes. InstallerClean queries the same database Windows itself uses to track what'
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
-Setup and portable builds score clean across every engine on VirusTotal. The slim build has two flags from the same generic ML classifier shared between Avast and AVG; false-positive reports have been filed with both vendors. (For comparison, PatchCleaner with [890,000+ downloads](https://www.homedev.com.au/Free/PatchCleaner) since 2015 also has [two flags on VirusTotal](https://www.virustotal.com/gui/file/6472de894c5cb6050fd80cdd893b8772aef71f8bdb5c65a0175cf7cbb90e6ec6).)
+Setup and portable builds score clean across every engine on VirusTotal. The slim build is a framework-dependent .NET launcher and occasionally trips heuristic flags from one or two AV engines; false-positive reports are filed as they appear. (For comparison, PatchCleaner with [890,000+ downloads](https://www.homedev.com.au/Free/PatchCleaner) since 2015 also picks up flags on [VirusTotal](https://www.virustotal.com/gui/file/6472de894c5cb6050fd80cdd893b8772aef71f8bdb5c65a0175cf7cbb90e6ec6).)
 
 ## What it doesn't do
 
