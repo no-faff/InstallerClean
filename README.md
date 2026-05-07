@@ -149,7 +149,7 @@ Yes. InstallerClean queries the same database Windows itself uses to track what'
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
-Setup and portable builds score clean across every engine on VirusTotal. The slim build is a framework-dependent .NET launcher and occasionally trips heuristic flags from one or two AV engines; false-positive reports are filed as they appear. (For comparison, PatchCleaner with [890,000+ downloads](https://www.homedev.com.au/Free/PatchCleaner) since 2015 also picks up flags on [VirusTotal](https://www.virustotal.com/gui/file/6472de894c5cb6050fd80cdd893b8772aef71f8bdb5c65a0175cf7cbb90e6ec6).)
+All three builds (setup, portable and slim) score 0/70 clean on VirusTotal.
 
 ## What it doesn't do
 

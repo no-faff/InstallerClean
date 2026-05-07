@@ -149,7 +149,7 @@ Oui. InstallerClean interroge la même base que Windows utilise lui-même pour s
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
-Les builds setup et portable sont propres sur tous les moteurs VirusTotal. Le build slim est un lanceur .NET dépendant du framework et déclenche occasionnellement des heuristiques d'un ou deux moteurs antivirus ; des rapports de faux positif sont déposés au fur et à mesure. (Pour comparaison, PatchCleaner avec [890 000+ téléchargements](https://www.homedev.com.au/Free/PatchCleaner) depuis 2015 récolte aussi des signalements sur [VirusTotal](https://www.virustotal.com/gui/file/6472de894c5cb6050fd80cdd893b8772aef71f8bdb5c65a0175cf7cbb90e6ec6).)
+Les trois builds (setup, portable et slim) sont propres à 0/70 sur VirusTotal.
 
 ## Ce qu'il ne fait pas
 

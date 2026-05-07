@@ -149,7 +149,7 @@ InstallerClean 识别两类不需要的文件。
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 认证 100% 干净" width="190"></a>
 
-setup 和 portable 构建在 VirusTotal 的所有引擎上都干净。slim 构建是依赖框架的 .NET 启动器，偶尔会触发一两个杀毒引擎的启发式标记；误报报告会随时提交。（作为对比，自 2015 年以来下载量超过 [89 万次](https://www.homedev.com.au/Free/PatchCleaner) 的 PatchCleaner 在 [VirusTotal](https://www.virustotal.com/gui/file/6472de894c5cb6050fd80cdd893b8772aef71f8bdb5c65a0175cf7cbb90e6ec6) 上也会被标记。）
+三个构建（setup、portable 和 slim）在 VirusTotal 上均为 0/70 干净。
 
 ## 它不做什么
 
