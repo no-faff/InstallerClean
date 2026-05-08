@@ -180,8 +180,8 @@ InstallerClean 识别两类不需要的文件。
 
 三种构建，请选其一：
 
-- **Setup**（`InstallerClean-setup.exe`）：标准的 Windows 安装程序，自带 .NET 10 运行时。适合大多数用户。
-- **Portable**（`InstallerClean-portable.exe`）：单一自包含可执行文件，无需安装。自带运行时。运行、使用、删除即可。
+- **Setup**（`InstallerClean-setup.exe`）：标准的 Windows 安装程序，自带 .NET 10 运行时。在开始菜单中添加快捷方式，可以干净卸载。放在「程序」里，六个月后容易找回。
+- **Portable**（`InstallerClean-portable.exe`）：单一自包含可执行文件，自带运行时。无需安装，无需卸载。运行、使用、删除即可。需要时随时再运行。
 - **Slim**（`InstallerClean-slim.exe`）：体积最小。需要事先安装 [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)（如果您的 Visual Studio 是最新版本，那就已经装了）。
 
 从[发布页面](../../releases/latest)下载，然后运行。Windows SmartScreen 会提示"未知发布者"。点击"**更多信息**"然后"**仍要运行**"。这对未签名的开源软件而言是正常情况。

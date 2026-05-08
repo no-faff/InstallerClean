@@ -182,9 +182,9 @@ All three builds (setup, portable and slim) are clean on VirusTotal, with zero d
 
 Three builds, choose one:
 
-- **Setup** (`InstallerClean-setup.exe`): regular Windows installer, bundles the .NET 10 runtime. Best for most users.
-- **Portable** (`InstallerClean-portable.exe`): single self-contained exe, no install. Bundles the runtime. Run, use, delete.
-- **Slim** (`InstallerClean-slim.exe`): smallest download. Requires the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) to be installed already (which you have if you have an up-to-date Visual Studio).
+- **Setup** (`InstallerClean-setup.exe`): a regular Windows installer with the .NET 10 runtime bundled. Adds a Start Menu entry and uninstalls cleanly. Tucked into Programs so it's easy to find six months from now.
+- **Portable** (`InstallerClean-portable.exe`): a single self-contained exe with the runtime bundled. No install, no uninstaller. Run it, use it, delete it. Run it again whenever.
+- **Slim** (`InstallerClean-slim.exe`): the smallest download. Requires the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) to be installed already (which you have if you have an up-to-date Visual Studio).
 
 Download from the [releases page](../../releases/latest), then run. Windows SmartScreen will say "Unknown publisher". Click **More info** then **Run anyway**. This is normal for unsigned open-source software.
 

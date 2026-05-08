@@ -180,9 +180,9 @@ Les trois builds (setup, portable et slim) sont propres sur VirusTotal, aucune d
 
 Trois builds, choisissez-en un :
 
-- **Setup** (`InstallerClean-setup.exe`) : installeur Windows classique, embarque le runtime .NET 10. Recommandé pour la plupart des utilisateurs.
-- **Portable** (`InstallerClean-portable.exe`) : exe unique autonome, sans installation. Embarque le runtime. Lancez, utilisez, supprimez.
-- **Slim** (`InstallerClean-slim.exe`) : téléchargement le plus léger. Nécessite que le [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) soit déjà installé (ce qui est le cas si vous avez Visual Studio à jour).
+- **Setup** (`InstallerClean-setup.exe`) : un installeur Windows classique avec le runtime .NET 10 intégré. Ajoute un raccourci dans le menu Démarrer et se désinstalle proprement. Bien rangé dans les Programmes, facile à retrouver dans six mois.
+- **Portable** (`InstallerClean-portable.exe`) : un exe unique autonome avec le runtime intégré. Pas d'installation, pas de désinstallation. Lancez-le, utilisez-le, supprimez-le. Relancez-le quand vous voulez.
+- **Slim** (`InstallerClean-slim.exe`) : le téléchargement le plus léger. Nécessite que le [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) soit déjà installé (ce qui est le cas si vous avez Visual Studio à jour).
 
 Téléchargez depuis la [page des versions](../../releases/latest), puis lancez. Windows SmartScreen affichera « Éditeur inconnu ». Cliquez sur **Informations complémentaires** puis **Exécuter quand même**. C'est normal pour un logiciel open source non signé.
 
