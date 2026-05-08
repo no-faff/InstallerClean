@@ -6,7 +6,7 @@
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
 
-<p align="center"><em>🎵 What's my line? I'm happy <a href="https://www.youtube.com/watch?v=HM-jHhUZfFI">cleaning Windows</a> 🎶</em></p>
+<p align="center"><em>🎶 What's my line? I'm happy <a href="https://www.youtube.com/watch?v=HM-jHhUZfFI">cleaning Windows</a></em></p>
 
 <h1 align="center">InstallerClean</h1>
 
@@ -288,4 +288,4 @@ If InstallerClean helped, consider [supporting No Faff](https://nofaff.netlify.a
 
 ---
 
-🎵 [George Formby - When I'm Cleaning Windows](https://www.youtube.com/watch?v=sfmAeijj5cM). Enjoy!
+🎶 [George Formby - When I'm Cleaning Windows](https://www.youtube.com/watch?v=sfmAeijj5cM). Enjoy!
