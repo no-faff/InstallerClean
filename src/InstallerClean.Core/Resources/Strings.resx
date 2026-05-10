@@ -121,7 +121,7 @@
   <data name="Action.Done" xml:space="preserve"><value>_Done</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Details</value></data>
   <data name="Action.Donate" xml:space="preserve"><value>Donate</value></data>
-  <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a _star on GitHub</value></data>
+  <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
   <data name="Section.SayThanks" xml:space="preserve"><value>SAY THANKS</value></data>
   <data name="Action.MITLicence" xml:space="preserve"><value>MIT licence</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Move</value></data>
