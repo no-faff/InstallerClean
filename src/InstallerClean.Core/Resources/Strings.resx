@@ -241,7 +241,7 @@
   <data name="Completion.AllClear" xml:space="preserve"><value>All clean</value></data>
   <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer</value></data>
   <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working</value></data>
-  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working. Larger files may have been deleted permanently.</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working.</value></data>
   <!-- 0 = size freed (e.g. "120.5 MB") -->
   <data name="Completion.Freed" xml:space="preserve"><value>{0} freed</value></data>
   <!-- Heading shown when an operation succeeded for SOME files but
@@ -364,8 +364,7 @@ Details in {1}.</value></data>
        ============================================================ -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Sending...</value></data>
   <data name="ResultLog.Sent" xml:space="preserve"><value>Thanks! Result log sent.</value></data>
-  <data name="ResultLog.NetworkError" xml:space="preserve"><value>Network error. Never mind, click Done.</value></data>
-  <data name="ResultLog.GenericFailure" xml:space="preserve"><value>Didn't work. Never mind, click Done.</value></data>
+  <data name="ResultLog.Failed" xml:space="preserve"><value>Didn't work. Never mind, click Done.</value></data>
   <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>This will be sent to nofaff.netlify.app</value></data>
   <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Nothing personal in here. It just lets me see whether the app is helping people.</value></data>
 

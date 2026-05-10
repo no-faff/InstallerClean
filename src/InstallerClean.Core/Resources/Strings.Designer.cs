@@ -52,7 +52,6 @@ public static class Strings
     public static string Action_MoveDestinationPlaceholder => Get("Action.MoveDestinationPlaceholder");
     public static string Action_Paste => Get("Action.Paste");
     public static string Action_Rescan => Get("Action.Rescan");
-    public static string Action_SayThanks => Get("Action.SayThanks");
     public static string Action_ScanAgain => Get("Action.ScanAgain");
     public static string Action_SelectAll => Get("Action.SelectAll");
     public static string Action_SendResultLog => Get("Action.SendResultLog");
@@ -209,14 +208,14 @@ public static class Strings
     public static string Plural_Product_Singular => Get("Plural.Product.Singular");
     public static string Reason_Orphaned => Get("Reason.Orphaned");
     public static string Reason_Superseded => Get("Reason.Superseded");
-    public static string ResultLog_GenericFailure => Get("ResultLog.GenericFailure");
-    public static string ResultLog_NetworkError => Get("ResultLog.NetworkError");
+    public static string ResultLog_Failed => Get("ResultLog.Failed");
     public static string ResultLog_Sending => Get("ResultLog.Sending");
     public static string ResultLog_Sent => Get("ResultLog.Sent");
     public static string Section_Move_Location => Get("Section.Move.Location");
     public static string Section_Registered_Details => Get("Section.Registered.Details");
     public static string Section_Registered_Patches => Get("Section.Registered.Patches");
     public static string Section_Registered_Products => Get("Section.Registered.Products");
+    public static string Section_SayThanks => Get("Section.SayThanks");
     public static string Startup_AlreadyRunningBody => Get("Startup.AlreadyRunningBody");
     public static string Startup_AlreadyRunningTitle => Get("Startup.AlreadyRunningTitle");
     public static string Startup_ErrorTitle => Get("Startup.ErrorTitle");

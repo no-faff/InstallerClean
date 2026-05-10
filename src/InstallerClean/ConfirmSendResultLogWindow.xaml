@@ -53,15 +53,19 @@
                        Margin="{StaticResource GapBottom.Lg}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <!-- Cancel is IsDefault so a reflexive Enter does NOT send;
-                     the affirmative click takes a deliberate Tab+Space or
-                     mouse press, matching the ConfirmDelete pattern. -->
+                <!-- Send is IsDefault: the user has already taken an explicit
+                     action to reach this modal (clicked Send result on the
+                     completion overlay), and the action is not destructive.
+                     Enter therefore confirms; Esc and the Cancel button
+                     back out. The Delete-confirm pattern (Cancel as
+                     default) does not transfer here because that one
+                     guards a destructive shell call. -->
                 <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
-                        Click="OnCancel" IsCancel="True" IsDefault="True"
+                        Click="OnCancel" IsCancel="True"
                         Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource PrimaryPill}"
                         Content="{loc:Translate Action.SendResultLogConfirm}"
-                        Click="OnSend"
+                        Click="OnSend" IsDefault="True"
                         AutomationProperties.Name="{loc:Translate Automation.ConfirmSendResultLog}"/>
             </StackPanel>
         </StackPanel>

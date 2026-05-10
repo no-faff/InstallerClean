@@ -226,7 +226,7 @@ public partial class CompletionViewModel : ObservableObject
             IsResultLogReady = false;
             ResultLogStatusMessage = outcome == ResultLogSendOutcome.Sent
                 ? Strings.ResultLog_Sent
-                : FailureMessage(outcome);
+                : Strings.ResultLog_Failed;
             OnPropertyChanged(nameof(HasSentResultLog));
             OnPropertyChanged(nameof(IsSendResultLogVisible));
         }
@@ -235,13 +235,6 @@ public partial class CompletionViewModel : ObservableObject
             IsSendingResultLog = false;
         }
     }
-
-    private static string FailureMessage(ResultLogSendOutcome outcome) => outcome switch
-    {
-        ResultLogSendOutcome.NetworkUnavailable => Strings.ResultLog_NetworkError,
-        ResultLogSendOutcome.Timeout => Strings.ResultLog_NetworkError,
-        _ => Strings.ResultLog_GenericFailure,
-    };
 
     [RelayCommand]
     private void Dismiss()
