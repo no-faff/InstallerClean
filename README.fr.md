@@ -67,7 +67,7 @@ InstallerClean détecte les correctifs remplacés par des mises à jour plus ré
 3. **Affiche** ce qui est utile et ce qui ne l'est pas, avec les tailles
 4. **Supprime** les fichiers inutiles : envoi à la Corbeille, ou déplacement vers un dossier de votre choix
 
-Aucune télémétrie. Aucune activité réseau. La fenêtre À propos contient un lien Vérifier les mises à jour qui ouvre la page des versions dans votre navigateur.
+Aucune télémétrie automatique. Aucune activité réseau en arrière-plan. Deux boutons opt-in peuvent déclencher du réseau sur clic : « Vérifier les mises à jour » dans À propos compare votre version à la dernière sur GitHub ; « Partager ce que vous avez nettoyé » à la fin ouvre votre navigateur sur une page No Faff.
 
 ## Captures d'écran
 
@@ -156,7 +156,7 @@ Les trois builds (setup, portable et slim) sont propres sur VirusTotal, aucune d
 - WinSxS (`C:\Windows\WinSxS`) est un dossier différent avec des règles différentes. Pour celui-là, utilisez le Nettoyage de disque intégré de Windows ou `Dism /Online /Cleanup-Image /StartComponentCleanup`.
 - Aucun service en arrière-plan, aucune tâche planifiée, aucun nettoyage automatique. L'application s'exécute quand vous la lancez.
 - Le registre est en lecture seule. L'application interroge la base Windows Installer ; elle ne la modifie pas.
-- Aucune télémétrie, aucun rapport d'usage, aucun ping de vérification de version. Le lien « Vérifier les mises à jour » dans À propos ouvre la page des versions GitHub dans votre navigateur.
+- Aucune télémétrie automatique, aucune activité réseau en arrière-plan. L'application ne fait aucun appel réseau tant que vous ne cliquez pas sur l'un de deux boutons opt-in. **Vérifier les mises à jour** dans À propos interroge l'API publique des releases de GitHub au moment du clic (un seul GET HTTPS, identifiant `InstallerClean/<version>`). **Partager ce que vous avez nettoyé** sur l'écran de fin ouvre votre navigateur sur une page No Faff où vous pouvez choisir de publier le nombre d'octets nettoyés ; l'application ne fait pas ce POST, le navigateur s'en charge.
 - Aucun supplément groupé. Pas de barres d'outils, pas d'offres tierces, pas de fenêtres intempestives.
 - La seule autorisation demandée au-delà du lancement est Administrateur, requise parce que `C:\Windows\Installer` est réservé aux administrateurs.
 
@@ -231,7 +231,7 @@ Accepte aussi `--help`, `/?` et `-h`. Pour lancer l'interface graphique, exécut
 
 `/s` est un essai à blanc : il analyse, liste ce qui serait supprimé avec noms de fichiers et tailles, puis quitte. Utile pour auditer avant nettoyage. Le code de sortie est toujours 0. Tous les fichiers se trouvent dans `C:\Windows\Installer`.
 
-`/d` et `/m` analysent puis agissent. `/d` envoie les fichiers supprimables à la Corbeille. `/m` les déplace vers un dossier (soit celui spécifié sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Le code de sortie est 0 en cas de succès, 1 si un ou plusieurs fichiers ont échoué.
+`/d` et `/m` analysent puis agissent. `/d` envoie les fichiers supprimables à la Corbeille. `/m` les déplace vers un dossier (soit celui spécifié sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Codes de sortie : `0` succès complet, `2` partiel (certains fichiers réussis, certains échoués), `1` échec total (analyse échouée, conflit de mutex, mauvais arguments, ou tous les fichiers du lot ont échoué), `130` Ctrl+C.
 
 Les trois nécessitent une invite de commandes élevée (administrateur).
 

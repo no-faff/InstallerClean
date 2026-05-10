@@ -46,7 +46,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // the ctor runs.
         Scan = new ScanViewModel(scanService, rebootService, dialogService,
             isExternallyBlocked: () => Cleanup?.IsOperating == true || Completion?.IsComplete == true);
-        Completion = new CompletionViewModel(() => Scan.ScanCommand.ExecuteAsync(null));
+        Completion = new CompletionViewModel(
+            rescanRequested: () => Scan.ScanCommand.ExecuteAsync(null),
+            openUrl: windowService.OpenUrl);
         Cleanup = new CleanupViewModel(
             moveService, deleteService, settingsService,
             dialogService, confirmationService, fileSystem,

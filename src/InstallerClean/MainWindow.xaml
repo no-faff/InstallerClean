@@ -450,6 +450,21 @@
                             Margin="{StaticResource GapBottom.Sm}"
                             AutomationProperties.Name="{loc:Translate Automation.CloseResult}"/>
 
+                    <!-- Share what you cleared. Visible only after a Move
+                         or Delete that actually cleared bytes; opens a
+                         No Faff page in the browser, where the user
+                         confirms before any value is posted. -->
+                    <Button Style="{StaticResource GhostPill}"
+                            Content="{loc:Translate Action.ShareSavings}"
+                            Command="{Binding Completion.ShareCommand}"
+                            Visibility="{Binding Completion.IsShareAvailable, Converter={StaticResource BoolToVis}}"
+                            HorizontalAlignment="Center"
+                            Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
+                            Margin="{StaticResource GapBottom.Sm}"
+                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
+                            ToolTip="{loc:Translate Tooltip.ShareSavings}"
+                            AutomationProperties.Name="{loc:Translate Automation.ShareSavings}"/>
+
                     <!-- Scan again -->
                     <Button Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.ScanAgain}" Command="{Binding Completion.RescanAfterCompletionCommand}"

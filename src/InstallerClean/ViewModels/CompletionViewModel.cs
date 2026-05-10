@@ -20,17 +20,41 @@ public partial class CompletionViewModel : ObservableObject
     [ObservableProperty] private string _summary = string.Empty;
     [ObservableProperty] private string _restore = string.Empty;
     [ObservableProperty] private string _errors = string.Empty;
+    [ObservableProperty] [property: System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Style", "IDE0044:Add readonly modifier",
+        Justification = "ObservableProperty source generator writes via the field.")]
+    private long _lastClearedBytes;
+
+    /// <summary>
+    /// True when the most recent operation cleared at least one byte
+    /// (Move or Delete). The Share button on the completion overlay
+    /// hides itself otherwise: there is nothing to share for an
+    /// all-clear scan or a Move that moved zero files.
+    /// </summary>
+    public bool IsShareAvailable => LastClearedBytes > 0;
+
+    partial void OnLastClearedBytesChanged(long value) =>
+        OnPropertyChanged(nameof(IsShareAvailable));
+
+    private const string ShareUrlBase = "https://nofaff.netlify.app/installerclean/share";
 
     private readonly Func<Task>? _rescanRequested;
+    private readonly Action<string>? _openUrl;
 
     /// <summary>
     /// <paramref name="rescanRequested"/> is an awaitable run-a-scan
-    /// hook. Func not a service reference so this VM stays ignorant of
-    /// the scan service.
+    /// hook. <paramref name="openUrl"/> is the host-side URL launcher;
+    /// the production wiring is the WPF host's UrlLauncher, which
+    /// goes through UnelevatedLauncher with a clipboard-fallback
+    /// dialog. Both are passed as delegates so this VM stays
+    /// ignorant of the scan service and the WPF host.
     /// </summary>
-    public CompletionViewModel(Func<Task>? rescanRequested = null)
+    public CompletionViewModel(
+        Func<Task>? rescanRequested = null,
+        Action<string>? openUrl = null)
     {
         _rescanRequested = rescanRequested;
+        _openUrl = openUrl;
     }
 
     /// <summary>Shows the "All clear" state after a scan finds no orphans.</summary>
@@ -40,6 +64,7 @@ public partial class CompletionViewModel : ObservableObject
         Summary = Strings.Completion_NothingToCleanUp;
         Restore = string.Empty;
         Errors = string.Empty;
+        LastClearedBytes = 0;
         IsComplete = true;
     }
 
@@ -60,6 +85,7 @@ public partial class CompletionViewModel : ObservableObject
                 movedCount, movedLabel, destination, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = Strings.Completion_MoveRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        LastClearedBytes = movedBytes;
         IsComplete = true;
     }
 
@@ -77,7 +103,22 @@ public partial class CompletionViewModel : ObservableObject
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = Strings.Completion_DeleteRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        LastClearedBytes = deletedBytes;
         IsComplete = true;
+    }
+
+    /// <summary>
+    /// Opens the No Faff "share what you cleared" page in the user's
+    /// browser, with the cleared-bytes value as a query parameter.
+    /// The browser-side page asks for explicit confirmation before
+    /// posting the value; the app does not make a network call.
+    /// </summary>
+    [RelayCommand]
+    private void Share()
+    {
+        if (LastClearedBytes <= 0 || _openUrl is null) return;
+        var url = $"{ShareUrlBase}?bytes={LastClearedBytes}";
+        _openUrl(url);
     }
 
     [RelayCommand]

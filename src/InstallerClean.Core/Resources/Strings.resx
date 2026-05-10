@@ -127,6 +127,7 @@
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Move destination...</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Re-scan</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Scan again</value></data>
+  <data name="Action.ShareSavings" xml:space="preserve"><value>_Share what you cleared</value></data>
 
   <!-- ============================================================
        AUTOMATION NAMES (screen reader / accessibility)
@@ -143,6 +144,7 @@
   <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all orphaned installer files to the Recycle Bin</value></data>
   <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Confirm sending the orphaned files to the Recycle Bin</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>Confirm moving the orphaned files to the chosen destination folder</value></data>
+  <data name="Automation.ShareSavings" xml:space="preserve"><value>Open the No Faff share page in your browser to report how much was cleared</value></data>
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Move destination folder</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Operation progress</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>Scan C:\Windows\Installer again</value></data>
@@ -160,6 +162,7 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the orphaned files will be moved. Type a path, paste one, drop a folder, or click Browse.</value></data>
+  <data name="Tooltip.ShareSavings" xml:space="preserve"><value>Opens the No Faff share page in your browser. The page asks for confirmation before posting; the app makes no network call on its own.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the orphaned files to the chosen destination folder.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Send the orphaned files to the Recycle Bin.</value></data>
   <data name="Tooltip.OpenProjectOnGitHub" xml:space="preserve"><value>Open the project on GitHub</value></data>
@@ -330,6 +333,17 @@ Details in {1}.</value></data>
   <!-- 0 = the relative path the caller passed -->
   <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0}</value></data>
   <data name="BrowserLaunchFailedTitle" xml:space="preserve"><value>Couldn't open your browser</value></data>
+  <data name="UpdateCheck.Title" xml:space="preserve"><value>Check for updates</value></data>
+  <!-- 0 = current version string -->
+  <data name="UpdateCheck.UpToDate.Body" xml:space="preserve"><value>You're running the latest version: {0}.</value></data>
+  <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Update available</value></data>
+  <!-- 0 = installed version, 1 = latest version on GitHub -->
+  <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Your version: {0}&#10;Latest version: {1}&#10;&#10;Click OK to open the release page in your browser.</value></data>
+  <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Couldn't reach GitHub. Check your internet connection and try again.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub's response did not contain a recognised release. Try again later, or open the releases page directly.</value></data>
+  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>The check timed out. Your connection to GitHub may be slow; try again.</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>The check failed for an unknown reason. Details are in crash.log if you need to report it.</value></data>
   <!-- 0 = the URL the user was trying to reach -->
   <data name="BrowserLaunchFailedClipboardOk" xml:space="preserve"><value>The link couldn't be opened in your normal-user browser. The URL has been copied to your clipboard so you can open it manually:&#10;&#10;{0}</value></data>
   <data name="BrowserLaunchFailedClipboardFailed" xml:space="preserve"><value>The link couldn't be opened in your normal-user browser, and copying it to the clipboard also failed. The URL is:&#10;&#10;{0}</value></data>

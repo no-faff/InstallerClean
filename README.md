@@ -158,8 +158,8 @@ As of the v1.7.0 release: 0/68 (setup), 0/69 (portable), 0/70 (slim) on VirusTot
 - WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, use Windows's built-in Disk Cleanup or `Dism /Online /Cleanup-Image /StartComponentCleanup`.
 - No background service, no scheduled task, no auto-clean. The app runs when you launch it.
 - The registry is read-only. The app queries the Windows Installer database; it doesn't change it.
-- No telemetry, no usage reporting, no version-check ping. The "Check for updates" link in About opens the GitHub releases page in your browser.
-- No bundled extras. No toolbars, no third-party offers, no nag screens.
+- No automatic telemetry, no background network. The app makes no network call until you click one of two buttons. **Check for updates** in About queries GitHub's public releases API on click and tells you whether you have the latest version (single HTTPS GET, identifying string `InstallerClean/<version>`). **Share what you cleared** on the completion screen opens your browser to a No Faff page where you can opt to post the cleared-bytes count; the app does not make that POST itself, the browser does.
+- No bundled extras. No toolbars, no third-party offers, no upsells.
 - The only permission asked for beyond launching is Administrator, which is required because `C:\Windows\Installer` is admin-only.
 
 ## FAQ
