@@ -26,14 +26,16 @@ public partial class AboutWindow : Window
     {
         if (sender is not System.Windows.Controls.Button button) return;
 
-        // Cancel any in-flight check from a previous click. Only one
-        // check is in flight at a time; the second click supersedes
-        // the first.
-        _checkCts?.Cancel();
+        // Swap-then-dispose. The previous CTS is cancelled to release
+        // any waiter inside CheckAsync; disposing it after the swap
+        // matches the CleanupViewModel.ScheduleMoveDestinationSave
+        // pattern and avoids leaking one CTS per rapid double-click.
+        var previous = _checkCts;
         _checkCts = new CancellationTokenSource();
+        previous?.Cancel();
+        previous?.Dispose();
         var token = _checkCts.Token;
 
-        var originalContent = button.Content;
         button.IsEnabled = false;
         Mouse.OverrideCursor = Cursors.Wait;
         try
@@ -83,7 +85,6 @@ public partial class AboutWindow : Window
         finally
         {
             Mouse.OverrideCursor = null;
-            button.Content = originalContent;
             button.IsEnabled = true;
         }
     }

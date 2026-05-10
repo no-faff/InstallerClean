@@ -104,6 +104,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 FullPath: filePath,
                 SizeBytes: size,
                 IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
+                IsSuperseded: false,
                 Reason: Strings.Reason_Orphaned));
         }
 
@@ -144,6 +145,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     FullPath: pkg.LocalPackagePath,
                     SizeBytes: size,
                     IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
+                    IsSuperseded: true,
                     Reason: Strings.Reason_Superseded));
             }
             else

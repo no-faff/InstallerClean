@@ -64,6 +64,7 @@ public partial class CompletionViewModel : ObservableObject
     private bool _resultLogSentThisSession;
     private bool _promptShownThisSession;
     private bool _skipNextResultLogPrompt;
+    private bool _sendInFlight;
 
     /// <summary>
     /// Visible when a fresh log exists for the operation just
@@ -200,28 +201,55 @@ public partial class CompletionViewModel : ObservableObject
     [RelayCommand]
     private async Task SendResultLogAsync()
     {
-        if (_resultLogService is null || _resultLogSentThisSession) return;
+        if (_resultLogService is null || _resultLogSentThisSession || _sendInFlight) return;
 
-        // Read the file the user is about to send so the confirmation
-        // window can render the literal bytes that will go out. If the
-        // file's gone or unreadable, fall through to the failure path:
-        // the SendAsync call below will return NoLogToSend and the same
-        // generic failure message lands in the status line.
-        var jsonContent = await _resultLogService.ReadLastLogAsync().ConfigureAwait(true);
-        if (_confirmationService is { } confirm && jsonContent is { })
-        {
-            if (!confirm.ConfirmSendResultLog(jsonContent))
-                return;
-        }
-
-        IsSendingResultLog = true;
-        ResultLogStatusMessage = Strings.ResultLog_Sending;
+        // _sendInFlight gates re-entry across the modal await, which
+        // IsSendingResultLog cannot cover because the latter would
+        // flicker the button visible/invisible during the user's
+        // confirmation step. Cleared in the finally so a Cancel from
+        // the modal restores the ability to click again.
+        _sendInFlight = true;
         try
         {
-            var outcome = await _resultLogService.SendAsync().ConfigureAwait(true);
-            // The Send button vanishes for the rest of the session
-            // regardless of outcome. The user has had their go; we
-            // don't ask them to "try again" for what was a favour.
+            // Read once; the same bytes feed the modal preview and the
+            // POST. Reading from disk twice would let a concurrent
+            // writer slip a different payload between the user's review
+            // and the wire transmission.
+            var jsonContent = await _resultLogService.ReadLastLogAsync().ConfigureAwait(true);
+
+            if (_confirmationService is { } confirm && jsonContent is { })
+            {
+                if (!confirm.ConfirmSendResultLog(jsonContent))
+                    return;
+            }
+
+            IsSendingResultLog = true;
+            ResultLogStatusMessage = Strings.ResultLog_Sending;
+            ResultLogSendOutcome outcome;
+            try
+            {
+                outcome = await _resultLogService.SendAsync(jsonContent ?? string.Empty)
+                    .ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                // SendAsync is documented "never throws", but the
+                // contract is load-bearing across an assembly boundary.
+                // A future change that broke the contract would
+                // otherwise ride DispatcherUnhandledException to a
+                // process exit; instead this collapses to the same
+                // visible failure state as a clean reject.
+                CrashLog.TryWrite(ex);
+                outcome = ResultLogSendOutcome.Unknown;
+            }
+            finally
+            {
+                IsSendingResultLog = false;
+            }
+
+            // Send outcome (success or failure) flips the session lock.
+            // No "try again": a failed send was a favour declined; the
+            // user moves on.
             _resultLogSentThisSession = true;
             IsResultLogReady = false;
             ResultLogStatusMessage = outcome == ResultLogSendOutcome.Sent
@@ -232,7 +260,7 @@ public partial class CompletionViewModel : ObservableObject
         }
         finally
         {
-            IsSendingResultLog = false;
+            _sendInFlight = false;
         }
     }
 

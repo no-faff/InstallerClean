@@ -47,8 +47,8 @@ public class ScanMoveCompletionTests
     {
         var orphans = new[]
         {
-            new OrphanedFile(@"C:\Windows\Installer\a.msi", 1_048_576, false, InstallerClean.Resources.Strings.Reason_Orphaned),
-            new OrphanedFile(@"C:\Windows\Installer\b.msi", 2_097_152, false, InstallerClean.Resources.Strings.Reason_Orphaned),
+            new OrphanedFile(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, InstallerClean.Resources.Strings.Reason_Orphaned),
+            new OrphanedFile(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, InstallerClean.Resources.Strings.Reason_Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -102,7 +102,7 @@ public class ScanMoveCompletionTests
     {
         var orphans = new[]
         {
-            new OrphanedFile(@"C:\Windows\Installer\x.msi", 524_288, false, InstallerClean.Resources.Strings.Reason_Orphaned),
+            new OrphanedFile(@"C:\Windows\Installer\x.msi", 524_288, false, false, InstallerClean.Resources.Strings.Reason_Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -218,9 +218,9 @@ public class ScanMoveCompletionTests
     {
         var orphans = new[]
         {
-            new OrphanedFile(@"C:\Windows\Installer\a.msi", 1024, false, InstallerClean.Resources.Strings.Reason_Orphaned),
-            new OrphanedFile(@"C:\Windows\Installer\b.msi", 2048, false, InstallerClean.Resources.Strings.Reason_Orphaned),
-            new OrphanedFile(@"C:\Windows\Installer\c.msi", 4096, false, InstallerClean.Resources.Strings.Reason_Orphaned),
+            new OrphanedFile(@"C:\Windows\Installer\a.msi", 1024, false, false, InstallerClean.Resources.Strings.Reason_Orphaned),
+            new OrphanedFile(@"C:\Windows\Installer\b.msi", 2048, false, false, InstallerClean.Resources.Strings.Reason_Orphaned),
+            new OrphanedFile(@"C:\Windows\Installer\c.msi", 4096, false, false, InstallerClean.Resources.Strings.Reason_Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));

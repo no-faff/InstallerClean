@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
-using InstallerClean.Resources;
 using InstallerClean.Services;
 
 namespace InstallerClean.Models;
@@ -64,8 +63,31 @@ public sealed record ResultLogEntry(
             ScanInfo.From(scan, scanDurationMs, pendingReboot),
             OperationInfo.FromDelete(delete, scan.RemovableFiles.Count, bytesFreed, cancelled));
 
-    private static string ResolveOs() =>
-        $"{RuntimeInformation.OSDescription} ({RuntimeInformation.OSArchitecture})";
+    private static string ResolveOs()
+    {
+        // Bucket to OS family and architecture only. The raw
+        // RuntimeInformation.OSDescription string carries the Windows
+        // build number (e.g. "10.0.26100"), which can narrow an
+        // Insider-ring user to a population small enough to function
+        // as a fingerprint. The schema's no-machine-identifier
+        // contract requires a coarser shape.
+        //
+        // Build-number boundaries: Windows 11 starts at 22000
+        // (released 2021-10-05). Earlier NT 10 builds are Windows 10.
+        // The boundary holds for Windows 11 24H2 / build 26100 which
+        // is also the Server 2025 build; the family label calls it
+        // Windows 11 because the client population dominates and the
+        // server population is a fraction of a percent of installs.
+        var build = Environment.OSVersion.Version.Build;
+        var family = build switch
+        {
+            >= 22000 => "Windows 11",
+            >= 10000 => "Windows 10",
+            > 0 => "Windows",
+            _ => "Unknown",
+        };
+        return $"{family} ({RuntimeInformation.OSArchitecture})";
+    }
 }
 
 public sealed record AppInfo(string Version)
@@ -84,8 +106,7 @@ public sealed record ScanInfo(
 {
     public static ScanInfo From(ScanResult scan, long durationMs, string pendingReboot)
     {
-        var supersededLabel = Strings.Reason_Superseded;
-        var supersededCount = scan.RemovableFiles.Count(f => f.Reason == supersededLabel);
+        var supersededCount = scan.RemovableFiles.Count(f => f.IsSuperseded);
         return new(
             durationMs,
             scan.RegisteredPackages.Count,

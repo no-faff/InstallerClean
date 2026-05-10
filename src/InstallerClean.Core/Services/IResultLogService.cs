@@ -4,12 +4,11 @@ namespace InstallerClean.Services;
 
 /// <summary>
 /// Writes the post-cleanup diagnostic log to disk and, on user
-/// request, POSTs the same JSON to No Faff. The POST is strictly
-/// click-triggered; nothing in this service fires on its own. The
-/// pre-1.5.3 build's auto-HTTP-on-startup tripped DeepInstinct's
-/// C2 heuristic on the elevated apphost, and the rule for any new
-/// outbound call from an elevated process is one direct user action,
-/// one network packet.
+/// request, POSTs the same JSON to No Faff. Each outbound call from
+/// the elevated process is bound to one direct user action; nothing
+/// in this service fires on its own. The constraint is anchored in
+/// v1.5.3's DeepInstinct flag on auto-HTTP-on-startup against the
+/// elevated apphost.
 /// </summary>
 public interface IResultLogService
 {
@@ -28,18 +27,23 @@ public interface IResultLogService
     Task<bool> WriteAsync(ResultLogEntry entry, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// POSTs the contents of <see cref="LastLogPath"/> to the No Faff
-    /// result-log endpoint. Returns one of <see cref="ResultLogSendOutcome"/>;
+    /// POSTs <paramref name="body"/> to the No Faff result-log endpoint.
+    /// The caller is expected to obtain the body via
+    /// <see cref="ReadLastLogAsync"/> immediately before calling so the
+    /// modal preview and the wire payload are the same bytes; reading
+    /// last-run.json twice would open a TOCTOU window between user
+    /// review and POST. Returns one of <see cref="ResultLogSendOutcome"/>;
     /// the caller picks a localised message per case rather than the
     /// service echoing a framework exception. Never throws.
     /// </summary>
-    Task<ResultLogSendOutcome> SendAsync(CancellationToken cancellationToken = default);
+    Task<ResultLogSendOutcome> SendAsync(string body, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Reads <see cref="LastLogPath"/> as UTF-8 text and returns the
     /// raw content for display in the confirmation window. Never
     /// throws; returns null when the file doesn't exist, exceeds the
-    /// 64 KiB read cap, or fails to read.
+    /// <see cref="ResultLogService.MaxLogBytes"/> cap, or fails to read.
+    /// Oversize and read-failure cases write a breadcrumb to crash.log.
     /// </summary>
     Task<string?> ReadLastLogAsync(CancellationToken cancellationToken = default);
 }

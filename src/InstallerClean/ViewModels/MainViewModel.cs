@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.IO.Abstractions;
 using CommunityToolkit.Mvvm.ComponentModel;
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
 
@@ -137,30 +138,44 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private async void OnScanCompleted(object? sender, EventArgs e)
     {
-        // The suppression flag is consumed up front so a rescan that
-        // returns orphans (rather than another all-clear) still resets
-        // the one-shot for the next operation's MarkResultLogReady call.
-        var suppress = Completion.ConsumeSuppressNextResultLogPrompt();
+        // async void: WriteAsync's "never throws" contract is load-
+        // bearing across the assembly boundary. A future change that
+        // broke the contract would otherwise ride DispatcherUnhandledException
+        // to a process exit. The outer try/catch keeps the contract's
+        // failure mode local to this handler.
+        try
+        {
+            // The suppression flag is consumed up front so a rescan
+            // that returns orphans (rather than another all-clear)
+            // still resets the one-shot for the next MarkResultLogReady
+            // call.
+            var suppress = Completion.ConsumeSuppressNextResultLogPrompt();
 
-        if (Scan.OrphanedFileCount != 0 || Cleanup.IsOperating || Scan.LastScanResult is not { } result)
-            return;
+            if (Scan.OrphanedFileCount != 0 || Cleanup.IsOperating || Scan.LastScanResult is not { } result)
+                return;
 
-        Completion.ShowAllClear();
+            Completion.ShowAllClear();
 
-        if (suppress) return;
-        // Users with the lifetime lock will never see the Send button
-        // again, so don't spend disk I/O writing a file they won't
-        // send. Cleanup-side writes still happen because they go via
-        // CleanupViewModel directly; this branch is the all-clear path.
-        if (_hasSentResultLogBefore) return;
+            if (suppress) return;
+            // The lifetime lock hides the Send button for the rest of
+            // the user's life on this machine, so writing last-run.json
+            // would burn disk I/O on a file the user never sees.
+            // CleanupViewModel still writes after each Move/Delete by
+            // design (the file documents the most recent operation
+            // outcome regardless of whether the prompt is offered).
+            if (_hasSentResultLogBefore) return;
 
-        // WriteAsync is best-effort. A failed write (disk full, locked
-        // file, read-only profile) returns false instead of throwing,
-        // and the Send button stays hidden rather than overpainting a
-        // dialog on the all-clear summary.
-        var entry = ResultLogEntry.ForScanOnly(
-            result, Scan.LastScanDurationMs, Scan.PendingRebootLabel);
-        if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
-            Completion.MarkResultLogReady();
+            // WriteAsync returns false on disk-full / locked-file /
+            // read-only-profile failure; the Send button stays hidden
+            // rather than overpainting a dialog on the all-clear summary.
+            var entry = ResultLogEntry.ForScanOnly(
+                result, Scan.LastScanDurationMs, Scan.PendingRebootLabel);
+            if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
+                Completion.MarkResultLogReady();
+        }
+        catch (Exception ex)
+        {
+            CrashLog.TryWrite(ex);
+        }
     }
 }

@@ -27,15 +27,23 @@ public sealed class UpdateCheckService : IUpdateCheckService
     private const string ApiUrl =
         "https://api.github.com/repos/no-faff/InstallerClean/releases/latest";
 
-    // GitHub's API returns 403 if no User-Agent is supplied. The
-    // project name plus the running version is the canonical form;
-    // GitHub's docs use the same shape in their examples.
+    // GitHub's API returns 403 without a User-Agent. RFC 9110 product =
+    // token "/" token; the version token must be a bare semver, no spaces,
+    // because the localised "Version 1.8.0" display string contains an
+    // internal space and parses as two adjacent products with no slash.
+    // ResultLogService takes the same shape; the two must stay in sync.
     private static readonly string UserAgent =
-        $"InstallerClean/{DisplayHelpers.GetVersionString()}";
+        $"InstallerClean/{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0"}";
+
+    private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
+
+    private const string ReleasesPageUrl =
+        "https://github.com/no-faff/InstallerClean/releases/latest";
 
     private static readonly HttpClient HttpClient = new()
     {
-        Timeout = TimeSpan.FromSeconds(8),
+        Timeout = RequestTimeout,
+        MaxResponseContentBufferSize = 256 * 1024,
     };
 
     public async Task<UpdateCheckResult> CheckAsync(CancellationToken cancellationToken = default)
@@ -81,9 +89,15 @@ public sealed class UpdateCheckService : IUpdateCheckService
 
             if (latestNormalised > currentNormalised)
             {
-                var releaseUrl = doc.RootElement.TryGetProperty("html_url", out var urlElement)
-                    ? urlElement.GetString() ?? "https://github.com/no-faff/InstallerClean/releases/latest"
-                    : "https://github.com/no-faff/InstallerClean/releases/latest";
+                // html_url comes from a TLS-validated github.com response,
+                // so trust is anchored at the transport. Even so, the
+                // returned string is constrained to the project's own
+                // releases path; any other shape falls back to the
+                // hardcoded ReleasesPageUrl so a manipulated response
+                // can't redirect the user's browser elsewhere.
+                var rawUrl = doc.RootElement.TryGetProperty("html_url", out var urlElement)
+                    ? urlElement.GetString() : null;
+                var releaseUrl = IsTrustedReleaseUrl(rawUrl) ? rawUrl! : ReleasesPageUrl;
 
                 return new UpdateAvailable(
                     CurrentVersion: FormatVersion(currentNormalised),
@@ -132,4 +146,13 @@ public sealed class UpdateCheckService : IUpdateCheckService
 
     private static string FormatVersion(Version v) =>
         $"{v.Major}.{v.Minor}.{v.Build}";
+
+    private static bool IsTrustedReleaseUrl(string? url)
+    {
+        if (string.IsNullOrEmpty(url)) return false;
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return false;
+        if (uri.Scheme != Uri.UriSchemeHttps) return false;
+        if (!string.Equals(uri.Host, "github.com", StringComparison.OrdinalIgnoreCase)) return false;
+        return uri.AbsolutePath.StartsWith("/no-faff/InstallerClean/releases/", StringComparison.Ordinal);
+    }
 }

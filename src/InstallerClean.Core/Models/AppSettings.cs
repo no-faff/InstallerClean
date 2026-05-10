@@ -26,10 +26,15 @@ public sealed class AppSettings
 
     /// <summary>
     /// Set to true once the user has successfully sent a result log
-    /// to No Faff. The Send button is then hidden forever (across
-    /// sessions and across version upgrades) so we capture one report
-    /// per machine, never two. Eliminates the bias where a user who
-    /// freed nothing on a re-run would skew the aggregate downward.
+    /// to No Faff. The Send button is then hidden across sessions and
+    /// across version upgrades, so the receiving cohort is each
+    /// machine's first-ever submission rather than a low-impact rerun.
+    /// One report per intact settings file: if the JSON ever becomes
+    /// unreadable, <see cref="Services.SettingsService"/>.Load renames
+    /// it to <c>settings.json.bad</c> and returns defaults, which
+    /// re-enables the prompt. The receiver does not deduplicate, so a
+    /// machine whose settings file is corrupted, deleted, or roaming-
+    /// profile-clobbered between sessions can submit again.
     /// </summary>
     public bool HasSentResultLog { get; set; }
 }

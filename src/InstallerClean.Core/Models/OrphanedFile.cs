@@ -7,21 +7,29 @@ namespace InstallerClean.Models;
 /// A single file in <c>C:\Windows\Installer</c> that the scan classified
 /// as removable. Two pathways add entries here: files the API never
 /// claimed (true orphans) and patches the API still claims but has
-/// marked superseded or obsoleted (carried via <see cref="Reason"/>).
+/// marked superseded or obsoleted.
 /// </summary>
 /// <param name="FullPath">Absolute path inside <c>C:\Windows\Installer</c>.</param>
 /// <param name="SizeBytes">File size on disk; 0 if the file disappeared between scan and stat.</param>
 /// <param name="IsPatch">True for <c>.msp</c>, false for <c>.msi</c>. Drives the patch/installer column.</param>
+/// <param name="IsSuperseded">
+/// True for entries added because the Windows Installer database marks the
+/// patch superseded or obsoleted, false for true orphans the API never
+/// claimed. Distinguishes the two pathways with a stable boolean rather
+/// than a localised string; counts and analytics compare on this.
+/// </param>
 /// <param name="Reason">
 /// Localised tag shown in the Reason column of the orphan list. Sourced
 /// from the resx (<c>Reason.Orphaned</c> or <c>Reason.Superseded</c>);
-/// callers must pass a localised value rather than relying on a default,
-/// so a non-en-GB UI never shows a stray English fragment.
+/// callers pass a localised value rather than relying on a default so a
+/// non-en-GB UI never shows a stray English fragment. Display only; the
+/// machine-readable signal is <see cref="IsSuperseded"/>.
 /// </param>
 public record OrphanedFile(
     string FullPath,
     long SizeBytes,
     bool IsPatch,
+    bool IsSuperseded,
     string Reason)
 {
     public string FileName => Path.GetFileName(FullPath);

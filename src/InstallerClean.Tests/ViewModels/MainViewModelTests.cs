@@ -49,7 +49,7 @@ public class MainViewModelTests
     private static ScanResult ScanResultWithOrphans(int count)
     {
         var files = Enumerable.Range(0, count)
-            .Select(i => new OrphanedFile($@"C:\Windows\Installer\orphan{i}.msi", 1024 * (i + 1), false, InstallerClean.Resources.Strings.Reason_Orphaned))
+            .Select(i => new OrphanedFile($@"C:\Windows\Installer\orphan{i}.msi", 1024 * (i + 1), false, false, InstallerClean.Resources.Strings.Reason_Orphaned))
             .ToList();
         return new ScanResult(files, Array.Empty<RegisteredPackage>(), 0);
     }
@@ -72,8 +72,8 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, Orphaned),
-            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, Orphaned),
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, Orphaned),
         };
         var registered = new List<RegisteredPackage>
         {
@@ -165,7 +165,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\huge.msi", 107_374_182_400, false, Orphaned), // 100 GB
+            new(@"C:\Windows\Installer\huge.msi", 107_374_182_400, false, false, Orphaned), // 100 GB
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -192,7 +192,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\empty.msi", 0, false, Orphaned),
+            new(@"C:\Windows\Installer\empty.msi", 0, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -324,8 +324,8 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, Orphaned),
-            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, Orphaned),
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -374,7 +374,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\x.msi", 524_288, false, Orphaned),
+            new(@"C:\Windows\Installer\x.msi", 524_288, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));

@@ -19,7 +19,9 @@ namespace InstallerClean.Services;
 public sealed class ResultLogService : IResultLogService
 {
     private const string EndpointUrl = "https://nofaff.netlify.app/api/result-log";
-    private const long MaxLogBytes = 64 * 1024;
+    public const long MaxLogBytes = 64 * 1024;
+
+    private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
 
     private static readonly string LogFolder = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -39,7 +41,7 @@ public sealed class ResultLogService : IResultLogService
 
     private static readonly HttpClient HttpClient = new()
     {
-        Timeout = TimeSpan.FromSeconds(8),
+        Timeout = RequestTimeout,
     };
 
     public string LastLogPath => LogFile;
@@ -78,26 +80,13 @@ public sealed class ResultLogService : IResultLogService
         }
     }
 
-    public async Task<ResultLogSendOutcome> SendAsync(CancellationToken cancellationToken = default)
+    public async Task<ResultLogSendOutcome> SendAsync(string body, CancellationToken cancellationToken = default)
     {
-        if (!File.Exists(LogFile))
+        if (string.IsNullOrEmpty(body))
             return ResultLogSendOutcome.NoLogToSend;
 
         try
         {
-            string body;
-            using (var handle = StorageHelpers.OpenAtomic(
-                       LogFile, FileAccess.Read, StorageHelpers.AtomicOpenMode.OpenExisting))
-            {
-                if (handle is null)
-                    return ResultLogSendOutcome.NoLogToSend;
-                using var fs = new FileStream(handle, FileAccess.Read);
-                if (fs.Length > MaxLogBytes)
-                    return ResultLogSendOutcome.Unknown;
-                using var reader = new StreamReader(fs, Encoding.UTF8);
-                body = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-            }
-
             using var request = new HttpRequestMessage(HttpMethod.Post, EndpointUrl);
             request.Headers.UserAgent.ParseAdd(UserAgent);
             request.Content = new StringContent(body, Encoding.UTF8);
@@ -105,9 +94,9 @@ public sealed class ResultLogService : IResultLogService
 
             using var response = await HttpClient.SendAsync(request, cancellationToken)
                 .ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode)
-                return ResultLogSendOutcome.ServerError;
-            return ResultLogSendOutcome.Sent;
+            return response.IsSuccessStatusCode
+                ? ResultLogSendOutcome.Sent
+                : ResultLogSendOutcome.ServerError;
         }
         catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
@@ -140,7 +129,15 @@ public sealed class ResultLogService : IResultLogService
                 LogFile, FileAccess.Read, StorageHelpers.AtomicOpenMode.OpenExisting);
             if (handle is null) return null;
             using var fs = new FileStream(handle, FileAccess.Read);
-            if (fs.Length > MaxLogBytes) return null;
+            if (fs.Length > MaxLogBytes)
+            {
+                // Oversize is not a normal outcome (writer caps at the
+                // schema's natural size); record it so a "Didn't work"
+                // user report has a breadcrumb to follow.
+                CrashLog.TryWrite(new InvalidDataException(
+                    $"last-run.json exceeds the {MaxLogBytes}-byte cap and was not read."));
+                return null;
+            }
             using var reader = new StreamReader(fs, Encoding.UTF8);
             return await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
         }
