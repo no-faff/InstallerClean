@@ -76,7 +76,7 @@ public class ScanMoveCompletionTests
 
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains(@"D:\backup", vm.Completion.Summary);
-        Assert.Contains("3.0 MB", vm.Completion.Heading);  // 1MB + 2MB cleared
+        Assert.Contains("3.0 MB", vm.Completion.Heading);  // 1MB + 2MB freed
         Assert.False(vm.Cleanup.IsOperating);
         await _scanService.Received(2).ScanAsync(  // initial + post-move refresh
             Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>());
@@ -92,7 +92,7 @@ public class ScanMoveCompletionTests
         await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.True(vm.Completion.IsComplete);
-        Assert.Equal("All clear", vm.Completion.Heading);
+        Assert.Equal("All clean", vm.Completion.Heading);
         Assert.False(vm.Cleanup.MoveAllCommand.CanExecute(null));
         Assert.False(vm.Cleanup.DeleteAllCommand.CanExecute(null));
     }

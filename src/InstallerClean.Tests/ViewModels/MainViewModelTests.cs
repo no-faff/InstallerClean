@@ -100,7 +100,7 @@ public class MainViewModelTests
         await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.True(vm.Completion.IsComplete);
-        Assert.Equal("All clear", vm.Completion.Heading);
+        Assert.Equal("All clean", vm.Completion.Heading);
     }
 
     [Fact]
@@ -346,7 +346,7 @@ public class MainViewModelTests
             Arg.Any<IEnumerable<string>>(), vm.Cleanup.MoveDestination,
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
-        Assert.Contains("cleared", vm.Completion.Heading);
+        Assert.Contains("freed", vm.Completion.Heading);
     }
 
     [Fact]
