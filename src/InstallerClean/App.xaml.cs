@@ -137,6 +137,7 @@ public partial class App : Application
             splash.CancelRequested += (_, _) => startupCts.Cancel();
 
             var splashProgress = new Progress<string>(splash.OnScanProgress);
+            var cancelled = false;
             try
             {
                 var scanTask = viewModel.Scan.ScanWithProgressAsync(splashProgress, startupCts.Token);
@@ -144,13 +145,18 @@ public partial class App : Application
             }
             catch (OperationCanceledException)
             {
-                splash.Close();
-                Shutdown(0);
-                return;
+                // Cancelled startup scan falls through to the main
+                // window in its empty pre-scan state. The user clicked
+                // Cancel intentionally; a silent process exit at this
+                // point is indistinguishable from a crash to the user.
+                cancelled = true;
             }
 
-            splash.UpdateStep(Strings.Status_Done, 100);
-            await Task.Delay(200);
+            if (!cancelled)
+            {
+                splash.UpdateStep(Strings.Status_Done, 100);
+                await Task.Delay(200);
+            }
 
             var window = new MainWindow(viewModel);
             Application.Current.MainWindow = window;

@@ -7,7 +7,6 @@ namespace InstallerClean.Services;
 /// </summary>
 public interface IDialogService
 {
-    void ShowInformation(string message, string caption);
     void ShowWarning(string message, string caption);
     void ShowError(string message, string caption);
 }

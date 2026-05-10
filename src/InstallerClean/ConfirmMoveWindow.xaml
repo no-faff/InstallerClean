@@ -10,7 +10,10 @@
         ResizeMode="NoResize">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="32" GlassFrameThickness="0"
+        <!-- CaptionHeight=0: this is a centred-on-owner modal with no
+             title-bar buttons, so no drag region is needed and the
+             Border below claims the full window. -->
+        <WindowChrome CaptionHeight="0" GlassFrameThickness="0"
                       ResizeBorderThickness="0"/>
     </WindowChrome.WindowChrome>
 
@@ -25,10 +28,15 @@
                        TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- Cancel is the default for symmetry with the Confirm
+                     Delete dialog: a reflexive Enter dismisses, never
+                     commits. -->
                 <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
-                        Click="OnCancel" IsCancel="True" Margin="{StaticResource GapRight.Sm}"/>
+                        Click="OnCancel" IsCancel="True" IsDefault="True"
+                        Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource AccentPill}" Content="{loc:Translate Action.Move}"
-                        Click="OnMove" IsDefault="True"/>
+                        Click="OnMove"
+                        AutomationProperties.Name="{loc:Translate Automation.ConfirmMove}"/>
             </StackPanel>
         </StackPanel>
     </Border>

@@ -61,17 +61,17 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     }
                     deleted++;
                 }
-                catch (UnauthorizedAccessException ex)
+                catch (UnauthorizedAccessException)
                 {
-                    errors.Add(new AccessDenied(filePath, ex.Message));
+                    errors.Add(new AccessDenied(filePath));
                 }
-                catch (IOException ex)
+                catch (IOException)
                 {
-                    errors.Add(new IOFailure(filePath, ex.Message));
+                    errors.Add(new IOFailure(filePath));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    errors.Add(new UnknownError(filePath, ex.GetType().Name, ex.Message));
+                    errors.Add(new UnknownError(filePath));
                 }
             }
 

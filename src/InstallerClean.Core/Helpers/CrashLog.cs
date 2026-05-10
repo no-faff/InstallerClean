@@ -10,6 +10,14 @@ public static class CrashLog
 {
     private const long MaxBytes = 512 * 1024;
 
+    private static readonly string PrivacyHeader =
+        "# crash.log captures unhandled exceptions from InstallerClean." + Environment.NewLine +
+        "# Under elevation the framework's exception messages can include file" + Environment.NewLine +
+        "# paths from the running session (including other users' profiles" + Environment.NewLine +
+        "# enumerated by Windows Installer queries). Redact paths before" + Environment.NewLine +
+        "# attaching this file to a public bug report." + Environment.NewLine +
+        Environment.NewLine;
+
     private static readonly string LogFolder = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "NoFaff", "InstallerClean");
@@ -48,6 +56,18 @@ public static class CrashLog
             if (handle is null) return (LogFile, false);
 
             using var fs = new FileStream(handle, FileAccess.Write);
+            // First write of a fresh log file gets a privacy header so a
+            // user about to attach this to a public bug report sees the
+            // disclosure: under elevation, framework exception messages
+            // can contain file paths from the running session including
+            // other users' profiles. Header lines are prefixed with #
+            // so log readers can skip them.
+            if (fs.Length == 0)
+            {
+                using var headerWriter = new StreamWriter(fs, Encoding.UTF8, leaveOpen: true);
+                headerWriter.Write(PrivacyHeader);
+                headerWriter.Flush();
+            }
             fs.Seek(0, SeekOrigin.End);
 
             var entry = $"---- {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";

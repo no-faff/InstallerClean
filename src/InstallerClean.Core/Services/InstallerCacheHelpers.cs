@@ -28,6 +28,47 @@ internal static class InstallerCacheHelpers
     }
 
     /// <summary>
+    /// True if <paramref name="path"/> resolves under any of the
+    /// canonical Windows system folders: <c>%SystemRoot%</c>,
+    /// <c>%ProgramFiles%</c>, <c>%ProgramFiles(x86)%</c>, or
+    /// <c>%ProgramData%</c>. Symlinks, junctions and subst-mapped
+    /// drives are expanded the same way as
+    /// <see cref="IsInstallerFolderOrChild"/>. The CLI uses this to
+    /// refuse a saved Move destination that resolves under a system
+    /// folder, since those folders are on documented DLL-search and
+    /// SxS-resolution paths and the CLI writes there silently
+    /// (without showing the user the resolved path first). Per-user
+    /// Documents/Desktop are deliberately not in this list: they're
+    /// data folders, not system trust boundaries.
+    /// </summary>
+    internal static bool IsSystemFolderOrChild(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return false;
+
+        var resolvedInput = ResolveFinalPath(path)
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        var systemRoots = new[]
+        {
+            Environment.GetFolderPath(Environment.SpecialFolder.Windows),
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+        };
+
+        foreach (var root in systemRoots)
+        {
+            if (string.IsNullOrEmpty(root)) continue;
+            var resolvedRoot = ResolveFinalPath(root).TrimEnd(Path.DirectorySeparatorChar);
+            if (resolvedInput.Equals(resolvedRoot, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (resolvedInput.StartsWith(resolvedRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+        return false;
+    }
+
+    /// <summary>
     /// Expands symlinks, NTFS junctions and subst-mapped drives to the
     /// real on-disk path. Required so a destination check cannot be
     /// bypassed by picking a junction that points inside

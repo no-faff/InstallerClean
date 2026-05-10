@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
   <!-- assemblyIdentity is advisory; Windows ignores it for trust.
-       Bumped in lockstep with Directory.Build.props <Version>. -->
+       Version matches Directory.Build.props <Version>. -->
   <assemblyIdentity version="1.7.0.0" name="InstallerClean.app"/>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
@@ -14,8 +14,8 @@
     <application>
       <!-- Windows 10 and 11. Microsoft never published a separate
            compatibility GUID for Windows 11; apps target the Windows 10
-           GUID and report as compatible with Windows 11 automatically.
-           Don't add an extra GUID here. -->
+           GUID and Windows reports them as compatible with Windows 11
+           automatically. The 8e0f7a12 GUID covers both. -->
       <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"/>
     </application>
   </compatibility>

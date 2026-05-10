@@ -12,10 +12,22 @@ public sealed class SettingsService : ISettingsService
 
     private static readonly string DefaultSettingsFile = Path.Combine(SettingsFolder, "settings.json");
 
+    // 64KB read cap. The schema is a flat object and the file is
+    // normally a few hundred bytes. An oversize settings.json would
+    // otherwise be loaded into a single managed string at startup
+    // and could OOM the elevated WPF process before MainWindow opens;
+    // the cap turns oversize into a clean InvalidDataException that
+    // the catch block routes to the .bad-rename recovery path.
+    private const int MaxReadBytes = 64 * 1024;
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        // Defence in depth against deeply-nested JSON parsed by the
+        // elevated process. The schema is shallow; eight levels covers
+        // the deepest expected nesting plus headroom.
+        MaxDepth = 8,
     };
 
     private readonly string _settingsFile;
@@ -39,6 +51,9 @@ public sealed class SettingsService : ISettingsService
                 return new AppSettings();
 
             using var fs = new FileStream(handle, FileAccess.Read);
+            if (fs.Length > MaxReadBytes)
+                throw new InvalidDataException("settings.json exceeds the read cap");
+
             using var reader = new StreamReader(fs);
             var json = reader.ReadToEnd();
             return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();

@@ -203,8 +203,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // the first call passes a 256-char buffer, so this
                 // branch isn't exercised in normal use. On MoreData
                 // pcchSid carries the size required INCLUDING the
-                // terminator, so we allocate exactly that and pass
-                // the same value back as the new buffer size.
+                // terminator; the retry allocates exactly that size and
+                // passes the same value back as the new buffer size.
                 sidBuffer = new char[sidLen];
 
                 error = Msi.MsiEnumProductsEx(
@@ -298,7 +298,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 break;
 
             if (error == MsiError.AccessDenied)
-                break; // skip patches we can't access
+                break; // skip patches the API refuses to enumerate
 
             if (error == MsiError.Success || error == MsiError.MoreData)
             {

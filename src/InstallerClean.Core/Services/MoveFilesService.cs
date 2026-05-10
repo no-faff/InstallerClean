@@ -25,6 +25,13 @@ public sealed class MoveFilesService : IMoveFilesService
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
+        // Reject relative destinations: Path.GetFullPath would otherwise
+        // resolve them against the process CWD, and the CLI host's CWD
+        // is whatever the caller invoked it from.
+        if (!Path.IsPathFullyQualified(destinationFolder))
+            throw new InvalidOperationException(
+                string.Format(Strings.Error_DestinationNotFullyQualified, destinationFolder));
+
         // Destination must not resolve inside C:\Windows\Installer;
         // ResolveFinalPath expands junctions so a reparse-point
         // destination cannot smuggle the batch into the cache folder.
@@ -34,13 +41,24 @@ public sealed class MoveFilesService : IMoveFilesService
 
         return Task.Run(() =>
         {
-            _fs.Directory.CreateDirectory(destinationFolder);
+            CreateDestinationFolder(destinationFolder);
 
             // Re-check after CreateDirectory closes the TOCTOU window
             // where a junction could be swapped into the leaf.
             if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
                 throw new InvalidOperationException(
                     string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
+
+            // Capture the canonical destination once, then re-resolve
+            // per iteration. The per-iteration check catches a junction
+            // swap on the destination's parent folder during the loop:
+            // without it, a relabelled leaf folder would silently route
+            // the remaining files into the junction's target. The
+            // pre-loop IsInstallerFolderOrChild check covers the
+            // CreateDirectory point; the loop-body check covers each
+            // per-file move.
+            var canonicalDestination = InstallerCacheHelpers.ResolveFinalPath(destinationFolder)
+                .TrimEnd(Path.DirectorySeparatorChar);
 
             ProbeDestinationWriteable(destinationFolder);
 
@@ -58,6 +76,13 @@ public sealed class MoveFilesService : IMoveFilesService
                 // visible counter advances on missing / reparse-point
                 // entries instead of jumping over them.
                 progress?.Report(new OperationProgress(i + 1, total, _fs.Path.GetFileName(sourcePath)));
+
+                // Re-resolve and compare to the canonical capture.
+                var currentResolved = InstallerCacheHelpers.ResolveFinalPath(destinationFolder)
+                    .TrimEnd(Path.DirectorySeparatorChar);
+                if (!currentResolved.Equals(canonicalDestination, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidOperationException(
+                        string.Format(Strings.Error_DestinationChangedMidBatch, destinationFolder));
 
                 try
                 {
@@ -86,17 +111,17 @@ public sealed class MoveFilesService : IMoveFilesService
                 {
                     errors.Add(new DestinationCollision(sourcePath, ex.FileName));
                 }
-                catch (UnauthorizedAccessException ex)
+                catch (UnauthorizedAccessException)
                 {
-                    errors.Add(new AccessDenied(sourcePath, ex.Message));
+                    errors.Add(new AccessDenied(sourcePath));
                 }
-                catch (IOException ex)
+                catch (IOException)
                 {
-                    errors.Add(new IOFailure(sourcePath, ex.Message));
+                    errors.Add(new IOFailure(sourcePath));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    errors.Add(new UnknownError(sourcePath, ex.GetType().Name, ex.Message));
+                    errors.Add(new UnknownError(sourcePath));
                 }
             }
 
@@ -109,6 +134,33 @@ public sealed class MoveFilesService : IMoveFilesService
             InstallerCacheHelpers.PruneEmptySubdirectories(CancellationToken.None);
             return new MoveResult(moved, errors.AsReadOnly());
         }, cancellationToken);
+    }
+
+    /// <summary>
+    /// Wraps <c>Directory.CreateDirectory</c> so framework-thrown
+    /// UnauthorizedAccessException and IOException are remapped to the
+    /// same UnauthorizedAccessException-with-localised-message that
+    /// <see cref="ProbeDestinationWriteable"/> produces. The caller's
+    /// catch block sees one consistent contract; the framework's
+    /// path-bearing message is preserved on InnerException for crash
+    /// log consumers but never reaches the displayed UI.
+    /// </summary>
+    private void CreateDestinationFolder(string folder)
+    {
+        try
+        {
+            _fs.Directory.CreateDirectory(folder);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            throw new UnauthorizedAccessException(
+                string.Format(Strings.Error_CannotWriteFolder, folder), ex);
+        }
+        catch (IOException ex)
+        {
+            throw new UnauthorizedAccessException(
+                string.Format(Strings.Error_CannotWriteFolder, folder), ex);
+        }
     }
 
     private void ProbeDestinationWriteable(string folder)

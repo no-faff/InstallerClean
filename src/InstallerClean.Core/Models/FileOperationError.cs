@@ -30,14 +30,13 @@ public sealed record MissingSourceFile(string FilePath)
 
 /// <summary>
 /// Windows refused the operation due to permission, sharing or path
-/// constraints. <see cref="Detail"/> carries the underlying exception
-/// message for diagnosis but is NEVER returned to the UI: with the
-/// app running elevated, framework-provided messages can include
-/// paths from other users' profiles. The displayed message is
-/// category-only via the resx; the Detail is captured for crash log
-/// / telemetry consumers.
+/// constraints. The displayed message is category-only via the resx;
+/// the underlying exception message is intentionally not retained on
+/// the record because under elevation it can include paths from other
+/// users' profiles, and a record field that's only ever written can
+/// leak via accidental serialisation or logging.
 /// </summary>
-public sealed record AccessDenied(string FilePath, string Detail)
+public sealed record AccessDenied(string FilePath)
     : FileOperationError(FilePath)
 {
     public override string LocalisedMessage => Strings.Error_AccessDenied;
@@ -77,12 +76,11 @@ public sealed record SourceIsReparsePoint(string FilePath)
 }
 
 /// <summary>
-/// Generic IO failure (disk full, sharing violation, etc).
-/// <see cref="Detail"/> stays for crash-log / telemetry; the UI sees
-/// only a category-only sentence so framework-provided paths stay
-/// out of the displayed error list (see <see cref="AccessDenied"/>).
+/// Generic IO failure (disk full, sharing violation, etc). The UI sees
+/// only a category-only sentence; the underlying exception message
+/// stays off the record for the same reason as <see cref="AccessDenied"/>.
 /// </summary>
-public sealed record IOFailure(string FilePath, string Detail)
+public sealed record IOFailure(string FilePath)
     : FileOperationError(FilePath)
 {
     public override string LocalisedMessage => Strings.Error_IOFailure;
@@ -90,13 +88,11 @@ public sealed record IOFailure(string FilePath, string Detail)
 
 /// <summary>
 /// Catch-all for exception types not covered by the specific
-/// categories. <see cref="ExceptionTypeName"/> is the runtime type
-/// name, useful for telemetry; <see cref="Detail"/> is the exception
-/// message. Both stay out of the UI; <see cref="LocalisedMessage"/>
-/// returns a category-only sentence (see <see cref="AccessDenied"/>
-/// for the path-leak rationale).
+/// categories. The displayed message is category-only via the resx;
+/// the underlying exception message and runtime type name stay off
+/// the record for the same reason as <see cref="AccessDenied"/>.
 /// </summary>
-public sealed record UnknownError(string FilePath, string ExceptionTypeName, string Detail)
+public sealed record UnknownError(string FilePath)
     : FileOperationError(FilePath)
 {
     public override string LocalisedMessage => Strings.Error_UnknownError;

@@ -172,7 +172,10 @@
                                  Text="{Binding Cleanup.MoveDestination, Mode=TwoWay,
                                                 UpdateSourceTrigger=PropertyChanged}"
                                  AutomationProperties.Name="{loc:Translate Automation.MoveDestinationFolder}"
-                                 ToolTip="{loc:Translate Tooltip.MoveDestination}"/>
+                                 ToolTip="{loc:Translate Tooltip.MoveDestination}"
+                                 AllowDrop="True"
+                                 PreviewDragOver="MoveDestination_DragOver"
+                                 Drop="MoveDestination_Drop"/>
                         <TextBlock Text="{loc:Translate Action.MoveDestinationPlaceholder}"
                                    Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}" FontStyle="Italic"
                                    Padding="12,0" VerticalAlignment="Center"
@@ -441,7 +444,7 @@
                          OnPreviewKeyDown, Tab moves to "Scan again" which
                          carries its own focus ring as the visible target. -->
                     <Button x:Name="CompletionCloseButton" Style="{StaticResource AccentPill}"
-                            Content="{loc:Translate Action.Close}" Command="{Binding Completion.DismissCommand}"
+                            Content="{loc:Translate Action.Done}" Command="{Binding Completion.DismissCommand}"
                             IsDefault="True" FocusVisualStyle="{x:Null}"
                             HorizontalAlignment="Center" MinWidth="120"
                             Margin="{StaticResource GapBottom.Sm}"

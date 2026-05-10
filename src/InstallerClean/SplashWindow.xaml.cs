@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
@@ -45,6 +46,13 @@ public partial class SplashWindow : Window
     {
         CancelButton.IsEnabled = false;
         CancelButton.Content = Strings.Status_Cancelling;
+        // Tooltip explains the disabled state: cancellation is observed
+        // at the next CancellationToken checkpoint, which during a
+        // mid-MSI-API call can be several seconds. Without this hint a
+        // user sees a frozen "Cancelling..." button and can't tell the
+        // app from hung.
+        ToolTipService.SetShowOnDisabled(CancelButton, true);
+        CancelButton.ToolTip = Strings.Tooltip_CancellingPending;
         StepText.Text = Strings.Status_Cancelling;
         CancelRequested?.Invoke(this, EventArgs.Empty);
     }

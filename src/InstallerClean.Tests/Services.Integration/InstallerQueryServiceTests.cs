@@ -7,14 +7,6 @@ namespace InstallerClean.Tests.Services.Integration;
 public class InstallerQueryServiceTests
 {
     [Fact]
-    public void Implements_IInstallerQueryService()
-    {
-        var svc = new InstallerQueryService();
-
-        Assert.IsAssignableFrom<IInstallerQueryService>(svc);
-    }
-
-    [Fact]
     public async Task GetRegisteredPackagesAsync_cancellation_before_start_throws()
     {
         var svc = new InstallerQueryService();
@@ -30,8 +22,9 @@ public class InstallerQueryServiceTests
     {
         var svc = new InstallerQueryService();
 
-        // Without admin, we expect UnauthorizedAccessException, not OperationCanceledException.
-        // This confirms the default cancellation token does not interfere.
+        // Default token does not interfere with the call: any thrown
+        // exception in this branch is an API failure (UAE without
+        // elevation), never OperationCanceledException.
         var ex = await Record.ExceptionAsync(
             () => svc.GetRegisteredPackagesAsync(cancellationToken: CancellationToken.None));
 
@@ -91,103 +84,70 @@ public class InstallerQueryServiceTests
         }
     }
 
-    [Fact]
+    // The next five tests exercise the API on a real-elevated host.
+    // Each is marked Skip so a non-elevated CI run reports them as
+    // visibly skipped rather than passing without asserting; remove
+    // the Skip parameter and run elevated on Windows to exercise.
+    private const string ElevatedSkipReason =
+        "Manual: requires elevated Windows host. Remove [Fact(Skip)] to run.";
+
+    [Fact(Skip = ElevatedSkipReason)]
     public async Task GetRegisteredPackagesAsync_returns_readonly_list_when_elevated()
     {
         var svc = new InstallerQueryService();
+        var packages = await svc.GetRegisteredPackagesAsync();
 
-        try
-        {
-            var packages = await svc.GetRegisteredPackagesAsync();
-
-            Assert.IsAssignableFrom<IReadOnlyList<RegisteredPackage>>(packages);
-            Assert.NotNull(packages);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            // Not elevated - the API path assertion cannot be tested.
-            // The non-elevated behaviour is covered by other tests.
-        }
+        Assert.IsAssignableFrom<IReadOnlyList<RegisteredPackage>>(packages);
+        Assert.NotNull(packages);
     }
 
-    [Fact]
+    [Fact(Skip = ElevatedSkipReason)]
     public async Task GetRegisteredPackagesAsync_all_paths_non_empty_when_elevated()
     {
         var svc = new InstallerQueryService();
+        var packages = await svc.GetRegisteredPackagesAsync();
 
-        try
-        {
-            var packages = await svc.GetRegisteredPackagesAsync();
-
-            Assert.All(packages, p =>
-                Assert.False(string.IsNullOrWhiteSpace(p.LocalPackagePath)));
-        }
-        catch (UnauthorizedAccessException)
-        {
-            // Not elevated - skip.
-        }
+        Assert.All(packages, p =>
+            Assert.False(string.IsNullOrWhiteSpace(p.LocalPackagePath)));
     }
 
-    [Fact]
+    [Fact(Skip = ElevatedSkipReason)]
     public async Task GetRegisteredPackagesAsync_paths_unique_case_insensitive_when_elevated()
     {
         var svc = new InstallerQueryService();
+        var packages = await svc.GetRegisteredPackagesAsync();
 
-        try
-        {
-            var packages = await svc.GetRegisteredPackagesAsync();
+        var uniquePaths = new HashSet<string>(
+            packages.Select(p => p.LocalPackagePath),
+            StringComparer.OrdinalIgnoreCase);
 
-            var uniquePaths = new HashSet<string>(
-                packages.Select(p => p.LocalPackagePath),
-                StringComparer.OrdinalIgnoreCase);
-
-            Assert.Equal(packages.Count, uniquePaths.Count);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            // Not elevated - skip.
-        }
+        Assert.Equal(packages.Count, uniquePaths.Count);
     }
 
-    [Fact]
+    [Fact(Skip = ElevatedSkipReason)]
     public async Task GetRegisteredPackagesAsync_removable_only_when_superseded_when_elevated()
     {
         var svc = new InstallerQueryService();
+        var packages = await svc.GetRegisteredPackagesAsync();
 
-        try
+        foreach (var pkg in packages.Where(p => p.IsRemovable))
         {
-            var packages = await svc.GetRegisteredPackagesAsync();
-
-            foreach (var pkg in packages.Where(p => p.IsRemovable))
-            {
-                Assert.True(pkg.PatchState is 2 or 4,
-                    $"IsRemovable=true but PatchState={pkg.PatchState}");
-            }
-        }
-        catch (UnauthorizedAccessException)
-        {
-            // Not elevated - skip.
+            Assert.True(pkg.PatchState is 2 or 4,
+                $"IsRemovable=true but PatchState={pkg.PatchState}");
         }
     }
 
-    [Fact]
+    [Fact(Skip = ElevatedSkipReason)]
     public async Task GetRegisteredPackagesAsync_scan_complete_has_count_when_elevated()
     {
         var svc = new InstallerQueryService();
         var messages = new List<string>();
         var progress = new SyncProgress<string>(m => messages.Add(m));
 
-        try
-        {
-            var packages = await svc.GetRegisteredPackagesAsync(progress);
+        var packages = await svc.GetRegisteredPackagesAsync(progress);
 
-            var completionMsg = messages.Last();
-            var noun = packages.Count == 1 ? "package" : "packages";
-            Assert.Contains($"{packages.Count} registered {noun} found", completionMsg);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            // Not elevated - skip.
-        }
+        var completionMsg = messages.Last();
+        var noun = packages.Count == 1 ? "package" : "packages";
+        Assert.Contains($"{packages.Count} registered {noun} found", completionMsg);
     }
 }

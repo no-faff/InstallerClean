@@ -224,14 +224,23 @@ internal static class Program
 
             // /d and /s already returned; everything below this point runs only for /m.
             string dest;
+            // Two destination sources with different trust posture:
+            // the command-line argument is supplied at invocation, the
+            // settings-loaded path is whatever was last written into
+            // %LOCALAPPDATA% (which the CLI then writes to silently
+            // without showing the resolved path first). The settings
+            // path therefore goes through an extra system-folder gate.
+            bool destFromSettings;
             if (args.Length > 1)
             {
                 dest = args[1].Trim();
+                destFromSettings = false;
             }
             else
             {
                 var settingsService = services.GetRequiredService<ISettingsService>();
                 dest = settingsService.Load().MoveDestination;
+                destFromSettings = true;
             }
             if (string.IsNullOrWhiteSpace(dest))
             {
@@ -241,11 +250,30 @@ internal static class Program
                 return ExitError;
             }
 
+            // Reject relative destinations: Path.GetFullPath would
+            // otherwise resolve them against the process CWD, and the
+            // CLI host's CWD is whatever the caller invoked it from.
+            if (!Path.IsPathFullyQualified(dest))
+            {
+                Console.WriteLine(string.Format(Strings.Cli_MoveDestinationRelative, dest));
+                EventLogWriter.Write(EventLogWriter.Level.Warning,
+                    string.Format(Strings.Cli_EventLogMoveDestinationRelative, arg, dest));
+                return ExitError;
+            }
+
             if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
             {
                 Console.WriteLine(Strings.Cli_MoveDestinationInsideInstaller);
                 EventLogWriter.Write(EventLogWriter.Level.Warning,
                     string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, arg, dest));
+                return ExitError;
+            }
+
+            if (destFromSettings && InstallerCacheHelpers.IsSystemFolderOrChild(dest))
+            {
+                Console.WriteLine(string.Format(Strings.Cli_MoveDestinationInSystemFolder, dest));
+                EventLogWriter.Write(EventLogWriter.Level.Warning,
+                    string.Format(Strings.Cli_EventLogMoveDestinationInSystemFolder, arg, dest));
                 return ExitError;
             }
 
@@ -333,8 +361,8 @@ internal static class Program
         Console.WriteLine();
         Console.WriteLine(Strings.Cli_Help_ExitCodesHeader);
         Console.WriteLine(Strings.Cli_Help_ExitCodeOk);
-        Console.WriteLine(Strings.Cli_Help_ExitCodePartial);
         Console.WriteLine(Strings.Cli_Help_ExitCodeError);
+        Console.WriteLine(Strings.Cli_Help_ExitCodePartial);
         Console.WriteLine(Strings.Cli_Help_ExitCodeCancelled);
         Console.WriteLine();
         Console.WriteLine(Strings.Cli_Help_NoteLine1);

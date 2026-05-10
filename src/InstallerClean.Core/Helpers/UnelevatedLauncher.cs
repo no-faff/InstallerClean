@@ -1,48 +1,49 @@
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Helpers;
 
 /// <summary>
-/// Opens URLs at the desktop shell's IL. An elevated parent would
-/// otherwise spawn the browser elevated, so each Donate / Star /
-/// Updates click would open a separate Admin browser session with
-/// no cookies. Falls back to elevated <c>Process.Start</c> if the
-/// shell-token chain fails, logging the reason to crash.log.
+/// Opens URLs at the desktop shell's IL. An elevated parent that calls
+/// <c>Process.Start</c> with <c>UseShellExecute=true</c> spawns the
+/// browser elevated, which leaves the user without their normal cookies
+/// and turns any phishing page typed into the elevated session into a
+/// privilege-amplification path. The shell-token chain duplicates the
+/// desktop shell's primary token and runs <c>rundll32 url.dll,
+/// FileProtocolHandler</c> under it, so the URL opens in the user's
+/// normal-IL browser.
 /// </summary>
 internal static class UnelevatedLauncher
 {
     /// <summary>
-    /// Opens <paramref name="url"/> in the user's default browser at
-    /// medium IL. Falls back to elevated Process.Start if the
-    /// shell-token route fails. Errors log and swallow.
+    /// Result of an <see cref="OpenUrl"/> attempt. <see cref="Launched"/>
+    /// is true when the unelevated browser was spawned; otherwise
+    /// <see cref="FailureReason"/> describes what failed in the token
+    /// chain. Callers fall back to a copy-to-clipboard prompt rather
+    /// than launching elevated.
     /// </summary>
-    public static void OpenUrl(string url)
+    public readonly record struct OpenUrlResult(bool Launched, string FailureReason);
+
+    /// <summary>
+    /// Opens <paramref name="url"/> in the user's default browser at
+    /// medium IL. Returns a result rather than throwing or falling back
+    /// to an elevated launch: the calling host decides what to do when
+    /// the unelevated route is unavailable.
+    /// </summary>
+    public static OpenUrlResult OpenUrl(string url)
     {
         try
         {
             if (TryUnelevatedLaunch(url, out var failureReason))
-                return;
+                return new OpenUrlResult(true, string.Empty);
             CrashLog.Write(new InvalidOperationException(
-                "UnelevatedLauncher fell back to elevated Process.Start: " + failureReason));
+                "UnelevatedLauncher could not spawn an unelevated browser: " + failureReason));
+            return new OpenUrlResult(false, failureReason);
         }
         catch (Exception ex)
         {
             CrashLog.Write(ex);
-        }
-
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = url,
-                UseShellExecute = true,
-            });
-        }
-        catch (Exception ex)
-        {
-            CrashLog.Write(ex);
+            return new OpenUrlResult(false, ex.GetType().Name);
         }
     }
 

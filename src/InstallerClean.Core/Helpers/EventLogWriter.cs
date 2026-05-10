@@ -52,15 +52,16 @@ internal static class EventLogWriter
     /// Ensures the InstallerClean event source exists and is registered
     /// against the Application log. Returns false if the source is
     /// pre-registered against a different log (e.g. an older install
-    /// pointed it at System): writing summaries containing user-typed
-    /// paths into an attacker-readable log is an information-disclosure
-    /// path even on otherwise correct DACLs, so the writer skips
-    /// silently rather than mis-routing the entry.
+    /// pointed it at System). Refusing to write into a non-Application
+    /// log keeps user-typed paths out of any log whose DACL is wider
+    /// than Application's; the writer drops the entry rather than
+    /// mis-routing it.
     /// </summary>
     private static bool EnsureSourceMappedToApplicationLog()
     {
-        // First-run registration requires admin (our manifest guarantees
-        // it); subsequent runs short-circuit via SourceExists.
+        // First-run registration requires admin; the app.manifest's
+        // requireAdministrator guarantees this caller has it. Subsequent
+        // runs short-circuit via SourceExists.
         //
         // SourceExists then CreateEventSource is a check-then-act pair,
         // not atomic: a different process can register the source against

@@ -158,7 +158,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // Dispose the type-once-and-stop case (every other path is
         // covered by the next schedule call replacing the field).
         // Token equality skips disposal if a fresh keystroke already
-        // installed a new CTS while we were awaiting the delay.
+        // installed a new CTS during the await.
         if (_moveDestinationSaveCts is { } current && current.Token == token)
         {
             _moveDestinationSaveCts = null;
@@ -270,7 +270,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             DisposeOperationCts();
             _dialogService.ShowWarning(
                 DescribeWriteFailure(dest, ex, crash.Path, crash.Written),
-                Strings.Error_InvalidDestinationTitle);
+                Strings.Error_DestinationWriteFailedTitle);
             return;
         }
         IsOperating = false;
@@ -282,8 +282,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         var totalBytes = removableFiles.Sum(f => f.SizeBytes);
         var sizeDisplay = _scan.OrphanedSizeDisplay;
 
-        // Free-space check. Skip silently for paths we can't measure
-        // (UNC shares where the caller lacks query rights, etc).
+        // Free-space check. Skip silently for paths the API can't
+        // measure (UNC shares where the caller lacks query rights, etc).
         var availableFreeSpace = StorageHelpers.GetAvailableFreeSpace(dest);
         if (availableFreeSpace is long free && free < totalBytes)
         {
@@ -361,6 +361,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             DisposeOperationCts();
             IsOperating = false;
             OperationProgressPercent = 0;
+            // Stale-state reset: a cancel-then-rerun cycle would otherwise
+            // briefly show the previous run's last filename and "X of Y"
+            // line through the next operation's first progress callback.
+            OperationCurrentFile = 0;
+            OperationTotalFiles = 0;
+            OperationCurrentFileName = string.Empty;
         }
     }
 
@@ -421,6 +427,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             DisposeOperationCts();
             IsOperating = false;
             OperationProgressPercent = 0;
+            // Stale-state reset: a cancel-then-rerun cycle would otherwise
+            // briefly show the previous run's last filename and "X of Y"
+            // line through the next operation's first progress callback.
+            OperationCurrentFile = 0;
+            OperationTotalFiles = 0;
+            OperationCurrentFileName = string.Empty;
         }
     }
 

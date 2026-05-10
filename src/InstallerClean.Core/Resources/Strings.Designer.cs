@@ -23,14 +23,17 @@ public static class Strings
     private static readonly ResourceManager Manager =
         new("InstallerClean.Resources.Strings", typeof(Strings).Assembly);
 
-    /// <summary>The cached ResourceManager backing every property below.</summary>
+    /// <summary>
+    /// The cached ResourceManager backing every property below.
+    /// Exposed because TranslateExtension reuses this same instance
+    /// to resolve XAML keys; constructing a parallel ResourceManager
+    /// from the WPF host assembly would miss the resx embedded in
+    /// InstallerClean.Core.
+    /// </summary>
     public static ResourceManager ResourceManager => Manager;
 
-    /// <summary>Override the culture used for lookups (otherwise CurrentUICulture).</summary>
-    public static CultureInfo? Culture { get; set; }
-
     private static string Get(string key) =>
-        Manager.GetString(key, Culture ?? CultureInfo.CurrentUICulture) ?? key;
+        Manager.GetString(key, CultureInfo.CurrentUICulture) ?? key;
 
     public static string Action_About => Get("Action.About");
     public static string Action_Browse => Get("Action.Browse");
@@ -42,6 +45,7 @@ public static class Strings
     public static string Action_Delete => Get("Action.Delete");
     public static string Action_Details => Get("Action.Details");
     public static string Action_Donate => Get("Action.Donate");
+    public static string Action_Done => Get("Action.Done");
     public static string Action_LeaveStarOnGitHub => Get("Action.LeaveStarOnGitHub");
     public static string Action_MITLicence => Get("Action.MITLicence");
     public static string Action_Move => Get("Action.Move");
@@ -57,6 +61,7 @@ public static class Strings
     public static string Automation_Close => Get("Automation.Close");
     public static string Automation_CloseResult => Get("Automation.CloseResult");
     public static string Automation_ConfirmDelete => Get("Automation.ConfirmDelete");
+    public static string Automation_ConfirmMove => Get("Automation.ConfirmMove");
     public static string Automation_DeleteAllFiles => Get("Automation.DeleteAllFiles");
     public static string Automation_LeaveStarOnGitHub => Get("Automation.LeaveStarOnGitHub");
     public static string Automation_Minimise => Get("Automation.Minimise");
@@ -76,6 +81,9 @@ public static class Strings
     public static string Body_PendingReboot_InstallerInProgress => Get("Body.PendingReboot.InstallerInProgress");
     public static string Body_PendingReboot_MsiExecuteMutex => Get("Body.PendingReboot.MsiExecuteMutex");
     public static string Body_PendingReboot_PendingRenameInCache => Get("Body.PendingReboot.PendingRenameInCache");
+    public static string BrowserLaunchFailedClipboardFailed => Get("BrowserLaunchFailedClipboardFailed");
+    public static string BrowserLaunchFailedClipboardOk => Get("BrowserLaunchFailedClipboardOk");
+    public static string BrowserLaunchFailedTitle => Get("BrowserLaunchFailedTitle");
     public static string Cli_Cancelled => Get("Cli.Cancelled");
     public static string Cli_Cancelling => Get("Cli.Cancelling");
     public static string Cli_DeletedFiles => Get("Cli.DeletedFiles");
@@ -83,6 +91,8 @@ public static class Strings
     public static string Cli_EventLogCancelledPartial => Get("Cli.EventLogCancelledPartial");
     public static string Cli_EventLogDeleteSummary => Get("Cli.EventLogDeleteSummary");
     public static string Cli_EventLogMoveDestinationInsideInstaller => Get("Cli.EventLogMoveDestinationInsideInstaller");
+    public static string Cli_EventLogMoveDestinationInSystemFolder => Get("Cli.EventLogMoveDestinationInSystemFolder");
+    public static string Cli_EventLogMoveDestinationRelative => Get("Cli.EventLogMoveDestinationRelative");
     public static string Cli_EventLogMoveNoDestination => Get("Cli.EventLogMoveNoDestination");
     public static string Cli_EventLogMoveSummary => Get("Cli.EventLogMoveSummary");
     public static string Cli_EventLogPendingRebootBlocked => Get("Cli.EventLogPendingRebootBlocked");
@@ -107,11 +117,12 @@ public static class Strings
     public static string Cli_Help_ScanOnly => Get("Cli.Help.ScanOnly");
     public static string Cli_Help_Usage => Get("Cli.Help.Usage");
     public static string Cli_MoveDestinationInsideInstaller => Get("Cli.MoveDestinationInsideInstaller");
+    public static string Cli_MoveDestinationInSystemFolder => Get("Cli.MoveDestinationInSystemFolder");
+    public static string Cli_MoveDestinationRelative => Get("Cli.MoveDestinationRelative");
     public static string Cli_MovedFiles => Get("Cli.MovedFiles");
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_NoMoveDestination => Get("Cli.NoMoveDestination");
     public static string Cli_NothingToDo => Get("Cli.NothingToDo");
-    public static string Cli_PendingRebootBlocked_Generic => Get("Cli.PendingRebootBlocked.Generic");
     public static string Cli_PendingRebootBlocked_InstallerInProgress => Get("Cli.PendingRebootBlocked.InstallerInProgress");
     public static string Cli_PendingRebootBlocked_MsiExecuteMutex => Get("Cli.PendingRebootBlocked.MsiExecuteMutex");
     public static string Cli_PendingRebootBlocked_PendingRenameInCache => Get("Cli.PendingRebootBlocked.PendingRenameInCache");
@@ -137,8 +148,11 @@ public static class Strings
     public static string Error_AdminRequiredBody => Get("Error.AdminRequiredBody");
     public static string Error_AdminRequiredTitle => Get("Error.AdminRequiredTitle");
     public static string Error_CannotWriteFolder => Get("Error.CannotWriteFolder");
+    public static string Error_DestinationChangedMidBatch => Get("Error.DestinationChangedMidBatch");
     public static string Error_DestinationInsideInstaller => Get("Error.DestinationInsideInstaller");
     public static string Error_DestinationMissing => Get("Error.DestinationMissing");
+    public static string Error_DestinationNotFullyQualified => Get("Error.DestinationNotFullyQualified");
+    public static string Error_DestinationWriteFailedTitle => Get("Error.DestinationWriteFailedTitle");
     public static string Error_InstallerDbEmpty => Get("Error.InstallerDbEmpty");
     public static string Error_InstallerDbUnavailableTitle => Get("Error.InstallerDbUnavailableTitle");
     public static string Error_InvalidDestinationTitle => Get("Error.InvalidDestinationTitle");
@@ -232,6 +246,7 @@ public static class Strings
     public static string Summary_RegisteredStillUsed => Get("Summary.RegisteredStillUsed");
     public static string Summary_RegisteredWindow => Get("Summary.RegisteredWindow");
     public static string Tooltip_BuyMeACuppa => Get("Tooltip.BuyMeACuppa");
+    public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");
     public static string Tooltip_Close => Get("Tooltip.Close");
     public static string Tooltip_Delete => Get("Tooltip.Delete");
     public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");

@@ -48,5 +48,5 @@ public sealed class WindowService : IWindowService
         Application.Current?.MainWindow?.Close();
     }
 
-    public void OpenUrl(string url) => UnelevatedLauncher.OpenUrl(url);
+    public void OpenUrl(string url) => UrlLauncher.OpenUrl(url);
 }

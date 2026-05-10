@@ -1,7 +1,9 @@
 namespace InstallerClean.Interop;
 
 /// <summary>
-/// Windows Installer API error codes returned by Msi* functions.
+/// Windows Installer API error codes returned by Msi* functions. Only
+/// the values the code actually branches on are listed; the full set
+/// is documented in Microsoft's MSI error reference.
 /// </summary>
 public static class MsiError
 {
@@ -9,11 +11,6 @@ public static class MsiError
     public const uint AccessDenied = 5;
     public const uint MoreData = 234;
     public const uint NoMoreItems = 259;
-    public const uint UnknownProduct = 1605;
-    public const uint UnknownProperty = 1608;
-    public const uint BadConfiguration = 1610;
-    public const uint InvalidParameter = 87;
-    public const uint FunctionFailed = 1627;
 }
 
 /// <summary>
@@ -92,9 +89,10 @@ public static class MsiSummaryProperty
 
 /// <summary>
 /// VARTYPE values returned by MsiSummaryInfoGetProperty in puiDataType.
+/// The summary stream stores everything the project reads as VT_LPSTR;
+/// other VARTYPEs are documented in Microsoft's STDOLE2 reference.
 /// </summary>
 public static class VtType
 {
-    public const uint Empty  = 0;
     public const uint String = 30; // VT_LPSTR
 }

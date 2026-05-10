@@ -139,7 +139,7 @@ After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer`
 
 Yes. InstallerClean queries the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, the app trusts it; it doesn't guess based on filenames or dates.
 
-**In the app.** Delete sends files to the Recycle Bin. Move puts them in a folder you choose. Either way the files can be restored if anything breaks. Nothing is touched until you confirm. If Windows Installer is currently writing to the cache, has a previous transaction suspended, or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown. The core logic is covered by 200+ automated tests that run on every commit (see the CI badge above).
+**In the app.** Delete sends files to the Recycle Bin. Move puts them in a folder you choose. Either way the files can be restored if anything breaks. Nothing is touched until you confirm. If Windows Installer is currently writing to the cache, has a previous transaction suspended, or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown. The scan, query, move, delete, settings and pending-reboot services are covered by an automated test suite that runs on every commit (see the CI badge above).
 
 **Verifying the binary.** InstallerClean is unsigned. Code-signing certificates cost money annually and I'd rather keep the project free, open and donations-funded.
 
@@ -151,7 +151,7 @@ Yes. InstallerClean queries the same database Windows itself uses to track what'
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
-All three builds (setup, portable and slim) are clean on VirusTotal, with zero detections from any engine.
+As of the v1.7.0 release: 0/68 (setup), 0/69 (portable), 0/70 (slim) on VirusTotal. Each release publishes live VT links in its release notes so you can re-check at any time.
 
 ## What it doesn't do
 
@@ -173,6 +173,10 @@ All three builds (setup, portable and slim) are clean on VirusTotal, with zero d
 **Will Windows complain if I remove these files?** No. InstallerClean only removes files Windows itself reports as no-longer-needed via its own installer-database API. The next install / uninstall / patch cycle proceeds normally.
 
 **Why no `Win32_Product` (WMI)?** [`Win32_Product` triggers MSI repair operations on every product during enumeration](https://gregramsey.net/2012/02/20/win32_product-is-evil/), which can take minutes and load the disk hard. InstallerClean calls the Windows Installer COM API directly with no side effects.
+
+**Why not just a PowerShell script?** A short script that calls `MsiEnumPatchesEx` is enough to *list* patches, but the load-bearing parts of InstallerClean are the bits a script glosses over: the orphan-vs-superseded classification, the registry fallback that only ever adds files to the "still needed" set (never to "removable"), the pending-reboot block, the Move-to-elsewhere safety net, the per-file progress with cancellation, and the Recycle-Bin-not-permanent-delete default. Edge cases on real heavy-MSI machines (corrupt registrations, junctions inside the cache, products in `HKU\.DEFAULT`, suspended Installer transactions) are easy to mishandle in a one-off script. The `installerclean-cli` is the headless face if scripting is what you want.
+
+**Why .NET 10 and not .NET 8?** Both are LTS releases (.NET 10 became LTS in November 2025). The choice was driven by source-generated `LibraryImport` plus `[assembly: DisableRuntimeMarshalling]`, which produce P/Invoke shims that are easier to audit for ABI correctness than runtime-marshalled `DllImport`. The project pins to the 10.0.10x SDK band specifically because the apphost shape it produces is what the AV vendors have trained on as legitimate; v1.7.0's slim build picks up extra heuristic flags when built on the 10.0.20x band.
 
 **Does it work on Windows 7 or 8?** Untested and not supported. Targets Windows 10 and 11.
 
@@ -233,7 +237,7 @@ Also accepts `--help`, `/?` and `-h`. To launch the GUI, run `InstallerClean.exe
 
 `/s` is a dry run: it scans, lists what it would remove with filenames and sizes, then exits. Useful for auditing before cleanup. Exit code is always 0. All files are in `C:\Windows\Installer`.
 
-`/d` and `/m` scan and then act. `/d` sends removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit code is 0 on success, 1 if any files failed.
+`/d` and `/m` scan and then act. `/d` sends removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, mutex contention, bad arguments, or every file in the batch failed), `130` for Ctrl+C.
 
 All three require an elevated (administrator) command prompt.
 

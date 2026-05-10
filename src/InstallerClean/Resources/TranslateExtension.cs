@@ -13,14 +13,12 @@ namespace InstallerClean.Resources;
 /// flows through automatically.
 /// </summary>
 /// <remarks>
-/// C# code paths use the auto-generated <c>Strings</c> class directly
-/// for compile-time safety. XAML can't reach that class because the
-/// MSBuild StronglyTypedClassName task always emits it as
-/// <c>internal</c> and <c>{x:Static}</c> requires public; this
-/// extension is the XAML-side equivalent.
-///
-/// On lookup miss the key itself is returned, so a typo is visually
-/// obvious in the running UI rather than producing a blank or null.
+/// C# code paths use the strongly-typed <c>Strings</c> class directly
+/// for compile-time safety. XAML uses this extension instead, which
+/// resolves keys at runtime: a missing key falls back to returning the
+/// key itself, so a misspelled <c>{loc:Translate Window.Main.Titel}</c>
+/// renders as the literal "Window.Main.Titel" in the UI rather than a
+/// blank or a null. Visible typos are easier to fix than silent ones.
 /// </remarks>
 [MarkupExtensionReturnType(typeof(string))]
 public sealed class TranslateExtension : MarkupExtension

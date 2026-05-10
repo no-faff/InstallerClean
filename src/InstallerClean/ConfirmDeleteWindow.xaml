@@ -10,7 +10,10 @@
         ResizeMode="NoResize">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="32" GlassFrameThickness="0"
+        <!-- CaptionHeight=0: this is a centred-on-owner modal with no
+             title-bar buttons, so no drag region is needed and the
+             Border below claims the full window. -->
+        <WindowChrome CaptionHeight="0" GlassFrameThickness="0"
                       ResizeBorderThickness="0"/>
     </WindowChrome.WindowChrome>
 
@@ -26,21 +29,30 @@
                            TextWrapping="Wrap" VerticalAlignment="Center"/>
             </StackPanel>
 
+            <StackPanel x:Name="LargeSizeWarning" Orientation="Horizontal"
+                        Margin="{StaticResource GapBottom.Md}" Visibility="Collapsed">
+                <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
+                      Fill="{StaticResource Status.Warning}" Width="14" Height="14" Stretch="Uniform"
+                      VerticalAlignment="Top" Margin="0,3,8,0"/>
+                <TextBlock Text="{loc:Translate Confirm.DeleteLargeWarning}"
+                           Foreground="{StaticResource Status.Warning}" FontSize="{StaticResource Type.Body}"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+
             <TextBlock
                        Text="{loc:Translate Confirm.DeleteToRecycleBin}"
                        Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"
                        Margin="{StaticResource GapBottom.Lg}"/>
-            <TextBlock x:Name="LargeSizeWarning"
-                       Text="{loc:Translate Confirm.DeleteLargeWarning}"
-                       Foreground="{StaticResource Status.Warning}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"
-                       Margin="0,-12,0,16" Visibility="Collapsed"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- Cancel is the default to stop a reflexive Enter from
+                     deleting; affirmative click requires explicit pointer
+                     or Tab+Space. -->
                 <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
-                        Click="OnCancel" IsCancel="True" Margin="{StaticResource GapRight.Sm}"/>
+                        Click="OnCancel" IsCancel="True" IsDefault="True"
+                        Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource DangerPill}" Content="{loc:Translate Action.Delete}" Click="OnDelete"
-                        IsDefault="True"
-                        AutomationProperties.HelpText="{loc:Translate Automation.ConfirmDelete}"/>
+                        AutomationProperties.Name="{loc:Translate Automation.ConfirmDelete}"/>
             </StackPanel>
         </StackPanel>
     </Border>
