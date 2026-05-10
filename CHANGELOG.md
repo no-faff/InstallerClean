@@ -2,7 +2,7 @@
 
 All notable changes to InstallerClean. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.8.0] - Unreleased
 
 Two opt-in buttons that, on a single click each, talk to the network. There is no timer, no startup hook, no other call site for either feature: every byte the app sends is the direct consequence of a button press.
 

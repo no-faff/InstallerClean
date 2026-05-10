@@ -5,7 +5,7 @@
          and the release script reads it from here to pass /DAppVersion
          to the Inno Setup compiler, so the installer never drifts from
          the assembly. -->
-    <Version>1.7.0</Version>
+    <Version>1.8.0</Version>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
