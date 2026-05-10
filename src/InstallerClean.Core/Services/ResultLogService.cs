@@ -128,4 +128,30 @@ public sealed class ResultLogService : IResultLogService
             return ResultLogSendOutcome.Unknown;
         }
     }
+
+    public async Task<string?> ReadLastLogAsync(CancellationToken cancellationToken = default)
+    {
+        if (!File.Exists(LogFile))
+            return null;
+
+        try
+        {
+            using var handle = StorageHelpers.OpenAtomic(
+                LogFile, FileAccess.Read, StorageHelpers.AtomicOpenMode.OpenExisting);
+            if (handle is null) return null;
+            using var fs = new FileStream(handle, FileAccess.Read);
+            if (fs.Length > MaxLogBytes) return null;
+            using var reader = new StreamReader(fs, Encoding.UTF8);
+            return await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            CrashLog.TryWrite(ex);
+            return null;
+        }
+    }
 }

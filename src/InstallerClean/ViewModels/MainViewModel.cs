@@ -31,6 +31,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private readonly EventHandler _scanCompletedHandler;
     private readonly IResultLogService _resultLogService;
+    private readonly ISettingsService _settingsService;
+    private readonly bool _hasSentResultLogBefore;
 
     public MainViewModel(
         IFileSystemScanService scanService,
@@ -46,6 +48,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         IResultLogService resultLogService)
     {
         _resultLogService = resultLogService;
+        _settingsService = settingsService;
+        // Snapshot the lifetime lock once at construction. The settings
+        // service is also read inside CleanupViewModel for MoveDestination,
+        // but those two reads can't race: this snapshot covers HasSentResultLog
+        // for the whole MainViewModel lifetime, and writes go through the
+        // persistence callback below.
+        _hasSentResultLogBefore = settingsService.Load().HasSentResultLog;
 
         // Closures read Cleanup / Completion at invocation time, after
         // the ctor runs.
@@ -53,7 +62,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             isExternallyBlocked: () => Cleanup?.IsOperating == true || Completion?.IsComplete == true);
         Completion = new CompletionViewModel(
             rescanRequested: () => Scan.ScanCommand.ExecuteAsync(null),
-            resultLogService: resultLogService);
+            resultLogService: resultLogService,
+            confirmationService: confirmationService,
+            hasSentBefore: _hasSentResultLogBefore);
         Cleanup = new CleanupViewModel(
             moveService, deleteService, settingsService,
             dialogService, confirmationService, fileSystem,
@@ -110,6 +121,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // up so a parallel scan can't race the operation.
             Scan.NotifyExternallyBlockedChanged();
         }
+        else if (e.PropertyName == nameof(CompletionViewModel.HasSentResultLog) &&
+                 Completion.HasSentResultLog)
+        {
+            // Persist the lifetime lock immediately after a successful
+            // send. TrySave is best-effort; a failed save means the
+            // user might see the prompt one extra time on a future
+            // session, which is harmless and self-correcting on the
+            // next successful save.
+            var snapshot = _settingsService.Load();
+            snapshot.HasSentResultLog = true;
+            _settingsService.TrySave(snapshot);
+        }
     }
 
     private async void OnScanCompleted(object? sender, EventArgs e)
@@ -125,6 +148,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Completion.ShowAllClear();
 
         if (suppress) return;
+        // Users with the lifetime lock will never see the Send button
+        // again, so don't spend disk I/O writing a file they won't
+        // send. Cleanup-side writes still happen because they go via
+        // CleanupViewModel directly; this branch is the all-clear path.
+        if (_hasSentResultLogBefore) return;
 
         // WriteAsync is best-effort. A failed write (disk full, locked
         // file, read-only profile) returns false instead of throwing,

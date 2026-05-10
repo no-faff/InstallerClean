@@ -450,14 +450,16 @@
                             Margin="{StaticResource GapBottom.Sm}"
                             AutomationProperties.Name="{loc:Translate Automation.CloseResult}"/>
 
-                    <!-- Send result log. Visible after every completion
-                         state where a fresh last-run.json has been
-                         written (all-clear scan, successful or partial
-                         Move, successful or partial Delete). Single click
-                         POSTs the JSON file's contents to the No Faff
-                         endpoint; once successfully sent, the button is
-                         replaced by a "Thanks!" status line and stays
-                         hidden for the rest of the session. -->
+                    <!-- Send result. Visible once per session, on the first
+                         completion overlay shown (all-clear scan, Move or
+                         Delete). Clicking opens the confirmation window
+                         showing the literal JSON about to be POSTed.
+                         After a Send (success or failure) the button is
+                         hidden for the rest of the session and the
+                         status line takes its place. The lifetime lock
+                         in AppSettings.HasSentResultLog keeps the
+                         button hidden in future sessions too, so no
+                         user is asked twice. -->
                     <Button Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.SendResultLog}"
                             Command="{Binding Completion.SendResultLogCommand}"
@@ -466,7 +468,7 @@
                             Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
                             Margin="{StaticResource GapBottom.Sm}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
-                            ToolTip="{loc:Translate Tooltip.SendResultLog}"
+                            ToolTip="{Binding Completion.SendResultLogTooltip}"
                             AutomationProperties.Name="{loc:Translate Automation.SendResultLog}"/>
 
                     <!-- Result-log status line. Shows "Sending..." while

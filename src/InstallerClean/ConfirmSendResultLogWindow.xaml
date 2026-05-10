@@ -1,0 +1,69 @@
+<Window x:Class="InstallerClean.ConfirmSendResultLogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:InstallerClean.Resources"
+        Title="{loc:Translate ConfirmSendResultLog.Title}"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" GlassFrameThickness="0"
+                      ResizeBorderThickness="0"/>
+    </WindowChrome.WindowChrome>
+
+    <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="32,28"
+            MaxWidth="640" MinWidth="480"
+            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="1">
+        <StackPanel>
+            <TextBlock Text="{loc:Translate ConfirmSendResultLog.Title}"
+                       Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
+                       TextWrapping="Wrap"
+                       Margin="{StaticResource GapBottom.Md}"/>
+
+            <Border Background="{StaticResource Surface.Sidebar}" CornerRadius="6"
+                    BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="1"
+                    Padding="12,10"
+                    MaxHeight="360"
+                    Margin="{StaticResource GapBottom.Md}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <!-- IsReadOnly + the SelectableText style stays consistent with
+                         the version-string display in About; the user can copy the
+                         JSON out for their own audit without being able to edit it
+                         before Send. FontFamily is system monospace so the JSON
+                         keys line up. -->
+                    <TextBox x:Name="JsonText"
+                             IsReadOnly="True"
+                             BorderThickness="0"
+                             Background="Transparent"
+                             Foreground="{StaticResource Text.Body}"
+                             FontFamily="Consolas, Cascadia Mono, Lucida Console, monospace"
+                             FontSize="{StaticResource Type.Body}"
+                             TextWrapping="NoWrap"
+                             VerticalScrollBarVisibility="Disabled"
+                             HorizontalScrollBarVisibility="Disabled"/>
+                </ScrollViewer>
+            </Border>
+
+            <TextBlock Text="{loc:Translate ConfirmSendResultLog.Reassurance}"
+                       Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
+                       TextWrapping="Wrap"
+                       Margin="{StaticResource GapBottom.Lg}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- Cancel is IsDefault so a reflexive Enter does NOT send;
+                     the affirmative click takes a deliberate Tab+Space or
+                     mouse press, matching the ConfirmDelete pattern. -->
+                <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
+                        Click="OnCancel" IsCancel="True" IsDefault="True"
+                        Margin="{StaticResource GapRight.Sm}"/>
+                <Button Style="{StaticResource PrimaryPill}"
+                        Content="{loc:Translate Action.SendResultLogConfirm}"
+                        Click="OnSend"
+                        AutomationProperties.Name="{loc:Translate Automation.ConfirmSendResultLog}"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

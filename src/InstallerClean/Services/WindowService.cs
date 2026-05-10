@@ -8,16 +8,13 @@ public sealed class WindowService : IWindowService
 {
     private readonly ISettingsService _settingsService;
     private readonly IUpdateCheckService _updateCheckService;
-    private readonly IResultLogService _resultLogService;
 
     public WindowService(
         ISettingsService settingsService,
-        IUpdateCheckService updateCheckService,
-        IResultLogService resultLogService)
+        IUpdateCheckService updateCheckService)
     {
         _settingsService = settingsService;
         _updateCheckService = updateCheckService;
-        _resultLogService = resultLogService;
     }
 
     public void ShowOrphanedDetails(OrphanedFilesViewModel viewModel)
@@ -43,7 +40,7 @@ public sealed class WindowService : IWindowService
     public void ShowAbout()
     {
         if (Application.Current is null) return;
-        var window = new AboutWindow(_updateCheckService, _resultLogService)
+        var window = new AboutWindow(_updateCheckService)
         {
             Owner = Application.Current.MainWindow,
         };

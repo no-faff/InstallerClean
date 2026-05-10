@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         Title="{loc:Translate Window.About.Title}"
-        Width="500" Height="220"
+        Width="500" Height="250"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
@@ -23,6 +23,8 @@
             <RowDefinition Height="4"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="4"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -44,21 +46,22 @@
                  Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}"
                  Margin="-2,0,0,0"/>
 
-        <StackPanel Grid.Row="5" Orientation="Horizontal">
-            <TextBlock Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}">
-                <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/blob/main/LICENSE"
-                           Click="Hyperlink_Click"
-                           Style="{StaticResource SubtleLink}"><Run Text="{loc:Translate Action.MITLicence}"/></Hyperlink>
-            </TextBlock>
-            <TextBlock x:Name="ViewLastResultLogContainer"
-                       Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
-                       Margin="{StaticResource GapLeft.Md}">
-                <Hyperlink Click="ViewLastResultLogClick"
-                           Style="{StaticResource SubtleLink}"><Run Text="{loc:Translate Action.ViewLastResultLog}"/></Hyperlink>
-            </TextBlock>
-        </StackPanel>
+        <TextBlock Grid.Row="5" Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}">
+            <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/blob/main/LICENSE"
+                       Click="Hyperlink_Click"
+                       Style="{StaticResource SubtleLink}"><Run Text="{loc:Translate Action.MITLicence}"/></Hyperlink>
+        </TextBlock>
 
-        <DockPanel Grid.Row="7" LastChildFill="False">
+        <!-- Quiet section header above the Star + Donate row; matches the
+             "MOVE LOCATION" pattern on the main window for typographic
+             continuity. The resx value is already uppercased so screen
+             readers don't see SmallCaps glyph mapping at all. -->
+        <TextBlock Grid.Row="7" Text="{loc:Translate Section.SayThanks}"
+                   Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
+                   FontWeight="Medium"
+                   AutomationProperties.Name="{loc:Translate Automation.SayThanks}"/>
+
+        <DockPanel Grid.Row="9" LastChildFill="False">
             <Button DockPanel.Dock="Left" Style="{StaticResource CompactGhostPill}"
                     Click="StarClick" AutomationProperties.Name="{loc:Translate Automation.LeaveStarOnGitHub}"
                     ToolTip="{loc:Translate Tooltip.OpenProjectOnGitHub}"

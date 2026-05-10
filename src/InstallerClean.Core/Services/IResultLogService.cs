@@ -34,6 +34,14 @@ public interface IResultLogService
     /// service echoing a framework exception. Never throws.
     /// </summary>
     Task<ResultLogSendOutcome> SendAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Reads <see cref="LastLogPath"/> as UTF-8 text and returns the
+    /// raw content for display in the confirmation window. Never
+    /// throws; returns null when the file doesn't exist, exceeds the
+    /// 64 KiB read cap, or fails to read.
+    /// </summary>
+    Task<string?> ReadLastLogAsync(CancellationToken cancellationToken = default);
 }
 
 public enum ResultLogSendOutcome

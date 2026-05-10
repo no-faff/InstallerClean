@@ -21,7 +21,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=3600&color=brightgreen" alt="Total downloads"></a>
 </p>
 
-![Screenshot of InstallerClean after a successful clean-up: 965 MB cleared, 68 files moved](docs/screenshots/10-moved-done-success.webp)
+![Screenshot of InstallerClean after a successful clean-up: 965 MB freed, 68 files moved](docs/screenshots/10-moved-done-success.webp)
 
 - **What:** Finds and removes unneeded files from `C:\Windows\Installer`, the hidden folder Windows never cleans up.
 - **How much space:** Depends on your software. On my machine it was just shy of 1 GB. An InstallerClean user [reported](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. With Adobe Acrobat it can pass 100 GB. It could be nothing at all. The point is that it's quick and costs nothing; whatever can be removed will be gone.
@@ -104,7 +104,7 @@ No telemetry. No network activity. The About window has a Check for updates link
 </p>
 
 <p>
-  <img src="docs/screenshots/10-moved-done-success.webp" alt="Success overlay showing 965 MB cleared after a move operation" width="900"><br>
+  <img src="docs/screenshots/10-moved-done-success.webp" alt="Success overlay showing 965 MB freed after a move operation" width="900"><br>
   <em>After a successful Move.</em>
 </p>
 

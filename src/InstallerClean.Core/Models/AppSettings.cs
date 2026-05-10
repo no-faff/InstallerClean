@@ -23,6 +23,15 @@ public sealed class AppSettings
 
     /// <summary>Last-saved size of the registered-files window. Null until the user resizes it.</summary>
     public WindowSize? RegisteredWindowSize { get; set; }
+
+    /// <summary>
+    /// Set to true once the user has successfully sent a result log
+    /// to No Faff. The Send button is then hidden forever (across
+    /// sessions and across version upgrades) so we capture one report
+    /// per machine, never two. Eliminates the bias where a user who
+    /// freed nothing on a re-run would skew the aggregate downward.
+    /// </summary>
+    public bool HasSentResultLog { get; set; }
 }
 
 /// <summary>Persisted Width/Height pair for a remembered window size.</summary>

@@ -40,7 +40,7 @@ public sealed record ResultLogEntry(
         long scanDurationMs,
         string pendingReboot,
         MoveResult move,
-        long bytesCleared,
+        long bytesFreed,
         string moveDestinationKind,
         bool cancelled) =>
         new(
@@ -48,21 +48,21 @@ public sealed record ResultLogEntry(
             AppInfo.Current(),
             ResolveOs(),
             ScanInfo.From(scan, scanDurationMs, pendingReboot),
-            OperationInfo.FromMove(move, scan.RemovableFiles.Count, bytesCleared, moveDestinationKind, cancelled));
+            OperationInfo.FromMove(move, scan.RemovableFiles.Count, bytesFreed, moveDestinationKind, cancelled));
 
     public static ResultLogEntry ForDelete(
         ScanResult scan,
         long scanDurationMs,
         string pendingReboot,
         DeleteResult delete,
-        long bytesCleared,
+        long bytesFreed,
         bool cancelled) =>
         new(
             CurrentSchemaVersion,
             AppInfo.Current(),
             ResolveOs(),
             ScanInfo.From(scan, scanDurationMs, pendingReboot),
-            OperationInfo.FromDelete(delete, scan.RemovableFiles.Count, bytesCleared, cancelled));
+            OperationInfo.FromDelete(delete, scan.RemovableFiles.Count, bytesFreed, cancelled));
 
     private static string ResolveOs() =>
         $"{RuntimeInformation.OSDescription} ({RuntimeInformation.OSArchitecture})";
@@ -77,7 +77,6 @@ public sealed record AppInfo(string Version)
 public sealed record ScanInfo(
     long DurationMs,
     int RegisteredCount,
-    int RemovableCount,
     int OrphanedCount,
     int SupersededCount,
     int MissingFromDiskCount,
@@ -90,7 +89,6 @@ public sealed record ScanInfo(
         return new(
             durationMs,
             scan.RegisteredPackages.Count,
-            scan.RemovableFiles.Count,
             scan.RemovableFiles.Count - supersededCount,
             supersededCount,
             scan.MissingFromDiskCount,
@@ -116,32 +114,32 @@ public sealed record OperationInfo(
     string Outcome,
     int FilesProcessed,
     int FilesFailed,
-    long BytesCleared,
+    long BytesFreed,
     IReadOnlyList<ErrorBucket> Errors,
     string? MoveDestinationKind)
 {
     public static OperationInfo ScanOnly() =>
         new(OperationKinds.Scan, OperationOutcomes.NoFiles, 0, 0, 0, Array.Empty<ErrorBucket>(), null);
 
-    public static OperationInfo FromMove(MoveResult result, int totalCandidates, long bytesCleared,
+    public static OperationInfo FromMove(MoveResult result, int totalCandidates, long bytesFreed,
         string moveDestinationKind, bool cancelled) =>
         new(
             OperationKinds.Move,
             ClassifyOutcome(result.MovedCount, result.Errors.Count, totalCandidates, cancelled),
             result.MovedCount,
             result.Errors.Count,
-            bytesCleared,
+            bytesFreed,
             BucketErrors(result.Errors),
             moveDestinationKind);
 
-    public static OperationInfo FromDelete(DeleteResult result, int totalCandidates, long bytesCleared,
+    public static OperationInfo FromDelete(DeleteResult result, int totalCandidates, long bytesFreed,
         bool cancelled) =>
         new(
             OperationKinds.Delete,
             ClassifyOutcome(result.DeletedCount, result.Errors.Count, totalCandidates, cancelled),
             result.DeletedCount,
             result.Errors.Count,
-            bytesCleared,
+            bytesFreed,
             BucketErrors(result.Errors),
             null);
 

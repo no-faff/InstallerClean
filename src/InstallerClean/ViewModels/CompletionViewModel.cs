@@ -12,8 +12,31 @@ namespace InstallerClean.ViewModels;
 /// / errors block shown after a scan-with-no-orphans, a successful
 /// move or a successful delete. The rescan command runs the
 /// <c>rescanRequested</c> constructor delegate so this VM stays
-/// ignorant of the scan service. The "send result log" button on
-/// the same overlay routes through <see cref="IResultLogService"/>.
+/// ignorant of the scan service. The "Send result" button on the same
+/// overlay routes through <see cref="IResultLogService"/> and
+/// <see cref="IConfirmationService"/>.
+///
+/// Visibility rules for the Send button are layered so the prompt
+/// never re-asks once the user has either sent or dismissed it:
+///
+///   - Lifetime lock: <c>AppSettings.HasSentResultLog</c> on disk.
+///     Set to true on a successful POST, never cleared. Future
+///     sessions never re-prompt the same user, even across version
+///     upgrades, which is the design call documented in
+///     <see cref="AppSettings.HasSentResultLog"/>.
+///
+///   - Session lock: <see cref="_promptShownThisSession"/>. First
+///     <see cref="MarkResultLogReady"/> call in the session sets it
+///     and shows the button; later calls (from a rescan, from a
+///     follow-up Move/Delete) no-op so the prompt only appears once
+///     per session.
+///
+///   - One-shot suppression: <see cref="SuppressNextResultLogPrompt"/>
+///     used by <c>RescanAfterCompletion</c> so the all-clear that
+///     immediately follows a rescan-from-overlay doesn't re-write
+///     <c>last-run.json</c> with the rescan's empty result and bury
+///     the meaningful Move/Delete payload the user might still want
+///     to send.
 /// </summary>
 public partial class CompletionViewModel : ObservableObject
 {
@@ -23,18 +46,29 @@ public partial class CompletionViewModel : ObservableObject
     [ObservableProperty] private string _restore = string.Empty;
     [ObservableProperty] private string _errors = string.Empty;
 
-    [ObservableProperty] private bool _isResultLogReady;
-    [ObservableProperty] private bool _isSendingResultLog;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSendResultLogVisible))]
+    private bool _isResultLogReady;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSendResultLogVisible))]
+    private bool _isSendingResultLog;
+
     [ObservableProperty] private string _resultLogStatusMessage = string.Empty;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SendResultLogTooltip))]
+    private bool _lastResultFreedNothing;
+
+    private readonly bool _alreadySentBeforeThisSession;
     private bool _resultLogSentThisSession;
+    private bool _promptShownThisSession;
     private bool _skipNextResultLogPrompt;
 
     /// <summary>
     /// Visible when a fresh log exists for the operation just
-    /// completed and the user has not already sent one this session.
-    /// Once sent, the button is replaced by an inline "Thanks!"
-    /// message rather than re-shown for the next operation.
+    /// completed and the user has not already sent or dismissed one
+    /// this session.
     /// </summary>
     public bool IsSendResultLogVisible =>
         IsResultLogReady && !_resultLogSentThisSession && !IsSendingResultLog;
@@ -42,35 +76,45 @@ public partial class CompletionViewModel : ObservableObject
     /// <summary>True after the user has successfully sent a log this session.</summary>
     public bool HasSentResultLog => _resultLogSentThisSession;
 
-    partial void OnIsResultLogReadyChanged(bool value)
-    {
-        OnPropertyChanged(nameof(IsSendResultLogVisible));
-    }
-
-    partial void OnIsSendingResultLogChanged(bool value)
-    {
-        OnPropertyChanged(nameof(IsSendResultLogVisible));
-    }
+    /// <summary>
+    /// Tooltip text for the Send button. Switches to the "please
+    /// send even if nothing was found" variant when the last completion
+    /// produced zero bytes freed (all-clear scan, or a Move/Delete that
+    /// found nothing to operate on), so the all-clear cohort isn't
+    /// silently filtered out of the aggregate.
+    /// </summary>
+    public string SendResultLogTooltip =>
+        LastResultFreedNothing
+            ? Strings.Tooltip_SendResultLog_NothingFound
+            : Strings.Tooltip_SendResultLog;
 
     private readonly Func<Task>? _rescanRequested;
     private readonly IResultLogService? _resultLogService;
+    private readonly IConfirmationService? _confirmationService;
 
     /// <summary>
     /// <paramref name="rescanRequested"/> is an awaitable run-a-scan
-    /// hook. <paramref name="resultLogService"/> writes and sends the
-    /// post-cleanup diagnostic log when the user clicks the Send
-    /// button. Both are optional so unit tests can construct a bare
-    /// view-model.
+    /// hook. <paramref name="resultLogService"/> writes, reads and
+    /// sends the post-cleanup diagnostic log. <paramref name="confirmationService"/>
+    /// shows the modal that lets the user see exactly what would be
+    /// sent before pressing Send. <paramref name="hasSentBefore"/> is
+    /// the persisted lifetime flag (<see cref="AppSettings.HasSentResultLog"/>)
+    /// read once at construction. All services are optional so unit
+    /// tests can construct a bare view-model.
     /// </summary>
     public CompletionViewModel(
         Func<Task>? rescanRequested = null,
-        IResultLogService? resultLogService = null)
+        IResultLogService? resultLogService = null,
+        IConfirmationService? confirmationService = null,
+        bool hasSentBefore = false)
     {
         _rescanRequested = rescanRequested;
         _resultLogService = resultLogService;
+        _confirmationService = confirmationService;
+        _alreadySentBeforeThisSession = hasSentBefore;
     }
 
-    /// <summary>Shows the "All clear" state after a scan finds no orphans.</summary>
+    /// <summary>Shows the "All clean" state after a scan finds no orphans.</summary>
     public void ShowAllClear()
     {
         Heading = Strings.Completion_AllClear;
@@ -78,6 +122,7 @@ public partial class CompletionViewModel : ObservableObject
         Restore = string.Empty;
         Errors = string.Empty;
         ResultLogStatusMessage = string.Empty;
+        LastResultFreedNothing = true;
         IsComplete = true;
     }
 
@@ -86,10 +131,10 @@ public partial class CompletionViewModel : ObservableObject
         IReadOnlyList<FileOperationError> errors)
     {
         // Distinct heading on partial-failure paths so a user whose
-        // Move only half-completed doesn't see a green "120 MB cleared"
+        // Move only half-completed doesn't see a green "120 MB freed"
         // banner that hides the per-file error list below it.
         Heading = string.Format(
-            errors.Count == 0 ? Strings.Completion_Cleared : Strings.Completion_PartlyCleared,
+            errors.Count == 0 ? Strings.Completion_Freed : Strings.Completion_PartlyFreed,
             DisplayHelpers.FormatSize(movedBytes));
         var movedLabel = DisplayHelpers.PluraliseFile(movedCount);
         Summary = errors.Count == 0
@@ -99,6 +144,7 @@ public partial class CompletionViewModel : ObservableObject
         Restore = Strings.Completion_MoveRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
+        LastResultFreedNothing = movedBytes <= 0;
         IsComplete = true;
     }
 
@@ -107,7 +153,7 @@ public partial class CompletionViewModel : ObservableObject
         IReadOnlyList<FileOperationError> errors)
     {
         Heading = string.Format(
-            errors.Count == 0 ? Strings.Completion_Cleared : Strings.Completion_PartlyCleared,
+            errors.Count == 0 ? Strings.Completion_Freed : Strings.Completion_PartlyFreed,
             DisplayHelpers.FormatSize(deletedBytes));
         var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
         Summary = errors.Count == 0
@@ -117,27 +163,29 @@ public partial class CompletionViewModel : ObservableObject
         Restore = Strings.Completion_DeleteRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
+        LastResultFreedNothing = deletedBytes <= 0;
         IsComplete = true;
     }
 
     /// <summary>
-    /// Marks a fresh result-log file as available for the user to
-    /// send. Called by the operation pipeline after the JSON has been
-    /// written to disk. A no-op once the user has already sent a log
-    /// this session.
+    /// Marks a fresh result-log file as available for the user to send.
+    /// No-op if the lifetime lock is set, if the user has already sent
+    /// this session, or if the prompt has already been offered this
+    /// session.
     /// </summary>
     public void MarkResultLogReady()
     {
+        if (_alreadySentBeforeThisSession) return;
         if (_resultLogSentThisSession) return;
+        if (_promptShownThisSession) return;
+        _promptShownThisSession = true;
         IsResultLogReady = true;
     }
 
     /// <summary>
     /// One-shot flag set by <c>RescanAfterCompletion</c> so the all-clear
-    /// that follows a rescan from the completion overlay doesn't re-prompt
-    /// the user with the Send button they have just declined to use.
-    /// Consumed by the next <see cref="ConsumeSuppressNextResultLogPrompt"/>
-    /// call.
+    /// that follows a rescan from the completion overlay doesn't
+    /// re-write <c>last-run.json</c> with the rescan's empty result.
     /// </summary>
     public void SuppressNextResultLogPrompt() => _skipNextResultLogPrompt = true;
 
@@ -154,23 +202,33 @@ public partial class CompletionViewModel : ObservableObject
     {
         if (_resultLogService is null || _resultLogSentThisSession) return;
 
+        // Read the file the user is about to send so the confirmation
+        // window can render the literal bytes that will go out. If the
+        // file's gone or unreadable, fall through to the failure path:
+        // the SendAsync call below will return NoLogToSend and the same
+        // generic failure message lands in the status line.
+        var jsonContent = await _resultLogService.ReadLastLogAsync().ConfigureAwait(true);
+        if (_confirmationService is { } confirm && jsonContent is { })
+        {
+            if (!confirm.ConfirmSendResultLog(jsonContent))
+                return;
+        }
+
         IsSendingResultLog = true;
         ResultLogStatusMessage = Strings.ResultLog_Sending;
         try
         {
-            var outcome = await _resultLogService.SendAsync();
-            if (outcome == ResultLogSendOutcome.Sent)
-            {
-                _resultLogSentThisSession = true;
-                IsResultLogReady = false;
-                ResultLogStatusMessage = Strings.ResultLog_Sent;
-                OnPropertyChanged(nameof(HasSentResultLog));
-                OnPropertyChanged(nameof(IsSendResultLogVisible));
-            }
-            else
-            {
-                ResultLogStatusMessage = OutcomeMessage(outcome);
-            }
+            var outcome = await _resultLogService.SendAsync().ConfigureAwait(true);
+            // The Send button vanishes for the rest of the session
+            // regardless of outcome. The user has had their go; we
+            // don't ask them to "try again" for what was a favour.
+            _resultLogSentThisSession = true;
+            IsResultLogReady = false;
+            ResultLogStatusMessage = outcome == ResultLogSendOutcome.Sent
+                ? Strings.ResultLog_Sent
+                : FailureMessage(outcome);
+            OnPropertyChanged(nameof(HasSentResultLog));
+            OnPropertyChanged(nameof(IsSendResultLogVisible));
         }
         finally
         {
@@ -178,13 +236,11 @@ public partial class CompletionViewModel : ObservableObject
         }
     }
 
-    private static string OutcomeMessage(ResultLogSendOutcome outcome) => outcome switch
+    private static string FailureMessage(ResultLogSendOutcome outcome) => outcome switch
     {
-        ResultLogSendOutcome.NetworkUnavailable => Strings.ResultLog_NetworkUnavailable,
-        ResultLogSendOutcome.Timeout => Strings.ResultLog_Timeout,
-        ResultLogSendOutcome.ServerError => Strings.ResultLog_ServerError,
-        ResultLogSendOutcome.NoLogToSend => Strings.ResultLog_NoLogToSend,
-        _ => Strings.ResultLog_Unknown,
+        ResultLogSendOutcome.NetworkUnavailable => Strings.ResultLog_NetworkError,
+        ResultLogSendOutcome.Timeout => Strings.ResultLog_NetworkError,
+        _ => Strings.ResultLog_GenericFailure,
     };
 
     [RelayCommand]
@@ -204,8 +260,8 @@ public partial class CompletionViewModel : ObservableObject
         IsResultLogReady = false;
         ResultLogStatusMessage = string.Empty;
         // The next ScanCompleted will run with this rescan in flight; an
-        // all-clear that follows must not re-show the Send button the
-        // user has just dismissed by choosing to rescan.
+        // all-clear that follows must not overwrite last-run.json with
+        // the empty rescan result the user has just dismissed.
         SuppressNextResultLogPrompt();
         if (_rescanRequested is { } request)
             await request();
