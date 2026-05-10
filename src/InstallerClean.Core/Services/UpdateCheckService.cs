@@ -32,7 +32,9 @@ public sealed class UpdateCheckService : IUpdateCheckService
     // because the localised "Version 1.8.0" display string contains an
     // internal space and parses as two adjacent products with no slash.
     // ResultLogService takes the same shape; the two must stay in sync.
-    private static readonly string UserAgent =
+    // Exposed internally so a unit test can assert the constant parses
+    // through HttpRequestMessage.Headers.UserAgent.ParseAdd at build time.
+    internal static readonly string UserAgent =
         $"InstallerClean/{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0"}";
 
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
@@ -147,7 +149,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
     private static string FormatVersion(Version v) =>
         $"{v.Major}.{v.Minor}.{v.Build}";
 
-    private static bool IsTrustedReleaseUrl(string? url)
+    internal static bool IsTrustedReleaseUrl(string? url)
     {
         if (string.IsNullOrEmpty(url)) return false;
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return false;

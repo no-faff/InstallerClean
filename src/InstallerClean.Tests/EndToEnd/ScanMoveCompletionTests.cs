@@ -183,11 +183,17 @@ public class ScanMoveCompletionTests
         var windowService = Substitute.For<IWindowService>();
         var resultLogService = Substitute.For<IResultLogService>();
 
+        // Pass the same `fs` instance the production services were
+        // wired against. Two distinct MockFileSystems in one test
+        // ride on the fact that MainViewModel only feeds IFileSystem
+        // to CleanupViewModel's destination probe, but that wiring
+        // could change; sharing the instance keeps the test honest
+        // about the production graph.
         var vm = new MainViewModel(
             scanService, moveService, deleteService,
             settingsService, rebootService, msiInfoService,
             dialogService, confirmationService, windowService,
-            new MockFileSystem(), resultLogService);
+            fs, resultLogService);
 
         // Stage 1: real scan finds the two orphans.
         await vm.Scan.ScanWithProgressAsync(null);
