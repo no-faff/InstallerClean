@@ -14,8 +14,10 @@ public static class CrashLog
         "# crash.log captures unhandled exceptions from InstallerClean." + Environment.NewLine +
         "# Under elevation the framework's exception messages can include file" + Environment.NewLine +
         "# paths from the running session (including other users' profiles" + Environment.NewLine +
-        "# enumerated by Windows Installer queries). Redact paths before" + Environment.NewLine +
-        "# attaching this file to a public bug report." + Environment.NewLine +
+        "# enumerated by Windows Installer queries). Network-failure messages" + Environment.NewLine +
+        "# from the update check or result-log POST can include the destination" + Environment.NewLine +
+        "# URL and the resolved IP / proxy address. Redact both classes of" + Environment.NewLine +
+        "# detail before attaching this file to a public bug report." + Environment.NewLine +
         Environment.NewLine;
 
     private static readonly string LogFolder = Path.Combine(

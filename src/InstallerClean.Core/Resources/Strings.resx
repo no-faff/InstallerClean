@@ -128,7 +128,7 @@
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Move destination...</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Re-scan</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Scan again</value></data>
-  <data name="Action.SendResultLog" xml:space="preserve"><value>_Send result</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>Send result</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Send</value></data>
 
   <!-- ============================================================
@@ -166,8 +166,8 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the orphaned files will be moved. Type a path, paste one, drop a folder, or click Browse.</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Just a basic summary. Totally optional. No personal information is included.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Just a basic summary. Totally optional. No personal information is included. Please send even though nothing was found.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Just a basic summary, sent to No Faff. Totally optional. No personal information is included.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Just a basic summary, sent to No Faff. Totally optional. No personal information is included. Please send even though nothing was found.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the orphaned files to the chosen destination folder.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Send the orphaned files to the Recycle Bin.</value></data>
   <data name="Tooltip.OpenProjectOnGitHub" xml:space="preserve"><value>Open the project on GitHub</value></data>
@@ -240,7 +240,7 @@
        ============================================================ -->
   <data name="Completion.AllClear" xml:space="preserve"><value>All clean</value></data>
   <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer</value></data>
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working.</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working.</value></data>
   <!-- 0 = size freed (e.g. "120.5 MB") -->
   <data name="Completion.Freed" xml:space="preserve"><value>{0} freed</value></data>
@@ -280,7 +280,7 @@
   <data name="Confirm.MoveDestination" xml:space="preserve"><value>Files will be moved to {0}</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Delete {0} {1} ({2})?</value></data>
   <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Files will be sent to the Recycle Bin. If you want backup copies, use Move instead.</value></data>
-  <data name="Confirm.DeleteLargeWarning" xml:space="preserve"><value>At this size some files may skip the Recycle Bin and be deleted permanently. Windows does this automatically when a file exceeds the Recycle Bin's free space. Use Move instead if you want guaranteed backup copies.</value></data>
+  <data name="Confirm.DeleteLargeWarning" xml:space="preserve"><value>At this size some files may skip the Recycle Bin and be deleted permanently. Windows does this automatically when a file exceeds the Recycle Bin's per-drive size limit. Use Move instead if you want guaranteed backup copies.</value></data>
 
   <!-- ============================================================
        ERROR MESSAGES
@@ -364,9 +364,22 @@ Details in {1}.</value></data>
        ============================================================ -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Sending...</value></data>
   <data name="ResultLog.Sent" xml:space="preserve"><value>Thanks! Result log sent.</value></data>
-  <data name="ResultLog.Failed" xml:space="preserve"><value>Didn't work. Never mind, click Done.</value></data>
-  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>This will be sent to nofaff.netlify.app</value></data>
-  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Nothing personal in here. It just lets me see whether the app is helping people.</value></data>
+  <data name="ResultLog.Failed" xml:space="preserve"><value>Didn't work. Never mind.</value></data>
+  <!-- Body header shown in the confirmation modal. Names the
+       recipient and the full URL so the user sees the destination
+       without having to scroll the JSON. -->
+  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>Send this to No Faff?</value></data>
+  <!-- Reassurance line under the JSON. Names the URL once, calls
+       out the no-PII property, and explains the purpose so the
+       user has the context the modal title implies. -->
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Sent to nofaff.netlify.app/api/result-log. Counts and labels only, nothing identifying you or your machine. Helps me know whether the app is working.</value></data>
+  <!-- Window-chrome title (hidden in the actual UI by WindowStyle=None
+       but read aloud by screen readers). Kept short so the screen
+       reader announces "Confirm send" before the body header. -->
+  <data name="Window.ConfirmSendResultLog.Title" xml:space="preserve"><value>Confirm send</value></data>
+  <!-- AutomationProperties.Name on the JSON preview TextBox so screen
+       readers announce its content rather than "edit, read-only". -->
+  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Result log preview, read-only</value></data>
 
   <!-- ============================================================
        SINGLE INSTANCE / STARTUP / CRASH

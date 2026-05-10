@@ -402,11 +402,27 @@
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="0,0,0,6"/>
 
-                    <!-- Restore guidance -->
+                    <!-- Restore guidance. Collapses when empty so the
+                         all-clear overlay (which has no restore hint)
+                         doesn't carry a phantom 30+ pixel gap from the
+                         bottom margin plus line-height of an empty
+                         TextBlock. Pattern matches the Errors Border
+                         below. -->
                     <TextBlock Text="{Binding Completion.Restore}"
                                Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
                                HorizontalAlignment="Center" TextAlignment="Center"
-                               TextWrapping="Wrap" Margin="{StaticResource GapBottom.Xl}"/>
+                               TextWrapping="Wrap" Margin="{StaticResource GapBottom.Xl}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Completion.Restore}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
 
                     <!-- Error details (only visible when there are errors) -->
                     <Border Margin="{StaticResource GapBottom.Xl}" MaxHeight="80">

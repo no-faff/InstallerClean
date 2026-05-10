@@ -69,7 +69,7 @@ InstallerClean detects which patches have been superseded by newer updates and f
 3. **Shows** what's needed and what's not, with sizes
 4. **Removes** the unneeded files: delete to the Recycle Bin, or move to a folder you choose
 
-No telemetry. No network activity. The About window has a Check for updates link that opens the releases page in your browser.
+No automatic network activity. Two opt-in buttons make a single HTTPS call when clicked: **Check for updates** in About, and **Send result** on the completion screen. See [What it doesn't do](#what-it-doesnt-do) below for the full detail.
 
 ## Screenshots
 
@@ -158,7 +158,7 @@ As of the v1.7.0 release: 0/68 (setup), 0/69 (portable), 0/70 (slim) on VirusTot
 - WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, use Windows's built-in Disk Cleanup or `Dism /Online /Cleanup-Image /StartComponentCleanup`.
 - No background service, no scheduled task, no auto-clean. The app runs when you launch it.
 - The registry is read-only. The app queries the Windows Installer database; it doesn't change it.
-- No automatic telemetry, no background network. The app makes no network call until you click one of two buttons. **Check for updates** in About queries GitHub's public releases API on click and tells you whether you have the latest version (single HTTPS GET, identifying string `InstallerClean/<version>`). **Send result log to No Faff** on the completion screen reads `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` and HTTPS-POSTs it to a No Faff endpoint so I can see whether the run worked. The JSON contains counts and categorical labels only: no file paths, no user names, no machine identifiers, no time-of-day. The file can be opened from About to inspect before sending. The button is one-shot per session.
+- No automatic telemetry, no background network. The app makes no network call until you click one of two buttons. **Check for updates** in About queries GitHub's public releases API on click and tells you whether you have the latest version (single HTTPS GET, identifying string `InstallerClean/<version>`). **Send result** on the completion screen reads `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` and HTTPS-POSTs it to a No Faff endpoint so I can see whether the run worked. The JSON contains counts and categorical labels only: no file paths, no user names, no machine identifiers, no time-of-day. Clicking opens a confirmation window showing the exact JSON about to be sent; review it there and press Send to confirm, or Cancel to back out. The button is one-shot per machine, ever.
 - No bundled extras. No toolbars, no third-party offers, no upsells.
 - The only permission asked for beyond launching is Administrator, which is required because `C:\Windows\Installer` is admin-only.
 

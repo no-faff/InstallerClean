@@ -72,6 +72,7 @@ public static class Strings
     public static string Automation_MoveDestinationFolder => Get("Automation.MoveDestinationFolder");
     public static string Automation_OperationProgress => Get("Automation.OperationProgress");
     public static string Automation_RescanInstaller => Get("Automation.RescanInstaller");
+    public static string Automation_ResultLogPreview => Get("Automation.ResultLogPreview");
     public static string Automation_SayThanks => Get("Automation.SayThanks");
     public static string Automation_ScanningProgress => Get("Automation.ScanningProgress");
     public static string Automation_SendResultLog => Get("Automation.SendResultLog");
@@ -281,6 +282,7 @@ public static class Strings
     public static string Window_About_Title => Get("Window.About.Title");
     public static string Window_ConfirmDelete_Title => Get("Window.ConfirmDelete.Title");
     public static string Window_ConfirmMove_Title => Get("Window.ConfirmMove.Title");
+    public static string Window_ConfirmSendResultLog_Title => Get("Window.ConfirmSendResultLog.Title");
     public static string Window_Main_Title => Get("Window.Main.Title");
     public static string Window_Orphaned_Title => Get("Window.Orphaned.Title");
     public static string Window_Registered_Title => Get("Window.Registered.Title");

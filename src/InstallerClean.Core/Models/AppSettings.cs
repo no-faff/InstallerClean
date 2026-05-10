@@ -16,6 +16,19 @@ public sealed class AppSettings
     /// this is empty, so the user must Browse for a destination at
     /// least once before they can run their first Move.
     /// </summary>
+    /// <remarks>
+    /// Validation contract: the textbox accepts any string and the
+    /// debounced write to settings.json never validates. The
+    /// <c>IsInstallerFolderOrChild</c> / <c>IsSystemFolderOrChild</c>
+    /// gates run at use time in <c>CleanupViewModel.MoveAllAsync</c>
+    /// and in the CLI's <c>Program.cs</c>. The dual gate is the
+    /// defence: removing either use-time gate without adding a
+    /// write-time equivalent re-opens the system-folder-destination
+    /// class of bugs because a hand-edited settings.json (or a
+    /// settings.json carried in from a prior install with a since-
+    /// invalidated destination) would silently bypass the missing
+    /// gate.
+    /// </remarks>
     public string MoveDestination { get; set; } = string.Empty;
 
     /// <summary>Last-saved size of the orphaned-files window. Null until the user resizes it.</summary>
