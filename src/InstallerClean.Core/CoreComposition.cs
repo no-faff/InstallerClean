@@ -53,6 +53,7 @@ public static class CoreComposition
         // User-triggered network. Singleton keeps the HttpClient
         // connection pool reused across the button-click lifetime.
         services.AddSingleton<IUpdateCheckService, UpdateCheckService>();
+        services.AddSingleton<IResultLogService, ResultLogService>();
 
         return services;
     }

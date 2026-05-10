@@ -47,6 +47,19 @@ public partial class ScanViewModel : ObservableObject
     /// <summary>True when the last probe returned Block.</summary>
     public bool HasPendingReboot => PendingRebootResult?.IsBlocked == true;
 
+    /// <summary>
+    /// Stable, non-localised label for the current pending-reboot state.
+    /// Drives the diagnostic log so a non-en-GB user's report still
+    /// matches a developer's filter on <c>"installerInProgress"</c>.
+    /// </summary>
+    public string PendingRebootLabel => PendingRebootResult?.Reason switch
+    {
+        PendingRebootReason.MsiExecuteMutexHeld => PendingRebootLabels.MsiExecuteMutexHeld,
+        PendingRebootReason.InstallerInProgress => PendingRebootLabels.InstallerInProgress,
+        PendingRebootReason.PendingRenameInCache => PendingRebootLabels.PendingRenameInCache,
+        _ => PendingRebootLabels.Clean,
+    };
+
     /// <summary>Localised banner text for the current Block reason; empty otherwise.</summary>
     public string PendingRebootBannerText => PendingRebootResult?.Reason switch
     {
@@ -70,6 +83,15 @@ public partial class ScanViewModel : ObservableObject
     /// next scan replaces it.
     /// </summary>
     public ScanResult? LastScanResult { get; private set; }
+
+    /// <summary>
+    /// Wall-clock duration of the most recent user-visible scan, in
+    /// milliseconds. Set by <c>ScanAsync</c> and <c>ScanWithProgressAsync</c>;
+    /// not overwritten by <c>RefreshAsync</c> so the result-log entry
+    /// built after a Move or Delete reports the duration of the scan
+    /// that surfaced the orphans, not the silent post-operation refresh.
+    /// </summary>
+    public long LastScanDurationMs { get; private set; }
 
     /// <summary>
     /// Raised after every successful scan completes, including the
@@ -178,6 +200,7 @@ public partial class ScanViewModel : ObservableObject
             await scanTask;
 
             sw.Stop();
+            LastScanDurationMs = sw.ElapsedMilliseconds;
             ScanProgress = string.Format(Strings.Status_ScanComplete, DisplayHelpers.FormatElapsed(sw.Elapsed));
             ScanCompleted?.Invoke(this, EventArgs.Empty);
         }
@@ -244,6 +267,7 @@ public partial class ScanViewModel : ObservableObject
         var sw = Stopwatch.StartNew();
         await RunScanCoreAsync(progress, cancellationToken);
         sw.Stop();
+        LastScanDurationMs = sw.ElapsedMilliseconds;
         ScanProgress = string.Format(Strings.Status_ScanComplete, DisplayHelpers.FormatElapsed(sw.Elapsed));
         ScanCompleted?.Invoke(this, EventArgs.Empty);
     }

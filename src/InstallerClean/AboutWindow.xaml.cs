@@ -10,13 +10,17 @@ namespace InstallerClean;
 public partial class AboutWindow : Window
 {
     private readonly IUpdateCheckService _updateCheckService;
+    private readonly IResultLogService _resultLogService;
     private CancellationTokenSource? _checkCts;
 
-    public AboutWindow(IUpdateCheckService updateCheckService)
+    public AboutWindow(IUpdateCheckService updateCheckService, IResultLogService resultLogService)
     {
         InitializeComponent();
         _updateCheckService = updateCheckService;
+        _resultLogService = resultLogService;
         VersionText.Text = DisplayHelpers.GetVersionString();
+        ViewLastResultLogContainer.Visibility = _resultLogService.HasFreshLog
+            ? Visibility.Visible : Visibility.Collapsed;
         this.EnableAltSpaceSystemMenu();
     }
 
@@ -101,6 +105,18 @@ public partial class AboutWindow : Window
     {
         if (sender is System.Windows.Documents.Hyperlink link && link.NavigateUri is not null)
             UrlLauncher.OpenUrl(link.NavigateUri.AbsoluteUri);
+    }
+
+    private void ViewLastResultLogClick(object sender, RoutedEventArgs e)
+    {
+        // Convert to a file:// URI so url.dll,FileProtocolHandler
+        // ShellExecutes via the registered handler for .json. Plain
+        // paths can confuse rundll32's argument parser when they
+        // contain spaces, the file:// form quotes the path uniformly.
+        // Routing through UrlLauncher keeps the editor at medium IL
+        // even though InstallerClean is running elevated.
+        var uri = new Uri(_resultLogService.LastLogPath).AbsoluteUri;
+        UrlLauncher.OpenUrl(uri);
     }
 
     private void StarClick(object sender, RoutedEventArgs e) =>

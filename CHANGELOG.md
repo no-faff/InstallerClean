@@ -2,6 +2,20 @@
 
 All notable changes to InstallerClean. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+Two opt-in buttons that, on a single click each, talk to the network. There is no timer, no startup hook, no other call site for either feature: every byte the app sends is the direct consequence of a button press.
+
+### Added
+
+- **Check for updates** in About now performs the version check itself rather than opening the releases page in the browser. On click, the app issues a single HTTPS GET to `api.github.com/repos/no-faff/InstallerClean/releases/latest`, identifies as `InstallerClean/<version>`, parses `tag_name`, and shows one of three localised dialogs: up to date, update available (with a button to open the release page), or check failed with a reason. 8-second timeout. Cancellation on the second click within the same session.
+- **Send result log to No Faff** on the completion screen. After every Move, Delete or scan-with-no-orphans, the app writes a small JSON file (`%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json`) summarising the operation in counts and categorical labels only: schema version, app version, OS string, scan duration, registered/removable/orphaned/superseded/missing counts, pending-reboot label, operation kind, outcome, files processed, files failed, bytes cleared, error buckets and (for moves) destination kind. No file paths, no user names, no machine identifiers, no time-of-day. The button is one-shot per session and is suppressed when the all-clear comes from the Re-scan-after-completion path so the user isn't re-prompted for a result they have just declined to send. After a successful POST, the button is replaced by a "Thanks!" status line. The full schema can be inspected from About via "View last result log", which opens the JSON file in the user's default editor at medium IL.
+- About surfaces a "View last result log" link next to the MIT licence link, visible only when a result log file exists on disk.
+
+### Changed
+
+- The completion-screen "Share what you cleared" button (browser-mediated cleared-bytes share) was replaced before release by Send result log. The button does the network call directly rather than handing the value off through a browser confirmation page; the JSON content is what gets sent and the file can be opened from About to inspect first.
+
 ## [1.7.0] - 2026-05-05
 
 Pending-reboot detection rewritten to fix spurious "Windows is waiting to restart" banners on machines with no actual Windows update pending. Closes [#12](https://github.com/no-faff/InstallerClean/issues/12).

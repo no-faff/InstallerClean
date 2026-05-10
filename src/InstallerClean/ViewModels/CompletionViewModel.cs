@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Resources;
+using InstallerClean.Services;
 
 namespace InstallerClean.ViewModels;
 
@@ -11,7 +12,8 @@ namespace InstallerClean.ViewModels;
 /// / errors block shown after a scan-with-no-orphans, a successful
 /// move or a successful delete. The rescan command runs the
 /// <c>rescanRequested</c> constructor delegate so this VM stays
-/// ignorant of the scan service.
+/// ignorant of the scan service. The "send result log" button on
+/// the same overlay routes through <see cref="IResultLogService"/>.
 /// </summary>
 public partial class CompletionViewModel : ObservableObject
 {
@@ -20,41 +22,52 @@ public partial class CompletionViewModel : ObservableObject
     [ObservableProperty] private string _summary = string.Empty;
     [ObservableProperty] private string _restore = string.Empty;
     [ObservableProperty] private string _errors = string.Empty;
-    [ObservableProperty] [property: System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Style", "IDE0044:Add readonly modifier",
-        Justification = "ObservableProperty source generator writes via the field.")]
-    private long _lastClearedBytes;
+
+    [ObservableProperty] private bool _isResultLogReady;
+    [ObservableProperty] private bool _isSendingResultLog;
+    [ObservableProperty] private string _resultLogStatusMessage = string.Empty;
+
+    private bool _resultLogSentThisSession;
+    private bool _skipNextResultLogPrompt;
 
     /// <summary>
-    /// True when the most recent operation cleared at least one byte
-    /// (Move or Delete). The Share button on the completion overlay
-    /// hides itself otherwise: there is nothing to share for an
-    /// all-clear scan or a Move that moved zero files.
+    /// Visible when a fresh log exists for the operation just
+    /// completed and the user has not already sent one this session.
+    /// Once sent, the button is replaced by an inline "Thanks!"
+    /// message rather than re-shown for the next operation.
     /// </summary>
-    public bool IsShareAvailable => LastClearedBytes > 0;
+    public bool IsSendResultLogVisible =>
+        IsResultLogReady && !_resultLogSentThisSession && !IsSendingResultLog;
 
-    partial void OnLastClearedBytesChanged(long value) =>
-        OnPropertyChanged(nameof(IsShareAvailable));
+    /// <summary>True after the user has successfully sent a log this session.</summary>
+    public bool HasSentResultLog => _resultLogSentThisSession;
 
-    private const string ShareUrlBase = "https://nofaff.netlify.app/installerclean/share";
+    partial void OnIsResultLogReadyChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsSendResultLogVisible));
+    }
+
+    partial void OnIsSendingResultLogChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsSendResultLogVisible));
+    }
 
     private readonly Func<Task>? _rescanRequested;
-    private readonly Action<string>? _openUrl;
+    private readonly IResultLogService? _resultLogService;
 
     /// <summary>
     /// <paramref name="rescanRequested"/> is an awaitable run-a-scan
-    /// hook. <paramref name="openUrl"/> is the host-side URL launcher;
-    /// the production wiring is the WPF host's UrlLauncher, which
-    /// goes through UnelevatedLauncher with a clipboard-fallback
-    /// dialog. Both are passed as delegates so this VM stays
-    /// ignorant of the scan service and the WPF host.
+    /// hook. <paramref name="resultLogService"/> writes and sends the
+    /// post-cleanup diagnostic log when the user clicks the Send
+    /// button. Both are optional so unit tests can construct a bare
+    /// view-model.
     /// </summary>
     public CompletionViewModel(
         Func<Task>? rescanRequested = null,
-        Action<string>? openUrl = null)
+        IResultLogService? resultLogService = null)
     {
         _rescanRequested = rescanRequested;
-        _openUrl = openUrl;
+        _resultLogService = resultLogService;
     }
 
     /// <summary>Shows the "All clear" state after a scan finds no orphans.</summary>
@@ -64,7 +77,7 @@ public partial class CompletionViewModel : ObservableObject
         Summary = Strings.Completion_NothingToCleanUp;
         Restore = string.Empty;
         Errors = string.Empty;
-        LastClearedBytes = 0;
+        ResultLogStatusMessage = string.Empty;
         IsComplete = true;
     }
 
@@ -85,7 +98,7 @@ public partial class CompletionViewModel : ObservableObject
                 movedCount, movedLabel, destination, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = Strings.Completion_MoveRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
-        LastClearedBytes = movedBytes;
+        ResultLogStatusMessage = string.Empty;
         IsComplete = true;
     }
 
@@ -103,29 +116,84 @@ public partial class CompletionViewModel : ObservableObject
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = Strings.Completion_DeleteRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
-        LastClearedBytes = deletedBytes;
+        ResultLogStatusMessage = string.Empty;
         IsComplete = true;
     }
 
     /// <summary>
-    /// Opens the No Faff "share what you cleared" page in the user's
-    /// browser, with the cleared-bytes value as a query parameter.
-    /// The browser-side page asks for explicit confirmation before
-    /// posting the value; the app does not make a network call.
+    /// Marks a fresh result-log file as available for the user to
+    /// send. Called by the operation pipeline after the JSON has been
+    /// written to disk. A no-op once the user has already sent a log
+    /// this session.
     /// </summary>
-    [RelayCommand]
-    private void Share()
+    public void MarkResultLogReady()
     {
-        if (LastClearedBytes <= 0 || _openUrl is null) return;
-        var url = $"{ShareUrlBase}?bytes={LastClearedBytes}";
-        _openUrl(url);
+        if (_resultLogSentThisSession) return;
+        IsResultLogReady = true;
     }
+
+    /// <summary>
+    /// One-shot flag set by <c>RescanAfterCompletion</c> so the all-clear
+    /// that follows a rescan from the completion overlay doesn't re-prompt
+    /// the user with the Send button they have just declined to use.
+    /// Consumed by the next <see cref="ConsumeSuppressNextResultLogPrompt"/>
+    /// call.
+    /// </summary>
+    public void SuppressNextResultLogPrompt() => _skipNextResultLogPrompt = true;
+
+    /// <summary>Reads and clears the one-shot suppression flag.</summary>
+    public bool ConsumeSuppressNextResultLogPrompt()
+    {
+        var s = _skipNextResultLogPrompt;
+        _skipNextResultLogPrompt = false;
+        return s;
+    }
+
+    [RelayCommand]
+    private async Task SendResultLogAsync()
+    {
+        if (_resultLogService is null || _resultLogSentThisSession) return;
+
+        IsSendingResultLog = true;
+        ResultLogStatusMessage = Strings.ResultLog_Sending;
+        try
+        {
+            var outcome = await _resultLogService.SendAsync();
+            if (outcome == ResultLogSendOutcome.Sent)
+            {
+                _resultLogSentThisSession = true;
+                IsResultLogReady = false;
+                ResultLogStatusMessage = Strings.ResultLog_Sent;
+                OnPropertyChanged(nameof(HasSentResultLog));
+                OnPropertyChanged(nameof(IsSendResultLogVisible));
+            }
+            else
+            {
+                ResultLogStatusMessage = OutcomeMessage(outcome);
+            }
+        }
+        finally
+        {
+            IsSendingResultLog = false;
+        }
+    }
+
+    private static string OutcomeMessage(ResultLogSendOutcome outcome) => outcome switch
+    {
+        ResultLogSendOutcome.NetworkUnavailable => Strings.ResultLog_NetworkUnavailable,
+        ResultLogSendOutcome.Timeout => Strings.ResultLog_Timeout,
+        ResultLogSendOutcome.ServerError => Strings.ResultLog_ServerError,
+        ResultLogSendOutcome.NoLogToSend => Strings.ResultLog_NoLogToSend,
+        _ => Strings.ResultLog_Unknown,
+    };
 
     [RelayCommand]
     private void Dismiss()
     {
         IsComplete = false;
         Errors = string.Empty;
+        IsResultLogReady = false;
+        ResultLogStatusMessage = string.Empty;
     }
 
     [RelayCommand]
@@ -133,6 +201,12 @@ public partial class CompletionViewModel : ObservableObject
     {
         IsComplete = false;
         Errors = string.Empty;
+        IsResultLogReady = false;
+        ResultLogStatusMessage = string.Empty;
+        // The next ScanCompleted will run with this rescan in flight; an
+        // all-clear that follows must not re-show the Send button the
+        // user has just dismissed by choosing to rescan.
+        SuppressNextResultLogPrompt();
         if (_rescanRequested is { } request)
             await request();
     }

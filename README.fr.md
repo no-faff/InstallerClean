@@ -67,7 +67,7 @@ InstallerClean détecte les correctifs remplacés par des mises à jour plus ré
 3. **Affiche** ce qui est utile et ce qui ne l'est pas, avec les tailles
 4. **Supprime** les fichiers inutiles : envoi à la Corbeille, ou déplacement vers un dossier de votre choix
 
-Aucune télémétrie automatique. Aucune activité réseau en arrière-plan. Deux boutons opt-in peuvent déclencher du réseau sur clic : « Vérifier les mises à jour » dans À propos compare votre version à la dernière sur GitHub ; « Partager ce que vous avez nettoyé » à la fin ouvre votre navigateur sur une page No Faff.
+Aucune télémétrie automatique. Aucune activité réseau en arrière-plan. Deux boutons opt-in peuvent déclencher du réseau sur clic : « Vérifier les mises à jour » dans À propos compare votre version à la dernière sur GitHub ; « Envoyer le journal de résultat à No Faff » sur l'écran de fin envoie le fichier `last-run.json` (compteurs et étiquettes catégorielles uniquement, aucun chemin, aucun identifiant) à un endpoint No Faff.
 
 ## Captures d'écran
 
@@ -156,7 +156,7 @@ Les trois builds (setup, portable et slim) sont propres sur VirusTotal, aucune d
 - WinSxS (`C:\Windows\WinSxS`) est un dossier différent avec des règles différentes. Pour celui-là, utilisez le Nettoyage de disque intégré de Windows ou `Dism /Online /Cleanup-Image /StartComponentCleanup`.
 - Aucun service en arrière-plan, aucune tâche planifiée, aucun nettoyage automatique. L'application s'exécute quand vous la lancez.
 - Le registre est en lecture seule. L'application interroge la base Windows Installer ; elle ne la modifie pas.
-- Aucune télémétrie automatique, aucune activité réseau en arrière-plan. L'application ne fait aucun appel réseau tant que vous ne cliquez pas sur l'un de deux boutons opt-in. **Vérifier les mises à jour** dans À propos interroge l'API publique des releases de GitHub au moment du clic (un seul GET HTTPS, identifiant `InstallerClean/<version>`). **Partager ce que vous avez nettoyé** sur l'écran de fin ouvre votre navigateur sur une page No Faff où vous pouvez choisir de publier le nombre d'octets nettoyés ; l'application ne fait pas ce POST, le navigateur s'en charge.
+- Aucune télémétrie automatique, aucune activité réseau en arrière-plan. L'application ne fait aucun appel réseau tant que vous ne cliquez pas sur l'un de deux boutons opt-in. **Vérifier les mises à jour** dans À propos interroge l'API publique des releases de GitHub au moment du clic (un seul GET HTTPS, identifiant `InstallerClean/<version>`). **Envoyer le journal de résultat à No Faff** sur l'écran de fin lit `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` et l'envoie en HTTPS POST à un endpoint No Faff afin que je puisse voir si l'exécution a réussi. Le JSON contient uniquement des compteurs et des étiquettes catégorielles : aucun chemin de fichier, aucun nom d'utilisateur, aucun identifiant machine, aucune heure du jour. Le fichier peut être ouvert depuis À propos pour inspection avant envoi. Le bouton est à usage unique par session.
 - Aucun supplément groupé. Pas de barres d'outils, pas d'offres tierces, pas de fenêtres intempestives.
 - La seule autorisation demandée au-delà du lancement est Administrateur, requise parce que `C:\Windows\Installer` est réservé aux administrateurs.
 

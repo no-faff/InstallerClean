@@ -450,20 +450,46 @@
                             Margin="{StaticResource GapBottom.Sm}"
                             AutomationProperties.Name="{loc:Translate Automation.CloseResult}"/>
 
-                    <!-- Share what you cleared. Visible only after a Move
-                         or Delete that actually cleared bytes; opens a
-                         No Faff page in the browser, where the user
-                         confirms before any value is posted. -->
+                    <!-- Send result log. Visible after every completion
+                         state where a fresh last-run.json has been
+                         written (all-clear scan, successful or partial
+                         Move, successful or partial Delete). Single click
+                         POSTs the JSON file's contents to the No Faff
+                         endpoint; once successfully sent, the button is
+                         replaced by a "Thanks!" status line and stays
+                         hidden for the rest of the session. -->
                     <Button Style="{StaticResource GhostPill}"
-                            Content="{loc:Translate Action.ShareSavings}"
-                            Command="{Binding Completion.ShareCommand}"
-                            Visibility="{Binding Completion.IsShareAvailable, Converter={StaticResource BoolToVis}}"
+                            Content="{loc:Translate Action.SendResultLog}"
+                            Command="{Binding Completion.SendResultLogCommand}"
+                            Visibility="{Binding Completion.IsSendResultLogVisible, Converter={StaticResource BoolToVis}}"
                             HorizontalAlignment="Center"
                             Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
                             Margin="{StaticResource GapBottom.Sm}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
-                            ToolTip="{loc:Translate Tooltip.ShareSavings}"
-                            AutomationProperties.Name="{loc:Translate Automation.ShareSavings}"/>
+                            ToolTip="{loc:Translate Tooltip.SendResultLog}"
+                            AutomationProperties.Name="{loc:Translate Automation.SendResultLog}"/>
+
+                    <!-- Result-log status line. Shows "Sending..." while
+                         the POST is in flight, "Thanks!" after a success,
+                         or a localised failure reason. Empty (and so
+                         collapsed) at every other moment. -->
+                    <TextBlock Text="{Binding Completion.ResultLogStatusMessage}"
+                               HorizontalAlignment="Center" TextAlignment="Center"
+                               Foreground="{StaticResource Text.Muted}"
+                               FontSize="{StaticResource Type.Body}"
+                               TextWrapping="Wrap" MaxWidth="380"
+                               Margin="{StaticResource GapBottom.Sm}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Completion.ResultLogStatusMessage}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
 
                     <!-- Scan again -->
                     <Button Style="{StaticResource GhostPill}"

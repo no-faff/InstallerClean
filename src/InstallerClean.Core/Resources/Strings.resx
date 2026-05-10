@@ -127,7 +127,8 @@
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Move destination...</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Re-scan</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Scan again</value></data>
-  <data name="Action.ShareSavings" xml:space="preserve"><value>_Share what you cleared</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>_Send result log to No Faff</value></data>
+  <data name="Action.ViewLastResultLog" xml:space="preserve"><value>View last result log</value></data>
 
   <!-- ============================================================
        AUTOMATION NAMES (screen reader / accessibility)
@@ -144,7 +145,7 @@
   <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all orphaned installer files to the Recycle Bin</value></data>
   <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Confirm sending the orphaned files to the Recycle Bin</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>Confirm moving the orphaned files to the chosen destination folder</value></data>
-  <data name="Automation.ShareSavings" xml:space="preserve"><value>Open the No Faff share page in your browser to report how much was cleared</value></data>
+  <data name="Automation.SendResultLog" xml:space="preserve"><value>Send the diagnostic log of this run to No Faff</value></data>
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Move destination folder</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Operation progress</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>Scan C:\Windows\Installer again</value></data>
@@ -162,7 +163,7 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the orphaned files will be moved. Type a path, paste one, drop a folder, or click Browse.</value></data>
-  <data name="Tooltip.ShareSavings" xml:space="preserve"><value>Opens the No Faff share page in your browser. The page asks for confirmation before posting; the app makes no network call on its own.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Sends the diagnostic JSON written to %LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json. No paths, names or machine identifiers are included; the file can be opened in any text editor first.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the orphaned files to the chosen destination folder.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Send the orphaned files to the Recycle Bin.</value></data>
   <data name="Tooltip.OpenProjectOnGitHub" xml:space="preserve"><value>Open the project on GitHub</value></data>
@@ -353,6 +354,17 @@ Details in {1}.</value></data>
   <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Cannot write to {0}.</value></data>
   <!-- 0 = file name -->
   <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Could not find a unique filename for '{0}' after 10,000 attempts.</value></data>
+
+  <!-- ============================================================
+       RESULT LOG (post-cleanup diagnostic send)
+       ============================================================ -->
+  <data name="ResultLog.Sending" xml:space="preserve"><value>Sending...</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>Thanks! Result log sent.</value></data>
+  <data name="ResultLog.NetworkUnavailable" xml:space="preserve"><value>Couldn't reach the No Faff endpoint. Check your internet connection and try again.</value></data>
+  <data name="ResultLog.Timeout" xml:space="preserve"><value>The send timed out. Your connection may be slow; try again.</value></data>
+  <data name="ResultLog.ServerError" xml:space="preserve"><value>The endpoint returned an error response. Try again in a few minutes.</value></data>
+  <data name="ResultLog.NoLogToSend" xml:space="preserve"><value>No log file was found to send.</value></data>
+  <data name="ResultLog.Unknown" xml:space="preserve"><value>The send failed for an unknown reason. Details are in crash.log.</value></data>
 
   <!-- ============================================================
        SINGLE INSTANCE / STARTUP / CRASH

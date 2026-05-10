@@ -54,7 +54,8 @@ public static class Strings
     public static string Action_Rescan => Get("Action.Rescan");
     public static string Action_ScanAgain => Get("Action.ScanAgain");
     public static string Action_SelectAll => Get("Action.SelectAll");
-    public static string Action_ShareSavings => Get("Action.ShareSavings");
+    public static string Action_SendResultLog => Get("Action.SendResultLog");
+    public static string Action_ViewLastResultLog => Get("Action.ViewLastResultLog");
     public static string Automation_BuyMeACuppa => Get("Automation.BuyMeACuppa");
     public static string Automation_CancelOperation => Get("Automation.CancelOperation");
     public static string Automation_CancelScan => Get("Automation.CancelScan");
@@ -71,7 +72,7 @@ public static class Strings
     public static string Automation_OperationProgress => Get("Automation.OperationProgress");
     public static string Automation_RescanInstaller => Get("Automation.RescanInstaller");
     public static string Automation_ScanningProgress => Get("Automation.ScanningProgress");
-    public static string Automation_ShareSavings => Get("Automation.ShareSavings");
+    public static string Automation_SendResultLog => Get("Automation.SendResultLog");
     public static string Automation_StartupScanProgress => Get("Automation.StartupScanProgress");
     public static string Automation_ViewOrphanedFiles => Get("Automation.ViewOrphanedFiles");
     public static string Automation_ViewRegisteredFiles => Get("Automation.ViewRegisteredFiles");
@@ -203,6 +204,13 @@ public static class Strings
     public static string Plural_Product_Singular => Get("Plural.Product.Singular");
     public static string Reason_Orphaned => Get("Reason.Orphaned");
     public static string Reason_Superseded => Get("Reason.Superseded");
+    public static string ResultLog_NetworkUnavailable => Get("ResultLog.NetworkUnavailable");
+    public static string ResultLog_NoLogToSend => Get("ResultLog.NoLogToSend");
+    public static string ResultLog_Sending => Get("ResultLog.Sending");
+    public static string ResultLog_Sent => Get("ResultLog.Sent");
+    public static string ResultLog_ServerError => Get("ResultLog.ServerError");
+    public static string ResultLog_Timeout => Get("ResultLog.Timeout");
+    public static string ResultLog_Unknown => Get("ResultLog.Unknown");
     public static string Section_Move_Location => Get("Section.Move.Location");
     public static string Section_Registered_Details => Get("Section.Registered.Details");
     public static string Section_Registered_Patches => Get("Section.Registered.Patches");
@@ -256,7 +264,7 @@ public static class Strings
     public static string Tooltip_Move => Get("Tooltip.Move");
     public static string Tooltip_MoveDestination => Get("Tooltip.MoveDestination");
     public static string Tooltip_OpenProjectOnGitHub => Get("Tooltip.OpenProjectOnGitHub");
-    public static string Tooltip_ShareSavings => Get("Tooltip.ShareSavings");
+    public static string Tooltip_SendResultLog => Get("Tooltip.SendResultLog");
     public static string Tooltip_SigningCertificate => Get("Tooltip.SigningCertificate");
     public static string UpdateCheck_Failed_NetworkUnavailable => Get("UpdateCheck.Failed.NetworkUnavailable");
     public static string UpdateCheck_Failed_ResponseParseError => Get("UpdateCheck.Failed.ResponseParseError");

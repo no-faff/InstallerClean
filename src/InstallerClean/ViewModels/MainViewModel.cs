@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.IO.Abstractions;
 using CommunityToolkit.Mvvm.ComponentModel;
+using InstallerClean.Models;
 using InstallerClean.Services;
 
 namespace InstallerClean.ViewModels;
@@ -29,6 +30,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public ChromeViewModel Chrome { get; }
 
     private readonly EventHandler _scanCompletedHandler;
+    private readonly IResultLogService _resultLogService;
 
     public MainViewModel(
         IFileSystemScanService scanService,
@@ -40,19 +42,22 @@ public partial class MainViewModel : ObservableObject, IDisposable
         IDialogService dialogService,
         IConfirmationService confirmationService,
         IWindowService windowService,
-        IFileSystem fileSystem)
+        IFileSystem fileSystem,
+        IResultLogService resultLogService)
     {
+        _resultLogService = resultLogService;
+
         // Closures read Cleanup / Completion at invocation time, after
         // the ctor runs.
         Scan = new ScanViewModel(scanService, rebootService, dialogService,
             isExternallyBlocked: () => Cleanup?.IsOperating == true || Completion?.IsComplete == true);
         Completion = new CompletionViewModel(
             rescanRequested: () => Scan.ScanCommand.ExecuteAsync(null),
-            openUrl: windowService.OpenUrl);
+            resultLogService: resultLogService);
         Cleanup = new CleanupViewModel(
             moveService, deleteService, settingsService,
             dialogService, confirmationService, fileSystem,
-            Scan, Completion);
+            Scan, Completion, resultLogService);
         Chrome = new ChromeViewModel(windowService, msiInfoService, Scan);
 
         // Surface the all-clear overlay when a scan finishes with no
@@ -60,11 +65,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // IsOperating=false AFTER the post-operation refresh fires
         // ScanCompleted; reordering that flow would let an all-clear
         // overpaint a Move/Delete summary.
-        _scanCompletedHandler = (_, _) =>
-        {
-            if (Scan.OrphanedFileCount == 0 && !Cleanup.IsOperating)
-                Completion.ShowAllClear();
-        };
+        _scanCompletedHandler = OnScanCompleted;
         Scan.ScanCompleted += _scanCompletedHandler;
 
         // Drive IsMainContentInteractive off the three overlay states.
@@ -109,5 +110,29 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // up so a parallel scan can't race the operation.
             Scan.NotifyExternallyBlockedChanged();
         }
+    }
+
+    private async void OnScanCompleted(object? sender, EventArgs e)
+    {
+        // The suppression flag is consumed up front so a rescan that
+        // returns orphans (rather than another all-clear) still resets
+        // the one-shot for the next operation's MarkResultLogReady call.
+        var suppress = Completion.ConsumeSuppressNextResultLogPrompt();
+
+        if (Scan.OrphanedFileCount != 0 || Cleanup.IsOperating || Scan.LastScanResult is not { } result)
+            return;
+
+        Completion.ShowAllClear();
+
+        if (suppress) return;
+
+        // WriteAsync is best-effort. A failed write (disk full, locked
+        // file, read-only profile) returns false instead of throwing,
+        // and the Send button stays hidden rather than overpainting a
+        // dialog on the all-clear summary.
+        var entry = ResultLogEntry.ForScanOnly(
+            result, Scan.LastScanDurationMs, Scan.PendingRebootLabel);
+        if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
+            Completion.MarkResultLogReady();
     }
 }

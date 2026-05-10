@@ -21,6 +21,7 @@ public class MainViewModelTests
     private readonly IDialogService _dialogService = Substitute.For<IDialogService>();
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
+    private readonly IResultLogService _resultLogService = Substitute.For<IResultLogService>();
     private readonly MockFileSystem _fileSystem = new();
 
     private MainViewModel CreateViewModel() => CreateViewModel(new AppSettings());
@@ -39,7 +40,7 @@ public class MainViewModelTests
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService,
-            _fileSystem);
+            _fileSystem, _resultLogService);
     }
 
     private static ScanResult EmptyScanResult() =>

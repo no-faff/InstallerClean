@@ -26,6 +26,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     private readonly IFileSystem _fs;
     private readonly ScanViewModel _scan;
     private readonly CompletionViewModel _completion;
+    private readonly IResultLogService _resultLogService;
     private readonly PropertyChangedEventHandler _scanHandler;
 
     private CancellationTokenSource? _operationCts;
@@ -62,7 +63,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         IConfirmationService confirmationService,
         IFileSystem fileSystem,
         ScanViewModel scan,
-        CompletionViewModel completion)
+        CompletionViewModel completion,
+        IResultLogService resultLogService)
     {
         _moveService = moveService;
         _deleteService = deleteService;
@@ -72,6 +74,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         _fs = fileSystem;
         _scan = scan;
         _completion = completion;
+        _resultLogService = resultLogService;
 
         _settings = settingsService.Load();
         MoveDestination = _settings.MoveDestination;
@@ -218,6 +221,14 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     {
         if (_scan.LastScanResult is null) return;
 
+        // Capture pre-operation scan state for the result-log entry.
+        // RefreshAsync below replaces _scan.LastScanResult with the
+        // post-move state, so the diagnostic record needs the pre-move
+        // result captured here.
+        var preOpScan = _scan.LastScanResult;
+        var preOpDurationMs = _scan.LastScanDurationMs;
+        var preOpRebootLabel = _scan.PendingRebootLabel;
+
         var dest = MoveDestination;
 
         // SECURITY: never let files move back inside C:\Windows\Installer.
@@ -341,6 +352,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             await _scan.RefreshAsync();
 
             _completion.ShowMoveSummary(movedCount, movedBytes, movedDest, result.Errors);
+
+            var entry = ResultLogEntry.ForMove(
+                preOpScan, preOpDurationMs, preOpRebootLabel,
+                result, movedBytes,
+                ClassifyMoveDestination(movedDest), cancelled: false);
+            if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
+                _completion.MarkResultLogReady();
         }
         catch (OperationCanceledException)
         {
@@ -375,6 +393,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     {
         if (_scan.LastScanResult is null) return;
 
+        var preOpScan = _scan.LastScanResult;
+        var preOpDurationMs = _scan.LastScanDurationMs;
+        var preOpRebootLabel = _scan.PendingRebootLabel;
+
         var removableFiles = _scan.LastScanResult.RemovableFiles;
         var count = removableFiles.Count;
         var totalBytes = removableFiles.Sum(f => f.SizeBytes);
@@ -408,6 +430,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             await _scan.RefreshAsync();
 
             _completion.ShowDeleteSummary(deletedCount, deletedBytes, result.Errors);
+
+            var entry = ResultLogEntry.ForDelete(
+                preOpScan, preOpDurationMs, preOpRebootLabel,
+                result, deletedBytes, cancelled: false);
+            if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
+                _completion.MarkResultLogReady();
         }
         catch (OperationCanceledException)
         {
@@ -476,6 +504,49 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // N files..." action verb for the operation's duration; the
         // DockPanel below the bar shows the live count via
         // OperationProgressDetail.
+    }
+
+    /// <summary>
+    /// Classifies the move destination for the diagnostic log. Returns
+    /// one of <see cref="MoveDestinationKinds"/>: <c>uncShare</c> for
+    /// <c>\\server\share</c>, <c>sameDrive</c> when the destination
+    /// resolves to the same drive letter as the Installer cache (the
+    /// system drive), <c>removableDrive</c> when the destination's
+    /// <see cref="DriveType"/> is Removable, <c>differentFixedDrive</c>
+    /// when it's Fixed but a different letter, and <c>unknown</c> for
+    /// anything <see cref="DriveInfo"/> can't classify (network drive
+    /// the API can't query, mapped path with no drive letter, etc).
+    /// </summary>
+    internal static string ClassifyMoveDestination(string dest)
+    {
+        if (string.IsNullOrWhiteSpace(dest)) return MoveDestinationKinds.Unknown;
+        if (dest.StartsWith(@"\\", StringComparison.Ordinal) &&
+            !dest.StartsWith(@"\\?\", StringComparison.Ordinal))
+            return MoveDestinationKinds.UncShare;
+
+        try
+        {
+            var destRoot = Path.GetPathRoot(Path.GetFullPath(dest));
+            if (string.IsNullOrEmpty(destRoot)) return MoveDestinationKinds.Unknown;
+
+            var systemRoot = Path.GetPathRoot(
+                Environment.GetFolderPath(Environment.SpecialFolder.System));
+            if (string.Equals(destRoot, systemRoot, StringComparison.OrdinalIgnoreCase))
+                return MoveDestinationKinds.SameDrive;
+
+            var info = new DriveInfo(destRoot);
+            return info.DriveType switch
+            {
+                DriveType.Fixed => MoveDestinationKinds.DifferentFixedDrive,
+                DriveType.Removable => MoveDestinationKinds.RemovableDrive,
+                DriveType.Network => MoveDestinationKinds.UncShare,
+                _ => MoveDestinationKinds.Unknown,
+            };
+        }
+        catch
+        {
+            return MoveDestinationKinds.Unknown;
+        }
     }
 
     /// <summary>
