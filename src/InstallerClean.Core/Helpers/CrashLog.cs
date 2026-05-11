@@ -58,22 +58,22 @@ public static class CrashLog
             if (handle is null) return (LogFile, false);
 
             using var fs = new FileStream(handle, FileAccess.Write);
+            // Capture before seeking; fs.Length is unaffected but a
+            // future refactor reading it after the seek could fool
+            // itself into thinking a fresh file already has content.
+            var writeHeader = fs.Length == 0;
+            fs.Seek(0, SeekOrigin.End);
+
             // First write of a fresh log file gets a privacy header so a
             // user about to attach this to a public bug report sees the
             // disclosure: under elevation, framework exception messages
             // can contain file paths from the running session including
             // other users' profiles. Header lines are prefixed with #
             // so log readers can skip them.
-            if (fs.Length == 0)
-            {
-                using var headerWriter = new StreamWriter(fs, Encoding.UTF8, leaveOpen: true);
-                headerWriter.Write(PrivacyHeader);
-                headerWriter.Flush();
-            }
-            fs.Seek(0, SeekOrigin.End);
-
-            var entry = $"---- {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";
             using var writer = new StreamWriter(fs, Encoding.UTF8, leaveOpen: false);
+            if (writeHeader)
+                writer.Write(PrivacyHeader);
+            var entry = $"---- {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";
             writer.Write(entry);
             return (LogFile, true);
         }

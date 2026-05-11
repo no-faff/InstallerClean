@@ -103,6 +103,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         DisposeOperationCts();
         var saveCts = _moveDestinationSaveCts;
         _moveDestinationSaveCts = null;
+        // Cancel before Dispose so an in-flight SaveAfterDelayAsync
+        // observes the token and stops; otherwise a final keystroke
+        // could land a settings write after the VM is gone.
+        saveCts?.Cancel();
         saveCts?.Dispose();
     }
 
@@ -229,7 +233,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         var preOpDurationMs = _scan.LastScanDurationMs;
         var preOpRebootLabel = _scan.PendingRebootLabel;
 
-        var dest = MoveDestination;
+        var dest = MoveDestination.Trim();
 
         // SECURITY: never let files move back inside C:\Windows\Installer.
         // ResolveFinalPath inside IsInstallerFolderOrChild expands

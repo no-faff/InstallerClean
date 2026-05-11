@@ -58,9 +58,18 @@ public sealed class SettingsService : ISettingsService
             var json = reader.ReadToEnd();
             return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
         }
-        catch (Exception)
+        catch (Exception ex) when (
+            ex is JsonException
+                or InvalidDataException
+                or IOException
+                or UnauthorizedAccessException)
         {
-            // Rename the unreadable file to .bad for manual recovery.
+            // Recovery is scoped to JSON / IO / access-control failures
+            // because those are the only modes a settings.json should
+            // produce. Other types (OutOfMemoryException, StackOverflow)
+            // propagate; .bad-renaming on those would destroy a
+            // recoverable settings file in response to a system-wide
+            // problem.
             var badFile = _settingsFile + ".bad";
             try { File.Move(_settingsFile, badFile, overwrite: true); }
             catch { }

@@ -173,6 +173,7 @@
                         <TextBox Style="{StaticResource PillTextBox}"
                                  Text="{Binding Cleanup.MoveDestination, Mode=TwoWay,
                                                 UpdateSourceTrigger=PropertyChanged}"
+                                 MaxLength="8192"
                                  AutomationProperties.Name="{loc:Translate Automation.MoveDestinationFolder}"
                                  ToolTip="{loc:Translate Tooltip.MoveDestination}"
                                  AllowDrop="True"
