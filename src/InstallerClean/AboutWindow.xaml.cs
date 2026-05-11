@@ -70,15 +70,11 @@ public partial class AboutWindow : Window
                     break;
 
                 case UpdateAvailable available:
-                    var body = string.Format(
-                        Strings.UpdateCheck_UpdateAvailable_Body,
-                        available.CurrentVersion, available.LatestVersion);
-                    var choice = MessageBox.Show(
-                        body,
-                        Strings.UpdateCheck_UpdateAvailable_Title,
-                        MessageBoxButton.OKCancel,
-                        MessageBoxImage.Information);
-                    if (choice == MessageBoxResult.OK)
+                    var dialog = new UpdateAvailableWindow(available.CurrentVersion, available.LatestVersion)
+                    {
+                        Owner = this,
+                    };
+                    if (dialog.ShowDialog() == true)
                         UrlLauncher.OpenUrl(available.ReleaseUrl);
                     CheckStatusText.Text = Strings.UpdateCheck_Status_JustChecked;
                     break;

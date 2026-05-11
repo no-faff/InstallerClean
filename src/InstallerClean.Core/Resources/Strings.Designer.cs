@@ -50,6 +50,7 @@ public static class Strings
     public static string Action_MITLicence => Get("Action.MITLicence");
     public static string Action_Move => Get("Action.Move");
     public static string Action_MoveDestinationPlaceholder => Get("Action.MoveDestinationPlaceholder");
+    public static string Action_OpenReleasePage => Get("Action.OpenReleasePage");
     public static string Action_Paste => Get("Action.Paste");
     public static string Action_Rescan => Get("Action.Rescan");
     public static string Action_ScanAgain => Get("Action.ScanAgain");
@@ -281,7 +282,6 @@ public static class Strings
     public static string UpdateCheck_Title => Get("UpdateCheck.Title");
     public static string UpdateCheck_UpdateAvailable_Body => Get("UpdateCheck.UpdateAvailable.Body");
     public static string UpdateCheck_UpdateAvailable_Title => Get("UpdateCheck.UpdateAvailable.Title");
-    public static string UpdateCheck_UpToDate_Body => Get("UpdateCheck.UpToDate.Body");
     public static string Version_Display => Get("Version.Display");
     public static string Window_About_Title => Get("Window.About.Title");
     public static string Window_ConfirmDelete_Title => Get("Window.ConfirmDelete.Title");

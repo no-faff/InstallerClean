@@ -1,0 +1,42 @@
+<Window x:Class="InstallerClean.UpdateAvailableWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:InstallerClean.Resources"
+        Title="{loc:Translate UpdateCheck.UpdateAvailable.Title}"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <WindowChrome.WindowChrome>
+        <!-- CaptionHeight=0: centred-on-owner modal with no title-
+             bar buttons, so no drag region is needed and the Border
+             below claims the full window. -->
+        <WindowChrome CaptionHeight="0" GlassFrameThickness="0"
+                      ResizeBorderThickness="0"/>
+    </WindowChrome.WindowChrome>
+
+    <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="32,28"
+            MaxWidth="400" MinWidth="320"
+            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="1">
+        <StackPanel>
+            <TextBlock Text="{loc:Translate UpdateCheck.UpdateAvailable.Title}"
+                       Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
+                       Margin="{StaticResource GapBottom.Md}"/>
+
+            <TextBlock x:Name="VersionInfo"
+                       Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}"
+                       TextWrapping="Wrap"
+                       Margin="{StaticResource GapBottom.Lg}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
+                        Click="OnCancel" IsCancel="True"
+                        Margin="{StaticResource GapRight.Sm}"/>
+                <Button Style="{StaticResource PrimaryPill}" Content="{loc:Translate Action.OpenReleasePage}"
+                        Click="OnOpen" IsDefault="True"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
