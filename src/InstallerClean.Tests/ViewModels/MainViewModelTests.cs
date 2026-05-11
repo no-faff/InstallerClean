@@ -608,6 +608,29 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task OnScanCompleted_skips_last_run_log_write_when_all_clear_and_lifetime_lock_set()
+    {
+        // The all-clear path in MainViewModel.OnScanCompleted runs after
+        // a scan that returns zero orphans. The IsResultLogLocked gate
+        // must skip WriteAsync because no Send path exists to drain the
+        // resulting last-run.json: the Send button stays hidden via the
+        // lifetime lock for the rest of the user's time on this machine.
+        // Without the gate the file is overwritten on every all-clear
+        // with a payload nobody can read.
+        var vm = CreateViewModel(new AppSettings { HasSentResultLog = true });
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(),
+                Array.Empty<RegisteredPackage>(),
+                0));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task DeleteAllAsync_skips_last_run_log_write_after_in_session_send()
     {
         // First a successful Send flips the in-session lock. Then a

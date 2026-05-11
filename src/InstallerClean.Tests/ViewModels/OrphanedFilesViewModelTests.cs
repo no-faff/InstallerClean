@@ -149,10 +149,19 @@ public class OrphanedFilesViewModelTests
         vm.Dispose();
         allowComplete.Set();
 
-        // Settle the worker. The cancellation token is checked AFTER the
-        // GetSummaryInfo call completes; SelectedDetails should not be
-        // assigned because the token signals cancellation by then.
-        await Task.Delay(50);
+        // Poll-with-timeout for the worker's post-GetSummaryInfo
+        // cancellation observation to settle. SelectedDetails becomes
+        // non-null only if the worker missed the cancellation; a
+        // continuously-null reading across the polling window confirms
+        // the cancellation was honoured. Polling instead of a fixed
+        // delay so the test surfaces a regression immediately rather
+        // than relying on a fixed-time hope.
+        var pollEnd = DateTime.UtcNow + TimeSpan.FromSeconds(5);
+        while (DateTime.UtcNow < pollEnd)
+        {
+            if (vm.SelectedDetails is not null) break;
+            await Task.Delay(10);
+        }
         Assert.Null(vm.SelectedDetails);
     }
 }
