@@ -44,16 +44,18 @@
         <TextBlock Grid.Row="1" Text="{loc:Translate Window.Main.Title}"
                    Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Md}" FontWeight="SemiBold"/>
 
-        <!-- Version + Check-for-updates inline. The check is functionally
-             tied to the version (compares this build's number against the
-             latest tag) so it sits next to the number it's about to test
-             rather than crammed into the bottom button row.
-             The status TextBlock to the right of the button is empty
-             at rest, fills with "Checking..." during the in-flight
-             call and "Just checked." through the cooldown that follows.
+        <!-- Version + Check-for-updates inline. The check compares this
+             build's number against the latest tag, so it sits next to
+             the number it's about to test.
+
+             The status TextBlock right of the button is the result
+             channel: "Checking..." during the in-flight call, then
+             "Up to date." inline for the no-update case (no MessageBox
+             on that path) or "Just checked." once the MessageBox
+             dismisses on the update-available and check-failed paths.
              AutomationProperties.LiveSetting=Polite so screen readers
-             announce the transitions; otherwise the 8-second wait
-             between click and dialog is silent to Narrator / NVDA / JAWS. -->
+             announce the in-flight wait; otherwise Narrator / NVDA /
+             JAWS see a silent button click. -->
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -65,7 +67,7 @@
             <TextBox Grid.Column="0" x:Name="VersionText"
                      Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}"
                      VerticalAlignment="Center" Margin="-2,0,0,0"/>
-            <Button Grid.Column="2" Style="{StaticResource CompactGhostPill}"
+            <Button Grid.Column="2" Style="{StaticResource CompactPill}"
                     x:Name="CheckNowButton"
                     Content="{loc:Translate Action.CheckForUpdates}" Click="CheckNowClick"
                     VerticalAlignment="Center"/>

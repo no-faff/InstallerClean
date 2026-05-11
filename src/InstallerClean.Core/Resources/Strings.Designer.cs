@@ -277,6 +277,7 @@ public static class Strings
     public static string UpdateCheck_Failed_Unknown => Get("UpdateCheck.Failed.Unknown");
     public static string UpdateCheck_Status_Checking => Get("UpdateCheck.Status.Checking");
     public static string UpdateCheck_Status_JustChecked => Get("UpdateCheck.Status.JustChecked");
+    public static string UpdateCheck_Status_UpToDate => Get("UpdateCheck.Status.UpToDate");
     public static string UpdateCheck_Title => Get("UpdateCheck.Title");
     public static string UpdateCheck_UpdateAvailable_Body => Get("UpdateCheck.UpdateAvailable.Body");
     public static string UpdateCheck_UpdateAvailable_Title => Get("UpdateCheck.UpdateAvailable.Title");

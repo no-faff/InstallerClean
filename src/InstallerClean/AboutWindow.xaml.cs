@@ -65,12 +65,8 @@ public partial class AboutWindow : Window
 
             switch (result)
             {
-                case UpToDate up:
-                    MessageBox.Show(
-                        string.Format(Strings.UpdateCheck_UpToDate_Body, up.CurrentVersion),
-                        Strings.UpdateCheck_Title,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
+                case UpToDate:
+                    CheckStatusText.Text = Strings.UpdateCheck_Status_UpToDate;
                     break;
 
                 case UpdateAvailable available:
@@ -84,6 +80,7 @@ public partial class AboutWindow : Window
                         MessageBoxImage.Information);
                     if (choice == MessageBoxResult.OK)
                         UrlLauncher.OpenUrl(available.ReleaseUrl);
+                    CheckStatusText.Text = Strings.UpdateCheck_Status_JustChecked;
                     break;
 
                 case CheckFailed failed:
@@ -92,10 +89,9 @@ public partial class AboutWindow : Window
                         Strings.UpdateCheck_Title,
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
+                    CheckStatusText.Text = Strings.UpdateCheck_Status_JustChecked;
                     break;
             }
-
-            CheckStatusText.Text = Strings.UpdateCheck_Status_JustChecked;
         }
         finally
         {
