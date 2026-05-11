@@ -128,16 +128,20 @@
 
     <!-- ============================================================
          RADIUS
-         Five roles cover the app:
-           Pill      - fully rounded action buttons.
-           Card      - rounded cards and overlay containers.
-           CardSm    - smaller rounded surfaces (splash card border).
-           Chip      - context menus, tooltips, list rows.
-           Tight     - menu-item highlight chip.
+         Seven roles cover the app:
+           Pill         - fully rounded 40 px action buttons.
+           CompactPill  - fully rounded 30 px compact buttons.
+           Card         - rounded cards and overlay containers.
+           CardSm       - smaller rounded surfaces (splash card border).
+           Inset        - card-within-a-card surfaces (JSON preview, etc.).
+           Chip         - context menus, tooltips, list rows.
+           Tight        - menu-item highlight chip.
          ============================================================ -->
     <CornerRadius x:Key="Radius.Pill">20</CornerRadius>
+    <CornerRadius x:Key="Radius.CompactPill">15</CornerRadius>
     <CornerRadius x:Key="Radius.Card">16</CornerRadius>
     <CornerRadius x:Key="Radius.CardSm">12</CornerRadius>
+    <CornerRadius x:Key="Radius.Inset">6</CornerRadius>
     <CornerRadius x:Key="Radius.Chip">4</CornerRadius>
     <CornerRadius x:Key="Radius.Tight">2</CornerRadius>
 

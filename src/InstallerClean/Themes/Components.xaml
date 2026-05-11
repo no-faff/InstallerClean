@@ -302,7 +302,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bg" Background="{StaticResource Action.Primary.Background}"
-                            CornerRadius="15"
+                            CornerRadius="{StaticResource Radius.CompactPill}"
                             Padding="{TemplateBinding Padding}"
                             Height="{TemplateBinding Height}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -336,7 +336,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bg" Background="Transparent"
-                            CornerRadius="15"
+                            CornerRadius="{StaticResource Radius.CompactPill}"
                             Padding="{TemplateBinding Padding}"
                             Height="{TemplateBinding Height}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"

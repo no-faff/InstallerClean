@@ -221,7 +221,12 @@
 
         </Grid>
 
-        <!-- ── Bottom nav ────────────────────────────────────── -->
+        <!-- ── Bottom nav ──────────────────────────────────────
+             Asymmetric Margin: 4 left because Re-scan and About are
+             GhostPills with their own internal padding; 24 right for
+             clearance between the right-anchored chrome icons and the
+             window-close hit area above. One-off; intentionally a
+             literal Thickness rather than a Gap token. -->
         <DockPanel Grid.Row="3" LastChildFill="False" Margin="4,8,24,8"
                    IsEnabled="{Binding IsMainContentInteractive}">
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"

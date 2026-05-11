@@ -24,7 +24,7 @@
                        TextWrapping="Wrap"
                        Margin="{StaticResource GapBottom.Md}"/>
 
-            <Border Background="{StaticResource Surface.Sidebar}" CornerRadius="6"
+            <Border Background="{StaticResource Surface.Sidebar}" CornerRadius="{StaticResource Radius.Inset}"
                     BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="1"
                     Padding="12,10"
                     MaxHeight="360"
