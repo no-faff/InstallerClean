@@ -74,7 +74,15 @@ public partial class CompletionViewModel : ObservableObject
     public bool IsSendResultLogVisible =>
         IsResultLogReady && !_resultLogSentThisSession && !IsSendingResultLog;
 
-    /// <summary>True after the user has successfully sent a log this session.</summary>
+    /// <summary>
+    /// Trigger property the MainViewModel listens to so it persists the
+    /// lifetime lock. Read-side returns true after any click outcome
+    /// (the session lock fires on success and failure both), but the
+    /// PropertyChanged event is only raised on a Sent outcome, so the
+    /// persistence handler only fires for actual transmissions. The
+    /// asymmetry is what stops a transient timeout permanently locking
+    /// a user out without anything reaching the receiver.
+    /// </summary>
     public bool HasSentResultLog => _resultLogSentThisSession;
 
     /// <summary>
@@ -201,7 +209,9 @@ public partial class CompletionViewModel : ObservableObject
     [RelayCommand]
     private async Task SendResultLogAsync()
     {
-        if (_resultLogService is null || _resultLogSentThisSession || _sendInFlight) return;
+        if (_resultLogService is null || _resultLogSentThisSession || _sendInFlight ||
+            _alreadySentBeforeThisSession)
+            return;
 
         // _sendInFlight gates re-entry across the modal await, which
         // IsSendingResultLog cannot cover because the latter would
@@ -216,8 +226,23 @@ public partial class CompletionViewModel : ObservableObject
             // writer slip a different payload between the user's review
             // and the wire transmission.
             var jsonContent = await _resultLogService.ReadLastLogAsync().ConfigureAwait(true);
+            if (jsonContent is null)
+            {
+                // File missing, oversize, or unreadable between the
+                // post-operation write and the user's click. Treat as
+                // a transient failure: session lock hides the button,
+                // status takes its place, lifetime lock stays open so
+                // the user is re-prompted on the next session.
+                CrashLog.TryWrite(new InvalidOperationException(
+                    "Send result clicked but last-run.json could not be read for preview."));
+                _resultLogSentThisSession = true;
+                IsResultLogReady = false;
+                ResultLogStatusMessage = Strings.ResultLog_Failed;
+                OnPropertyChanged(nameof(IsSendResultLogVisible));
+                return;
+            }
 
-            if (_confirmationService is { } confirm && jsonContent is { })
+            if (_confirmationService is { } confirm)
             {
                 if (!confirm.ConfirmSendResultLog(jsonContent))
                     return;
@@ -228,7 +253,7 @@ public partial class CompletionViewModel : ObservableObject
             ResultLogSendOutcome outcome;
             try
             {
-                outcome = await _resultLogService.SendAsync(jsonContent ?? string.Empty)
+                outcome = await _resultLogService.SendAsync(jsonContent)
                     .ConfigureAwait(true);
             }
             catch (Exception ex)
@@ -247,15 +272,21 @@ public partial class CompletionViewModel : ObservableObject
                 IsSendingResultLog = false;
             }
 
-            // Send outcome (success or failure) flips the session lock.
-            // No "try again": a failed send was a favour declined; the
-            // user moves on.
+            // Session lock flips on any click outcome so the button
+            // doesn't reappear after a transient failure within the
+            // same session. The lifetime lock only persists on a
+            // successful transmission: a user whose first-ever click
+            // hit a timeout (CGNAT blip, Netlify cold start, captive
+            // portal) gets re-prompted next session rather than being
+            // permanently locked out without anything ever reaching
+            // the receiver.
             _resultLogSentThisSession = true;
             IsResultLogReady = false;
             ResultLogStatusMessage = outcome == ResultLogSendOutcome.Sent
                 ? Strings.ResultLog_Sent
                 : Strings.ResultLog_Failed;
-            OnPropertyChanged(nameof(HasSentResultLog));
+            if (outcome == ResultLogSendOutcome.Sent)
+                OnPropertyChanged(nameof(HasSentResultLog));
             OnPropertyChanged(nameof(IsSendResultLogVisible));
         }
         finally

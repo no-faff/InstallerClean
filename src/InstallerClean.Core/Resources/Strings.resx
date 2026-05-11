@@ -161,11 +161,11 @@
        TOOLTIPS
        ============================================================ -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Buy me a cuppa</value></data>
-  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Cancellation requested. The app is waiting for the current step to reach a stopping point — this can take a few seconds during heavy I/O or an MSI database call.</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Cancellation requested. The app is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Close</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
-  <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the orphaned files will be moved. Type a path, paste one, drop a folder, or click Browse.</value></data>
+  <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the orphaned files will be moved. Type a path, paste one, drop a folder or click Browse.</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Just a basic summary, sent to No Faff. Totally optional. No personal information is included.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Just a basic summary, sent to No Faff. Totally optional. No personal information is included. Please send even though nothing was found.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the orphaned files to the chosen destination folder.</value></data>
@@ -498,7 +498,7 @@ The crash log could not be written.</value></data>
        ============================================================ -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - clean up C:\Windows\Installer</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Usage:</value></data>
-  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   Show this help (also accepts /?, -h, or no args)</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   Show this help (also accepts /?, -h or no args)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       Scan only - list removable files</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       Delete removable files (Recycle Bin)</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       Move to saved default location</value></data>

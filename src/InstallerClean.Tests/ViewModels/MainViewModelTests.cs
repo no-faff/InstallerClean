@@ -517,4 +517,63 @@ public class MainViewModelTests
 
         _windowService.Received(1).OpenUrl("https://nofaff.netlify.app");
     }
+
+    // ----------------------------------------------------------------
+    // Result-log persistence path. The lifetime lock
+    // (AppSettings.HasSentResultLog) is the contract behind "one report
+    // ever per machine". It rests on three load-bearing behaviours that
+    // these three tests pin:
+    //
+    //   - A successful Send persists HasSentResultLog=true to settings.
+    //   - A failed Send does NOT persist, so a transient timeout on the
+    //     first-ever click doesn't permanently lock the user out without
+    //     anything reaching the receiver.
+    //   - A Send invoked when last-run.json is unreadable (missing,
+    //     oversize, IO failure) skips the modal AND the wire call and
+    //     does not persist either.
+    // ----------------------------------------------------------------
+
+    [Fact]
+    public async Task SendResultLog_success_persists_HasSentResultLog_to_settings()
+    {
+        var settings = new AppSettings();
+        var vm = CreateViewModel(settings);
+        _resultLogService.ReadLastLogAsync().Returns(Task.FromResult<string?>("{\"schemaVersion\":1}"));
+        _confirmationService.ConfirmSendResultLog(Arg.Any<string>()).Returns(true);
+        _resultLogService.SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(ResultLogSendOutcome.Sent);
+
+        await vm.Completion.SendResultLogCommand.ExecuteAsync(null);
+
+        _settingsService.Received().TrySave(Arg.Is<AppSettings>(s => s.HasSentResultLog));
+    }
+
+    [Fact]
+    public async Task SendResultLog_network_failure_does_not_persist_HasSentResultLog()
+    {
+        var settings = new AppSettings();
+        var vm = CreateViewModel(settings);
+        _resultLogService.ReadLastLogAsync().Returns(Task.FromResult<string?>("{\"schemaVersion\":1}"));
+        _confirmationService.ConfirmSendResultLog(Arg.Any<string>()).Returns(true);
+        _resultLogService.SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(ResultLogSendOutcome.NetworkUnavailable);
+
+        await vm.Completion.SendResultLogCommand.ExecuteAsync(null);
+
+        _settingsService.DidNotReceive().TrySave(Arg.Is<AppSettings>(s => s.HasSentResultLog));
+    }
+
+    [Fact]
+    public async Task SendResultLog_with_unreadable_log_skips_modal_and_send_and_does_not_persist()
+    {
+        var settings = new AppSettings();
+        var vm = CreateViewModel(settings);
+        _resultLogService.ReadLastLogAsync().Returns(Task.FromResult<string?>(null));
+
+        await vm.Completion.SendResultLogCommand.ExecuteAsync(null);
+
+        _confirmationService.DidNotReceive().ConfirmSendResultLog(Arg.Any<string>());
+        await _resultLogService.DidNotReceive().SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+        _settingsService.DidNotReceive().TrySave(Arg.Is<AppSettings>(s => s.HasSentResultLog));
+    }
 }

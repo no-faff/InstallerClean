@@ -92,7 +92,14 @@ public sealed class ResultLogService : IResultLogService
             request.Content = new StringContent(body, Encoding.UTF8);
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            using var response = await HttpClient.SendAsync(request, cancellationToken)
+            // ResponseHeadersRead returns as soon as the status line and
+            // headers are in. The caller only reads IsSuccessStatusCode
+            // and never touches Content; with the default
+            // ResponseContentRead the body would be buffered into memory
+            // anyway, exposing the elevated process to an oversize body
+            // from a hijacked or DNS-poisoned endpoint.
+            using var response = await HttpClient.SendAsync(
+                    request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
                 .ConfigureAwait(false);
             return response.IsSuccessStatusCode
                 ? ResultLogSendOutcome.Sent
