@@ -103,10 +103,24 @@ public partial class App : Application
         SplashWindow? splash = null;
         try
         {
-            var appIcon = new BitmapImage(new Uri("pack://application:,,,/Assets/splash-icon.png"));
-            // Freeze so the same instance can be assigned to many windows
-            // safely without a per-window copy.
-            appIcon.Freeze();
+            // pack-URI resolution can fail if the resource is renamed,
+            // dropped from the assembly graph or the embed step is broken
+            // in a build. Wrap so a missing-icon regression degrades to
+            // "default WPF icon" rather than fatal XamlParseException at
+            // startup.
+            BitmapImage? appIcon = null;
+            try
+            {
+                appIcon = new BitmapImage(new Uri("pack://application:,,,/Assets/splash-icon.png"));
+                // Freeze so the same instance can be assigned to many
+                // windows safely without a per-window copy.
+                appIcon.Freeze();
+            }
+            catch (Exception iconEx)
+            {
+                CrashLog.TryWrite(iconEx);
+            }
+
             EventManager.RegisterClassHandler(typeof(Window), Window.LoadedEvent,
                 new RoutedEventHandler((s, _) =>
                 {
@@ -115,7 +129,8 @@ public partial class App : Application
                         var hwnd = new WindowInteropHelper(w).Handle;
                         int value = 1;
                         Dwmapi.DwmSetWindowAttribute(hwnd, Dwmapi.DWMWA_USE_IMMERSIVE_DARK_MODE, ref value, sizeof(int));
-                        w.Icon = appIcon;
+                        if (appIcon is not null)
+                            w.Icon = appIcon;
                     }
                 }));
 

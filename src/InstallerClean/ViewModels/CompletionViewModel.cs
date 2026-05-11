@@ -133,11 +133,16 @@ public partial class CompletionViewModel : ObservableObject
         _alreadySentBeforeThisSession = hasSentBefore;
     }
 
-    /// <summary>Shows the "All clean" state after a scan finds no orphans.</summary>
-    public void ShowAllClear()
+    /// <summary>Shows the "All clean" state after a scan finds no orphans.
+    /// <paramref name="scanDurationMs"/> is the elapsed scan time the
+    /// summary line reports back to the user as a "yes, a scan actually
+    /// ran" receipt.</summary>
+    public void ShowAllClear(long scanDurationMs)
     {
         Heading = Strings.Completion_AllClean;
-        Summary = Strings.Completion_NothingToCleanUp;
+        Summary = string.Format(
+            Strings.Completion_NothingToCleanUp,
+            DisplayHelpers.FormatElapsed(TimeSpan.FromMilliseconds(scanDurationMs)));
         Restore = string.Empty;
         Errors = string.Empty;
         ResultLogStatusMessage = string.Empty;

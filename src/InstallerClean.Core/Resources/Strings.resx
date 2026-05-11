@@ -244,7 +244,8 @@
        COMPLETION SCREEN
        ============================================================ -->
   <data name="Completion.AllClean" xml:space="preserve"><value>All clean</value></data>
-  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer</value></data>
+  <!-- 0 = formatted scan duration (e.g. "1.4s" or "850ms"). -->
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer. Scanned in {0}.</value></data>
   <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working.</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working.</value></data>
   <!-- 0 = size freed (e.g. "120.5 MB") -->
