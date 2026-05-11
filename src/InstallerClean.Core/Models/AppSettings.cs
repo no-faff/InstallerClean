@@ -11,10 +11,9 @@ namespace InstallerClean.Models;
 public sealed class AppSettings
 {
     /// <summary>
-    /// Folder the user last picked for the Move-orphans operation.
-    /// Empty until the first Move. The Move pill stays disabled while
-    /// this is empty, so the user must Browse for a destination at
-    /// least once before they can run their first Move.
+    /// Folder last picked for the Move-orphans operation. Empty until
+    /// the first Move; Browse is required to populate it before the
+    /// Move command's CanExecute returns true.
     /// </summary>
     /// <remarks>
     /// Validation contract: the textbox accepts any string and the

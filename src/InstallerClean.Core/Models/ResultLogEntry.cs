@@ -5,17 +5,16 @@ using InstallerClean.Services;
 namespace InstallerClean.Models;
 
 /// <summary>
-/// User-shareable diagnostic record produced after every cleanup
-/// operation (Move, Delete, or scan-with-no-orphans). Persisted as
-/// <c>last-run.json</c> in <c>%LOCALAPPDATA%\NoFaff\InstallerClean</c>;
-/// the user can view the file in their default JSON editor before
-/// sharing, and the contents are exactly what gets POSTed if they
-/// click "Send result log to No Faff".
+/// Diagnostic record produced after every cleanup operation (Move,
+/// Delete, or scan-with-no-orphans). Persisted as <c>last-run.json</c>
+/// in <c>%LOCALAPPDATA%\NoFaff\InstallerClean</c>; the file's contents
+/// are exactly what gets POSTed when the Send-result button is
+/// confirmed.
 ///
 /// Schema is intentionally narrow. Every field is either categorical
-/// or a count; no file paths, no user names, no machine identifiers,
+/// or a count; no file paths, no usernames, no machine identifiers,
 /// no time-of-day, nothing that could correlate two runs from the
-/// same user.
+/// same machine.
 /// </summary>
 public sealed record ResultLogEntry(
     int SchemaVersion,
@@ -118,12 +117,12 @@ public sealed record ScanInfo(
 }
 
 /// <summary>
-/// What the user did after the scan and how it landed.
-/// <see cref="Kind"/> is <c>scan</c> when the user took no action
-/// (the scan reported zero orphans, or the user dismissed without
-/// running Move or Delete); <c>move</c> or <c>delete</c> otherwise.
-/// <see cref="Outcome"/> is <c>complete</c> / <c>partial</c> /
-/// <c>cancelled</c> / <c>failed</c> / <c>noFiles</c>.
+/// Operation taken after the scan and the outcome.
+/// <see cref="Kind"/> is <c>scan</c> when no Move or Delete ran
+/// (the scan reported zero orphans, or the completion overlay was
+/// dismissed without Move/Delete); <c>move</c> or <c>delete</c>
+/// otherwise. <see cref="Outcome"/> is <c>complete</c> /
+/// <c>partial</c> / <c>cancelled</c> / <c>failed</c> / <c>noFiles</c>.
 /// <see cref="Errors"/> is the per-category count only (no paths,
 /// no exception messages). <see cref="MoveDestinationKind"/> is
 /// null when not a move; otherwise <c>sameDrive</c> /

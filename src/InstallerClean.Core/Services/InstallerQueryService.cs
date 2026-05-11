@@ -314,8 +314,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // leave real-but-superseded patches missing from the
                 // result set, classifying them as orphaned and offering
                 // them for cleanup. Throwing surfaces the API failure
-                // to the caller (the scan command's catch shows an
-                // error and the user can investigate).
+                // to the caller (the scan command's catch routes it
+                // to a dialog and to crash.log).
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                     throw new InvalidOperationException(
                         string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));

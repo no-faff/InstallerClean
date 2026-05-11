@@ -187,10 +187,10 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Marks a fresh result-log file as available for the user to send.
-    /// No-op if the lifetime lock is set, if the user has already sent
-    /// this session, or if the prompt has already been offered this
-    /// session.
+    /// Marks a fresh result-log as available to send. No-op when the
+    /// lifetime lock is set, when the session lock has fired (any click
+    /// outcome this run), or when the prompt has already been offered
+    /// once this session.
     /// </summary>
     public void MarkResultLogReady()
     {
