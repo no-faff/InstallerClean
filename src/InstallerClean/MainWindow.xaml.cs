@@ -39,6 +39,7 @@ public partial class MainWindow : Window
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
 
         this.EnableAltSpaceSystemMenu();
+        this.ClearFocusOnDeactivation();
     }
 
     private void OnClosed(object? sender, EventArgs e)
@@ -94,28 +95,6 @@ public partial class MainWindow : Window
     private void MinimizeClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
-
-    // Window-level focus reset on deactivation. WPF restores keyboard
-    // focus to the previously focused element when the window
-    // reactivates after Alt+Tab. On overlays that auto-focus a button
-    // (Done on the completion overlay, the in-flight Cancel buttons on
-    // the scan and operation overlays), or on any element the user
-    // previously Tab-navigated to, that restoration paints a focus
-    // ring even though the user did not initiate any keyboard
-    // interaction on return. Clearing both logical and keyboard focus
-    // here breaks the restoration chain: the next paint after
-    // reactivation has nothing to ring. Keyboard navigation initiated
-    // by the user after return (Tab, accelerator keys) still acquires
-    // focus and paints the ring on the right target, so accessibility
-    // is preserved; only the spurious "stuck selected" appearance
-    // after switching to a screenshot tool / browser / another app
-    // and back is removed.
-    protected override void OnDeactivated(EventArgs e)
-    {
-        base.OnDeactivated(e);
-        FocusManager.SetFocusedElement(this, null);
-        Keyboard.ClearFocus();
-    }
 
     protected override void OnSourceInitialized(EventArgs e)
     {

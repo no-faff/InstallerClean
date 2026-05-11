@@ -26,4 +26,30 @@ internal static class WindowChromeExtensions
         window.PreviewKeyDown += handler;
         window.Closed += (_, _) => window.PreviewKeyDown -= handler;
     }
+
+    /// <summary>
+    /// Clears logical and keyboard focus when the window deactivates.
+    /// WPF restores focus to the previously focused element when the
+    /// window reactivates after Alt+Tab or any out-of-process focus
+    /// steal (screenshot tool hotkey, browser opened from a link,
+    /// UAC prompt, anything that briefly takes the foreground).
+    /// The restored focus paints a focus ring on whatever button held
+    /// focus before deactivation, even though the user did not
+    /// initiate any keyboard interaction on return. Clearing focus
+    /// here breaks the restoration chain so the next paint after
+    /// reactivation has nothing to ring. Keyboard navigation
+    /// initiated by the user after return (Tab, accelerators) still
+    /// acquires focus normally and paints the ring on the right
+    /// target, so the accessibility affordance is preserved; only
+    /// the spurious "stuck selected" appearance after returning to
+    /// the app is removed.
+    /// </summary>
+    public static void ClearFocusOnDeactivation(this Window window)
+    {
+        window.Deactivated += (_, _) =>
+        {
+            FocusManager.SetFocusedElement(window, null);
+            Keyboard.ClearFocus();
+        };
+    }
 }

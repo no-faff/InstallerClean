@@ -10,6 +10,7 @@ public partial class ConfirmSendResultLogWindow : Window
         InitializeComponent();
         JsonText.Text = jsonContent;
         this.EnableAltSpaceSystemMenu();
+        this.ClearFocusOnDeactivation();
     }
 
     private void OnSend(object sender, RoutedEventArgs e)

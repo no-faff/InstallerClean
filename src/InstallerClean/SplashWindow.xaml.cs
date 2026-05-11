@@ -16,6 +16,7 @@ public partial class SplashWindow : Window
     {
         InitializeComponent();
         VersionText.Text = DisplayHelpers.GetVersionString();
+        this.ClearFocusOnDeactivation();
     }
 
     public void OnScanProgress(string message)

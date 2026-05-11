@@ -13,6 +13,7 @@ public partial class ConfirmMoveWindow : Window
         MessageText.Text = string.Format(Strings.Confirm_MoveTitle, fileCount, label, sizeDisplay);
         DestinationText.Text = string.Format(Strings.Confirm_MoveDestination, destination);
         this.EnableAltSpaceSystemMenu();
+        this.ClearFocusOnDeactivation();
     }
 
     private void OnMove(object sender, RoutedEventArgs e)
