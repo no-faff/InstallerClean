@@ -28,21 +28,17 @@ internal static class WindowChromeExtensions
     }
 
     /// <summary>
-    /// Clears logical and keyboard focus when the window deactivates.
-    /// WPF restores focus to the previously focused element when the
-    /// window reactivates after Alt+Tab or any out-of-process focus
-    /// steal (screenshot tool hotkey, browser opened from a link,
-    /// UAC prompt, anything that briefly takes the foreground).
-    /// The restored focus paints a focus ring on whatever button held
-    /// focus before deactivation, even though the user did not
-    /// initiate any keyboard interaction on return. Clearing focus
-    /// here breaks the restoration chain so the next paint after
-    /// reactivation has nothing to ring. Keyboard navigation
-    /// initiated by the user after return (Tab, accelerators) still
-    /// acquires focus normally and paints the ring on the right
-    /// target, so the accessibility affordance is preserved; only
-    /// the spurious "stuck selected" appearance after returning to
-    /// the app is removed.
+    /// Clears logical and keyboard focus on Window.Deactivated. WPF
+    /// restores focus to the previously focused element on
+    /// reactivation, painting a ring on a button the user did not
+    /// navigate to. Keyboard navigation after return (Tab,
+    /// accelerators) acquires focus normally, so the keyboard
+    /// affordance is preserved.
+    ///
+    /// Window.Deactivated also fires when another top-level window
+    /// in the same process activates: a modal opened via ShowDialog
+    /// or a non-modal window opened via Show(). The parent loses
+    /// its prior focus across that round trip too.
     /// </summary>
     public static void ClearFocusOnDeactivation(this Window window)
     {

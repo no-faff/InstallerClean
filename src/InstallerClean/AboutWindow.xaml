@@ -44,15 +44,11 @@
         <TextBlock Grid.Row="1" Text="{loc:Translate Window.Main.Title}"
                    Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Md}" FontWeight="SemiBold"/>
 
-        <!-- Version + status. The status TextBlock right of the
-             version is the result channel for the Check-for-updates
-             button below: "Checking..." during the in-flight call,
-             then "Up to date." inline for the no-update case or
-             "Just checked." once the dialog dismisses on the
-             update-available and check-failed paths.
-             AutomationProperties.LiveSetting=Polite so screen readers
-             announce the in-flight wait; otherwise Narrator / NVDA /
-             JAWS see a silent button click. -->
+        <!-- The status TextBlock to the right of the version is the
+             result channel for the Check-for-updates button below.
+             LiveSetting=Polite so the in-flight wait is announced to
+             Narrator / NVDA / JAWS; without it the button click reads
+             as silent. -->
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>

@@ -446,17 +446,10 @@
                                  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                     </Border>
 
-                    <!-- Closes this result screen, NOT the app: exiting
+                    <!-- Closes the result overlay, NOT the app: exiting
                          from here would trap the user with no way to
-                         re-scan or open About. -->
-                    <!-- The completion overlay auto-focuses this button so
-                         Esc and Enter dismiss cleanly and screen readers
-                         announce the action's result. Enter activates
-                         from anywhere via IsDefault, Esc dismisses
-                         through OnPreviewKeyDown. The focus ring around
-                         it on appearance is the AccentPill default; the
-                         post-Alt+Tab stuck-ring artefact is broken at
-                         the window level in OnDeactivated. -->
+                         re-scan or open About. Auto-focused on overlay
+                         show so Esc/Enter dismiss without mouse. -->
                     <Button x:Name="CompletionCloseButton" Style="{StaticResource AccentPill}"
                             Content="{loc:Translate Action.Done}" Command="{Binding Completion.DismissCommand}"
                             IsDefault="True"
@@ -464,21 +457,12 @@
                             Margin="{StaticResource GapBottom.Sm}"
                             AutomationProperties.Name="{loc:Translate Automation.CloseResult}"/>
 
-                    <!-- Send result. Visible once per session, on the first
-                         completion overlay shown (all-clear scan, Move or
-                         Delete). Clicking opens the confirmation window
-                         showing the literal JSON about to be POSTed.
-                         After a Send (success or failure) the button is
-                         hidden for the rest of the session and the
-                         status line takes its place. The lifetime lock
-                         in AppSettings.HasSentResultLog keeps the
-                         button hidden in future sessions too, so no
-                         user is asked twice. SmallPillFocusVisual is
-                         intentional here: Tab navigation should paint
-                         the ring as the focus target. The Alt+Tab
-                         restoration artefact (a ring appearing without
-                         any user keyboard interaction) is broken at the
-                         window level via MainWindow.OnDeactivated. -->
+                    <!-- Send-result-log button. The lifetime lock in
+                         AppSettings.HasSentResultLog hides it after a
+                         send (success or failure) and across future
+                         sessions, so no user is asked twice.
+                         FocusVisualStyle is set explicitly so this
+                         GhostPill paints a ring under Tab navigation. -->
                     <Button Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.SendResultLog}"
                             Command="{Binding Completion.SendResultLogCommand}"
