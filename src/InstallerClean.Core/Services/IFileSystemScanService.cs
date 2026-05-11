@@ -24,8 +24,9 @@ public interface IFileSystemScanService
     /// cannot read the MSI database (typically: not elevated), or
     /// <see cref="InvalidOperationException"/> if Windows Installer
     /// returns no registered products at all (an empty database is
-    /// usually a sign of a deeper Windows-side problem; we surface it
-    /// rather than silently flagging every cached file as orphaned).
+    /// usually a sign of a deeper Windows-side problem, surfaced as
+    /// an exception rather than silently flagging every cached file
+    /// as orphaned).
     /// </summary>
     Task<ScanResult> ScanAsync(
         IProgress<string>? progress = null,
