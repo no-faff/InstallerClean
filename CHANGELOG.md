@@ -7,14 +7,14 @@ All notable changes to InstallerClean. Format follows [Keep a Changelog](https:/
 ### Added
 
 - Check for updates in About now performs the version check itself rather than opening the releases page. Single HTTPS GET to `api.github.com/repos/no-faff/InstallerClean/releases/latest` on click; UA `InstallerClean/<version>`; 8 s timeout; localised result dialog.
-- Send result on the completion overlay. Writes `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` after every Move, Delete or all-clear; opens a confirmation window showing the exact JSON; POSTs to `https://nofaff.netlify.app/api/result-log` on confirm. Counts and categorical labels only — no paths, no usernames, no machine identifiers, no time-of-day. Once per machine, ever.
+- Send result on the completion overlay. Writes `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` after every Move, Delete or all-clear; opens a confirmation window showing the exact JSON; POSTs to `https://nofaff.netlify.app/api/result-log` on confirm. Counts and categorical labels only. No paths, no usernames, no machine identifiers, no time-of-day. Once per machine, ever.
 
 ### Changed
 
 - "All clear" overlay heading is now "All clean".
 - "{N} cleared" completion heading is now "{N} freed".
 - JSON schema field `bytesCleared` renamed to `bytesFreed`; redundant `removableCount` dropped (sum of `orphanedCount` + `supersededCount`).
-- Star and Donate buttons in About picked up Alt+S / Alt+D accelerators; "SAY THANKS" section header above them.
+- Star and Buy-me-a-cuppa buttons in About picked up Alt+S / Alt+B accelerators; "SAY THANKS" section header above them.
 
 ### Removed
 
