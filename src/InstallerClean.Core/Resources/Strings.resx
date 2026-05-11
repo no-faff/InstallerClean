@@ -171,7 +171,7 @@
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Just a basic summary, sent to No Faff. Totally optional. No personal information is included. Please send even though nothing was found.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the orphaned files to the chosen destination folder.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Send the orphaned files to the Recycle Bin.</value></data>
-  <data name="Tooltip.OpenKoFiPage" xml:space="preserve"><value>Open my Ko-fi page</value></data>
+  <data name="Tooltip.Donate" xml:space="preserve"><value>Thanks if you feel like contributing</value></data>
   <data name="Tooltip.OpenProjectOnGitHub" xml:space="preserve"><value>Open the project on GitHub</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Subject name from the embedded Authenticode certificate. Not chain-verified.</value></data>
 

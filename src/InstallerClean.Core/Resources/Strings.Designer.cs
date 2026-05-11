@@ -263,11 +263,11 @@ public static class Strings
     public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");
     public static string Tooltip_Close => Get("Tooltip.Close");
     public static string Tooltip_Delete => Get("Tooltip.Delete");
+    public static string Tooltip_Donate => Get("Tooltip.Donate");
     public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");
     public static string Tooltip_Minimise => Get("Tooltip.Minimise");
     public static string Tooltip_Move => Get("Tooltip.Move");
     public static string Tooltip_MoveDestination => Get("Tooltip.MoveDestination");
-    public static string Tooltip_OpenKoFiPage => Get("Tooltip.OpenKoFiPage");
     public static string Tooltip_OpenProjectOnGitHub => Get("Tooltip.OpenProjectOnGitHub");
     public static string Tooltip_SendResultLog => Get("Tooltip.SendResultLog");
     public static string Tooltip_SendResultLog_NothingFound => Get("Tooltip.SendResultLog.NothingFound");
