@@ -230,10 +230,19 @@
         <DockPanel Grid.Row="3" LastChildFill="False" Margin="4,8,24,8"
                    IsEnabled="{Binding IsMainContentInteractive}">
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
+                    KeyboardNavigation.TabIndex="0"
                     Content="{loc:Translate Action.Rescan}" Command="{Binding Scan.ScanCommand}"/>
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
+                    KeyboardNavigation.TabIndex="1"
                     Content="{loc:Translate Action.About}" Command="{Binding Chrome.ShowAboutCommand}" Margin="4,0,0,0"/>
+            <!-- TabIndex puts Star then Heart in keyboard order so Tab
+                 follows the left-to-right visual order. DockPanel
+                 Dock="Right" places Heart at the far right and Star to
+                 its left; XAML order has Heart first, so without explicit
+                 TabIndex the tab visit is Heart -> Star, reverse of
+                 reading. -->
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
+                    KeyboardNavigation.TabIndex="3"
                     Command="{Binding Chrome.DonateCommand}"
                     AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa}"
                     FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
@@ -277,6 +286,7 @@
                 </Button.ToolTip>
             </Button>
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
+                    KeyboardNavigation.TabIndex="2"
                     Command="{Binding Chrome.StarOnGitHubCommand}"
                     AutomationProperties.Name="{loc:Translate Automation.LeaveStarOnGitHub}"
                     FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
@@ -323,7 +333,9 @@
         </DockPanel>
 
         <!-- ── Scanning overlay ──────────────────────────────────── -->
-        <Grid Grid.RowSpan="4" Visibility="{Binding Scan.IsScanning, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.RowSpan="4" Visibility="{Binding Scan.IsScanning, Converter={StaticResource BoolToVis}}"
+              KeyboardNavigation.TabNavigation="Cycle"
+              KeyboardNavigation.ControlTabNavigation="Cycle">
             <Rectangle Fill="{StaticResource Surface.Overlay}"/>
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <ProgressBar IsIndeterminate="True" Width="240" Height="8" Margin="{StaticResource GapBottom.Md}"
@@ -340,7 +352,9 @@
         </Grid>
 
         <!-- ── Operating overlay ─────────────────────────────────── -->
-        <Grid Grid.RowSpan="4" Visibility="{Binding Cleanup.IsOperating, Converter={StaticResource BoolToVis}}">
+        <Grid Grid.RowSpan="4" Visibility="{Binding Cleanup.IsOperating, Converter={StaticResource BoolToVis}}"
+              KeyboardNavigation.TabNavigation="Cycle"
+              KeyboardNavigation.ControlTabNavigation="Cycle">
             <Rectangle Fill="{StaticResource Surface.Overlay}"/>
             <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Pill}"
                     Padding="28,22" MinWidth="260"

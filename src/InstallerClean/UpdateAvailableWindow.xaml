@@ -5,6 +5,7 @@
         Title="{loc:Translate UpdateCheck.UpdateAvailable.Title}"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent"
+        ShowInTaskbar="False"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
