@@ -451,17 +451,15 @@
                          re-scan or open About. -->
                     <!-- The completion overlay auto-focuses this button so
                          Esc and Enter dismiss cleanly and screen readers
-                         announce the action's result; FocusVisualStyle is
-                         null because the focused-button ring around a
-                         centred IsDefault button on a result screen reads
-                         as a stuck "selected" state, especially after the
-                         user Alt+Tabs away and back. Enter still activates
-                         from anywhere via IsDefault, Esc dismisses through
-                         OnPreviewKeyDown, Tab moves to "Scan again" which
-                         carries its own focus ring as the visible target. -->
+                         announce the action's result. Enter activates
+                         from anywhere via IsDefault, Esc dismisses
+                         through OnPreviewKeyDown. The focus ring around
+                         it on appearance is the AccentPill default; the
+                         post-Alt+Tab stuck-ring artefact is broken at
+                         the window level in OnDeactivated. -->
                     <Button x:Name="CompletionCloseButton" Style="{StaticResource AccentPill}"
                             Content="{loc:Translate Action.Done}" Command="{Binding Completion.DismissCommand}"
-                            IsDefault="True" FocusVisualStyle="{x:Null}"
+                            IsDefault="True"
                             HorizontalAlignment="Center" MinWidth="120"
                             Margin="{StaticResource GapBottom.Sm}"
                             AutomationProperties.Name="{loc:Translate Automation.CloseResult}"/>
