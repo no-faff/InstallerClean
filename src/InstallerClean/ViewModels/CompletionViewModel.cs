@@ -246,10 +246,6 @@ public partial class CompletionViewModel : ObservableObject
                 CrashLog.TryWrite(new InvalidOperationException(
                     "Send result clicked but last-run.json could not be read for preview."));
                 _resultLogSentThisSession = true;
-                // IsResultLogReady = false fires the
-                // [NotifyPropertyChangedFor(IsSendResultLogVisible)]
-                // auto-event on its setter; no manual OnPropertyChanged
-                // call needed.
                 IsResultLogReady = false;
                 // Distinct from the post-POST failure copy: the silent-
                 // skip path never opened the modal and never reached
@@ -299,11 +295,6 @@ public partial class CompletionViewModel : ObservableObject
             // the next session re-prompts rather than locking the
             // machine out with nothing ever reaching the receiver.
             _resultLogSentThisSession = true;
-            // IsResultLogReady = false fires [NotifyPropertyChangedFor]
-            // for IsSendResultLogVisible on the backing field's setter;
-            // IsSendingResultLog = false above did the same on its way
-            // out of the try/finally. Explicit OnPropertyChanged for
-            // the same property would be a third fire.
             IsResultLogReady = false;
             ResultLogStatusMessage = outcome == ResultLogSendOutcome.Sent
                 ? Strings.ResultLog_Sent
