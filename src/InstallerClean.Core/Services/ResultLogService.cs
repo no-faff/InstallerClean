@@ -92,9 +92,9 @@ public sealed class ResultLogService : IResultLogService
         if (string.IsNullOrEmpty(body))
             return ResultLogSendOutcome.NoLogToSend;
 
-        // The only production caller pipes body through ReadLastLogAsync,
-        // which caps at MaxLogBytes; this is defence in depth for a
-        // future caller that builds the body in-memory.
+        // Defence in depth: a caller that builds the body in-memory
+        // (rather than piping through ReadLastLogAsync, which enforces
+        // MaxLogBytes on read) would otherwise bypass the byte cap.
         if (Encoding.UTF8.GetByteCount(body) > IResultLogService.MaxLogBytes)
             return ResultLogSendOutcome.Unknown;
 

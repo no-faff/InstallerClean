@@ -58,9 +58,6 @@ public static class CrashLog
             if (handle is null) return (LogFile, false);
 
             using var fs = new FileStream(handle, FileAccess.Write);
-            // Capture before seeking; fs.Length is unaffected but a
-            // future refactor reading it after the seek could fool
-            // itself into thinking a fresh file already has content.
             var writeHeader = fs.Length == 0;
             fs.Seek(0, SeekOrigin.End);
 

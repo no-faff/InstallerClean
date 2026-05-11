@@ -43,23 +43,21 @@ internal static partial class WindowChromeExtensions
     /// </summary>
     public static void ClearFocusOnDeactivation(this Window window)
     {
-        // Receipts (for any AV-heuristic review of the elevated host):
-        // the pair reads the foreground window's owning PID, never the
-        // window text, never a hook handle, never a keystroke buffer.
-        // Fires at most once per loss of activation (Window.Deactivated
-        // is a low-frequency event).
+        // The Win32 pair reads the foreground window's owning PID
+        // only: never the window text, never a hook handle, never a
+        // keystroke buffer. Fires at most once per loss of activation;
+        // Window.Deactivated is a low-frequency event.
         //
-        // Handler lifetime: the lambda captures `window` only, so a
-        // window-Closed teardown collects both. No explicit Closed
-        // unhook unlike the field-pinned PropertyChanged handlers in
-        // the view-models, which need precise control over subscriber
-        // lifetime across DI scope.
+        // The lambda captures `window` only; the handler is collected
+        // when the window is, so no explicit Closed unhook is needed.
+        // ViewModels pin PropertyChanged handlers to fields and unhook
+        // them because their subscriber lifetime crosses DI scope; a
+        // window-local Deactivated subscription does not.
         window.Deactivated += (_, _) =>
         {
-            // Editable text input keeps focus on Alt+Tab return: the
-            // caret position is preserved so a user mid-edit who tabs
-            // away to copy a path can paste back without re-clicking.
-            // TextBoxBase covers both TextBox and RichTextBox.
+            // TextBoxBase (TextBox or RichTextBox) keeps focus across
+            // Alt+Tab so a user mid-edit can copy a path from another
+            // app and paste back without re-clicking the caret.
             if (FocusManager.GetFocusedElement(window) is TextBoxBase) return;
 
             IntPtr fg = GetForegroundWindow();
