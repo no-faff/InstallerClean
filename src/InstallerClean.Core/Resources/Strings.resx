@@ -157,7 +157,9 @@
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Scanning progress</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Startup scan progress</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>View orphaned files</value></data>
+  <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Available for cleanup.</value></data>
   <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>View registered files</value></data>
+  <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Read-only inventory.</value></data>
 
   <!-- ============================================================
        TOOLTIPS

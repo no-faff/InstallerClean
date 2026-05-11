@@ -113,7 +113,8 @@
                             Height="28" Padding="12,0" FontSize="{StaticResource Type.Heading.Sm}"
                             VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
-                            AutomationProperties.Name="{loc:Translate Automation.ViewRegisteredFiles}"/>
+                            AutomationProperties.Name="{loc:Translate Automation.ViewRegisteredFiles}"
+                            AutomationProperties.HelpText="{loc:Translate Automation.ViewRegisteredFiles.HelpText}"/>
                 </Grid>
 
             </StackPanel>
@@ -152,7 +153,8 @@
                             Height="28" Padding="12,0" FontSize="{StaticResource Type.Heading.Sm}"
                             VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
-                            AutomationProperties.Name="{loc:Translate Automation.ViewOrphanedFiles}"/>
+                            AutomationProperties.Name="{loc:Translate Automation.ViewOrphanedFiles}"
+                            AutomationProperties.HelpText="{loc:Translate Automation.ViewOrphanedFiles.HelpText}"/>
                 </Grid>
 
                 <!-- Move location label -->
@@ -193,7 +195,7 @@
                         </TextBlock>
                     </Grid>
 
-                    <Button Grid.Column="2" Style="{StaticResource PrimaryPill}"
+                    <Button Grid.Column="2" Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.Browse}" Command="{Binding Cleanup.BrowseDestinationCommand}"/>
                 </Grid>
 
@@ -215,7 +217,7 @@
                     <TextBlock DockPanel.Dock="Left" Text="{Binding Cleanup.OperationProgress}"
                                VerticalAlignment="Center" Foreground="{StaticResource Text.Muted}"
                                FontSize="{StaticResource Type.Body}"
-                               TextTrimming="CharacterEllipsis"/>
+                               TextTrimming="CharacterEllipsis" MaxWidth="280"/>
                 </DockPanel>
             </Grid>
 

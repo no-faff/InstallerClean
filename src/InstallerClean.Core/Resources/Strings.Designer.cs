@@ -80,7 +80,9 @@ public static class Strings
     public static string Automation_SendResultLog => Get("Automation.SendResultLog");
     public static string Automation_StartupScanProgress => Get("Automation.StartupScanProgress");
     public static string Automation_ViewOrphanedFiles => Get("Automation.ViewOrphanedFiles");
+    public static string Automation_ViewOrphanedFiles_HelpText => Get("Automation.ViewOrphanedFiles.HelpText");
     public static string Automation_ViewRegisteredFiles => Get("Automation.ViewRegisteredFiles");
+    public static string Automation_ViewRegisteredFiles_HelpText => Get("Automation.ViewRegisteredFiles.HelpText");
     public static string Body_MainExplanation => Get("Body.MainExplanation");
     public static string Body_NoFileSelected => Get("Body.NoFileSelected");
     public static string Body_NoMetadata => Get("Body.NoMetadata");
