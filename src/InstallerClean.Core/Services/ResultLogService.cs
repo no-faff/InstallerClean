@@ -19,7 +19,6 @@ namespace InstallerClean.Services;
 public sealed class ResultLogService : IResultLogService
 {
     private const string EndpointUrl = "https://nofaff.netlify.app/api/result-log";
-    public const long MaxLogBytes = 64 * 1024;
 
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
 
@@ -144,13 +143,13 @@ public sealed class ResultLogService : IResultLogService
                 LogFile, FileAccess.Read, StorageHelpers.AtomicOpenMode.OpenExisting);
             if (handle is null) return null;
             using var fs = new FileStream(handle, FileAccess.Read);
-            if (fs.Length > MaxLogBytes)
+            if (fs.Length > IResultLogService.MaxLogBytes)
             {
                 // Oversize is not a normal outcome (writer caps at the
                 // schema's natural size); record it so a "Didn't work"
                 // user report has a breadcrumb to follow.
                 CrashLog.TryWrite(new InvalidDataException(
-                    $"last-run.json exceeds the {MaxLogBytes}-byte cap and was not read."));
+                    $"last-run.json exceeds the {IResultLogService.MaxLogBytes}-byte cap and was not read."));
                 return null;
             }
             using var reader = new StreamReader(fs, Encoding.UTF8);

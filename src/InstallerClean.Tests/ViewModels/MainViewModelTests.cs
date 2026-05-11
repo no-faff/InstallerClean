@@ -576,4 +576,34 @@ public class MainViewModelTests
         await _resultLogService.DidNotReceive().SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
         _settingsService.DidNotReceive().TrySave(Arg.Is<AppSettings>(s => s.HasSentResultLog));
     }
+
+    [Fact]
+    public async Task RescanAfterCompletion_suppresses_the_next_all_clear_prompt()
+    {
+        // First scan finds zero orphans. The all-clear path calls
+        // WriteAsync (which the mock returns true for) and
+        // MarkResultLogReady, so the Send button becomes visible.
+        // Rescan-from-completion sets the one-shot suppression flag;
+        // the second scan's all-clear path consumes the flag and
+        // does NOT call WriteAsync or MarkResultLogReady. The button
+        // stays hidden even though the second all-clear ran.
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(EmptyScanResult());
+        _resultLogService.WriteAsync(Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(true));
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+        Assert.True(vm.Completion.IsResultLogReady);
+        Assert.True(vm.Completion.IsSendResultLogVisible);
+
+        _resultLogService.ClearReceivedCalls();
+
+        await vm.Completion.RescanAfterCompletionCommand.ExecuteAsync(null);
+
+        Assert.False(vm.Completion.IsResultLogReady);
+        Assert.False(vm.Completion.IsSendResultLogVisible);
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
 }

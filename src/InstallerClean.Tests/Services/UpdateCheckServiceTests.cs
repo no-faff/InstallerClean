@@ -37,6 +37,8 @@ public class UpdateCheckServiceTests
     [InlineData("https://github.com/no-faff/InstallerClean/releases/tag/v1.8.0", true)]
     [InlineData("https://github.com/no-faff/InstallerClean/releases/latest", true)]
     [InlineData("https://github.com/no-faff/InstallerClean/releases/", true)]
+    [InlineData("https://GITHUB.COM/no-faff/InstallerClean/Releases/tag/v1.8.0", true)]
+    [InlineData("https://github.com/No-Faff/InstallerClean/releases/tag/v1.8.0", true)]
     [InlineData("https://github.com/no-faff/InstallerClean", false)]
     [InlineData("https://github.com/no-faff/OtherProject/releases/v1.0", false)]
     [InlineData("https://github.com.attacker.example/no-faff/InstallerClean/releases/", false)]

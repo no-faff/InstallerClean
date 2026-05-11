@@ -353,12 +353,20 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
             _completion.ShowMoveSummary(movedCount, movedBytes, movedDest, result.Errors);
 
-            var entry = ResultLogEntry.ForMove(
-                preOpScan, preOpDurationMs, preOpRebootLabel,
-                result, movedBytes,
-                ClassifyMoveDestination(movedDest), cancelled: false);
-            if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
-                _completion.MarkResultLogReady();
+            // Skip the last-run.json write once the result-log surface
+            // is locked. Nothing will ever read the file from this point
+            // on: the Send button stays hidden for the rest of the
+            // session via the session lock, and the next session checks
+            // the persisted lifetime lock at startup.
+            if (!_completion.IsResultLogLocked)
+            {
+                var entry = ResultLogEntry.ForMove(
+                    preOpScan, preOpDurationMs, preOpRebootLabel,
+                    result, movedBytes,
+                    ClassifyMoveDestination(movedDest), cancelled: false);
+                if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
+                    _completion.MarkResultLogReady();
+            }
         }
         catch (OperationCanceledException)
         {
@@ -431,11 +439,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
             _completion.ShowDeleteSummary(deletedCount, deletedBytes, result.Errors);
 
-            var entry = ResultLogEntry.ForDelete(
-                preOpScan, preOpDurationMs, preOpRebootLabel,
-                result, deletedBytes, cancelled: false);
-            if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
-                _completion.MarkResultLogReady();
+            // Same lock-aware gate as MoveAllAsync: skip the write once
+            // the result-log surface is closed for the rest of the
+            // session and across future sessions.
+            if (!_completion.IsResultLogLocked)
+            {
+                var entry = ResultLogEntry.ForDelete(
+                    preOpScan, preOpDurationMs, preOpRebootLabel,
+                    result, deletedBytes, cancelled: false);
+                if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
+                    _completion.MarkResultLogReady();
+            }
         }
         catch (OperationCanceledException)
         {

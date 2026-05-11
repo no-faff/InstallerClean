@@ -112,15 +112,17 @@ public sealed class UpdateCheckService : IUpdateCheckService
         catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             // HttpClient throws TaskCanceledException on its own
-            // Timeout setting; the request token wasn't cancelled by
-            // the caller, so this is the timeout path.
+            // Timeout setting; the request token was not cancelled
+            // by the caller, so this is the timeout path rather than
+            // the user-cancellation path below.
             return new CheckFailed(UpdateCheckFailureReason.Timeout);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            // Caller cancelled. Surface the cancellation rather than
-            // wrapping it in a result, so the UI can suppress the
-            // "couldn't check" dialog when the user dismissed.
+            // Caller cancelled. Surface the cancellation as an
+            // exception rather than wrapping it into a CheckFailed
+            // result; an explicit OCE differentiates user-cancelled
+            // from server-cancelled at the call site.
             throw;
         }
         catch (HttpRequestException ex)
@@ -155,6 +157,10 @@ public sealed class UpdateCheckService : IUpdateCheckService
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return false;
         if (uri.Scheme != Uri.UriSchemeHttps) return false;
         if (!string.Equals(uri.Host, "github.com", StringComparison.OrdinalIgnoreCase)) return false;
-        return uri.AbsolutePath.StartsWith("/no-faff/InstallerClean/releases/", StringComparison.Ordinal);
+        // Host check is case-insensitive; path check matches the same
+        // intent. GitHub serves the canonical lowercase form today, but
+        // a future redirect that bounces through "/No-Faff/InstallerClean/releases/..."
+        // would still belong to this project.
+        return uri.AbsolutePath.StartsWith("/no-faff/InstallerClean/releases/", StringComparison.OrdinalIgnoreCase);
     }
 }

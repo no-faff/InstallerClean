@@ -116,6 +116,26 @@
         </Setter>
     </Style>
 
+    <!-- Focus ring for flat, rectangular controls (the read-only JSON
+         preview TextBox in ConfirmSendResultLogWindow). The pill
+         visuals above sit around rounded controls and would paint a
+         16px-rounded ring outside a sharp-cornered TextBox edge. This
+         one uses a 2px corner radius so the ring shape tracks the
+         underlying rectangle. -->
+    <Style x:Key="FlatTextBoxFocusVisual">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border CornerRadius="2"
+                            BorderThickness="{StaticResource BorderThickness.Standard}"
+                            BorderBrush="{DynamicResource Text.Body}"
+                            Margin="-2"
+                            SnapsToDevicePixels="True"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- ============================================================
          PILL BUTTONS
          Four flavours sharing one visual language (40px tall, fully

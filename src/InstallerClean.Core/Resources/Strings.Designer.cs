@@ -210,6 +210,7 @@ public static class Strings
     public static string Reason_Orphaned => Get("Reason.Orphaned");
     public static string Reason_Superseded => Get("Reason.Superseded");
     public static string ResultLog_Failed => Get("ResultLog.Failed");
+    public static string ResultLog_NothingToSend => Get("ResultLog.NothingToSend");
     public static string ResultLog_Sending => Get("ResultLog.Sending");
     public static string ResultLog_Sent => Get("ResultLog.Sent");
     public static string Section_Move_Location => Get("Section.Move.Location");

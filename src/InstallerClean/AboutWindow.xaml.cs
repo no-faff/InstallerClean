@@ -1,4 +1,5 @@
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using InstallerClean.Helpers;
@@ -9,6 +10,17 @@ namespace InstallerClean;
 
 public partial class AboutWindow : Window
 {
+    // Cooldown between successive Check-for-updates clicks. A hand-
+    // driven user clicks once and reads the dialog; the cooldown only
+    // bites if something is hammering the button. That pattern
+    // (elevated process repeatedly hitting an external endpoint in
+    // rapid succession) is what behaviour-based AV classifiers score
+    // against as beaconing, and is also what GitHub's unauthenticated
+    // 60/hour rate-limit refuses on a long enough timescale. Five
+    // seconds breaks the repeat-call shape without affecting any
+    // legitimate user.
+    private static readonly TimeSpan CheckForUpdatesCooldown = TimeSpan.FromSeconds(5);
+
     private readonly IUpdateCheckService _updateCheckService;
     private CancellationTokenSource? _checkCts;
 
@@ -85,6 +97,19 @@ public partial class AboutWindow : Window
         finally
         {
             Mouse.OverrideCursor = null;
+            // Cursor un-mucks immediately; the button stays disabled
+            // through the cooldown. The await happens after the catch
+            // chain so a Cancel during the cooldown re-enables on the
+            // next click via the OnClosed disposal path.
+            try
+            {
+                await Task.Delay(CheckForUpdatesCooldown, token);
+            }
+            catch (OperationCanceledException)
+            {
+                // Window closing or a follow-up click; the
+                // button-re-enable below is harmless in either case.
+            }
             button.IsEnabled = true;
         }
     }

@@ -50,7 +50,7 @@
                              VerticalScrollBarVisibility="Disabled"
                              HorizontalScrollBarVisibility="Disabled"
                              KeyboardNavigation.TabIndex="2"
-                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
+                             FocusVisualStyle="{StaticResource FlatTextBoxFocusVisual}"
                              AutomationProperties.Name="{loc:Translate Automation.ResultLogPreview}"/>
                 </ScrollViewer>
             </Border>
@@ -61,13 +61,13 @@
                        Margin="{StaticResource GapBottom.Lg}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <!-- Send is IsDefault: the user has already taken an explicit
-                     action to reach this modal (clicked Send result on the
-                     completion overlay), and the action is not destructive.
-                     Enter therefore confirms; Esc and the Cancel button
-                     back out. The Delete-confirm pattern (Cancel as
-                     default) does not transfer here because that one
-                     guards a destructive shell call. -->
+                <!-- Send is IsDefault. The modal opens in response to an
+                     explicit Send-result click on the completion overlay
+                     and the action is not destructive, so Enter confirms
+                     and Esc cancels. ConfirmDeleteWindow inverts this
+                     (Cancel as default) because Delete is destructive
+                     and IsDefault on the affirmative would let a
+                     reflexive Enter delete. -->
                 <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True"
                         KeyboardNavigation.TabIndex="0"

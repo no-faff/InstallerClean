@@ -13,10 +13,10 @@ namespace InstallerClean.ViewModels;
 /// public properties for XAML binding, and wires the inter-VM signals
 /// that coordinate them:
 ///
-///   - When a scan completes with no orphans, push the "all clear"
+///   - A scan completing with no orphans pushes the "all clear"
 ///     completion overlay.
-///   - When the user clicks the "Scan again" button on the completion
-///     overlay, fire the scan VM's Scan command.
+///   - The "Scan again" command on the completion overlay invokes
+///     the Scan VM's Scan command via the rescan delegate.
 ///
 /// All scan/cleanup/completion/chrome state lives on the child VMs.
 /// XAML binds via the corresponding nested property
@@ -157,12 +157,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             Completion.ShowAllClear();
 
             if (suppress) return;
-            // The lifetime lock hides the Send button for the rest of
-            // the user's life on this machine, so writing last-run.json
-            // would burn disk I/O on a file the user never sees.
-            // CleanupViewModel still writes after each Move/Delete by
-            // design (the file documents the most recent operation
-            // outcome regardless of whether the prompt is offered).
+            // The lifetime lock permanently hides the Send button on
+            // this machine, so writing last-run.json on this path
+            // produces a file with no consumer. CleanupViewModel
+            // applies the same gate via Completion.IsResultLogLocked.
             if (_hasSentResultLogBefore) return;
 
             // WriteAsync returns false on disk-full / locked-file /

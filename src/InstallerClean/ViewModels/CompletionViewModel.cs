@@ -12,31 +12,28 @@ namespace InstallerClean.ViewModels;
 /// / errors block shown after a scan-with-no-orphans, a successful
 /// move or a successful delete. The rescan command runs the
 /// <c>rescanRequested</c> constructor delegate so this VM stays
-/// ignorant of the scan service. The "Send result" button on the same
+/// ignorant of the scan service. The Send-result button on the same
 /// overlay routes through <see cref="IResultLogService"/> and
 /// <see cref="IConfirmationService"/>.
 ///
-/// Visibility rules for the Send button are layered so the prompt
-/// never re-asks once the user has either sent or dismissed it:
+/// Visibility of the Send button is gated by three independent locks:
 ///
 ///   - Lifetime lock: <c>AppSettings.HasSentResultLog</c> on disk.
-///     Set to true on a successful POST, never cleared. Future
-///     sessions never re-prompt the same user, even across version
-///     upgrades, which is the design call documented in
-///     <see cref="AppSettings.HasSentResultLog"/>.
+///     Set to true on a successful POST, never cleared. The flag
+///     survives version upgrades and the prompt does not return on
+///     a later session. Documented in <see cref="AppSettings.HasSentResultLog"/>.
 ///
-///   - Session lock: <see cref="_promptShownThisSession"/>. First
-///     <see cref="MarkResultLogReady"/> call in the session sets it
-///     and shows the button; later calls (from a rescan, from a
-///     follow-up Move/Delete) no-op so the prompt only appears once
-///     per session.
+///   - Session lock: <see cref="_promptShownThisSession"/>. The first
+///     <see cref="MarkResultLogReady"/> call in a session sets the
+///     flag; later calls no-op. Each session offers the prompt at
+///     most once.
 ///
 ///   - One-shot suppression: <see cref="SuppressNextResultLogPrompt"/>
-///     used by <c>RescanAfterCompletion</c> so the all-clear that
-///     immediately follows a rescan-from-overlay doesn't re-write
-///     <c>last-run.json</c> with the rescan's empty result and bury
-///     the meaningful Move/Delete payload the user might still want
-///     to send.
+///     set by <c>RescanAfterCompletion</c>. The all-clear that
+///     immediately follows a rescan-from-overlay skips the WriteAsync
+///     and MarkResultLogReady call so the rescan's empty result does
+///     not overwrite the prior Move/Delete payload in
+///     <c>last-run.json</c>.
 /// </summary>
 public partial class CompletionViewModel : ObservableObject
 {
@@ -84,6 +81,19 @@ public partial class CompletionViewModel : ObservableObject
     /// a user out without anything reaching the receiver.
     /// </summary>
     public bool HasSentResultLog => _resultLogSentThisSession;
+
+    /// <summary>
+    /// True when the result-log surface is shut down for any reason:
+    /// the user already sent in a previous session (lifetime lock from
+    /// settings) or the session lock has fired this run. Consumed by
+    /// CleanupViewModel and the all-clear handler in MainViewModel to
+    /// skip the last-run.json write when nobody will ever send the
+    /// file: the disk I/O is otherwise paid on every Move and Delete
+    /// for the rest of the session even though the Send button stays
+    /// hidden.
+    /// </summary>
+    public bool IsResultLogLocked =>
+        _alreadySentBeforeThisSession || _resultLogSentThisSession;
 
     /// <summary>
     /// Tooltip text for the Send button. Switches to the "please
@@ -241,7 +251,12 @@ public partial class CompletionViewModel : ObservableObject
                 // auto-event on its setter; no manual OnPropertyChanged
                 // call needed.
                 IsResultLogReady = false;
-                ResultLogStatusMessage = Strings.ResultLog_Failed;
+                // Distinct from the post-POST failure copy: the silent-
+                // skip path never opened the modal and never reached
+                // the wire. "No log to send" tells the user the app
+                // didn't try, vs "Didn't work" which implies it tried
+                // and got refused.
+                ResultLogStatusMessage = Strings.ResultLog_NothingToSend;
                 return;
             }
 
@@ -276,13 +291,13 @@ public partial class CompletionViewModel : ObservableObject
             }
 
             // Session lock flips on any click outcome so the button
-            // doesn't reappear after a transient failure within the
+            // does not reappear after a transient failure within the
             // same session. The lifetime lock only persists on a
-            // successful transmission: a user whose first-ever click
-            // hit a timeout (CGNAT blip, Netlify cold start, captive
-            // portal) gets re-prompted next session rather than being
-            // permanently locked out without anything ever reaching
-            // the receiver.
+            // successful transmission: a first-ever click that hits
+            // a transient timeout (CGNAT blip, Netlify cold start,
+            // captive-portal DNS) leaves the lifetime lock unset, so
+            // the next session re-prompts rather than locking the
+            // machine out with nothing ever reaching the receiver.
             _resultLogSentThisSession = true;
             IsResultLogReady = false;
             ResultLogStatusMessage = outcome == ResultLogSendOutcome.Sent
@@ -314,9 +329,9 @@ public partial class CompletionViewModel : ObservableObject
         Errors = string.Empty;
         IsResultLogReady = false;
         ResultLogStatusMessage = string.Empty;
-        // The next ScanCompleted will run with this rescan in flight; an
-        // all-clear that follows must not overwrite last-run.json with
-        // the empty rescan result the user has just dismissed.
+        // The next ScanCompleted fires with this rescan in flight; an
+        // all-clear that follows it skips the last-run.json overwrite
+        // so the prior Move/Delete payload survives across the rescan.
         SuppressNextResultLogPrompt();
         if (_rescanRequested is { } request)
             await request();
