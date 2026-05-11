@@ -50,6 +50,7 @@ public partial class AboutWindow : Window
 
         button.IsEnabled = false;
         Mouse.OverrideCursor = Cursors.Wait;
+        CheckStatusText.Text = Strings.UpdateCheck_Status_Checking;
         try
         {
             UpdateCheckResult result;
@@ -93,14 +94,12 @@ public partial class AboutWindow : Window
                         MessageBoxImage.Warning);
                     break;
             }
+
+            CheckStatusText.Text = Strings.UpdateCheck_Status_JustChecked;
         }
         finally
         {
             Mouse.OverrideCursor = null;
-            // Cursor cleared immediately. The button stays disabled
-            // until the cooldown either elapses cleanly or is cancelled
-            // by OnClosed disposing the CTS; both paths fall through to
-            // the re-enable below.
             try
             {
                 await Task.Delay(CheckForUpdatesCooldown, token);
@@ -108,6 +107,7 @@ public partial class AboutWindow : Window
             catch (OperationCanceledException)
             {
             }
+            CheckStatusText.Text = string.Empty;
             button.IsEnabled = true;
         }
     }

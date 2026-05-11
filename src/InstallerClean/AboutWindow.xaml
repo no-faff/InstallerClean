@@ -47,12 +47,19 @@
         <!-- Version + Check-for-updates inline. The check is functionally
              tied to the version (compares this build's number against the
              latest tag) so it sits next to the number it's about to test
-             rather than crammed into the bottom button row. -->
+             rather than crammed into the bottom button row.
+             The status TextBlock to the right of the button is empty
+             at rest, fills with "Checking..." during the in-flight
+             call and "Just checked." through the cooldown that follows.
+             AutomationProperties.LiveSetting=Polite so screen readers
+             announce the transitions; otherwise the 8-second wait
+             between click and dialog is silent to Narrator / NVDA / JAWS. -->
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="12"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="12"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0" x:Name="VersionText"
@@ -62,6 +69,10 @@
                     x:Name="CheckNowButton"
                     Content="{loc:Translate Action.CheckForUpdates}" Click="CheckNowClick"
                     VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="4" x:Name="CheckStatusText"
+                       Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
+                       VerticalAlignment="Center" TextWrapping="NoWrap"
+                       AutomationProperties.LiveSetting="Polite"/>
         </Grid>
 
         <TextBlock Grid.Row="5" Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}">
