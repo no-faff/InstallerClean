@@ -475,7 +475,13 @@
                          status line takes its place. The lifetime lock
                          in AppSettings.HasSentResultLog keeps the
                          button hidden in future sessions too, so no
-                         user is asked twice. -->
+                         user is asked twice.
+                         FocusVisualStyle is null for the same Alt+Tab
+                         focus-restoration reason as the Done button
+                         above: this button sits on a result overlay and
+                         would otherwise paint a stuck "selected" ring
+                         when the user switches away (e.g. to a screenshot
+                         tool) and back. -->
                     <Button Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.SendResultLog}"
                             Command="{Binding Completion.SendResultLogCommand}"
@@ -483,7 +489,7 @@
                             HorizontalAlignment="Center"
                             Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
                             Margin="{StaticResource GapBottom.Sm}"
-                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
+                            FocusVisualStyle="{x:Null}"
                             ToolTip="{Binding Completion.SendResultLogTooltip}"
                             AutomationProperties.Name="{loc:Translate Automation.SendResultLog}"/>
 
