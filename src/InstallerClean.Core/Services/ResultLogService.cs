@@ -92,6 +92,12 @@ public sealed class ResultLogService : IResultLogService
         if (string.IsNullOrEmpty(body))
             return ResultLogSendOutcome.NoLogToSend;
 
+        // The only production caller pipes body through ReadLastLogAsync,
+        // which caps at MaxLogBytes; this is defence in depth for a
+        // future caller that builds the body in-memory.
+        if (Encoding.UTF8.GetByteCount(body) > IResultLogService.MaxLogBytes)
+            return ResultLogSendOutcome.Unknown;
+
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Post, EndpointUrl);

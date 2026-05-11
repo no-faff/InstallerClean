@@ -42,6 +42,11 @@ internal static partial class WindowChromeExtensions
     /// </summary>
     public static void ClearFocusOnDeactivation(this Window window)
     {
+        // Receipts (for any AV-heuristic review of the elevated host):
+        // the pair reads the foreground window's owning PID, never the
+        // window text, never a hook handle, never a keystroke buffer.
+        // Fires at most once per loss of activation (Window.Deactivated
+        // is a low-frequency event).
         window.Deactivated += (_, _) =>
         {
             IntPtr fg = GetForegroundWindow();

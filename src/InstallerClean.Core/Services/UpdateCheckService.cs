@@ -65,7 +65,10 @@ public sealed class UpdateCheckService : IUpdateCheckService
 
             var json = await response.Content.ReadAsStringAsync(cancellationToken)
                 .ConfigureAwait(false);
-            using var doc = JsonDocument.Parse(json);
+            // MaxDepth=8 matches SettingsService.JsonOptions. The schema
+            // is shallow; the cap defends the elevated process against
+            // pathologically nested JSON under the 256 KiB body cap.
+            using var doc = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 8 });
 
             if (!doc.RootElement.TryGetProperty("tag_name", out var tagElement))
                 return new CheckFailed(UpdateCheckFailureReason.ResponseParseError);
