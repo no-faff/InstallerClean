@@ -87,6 +87,7 @@
   <data name="Section.Registered.Patches" xml:space="preserve"><value>PATCHES</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>PRODUCT DETAILS</value></data>
   <data name="Section.Move.Location" xml:space="preserve"><value>MOVE LOCATION</value></data>
+  <data name="Section.SayThanks" xml:space="preserve"><value>SAY THANKS</value></data>
 
   <!-- ============================================================
        FIELD LABELS (used in detail panels)
@@ -122,7 +123,6 @@
   <data name="Action.Details" xml:space="preserve"><value>Details</value></data>
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Buy me a cuppa</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a _star on GitHub</value></data>
-  <data name="Section.SayThanks" xml:space="preserve"><value>SAY THANKS</value></data>
   <data name="Action.MITLicence" xml:space="preserve"><value>MIT licence</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Move</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Move destination...</value></data>
@@ -140,6 +140,7 @@
   <data name="Automation.CancelScan" xml:space="preserve"><value>Cancel scan</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Cancel startup scan</value></data>
   <data name="Automation.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Automation.CloseWindow" xml:space="preserve"><value>Close window</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Close result and return to main window</value></data>
   <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimise</value></data>
@@ -167,8 +168,8 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the orphaned files will be moved. Type a path, paste one, drop a folder or click Browse.</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Just a basic summary, sent to No Faff. Totally optional. No personal information is included.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Just a basic summary, sent to No Faff. Totally optional. No personal information is included. Please send even though nothing was found.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>An anonymous summary sent to No Faff. Totally optional.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>An anonymous summary sent to No Faff. Totally optional. Worth sending even when nothing was found.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the orphaned files to the chosen destination folder.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Send the orphaned files to the Recycle Bin.</value></data>
   <data name="Tooltip.Donate" xml:space="preserve"><value>Thanks if you feel like contributing</value></data>
@@ -179,7 +180,7 @@
        BODY COPY
        ============================================================ -->
   <data name="Body.MainExplanation" xml:space="preserve">
-    <value>C:\Windows\Installer caches the files Windows needs to repair and update installed software. The unused files listed below are no longer needed: the product was uninstalled (Orphaned) or a newer patch replaced this one (Superseded). Delete them to the Recycle Bin or move them somewhere to be extra safe.</value>
+    <value>C:\Windows\Installer caches the files Windows needs to repair and update installed software. The unused files counted below are no longer needed: the product was uninstalled (Orphaned) or a newer patch replaced this one (Superseded). Delete them to the Recycle Bin or move them somewhere to be extra safe.</value>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer is currently processing an installation. Move and Delete are disabled until it finishes.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache.</value></data>
@@ -240,7 +241,7 @@
   <!-- ============================================================
        COMPLETION SCREEN
        ============================================================ -->
-  <data name="Completion.AllClear" xml:space="preserve"><value>All clean</value></data>
+  <data name="Completion.AllClean" xml:space="preserve"><value>All clean</value></data>
   <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer</value></data>
   <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working.</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working.</value></data>
@@ -256,7 +257,7 @@
   <!-- 0 = deleted count, 1 = pluralised noun -->
   <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} sent to the Recycle Bin</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
-  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} deleted. {2} {3}.</value></data>
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} sent to the Recycle Bin. {2} {3}.</value></data>
 
   <!-- ============================================================
        SUMMARIES
@@ -264,10 +265,10 @@
   <!-- 0 = file count, 1 = pluralised "file is"/"files are" -->
   <data name="Summary.RegisteredStillUsed" xml:space="preserve"><value>{0} {1} still used</value></data>
   <data name="Summary.OrphanedToCleanUp" xml:space="preserve"><value>{0} {1} to clean up</value></data>
-  <data name="Summary.MissingFromDisk" xml:space="preserve"><value>{0} registered {1} missing from disk. Your Windows Installer database references installers that no longer exist.</value></data>
+  <data name="Summary.MissingFromDisk" xml:space="preserve"><value>{0} registered {1} missing from disk. Windows refers to installer files that aren't there. InstallerClean can't recover them, and cleanup won't fix it.</value></data>
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} files</value></data>
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} {1} ({2})</value></data>
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} unused {1} ({2})</value></data>
   <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} registered {1} ({2})</value></data>
   <!-- Placeholder name shown for a registered package whose API ProductName is empty. -->
   <data name="Field.UnknownProductName" xml:space="preserve"><value>(unknown)</value></data>
@@ -282,7 +283,7 @@
   <data name="Confirm.MoveDestination" xml:space="preserve"><value>Files will be moved to {0}</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Delete {0} {1} ({2})?</value></data>
   <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Files will be sent to the Recycle Bin. If you want backup copies, use Move instead.</value></data>
-  <data name="Confirm.DeleteLargeWarning" xml:space="preserve"><value>At this size some files may skip the Recycle Bin and be deleted permanently. Windows does this automatically when a file exceeds the Recycle Bin's per-drive size limit. Use Move instead if you want guaranteed backup copies.</value></data>
+  <data name="Confirm.DeleteLargeWarning" xml:space="preserve"><value>At this size some files may skip the Recycle Bin and be deleted permanently. Use Move instead if you want a guaranteed backup.</value></data>
 
   <!-- ============================================================
        ERROR MESSAGES
@@ -344,6 +345,7 @@ Details in {1}.</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Checking...</value></data>
   <data name="UpdateCheck.Status.JustChecked" xml:space="preserve"><value>Just checked.</value></data>
   <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>Up to date.</value></data>
+  <data name="UpdateCheck.Status.Failed" xml:space="preserve"><value>Check failed.</value></data>
   <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Update available</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>You're running version {0}.&#10;Version {1} is available.</value></data>

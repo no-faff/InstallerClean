@@ -136,7 +136,7 @@ public partial class CompletionViewModel : ObservableObject
     /// <summary>Shows the "All clean" state after a scan finds no orphans.</summary>
     public void ShowAllClear()
     {
-        Heading = Strings.Completion_AllClear;
+        Heading = Strings.Completion_AllClean;
         Summary = Strings.Completion_NothingToCleanUp;
         Restore = string.Empty;
         Errors = string.Empty;

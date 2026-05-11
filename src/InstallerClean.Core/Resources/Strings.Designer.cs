@@ -63,6 +63,7 @@ public static class Strings
     public static string Automation_CancelStartupScan => Get("Automation.CancelStartupScan");
     public static string Automation_Close => Get("Automation.Close");
     public static string Automation_CloseResult => Get("Automation.CloseResult");
+    public static string Automation_CloseWindow => Get("Automation.CloseWindow");
     public static string Automation_ConfirmDelete => Get("Automation.ConfirmDelete");
     public static string Automation_ConfirmMove => Get("Automation.ConfirmMove");
     public static string Automation_ConfirmSendResultLog => Get("Automation.ConfirmSendResultLog");
@@ -135,7 +136,7 @@ public static class Strings
     public static string Cli_PendingRebootBlocked_PendingRenameInCache => Get("Cli.PendingRebootBlocked.PendingRenameInCache");
     public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_UnknownArgument => Get("Cli.UnknownArgument");
-    public static string Completion_AllClear => Get("Completion.AllClear");
+    public static string Completion_AllClean => Get("Completion.AllClean");
     public static string Completion_DeleteRestoreHint => Get("Completion.DeleteRestoreHint");
     public static string Completion_DeleteSummary => Get("Completion.DeleteSummary");
     public static string Completion_DeleteSummaryWithErrors => Get("Completion.DeleteSummaryWithErrors");
@@ -278,6 +279,7 @@ public static class Strings
     public static string UpdateCheck_Failed_Timeout => Get("UpdateCheck.Failed.Timeout");
     public static string UpdateCheck_Failed_Unknown => Get("UpdateCheck.Failed.Unknown");
     public static string UpdateCheck_Status_Checking => Get("UpdateCheck.Status.Checking");
+    public static string UpdateCheck_Status_Failed => Get("UpdateCheck.Status.Failed");
     public static string UpdateCheck_Status_JustChecked => Get("UpdateCheck.Status.JustChecked");
     public static string UpdateCheck_Status_UpToDate => Get("UpdateCheck.Status.UpToDate");
     public static string UpdateCheck_Title => Get("UpdateCheck.Title");
