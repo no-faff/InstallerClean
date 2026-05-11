@@ -11,6 +11,12 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.7"
         }
       },
+      "Microsoft.NET.ILLink.Tasks": {
+        "type": "Direct",
+        "requested": "[10.0.7, )",
+        "resolved": "10.0.7",
+        "contentHash": "AA/yhzFHNtQZXLdqjzujPy25G8EWwGWsAnxOE2zYSBoT/8QHP6ketN3CToD3DFreO653ipUwnKHo22B8AlBMCw=="
+      },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
         "resolved": "10.0.7",
@@ -58,6 +64,13 @@
           "System.Diagnostics.EventLog": "[10.0.7, )",
           "System.IO.Abstractions": "[22.1.1, )"
         }
+      }
+    },
+    "net10.0/win-x64": {
+      "System.Diagnostics.EventLog": {
+        "type": "Transitive",
+        "resolved": "10.0.7",
+        "contentHash": "WbmDLeTPYhEzXhvYVioTVn/D1XX6bovyny9n5p8Zxtf03+eY385RB818teZm6n+fA63iZNvng0/Np4tLuhkMhQ=="
       }
     }
   }
