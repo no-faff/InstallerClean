@@ -490,13 +490,19 @@
                     <!-- Result-log status line. Shows "Sending..." while
                          the POST is in flight, "Thanks!" after a success,
                          or a localised failure reason. Empty (and so
-                         collapsed) at every other moment. -->
+                         collapsed) at every other moment.
+                         AutomationProperties.LiveSetting=Polite makes
+                         screen readers announce text changes here even
+                         though focus is on Done; otherwise the silent-
+                         skip and post-POST status copy is invisible to
+                         users on Narrator/NVDA/JAWS. -->
                     <TextBlock Text="{Binding Completion.ResultLogStatusMessage}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                Foreground="{StaticResource Text.Muted}"
                                FontSize="{StaticResource Type.Body}"
                                TextWrapping="Wrap" MaxWidth="380"
-                               Margin="{StaticResource GapBottom.Sm}">
+                               Margin="{StaticResource GapBottom.Sm}"
+                               AutomationProperties.LiveSetting="Polite">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Visible"/>

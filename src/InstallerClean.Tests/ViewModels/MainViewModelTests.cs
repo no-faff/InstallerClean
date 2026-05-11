@@ -578,6 +578,73 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task MoveAllAsync_skips_last_run_log_write_when_lifetime_lock_set()
+    {
+        // Settings come in with HasSentResultLog=true (the user sent
+        // in a previous session). _alreadySentBeforeThisSession is
+        // therefore true at MainViewModel construction; Completion
+        // .IsResultLogLocked reads it. CleanupViewModel must not
+        // write last-run.json because the file has no consumer.
+        var vm = CreateViewModel(new AppSettings { HasSentResultLog = true });
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1024, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-locked-move");
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_skips_last_run_log_write_after_in_session_send()
+    {
+        // First a successful Send flips the in-session lock. Then a
+        // Delete runs; the IsResultLogLocked OR property covers
+        // the in-session-only case (lifetime lock from settings is
+        // still false at construction).
+        var vm = CreateViewModel();
+        _resultLogService.ReadLastLogAsync().Returns(Task.FromResult<string?>("{\"schemaVersion\":1}"));
+        _confirmationService.ConfirmSendResultLog(Arg.Any<string>()).Returns(true);
+        _resultLogService.SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(ResultLogSendOutcome.Sent);
+
+        await vm.Completion.SendResultLogCommand.ExecuteAsync(null);
+        Assert.True(vm.Completion.IsResultLogLocked);
+        _resultLogService.ClearReceivedCalls();
+
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\y.msi", 2048, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
+        _confirmationService.ConfirmDelete(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task RescanAfterCompletion_suppresses_the_next_all_clear_prompt()
     {
         // First scan finds zero orphans. The all-clear path calls

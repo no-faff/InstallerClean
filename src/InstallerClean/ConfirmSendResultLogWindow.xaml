@@ -30,15 +30,13 @@
                     MaxHeight="360"
                     Margin="{StaticResource GapBottom.Md}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                    <!-- IsReadOnly + the SelectableText style stays consistent with
-                         the version-string display in About; the user can copy the
-                         JSON out for their own audit without being able to edit it
-                         before Send. FontFamily is system monospace so the JSON
-                         keys line up. KeyboardNavigation.TabIndex sits behind the
-                         action buttons so a keyboard-first user lands on Cancel
-                         and Send before the (large) read-only box; screen readers
-                         still reach the box and announce it as the result log
-                         preview. -->
+                    <!-- IsReadOnly so the JSON is copy-out-able but not
+                         edit-before-Send. FontFamily is system monospace
+                         so the JSON keys line up. KeyboardNavigation.TabIndex
+                         sits behind the action buttons so a keyboard-first
+                         user lands on Cancel and Send before the (large)
+                         read-only box; screen readers still reach the box
+                         and announce it via AutomationProperties.Name. -->
                     <TextBox x:Name="JsonText"
                              IsReadOnly="True"
                              BorderThickness="0"

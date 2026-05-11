@@ -126,7 +126,7 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border CornerRadius="2"
+                    <Border CornerRadius="{StaticResource Radius.Tight}"
                             BorderThickness="{StaticResource BorderThickness.Standard}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"

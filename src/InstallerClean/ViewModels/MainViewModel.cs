@@ -157,11 +157,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
             Completion.ShowAllClear();
 
             if (suppress) return;
-            // The lifetime lock permanently hides the Send button on
-            // this machine, so writing last-run.json on this path
-            // produces a file with no consumer. CleanupViewModel
-            // applies the same gate via Completion.IsResultLogLocked.
-            if (_hasSentResultLogBefore) return;
+            // Either lock (the prior-session persisted flag or the
+            // in-session click flag) hides the Send button for the
+            // rest of the user's time on this machine. Writing
+            // last-run.json on this path produces a file with no
+            // consumer. CleanupViewModel's Move and Delete paths read
+            // the same property.
+            if (Completion.IsResultLogLocked) return;
 
             // WriteAsync returns false on disk-full / locked-file /
             // read-only-profile failure; the Send button stays hidden

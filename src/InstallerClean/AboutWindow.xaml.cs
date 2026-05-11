@@ -97,18 +97,16 @@ public partial class AboutWindow : Window
         finally
         {
             Mouse.OverrideCursor = null;
-            // Cursor un-mucks immediately; the button stays disabled
-            // through the cooldown. The await happens after the catch
-            // chain so a Cancel during the cooldown re-enables on the
-            // next click via the OnClosed disposal path.
+            // Cursor cleared immediately. The button stays disabled
+            // until the cooldown either elapses cleanly or is cancelled
+            // by OnClosed disposing the CTS; both paths fall through to
+            // the re-enable below.
             try
             {
                 await Task.Delay(CheckForUpdatesCooldown, token);
             }
             catch (OperationCanceledException)
             {
-                // Window closing or a follow-up click; the
-                // button-re-enable below is harmless in either case.
             }
             button.IsEnabled = true;
         }

@@ -299,13 +299,17 @@ public partial class CompletionViewModel : ObservableObject
             // the next session re-prompts rather than locking the
             // machine out with nothing ever reaching the receiver.
             _resultLogSentThisSession = true;
+            // IsResultLogReady = false fires [NotifyPropertyChangedFor]
+            // for IsSendResultLogVisible on the backing field's setter;
+            // IsSendingResultLog = false above did the same on its way
+            // out of the try/finally. Explicit OnPropertyChanged for
+            // the same property would be a third fire.
             IsResultLogReady = false;
             ResultLogStatusMessage = outcome == ResultLogSendOutcome.Sent
                 ? Strings.ResultLog_Sent
                 : Strings.ResultLog_Failed;
             if (outcome == ResultLogSendOutcome.Sent)
                 OnPropertyChanged(nameof(HasSentResultLog));
-            OnPropertyChanged(nameof(IsSendResultLogVisible));
         }
         finally
         {
