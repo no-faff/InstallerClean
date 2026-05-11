@@ -34,6 +34,21 @@ public partial class AboutWindow : Window
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
 
+    // Window-level focus reset on deactivation. WPF restores keyboard
+    // focus to the previously focused element when the window
+    // reactivates after Alt+Tab (or any out-of-process focus steal
+    // such as a screenshot tool's hotkey). The restored focus paints
+    // a ring on whichever button held focus before deactivation, even
+    // though the user did not initiate any keyboard interaction on
+    // return. Clearing both logical and keyboard focus here breaks
+    // the restoration chain. Same pattern as MainWindow.OnDeactivated.
+    protected override void OnDeactivated(EventArgs e)
+    {
+        base.OnDeactivated(e);
+        FocusManager.SetFocusedElement(this, null);
+        Keyboard.ClearFocus();
+    }
+
     private async void CheckNowClick(object sender, RoutedEventArgs e)
     {
         if (sender is not System.Windows.Controls.Button button) return;
