@@ -37,6 +37,7 @@ public static class Strings
 
     public static string Action_About => Get("Action.About");
     public static string Action_Browse => Get("Action.Browse");
+    public static string Action_BuyMeACuppa => Get("Action.BuyMeACuppa");
     public static string Action_Cancel => Get("Action.Cancel");
     public static string Action_CheckForUpdates => Get("Action.CheckForUpdates");
     public static string Action_Close => Get("Action.Close");
@@ -44,7 +45,6 @@ public static class Strings
     public static string Action_Cut => Get("Action.Cut");
     public static string Action_Delete => Get("Action.Delete");
     public static string Action_Details => Get("Action.Details");
-    public static string Action_Donate => Get("Action.Donate");
     public static string Action_Done => Get("Action.Done");
     public static string Action_LeaveStarOnGitHub => Get("Action.LeaveStarOnGitHub");
     public static string Action_MITLicence => Get("Action.MITLicence");
@@ -267,6 +267,7 @@ public static class Strings
     public static string Tooltip_Minimise => Get("Tooltip.Minimise");
     public static string Tooltip_Move => Get("Tooltip.Move");
     public static string Tooltip_MoveDestination => Get("Tooltip.MoveDestination");
+    public static string Tooltip_OpenKoFiPage => Get("Tooltip.OpenKoFiPage");
     public static string Tooltip_OpenProjectOnGitHub => Get("Tooltip.OpenProjectOnGitHub");
     public static string Tooltip_SendResultLog => Get("Tooltip.SendResultLog");
     public static string Tooltip_SendResultLog_NothingFound => Get("Tooltip.SendResultLog.NothingFound");
