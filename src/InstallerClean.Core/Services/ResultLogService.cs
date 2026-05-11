@@ -42,6 +42,14 @@ public sealed class ResultLogService : IResultLogService
     private static readonly HttpClient HttpClient = new()
     {
         Timeout = RequestTimeout,
+        // Defence in depth: SendAsync uses
+        // HttpCompletionOption.ResponseHeadersRead so the body never
+        // enters this buffer today. A future caller adding
+        // response.Content.ReadAsStringAsync() (or any path that
+        // forces the body to materialise) would otherwise inherit
+        // the HttpClient 2 GiB default. 4 KiB is generous for the
+        // expected {"ok":true} ack body.
+        MaxResponseContentBufferSize = 4 * 1024,
     };
 
     public string LastLogPath => LogFile;

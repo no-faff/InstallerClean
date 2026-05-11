@@ -236,9 +236,12 @@ public partial class CompletionViewModel : ObservableObject
                 CrashLog.TryWrite(new InvalidOperationException(
                     "Send result clicked but last-run.json could not be read for preview."));
                 _resultLogSentThisSession = true;
+                // IsResultLogReady = false fires the
+                // [NotifyPropertyChangedFor(IsSendResultLogVisible)]
+                // auto-event on its setter; no manual OnPropertyChanged
+                // call needed.
                 IsResultLogReady = false;
                 ResultLogStatusMessage = Strings.ResultLog_Failed;
-                OnPropertyChanged(nameof(IsSendResultLogVisible));
                 return;
             }
 
