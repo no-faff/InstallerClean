@@ -39,7 +39,7 @@
         </StackPanel>
         <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#xE8BB;" ToolTip="{loc:Translate Tooltip.Close}"
                 Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
-                Margin="0,-4,-24,0" AutomationProperties.Name="{loc:Translate Automation.Close}"/>
+                Margin="0,-4,-24,0" AutomationProperties.Name="{loc:Translate Automation.CloseWindow}"/>
 
         <TextBlock Grid.Row="1" Text="{loc:Translate Window.Main.Title}"
                    Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Md}" FontWeight="SemiBold"/>
@@ -75,12 +75,13 @@
                 Content="{loc:Translate Action.CheckForUpdates}" Click="CheckNowClick"
                 HorizontalAlignment="Left"/>
 
-        <!-- Quiet section header above the Star + Donate row. The resx
-             value is already uppercased so screen readers don't see
-             SmallCaps glyph mapping at all. -->
+        <!-- Section header above the Star + Buy-me-a-cuppa row. The
+             resx value is already uppercased so screen readers don't
+             see SmallCaps glyph mapping at all. Type.Heading.Sm +
+             Text.Body matches MOVE LOCATION and the registered-
+             window PRODUCTS / PATCHES / PRODUCT DETAILS labels. -->
         <TextBlock Grid.Row="9" Text="{loc:Translate Section.SayThanks}"
-                   Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
-                   FontWeight="Medium"
+                   Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Heading.Sm}"
                    AutomationProperties.Name="{loc:Translate Automation.SayThanks}"/>
 
         <Grid Grid.Row="11">

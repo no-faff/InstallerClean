@@ -86,7 +86,7 @@ public partial class AboutWindow : Window
                         Strings.UpdateCheck_Title,
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
-                    CheckStatusText.Text = Strings.UpdateCheck_Status_JustChecked;
+                    CheckStatusText.Text = Strings.UpdateCheck_Status_Failed;
                     break;
             }
         }
