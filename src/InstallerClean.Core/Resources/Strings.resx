@@ -182,7 +182,7 @@
        BODY COPY
        ============================================================ -->
   <data name="Body.MainExplanation" xml:space="preserve">
-    <value>C:\Windows\Installer caches the files Windows needs to repair and update installed software. The unused files counted below are no longer needed: the product was uninstalled (Orphaned) or a newer patch replaced this one (Superseded). Delete them to the Recycle Bin or move them somewhere to be extra safe.</value>
+    <value>C:\Windows\Installer caches the files Windows needs to repair and update installed software. The unused files shown below are no longer needed: the product was uninstalled (Orphaned) or a newer patch replaced this one (Superseded). Delete them to the Recycle Bin or move them somewhere to be extra safe.</value>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer is currently processing an installation. Move and Delete are disabled until it finishes.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache.</value></data>
@@ -268,7 +268,7 @@
   <!-- 0 = file count, 1 = pluralised "file is"/"files are" -->
   <data name="Summary.RegisteredStillUsed" xml:space="preserve"><value>{0} {1} still used</value></data>
   <data name="Summary.OrphanedToCleanUp" xml:space="preserve"><value>{0} {1} to clean up</value></data>
-  <data name="Summary.MissingFromDisk" xml:space="preserve"><value>{0} registered {1} missing from disk. Windows refers to installer files that aren't there. InstallerClean can't recover them, and cleanup won't fix it.</value></data>
+  <data name="Summary.MissingFromDisk" xml:space="preserve"><value>{0} registered {1} missing from disk. Windows refers to installer files that aren't there. Not something InstallerClean can fix.</value></data>
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} files</value></data>
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} unused {1} ({2})</value></data>
