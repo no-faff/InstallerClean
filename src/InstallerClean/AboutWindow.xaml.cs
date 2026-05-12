@@ -10,15 +10,11 @@ namespace InstallerClean;
 
 public partial class AboutWindow : Window
 {
-    // Cooldown between successive Check-for-updates clicks. A hand-
-    // driven user clicks once and reads the dialog; the cooldown only
-    // bites if something is hammering the button. That pattern
-    // (elevated process repeatedly hitting an external endpoint in
-    // rapid succession) is what behaviour-based AV classifiers score
-    // against as beaconing, and is also what GitHub's unauthenticated
-    // 60/hour rate-limit refuses on a long enough timescale. Five
-    // seconds breaks the repeat-call shape without affecting any
-    // legitimate user.
+    // Cooldown between successive Check-for-updates clicks. Only bites
+    // if something is hammering the button: a hand-driven user clicks
+    // once and reads the dialog. Five seconds keeps a stuck button or
+    // a UI-automation loop from running into GitHub's 60/hour
+    // unauthenticated rate-limit on a long enough timescale.
     private static readonly TimeSpan CheckForUpdatesCooldown = TimeSpan.FromSeconds(5);
 
     private readonly IUpdateCheckService _updateCheckService;
