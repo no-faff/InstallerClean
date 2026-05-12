@@ -55,6 +55,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [ObservableProperty] private string _operationCurrentFileName = string.Empty;
     [ObservableProperty] private double _operationProgressPercent;
 
+    /// <summary>
+    /// True between a Cancel click and the next CancellationToken
+    /// checkpoint in the worker. Gates the overlay Cancel button so a
+    /// second click is rejected before it reaches the (already-cancelled)
+    /// CTS, and drives the tooltip on the disabled button.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CancelOperationCommand))]
+    private bool _isCancellationRequested;
+
     public CleanupViewModel(
         IMoveFilesService moveService,
         IDeleteFilesService deleteService,
@@ -114,6 +124,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     {
         MoveAllCommand.NotifyCanExecuteChanged();
         DeleteAllCommand.NotifyCanExecuteChanged();
+        CancelOperationCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnMoveDestinationChanged(string value)
@@ -203,9 +214,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
     }
 
-    [RelayCommand]
+    private bool CanCancelOperation() => IsOperating && !IsCancellationRequested;
+
+    [RelayCommand(CanExecute = nameof(CanCancelOperation))]
     private void CancelOperation()
     {
+        // IsCancellationRequested gates the next CanCancelOperation
+        // call so a follow-up click is dropped before it reaches the
+        // already-cancelled CTS. The button binding also flips the
+        // tooltip via a DataTrigger.
+        IsCancellationRequested = true;
         // Races the finally block that disposes _operationCts;
         // ObjectDisposedException here just means the operation
         // already finished.
@@ -400,6 +418,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         {
             DisposeOperationCts();
             IsOperating = false;
+            // Reset the cancellation flag so the overlay Cancel button
+            // is enabled again on the next operation. Set inside the
+            // finally so success, cancel, and exception paths all reach
+            // it.
+            IsCancellationRequested = false;
             OperationProgressPercent = 0;
             // Stale-state reset: a cancel-then-rerun cycle would otherwise
             // briefly show the previous run's last filename and "X of Y"
@@ -487,6 +510,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         {
             DisposeOperationCts();
             IsOperating = false;
+            // Reset the cancellation flag so the overlay Cancel button
+            // is enabled again on the next operation. Set inside the
+            // finally so success, cancel, and exception paths all reach
+            // it.
+            IsCancellationRequested = false;
             OperationProgressPercent = 0;
             // Stale-state reset: a cancel-then-rerun cycle would otherwise
             // briefly show the previous run's last filename and "X of Y"

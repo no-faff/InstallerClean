@@ -48,13 +48,17 @@
                          Minimum="0" Maximum="100" Value="0"
                          Height="12" Margin="48,0"
                          AutomationProperties.Name="{loc:Translate Automation.StartupScanProgress}"/>
-            <!-- Step text -->
+            <!-- Step text. LiveSetting=Polite announces the splash's
+                 step transitions to Narrator: without it, the
+                 cancellation message and the per-step "Asking Windows
+                 about installed software..." progress go unread. -->
             <TextBlock Grid.Row="7"
                        x:Name="StepText"
                        Text="{loc:Translate Status.Scanning}"
                        Foreground="{StaticResource Text.Body}"
                        FontSize="{StaticResource Type.Body}"
-                       HorizontalAlignment="Center"/>
+                       HorizontalAlignment="Center"
+                       AutomationProperties.LiveSetting="Polite"/>
 
             <!-- Cancel button -->
             <Button Grid.Row="9"

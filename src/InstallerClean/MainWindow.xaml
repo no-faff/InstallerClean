@@ -37,7 +37,8 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal"
                     VerticalAlignment="Center" Margin="16,0,0,0">
             <Image Source="Assets/splash-icon.png" Width="16" Height="16"
-                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"/>
+                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"
+                   AutomationProperties.Name=""/>
             <TextBlock Text="{loc:Translate Window.Main.Title}" Foreground="{StaticResource Text.Body}"
                        FontSize="{StaticResource Type.Heading.Sm}" FontWeight="Medium"/>
         </StackPanel>
@@ -75,8 +76,14 @@
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
                           Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
                           VerticalAlignment="Center" Margin="{StaticResource GapRight.Icon}"/>
+                    <!-- LiveSetting=Polite so Narrator announces the
+                         banner when HasPendingReboot flips to true after
+                         a scan. The banner itself is the reason Move and
+                         Delete are disabled; a silent reveal leaves the
+                         screen-reader user without that context. -->
                     <TextBlock Text="{Binding Scan.PendingRebootBannerText}"
-                               Foreground="{StaticResource Text.Body}" VerticalAlignment="Center"/>
+                               Foreground="{StaticResource Text.Body}" VerticalAlignment="Center"
+                               AutomationProperties.LiveSetting="Polite"/>
                 </StackPanel>
 
                 <!-- Registered files missing from disk -->
@@ -87,7 +94,8 @@
                           VerticalAlignment="Center" Margin="{StaticResource GapRight.Icon}"/>
                     <TextBlock Text="{Binding Scan.MissingFromDiskSummaryText}"
                                TextWrapping="Wrap"
-                               Foreground="{StaticResource Text.Body}" VerticalAlignment="Center"/>
+                               Foreground="{StaticResource Text.Body}" VerticalAlignment="Center"
+                               AutomationProperties.LiveSetting="Polite"/>
                 </StackPanel>
 
                 <Grid>
@@ -200,15 +208,21 @@
                             Content="{loc:Translate Action.Browse}" Command="{Binding Cleanup.BrowseDestinationCommand}"/>
                 </Grid>
 
-                <!-- Buttons row -->
+                <!-- Buttons row. TabIndex puts Delete before Move so
+                     Tab follows left-to-right visual order; DockPanel
+                     Dock="Right" places Move at the far right and
+                     Delete to its left, but XAML order alone would
+                     visit Move first under Tab. -->
                 <DockPanel Grid.Row="6">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
+                            KeyboardNavigation.TabIndex="1"
                             Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
                             AutomationProperties.HelpText="{loc:Translate Automation.MoveAllFiles}"
                             ToolTip="{loc:Translate Tooltip.Move}"
                             ToolTipService.ShowOnDisabled="True"/>
 
                     <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
+                            KeyboardNavigation.TabIndex="0"
                             Content="{loc:Translate Action.Delete}" Command="{Binding Cleanup.DeleteAllCommand}"
                             AutomationProperties.HelpText="{loc:Translate Automation.DeleteAllFiles}"
                             ToolTip="{loc:Translate Tooltip.Delete}"
@@ -218,7 +232,8 @@
                     <TextBlock DockPanel.Dock="Left" Text="{Binding Cleanup.OperationProgress}"
                                VerticalAlignment="Center" Foreground="{StaticResource Text.Muted}"
                                FontSize="{StaticResource Type.Body}"
-                               TextTrimming="CharacterEllipsis" MaxWidth="280"/>
+                               TextTrimming="CharacterEllipsis" MaxWidth="280"
+                               AutomationProperties.LiveSetting="Polite"/>
                 </DockPanel>
             </Grid>
 
@@ -344,7 +359,8 @@
                 <ProgressBar IsIndeterminate="True" Width="240" Height="8" Margin="{StaticResource GapBottom.Md}"
                              AutomationProperties.Name="{loc:Translate Automation.ScanningProgress}"/>
                 <TextBlock Text="{Binding Scan.ScanProgress}" Foreground="{StaticResource Text.Heading}"
-                           FontSize="{StaticResource Type.Heading.Sm}" HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"/>
+                           FontSize="{StaticResource Type.Heading.Sm}" HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"
+                           AutomationProperties.LiveSetting="Polite"/>
                 <Button x:Name="ScanCancelButton" Style="{StaticResource GhostPill}"
                         Content="{loc:Translate Action.Cancel}" Command="{Binding Scan.CancelScanCommand}"
                         Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
@@ -365,29 +381,51 @@
                 <StackPanel>
                     <TextBlock Text="{Binding Cleanup.OperationProgress}" Foreground="{StaticResource Text.Heading}"
                                FontSize="{StaticResource Type.Heading.Sm}" FontWeight="SemiBold"
-                               HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"/>
+                               HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"
+                               AutomationProperties.LiveSetting="Polite"/>
                     <ProgressBar Value="{Binding Cleanup.OperationProgressPercent}"
                                  Minimum="0" Maximum="100"
                                  Width="200" Height="8" Margin="{StaticResource GapBottom.Sm}"
                                  AutomationProperties.Name="{loc:Translate Automation.OperationProgress}"/>
                     <DockPanel Margin="0,0,0,2">
-                        <TextBlock DockPanel.Dock="Right" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}">
+                        <TextBlock DockPanel.Dock="Right" Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Caption}">
                             <Run Text="{Binding Cleanup.OperationProgressPercent, Mode=OneWay, StringFormat='{}{0:F0}%'}"/>
                         </TextBlock>
                         <TextBlock Text="{Binding Cleanup.OperationProgressDetail}"
-                                   Foreground="{StaticResource Text.Dim}"
-                                   FontSize="{StaticResource Type.Caption}"/>
+                                   Foreground="{StaticResource Text.Muted}"
+                                   FontSize="{StaticResource Type.Caption}"
+                                   AutomationProperties.LiveSetting="Polite"/>
                     </DockPanel>
                     <TextBlock Text="{Binding Cleanup.OperationCurrentFileName}"
-                               Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"
+                               Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Caption}"
                                HorizontalAlignment="Center" Margin="0,4,0,0"
-                               TextTrimming="CharacterEllipsis" MaxWidth="240"/>
-                    <Button x:Name="OperationCancelButton" Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
+                               TextTrimming="CharacterEllipsis" MaxWidth="240"
+                               AutomationProperties.LiveSetting="Polite"/>
+                    <!-- Cancel button binds IsEnabled via the
+                         CanCancelOperation predicate so a second click
+                         after the cancel-in-flight is dropped. The
+                         tooltip set by the IsCancellationRequested
+                         trigger explains the disabled state during the
+                         several-second window between Cancel and the
+                         next CancellationToken checkpoint, mirroring
+                         the splash window's pattern. -->
+                    <Button x:Name="OperationCancelButton" Content="{loc:Translate Action.Cancel}"
                             Command="{Binding Cleanup.CancelOperationCommand}"
                             AutomationProperties.Name="{loc:Translate Automation.CancelOperation}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             HorizontalAlignment="Center" Margin="0,8,0,0"
-                            Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"/>
+                            Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource GhostPill}">
+                                <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Cleanup.IsCancellationRequested}" Value="True">
+                                        <Setter Property="ToolTip" Value="{loc:Translate Tooltip.CancellingPending}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </StackPanel>
             </Border>
         </Grid>
@@ -458,12 +496,8 @@
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
-                        <!-- IsTabStop=True overrides SelectableText so
-                             a screen-reader user can Tab onto the
-                             error list and scroll its overflow. -->
                         <TextBox Text="{Binding Completion.Errors, Mode=OneWay}"
                                  Style="{StaticResource SelectableText}"
-                                 IsTabStop="True"
                                  Foreground="{StaticResource Status.Warning}" FontSize="{StaticResource Type.Caption}"
                                  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                     </Border>

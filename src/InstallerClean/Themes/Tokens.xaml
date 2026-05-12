@@ -97,12 +97,15 @@
 
     <!-- ============================================================
          LINKS
-         Default for explicit "Link"-styled buttons; Inline for
-         hyperlinks embedded in body text where full Link colour would
-         shout. Hover brings Inline up to full Link.
+         Single indigo for every link surface. An earlier Link.Inline
+         carried a 66% alpha wash which dropped to 2.95:1 against
+         Surface.Sidebar (the AboutWindow MIT licence link's home),
+         below the WCAG AA-text 4.5:1 line. Steady-state Link.Default
+         passes at 4.90:1; the SubtleLink style's hover brightens
+         further still.
          ============================================================ -->
     <SolidColorBrush x:Key="Link.Default" Color="{StaticResource Primitive.Indigo.400}"/>
-    <SolidColorBrush x:Key="Link.Inline"  Color="{StaticResource Primitive.Indigo.400.Alpha66}"/>
+    <SolidColorBrush x:Key="Link.Inline"  Color="{StaticResource Primitive.Indigo.400}"/>
 
     <!-- ============================================================
          SELECTION & SCROLLBAR

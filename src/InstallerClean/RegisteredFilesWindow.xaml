@@ -33,13 +33,14 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal"
                     VerticalAlignment="Center" Margin="-8,-4,0,0">
             <Image Source="Assets/splash-icon.png" Width="16" Height="16"
-                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"/>
+                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"
+                   AutomationProperties.Name=""/>
             <TextBlock Text="{loc:Translate Window.Registered.Title}" Foreground="{StaticResource Text.Body}"
                        FontSize="{StaticResource Type.Heading.Sm}" FontWeight="Medium"/>
         </StackPanel>
         <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#xE8BB;"
                 Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
-                Margin="{StaticResource CloseButtonOverhangMargin}" AutomationProperties.Name="{loc:Translate Automation.Close}" ToolTip="{loc:Translate Tooltip.Close}"/>
+                Margin="{StaticResource CloseButtonOverhangMargin}" AutomationProperties.Name="{loc:Translate Automation.CloseWindow}" ToolTip="{loc:Translate Tooltip.Close}"/>
 
         <TextBlock Grid.Row="1" Text="{loc:Translate Section.Registered.Products}" Foreground="{StaticResource Text.Body}"
                    FontSize="{StaticResource Type.Heading.Sm}"/>

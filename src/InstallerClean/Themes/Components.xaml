@@ -40,7 +40,12 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="FontFamily" Value="{StaticResource Type.FontFamily}"/>
-        <Setter Property="IsTabStop" Value="False"/>
+        <!-- IsTabStop=True so keyboard-only users can Tab onto a value
+             and Ctrl+C it. Display-only consumers that should be skipped
+             on Tab (e.g. AboutWindow VersionText, which the user sees
+             without focusing on open) override IsTabStop=False
+             individually. -->
+        <Setter Property="IsTabStop" Value="True"/>
         <Setter Property="ContextMenu">
             <Setter.Value>
                 <ContextMenu>
