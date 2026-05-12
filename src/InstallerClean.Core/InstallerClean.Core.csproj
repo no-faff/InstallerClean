@@ -4,15 +4,14 @@
     InstallerClean.Core: headless library shared by the WPF app
     (InstallerClean) and the console CLI (InstallerClean.Cli).
 
-    Targets net10.0 (NOT net10.0-windows): everything in here must run
+    Targets net10.0 (not net10.0-windows): everything in here runs
     without a WPF dispatcher, without HWND ownership, and without the
     PresentationFramework / PresentationCore assemblies. Win32 P/Invoke
     is fine (msi.dll, kernel32, shell32) because those work in any
     process subsystem.
 
-    Anything that needs MessageBox, Window, WindowChrome or a
-    XAML-bound view-model goes in InstallerClean (the WPF project),
-    not here.
+    MessageBox, Window, WindowChrome and XAML-bound view-models live
+    in InstallerClean (the WPF project), not here.
   -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -48,8 +47,8 @@
        neutral resx for the assembly's NeutralLanguage (en-GB). No
        satellite assembly is produced because no other culture has a
        resx; .NET resource fallback returns the neutral resx for any
-       requested culture. Add a Strings.<culture>.resx if a real
-       translation is needed. -->
+       requested culture. A real translation lands as a new
+       Strings.<culture>.resx beside the neutral one. -->
   <ItemGroup>
     <EmbeddedResource Update="Resources\Strings.resx">
       <ManifestResourceName>InstallerClean.Resources.Strings</ManifestResourceName>

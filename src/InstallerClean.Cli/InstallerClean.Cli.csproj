@@ -4,8 +4,7 @@
     InstallerClean.Cli: console host for the headless service surface
     in InstallerClean.Core. A real .NET console exe (subsystem CONSOLE)
     so PowerShell, cmd and scheduled tasks block on the process
-    naturally; the previous setup used a tiny C launcher to wrap the
-    WPF GUI exe and that fudge is no longer needed.
+    naturally.
   -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
