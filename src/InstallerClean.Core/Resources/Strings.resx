@@ -74,7 +74,7 @@
   <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
   <data name="Window.About.Title" xml:space="preserve"><value>About</value></data>
   <data name="Window.Registered.Title" xml:space="preserve"><value>Registered files</value></data>
-  <data name="Window.Orphaned.Title" xml:space="preserve"><value>Orphaned files</value></data>
+  <data name="Window.Orphaned.Title" xml:space="preserve"><value>Unused files</value></data>
   <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Confirm move</value></data>
   <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Confirm delete</value></data>
 
@@ -141,10 +141,10 @@
   <data name="Automation.CloseResult" xml:space="preserve"><value>Close result and return to main window</value></data>
   <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimise</value></data>
-  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Move all orphaned installer files to the chosen destination folder</value></data>
-  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all orphaned installer files to the Recycle Bin</value></data>
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Confirm sending the orphaned files to the Recycle Bin</value></data>
-  <data name="Automation.ConfirmMove" xml:space="preserve"><value>Confirm moving the orphaned files to the chosen destination folder</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Move all unused installer files to the chosen destination folder</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all unused installer files to the Recycle Bin</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Confirm sending the unused files to the Recycle Bin</value></data>
+  <data name="Automation.ConfirmMove" xml:space="preserve"><value>Confirm moving the unused files to the chosen destination folder</value></data>
   <data name="Automation.SendResultLog" xml:space="preserve"><value>Send the diagnostic log of this run to No Faff</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Say thanks</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Confirm sending the diagnostic log to No Faff</value></data>
@@ -153,7 +153,7 @@
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>Scan C:\Windows\Installer again</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Scanning progress</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Startup scan progress</value></data>
-  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>View orphaned files</value></data>
+  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>View unused files</value></data>
   <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Available for cleanup.</value></data>
   <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>View registered files</value></data>
   <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Read-only inventory.</value></data>
@@ -174,7 +174,7 @@
 
   <!-- Body copy -->
   <data name="Body.MainExplanation" xml:space="preserve">
-    <value>C:\Windows\Installer caches the files Windows needs to repair and update installed software. The unused files shown below are no longer needed: the product was uninstalled (Orphaned) or a newer patch replaced this one (Superseded). Delete them to the Recycle Bin or move them somewhere to be extra safe.</value>
+    <value>C:\Windows\Installer caches the files Windows needs to repair and update installed software. The unused files shown below are no longer needed: the product was uninstalled (orphaned) or a newer patch replaced this one (superseded). Delete them to the Recycle Bin or move them somewhere to be extra safe.</value>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer is currently processing an installation. Move and Delete are disabled until it finishes.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache.</value></data>
@@ -438,9 +438,9 @@ The crash log could not be written.</value></data>
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>Found {0} {1} to clean up ({2}).</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>Nothing to do.</value></data>
   <!-- 0 = mode arg ("/s"), 1 = registered package count, 2 = pluralised "package"/"packages" -->
-  <data name="Cli.EventLogScanNoOrphans" xml:space="preserve"><value>Scan mode ({0}): no orphaned files. Installer database has {1} registered {2}.</value></data>
+  <data name="Cli.EventLogScanNoOrphans" xml:space="preserve"><value>Scan mode ({0}): no unused files. Installer database has {1} registered {2}.</value></data>
   <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
-  <data name="Cli.EventLogScanFound" xml:space="preserve"><value>Scan mode ({0}): {1} orphaned {2} found, {3}. No action taken.</value></data>
+  <data name="Cli.EventLogScanFound" xml:space="preserve"><value>Scan mode ({0}): {1} unused {2} found, {3}. No action taken.</value></data>
   <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
   <data name="Cli.DeletingFiles" xml:space="preserve"><value>Deleting {0} {1}...</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->

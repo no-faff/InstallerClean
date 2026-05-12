@@ -21,7 +21,7 @@
     <AssemblyName>InstallerClean</AssemblyName>
     <!-- Version comes from Directory.Build.props -->
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
-    <Description>Safely clean up C:\Windows\Installer orphaned files</Description>
+    <Description>Safely clean up C:\Windows\Installer unused files</Description>
     <Authors>No Faff</Authors>
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
