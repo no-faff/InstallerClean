@@ -93,8 +93,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // WOW6432Node under an x86 process and silently misses
             // installer-cache entries written by 64-bit installers.
             // Pinning to Registry64 keeps the fallback path correct
-            // regardless of host bitness; it matches the 64-bit view
-            // anyway for the current x64 ship.
+            // regardless of host bitness.
             using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
                 Microsoft.Win32.RegistryHive.LocalMachine,
                 Microsoft.Win32.RegistryView.Registry64);
@@ -134,8 +133,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
         catch (Exception ex)
         {
-            // Best effort; logged so a user report about missing products
-            // has a diagnostic trail.
+            // Best effort. The crash log preserves a diagnostic trail
+            // for reports of missing registered products.
             Helpers.CrashLog.Write(ex);
         }
 

@@ -6,12 +6,10 @@ using InstallerClean.Resources;
 namespace InstallerClean.Services;
 
 /// <summary>
-/// Default <see cref="IFileSystemScanService"/> implementation. Pairs the
-/// API output from <see cref="IInstallerQueryService"/> with a directory
-/// walk of <c>C:\Windows\Installer</c> via the injected
-/// <see cref="IFileSystem"/>, so tests can substitute a mock filesystem
-/// and a mock query service to drive every code path without touching
-/// the real Installer folder.
+/// Default <see cref="IFileSystemScanService"/> implementation. Pairs
+/// the API output from <see cref="IInstallerQueryService"/> with a
+/// directory walk of <c>C:\Windows\Installer</c> via the injected
+/// <see cref="IFileSystem"/>.
 /// </summary>
 public sealed class FileSystemScanService : IFileSystemScanService
 {
@@ -20,19 +18,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
     private readonly IEnumerable<string>? _overrideFiles;
     private readonly string? _installerFolderOverride;
 
-    /// <summary>
-    /// Production constructor. The DI container injects both
-    /// dependencies; the override fields stay null so production
-    /// enumeration walks the real Installer folder via the injected
-    /// <see cref="IFileSystem"/>.
-    /// </summary>
+    /// <summary>Production constructor. DI supplies both dependencies; the override fields stay null.</summary>
     /// <remarks>
-    /// This is the only public ctor and the only one DI picks:
-    /// Microsoft.Extensions.DependencyInjection resolves the public
-    /// ctor with the most resolvable parameters and ignores internal
-    /// ctors. The test ctors below stay <c>internal</c> for that
-    /// reason; widening one to public would let DI pick it during
-    /// resolution and inject defaults the production code never expects.
+    /// Microsoft.Extensions.DependencyInjection resolves the public ctor
+    /// with the most resolvable parameters and ignores internal ctors.
+    /// The test ctors below are <c>internal</c> so DI cannot select one
+    /// at resolution time and pass defaults the production code never
+    /// expects.
     /// </remarks>
     public FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem)
         : this(queryService, fileSystem, null, null) { }
@@ -46,8 +38,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         : this(queryService, new FileSystem(), overrideFiles, installerFolderOverride) { }
 
     /// <summary>
-    /// Test constructor. Inject an <see cref="IFileSystem"/> so unit
-    /// tests can verify the scan-against-registered-set logic without
+    /// Test constructor. Injects an <see cref="IFileSystem"/> so the
+    /// scan-against-registered-set logic can be verified without
     /// touching <c>C:\Windows\Installer</c> on the host machine.
     /// </summary>
     internal FileSystemScanService(IInstallerQueryService queryService, IFileSystem fileSystem,
@@ -65,14 +57,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
     {
         progress?.Report(Strings.Status_QueryingApi);
 
-        // ConfigureAwait(false): the rest of this method does a directory
-        // walk and per-file stat across every file in C:\Windows\Installer.
-        // Without ConfigureAwait(false), the await continuation runs on
-        // the caller's SynchronizationContext - which is the WPF dispatcher
-        // when called from the splash startup path or the user-driven
-        // scan command - and the heavy I/O blocks the UI thread for the
-        // entire scan duration. Core services should never assume a UI
-        // thread; ConfigureAwait(false) is the contract.
+        // ConfigureAwait(false): Core services do not bind to a caller's
+        // SynchronizationContext. The continuation under a WPF host
+        // would otherwise run on the dispatcher and the directory walk
+        // plus per-file stat would block the UI thread for the scan
+        // duration.
         var registered = await _queryService.GetRegisteredPackagesAsync(progress, cancellationToken)
             .ConfigureAwait(false);
 

@@ -61,12 +61,12 @@ public static class CrashLog
             var writeHeader = fs.Length == 0;
             fs.Seek(0, SeekOrigin.End);
 
-            // First write of a fresh log file gets a privacy header so a
-            // user about to attach this to a public bug report sees the
-            // disclosure: under elevation, framework exception messages
-            // can contain file paths from the running session including
-            // other users' profiles. Header lines are prefixed with #
-            // so log readers can skip them.
+            // The first write to a fresh log file prepends a privacy
+            // header. Under elevation, framework exception messages can
+            // contain file paths from the running session including
+            // other users' profiles, so anyone attaching this log to a
+            // public report needs the disclosure before sharing.
+            // Header lines start with # so log readers can skip them.
             using var writer = new StreamWriter(fs, Encoding.UTF8, leaveOpen: false);
             if (writeHeader)
                 writer.Write(PrivacyHeader);
