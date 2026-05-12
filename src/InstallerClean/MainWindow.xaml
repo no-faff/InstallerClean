@@ -213,7 +213,7 @@
                      Dock="Right" places Move at the far right and
                      Delete to its left, but XAML order alone would
                      visit Move first under Tab. -->
-                <DockPanel Grid.Row="6">
+                <DockPanel Grid.Row="6" KeyboardNavigation.TabNavigation="Local">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
                             KeyboardNavigation.TabIndex="1"
                             Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
@@ -245,6 +245,7 @@
              icons and the window-close hit area above. One-off;
              a literal Thickness rather than a Gap token. -->
         <DockPanel Grid.Row="3" LastChildFill="False" Margin="4,8,24,8"
+                   KeyboardNavigation.TabNavigation="Local"
                    IsEnabled="{Binding IsMainContentInteractive}">
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     KeyboardNavigation.TabIndex="0"
