@@ -106,8 +106,16 @@ public partial class AboutWindow : Window
             catch (OperationCanceledException)
             {
             }
-            CheckStatusText.Text = string.Empty;
-            button.IsEnabled = true;
+            // Skip the post-cooldown UI writes if the window was closed
+            // (OnClosed cancels _checkCts). The control references stay
+            // valid after Close() today, but a future refactor that
+            // disposes element trees on Closed would surface a
+            // NullReferenceException here.
+            if (!token.IsCancellationRequested)
+            {
+                CheckStatusText.Text = string.Empty;
+                button.IsEnabled = true;
+            }
         }
     }
 

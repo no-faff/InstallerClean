@@ -103,11 +103,14 @@ public partial class App : Application
         SplashWindow? splash = null;
         try
         {
-            // pack-URI resolution can fail if the resource is renamed,
-            // dropped from the assembly graph or the embed step is broken
-            // in a build. Wrap so a missing-icon regression degrades to
-            // "default WPF icon" rather than fatal XamlParseException at
-            // startup.
+            // Wrap the BitmapImage construction so a pack-URI resolution
+            // failure (resource renamed, dropped, or the embed step is
+            // broken in a build) degrades the title-bar Window.Icon
+            // assignment below to the default WPF icon rather than
+            // crashing startup. The XAML Image consumers in every
+            // window resolve the same pack URI; a missing resource
+            // leaves them painting blank via WPF's own loader fallback,
+            // which is not caught here.
             BitmapImage? appIcon = null;
             try
             {

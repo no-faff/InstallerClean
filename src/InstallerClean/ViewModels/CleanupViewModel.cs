@@ -131,10 +131,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     {
         MoveAllCommand.NotifyCanExecuteChanged();
 
-        if (string.Equals(_settings.MoveDestination, value, StringComparison.Ordinal))
+        // Trim once at the persist boundary so settings.json holds the
+        // normalised path. The TextBox binding keeps the user's typed
+        // value verbatim; on the next session the trimmed value loads
+        // back. The CLI /m reads settings.MoveDestination so trimming
+        // here keeps CLI and GUI paths symmetric; MoveAllAsync below
+        // also trims as belt-and-braces.
+        var normalised = value?.Trim() ?? string.Empty;
+        if (string.Equals(_settings.MoveDestination, normalised, StringComparison.Ordinal))
             return;
 
-        _settings.MoveDestination = value;
+        _settings.MoveDestination = normalised;
         ScheduleMoveDestinationSave();
     }
 
