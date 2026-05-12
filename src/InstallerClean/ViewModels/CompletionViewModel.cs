@@ -134,15 +134,19 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>Shows the "All clean" state after a scan finds no orphans.
-    /// <paramref name="scanDurationMs"/> is the elapsed scan time the
-    /// summary line reports back to the user as a "yes, a scan actually
-    /// ran" receipt.</summary>
-    public void ShowAllClear(long scanDurationMs)
+    /// <paramref name="installedProductCount"/> is the registered-package
+    /// count surfaced as the scan receipt; <paramref name="scanDurationMs"/>
+    /// is the elapsed scan time. The count and the duration together stop
+    /// the all-clean overlay from reading as "did nothing" on a fast
+    /// machine where the duration alone shows as a fraction of a second.</summary>
+    public void ShowAllClear(int installedProductCount, long scanDurationMs)
     {
         Heading = Strings.Completion_AllClean;
         Summary = string.Format(
             Strings.Completion_NothingToCleanUp,
-            DisplayHelpers.FormatElapsed(TimeSpan.FromMilliseconds(scanDurationMs)));
+            installedProductCount,
+            DisplayHelpers.PluraliseProduct(installedProductCount),
+            DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
         Restore = string.Empty;
         Errors = string.Empty;
         ResultLogStatusMessage = string.Empty;

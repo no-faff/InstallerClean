@@ -105,6 +105,9 @@
   <data name="Field.File" xml:space="preserve"><value>File</value></data>
   <data name="Field.Size" xml:space="preserve"><value>Size</value></data>
   <data name="Field.Patches" xml:space="preserve"><value>Patches</value></data>
+  <!-- Placeholder shown for a registered package whose API ProductName is empty. -->
+  <data name="Field.UnknownProductName" xml:space="preserve"><value>(unknown)</value></data>
+  <data name="Field.PatchesOnly" xml:space="preserve"><value>(patches only)</value></data>
 
   <!-- ============================================================
        ACTIONS (button labels; underscore prefixes are WPF mnemonics)
@@ -119,7 +122,11 @@
   <data name="Action.CheckForUpdates" xml:space="preserve"><value>Check for _updates</value></data>
   <data name="Action.Close" xml:space="preserve"><value>_Close</value></data>
   <data name="Action.Delete" xml:space="preserve"><value>_Delete</value></data>
-  <data name="Action.Done" xml:space="preserve"><value>_Done</value></data>
+  <!-- No Alt mnemonic: the completion overlay sits over the Delete
+       button below, and Alt+D on a visible overlay would dismiss
+       Done then fire Delete on the next press. IsDefault=True makes
+       Enter the keyboard shortcut. -->
+  <data name="Action.Done" xml:space="preserve"><value>Done</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Details</value></data>
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Buy me a cuppa</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a _star on GitHub</value></data>
@@ -129,7 +136,7 @@
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>_Open release page</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Re-scan</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Scan again</value></data>
-  <data name="Action.SendResultLog" xml:space="preserve"><value>Send result</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>Send summary</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Send</value></data>
 
   <!-- ============================================================
@@ -174,7 +181,6 @@
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>An anonymous summary sent to No Faff. Totally optional. Worth sending even when nothing was found.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the orphaned files to the chosen destination folder.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Send the orphaned files to the Recycle Bin.</value></data>
-  <data name="Tooltip.Donate" xml:space="preserve"><value>Thanks if you feel like contributing</value></data>
   <data name="Tooltip.OpenProjectOnGitHub" xml:space="preserve"><value>Open the project on GitHub</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Subject name from the embedded Authenticode certificate. Not chain-verified.</value></data>
 
@@ -222,6 +228,10 @@
   <data name="Status.Deleting" xml:space="preserve"><value>Deleting {0} {1}...</value></data>
   <data name="Status.MoveCancelled" xml:space="preserve"><value>Move cancelled.</value></data>
   <data name="Status.DeleteCancelled" xml:space="preserve"><value>Delete cancelled.</value></data>
+  <!-- 0 = files processed before cancel, 1 = total files in the batch,
+       2 = pluralised "file"/"files" agreeing with the total. -->
+  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Move cancelled. {0} of {1} {2} processed.</value></data>
+  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>Delete cancelled. {0} of {1} {2} processed.</value></data>
   <!-- 0 = exception type name, 1 = crash log path. Both surface in
        the status pill so the user can find the log; full message +
        stack trace go to the log itself. -->
@@ -244,8 +254,12 @@
        COMPLETION SCREEN
        ============================================================ -->
   <data name="Completion.AllClean" xml:space="preserve"><value>All clean</value></data>
-  <!-- 0 = formatted scan duration (e.g. "1.4s" or "850ms"). -->
-  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer. Scanned in {0}.</value></data>
+  <!-- 0 = installed product count, 1 = pluralised "product"/"products",
+       2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
+       "less than a second"). The count is the receipt that a real
+       scan ran; on fast machines a duration alone reads as "did
+       nothing". -->
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer. Scanned {0} {1} in {2}.</value></data>
   <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working.</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working.</value></data>
   <!-- 0 = size freed (e.g. "120.5 MB") -->
@@ -268,14 +282,12 @@
   <!-- 0 = file count, 1 = pluralised "file is"/"files are" -->
   <data name="Summary.RegisteredStillUsed" xml:space="preserve"><value>{0} {1} still used</value></data>
   <data name="Summary.OrphanedToCleanUp" xml:space="preserve"><value>{0} {1} to clean up</value></data>
-  <data name="Summary.MissingFromDisk" xml:space="preserve"><value>{0} registered {1} missing from disk. Windows refers to installer files that aren't there. Not something InstallerClean can fix.</value></data>
-  <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} files</value></data>
+  <data name="Summary.MissingFromDisk" xml:space="preserve"><value>{0} registered {1} missing from disk. Windows refers to installer files that aren't there. Cleaning the cache won't change this.</value></data>
+  <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
+  <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} {2}</value></data>
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} unused {1} ({2})</value></data>
   <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} registered {1} ({2})</value></data>
-  <!-- Placeholder name shown for a registered package whose API ProductName is empty. -->
-  <data name="Field.UnknownProductName" xml:space="preserve"><value>(unknown)</value></data>
-  <data name="Field.PatchesOnly" xml:space="preserve"><value>(patches only)</value></data>
 
   <!-- ============================================================
        CONFIRMATION DIALOGS
@@ -346,9 +358,7 @@ Details in {1}.</value></data>
   <data name="BrowserLaunchFailedTitle" xml:space="preserve"><value>Couldn't open your browser</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Check for updates</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Checking...</value></data>
-  <data name="UpdateCheck.Status.JustChecked" xml:space="preserve"><value>Just checked.</value></data>
   <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>Up to date.</value></data>
-  <data name="UpdateCheck.Status.Failed" xml:space="preserve"><value>Check failed.</value></data>
   <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Update available</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>You're running version {0}.&#10;Version {1} is available.</value></data>

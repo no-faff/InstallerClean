@@ -154,7 +154,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (Scan.OrphanedFileCount != 0 || Cleanup.IsOperating || Scan.LastScanResult is not { } result)
                 return;
 
-            Completion.ShowAllClear(Scan.LastScanDurationMs);
+            Completion.ShowAllClear(result.RegisteredPackages.Count, Scan.LastScanDurationMs);
 
             if (suppress) return;
             // Either lock (the prior-session persisted flag or the

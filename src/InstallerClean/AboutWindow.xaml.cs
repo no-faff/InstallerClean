@@ -77,7 +77,10 @@ public partial class AboutWindow : Window
                     };
                     if (dialog.ShowDialog() == true)
                         UrlLauncher.OpenUrl(available.ReleaseUrl);
-                    CheckStatusText.Text = Strings.UpdateCheck_Status_JustChecked;
+                    // No inline status: the modal carried the user-facing
+                    // text. A "Just checked" status under the dismissed
+                    // modal understates an update that's still waiting.
+                    CheckStatusText.Text = string.Empty;
                     break;
 
                 case CheckFailed failed:
@@ -86,7 +89,10 @@ public partial class AboutWindow : Window
                         Strings.UpdateCheck_Title,
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
-                    CheckStatusText.Text = Strings.UpdateCheck_Status_Failed;
+                    // No inline status: the MessageBox carries the failure
+                    // reason. Duplicating "Check failed." in the pill is
+                    // noise.
+                    CheckStatusText.Text = string.Empty;
                     break;
             }
         }

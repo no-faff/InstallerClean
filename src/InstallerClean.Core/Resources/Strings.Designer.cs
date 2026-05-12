@@ -233,6 +233,7 @@ public static class Strings
     public static string Status_Cancelling => Get("Status.Cancelling");
     public static string Status_CheckingRegistry => Get("Status.CheckingRegistry");
     public static string Status_DeleteCancelled => Get("Status.DeleteCancelled");
+    public static string Status_DeleteCancelled_Partial => Get("Status.DeleteCancelled.Partial");
     public static string Status_DeleteFailed => Get("Status.DeleteFailed");
     public static string Status_DeleteFailed_NoLog => Get("Status.DeleteFailed.NoLog");
     public static string Status_Deleting => Get("Status.Deleting");
@@ -241,6 +242,7 @@ public static class Strings
     public static string Status_FoundOrphans => Get("Status.FoundOrphans");
     public static string Status_FoundProducts => Get("Status.FoundProducts");
     public static string Status_MoveCancelled => Get("Status.MoveCancelled");
+    public static string Status_MoveCancelled_Partial => Get("Status.MoveCancelled.Partial");
     public static string Status_MoveFailed => Get("Status.MoveFailed");
     public static string Status_MoveFailed_NoLog => Get("Status.MoveFailed.NoLog");
     public static string Status_Moving => Get("Status.Moving");
@@ -266,7 +268,6 @@ public static class Strings
     public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");
     public static string Tooltip_Close => Get("Tooltip.Close");
     public static string Tooltip_Delete => Get("Tooltip.Delete");
-    public static string Tooltip_Donate => Get("Tooltip.Donate");
     public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");
     public static string Tooltip_Minimise => Get("Tooltip.Minimise");
     public static string Tooltip_Move => Get("Tooltip.Move");
@@ -281,8 +282,6 @@ public static class Strings
     public static string UpdateCheck_Failed_Timeout => Get("UpdateCheck.Failed.Timeout");
     public static string UpdateCheck_Failed_Unknown => Get("UpdateCheck.Failed.Unknown");
     public static string UpdateCheck_Status_Checking => Get("UpdateCheck.Status.Checking");
-    public static string UpdateCheck_Status_Failed => Get("UpdateCheck.Status.Failed");
-    public static string UpdateCheck_Status_JustChecked => Get("UpdateCheck.Status.JustChecked");
     public static string UpdateCheck_Status_UpToDate => Get("UpdateCheck.Status.UpToDate");
     public static string UpdateCheck_Title => Get("UpdateCheck.Title");
     public static string UpdateCheck_UpdateAvailable_Body => Get("UpdateCheck.UpdateAvailable.Body");

@@ -374,7 +374,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (OperationCanceledException)
         {
-            OperationProgress = Strings.Status_MoveCancelled;
+            // Partial-count surfaces the same information the CLI's
+            // EventLogCancelledPartial template carries: an Esc mid-batch
+            // is usually because of a slow file, and the user expects
+            // a receipt of what got through. Reads the per-file fields
+            // before the finally below resets them to zero.
+            OperationProgress = OperationCurrentFile > 0 && OperationTotalFiles > 0
+                ? string.Format(Strings.Status_MoveCancelled_Partial,
+                    OperationCurrentFile,
+                    OperationTotalFiles,
+                    DisplayHelpers.PluraliseFile(OperationTotalFiles))
+                : Strings.Status_MoveCancelled;
             await _scan.RefreshAsync();
         }
         catch (Exception ex)
@@ -457,7 +467,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (OperationCanceledException)
         {
-            OperationProgress = Strings.Status_DeleteCancelled;
+            OperationProgress = OperationCurrentFile > 0 && OperationTotalFiles > 0
+                ? string.Format(Strings.Status_DeleteCancelled_Partial,
+                    OperationCurrentFile,
+                    OperationTotalFiles,
+                    DisplayHelpers.PluraliseFile(OperationTotalFiles))
+                : Strings.Status_DeleteCancelled;
             await _scan.RefreshAsync();
         }
         catch (Exception ex)
@@ -490,7 +505,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// from concatenated <c>&lt;Run&gt;</c> literals.
     /// </summary>
     public string OperationProgressDetail =>
-        string.Format(Strings.Summary_OperationFiles, OperationCurrentFile, OperationTotalFiles);
+        string.Format(Strings.Summary_OperationFiles,
+            OperationCurrentFile,
+            OperationTotalFiles,
+            DisplayHelpers.PluraliseFile(OperationTotalFiles));
 
     partial void OnOperationCurrentFileChanged(int value) =>
         OnPropertyChanged(nameof(OperationProgressDetail));

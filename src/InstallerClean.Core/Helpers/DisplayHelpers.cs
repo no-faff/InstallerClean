@@ -28,6 +28,18 @@ internal static class DisplayHelpers
             : $"{elapsed.TotalSeconds:F1}s";
 
     /// <summary>
+    /// Natural-language elapsed time for body copy. Renders sub-second
+    /// scans as "less than a second" and second-plus scans as
+    /// "{N.N} seconds" so an all-clean overlay reads as a sentence
+    /// rather than a CLI status pill. <see cref="FormatElapsed"/> stays
+    /// the right call for the short-form metadata pills.
+    /// </summary>
+    internal static string FormatElapsedLong(TimeSpan elapsed) =>
+        elapsed.TotalSeconds < 1
+            ? "less than a second"
+            : $"{elapsed.TotalSeconds:F1} seconds";
+
+    /// <summary>
     /// Picks the singular or plural fragment per the English n != 1
     /// rule. Consumers pass resx-sourced fragments; this helper holds
     /// no English nouns of its own, so the body is the only site a
