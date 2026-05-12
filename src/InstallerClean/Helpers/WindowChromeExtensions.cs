@@ -1,5 +1,4 @@
 using System.Windows;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using InstallerClean.Interop.Native;
 
@@ -55,11 +54,6 @@ internal static class WindowChromeExtensions
         // window-local Deactivated subscription does not.
         window.Deactivated += (_, _) =>
         {
-            // TextBoxBase (TextBox or RichTextBox) keeps focus across
-            // Alt+Tab so a user mid-edit can copy a path from another
-            // app and paste back without re-clicking the caret.
-            if (FocusManager.GetFocusedElement(window) is TextBoxBase) return;
-
             IntPtr fg = User32.GetForegroundWindow();
             if (fg == IntPtr.Zero) return;
 
