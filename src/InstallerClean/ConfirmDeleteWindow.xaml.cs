@@ -21,7 +21,7 @@ public partial class ConfirmDeleteWindow : Window
             LargeSizeWarning.Visibility = Visibility.Visible;
 
         this.EnableAltSpaceSystemMenu();
-        this.ClearFocusOnDeactivation();
+        this.SuppressFocusVisualOnDeactivation();
     }
 
     private void OnDelete(object sender, RoutedEventArgs e)

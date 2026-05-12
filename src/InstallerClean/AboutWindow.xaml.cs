@@ -26,7 +26,7 @@ public partial class AboutWindow : Window
         _updateCheckService = updateCheckService;
         VersionText.Text = DisplayHelpers.GetVersionString();
         this.EnableAltSpaceSystemMenu();
-        this.ClearFocusOnDeactivation();
+        this.SuppressFocusVisualOnDeactivation();
     }
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();

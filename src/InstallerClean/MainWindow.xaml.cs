@@ -39,7 +39,7 @@ public partial class MainWindow : Window
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
 
         this.EnableAltSpaceSystemMenu();
-        this.ClearFocusOnDeactivation();
+        this.SuppressFocusVisualOnDeactivation();
     }
 
     private void OnClosed(object? sender, EventArgs e)

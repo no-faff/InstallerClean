@@ -33,7 +33,7 @@ public partial class RegisteredFilesWindow : Window
 
         Closed += OnClosed;
         this.EnableAltSpaceSystemMenu();
-        this.ClearFocusOnDeactivation();
+        this.SuppressFocusVisualOnDeactivation();
     }
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();

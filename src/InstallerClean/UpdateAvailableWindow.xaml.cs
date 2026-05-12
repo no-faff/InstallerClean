@@ -13,7 +13,7 @@ public partial class UpdateAvailableWindow : Window
             Strings.UpdateCheck_UpdateAvailable_Body,
             currentVersion, latestVersion);
         this.EnableAltSpaceSystemMenu();
-        this.ClearFocusOnDeactivation();
+        this.SuppressFocusVisualOnDeactivation();
     }
 
     private void OnOpen(object sender, RoutedEventArgs e) => DialogResult = true;
