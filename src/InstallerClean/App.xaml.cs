@@ -1,5 +1,7 @@
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using Microsoft.Extensions.DependencyInjection;
@@ -131,6 +133,21 @@ public partial class App : Application
                         Dwmapi.DwmSetWindowAttribute(hwnd, Dwmapi.DWMWA_USE_IMMERSIVE_DARK_MODE, ref value, sizeof(int));
                         if (appIcon is not null)
                             w.Icon = appIcon;
+                    }
+                }));
+
+            // WPF's default TextBox handles double-click (select word) but
+            // not triple-click. A class handler at the preview tunnel adds
+            // triple-click = select all uniformly across every TextBox in
+            // the app, matching the Windows convention for editable and
+            // read-only text controls.
+            EventManager.RegisterClassHandler(typeof(TextBox), TextBox.PreviewMouseLeftButtonDownEvent,
+                new MouseButtonEventHandler((s, e) =>
+                {
+                    if (e.ClickCount == 3 && s is TextBox tb)
+                    {
+                        tb.SelectAll();
+                        e.Handled = true;
                     }
                 }));
 
