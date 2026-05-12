@@ -389,6 +389,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
                     _completion.MarkResultLogReady();
             }
+            // Success path: the completion overlay now carries the
+            // user-facing summary; clear the bottom-row status pill so
+            // the user doesn't see stale "Moving 100 files..." after
+            // dismissing the overlay. Cancel and failure catches set
+            // their own end-state text which the finally does not
+            // overwrite.
+            OperationProgress = string.Empty;
         }
         catch (OperationCanceledException)
         {
@@ -487,6 +494,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
                     _completion.MarkResultLogReady();
             }
+            OperationProgress = string.Empty;
         }
         catch (OperationCanceledException)
         {
