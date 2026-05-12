@@ -17,10 +17,27 @@
 AppId=InstallerClean
 AppName=InstallerClean
 AppVersion={#AppVersion}
+; AppMutex shares the named single-instance mutex with the running GUI
+; and CLI. Setup pauses with a "close the running app" prompt when the
+; user upgrades while InstallerClean.exe or installerclean-cli.exe is
+; in flight, instead of failing with a vague "file in use" write error.
+; Same name is used in App.xaml.cs and Cli/Program.cs.
+AppMutex=Global\InstallerClean_SingleInstance
 AppPublisher=No Faff
 AppPublisherURL=https://github.com/no-faff/InstallerClean
 AppSupportURL=https://github.com/no-faff/InstallerClean/discussions
 AppCopyright=Copyright (c) 2026 No Faff
+; VersionInfo* populates setup.exe's own file-properties dialog. Without
+; these directives the right-click Properties surface reads ISCC's
+; defaults (which look like a generic Inno binary). The version number
+; is .0-padded to four parts because Win32 VS_FIXEDFILEINFO is always
+; four parts.
+VersionInfoVersion={#AppVersion}.0
+VersionInfoProductVersion={#AppVersion}.0
+VersionInfoProductName=InstallerClean
+VersionInfoCompany=No Faff
+VersionInfoCopyright=Copyright (c) 2026 No Faff
+VersionInfoDescription=InstallerClean Setup
 DefaultDirName={autopf}\InstallerClean
 DefaultGroupName=InstallerClean
 UninstallDisplayIcon={app}\InstallerClean.exe

@@ -7,6 +7,14 @@
     <LangVersion>12</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- R2R is off by .NET 10 default for PublishSingleFile + framework-
+         dependent, but pinning here makes the absence explicit so a
+         future SDK feature-band change to the default cannot silently
+         flip the slim binary's R2R section count. R2R cold-start gains
+         are negligible for a rarely-run utility and the section-count
+         delta would be exactly the cumulative AV-signal shift v1.8's
+         pre-tag VT pause is meant to catch. -->
+    <PublishReadyToRun>false</PublishReadyToRun>
     <RootNamespace>InstallerClean</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>InstallerClean</AssemblyName>
