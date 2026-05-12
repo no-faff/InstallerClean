@@ -19,7 +19,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=300" alt="Total des téléchargements"></a>
 </p>
 
-![Capture d'écran d'InstallerClean après un nettoyage réussi : 965 Mo libérés, 68 fichiers déplacés](docs/screenshots/10-moved-done-success.webp)
+![Capture d'écran d'InstallerClean après un nettoyage réussi : 965 Mo libérés, 68 fichiers déplacés](docs/screenshots/04d-deleted-freed-success.webp)
 
 - **En bref :** Trouve et supprime les fichiers inutiles dans `C:\Windows\Installer`, le dossier caché que Windows ne nettoie jamais.
 - **Combien d'espace :** Ça dépend de vos logiciels. Sur ma machine, c'était presque 1 Go. Un utilisateur d'InstallerClean a [rapporté](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 Go. Avec Adobe Acrobat installé, ça peut dépasser 100 Go. Ça peut aussi être nul. L'idée, c'est que c'est rapide et gratuit ; tout ce qui peut être supprimé le sera.
@@ -77,37 +77,37 @@ Aucune activité réseau automatique. Deux boutons opt-in déclenchent un seul a
 <br>
 
 <p>
-  <img src="docs/screenshots/03-scan.webp" alt="Écran de démarrage affichant l'analyse en cours, 68 fichiers à nettoyer ont été trouvés" width="900"><br>
+  <img src="docs/screenshots/01-initial-scan.webp" alt="Écran de démarrage affichant l'analyse en cours, 68 fichiers à nettoyer ont été trouvés" width="900"><br>
   <em>Analyse initiale. Très rapide.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-main-window.webp" alt="Fenêtre principale affichant 114 fichiers encore utilisés et 68 fichiers à nettoyer" width="900"><br>
+  <img src="docs/screenshots/02-main-window.webp" alt="Fenêtre principale affichant 114 fichiers encore utilisés et 68 fichiers à nettoyer" width="900"><br>
   <em>Résultats : ce qui est utilisé, ce qui est supprimable.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-keep-details.webp" alt="Fenêtre des fichiers enregistrés listant les produits installés et leurs métadonnées d'installeur" width="900"><br>
+  <img src="docs/screenshots/03a-details-registered.webp" alt="Fenêtre des fichiers enregistrés listant les produits installés et leurs métadonnées d'installeur" width="900"><br>
   <em>Les fichiers encore en service, avec les métadonnées lues dans la base de l'installeur.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-delete-details.webp" alt="Fenêtre des fichiers orphelins listant les fichiers .msi supprimables avec la raison de leur suppression" width="900"><br>
+  <img src="docs/screenshots/03b-details-safe-to-delete.webp" alt="Fenêtre des fichiers orphelins listant les fichiers .msi supprimables avec la raison de leur suppression" width="900"><br>
   <em>Les fichiers devenus inutiles.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/08-delete.webp" alt="Dialogue de confirmation de suppression montrant que 68 fichiers (965 Mo) iront à la Corbeille" width="900"><br>
+  <img src="docs/screenshots/04b-Delete-dialogue.webp" alt="Dialogue de confirmation de suppression montrant que 68 fichiers (965 Mo) iront à la Corbeille" width="900"><br>
   <em>Confirmation avant chaque action. Supprimer envoie à la Corbeille ; Déplacer met les fichiers où vous voulez.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/10-moved-done-success.webp" alt="Superposition de succès montrant 965 Mo libérés après un déplacement" width="900"><br>
+  <img src="docs/screenshots/04d-deleted-freed-success.webp" alt="Superposition de succès montrant 965 Mo libérés après un déplacement" width="900"><br>
   <em>Après un Déplacement réussi.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/12-all-clear.webp" alt="Superposition « tout est propre » affichée lors d'une nouvelle analyse quand il n'y a plus rien à supprimer" width="900"><br>
+  <img src="docs/screenshots/06a-scanned-again-all-clean.webp" alt="Superposition « tout est propre » affichée lors d'une nouvelle analyse quand il n'y a plus rien à supprimer" width="900"><br>
   <em>Après une nouvelle analyse. Plus rien à nettoyer.</em>
 </p>
 

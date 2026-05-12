@@ -21,7 +21,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=3600&color=brightgreen" alt="Total downloads"></a>
 </p>
 
-![Screenshot of InstallerClean after a successful clean-up: 965 MB freed, 68 files moved](docs/screenshots/10-moved-done-success.webp)
+![Screenshot of InstallerClean after a successful clean-up: 965 MB freed, 68 files moved](docs/screenshots/04d-deleted-freed-success.webp)
 
 - **What:** Finds and removes unneeded files from `C:\Windows\Installer`, the hidden folder Windows never cleans up.
 - **How much space:** Depends on your software. On my machine it was just shy of 1 GB. An InstallerClean user [reported](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. With Adobe Acrobat it can pass 100 GB. It could be nothing at all. The point is that it's quick and costs nothing; whatever can be removed will be gone.
@@ -79,37 +79,37 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
 <br>
 
 <p>
-  <img src="docs/screenshots/03-scan.webp" alt="Splash screen showing the scan in progress, having found 68 files to clean up" width="900"><br>
+  <img src="docs/screenshots/01-initial-scan.webp" alt="Splash screen showing the scan in progress, having found 68 files to clean up" width="900"><br>
   <em>Initial scan. This is very quick.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-main-window.webp" alt="Main window showing 114 files still used and 68 files to clean up" width="900"><br>
+  <img src="docs/screenshots/02-main-window.webp" alt="Main window showing 114 files still used and 68 files to clean up" width="900"><br>
   <em>Results: how much is in use, how much is removable.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-keep-details.webp" alt="Registered files window listing installed products and their installer-database metadata" width="900"><br>
+  <img src="docs/screenshots/03a-details-registered.webp" alt="Registered files window listing installed products and their installer-database metadata" width="900"><br>
   <em>The files still in use, with metadata read from the installer database.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-delete-details.webp" alt="Orphaned files window listing removable .msi files with reasons" width="900"><br>
+  <img src="docs/screenshots/03b-details-safe-to-delete.webp" alt="Orphaned files window listing removable .msi files with reasons" width="900"><br>
   <em>The files no longer needed.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/08-delete.webp" alt="Delete confirmation dialog showing 68 files (965 MB) will go to the Recycle Bin" width="900"><br>
+  <img src="docs/screenshots/04b-Delete-dialogue.webp" alt="Delete confirmation dialog showing 68 files (965 MB) will go to the Recycle Bin" width="900"><br>
   <em>Confirmation before either action. Delete sends to the Recycle Bin; Move puts the files somewhere of your choice.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/10-moved-done-success.webp" alt="Success overlay showing 965 MB freed after a move operation" width="900"><br>
+  <img src="docs/screenshots/04d-deleted-freed-success.webp" alt="Success overlay showing 965 MB freed after a move operation" width="900"><br>
   <em>After a successful Move.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/12-all-clear.webp" alt="All-clear overlay shown when nothing is removable on a subsequent scan" width="900"><br>
+  <img src="docs/screenshots/06a-scanned-again-all-clean.webp" alt="All-clear overlay shown when nothing is removable on a subsequent scan" width="900"><br>
   <em>After scanning again. Nothing left to clean.</em>
 </p>
 
