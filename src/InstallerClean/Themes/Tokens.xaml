@@ -1,16 +1,15 @@
 <!--
-    Semantic design tokens. Each entry is a *role* in the UI vocabulary.
+    Semantic design tokens. Each entry is a role in the UI vocabulary.
 
     Colour roles resolve to a Color in Primitives.xaml. Numeric roles
-    (typography, radius, border, spacing) are defined directly with a
-    literal value, with a comment naming the corresponding step in the
-    primitive scale so the canonical scale is still legible.
+    (typography, radius, border, spacing) carry a literal value plus a
+    comment naming the corresponding step in the primitive scale so
+    the canonical scale stays legible.
 
-    Rule: window XAML and component styles consume tokens from this
-    file, never primitives. When a colour or scale needs to change,
-    edit the token here, not the consumer. When a new role appears
-    that has no token, add one rather than reaching into the primitive
-    layer.
+    Window XAML and component styles consume tokens from this file,
+    never primitives. A colour or scale change edits the token here,
+    not the consumer. A new role with no existing token gets a new
+    token rather than a direct primitive reach.
 
     Naming: <category>.<role>[.<state>].
         Surface.*, Text.*, Action.<intent>.<state>, Status.*,
@@ -26,33 +25,24 @@
         <ResourceDictionary Source="Primitives.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
-    <!-- ============================================================
-         SURFACES
-         The three layered backgrounds (window, sidebar-level, card)
-         plus the modal overlay tint.
-         ============================================================ -->
+    <!-- Surfaces. The three layered backgrounds (window, sidebar-
+         level, card) plus the modal overlay tint. -->
     <SolidColorBrush x:Key="Surface.AppBackground" Color="{StaticResource Primitive.Slate.950}"/>
     <SolidColorBrush x:Key="Surface.Sidebar"       Color="{StaticResource Primitive.Slate.800}"/>
     <SolidColorBrush x:Key="Surface.Card"          Color="{StaticResource Primitive.Slate.900}"/>
     <SolidColorBrush x:Key="Surface.Overlay"       Color="{StaticResource Primitive.Slate.950.Alpha50}"/>
 
-    <!-- ============================================================
-         TEXT TIERS
-         Heading > Body > Muted > Dim. Use the lowest tier that still
-         reads at the size the text is being rendered.
-         ============================================================ -->
+    <!-- Text tiers. Heading > Body > Muted > Dim. The lowest tier
+         that still reads at the rendered size wins. -->
     <SolidColorBrush x:Key="Text.Heading" Color="{StaticResource Primitive.Slate.50}"/>
     <SolidColorBrush x:Key="Text.Body"    Color="{StaticResource Primitive.Slate.300}"/>
     <SolidColorBrush x:Key="Text.Muted"   Color="{StaticResource Primitive.Slate.400}"/>
     <SolidColorBrush x:Key="Text.Dim"     Color="{StaticResource Primitive.Slate.500}"/>
 
-    <!-- ============================================================
-         ACTIONS
-         Each action role has Default / Hover / Pressed states. Buttons
-         consume these via component styles in Components.xaml; raw
-         window XAML should not reach for them directly except for the
-         rare one-off (e.g. Selection.Background on a list item).
-         ============================================================ -->
+    <!-- Actions. Each action role has Default / Hover / Pressed
+         states. Buttons consume these via component styles in
+         Components.xaml; raw window XAML reaches for them only for
+         one-offs (e.g. Selection.Background on a list item). -->
 
     <!-- Primary: standard button (slate). -->
     <SolidColorBrush x:Key="Action.Primary.Background" Color="{StaticResource Primitive.Slate.700}"/>
@@ -78,48 +68,35 @@
     <!-- Neutral: badges, dividers, low-emphasis fills. -->
     <SolidColorBrush x:Key="Action.Neutral" Color="{StaticResource Primitive.Slate.600}"/>
 
-    <!-- ============================================================
-         STATUS
-         Outcome and state colours. Reserved meanings:
-           Warning - imminent risk requires user attention.
-           Success - completion / positive outcome.
-         ============================================================ -->
+    <!-- Status. Outcome and state colours. Warning is imminent risk
+         requiring user attention; Success is completion or positive
+         outcome. -->
     <SolidColorBrush x:Key="Status.Warning" Color="{StaticResource Primitive.Amber.500}"/>
     <SolidColorBrush x:Key="Status.Success" Color="{StaticResource Primitive.Green.400}"/>
 
-    <!-- ============================================================
-         DECORATION
-         Brand-flavour icons. Distinct from Status colours so they can
-         coexist on screen without semantic collision.
-         ============================================================ -->
+    <!-- Decoration. Brand-flavour icons. Distinct from Status colours
+         so the two coexist on screen without semantic collision. -->
     <SolidColorBrush x:Key="Decoration.Heart" Color="{StaticResource Primitive.Red.500}"/>
     <SolidColorBrush x:Key="Decoration.Star"  Color="{StaticResource Primitive.Amber.400}"/>
 
-    <!-- ============================================================
-         LINKS
-         Inline and default link tokens both resolve to full-opacity
-         Indigo.400. A 66% alpha wash on Surface.Sidebar (the AboutWindow
-         MIT licence link's home) measures 2.95:1 against background,
-         below the WCAG AA-text 4.5:1 line; full opacity sits at 4.90:1.
-         SubtleLink's hover-brighten remains the visual differentiation
-         between in-body and full-weight links.
-         ============================================================ -->
+    <!-- Links. Inline and default link tokens both resolve to full-
+         opacity Indigo.400. A 66% alpha wash on Surface.Sidebar (the
+         AboutWindow MIT licence link's home) measures 2.95:1 against
+         background, below the WCAG AA-text 4.5:1 line; full opacity
+         sits at 4.90:1. SubtleLink's hover-brighten remains the
+         visual differentiation between in-body and full-weight
+         links. -->
     <SolidColorBrush x:Key="Link.Default" Color="{StaticResource Primitive.Indigo.400}"/>
     <SolidColorBrush x:Key="Link.Inline"  Color="{StaticResource Primitive.Indigo.400}"/>
 
-    <!-- ============================================================
-         SELECTION & SCROLLBAR
-         ============================================================ -->
+    <!-- Selection and scrollbar. -->
     <SolidColorBrush x:Key="Selection.Background"   Color="{StaticResource Primitive.Violet.700}"/>
     <SolidColorBrush x:Key="Scrollbar.Thumb"        Color="{StaticResource Primitive.Slate.50.Alpha20}"/>
     <SolidColorBrush x:Key="Scrollbar.Thumb.Hover"  Color="{StaticResource Primitive.Slate.50.Alpha50}"/>
 
-    <!-- ============================================================
-         TYPOGRAPHY
-         Six-step hierarchy. Each role is named for the *job* it does,
-         not the size: changing the size means changing this token,
-         not renaming consumers.
-         ============================================================ -->
+    <!-- Typography. Six-step hierarchy. Each role is named for the
+         job it does, not the size, so a size change edits the token
+         instead of renaming consumers. -->
     <FontFamily x:Key="Type.FontFamily">pack://application:,,,/Fonts/#Poppins</FontFamily>
 
     <sys:Double x:Key="Type.Display">28</sys:Double>     <!-- splash hero -->
@@ -129,17 +106,14 @@
     <sys:Double x:Key="Type.Body">12</sys:Double>        <!-- body copy, descriptions -->
     <sys:Double x:Key="Type.Caption">11</sys:Double>     <!-- metadata labels, footer -->
 
-    <!-- ============================================================
-         RADIUS
-         Seven roles cover the app:
+    <!-- Radius. Seven roles cover the app:
            Pill         - fully rounded 40 px action buttons.
            CompactPill  - fully rounded 30 px compact buttons.
            Card         - rounded cards and overlay containers.
            CardSm       - smaller rounded surfaces (splash card border).
            Inset        - card-within-a-card surfaces (JSON preview, etc.).
            Chip         - context menus, tooltips, list rows.
-           Tight        - menu-item highlight chip.
-         ============================================================ -->
+           Tight        - menu-item highlight chip. -->
     <CornerRadius x:Key="Radius.Pill">20</CornerRadius>
     <CornerRadius x:Key="Radius.CompactPill">15</CornerRadius>
     <CornerRadius x:Key="Radius.Card">16</CornerRadius>
@@ -156,16 +130,15 @@
     <CornerRadius x:Key="Radius.PillFocus">22</CornerRadius>
     <CornerRadius x:Key="Radius.CompactPillFocus">17</CornerRadius>
 
-    <!-- ============================================================
-         BORDER THICKNESS
-         Two flavours: the Double tokens are for properties that take a
-         scalar (Path.StrokeThickness, etc); the Thickness tokens are
-         for properties that take a Thickness struct (Border.BorderThickness,
-         Control.BorderThickness). XAML resource lookups don't run the
-         ThicknessConverter, so a Double resource cannot satisfy a
-         Thickness setter; using the wrong key raises a XamlParseException
-         the first time the consuming template is realised at runtime.
-         ============================================================ -->
+    <!-- Border thickness. Two flavours: the Double tokens are for
+         properties that take a scalar (Path.StrokeThickness, etc);
+         the Thickness tokens are for properties that take a
+         Thickness struct (Border.BorderThickness,
+         Control.BorderThickness). XAML resource lookups don't run
+         the ThicknessConverter, so a Double resource cannot satisfy
+         a Thickness setter; the mismatched key raises a
+         XamlParseException the first time the consuming template is
+         realised at runtime. -->
     <sys:Double x:Key="Border.None">0</sys:Double>
     <sys:Double x:Key="Border.Hairline">1</sys:Double>
     <sys:Double x:Key="Border.Standard">2</sys:Double>
@@ -175,14 +148,11 @@
     <Thickness x:Key="BorderThickness.Standard">2</Thickness>
     <Thickness x:Key="BorderThickness.Heavy">4</Thickness>
 
-    <!-- ============================================================
-         SPACING
-         Thicknesses cover Margin/Padding sites. Directional
+    <!-- Spacing. Thicknesses cover Margin/Padding sites. Directional
          (GapBottom, GapRight, GapLeft) for one-sided patterns;
-         multi-sided literal Margins are kept for genuine one-offs.
-         A scalar Spacing.* ramp earns a place only if a real Width /
-         Height / scalar-Padding consumer surfaces.
-         ============================================================ -->
+         multi-sided literal Margins stay for genuine one-offs. A
+         scalar Spacing.* ramp earns a place only when a real Width /
+         Height / scalar-Padding consumer surfaces. -->
 
     <Thickness x:Key="Gap.Sm">8</Thickness>
     <Thickness x:Key="Gap.Md">12</Thickness>

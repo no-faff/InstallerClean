@@ -63,7 +63,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- ── Context: scan results ──────────────────────── -->
+            <!-- Context: scan results -->
             <StackPanel Grid.Row="0">
 
                 <!-- Explanatory text -->
@@ -127,10 +127,10 @@
 
             </StackPanel>
 
-            <!-- ── Separator ────────────────────────────────────── -->
+            <!-- Separator -->
             <Border Grid.Row="2" BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="0,1,0,0"/>
 
-            <!-- ── Action zone: orphaned + move/delete ──────────── -->
+            <!-- Action zone: orphaned + move/delete -->
             <Grid Grid.Row="4">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -239,12 +239,11 @@
 
         </Grid>
 
-        <!-- ── Bottom nav ──────────────────────────────────────
-             Asymmetric Margin: 4 left because Re-scan and About are
-             GhostPills with their own internal padding; 24 right for
-             clearance between the right-anchored chrome icons and the
-             window-close hit area above. One-off; intentionally a
-             literal Thickness rather than a Gap token. -->
+        <!-- Bottom nav. Asymmetric Margin: 4 left because Re-scan
+             and About are GhostPills with their own internal padding;
+             24 right for clearance between the right-anchored chrome
+             icons and the window-close hit area above. One-off;
+             a literal Thickness rather than a Gap token. -->
         <DockPanel Grid.Row="3" LastChildFill="False" Margin="4,8,24,8"
                    IsEnabled="{Binding IsMainContentInteractive}">
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
@@ -350,7 +349,7 @@
             </Button>
         </DockPanel>
 
-        <!-- ── Scanning overlay ──────────────────────────────────── -->
+        <!-- Scanning overlay -->
         <Grid Grid.RowSpan="4" Visibility="{Binding Scan.IsScanning, Converter={StaticResource BoolToVis}}"
               KeyboardNavigation.TabNavigation="Cycle"
               KeyboardNavigation.ControlTabNavigation="Cycle">
@@ -370,7 +369,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- ── Operating overlay ─────────────────────────────────── -->
+        <!-- Operating overlay -->
         <Grid Grid.RowSpan="4" Visibility="{Binding Cleanup.IsOperating, Converter={StaticResource BoolToVis}}"
               KeyboardNavigation.TabNavigation="Cycle"
               KeyboardNavigation.ControlTabNavigation="Cycle">
@@ -429,9 +428,9 @@
                 </StackPanel>
             </Border>
         </Grid>
-        <!-- ── Completion overlay ──────────────────────────────
-             TabNavigation="Cycle" traps Tab inside the overlay.
-             1px BorderBrush matches the confirm dialogs. -->
+        <!-- Completion overlay. TabNavigation="Cycle" traps Tab
+             inside the overlay. 1px BorderBrush matches the confirm
+             dialogs. -->
         <Grid x:Name="CompletionOverlay" Grid.RowSpan="4" Visibility="{Binding Completion.IsComplete, Converter={StaticResource BoolToVis}}"
               KeyboardNavigation.TabNavigation="Cycle"
               KeyboardNavigation.ControlTabNavigation="Cycle">

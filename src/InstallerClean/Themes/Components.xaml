@@ -3,9 +3,9 @@
     (PrimaryPill, GhostPill, Card, etc) and consumes only semantic
     tokens from Tokens.xaml.
 
-    Rule: nothing in this file references a Primitive.* key. If a
-    component needs a colour or numeric that does not yet have a
-    token, add it to Tokens.xaml first, then consume it here.
+    Nothing in this file references a Primitive.* key. A component
+    that needs a colour or numeric not yet in Tokens.xaml gets a new
+    token there first, then consumes it from this file.
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -16,11 +16,8 @@
         <ResourceDictionary Source="Tokens.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
-    <!-- ============================================================
-         GLOBAL DEFAULTS
-         Apply the bundled font to every Window and TextBlock so we
-         never have to repeat FontFamily on individual controls.
-         ============================================================ -->
+    <!-- Global defaults. Bundled-font assignment on Window and
+         TextBlock removes the per-control FontFamily repetition. -->
     <Style TargetType="Window">
         <Setter Property="FontFamily" Value="{StaticResource Type.FontFamily}"/>
     </Style>
@@ -28,12 +25,10 @@
         <Setter Property="FontFamily" Value="{StaticResource Type.FontFamily}"/>
     </Style>
 
-    <!-- ============================================================
-         SELECTABLE TEXT
-         A read-only TextBox styled to look like a TextBlock but with
-         user-selectable contents. Useful for showing values the user
-         might want to copy (file paths, version strings, hashes).
-         ============================================================ -->
+    <!-- Selectable text. A read-only TextBox styled to look like a
+         TextBlock but with user-selectable contents. Useful for
+         showing values worth copying (file paths, version strings,
+         hashes). -->
     <Style x:Key="SelectableText" TargetType="TextBox">
         <Setter Property="IsReadOnly" Value="True"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -53,12 +48,9 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         CARDS
-         Rounded surface containers. Card has standard inner padding;
-         CardNoPad lets the consumer control its own padding (used for
-         lists that paint their own row spacing).
-         ============================================================ -->
+    <!-- Cards. Rounded surface containers. Card has standard inner
+         padding; CardNoPad lets the consumer control its own padding
+         (used for lists that paint their own row spacing). -->
     <Style x:Key="Card" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource Surface.Card}"/>
         <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}"/>
@@ -70,13 +62,11 @@
         <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}"/>
     </Style>
 
-    <!-- ============================================================
-         FOCUS VISUALS
-         Three sizes match the three pill heights (40 / 30 / 28).
-         The default focus visual at the bottom of this file applies
-         to anything else that takes focus (LinkButton, Hyperlink,
-         plain Button) so keyboard navigation stays visible everywhere.
-         ============================================================ -->
+    <!-- Focus visuals. Three sizes match the three pill heights
+         (40 / 30 / 28). The default focus visual at the bottom of
+         this file applies to anything else that takes focus
+         (LinkButton, Hyperlink, plain Button) so keyboard navigation
+         stays visible everywhere. -->
     <Style x:Key="PillFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
@@ -139,15 +129,12 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         PILL BUTTONS
-         Four flavours sharing one visual language (40px tall, fully
-         rounded, 14pt Medium label):
+    <!-- Pill buttons. Four flavours share one visual language (40px
+         tall, fully rounded, 14pt Medium label):
            AccentPill  - secondary action colour (CTA / Move).
            PrimaryPill - primary action colour (Browse / Add / Close).
            DangerPill  - destructive action colour (Delete).
-           GhostPill   - text-only action with no fill (Settings / About).
-         ============================================================ -->
+           GhostPill   - text-only action with no fill (Settings / About). -->
 
     <Style x:Key="AccentPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
@@ -288,10 +275,8 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         COMPACT PILL BUTTONS (30px tall)
-         Compact variants for the About dialog action row.
-         ============================================================ -->
+    <!-- Compact pill buttons (30 px tall). Compact variants for the
+         About dialog action row. -->
 
     <Style x:Key="CompactPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
@@ -361,9 +346,7 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         INPUTS
-         ============================================================ -->
+    <!-- Inputs. -->
 
     <Style x:Key="PillTextBox" TargetType="TextBox">
         <Setter Property="Background" Value="{StaticResource Surface.Card}"/>
@@ -404,13 +387,10 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         LIST ITEMS
-         ListView and ListBox row styles. Selection highlight uses the
-         primary action background (not the violet selection accent),
-         to read as "this row is the active selection" rather than
-         "this row is brand-flavoured".
-         ============================================================ -->
+    <!-- List items. ListView and ListBox row styles. Selection
+         highlight uses the primary action background (not the violet
+         selection accent) so a selected row reads as "active
+         selection" rather than "brand-flavoured". -->
 
     <Style TargetType="ListViewItem">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
@@ -470,12 +450,10 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         LINKS
-         LinkButton: stand-alone link control (e.g. "Details..." actions).
-         SubtleLink: in-body Hyperlink that brightens to full Link
-         colour on hover so it doesn't shout when sat in a paragraph.
-         ============================================================ -->
+    <!-- Links. LinkButton is the stand-alone link control (e.g.
+         "Details..." actions). SubtleLink is an in-body Hyperlink
+         that brightens to full Link colour on hover so it does not
+         shout when sat in a paragraph. -->
 
     <Style x:Key="LinkButton" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Link.Default}"/>
@@ -520,12 +498,9 @@
         </Style.Triggers>
     </Style>
 
-    <!-- ============================================================
-         SCROLLBAR
-         Thin (8px), rounded, subtle thumb that brightens on hover.
-         Both horizontal and vertical orientations covered through one
-         keyed Thumb style and a Style.Triggers branch.
-         ============================================================ -->
+    <!-- Scrollbar. Thin (8px), rounded, subtle thumb that brightens
+         on hover. One keyed Thumb style plus a Style.Triggers branch
+         covers both horizontal and vertical orientations. -->
 
     <Style x:Key="ThinThumb" TargetType="Thumb">
         <Setter Property="Template">
@@ -589,13 +564,11 @@
         </Style.Triggers>
     </Style>
 
-    <!-- ============================================================
-         CAPTION BUTTONS
-         Title-bar minimise / maximise / close. Distinct CaptionClose
-         style because the close button uses Action.CaptionClose.* on
-         hover (red, matching the Windows convention) where the others
-         use the standard Action.Primary background.
-         ============================================================ -->
+    <!-- Caption buttons. Title-bar minimise / maximise / close. The
+         CaptionClose style is distinct because the close button uses
+         Action.CaptionClose.* on hover (red, matching the Windows
+         convention) where the others use the standard Action.Primary
+         background. -->
 
     <!-- The chrome glyphs (E921 minimise, E922 maximise, E923 restore,
          E8BB close) live in Segoe MDL2 Assets, the canonical Windows
@@ -676,12 +649,9 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         TOOLTIPS
-         WarningTooltip: indigo accent tooltip for the donate / star
-         buttons that shouts a little. The implicit ToolTip style
-         below is the default for everything else.
-         ============================================================ -->
+    <!-- Tooltips. WarningTooltip is the indigo accent tooltip for
+         the donate / star buttons that shouts a little; the implicit
+         ToolTip style below is the default for everything else. -->
 
     <Style x:Key="WarningTooltip" TargetType="ToolTip">
         <Setter Property="Background" Value="Transparent"/>
@@ -731,12 +701,10 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         DEFAULT FOCUS VISUAL
-         Catches anything that takes focus but has no FocusVisualStyle
-         override (plain Buttons, LinkButtons, Hyperlinks). Pill
-         buttons opt out via their own *FocusVisual styles above.
-         ============================================================ -->
+    <!-- Default focus visual. Catches anything that takes focus but
+         has no FocusVisualStyle override (plain Buttons, LinkButtons,
+         Hyperlinks). Pill buttons opt out via their own *FocusVisual
+         styles above. -->
     <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
         <Setter Property="Control.Template">
             <Setter.Value>
@@ -751,19 +719,16 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         PROGRESS BAR
-         Slim dark bar. Determinate uses PART_Indicator (WPF stock).
-         Indeterminate moves the RepeatBehavior onto the DoubleAnimation
-         rather than the wrapping Storyboard so the compiled BAML
-         doesn't carry the literal "Storyboard RepeatBehavior=Forever"
-         attribute pair.
+    <!-- Progress bar. Slim dark bar. Determinate uses PART_Indicator
+         (WPF stock). The indeterminate path moves the RepeatBehavior
+         onto the DoubleAnimation rather than the wrapping Storyboard
+         so the compiled BAML carries no literal "Storyboard
+         RepeatBehavior=Forever" attribute pair.
 
-         The indeterminate animation translates the 80px bar from
-         X=-80 to X=320 (max bar width 240px). DoubleAnimation can't
-         template-bind ActualWidth; raise the To value if a wider
-         indeterminate consumer appears.
-         ============================================================ -->
+         The indeterminate animation translates the 80 px bar from
+         X=-80 to X=320 (max bar width 240 px). DoubleAnimation can't
+         template-bind ActualWidth, so a wider indeterminate consumer
+         needs the To value raised. -->
     <Style TargetType="ProgressBar">
         <Setter Property="Background" Value="{StaticResource Surface.Sidebar}"/>
         <Setter Property="Foreground" Value="{StaticResource Action.Secondary.Background}"/>
@@ -815,12 +780,10 @@
         </Setter>
     </Style>
 
-    <!-- ============================================================
-         CONTEXT MENU & MENU ITEM
-         Padding/CornerRadius literals here are per-control tunings,
-         not spacing-token decisions: the Spacing scale is uniform and
-         doesn't represent the asymmetric (12,6) padding menu rows want.
-         ============================================================ -->
+    <!-- Context menu and menu item. Padding/CornerRadius literals
+         here are per-control tunings, not spacing-token decisions:
+         the Spacing scale is uniform and does not capture the
+         asymmetric (12,6) padding menu rows want. -->
 
     <Style TargetType="ContextMenu">
         <Setter Property="Background" Value="{StaticResource Surface.Sidebar}"/>
