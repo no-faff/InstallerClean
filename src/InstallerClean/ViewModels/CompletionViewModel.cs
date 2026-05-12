@@ -285,12 +285,11 @@ public partial class CompletionViewModel : ObservableObject
             }
             catch (Exception ex)
             {
-                // SendAsync is documented "never throws", but the
-                // contract is load-bearing across an assembly boundary.
-                // A future change that broke the contract would
-                // otherwise ride DispatcherUnhandledException to a
-                // process exit; instead this collapses to the same
-                // visible failure state as a clean reject.
+                // SendAsync documents never-throws, but the contract
+                // sits across an assembly boundary. The catch collapses
+                // any breach to the same visible failure state as a
+                // clean reject so a regression can't ride
+                // DispatcherUnhandledException to a process exit.
                 CrashLog.TryWrite(ex);
                 outcome = ResultLogSendOutcome.Unknown;
             }

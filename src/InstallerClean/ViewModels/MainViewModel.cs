@@ -73,10 +73,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Chrome = new ChromeViewModel(windowService, msiInfoService, Scan);
 
         // Surface the all-clear overlay when a scan finishes with no
-        // orphans. The IsOperating guard depends on Cleanup setting
-        // IsOperating=false AFTER the post-operation refresh fires
-        // ScanCompleted; reordering that flow would let an all-clear
-        // overpaint a Move/Delete summary.
+        // orphans. Cleanup sets IsOperating=false after the post-
+        // operation refresh fires ScanCompleted; that ordering keeps
+        // an all-clear from overpainting a Move/Delete summary.
         _scanCompletedHandler = OnScanCompleted;
         Scan.ScanCompleted += _scanCompletedHandler;
 
@@ -138,11 +137,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private async void OnScanCompleted(object? sender, EventArgs e)
     {
-        // async void: WriteAsync's "never throws" contract is load-
-        // bearing across the assembly boundary. A future change that
-        // broke the contract would otherwise ride DispatcherUnhandledException
-        // to a process exit. The outer try/catch keeps the contract's
-        // failure mode local to this handler.
+        // async void: WriteAsync documents never-throws, but the
+        // contract sits across an assembly boundary. The outer
+        // try/catch keeps any breach of that contract from riding
+        // DispatcherUnhandledException to a process exit.
         try
         {
             // The suppression flag is consumed up front so a rescan

@@ -212,7 +212,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         };
         if (dialog.ShowDialog() == true)
         {
-            // OnMoveDestinationChanged persists the new value.
             MoveDestination = dialog.FolderName;
         }
     }
@@ -251,7 +250,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         var dest = MoveDestination.Trim();
 
-        // SECURITY: never let files move back inside C:\Windows\Installer.
+        // Never let files move back inside C:\Windows\Installer.
         // ResolveFinalPath inside IsInstallerFolderOrChild expands
         // junctions so a reparse-point destination cannot smuggle the
         // batch into the cache folder.
