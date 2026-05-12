@@ -45,7 +45,7 @@ public class OrphanedFilesViewModelTests
 
         var vm = new OrphanedFilesViewModel(files, NullInfoService());
 
-        Assert.Equal("2 files (1.0 MB)", vm.Summary);
+        Assert.Equal("2 unused files (1.0 MB)", vm.Summary);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class OrphanedFilesViewModelTests
 
         var vm = new OrphanedFilesViewModel(files, NullInfoService());
 
-        Assert.Equal("1 file (1.0 MB)", vm.Summary);
+        Assert.Equal("1 unused file (1.0 MB)", vm.Summary);
     }
 
     [Fact]
