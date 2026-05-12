@@ -105,7 +105,7 @@ All notable changes to InstallerClean. Format follows [Keep a Changelog](https:/
 ### Changed
 
 - About dialog redesign: version, licence and repository metadata in a compact block; Star on GitHub and Donate as labelled actions in the footer alongside Check for updates and Close.
-- Inno Setup compression switched from `lzma2/ultra64` to `zip` (cleared a DeepInstinct heuristic flag on `setup.exe`'s hash).
+- Inno Setup compression switched from `lzma2/ultra64` to `zip` after `setup.exe` was flagged by DeepInstinct on VirusTotal.
 - Scan-complete timer displays milliseconds when under one second (was rounding to "0.0s").
 
 ### Fixed
@@ -115,7 +115,7 @@ All notable changes to InstallerClean. Format follows [Keep a Changelog](https:/
 
 ### Removed
 
-- `UpdateCheckService` (the HTTP-based update check). Check for updates now opens the GitHub releases page in the browser. Auto HTTP from an elevated app on startup was tripping DeepInstinct's C2 heuristic.
+- `UpdateCheckService` (the HTTP-based update check). Check for updates now opens the GitHub releases page in the browser. The slim binary was being flagged by DeepInstinct on VirusTotal; auto-HTTP-on-startup from an elevated process was the leading suspicion at the time.
 
 ## [1.5.2] - 2026-04-17
 
