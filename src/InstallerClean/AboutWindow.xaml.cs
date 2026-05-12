@@ -107,10 +107,10 @@ public partial class AboutWindow : Window
             {
             }
             // Skip the post-cooldown UI writes if the window was closed
-            // (OnClosed cancels _checkCts). The control references stay
-            // valid after Close() today, but a future refactor that
-            // disposes element trees on Closed would surface a
-            // NullReferenceException here.
+            // (OnClosed cancels _checkCts). WPF Close() leaves element
+            // references valid; a future refactor that disposes the
+            // element tree on Closed would surface NullReferenceException
+            // on these property writes.
             if (!token.IsCancellationRequested)
             {
                 CheckStatusText.Text = string.Empty;

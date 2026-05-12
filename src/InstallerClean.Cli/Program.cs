@@ -45,12 +45,13 @@ internal static class Program
 
     public static async Task<int> Main(string[] args)
     {
-        // UTF-8 stdout so a future translation of Cli.* into a
-        // non-ASCII language doesn't mojibake under redirected output
+        // UTF-8 stdout so a translation of Cli.* into a non-ASCII
+        // language doesn't mojibake under redirected output
         // (cmd /c installerclean-cli /s > out.txt) or under
-        // PowerShell 5 which still defaults to OEM. Today every CLI
-        // resx value is ASCII so this is benign; setting it now
-        // future-proofs the resx surface.
+        // PowerShell 5 which defaults to OEM. The Cli.* resx values
+        // are pure ASCII so the setting is benign while no
+        // translation has shipped; pinning it removes the dependency
+        // on the host shell's default code page.
         Console.OutputEncoding = Encoding.UTF8;
 
         // Lowercase up front so every later comparison (--help, /?, -h,
