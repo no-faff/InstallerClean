@@ -218,4 +218,18 @@
          the card shape. -->
     <Thickness x:Key="Padding.ModalCard">32,28</Thickness>
 
+    <!-- Main window content margin. The bottom value (48) matches the
+         effective height of the bottom-nav DockPanel below (Row=3,
+         Margin 4,8,24,8 around two 28-px-tall GhostPills); changing
+         either side of that invariant requires the other side to
+         follow or the content visually drifts behind the nav. -->
+    <Thickness x:Key="MainContentMargin">24,0,24,48</Thickness>
+
+    <!-- Negative top/right margin used by the detail-window caption-X
+         close buttons (About, Registered, Orphaned). The -24 right
+         component pulls the X out past DetailWindowMargin's 24 right
+         component so the X sits at the window edge; the two move
+         together. -->
+    <Thickness x:Key="CloseButtonOverhangMargin">0,-4,-24,0</Thickness>
+
 </ResourceDictionary>

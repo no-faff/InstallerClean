@@ -51,7 +51,7 @@
                     ToolTip="{loc:Translate Tooltip.Close}"/>
         </StackPanel>
 
-        <Grid Grid.Row="1" Grid.RowSpan="2" Margin="24,0,24,48" VerticalAlignment="Center"
+        <Grid Grid.Row="1" Grid.RowSpan="2" Margin="{StaticResource MainContentMargin}" VerticalAlignment="Center"
               MaxWidth="720" HorizontalAlignment="Center"
               IsEnabled="{Binding IsMainContentInteractive}">
             <Grid.RowDefinitions>
