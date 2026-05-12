@@ -15,8 +15,7 @@ All notable changes to InstallerClean. Format follows [Keep a Changelog](https:/
 - "{N} cleared" completion heading is now "{N} freed".
 - JSON schema field `bytesCleared` renamed to `bytesFreed`; redundant `removableCount` dropped (sum of `orphanedCount` + `supersededCount`).
 - Star and Buy-me-a-cuppa buttons in About picked up Alt+S / Alt+B accelerators; "SAY THANKS" section header above them.
-- Umbrella term renamed from "orphaned files" to "unused files" in window titles, screen-reader announcements, Event Log entries and the app description.
-- Parenthetical Reason references in body copy lowercased to "(orphaned)" / "(superseded)"; Reason column values ("Orphaned" / "Superseded") unchanged.
+- Umbrella term renamed from "orphaned files" to "unused files" in window titles, screen-reader announcements, Event Log entries and the app description. Per-file Reason values ("Orphaned" / "Superseded") unchanged.
 
 ### Removed
 
