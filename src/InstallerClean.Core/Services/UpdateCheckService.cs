@@ -42,6 +42,12 @@ public sealed class UpdateCheckService : IUpdateCheckService
     private const string ReleasesPageUrl =
         "https://github.com/no-faff/InstallerClean/releases/latest";
 
+    // MaxDepth=8 matches SettingsService.JsonOptions. The schema is
+    // shallow; the cap defends the elevated process against
+    // pathologically nested JSON under the 256 KiB body cap.
+    // Internal for the config-pin test.
+    internal static readonly JsonDocumentOptions JsonParseOptions = new() { MaxDepth = 8 };
+
     private static readonly HttpClient HttpClient = new()
     {
         Timeout = RequestTimeout,
@@ -65,10 +71,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
 
             var json = await response.Content.ReadAsStringAsync(cancellationToken)
                 .ConfigureAwait(false);
-            // MaxDepth=8 matches SettingsService.JsonOptions. The schema
-            // is shallow; the cap defends the elevated process against
-            // pathologically nested JSON under the 256 KiB body cap.
-            using var doc = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 8 });
+            using var doc = JsonDocument.Parse(json, JsonParseOptions);
 
             if (!doc.RootElement.TryGetProperty("tag_name", out var tagElement))
                 return new CheckFailed(UpdateCheckFailureReason.ResponseParseError);

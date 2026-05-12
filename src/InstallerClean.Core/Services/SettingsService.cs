@@ -20,7 +20,8 @@ public sealed class SettingsService : ISettingsService
     // the catch block routes to the .bad-rename recovery path.
     private const int MaxReadBytes = 64 * 1024;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    // Internal for the config-pin test in SettingsServiceConfigTests.
+    internal static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,

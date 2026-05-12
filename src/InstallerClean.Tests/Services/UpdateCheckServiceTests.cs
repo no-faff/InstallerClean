@@ -33,6 +33,18 @@ public class UpdateCheckServiceTests
         Assert.DoesNotContain(' ', product.Product.Version);
     }
 
+    [Fact]
+    public void JsonParseOptions_caps_depth_at_8()
+    {
+        // The GitHub Releases response is parsed by the elevated
+        // process. MaxDepth=8 bounds exposure to pathologically nested
+        // JSON; the 256 KiB MaxResponseContentBufferSize is the load-
+        // bearing defence, this is hardening. Pinned so a refactor that
+        // drops the JsonDocumentOptions and falls back to the BCL
+        // default 64 fails CI rather than silently widening the cap.
+        Assert.Equal(8, UpdateCheckService.JsonParseOptions.MaxDepth);
+    }
+
     [Theory]
     [InlineData("https://github.com/no-faff/InstallerClean/releases/tag/v1.8.0", true)]
     [InlineData("https://github.com/no-faff/InstallerClean/releases/latest", true)]
