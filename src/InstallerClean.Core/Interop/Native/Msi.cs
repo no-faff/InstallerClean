@@ -33,12 +33,12 @@ internal static partial class Msi
     /// </summary>
     /// <remarks>
     /// szInstalledProductCode is a fixed 39-char buffer in the native
-    /// signature (a GUID + null terminator); the native function does
-    /// NOT take a count parameter for it. Use ConstantElementCount, not
-    /// CountElementName, so the C# signature exactly matches the
-    /// 8-parameter native signature - a CountElementName-derived 9th
-    /// parameter would be passed harmlessly under the x64 calling
-    /// convention but is undefined behaviour and would crash on x86.
+    /// signature (a GUID + null terminator); the native function takes
+    /// no count parameter for it. ConstantElementCount keeps the C#
+    /// signature aligned with the 8-parameter native signature.
+    /// CountElementName would inject a phantom 9th parameter that the
+    /// x64 calling convention passes harmlessly but is undefined
+    /// behaviour and crashes on x86.
     /// </remarks>
     [LibraryImport(Library, EntryPoint = "MsiEnumProductsExW",
                    StringMarshalling = StringMarshalling.Utf16)]
