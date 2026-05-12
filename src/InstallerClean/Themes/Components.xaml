@@ -66,16 +66,26 @@
          (40 / 30 / 28). The default focus visual at the bottom of
          this file applies to anything else that takes focus
          (LinkButton, Hyperlink, plain Button) so keyboard navigation
-         stays visible everywhere. -->
+         stays visible everywhere. Each visual collapses when the
+         parent Window is inactive: logical focus survives Alt+Tab so
+         a user mid-edit in a TextBox can return and Ctrl+V without
+         re-clicking, while the focus ring tracks the window's active
+         state and never lingers behind a foregrounded other app. -->
     <Style x:Key="PillFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border CornerRadius="{StaticResource Radius.PillFocus}"
+                    <Border x:Name="FocusBorder"
+                            CornerRadius="{StaticResource Radius.PillFocus}"
                             BorderThickness="{StaticResource BorderThickness.Standard}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
                             SnapsToDevicePixels="True"/>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=IsActive}" Value="False">
+                            <Setter TargetName="FocusBorder" Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -85,11 +95,17 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border CornerRadius="{StaticResource Radius.CompactPillFocus}"
+                    <Border x:Name="FocusBorder"
+                            CornerRadius="{StaticResource Radius.CompactPillFocus}"
                             BorderThickness="{StaticResource BorderThickness.Standard}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
                             SnapsToDevicePixels="True"/>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=IsActive}" Value="False">
+                            <Setter TargetName="FocusBorder" Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -99,11 +115,17 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border CornerRadius="{StaticResource Radius.Card}"
+                    <Border x:Name="FocusBorder"
+                            CornerRadius="{StaticResource Radius.Card}"
                             BorderThickness="{StaticResource BorderThickness.Standard}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
                             SnapsToDevicePixels="True"/>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=IsActive}" Value="False">
+                            <Setter TargetName="FocusBorder" Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -119,11 +141,17 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border CornerRadius="{StaticResource Radius.Tight}"
+                    <Border x:Name="FocusBorder"
+                            CornerRadius="{StaticResource Radius.Tight}"
                             BorderThickness="{StaticResource BorderThickness.Standard}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
                             SnapsToDevicePixels="True"/>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=IsActive}" Value="False">
+                            <Setter TargetName="FocusBorder" Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -704,16 +732,22 @@
     <!-- Default focus visual. Catches anything that takes focus but
          has no FocusVisualStyle override (plain Buttons, LinkButtons,
          Hyperlinks). Pill buttons opt out via their own *FocusVisual
-         styles above. -->
+         styles above. Collapses on Window.IsActive=False for the same
+         reason as the *FocusVisual styles. -->
     <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Rectangle RadiusX="2" RadiusY="2"
+                    <Rectangle x:Name="FocusRect" RadiusX="2" RadiusY="2"
                                Stroke="{DynamicResource Text.Body}"
                                StrokeThickness="{StaticResource Border.Hairline}"
                                SnapsToDevicePixels="True"
                                Margin="-1"/>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=IsActive}" Value="False">
+                            <Setter TargetName="FocusRect" Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

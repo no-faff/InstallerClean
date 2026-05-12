@@ -25,7 +25,6 @@ public partial class OrphanedFilesWindow : Window
 
         Closed += OnClosed;
         this.EnableAltSpaceSystemMenu();
-        this.ClearFocusOnDeactivation();
     }
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
