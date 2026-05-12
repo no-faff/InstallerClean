@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
@@ -19,9 +20,9 @@ internal static class Program
     /// flagged was successfully processed.</summary>
     private const int ExitOk = 0;
 
-    /// <summary>1 = total failure: scan failed, mutex contention, bad
-    /// args, or every file in the batch failed. Sysadmin scripts
-    /// should treat this as "the run accomplished nothing".</summary>
+    /// <summary>1 = total failure: scan failed, bad args, or every
+    /// file in the batch failed. Sysadmin scripts should treat this
+    /// as "the run accomplished nothing and it's not transient".</summary>
     private const int ExitError = 1;
 
     /// <summary>2 = partial success: the operation processed some
@@ -30,11 +31,28 @@ internal static class Program
     /// (probably yes on partial; probably no on full failure).</summary>
     private const int ExitPartial = 2;
 
+    /// <summary>75 = POSIX EX_TEMPFAIL: transient condition the
+    /// caller may want to retry later. Used when the single-instance
+    /// mutex is held (GUI or another CLI run in flight) or a pending
+    /// Windows Installer transaction blocks cache changes. Distinct
+    /// from ExitError so a Task Scheduler "retry every 15 minutes for
+    /// 3 attempts" policy can fire on transient and back off on hard
+    /// failure.</summary>
+    private const int ExitTransient = 75;
+
     /// <summary>POSIX convention: 130 == 128 + SIGINT (Ctrl+C).</summary>
     private const int ExitCancelled = 130;
 
     public static async Task<int> Main(string[] args)
     {
+        // UTF-8 stdout so a future translation of Cli.* into a
+        // non-ASCII language doesn't mojibake under redirected output
+        // (cmd /c installerclean-cli /s > out.txt) or under
+        // PowerShell 5 which still defaults to OEM. Today every CLI
+        // resx value is ASCII so this is benign; setting it now
+        // future-proofs the resx surface.
+        Console.OutputEncoding = Encoding.UTF8;
+
         // Lowercase up front so every later comparison (--help, /?, -h,
         // /s, /d, /m) is case-insensitive. PowerShell users frequently
         // type /S in upper case.
@@ -101,9 +119,17 @@ internal static class Program
             if (!holdsMutex)
             {
                 Console.WriteLine(Strings.Startup_AlreadyRunningBody);
+                // Audit the skipped run on the Application channel so an
+                // RMM consumer polling for InstallerClean entries can
+                // tell "the task fired but the GUI was open" from "the
+                // task never fired".
+                EventLogWriter.Write(EventLogWriter.Level.Information,
+                    string.Format(Strings.Cli_EventLogMutexBlocked, arg));
+                if (EventLogWriter.EventLogUnavailable)
+                    Console.WriteLine(Strings.Cli_EventLogUnavailable);
                 mutex.Dispose();
                 Console.CancelKeyPress -= cancelHandler;
-                return ExitError;
+                return ExitTransient;
             }
         }
 
@@ -181,7 +207,11 @@ internal static class Program
                             arg,
                             rebootCheck.Reason?.ToString() ?? "Unknown",
                             rebootCheck.Detail ?? string.Empty));
-                    return ExitError;
+                    // Pending reboot is transient (the user reboots and
+                    // the next scheduled run proceeds); distinct from
+                    // ExitError so a retry policy can act on it without
+                    // also retrying hard scan/move/delete failures.
+                    return ExitTransient;
                 }
             }
 
@@ -342,6 +372,12 @@ internal static class Program
         }
         finally
         {
+            // Surface the EventLog-unavailable warning once per run,
+            // after the main output but before mutex release. RMM
+            // consumers expecting Application-channel entries get a
+            // record (in stdout) that the channel was unwritable.
+            if (EventLogWriter.EventLogUnavailable)
+                Console.WriteLine(Strings.Cli_EventLogUnavailable);
             Console.CancelKeyPress -= cancelHandler;
             if (holdsMutex) mutex!.ReleaseMutex();
             mutex?.Dispose();
@@ -363,6 +399,7 @@ internal static class Program
         Console.WriteLine(Strings.Cli_Help_ExitCodeOk);
         Console.WriteLine(Strings.Cli_Help_ExitCodeError);
         Console.WriteLine(Strings.Cli_Help_ExitCodePartial);
+        Console.WriteLine(Strings.Cli_Help_ExitCodeTransient);
         Console.WriteLine(Strings.Cli_Help_ExitCodeCancelled);
         Console.WriteLine();
         Console.WriteLine(Strings.Cli_Help_NoteLine1);

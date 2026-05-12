@@ -25,6 +25,16 @@ internal static class EventLogWriter
     }
 
     /// <summary>
+    /// Sticky flag: set true on the first Write that fails (source
+    /// creation denied by Group Policy, event-log service stopped,
+    /// source pre-mapped to a non-Application log). The CLI Main
+    /// surfaces a one-line stdout warning when this is set, so an
+    /// RMM consumer expecting Application-channel entries can tell
+    /// "the channel was unwritable" apart from "nothing happened".
+    /// </summary>
+    internal static bool EventLogUnavailable { get; private set; }
+
+    /// <summary>
     /// Writes the summary entry. Never throws; a failed write (source
     /// creation denied, event log service stopped, non-Windows host,
     /// source mapped to a non-Application log) is swallowed because the
@@ -35,7 +45,10 @@ internal static class EventLogWriter
         try
         {
             if (!EnsureSourceMappedToApplicationLog())
+            {
+                EventLogUnavailable = true;
                 return;
+            }
             var entryType = level == Level.Warning
                 ? EventLogEntryType.Warning
                 : EventLogEntryType.Information;
@@ -43,6 +56,7 @@ internal static class EventLogWriter
         }
         catch
         {
+            EventLogUnavailable = true;
             // Stdout is the primary channel; silent failure here keeps the
             // CLI working on hosts where the event log isn't writable.
         }

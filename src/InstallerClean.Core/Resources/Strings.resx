@@ -511,6 +511,16 @@ The crash log could not be written.</value></data>
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
   <data name="Cli.EventLogMoveSummary" xml:space="preserve"><value>{0} mode: {1} of {2} {3} moved to {4}, {5} relocated, {6} {7}.</value></data>
   <data name="Cli.EventLogCancelledPartial" xml:space="preserve"><value>{0} mode interrupted by Ctrl+C: {1} of {2} {3} processed before cancellation. See progress output for the per-file detail.</value></data>
+  <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
+       can't acquire the single-instance mutex, so an RMM consumer of
+       the Application channel sees a record of every scheduled-job
+       firing whether or not it was able to run. -->
+  <data name="Cli.EventLogMutexBlocked" xml:space="preserve"><value>{0} mode skipped: GUI or another CLI run is already holding the single-instance mutex.</value></data>
+  <!-- Stdout warning printed once at the end of a CLI run if any
+       Event Log write failed (Group Policy or service unavailable).
+       Tells an RMM consumer expecting an Application entry that the
+       channel was unwritable, not just empty. -->
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Note: Event Log writing failed. Check Application channel permissions or Group Policy.</value></data>
 
   <!-- ============================================================
        CLI HELP TEXT (printed by /? -? /h)
@@ -529,6 +539,7 @@ The crash log could not be written.</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   success: every flagged file was processed</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some files processed, some failed</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   failure: nothing processed (bad args, scan failed, all files failed)</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transient: GUI is running or a Windows Installer transaction is pending (try later)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 cancelled (Ctrl+C)</value></data>
 
 </root>

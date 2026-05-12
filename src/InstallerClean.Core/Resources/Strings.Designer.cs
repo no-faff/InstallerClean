@@ -105,9 +105,11 @@ public static class Strings
     public static string Cli_EventLogMoveDestinationRelative => Get("Cli.EventLogMoveDestinationRelative");
     public static string Cli_EventLogMoveNoDestination => Get("Cli.EventLogMoveNoDestination");
     public static string Cli_EventLogMoveSummary => Get("Cli.EventLogMoveSummary");
+    public static string Cli_EventLogMutexBlocked => Get("Cli.EventLogMutexBlocked");
     public static string Cli_EventLogPendingRebootBlocked => Get("Cli.EventLogPendingRebootBlocked");
     public static string Cli_EventLogScanFound => Get("Cli.EventLogScanFound");
     public static string Cli_EventLogScanNoOrphans => Get("Cli.EventLogScanNoOrphans");
+    public static string Cli_EventLogUnavailable => Get("Cli.EventLogUnavailable");
     public static string Cli_FoundOrphans => Get("Cli.FoundOrphans");
     public static string Cli_GenericError => Get("Cli.GenericError");
     public static string Cli_GenericError_NoLog => Get("Cli.GenericError.NoLog");
@@ -117,6 +119,7 @@ public static class Strings
     public static string Cli_Help_ExitCodeOk => Get("Cli.Help.ExitCodeOk");
     public static string Cli_Help_ExitCodePartial => Get("Cli.Help.ExitCodePartial");
     public static string Cli_Help_ExitCodesHeader => Get("Cli.Help.ExitCodesHeader");
+    public static string Cli_Help_ExitCodeTransient => Get("Cli.Help.ExitCodeTransient");
     public static string Cli_Help_Header => Get("Cli.Help.Header");
     public static string Cli_Help_Help => Get("Cli.Help.Help");
     public static string Cli_Help_MoveDefault => Get("Cli.Help.MoveDefault");
