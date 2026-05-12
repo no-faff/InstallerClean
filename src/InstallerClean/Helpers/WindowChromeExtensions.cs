@@ -1,11 +1,11 @@
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Helpers;
 
-internal static partial class WindowChromeExtensions
+internal static class WindowChromeExtensions
 {
     /// <summary>
     /// Restores Alt+Space system menu behaviour on a Window that uses a
@@ -60,20 +60,14 @@ internal static partial class WindowChromeExtensions
             // app and paste back without re-clicking the caret.
             if (FocusManager.GetFocusedElement(window) is TextBoxBase) return;
 
-            IntPtr fg = GetForegroundWindow();
+            IntPtr fg = User32.GetForegroundWindow();
             if (fg == IntPtr.Zero) return;
 
-            GetWindowThreadProcessId(fg, out uint fgPid);
+            User32.GetWindowThreadProcessId(fg, out uint fgPid);
             if (fgPid == (uint)Environment.ProcessId) return;
 
             FocusManager.SetFocusedElement(window, null);
             Keyboard.ClearFocus();
         };
     }
-
-    [LibraryImport("user32.dll")]
-    private static partial IntPtr GetForegroundWindow();
-
-    [LibraryImport("user32.dll")]
-    private static partial uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 }
