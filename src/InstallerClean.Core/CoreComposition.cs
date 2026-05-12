@@ -24,11 +24,10 @@ public static class CoreComposition
     /// process is the simplest correct choice.
     /// </summary>
     /// <remarks>
-    /// Every registration here is Singleton. Do not change any to
-    /// Scoped without coordinating with the WPF host's
+    /// Every registration here is Singleton. A Scoped service captured
+    /// by a Singleton throws at startup via the WPF host's
     /// <c>Composition.BuildServiceProvider(validateScopes: true)</c>
-    /// flag, which will throw at startup if a Scoped service is
-    /// captured by a Singleton.
+    /// flag.
     /// </remarks>
     public static IServiceCollection AddInstallerCleanCore(this IServiceCollection services)
     {

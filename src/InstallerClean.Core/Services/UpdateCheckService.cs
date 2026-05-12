@@ -10,12 +10,10 @@ namespace InstallerClean.Services;
 /// User-triggered version check against the GitHub Releases API.
 /// </summary>
 /// <remarks>
-/// The HTTP call lives inside the elevated process. The architectural
-/// constraint v1.5.3 inherited from the DeepInstinct flag was "no
-/// automatic outbound HTTP from elevated startup": this service
-/// preserves that constraint by only running when
-/// <see cref="CheckAsync"/> is invoked from a user click. There is no
-/// timer, no startup hook, no other call site.
+/// The HTTP call lives inside the elevated process. CheckAsync runs
+/// only when invoked from a user click: no timer, no startup hook, no
+/// other call site. (DeepInstinct's auto-HTTP-from-elevated-startup
+/// heuristic is the incident the constraint defends against.)
 ///
 /// HttpClient is held in a static field per the documented BCL
 /// guidance: a fresh instance per call leaks Windows-side socket
@@ -163,10 +161,10 @@ public sealed class UpdateCheckService : IUpdateCheckService
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return false;
         if (uri.Scheme != Uri.UriSchemeHttps) return false;
         if (!string.Equals(uri.Host, "github.com", StringComparison.OrdinalIgnoreCase)) return false;
-        // Host check is case-insensitive; path check matches the same
-        // intent. GitHub serves the canonical lowercase form today, but
-        // a future redirect that bounces through "/No-Faff/InstallerClean/releases/..."
-        // would still belong to this project.
+        // Host check is case-insensitive; path check follows. GitHub
+        // serves the canonical lowercase form, but a redirect through
+        // "/No-Faff/InstallerClean/releases/..." would still belong
+        // to this project.
         return uri.AbsolutePath.StartsWith("/no-faff/InstallerClean/releases/", StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -77,9 +77,6 @@ public partial class AboutWindow : Window
                     };
                     if (dialog.ShowDialog() == true)
                         UrlLauncher.OpenUrl(available.ReleaseUrl);
-                    // No inline status: the modal carried the user-facing
-                    // text. A "Just checked" status under the dismissed
-                    // modal understates an update that's still waiting.
                     CheckStatusText.Text = string.Empty;
                     break;
 
@@ -89,9 +86,6 @@ public partial class AboutWindow : Window
                         Strings.UpdateCheck_Title,
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
-                    // No inline status: the MessageBox carries the failure
-                    // reason. Duplicating "Check failed." in the pill is
-                    // noise.
                     CheckStatusText.Text = string.Empty;
                     break;
             }
@@ -106,11 +100,8 @@ public partial class AboutWindow : Window
             catch (OperationCanceledException)
             {
             }
-            // Skip the post-cooldown UI writes if the window was closed
-            // (OnClosed cancels _checkCts). WPF Close() leaves element
-            // references valid; a future refactor that disposes the
-            // element tree on Closed would surface NullReferenceException
-            // on these property writes.
+            // OnClosed cancels _checkCts; on that path the cooldown
+            // exits without touching the closing window's elements.
             if (!token.IsCancellationRequested)
             {
                 CheckStatusText.Text = string.Empty;

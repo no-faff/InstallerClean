@@ -43,11 +43,10 @@ public sealed class ResultLogService : IResultLogService
         Timeout = RequestTimeout,
         // Defence in depth: SendAsync uses
         // HttpCompletionOption.ResponseHeadersRead so the body never
-        // enters this buffer today. A future caller adding
-        // response.Content.ReadAsStringAsync() (or any path that
-        // forces the body to materialise) would otherwise inherit
-        // the HttpClient 2 GiB default. 4 KiB is generous for the
-        // expected {"ok":true} ack body.
+        // materialises in HttpClient's buffer. A caller adding
+        // response.Content.ReadAsStringAsync() would otherwise inherit
+        // the 2 GiB default. 4 KiB is generous for the expected
+        // {"ok":true} ack.
         MaxResponseContentBufferSize = 4 * 1024,
     };
 

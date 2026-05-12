@@ -5,12 +5,13 @@ using Xunit;
 namespace InstallerClean.Tests.Services;
 
 /// <summary>
-/// UpdateCheckService unit tests. CheckAsync itself isn't covered here
-/// because it depends on a live HttpClient against GitHub; what these
-/// tests pin down is the contract the v1.8 review surfaced: the
-/// User-Agent must parse through HttpRequestMessage.Headers.UserAgent
-/// (a localised display string was the v1.7.x bug) and the release-URL
-/// trust check must accept only this project's own releases path.
+/// UpdateCheckService unit tests. CheckAsync itself isn't covered
+/// here because it depends on a live HttpClient against GitHub; these
+/// tests pin the User-Agent (must parse through
+/// HttpRequestMessage.Headers.UserAgent - a localised display string
+/// in the version slot causes GitHub to return 403) and the
+/// release-URL trust check (accept only this project's own releases
+/// path).
 /// </summary>
 public class UpdateCheckServiceTests
 {

@@ -5,11 +5,11 @@ using Xunit;
 namespace InstallerClean.Tests.Models;
 
 /// <summary>
-/// Wire-format pins for the result-log schema. v1.8 renamed
-/// bytesCleared to bytesFreed and dropped the redundant RemovableCount
-/// field; the receiving Edge Function depends on those names, and a
-/// silent rename here would land in production unnoticed until the
-/// aggregator started returning zero totals.
+/// Wire-format pins for the result-log schema. The receiving Edge
+/// Function depends on bytesFreed (not bytesCleared) and on the
+/// two-atom orphanedCount + supersededCount pair (not a combined
+/// removableCount); a silent rename here would land in production
+/// unnoticed until the aggregator started returning zero totals.
 /// </summary>
 public class ResultLogEntryTests
 {

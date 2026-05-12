@@ -67,11 +67,9 @@ public partial class CompletionViewModel : ObservableObject
     /// Visible when a fresh log exists for the operation just
     /// completed and the user has not already sent or dismissed one
     /// this session. The lifetime-lock clause is belt-and-braces:
-    /// MarkResultLogReady upstream of this getter already returns
-    /// early when _alreadySentBeforeThisSession is true, so
-    /// IsResultLogReady stays false. The privacy contract (the
-    /// "once per machine, ever" promise) is the load-bearing reason
-    /// to gate the visibility in two independent places.
+    /// MarkResultLogReady upstream of this getter also gates on the
+    /// same flag. The "once per machine, ever" privacy contract is
+    /// worth two independent checks.
     /// </summary>
     public bool IsSendResultLogVisible =>
         IsResultLogReady && !_resultLogSentThisSession && !IsSendingResultLog

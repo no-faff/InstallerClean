@@ -35,16 +35,13 @@ internal static partial class Shell32
     /// <see cref="Marshal.FreeCoTaskMem(IntPtr)"/>.
     /// </summary>
     /// <remarks>
-    /// Pack = 8 (the .NET x64 default) is correct for SHFILEOPSTRUCT
-    /// despite the shellapi.h header wrapping the native declaration
-    /// in <c>#include &lt;pshpack1.h&gt;</c>. The pshpack1 directive
-    /// is a 16-bit-Windows relic; the modern Win32 ABI on x64 uses
-    /// natural alignment, so pFrom sits at offset 16 (not 12). A
-    /// previous attempt to set Pack = 1 to "match" the header
-    /// produced AccessViolationException at runtime - the kernel
-    /// read pFrom from offset 16 while we'd written it at offset 12.
-    /// Do not change Pack without verifying with a real call to
-    /// SHFileOperationW.
+    /// Pack = 8 matches the modern Win32 x64 ABI for SHFILEOPSTRUCT.
+    /// shellapi.h wraps the native declaration in
+    /// <c>#include &lt;pshpack1.h&gt;</c>, but pshpack1 is a 16-bit-
+    /// Windows relic; on x64 natural alignment places pFrom at offset
+    /// 16. Pack = 1 places it at offset 12 and produces
+    /// AccessViolationException at runtime, because the kernel reads
+    /// pFrom from offset 16.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct SHFILEOPSTRUCT

@@ -52,7 +52,8 @@ internal static class Composition
         services.AddSingleton<MainViewModel>();
 
         // validateScopes: true catches a Scoped registration captured
-        // by a Singleton; today every registration is Singleton.
+        // by a Singleton. The current graph is Singleton-only; the
+        // check is cheap insurance against a future Scoped addition.
         return services.BuildServiceProvider(validateScopes: true);
     }
 }

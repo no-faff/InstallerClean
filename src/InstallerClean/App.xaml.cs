@@ -59,8 +59,8 @@ public partial class App : Application
 
         DispatcherUnhandledException += (_, args) =>
         {
-            // On recursive entry (see _handlingUnhandledException), log
-            // silently and bail to avoid stacked dialogs.
+            // Recursive entry: log silently and bail. A nested handler
+            // call would stack a second MessageBox over the first.
             if (_handlingUnhandledException)
             {
                 CrashLog.Write(args.Exception);
@@ -103,14 +103,11 @@ public partial class App : Application
         SplashWindow? splash = null;
         try
         {
-            // Wrap the BitmapImage construction so a pack-URI resolution
-            // failure (resource renamed, dropped, or the embed step is
-            // broken in a build) degrades the title-bar Window.Icon
-            // assignment below to the default WPF icon rather than
-            // crashing startup. The XAML Image consumers in every
-            // window resolve the same pack URI; a missing resource
-            // leaves them painting blank via WPF's own loader fallback,
-            // which is not caught here.
+            // Title-bar Window.Icon assignment in the class handler
+            // below degrades to WPF's default icon on a pack-URI load
+            // failure (resource renamed, embed step broken). XAML
+            // Image consumers in the windows resolve the same URI and
+            // fall back to blank via WPF's own loader.
             BitmapImage? appIcon = null;
             try
             {
@@ -142,12 +139,10 @@ public partial class App : Application
 
             splash.UpdateStep(Strings.Status_Scanning, 10);
 
-            // Build the service container once and resolve the entire
-            // view-model graph from it. OnExit disposes the container
-            // which in turn disposes any IDisposable singletons the
-            // graph holds (today MainViewModel, ChromeViewModel and
-            // CleanupViewModel, which need to unhook PropertyChanged
-            // subscriptions from ScanViewModel for clean teardown).
+            // Single container, single resolve. OnExit disposes the
+            // container; MainViewModel, ChromeViewModel and CleanupViewModel
+            // implement IDisposable so their ScanViewModel PropertyChanged
+            // subscriptions unhook on teardown.
             _services = Composition.BuildServiceProvider();
             var viewModel = _services.GetRequiredService<MainViewModel>();
 

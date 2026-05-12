@@ -16,28 +16,23 @@ namespace InstallerClean.Cli;
 /// </summary>
 internal static class Program
 {
-    /// <summary>0 = the operation completed and every file the scan
-    /// flagged was successfully processed.</summary>
+    /// <summary>0 = every file the scan flagged was processed.</summary>
     private const int ExitOk = 0;
 
-    /// <summary>1 = total failure: scan failed, bad args, or every
-    /// file in the batch failed. Sysadmin scripts should treat this
-    /// as "the run accomplished nothing and it's not transient".</summary>
+    /// <summary>1 = hard failure: scan failed, bad args, or every file
+    /// in the batch failed. Not transient.</summary>
     private const int ExitError = 1;
 
-    /// <summary>2 = partial success: the operation processed some
-    /// files but at least one failed. Distinguishable from ExitError
-    /// so a Task Scheduler retry policy can decide whether to retry
-    /// (probably yes on partial; probably no on full failure).</summary>
+    /// <summary>2 = partial: the operation processed some files but at
+    /// least one failed. Distinct from ExitError so a retry policy
+    /// can act on the partial case differently from total failure.</summary>
     private const int ExitPartial = 2;
 
-    /// <summary>75 = POSIX EX_TEMPFAIL: transient condition the
-    /// caller may want to retry later. Used when the single-instance
-    /// mutex is held (GUI or another CLI run in flight) or a pending
+    /// <summary>75 = POSIX EX_TEMPFAIL: transient. The single-instance
+    /// mutex is held by the GUI or another CLI run, or a pending
     /// Windows Installer transaction blocks cache changes. Distinct
-    /// from ExitError so a Task Scheduler "retry every 15 minutes for
-    /// 3 attempts" policy can fire on transient and back off on hard
-    /// failure.</summary>
+    /// from ExitError so a retry-on-transient policy can fire here
+    /// and back off on hard failure.</summary>
     private const int ExitTransient = 75;
 
     /// <summary>POSIX convention: 130 == 128 + SIGINT (Ctrl+C).</summary>
@@ -45,13 +40,10 @@ internal static class Program
 
     public static async Task<int> Main(string[] args)
     {
-        // UTF-8 stdout so a translation of Cli.* into a non-ASCII
-        // language doesn't mojibake under redirected output
-        // (cmd /c installerclean-cli /s > out.txt) or under
-        // PowerShell 5 which defaults to OEM. The Cli.* resx values
-        // are pure ASCII so the setting is benign while no
-        // translation has shipped; pinning it removes the dependency
-        // on the host shell's default code page.
+        // Pin to UTF-8 so a Cli.* translation into a non-ASCII language
+        // doesn't mojibake under redirected output (cmd /c
+        // installerclean-cli /s > out.txt) or PowerShell 5's OEM
+        // default code page.
         Console.OutputEncoding = Encoding.UTF8;
 
         // Lowercase up front so every later comparison (--help, /?, -h,
@@ -113,17 +105,17 @@ internal static class Program
             }
             catch (AbandonedMutexException)
             {
-                // Previous owner crashed without releasing; .NET hands
-                // us ownership and we proceed.
+                // Previous owner crashed without releasing; the runtime
+                // transfers ownership to this thread.
                 holdsMutex = true;
             }
             if (!holdsMutex)
             {
                 Console.WriteLine(Strings.Startup_AlreadyRunningBody);
-                // Audit the skipped run on the Application channel so an
-                // RMM consumer polling for InstallerClean entries can
-                // tell "the task fired but the GUI was open" from "the
-                // task never fired".
+                // RMM consumer polling the Application channel for
+                // InstallerClean entries needs an audit record on the
+                // skipped path to distinguish it from "the task never
+                // fired".
                 EventLogWriter.Write(EventLogWriter.Level.Information,
                     string.Format(Strings.Cli_EventLogMutexBlocked, arg));
                 if (EventLogWriter.EventLogUnavailable)
@@ -208,10 +200,8 @@ internal static class Program
                             arg,
                             rebootCheck.Reason?.ToString() ?? "Unknown",
                             rebootCheck.Detail ?? string.Empty));
-                    // Pending reboot is transient (the user reboots and
-                    // the next scheduled run proceeds); distinct from
-                    // ExitError so a retry policy can act on it without
-                    // also retrying hard scan/move/delete failures.
+                    // Transient: a reboot clears the gate. Hard scan and
+                    // move/delete failures stay on ExitError.
                     return ExitTransient;
                 }
             }
@@ -247,20 +237,18 @@ internal static class Program
                     string.Format(Strings.Cli_EventLogDeleteSummary,
                         arg, result.DeletedCount, count, DisplayHelpers.PluraliseFile(count),
                         size, result.Errors.Count, DisplayHelpers.PluraliseError(result.Errors.Count)));
-                // All-deleted is full success; any-deleted-with-errors is partial; nothing-deleted is total failure.
                 if (result.Errors.Count == 0) return ExitOk;
                 if (result.DeletedCount > 0) return ExitPartial;
                 return ExitError;
             }
 
-            // /d and /s already returned; everything below this point runs only for /m.
             string dest;
-            // Two destination sources with different trust posture:
-            // the command-line argument is supplied at invocation, the
+            // Two destination sources with different trust posture: a
+            // command-line argument is supplied at invocation; the
             // settings-loaded path is whatever was last written into
-            // %LOCALAPPDATA% (which the CLI then writes to silently
-            // without showing the resolved path first). The settings
-            // path therefore goes through an extra system-folder gate.
+            // %LOCALAPPDATA% and the CLI writes to it without echoing
+            // the resolved path first. The settings path therefore
+            // also goes through IsSystemFolderOrChild below.
             bool destFromSettings;
             if (args.Length > 1)
             {
@@ -347,15 +335,14 @@ internal static class Program
         }
         catch (UnauthorizedAccessException ex)
         {
-            // Two production sites throw UnauthorizedAccessException with
-            // resx-sourced messages safe to print under elevation: the MSI
-            // enumerator on AccessDenied (Strings.Error_MsiAccessDenied,
-            // which itself names the admin requirement) and the Move
-            // pre-flight probe on a non-writable destination
-            // (Strings.Error_CannotWriteFolder, naming the destination).
-            // Echoing ex.Message directly distinguishes the two; printing
-            // a static "AdminRequired" line for both made a read-only
-            // destination look like a privilege failure.
+            // Two production throw sites use UnauthorizedAccessException
+            // with resx-sourced messages safe to print under elevation:
+            // Strings.Error_MsiAccessDenied (MSI enumerator AccessDenied,
+            // names the admin requirement) and Strings.Error_CannotWriteFolder
+            // (Move pre-flight probe, names the destination). Echoing
+            // ex.Message distinguishes the two; a single static line
+            // would conflate a read-only destination with a privilege
+            // failure.
             Console.WriteLine(ex.Message);
             return ExitError;
         }
@@ -373,10 +360,9 @@ internal static class Program
         }
         finally
         {
-            // Surface the EventLog-unavailable warning once per run,
-            // after the main output but before mutex release. RMM
-            // consumers expecting Application-channel entries get a
-            // record (in stdout) that the channel was unwritable.
+            // One stdout audit line per run: if any Write fell into the
+            // unavailable path, RMM consumers polling the Application
+            // channel see a record that the channel was unwritable.
             if (EventLogWriter.EventLogUnavailable)
                 Console.WriteLine(Strings.Cli_EventLogUnavailable);
             Console.CancelKeyPress -= cancelHandler;

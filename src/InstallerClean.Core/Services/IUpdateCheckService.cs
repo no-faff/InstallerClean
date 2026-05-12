@@ -3,9 +3,9 @@ namespace InstallerClean.Services;
 /// <summary>
 /// Single-call check against the GitHub Releases API. Triggered only
 /// by an explicit user action (the "Check for updates" button in the
-/// About window), never automatically. The architectural rule
-/// preserved from v1.5.3: no outbound network capability fires
-/// without a deliberate click.
+/// About window), never automatically. No outbound network capability
+/// fires without a deliberate click. (DeepInstinct heuristic on
+/// auto-HTTP-from-elevated-startup.)
 /// </summary>
 public interface IUpdateCheckService
 {

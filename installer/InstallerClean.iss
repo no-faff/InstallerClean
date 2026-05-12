@@ -1,15 +1,16 @@
 ; InstallerClean Inno Setup script.
 ;
-; AppId is intentionally constant across versions ("InstallerClean") so
-; Windows treats every shipped version as the same product and the
-; uninstall entry stays at HKLM\Software\Microsoft\Windows\CurrentVersion\
-; Uninstall\InstallerClean_is1. Do NOT change AppId.
+; AppId stays constant across versions ("InstallerClean") so Windows
+; treats every shipped version as the same product; the uninstall
+; entry lives at HKLM\Software\Microsoft\Windows\CurrentVersion\
+; Uninstall\InstallerClean_is1. Changing AppId breaks Add/Remove
+; Programs continuity across versions.
 ;
-; AppVersion is normally provided by the release script via
-; "ISCC.exe /DAppVersion=1.8.0 ...". The fallback below is for ad-hoc
-; local builds; keep it in sync with the current shipping target so a
-; from-source install doesn't claim to be an older version on the user's
-; Add/Remove Programs entry.
+; AppVersion is normally passed by the release script via
+; "ISCC.exe /DAppVersion=1.8.0 ...". The #define fallback below is
+; for ad-hoc local builds; it tracks the current shipping target so a
+; from-source install doesn't claim an older version on the Add/Remove
+; Programs entry.
 [Setup]
 #ifndef AppVersion
   #define AppVersion "1.8.0"
@@ -17,21 +18,16 @@
 AppId=InstallerClean
 AppName=InstallerClean
 AppVersion={#AppVersion}
-; AppMutex shares the named single-instance mutex with the running GUI
-; and CLI. Setup pauses with a "close the running app" prompt when the
-; user upgrades while InstallerClean.exe or installerclean-cli.exe is
-; in flight, instead of failing with a vague "file in use" write error.
-; Same name is used in App.xaml.cs and Cli/Program.cs.
+; Mutex name matches App.xaml.cs and Cli/Program.cs. Setup pauses with
+; a "close the running app" prompt when the user upgrades while
+; InstallerClean.exe or installerclean-cli.exe is holding it.
 AppMutex=Global\InstallerClean_SingleInstance
 AppPublisher=No Faff
 AppPublisherURL=https://github.com/no-faff/InstallerClean
 AppSupportURL=https://github.com/no-faff/InstallerClean/discussions
 AppCopyright=Copyright (c) 2026 No Faff
-; VersionInfo* populates setup.exe's own file-properties dialog. Without
-; these directives the right-click Properties surface reads ISCC's
-; defaults (which look like a generic Inno binary). The version number
-; is .0-padded to four parts because Win32 VS_FIXEDFILEINFO is always
-; four parts.
+; Win32 VS_FIXEDFILEINFO is a four-part version; AppVersion is three,
+; so VersionInfoVersion / VersionInfoProductVersion pad with .0.
 VersionInfoVersion={#AppVersion}.0
 VersionInfoProductVersion={#AppVersion}.0
 VersionInfoProductName=InstallerClean
@@ -66,9 +62,9 @@ ClickFinish=Click Finish to close setup.
 
 [Files]
 Source: "..\publish\self-contained\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
-; The CLI is now a real .NET console exe published from
-; src/InstallerClean.Cli; it ships alongside the GUI exe so PowerShell
-; and cmd block on the process naturally without any launcher fudge.
+; CLI is a .NET console exe published from src/InstallerClean.Cli;
+; ships alongside the GUI so PowerShell and cmd block on the process
+; subsystem naturally.
 Source: "..\publish\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]

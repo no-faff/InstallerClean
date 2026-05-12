@@ -237,11 +237,9 @@ public partial class ScanViewModel : ObservableObject
         }
         finally
         {
-            // Match the capture-null-dispose pattern in
-            // CleanupViewModel.DisposeOperationCts: a concurrent
-            // CancelScanCommand reading _scanCts after the null sees
-            // no CTS and no-ops, rather than racing the dispose. The
-            // explicit `cts` local makes the ordering load-bearing.
+            // Capture, null, dispose: a concurrent CancelScanCommand
+            // reading _scanCts after the null sees no CTS and no-ops.
+            // Mirrors CleanupViewModel.DisposeOperationCts.
             var local = _scanCts;
             _scanCts = null;
             local?.Dispose();

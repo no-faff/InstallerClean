@@ -53,11 +53,10 @@ public class InstallerCacheHelpersResolveTests
     [Fact]
     public void ResolveFinalPath_walk_up_to_drive_root_keeps_separator()
     {
-        // Probe that lands at "C:\" (existing-ancestor walk-up case where
-        // the only existing ancestor is the drive root itself) used to
-        // produce drive-relative paths like "C:NewFolder\Sub" because the
-        // suffix attachment trimmed the trailing separator off "C:\" then
-        // concatenated a separator-less suffix.
+        // When the existing-ancestor walk lands at the drive root
+        // ("C:\"), the suffix attachment must keep the trailing
+        // separator. Trimming it produces drive-relative paths like
+        // "C:NewFolder\Sub" once the separator-less suffix concatenates.
         var systemDrive = Path.GetPathRoot(Environment.SystemDirectory);
         if (string.IsNullOrEmpty(systemDrive)) return;
         var unborn = Path.Combine(systemDrive, "ic-resolve-nonexistent-" + Guid.NewGuid(), "leaf");

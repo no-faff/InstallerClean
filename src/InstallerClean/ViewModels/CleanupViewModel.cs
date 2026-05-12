@@ -56,10 +56,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [ObservableProperty] private double _operationProgressPercent;
 
     /// <summary>
-    /// True between a Cancel click and the next CancellationToken
-    /// checkpoint in the worker. Gates the overlay Cancel button so a
-    /// second click is rejected before it reaches the (already-cancelled)
-    /// CTS, and drives the tooltip on the disabled button.
+    /// True between a Cancel click and the worker's next
+    /// CancellationToken checkpoint. Gates the overlay Cancel button's
+    /// IsEnabled binding and the disabled-state tooltip.
     /// </summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CancelOperationCommand))]
@@ -131,12 +130,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     {
         MoveAllCommand.NotifyCanExecuteChanged();
 
-        // Trim once at the persist boundary so settings.json holds the
-        // normalised path. The TextBox binding keeps the user's typed
-        // value verbatim; on the next session the trimmed value loads
-        // back. The CLI /m reads settings.MoveDestination so trimming
-        // here keeps CLI and GUI paths symmetric; MoveAllAsync below
-        // also trims as belt-and-braces.
+        // settings.json holds the trimmed string so a reader (CLI /m,
+        // next session start) gets a normalised path. The TextBox
+        // binding keeps the typed value mid-session.
         var normalised = value?.Trim() ?? string.Empty;
         if (string.Equals(_settings.MoveDestination, normalised, StringComparison.Ordinal))
             return;
@@ -226,21 +222,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [RelayCommand(CanExecute = nameof(CanCancelOperation))]
     private void CancelOperation()
     {
-        // IsCancellationRequested gates the next CanCancelOperation
-        // call so a follow-up click is dropped before it reaches the
-        // already-cancelled CTS. The button binding also flips the
-        // tooltip via a DataTrigger.
         IsCancellationRequested = true;
         // Races the finally block that disposes _operationCts;
-        // ObjectDisposedException here just means the operation
-        // already finished.
+        // ObjectDisposedException here means the operation finished
+        // before the click reached the dispatcher.
         try { _operationCts?.Cancel(); }
         catch (ObjectDisposedException) { }
-        // The async move/delete loop only updates OperationProgress on
-        // its next iteration; without a synchronous write here the
-        // overlay holds "Moving 23 of 100..." for one iteration after
-        // Esc, which reads as an unresponsive UI. The async progress
-        // reporter overwrites this with "Move cancelled." or
+        // The move/delete loop only repaints OperationProgress on its
+        // next iteration. Without a synchronous write the overlay holds
+        // "Moving 23 of 100..." for one iteration past the click. The
+        // progress reporter overwrites with "Move cancelled." or
         // "Delete cancelled." once the loop observes the cancellation.
         OperationProgress = Strings.Status_Cancelling;
     }
@@ -396,21 +387,15 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
                     _completion.MarkResultLogReady();
             }
-            // Success path: the completion overlay now carries the
-            // user-facing summary; clear the bottom-row status pill so
-            // the user doesn't see stale "Moving 100 files..." after
-            // dismissing the overlay. Cancel and failure catches set
-            // their own end-state text which the finally does not
-            // overwrite.
+            // Completion overlay carries the user-facing summary; the
+            // bottom-row pill stays blank once the overlay dismisses.
             OperationProgress = string.Empty;
         }
         catch (OperationCanceledException)
         {
-            // Partial-count surfaces the same information the CLI's
-            // EventLogCancelledPartial template carries: an Esc mid-batch
-            // is usually because of a slow file, and the user expects
-            // a receipt of what got through. Reads the per-file fields
-            // before the finally below resets them to zero.
+            // OperationCurrentFile and OperationTotalFiles hold the last
+            // worker-reported counts when the OCE arrives; the finally
+            // resets them, so the catch reads them first.
             OperationProgress = OperationCurrentFile > 0 && OperationTotalFiles > 0
                 ? string.Format(Strings.Status_MoveCancelled_Partial,
                     OperationCurrentFile,
@@ -432,10 +417,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         {
             DisposeOperationCts();
             IsOperating = false;
-            // Reset the cancellation flag so the overlay Cancel button
-            // is enabled again on the next operation. Set inside the
-            // finally so success, cancel, and exception paths all reach
-            // it.
             IsCancellationRequested = false;
             OperationProgressPercent = 0;
             // Stale-state reset: a cancel-then-rerun cycle would otherwise
@@ -525,10 +506,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         {
             DisposeOperationCts();
             IsOperating = false;
-            // Reset the cancellation flag so the overlay Cancel button
-            // is enabled again on the next operation. Set inside the
-            // finally so success, cancel, and exception paths all reach
-            // it.
             IsCancellationRequested = false;
             OperationProgressPercent = 0;
             // Stale-state reset: a cancel-then-rerun cycle would otherwise
