@@ -518,11 +518,10 @@ public class MainViewModelTests
         _windowService.Received(1).OpenUrl("https://nofaff.netlify.app");
     }
 
-    // ----------------------------------------------------------------
     // Result-log persistence path. The lifetime lock
     // (AppSettings.HasSentResultLog) is the contract behind "one report
-    // ever per machine". It rests on three load-bearing behaviours that
-    // these three tests pin:
+    // ever per machine". The three tests below pin its load-bearing
+    // behaviours:
     //
     //   - A successful Send persists HasSentResultLog=true to settings.
     //   - A failed Send does NOT persist, so a transient timeout on the
@@ -531,7 +530,6 @@ public class MainViewModelTests
     //   - A Send invoked when last-run.json is unreadable (missing,
     //     oversize, IO failure) skips the modal AND the wire call and
     //     does not persist either.
-    // ----------------------------------------------------------------
 
     [Fact]
     public async Task SendResultLog_success_persists_HasSentResultLog_to_settings()

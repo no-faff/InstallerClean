@@ -109,7 +109,8 @@ public class MoveFilesServiceUnitTests
         var fs = new MockFileSystem();
         var source = $@"{SourceDir}\a.msi";
         fs.AddFile(source, new MockFileData("payload"));
-        // Note: DestDir not pre-created.
+        // DestDir is not pre-created so the test exercises the
+        // service's directory-create path.
 
         var svc = new MoveFilesService(fs);
         var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
