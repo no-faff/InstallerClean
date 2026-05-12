@@ -11,9 +11,8 @@ namespace InstallerClean.Services;
 /// </summary>
 /// <remarks>
 /// The HTTP call lives inside the elevated process. CheckAsync runs
-/// only when invoked from a user click: no timer, no startup hook, no
-/// other call site. The rule comes out of a DeepInstinct flag on an
-/// earlier slim build that did automatic HTTP on startup.
+/// only when invoked from a user click: no timer, no startup hook,
+/// no other call site.
 ///
 /// HttpClient is held in a static field per the documented BCL
 /// guidance: a fresh instance per call leaks Windows-side socket

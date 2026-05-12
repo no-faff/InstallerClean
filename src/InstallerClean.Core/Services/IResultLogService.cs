@@ -6,9 +6,7 @@ namespace InstallerClean.Services;
 /// Writes the post-cleanup diagnostic log to disk and, on user
 /// request, POSTs the same JSON to No Faff. Each outbound call from
 /// the elevated process is bound to one direct user action; nothing
-/// in this service fires on its own. The rule comes out of a
-/// DeepInstinct flag on an earlier slim build that did automatic
-/// HTTP on startup.
+/// in this service fires on its own.
 /// </summary>
 public interface IResultLogService
 {
