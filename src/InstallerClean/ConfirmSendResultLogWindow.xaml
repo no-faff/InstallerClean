@@ -16,9 +16,9 @@
                       ResizeBorderThickness="0"/>
     </WindowChrome.WindowChrome>
 
-    <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="32,28"
+    <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
             MaxWidth="640" MinWidth="480"
-            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="1">
+            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <StackPanel>
             <TextBlock Text="{loc:Translate ConfirmSendResultLog.Title}"
                        Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
@@ -26,7 +26,7 @@
                        Margin="{StaticResource GapBottom.Md}"/>
 
             <Border Background="{StaticResource Surface.Sidebar}" CornerRadius="{StaticResource Radius.Inset}"
-                    BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="1"
+                    BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}"
                     Padding="12,10"
                     MaxHeight="360"
                     Margin="{StaticResource GapBottom.Md}">
