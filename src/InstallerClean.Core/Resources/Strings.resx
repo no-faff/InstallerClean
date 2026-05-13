@@ -234,14 +234,18 @@
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>All clean</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
        "less than a second"). The count is the receipt that a real
        scan ran; on fast machines a duration alone reads as "did
-       nothing". -->
-  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer. Scanned {0} {1} in {2}.</value></data>
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working.</value></data>
-  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working.</value></data>
+       nothing". Rendered in the Restore slot of the completion
+       overlay so the all-clean state has the same two-tier shape
+       (heading + summary + smaller receipt) as the post-Move and
+       post-Delete states. -->
+  <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Scanned {0} {1} in {2}</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working</value></data>
   <!-- 0 = size freed (e.g. "120.5 MB") -->
   <data name="Completion.Freed" xml:space="preserve"><value>{0} freed</value></data>
   <!-- Heading shown when an operation succeeded for SOME files but

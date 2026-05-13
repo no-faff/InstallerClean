@@ -146,12 +146,12 @@ public partial class CompletionViewModel : ObservableObject
     public void ShowAllClear(int installedProductCount, long scanDurationMs)
     {
         Heading = Strings.Completion_AllClean;
-        Summary = string.Format(
-            Strings.Completion_NothingToCleanUp,
+        Summary = Strings.Completion_NothingToCleanUp;
+        Restore = string.Format(
+            Strings.Completion_NothingToCleanUpReceipt,
             installedProductCount,
             DisplayHelpers.PluraliseProduct(installedProductCount),
             DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
-        Restore = string.Empty;
         Errors = string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = true;
