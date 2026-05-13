@@ -99,12 +99,12 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
 </p>
 
 <p>
-  <img src="docs/screenshots/04d-deleted-freed-success.webp" alt="Success overlay showing 965 MB freed after a move operation" width="900"><br>
-  <em>After a successful Move.</em>
+  <img src="docs/screenshots/04d-deleted-freed-success.webp" alt="Success overlay showing 965 MB freed after a delete operation, with 68 files sent to the Recycle Bin" width="900"><br>
+  <em>After a successful Delete.</em>
 </p>
 
 <p>
-  <img src="docs/screenshots/06a-scanned-again-all-clean.webp" alt="All-clear overlay shown when nothing is removable on a subsequent scan" width="900"><br>
+  <img src="docs/screenshots/06a-scanned-again-all-clean.webp" alt="All clean overlay shown when nothing is removable on a subsequent scan" width="900"><br>
   <em>After scanning again. Nothing left to clean.</em>
 </p>
 
