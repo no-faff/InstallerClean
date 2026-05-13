@@ -173,7 +173,7 @@ As of the v1.7.0 release: 0/68 (setup), 0/69 (portable), 0/70 (slim) on VirusTot
 
 **Does it work on Windows 7 or 8?** Untested and not supported. Targets Windows 10 and 11.
 
-**Is it suitable for RMM / mass deployment?** Yes. The CLI exits with three-state codes (0 / 2 / 1 = full success / partial / failure; 130 for Ctrl+C), writes a per-run summary to the Application event log, and respects the same single-instance mutex as the GUI. See the Command line section.
+**Is it suitable for RMM / mass deployment?** Yes. The CLI exits with distinct codes per outcome (0 success, 2 partial, 1 hard failure, 75 transient, 130 Ctrl+C) so a scheduled task can retry on 75 without conflating it with hard failures. It writes a per-run summary to the Application event log and respects the same single-instance mutex as the GUI. See the Command line section.
 
 ## Download
 
@@ -230,7 +230,7 @@ Also accepts `--help`, `/?` and `-h`. To launch the GUI, run `InstallerClean.exe
 
 `/s` is a dry run: it scans, lists what it would remove with filenames and sizes, then exits. Useful for auditing before cleanup. Exit code is always 0. All files are in `C:\Windows\Installer`.
 
-`/d` and `/m` scan and then act. `/d` sends removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, mutex contention, bad arguments, or every file in the batch failed), `130` for Ctrl+C.
+`/d` and `/m` scan and then act. `/d` sends removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments, or every file in the batch failed), `75` for transient conditions (another InstallerClean instance is running, or Windows Installer reports a pending transaction; safe to retry), `130` for Ctrl+C.
 
 All three require an elevated (administrator) command prompt.
 
