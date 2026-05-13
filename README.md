@@ -73,11 +73,6 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
 
 ## Screenshots
 
-<details>
-<summary>Click to expand</summary>
-
-<br>
-
 <p>
   <img src="docs/screenshots/01-initial-scan.webp" alt="Splash screen showing the scan in progress, having found 68 files to clean up" width="900"><br>
   <em>Initial scan. This is very quick.</em>
@@ -112,8 +107,6 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
   <img src="docs/screenshots/06a-scanned-again-all-clean.webp" alt="All-clear overlay shown when nothing is removable on a subsequent scan" width="900"><br>
   <em>After scanning again. Nothing left to clean.</em>
 </p>
-
-</details>
 
 ## How it works
 
