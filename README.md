@@ -144,7 +144,7 @@ Yes. InstallerClean queries the same database Windows itself uses to track what'
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
-As of the v1.7.0 release: 0/68 (setup), 0/69 (portable), 0/70 (slim) on VirusTotal. Each release publishes live VT links in its release notes so you can re-check at any time.
+VirusTotal: clean across every engine. Live links in each release's notes so you can re-check.
 
 ## What it doesn't do
 
