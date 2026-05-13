@@ -163,13 +163,15 @@ VirusTotal: clean across every engine. Live links in each release's notes so you
 
 **Can I undo a Delete?** Yes. Delete sends files to the Recycle Bin. Restore them from there. If you emptied the Recycle Bin, the files are gone, but you can instead use Move to put them in a folder you choose, then verify nothing breaks before deleting from there.
 
-**Will Windows complain if I remove these files?** No. InstallerClean only removes files Windows itself reports as no-longer-needed via its own installer-database API. The next install / uninstall / patch cycle proceeds normally.
+**Will Windows complain if I remove these files?** Not normally. InstallerClean only removes files Windows itself reports as no-longer-needed via its own installer-database API. The rare exception is a machine whose Installer database is out of date, usually after a previous uninstall that didn't complete cleanly. On those, a later attempt to uninstall some product might fail with Windows asking for the original `.msi`. This has never been reported on InstallerClean across many thousands of downloads, but if it ever happened to you:
+
+- **If you Deleted**: restore the files from the Recycle Bin. They go back to `C:\Windows\Installer` automatically and the uninstall succeeds.
+- **If you Moved**: copy the files from your move folder back into `C:\Windows\Installer` and the uninstall succeeds.
+- **No copy anywhere**: download the installer again from the vendor and run it; this puts a fresh `.msi` back in the cache and the uninstall succeeds.
 
 **Why no `Win32_Product` (WMI)?** [`Win32_Product` triggers MSI repair operations on every product during enumeration](https://gregramsey.net/2012/02/20/win32_product-is-evil/), which can take minutes and load the disk hard. InstallerClean calls the Windows Installer COM API directly with no side effects.
 
 **Why not just a PowerShell script?** A short script that calls `MsiEnumPatchesEx` is enough to *list* patches, but the load-bearing parts of InstallerClean are the bits a script glosses over: the orphan-vs-superseded classification, the registry fallback that only ever adds files to the "still needed" set (never to "removable"), the pending-reboot block, the Move-to-elsewhere safety net, the per-file progress with cancellation, and the Recycle-Bin-not-permanent-delete default. Edge cases on real heavy-MSI machines (corrupt registrations, junctions inside the cache, products in `HKU\.DEFAULT`, suspended Installer transactions) are easy to mishandle in a one-off script. The `installerclean-cli` is the headless face if scripting is what you want.
-
-**Why .NET 10 and not .NET 8?** Both are LTS releases (.NET 10 became LTS in November 2025). The choice was driven by source-generated `LibraryImport` plus `[assembly: DisableRuntimeMarshalling]`, which produce P/Invoke shims that are easier to audit for ABI correctness than runtime-marshalled `DllImport`. The project pins to the 10.0.10x SDK band specifically because the apphost shape it produces is what the AV vendors have trained on as legitimate; v1.7.0's slim build picks up extra heuristic flags when built on the 10.0.20x band.
 
 **Does it work on Windows 7 or 8?** Untested and not supported. Targets Windows 10 and 11.
 
