@@ -89,7 +89,7 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
 </p>
 
 <p>
-  <img src="docs/screenshots/03b-details-safe-to-delete.webp" alt="Orphaned files window listing removable .msi files with reasons" width="900"><br>
+  <img src="docs/screenshots/03b-details-safe-to-delete.webp" alt="Unused files window listing removable .msi files with reasons" width="900"><br>
   <em>The files no longer needed.</em>
 </p>
 
@@ -203,13 +203,13 @@ scoop install installerclean
 | Last updated | 2026 (active) | 3 March 2016 |
 | Source code | Open source (MIT) | Closed source |
 | Runtime | .NET 10 (self-contained) | .NET + VBScript |
-| API | Windows Installer COM (direct) | WMI (`Win32_Product`) |
+| API | Windows Installer COM (in-process) | Windows Installer COM (out-of-process via VBScript) |
 | Superseded patch detection | Yes | No |
 | Adobe handling | Detects superseded patches | Excludes by default |
 | UI | Dark theme (WPF) | Windows Forms |
 | Data collection | None | None |
 
-> **A note on WMI:** PatchCleaner uses `Win32_Product`, which is known to [trigger MSI repair operations](https://gregramsey.net/2012/02/20/win32_product-is-evil/) during enumeration. InstallerClean calls the Windows Installer COM interface directly with no side effects.
+> **A note on `Win32_Product`:** The common-but-broken approach for listing installed products is `Win32_Product` (WMI), which [triggers MSI repair operations](https://gregramsey.net/2012/02/20/win32_product-is-evil/) on every product during enumeration. Both InstallerClean and PatchCleaner avoid it. Both use the Windows Installer COM interface. The `WMIProducts.vbs` filename in PatchCleaner's script is misleading; the script uses MSI COM, not WMI.
 
 [Ultra Virus Killer (UVK)](https://www.carifred.com/uvk/) also offers Installer cleanup as part of its System Booster module, but it's a paid tool ($15-25) and the cleanup is one small feature inside a much larger application. InstallerClean is free, focused and open source.
 
