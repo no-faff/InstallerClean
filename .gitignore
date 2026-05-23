@@ -419,8 +419,3 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
-
-CLAUDE.md
-/exports
-/non-repo-files
-/.superpowers

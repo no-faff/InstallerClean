@@ -13,7 +13,7 @@
 ; Programs entry.
 [Setup]
 #ifndef AppVersion
-  #define AppVersion "1.8.0"
+  #define AppVersion "1.8.1"
 #endif
 AppId=InstallerClean
 AppName=InstallerClean
