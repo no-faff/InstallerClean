@@ -89,7 +89,7 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
 </p>
 
 <p>
-  <img src="docs/screenshots/03b-details-safe-to-delete.webp" alt="Unused files window listing removable .msi files with reasons" width="900"><br>
+  <img src="docs/screenshots/03b-details-unused.webp" alt="Unused files window listing removable .msi files with reasons" width="900"><br>
   <em>The files no longer needed.</em>
 </p>
 
@@ -213,7 +213,7 @@ scoop install installerclean
 
 [Ultra Virus Killer (UVK)](https://www.carifred.com/uvk/) also offers Installer cleanup as part of its System Booster module, but it's a paid tool ($15-25) and the cleanup is one small feature inside a much larger application. InstallerClean is free, focused and open source.
 
-General-purpose system cleaners like [CCleaner](https://www.ccleaner.com/) and [BleachBit](https://www.bleachbit.org/) do not touch `C:\Windows\Installer`. The folder needs Windows Installer API queries to tell registered packages from orphaned ones, and a generic cleaner that just walked the file tree could break installed apps. InstallerClean is the tool to reach for when that's the folder you actually want cleaned.
+General-purpose system cleaners like [CCleaner](https://www.ccleaner.com/) and [BleachBit](https://www.bleachbit.org/) do not touch `C:\Windows\Installer`. The folder needs Windows Installer API queries to tell registered packages from unused ones, and a generic cleaner that just walked the file tree could break installed apps. InstallerClean is the tool to reach for when that's the folder you actually want cleaned.
 
 ## Command line
 

@@ -92,7 +92,7 @@ Aucune activité réseau automatique. Deux boutons opt-in déclenchent un seul a
 </p>
 
 <p>
-  <img src="docs/screenshots/03b-details-safe-to-delete.webp" alt="Fenêtre des fichiers orphelins listant les fichiers .msi supprimables avec la raison de leur suppression" width="900"><br>
+  <img src="docs/screenshots/03b-details-unused.webp" alt="Fenêtre des fichiers inutilisés listant les fichiers .msi supprimables avec la raison de leur suppression" width="900"><br>
   <em>Les fichiers devenus inutiles.</em>
 </p>
 
@@ -212,7 +212,7 @@ scoop install installerclean
 
 [Ultra Virus Killer (UVK)](https://www.carifred.com/uvk/) propose aussi un nettoyage du dossier Installer dans son module System Booster, mais c'est un outil payant (15-25 $) et le nettoyage n'est qu'une petite fonctionnalité dans une application bien plus large. InstallerClean est gratuit, ciblé et open source.
 
-Les nettoyeurs système généralistes comme [CCleaner](https://www.ccleaner.com/) et [BleachBit](https://www.bleachbit.org/) ne touchent pas à `C:\Windows\Installer`. Le dossier nécessite des requêtes à l'API Windows Installer pour distinguer les paquets enregistrés des fichiers orphelins, et un nettoyeur générique qui se contenterait de parcourir l'arborescence pourrait casser des applications installées. InstallerClean est l'outil à choisir quand c'est précisément ce dossier-là que vous voulez nettoyer.
+Les nettoyeurs système généralistes comme [CCleaner](https://www.ccleaner.com/) et [BleachBit](https://www.bleachbit.org/) ne touchent pas à `C:\Windows\Installer`. Le dossier nécessite des requêtes à l'API Windows Installer pour distinguer les paquets enregistrés des fichiers inutilisés, et un nettoyeur générique qui se contenterait de parcourir l'arborescence pourrait casser des applications installées. InstallerClean est l'outil à choisir quand c'est précisément ce dossier-là que vous voulez nettoyer.
 
 ## Ligne de commande
 
