@@ -138,7 +138,7 @@ internal static class Program
             // AbandonedMutexException path. A console Main has no
             // SynchronizationContext, so GetResult here cannot deadlock
             // on captured-context resumption.
-            return RunWorkAsync(arg, args, token).GetAwaiter().GetResult();
+            return RunWorkAsync(arg, args, cts.Token).GetAwaiter().GetResult();
         }
         finally
         {
