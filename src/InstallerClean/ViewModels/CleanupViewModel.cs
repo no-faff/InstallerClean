@@ -545,14 +545,21 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(OperationProgressDetail));
 
     /// <summary>
-    /// Null-then-dispose <see cref="_operationCts"/>. Order matters: a
-    /// concurrent CancelOperationCommand reading the field after the
-    /// null sees no CTS and no-ops, instead of racing the dispose.
+    /// Cancel-then-null-then-dispose <see cref="_operationCts"/>. Order
+    /// matters on two fronts: the null happens before Dispose so a
+    /// concurrent CancelOperationCommand reading the field sees no CTS
+    /// and no-ops instead of racing the dispose; the Cancel happens
+    /// first so a still-running worker on the Dispose-during-shutdown
+    /// path observes OperationCanceledException at its next
+    /// ThrowIfCancellationRequested rather than ObjectDisposedException.
+    /// Cancel on a completed CTS (the success-path callers below) is a
+    /// no-op.
     /// </summary>
     private void DisposeOperationCts()
     {
         var cts = _operationCts;
         _operationCts = null;
+        cts?.Cancel();
         cts?.Dispose();
     }
 

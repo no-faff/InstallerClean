@@ -166,9 +166,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // WriteAsync returns false on disk-full / locked-file /
             // read-only-profile failure; the Send button stays hidden
             // rather than overpainting a dialog on the all-clear summary.
+            //
+            // ConfigureAwait(false): if the user closes the window
+            // between the startup scan completing and the write
+            // returning, the dispatcher is gone and a default-context
+            // resumption throws. The post-await action is a single
+            // field write inside MarkResultLogReady; the binding system
+            // has no UI left to update either way.
             var entry = ResultLogEntry.ForScanOnly(
                 result, Scan.LastScanDurationMs, Scan.PendingRebootLabel);
-            if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
+            if (await _resultLogService.WriteAsync(entry).ConfigureAwait(false))
                 Completion.MarkResultLogReady();
         }
         catch (Exception ex)
