@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="README.md">English</a> · <strong>Français</strong> · <a href="README.zh-CN.md">简体中文</a>
+  <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.es.md">Español</a> · <strong>Français</strong>
 </p>
 
 <p align="center">
@@ -67,7 +67,7 @@ InstallerClean détecte les correctifs remplacés par des mises à jour plus ré
 3. **Affiche** ce qui est utile et ce qui ne l'est pas, avec les tailles
 4. **Supprime** les fichiers inutiles : envoi à la Corbeille, ou déplacement vers un dossier de votre choix
 
-Aucune activité réseau automatique. Deux boutons opt-in déclenchent un seul appel HTTPS sur clic : **Vérifier les mises à jour** dans À propos, et **Envoyer le résultat** sur l'écran de fin. Voir [Ce que l'application ne fait pas](#ce-que-lapplication-ne-fait-pas) plus bas pour le détail.
+Aucune activité réseau automatique. Deux boutons opt-in déclenchent un seul appel HTTPS sur clic : **Vérifier les mises à jour** dans À propos, et **Envoyer le résultat** sur l'écran de fin. Voir [Ce qu'il ne fait pas](#ce-quil-ne-fait-pas) plus bas pour le détail.
 
 ## Captures d'écran
 
@@ -137,7 +137,7 @@ Après un Déplacement ou une Suppression, les sous-dossiers vides à l'intérie
 
 Oui. InstallerClean interroge la même base que Windows utilise lui-même pour suivre ce qui est installé. Si Windows indique qu'un fichier n'est plus nécessaire, l'application le croit ; elle ne devine pas à partir des noms de fichiers ou des dates.
 
-**Dans l'application.** La suppression envoie les fichiers à la Corbeille. Le déplacement les met dans un dossier de votre choix. Dans les deux cas, les fichiers peuvent être restaurés en cas de problème. Rien n'est touché tant que vous ne confirmez pas. Si Windows Installer est en train d'écrire dans le cache, a une transaction précédente suspendue, ou a un renommage post-redémarrage en attente ciblant le cache, Déplacer et Supprimer sont désactivés et la raison précise est affichée. La logique principale est couverte par plus de 200 tests automatisés exécutés à chaque commit (voir le badge CI ci-dessus).
+**Dans l'application.** La suppression envoie les fichiers à la Corbeille. Le déplacement les met dans un dossier de votre choix. Dans les deux cas, les fichiers peuvent être restaurés en cas de problème. Rien n'est touché tant que vous ne confirmez pas. Si Windows Installer est en train d'écrire dans le cache, a une transaction précédente suspendue, ou a un renommage post-redémarrage en attente ciblant le cache, Déplacer et Supprimer sont désactivés et la raison précise est affichée. Les services de scan, requête, déplacement, suppression, réglages et redémarrage en attente sont couverts par une suite de tests automatisés qui s'exécute à chaque commit (voir le badge CI ci-dessus).
 
 **Vérifier le binaire.** InstallerClean n'est pas signé numériquement. Les certificats de signature de code coûtent de l'argent chaque année, et je préfère garder le projet gratuit, ouvert et financé par les dons.
 
@@ -149,14 +149,14 @@ Oui. InstallerClean interroge la même base que Windows utilise lui-même pour s
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
-Les trois builds (setup, portable et slim) sont propres sur VirusTotal, aucune détection d'aucun moteur.
+VirusTotal : propre sur tous les moteurs. Des liens en direct dans les notes de chaque version pour que vous puissiez revérifier.
 
 ## Ce qu'il ne fait pas
 
 - WinSxS (`C:\Windows\WinSxS`) est un dossier différent avec des règles différentes. Pour celui-là, utilisez le Nettoyage de disque intégré de Windows ou `Dism /Online /Cleanup-Image /StartComponentCleanup`.
 - Aucun service en arrière-plan, aucune tâche planifiée, aucun nettoyage automatique. L'application s'exécute quand vous la lancez.
 - Le registre est en lecture seule. L'application interroge la base Windows Installer ; elle ne la modifie pas.
-- Aucune télémétrie automatique, aucune activité réseau en arrière-plan. L'application ne fait aucun appel réseau tant que vous ne cliquez pas sur l'un de deux boutons opt-in. **Vérifier les mises à jour** dans À propos interroge l'API publique des releases de GitHub au moment du clic (un seul GET HTTPS, identifiant `InstallerClean/<version>`). **Envoyer le résultat** sur l'écran de fin lit `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` et l'envoie en HTTPS POST à un endpoint No Faff afin que je puisse voir si l'exécution a réussi. Le JSON contient uniquement des compteurs et des étiquettes catégorielles : aucun chemin de fichier, aucun nom d'utilisateur, aucun identifiant machine, aucune heure du jour. Cliquer ouvre une fenêtre de confirmation montrant le JSON exact qui sera envoyé ; vous l'inspectez puis vous confirmez, ou vous annulez. Le bouton est à usage unique par machine, à vie.
+- Aucune télémétrie automatique, aucune activité réseau en arrière-plan. L'application ne fait aucun appel réseau tant que vous ne cliquez pas sur l'un des deux boutons opt-in. **Vérifier les mises à jour** dans À propos interroge l'API publique des releases de GitHub au moment du clic et vous indique si vous avez la dernière version (un seul GET HTTPS, identifiant `InstallerClean/<version>`). **Envoyer le résumé** sur l'écran de fin lit `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` et l'envoie en HTTPS POST à un endpoint No Faff afin que je puisse voir si l'exécution a réussi. Le JSON contient uniquement des compteurs et des étiquettes catégorielles : aucun chemin de fichier, aucun nom d'utilisateur, aucun identifiant machine, aucune heure du jour. Cliquer ouvre une fenêtre de confirmation montrant le JSON exact qui sera envoyé ; inspectez-le puis appuyez sur Envoyer pour confirmer, ou sur Annuler pour vous rétracter. Une fois par machine : après un envoi réussi le bouton reste caché à jamais ; si la première tentative échoue avec une erreur transitoire, la session suivante redemandera.
 - Aucun supplément groupé. Pas de barres d'outils, pas d'offres tierces, pas de fenêtres intempestives.
 - La seule autorisation demandée au-delà du lancement est Administrateur, requise parce que `C:\Windows\Installer` est réservé aux administrateurs.
 
@@ -168,13 +168,19 @@ Les trois builds (setup, portable et slim) sont propres sur VirusTotal, aucune d
 
 **Puis-je annuler une suppression ?** Oui. La suppression envoie les fichiers à la Corbeille. Restaurez-les depuis là. Si vous avez vidé la Corbeille, les fichiers sont perdus, mais vous pouvez utiliser Déplacer pour les mettre dans un dossier de votre choix, vérifier que rien ne casse, puis les supprimer de là.
 
-**Windows va-t-il se plaindre si je supprime ces fichiers ?** Non. InstallerClean ne supprime que les fichiers que Windows lui-même signale comme n'étant plus nécessaires via son API de base d'installeur. Le prochain cycle d'installation, désinstallation ou correctif se déroule normalement.
+**Windows va-t-il se plaindre si je supprime ces fichiers ?** Pas en temps normal. InstallerClean ne supprime que les fichiers que Windows lui-même signale comme n'étant plus nécessaires via son API de base d'installeur. L'exception rare est une machine dont la base d'installeur est désynchronisée, en général après une désinstallation précédente qui ne s'est pas terminée proprement. Sur ces machines, une tentative ultérieure de désinstallation d'un produit peut échouer en demandant le `.msi` d'origine. Cela n'a jamais été rapporté sur InstallerClean au fil de plusieurs milliers de téléchargements, mais si cela vous arrive :
+
+- **Si vous avez Supprimé** : restaurez les fichiers depuis la Corbeille. Ils retournent automatiquement dans `C:\Windows\Installer` et la désinstallation aboutit.
+- **Si vous avez Déplacé** : recopiez les fichiers de votre dossier de destination dans `C:\Windows\Installer` et la désinstallation aboutit.
+- **Aucune copie nulle part** : retéléchargez l'installeur chez l'éditeur et lancez-le ; cela remet un `.msi` neuf dans le cache et la désinstallation aboutit.
 
 **Pourquoi pas `Win32_Product` (WMI) ?** [`Win32_Product` déclenche des opérations de réparation MSI sur chaque produit pendant l'énumération](https://gregramsey.net/2012/02/20/win32_product-is-evil/), ce qui peut prendre plusieurs minutes et solliciter le disque très fort. InstallerClean appelle l'API COM de Windows Installer directement, sans effets de bord.
 
+**Pourquoi pas un simple script PowerShell ?** Un court script qui appelle `MsiEnumPatchesEx` suffit pour *lister* les correctifs, mais ce qui porte InstallerClean ce sont les parties qu'un script survole : la classification orphelin / remplacé, le repli vers le registre qui n'ajoute des fichiers qu'à l'ensemble « encore utiles » (jamais à « supprimables »), le blocage en cas de redémarrage en attente, le filet de sécurité Déplacer-ailleurs, la progression par fichier avec annulation, et le choix par défaut Corbeille plutôt que suppression définitive. Les cas limites sur des machines vraiment chargées en MSI (enregistrements corrompus, jonctions dans le cache, produits dans `HKU\.DEFAULT`, transactions Installer suspendues) sont faciles à mal gérer dans un script ad hoc. La `installerclean-cli` est la version sans interface si c'est du scripting qu'il vous faut.
+
 **Fonctionne-t-il sur Windows 7 ou 8 ?** Non testé et non pris en charge. Cible Windows 10 et 11.
 
-**Convient-il au RMM ou au déploiement de masse ?** Oui. La CLI sort avec des codes à trois états (0 / 2 / 1 = succès complet / partiel / échec ; 130 pour Ctrl+C), écrit un résumé par exécution dans le journal d'événements Application et respecte le même mutex d'instance unique que l'interface graphique. Voir la section Ligne de commande.
+**Convient-il au RMM ou au déploiement de masse ?** Oui. La CLI sort avec des codes distincts par résultat (0 succès, 2 partiel, 1 échec total, 75 transitoire, 130 Ctrl+C), de sorte qu'une tâche planifiée peut réessayer sur 75 sans le confondre avec un échec total. Elle écrit un résumé par exécution dans le journal d'événements Application et respecte le même mutex d'instance unique que l'interface graphique. Voir la section Ligne de commande.
 
 ## Téléchargement
 
@@ -202,13 +208,13 @@ scoop install installerclean
 | Dernière mise à jour | 2026 (actif) | 3 mars 2016 |
 | Code source | Open source (MIT) | Fermé |
 | Runtime | .NET 10 (autonome) | .NET + VBScript |
-| API | Windows Installer COM (direct) | WMI (`Win32_Product`) |
+| API | Windows Installer COM (en cours de processus) | Windows Installer COM (hors processus via VBScript) |
 | Détection des correctifs remplacés | Oui | Non |
 | Gestion d'Adobe | Détecte les correctifs remplacés | Exclus par défaut |
 | Interface | Thème sombre (WPF) | Windows Forms |
 | Collecte de données | Aucune | Aucune |
 
-> **À propos de WMI :** PatchCleaner utilise `Win32_Product`, qui [déclenche des opérations de réparation MSI](https://gregramsey.net/2012/02/20/win32_product-is-evil/) pendant l'énumération. InstallerClean appelle l'interface COM de Windows Installer directement, sans effets de bord.
+> **À propos de `Win32_Product` :** L'approche courante mais cassée pour lister les produits installés est `Win32_Product` (WMI), qui [déclenche des opérations de réparation MSI](https://gregramsey.net/2012/02/20/win32_product-is-evil/) sur chaque produit pendant l'énumération. InstallerClean comme PatchCleaner l'évitent. Tous deux utilisent l'interface COM de Windows Installer. Le nom de fichier `WMIProducts.vbs` dans le script de PatchCleaner est trompeur ; le script utilise COM MSI, pas WMI.
 
 [Ultra Virus Killer (UVK)](https://www.carifred.com/uvk/) propose aussi un nettoyage du dossier Installer dans son module System Booster, mais c'est un outil payant (15-25 $) et le nettoyage n'est qu'une petite fonctionnalité dans une application bien plus large. InstallerClean est gratuit, ciblé et open source.
 
@@ -231,7 +237,7 @@ Accepte aussi `--help`, `/?` et `-h`. Pour lancer l'interface graphique, exécut
 
 `/s` est un essai à blanc : il analyse, liste ce qui serait supprimé avec noms de fichiers et tailles, puis quitte. Utile pour auditer avant nettoyage. Le code de sortie est toujours 0. Tous les fichiers se trouvent dans `C:\Windows\Installer`.
 
-`/d` et `/m` analysent puis agissent. `/d` envoie les fichiers supprimables à la Corbeille. `/m` les déplace vers un dossier (soit celui spécifié sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Codes de sortie : `0` succès complet, `2` partiel (certains fichiers réussis, certains échoués), `1` échec total (analyse échouée, conflit de mutex, mauvais arguments, ou tous les fichiers du lot ont échoué), `130` Ctrl+C.
+`/d` et `/m` analysent puis agissent. `/d` envoie les fichiers supprimables à la Corbeille. `/m` les déplace vers un dossier (soit celui spécifié sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Codes de sortie : `0` succès complet, `2` partiel (certains fichiers réussis, certains échoués), `1` échec total (analyse échouée, mauvais arguments, ou tous les fichiers du lot ont échoué), `75` conditions transitoires (une autre instance d'InstallerClean est en cours, ou Windows Installer signale une transaction en attente ; réessai sans risque), `130` Ctrl+C.
 
 Les trois nécessitent une invite de commandes élevée (administrateur).
 
