@@ -39,28 +39,26 @@ public sealed record ResultLogEntry(
         string pendingReboot,
         MoveResult move,
         long bytesFreed,
-        string moveDestinationKind,
-        bool cancelled) =>
+        string moveDestinationKind) =>
         new(
             CurrentSchemaVersion,
             AppInfo.Current(),
             ResolveOs(),
             ScanInfo.From(scan, scanDurationMs, pendingReboot),
-            OperationInfo.FromMove(move, scan.RemovableFiles.Count, bytesFreed, moveDestinationKind, cancelled));
+            OperationInfo.FromMove(move, scan.RemovableFiles.Count, bytesFreed, moveDestinationKind));
 
     public static ResultLogEntry ForDelete(
         ScanResult scan,
         long scanDurationMs,
         string pendingReboot,
         DeleteResult delete,
-        long bytesFreed,
-        bool cancelled) =>
+        long bytesFreed) =>
         new(
             CurrentSchemaVersion,
             AppInfo.Current(),
             ResolveOs(),
             ScanInfo.From(scan, scanDurationMs, pendingReboot),
-            OperationInfo.FromDelete(delete, scan.RemovableFiles.Count, bytesFreed, cancelled));
+            OperationInfo.FromDelete(delete, scan.RemovableFiles.Count, bytesFreed));
 
     private static string ResolveOs()
     {
@@ -122,12 +120,11 @@ public sealed record ScanInfo(
 /// (the scan reported zero orphans, or the completion overlay was
 /// dismissed without Move/Delete); <c>move</c> or <c>delete</c>
 /// otherwise. <see cref="Outcome"/> is <c>complete</c> /
-/// <c>partial</c> / <c>cancelled</c> / <c>failed</c> / <c>noFiles</c>.
-/// <see cref="Errors"/> is the per-category count only (no paths,
-/// no exception messages). <see cref="MoveDestinationKind"/> is
-/// null when not a move; otherwise <c>sameDrive</c> /
-/// <c>differentFixedDrive</c> / <c>removableDrive</c> /
-/// <c>uncShare</c> / <c>unknown</c>.
+/// <c>partial</c> / <c>failed</c> / <c>noFiles</c>. <see cref="Errors"/>
+/// is the per-category count only (no paths, no exception messages).
+/// <see cref="MoveDestinationKind"/> is null when not a move; otherwise
+/// <c>sameDrive</c> / <c>differentFixedDrive</c> / <c>removableDrive</c>
+/// / <c>uncShare</c> / <c>unknown</c>.
 /// </summary>
 public sealed record OperationInfo(
     string Kind,
@@ -142,30 +139,28 @@ public sealed record OperationInfo(
         new(OperationKinds.Scan, OperationOutcomes.NoFiles, 0, 0, 0, Array.Empty<ErrorBucket>(), null);
 
     public static OperationInfo FromMove(MoveResult result, int totalCandidates, long bytesFreed,
-        string moveDestinationKind, bool cancelled) =>
+        string moveDestinationKind) =>
         new(
             OperationKinds.Move,
-            ClassifyOutcome(result.MovedCount, result.Errors.Count, totalCandidates, cancelled),
+            ClassifyOutcome(result.MovedCount, result.Errors.Count, totalCandidates),
             result.MovedCount,
             result.Errors.Count,
             bytesFreed,
             BucketErrors(result.Errors),
             moveDestinationKind);
 
-    public static OperationInfo FromDelete(DeleteResult result, int totalCandidates, long bytesFreed,
-        bool cancelled) =>
+    public static OperationInfo FromDelete(DeleteResult result, int totalCandidates, long bytesFreed) =>
         new(
             OperationKinds.Delete,
-            ClassifyOutcome(result.DeletedCount, result.Errors.Count, totalCandidates, cancelled),
+            ClassifyOutcome(result.DeletedCount, result.Errors.Count, totalCandidates),
             result.DeletedCount,
             result.Errors.Count,
             bytesFreed,
             BucketErrors(result.Errors),
             null);
 
-    private static string ClassifyOutcome(int processed, int failed, int total, bool cancelled)
+    private static string ClassifyOutcome(int processed, int failed, int total)
     {
-        if (cancelled) return OperationOutcomes.Cancelled;
         if (processed == 0 && failed == total && total > 0) return OperationOutcomes.Failed;
         if (failed == 0) return OperationOutcomes.Complete;
         return OperationOutcomes.Partial;
@@ -195,7 +190,6 @@ public static class OperationOutcomes
 {
     public const string Complete = "complete";
     public const string Partial = "partial";
-    public const string Cancelled = "cancelled";
     public const string Failed = "failed";
     public const string NoFiles = "noFiles";
 }

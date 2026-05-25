@@ -174,7 +174,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         var fresh = _settingsService.Load();
         fresh.MoveDestination = _settings.MoveDestination;
         _settings = fresh;
-        _ = _settingsService.TrySave(_settings);
+        if (!_settingsService.TrySave(_settings))
+        {
+            // TrySave returns false on disk-full / read-only-profile /
+            // path-redirection failure (it never throws). This branch
+            // is fire-and-forget by design; without a breadcrumb a
+            // user report of "my destination reset between sessions"
+            // has no trail back to the failed write.
+            CrashLog.TryWrite(new InvalidOperationException(
+                "Settings.TrySave returned false during MoveDestination debounced save."));
+        }
 
         // Dispose the type-once-and-stop case (every other path is
         // covered by the next schedule call replacing the field).
@@ -382,7 +391,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 var entry = ResultLogEntry.ForMove(
                     preOpScan, preOpDurationMs, preOpRebootLabel,
                     result, movedBytes,
-                    ClassifyMoveDestination(movedDest), cancelled: false);
+                    ClassifyMoveDestination(movedDest));
                 if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
                     _completion.MarkResultLogReady();
             }
@@ -477,7 +486,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             {
                 var entry = ResultLogEntry.ForDelete(
                     preOpScan, preOpDurationMs, preOpRebootLabel,
-                    result, deletedBytes, cancelled: false);
+                    result, deletedBytes);
                 if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
                     _completion.MarkResultLogReady();
             }
