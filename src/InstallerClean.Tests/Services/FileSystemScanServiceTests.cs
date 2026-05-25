@@ -14,6 +14,9 @@ public class FileSystemScanServiceTests
     private static RegisteredPackage Superseded(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 2, IsRemovable: true);
 
+    private static RegisteredPackage Obsoleted(string path) =>
+        new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 4, IsRemovable: true);
+
     [Fact]
     public async Task ScanAsync_returns_files_not_in_registered_set()
     {
@@ -118,6 +121,32 @@ public class FileSystemScanServiceTests
 
         // The applied patch stays in RegisteredPackages
         Assert.Single(result.RegisteredPackages);
+    }
+
+    [Fact]
+    public async Task ScanAsync_obsoleted_patches_use_distinct_reason_label()
+    {
+        // MSI PatchState 4 (obsoleted) is a different API state from 2
+        // (superseded). The Reason column distinguishes them so a user
+        // examining the orphan list sees the precise MSI lifecycle state.
+        var registered = new List<RegisteredPackage>
+        {
+            Obsoleted(@"C:\Windows\Installer\obsoleted.msp"),
+        };
+
+        var mockQuery = Substitute.For<IInstallerQueryService>();
+        mockQuery
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(registered.AsReadOnly());
+
+        var fs = new MockFileSystem();
+        fs.AddFile(@"C:\Windows\Installer\obsoleted.msp", new MockFileData(new byte[150]));
+
+        var svc = new FileSystemScanService(mockQuery, fs, Array.Empty<string>(), null);
+        var result = await svc.ScanAsync();
+
+        Assert.Single(result.RemovableFiles);
+        Assert.Equal("Obsoleted", result.RemovableFiles[0].Reason);
     }
 
     [Fact]

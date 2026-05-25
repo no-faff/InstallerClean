@@ -217,6 +217,7 @@ public static class Strings
     public static string Plural_Package_Singular => Get("Plural.Package.Singular");
     public static string Plural_Product_Plural => Get("Plural.Product.Plural");
     public static string Plural_Product_Singular => Get("Plural.Product.Singular");
+    public static string Reason_Obsoleted => Get("Reason.Obsoleted");
     public static string Reason_Orphaned => Get("Reason.Orphaned");
     public static string Reason_Superseded => Get("Reason.Superseded");
     public static string ResultLog_Failed => Get("ResultLog.Failed");

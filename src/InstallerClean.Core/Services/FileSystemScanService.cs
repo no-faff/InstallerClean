@@ -137,12 +137,19 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 if (exists)
                 {
                     var ext = _fs.Path.GetExtension(pkg.LocalPackagePath);
+                    // PatchState 2 = superseded by a newer patch.
+                    // PatchState 4 = obsoleted (publisher-withdrawn);
+                    // distinct API state, distinct Reason label, same
+                    // user-visible outcome (the patch is removable).
+                    var reason = pkg.PatchState == 4
+                        ? Strings.Reason_Obsoleted
+                        : Strings.Reason_Superseded;
                     removable.Add(new OrphanedFile(
                         FullPath: pkg.LocalPackagePath,
                         SizeBytes: size,
                         IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
                         IsSuperseded: true,
-                        Reason: Strings.Reason_Superseded));
+                        Reason: reason));
                 }
                 else
                 {

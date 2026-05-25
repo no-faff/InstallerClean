@@ -190,6 +190,14 @@
   <!-- Reasons (Reason column in the orphaned-files list) -->
   <data name="Reason.Orphaned" xml:space="preserve"><value>Orphaned</value></data>
   <data name="Reason.Superseded" xml:space="preserve"><value>Superseded</value></data>
+  <!-- MSI PatchState 4 (obsoleted) is a distinct state from 2
+       (superseded): superseded means a newer patch has replaced
+       this one, obsoleted means the patch has been withdrawn /
+       deprecated by the publisher independent of a replacement.
+       The user-visible outcome (the patch is removable) is the
+       same; the Reason column distinguishes them for users who
+       want the MSI-state precision. -->
+  <data name="Reason.Obsoleted" xml:space="preserve"><value>Obsoleted</value></data>
 
   <!-- Status / progress text -->
   <data name="Status.Scanning" xml:space="preserve"><value>Scanning...</value></data>
