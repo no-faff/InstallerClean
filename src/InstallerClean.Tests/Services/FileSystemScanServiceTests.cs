@@ -104,7 +104,7 @@ public class FileSystemScanServiceTests
             .Returns(registered.AsReadOnly());
 
         // Both registered files present on disk so the superseded entry
-        // passes the exists guard added for the missing-source-file case.
+        // passes the on-disk existence guard.
         var fs = new MockFileSystem();
         fs.AddFile(@"C:\Windows\Installer\applied.msp", new MockFileData(new byte[100]));
         fs.AddFile(@"C:\Windows\Installer\superseded.msp", new MockFileData(new byte[200]));

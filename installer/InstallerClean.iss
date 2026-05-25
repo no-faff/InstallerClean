@@ -22,22 +22,10 @@ AppVersion={#AppVersion}
 ; a "close the running app" prompt when the user upgrades while
 ; InstallerClean.exe or installerclean-cli.exe is holding it.
 AppMutex=Global\InstallerClean_SingleInstance
-; %LOCALAPPDATA%\NoFaff\InstallerClean\ (settings.json, last-run.json,
-; settings.json.bad on a corrupt-and-recovered run, crash.log) is
-; deliberately NOT cleared on uninstall. The "move destination" path
-; and the lifetime result-log lock survive across upgrades; clearing
-; them would make every upgrade feel like a fresh install. There is
-; no [UninstallDelete] section for that reason.
-;
-; WizardImageFileDynamicDark is not set. Under WizardStyle=modern
-; dynamic, Inno follows Windows light/dark; without a dark BMP the
-; light wizard-image.bmp shows against dark chrome in dark mode.
-; Closing this needs either a hand-designed dark-tone variant of
-; wizard-image.bmp (the existing image is brand artwork; a
-; programmatic invert / luminance shift would mangle the brand
-; palette) or dropping `dynamic` from WizardStyle so the wizard
-; stays in light mode regardless of Windows theme. Neither has
-; been actioned yet; the visible mismatch is mild.
+; %LOCALAPPDATA%\NoFaff\InstallerClean\ user data (settings.json,
+; last-run.json, settings.json.bad on a corrupt-and-recovered run,
+; crash.log) survives uninstall by design: the saved move destination
+; and the lifetime result-log lock carry across upgrades.
 AppPublisher=No Faff
 AppPublisherURL=https://github.com/no-faff/InstallerClean
 AppSupportURL=https://github.com/no-faff/InstallerClean/discussions
