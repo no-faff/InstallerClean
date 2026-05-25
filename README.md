@@ -21,7 +21,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total" alt="Total downloads"></a>
 </p>
 
-![Screenshot of InstallerClean after a successful clean-up: 965 MB freed, 68 files moved](docs/screenshots/04d-deleted-freed-success.webp)
+![Screenshot of InstallerClean after a successful clean-up: 965 MB freed, 68 files deleted](docs/screenshots/04d-deleted-freed-success.webp)
 
 - **What:** Finds and removes unneeded files from `C:\Windows\Installer`, the hidden folder Windows never cleans up.
 - **How much space:** Depends on your software. On my machine it was just shy of 1 GB. An InstallerClean user [reported](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. With Adobe Acrobat it can pass 100 GB. It could be nothing at all. The point is that it's quick and costs nothing; whatever can be removed will be gone.
@@ -234,7 +234,7 @@ Also accepts `--help`, `/?` and `-h`. To launch the GUI, run `InstallerClean.exe
 
 `/d` and `/m` scan and then act. `/d` sends removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments, or every file in the batch failed), `75` for transient conditions (another InstallerClean instance is running, or Windows Installer reports a pending transaction; safe to retry), `130` for Ctrl+C.
 
-All three require an elevated (administrator) command prompt.
+All three require an elevated (administrator) command prompt. If Group Policy blocks the UAC elevation prompt the process refuses to start and Windows returns error 740 to the parent shell (`$LASTEXITCODE = 740` in PowerShell). `taskkill /pid <pid>` does not fire a graceful cancel; the single-instance mutex is recovered by the next run via the AbandonedMutexException path.
 
 ### Why `installerclean-cli` and not `installerclean.exe`?
 
