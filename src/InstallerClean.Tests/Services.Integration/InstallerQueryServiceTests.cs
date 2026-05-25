@@ -42,9 +42,10 @@ public class InstallerQueryServiceTests
         var ex = await Record.ExceptionAsync(() => svc.GetRegisteredPackagesAsync());
 
         // If running elevated (e.g. in CI with admin), the call succeeds.
-        // If not elevated, it throws UnauthorizedAccessException.
+        // If not elevated, it throws a UnauthorizedAccessException-derived
+        // type (LocalisedAccessException carrying a resx-sourced message).
         if (ex is not null)
-            Assert.IsType<UnauthorizedAccessException>(ex);
+            Assert.IsAssignableFrom<UnauthorizedAccessException>(ex);
     }
 
     [Fact]

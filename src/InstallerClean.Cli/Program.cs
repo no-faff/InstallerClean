@@ -271,25 +271,17 @@ internal static class Program
                 return ExitError;
             }
 
+            // Two destination sources: a command-line argument supplied
+            // at invocation, or the path last written into
+            // %LOCALAPPDATA%. Both go through the same fully-qualified,
+            // not-inside-Installer, not-inside-System-folder gates below.
+            // A stale Scheduled Task argument has the same trust posture
+            // as a stale settings.json once the CLI is running elevated.
             string dest;
-            // Two destination sources with different trust posture: a
-            // command-line argument is supplied at invocation; the
-            // settings-loaded path is whatever was last written into
-            // %LOCALAPPDATA% and the CLI writes to it without echoing
-            // the resolved path first. The settings path therefore
-            // also goes through IsSystemFolderOrChild below.
-            bool destFromSettings;
             if (args.Length > 1)
-            {
                 dest = args[1].Trim();
-                destFromSettings = false;
-            }
             else
-            {
-                var settingsService = services.GetRequiredService<ISettingsService>();
-                dest = settingsService.Load().MoveDestination;
-                destFromSettings = true;
-            }
+                dest = services.GetRequiredService<ISettingsService>().Load().MoveDestination;
             if (string.IsNullOrWhiteSpace(dest))
             {
                 Console.WriteLine(Strings.Cli_NoMoveDestination);
@@ -317,7 +309,11 @@ internal static class Program
                 return ExitError;
             }
 
-            if (destFromSettings && InstallerCacheHelpers.IsSystemFolderOrChild(dest))
+            // System-folder gate covers both destination sources: the
+            // command-line /m argument and the settings-loaded fallback
+            // have the same trust posture (an admin's stale Scheduled
+            // Task argument can drift just like a stale settings.json).
+            if (InstallerCacheHelpers.IsSystemFolderOrChild(dest))
             {
                 Console.WriteLine(string.Format(Strings.Cli_MoveDestinationInSystemFolder, dest));
                 EventLogWriter.Write(EventLogWriter.Level.Warning,
@@ -362,16 +358,16 @@ internal static class Program
             }
             return ExitCancelled;
         }
-        catch (UnauthorizedAccessException ex)
+        catch (LocalisedAccessException ex)
         {
-            // Two production throw sites use UnauthorizedAccessException
-            // with resx-sourced messages safe to print under elevation:
-            // Strings.Error_MsiAccessDenied (MSI enumerator AccessDenied,
-            // names the admin requirement) and Strings.Error_CannotWriteFolder
-            // (Move pre-flight probe, names the destination). Echoing
-            // ex.Message distinguishes the two; a single static line
-            // would conflate a read-only destination with a privilege
-            // failure.
+            // LocalisedAccessException is the contract: services that
+            // raise it have built the Message from a resx string with
+            // user-controlled template args only, so echoing under
+            // elevation is safe and distinguishes "MSI enumerator
+            // access denied" from "cannot write the destination
+            // folder". BCL-raised UnauthorizedAccessException from
+            // deep in the framework can carry cross-profile paths and
+            // falls through to the generic catch below.
             Console.WriteLine(ex.Message);
             return ExitError;
         }

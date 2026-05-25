@@ -153,12 +153,12 @@ public sealed class MoveFilesService : IMoveFilesService
         }
         catch (UnauthorizedAccessException ex)
         {
-            throw new UnauthorizedAccessException(
+            throw new LocalisedAccessException(
                 string.Format(Strings.Error_CannotWriteFolder, folder), ex);
         }
         catch (IOException ex)
         {
-            throw new UnauthorizedAccessException(
+            throw new LocalisedAccessException(
                 string.Format(Strings.Error_CannotWriteFolder, folder), ex);
         }
     }

@@ -194,7 +194,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 break;
 
             if (error == MsiError.AccessDenied)
-                throw new UnauthorizedAccessException(Strings.Error_MsiAccessDenied);
+                throw new LocalisedAccessException(Strings.Error_MsiAccessDenied);
 
             if (error == MsiError.MoreData)
             {
