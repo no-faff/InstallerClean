@@ -276,7 +276,7 @@ dotnet test src/InstallerClean.Tests/
 
 ## Apoyar el proyecto
 
-Si InstallerClean te ha sido útil, considera [apoyar a No Faff](https://nofaff.netlify.app) o dejar una estrella en GitHub.
+Si InstallerClean te ha sido útil, considera [apoyar a No Faff](https://nofaff.netlify.app/support) o dejar una estrella en GitHub.
 
 ## Historial de estrellas
 

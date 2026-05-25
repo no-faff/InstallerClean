@@ -276,7 +276,7 @@ dotnet test src/InstallerClean.Tests/
 
 ## 支持本项目
 
-如果 InstallerClean 帮到了您，欢迎[支持 No Faff](https://nofaff.netlify.app)，或在 GitHub 上点亮一颗 star。
+如果 InstallerClean 帮到了您，欢迎[支持 No Faff](https://nofaff.netlify.app/support)，或在 GitHub 上点亮一颗 star。
 
 ## Star 历史
 

@@ -269,7 +269,7 @@ Found a bug or have a suggestion? [Open an issue](../../issues) or start a [disc
 
 ## Support the project
 
-If InstallerClean helped, consider [supporting No Faff](https://nofaff.netlify.app) or leaving a star on GitHub.
+If InstallerClean helped, consider [supporting No Faff](https://nofaff.netlify.app/support) or leaving a star on GitHub.
 
 ## Star history
 

@@ -276,7 +276,7 @@ Vous avez trouvé un bug ou une suggestion ? [Ouvrez un ticket](../../issues) ou
 
 ## Soutenir le projet
 
-Si InstallerClean vous a été utile, vous pouvez [soutenir No Faff](https://nofaff.netlify.app) ou laisser une étoile sur GitHub.
+Si InstallerClean vous a été utile, vous pouvez [soutenir No Faff](https://nofaff.netlify.app/support) ou laisser une étoile sur GitHub.
 
 ## Historique des étoiles
 
