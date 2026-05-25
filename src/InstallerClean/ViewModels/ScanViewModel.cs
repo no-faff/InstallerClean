@@ -259,12 +259,15 @@ public partial class ScanViewModel : ObservableObject
                 Strings.Error_AdminRequiredTitle);
             ScanProgress = Strings.Status_ScanAccessDenied;
         }
-        catch (InvalidOperationException ex)
+        catch (LocalisedInvalidOperationException ex)
         {
-            // ex.Message is safe here only because every
-            // InstallerQueryService throw uses a resx-sourced message.
-            // A path-bearing throw site would need to switch to the
-            // type-name+crashlog pattern used in the generic catch.
+            // LocalisedInvalidOperationException is the contract: sites
+            // that raise it have built Message from a resx string with
+            // only fixed-shape template args (counts, error codes), so
+            // echoing under elevation is safe. BCL-raised
+            // InvalidOperationException from deep in the framework falls
+            // through to the generic catch below with type-name + crash
+            // log only.
             _dialogService.ShowError(ex.Message, Strings.Error_InstallerDbUnavailableTitle);
             ScanProgress = Strings.Status_ScanFailedDb;
         }

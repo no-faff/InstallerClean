@@ -142,7 +142,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // here means the database is corrupt or inaccessible; silently
         // reporting "all clear" would be worse than failing.
         if (claimed.Count == 0)
-            throw new InvalidOperationException(Strings.Error_InstallerDbEmpty);
+            throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty);
 
         progress?.Report(string.Format(Strings.Status_RegistryScanComplete,
             claimed.Count, Helpers.DisplayHelpers.PluralisePackage(claimed.Count)));
@@ -235,7 +235,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             {
                 consecutiveNonSuccess++;
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
-                    throw new InvalidOperationException(
+                    throw new LocalisedInvalidOperationException(
                         string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));
             }
         }
@@ -316,7 +316,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // to the caller (the scan command's catch routes it
                 // to a dialog and to crash.log).
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
-                    throw new InvalidOperationException(
+                    throw new LocalisedInvalidOperationException(
                         string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));
             }
         }

@@ -222,7 +222,7 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new InvalidOperationException(
+            .ThrowsAsync(new LocalisedInvalidOperationException(
                 "The Windows Installer database appears to be empty or inaccessible."));
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
