@@ -124,8 +124,7 @@ public class FileSystemScanServiceTests
     public async Task ScanAsync_superseded_patches_missing_from_disk_counted_to_removable_bucket()
     {
         // MSI database lists a patch as superseded but the underlying
-        // file has already been removed (older cleaner, manual delete,
-        // earlier PatchCleaner run). The scan should count it against
+        // file is no longer on disk. The scan should count it against
         // MissingRemovableCount (benign: Windows considers the patch
         // removable already) and leave it out of RemovableFiles so a
         // subsequent Delete or Move does not fail with MissingSourceFile.

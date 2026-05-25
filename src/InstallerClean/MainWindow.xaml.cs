@@ -69,14 +69,11 @@ public partial class MainWindow : Window
         if (e.PropertyName == nameof(ScanViewModel.IsScanning) && _vm.Scan.IsScanning)
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => ScanCancelButton.Focus());
 
-        // Announce banner reveals to screen readers. WPF's UIA bridge
-        // historically did not re-fire LiveRegionChanged when an
-        // element enters the tree from Visibility=Collapsed; the
-        // bridge only re-announces a text change inside an already-
-        // rendered subtree. Raise the event explicitly on the
-        // false→true transition. Loaded priority defers past the
-        // binding update so the peer's text is current when the
-        // announcement fires.
+        // WPF's UIA bridge does not re-fire LiveRegionChanged for a
+        // Visibility=Collapsed→Visible transition; the bridge only
+        // announces text changes inside an already-rendered subtree.
+        // Loaded priority defers past the binding update so the peer's
+        // text is current when the explicit raise fires.
         if (e.PropertyName == nameof(ScanViewModel.HasPendingReboot) && _vm.Scan.HasPendingReboot)
             Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(PendingRebootBannerText));
         if (e.PropertyName == nameof(ScanViewModel.HasMissingFromDisk) && _vm.Scan.HasMissingFromDisk)
