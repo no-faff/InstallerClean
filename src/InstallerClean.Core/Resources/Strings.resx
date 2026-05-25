@@ -278,6 +278,15 @@
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} files to clean up</value></data>
   <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from disk. Windows refers to installer files that aren't there. Cleaning the cache won't change this.</value></data>
   <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from disk. Windows refers to installer files that aren't there. Cleaning the cache won't change this.</value></data>
+  <!-- Informational line shown when the MSI database carries
+       superseded-patch registrations whose files are already gone
+       from disk (older cleaner / manual sweep / prior PatchCleaner
+       run). Distinct from the missing-from-disk warning because the
+       files are removable already; only the MSI registration is
+       stale. InstallerClean doesn't unregister anything, so this
+       is purely diagnostic. -->
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>1 stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it).</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>{0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them).</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} {2}</value></data>
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->

@@ -272,6 +272,8 @@ public static class Strings
     public static string Summary_RegisteredStillUsed_Plural => Get("Summary.RegisteredStillUsed.Plural");
     public static string Summary_RegisteredStillUsed_Singular => Get("Summary.RegisteredStillUsed.Singular");
     public static string Summary_RegisteredWindow => Get("Summary.RegisteredWindow");
+    public static string Summary_StaleMsiEntries_Plural => Get("Summary.StaleMsiEntries.Plural");
+    public static string Summary_StaleMsiEntries_Singular => Get("Summary.StaleMsiEntries.Singular");
     public static string Tooltip_BuyMeACuppa => Get("Tooltip.BuyMeACuppa");
     public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");
     public static string Tooltip_Close => Get("Tooltip.Close");

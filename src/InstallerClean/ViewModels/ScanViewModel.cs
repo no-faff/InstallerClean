@@ -86,9 +86,13 @@ public partial class ScanViewModel : ObservableObject
 
     /// <summary>
     /// Count of superseded / obsoleted packages whose file is already
-    /// gone from disk. Informational only; does not surface in the UI.
+    /// gone from disk. Drives the diagnostic-info line under the body
+    /// explanation.
     /// </summary>
-    [ObservableProperty] private int _missingRemovableCount;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasStaleMsiEntries))]
+    [NotifyPropertyChangedFor(nameof(StaleMsiEntriesText))]
+    private int _missingRemovableCount;
 
     /// <summary>
     /// Cached result of the most recent successful scan. Null until
@@ -155,6 +159,24 @@ public partial class ScanViewModel : ObservableObject
                 Strings.Summary_MissingFromDisk_Singular,
                 Strings.Summary_MissingFromDisk_Plural),
             MissingNonRemovableCount);
+
+    /// <summary>
+    /// True when the MSI database carries superseded-patch registrations
+    /// whose underlying files are already gone from disk. Distinct from
+    /// <see cref="HasMissingFromDisk"/>: that case is load-bearing
+    /// (Windows still claims the file but it's gone, so a future
+    /// install/uninstall/patch will fail); this case is benign (Windows
+    /// considers the patch removable, the file having gone is the
+    /// expected end state). Surfaced as a small informational line.
+    /// </summary>
+    public bool HasStaleMsiEntries => MissingRemovableCount > 0;
+
+    public string StaleMsiEntriesText =>
+        string.Format(
+            DisplayHelpers.Pluralise(MissingRemovableCount,
+                Strings.Summary_StaleMsiEntries_Singular,
+                Strings.Summary_StaleMsiEntries_Plural),
+            MissingRemovableCount);
 
     partial void OnRegisteredFileCountChanged(int value) =>
         OnPropertyChanged(nameof(RegisteredSummaryText));

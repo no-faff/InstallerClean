@@ -117,6 +117,23 @@
                                AutomationProperties.LiveSetting="Polite"/>
                 </StackPanel>
 
+                <!-- Stale MSI registration entries (informational). The
+                     MSI database carries a superseded-patch registration
+                     for a file that's already gone from disk. Distinct
+                     from the missing-from-disk banner above: that case
+                     is load-bearing (file still claimed by Windows but
+                     gone, future install/uninstall/patch will fail);
+                     this case is benign (Windows considers the patch
+                     removable already). Muted italic Caption to mark it
+                     as low-emphasis next to the warning banner. -->
+                <TextBlock Visibility="{Binding Scan.HasStaleMsiEntries, Converter={StaticResource BoolToVis}}"
+                           Text="{Binding Scan.StaleMsiEntriesText}"
+                           Foreground="{StaticResource Text.Muted}"
+                           FontStyle="Italic" FontSize="{StaticResource Type.Caption}"
+                           TextWrapping="Wrap"
+                           Margin="{StaticResource GapBottom.Lg}"
+                           AutomationProperties.LiveSetting="Polite"/>
+
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
