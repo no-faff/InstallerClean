@@ -53,10 +53,6 @@ internal static class DisplayHelpers
     internal static string PluraliseFile(int count) =>
         Pluralise(count, Strings.Plural_File_Singular, Strings.Plural_File_Plural);
 
-    /// <summary>"file is"/"files are" pair, sourced from Strings.resx.</summary>
-    internal static string PluraliseFileVerb(int count) =>
-        Pluralise(count, Strings.Plural_FileVerb_Singular, Strings.Plural_FileVerb_Plural);
-
     /// <summary>"error"/"errors" pair, sourced from Strings.resx.</summary>
     internal static string PluraliseError(int count) =>
         Pluralise(count, Strings.Plural_Error_Singular, Strings.Plural_Error_Plural);

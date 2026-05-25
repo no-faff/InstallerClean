@@ -134,18 +134,27 @@ public partial class ScanViewModel : ObservableObject
         ScanCommand.NotifyCanExecuteChanged();
 
     public string RegisteredSummaryText =>
-        string.Format(Strings.Summary_RegisteredStillUsed,
-            RegisteredFileCount, DisplayHelpers.PluraliseFileVerb(RegisteredFileCount));
+        string.Format(
+            DisplayHelpers.Pluralise(RegisteredFileCount,
+                Strings.Summary_RegisteredStillUsed_Singular,
+                Strings.Summary_RegisteredStillUsed_Plural),
+            RegisteredFileCount);
 
     public string OrphanedSummaryText =>
-        string.Format(Strings.Summary_OrphanedToCleanUp,
-            OrphanedFileCount, DisplayHelpers.PluraliseFile(OrphanedFileCount));
+        string.Format(
+            DisplayHelpers.Pluralise(OrphanedFileCount,
+                Strings.Summary_OrphanedToCleanUp_Singular,
+                Strings.Summary_OrphanedToCleanUp_Plural),
+            OrphanedFileCount);
 
     public bool HasMissingFromDisk => MissingNonRemovableCount > 0;
 
     public string MissingFromDiskSummaryText =>
-        string.Format(Strings.Summary_MissingFromDisk,
-            MissingNonRemovableCount, DisplayHelpers.PluraliseFileVerb(MissingNonRemovableCount));
+        string.Format(
+            DisplayHelpers.Pluralise(MissingNonRemovableCount,
+                Strings.Summary_MissingFromDisk_Singular,
+                Strings.Summary_MissingFromDisk_Plural),
+            MissingNonRemovableCount);
 
     partial void OnRegisteredFileCountChanged(int value) =>
         OnPropertyChanged(nameof(RegisteredSummaryText));

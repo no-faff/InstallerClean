@@ -264,10 +264,20 @@
   <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} sent to the Recycle Bin. {2} {3}</value></data>
 
   <!-- Summaries -->
-  <!-- 0 = file count, 1 = pluralised "file is"/"files are" -->
-  <data name="Summary.RegisteredStillUsed" xml:space="preserve"><value>{0} {1} still used</value></data>
-  <data name="Summary.OrphanedToCleanUp" xml:space="preserve"><value>{0} {1} to clean up</value></data>
-  <data name="Summary.MissingFromDisk" xml:space="preserve"><value>{0} registered {1} missing from disk. Windows refers to installer files that aren't there. Cleaning the cache won't change this.</value></data>
+  <!-- 0 = file count. Singular / plural pairs picked at the call
+       site by Pluralise(count, Singular, Plural); this avoids
+       concatenating a count and a "file is"/"files are" fragment
+       across a placeholder boundary, which does not survive
+       translation into languages where the noun-verb-count agreement
+       crosses the placeholder (Slavic case selection, Arabic dual,
+       Japanese particle placement, etc). A translator rewrites both
+       singular and plural keys per their language's rule. -->
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} file still used</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files still used</value></data>
+  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} file to clean up</value></data>
+  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} files to clean up</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from disk. Windows refers to installer files that aren't there. Cleaning the cache won't change this.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from disk. Windows refers to installer files that aren't there. Cleaning the cache won't change this.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} {2}</value></data>
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
@@ -419,14 +429,6 @@ The crash log could not be written.</value></data>
        not change. -->
   <data name="Plural.File.Singular" xml:space="preserve"><value>file</value></data>
   <data name="Plural.File.Plural" xml:space="preserve"><value>files</value></data>
-  <data name="Plural.FileVerb.Singular" xml:space="preserve">
-    <value>file is</value>
-    <comment>English-only: these fragments concatenate with a count across a placeholder boundary in Summary.RegisteredStillUsed and Summary.OrphanedToCleanUp ("{0} {1} still used"). The pattern does not survive translation into word-order-flexible languages (Slavic, Japanese, Arabic) where the noun-verb-count agreement crosses the placeholder. Languages other than English should rewrite both Summary keys to embed the fixed pluralisation rather than reuse this fragment.</comment>
-  </data>
-  <data name="Plural.FileVerb.Plural" xml:space="preserve">
-    <value>files are</value>
-    <comment>See Plural.FileVerb.Singular.</comment>
-  </data>
   <data name="Plural.Error.Singular" xml:space="preserve"><value>error</value></data>
   <data name="Plural.Error.Plural" xml:space="preserve"><value>errors</value></data>
   <data name="Plural.Package.Singular" xml:space="preserve"><value>package</value></data>

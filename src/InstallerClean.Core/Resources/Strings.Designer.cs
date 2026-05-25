@@ -212,8 +212,6 @@ public static class Strings
     public static string Plural_Error_Singular => Get("Plural.Error.Singular");
     public static string Plural_File_Plural => Get("Plural.File.Plural");
     public static string Plural_File_Singular => Get("Plural.File.Singular");
-    public static string Plural_FileVerb_Plural => Get("Plural.FileVerb.Plural");
-    public static string Plural_FileVerb_Singular => Get("Plural.FileVerb.Singular");
     public static string Plural_Package_Plural => Get("Plural.Package.Plural");
     public static string Plural_Package_Singular => Get("Plural.Package.Singular");
     public static string Plural_Product_Plural => Get("Plural.Product.Plural");
@@ -265,11 +263,14 @@ public static class Strings
     public static string Status_Scanning => Get("Status.Scanning");
     public static string Status_ScanningCache => Get("Status.ScanningCache");
     public static string Status_StartingScan => Get("Status.StartingScan");
-    public static string Summary_MissingFromDisk => Get("Summary.MissingFromDisk");
+    public static string Summary_MissingFromDisk_Plural => Get("Summary.MissingFromDisk.Plural");
+    public static string Summary_MissingFromDisk_Singular => Get("Summary.MissingFromDisk.Singular");
     public static string Summary_OperationFiles => Get("Summary.OperationFiles");
-    public static string Summary_OrphanedToCleanUp => Get("Summary.OrphanedToCleanUp");
+    public static string Summary_OrphanedToCleanUp_Plural => Get("Summary.OrphanedToCleanUp.Plural");
+    public static string Summary_OrphanedToCleanUp_Singular => Get("Summary.OrphanedToCleanUp.Singular");
     public static string Summary_OrphanedWindow => Get("Summary.OrphanedWindow");
-    public static string Summary_RegisteredStillUsed => Get("Summary.RegisteredStillUsed");
+    public static string Summary_RegisteredStillUsed_Plural => Get("Summary.RegisteredStillUsed.Plural");
+    public static string Summary_RegisteredStillUsed_Singular => Get("Summary.RegisteredStillUsed.Singular");
     public static string Summary_RegisteredWindow => Get("Summary.RegisteredWindow");
     public static string Tooltip_BuyMeACuppa => Get("Tooltip.BuyMeACuppa");
     public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");
