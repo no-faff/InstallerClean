@@ -162,6 +162,7 @@ public static class Strings
     public static string Confirm_MoveTitle => Get("Confirm.MoveTitle");
     public static string ConfirmSendResultLog_Reassurance => Get("ConfirmSendResultLog.Reassurance");
     public static string ConfirmSendResultLog_Title => Get("ConfirmSendResultLog.Title");
+    public static string CrashLog_PrivacyHeader => Get("CrashLog.PrivacyHeader");
     public static string Error_AccessDenied => Get("Error.AccessDenied");
     public static string Error_AccessDeniedDestination => Get("Error.AccessDeniedDestination");
     public static string Error_AdminRequiredBody => Get("Error.AdminRequiredBody");

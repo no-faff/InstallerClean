@@ -513,6 +513,22 @@ The crash log could not be written.</value></data>
        channel was unwritable, not just empty. -->
   <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Note: Event Log writing failed. Check Application channel permissions or Group Policy.</value></data>
 
+  <!-- crash.log privacy header. Prepended to a fresh crash.log so a
+       user attaching the file to a public bug report has the
+       disclosure before sharing. The "# " prefix lets log readers
+       that skip comment lines (less, grep -v, jq pipelines) skip
+       the header. Stored as one multi-line block; the C# side reads
+       it verbatim and normalises line endings to the host platform. -->
+  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log captures unhandled exceptions from InstallerClean.
+# Under elevation the framework's exception messages can include
+# file paths from the running session (including other users'
+# profiles enumerated by Windows Installer queries). Network-
+# failure messages from the update check or result-log POST can
+# include the destination URL and the resolved IP / proxy address.
+# Redact both classes of detail before attaching this file to a
+# public bug report.
+</value></data>
+
   <!-- CLI help text (printed by /? -? /h) -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - clean up C:\Windows\Installer</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Usage:</value></data>

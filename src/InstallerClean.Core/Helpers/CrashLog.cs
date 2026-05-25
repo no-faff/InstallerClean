@@ -1,4 +1,5 @@
 using System.Text;
+using InstallerClean.Resources;
 
 namespace InstallerClean.Helpers;
 
@@ -10,15 +11,12 @@ public static class CrashLog
 {
     private const long MaxBytes = 512 * 1024;
 
+    // resx stores the header as one multi-line block ending with a
+    // single LF. Normalise to the host platform's line endings so
+    // the file reads cleanly in Notepad / VS Code / less. The
+    // trailing blank line separates the header from the first entry.
     private static readonly string PrivacyHeader =
-        "# crash.log captures unhandled exceptions from InstallerClean." + Environment.NewLine +
-        "# Under elevation the framework's exception messages can include file" + Environment.NewLine +
-        "# paths from the running session (including other users' profiles" + Environment.NewLine +
-        "# enumerated by Windows Installer queries). Network-failure messages" + Environment.NewLine +
-        "# from the update check or result-log POST can include the destination" + Environment.NewLine +
-        "# URL and the resolved IP / proxy address. Redact both classes of" + Environment.NewLine +
-        "# detail before attaching this file to a public bug report." + Environment.NewLine +
-        Environment.NewLine;
+        Strings.CrashLog_PrivacyHeader.Replace("\n", Environment.NewLine) + Environment.NewLine;
 
     private static readonly string LogFolder = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
