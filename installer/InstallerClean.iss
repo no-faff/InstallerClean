@@ -53,6 +53,7 @@ SetupIconFile=..\src\InstallerClean\Assets\app.ico
 WizardStyle=modern dynamic
 DisableProgramGroupPage=yes
 WizardImageFile=wizard-image.bmp
+WizardImageFileDynamicDark=wizard-image-dark.bmp
 WizardSmallImageFile=wizard-small.png
 WizardSmallImageFileDynamicDark=wizard-small.png
 WizardImageAlphaFormat=defined
