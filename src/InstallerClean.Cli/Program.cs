@@ -111,7 +111,7 @@ internal static class Program
             }
             if (!holdsMutex)
             {
-                Console.WriteLine(Strings.Startup_AlreadyRunningBody);
+                Console.WriteLine(Strings.Cli_MutexBlocked);
                 // RMM consumer polling the Application channel for
                 // InstallerClean entries needs an audit record on the
                 // skipped path to distinguish it from "the task never
