@@ -163,7 +163,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         }
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
 
-        progress?.Report(string.Format(Strings.Status_FoundOrphans,
+        progress?.Report(string.Format(Strings.Status_FoundUnused,
             removable.Count, DisplayHelpers.PluraliseFile(removable.Count)));
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingNonRemovable, missingRemovable);
     }

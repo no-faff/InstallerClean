@@ -125,7 +125,7 @@
   <data name="Action.MITLicence" xml:space="preserve"><value>MIT licence</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Move</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Move destination...</value></data>
-  <data name="Action.OpenReleasePage" xml:space="preserve"><value>_Open release page</value></data>
+  <data name="Action.OpenReleasePage" xml:space="preserve"><value>Open _release page</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Re-scan</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Scan again</value></data>
   <data name="Action.SendResultLog" xml:space="preserve"><value>Send summary</value></data>
@@ -204,9 +204,9 @@
   <!-- 0 = elapsed time text (e.g. "1.2s") -->
   <data name="Status.ScanComplete" xml:space="preserve"><value>Scan complete ({0})</value></data>
   <!-- 0 = product count, 1 = pluralised "product"/"products" -->
-  <data name="Status.FoundProducts" xml:space="preserve"><value>Found {0} installed {1}. Scanning local packages...</value></data>
+  <data name="Status.FoundProducts" xml:space="preserve"><value>Scanning local packages...</value></data>
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
-  <data name="Status.FoundOrphans" xml:space="preserve"><value>Found {0} {1} to clean up.</value></data>
+  <data name="Status.FoundUnused" xml:space="preserve"><value>Found {0} {1} to clean up.</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>Preparing destination folder...</value></data>
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>Moving {0} {1}...</value></data>

@@ -244,8 +244,8 @@ public static class Strings
     public static string Status_Deleting => Get("Status.Deleting");
     public static string Status_Done => Get("Status.Done");
     public static string Status_EnumeratingProducts => Get("Status.EnumeratingProducts");
-    public static string Status_FoundOrphans => Get("Status.FoundOrphans");
     public static string Status_FoundProducts => Get("Status.FoundProducts");
+    public static string Status_FoundUnused => Get("Status.FoundUnused");
     public static string Status_MoveCancelled => Get("Status.MoveCancelled");
     public static string Status_MoveCancelled_Partial => Get("Status.MoveCancelled.Partial");
     public static string Status_MoveFailed => Get("Status.MoveFailed");
