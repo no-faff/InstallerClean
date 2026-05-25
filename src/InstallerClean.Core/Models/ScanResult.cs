@@ -26,14 +26,28 @@ namespace InstallerClean.Models;
 /// disk. Excludes <see cref="MissingFromDiskCount"/> entries so the
 /// total never includes non-existent files.
 /// </param>
-/// <param name="MissingFromDiskCount">
-/// Packages the API still claims but whose <c>LocalPackage</c> file is
-/// missing on disk. Surfaced as an info banner: a non-zero count usually
-/// means a previous third-party cleaner removed files Windows still
-/// expects to be there.
+/// <param name="MissingNonRemovableCount">
+/// Packages the API still treats as in-use but whose <c>LocalPackage</c>
+/// file is missing on disk. A non-zero value is the load-bearing signal
+/// for the missing-from-disk banner: it means another tool removed
+/// files Windows still references and a future install / uninstall /
+/// patch will fail when it goes looking for them.
+/// </param>
+/// <param name="MissingRemovableCount">
+/// Packages the API has marked superseded or obsoleted whose file is
+/// already gone from disk. Benign: Windows considers these removable,
+/// the file has already been removed, the entry is just leftover MSI
+/// registration. Counted separately from
+/// <see cref="MissingNonRemovableCount"/> so the banner only fires for
+/// the actionable case.
 /// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
     IReadOnlyList<RegisteredPackage> RegisteredPackages,
     long RegisteredTotalBytes,
-    int MissingFromDiskCount = 0);
+    int MissingNonRemovableCount = 0,
+    int MissingRemovableCount = 0)
+{
+    /// <summary>Total registered packages missing on disk; sum of the two sub-counts.</summary>
+    public int MissingFromDiskCount => MissingNonRemovableCount + MissingRemovableCount;
+}

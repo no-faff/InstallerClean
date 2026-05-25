@@ -72,10 +72,23 @@ public partial class ScanViewModel : ObservableObject
             "A new enum value was added without updating PendingRebootBannerText."),
     };
 
+    /// <summary>
+    /// Count of registered, non-removable packages whose file is missing
+    /// from disk. Drives the missing-from-disk banner: the banner only
+    /// triggers on this population, not on superseded patches whose
+    /// file is already gone (those are benign and counted separately
+    /// in <see cref="MissingRemovableCount"/>).
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasMissingFromDisk))]
     [NotifyPropertyChangedFor(nameof(MissingFromDiskSummaryText))]
-    private int _missingFromDiskCount;
+    private int _missingNonRemovableCount;
+
+    /// <summary>
+    /// Count of superseded / obsoleted packages whose file is already
+    /// gone from disk. Informational only; does not surface in the UI.
+    /// </summary>
+    [ObservableProperty] private int _missingRemovableCount;
 
     /// <summary>
     /// Cached result of the most recent successful scan. Null until
@@ -128,11 +141,11 @@ public partial class ScanViewModel : ObservableObject
         string.Format(Strings.Summary_OrphanedToCleanUp,
             OrphanedFileCount, DisplayHelpers.PluraliseFile(OrphanedFileCount));
 
-    public bool HasMissingFromDisk => MissingFromDiskCount > 0;
+    public bool HasMissingFromDisk => MissingNonRemovableCount > 0;
 
     public string MissingFromDiskSummaryText =>
         string.Format(Strings.Summary_MissingFromDisk,
-            MissingFromDiskCount, DisplayHelpers.PluraliseFileVerb(MissingFromDiskCount));
+            MissingNonRemovableCount, DisplayHelpers.PluraliseFileVerb(MissingNonRemovableCount));
 
     partial void OnRegisteredFileCountChanged(int value) =>
         OnPropertyChanged(nameof(RegisteredSummaryText));
@@ -163,7 +176,6 @@ public partial class ScanViewModel : ObservableObject
         var registeredSize = DisplayHelpers.FormatSize(result.RegisteredTotalBytes);
         var orphanedCount = result.RemovableFiles.Count;
         var orphanedSize = DisplayHelpers.FormatSize(result.RemovableFiles.Sum(f => f.SizeBytes));
-        var missingCount = result.MissingFromDiskCount;
 
         PendingRebootResult = pendingRebootResult;
         LastScanResult = result;
@@ -171,7 +183,8 @@ public partial class ScanViewModel : ObservableObject
         RegisteredSizeDisplay = registeredSize;
         OrphanedFileCount = orphanedCount;
         OrphanedSizeDisplay = orphanedSize;
-        MissingFromDiskCount = missingCount;
+        MissingNonRemovableCount = result.MissingNonRemovableCount;
+        MissingRemovableCount = result.MissingRemovableCount;
         HasScanned = true;
     }
 

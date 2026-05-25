@@ -100,7 +100,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // Stat every registered package once here so the Details window
         // doesn't have to hit disk on the UI thread when it opens.
         long stillUsedBytes = 0;
-        int missingFromDisk = 0;
+        int missingNonRemovable = 0;
+        int missingRemovable = 0;
         var sizedPackages = new List<RegisteredPackage>(registered.Count);
         foreach (var pkg in registered)
         {
@@ -123,37 +124,54 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 // doesn't break the scan.
             }
 
-            if (!exists) missingFromDisk++;
-
             sizedPackages.Add(pkg with { FileSizeBytes = size, FileExists = exists });
 
-            // Removable patches join the orphan list only when the file
-            // is still on disk. The MSI database can mark a patch
-            // superseded after the file was already removed by another
-            // cleaner or a manual sweep; adding such an entry would
-            // produce a guaranteed MissingSourceFile at operation time
-            // and a confusing failed-operation report. MissingFromDiskCount
-            // already reflects these entries for the banner.
-            if (pkg.IsRemovable && exists)
+            // Three populations to keep distinct:
+            //   removable + on-disk           → joins the orphan list
+            //   removable + missing           → benign leftover MSI
+            //                                   registration; counted to
+            //                                   MissingRemovableCount only
+            //   non-removable + on-disk       → still-used package
+            //   non-removable + missing       → load-bearing signal; an
+            //                                   API-claimed file is gone
+            //                                   from disk, and a future
+            //                                   install / uninstall / patch
+            //                                   that needs it will fail.
+            //                                   Drives the banner.
+            if (pkg.IsRemovable)
             {
-                var ext = _fs.Path.GetExtension(pkg.LocalPackagePath);
-                removable.Add(new OrphanedFile(
-                    FullPath: pkg.LocalPackagePath,
-                    SizeBytes: size,
-                    IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
-                    IsSuperseded: true,
-                    Reason: Strings.Reason_Superseded));
+                if (exists)
+                {
+                    var ext = _fs.Path.GetExtension(pkg.LocalPackagePath);
+                    removable.Add(new OrphanedFile(
+                        FullPath: pkg.LocalPackagePath,
+                        SizeBytes: size,
+                        IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
+                        IsSuperseded: true,
+                        Reason: Strings.Reason_Superseded));
+                }
+                else
+                {
+                    missingRemovable++;
+                }
             }
-            else if (!pkg.IsRemovable)
+            else
             {
-                stillUsedBytes += size;
+                if (exists)
+                {
+                    stillUsedBytes += size;
+                }
+                else
+                {
+                    missingNonRemovable++;
+                }
             }
         }
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
 
         progress?.Report(string.Format(Strings.Status_FoundOrphans,
             removable.Count, DisplayHelpers.PluraliseFile(removable.Count)));
-        return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingFromDisk);
+        return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingNonRemovable, missingRemovable);
     }
 
     private IEnumerable<string> GetInstallerFiles(string folder)

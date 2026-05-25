@@ -121,13 +121,14 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
-    public async Task ScanAsync_superseded_patches_missing_from_disk_are_excluded()
+    public async Task ScanAsync_superseded_patches_missing_from_disk_counted_to_removable_bucket()
     {
         // MSI database lists a patch as superseded but the underlying
         // file has already been removed (older cleaner, manual delete,
         // earlier PatchCleaner run). The scan should count it against
-        // MissingFromDiskCount and leave it out of RemovableFiles so
-        // a subsequent Delete or Move does not fail with MissingSourceFile.
+        // MissingRemovableCount (benign: Windows considers the patch
+        // removable already) and leave it out of RemovableFiles so a
+        // subsequent Delete or Move does not fail with MissingSourceFile.
         var registered = new List<RegisteredPackage>
         {
             Superseded(@"C:\Windows\Installer\ghost.msp"),
@@ -146,6 +147,38 @@ public class FileSystemScanServiceTests
 
         Assert.Empty(result.RemovableFiles);
         Assert.Empty(result.RegisteredPackages);
+        Assert.Equal(1, result.MissingRemovableCount);
+        Assert.Equal(0, result.MissingNonRemovableCount);
+        Assert.Equal(1, result.MissingFromDiskCount);
+    }
+
+    [Fact]
+    public async Task ScanAsync_non_removable_missing_from_disk_counted_to_non_removable_bucket()
+    {
+        // A registered, non-removable package (a current product, not a
+        // superseded patch) whose file has gone missing from disk. The
+        // load-bearing condition for the missing-from-disk banner: an
+        // API-claimed file Windows still needs is gone, and a future
+        // install / uninstall / patch will fail.
+        var registered = new List<RegisteredPackage>
+        {
+            Registered(@"C:\Windows\Installer\ghost.msi"),
+        };
+
+        var mockQuery = Substitute.For<IInstallerQueryService>();
+        mockQuery
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(registered.AsReadOnly());
+
+        var fs = new MockFileSystem();
+
+        var svc = new FileSystemScanService(mockQuery, fs, Array.Empty<string>(), null);
+        var result = await svc.ScanAsync();
+
+        Assert.Empty(result.RemovableFiles);
+        Assert.Single(result.RegisteredPackages);
+        Assert.Equal(1, result.MissingNonRemovableCount);
+        Assert.Equal(0, result.MissingRemovableCount);
         Assert.Equal(1, result.MissingFromDiskCount);
     }
 
