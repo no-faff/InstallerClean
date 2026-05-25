@@ -28,6 +28,16 @@ AppMutex=Global\InstallerClean_SingleInstance
 ; and the lifetime result-log lock survive across upgrades; clearing
 ; them would make every upgrade feel like a fresh install. There is
 ; no [UninstallDelete] section for that reason.
+;
+; WizardImageFileDynamicDark is not set. Under WizardStyle=modern
+; dynamic, Inno follows Windows light/dark; without a dark BMP the
+; light wizard-image.bmp shows against dark chrome in dark mode.
+; Closing this needs either a hand-designed dark-tone variant of
+; wizard-image.bmp (the existing image is brand artwork; a
+; programmatic invert / luminance shift would mangle the brand
+; palette) or dropping `dynamic` from WizardStyle so the wizard
+; stays in light mode regardless of Windows theme. Neither has
+; been actioned yet; the visible mismatch is mild.
 AppPublisher=No Faff
 AppPublisherURL=https://github.com/no-faff/InstallerClean
 AppSupportURL=https://github.com/no-faff/InstallerClean/discussions
