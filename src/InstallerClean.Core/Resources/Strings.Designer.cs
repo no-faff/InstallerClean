@@ -58,6 +58,7 @@ public static class Strings
     public static string Action_SendResultLog => Get("Action.SendResultLog");
     public static string Action_SendResultLogConfirm => Get("Action.SendResultLogConfirm");
     public static string Automation_BuyMeACuppa => Get("Automation.BuyMeACuppa");
+    public static string Automation_BuyMeACuppa_About => Get("Automation.BuyMeACuppa.About");
     public static string Automation_CancelOperation => Get("Automation.CancelOperation");
     public static string Automation_CancelScan => Get("Automation.CancelScan");
     public static string Automation_CancelStartupScan => Get("Automation.CancelStartupScan");
@@ -69,6 +70,7 @@ public static class Strings
     public static string Automation_ConfirmSendResultLog => Get("Automation.ConfirmSendResultLog");
     public static string Automation_DeleteAllFiles => Get("Automation.DeleteAllFiles");
     public static string Automation_LeaveStarOnGitHub => Get("Automation.LeaveStarOnGitHub");
+    public static string Automation_LeaveStarOnGitHub_About => Get("Automation.LeaveStarOnGitHub.About");
     public static string Automation_Minimise => Get("Automation.Minimise");
     public static string Automation_MoveAllFiles => Get("Automation.MoveAllFiles");
     public static string Automation_MoveDestinationFolder => Get("Automation.MoveDestinationFolder");

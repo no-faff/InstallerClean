@@ -490,8 +490,14 @@
             <!-- Underline AND brighten on hover so the link is
                  discoverable. Without an underline change, hover-only
                  reveals the link by colour shift, which fails for users
-                 with reduced colour vision. -->
+                 with reduced colour vision. The IsKeyboardFocused arm
+                 mirrors hover for a keyboard-only user: tabbing to the
+                 link surfaces the same colour + underline cue. -->
             <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource Link.Default}"/>
+                <Setter Property="TextDecorations" Value="Underline"/>
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
                 <Setter Property="Foreground" Value="{StaticResource Link.Default}"/>
                 <Setter Property="TextDecorations" Value="Underline"/>
             </Trigger>

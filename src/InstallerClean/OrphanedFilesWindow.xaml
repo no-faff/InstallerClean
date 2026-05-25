@@ -65,7 +65,7 @@
                                            Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
                                            TextTrimming="CharacterEllipsis" ToolTip="{Binding FullPath}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding Reason}"
-                                           Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"
+                                           Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Caption}"
                                            VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="2" Text="{Binding SizeDisplay}"
                                            Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}" TextAlignment="Right"/>
