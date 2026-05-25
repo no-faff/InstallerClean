@@ -46,33 +46,53 @@
                 <ColumnDefinition Width="380"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Style="{StaticResource CardNoPad}">
-                <ListBox x:Name="FilesList" ItemsSource="{Binding Files}"
-                         SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
-                         Background="Transparent" BorderThickness="0"
-                         Margin="16,8,0,8" HorizontalContentAlignment="Stretch"
-                         VirtualizingStackPanel.IsVirtualizing="True"
-                         VirtualizingStackPanel.VirtualizationMode="Recycling">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="0,1,16,1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="80"/>
-                                    <ColumnDefinition Width="72"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding FileName}"
-                                           Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
-                                           TextTrimming="CharacterEllipsis" ToolTip="{Binding FullPath}"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Reason}"
-                                           Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Caption}"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="2" Text="{Binding SizeDisplay}"
-                                           Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}" TextAlignment="Right"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+            <Border Grid.Column="0" Style="{StaticResource CardNoPad}" ClipToBounds="True">
+                <!-- ListView+GridView (was ListBox before v1.8.2). The
+                     GridView column headers give screen readers
+                     ("FileName, Reason, Size") so each row announces
+                     with column-headed cells; a flat ListBox row
+                     announced as a single cell, run-together. The
+                     RegisteredFilesWindow uses the same pattern. -->
+                <ListView x:Name="FilesList" ItemsSource="{Binding Files}"
+                          SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
+                          BorderThickness="0" Background="Transparent"
+                          Padding="0" Margin="0,-1,0,-6"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          VirtualizingStackPanel.IsVirtualizing="True"
+                          VirtualizingStackPanel.VirtualizationMode="Recycling">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="{loc:Translate Field.File}" Width="380"
+                                            x:Name="ColFileName">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding FileName}" Foreground="{StaticResource Text.Heading}"
+                                                   FontSize="{StaticResource Type.Heading.Sm}" TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding FullPath}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="{loc:Translate Field.Reason}" Width="100"
+                                            x:Name="ColReason">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Reason}" Foreground="{StaticResource Text.Muted}"
+                                                   FontSize="{StaticResource Type.Caption}" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="{loc:Translate Field.Size}" Width="90"
+                                            x:Name="ColSize">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Text.Body}"
+                                                   FontSize="{StaticResource Type.Body}" TextAlignment="Right"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </Border>
 
             <Border Grid.Column="2" Style="{StaticResource Card}">

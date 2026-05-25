@@ -36,7 +36,7 @@ public partial class OrphanedFilesWindow : Window
         {
             FilesList.SelectedIndex = 0;
             FilesList.ScrollIntoView(FilesList.Items[0]);
-            var container = (ListBoxItem?)FilesList.ItemContainerGenerator
+            var container = (ListViewItem?)FilesList.ItemContainerGenerator
                 .ContainerFromIndex(0);
             container?.Focus();
         }
