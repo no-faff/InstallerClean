@@ -3,6 +3,7 @@ using System.IO.Abstractions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
+using InstallerClean.Resources;
 using InstallerClean.Services;
 
 namespace InstallerClean.ViewModels;
@@ -109,6 +110,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// </summary>
     public bool IsMainContentInteractive =>
         !Scan.IsScanning && !Cleanup.IsOperating && !Completion.IsComplete;
+
+    /// <summary>
+    /// Body explanation paragraph with the two Reason values formatted
+    /// in. The resx template carries <c>{0}</c> and <c>{1}</c> for
+    /// Reason.Orphaned and Reason.Superseded so a translator can edit
+    /// the column labels in one place and have the body copy follow.
+    /// </summary>
+    public string MainExplanationText =>
+        string.Format(Strings.Body_MainExplanation, Strings.Reason_Orphaned, Strings.Reason_Superseded);
 
     private void OnChildPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {

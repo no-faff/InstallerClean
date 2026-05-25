@@ -25,11 +25,11 @@ internal static class UrlLauncher
         // path to it.
         var clipboardOk = TryCopyToClipboard(url);
         var body = clipboardOk
-            ? string.Format(Strings.BrowserLaunchFailedClipboardOk, url)
-            : string.Format(Strings.BrowserLaunchFailedClipboardFailed, url);
+            ? string.Format(Strings.BrowserLaunch_ClipboardOk, url)
+            : string.Format(Strings.BrowserLaunch_ClipboardFailed, url);
         MessageBox.Show(
             body,
-            Strings.BrowserLaunchFailedTitle,
+            Strings.BrowserLaunch_FailedTitle,
             MessageBoxButton.OK,
             MessageBoxImage.Information);
     }

@@ -91,9 +91,9 @@ public static class Strings
     public static string Body_PendingReboot_InstallerInProgress => Get("Body.PendingReboot.InstallerInProgress");
     public static string Body_PendingReboot_MsiExecuteMutex => Get("Body.PendingReboot.MsiExecuteMutex");
     public static string Body_PendingReboot_PendingRenameInCache => Get("Body.PendingReboot.PendingRenameInCache");
-    public static string BrowserLaunchFailedClipboardFailed => Get("BrowserLaunchFailedClipboardFailed");
-    public static string BrowserLaunchFailedClipboardOk => Get("BrowserLaunchFailedClipboardOk");
-    public static string BrowserLaunchFailedTitle => Get("BrowserLaunchFailedTitle");
+    public static string BrowserLaunch_ClipboardFailed => Get("BrowserLaunch.ClipboardFailed");
+    public static string BrowserLaunch_ClipboardOk => Get("BrowserLaunch.ClipboardOk");
+    public static string BrowserLaunch_FailedTitle => Get("BrowserLaunch.FailedTitle");
     public static string Cli_Cancelled => Get("Cli.Cancelled");
     public static string Cli_Cancelling => Get("Cli.Cancelling");
     public static string Cli_DeletedFiles => Get("Cli.DeletedFiles");
