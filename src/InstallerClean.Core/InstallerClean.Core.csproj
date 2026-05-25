@@ -32,14 +32,14 @@
     <!-- Abstractions only: callers register Core's services into their
          own IServiceCollection. The Core library itself doesn't pick
          a container implementation. -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
     <!-- EventLog is only available on Windows but the source builds
          for any platform. The platform analyser is satisfied by the
          assembly-wide [SupportedOSPlatform("windows7.0")] attribute in
          GlobalUsings.cs; EventLogWriter additionally wraps the call in
          a try/catch so a non-Windows host (or a Windows host with the
          service stopped) can't throw out of a logging call. -->
-    <PackageReference Include="System.Diagnostics.EventLog" Version="10.0.8" />
+    <PackageReference Include="System.Diagnostics.EventLog" Version="10.0.7" />
   </ItemGroup>
 
   <!-- Localisation: the typed Strings accessor is hand-managed via

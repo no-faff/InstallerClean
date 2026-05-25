@@ -40,7 +40,7 @@
          it to wire every service the main view-model graph needs.
          InstallerClean.Core only needs the Abstractions package
          (callers register Core's services into their own collection). -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>
