@@ -127,7 +127,14 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
             sizedPackages.Add(pkg with { FileSizeBytes = size, FileExists = exists });
 
-            if (pkg.IsRemovable)
+            // Removable patches join the orphan list only when the file
+            // is still on disk. The MSI database can mark a patch
+            // superseded after the file was already removed by another
+            // cleaner or a manual sweep; adding such an entry would
+            // produce a guaranteed MissingSourceFile at operation time
+            // and a confusing failed-operation report. MissingFromDiskCount
+            // already reflects these entries for the banner.
+            if (pkg.IsRemovable && exists)
             {
                 var ext = _fs.Path.GetExtension(pkg.LocalPackagePath);
                 removable.Add(new OrphanedFile(
@@ -137,7 +144,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     IsSuperseded: true,
                     Reason: Strings.Reason_Superseded));
             }
-            else
+            else if (!pkg.IsRemovable)
             {
                 stillUsedBytes += size;
             }

@@ -1,3 +1,4 @@
+using System.IO.Abstractions.TestingHelpers;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using InstallerClean.Models;
@@ -102,10 +103,13 @@ public class FileSystemScanServiceTests
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
-        // No orphaned files on disk; only the registered ones
-        var fakeFiles = Array.Empty<string>();
+        // Both registered files present on disk so the superseded entry
+        // passes the exists guard added for the missing-source-file case.
+        var fs = new MockFileSystem();
+        fs.AddFile(@"C:\Windows\Installer\applied.msp", new MockFileData(new byte[100]));
+        fs.AddFile(@"C:\Windows\Installer\superseded.msp", new MockFileData(new byte[200]));
 
-        var svc = new FileSystemScanService(mockQuery, fakeFiles);
+        var svc = new FileSystemScanService(mockQuery, fs, Array.Empty<string>(), null);
         var result = await svc.ScanAsync();
 
         // The superseded patch should appear in RemovableFiles with Reason="Superseded"
@@ -114,6 +118,35 @@ public class FileSystemScanServiceTests
 
         // The applied patch stays in RegisteredPackages
         Assert.Single(result.RegisteredPackages);
+    }
+
+    [Fact]
+    public async Task ScanAsync_superseded_patches_missing_from_disk_are_excluded()
+    {
+        // MSI database lists a patch as superseded but the underlying
+        // file has already been removed (older cleaner, manual delete,
+        // earlier PatchCleaner run). The scan should count it against
+        // MissingFromDiskCount and leave it out of RemovableFiles so
+        // a subsequent Delete or Move does not fail with MissingSourceFile.
+        var registered = new List<RegisteredPackage>
+        {
+            Superseded(@"C:\Windows\Installer\ghost.msp"),
+        };
+
+        var mockQuery = Substitute.For<IInstallerQueryService>();
+        mockQuery
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(registered.AsReadOnly());
+
+        // Empty MockFileSystem: ghost.msp is registered but not present.
+        var fs = new MockFileSystem();
+
+        var svc = new FileSystemScanService(mockQuery, fs, Array.Empty<string>(), null);
+        var result = await svc.ScanAsync();
+
+        Assert.Empty(result.RemovableFiles);
+        Assert.Empty(result.RegisteredPackages);
+        Assert.Equal(1, result.MissingFromDiskCount);
     }
 
     [Fact]
