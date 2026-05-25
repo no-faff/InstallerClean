@@ -38,7 +38,7 @@ internal static class Program
     /// <summary>POSIX convention: 130 == 128 + SIGINT (Ctrl+C).</summary>
     private const int ExitCancelled = 130;
 
-    public static async Task<int> Main(string[] args)
+    public static int Main(string[] args)
     {
         // Pin to UTF-8 so a Cli.* translation into a non-ASCII language
         // doesn't mojibake under redirected output (cmd /c
@@ -126,6 +126,35 @@ internal static class Program
             }
         }
 
+        try
+        {
+            // Sync-over-async wrapper so the acquired mutex (held on the
+            // Main thread per its Win32 owner-thread rule) is released
+            // by the same thread. Without this, the first await inside
+            // RunWorkAsync would hop the continuation onto a thread-pool
+            // thread and the finally's ReleaseMutex would throw
+            // ApplicationException, orphaning the mutex until process
+            // exit and forcing the next instance through the
+            // AbandonedMutexException path. A console Main has no
+            // SynchronizationContext, so GetResult here cannot deadlock
+            // on captured-context resumption.
+            return RunWorkAsync(arg, args, token).GetAwaiter().GetResult();
+        }
+        finally
+        {
+            // One stdout audit line per run: if any Write fell into the
+            // unavailable path, RMM consumers polling the Application
+            // channel see a record that the channel was unwritable.
+            if (EventLogWriter.EventLogUnavailable)
+                Console.WriteLine(Strings.Cli_EventLogUnavailable);
+            Console.CancelKeyPress -= cancelHandler;
+            if (holdsMutex) mutex!.ReleaseMutex();
+            mutex?.Dispose();
+        }
+    }
+
+    private static async Task<int> RunWorkAsync(string arg, string[] args, CancellationToken token)
+    {
         // Tracks the highest CurrentFile reported by the move/delete
         // progress reporter. On a Ctrl+C mid-loop the OCE catch reads
         // this to write an EventLog summary and pick ExitPartial vs
@@ -142,7 +171,7 @@ internal static class Program
             var scanService = services.GetRequiredService<IFileSystemScanService>();
 
             Console.WriteLine(Strings.Cli_ScanningInstaller);
-            var scanResult = await scanService.ScanAsync(cancellationToken: cts.Token);
+            var scanResult = await scanService.ScanAsync(cancellationToken: token);
 
             var count = scanResult.RemovableFiles.Count;
             var totalBytes = scanResult.RemovableFiles.Sum(f => f.SizeBytes);
@@ -223,7 +252,7 @@ internal static class Program
                 var deleteService = services.GetRequiredService<IDeleteFilesService>();
                 Console.WriteLine(string.Format(Strings.Cli_DeletingFiles,
                     count, DisplayHelpers.PluraliseFile(count)));
-                var result = await deleteService.DeleteFilesAsync(filePaths, progress, cts.Token);
+                var result = await deleteService.DeleteFilesAsync(filePaths, progress, token);
                 Console.WriteLine(string.Format(Strings.Cli_DeletedFiles,
                     result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
                 if (result.Errors.Count > 0)
@@ -299,7 +328,7 @@ internal static class Program
             var moveService = services.GetRequiredService<IMoveFilesService>();
             Console.WriteLine(string.Format(Strings.Cli_MovingFiles,
                 count, DisplayHelpers.PluraliseFile(count), dest));
-            var moveResult = await moveService.MoveFilesAsync(filePaths, dest, progress, cts.Token);
+            var moveResult = await moveService.MoveFilesAsync(filePaths, dest, progress, token);
             Console.WriteLine(string.Format(Strings.Cli_MovedFiles,
                 moveResult.MovedCount, DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
             if (moveResult.Errors.Count > 0)
@@ -357,17 +386,6 @@ internal static class Program
                 ? string.Format(Strings.Cli_GenericError, typeName, crash.Path)
                 : string.Format(Strings.Cli_GenericError_NoLog, typeName));
             return ExitError;
-        }
-        finally
-        {
-            // One stdout audit line per run: if any Write fell into the
-            // unavailable path, RMM consumers polling the Application
-            // channel see a record that the channel was unwritable.
-            if (EventLogWriter.EventLogUnavailable)
-                Console.WriteLine(Strings.Cli_EventLogUnavailable);
-            Console.CancelKeyPress -= cancelHandler;
-            if (holdsMutex) mutex!.ReleaseMutex();
-            mutex?.Dispose();
         }
     }
 
