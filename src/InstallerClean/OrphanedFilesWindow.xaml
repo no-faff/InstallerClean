@@ -47,12 +47,12 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Style="{StaticResource CardNoPad}" ClipToBounds="True">
-                <!-- ListView+GridView (was ListBox before v1.8.2). The
-                     GridView column headers give screen readers
-                     ("FileName, Reason, Size") so each row announces
-                     with column-headed cells; a flat ListBox row
-                     announced as a single cell, run-together. The
-                     RegisteredFilesWindow uses the same pattern. -->
+                <!-- ListView+GridView pattern matching
+                     RegisteredFilesWindow. The GridView column headers
+                     let screen readers announce each row as column-
+                     headed cells ("FileName, Reason, Size"); a flat
+                     ListBox row announces as a single cell with the
+                     values run together. -->
                 <ListView x:Name="FilesList" ItemsSource="{Binding Files}"
                           SelectedItem="{Binding SelectedFile, Mode=TwoWay}"
                           BorderThickness="0" Background="Transparent"
