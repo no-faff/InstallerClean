@@ -12,15 +12,8 @@
     <LangVersion>12</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <!-- R2R is off by .NET 10 default for the small self-contained
-         single-file shape this CLI publishes as, but pinning here
-         makes the absence explicit so a future SDK feature-band change
-         to the default cannot silently flip the CLI binary's R2R
-         section count. installerclean-cli ships inside
-         InstallerClean-setup.exe as self-contained; the same
-         AV-signal-stability rationale that InstallerClean.csproj
-         documents applies here, and the cold-start gain R2R would
-         buy is negligible for a one-shot console run. -->
+    <!-- R2R off, matching InstallerClean.csproj. Same AV-signal-
+         stability rationale documented there. -->
     <PublishReadyToRun>false</PublishReadyToRun>
     <RootNamespace>InstallerClean.Cli</RootNamespace>
     <AssemblyName>installerclean-cli</AssemblyName>

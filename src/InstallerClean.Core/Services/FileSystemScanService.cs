@@ -126,18 +126,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
             sizedPackages.Add(pkg with { FileSizeBytes = size, FileExists = exists });
 
-            // Three populations to keep distinct:
-            //   removable + on-disk           → joins the orphan list
-            //   removable + missing           → benign leftover MSI
-            //                                   registration; counted to
-            //                                   MissingRemovableCount only
-            //   non-removable + on-disk       → still-used package
-            //   non-removable + missing       → load-bearing signal; an
-            //                                   API-claimed file is gone
-            //                                   from disk, and a future
-            //                                   install / uninstall / patch
-            //                                   that needs it will fail.
-            //                                   Drives the banner.
+            // Non-removable + missing is the load-bearing banner signal:
+            // Windows still claims the file but it is gone from disk, so
+            // a future install / uninstall / patch will fail. Removable
+            // + missing is benign (Windows considers the patch already
+            // removed; the file having gone is the expected end state)
+            // and counts separately so the banner does not fire on it.
             if (pkg.IsRemovable)
             {
                 if (exists)
