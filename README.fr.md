@@ -19,7 +19,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=300" alt="Total des téléchargements"></a>
 </p>
 
-![Capture d'écran d'InstallerClean après un nettoyage réussi : 965 Mo libérés, 68 fichiers déplacés](docs/screenshots/04d-deleted-freed-success.webp)
+![Capture d'écran d'InstallerClean après un nettoyage réussi : 965 Mo libérés, 68 fichiers supprimés](docs/screenshots/04d-deleted-freed-success.webp)
 
 - **En bref :** Trouve et supprime les fichiers inutiles dans `C:\Windows\Installer`, le dossier caché que Windows ne nettoie jamais.
 - **Combien d'espace :** Ça dépend de vos logiciels. Sur ma machine, c'était presque 1 Go. Un utilisateur d'InstallerClean a [rapporté](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 Go. Avec Adobe Acrobat installé, ça peut dépasser 100 Go. Ça peut aussi être nul. L'idée, c'est que c'est rapide et gratuit ; tout ce qui peut être supprimé le sera.
@@ -102,7 +102,7 @@ Aucune activité réseau automatique. Deux boutons opt-in déclenchent un seul a
 </p>
 
 <p>
-  <img src="docs/screenshots/04d-deleted-freed-success.webp" alt="Superposition de succès montrant 965 Mo libérés après un déplacement" width="900"><br>
+  <img src="docs/screenshots/04d-deleted-freed-success.webp" alt="Superposition de succès montrant 965 Mo libérés après une suppression" width="900"><br>
   <em>Après un Déplacement réussi.</em>
 </p>
 
@@ -239,7 +239,7 @@ Accepte aussi `--help`, `/?` et `-h`. Pour lancer l'interface graphique, exécut
 
 `/d` et `/m` analysent puis agissent. `/d` envoie les fichiers supprimables à la Corbeille. `/m` les déplace vers un dossier (soit celui spécifié sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Codes de sortie : `0` succès complet, `2` partiel (certains fichiers réussis, certains échoués), `1` échec total (analyse échouée, mauvais arguments, ou tous les fichiers du lot ont échoué), `75` conditions transitoires (une autre instance d'InstallerClean est en cours, ou Windows Installer signale une transaction en attente ; réessai sans risque), `130` Ctrl+C.
 
-Les trois nécessitent une invite de commandes élevée (administrateur).
+Les trois nécessitent une invite de commandes élevée (administrateur). Si la stratégie de groupe bloque l'invite d'élévation UAC, le processus refuse de démarrer et Windows renvoie l'erreur 740 à l'invite parente (`$LASTEXITCODE = 740` en PowerShell). `taskkill /pid <pid>` ne déclenche pas d'annulation propre ; le mutex d'instance unique est récupéré au prochain lancement via le chemin AbandonedMutexException.
 
 À noter : la sortie de la CLI elle-même est en anglais. Les descriptions ci-dessus correspondent aux options disponibles.
 
