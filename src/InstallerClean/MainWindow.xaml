@@ -77,30 +77,17 @@
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
                           Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
                           VerticalAlignment="Center" Margin="{StaticResource GapRight.Icon}"/>
-                    <!-- LiveSetting=Polite so Narrator announces the
-                         banner when HasPendingReboot flips to true after
-                         a scan. The banner itself is the reason Move and
-                         Delete are disabled; a silent reveal leaves the
-                         screen-reader user without that context.
-
-                         The WPF UIA bridge has historically not re-fired
-                         LiveRegionChanged for a Visibility=Collapsed→
-                         Visible transition: LiveRegionChanged fires for
-                         text changes inside an already-rendered subtree.
-                         Two fixes exist if a screen-reader user reports
-                         a silent banner reveal: (a) keep the StackPanel
-                         in the tree always with Opacity and
-                         IsHitTestVisible toggled on HasPendingReboot
-                         (costs a permanent ~24px gap on every main-
-                         window load), or (b) raise an explicit
-                         LiveRegionChanged AutomationEvent from code-
-                         behind on the false→true transition
-                         (Dispatcher.BeginInvoke needed so the text
-                         binding has settled before the event fires).
-                         The actual .NET 10 WPF behaviour against this
-                         transition is unconfirmed by a live NVDA /
-                         Narrator pass. -->
-                    <TextBlock Text="{Binding Scan.PendingRebootBannerText}"
+                    <!-- LiveSetting=Polite + code-behind RaiseAutomationEvent
+                         on the false→true HasPendingReboot transition.
+                         The WPF UIA bridge has historically not re-
+                         fired LiveRegionChanged when an element enters
+                         the tree from Visibility=Collapsed; the bridge
+                         only re-announces a text change inside an
+                         already-rendered subtree. Code-behind raises
+                         LiveRegionChanged explicitly so the banner's
+                         appearance is announced. -->
+                    <TextBlock x:Name="PendingRebootBannerText"
+                               Text="{Binding Scan.PendingRebootBannerText}"
                                Foreground="{StaticResource Text.Body}" VerticalAlignment="Center"
                                AutomationProperties.LiveSetting="Polite"/>
                 </StackPanel>
@@ -111,7 +98,8 @@
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
                           Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
                           VerticalAlignment="Center" Margin="{StaticResource GapRight.Icon}"/>
-                    <TextBlock Text="{Binding Scan.MissingFromDiskSummaryText}"
+                    <TextBlock x:Name="MissingFromDiskBannerText"
+                               Text="{Binding Scan.MissingFromDiskSummaryText}"
                                TextWrapping="Wrap"
                                Foreground="{StaticResource Text.Body}" VerticalAlignment="Center"
                                AutomationProperties.LiveSetting="Polite"/>

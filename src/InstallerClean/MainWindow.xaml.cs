@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
@@ -67,6 +68,25 @@ public partial class MainWindow : Window
     {
         if (e.PropertyName == nameof(ScanViewModel.IsScanning) && _vm.Scan.IsScanning)
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => ScanCancelButton.Focus());
+
+        // Announce banner reveals to screen readers. WPF's UIA bridge
+        // historically did not re-fire LiveRegionChanged when an
+        // element enters the tree from Visibility=Collapsed; the
+        // bridge only re-announces a text change inside an already-
+        // rendered subtree. Raise the event explicitly on the
+        // false→true transition. Loaded priority defers past the
+        // binding update so the peer's text is current when the
+        // announcement fires.
+        if (e.PropertyName == nameof(ScanViewModel.HasPendingReboot) && _vm.Scan.HasPendingReboot)
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(PendingRebootBannerText));
+        if (e.PropertyName == nameof(ScanViewModel.HasMissingFromDisk) && _vm.Scan.HasMissingFromDisk)
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(MissingFromDiskBannerText));
+    }
+
+    private static void RaiseLiveRegionChanged(FrameworkElement element)
+    {
+        var peer = UIElementAutomationPeer.FromElement(element) ?? UIElementAutomationPeer.CreatePeerForElement(element);
+        peer?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
     }
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
