@@ -80,7 +80,24 @@
                          banner when HasPendingReboot flips to true after
                          a scan. The banner itself is the reason Move and
                          Delete are disabled; a silent reveal leaves the
-                         screen-reader user without that context. -->
+                         screen-reader user without that context.
+
+                         Known concern: the WPF UIA bridge has historically
+                         not re-fired LiveRegionChanged for a Visibility=
+                         Collapsed→Visible transition; the announcement
+                         only fires when an existing-in-tree element's
+                         text changes. The two reliable fixes are (a) keep
+                         the StackPanel in the tree always with Opacity
+                         and IsHitTestVisible toggled on HasPendingReboot
+                         (costs a permanent ~24px gap on every main-window
+                         load), and (b) raise an explicit LiveRegionChanged
+                         AutomationEvent from code-behind on the false→true
+                         transition (Dispatcher.BeginInvoke needed so the
+                         text binding has settled before the event fires).
+                         Both have cost; the actual .NET 10 WPF behaviour
+                         is unconfirmed by a live NVDA / Narrator pass.
+                         Revisit if a screen-reader user reports a silent
+                         banner reveal. -->
                     <TextBlock Text="{Binding Scan.PendingRebootBannerText}"
                                Foreground="{StaticResource Text.Body}" VerticalAlignment="Center"
                                AutomationProperties.LiveSetting="Polite"/>
