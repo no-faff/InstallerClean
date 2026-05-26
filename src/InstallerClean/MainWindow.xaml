@@ -114,7 +114,8 @@
                      this case is benign (Windows considers the patch
                      removable already). Muted italic Caption to mark it
                      as low-emphasis next to the warning banner. -->
-                <TextBlock Visibility="{Binding Scan.HasStaleMsiEntries, Converter={StaticResource BoolToVis}}"
+                <TextBlock x:Name="StaleMsiEntriesText"
+                           Visibility="{Binding Scan.HasStaleMsiEntries, Converter={StaticResource BoolToVis}}"
                            Text="{Binding Scan.StaleMsiEntriesText}"
                            Foreground="{StaticResource Text.Muted}"
                            FontStyle="Italic" FontSize="{StaticResource Type.Caption}"
@@ -563,7 +564,8 @@
                          though focus is on Done; otherwise the silent-
                          skip and post-POST status copy is invisible to
                          users on Narrator/NVDA/JAWS. -->
-                    <TextBlock Text="{Binding Completion.ResultLogStatusMessage}"
+                    <TextBlock x:Name="ResultLogStatusText"
+                               Text="{Binding Completion.ResultLogStatusMessage}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                Foreground="{StaticResource Text.Muted}"
                                FontSize="{StaticResource Type.Body}"

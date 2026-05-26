@@ -56,6 +56,21 @@ public partial class MainWindow : Window
     {
         if (e.PropertyName == nameof(CompletionViewModel.IsComplete) && _vm.Completion.IsComplete)
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
+
+        // ResultLogStatusMessage transitions empty -> non-empty on the
+        // first "Sending..." reveal. WPF's UIA bridge does not re-fire
+        // LiveRegionChanged for the Visibility=Collapsed→Visible
+        // DataTrigger that gates the TextBlock, so without an explicit
+        // raise the SR stays silent precisely when the user has just
+        // consented to a network call and wants confirmation. Later
+        // text changes (Sending -> Sent / Failed) fire LiveRegionChanged
+        // through the bridge normally because the TextBlock is already
+        // in the rendered tree by then.
+        if (e.PropertyName == nameof(CompletionViewModel.ResultLogStatusMessage)
+            && !string.IsNullOrEmpty(_vm.Completion.ResultLogStatusMessage))
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(ResultLogStatusText));
+        }
     }
 
     private void OnCleanupPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -78,6 +93,8 @@ public partial class MainWindow : Window
             Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(PendingRebootBannerText));
         if (e.PropertyName == nameof(ScanViewModel.HasMissingFromDisk) && _vm.Scan.HasMissingFromDisk)
             Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(MissingFromDiskBannerText));
+        if (e.PropertyName == nameof(ScanViewModel.HasStaleMsiEntries) && _vm.Scan.HasStaleMsiEntries)
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(StaleMsiEntriesText));
     }
 
     private static void RaiseLiveRegionChanged(FrameworkElement element)
