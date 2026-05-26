@@ -75,7 +75,12 @@
     <SolidColorBrush x:Key="Status.Success" Color="{StaticResource Primitive.Green.400}"/>
 
     <!-- Decoration. Brand-flavour icons. Distinct from Status colours
-         so the two coexist on screen without semantic collision. -->
+         so the two coexist on screen without semantic collision. Heart
+         (Red.500 #ef4444) is 3.89:1 against Surface.Sidebar #1e293b,
+         narrowly above the WCAG 1.4.11 non-text 3:1 threshold; the icon
+         is decorative (AutomationProperties.Name carries the meaning)
+         so the margin is acceptable. Brighten to Red.400 if a user
+         reports trouble seeing the heart against the sidebar. -->
     <SolidColorBrush x:Key="Decoration.Heart" Color="{StaticResource Primitive.Red.500}"/>
     <SolidColorBrush x:Key="Decoration.Star"  Color="{StaticResource Primitive.Amber.400}"/>
 

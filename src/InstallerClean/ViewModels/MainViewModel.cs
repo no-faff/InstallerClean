@@ -186,6 +186,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // resumption throws. The post-await action is a single
             // field write inside MarkResultLogReady; the binding system
             // has no UI left to update either way.
+            //
+            // Secondary risk: MarkResultLogReady's setter fires
+            // PropertyChanged for IsResultLogReady and IsSendResultLog
+            // Visible, which subscribers can route through ICommand
+            // .CanExecuteChanged. CommandManager.InvalidateRequerySuggested
+            // is dispatcher-affined; an InvalidOperationException
+            // through that path is caught by the outer try below, so
+            // the dispatcher-death case still fails closed (Send button
+            // stays hidden) rather than crashing the process.
             var entry = ResultLogEntry.ForScanOnly(
                 result, Scan.LastScanDurationMs, Scan.PendingRebootLabel);
             if (await _resultLogService.WriteAsync(entry).ConfigureAwait(false))

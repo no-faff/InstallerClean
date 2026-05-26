@@ -106,9 +106,18 @@ internal static class UnelevatedLauncher
         // "open URL with the default handler" shell entry.
         var system32 = Environment.GetFolderPath(Environment.SpecialFolder.System);
         var rundll32 = Path.Combine(system32, "rundll32.exe");
-        // %-encode embedded `"` so the outer quoting can't be closed
-        // early by a URL containing one.
-        var safeUrl = url.Replace("\"", "%22");
+        // Re-canonicalise through Uri to drop any shell-metacharacter
+        // surprise the literal Replace doesn't reach (raw `<`, `>`,
+        // `|`, `&`, `^`). Uri.AbsoluteUri percent-encodes anything
+        // outside the RFC 3986 reserved set. The %-replace on the
+        // outer `"` covers a quote landing inside the canonical form
+        // (Uri encodes `"` to %22 already; the second pass is belt-
+        // and-braces).
+        string safeUrl;
+        if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            safeUrl = uri.AbsoluteUri.Replace("\"", "%22");
+        else
+            safeUrl = url.Replace("\"", "%22");
         var commandLine = $"\"{rundll32}\" url.dll,FileProtocolHandler \"{safeUrl}\"";
 
         var si = new Advapi32.STARTUPINFO
@@ -132,6 +141,11 @@ internal static class UnelevatedLauncher
         }
 
         // Close the returned handles or the kernel objects leak.
+        // CloseHandle's return value is unchecked: failure here is rare
+        // and the leaked object is bounded by URL clicks per process
+        // lifetime; the worst case is a handful of HANDLEs the SAM
+        // reclaims at process exit. Logging would introduce noise on
+        // every successful path.
         if (pi.hProcess != IntPtr.Zero) Kernel32.CloseHandle(pi.hProcess);
         if (pi.hThread != IntPtr.Zero) Kernel32.CloseHandle(pi.hThread);
 
