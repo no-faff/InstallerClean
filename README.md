@@ -148,7 +148,7 @@ VirusTotal: clean across every engine. Live links in each release's notes so you
 
 ## What it doesn't do
 
-- WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, use Windows's built-in Disk Cleanup or `Dism /Online /Cleanup-Image /StartComponentCleanup`.
+- WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, run `Dism /Online /Cleanup-Image /StartComponentCleanup` from an elevated prompt.
 - No background service, no scheduled task, no auto-clean. The app runs when you launch it.
 - The registry is read-only. The app queries the Windows Installer database; it doesn't change it.
 - No automatic telemetry, no background network. The app makes no network call until you click one of two buttons. **Check for updates** in About queries GitHub's public releases API on click and tells you whether you have the latest version (single HTTPS GET, identifying string `InstallerClean/<version>`). **Send summary** on the completion screen reads `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` and HTTPS-POSTs it to a No Faff endpoint so I can see whether the run worked. The JSON contains counts and categorical labels only: no file paths, no user names, no machine identifiers, no time-of-day. Clicking opens a confirmation window showing the exact JSON about to be sent; review it there and press Send to confirm, or Cancel to back out. Once per machine: after a successful send the button stays hidden for ever; if the first attempt fails with a transient error the next session re-prompts.
