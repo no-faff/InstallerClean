@@ -199,8 +199,8 @@
 
   <!-- Body copy -->
   <data name="Body.MainExplanation" xml:space="preserve">
-    <value>C:\Windows\Installer caches the files Windows needs to repair and update installed software. The unused files shown below are no longer needed: the product was uninstalled ({0}) or a newer patch replaced this one ({1}). Delete them to the Recycle Bin or move them somewhere to be extra safe.</value>
-    <comment>{0} = Reason.Orphaned, {1} = Reason.Superseded. Keep the parenthetical structure so the column-Reason labels stay reachable from the body copy after translation.</comment>
+    <value>C:\Windows\Installer caches the files Windows needs to repair and update installed software. The unused files shown below are no longer needed: the product was uninstalled ({0}), a newer patch replaced this one ({1}), or the publisher withdrew it ({2}). Delete them to the Recycle Bin or move them somewhere to be extra safe.</value>
+    <comment>{0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer is currently processing an installation. Move and Delete are disabled until it finishes.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache.</value></data>

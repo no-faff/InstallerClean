@@ -49,7 +49,7 @@ public class MainViewModelTests
     private static ScanResult ScanResultWithOrphans(int count)
     {
         var files = Enumerable.Range(0, count)
-            .Select(i => new OrphanedFile($@"C:\Windows\Installer\orphan{i}.msi", 1024 * (i + 1), false, false, InstallerClean.Resources.Strings.Reason_Orphaned))
+            .Select(i => new OrphanedFile($@"C:\Windows\Installer\orphan{i}.msi", 1024 * (i + 1), false, false, false, InstallerClean.Resources.Strings.Reason_Orphaned))
             .ToList();
         return new ScanResult(files, Array.Empty<RegisteredPackage>(), 0);
     }
@@ -72,8 +72,8 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, Orphaned),
-            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, Orphaned),
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, Orphaned),
         };
         var registered = new List<RegisteredPackage>
         {
@@ -165,7 +165,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\huge.msi", 107_374_182_400, false, false, Orphaned), // 100 GB
+            new(@"C:\Windows\Installer\huge.msi", 107_374_182_400, false, false, false, Orphaned), // 100 GB
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -192,7 +192,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\empty.msi", 0, false, false, Orphaned),
+            new(@"C:\Windows\Installer\empty.msi", 0, false, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -324,8 +324,8 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, Orphaned),
-            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, Orphaned),
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -374,7 +374,7 @@ public class MainViewModelTests
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\x.msi", 524_288, false, false, Orphaned),
+            new(@"C:\Windows\Installer\x.msi", 524_288, false, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -586,7 +586,7 @@ public class MainViewModelTests
         var vm = CreateViewModel(new AppSettings { HasSentResultLog = true });
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msi", 1024, false, false, Orphaned),
+            new(@"C:\Windows\Installer\a.msi", 1024, false, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -647,7 +647,7 @@ public class MainViewModelTests
 
         var orphans = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\y.msi", 2048, false, false, Orphaned),
+            new(@"C:\Windows\Installer\y.msi", 2048, false, false, false, Orphaned),
         };
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
@@ -693,5 +693,79 @@ public class MainViewModelTests
         Assert.False(vm.Completion.IsSendResultLogVisible);
         await _resultLogService.DidNotReceive().WriteAsync(
             Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ScanViewModel_HasMissingFromDisk_tracks_MissingNonRemovableCount()
+    {
+        // Pins the predicate that drives the missing-from-disk banner
+        // visibility: it's a non-removable count, not the total
+        // missing-from-disk count (which would also include the
+        // benign removable+missing case the round-1 split fixed).
+        var vm = CreateViewModel();
+
+        var nonRemovable = new RegisteredPackage(
+            @"C:\Windows\Installer\nonremovable.msi", "Product", "{aaa}",
+            IsRemovable: false, FileExists: false);
+        var scan = new ScanResult(
+            RemovableFiles: Array.Empty<OrphanedFile>(),
+            RegisteredPackages: new[] { nonRemovable },
+            RegisteredTotalBytes: 0,
+            MissingNonRemovableCount: 1);
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(scan);
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Scan.HasMissingFromDisk);
+        Assert.Equal(1, vm.Scan.MissingNonRemovableCount);
+        Assert.Contains("1", vm.Scan.MissingFromDiskSummaryText);
+    }
+
+    [Fact]
+    public async Task ScanViewModel_HasStaleMsiEntries_tracks_MissingRemovableCount()
+    {
+        // The stale-MSI banner is informational (removable + missing-
+        // from-disk is the expected end state after a previous clean)
+        // and uses a separate counter from the load-bearing missing-
+        // from-disk banner.
+        var vm = CreateViewModel();
+
+        var removable = new RegisteredPackage(
+            @"C:\Windows\Installer\removable.msp", "Patch", "{bbb}",
+            IsRemovable: true, FileExists: false);
+        var scan = new ScanResult(
+            RemovableFiles: Array.Empty<OrphanedFile>(),
+            RegisteredPackages: new[] { removable },
+            RegisteredTotalBytes: 0,
+            MissingNonRemovableCount: 0,
+            MissingRemovableCount: 2);
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(scan);
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Scan.HasStaleMsiEntries);
+        Assert.False(vm.Scan.HasMissingFromDisk);
+        Assert.Equal(2, vm.Scan.MissingRemovableCount);
+        Assert.Contains("2", vm.Scan.StaleMsiEntriesText);
+    }
+
+    [Fact]
+    public void MainExplanationText_carries_all_three_reason_labels()
+    {
+        // The body copy template takes Reason.Orphaned, Reason.Superseded
+        // and Reason.Obsoleted as three format slots; a future template
+        // change that drops one of the three would silently leak a stray
+        // placeholder ({2}) into the rendered paragraph instead of a
+        // localised tag.
+        var vm = CreateViewModel();
+
+        Assert.Contains(Strings.Reason_Orphaned, vm.MainExplanationText);
+        Assert.Contains(Strings.Reason_Superseded, vm.MainExplanationText);
+        Assert.Contains(Strings.Reason_Obsoleted, vm.MainExplanationText);
+        Assert.DoesNotContain("{0}", vm.MainExplanationText);
+        Assert.DoesNotContain("{1}", vm.MainExplanationText);
+        Assert.DoesNotContain("{2}", vm.MainExplanationText);
     }
 }

@@ -112,13 +112,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         !Scan.IsScanning && !Cleanup.IsOperating && !Completion.IsComplete;
 
     /// <summary>
-    /// Body explanation paragraph with the two Reason values formatted
-    /// in. The resx template carries <c>{0}</c> and <c>{1}</c> for
-    /// Reason.Orphaned and Reason.Superseded so a translator can edit
-    /// the column labels in one place and have the body copy follow.
+    /// Body explanation paragraph with the three Reason values formatted
+    /// in. The resx template carries <c>{0}</c>, <c>{1}</c> and <c>{2}</c>
+    /// for Reason.Orphaned, Reason.Superseded and Reason.Obsoleted so a
+    /// translator can edit the column labels in one place and have the
+    /// body copy follow. Obsoleted (PatchState 4) is publisher-withdrawn
+    /// rather than newer-patch-replaced; the body distinguishes both.
     /// </summary>
     public string MainExplanationText =>
-        string.Format(Strings.Body_MainExplanation, Strings.Reason_Orphaned, Strings.Reason_Superseded);
+        string.Format(Strings.Body_MainExplanation,
+            Strings.Reason_Orphaned, Strings.Reason_Superseded, Strings.Reason_Obsoleted);
 
     private void OnChildPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {

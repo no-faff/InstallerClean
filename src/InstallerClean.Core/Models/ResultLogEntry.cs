@@ -23,7 +23,15 @@ public sealed record ResultLogEntry(
     ScanInfo Scan,
     OperationInfo Operation)
 {
-    public const int CurrentSchemaVersion = 1;
+    /// <summary>
+    /// Bumped to 2 in v1.8.2: <see cref="ScanInfo.SupersededCount"/> now
+    /// counts PatchState=Superseded (2) only. PatchState=Obsoleted (4)
+    /// entries land in a new <see cref="ScanInfo.ObsoletedCount"/> field.
+    /// v1 receivers saw both lumped under supersededCount; the rename
+    /// in the underlying flag (<c>IsRemovablePatch</c>) made the
+    /// pre-existing field name a lie.
+    /// </summary>
+    public const int CurrentSchemaVersion = 2;
 
     public static ResultLogEntry ForScanOnly(ScanResult scan, long scanDurationMs, string pendingReboot) =>
         new(
@@ -98,17 +106,23 @@ public sealed record ScanInfo(
     int RegisteredCount,
     int OrphanedCount,
     int SupersededCount,
+    int ObsoletedCount,
     int MissingFromDiskCount,
     string PendingReboot)
 {
     public static ScanInfo From(ScanResult scan, long durationMs, string pendingReboot)
     {
-        var supersededCount = scan.RemovableFiles.Count(f => f.IsSuperseded);
+        // Schema v2 separates Superseded (PatchState 2) from Obsoleted
+        // (PatchState 4). IsRemovablePatch covers both; IsObsoleted is
+        // true only for PatchState 4. OrphanedCount is the remainder.
+        var obsoletedCount = scan.RemovableFiles.Count(f => f.IsObsoleted);
+        var supersededCount = scan.RemovableFiles.Count(f => f.IsRemovablePatch) - obsoletedCount;
         return new(
             durationMs,
             scan.RegisteredPackages.Count,
-            scan.RemovableFiles.Count - supersededCount,
+            scan.RemovableFiles.Count - supersededCount - obsoletedCount,
             supersededCount,
+            obsoletedCount,
             scan.MissingFromDiskCount,
             pendingReboot);
     }

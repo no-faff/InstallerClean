@@ -22,9 +22,9 @@ public class OrphanedFilesViewModelTests
     {
         var files = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\small.msi", 100, false, false, Orphaned),
-            new(@"C:\Windows\Installer\large.msi", 10_000, false, false, Orphaned),
-            new(@"C:\Windows\Installer\medium.msi", 1_000, false, false, Orphaned),
+            new(@"C:\Windows\Installer\small.msi", 100, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\large.msi", 10_000, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\medium.msi", 1_000, false, false, false, Orphaned),
         };
 
         var vm = new OrphanedFilesViewModel(files, NullInfoService());
@@ -39,8 +39,8 @@ public class OrphanedFilesViewModelTests
     {
         var files = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msi", 524_288, false, false, Orphaned),
-            new(@"C:\Windows\Installer\b.msi", 524_288, false, false, Orphaned),
+            new(@"C:\Windows\Installer\a.msi", 524_288, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 524_288, false, false, false, Orphaned),
         };
 
         var vm = new OrphanedFilesViewModel(files, NullInfoService());
@@ -53,7 +53,7 @@ public class OrphanedFilesViewModelTests
     {
         var files = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, Orphaned),
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
         };
 
         var vm = new OrphanedFilesViewModel(files, NullInfoService());
@@ -66,8 +66,8 @@ public class OrphanedFilesViewModelTests
     {
         var files = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\small.msi", 100, false, false, Orphaned),
-            new(@"C:\Windows\Installer\large.msi", 10_000, false, false, Orphaned),
+            new(@"C:\Windows\Installer\small.msi", 100, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\large.msi", 10_000, false, false, false, Orphaned),
         };
 
         var vm = new OrphanedFilesViewModel(files, NullInfoService());
@@ -91,7 +91,7 @@ public class OrphanedFilesViewModelTests
     {
         var files = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msi", 1024, false, false, Orphaned),
+            new(@"C:\Windows\Installer\a.msi", 1024, false, false, false, Orphaned),
         };
 
         var vm = new OrphanedFilesViewModel(files, NullInfoService());
@@ -132,7 +132,7 @@ public class OrphanedFilesViewModelTests
 
         var files = new List<OrphanedFile>
         {
-            new(@"C:\Windows\Installer\a.msi", 1024, false, false, Orphaned),
+            new(@"C:\Windows\Installer\a.msi", 1024, false, false, false, Orphaned),
         };
         var vm = new OrphanedFilesViewModel(files, infoService);
 

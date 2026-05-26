@@ -99,7 +99,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 FullPath: filePath,
                 SizeBytes: size,
                 IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
-                IsSuperseded: false,
+                IsRemovablePatch: false,
+                IsObsoleted: false,
                 Reason: Strings.Reason_Orphaned));
         }
 
@@ -147,14 +148,16 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     // PatchState 4 = obsoleted (publisher-withdrawn);
                     // distinct API state, distinct Reason label, same
                     // user-visible outcome (the patch is removable).
-                    var reason = pkg.PatchState == 4
+                    var isObsoleted = pkg.PatchState == 4;
+                    var reason = isObsoleted
                         ? Strings.Reason_Obsoleted
                         : Strings.Reason_Superseded;
                     removable.Add(new OrphanedFile(
                         FullPath: pkg.LocalPackagePath,
                         SizeBytes: size,
                         IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
-                        IsSuperseded: true,
+                        IsRemovablePatch: true,
+                        IsObsoleted: isObsoleted,
                         Reason: reason));
                 }
                 else
