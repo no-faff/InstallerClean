@@ -285,10 +285,14 @@ public partial class CompletionViewModel : ObservableObject
             }
             catch (OperationCanceledException)
             {
-                // Caller cancellation propagates; the generic catch
-                // would otherwise downgrade it to a "Send failed"
-                // outcome if a token is wired through later.
-                throw;
+                // Caller-driven cancel: clear the "Sending..." caption
+                // and exit through the same wrap-up as a clean reject
+                // (outcome = Unknown). The AsyncRelayCommand wrapper
+                // would otherwise leave the SR-announced and visible
+                // status stuck at "Sending..." while the lifetime lock
+                // never engaged because the post-await reset block was
+                // skipped.
+                outcome = ResultLogSendOutcome.Unknown;
             }
             catch (Exception ex)
             {

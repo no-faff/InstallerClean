@@ -252,6 +252,18 @@ public partial class ScanViewModel : ObservableObject
         {
             ScanProgress = Strings.Status_ScanCancelled;
         }
+        catch (LocalisedAccessException ex)
+        {
+            // LocalisedAccessException carries a safe-to-echo resx
+            // message; surfacing it preserves the precise diagnosis
+            // (e.g., "Access denied enumerating installed products")
+            // rather than the generic "Run as administrator" guidance
+            // the BCL-UAE branch below shows. Order matters: this
+            // catch must precede catch (UnauthorizedAccessException)
+            // because LocalisedAccessException inherits from it.
+            _dialogService.ShowWarning(ex.Message, Strings.Error_AdminRequiredTitle);
+            ScanProgress = Strings.Status_ScanAccessDenied;
+        }
         catch (UnauthorizedAccessException)
         {
             _dialogService.ShowWarning(
