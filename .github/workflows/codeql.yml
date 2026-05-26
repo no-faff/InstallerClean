@@ -11,10 +11,11 @@ on:
 jobs:
   analyse:
     name: Analyse C#
-    # Pinned explicitly because the windows-latest label flips to
-    # windows-2025 (VS2026) underneath workflows on 2026-06-15;
-    # pinning eats the migration now rather than at release time.
-    runs-on: windows-2025
+    # See the matching comment in ci.yml: windows-2025 pin reverted
+    # after a codeload.github.com retrieval failure on the runner
+    # image released 2026-05-18. Re-attempt in early June ahead of
+    # the 2026-06-15 windows-latest flip.
+    runs-on: windows-latest
     permissions:
       security-events: write
 

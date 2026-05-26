@@ -8,10 +8,14 @@ on:
 
 jobs:
   build-and-test:
-    # Pinned explicitly because the windows-latest label flips to
-    # windows-2025 (VS2026) underneath workflows on 2026-06-15;
-    # pinning eats the migration now rather than at release time.
-    runs-on: windows-2025
+    # windows-latest until 2026-06-15 (Server 2022 + VS2022); after
+    # that, GitHub flips the label to windows-2025 (Server 2025 +
+    # VS2026). An attempt to pin to windows-2025 ahead of the flip
+    # surfaced a codeload.github.com retrieval failure for
+    # actions/setup-dotnet on the image as released on 2026-05-18,
+    # consistent across two CI and two CodeQL runs. Re-attempt the
+    # pin in early June; the windows-2025 image should have settled.
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
