@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using System.Security;
 using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Resources;
@@ -89,11 +90,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
             long size = 0;
             // IOException covers locked / vanished files; UnauthorizedAccess
             // covers payload subfolders the elevated process still can't
-            // read (deeply ACL'd MSI directories). OOM and the like are
-            // genuine bugs and propagate.
+            // read (deeply ACL'd MSI directories); SecurityException covers
+            // the rare CAS-policy path. OOM and the like propagate.
             try { size = _fs.FileInfo.New(filePath).Length; }
             catch (IOException) { /* file vanished or locked */ }
             catch (UnauthorizedAccessException) { /* unreadable subfolder */ }
+            catch (SecurityException) { /* CAS policy denies the FileInfo construction */ }
 
             removable.Add(new OrphanedFile(
                 FullPath: filePath,
@@ -124,12 +126,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     size = _fs.FileInfo.New(pkg.LocalPackagePath).Length;
                 }
             }
-            catch (Exception)
-            {
-                // Inaccessible package: treat as missing-from-disk
-                // (size=0, exists=false) so the count surfaces but
-                // doesn't break the scan.
-            }
+            // Same narrowed set as the orphan-file stat block above:
+            // IOException for locked / vanished, UnauthorizedAccessException
+            // for the deeply ACL'd payload subfolder case, SecurityException
+            // for the rare CAS-policy path. OOM / SOH propagate.
+            catch (IOException) { /* file vanished or locked between Exists and Length */ }
+            catch (UnauthorizedAccessException) { /* unreadable payload subfolder */ }
+            catch (SecurityException) { /* CAS policy denies the FileInfo construction */ }
 
             sizedPackages.Add(pkg with { FileSizeBytes = size, FileExists = exists });
 
