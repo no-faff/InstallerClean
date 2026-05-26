@@ -531,6 +531,20 @@ The crash log could not be written.</value></data>
        the Application channel sees a record of every scheduled-job
        firing whether or not it was able to run. -->
   <data name="Cli.EventLogMutexBlocked" xml:space="preserve"><value>{0} mode skipped: GUI or another CLI run is already holding the single-instance mutex.</value></data>
+  <!-- Audit entry for the LocalisedAccessException and
+       LocalisedInvalidOperationException catches: the message has been
+       built from a resx template with user-controlled args only, so the
+       full text is safe to record. 0 = mode arg, 1 = the localised
+       message (already-formatted). RMM consumers parsing the
+       Application channel see the actionable reason without a separate
+       crash-log lookup. -->
+  <data name="Cli.EventLogValidationFailed" xml:space="preserve"><value>{0} mode failed: {1}</value></data>
+  <!-- Audit entry for the generic Exception catch: ex.Message is held
+       back (path-leak risk under elevation), only the type name and
+       crash log path travel to the EventLog. 0 = mode arg, 1 = type
+       name, 2 = crash log path. -->
+  <data name="Cli.EventLogHardError" xml:space="preserve"><value>{0} mode failed: {1}. Details in {2}.</value></data>
+  <data name="Cli.EventLogHardError.NoLog" xml:space="preserve"><value>{0} mode failed: {1}. The crash log could not be written.</value></data>
   <!-- Stdout warning printed once at the end of a CLI run if any
        Event Log write failed (Group Policy or service unavailable).
        Tells an RMM consumer expecting an Application entry that the

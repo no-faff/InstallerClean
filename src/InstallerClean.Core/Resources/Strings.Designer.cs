@@ -102,6 +102,8 @@ public static class Strings
     public static string Cli_DeletingFiles => Get("Cli.DeletingFiles");
     public static string Cli_EventLogCancelledPartial => Get("Cli.EventLogCancelledPartial");
     public static string Cli_EventLogDeleteSummary => Get("Cli.EventLogDeleteSummary");
+    public static string Cli_EventLogHardError => Get("Cli.EventLogHardError");
+    public static string Cli_EventLogHardError_NoLog => Get("Cli.EventLogHardError.NoLog");
     public static string Cli_EventLogMoveDestinationInsideInstaller => Get("Cli.EventLogMoveDestinationInsideInstaller");
     public static string Cli_EventLogMoveDestinationInSystemFolder => Get("Cli.EventLogMoveDestinationInSystemFolder");
     public static string Cli_EventLogMoveDestinationRelative => Get("Cli.EventLogMoveDestinationRelative");
@@ -112,6 +114,7 @@ public static class Strings
     public static string Cli_EventLogScanFound => Get("Cli.EventLogScanFound");
     public static string Cli_EventLogScanNoOrphans => Get("Cli.EventLogScanNoOrphans");
     public static string Cli_EventLogUnavailable => Get("Cli.EventLogUnavailable");
+    public static string Cli_EventLogValidationFailed => Get("Cli.EventLogValidationFailed");
     public static string Cli_FoundOrphans => Get("Cli.FoundOrphans");
     public static string Cli_GenericError => Get("Cli.GenericError");
     public static string Cli_GenericError_NoLog => Get("Cli.GenericError.NoLog");

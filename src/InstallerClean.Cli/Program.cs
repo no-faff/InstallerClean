@@ -369,6 +369,8 @@ internal static class Program
             // deep in the framework can carry cross-profile paths and
             // falls through to the generic catch below.
             Console.WriteLine(ex.Message);
+            EventLogWriter.Write(EventLogWriter.Level.Warning,
+                string.Format(Strings.Cli_EventLogValidationFailed, arg, ex.Message));
             return ExitError;
         }
         catch (LocalisedInvalidOperationException ex)
@@ -381,6 +383,8 @@ internal static class Program
             // changed-mid-batch). The sysadmin sees what to fix
             // instead of a generic "see crash.log" breadcrumb.
             Console.WriteLine(ex.Message);
+            EventLogWriter.Write(EventLogWriter.Level.Warning,
+                string.Format(Strings.Cli_EventLogValidationFailed, arg, ex.Message));
             return ExitError;
         }
         catch (Exception ex)
@@ -393,6 +397,13 @@ internal static class Program
             Console.WriteLine(crash.Written
                 ? string.Format(Strings.Cli_GenericError, typeName, crash.Path)
                 : string.Format(Strings.Cli_GenericError_NoLog, typeName));
+            // EventLog the failure so an Application-channel audit picks
+            // up every CLI invocation, not just the success and partial-
+            // success branches. Same path-leak discipline as stdout:
+            // type-name + crash-log path only, never ex.Message.
+            EventLogWriter.Write(EventLogWriter.Level.Warning, crash.Written
+                ? string.Format(Strings.Cli_EventLogHardError, arg, typeName, crash.Path)
+                : string.Format(Strings.Cli_EventLogHardError_NoLog, arg, typeName));
             return ExitError;
         }
     }
