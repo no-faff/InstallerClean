@@ -11,11 +11,10 @@ on:
 jobs:
   analyse:
     name: Analyse C#
-    # See the matching comment in ci.yml: windows-2025 pin reverted
-    # after a codeload.github.com retrieval failure on the runner
-    # image released 2026-05-18. Re-attempt in early June ahead of
-    # the 2026-06-15 windows-latest flip.
-    runs-on: windows-latest
+    # See the matching comment in ci.yml: pinned to windows-2025
+    # ahead of the 2026-06-15 windows-latest flip so incompatibility
+    # shows up early.
+    runs-on: windows-2025
     permissions:
       security-events: write
 
