@@ -43,10 +43,8 @@ DefaultGroupName=InstallerClean
 UninstallDisplayIcon={app}\InstallerClean.exe
 OutputDir=..\publish
 OutputBaseFilename=InstallerClean-setup
-; zip compression doesn't honour SolidCompression; the setting is
-; kept out so the script doesn't claim a packing mode that isn't in
-; effect. zip is the AV-band-safe choice per CLAUDE.md (lzma2 trips
-; DeepInstinct historically).
+; zip rather than lzma2: lzma2 hit DeepInstinct false-positives on
+; the setup hash.
 Compression=zip
 MinVersion=10.0
 ArchitecturesAllowed=x64compatible

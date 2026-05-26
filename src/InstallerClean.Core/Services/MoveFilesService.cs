@@ -27,13 +27,7 @@ public sealed class MoveFilesService : IMoveFilesService
     {
         // Reject relative destinations: Path.GetFullPath would otherwise
         // resolve them against the process CWD, and the CLI host's CWD
-        // is whatever the caller invoked it from. The Localised* sentinel
-        // marks the message as built from a resx template with only
-        // user-controlled args (the typed destination path), so the CLI
-        // and GUI catches above the BCL-Exception arm can echo it
-        // verbatim. BCL-raised InvalidOperationException from inside the
-        // framework still falls through to the type-name + crash-log
-        // breadcrumb.
+        // is whatever the caller invoked it from.
         if (!Path.IsPathFullyQualified(destinationFolder))
             throw new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_DestinationNotFullyQualified, destinationFolder));
@@ -183,11 +177,7 @@ public sealed class MoveFilesService : IMoveFilesService
         {
             // ex.Message stays out of the thrown message (path-leak risk
             // under elevation); the inner exception preserves it for
-            // crash-log consumers via .InnerException. LocalisedAccessException
-            // marks the message as resx-templated and safe to echo, so
-            // CleanupViewModel's typed catch and the CLI's typed catch
-            // surface "Cannot write to {folder}" instead of the generic
-            // type-name + crash-log breadcrumb.
+            // crash-log consumers via .InnerException.
             throw new LocalisedAccessException(
                 string.Format(Strings.Error_CannotWriteFolder, folder), ex);
         }

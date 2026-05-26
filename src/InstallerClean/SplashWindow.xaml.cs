@@ -18,11 +18,9 @@ public partial class SplashWindow : Window
         InitializeComponent();
         VersionText.Text = DisplayHelpers.GetVersionString();
         this.SuppressFocusVisualOnDeactivation();
-        // Auto-focus the Cancel button on first frame: without an
-        // initial focus a keyboard-only user sees a splash with no
-        // visible focus ring and pressing Space does nothing until
-        // they Tab. Loaded fires after the visual tree is realised so
-        // the focus call actually lands.
+        // Loaded fires after the visual tree is realised, so Focus()
+        // on the only focusable element lands on first paint and the
+        // keyboard-only user sees a visible focus ring immediately.
         Loaded += (_, _) => CancelButton.Focus();
     }
 
@@ -54,12 +52,9 @@ public partial class SplashWindow : Window
     {
         CancelButton.IsEnabled = false;
         CancelButton.Content = Strings.Status_Cancelling;
-        // Sync the SR announcement with the visible label: the static
-        // XAML name was "Cancel startup scan" which an SR keeps
-        // announcing even after the visible Content has swapped to
-        // "Cancelling..." and the button is disabled. Mismatched name
-        // vs label vs state leaves the SR user uncertain whether their
-        // click landed.
+        // SR-announced name tracks the visible Content swap; a
+        // declared-once XAML name drifts from the post-click label and
+        // from IsEnabled=false.
         AutomationProperties.SetName(CancelButton, Strings.Status_Cancelling);
         // Tooltip explains the disabled state: cancellation is observed
         // at the next CancellationToken checkpoint, which during a

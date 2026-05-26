@@ -175,9 +175,7 @@
 
     <!-- Horizontal-only gap (both sides). Used where an inline
          element wants equal left+right margin without affecting
-         vertical layout. Sm/Lg variants live un-defined until a real
-         consumer surfaces, per the spacing-ramp policy at the top of
-         this file. -->
+         vertical layout. -->
     <Thickness x:Key="GapX.Md">12,0,12,0</Thickness>
 
     <!-- Outer margin shared by the detail windows (Orphaned, Registered,

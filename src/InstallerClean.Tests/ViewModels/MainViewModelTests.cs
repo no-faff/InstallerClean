@@ -698,10 +698,10 @@ public class MainViewModelTests
     [Fact]
     public async Task ScanViewModel_HasMissingFromDisk_tracks_MissingNonRemovableCount()
     {
-        // Pins the predicate that drives the missing-from-disk banner
-        // visibility: it's a non-removable count, not the total
-        // missing-from-disk count (which would also include the
-        // benign removable+missing case the round-1 split fixed).
+        // HasMissingFromDisk fires on the non-removable count alone.
+        // The removable+missing case (Windows considers them removed,
+        // the file having gone is the expected end state) counts
+        // separately so the load-bearing banner does not fire on it.
         var vm = CreateViewModel();
 
         var nonRemovable = new RegisteredPackage(
@@ -725,10 +725,11 @@ public class MainViewModelTests
     [Fact]
     public async Task ScanViewModel_HasStaleMsiEntries_tracks_MissingRemovableCount()
     {
-        // The stale-MSI banner is informational (removable + missing-
-        // from-disk is the expected end state after a previous clean)
-        // and uses a separate counter from the load-bearing missing-
-        // from-disk banner.
+        // The stale-MSI banner sources from MissingRemovableCount, a
+        // separate counter from the load-bearing missing-from-disk
+        // banner. Removable+missing is the expected end state of a
+        // patch the API still claims but the file has already been
+        // cleaned away.
         var vm = CreateViewModel();
 
         var removable = new RegisteredPackage(
@@ -754,11 +755,9 @@ public class MainViewModelTests
     [Fact]
     public void MainExplanationText_carries_all_three_reason_labels()
     {
-        // The body copy template takes Reason.Orphaned, Reason.Superseded
-        // and Reason.Obsoleted as three format slots; a future template
-        // change that drops one of the three would silently leak a stray
-        // placeholder ({2}) into the rendered paragraph instead of a
-        // localised tag.
+        // The body copy template carries three Reason format slots;
+        // a missing arg would surface as a literal "{2}" in the
+        // rendered text rather than a localised tag.
         var vm = CreateViewModel();
 
         Assert.Contains(Strings.Reason_Orphaned, vm.MainExplanationText);

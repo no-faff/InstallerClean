@@ -22,9 +22,7 @@
   <application xmlns="urn:schemas-microsoft-com:asm.v3">
     <windowsSettings>
       <!-- longPathAware so File.Move / Path.GetFullPath honour paths
-           past MAX_PATH (260 chars). DPI settings deliberately omitted
-           on the CLI: a console process has no windows, so dpiAware and
-           dpiAwareness affect nothing. -->
+           past MAX_PATH (260 chars). -->
       <longPathAware xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">true</longPathAware>
     </windowsSettings>
   </application>

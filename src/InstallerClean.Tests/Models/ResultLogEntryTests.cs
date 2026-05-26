@@ -70,10 +70,9 @@ public class ResultLogEntryTests
     [Fact]
     public void Schema_version_is_two()
     {
-        // v1.8.2 bumped to schema 2 to split obsoletedCount out of
-        // supersededCount. A silent bump in either direction would
-        // route every record through the lenient v<n>-unknown/ path
-        // on the receiving Edge Function.
+        // The receiving Edge Function field-validates per version; a
+        // silent bump routes every record through its lenient
+        // v<n>-unknown/ path.
         Assert.Equal(2, ResultLogEntry.CurrentSchemaVersion);
     }
 
@@ -94,10 +93,10 @@ public class ResultLogEntryTests
     public void ScanInfo_From_counts_orphaned_superseded_obsoleted_via_explicit_flags()
     {
         // IsRemovablePatch and IsObsoleted are stamped at scan time so
-        // ScanInfo.From doesn't have to look at the localised Reason
-        // string. PatchState=Superseded (2) sets IsRemovablePatch only;
-        // PatchState=Obsoleted (4) sets both flags; true orphans set
-        // neither.
+        // ScanInfo.From is culture-invariant (it doesn't read the
+        // localised Reason string). PatchState=Superseded (2) sets
+        // IsRemovablePatch only; PatchState=Obsoleted (4) sets both
+        // flags; true orphans set neither.
         var files = new List<OrphanedFile>
         {
             new(@"C:\a.msi", 1024, false, IsRemovablePatch: false, IsObsoleted: false, "Orphaned"),
@@ -120,10 +119,9 @@ public class ResultLogEntryTests
     [Fact]
     public void ScanInfo_From_obsoleted_only_does_not_inflate_supersededCount()
     {
-        // The pre-v1.8.2 implementation set IsSuperseded=true for
-        // PatchState=Obsoleted (4) too, so SupersededCount lumped both.
-        // This pins the v2 split: a scan with only obsoleted entries
-        // produces supersededCount=0.
+        // Obsoleted entries (IsObsoleted=true) increment obsoletedCount
+        // and not supersededCount; a scan with only obsoleted entries
+        // produces supersededCount=0 and obsoletedCount=N.
         var files = new List<OrphanedFile>
         {
             new(@"C:\a.msp", 2048, true, IsRemovablePatch: true, IsObsoleted: true, "Obsoleted"),

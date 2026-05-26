@@ -16,17 +16,15 @@ namespace InstallerClean.Models;
 /// <param name="SizeBytes">File size on disk; 0 if the file disappeared between scan and stat.</param>
 /// <param name="IsPatch">True for <c>.msp</c>, false for <c>.msi</c>. Drives the patch/installer column.</param>
 /// <param name="IsRemovablePatch">
-/// True for entries added because the Windows Installer database marks the
-/// patch removable (PatchState=Superseded or =Obsoleted), false for true
-/// orphans the API never claimed. Renamed from <c>IsSuperseded</c> in
-/// v1.8.2; the old name was a misnomer once the obsoleted distinction
-/// was added because PatchState=4 entries also set the flag.
+/// True for entries the Windows Installer database marks removable
+/// (PatchState=Superseded or PatchState=Obsoleted); false for true
+/// orphans the API never claimed.
 /// </param>
 /// <param name="IsObsoleted">
-/// True only for entries with PatchState=Obsoleted (4); false for both
-/// PatchState=Superseded (2) and true orphans. Used by the result-log
-/// schema to split <c>supersededCount</c> and <c>obsoletedCount</c>.
-/// Implies <see cref="IsRemovablePatch"/>; the inverse does not hold.
+/// True only for entries with PatchState=Obsoleted (4). Implies
+/// <see cref="IsRemovablePatch"/>; the inverse does not hold. The
+/// result-log schema splits <c>supersededCount</c> and
+/// <c>obsoletedCount</c> on this flag.
 /// </param>
 /// <param name="Reason">
 /// Localised tag shown in the Reason column of the orphan list. Sourced

@@ -271,13 +271,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             return;
         }
 
-        // System-folder gate mirrors the CLI's check at Program.cs.
         // %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and
-        // %ProgramData% sit on documented DLL-search and SxS-resolution
-        // paths; relocating MSI payloads there silently could plant a
-        // file Windows trusts at load time. A typed-by-mistake or
-        // pasted destination ("C:\Windows\System32\Spool") shouldn't
-        // proceed just because it passed the Installer-folder check.
+        // %ProgramData% sit on the Win32 DLL search path and the SxS
+        // resolution path: a process searching those paths trusts a
+        // planted file at load time.
         if (InstallerCacheHelpers.IsSystemFolderOrChild(dest))
         {
             _dialogService.ShowWarning(
@@ -429,20 +426,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (LocalisedInvalidOperationException ex)
         {
-            // Deliberate validation throw from MoveFilesService (not-
-            // fully-qualified destination, IsInstallerFolderOrChild race,
-            // destination-changed-mid-batch). Message is built from a
-            // resx template with user-controlled args only, so echoing
-            // is safe and tells the user what to fix.
             _dialogService.ShowWarning(ex.Message, Strings.Error_InvalidDestinationTitle);
             OperationProgress = string.Empty;
         }
         catch (LocalisedAccessException ex)
         {
-            // CreateDestinationFolder or ProbeDestinationWriteable could
-            // not write to the destination after the GUI's own pre-flight
-            // accepted it (a junction swap, antivirus locking the folder,
-            // etc.). The resx-templated message names the folder.
             _dialogService.ShowWarning(ex.Message, Strings.Error_DestinationWriteFailedTitle);
             OperationProgress = string.Empty;
         }

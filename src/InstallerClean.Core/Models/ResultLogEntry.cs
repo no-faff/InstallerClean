@@ -24,12 +24,11 @@ public sealed record ResultLogEntry(
     OperationInfo Operation)
 {
     /// <summary>
-    /// Bumped to 2 in v1.8.2: <see cref="ScanInfo.SupersededCount"/> now
-    /// counts PatchState=Superseded (2) only. PatchState=Obsoleted (4)
-    /// entries land in a new <see cref="ScanInfo.ObsoletedCount"/> field.
-    /// v1 receivers saw both lumped under supersededCount; the rename
-    /// in the underlying flag (<c>IsRemovablePatch</c>) made the
-    /// pre-existing field name a lie.
+    /// Schema 2 separates <see cref="ScanInfo.ObsoletedCount"/>
+    /// (PatchState=4) from <see cref="ScanInfo.SupersededCount"/>
+    /// (PatchState=2). Schema 1 envelopes lump both states under
+    /// supersededCount; receivers must branch on this version before
+    /// reading either field.
     /// </summary>
     public const int CurrentSchemaVersion = 2;
 
@@ -112,9 +111,9 @@ public sealed record ScanInfo(
 {
     public static ScanInfo From(ScanResult scan, long durationMs, string pendingReboot)
     {
-        // Schema v2 separates Superseded (PatchState 2) from Obsoleted
-        // (PatchState 4). IsRemovablePatch covers both; IsObsoleted is
-        // true only for PatchState 4. OrphanedCount is the remainder.
+        // IsRemovablePatch is the union of Superseded (2) and Obsoleted
+        // (4); IsObsoleted is true only for PatchState=4. OrphanedCount
+        // is the remainder after subtracting both.
         var obsoletedCount = scan.RemovableFiles.Count(f => f.IsObsoleted);
         var supersededCount = scan.RemovableFiles.Count(f => f.IsRemovablePatch) - obsoletedCount;
         return new(

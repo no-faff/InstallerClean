@@ -28,11 +28,9 @@ internal sealed class MutexProbe : IMutexProbe
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
         {
-            // PendingRebootService treats Exists==false as "not blocked";
-            // an OOM here would silently route a real "MSI install in
-            // flight" condition through the gate as Clean. Narrowing
-            // matches SettingsService.Load's documented pattern: known
-            // failure modes return false; OOM/SOH propagate.
+            // PendingRebootService treats Exists==false as "not blocked".
+            // Folding OOM into that return would silently route a real
+            // "MSI install in flight" condition through the gate as Clean.
             return false;
         }
     }

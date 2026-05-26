@@ -84,10 +84,9 @@ internal static class Program
         ConsoleCancelEventHandler cancelHandler = (_, cancelArgs) =>
         {
             cancelArgs.Cancel = true; // keep the process running long enough to stop gracefully
-            // Second Ctrl+C lands while the first is still being
-            // processed: don't print "Cancelling..." twice (line-count
-            // noise to RMM scripts that parse stdout, and the second
-            // Cancel call on an already-cancelled CTS is a no-op).
+            // Idempotent under repeated Ctrl+C: the stdout "Cancelling..."
+            // line must not double or scripts grepping `\d+ errors:` on
+            // a later line count drift by one.
             if (cts.IsCancellationRequested) return;
             Console.WriteLine();
             Console.WriteLine(Strings.Cli_Cancelling);
@@ -230,11 +229,11 @@ internal static class Program
                             "A new enum value was added without updating the CLI message switch."),
                     };
                     Console.WriteLine(stdoutMessage);
-                    // Short label for the EventLog: an operator grepping
-                    // the Application channel reads a human phrase, not
-                    // the enum identifier ("MsiExecuteMutexHeld"). The
-                    // labels stay English by convention even when the
-                    // stdout sentence is translated.
+                    // Short English label for the EventLog: the channel
+                    // is sysadmin-facing and stays English by convention
+                    // even when the stdout sentence is translated. An
+                    // Application-channel grep on a known phrase needs a
+                    // stable target.
                     var reasonLabel = reason switch
                     {
                         PendingRebootReason.MsiExecuteMutexHeld =>
@@ -288,11 +287,10 @@ internal static class Program
                     foreach (var err in result.Errors)
                         Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
                 }
-                // EventLog reports actually-deleted bytes, not the scan
-                // total. Without this subtraction, every partial-failure
-                // run logs "X MB recovered" where X is the upper bound
-                // (everything the scan flagged), overstating fleet-wide
-                // capacity-planning telemetry on every error.
+                // Bytes-recovered figure excludes the per-file error
+                // list. Reporting the scan total on a partial failure
+                // would overstate the freed-space figure for every run
+                // that didn't process every file.
                 long actualBytes = result.Errors.Count == 0
                     ? totalBytes
                     : SumBytesExcludingErrors(scanResult.RemovableFiles, result.Errors);
@@ -372,7 +370,7 @@ internal static class Program
                 foreach (var err in moveResult.Errors)
                     Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
             }
-            // Same actually-moved-bytes computation the /d branch does.
+            // Same per-file error exclusion as the /d branch.
             long actualMovedBytes = moveResult.Errors.Count == 0
                 ? totalBytes
                 : SumBytesExcludingErrors(scanResult.RemovableFiles, moveResult.Errors);
@@ -419,13 +417,7 @@ internal static class Program
         }
         catch (LocalisedInvalidOperationException ex)
         {
-            // Same contract as LocalisedAccessException: resx-templated
-            // safe-to-echo. Reached for InstallerQueryService throws
-            // (empty database, MSI enumerator hard-fail) and
-            // MoveFilesService validation throws (not-fully-qualified
-            // destination, IsInstallerFolderOrChild race, destination-
-            // changed-mid-batch). The sysadmin sees what to fix
-            // instead of a generic "see crash.log" breadcrumb.
+            // Same safe-to-echo contract as LocalisedAccessException.
             Console.WriteLine(ex.Message);
             EventLogWriter.Write(EventLogWriter.Level.Warning,
                 string.Format(Strings.Cli_EventLogValidationFailed, arg, ex.Message));
@@ -433,18 +425,15 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            // ex.Message stays out of stdout: under elevation it can carry
-            // cross-profile paths, and Task Scheduler / RMM tooling
-            // routinely captures stdout to disk.
+            // ex.Message stays out of stdout AND the EventLog: under
+            // elevation it can carry cross-profile paths, and Task
+            // Scheduler / RMM tooling routinely captures stdout to disk.
+            // Type-name + crash-log path only.
             var crash = Helpers.CrashLog.TryWrite(ex);
             var typeName = ex.GetType().Name;
             Console.WriteLine(crash.Written
                 ? string.Format(Strings.Cli_GenericError, typeName, crash.Path)
                 : string.Format(Strings.Cli_GenericError_NoLog, typeName));
-            // EventLog the failure so an Application-channel audit picks
-            // up every CLI invocation, not just the success and partial-
-            // success branches. Same path-leak discipline as stdout:
-            // type-name + crash-log path only, never ex.Message.
             EventLogWriter.Write(EventLogWriter.Level.Warning, crash.Written
                 ? string.Format(Strings.Cli_EventLogHardError, arg, typeName, crash.Path)
                 : string.Format(Strings.Cli_EventLogHardError_NoLog, arg, typeName));
