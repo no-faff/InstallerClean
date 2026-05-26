@@ -61,7 +61,12 @@ public sealed class UpdateCheckService : IUpdateCheckService
             request.Headers.UserAgent.ParseAdd(UserAgent);
             request.Headers.Accept.ParseAdd("application/vnd.github+json");
 
-            using var response = await HttpClient.SendAsync(request, cancellationToken)
+            // HttpCompletionOption.ResponseHeadersRead so the body is
+            // only buffered as it's read, not eagerly into HttpContent.
+            // The 256 KiB cap on MaxResponseContentBufferSize still
+            // gates the total bytes ReadAsStringAsync may materialise.
+            using var response = await HttpClient.SendAsync(
+                    request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
                 .ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
                 return new CheckFailed(UpdateCheckFailureReason.ServerError);

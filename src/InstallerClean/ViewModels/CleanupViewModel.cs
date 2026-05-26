@@ -171,19 +171,25 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // Reload before writing so this save doesn't clobber updates
         // made by other writers (the detail windows persist their
         // window size on close via the same ISettingsService).
-        var fresh = _settingsService.Load();
-        fresh.MoveDestination = _settings.MoveDestination;
-        _settings = fresh;
-        if (!_settingsService.TrySave(_settings))
+        // Off-dispatcher: Task.Delay's continuation lands here without
+        // ConfigureAwait, so absent the Task.Run, Load() and TrySave()
+        // would stall the UI thread for the duration of the disk hop
+        // (OneDrive-redirected or network-roaming profiles bite hardest).
+        await Task.Run(() =>
         {
-            // TrySave returns false on disk-full / read-only-profile /
-            // path-redirection failure (it never throws). This branch
-            // is fire-and-forget by design; without a breadcrumb a
-            // user report of "my destination reset between sessions"
-            // has no trail back to the failed write.
-            CrashLog.TryWrite(new InvalidOperationException(
-                "Settings.TrySave returned false during MoveDestination debounced save."));
-        }
+            var fresh = _settingsService.Load();
+            fresh.MoveDestination = _settings.MoveDestination;
+            _settings = fresh;
+            if (!_settingsService.TrySave(_settings))
+            {
+                // TrySave returns false on disk-full / read-only-profile /
+                // path-redirection failure (it never throws). Without a
+                // breadcrumb a user report of "my destination reset between
+                // sessions" has no trail back to the failed write.
+                CrashLog.TryWrite(new InvalidOperationException(
+                    "Settings.TrySave returned false during MoveDestination debounced save."));
+            }
+        }, token).ConfigureAwait(true);
 
         // Dispose the type-once-and-stop case (every other path is
         // covered by the next schedule call replacing the field).

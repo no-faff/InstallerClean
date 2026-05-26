@@ -82,9 +82,16 @@ internal static class UnelevatedLauncher
         }
         using var shellToken = shellTokenRaw;
 
+        // CreateProcessWithTokenW documents three required rights on
+        // the primary token: TOKEN_QUERY | TOKEN_DUPLICATE |
+        // TOKEN_ASSIGN_PRIMARY. Requesting MAXIMUM_ALLOWED hands back
+        // a token with every right the caller is permitted on the
+        // shell's token, which is wider than this call needs.
+        const uint createProcessWithTokenRights =
+            Advapi32.TOKEN_QUERY | Advapi32.TOKEN_DUPLICATE | Advapi32.TOKEN_ASSIGN_PRIMARY;
         if (!Advapi32.DuplicateTokenEx(
                 shellToken,
-                Advapi32.MAXIMUM_ALLOWED,
+                createProcessWithTokenRights,
                 IntPtr.Zero,
                 Advapi32.SecurityImpersonationLevel.SecurityImpersonation,
                 Advapi32.TokenType.TokenPrimary,

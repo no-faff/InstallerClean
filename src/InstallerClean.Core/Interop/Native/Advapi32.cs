@@ -50,7 +50,12 @@ internal static partial class Advapi32
         ref STARTUPINFO startupInfo,
         out PROCESS_INFORMATION processInformation);
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    // CharSet is omitted because [assembly: DisableRuntimeMarshalling]
+    // ignores it for managed structs; every string-shaped field below
+    // is already IntPtr. A managed string field added here would not
+    // get auto-marshalled by the attribute either, so the cue would
+    // mislead more than it helps.
+    [StructLayout(LayoutKind.Sequential)]
     public struct STARTUPINFO
     {
         public uint cb;
@@ -96,7 +101,7 @@ internal static partial class Advapi32
         TokenImpersonation,
     }
 
+    public const uint TOKEN_ASSIGN_PRIMARY  = 0x0001;
     public const uint TOKEN_DUPLICATE       = 0x0002;
     public const uint TOKEN_QUERY           = 0x0008;
-    public const uint MAXIMUM_ALLOWED       = 0x02000000;
 }

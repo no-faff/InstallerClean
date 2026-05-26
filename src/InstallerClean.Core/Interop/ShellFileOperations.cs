@@ -19,14 +19,21 @@ internal static class ShellFileOperations
     /// </summary>
     internal static int SendToRecycleBin(string path)
     {
+        // The ArgumentException type alone names the precondition; the
+        // message is overhead a caller's catch-by-type already conveys.
+        // DeleteFilesService catches with catch (Exception) and buckets
+        // the result as UnknownError, so the message never reaches the
+        // user. A future caller adding a catch-by-type ArgumentException
+        // branch would get the right shape without a misleading
+        // "source file is missing" message.
         if (string.IsNullOrEmpty(path))
-            throw new ArgumentException(Strings.Error_MissingSourceFile, nameof(path));
+            throw new ArgumentException(null, nameof(path));
 
         // pFrom is a list-of-strings encoding (null-terminated entries,
         // list end = second null); an embedded \0 in path would split
         // it into two delete entries.
         if (path.Contains('\0'))
-            throw new ArgumentException(Strings.Error_MissingSourceFile, nameof(path));
+            throw new ArgumentException(null, nameof(path));
 
         // pFrom needs double-null-terminated UTF-16. `path + "\0"`
         // gives the inner null; StringToCoTaskMemUni appends the
