@@ -471,7 +471,7 @@ The crash log could not be written.</value></data>
   <!-- CLI output. Console messages emitted by installerclean-cli.exe.
        Localised so non-English sysadmins reading scripted output get
        text matching their UI culture. -->
-  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Unknown argument: {0}</value></data>
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Unknown argument: '{0}'</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Cancelling...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Cancelled.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -591,7 +591,7 @@ The crash log could not be written.</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   success: every flagged file was processed</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some files processed, some failed</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   failure: nothing processed (bad args, scan failed, all files failed)</value></data>
-  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transient: GUI is running or a Windows Installer transaction is pending (try later)</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transient: GUI is running or installer transaction pending (try later)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 cancelled (Ctrl+C)</value></data>
 
 </root>

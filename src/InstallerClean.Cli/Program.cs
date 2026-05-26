@@ -84,6 +84,11 @@ internal static class Program
         ConsoleCancelEventHandler cancelHandler = (_, cancelArgs) =>
         {
             cancelArgs.Cancel = true; // keep the process running long enough to stop gracefully
+            // Second Ctrl+C lands while the first is still being
+            // processed: don't print "Cancelling..." twice (line-count
+            // noise to RMM scripts that parse stdout, and the second
+            // Cancel call on an already-cancelled CTS is a no-op).
+            if (cts.IsCancellationRequested) return;
             Console.WriteLine();
             Console.WriteLine(Strings.Cli_Cancelling);
             cts.Cancel();
@@ -273,7 +278,13 @@ internal static class Program
                     result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
                 if (result.Errors.Count > 0)
                 {
-                    Console.WriteLine($"{result.Errors.Count} {DisplayHelpers.PluraliseError(result.Errors.Count)}:");
+                    // Plural "errors:" emitted regardless of count: the
+                    // documented RMM-scrape contract is \d+ errors: on
+                    // stdout; the one-error case must keep the same
+                    // shape so a `grep -E '[0-9]+ errors:'` matches.
+                    // English-grammar oddity ("1 errors:") is the cost
+                    // of a stable machine-parseable surface.
+                    Console.WriteLine($"{result.Errors.Count} {Strings.Plural_Error_Plural}:");
                     foreach (var err in result.Errors)
                         Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
                 }
@@ -354,7 +365,10 @@ internal static class Program
                 moveResult.MovedCount, DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
             if (moveResult.Errors.Count > 0)
             {
-                Console.WriteLine($"{moveResult.Errors.Count} {DisplayHelpers.PluraliseError(moveResult.Errors.Count)}:");
+                // See the matching block in the /d branch for the
+                // always-plural rationale: the RMM-scrape contract on
+                // stdout requires "\d+ errors:".
+                Console.WriteLine($"{moveResult.Errors.Count} {Strings.Plural_Error_Plural}:");
                 foreach (var err in moveResult.Errors)
                     Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
             }
