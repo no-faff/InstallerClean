@@ -180,25 +180,29 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // read-only-profile failure; the Send button stays hidden
             // rather than overpainting a dialog on the all-clear summary.
             //
-            // ConfigureAwait(false): if the user closes the window
-            // between the startup scan completing and the write
-            // returning, the dispatcher is gone and a default-context
-            // resumption throws. The post-await action is a single
-            // field write inside MarkResultLogReady; the binding system
-            // has no UI left to update either way.
-            //
-            // Secondary risk: MarkResultLogReady's setter fires
-            // PropertyChanged for IsResultLogReady and IsSendResultLog
-            // Visible, which subscribers can route through ICommand
-            // .CanExecuteChanged. CommandManager.InvalidateRequerySuggested
-            // is dispatcher-affined; an InvalidOperationException
-            // through that path is caught by the outer try below, so
-            // the dispatcher-death case still fails closed (Send button
-            // stays hidden) rather than crashing the process.
+            // ConfigureAwait(false) drops the I/O continuation off the
+            // dispatcher so a window-close mid-await doesn't throw on
+            // resumption. MarkResultLogReady() fires PropertyChanged
+            // for IsResultLogReady and IsSendResultLogVisible; binding
+            // subscribers (Send button Visibility, CanExecuteChanged
+            // routed through CommandManager.InvalidateRequerySuggested)
+            // are dispatcher-affined. Marshal that single field-write
+            // back to the dispatcher so the property change actually
+            // updates the UI; without the marshal the cross-thread
+            // PropertyChanged throws InvalidOperationException, the
+            // outer catch swallows it, and the Send button silently
+            // never appears on a happy-path startup-scan.
             var entry = ResultLogEntry.ForScanOnly(
                 result, Scan.LastScanDurationMs, Scan.PendingRebootLabel);
-            if (await _resultLogService.WriteAsync(entry).ConfigureAwait(false))
-                Completion.MarkResultLogReady();
+            var written = await _resultLogService.WriteAsync(entry).ConfigureAwait(false);
+            if (written)
+            {
+                var dispatcher = System.Windows.Application.Current?.Dispatcher;
+                if (dispatcher is { HasShutdownStarted: false })
+                    await dispatcher.InvokeAsync(Completion.MarkResultLogReady);
+                // If the dispatcher is gone the window has closed; the
+                // Send button has no UI to update either way.
+            }
         }
         catch (Exception ex)
         {

@@ -174,19 +174,27 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             return;
         }
 
-        // Reload before writing so this save doesn't clobber updates
-        // made by other writers (the detail windows persist their
-        // window size on close via the same ISettingsService).
-        // Off-dispatcher: Task.Delay's continuation lands here without
-        // ConfigureAwait, so absent the Task.Run, Load() and TrySave()
-        // would stall the UI thread for the duration of the disk hop
-        // (OneDrive-redirected or network-roaming profiles bite hardest).
+        // Reload-then-merge happens off the dispatcher because Load()
+        // and TrySave() are disk hops (OneDrive-redirected or network-
+        // roaming profiles bite hardest). The current MoveDestination
+        // is captured on the dispatcher BEFORE the worker starts, so a
+        // keystroke landing during the disk hop writes into
+        // _settings.MoveDestination on the dispatcher and gets picked
+        // up by the next debounce cycle without disturbing this save.
+        // The _settings field is NOT reassigned; an earlier version of
+        // this method swapped _settings = fresh and lost a keystroke
+        // that landed on the orphan instance between the worker's
+        // snapshot read and the field swap. Reload still happens so
+        // this save doesn't clobber other writers (the detail windows
+        // persist their window size on close via the same
+        // ISettingsService); the reloaded instance is only used as the
+        // payload to TrySave, not as the new _settings.
+        var destinationSnapshot = _settings.MoveDestination;
         await Task.Run(() =>
         {
             var fresh = _settingsService.Load();
-            fresh.MoveDestination = _settings.MoveDestination;
-            _settings = fresh;
-            if (!_settingsService.TrySave(_settings))
+            fresh.MoveDestination = destinationSnapshot;
+            if (!_settingsService.TrySave(fresh))
             {
                 // TrySave returns false on disk-full / read-only-profile /
                 // path-redirection failure (it never throws). Without a
