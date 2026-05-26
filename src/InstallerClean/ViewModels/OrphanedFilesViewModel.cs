@@ -43,6 +43,12 @@ public partial class OrphanedFilesViewModel : ObservableObject, IDisposable
         IMsiFileInfoService infoService)
     {
         _infoService = infoService;
+        // Pre-sort by size descending so the largest reclaimable files
+        // show first. OrphanedFilesWindow.xaml.cs:Window_Loaded mirrors
+        // this initial state into the GridView sort-arrow indicator;
+        // changing the OrderBy direction or key here without updating
+        // the indicator initialiser produces an arrow that lies about
+        // the actual sort order.
         Files = files.OrderByDescending(f => f.SizeBytes).ToList();
 
         var totalSize = DisplayHelpers.FormatSize(files.Sum(f => f.SizeBytes));

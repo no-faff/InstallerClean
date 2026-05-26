@@ -49,8 +49,10 @@ public partial class OrphanedFilesWindow : Window
             container?.Focus();
         }
 
-        // VM pre-sorts by size descending; show the arrow to match so
-        // a column header announces "Sorted descending" out of the box.
+        // Initial state mirrors OrphanedFilesViewModel.ctor's
+        // OrderByDescending(f => f.SizeBytes). Both sites must move
+        // together; the cross-reference comment on the VM constructor
+        // names this dependency.
         _lastSortProperty = nameof(OrphanedFile.SizeBytes);
         _lastSortDirection = ListSortDirection.Descending;
         _lastSortColumn = ColSize;

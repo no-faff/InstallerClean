@@ -36,8 +36,8 @@
         <Setter Property="Padding" Value="0"/>
         <Setter Property="FontFamily" Value="{StaticResource Type.FontFamily}"/>
         <!-- IsTabStop=True so keyboard-only users can Tab onto a value
-             to Ctrl+C it. Display-only consumers (e.g. AboutWindow
-             VersionText) override to False individually. -->
+             and Ctrl+C it. Consumers that genuinely shouldn't be in
+             the tab order set IsTabStop="False" at the site. -->
         <Setter Property="IsTabStop" Value="True"/>
         <Setter Property="ContextMenu">
             <Setter.Value>
