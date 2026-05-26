@@ -500,16 +500,25 @@ The crash log could not be written.</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Error: destination cannot be inside the Windows Installer folder.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Error: destination must be a fully qualified path. Got: {0}</value></data>
-  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Error: saved destination resolves under a Windows system folder ({0}). Pass an explicit path on the command line, or open the GUI and update the saved destination.</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%.</value></data>
   <!-- 0 = destination -->
   <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve"><value>{0} mode aborted: destination {1} is inside C:\Windows\Installer.</value></data>
   <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>{0} mode aborted: destination {1} is not a fully qualified path.</value></data>
-  <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0} mode aborted: saved destination {1} resolves inside a Windows system folder.</value></data>
+  <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0} mode aborted: destination {1} resolves inside a Windows system folder.</value></data>
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: Windows Installer is currently processing an installation. Move and Delete are blocked until it finishes. Try again once it completes.</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning.</value></data>
-  <!-- 0 = arg ("/d" or "/m"), 1 = reason name (MsiExecuteMutexHeld/InstallerInProgress/PendingRenameInCache), 2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
+  <!-- Short human labels for the EventLog ({1} slot in
+       Cli.EventLogPendingRebootBlocked). The stdout sentences in
+       Cli.PendingRebootBlocked.* are full localised text; these short
+       labels stay sysadmin-shaped so an Application-channel grep can
+       match a known string regardless of OS UI culture. -->
+  <data name="Cli.EventLogReason.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer mutex held</value></data>
+  <data name="Cli.EventLogReason.InstallerInProgress" xml:space="preserve"><value>installer transaction in progress</value></data>
+  <data name="Cli.EventLogReason.PendingRenameInCache" xml:space="preserve"><value>queued post-reboot file rename targets the Installer cache</value></data>
+  <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
+       2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
   <data name="Cli.EventLogPendingRebootBlocked" xml:space="preserve"><value>{0} mode aborted: pending reboot detected, reason: {1}. {2}</value></data>
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination -->
   <data name="Cli.MovingFiles" xml:space="preserve"><value>Moving {0} {1} to {2}...</value></data>

@@ -209,7 +209,8 @@ internal static class Program
                 {
                     // Block + null Reason is unreachable per the PendingRebootResult.Block
                     // factory contract; .Value is safe inside this IsBlocked branch.
-                    var stdoutMessage = rebootCheck.Reason!.Value switch
+                    var reason = rebootCheck.Reason!.Value;
+                    var stdoutMessage = reason switch
                     {
                         PendingRebootReason.MsiExecuteMutexHeld =>
                             Strings.Cli_PendingRebootBlocked_MsiExecuteMutex,
@@ -220,14 +221,29 @@ internal static class Program
                                 Strings.Cli_PendingRebootBlocked_PendingRenameInCache,
                                 rebootCheck.Detail ?? string.Empty),
                         _ => throw new InvalidOperationException(
-                            $"Unhandled PendingRebootReason: {rebootCheck.Reason!.Value}. " +
+                            $"Unhandled PendingRebootReason: {reason}. " +
                             "A new enum value was added without updating the CLI message switch."),
                     };
                     Console.WriteLine(stdoutMessage);
+                    // Short label for the EventLog: an operator grepping
+                    // the Application channel reads a human phrase, not
+                    // the enum identifier ("MsiExecuteMutexHeld"). The
+                    // labels stay English by convention even when the
+                    // stdout sentence is translated.
+                    var reasonLabel = reason switch
+                    {
+                        PendingRebootReason.MsiExecuteMutexHeld =>
+                            Strings.Cli_EventLogReason_MsiExecuteMutex,
+                        PendingRebootReason.InstallerInProgress =>
+                            Strings.Cli_EventLogReason_InstallerInProgress,
+                        PendingRebootReason.PendingRenameInCache =>
+                            Strings.Cli_EventLogReason_PendingRenameInCache,
+                        _ => reason.ToString(),
+                    };
                     EventLogWriter.Write(EventLogWriter.Level.Warning,
                         string.Format(Strings.Cli_EventLogPendingRebootBlocked,
                             arg,
-                            rebootCheck.Reason?.ToString() ?? "Unknown",
+                            reasonLabel,
                             rebootCheck.Detail ?? string.Empty));
                     // Transient: a reboot clears the gate. Hard scan and
                     // move/delete failures stay on ExitError.
@@ -261,11 +277,20 @@ internal static class Program
                     foreach (var err in result.Errors)
                         Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
                 }
+                // EventLog reports actually-deleted bytes, not the scan
+                // total. Without this subtraction, every partial-failure
+                // run logs "X MB recovered" where X is the upper bound
+                // (everything the scan flagged), overstating fleet-wide
+                // capacity-planning telemetry on every error.
+                long actualBytes = result.Errors.Count == 0
+                    ? totalBytes
+                    : SumBytesExcludingErrors(scanResult.RemovableFiles, result.Errors);
+                var actualSize = DisplayHelpers.FormatSize(actualBytes);
                 var level = result.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
                 EventLogWriter.Write(level,
                     string.Format(Strings.Cli_EventLogDeleteSummary,
                         arg, result.DeletedCount, count, DisplayHelpers.PluraliseFile(count),
-                        size, result.Errors.Count, DisplayHelpers.PluraliseError(result.Errors.Count)));
+                        actualSize, result.Errors.Count, DisplayHelpers.PluraliseError(result.Errors.Count)));
                 if (result.Errors.Count == 0) return ExitOk;
                 if (result.DeletedCount > 0) return ExitPartial;
                 return ExitError;
@@ -333,11 +358,16 @@ internal static class Program
                 foreach (var err in moveResult.Errors)
                     Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
             }
+            // Same actually-moved-bytes computation the /d branch does.
+            long actualMovedBytes = moveResult.Errors.Count == 0
+                ? totalBytes
+                : SumBytesExcludingErrors(scanResult.RemovableFiles, moveResult.Errors);
+            var actualMovedSize = DisplayHelpers.FormatSize(actualMovedBytes);
             var moveLevel = moveResult.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
             EventLogWriter.Write(moveLevel,
                 string.Format(Strings.Cli_EventLogMoveSummary,
                     arg, moveResult.MovedCount, count, DisplayHelpers.PluraliseFile(count),
-                    dest, size, moveResult.Errors.Count, DisplayHelpers.PluraliseError(moveResult.Errors.Count)));
+                    dest, actualMovedSize, moveResult.Errors.Count, DisplayHelpers.PluraliseError(moveResult.Errors.Count)));
             if (moveResult.Errors.Count == 0) return ExitOk;
             if (moveResult.MovedCount > 0) return ExitPartial;
             return ExitError;
@@ -406,6 +436,23 @@ internal static class Program
                 : string.Format(Strings.Cli_EventLogHardError_NoLog, arg, typeName));
             return ExitError;
         }
+    }
+
+    /// <summary>
+    /// Sums the SizeBytes of every scanned removable file whose FullPath
+    /// is not in the error list. Matches the GUI's actually-moved-bytes
+    /// computation at CleanupViewModel.cs so a fleet of GUI and CLI
+    /// machines produces telemetry on the same axis.
+    /// </summary>
+    private static long SumBytesExcludingErrors(
+        IReadOnlyList<OrphanedFile> removableFiles,
+        IReadOnlyList<FileOperationError> errors)
+    {
+        var errorPaths = new HashSet<string>(
+            errors.Select(e => e.FilePath), StringComparer.OrdinalIgnoreCase);
+        return removableFiles
+            .Where(f => !errorPaths.Contains(f.FullPath))
+            .Sum(f => f.SizeBytes);
     }
 
     private static void PrintUsage()

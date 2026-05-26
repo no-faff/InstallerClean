@@ -111,6 +111,9 @@ public static class Strings
     public static string Cli_EventLogMoveSummary => Get("Cli.EventLogMoveSummary");
     public static string Cli_EventLogMutexBlocked => Get("Cli.EventLogMutexBlocked");
     public static string Cli_EventLogPendingRebootBlocked => Get("Cli.EventLogPendingRebootBlocked");
+    public static string Cli_EventLogReason_InstallerInProgress => Get("Cli.EventLogReason.InstallerInProgress");
+    public static string Cli_EventLogReason_MsiExecuteMutex => Get("Cli.EventLogReason.MsiExecuteMutex");
+    public static string Cli_EventLogReason_PendingRenameInCache => Get("Cli.EventLogReason.PendingRenameInCache");
     public static string Cli_EventLogScanFound => Get("Cli.EventLogScanFound");
     public static string Cli_EventLogScanNoOrphans => Get("Cli.EventLogScanNoOrphans");
     public static string Cli_EventLogUnavailable => Get("Cli.EventLogUnavailable");
