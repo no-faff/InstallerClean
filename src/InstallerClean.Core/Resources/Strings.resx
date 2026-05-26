@@ -114,10 +114,11 @@
   <data name="Action.CheckForUpdates" xml:space="preserve"><value>Check for _updates</value></data>
   <data name="Action.Close" xml:space="preserve"><value>_Close</value></data>
   <data name="Action.Delete" xml:space="preserve"><value>_Delete</value></data>
-  <!-- No Alt mnemonic: the completion overlay sits over the Delete
-       button below, and Alt+D on a visible overlay would dismiss
-       Done then fire Delete on the next press. IsDefault=True makes
-       Enter the keyboard shortcut. -->
+  <!-- Alt+D safe here because the Delete button under the overlay is
+       disabled while Completion.IsComplete is true (IsMainContentInteractive
+       binds the body region to false); the mnemonic only resolves to
+       this Done button. IsDefault=True keeps Enter as the primary
+       keyboard shortcut. -->
   <data name="Action.Done" xml:space="preserve"><value>_Done</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Details</value></data>
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Buy me a cuppa</value></data>
@@ -211,7 +212,6 @@
   <data name="Status.RegistryScanComplete" xml:space="preserve"><value>Scan complete. {0} registered {1} found.</value></data>
   <!-- 0 = elapsed time text (e.g. "1.2s") -->
   <data name="Status.ScanComplete" xml:space="preserve"><value>Scan complete ({0})</value></data>
-  <!-- 0 = product count, 1 = pluralised "product"/"products" -->
   <data name="Status.FoundProducts" xml:space="preserve"><value>Scanning local packages...</value></data>
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
   <data name="Status.FoundUnused" xml:space="preserve"><value>Found {0} {1} to clean up.</value></data>

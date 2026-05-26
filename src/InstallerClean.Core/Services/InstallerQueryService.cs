@@ -46,8 +46,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         var products = EnumerateProducts(ct);
 
-        progress?.Report(string.Format(Strings.Status_FoundProducts,
-            products.Count, Helpers.DisplayHelpers.PluraliseProduct(products.Count)));
+        progress?.Report(Strings.Status_FoundProducts);
 
         foreach (var (productCode, userSid, context) in products)
         {
