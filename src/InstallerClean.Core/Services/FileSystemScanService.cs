@@ -87,7 +87,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 continue;
 
             long size = 0;
-            try { size = _fs.FileInfo.New(filePath).Length; } catch (Exception) { /* skip inaccessible files */ }
+            // IOException covers locked / vanished files; UnauthorizedAccess
+            // covers payload subfolders the elevated process still can't
+            // read (deeply ACL'd MSI directories). OOM and the like are
+            // genuine bugs and propagate.
+            try { size = _fs.FileInfo.New(filePath).Length; }
+            catch (IOException) { /* file vanished or locked */ }
+            catch (UnauthorizedAccessException) { /* unreadable subfolder */ }
 
             removable.Add(new OrphanedFile(
                 FullPath: filePath,

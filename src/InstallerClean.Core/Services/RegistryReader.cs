@@ -1,8 +1,14 @@
+using System.Security;
 using Microsoft.Win32;
 
 namespace InstallerClean.Services;
 
-/// <summary>Production IRegistryReader: opens HKLM Registry64 and swallows any failure as null/false.</summary>
+/// <summary>Production IRegistryReader: opens HKLM Registry64 and folds the
+/// documented failure modes (SecurityException, IOException,
+/// UnauthorizedAccessException, ObjectDisposedException) into null/false.
+/// OutOfMemoryException and StackOverflowException propagate so a real
+/// memory-pressure failure isn't silently downgraded to "no signal" by
+/// PendingRebootService.Check.</summary>
 internal sealed class RegistryReader : IRegistryReader
 {
     public bool LocalMachineKeyExists(string relativePath)
@@ -13,10 +19,10 @@ internal sealed class RegistryReader : IRegistryReader
             using var key = hive.OpenSubKey(relativePath);
             return key is not null;
         }
-        catch
-        {
-            return false;
-        }
+        catch (SecurityException) { return false; }
+        catch (IOException) { return false; }
+        catch (UnauthorizedAccessException) { return false; }
+        catch (ObjectDisposedException) { return false; }
     }
 
     public string[]? LocalMachineMultiStringValue(string keyPath, string valueName)
@@ -28,9 +34,9 @@ internal sealed class RegistryReader : IRegistryReader
             if (key is null) return null;
             return key.GetValue(valueName) as string[];
         }
-        catch
-        {
-            return null;
-        }
+        catch (SecurityException) { return null; }
+        catch (IOException) { return null; }
+        catch (UnauthorizedAccessException) { return null; }
+        catch (ObjectDisposedException) { return null; }
     }
 }

@@ -1,3 +1,4 @@
+using System.Security;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Services;
@@ -184,7 +185,9 @@ internal static class InstallerCacheHelpers
                 if (!Directory.EnumerateFileSystemEntries(dir).Any())
                     Directory.Delete(dir);
             }
-            catch (Exception) { /* skip protected directories */ }
+            catch (IOException) { /* directory not empty by the time Delete fires, or filesystem busy */ }
+            catch (UnauthorizedAccessException) { /* DACL refuses the elevated process; rare but possible */ }
+            catch (SecurityException) { /* permission denied at a higher tier */ }
         }
     }
 
