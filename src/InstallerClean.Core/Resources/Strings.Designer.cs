@@ -163,6 +163,14 @@ public static class Strings
     public static string ConfirmSendResultLog_Reassurance => Get("ConfirmSendResultLog.Reassurance");
     public static string ConfirmSendResultLog_Title => Get("ConfirmSendResultLog.Title");
     public static string CrashLog_PrivacyHeader => Get("CrashLog.PrivacyHeader");
+    public static string Display_ElapsedLong_LessThanASecond => Get("Display.ElapsedLong.LessThanASecond");
+    public static string Display_ElapsedLong_Seconds => Get("Display.ElapsedLong.Seconds");
+    public static string Display_Elapsed_Ms => Get("Display.Elapsed.Ms");
+    public static string Display_Elapsed_S => Get("Display.Elapsed.S");
+    public static string Display_Size_B => Get("Display.Size.B");
+    public static string Display_Size_GB => Get("Display.Size.GB");
+    public static string Display_Size_KB => Get("Display.Size.KB");
+    public static string Display_Size_MB => Get("Display.Size.MB");
     public static string Error_AccessDenied => Get("Error.AccessDenied");
     public static string Error_AccessDeniedDestination => Get("Error.AccessDeniedDestination");
     public static string Error_AdminRequiredBody => Get("Error.AdminRequiredBody");

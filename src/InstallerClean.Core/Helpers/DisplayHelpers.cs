@@ -16,16 +16,16 @@ internal static class DisplayHelpers
 
     internal static string FormatSize(long bytes) => bytes switch
     {
-        >= 1_073_741_824 => $"{bytes / 1_073_741_824.0:F2} GB",
-        >= 1_048_576 => $"{bytes / 1_048_576.0:F1} MB",
-        >= 1_024 => $"{bytes / 1_024.0:F1} KB",
-        _ => $"{bytes} B"
+        >= 1_073_741_824 => string.Format(Strings.Display_Size_GB, bytes / 1_073_741_824.0),
+        >= 1_048_576 => string.Format(Strings.Display_Size_MB, bytes / 1_048_576.0),
+        >= 1_024 => string.Format(Strings.Display_Size_KB, bytes / 1_024.0),
+        _ => string.Format(Strings.Display_Size_B, bytes)
     };
 
     internal static string FormatElapsed(TimeSpan elapsed) =>
         elapsed.TotalSeconds < 1
-            ? $"{elapsed.TotalMilliseconds:F0}ms"
-            : $"{elapsed.TotalSeconds:F1}s";
+            ? string.Format(Strings.Display_Elapsed_Ms, elapsed.TotalMilliseconds)
+            : string.Format(Strings.Display_Elapsed_S, elapsed.TotalSeconds);
 
     /// <summary>
     /// Natural-language elapsed time for body copy. Renders sub-second
@@ -36,8 +36,8 @@ internal static class DisplayHelpers
     /// </summary>
     internal static string FormatElapsedLong(TimeSpan elapsed) =>
         elapsed.TotalSeconds < 1
-            ? "less than a second"
-            : $"{elapsed.TotalSeconds:F1} seconds";
+            ? Strings.Display_ElapsedLong_LessThanASecond
+            : string.Format(Strings.Display_ElapsedLong_Seconds, elapsed.TotalSeconds);
 
     /// <summary>
     /// Picks the singular or plural fragment per the English n != 1
