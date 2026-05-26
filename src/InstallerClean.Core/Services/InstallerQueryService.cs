@@ -143,7 +143,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (claimed.Count == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty);
 
-        progress?.Report(string.Format(Strings.Status_RegistryScanComplete,
+        progress?.Report(string.Format(Strings.Status_RegisteredPackagesFound,
             claimed.Count, Helpers.DisplayHelpers.PluralisePackage(claimed.Count)));
 
         return claimed.Values.ToList().AsReadOnly();

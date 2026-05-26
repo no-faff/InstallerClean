@@ -279,7 +279,7 @@ public static class Strings
     public static string Status_Moving => Get("Status.Moving");
     public static string Status_PreparingDestination => Get("Status.PreparingDestination");
     public static string Status_QueryingApi => Get("Status.QueryingApi");
-    public static string Status_RegistryScanComplete => Get("Status.RegistryScanComplete");
+    public static string Status_RegisteredPackagesFound => Get("Status.RegisteredPackagesFound");
     public static string Status_ScanAccessDenied => Get("Status.ScanAccessDenied");
     public static string Status_ScanCancelled => Get("Status.ScanCancelled");
     public static string Status_ScanComplete => Get("Status.ScanComplete");

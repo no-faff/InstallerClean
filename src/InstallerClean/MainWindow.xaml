@@ -483,7 +483,10 @@
                                Foreground="{StaticResource Status.Success}" FontSize="{StaticResource Type.Heading.Lg}" FontWeight="Bold"
                                HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Sm}"/>
 
-                    <!-- Summary -->
+                    <!-- 6px bottom (off the 8/12/16/24 scale) tightens
+                         the summary heading against the restore-hint
+                         caption that follows; the standard GapBottom.Sm
+                         (8) loosens the heading/caption pairing visibly. -->
                     <TextBlock Text="{Binding Completion.Summary}"
                                Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Heading.Sm}"
                                HorizontalAlignment="Center" TextAlignment="Center"

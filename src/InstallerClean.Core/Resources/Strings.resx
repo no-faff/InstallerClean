@@ -3,21 +3,34 @@
   <!--
     InstallerClean string resources. Source-of-truth language: en-GB.
 
-    Naming convention: dot-delimited categories, generated as underscore-
-    delimited C# property names (Window.Main.Title becomes
-    Strings.Window_Main_Title). Categories used:
-      Window.*       window titles and chrome strings
-      Section.*      heading text inside windows
-      Field.*        labels for metadata fields
-      Action.*       button labels and verbs
-      Tooltip.*      hover tooltips
-      Status.*       transient status / progress text
-      Body.*         multi-sentence body copy
-      Reason.*       Reason column values in the unused files list
-      Confirm.*      confirmation dialog text
-      Error.*        user-facing error messages
-      Cli.*          console output for the CLI launcher
-      Plural.*       singular/plural fragments used by DisplayHelpers
+    Naming convention: every key starts with a dot-delimited category
+    prefix and is generated as an underscore-delimited C# property name
+    (Window.Main.Title becomes Strings.Window_Main_Title). The visible
+    categories are:
+      Action.*               button labels and verbs
+      Automation.*           AutomationProperties.Name / HelpText values
+      Body.*                 multi-sentence body copy
+      BrowserLaunch.*        copy for the URL-launch failure dialog
+      Cli.*                  console output for the CLI launcher
+      Completion.*           completion overlay copy
+      Confirm.*              confirmation dialog body text
+      ConfirmSendResultLog.* result-log Send confirmation modal
+      CrashLog.*             crash.log header copy
+      Display.*              size/duration formatting fragments
+      Error.*                user-facing error messages
+      Field.*                labels for metadata fields
+      FilePicker.*           folder-browser dialog labels
+      Plural.*               singular/plural fragments used by DisplayHelpers
+      Reason.*               Reason column values in the unused files list
+      ResultLog.*            send-summary states (Sending / Sent / Failed)
+      Section.*              heading text inside windows
+      Startup.*              splash + already-running messages
+      Status.*               transient status / progress text
+      Summary.*              status-line counts (registered / orphaned / missing)
+      Tooltip.*              hover tooltips
+      UpdateCheck.*          update-check status / failure detail
+      Version.*              version display string
+      Window.*               window titles and chrome strings
   -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
@@ -223,7 +236,10 @@
   <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Enumerating installed products...</value></data>
   <data name="Status.CheckingRegistry" xml:space="preserve"><value>Checking registry for additional packages...</value></data>
   <!-- 0 = registered package count, 1 = pluralised "package"/"packages" -->
-  <data name="Status.RegistryScanComplete" xml:space="preserve"><value>Scan complete. {0} registered {1} found.</value></data>
+  <!-- Fires mid-scan as a step-progress update after the registry-
+       fallback pass; not the end-of-scan pill (that's Status.ScanComplete).
+       0 = registered package count, 1 = pluralised "package"/"packages". -->
+  <data name="Status.RegisteredPackagesFound" xml:space="preserve"><value>Found {0} registered {1}.</value></data>
   <!-- 0 = elapsed time text (e.g. "1.2s") -->
   <data name="Status.ScanComplete" xml:space="preserve"><value>Scan complete ({0})</value></data>
   <data name="Status.FoundProducts" xml:space="preserve"><value>Scanning local packages...</value></data>
@@ -306,7 +322,7 @@
        because the files are removable already; only the MSI
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
-  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>1 stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it).</value></data>
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>{0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it).</value></data>
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>{0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them).</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} {2}</value></data>
@@ -318,7 +334,7 @@
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>Move {0} {1} ({2})?</value></data>
   <!-- 0 = destination path -->
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Files will be moved to {0}</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Files will be moved to {0}.</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Delete {0} {1} ({2})?</value></data>
   <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Files will be sent to the Recycle Bin. If you want backup copies, use Move instead.</value></data>
   <data name="Confirm.DeleteLargeWarning" xml:space="preserve"><value>At this size some files may skip the Recycle Bin and be deleted permanently. Use Move instead if you want a guaranteed backup.</value></data>
@@ -603,8 +619,8 @@ The crash log could not be written.</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>other console exe. The GUI lives in InstallerClean.exe alongside it.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Exit codes:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   success: every flagged file was processed</value></data>
-  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some files processed, some failed</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   failure: nothing processed (bad args, scan failed, all files failed)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some files processed, some failed</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transient: GUI is running or installer transaction pending (try later)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 cancelled (Ctrl+C)</value></data>
 
