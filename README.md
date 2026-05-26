@@ -79,7 +79,7 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Main window showing 114 files still used and 68 files to clean up" width="900"><br>
+  <img src="docs/screenshots/02-main-window.webp" alt="Main window showing 116 files still used and 68 files to clean up" width="900"><br>
   <em>Results: how much is in use, how much is removable.</em>
 </p>
 

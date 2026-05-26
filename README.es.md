@@ -19,7 +19,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total" alt="Descargas totales"></a>
 </p>
 
-![Captura de pantalla de InstallerClean tras una limpieza exitosa: 965 MB liberados, 68 archivos movidos](docs/screenshots/04d-deleted-freed-success.webp)
+![Captura de pantalla de InstallerClean tras una limpieza exitosa: 965 MB liberados, 68 archivos eliminados](docs/screenshots/04d-deleted-freed-success.webp)
 
 - **Qué hace:** Encuentra y elimina archivos innecesarios de `C:\Windows\Installer`, la carpeta oculta que Windows nunca limpia.
 - **Cuánto espacio:** Depende de tu software. En mi equipo fue casi 1 GB. Un usuario de InstallerClean [reportó](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. Con Adobe Acrobat puede superar los 100 GB. Podría ser nada en absoluto. La cuestión es que es rápido y no cuesta nada; todo lo que se pueda eliminar, se eliminará.
@@ -82,7 +82,7 @@ Sin actividad de red automática. Dos botones opt-in hacen una sola llamada HTTP
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Ventana principal mostrando 114 archivos aún en uso y 68 archivos para limpiar" width="900"><br>
+  <img src="docs/screenshots/02-main-window.webp" alt="Ventana principal mostrando 116 archivos aún en uso y 68 archivos para limpiar" width="900"><br>
   <em>Resultados: cuánto se está usando, cuánto es eliminable.</em>
 </p>
 

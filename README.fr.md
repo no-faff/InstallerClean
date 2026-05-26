@@ -82,7 +82,7 @@ Aucune activité réseau automatique. Deux boutons opt-in déclenchent un seul a
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Fenêtre principale affichant 114 fichiers encore utilisés et 68 fichiers à nettoyer" width="900"><br>
+  <img src="docs/screenshots/02-main-window.webp" alt="Fenêtre principale affichant 116 fichiers encore utilisés et 68 fichiers à nettoyer" width="900"><br>
   <em>Résultats : ce qui est utilisé, ce qui est supprimable.</em>
 </p>
 
@@ -103,7 +103,7 @@ Aucune activité réseau automatique. Deux boutons opt-in déclenchent un seul a
 
 <p>
   <img src="docs/screenshots/04d-deleted-freed-success.webp" alt="Superposition de succès montrant 965 Mo libérés après une suppression" width="900"><br>
-  <em>Après un Déplacement réussi.</em>
+  <em>Après une Suppression réussie.</em>
 </p>
 
 <p>
