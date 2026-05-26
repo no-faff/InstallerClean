@@ -39,6 +39,17 @@ public sealed class MoveFilesService : IMoveFilesService
             throw new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
 
+        // System-folder gate at the service boundary, not just at the
+        // call sites: %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)%
+        // and %ProgramData% sit on the Win32 DLL search path and the
+        // SxS resolution path. Anchoring the check inside MoveFilesAsync
+        // means any future caller (integration test, new automation
+        // entry point) that bypasses the GUI/CLI validation block still
+        // hits the same gate.
+        if (InstallerCacheHelpers.IsSystemFolderOrChild(destinationFolder))
+            throw new LocalisedInvalidOperationException(
+                string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
+
         return Task.Run(() =>
         {
             CreateDestinationFolder(destinationFolder);
@@ -48,6 +59,9 @@ public sealed class MoveFilesService : IMoveFilesService
             if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
                 throw new LocalisedInvalidOperationException(
                     string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
+            if (InstallerCacheHelpers.IsSystemFolderOrChild(destinationFolder))
+                throw new LocalisedInvalidOperationException(
+                    string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
 
             // Capture the canonical destination once, then re-resolve
             // per iteration. The per-iteration check catches a junction
