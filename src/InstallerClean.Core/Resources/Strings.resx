@@ -325,6 +325,8 @@ Please right-click and choose 'Run as administrator'.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Invalid destination</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Could not write to destination</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>The destination cannot be inside the Windows Installer folder.</value></data>
+  <!-- 0 = the destination path the user typed -->
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%.</value></data>
   <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Not enough space</value></data>
   <!-- 0 = destination, 1 = required size, 2 = available size -->
   <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Not enough space at {0}

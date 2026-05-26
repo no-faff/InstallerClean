@@ -271,6 +271,21 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             return;
         }
 
+        // System-folder gate mirrors the CLI's check at Program.cs.
+        // %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and
+        // %ProgramData% sit on documented DLL-search and SxS-resolution
+        // paths; relocating MSI payloads there silently could plant a
+        // file Windows trusts at load time. A typed-by-mistake or
+        // pasted destination ("C:\Windows\System32\Spool") shouldn't
+        // proceed just because it passed the Installer-folder check.
+        if (InstallerCacheHelpers.IsSystemFolderOrChild(dest))
+        {
+            _dialogService.ShowWarning(
+                string.Format(Strings.Error_DestinationInSystemFolder, dest),
+                Strings.Error_InvalidDestinationTitle);
+            return;
+        }
+
         // Pre-flight: CreateDirectory + write probe. Runs on a
         // worker thread so a slow UNC share doesn't freeze the UI for
         // the SMB timeout. The CTS is created BEFORE the probe so

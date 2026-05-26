@@ -170,6 +170,7 @@ public static class Strings
     public static string Error_CannotWriteFolder => Get("Error.CannotWriteFolder");
     public static string Error_DestinationChangedMidBatch => Get("Error.DestinationChangedMidBatch");
     public static string Error_DestinationInsideInstaller => Get("Error.DestinationInsideInstaller");
+    public static string Error_DestinationInSystemFolder => Get("Error.DestinationInSystemFolder");
     public static string Error_DestinationMissing => Get("Error.DestinationMissing");
     public static string Error_DestinationNotFullyQualified => Get("Error.DestinationNotFullyQualified");
     public static string Error_DestinationWriteFailedTitle => Get("Error.DestinationWriteFailedTitle");
