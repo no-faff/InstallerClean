@@ -33,7 +33,7 @@
     <Program_Type>Open Source</Program_Type>
     <Program_Release_Status>Minor Update</Program_Release_Status>
     <Program_Install_Support>Install and Uninstall</Program_Install_Support>
-    <Program_OS_Support>Win10,Win10x64,Win11</Program_OS_Support>
+    <Program_OS_Support>Win10x64,Win11</Program_OS_Support>
     <Program_Language>English</Program_Language>
     <Program_Change_Info>Completion overlay polish.</Program_Change_Info>
     <Program_Specific_Category>System</Program_Specific_Category>
