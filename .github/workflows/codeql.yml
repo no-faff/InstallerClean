@@ -11,7 +11,10 @@ on:
 jobs:
   analyse:
     name: Analyse C#
-    runs-on: windows-latest
+    # Pinned explicitly because the windows-latest label flips to
+    # windows-2025 (VS2026) underneath workflows on 2026-06-15;
+    # pinning eats the migration now rather than at release time.
+    runs-on: windows-2025
     permissions:
       security-events: write
 

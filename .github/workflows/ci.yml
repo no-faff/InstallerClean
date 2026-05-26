@@ -8,7 +8,10 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: windows-latest
+    # Pinned explicitly because the windows-latest label flips to
+    # windows-2025 (VS2026) underneath workflows on 2026-06-15;
+    # pinning eats the migration now rather than at release time.
+    runs-on: windows-2025
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
