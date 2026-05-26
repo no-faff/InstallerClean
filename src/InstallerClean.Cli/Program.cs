@@ -371,6 +371,18 @@ internal static class Program
             Console.WriteLine(ex.Message);
             return ExitError;
         }
+        catch (LocalisedInvalidOperationException ex)
+        {
+            // Same contract as LocalisedAccessException: resx-templated
+            // safe-to-echo. Reached for InstallerQueryService throws
+            // (empty database, MSI enumerator hard-fail) and
+            // MoveFilesService validation throws (not-fully-qualified
+            // destination, IsInstallerFolderOrChild race, destination-
+            // changed-mid-batch). The sysadmin sees what to fix
+            // instead of a generic "see crash.log" breadcrumb.
+            Console.WriteLine(ex.Message);
+            return ExitError;
+        }
         catch (Exception ex)
         {
             // ex.Message stays out of stdout: under elevation it can carry

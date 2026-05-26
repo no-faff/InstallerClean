@@ -412,6 +412,25 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 : Strings.Status_MoveCancelled;
             await _scan.RefreshAsync();
         }
+        catch (LocalisedInvalidOperationException ex)
+        {
+            // Deliberate validation throw from MoveFilesService (not-
+            // fully-qualified destination, IsInstallerFolderOrChild race,
+            // destination-changed-mid-batch). Message is built from a
+            // resx template with user-controlled args only, so echoing
+            // is safe and tells the user what to fix.
+            _dialogService.ShowWarning(ex.Message, Strings.Error_InvalidDestinationTitle);
+            OperationProgress = string.Empty;
+        }
+        catch (LocalisedAccessException ex)
+        {
+            // CreateDestinationFolder or ProbeDestinationWriteable could
+            // not write to the destination after the GUI's own pre-flight
+            // accepted it (a junction swap, antivirus locking the folder,
+            // etc.). The resx-templated message names the folder.
+            _dialogService.ShowWarning(ex.Message, Strings.Error_DestinationWriteFailedTitle);
+            OperationProgress = string.Empty;
+        }
         catch (Exception ex)
         {
             // Type name + log path only; ex.Message can leak paths under elevation.

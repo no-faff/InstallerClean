@@ -27,16 +27,22 @@ public sealed class MoveFilesService : IMoveFilesService
     {
         // Reject relative destinations: Path.GetFullPath would otherwise
         // resolve them against the process CWD, and the CLI host's CWD
-        // is whatever the caller invoked it from.
+        // is whatever the caller invoked it from. The Localised* sentinel
+        // marks the message as built from a resx template with only
+        // user-controlled args (the typed destination path), so the CLI
+        // and GUI catches above the BCL-Exception arm can echo it
+        // verbatim. BCL-raised InvalidOperationException from inside the
+        // framework still falls through to the type-name + crash-log
+        // breadcrumb.
         if (!Path.IsPathFullyQualified(destinationFolder))
-            throw new InvalidOperationException(
+            throw new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_DestinationNotFullyQualified, destinationFolder));
 
         // Destination must not resolve inside C:\Windows\Installer;
         // ResolveFinalPath expands junctions so a reparse-point
         // destination cannot smuggle the batch into the cache folder.
         if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
-            throw new InvalidOperationException(
+            throw new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
 
         return Task.Run(() =>
@@ -46,7 +52,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // Re-check after CreateDirectory closes the TOCTOU window
             // where a junction could be swapped into the leaf.
             if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
-                throw new InvalidOperationException(
+                throw new LocalisedInvalidOperationException(
                     string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
 
             // Capture the canonical destination once, then re-resolve
@@ -81,7 +87,7 @@ public sealed class MoveFilesService : IMoveFilesService
                 var currentResolved = InstallerCacheHelpers.ResolveFinalPath(destinationFolder)
                     .TrimEnd(Path.DirectorySeparatorChar);
                 if (!currentResolved.Equals(canonicalDestination, StringComparison.OrdinalIgnoreCase))
-                    throw new InvalidOperationException(
+                    throw new LocalisedInvalidOperationException(
                         string.Format(Strings.Error_DestinationChangedMidBatch, destinationFolder));
 
                 try
@@ -177,8 +183,12 @@ public sealed class MoveFilesService : IMoveFilesService
         {
             // ex.Message stays out of the thrown message (path-leak risk
             // under elevation); the inner exception preserves it for
-            // crash-log consumers via .InnerException.
-            throw new UnauthorizedAccessException(
+            // crash-log consumers via .InnerException. LocalisedAccessException
+            // marks the message as resx-templated and safe to echo, so
+            // CleanupViewModel's typed catch and the CLI's typed catch
+            // surface "Cannot write to {folder}" instead of the generic
+            // type-name + crash-log breadcrumb.
+            throw new LocalisedAccessException(
                 string.Format(Strings.Error_CannotWriteFolder, folder), ex);
         }
     }
