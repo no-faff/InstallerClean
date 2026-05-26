@@ -148,7 +148,24 @@
                                         <TextBlock Text="{Binding FileName}" Foreground="{StaticResource Text.Heading}"
                                                    FontSize="{StaticResource Type.Heading.Sm}" TextTrimming="CharacterEllipsis"
                                                    ToolTip="{Binding FullPath}"/>
-                                        <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
+                                        <TextBlock Text="{Binding SizeDisplay}" FontSize="{StaticResource Type.Caption}">
+                                            <TextBlock.Style>
+                                                <!-- Text.Dim on the selected-row background
+                                                     (Action.Primary.Background) is 3.34:1
+                                                     (fails AA for normal text). Lift to
+                                                     Text.Body on selection so a low-vision
+                                                     user can read the size after arrow-key
+                                                     navigation into a row. -->
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{StaticResource Text.Dim}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                                            <Setter Property="Foreground" Value="{StaticResource Text.Body}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

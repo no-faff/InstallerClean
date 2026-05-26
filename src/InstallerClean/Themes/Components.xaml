@@ -830,7 +830,8 @@
                             </Grid.ColumnDefinitions>
                             <ContentPresenter ContentSource="Header" RecognizesAccessKey="True"
                                               VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{TemplateBinding InputGestureText}"
+                            <TextBlock Grid.Column="1" x:Name="GestureText"
+                                       Text="{TemplateBinding InputGestureText}"
                                        Margin="20,0,0,0"
                                        Foreground="{StaticResource Text.Dim}"
                                        VerticalAlignment="Center"/>
@@ -840,6 +841,10 @@
                         <Trigger Property="IsHighlighted" Value="True">
                             <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Background}"/>
                             <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
+                            <!-- Text.Dim on Action.Primary.Background is 3.34:1 (fails AA
+                                 4.5:1 for normal text); the highlighted row must lift the
+                                 gesture column too, not just the header. -->
+                            <Setter TargetName="GestureText" Property="Foreground" Value="{StaticResource Text.Body}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource Text.Dim}"/>

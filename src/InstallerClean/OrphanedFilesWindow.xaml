@@ -76,8 +76,25 @@
                                             x:Name="ColReason">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Reason}" Foreground="{StaticResource Text.Muted}"
-                                                   FontSize="{StaticResource Type.Caption}" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Reason}"
+                                                   FontSize="{StaticResource Type.Caption}" VerticalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <!-- Text.Muted on the selected-row background
+                                                     (Action.Primary.Background) is 4.04:1 (fails AA
+                                                     for normal text at 11pt). Lift to Text.Body on
+                                                     selection so the load-bearing Orphaned-vs-Superseded
+                                                     distinction stays legible on the row a low-vision
+                                                     user has just navigated to. -->
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListViewItem}, Path=IsSelected}" Value="True">
+                                                            <Setter Property="Foreground" Value="{StaticResource Text.Body}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
