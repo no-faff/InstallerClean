@@ -18,6 +18,11 @@
     <RootNamespace>InstallerClean.Cli</RootNamespace>
     <AssemblyName>installerclean-cli</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- The CLI ships in the same install directory as the GUI; without
+         an ApplicationIcon the console exe paints with Windows's generic
+         terminal icon, which reads as "untrusted" next to the Squeegee
+         GUI sibling in Explorer. Reuses the GUI's app.ico verbatim. -->
+    <ApplicationIcon>..\InstallerClean\Assets\app.ico</ApplicationIcon>
     <Description>Command-line front-end for InstallerClean.</Description>
     <Authors>No Faff</Authors>
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
