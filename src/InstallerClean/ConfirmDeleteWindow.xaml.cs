@@ -18,7 +18,15 @@ public partial class ConfirmDeleteWindow : Window
         // Windows silently skips the Recycle Bin when either a single file or
         // the total exceeds the per-drive quota.
         if (totalBytes > TotalWarnThreshold || maxSingleFileBytes > SingleFileWarnThreshold)
+        {
             LargeSizeWarning.Visibility = Visibility.Visible;
+            // Surface the warning text on the Delete button's HelpText
+            // too, so screen-reader users hear it on focus rather than
+            // having to navigate to the warning TextBlock (which is not
+            // focusable). The visible TextBlock stays for sighted users.
+            System.Windows.Automation.AutomationProperties.SetHelpText(
+                DeleteButton, Strings.Confirm_DeleteLargeWarning);
+        }
 
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();

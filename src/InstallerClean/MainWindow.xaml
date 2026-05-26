@@ -256,11 +256,16 @@
                             ToolTipService.ShowOnDisabled="True"
                             Margin="{StaticResource GapRight.Sm}"/>
 
+                    <!-- LiveSetting is on the overlay's matching pill
+                         (the load-bearing surface during an operation);
+                         this body-row pill sits behind the operating
+                         overlay during the only window where the text
+                         is changing, so re-announcing here doubles every
+                         progress callback for screen readers. -->
                     <TextBlock DockPanel.Dock="Left" Text="{Binding Cleanup.OperationProgress}"
                                VerticalAlignment="Center" Foreground="{StaticResource Text.Muted}"
                                FontSize="{StaticResource Type.Body}"
-                               TextTrimming="CharacterEllipsis" MaxWidth="280"
-                               AutomationProperties.LiveSetting="Polite"/>
+                               TextTrimming="CharacterEllipsis" MaxWidth="280"/>
                 </DockPanel>
             </Grid>
 
@@ -423,11 +428,15 @@
                                    FontSize="{StaticResource Type.Caption}"
                                    AutomationProperties.LiveSetting="Polite"/>
                     </DockPanel>
+                    <!-- LiveSetting deliberately absent: the per-file
+                         filename changes at I/O speed and would flood
+                         the screen-reader queue faster than the user
+                         can drain it. OperationProgressDetail above
+                         carries the "X of Y" count for the SR. -->
                     <TextBlock Text="{Binding Cleanup.OperationCurrentFileName}"
                                Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Caption}"
                                HorizontalAlignment="Center" Margin="0,4,0,0"
-                               TextTrimming="CharacterEllipsis" MaxWidth="240"
-                               AutomationProperties.LiveSetting="Polite"/>
+                               TextTrimming="CharacterEllipsis" MaxWidth="240"/>
                     <!-- Cancel button binds IsEnabled via the
                          CanCancelOperation predicate so a second click
                          after the cancel-in-flight is dropped. The

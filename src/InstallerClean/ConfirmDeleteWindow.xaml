@@ -59,7 +59,8 @@
                 <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True" IsDefault="True"
                         Margin="{StaticResource GapRight.Sm}"/>
-                <Button Style="{StaticResource DangerPill}" Content="{loc:Translate Action.Delete}" Click="OnDelete"
+                <Button x:Name="DeleteButton" Style="{StaticResource DangerPill}"
+                        Content="{loc:Translate Action.Delete}" Click="OnDelete"
                         AutomationProperties.Name="{loc:Translate Automation.ConfirmDelete}"/>
             </StackPanel>
         </StackPanel>
