@@ -226,14 +226,14 @@ InstallerClean prend en charge un fonctionnement sans interface graphique pour l
 
 ```
 Utilisation :
-  installerclean-cli           Affiche ce message et quitte
-  installerclean-cli /s        Analyse seule, liste les fichiers supprimables
-  installerclean-cli /d        Supprime les fichiers (Corbeille)
-  installerclean-cli /m        Déplace vers l'emplacement par défaut enregistré
-  installerclean-cli /m PATH   Déplace vers le chemin spécifié
+  installerclean-cli --help   Affiche cette aide (accepte aussi /?, -h ou sans argument)
+  installerclean-cli /s       Analyse seule, liste les fichiers supprimables
+  installerclean-cli /d       Supprime les fichiers (Corbeille)
+  installerclean-cli /m       Déplace vers l'emplacement par défaut enregistré
+  installerclean-cli /m PATH  Déplace vers le chemin spécifié
 ```
 
-Accepte aussi `--help`, `/?` et `-h`. Pour lancer l'interface graphique, exécutez `InstallerClean.exe` (ou utilisez le raccourci du menu Démarrer si vous avez utilisé l'installeur setup).
+Pour lancer l'interface graphique, exécutez `InstallerClean.exe` (ou utilisez le raccourci du menu Démarrer si vous avez utilisé l'installeur setup).
 
 `/s` est un essai à blanc : il analyse, liste ce qui serait supprimé avec noms de fichiers et tailles, puis quitte. Utile pour auditer avant nettoyage. Le code de sortie est toujours 0. Tous les fichiers se trouvent dans `C:\Windows\Installer`.
 

@@ -221,14 +221,14 @@ InstallerClean supports headless operation for scripting and sysadmin use:
 
 ```
 Usage:
-  installerclean-cli           Print this usage and exit
-  installerclean-cli /s        Scan only - list removable files
-  installerclean-cli /d        Delete removable files (Recycle Bin)
-  installerclean-cli /m        Move to saved default location
-  installerclean-cli /m PATH   Move to specified path
+  installerclean-cli --help   Show this help (also accepts /?, -h or no args)
+  installerclean-cli /s       Scan only - list removable files
+  installerclean-cli /d       Delete removable files (Recycle Bin)
+  installerclean-cli /m       Move to saved default location
+  installerclean-cli /m PATH  Move to specified path
 ```
 
-Also accepts `--help`, `/?` and `-h`. To launch the GUI, run `InstallerClean.exe` (or use the Start-menu shortcut from the setup install).
+To launch the GUI, run `InstallerClean.exe` (or use the Start-menu shortcut from the setup install).
 
 `/s` is a dry run: it scans, lists what it would remove with filenames and sizes, then exits. Useful for auditing before cleanup. Exit code is always 0. All files are in `C:\Windows\Installer`.
 

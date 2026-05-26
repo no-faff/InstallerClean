@@ -226,14 +226,14 @@ InstallerClean 支持无界面运行，方便编写脚本和系统管理：
 
 ```
 用法：
-  installerclean-cli           显示此帮助并退出
-  installerclean-cli /s        仅扫描，列出可删除的文件
-  installerclean-cli /d        删除文件（送至回收站）
-  installerclean-cli /m        移动到已保存的默认位置
-  installerclean-cli /m PATH   移动到指定路径
+  installerclean-cli --help   显示此帮助（也接受 /?、-h 或不带参数）
+  installerclean-cli /s       仅扫描，列出可删除的文件
+  installerclean-cli /d       删除文件（送至回收站）
+  installerclean-cli /m       移动到已保存的默认位置
+  installerclean-cli /m PATH  移动到指定路径
 ```
 
-也接受 `--help`、`/?` 和 `-h`。要启动图形界面，请运行 `InstallerClean.exe`（或使用 setup 安装后的"开始"菜单快捷方式）。
+要启动图形界面，请运行 `InstallerClean.exe`（或使用 setup 安装后的"开始"菜单快捷方式）。
 
 `/s` 是空跑模式：扫描、列出将被删除的文件名和大小，然后退出。便于在清理前审核。退出码始终为 0。所有文件都在 `C:\Windows\Installer` 中。
 
