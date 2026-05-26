@@ -149,8 +149,30 @@
   <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Confirm sending the unused files to the Recycle Bin</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>Confirm moving the unused files to the chosen destination folder</value></data>
   <data name="Automation.SendResultLog" xml:space="preserve"><value>Send a summary of this run to No Faff</value></data>
+  <!-- Spoken on focus or in the SR element list. Names the endpoint so
+       a privacy-conscious user knows what the button will contact
+       without having to click through to the confirm dialog. -->
+  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Say thanks</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Confirm sending the summary to No Faff</value></data>
+  <!-- Spoken on focus of the Check-for-updates button. Tells an SR
+       user the action involves a network call before they trigger it. -->
+  <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Check for updates</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Checks the GitHub releases API over HTTPS for a newer version.</value></data>
+  <!-- Spoken on focus of the MIT licence hyperlink. Warns SR users
+       that activating the link opens a browser to a network resource. -->
+  <data name="Automation.MITLicence" xml:space="preserve"><value>MIT licence</value></data>
+  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Opens the LICENCE file on github.com in your browser.</value></data>
+  <!-- Replacements for the all-caps section labels ("MOVE LOCATION",
+       "PRODUCTS", "PATCHES", "PRODUCT DETAILS"). The visible text is
+       uppercased for the SmallCaps look; an SR with default verbosity
+       spells out short uppercase tokens as individual letters. The
+       Name override gives the SR a mixed-case form for announcement
+       while the visible text stays styled. -->
+  <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>Move location</value></data>
+  <data name="Automation.Section.Products" xml:space="preserve"><value>Products</value></data>
+  <data name="Automation.Section.Patches" xml:space="preserve"><value>Patches</value></data>
+  <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Product details</value></data>
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Move destination folder</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Operation progress</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>Scan C:\Windows\Installer again</value></data>

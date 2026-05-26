@@ -62,6 +62,8 @@ public static class Strings
     public static string Automation_CancelOperation => Get("Automation.CancelOperation");
     public static string Automation_CancelScan => Get("Automation.CancelScan");
     public static string Automation_CancelStartupScan => Get("Automation.CancelStartupScan");
+    public static string Automation_CheckForUpdates => Get("Automation.CheckForUpdates");
+    public static string Automation_CheckForUpdates_HelpText => Get("Automation.CheckForUpdates.HelpText");
     public static string Automation_Close => Get("Automation.Close");
     public static string Automation_CloseResult => Get("Automation.CloseResult");
     public static string Automation_CloseWindow => Get("Automation.CloseWindow");
@@ -72,6 +74,8 @@ public static class Strings
     public static string Automation_LeaveStarOnGitHub => Get("Automation.LeaveStarOnGitHub");
     public static string Automation_LeaveStarOnGitHub_About => Get("Automation.LeaveStarOnGitHub.About");
     public static string Automation_Minimise => Get("Automation.Minimise");
+    public static string Automation_MITLicence => Get("Automation.MITLicence");
+    public static string Automation_MITLicence_HelpText => Get("Automation.MITLicence.HelpText");
     public static string Automation_MoveAllFiles => Get("Automation.MoveAllFiles");
     public static string Automation_MoveDestinationFolder => Get("Automation.MoveDestinationFolder");
     public static string Automation_OperationProgress => Get("Automation.OperationProgress");
@@ -79,7 +83,12 @@ public static class Strings
     public static string Automation_ResultLogPreview => Get("Automation.ResultLogPreview");
     public static string Automation_SayThanks => Get("Automation.SayThanks");
     public static string Automation_ScanningProgress => Get("Automation.ScanningProgress");
+    public static string Automation_Section_MoveLocation => Get("Automation.Section.MoveLocation");
+    public static string Automation_Section_Patches => Get("Automation.Section.Patches");
+    public static string Automation_Section_ProductDetails => Get("Automation.Section.ProductDetails");
+    public static string Automation_Section_Products => Get("Automation.Section.Products");
     public static string Automation_SendResultLog => Get("Automation.SendResultLog");
+    public static string Automation_SendResultLog_HelpText => Get("Automation.SendResultLog.HelpText");
     public static string Automation_StartupScanProgress => Get("Automation.StartupScanProgress");
     public static string Automation_ViewOrphanedFiles => Get("Automation.ViewOrphanedFiles");
     public static string Automation_ViewOrphanedFiles_HelpText => Get("Automation.ViewOrphanedFiles.HelpText");

@@ -192,7 +192,8 @@
 
                 <!-- Move location label -->
                 <TextBlock Grid.Row="2" Text="{loc:Translate Section.Move.Location}"
-                           Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Heading.Sm}"/>
+                           Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Heading.Sm}"
+                           AutomationProperties.Name="{loc:Translate Automation.Section.MoveLocation}"/>
 
                 <!-- Move destination -->
                 <Grid Grid.Row="4">
@@ -208,6 +209,7 @@
                                                 UpdateSourceTrigger=PropertyChanged}"
                                  MaxLength="8192"
                                  AutomationProperties.Name="{loc:Translate Automation.MoveDestinationFolder}"
+                                 AutomationProperties.IsRequiredForForm="True"
                                  ToolTip="{loc:Translate Tooltip.MoveDestination}"
                                  AllowDrop="True"
                                  PreviewDragOver="MoveDestination_DragOver"
@@ -553,7 +555,8 @@
                             Margin="{StaticResource GapBottom.Sm}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             ToolTip="{Binding Completion.SendResultLogTooltip}"
-                            AutomationProperties.Name="{loc:Translate Automation.SendResultLog}"/>
+                            AutomationProperties.Name="{loc:Translate Automation.SendResultLog}"
+                            AutomationProperties.HelpText="{loc:Translate Automation.SendResultLog.HelpText}"/>
 
                     <!-- Result-log status line. Shows "Sending..." while
                          the POST is in flight, "Thanks!" after a success,

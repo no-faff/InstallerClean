@@ -58,7 +58,6 @@
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0" x:Name="VersionText"
                      Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}"
-                     IsTabStop="False"
                      VerticalAlignment="Center" Margin="-2,0,0,0"/>
             <TextBlock Grid.Column="2" x:Name="CheckStatusText"
                        Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
@@ -69,13 +68,17 @@
         <TextBlock Grid.Row="5" Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}">
             <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/blob/main/LICENSE"
                        Click="Hyperlink_Click"
-                       Style="{StaticResource SubtleLink}"><Run Text="{loc:Translate Action.MITLicence}"/></Hyperlink>
+                       Style="{StaticResource SubtleLink}"
+                       AutomationProperties.Name="{loc:Translate Automation.MITLicence}"
+                       AutomationProperties.HelpText="{loc:Translate Automation.MITLicence.HelpText}"><Run Text="{loc:Translate Action.MITLicence}"/></Hyperlink>
         </TextBlock>
 
         <Button Grid.Row="7" Style="{StaticResource CompactPill}"
                 x:Name="CheckNowButton"
                 Content="{loc:Translate Action.CheckForUpdates}" Click="CheckNowClick"
-                HorizontalAlignment="Left"/>
+                HorizontalAlignment="Left"
+                AutomationProperties.Name="{loc:Translate Automation.CheckForUpdates}"
+                AutomationProperties.HelpText="{loc:Translate Automation.CheckForUpdates.HelpText}"/>
 
         <!-- Section header above the Star + Buy-me-a-cuppa row. The
              resx value is already uppercased so screen readers don't
