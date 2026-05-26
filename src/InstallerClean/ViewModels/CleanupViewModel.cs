@@ -48,6 +48,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
     [ObservableProperty] private string _moveDestination = string.Empty;
 
+    // IsOperating goes false during the confirm-dialog window between
+    // pre-flight and the move call (so the modal owns the foreground
+    // state). Re-entry is gated by the [RelayCommand]-generated
+    // AsyncRelayCommand's internal IsRunning flag, not by IsOperating
+    // alone; a refactor that splits MoveAllAsync into two commands
+    // must re-introduce a VM-level guard or accept double-execution.
     [ObservableProperty] private bool _isOperating;
     [ObservableProperty] private string _operationProgress = string.Empty;
     [ObservableProperty] private int _operationCurrentFile;
@@ -346,6 +352,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         {
             // Pre-flight CTS no longer needed; dispose before returning.
             DisposeOperationCts();
+            OperationProgress = string.Empty;
             _dialogService.ShowWarning(
                 string.Format(Strings.Error_NotEnoughSpaceBody,
                     dest,
@@ -365,6 +372,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // User cancelled at the confirmation dialog. The pre-flight
             // CTS is no longer needed; dispose it before returning.
             DisposeOperationCts();
+            OperationProgress = Strings.Status_MoveCancelled;
             return;
         }
 
