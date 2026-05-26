@@ -283,6 +283,13 @@ public partial class CompletionViewModel : ObservableObject
                 outcome = await _resultLogService.SendAsync(jsonContent)
                     .ConfigureAwait(true);
             }
+            catch (OperationCanceledException)
+            {
+                // Caller cancellation propagates; the generic catch
+                // would otherwise downgrade it to a "Send failed"
+                // outcome if a token is wired through later.
+                throw;
+            }
             catch (Exception ex)
             {
                 // SendAsync documents never-throws, but the contract
