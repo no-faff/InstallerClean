@@ -200,8 +200,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 var dispatcher = System.Windows.Application.Current?.Dispatcher;
                 if (dispatcher is { HasShutdownStarted: false })
                     await dispatcher.InvokeAsync(Completion.MarkResultLogReady);
-                // If the dispatcher is gone the window has closed; the
-                // Send button has no UI to update either way.
+                else
+                    // No live dispatcher: either the window has closed (the
+                    // outer catch will absorb any binding-side InvalidOperation
+                    // Exception), or this is a unit test with Application.Current
+                    // null. In both cases a direct call is the right behaviour:
+                    // production fails closed, tests observe the property change.
+                    Completion.MarkResultLogReady();
             }
         }
         catch (Exception ex)
