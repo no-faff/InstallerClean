@@ -43,9 +43,14 @@ DefaultGroupName=InstallerClean
 UninstallDisplayIcon={app}\InstallerClean.exe
 OutputDir=..\publish
 OutputBaseFilename=InstallerClean-setup
-; zip rather than lzma2: lzma2 hit DeepInstinct false-positives on
-; the setup hash.
-Compression=zip
+; Compression=bzip; SolidCompression=no. Every other Inno
+; compression combination tested on this project has tripped a
+; static-ML false positive on the setup hash: lzma2 trips
+; DeepInstinct, zip (with or without SolidCompression=yes) trips
+; Arctic Wolf or DeepInstinct depending on the embedded portable's
+; runtime compression. bzip cleared every VirusTotal engine.
+Compression=bzip
+SolidCompression=no
 MinVersion=10.0
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
