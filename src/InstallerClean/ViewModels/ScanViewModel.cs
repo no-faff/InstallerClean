@@ -309,13 +309,18 @@ public partial class ScanViewModel : ObservableObject
     [RelayCommand]
     private void CancelScan()
     {
+        // Set the status before cancelling. The synchronous write updates
+        // the overlay the instant Esc is pressed (the ScanAsync progress
+        // reporter only fires on its next callback). Ordering it before
+        // _scanCts.Cancel() also guarantees ScanAsync's own
+        // "Scan cancelled." write lands after this one: cancelling first
+        // leaves a window where the scan can complete and write
+        // "Scan cancelled." before this line overwrites it with
+        // "Cancelling...", harmless on the single UI thread but a race in
+        // a SynchronizationContext-free unit test.
+        ScanProgress = Strings.Status_Cancelling;
         try { _scanCts?.Cancel(); }
         catch (ObjectDisposedException) { /* scan already finished */ }
-        // The progress reporter inside ScanAsync only fires on its
-        // next callback; without a synchronous write the overlay
-        // holds the previous step's text after Esc until that
-        // callback runs. ScanAsync overwrites this on its next step.
-        ScanProgress = Strings.Status_Cancelling;
     }
 
     /// <summary>
