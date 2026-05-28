@@ -159,7 +159,7 @@ VirusTotal: clean across every engine. Live links in each release's notes so you
 
 **Will I actually free up GBs of space?** Depends on your machine. A clean Windows 11 install with no extra software has nothing to remove. A long-running developer workstation, or any machine with heavy MSI-based software (Acrobat, Office, LibreOffice, large dev tools), can have tens of GB. Run `installerclean-cli /s` to see exactly what would be removed before you commit.
 
-Across the 35 reports people have been kind enough to send in since v1.8.0 added the option (thanks 🙏):
+Across the 35 reports people have been kind enough to send in (thanks 🙏) since v1.8.0 added the option:
 
 | Outcome | Share | Smallest | Median | Largest |
 |---|---|---|---|---|
