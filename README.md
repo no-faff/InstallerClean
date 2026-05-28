@@ -159,6 +159,13 @@ VirusTotal: clean across every engine. Live links in each release's notes so you
 
 **Will I actually free up GBs of space?** Depends on your machine. A clean Windows 11 install with no extra software has nothing to remove. A long-running developer workstation, or any machine with heavy MSI-based software (Acrobat, Office, LibreOffice, large dev tools), can have tens of GB. Run `installerclean-cli /s` to see exactly what would be removed before you commit.
 
+Across the 35 reports people have been kind enough to send in since v1.8.0 added the option (thanks 🙏):
+
+| Outcome | Share | Smallest | Median | Largest |
+|---|---|---|---|---|
+| Nothing to remove | 63% | - | - | - |
+| Freed space | 37% | 0.2 GB | 20 GB | 327 GB |
+
 **Why does it want Administrator?** `C:\Windows\Installer` is owned by SYSTEM and locked down to admins only. Reading the folder, writing to the Installer-database query API, and moving or deleting files all require elevation. There's no user-mode path.
 
 **Can I undo a Delete?** Yes. Delete sends files to the Recycle Bin. Restore them from there. If you emptied the Recycle Bin, the files are gone, but you can instead use Move to put them in a folder you choose, then verify nothing breaks before deleting from there.
