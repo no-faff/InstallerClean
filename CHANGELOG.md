@@ -1,6 +1,12 @@
 # Changelog
 
-All notable changes to InstallerClean. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
+Every change to InstallerClean, logged in full (not just the user-facing highlights). Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Fixed
+
+- Scan-cancel status now updates the instant Esc is pressed. `CancelScan` set the "Cancelling..." status after cancelling the token; reordering it before the cancel makes the synchronous write land immediately (the scan's own progress reporter only fires on its next callback) and guarantees the scan's later "Scan cancelled." write lands last. On the single UI thread the old order was harmless; the race only showed in a SynchronizationContext-free unit test, where it flaked in CI. No user-visible change on the running app.
 
 ## [1.8.2] - 2026-05-27
 
