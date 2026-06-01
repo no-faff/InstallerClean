@@ -10,6 +10,8 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 ## [1.8.2] - 2026-05-27
 
+An audit-driven release: a large sweep of correctness fixes (thread affinity, exception handling, path-leak defence on the CLI), an accessibility pass on the orphans list and completion overlay, a result-log schema bump that separates obsoleted from superseded patches, and AV-false-positive work on the portable and setup builds. No single headline feature; the value is the breadth and the receipts behind each fix.
+
 ### Fixed
 
 - Missing-from-disk banner no longer fires for a benign case. A registered patch marked superseded by the MSI database whose file had already been removed (by an older cleaner or a manual sweep) used to count into the same total as a non-removable package gone missing, and the banner text ("Windows refers to installer files that aren't there. Cleaning the cache won't change this") was wrong for the superseded-and-already-gone case. A machine that had been cleaned before could see a permanent banner suggesting the system was broken when it was fine. The two counts are now separate; the banner fires only on the non-removable population.
@@ -64,10 +66,13 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 ## [1.8.0] - 2026-05-13
 
+The two new opt-in network features (a manual update check and the Send-summary report) were the headline, but the bulk of this release was a deep accessibility pass across every window, a security and AV-heuristic hardening pass, internationalisation, and a correctness sweep, all done with the same one-click-from-elevated caution the rest of the app holds to.
+
 ### Added
 
-- Check for updates in About now performs the version check itself rather than opening the releases page. Single HTTPS GET to `api.github.com/repos/no-faff/InstallerClean/releases/latest` on click; UA `InstallerClean/<version>`; 8 s timeout; localised result dialog.
-- Send summary on the completion overlay. Writes `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` after every Move, Delete or all-clear; opens a confirmation window showing the exact JSON; POSTs to `https://nofaff.netlify.app/api/result-log` on confirm. Counts and categorical labels only. No paths, no usernames, no machine identifiers, no time-of-day. Once per machine, ever.
+- Check for updates in About now performs the version check itself rather than opening the releases page. Single HTTPS GET to `api.github.com/repos/no-faff/InstallerClean/releases/latest` on click; UA `InstallerClean/<version>`; 8 s timeout; localised result dialog; a styled "update available" window when behind.
+- Send summary on the completion overlay. Writes `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` after every Move, Delete or all-clear; opens a confirmation window showing the exact JSON; POSTs to `https://nofaff.netlify.app/api/result-log` on confirm. Counts and categorical labels only. No paths, no usernames, no machine identifiers, no time-of-day. Once per machine, ever, with a confirm-before-send window and a lifetime lock.
+- French (`README.fr.md`) and Simplified Chinese (`README.zh-CN.md`) translations of the README.
 
 ### Changed
 
@@ -88,7 +93,21 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - Focus ring no longer appears on Alt+Tab return. The focused element's `FocusVisualStyle` is swapped to null on cross-process `Window.Deactivated` and restored on the next `PreviewKeyDown`. Logical focus is preserved across the round trip so a mid-edit TextBox keeps its caret position and Ctrl+V continues to paste.
 - Screen reader: dynamic status text (scan progress, operation progress, send-summary status) and the pending-reboot and missing-from-disk banners announce on appear (`LiveSetting=Polite`).
 - Read-only `SelectableText` metadata fields are keyboard-reachable (`IsTabStop=True`) so a keyboard-only user can Tab to a value and Ctrl+C it.
+- Detail-panel rows carry screen-reader context so values are announced with their field names rather than read out bare.
+- Keyboard reach and focus order corrected across the detail and About windows; modal windows kept out of the taskbar where they should be.
 - Inline link colour bumped to meet WCAG AA contrast.
+- Operation progress is cleared on success so the status pill resets cleanly rather than holding the last step's text.
+- Splash-screen icon load tolerates a failure rather than taking the window down with it.
+
+### Security and hardening
+
+- Defence-in-depth pass on the network and input boundaries: a cap on the Send-summary request size, a bounded JSON parse depth (`MaxDepth=8`) on the update-check and settings deserialisation, and tightened handling of window-activation process IDs in the focus logic.
+- Correctness and hardening sweep across the codebase: tightened symmetry in shared helpers, an AboutWindow close guard, corrected cancellation-token ordering in `ScanAsync`, and receipts on the splash icon load.
+- Consolidated the user32 P/Invoke surface into Core and removed the need for `AllowUnsafeBlocks` on the WPF host, reducing the heuristic-AV signal of the host binary.
+
+### Changed (internal)
+
+- Codebase-wide comment and code-quality pass: comments brought to a state-the-contract standard, first-person and devlog-style phrasing removed, XAML literals (corner radii, margins, close-button overhang) replaced with design tokens, and the test suite extended to pin the result-log schema, the update-check user-agent contract, and the JSON parse-depth limits.
 
 ### Removed
 
@@ -112,6 +131,8 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - Spurious "Windows is waiting to restart" banner on Windows 11 with no Windows update pending. Closes [#12](https://github.com/no-faff/InstallerClean/issues/12).
 
 ## [1.6.0] - 2026-05-05
+
+The largest engineering release in the project's history. The codebase was split into three projects (Core / WPF GUI / CLI), put behind a dependency-injection container, given an `IFileSystem` boundary so every file-touching service is unit-testable, moved to .NET 10, and had the third-party wpfui dependency removed in favour of an own three-layer design system. The MainViewModel was broken into four child view-models. All of this was driven through a sustained sequence of ship-readiness audits (a 28-finding pass, a 24-finding pass, a 40-plus-finding pass) with the findings actioned rather than deferred. The long list below is the result of that work, not padding.
 
 ### Added
 
@@ -341,13 +362,60 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 ## [1.0.0] - 2026-03-04
 
-Initial public release.
+Initial public release. Built from the ground up over months: the scan-and-correlate engine, a safety model that moves rather than deletes, a full WPF application taken through nine rounds of UI redesign, a custom dark theme with bundled Poppins, the superseded-patch detection that is the real advance over PatchCleaner, a console CLI, and the distribution and trust work to ship it. The detail below is the shape of that first release, not a summary of it.
 
 ### Added
 
-- `C:\Windows\Installer` scan: enumerates `.msi` and `.msp` files and correlates against the Windows Installer API to identify orphans.
-- Superseded patch detection (catches the Adobe Acrobat patches PatchCleaner excludes by default).
-- Move (to a folder of your choice) or Delete (to the Recycle Bin).
-- CLI: `/d` (Delete), `/m` (Move to saved default), `/m PATH` (Move to specified path).
-- Self-contained `InstallerClean.exe` (162 MB) and framework-dependent `InstallerClean-framework-dependent.exe` (8 MB, needs .NET 8 Desktop Runtime).
+#### Scan and correlation engine
+
+- `C:\Windows\Installer` scan: enumerates every `.msi` and `.msp` file and correlates each against the Windows Installer API to identify which are still registered and which are orphaned.
+- Windows Installer query layer over the `MsiEnum*` / `MsiGet*Info` COM API, using the documented double-call buffer pattern to size each call before reading.
+- Superseded patch detection: reads actual patch state (State and Uninstallable properties) to find old patches Windows has replaced but never removed. This catches the Adobe Acrobat patches PatchCleaner excludes by default, the difference between recovering a couple of GB and tens of GB on a machine with heavy MSI software.
+- Registry fallback enumeration (`HKLM\...\Installer\UserData`) so the still-needed set is found even where the API under-reports; the fallback only ever adds to "still needed", never to "removable".
+- Per-package file statistics gathered up front during the scan so the detail windows never hit disk on the UI thread.
+- MSI summary-information reader (title, subject, author, keywords, comments, digital signature) via source-generated P/Invoke, surfaced in the detail windows.
+- Empty-subdirectory cleanup: after a Move or Delete, the empty folders the cache leaves behind are pruned in the same pass.
+- Hardening against an MSI API access-denied condition that could otherwise spin the enumeration in an infinite loop; SID resolution done in a single enumeration pass rather than re-querying.
+
+#### Safety model
+
+- Move (to a folder of your choice) or Delete (to the Recycle Bin, never a permanent delete by default), the move-don't-delete principle so anything can be restored if it turns out to be needed.
+- Confirmation dialogs before both Move and Delete, with the Recycle Bin behaviour spelled out.
+- Cancellable operations with structured per-file progress tracking for both Move and Delete.
+- Pending-reboot detection so the cache is not cleaned while a Windows Installer transaction is mid-flight.
+- Settings persisted as JSON with graceful handling of save failures.
+- Restore guidance shown after a Move so the user knows how to put files back.
+
+#### Application and UI
+
+- WPF desktop app requiring elevation via the application manifest (the cache is not readable otherwise).
+- Main window as a compact summary: registered count, orphaned count, space recoverable, with the action front and centre.
+- Orphaned-files and registered-files detail windows, the latter as a master-detail product/patch layout; detail panels scrollable for long content, first item auto-selected and focused on open, full keyboard navigation and mouse-wheel support.
+- Startup splash screen showing scan progress steps, cancellable.
+- Completion screen summarising what was done.
+- About window, custom delete and move confirmation windows.
+- Scan duration shown on completion; fast scans suppress the overlay so the window does not flash.
+- Proper pluralisation throughout (no "file(s)").
+
+#### Theme and visual design
+
+- Custom dark theme with a layered design-token resource system, inspired by Upscayl.
+- Custom `WindowChrome` title bars across every window, with caption buttons styled to match (close has a red hover).
+- Poppins bundled as the body font.
+- App icon (the squeegee) set on every window.
+
+#### Command line
+
+- Console CLI: `/d` (Delete), `/m` (Move to saved default), `/m PATH` (Move to a specified path), plus `--help`.
+
+#### Distribution and trust
+
+- Self-contained `InstallerClean.exe` and a framework-dependent build (needs the .NET Desktop Runtime).
+- README written for the target user, with sourced forum quotes, an honest space-range claim, and credit to PatchCleaner's author.
+- VirusTotal scan published (1/70 on the final release build) and linked from the README.
 - No data collection.
+
+### Changed
+
+- Renamed from the working title (Simple Windows Installer Cleaner) to **InstallerClean** ahead of launch.
+- The original exclusion-filter feature (substring/summary-info matching to exclude files) was removed once superseded-patch detection made it unnecessary: detecting the real patch state is more correct than asking the user to maintain exclusion rules.
