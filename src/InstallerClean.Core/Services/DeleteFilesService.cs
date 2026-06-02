@@ -80,7 +80,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                             deleted++;
                             break;
                         case RecycleOutcome.PermanentlyDeleted:
-                            errors.Add(new PermanentlyDeleted(filePath));
+                            errors.Add(new PermanentlyDeleted(filePath, outcome.HResult));
                             break;
                         // Failed, and any future outcome, recorded with its
                         // HRESULT for telemetry; the file was left in place.

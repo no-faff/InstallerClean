@@ -86,18 +86,23 @@ public class DeleteFilesServiceUnitTests
     }
 
     [Fact]
-    public async Task Permanent_delete_without_permit_is_recorded_as_an_error()
+    public async Task Permanent_delete_without_permit_is_recorded_as_an_error_carrying_the_hresult()
     {
         var (fs, engine) = Setup(); // probe returns true; this file still nukes
         var a = AddFile(fs, "a.msi");
-        engine.RecycleFile(a).Returns(new RecycleFileOutcome(RecycleOutcome.PermanentlyDeleted, 0));
+        // A success hrDelete (COPYENGINE_S_*) that nonetheless skipped the
+        // bin: the engine surfaces the nuke, and the code rides along for
+        // telemetry even though the operation "succeeded".
+        var hr = unchecked((int)0x00270008);
+        engine.RecycleFile(a).Returns(new RecycleFileOutcome(RecycleOutcome.PermanentlyDeleted, hr));
         var svc = new DeleteFilesService(fs, engine);
 
         var result = await svc.DeleteFilesAsync(new[] { a }, permitPermanentDelete: false);
 
         Assert.Equal(0, result.DeletedCount);
         var err = Assert.Single(result.Errors);
-        Assert.IsType<PermanentlyDeleted>(err);
+        var nuked = Assert.IsType<PermanentlyDeleted>(err);
+        Assert.Equal(hr, nuked.HResult);
         Assert.Equal(a, err.FilePath);
     }
 

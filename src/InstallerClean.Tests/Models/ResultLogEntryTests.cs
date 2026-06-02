@@ -1,5 +1,6 @@
 using System.Text.Json;
 using InstallerClean.Models;
+using InstallerClean.Services;
 using Xunit;
 
 namespace InstallerClean.Tests.Models;
@@ -68,12 +69,100 @@ public class ResultLogEntryTests
     }
 
     [Fact]
-    public void Schema_version_is_two()
+    public void Schema_version_is_three()
     {
         // The receiving Edge Function field-validates per version; a
         // silent bump routes every record through its lenient
-        // v<n>-unknown/ path.
-        Assert.Equal(2, ResultLogEntry.CurrentSchemaVersion);
+        // v<n>-unknown/ path. This pin makes a version change a
+        // deliberate, reviewed act. Schema 3 carries the per-file
+        // delete error code (the IFileOperation HRESULT) on each error
+        // bucket and uses the IFileOperation-era category names
+        // (RecycleFailed / PermanentlyDeleted) the v1.8.3 delete engine
+        // produces, where schema 2 had ShellRefused and no code.
+        Assert.Equal(3, ResultLogEntry.CurrentSchemaVersion);
+    }
+
+    [Fact]
+    public void Delete_error_bucket_carries_per_code_counts_for_RecycleFailed()
+    {
+        // One category bucket can hold files that failed with different
+        // shell HRESULTs, so the bucket records a per-code histogram, not
+        // a single code. Two files failed E_FAIL, one E_ACCESSDENIED.
+        var errors = new List<FileOperationError>
+        {
+            new RecycleFailed(@"C:\Windows\Installer\a.msi", unchecked((int)0x80004005)),
+            new RecycleFailed(@"C:\Windows\Installer\b.msi", unchecked((int)0x80004005)),
+            new RecycleFailed(@"C:\Windows\Installer\c.msi", unchecked((int)0x80070005)),
+        };
+
+        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), totalCandidates: 3, bytesFreed: 0);
+
+        var bucket = Assert.Single(op.Errors);
+        Assert.Equal("RecycleFailed", bucket.Category);
+        Assert.Equal(3, bucket.Count);
+        Assert.NotNull(bucket.Codes);
+        Assert.Equal(2, bucket.Codes!["0x80004005"]);
+        Assert.Equal(1, bucket.Codes!["0x80070005"]);
+    }
+
+    [Fact]
+    public void Delete_error_bucket_carries_codes_for_PermanentlyDeleted()
+    {
+        // PermanentlyDeleted records the hrDelete that accompanied the
+        // silent nuke. It is a success HRESULT (the shell reported the
+        // delete succeeded while skipping the bin), distinct from
+        // RecycleFailed's failure code, but it is carried for the same
+        // diagnostic reason.
+        var errors = new List<FileOperationError>
+        {
+            new PermanentlyDeleted(@"C:\Windows\Installer\a.msi", unchecked((int)0x00270008)),
+            new PermanentlyDeleted(@"C:\Windows\Installer\b.msi", unchecked((int)0x00270008)),
+        };
+
+        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), totalCandidates: 2, bytesFreed: 0);
+
+        var bucket = Assert.Single(op.Errors);
+        Assert.Equal("PermanentlyDeleted", bucket.Category);
+        Assert.NotNull(bucket.Codes);
+        Assert.Equal(2, bucket.Codes!["0x00270008"]);
+    }
+
+    [Fact]
+    public void Error_bucket_without_a_shell_code_omits_the_codes_field()
+    {
+        // MissingSourceFile carries no HRESULT; its bucket leaves Codes
+        // null and the field is omitted from the wire shape entirely
+        // (not serialised as null), so a category that cannot carry a
+        // code never emits an empty map.
+        var errors = new List<FileOperationError> { new MissingSourceFile(@"C:\Windows\Installer\gone.msi") };
+
+        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), totalCandidates: 1, bytesFreed: 0);
+
+        var bucket = Assert.Single(op.Errors);
+        Assert.Null(bucket.Codes);
+
+        var json = JsonSerializer.Serialize(op, JsonOptions);
+        Assert.DoesNotContain("codes", json);
+    }
+
+    [Fact]
+    public void Codes_serialise_as_a_camelCase_hex_keyed_map()
+    {
+        // Wire-format pin: the receiving Edge Function allowlists the
+        // key name `codes` and validates each key against 0xNNNNNNNN.
+        // The hex formatting matches how the same HRESULT renders on the
+        // completion screen, so a code in a report and a code in a
+        // screenshot read identically.
+        var errors = new List<FileOperationError>
+        {
+            new RecycleFailed(@"C:\Windows\Installer\a.msi", unchecked((int)0x80004005)),
+        };
+
+        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), totalCandidates: 1, bytesFreed: 0);
+
+        var json = JsonSerializer.Serialize(op, JsonOptions);
+        Assert.Contains("\"codes\"", json);
+        Assert.Contains("\"0x80004005\"", json);
     }
 
     [Fact]

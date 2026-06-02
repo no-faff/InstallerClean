@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 using InstallerClean.Services;
 
 namespace InstallerClean.Models;
@@ -29,8 +30,18 @@ public sealed record ResultLogEntry(
     /// (PatchState=2). Schema 1 envelopes lump both states under
     /// supersededCount; receivers must branch on this version before
     /// reading either field.
+    ///
+    /// Schema 3 adds an optional per-code count map
+    /// (<see cref="ErrorBucket.Codes"/>) to each error bucket and carries
+    /// the IFileOperation-era delete category names
+    /// (<c>RecycleFailed</c> / <c>PermanentlyDeleted</c>) the delete
+    /// engine produces, where schema 2 had <c>ShellRefused</c> and
+    /// dropped the code. A receiver that does not recognise the version
+    /// stores the report under a lenient v&lt;n&gt;-unknown/ prefix rather
+    /// than rejecting it, so a version bump never loses data even if the
+    /// receiver allowlist has not yet caught up.
     /// </summary>
-    public const int CurrentSchemaVersion = 2;
+    public const int CurrentSchemaVersion = 3;
 
     public static ResultLogEntry ForScanOnly(ScanResult scan, long scanDurationMs, string pendingReboot) =>
         new(
@@ -184,13 +195,42 @@ public sealed record OperationInfo(
         if (errors.Count == 0) return Array.Empty<ErrorBucket>();
         return errors
             .GroupBy(e => e.GetType().Name)
-            .Select(g => new ErrorBucket(g.Key, g.Count()))
+            .Select(g => new ErrorBucket(g.Key, g.Count(), ProjectCodes(g)))
             .OrderByDescending(b => b.Count)
             .ToList();
     }
+
+    private static IReadOnlyDictionary<string, int>? ProjectCodes(IEnumerable<FileOperationError> bucket)
+    {
+        // Only categories that carry a shell HRESULT contribute a code
+        // map; a bucket grouped by type name is homogeneous, so this is
+        // all-or-nothing per bucket. One bucket can still hold files that
+        // failed with different codes, so the map is per-code counts, not
+        // a single code. Hex (0xNNNNNNNN) matches FileOperationError's
+        // on-screen formatting, so a code in a report and a code in a
+        // screenshot read identically.
+        var coded = bucket.OfType<IHasShellHResult>().ToList();
+        if (coded.Count == 0) return null;
+        return coded
+            .GroupBy(e => $"0x{e.HResult:X8}")
+            .OrderBy(g => g.Key, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.Count());
+    }
 }
 
-public sealed record ErrorBucket(string Category, int Count);
+/// <summary>
+/// One error category in a result-log operation. <see cref="Codes"/> is
+/// the per-HRESULT count for categories that carry a shell code
+/// (RecycleFailed, PermanentlyDeleted); it is null, and omitted from the
+/// wire shape rather than serialised as null, for every category that
+/// does not (MissingSourceFile, AccessDenied, ...). Keys are the HRESULT
+/// formatted as 0xNNNNNNNN.
+/// </summary>
+public sealed record ErrorBucket(
+    string Category,
+    int Count,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    IReadOnlyDictionary<string, int>? Codes = null);
 
 public static class OperationKinds
 {

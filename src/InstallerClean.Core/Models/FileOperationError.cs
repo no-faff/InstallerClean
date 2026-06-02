@@ -21,6 +21,19 @@ public abstract record FileOperationError(string FilePath)
     public abstract string LocalisedMessage { get; }
 }
 
+/// <summary>
+/// Implemented by error categories that carry a shell HRESULT worth
+/// keeping for telemetry. The result-log projection reads it to build a
+/// per-code count map on the error bucket, so a category that holds
+/// files which failed with different codes keeps the whole distribution
+/// instead of collapsing to one. The value is a raw COM HRESULT; turning
+/// it into a string is the consumer's concern.
+/// </summary>
+public interface IHasShellHResult
+{
+    int HResult { get; }
+}
+
 /// <summary>The source file disappeared between the scan and the operation.</summary>
 public sealed record MissingSourceFile(string FilePath)
     : FileOperationError(FilePath)
@@ -62,7 +75,7 @@ public sealed record DestinationCollision(string FilePath, string FileName)
 /// reason as <see cref="AccessDenied"/>.
 /// </summary>
 public sealed record RecycleFailed(string FilePath, int HResult)
-    : FileOperationError(FilePath)
+    : FileOperationError(FilePath), IHasShellHResult
 {
     public override string LocalisedMessage =>
         // HResult is a COM HRESULT; hex keeps a top-bit-set code
@@ -78,9 +91,16 @@ public sealed record RecycleFailed(string FilePath, int HResult)
 /// nuked while every HRESULT still reports success. This category
 /// records that honestly when it happens without the user having
 /// consented to permanent deletion. Delete only.
+///
+/// <see cref="HResult"/> is the per-item hrDelete the shell reported:
+/// a SUCCESS code (the operation "succeeded" while skipping the bin),
+/// not the failure code <see cref="RecycleFailed"/> carries. It is
+/// retained for telemetry for the same reason, kept off the displayed
+/// sentence (category-level) for the same path-leak reason as
+/// <see cref="AccessDenied"/>.
 /// </summary>
-public sealed record PermanentlyDeleted(string FilePath)
-    : FileOperationError(FilePath)
+public sealed record PermanentlyDeleted(string FilePath, int HResult)
+    : FileOperationError(FilePath), IHasShellHResult
 {
     public override string LocalisedMessage => Strings.Error_DeletedNotRecycled;
 }
