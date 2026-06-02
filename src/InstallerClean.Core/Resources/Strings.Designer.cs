@@ -44,12 +44,14 @@ public static class Strings
     public static string Action_Copy => Get("Action.Copy");
     public static string Action_Cut => Get("Action.Cut");
     public static string Action_Delete => Get("Action.Delete");
+    public static string Action_DeletePermanently => Get("Action.DeletePermanently");
     public static string Action_Details => Get("Action.Details");
     public static string Action_Done => Get("Action.Done");
     public static string Action_LeaveStarOnGitHub => Get("Action.LeaveStarOnGitHub");
     public static string Action_MITLicence => Get("Action.MITLicence");
     public static string Action_Move => Get("Action.Move");
     public static string Action_MoveDestinationPlaceholder => Get("Action.MoveDestinationPlaceholder");
+    public static string Action_MoveInstead => Get("Action.MoveInstead");
     public static string Action_OpenReleasePage => Get("Action.OpenReleasePage");
     public static string Action_Paste => Get("Action.Paste");
     public static string Action_Rescan => Get("Action.Rescan");
@@ -79,6 +81,8 @@ public static class Strings
     public static string Automation_MoveAllFiles => Get("Automation.MoveAllFiles");
     public static string Automation_MoveDestinationFolder => Get("Automation.MoveDestinationFolder");
     public static string Automation_OperationProgress => Get("Automation.OperationProgress");
+    public static string Automation_RecycleUnavailableDeletePermanently => Get("Automation.RecycleUnavailableDeletePermanently");
+    public static string Automation_RecycleUnavailableMove => Get("Automation.RecycleUnavailableMove");
     public static string Automation_RescanInstaller => Get("Automation.RescanInstaller");
     public static string Automation_ResultLogPreview => Get("Automation.ResultLogPreview");
     public static string Automation_SayThanks => Get("Automation.SayThanks");
@@ -172,8 +176,9 @@ public static class Strings
     public static string Completion_NothingToCleanUp => Get("Completion.NothingToCleanUp");
     public static string Completion_NothingToCleanUpReceipt => Get("Completion.NothingToCleanUpReceipt");
     public static string Completion_PartlyFreed => Get("Completion.PartlyFreed");
-    public static string Completion_RecycleUnavailableHeading => Get("Completion.RecycleUnavailableHeading");
-    public static string Completion_RecycleUnavailableSummary => Get("Completion.RecycleUnavailableSummary");
+    public static string Completion_PermanentDeleteRestoreHint => Get("Completion.PermanentDeleteRestoreHint");
+    public static string Completion_PermanentDeleteSummary => Get("Completion.PermanentDeleteSummary");
+    public static string Completion_PermanentDeleteSummaryWithErrors => Get("Completion.PermanentDeleteSummaryWithErrors");
     public static string Confirm_DeleteLargeWarning => Get("Confirm.DeleteLargeWarning");
     public static string Confirm_DeleteTitle => Get("Confirm.DeleteTitle");
     public static string Confirm_DeleteToRecycleBin => Get("Confirm.DeleteToRecycleBin");
@@ -249,6 +254,9 @@ public static class Strings
     public static string Reason_Obsoleted => Get("Reason.Obsoleted");
     public static string Reason_Orphaned => Get("Reason.Orphaned");
     public static string Reason_Superseded => Get("Reason.Superseded");
+    public static string RecycleUnavailable_Body => Get("RecycleUnavailable.Body");
+    public static string RecycleUnavailable_Heading => Get("RecycleUnavailable.Heading");
+    public static string RecycleUnavailable_Reassurance => Get("RecycleUnavailable.Reassurance");
     public static string ResultLog_Failed => Get("ResultLog.Failed");
     public static string ResultLog_NothingToSend => Get("ResultLog.NothingToSend");
     public static string ResultLog_Sending => Get("ResultLog.Sending");
@@ -334,5 +342,6 @@ public static class Strings
     public static string Window_ConfirmSendResultLog_Title => Get("Window.ConfirmSendResultLog.Title");
     public static string Window_Main_Title => Get("Window.Main.Title");
     public static string Window_Orphaned_Title => Get("Window.Orphaned.Title");
+    public static string Window_RecycleUnavailable_Title => Get("Window.RecycleUnavailable.Title");
     public static string Window_Registered_Title => Get("Window.Registered.Title");
 }

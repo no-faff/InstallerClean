@@ -1,0 +1,60 @@
+<Window x:Class="InstallerClean.RecycleUnavailableWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:InstallerClean.Resources"
+        Title="{loc:Translate Window.RecycleUnavailable.Title}"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <WindowChrome.WindowChrome>
+        <!-- CaptionHeight=0: this is a centred-on-owner modal with no
+             title-bar buttons, so no drag region is needed and the
+             Border below claims the full window. -->
+        <WindowChrome CaptionHeight="0" GlassFrameThickness="0"
+                      ResizeBorderThickness="0"/>
+    </WindowChrome.WindowChrome>
+
+    <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
+            MaxWidth="480" MinWidth="380"
+            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource GapBottom.Md}">
+                <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
+                      Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
+                      VerticalAlignment="Center" Margin="{StaticResource GapRight.Sm}"/>
+                <TextBlock Text="{loc:Translate RecycleUnavailable.Heading}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
+                           TextWrapping="Wrap" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <TextBlock x:Name="BodyText" Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}"
+                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Md}"/>
+
+            <TextBlock Text="{loc:Translate RecycleUnavailable.Reassurance}"
+                       Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
+                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- Cancel is the default to stop a reflexive Enter from
+                     deleting; the same stance as ConfirmDeleteWindow. Move
+                     is the visual primary (AccentPill, rightmost) because
+                     it is the recommended safe path, but it is not the
+                     keyboard default: an affirmative requires an explicit
+                     pointer or Tab+Space. -->
+                <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
+                        Click="OnCancel" IsCancel="True" IsDefault="True"
+                        Margin="{StaticResource GapRight.Sm}"/>
+                <Button Style="{StaticResource DangerPill}" Content="{loc:Translate Action.DeletePermanently}"
+                        Click="OnDeletePermanently"
+                        Margin="{StaticResource GapRight.Sm}"
+                        AutomationProperties.Name="{loc:Translate Automation.RecycleUnavailableDeletePermanently}"/>
+                <Button Style="{StaticResource AccentPill}" Content="{loc:Translate Action.MoveInstead}"
+                        Click="OnMove"
+                        AutomationProperties.Name="{loc:Translate Automation.RecycleUnavailableMove}"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

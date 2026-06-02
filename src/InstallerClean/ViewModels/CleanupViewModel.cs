@@ -485,10 +485,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     {
         if (_scan.LastScanResult is null) return;
 
-        var preOpScan = _scan.LastScanResult;
-        var preOpDurationMs = _scan.LastScanDurationMs;
-        var preOpRebootLabel = _scan.PendingRebootLabel;
-
         var removableFiles = _scan.LastScanResult.RemovableFiles;
         var count = removableFiles.Count;
         var totalBytes = removableFiles.Sum(f => f.SizeBytes);
@@ -497,36 +493,83 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         if (!_confirmationService.ConfirmDelete(count, sizeDisplay, totalBytes, maxSingleFileBytes)) return;
 
+        // Snapshot the pre-operation scan state once, after the confirm so a
+        // cancel costs nothing. RefreshAsync (inside RunDeleteAsync) replaces
+        // _scan.LastScanResult with the post-delete state, and the
+        // permanent-delete retry reuses this same context; the recycle-first
+        // pass touches nothing if it refuses, so the snapshot still matches it.
+        var ctx = new DeleteContext(
+            removableFiles,
+            removableFiles.Select(f => f.FullPath).ToList(),
+            count,
+            totalBytes,
+            _scan.LastScanResult,
+            _scan.LastScanDurationMs,
+            _scan.PendingRebootLabel);
+
+        // Recycle-first. The service probes the files' volume and, rather than
+        // silently permanently deleting when the bin is unavailable, refuses
+        // the batch and touches nothing. That refusal comes back as true here.
+        var recycleUnavailable = await RunDeleteAsync(ctx, permitPermanentDelete: false);
+        if (!recycleUnavailable) return;
+
+        // The bin is unavailable for the volume and nothing has been deleted.
+        // Offer the safe Move path (primary), a consented permanent delete, or
+        // cancel. The dialog names only the confirmed fact, not a cause.
+        switch (_confirmationService.ConfirmRecycleUnavailable(count, sizeDisplay))
+        {
+            case RecycleUnavailableChoice.MoveInstead:
+                await MoveInsteadAsync();
+                break;
+            case RecycleUnavailableChoice.DeletePermanently:
+                await RunDeleteAsync(ctx, permitPermanentDelete: true);
+                break;
+            // Cancel: nothing was deleted and there is nothing more to do.
+        }
+    }
+
+    /// <summary>
+    /// Runs one delete pass and reports it on the completion overlay. Owns the
+    /// operating overlay, the cancellation source and the per-run state reset,
+    /// so the recycle-first attempt and the consented permanent-delete retry
+    /// each get a clean lifecycle.
+    /// </summary>
+    /// <returns>
+    /// <c>true</c> only when the Recycle Bin was unavailable for the volume and
+    /// <paramref name="permitPermanentDelete"/> was <c>false</c>: the service
+    /// refused and touched nothing, so <see cref="DeleteAllAsync"/> offers the
+    /// Move / permanent / cancel choice instead of reporting a result. Every
+    /// other outcome (completed, cancelled, failed) reports on the overlay and
+    /// returns <c>false</c>. The permanent retry passes
+    /// <paramref name="permitPermanentDelete"/> = <c>true</c>, which skips the
+    /// probe, so it can never return <c>true</c>.
+    /// </returns>
+    private async Task<bool> RunDeleteAsync(DeleteContext ctx, bool permitPermanentDelete)
+    {
         IsOperating = true;
         _operationCts = new CancellationTokenSource();
-        var filePaths = removableFiles.Select(f => f.FullPath).ToList();
         OperationProgress = string.Format(Strings.Status_Deleting,
-            filePaths.Count, DisplayHelpers.PluraliseFile(filePaths.Count));
+            ctx.Count, DisplayHelpers.PluraliseFile(ctx.Count));
 
         try
         {
             var progress = new Progress<OperationProgress>(OnOperationProgressUpdate);
-            // permitPermanentDelete left at its default (false): the service probes the
-            // volume and returns RecycleUnavailable rather than silently permanently
-            // deleting when the bin is off. That state is surfaced honestly below
-            // (nothing freed, point at Move); the richer Move/permanent/cancel choice
-            // dialog is the deferred completion-screen step.
             var result = await _deleteService.DeleteFilesAsync(
-                filePaths, progress: progress, cancellationToken: _operationCts.Token);
+                ctx.FilePaths, permitPermanentDelete, progress, _operationCts.Token);
 
-            // The shell recycle is recycle-or-permanently-delete; when the bin
-            // is unavailable for the volume the service refuses the batch and
-            // touches nothing (DeletedCount 0, no errors). The empty error list
-            // below otherwise reads as full success, so this must short-circuit
-            // before the bytes calculation or the overlay would claim the full
-            // size was freed while every orphan is still on disk. Nothing
-            // changed on disk, so no rescan, and the result-log write is skipped
-            // (there is no operation to record).
+            // Bin unavailable for the volume and no consent to permanently
+            // delete: the service refused the batch and touched nothing. Hand
+            // control back so DeleteAllAsync can offer the choice; the finally
+            // below tears the overlay down so the modal owns the foreground.
+            // Returning here also skips the bytes calculation that would
+            // otherwise read the empty error list as full success and claim the
+            // whole size was freed while every orphan is still on disk. Only
+            // the recycle-first pass reaches this; the permanent retry skips the
+            // probe.
             if (result.RecycleUnavailable)
             {
-                _completion.ShowRecycleUnavailable();
                 OperationProgress = string.Empty;
-                return;
+                return true;
             }
 
             var deletedCount = result.DeletedCount;
@@ -534,29 +577,38 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
             long deletedBytes;
             if (errorCount == 0)
-                deletedBytes = totalBytes;
+                deletedBytes = ctx.TotalBytes;
             else
             {
                 var errorPaths = new HashSet<string>(result.Errors.Select(e => e.FilePath), StringComparer.OrdinalIgnoreCase);
-                deletedBytes = removableFiles.Where(f => !errorPaths.Contains(f.FullPath)).Sum(f => f.SizeBytes);
+                deletedBytes = ctx.RemovableFiles.Where(f => !errorPaths.Contains(f.FullPath)).Sum(f => f.SizeBytes);
             }
 
             await _scan.RefreshAsync();
 
-            _completion.ShowDeleteSummary(deletedCount, deletedBytes, result.Errors);
+            // A consented permanent delete did not reach the Recycle Bin, so it
+            // gets its own summary copy rather than reusing the recycle-bin one.
+            if (permitPermanentDelete)
+                _completion.ShowPermanentDeleteSummary(deletedCount, deletedBytes, result.Errors);
+            else
+                _completion.ShowDeleteSummary(deletedCount, deletedBytes, result.Errors);
 
-            // Same lock-aware gate as MoveAllAsync: skip the write once
-            // the result-log surface is closed for the rest of the
-            // session and across future sessions.
+            // Same lock-aware gate as MoveAllAsync: skip the write once the
+            // result-log surface is closed for the rest of the session and
+            // across future sessions. Both the recycled and the consented-
+            // permanent path log a delete entry of the same shape: the
+            // operation freed real bytes either way and the result-log schema
+            // carries no recycled-vs-permanent distinction.
             if (!_completion.IsResultLogLocked)
             {
                 var entry = ResultLogEntry.ForDelete(
-                    preOpScan, preOpDurationMs, preOpRebootLabel,
+                    ctx.PreOpScan, ctx.PreOpDurationMs, ctx.PreOpRebootLabel,
                     result, deletedBytes);
                 if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
                     _completion.MarkResultLogReady();
             }
             OperationProgress = string.Empty;
+            return false;
         }
         catch (OperationCanceledException)
         {
@@ -567,6 +619,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     DisplayHelpers.PluraliseFile(OperationTotalFiles))
                 : Strings.Status_DeleteCancelled;
             await _scan.RefreshAsync();
+            return false;
         }
         catch (Exception ex)
         {
@@ -575,6 +628,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             OperationProgress = crash.Written
                 ? string.Format(Strings.Status_DeleteFailed, typeName, crash.Path)
                 : string.Format(Strings.Status_DeleteFailed_NoLog, typeName);
+            return false;
         }
         finally
         {
@@ -590,6 +644,48 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             OperationCurrentFileName = string.Empty;
         }
     }
+
+    /// <summary>
+    /// Routes the recycle-unavailable "Move instead" choice into the standard
+    /// Move flow so its destination validation, free-space and write-probe
+    /// checks and the Move confirmation all apply. A destination is required;
+    /// when none is set the folder picker opens first so the safe path is never
+    /// a dead end. If the user backs out of the picker, nothing happens.
+    /// </summary>
+    private async Task MoveInsteadAsync()
+    {
+        if (string.IsNullOrWhiteSpace(MoveDestination))
+        {
+            var dialog = new Microsoft.Win32.OpenFolderDialog
+            {
+                Title = Strings.FilePicker_ChooseDestinationTitle,
+            };
+            if (dialog.ShowDialog() != true) return;
+            MoveDestination = dialog.FolderName;
+        }
+
+        // Setting MoveDestination above re-evaluates CanMove synchronously via
+        // OnMoveDestinationChanged, so the command is executable here once a
+        // destination is present. The guard covers the rare case where it is
+        // not (for example the scan emptied between the dialogs).
+        if (MoveAllCommand.CanExecute(null))
+            await MoveAllCommand.ExecuteAsync(null);
+    }
+
+    /// <summary>
+    /// Snapshot of the scan state and file list a delete pass needs, captured
+    /// before the first delete so the permanent-delete retry and the
+    /// result-log entry both read the pre-operation values (RefreshAsync
+    /// replaces <see cref="ScanViewModel.LastScanResult"/> on success).
+    /// </summary>
+    private sealed record DeleteContext(
+        IReadOnlyList<OrphanedFile> RemovableFiles,
+        IReadOnlyList<string> FilePaths,
+        int Count,
+        long TotalBytes,
+        ScanResult PreOpScan,
+        long PreOpDurationMs,
+        string PreOpRebootLabel);
 
     /// <summary>
     /// Localised "{current} of {total} files" line shown beneath the

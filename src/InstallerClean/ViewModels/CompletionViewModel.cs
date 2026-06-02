@@ -200,22 +200,28 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Shows the honest "nothing deleted" state when the shell recycle was
-    /// refused because the Recycle Bin is unavailable for the volume and
-    /// the service touched nothing. Kept distinct from
-    /// <see cref="ShowDeleteSummary"/>: there an empty error list reads as
-    /// full success and would paint the green "freed" banner over zero
-    /// deletions. No restore hint (nothing reached the bin or disk); the
-    /// caller skips the result-log write.
+    /// Shows the completion summary for a consented permanent delete: the
+    /// Recycle Bin was unavailable for the volume and the user chose to
+    /// delete anyway, so these files did NOT reach the bin. Kept distinct
+    /// from <see cref="ShowDeleteSummary"/> so the copy never claims the
+    /// bin and the restore hint points at reinstalling rather than at the
+    /// (empty) Recycle Bin.
     /// </summary>
-    public void ShowRecycleUnavailable()
+    public void ShowPermanentDeleteSummary(int deletedCount, long deletedBytes,
+        IReadOnlyList<FileOperationError> errors)
     {
-        Heading = Strings.Completion_RecycleUnavailableHeading;
-        Summary = Strings.Completion_RecycleUnavailableSummary;
-        Restore = string.Empty;
-        Errors = string.Empty;
+        Heading = string.Format(
+            errors.Count == 0 ? Strings.Completion_Freed : Strings.Completion_PartlyFreed,
+            DisplayHelpers.FormatSize(deletedBytes));
+        var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
+        Summary = errors.Count == 0
+            ? string.Format(Strings.Completion_PermanentDeleteSummary, deletedCount, deletedLabel)
+            : string.Format(Strings.Completion_PermanentDeleteSummaryWithErrors,
+                deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
+        Restore = Strings.Completion_PermanentDeleteRestoreHint;
+        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
-        LastResultFreedNothing = true;
+        LastResultFreedNothing = deletedBytes <= 0;
         IsComplete = true;
     }
 

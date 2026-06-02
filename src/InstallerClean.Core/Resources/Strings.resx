@@ -90,6 +90,7 @@
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>Unused files</value></data>
   <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Confirm move</value></data>
   <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Confirm delete</value></data>
+  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>Recycle Bin unavailable</value></data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUCTS</value></data>
@@ -127,6 +128,7 @@
   <data name="Action.CheckForUpdates" xml:space="preserve"><value>Check for _updates</value></data>
   <data name="Action.Close" xml:space="preserve"><value>_Close</value></data>
   <data name="Action.Delete" xml:space="preserve"><value>_Delete</value></data>
+  <data name="Action.DeletePermanently" xml:space="preserve"><value>_Delete permanently</value></data>
   <!-- Alt+D safe here because the Delete button under the overlay is
        disabled while Completion.IsComplete is true (IsMainContentInteractive
        binds the body region to false); the mnemonic only resolves to
@@ -138,6 +140,7 @@
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a _star on GitHub</value></data>
   <data name="Action.MITLicence" xml:space="preserve"><value>MIT licence</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Move</value></data>
+  <data name="Action.MoveInstead" xml:space="preserve"><value>_Move instead</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Move destination...</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>Open _release page</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Re-scan</value></data>
@@ -161,6 +164,8 @@
   <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all unused installer files to the Recycle Bin</value></data>
   <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Confirm sending the unused files to the Recycle Bin</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>Confirm moving the unused files to the chosen destination folder</value></data>
+  <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Move the unused files to a folder you choose</value></data>
+  <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Delete the unused files permanently because the Recycle Bin is unavailable for this drive</value></data>
   <data name="Automation.SendResultLog" xml:space="preserve"><value>Send a summary of this run to No Faff</value></data>
   <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Say thanks</value></data>
@@ -300,12 +305,24 @@
   <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} sent to the Recycle Bin</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
   <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} sent to the Recycle Bin. {2} {3}</value></data>
-  <!-- Honest interim state when the shell recycle is refused because the
-       Recycle Bin is unavailable for the volume: nothing was deleted, so
-       there is no "freed" banner and no restore hint, and the user is
-       pointed at Move. Mirrors the CLI's Cli.RecycleUnavailable copy. -->
-  <data name="Completion.RecycleUnavailableHeading" xml:space="preserve"><value>Nothing deleted</value></data>
-  <data name="Completion.RecycleUnavailableSummary" xml:space="preserve"><value>The Recycle Bin is unavailable for this drive, so nothing was deleted. Move the files instead so you can restore them if needed, or re-enable the Recycle Bin and try again.</value></data>
+  <!-- Completion copy for a consented permanent delete (the Recycle Bin
+       was unavailable for the volume and the user chose to delete anyway).
+       Distinct from DeleteSummary so it never claims the bin: these files
+       did not reach it and cannot be restored from it. 0 = deleted count,
+       1 = pluralised noun; the WithErrors variant adds 2 = error count,
+       3 = pluralised "error"/"errors". -->
+  <data name="Completion.PermanentDeleteSummary" xml:space="preserve"><value>{0} {1} permanently deleted. They did not go to the Recycle Bin.</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} permanently deleted. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint" xml:space="preserve"><value>These files are gone for good. If Windows ever needs one, reinstall that program and you're back to normal, settings and all.</value></data>
+  <!-- The choice offered when Delete finds the Recycle Bin unavailable for
+       the files' volume: Move (the safe default), delete permanently with
+       consent, or cancel. Wording states only the confirmed fact (the probe
+       found the bin unavailable for the drive); it never asserts an
+       unconfirmed cause (off vs corrupt vs full). 0 = file count,
+       1 = pluralised noun, 2 = size display. -->
+  <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>The Recycle Bin isn't available for this drive</value></data>
+  <data name="RecycleUnavailable.Body" xml:space="preserve"><value>So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently.</value></data>
+  <data name="RecycleUnavailable.Reassurance" xml:space="preserve"><value>Permanent deletion can't be undone. But it's safe to do here: InstallerClean only removes files Windows reports as no longer needed, and if you ever needed one back you'd just reinstall that program, settings and all.</value></data>
 
   <!-- Summaries -->
   <!-- 0 = file count. Singular / plural pairs picked at the call
