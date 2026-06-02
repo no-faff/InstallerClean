@@ -416,14 +416,13 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task DeleteAllAsync_recycle_unavailable_shows_honest_state_and_no_false_freed()
+    public async Task DeleteAllAsync_recycle_unavailable_offers_choice_and_cancel_does_nothing()
     {
-        // Bin unavailable for the volume: the service refuses the batch
+        // Bin unavailable for the volume: the recycle-first pass refuses
         // (DeletedCount 0, no errors, RecycleUnavailable true) and touches
-        // nothing. The completion overlay must NOT show the green "freed"
-        // banner that an empty error list would otherwise produce, and the
-        // false "freed the full amount, deleted nothing" telemetry write
-        // must be skipped.
+        // nothing, so the VM offers the Move / permanent / cancel choice. On
+        // Cancel nothing more happens: no permanent retry, no completion
+        // overlay, and no telemetry write of a "deleted nothing" run.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -432,21 +431,107 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+                Arg.Any<IEnumerable<string>>(), Arg.Is(false),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true));
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+        _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
+            .Returns(RecycleUnavailableChoice.Cancel);
 
         await vm.Scan.ScanWithProgressAsync(null);
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
-        Assert.True(vm.Completion.IsComplete);
-        Assert.DoesNotContain("freed", vm.Completion.Heading);
-        Assert.Equal(Strings.Completion_RecycleUnavailableHeading, vm.Completion.Heading);
-        Assert.Equal(Strings.Completion_RecycleUnavailableSummary, vm.Completion.Summary);
+        _confirmationService.Received(1).ConfirmRecycleUnavailable(1, Arg.Any<string>());
+        await _deleteService.DidNotReceive().DeleteFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Is(true),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.False(vm.Completion.IsComplete);
         await _resultLogService.DidNotReceive().WriteAsync(
             Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_recycle_unavailable_delete_permanently_redeletes_with_consent()
+    {
+        // Choosing "delete permanently" re-runs the delete with consent. The
+        // completion copy must say the files were permanently deleted, never
+        // that they were sent to the Recycle Bin.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\big.msi", 200_000_000, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        // First (recycle) pass refuses; the consented retry succeeds.
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Is(false),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Is(true),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
+        _confirmationService.ConfirmDelete(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+        _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
+            .Returns(RecycleUnavailableChoice.DeletePermanently);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        await _deleteService.Received(1).DeleteFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Is(true),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Contains("permanently deleted", vm.Completion.Summary);
+        Assert.DoesNotContain("sent to the Recycle Bin", vm.Completion.Summary);
+        Assert.Equal(Strings.Completion_PermanentDeleteRestoreHint, vm.Completion.Restore);
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_recycle_unavailable_move_instead_routes_to_move_flow()
+    {
+        // Choosing "Move instead" routes into the standard Move flow (with a
+        // destination already set, so no folder picker is needed). The move
+        // service must be invoked and no permanent delete must happen.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\big.msi", 1_048_576, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Is(false),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true));
+        _confirmationService.ConfirmDelete(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+        _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
+            .Returns(RecycleUnavailableChoice.MoveInstead);
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move-instead");
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        // The Move-instead choice routed into the standard Move flow.
+        await _moveService.Received(1).MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), vm.Cleanup.MoveDestination,
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        // No permanent delete happened.
+        await _deleteService.DidNotReceive().DeleteFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Is(true),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Contains("freed", vm.Completion.Heading);
     }
 
     [Fact]
