@@ -142,7 +142,7 @@ Oui. InstallerClean interroge la même base que Windows utilise lui-même pour s
 **Vérifier le binaire.** InstallerClean n'est pas signé numériquement. Les certificats de signature de code coûtent de l'argent chaque année, et je préfère garder le projet gratuit, ouvert et financé par les dons.
 
 - Les empreintes SHA-256 de chaque version sont listées sur la [page des versions](../../releases/latest).
-- Des liens VirusTotal pour les builds setup, portable et slim sont publiés à chaque version.
+- Des liens VirusTotal pour les builds setup, portable, slim et CLI sont publiés à chaque version.
 - Le code source est sur [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) et la CI compile et teste chaque commit (voir le badge CI vert ci-dessus).
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) teste chaque version pour virus, logiciels espions et publiciels.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) teste chaque soumission dans une machine virtuelle et ne la liste que si elle passe leur examen.
@@ -184,11 +184,12 @@ VirusTotal : propre sur tous les moteurs. Des liens en direct dans les notes de 
 
 ## Téléchargement
 
-Trois builds, choisissez-en un :
+Quatre builds, choisissez-en un :
 
 - **Setup** (`InstallerClean-setup.exe`) : un installeur Windows classique avec le runtime .NET 10 intégré. Ajoute un raccourci dans le menu Démarrer et se désinstalle proprement. Bien rangé dans les Programmes, facile à retrouver dans six mois.
 - **Portable** (`InstallerClean-portable.exe`) : un exe unique autonome avec le runtime intégré. Pas d'installation, pas de désinstallation. Lancez-le, utilisez-le, supprimez-le. Relancez-le quand vous voulez.
 - **Slim** (`InstallerClean-slim.exe`) : le téléchargement le plus léger. Nécessite que le [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) soit déjà installé (ce qui est le cas si vous avez Visual Studio à jour).
+- **CLI** (`installerclean-cli.exe`) : la version en ligne de commande seule, un exe unique autonome. Pas d'installation, rien laissé sur la machine ensuite. Déposez-le sur un poste client, lancez une analyse ou un nettoyage, supprimez-le. Conçu pour le scripting, les tâches planifiées et le déploiement de masse, quand vous voulez les opérations sans application de bureau sur le client. Voir [Ligne de commande](#ligne-de-commande) pour les arguments et les codes de sortie.
 
 Téléchargez depuis la [page des versions](../../releases/latest), puis lancez. Windows SmartScreen affichera « Éditeur inconnu ». Cliquez sur **Informations complémentaires** puis **Exécuter quand même**. C'est normal pour un logiciel open source non signé.
 
@@ -247,14 +248,14 @@ Les trois nécessitent une invite de commandes élevée (administrateur). Si la 
 
 `InstallerClean.exe` est l'interface graphique WPF ; elle ne répond pas aux arguments de ligne de commande. `installerclean-cli.exe` est un exécutable console séparé livré dans le même répertoire d'installation, qui expose les mêmes opérations d'analyse, de déplacement et de suppression à PowerShell, cmd et aux tâches planifiées. Comme c'est un véritable processus console, il bloque l'invite jusqu'à sa fin ; redirigez ou pipez sa sortie comme pour n'importe quel autre exe console.
 
-Les téléchargements portable et slim n'incluent que l'exe d'interface graphique. Pour exécuter les opérations en CLI depuis ces builds, installez via le setup ou installez la CLI séparément.
+Les téléchargements portable et slim ne contiennent que l'exe d'interface graphique. Si vous voulez la ligne de commande sans l'interface, téléchargez `installerclean-cli.exe` depuis la [page des versions](../../releases/latest) et lancez-le directement. Le setup l'installe aussi à côté de l'interface graphique.
 
 ## Prérequis
 
 - Windows 10 ou 11
 - Privilèges administrateur (`C:\Windows\Installer` est réservé aux administrateurs)
 
-Voir [Téléchargement](#téléchargement) pour les options setup, portable et slim.
+Voir [Téléchargement](#téléchargement) pour les options setup, portable, slim et CLI.
 
 ## Compilation depuis les sources
 

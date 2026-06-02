@@ -137,7 +137,7 @@ Yes. InstallerClean queries the same database Windows itself uses to track what'
 **Verifying the binary.** InstallerClean is unsigned. Code-signing certificates cost money annually and I'd rather keep the project free, open and donations-funded.
 
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
-- VirusTotal links for setup, portable and slim builds are published with each release.
+- VirusTotal links for setup, portable, slim and CLI builds are published with each release.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) tests each release for viruses, spyware and adware.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) tests each submission in a virtual machine and lists it only if it passes their review.
@@ -188,11 +188,12 @@ Across the 59 reports people have been kind enough to send in (thanks 🙏) sinc
 
 ## Download
 
-Three builds, choose one:
+Four builds, choose one:
 
 - **Setup** (`InstallerClean-setup.exe`): a regular Windows installer with the .NET 10 runtime bundled. Adds a Start Menu entry and uninstalls cleanly. Tucked into Programs so it's easy to find six months from now.
 - **Portable** (`InstallerClean-portable.exe`): a single self-contained exe with the runtime bundled. No install, no uninstaller. Run it, use it, delete it. Run it again whenever.
 - **Slim** (`InstallerClean-slim.exe`): the smallest download. Requires the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) to be installed already (which you have if you have an up-to-date Visual Studio).
+- **CLI** (`installerclean-cli.exe`): the command-line version on its own, a single self-contained exe. No install, nothing left on the machine afterwards. Drop it on a client, run a scan or a clean, delete it. Built for scripting, scheduled tasks and mass deployment, where you want the operations without a desktop app on the client. See [Command line](#command-line) for the arguments and exit codes.
 
 Download from the [releases page](../../releases/latest), then run. Windows SmartScreen will say "Unknown publisher". Click **More info** then **Run anyway**. This is normal for unsigned open-source software.
 
@@ -249,14 +250,14 @@ All three require an elevated (administrator) command prompt. If Group Policy bl
 
 `InstallerClean.exe` is the WPF GUI; it does not respond to command-line arguments. `installerclean-cli.exe` is a separate console executable that ships in the same install directory and exposes the same scan / move / delete operations to PowerShell, cmd and scheduled tasks. Because it is a real console process, it blocks the prompt until it finishes; redirect or pipe its output as you would any other console exe.
 
-Portable and slim downloads bundle only the GUI exe. To run the CLI operations from those, install via the setup or install the CLI separately.
+The portable and slim downloads contain only the GUI exe. If you want the command line without the GUI, download `installerclean-cli.exe` from the [releases page](../../releases/latest) and run it directly. The setup installs it alongside the GUI as well.
 
 ## Requirements
 
 - Windows 10 or 11
 - Administrator privileges (`C:\Windows\Installer` is admin-only)
 
-See [Download](#download) for setup, portable and slim build options.
+See [Download](#download) for setup, portable, slim and CLI build options.
 
 ## Building from source
 
