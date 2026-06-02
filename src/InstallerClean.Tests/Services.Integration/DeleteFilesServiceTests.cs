@@ -4,24 +4,33 @@ using InstallerClean.Tests.Helpers;
 
 namespace InstallerClean.Tests.Services.Integration;
 
+/// <summary>
+/// Real-filesystem, real-COM integration tests: a live
+/// <see cref="RecycleEngine"/> drives the Windows IFileOperation API
+/// against throwaway files under %TEMP%, so the full recycle pipeline
+/// (STA thread, activation, the progress sink) is exercised. The
+/// unit suite under InstallerClean.Tests.Services uses MockFileSystem
+/// and a fake IRecycleEngine for the outcome-mapping coverage instead.
+/// These run on Windows only (the engine's STA apartment is a Windows
+/// concept); the Linux pre-commit run filters the Integration namespace
+/// out.
+///
+/// xUnit constructs a fresh instance per test method, so each test gets
+/// its own engine, disposed in <see cref="Dispose"/> (which drains the
+/// queue and joins the STA thread).
+/// </summary>
 public class DeleteFilesServiceTests : IDisposable
 {
     private readonly string _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+    private readonly RecycleEngine _engine = new();
 
     public DeleteFilesServiceTests()
     {
         Directory.CreateDirectory(_tempDir);
     }
 
-    /// <summary>
-    /// Constructs a DeleteFilesService against the real filesystem.
-    /// Integration tests need real %TEMP% so the recycle-bin send
-    /// against SHFileOperationW exercises the full pipeline; the
-    /// unit-suite under InstallerClean.Tests.Services uses MockFileSystem
-    /// for the File.Exists pre-check coverage instead.
-    /// </summary>
-    private static DeleteFilesService NewService() =>
-        new(new System.IO.Abstractions.FileSystem());
+    private DeleteFilesService NewService() =>
+        new(new System.IO.Abstractions.FileSystem(), _engine);
 
     [Fact]
     public async Task DeleteFilesAsync_deletes_file()
@@ -34,6 +43,7 @@ public class DeleteFilesServiceTests : IDisposable
 
         Assert.Equal(1, result.DeletedCount);
         Assert.Empty(result.Errors);
+        Assert.False(result.RecycleUnavailable);
         Assert.False(File.Exists(file));
     }
 
@@ -89,7 +99,7 @@ public class DeleteFilesServiceTests : IDisposable
 
         var svc = NewService();
         await Assert.ThrowsAnyAsync<OperationCanceledException>(
-            () => svc.DeleteFilesAsync(files, progress, cts.Token));
+            () => svc.DeleteFilesAsync(files, progress: progress, cancellationToken: cts.Token));
 
         var remaining = Directory.GetFiles(_tempDir).Length;
         Assert.True(remaining > 0, "Cancellation should have stopped before deleting all files");
@@ -97,8 +107,8 @@ public class DeleteFilesServiceTests : IDisposable
 
     public void Dispose()
     {
+        _engine.Dispose();
         if (Directory.Exists(_tempDir))
             Directory.Delete(_tempDir, recursive: true);
     }
-
 }

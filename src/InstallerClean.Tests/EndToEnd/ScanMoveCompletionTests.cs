@@ -109,7 +109,7 @@ public class ScanMoveCompletionTests
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
 
@@ -169,7 +169,9 @@ public class ScanMoveCompletionTests
         var scanService = new FileSystemScanService(queryService, fs, null, installerFolder);
         // Real move service over the in-memory FS.
         var moveService = new MoveFilesService(fs);
-        var deleteService = new DeleteFilesService(fs);
+        // The delete path is not exercised in this move-focused journey;
+        // the engine only needs to satisfy the constructor.
+        var deleteService = new DeleteFilesService(fs, Substitute.For<IRecycleEngine>());
 
         // External concerns stay substituted.
         var settingsService = Substitute.For<ISettingsService>();

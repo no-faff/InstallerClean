@@ -379,7 +379,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(
@@ -391,7 +391,7 @@ public class MainViewModelTests
 
         _confirmationService.Received(1).ConfirmDelete(1, Arg.Any<string>(), 524_288, 524_288);
         await _deleteService.Received(1).DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(),
+            Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains("Recycle Bin", vm.Completion.Summary);
@@ -411,8 +411,42 @@ public class MainViewModelTests
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(),
+            Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_recycle_unavailable_shows_honest_state_and_no_false_freed()
+    {
+        // Bin unavailable for the volume: the service refuses the batch
+        // (DeletedCount 0, no errors, RecycleUnavailable true) and touches
+        // nothing. The completion overlay must NOT show the green "freed"
+        // banner that an empty error list would otherwise produce, and the
+        // false "freed the full amount, deleted nothing" telemetry write
+        // must be skipped.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\big.msi", 200_000_000, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true));
+        _confirmationService.ConfirmDelete(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Completion.IsComplete);
+        Assert.DoesNotContain("freed", vm.Completion.Heading);
+        Assert.Equal(Strings.Completion_RecycleUnavailableHeading, vm.Completion.Heading);
+        Assert.Equal(Strings.Completion_RecycleUnavailableSummary, vm.Completion.Summary);
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -652,7 +686,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(
