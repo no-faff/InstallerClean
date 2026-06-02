@@ -300,6 +300,12 @@
   <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} sent to the Recycle Bin</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
   <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} sent to the Recycle Bin. {2} {3}</value></data>
+  <!-- Honest interim state when the shell recycle is refused because the
+       Recycle Bin is unavailable for the volume: nothing was deleted, so
+       there is no "freed" banner and no restore hint, and the user is
+       pointed at Move. Mirrors the CLI's Cli.RecycleUnavailable copy. -->
+  <data name="Completion.RecycleUnavailableHeading" xml:space="preserve"><value>Nothing deleted</value></data>
+  <data name="Completion.RecycleUnavailableSummary" xml:space="preserve"><value>The Recycle Bin is unavailable for this drive, so nothing was deleted. Move the files instead so you can restore them if needed, or re-enable the Recycle Bin and try again.</value></data>
 
   <!-- Summaries -->
   <!-- 0 = file count. Singular / plural pairs picked at the call
@@ -390,6 +396,7 @@ Details in {1}.</value></data>
   <data name="Error.UnknownError" xml:space="preserve"><value>Unknown error.</value></data>
   <!-- 0 = shell error code -->
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Windows shell reported error {0} while recycling the file.</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>The file was permanently deleted because it could not be sent to the Recycle Bin.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Refusing to move files into the Windows Installer folder (destination: {0}).</value></data>
   <!-- 0 = the relative path the caller passed -->
@@ -525,6 +532,9 @@ The crash log could not be written.</value></data>
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.EventLogDeleteSummary" xml:space="preserve"><value>{0} mode: {1} of {2} {3} sent to the Recycle Bin, {4} recovered, {5} {6}.</value></data>
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again.</value></data>
+  <!-- 0 = mode arg ("/d") -->
+  <data name="Cli.EventLogRecycleUnavailable" xml:space="preserve"><value>{0} mode aborted: the Recycle Bin is unavailable for the Windows volume; no files were deleted.</value></data>
   <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH or set a default in the GUI.</value></data>
   <data name="Cli.EventLogMoveNoDestination" xml:space="preserve"><value>{0} mode aborted: no destination specified.</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Error: destination cannot be inside the Windows Installer folder.</value></data>

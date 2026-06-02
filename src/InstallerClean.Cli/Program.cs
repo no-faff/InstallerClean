@@ -272,7 +272,22 @@ internal static class Program
                 var deleteService = services.GetRequiredService<IDeleteFilesService>();
                 Console.WriteLine(string.Format(Strings.Cli_DeletingFiles,
                     count, DisplayHelpers.PluraliseFile(count)));
-                var result = await deleteService.DeleteFilesAsync(filePaths, progress, token);
+                var result = await deleteService.DeleteFilesAsync(
+                    filePaths, permitPermanentDelete: false, progress: progress, cancellationToken: token);
+
+                // The shell recycle is recycle-or-permanently-delete. When the bin is
+                // unavailable for the volume the service refuses rather than nuking, and a
+                // non-interactive CLI cannot offer the Move/permanent/cancel choice the GUI
+                // will: surface guidance and exit transient (re-enabling the bin or a reboot
+                // clears it). There is deliberately no /force permanent-delete flag.
+                if (result.RecycleUnavailable)
+                {
+                    Console.WriteLine(Strings.Cli_RecycleUnavailable);
+                    EventLogWriter.Write(EventLogWriter.Level.Warning,
+                        string.Format(Strings.Cli_EventLogRecycleUnavailable, arg));
+                    return ExitTransient;
+                }
+
                 Console.WriteLine(string.Format(Strings.Cli_DeletedFiles,
                     result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
                 if (result.Errors.Count > 0)

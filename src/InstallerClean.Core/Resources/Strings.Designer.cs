@@ -123,6 +123,7 @@ public static class Strings
     public static string Cli_EventLogReason_InstallerInProgress => Get("Cli.EventLogReason.InstallerInProgress");
     public static string Cli_EventLogReason_MsiExecuteMutex => Get("Cli.EventLogReason.MsiExecuteMutex");
     public static string Cli_EventLogReason_PendingRenameInCache => Get("Cli.EventLogReason.PendingRenameInCache");
+    public static string Cli_EventLogRecycleUnavailable => Get("Cli.EventLogRecycleUnavailable");
     public static string Cli_EventLogScanFound => Get("Cli.EventLogScanFound");
     public static string Cli_EventLogScanNoOrphans => Get("Cli.EventLogScanNoOrphans");
     public static string Cli_EventLogUnavailable => Get("Cli.EventLogUnavailable");
@@ -157,6 +158,7 @@ public static class Strings
     public static string Cli_PendingRebootBlocked_InstallerInProgress => Get("Cli.PendingRebootBlocked.InstallerInProgress");
     public static string Cli_PendingRebootBlocked_MsiExecuteMutex => Get("Cli.PendingRebootBlocked.MsiExecuteMutex");
     public static string Cli_PendingRebootBlocked_PendingRenameInCache => Get("Cli.PendingRebootBlocked.PendingRenameInCache");
+    public static string Cli_RecycleUnavailable => Get("Cli.RecycleUnavailable");
     public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_UnknownArgument => Get("Cli.UnknownArgument");
     public static string Completion_AllClean => Get("Completion.AllClean");
@@ -170,6 +172,8 @@ public static class Strings
     public static string Completion_NothingToCleanUp => Get("Completion.NothingToCleanUp");
     public static string Completion_NothingToCleanUpReceipt => Get("Completion.NothingToCleanUpReceipt");
     public static string Completion_PartlyFreed => Get("Completion.PartlyFreed");
+    public static string Completion_RecycleUnavailableHeading => Get("Completion.RecycleUnavailableHeading");
+    public static string Completion_RecycleUnavailableSummary => Get("Completion.RecycleUnavailableSummary");
     public static string Confirm_DeleteLargeWarning => Get("Confirm.DeleteLargeWarning");
     public static string Confirm_DeleteTitle => Get("Confirm.DeleteTitle");
     public static string Confirm_DeleteToRecycleBin => Get("Confirm.DeleteToRecycleBin");
@@ -191,6 +195,7 @@ public static class Strings
     public static string Error_AdminRequiredBody => Get("Error.AdminRequiredBody");
     public static string Error_AdminRequiredTitle => Get("Error.AdminRequiredTitle");
     public static string Error_CannotWriteFolder => Get("Error.CannotWriteFolder");
+    public static string Error_DeletedNotRecycled => Get("Error.DeletedNotRecycled");
     public static string Error_DestinationChangedMidBatch => Get("Error.DestinationChangedMidBatch");
     public static string Error_DestinationInsideInstaller => Get("Error.DestinationInsideInstaller");
     public static string Error_DestinationInSystemFolder => Get("Error.DestinationInSystemFolder");

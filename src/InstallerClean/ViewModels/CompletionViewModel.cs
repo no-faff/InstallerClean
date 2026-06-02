@@ -200,6 +200,26 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
+    /// Shows the honest "nothing deleted" state when the shell recycle was
+    /// refused because the Recycle Bin is unavailable for the volume and
+    /// the service touched nothing. Kept distinct from
+    /// <see cref="ShowDeleteSummary"/>: there an empty error list reads as
+    /// full success and would paint the green "freed" banner over zero
+    /// deletions. No restore hint (nothing reached the bin or disk); the
+    /// caller skips the result-log write.
+    /// </summary>
+    public void ShowRecycleUnavailable()
+    {
+        Heading = Strings.Completion_RecycleUnavailableHeading;
+        Summary = Strings.Completion_RecycleUnavailableSummary;
+        Restore = string.Empty;
+        Errors = string.Empty;
+        ResultLogStatusMessage = string.Empty;
+        LastResultFreedNothing = true;
+        IsComplete = true;
+    }
+
+    /// <summary>
     /// Marks a fresh result-log as available to send. No-op when the
     /// lifetime lock is set, when the session lock has fired (any click
     /// outcome this run), or when the prompt has already been offered
@@ -366,7 +386,7 @@ public partial class CompletionViewModel : ObservableObject
     {
         if (errors.Count == 0) return string.Empty;
 
-        // Group by runtime type so MissingSourceFile, ShellRefused etc
+        // Group by runtime type so MissingSourceFile, RecycleFailed etc
         // each get their own bucket. Within a bucket, list each file
         // by name; the LocalisedMessage is shown once per category.
         var buckets = errors

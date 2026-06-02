@@ -506,7 +506,29 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         try
         {
             var progress = new Progress<OperationProgress>(OnOperationProgressUpdate);
-            var result = await _deleteService.DeleteFilesAsync(filePaths, progress, _operationCts.Token);
+            // permitPermanentDelete left at its default (false): the service probes the
+            // volume and returns RecycleUnavailable rather than silently permanently
+            // deleting when the bin is off. That state is surfaced honestly below
+            // (nothing freed, point at Move); the richer Move/permanent/cancel choice
+            // dialog is the deferred completion-screen step.
+            var result = await _deleteService.DeleteFilesAsync(
+                filePaths, progress: progress, cancellationToken: _operationCts.Token);
+
+            // The shell recycle is recycle-or-permanently-delete; when the bin
+            // is unavailable for the volume the service refuses the batch and
+            // touches nothing (DeletedCount 0, no errors). The empty error list
+            // below otherwise reads as full success, so this must short-circuit
+            // before the bytes calculation or the overlay would claim the full
+            // size was freed while every orphan is still on disk. Nothing
+            // changed on disk, so no rescan, and the result-log write is skipped
+            // (there is no operation to record).
+            if (result.RecycleUnavailable)
+            {
+                _completion.ShowRecycleUnavailable();
+                OperationProgress = string.Empty;
+                return;
+            }
+
             var deletedCount = result.DeletedCount;
             var errorCount = result.Errors.Count;
 
