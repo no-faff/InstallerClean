@@ -4,8 +4,13 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 ## [Unreleased]
 
+### Changed
+
+- Delete now uses the Windows `IFileOperation` shell interface instead of the older `SHFileOperationW`, and guarantees its core promise honestly. The old API could *silently permanently delete* a file it could not recycle (Recycle Bin disabled for the drive, a corrupt `$Recycle.Bin`, or a file larger than the bin allows) while reporting success, so a file the user believed was sent to the Recycle Bin could in fact be gone for good. Delete now checks the Recycle Bin is available for the drive before it runs, and reports a file as recycled only when it genuinely reached the bin. When recycling is not possible it stops rather than destroying anything: the GUI shows an honest "nothing deleted, the Recycle Bin isn't available, use Move instead" state, and the CLI refuses with guidance and the transient exit code 75. The per-file outcome now carries the real Windows error code (shown in hex) for any failure.
+
 ### Fixed
 
+- GUI no longer reports freed space when nothing was deleted. If the Recycle Bin was unavailable, the completion screen previously showed a green "freed N MB" over "0 files deleted" and logged that false figure; it now shows the honest recycle-unavailable state and frees nothing.
 - Scan-cancel status now updates the instant Esc is pressed. `CancelScan` set the "Cancelling..." status after cancelling the token; reordering it before the cancel makes the synchronous write land immediately (the scan's own progress reporter only fires on its next callback) and guarantees the scan's later "Scan cancelled." write lands last. On the single UI thread the old order was harmless; the race only showed in a SynchronizationContext-free unit test, where it flaked in CI. No user-visible change on the running app.
 
 ## [1.8.2] - 2026-05-27
