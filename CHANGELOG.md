@@ -21,6 +21,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 ### Fixed
 
 - GUI no longer reports freed space when nothing was deleted. If the Recycle Bin was unavailable, the completion screen previously showed a green "freed N MB" over "0 files deleted" and logged that false figure; it now frees nothing in that case and offers a choice of what to do instead (see Added).
+- The pending-reboot warning now wraps and shows its full text. It sat on a single line that ran off the right edge when the message was long, so the end of the guidance (such as "...before cleaning the cache") was cut off; it now wraps like the missing-from-disk warning. The main window also scrolls when a warning makes the content taller than the window will hold, so the Delete and Move buttons stay fully visible and clickable instead of having their lower halves clipped.
 - Scan-cancel status now updates the instant Esc is pressed. `CancelScan` set the "Cancelling..." status after cancelling the token; reordering it before the cancel makes the synchronous write land immediately (the scan's own progress reporter only fires on its next callback) and guarantees the scan's later "Scan cancelled." write lands last. On the single UI thread the old order was harmless; the race only showed in a SynchronizationContext-free unit test, where it flaked in CI. No user-visible change on the running app.
 
 ## [1.8.2] - 2026-05-27
