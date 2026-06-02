@@ -1,5 +1,4 @@
 using System.IO.Abstractions;
-using InstallerClean.Interop;
 using InstallerClean.Models;
 
 namespace InstallerClean.Services;
@@ -7,32 +6,49 @@ namespace InstallerClean.Services;
 public sealed class DeleteFilesService : IDeleteFilesService
 {
     private readonly IFileSystem _fs;
+    private readonly IRecycleEngine _engine;
 
     /// <summary>
     /// Constructor. The DI container injects the registered
-    /// <see cref="IFileSystem"/> singleton in production; tests pass
-    /// a <see cref="MockFileSystem"/> so the File.Exists pre-check
-    /// and per-file error categorisation can be verified without
-    /// touching <c>%TEMP%</c>. The recycle-bin send itself still
-    /// goes through SHFileOperationW, which is exercised only in
-    /// the integration tests.
+    /// <see cref="IFileSystem"/> and <see cref="IRecycleEngine"/>
+    /// singletons in production; tests pass a <see cref="MockFileSystem"/>
+    /// and a fake engine so the per-file outcome mapping, the
+    /// probe-and-refuse decision and the cancellation path are verified
+    /// without touching the real Recycle Bin.
     /// </summary>
-    public DeleteFilesService(IFileSystem fileSystem)
+    public DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine)
     {
         _fs = fileSystem;
+        _engine = engine;
     }
 
     public Task<DeleteResult> DeleteFilesAsync(
         IEnumerable<string> filePaths,
+        bool permitPermanentDelete = false,
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
         return Task.Run(() =>
         {
-            int deleted = 0;
-            var errors = new List<FileOperationError>();
             var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
             var total = pathList.Count;
+            if (total == 0)
+                return new DeleteResult(0, Array.Empty<FileOperationError>());
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // The shell recycle is recycle-or-permanently-delete: when the
+            // bin is unavailable a file is nuked while every HRESULT still
+            // reports success. So unless the caller has already consented
+            // to permanent deletion, probe the files' volume once and
+            // refuse the whole batch rather than silently deleting. Recycle
+            // behaviour is per-volume, so the probe rides on the volume the
+            // files actually sit on (orphans are all under the same one).
+            if (!permitPermanentDelete && !_engine.CanRecycleToVolume(pathList[0]))
+                return new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true);
+
+            int deleted = 0;
+            var errors = new List<FileOperationError>();
 
             for (int i = 0; i < total; i++)
             {
@@ -51,15 +67,27 @@ public sealed class DeleteFilesService : IDeleteFilesService
                         continue;
                     }
 
-                    // Native SHFileOperationW avoids VB's FileSystem.DeleteFile
-                    // which can try to show error dialogs from a non-STA thread.
-                    var result = ShellFileOperations.SendToRecycleBin(filePath);
-                    if (result != 0)
+                    var outcome = _engine.RecycleFile(filePath);
+                    switch (outcome.Outcome)
                     {
-                        errors.Add(new ShellRefused(filePath, result));
-                        continue;
+                        case RecycleOutcome.Recycled:
+                            deleted++;
+                            break;
+                        // With consent a nuke counts as deleted; without it
+                        // the file is gone and that is recorded honestly so
+                        // the user is never told it reached the bin.
+                        case RecycleOutcome.PermanentlyDeleted when permitPermanentDelete:
+                            deleted++;
+                            break;
+                        case RecycleOutcome.PermanentlyDeleted:
+                            errors.Add(new PermanentlyDeleted(filePath));
+                            break;
+                        // Failed, and any future outcome, recorded with its
+                        // HRESULT for telemetry; the file was left in place.
+                        default:
+                            errors.Add(new RecycleFailed(filePath, outcome.HResult));
+                            break;
                     }
-                    deleted++;
                 }
                 catch (UnauthorizedAccessException)
                 {

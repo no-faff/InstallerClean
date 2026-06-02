@@ -55,14 +55,34 @@ public sealed record DestinationCollision(string FilePath, string FileName)
 }
 
 /// <summary>
-/// SHFileOperationW returned a non-zero shell error code while
-/// recycling the file. Delete only.
+/// The shell IFileOperation API returned a failure HRESULT while
+/// recycling the file, and the file was left in place. Delete only.
+/// <see cref="HResult"/> is the raw shell code, retained for telemetry;
+/// the displayed sentence stays category-level for the same path-leak
+/// reason as <see cref="AccessDenied"/>.
 /// </summary>
-public sealed record ShellRefused(string FilePath, int ShellResult)
+public sealed record RecycleFailed(string FilePath, int HResult)
     : FileOperationError(FilePath)
 {
     public override string LocalisedMessage =>
-        string.Format(Strings.Error_ShellRecycleFailed, ShellResult);
+        // HResult is a COM HRESULT; hex keeps a top-bit-set code
+        // recognisable (E_FAIL as 0x80004005, not the signed decimal
+        // -2147467259 the bare {0} would render).
+        string.Format(Strings.Error_ShellRecycleFailed, $"0x{HResult:X8}");
+}
+
+/// <summary>
+/// The file was deleted but could not be sent to the Recycle Bin, so it
+/// is gone permanently. The shell IFileOperation recycle is
+/// recycle-or-permanently-delete: when the bin is unavailable a file is
+/// nuked while every HRESULT still reports success. This category
+/// records that honestly when it happens without the user having
+/// consented to permanent deletion. Delete only.
+/// </summary>
+public sealed record PermanentlyDeleted(string FilePath)
+    : FileOperationError(FilePath)
+{
+    public override string LocalisedMessage => Strings.Error_DeletedNotRecycled;
 }
 
 /// <summary>

@@ -41,9 +41,13 @@ public static class CoreComposition
         services.AddSingleton<IPendingRebootService, PendingRebootService>();
         services.AddSingleton<IMsiFileInfoService, MsiFileInfoService>();
 
-        // File-mutating services.
+        // File-mutating services. The recycle engine owns the single
+        // STA thread the IFileOperation delete path runs on; as a
+        // singleton the container disposes it at shutdown, joining the
+        // thread. DeleteFilesService depends on it.
         services.AddSingleton<IFileSystemScanService, FileSystemScanService>();
         services.AddSingleton<IMoveFilesService, MoveFilesService>();
+        services.AddSingleton<IRecycleEngine, RecycleEngine>();
         services.AddSingleton<IDeleteFilesService, DeleteFilesService>();
 
         // Persistence.
