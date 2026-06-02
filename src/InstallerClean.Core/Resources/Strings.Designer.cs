@@ -254,7 +254,8 @@ public static class Strings
     public static string Reason_Obsoleted => Get("Reason.Obsoleted");
     public static string Reason_Orphaned => Get("Reason.Orphaned");
     public static string Reason_Superseded => Get("Reason.Superseded");
-    public static string RecycleUnavailable_Body => Get("RecycleUnavailable.Body");
+    public static string RecycleUnavailable_Body_Plural => Get("RecycleUnavailable.Body.Plural");
+    public static string RecycleUnavailable_Body_Singular => Get("RecycleUnavailable.Body.Singular");
     public static string RecycleUnavailable_Heading => Get("RecycleUnavailable.Heading");
     public static string RecycleUnavailable_Reassurance => Get("RecycleUnavailable.Reassurance");
     public static string ResultLog_Failed => Get("ResultLog.Failed");

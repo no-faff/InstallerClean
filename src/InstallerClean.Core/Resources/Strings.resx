@@ -313,7 +313,7 @@
        3 = pluralised "error"/"errors". -->
   <data name="Completion.PermanentDeleteSummary" xml:space="preserve"><value>{0} {1} permanently deleted. They did not go to the Recycle Bin.</value></data>
   <data name="Completion.PermanentDeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} permanently deleted. {2} {3}</value></data>
-  <data name="Completion.PermanentDeleteRestoreHint" xml:space="preserve"><value>These files are gone for good. If Windows ever needs one, reinstall that program and you're back to normal, settings and all.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint" xml:space="preserve"><value>That's fine: these were safe to remove. In the unlikely event a program is ever left unable to update or uninstall, reinstall that program over the top and it's put right, with nothing lost.</value></data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
        the files' volume: Move (the safe default), delete permanently with
        consent, or cancel. Wording states only the confirmed fact (the probe
@@ -321,8 +321,9 @@
        unconfirmed cause (off vs corrupt vs full). 0 = file count,
        1 = pluralised noun, 2 = size display. -->
   <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>The Recycle Bin isn't available for this drive</value></data>
-  <data name="RecycleUnavailable.Body" xml:space="preserve"><value>So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently.</value></data>
-  <data name="RecycleUnavailable.Reassurance" xml:space="preserve"><value>Permanent deletion can't be undone. But it's safe to do here: InstallerClean only removes files Windows reports as no longer needed, and if you ever needed one back you'd just reinstall that program, settings and all.</value></data>
+  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>So this {0} {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently.</value></data>
+  <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently.</value></data>
+  <data name="RecycleUnavailable.Reassurance" xml:space="preserve"><value>Deleting them is safe: InstallerClean only ever picks files Windows no longer needs, and the Recycle Bin is just an extra safeguard. In the unlikely event a deletion ever left a program unable to update or uninstall, reinstalling that program over the top puts it right, with nothing lost.</value></data>
 
   <!-- Summaries -->
   <!-- 0 = file count. Singular / plural pairs picked at the call
@@ -337,8 +338,8 @@
   <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files still used</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} file to clean up</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} files to clean up</value></data>
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from disk. Windows refers to installer files that aren't there. Cleaning the cache won't change this.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from disk. Windows refers to installer files that aren't there. Cleaning the cache won't change this.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from disk. Something removed it before now (not InstallerClean), and Windows still expects it, so a program may one day fail to update or uninstall. If that happens, reinstall that program over the top and it's put right, with nothing lost.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from disk. Something removed them before now (not InstallerClean), and Windows still expects them, so a program may one day fail to update or uninstall. If that happens, reinstall that program over the top and it's put right, with nothing lost.</value></data>
   <!-- Informational line shown when the MSI database carries
        superseded-patch registrations whose files are already gone
        from disk. Distinct from the missing-from-disk warning

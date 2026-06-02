@@ -19,7 +19,10 @@ public partial class RecycleUnavailableWindow : Window
     {
         InitializeComponent();
         var label = DisplayHelpers.PluraliseFile(fileCount);
-        BodyText.Text = string.Format(Strings.RecycleUnavailable_Body, fileCount, label, sizeDisplay);
+        var bodyFormat = DisplayHelpers.Pluralise(fileCount,
+            Strings.RecycleUnavailable_Body_Singular,
+            Strings.RecycleUnavailable_Body_Plural);
+        BodyText.Text = string.Format(bodyFormat, fileCount, label, sizeDisplay);
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
     }
