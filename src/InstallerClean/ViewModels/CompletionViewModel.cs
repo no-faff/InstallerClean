@@ -215,10 +215,15 @@ public partial class CompletionViewModel : ObservableObject
             DisplayHelpers.FormatSize(deletedBytes));
         var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
         Summary = errors.Count == 0
-            ? string.Format(Strings.Completion_PermanentDeleteSummary, deletedCount, deletedLabel)
+            ? string.Format(DisplayHelpers.Pluralise(deletedCount,
+                    Strings.Completion_PermanentDeleteSummary_Singular,
+                    Strings.Completion_PermanentDeleteSummary_Plural),
+                deletedCount, deletedLabel)
             : string.Format(Strings.Completion_PermanentDeleteSummaryWithErrors,
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
-        Restore = Strings.Completion_PermanentDeleteRestoreHint;
+        Restore = DisplayHelpers.Pluralise(deletedCount,
+            Strings.Completion_PermanentDeleteRestoreHint_Singular,
+            Strings.Completion_PermanentDeleteRestoreHint_Plural);
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;

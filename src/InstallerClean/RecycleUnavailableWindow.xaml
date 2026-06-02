@@ -33,7 +33,7 @@
             <TextBlock x:Name="BodyText" Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}"
                        TextWrapping="Wrap" Margin="{StaticResource GapBottom.Md}"/>
 
-            <TextBlock Text="{loc:Translate RecycleUnavailable.Reassurance}"
+            <TextBlock x:Name="ReassuranceText"
                        Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
                        TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
 

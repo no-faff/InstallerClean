@@ -487,7 +487,7 @@ public class MainViewModelTests
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains("permanently deleted", vm.Completion.Summary);
         Assert.DoesNotContain("sent to the Recycle Bin", vm.Completion.Summary);
-        Assert.Equal(Strings.Completion_PermanentDeleteRestoreHint, vm.Completion.Restore);
+        Assert.Equal(Strings.Completion_PermanentDeleteRestoreHint_Singular, vm.Completion.Restore);
     }
 
     [Fact]

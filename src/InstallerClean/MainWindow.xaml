@@ -92,18 +92,23 @@
                                AutomationProperties.LiveSetting="Polite"/>
                 </StackPanel>
 
-                <!-- Registered files missing from disk -->
-                <StackPanel Orientation="Horizontal" Margin="{StaticResource GapBottom.Lg}"
-                            Visibility="{Binding Scan.HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
+                <!-- Registered files missing from disk. DockPanel (not a
+                     horizontal StackPanel) so the message wraps: a horizontal
+                     StackPanel gives its child infinite width, defeating
+                     TextWrapping and clipping the longer advisory text. Icon
+                     docks left and aligns to the first line; the TextBlock
+                     fills the rest and wraps. -->
+                <DockPanel Margin="{StaticResource GapBottom.Lg}"
+                           Visibility="{Binding Scan.HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
                           Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
-                          VerticalAlignment="Center" Margin="{StaticResource GapRight.Icon}"/>
+                          DockPanel.Dock="Left" VerticalAlignment="Top" Margin="{StaticResource GapRight.Icon}"/>
                     <TextBlock x:Name="MissingFromDiskBannerText"
                                Text="{Binding Scan.MissingFromDiskSummaryText}"
                                TextWrapping="Wrap"
                                Foreground="{StaticResource Text.Body}" VerticalAlignment="Center"
                                AutomationProperties.LiveSetting="Polite"/>
-                </StackPanel>
+                </DockPanel>
 
                 <!-- Stale MSI registration entries (informational). The
                      MSI database carries a superseded-patch registration

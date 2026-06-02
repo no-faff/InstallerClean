@@ -23,6 +23,9 @@ public partial class RecycleUnavailableWindow : Window
             Strings.RecycleUnavailable_Body_Singular,
             Strings.RecycleUnavailable_Body_Plural);
         BodyText.Text = string.Format(bodyFormat, fileCount, label, sizeDisplay);
+        ReassuranceText.Text = DisplayHelpers.Pluralise(fileCount,
+            Strings.RecycleUnavailable_Reassurance_Singular,
+            Strings.RecycleUnavailable_Reassurance_Plural);
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
     }

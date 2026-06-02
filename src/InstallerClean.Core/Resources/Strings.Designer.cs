@@ -176,8 +176,10 @@ public static class Strings
     public static string Completion_NothingToCleanUp => Get("Completion.NothingToCleanUp");
     public static string Completion_NothingToCleanUpReceipt => Get("Completion.NothingToCleanUpReceipt");
     public static string Completion_PartlyFreed => Get("Completion.PartlyFreed");
-    public static string Completion_PermanentDeleteRestoreHint => Get("Completion.PermanentDeleteRestoreHint");
-    public static string Completion_PermanentDeleteSummary => Get("Completion.PermanentDeleteSummary");
+    public static string Completion_PermanentDeleteRestoreHint_Plural => Get("Completion.PermanentDeleteRestoreHint.Plural");
+    public static string Completion_PermanentDeleteRestoreHint_Singular => Get("Completion.PermanentDeleteRestoreHint.Singular");
+    public static string Completion_PermanentDeleteSummary_Plural => Get("Completion.PermanentDeleteSummary.Plural");
+    public static string Completion_PermanentDeleteSummary_Singular => Get("Completion.PermanentDeleteSummary.Singular");
     public static string Completion_PermanentDeleteSummaryWithErrors => Get("Completion.PermanentDeleteSummaryWithErrors");
     public static string Confirm_DeleteLargeWarning => Get("Confirm.DeleteLargeWarning");
     public static string Confirm_DeleteTitle => Get("Confirm.DeleteTitle");
@@ -257,7 +259,8 @@ public static class Strings
     public static string RecycleUnavailable_Body_Plural => Get("RecycleUnavailable.Body.Plural");
     public static string RecycleUnavailable_Body_Singular => Get("RecycleUnavailable.Body.Singular");
     public static string RecycleUnavailable_Heading => Get("RecycleUnavailable.Heading");
-    public static string RecycleUnavailable_Reassurance => Get("RecycleUnavailable.Reassurance");
+    public static string RecycleUnavailable_Reassurance_Plural => Get("RecycleUnavailable.Reassurance.Plural");
+    public static string RecycleUnavailable_Reassurance_Singular => Get("RecycleUnavailable.Reassurance.Singular");
     public static string ResultLog_Failed => Get("ResultLog.Failed");
     public static string ResultLog_NothingToSend => Get("ResultLog.NothingToSend");
     public static string ResultLog_Sending => Get("ResultLog.Sending");
