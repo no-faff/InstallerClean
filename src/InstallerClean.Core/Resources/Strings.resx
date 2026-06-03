@@ -347,8 +347,8 @@
   <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files still needed</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} file to clean up</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} files to clean up</value></data>
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing. InstallerClean didn't delete it, and never removes a file a program still needs; something else deleted it before InstallerClean ran. It causes no trouble now, but a later repair, update or uninstall of the program it belongs to could fail. Open Details to see which file, and how to recover it.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing. InstallerClean didn't delete them, and never removes a file a program still needs; something else deleted them before InstallerClean ran. They cause no trouble now, but a later repair, update or uninstall of the programs they belong to could fail. Open Details to see which files, and how to recover them.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.</value></data>
   <!-- Informational line shown when the MSI database carries
        superseded-patch registrations whose files are already gone
        from disk. Distinct from the missing-from-disk warning
