@@ -211,7 +211,7 @@
 
   <!-- Body copy -->
   <data name="Body.MainExplanation" xml:space="preserve">
-    <value>C:\Windows\Installer caches the files Windows needs to repair and update installed software. Any unneeded files are shown below, left when the product was uninstalled ({0}), a newer patch replaced this one ({1}), or the publisher withdrew it ({2}). Delete them to the Recycle Bin or move them somewhere to be extra safe.</value>
+    <value>C:\Windows\Installer caches the files Windows needs to repair and update installed software. Any unneeded files are shown below, left when the product was uninstalled ({0}), a newer patch replaced this one ({1}) or the publisher withdrew it ({2}). Delete them to the Recycle Bin or move them somewhere to be extra safe.</value>
     <comment>{0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer is currently processing an installation. Move and Delete are disabled until it finishes.</value></data>
