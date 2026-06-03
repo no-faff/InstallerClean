@@ -194,12 +194,11 @@
          the card shape. -->
     <Thickness x:Key="Padding.ModalCard">32,28</Thickness>
 
-    <!-- Main window content margin. The bottom value (48) matches the
-         effective height of the bottom-nav DockPanel below (Row=3,
-         Margin 4,8,24,8 around two 28-px-tall GhostPills); changing
-         either side of that invariant requires the other side to
-         follow or the content visually drifts behind the nav. -->
-    <Thickness x:Key="MainContentMargin">24,0,24,48</Thickness>
+    <!-- Inset of the main-window scan-result panel. The window is
+         SizeToContent="Height", so the panel sits in its own Auto row
+         above the bottom-nav row: top clears the 32px title bar, bottom
+         is the gap to the nav (which carries its own 8px top margin). -->
+    <Thickness x:Key="MainContentMargin">24,16,24,16</Thickness>
 
     <!-- Negative top/right margin used by the detail-window caption-X
          close buttons (About, Registered, Orphaned). The -24 right
