@@ -44,10 +44,11 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
     // A missing file has no summary stream to read (the file is gone), so the
     // "no metadata" panel stands down in favour of the missing notice.
     public bool ShowNoMetadata => SelectedProduct is not null && SelectedDetails is null && !ShowMissing;
-    public string SelectedMissingNote =>
-        SelectedProduct is null || SelectedProduct.ProductName == Strings.Field_UnknownProductName
-            ? Strings.Body_RegisteredMissingFromDiskNoName
-            : string.Format(Strings.Body_RegisteredMissingFromDisk, SelectedProduct.ProductName);
+    // Identical for every product: the recovery advice does not vary by app,
+    // and naming the product would force a possessive that breaks on names
+    // ending in s. So the note is one generic string, shown whenever the
+    // selected product's installer file is missing from disk.
+    public string SelectedMissingNote => Strings.Body_RegisteredMissingFromDisk;
     public IReadOnlyList<PatchRow> SelectedPatches => SelectedProduct?.Patches ?? Array.Empty<PatchRow>();
 
     public RegisteredFilesViewModel(

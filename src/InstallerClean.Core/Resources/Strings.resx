@@ -220,10 +220,9 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Select a product to view details.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>No metadata available.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>This file is missing from disk. Windows still expects it, so reinstall {0} over the top to put it back, with nothing lost.</value>
-    <comment>{0} = the product name. Shown in the Registered Files details pane when the selected product's file is gone from disk.</comment>
+    <value>This installer file has been deleted. InstallerClean didn't remove it, and never removes a file a program still needs, it only clears the ones Windows reports as finished with. Something else deleted this one before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't, until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;If it does, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.&#10;&#10;The README explains this folder, and how to recover a file, in Microsoft's own words.</value>
+    <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
-  <data name="Body.RegisteredMissingFromDiskNoName" xml:space="preserve"><value>This file is missing from disk. Windows still expects it, so reinstall the program that needs it to put it back, with nothing lost.</value></data>
   <data name="Body.NoPatches" xml:space="preserve"><value>(none)</value></data>
 
   <!-- Reasons (Reason column in the orphaned-files list) -->
@@ -320,8 +319,8 @@
   <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} permanently deleted. It did not go to the Recycle Bin.</value></data>
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} permanently deleted. They did not go to the Recycle Bin.</value></data>
   <data name="Completion.PermanentDeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} permanently deleted. {2} {3}</value></data>
-  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>That's fine; it was safe to remove. In the unlikely event a program is ever left unable to update or uninstall, reinstall that program over the top and it's put right, with nothing lost.</value></data>
-  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>That's fine; they were safe to remove. In the unlikely event a program is ever left unable to update or uninstall, reinstall that program over the top and it's put right, with nothing lost.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.</value></data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
        the files' volume: Move (the safe default), delete permanently with
        consent, or cancel. Wording states only the confirmed fact (the probe
@@ -331,8 +330,8 @@
   <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>The Recycle Bin isn't available for this drive</value></data>
   <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>So this {0} {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently.</value></data>
   <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently.</value></data>
-  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Deleting it is safe; InstallerClean only ever picks files Windows no longer needs, and the Recycle Bin is just an extra safeguard. In the unlikely event a deletion ever left a program unable to update or uninstall, reinstalling that program over the top puts it right, with nothing lost.</value></data>
-  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Deleting them is safe; InstallerClean only ever picks files Windows no longer needs, and the Recycle Bin is just an extra safeguard. In the unlikely event a deletion ever left a program unable to update or uninstall, reinstalling that program over the top puts it right, with nothing lost.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Deleting it is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Deleting them is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.</value></data>
 
   <!-- Summaries -->
   <!-- 0 = file count. Singular / plural pairs picked at the call
@@ -347,8 +346,8 @@
   <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files still needed</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} file to clean up</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} files to clean up</value></data>
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from disk, removed by something before InstallerClean ran. Windows still expects it, so one day a program might fail to update or uninstall. If that happens, just reinstall that program over the top and all is put right, with nothing lost.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from disk, removed by something before InstallerClean ran. Windows still expects them, so one day a program might fail to update or uninstall. If that happens, just reinstall that program over the top and all is put right, with nothing lost.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing. InstallerClean didn't delete it, and never removes a file a program still needs; something else deleted it before InstallerClean ran. It causes no trouble now, but a later repair, update or uninstall of the program it belongs to could fail. Open Details to see which file, and how to recover it.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing. InstallerClean didn't delete them, and never removes a file a program still needs; something else deleted them before InstallerClean ran. They cause no trouble now, but a later repair, update or uninstall of the programs they belong to could fail. Open Details to see which files, and how to recover them.</value></data>
   <!-- Informational line shown when the MSI database carries
        superseded-patch registrations whose files are already gone
        from disk. Distinct from the missing-from-disk warning

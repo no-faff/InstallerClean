@@ -107,7 +107,6 @@ public static class Strings
     public static string Body_PendingReboot_MsiExecuteMutex => Get("Body.PendingReboot.MsiExecuteMutex");
     public static string Body_PendingReboot_PendingRenameInCache => Get("Body.PendingReboot.PendingRenameInCache");
     public static string Body_RegisteredMissingFromDisk => Get("Body.RegisteredMissingFromDisk");
-    public static string Body_RegisteredMissingFromDiskNoName => Get("Body.RegisteredMissingFromDiskNoName");
     public static string BrowserLaunch_ClipboardFailed => Get("BrowserLaunch.ClipboardFailed");
     public static string BrowserLaunch_ClipboardOk => Get("BrowserLaunch.ClipboardOk");
     public static string BrowserLaunch_FailedTitle => Get("BrowserLaunch.FailedTitle");
