@@ -146,6 +146,71 @@ Yes. InstallerClean queries the same database Windows itself uses to track what'
 
 VirusTotal: clean across every engine. Live links in each release's notes so you can re-check.
 
+## If a needed file goes missing
+
+InstallerClean only ever clears files Windows reports as finished with, so it
+can't leave a program unable to repair, update or uninstall. Removing files from
+`C:\Windows\Installer` by hand, or with a tool that doesn't check the Installer
+database first, is a different matter, and it's why the standard advice is to
+leave the folder alone. That advice is right, as far as it goes. Here's the
+fuller picture, and what to do if a needed file has already gone.
+
+<details>
+<summary><strong>About <code>C:\Windows\Installer</code>, and recovering a missing file</strong></summary>
+
+<br>
+
+`C:\Windows\Installer` is the Windows Installer cache. When you install an
+MSI-based program or apply a patch, Windows keeps a copy of the installer here
+and records, per product, the file it expects to find later. These files aren't
+used while the program runs; they're used when Windows repairs, updates or
+uninstalls it. Delete one a program still needs and nothing breaks straight
+away, which is exactly why it's easy to get away with deleting them and only hit
+trouble months later. Microsoft puts it like this:
+
+> "If the installer cache is compromised, you may not immediately see problems
+> until you take an action such as uninstalling, repairing, or updating a
+> product."
+
+Recovery is not straightforward, and Microsoft is candid about that:
+
+> "If application files are missing from the Windows Installer Cache, ask the
+> vendor or support team for the application about the missing files. You must
+> follow the procedures or steps recommended by the application vendor to
+> restore the files. In some cases, you may have to rebuild the operating system
+> and reinstall the application to fix the problem."
+
+> "Windows support engineers cannot help you recover missing application files
+> from the Windows Installer cache."
+
+You can't borrow the file from another machine, either:
+
+> "Missing files cannot be copied between computers because the files are
+> unique."
+
+In practice, the fix that usually works is to download the affected program's
+installer from its maker and run it over your existing install. Don't uninstall
+first: uninstalling is itself one of the steps that needs the missing file. Use
+the version you currently have installed if you can still get hold of it,
+because Windows may reject a different one:
+
+> "The upgrade cannot be installed by the Windows Installer service because the
+> program to be upgraded may be missing, or the upgrade may update a different
+> version of the program."
+
+This normally restores the file and leaves your settings untouched, but
+Microsoft doesn't guarantee it, and its documented last resort is reinstalling
+the program, or rebuilding Windows. That's the official position, reported as I
+find it. I didn't cause it and I can't improve on Microsoft's own guidance; I'm
+simply telling you what it is.
+
+None of this can happen because of InstallerClean. It only ever removes files
+Windows itself reports as no longer needed, so the file a future repair, update
+or uninstall goes looking for is never one it touched. Microsoft's guidance is at
+[Restore missing Windows Installer cache files](https://learn.microsoft.com/en-us/troubleshoot/windows-client/application-management/missing-windows-installer-cache).
+
+</details>
+
 ## What it doesn't do
 
 - WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, run `Dism /Online /Cleanup-Image /StartComponentCleanup` from an elevated prompt.
@@ -172,11 +237,7 @@ Across the 64 reports people have been kind enough to send in (thanks 🙏) sinc
 
 **Can I undo a Delete?** Yes. Delete sends files to the Recycle Bin. Restore them from there. If you emptied the Recycle Bin, the files are gone, but you can instead use Move to put them in a folder you choose, then verify nothing breaks before deleting from there.
 
-**Will Windows complain if I remove these files?** Not normally. InstallerClean only removes files Windows itself reports as no-longer-needed via its own installer-database API. The rare exception is a machine whose Installer database is out of date, usually after a previous uninstall that didn't complete cleanly. On those, a later attempt to uninstall some product might fail with Windows asking for the original `.msi`. This has never been reported on InstallerClean across many thousands of downloads, but if it ever happened to you:
-
-- **If you Deleted**: restore the files from the Recycle Bin. They go back to `C:\Windows\Installer` automatically and the uninstall succeeds.
-- **If you Moved**: copy the files from your move folder back into `C:\Windows\Installer` and the uninstall succeeds.
-- **No copy anywhere**: download the installer again from the vendor and run it; this puts a fresh `.msi` back in the cache and the uninstall succeeds.
+**Will Windows complain if I remove these files?** No. InstallerClean only ever removes the files Windows itself reports as finished with, so nothing it removes is needed to repair, update or uninstall a program. If a needed file does go missing from `C:\Windows\Installer` by some other means, see [If a needed file goes missing](#if-a-needed-file-goes-missing).
 
 **Why no `Win32_Product` (WMI)?** [`Win32_Product` triggers MSI repair operations on every product during enumeration](https://gregramsey.net/2012/02/20/win32_product-is-evil/), which can take minutes and load the disk hard. InstallerClean calls the Windows Installer COM API directly with no side effects.
 

@@ -151,6 +151,39 @@ Sí. InstallerClean consulta la misma base de datos que el propio Windows usa pa
 
 VirusTotal: limpio en todos los motores. Hay enlaces en vivo en las notas de cada versión para que puedas comprobarlo tú mismo.
 
+## Si falta un archivo necesario
+
+InstallerClean solo elimina los archivos que Windows da por terminados, así que no puede dejar a un programa sin posibilidad de reparación, actualización o desinstalación. Quitar archivos de `C:\Windows\Installer` a mano, o con una herramienta que no consulte primero la base de datos del instalador, es otra cosa, y es la razón por la que el consejo habitual es no tocar la carpeta. Ese consejo es acertado, hasta cierto punto. Aquí tienes el panorama completo, y qué hacer si un archivo necesario ya ha desaparecido.
+
+<details>
+<summary><strong>Acerca de <code>C:\Windows\Installer</code>, y cómo recuperar un archivo que falta</strong></summary>
+
+<br>
+
+`C:\Windows\Installer` es la caché de Windows Installer. Cuando instalas un programa basado en MSI o aplicas un parche, Windows guarda aquí una copia del instalador y anota, para cada producto, el archivo que espera encontrar más adelante. Estos archivos no se usan mientras el programa funciona; se usan cuando Windows lo repara, lo actualiza o lo desinstala. Borra uno que un programa todavía necesita y nada se rompe de inmediato; es justo por eso por lo que resulta fácil borrarlos sin consecuencias aparentes y solo tener problemas meses después. Microsoft lo expresa así:
+
+> "If the installer cache is compromised, you may not immediately see problems until you take an action such as uninstalling, repairing, or updating a product."
+
+La recuperación no es sencilla, y Microsoft es franco al respecto:
+
+> "If application files are missing from the Windows Installer Cache, ask the vendor or support team for the application about the missing files. You must follow the procedures or steps recommended by the application vendor to restore the files. In some cases, you may have to rebuild the operating system and reinstall the application to fix the problem."
+
+> "Windows support engineers cannot help you recover missing application files from the Windows Installer cache."
+
+Tampoco puedes tomar prestado el archivo de otra máquina:
+
+> "Missing files cannot be copied between computers because the files are unique."
+
+En la práctica, la solución que suele funcionar es descargar el instalador del programa afectado desde su fabricante y ejecutarlo sobre tu instalación existente. No desinstales primero: desinstalar es en sí mismo uno de los pasos que necesita el archivo que falta. Usa la versión que tienes instalada actualmente si todavía puedes conseguirla, porque Windows puede rechazar una distinta:
+
+> "The upgrade cannot be installed by the Windows Installer service because the program to be upgraded may be missing, or the upgrade may update a different version of the program."
+
+Esto normalmente restaura el archivo y deja tu configuración intacta, pero Microsoft no lo garantiza, y su último recurso documentado es reinstalar el programa, o reconstruir Windows. Esa es la posición oficial, contada tal como la encuentro. No la he causado yo y no puedo mejorar las propias indicaciones de Microsoft; me limito a decirte cuál es.
+
+Nada de esto puede ocurrir por culpa de InstallerClean. Solo elimina archivos que el propio Windows reporta como innecesarios, de modo que el archivo que una futura reparación, actualización o desinstalación irá a buscar nunca es uno que él haya tocado. Las indicaciones de Microsoft están en [Restore missing Windows Installer cache files](https://learn.microsoft.com/en-us/troubleshoot/windows-client/application-management/missing-windows-installer-cache).
+
+</details>
+
 ## Lo que no hace
 
 - WinSxS (`C:\Windows\WinSxS`) es una carpeta distinta con reglas distintas. Para esa, ejecuta `Dism /Online /Cleanup-Image /StartComponentCleanup` desde un símbolo del sistema elevado.
@@ -168,11 +201,7 @@ VirusTotal: limpio en todos los motores. Hay enlaces en vivo en las notas de cad
 
 **¿Puedo deshacer una eliminación?** Sí. Eliminar envía los archivos a la Papelera de reciclaje. Restáuralos desde ahí. Si vaciaste la Papelera, los archivos se han perdido, pero puedes usar Mover en su lugar para colocarlos en una carpeta a tu elección, verificar que nada se rompa, y borrarlos desde ahí.
 
-**¿Va a quejarse Windows si quito estos archivos?** Normalmente no. InstallerClean solo elimina los archivos que el propio Windows reporta como innecesarios a través de su API de la base de datos del instalador. La rara excepción es un equipo cuya base de datos del Installer está desactualizada, normalmente tras una desinstalación anterior que no se completó limpiamente. En esos casos, un intento posterior de desinstalar algún producto podría fallar pidiéndote el `.msi` original. Esto nunca se ha reportado en InstallerClean a lo largo de muchos miles de descargas, pero por si te pasa:
-
-- **Si Eliminaste**: restaura los archivos desde la Papelera de reciclaje. Vuelven a `C:\Windows\Installer` automáticamente y la desinstalación funciona.
-- **Si Moviste**: copia los archivos desde tu carpeta de movimiento de vuelta a `C:\Windows\Installer` y la desinstalación funciona.
-- **Sin copia en ningún sitio**: vuelve a descargar el instalador desde el proveedor y ejecútalo; eso vuelve a poner un `.msi` fresco en la caché y la desinstalación funciona.
+**¿Va a quejarse Windows si quito estos archivos?** No. InstallerClean solo elimina los archivos que el propio Windows da por terminados, así que nada de lo que elimina hace falta para reparar, actualizar o desinstalar un programa. Si un archivo necesario llega a desaparecer de `C:\Windows\Installer` por algún otro medio, consulta [Si falta un archivo necesario](#si-falta-un-archivo-necesario).
 
 **¿Por qué no `Win32_Product` (WMI)?** [`Win32_Product` desencadena operaciones de reparación de MSI en cada producto durante la enumeración](https://gregramsey.net/2012/02/20/win32_product-is-evil/), lo cual puede tardar minutos y cargar mucho el disco. InstallerClean llama a la API COM de Windows Installer directamente, sin efectos colaterales.
 

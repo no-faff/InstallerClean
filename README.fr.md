@@ -151,6 +151,39 @@ Oui. InstallerClean interroge la même base que Windows utilise lui-même pour s
 
 VirusTotal : propre sur tous les moteurs. Des liens en direct dans les notes de chaque version pour que vous puissiez revérifier.
 
+## Si un fichier nécessaire vient à manquer
+
+InstallerClean ne supprime jamais que les fichiers dont Windows a fini de se servir, il ne peut donc pas laisser un programme dans l'incapacité d'être réparé, mis à jour ou désinstallé. Supprimer des fichiers de `C:\Windows\Installer` à la main, ou avec un outil qui ne consulte pas d'abord la base de l'installeur, est tout autre chose, et c'est pourquoi le conseil habituel est de ne pas toucher au dossier. Ce conseil est juste, jusqu'à un certain point. Voici le tableau complet, et ce qu'il faut faire si un fichier nécessaire a déjà disparu.
+
+<details>
+<summary><strong>À propos de <code>C:\Windows\Installer</code>, et comment récupérer un fichier manquant</strong></summary>
+
+<br>
+
+`C:\Windows\Installer` est le cache de Windows Installer. Quand vous installez un programme basé sur MSI ou appliquez un correctif, Windows garde ici une copie de l'installeur et note, pour chaque produit, le fichier qu'il s'attend à retrouver plus tard. Ces fichiers ne servent pas pendant que le programme fonctionne ; ils servent quand Windows le répare, le met à jour ou le désinstalle. Supprimez-en un dont un programme a encore besoin et rien ne casse dans l'immédiat ; c'est précisément pour cela qu'il est facile de les supprimer sans conséquence apparente et de ne rencontrer des ennuis que des mois plus tard. Microsoft le formule ainsi :
+
+> "If the installer cache is compromised, you may not immediately see problems until you take an action such as uninstalling, repairing, or updating a product."
+
+La récupération n'a rien d'évident, et Microsoft ne le cache pas :
+
+> "If application files are missing from the Windows Installer Cache, ask the vendor or support team for the application about the missing files. You must follow the procedures or steps recommended by the application vendor to restore the files. In some cases, you may have to rebuild the operating system and reinstall the application to fix the problem."
+
+> "Windows support engineers cannot help you recover missing application files from the Windows Installer cache."
+
+Et vous ne pouvez pas non plus emprunter le fichier à une autre machine :
+
+> "Missing files cannot be copied between computers because the files are unique."
+
+En pratique, la solution qui marche le plus souvent consiste à télécharger l'installeur du programme concerné chez son éditeur et à le lancer par-dessus votre installation existante. Ne désinstallez pas d'abord : la désinstallation est elle-même l'une des étapes qui ont besoin du fichier manquant. Utilisez la version actuellement installée si vous pouvez encore vous la procurer, car Windows peut en refuser une autre :
+
+> "The upgrade cannot be installed by the Windows Installer service because the program to be upgraded may be missing, or the upgrade may update a different version of the program."
+
+Cela rétablit normalement le fichier et laisse vos réglages intacts, mais Microsoft ne le garantit pas, et son dernier recours documenté est de réinstaller le programme, voire de reconstruire Windows. C'est la position officielle, rapportée telle que je la trouve. Je n'en suis pas la cause et je ne peux pas améliorer les indications de Microsoft ; je me contente de vous dire ce qu'il en est.
+
+Rien de tout cela ne peut arriver à cause d'InstallerClean. Il ne supprime jamais que les fichiers que Windows lui-même signale comme n'étant plus nécessaires, de sorte que le fichier qu'une future réparation, mise à jour ou désinstallation ira chercher n'est jamais l'un de ceux qu'il a touchés. Les indications de Microsoft se trouvent sur [Restore missing Windows Installer cache files](https://learn.microsoft.com/en-us/troubleshoot/windows-client/application-management/missing-windows-installer-cache).
+
+</details>
+
 ## Ce qu'il ne fait pas
 
 - WinSxS (`C:\Windows\WinSxS`) est un dossier différent avec des règles différentes. Pour celui-là, exécutez `Dism /Online /Cleanup-Image /StartComponentCleanup` depuis une invite élevée.
@@ -168,11 +201,7 @@ VirusTotal : propre sur tous les moteurs. Des liens en direct dans les notes de 
 
 **Puis-je annuler une suppression ?** Oui. La suppression envoie les fichiers à la Corbeille. Restaurez-les depuis là. Si vous avez vidé la Corbeille, les fichiers sont perdus, mais vous pouvez utiliser Déplacer pour les mettre dans un dossier de votre choix, vérifier que rien ne casse, puis les supprimer de là.
 
-**Windows va-t-il se plaindre si je supprime ces fichiers ?** Pas en temps normal. InstallerClean ne supprime que les fichiers que Windows lui-même signale comme n'étant plus nécessaires via son API de base d'installeur. L'exception rare est une machine dont la base d'installeur est désynchronisée, en général après une désinstallation précédente qui ne s'est pas terminée proprement. Sur ces machines, une tentative ultérieure de désinstallation d'un produit peut échouer en demandant le `.msi` d'origine. Cela n'a jamais été rapporté sur InstallerClean au fil de plusieurs milliers de téléchargements, mais si cela vous arrive :
-
-- **Si vous avez Supprimé** : restaurez les fichiers depuis la Corbeille. Ils retournent automatiquement dans `C:\Windows\Installer` et la désinstallation aboutit.
-- **Si vous avez Déplacé** : recopiez les fichiers de votre dossier de destination dans `C:\Windows\Installer` et la désinstallation aboutit.
-- **Aucune copie nulle part** : retéléchargez l'installeur chez l'éditeur et lancez-le ; cela remet un `.msi` neuf dans le cache et la désinstallation aboutit.
+**Windows va-t-il se plaindre si je supprime ces fichiers ?** Non. InstallerClean ne supprime jamais que les fichiers dont Windows a fini de se servir, donc rien de ce qu'il supprime n'est requis pour réparer, mettre à jour ou désinstaller un programme. Si un fichier nécessaire venait malgré tout à disparaître de `C:\Windows\Installer` par un autre moyen, voir [Si un fichier nécessaire vient à manquer](#si-un-fichier-nécessaire-vient-à-manquer).
 
 **Pourquoi pas `Win32_Product` (WMI) ?** [`Win32_Product` déclenche des opérations de réparation MSI sur chaque produit pendant l'énumération](https://gregramsey.net/2012/02/20/win32_product-is-evil/), ce qui peut prendre plusieurs minutes et solliciter le disque très fort. InstallerClean appelle l'API COM de Windows Installer directement, sans effets de bord.
 
