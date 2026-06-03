@@ -251,7 +251,7 @@
                         </TextBlock>
                     </Grid>
 
-                    <Button Grid.Column="2" Style="{StaticResource GhostPill}"
+                    <Button Grid.Column="2" Style="{StaticResource GhostPill}" Padding="12,8"
                             Content="{loc:Translate Action.Browse}" Command="{Binding Cleanup.BrowseDestinationCommand}"/>
                 </Grid>
 
