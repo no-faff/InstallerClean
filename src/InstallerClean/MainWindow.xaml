@@ -148,7 +148,7 @@
                     <TextBlock x:Name="MissingFromDiskBannerText"
                                Text="{Binding Scan.MissingFromDiskSummaryText}"
                                TextWrapping="Wrap"
-                               Foreground="{StaticResource Text.Body}" VerticalAlignment="Center"
+                               Foreground="{StaticResource Text.Muted}" VerticalAlignment="Center"
                                AutomationProperties.LiveSetting="Polite"/>
                 </DockPanel>
 
