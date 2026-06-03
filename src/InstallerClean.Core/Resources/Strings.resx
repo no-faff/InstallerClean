@@ -140,6 +140,7 @@
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Buy me a cuppa</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a _star on GitHub</value></data>
   <data name="Action.MITLicence" xml:space="preserve"><value>MIT licence</value></data>
+  <data name="Action.ReadmeLink" xml:space="preserve"><value>What it does, and why it's safe</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Move</value></data>
   <data name="Action.MoveInstead" xml:space="preserve"><value>_Move instead</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Move destination...</value></data>
@@ -175,6 +176,7 @@
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Checks the GitHub releases API over HTTPS for a newer version.</value></data>
   <data name="Automation.MITLicence" xml:space="preserve"><value>MIT licence</value></data>
   <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Opens the LICENCE file on github.com in your browser.</value></data>
+  <data name="Automation.ReadmeLink.HelpText" xml:space="preserve"><value>Opens the README on github.com in your browser.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
        DETAILS). Narrator at default verbosity spells short uppercase
@@ -197,6 +199,7 @@
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Buy me a cuppa</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>It's thirsty work!</value></data>
+  <data name="Tooltip.ReadmeLink" xml:space="preserve"><value>Opens the README on GitHub</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Cancellation requested. The app is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Close</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
@@ -221,9 +224,15 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Select a product to view details.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>No metadata available.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>This installer file has been deleted. InstallerClean didn't do it, it never removes a file a program still needs; something else deleted this one before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.&#10;&#10;The README explains this folder, and how to recover a file, in Microsoft's own words.</value>
+    <value>This installer file has been deleted. InstallerClean didn't do it, it never removes a file a program still needs; something else deleted this one before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso.Prefix" xml:space="preserve">
+    <value>The README </value>
+    <comment>The missing-file note's closing sentence is three keys (prefix, link text, suffix) so "explains this folder" can render as a live Hyperlink to the README's recovery section, rather than as plain bound text. The trailing space on the prefix is the gap before the link; xml:space=preserve keeps it.</comment>
+  </data>
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso.Link" xml:space="preserve"><value>explains this folder</value></data>
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso.Suffix" xml:space="preserve"><value>, and how to recover a file, in Microsoft's own words.</value></data>
   <data name="Body.NoPatches" xml:space="preserve"><value>(none)</value></data>
 
   <!-- Reasons (Reason column in the orphaned-files list) -->

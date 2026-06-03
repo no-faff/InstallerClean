@@ -250,8 +250,17 @@
                                 <Path Grid.Column="0" Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
                                       Fill="{StaticResource Status.Warning}" Width="20" Height="20" Stretch="Uniform"
                                       VerticalAlignment="Top" Margin="0,2,10,0"/>
-                                <TextBlock Grid.Column="1" Text="{Binding SelectedMissingNote}" Foreground="{StaticResource Text.Body}"
-                                           FontSize="{StaticResource Type.Body}" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Top">
+                                    <TextBlock Text="{Binding SelectedMissingNote}" Foreground="{StaticResource Text.Body}"
+                                               FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"/>
+                                    <!-- The note's closing line is a separate TextBlock so "explains
+                                         this folder" can be a live Hyperlink (Run/Hyperlink/Run) into
+                                         the README's recovery section; Hyperlink_Click routes it through
+                                         the unelevated launcher. Top margin matches the blank-line gap
+                                         between the bound paragraphs above. -->
+                                    <TextBlock Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}"
+                                               TextWrapping="Wrap" Margin="0,16,0,0"><Run Text="{loc:Translate Body.RegisteredMissingFromDisk.SeeAlso.Prefix}"/><Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean#if-a-needed-file-goes-missing" Click="Hyperlink_Click" Style="{StaticResource SubtleLink}"><Run Text="{loc:Translate Body.RegisteredMissingFromDisk.SeeAlso.Link}"/></Hyperlink><Run Text="{loc:Translate Body.RegisteredMissingFromDisk.SeeAlso.Suffix}"/></TextBlock>
+                                </StackPanel>
                             </Grid>
                         </ScrollViewer>
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"

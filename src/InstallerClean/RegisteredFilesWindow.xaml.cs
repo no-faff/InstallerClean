@@ -38,6 +38,12 @@ public partial class RegisteredFilesWindow : Window
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
 
+    private void Hyperlink_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is System.Windows.Documents.Hyperlink link && link.NavigateUri is not null)
+            UrlLauncher.OpenUrl(link.NavigateUri.AbsoluteUri);
+    }
+
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         if (ProductsList.Items.Count > 0)

@@ -54,6 +54,7 @@ public static class Strings
     public static string Action_MoveInstead => Get("Action.MoveInstead");
     public static string Action_OpenReleasePage => Get("Action.OpenReleasePage");
     public static string Action_Paste => Get("Action.Paste");
+    public static string Action_ReadmeLink => Get("Action.ReadmeLink");
     public static string Action_Rescan => Get("Action.Rescan");
     public static string Action_ScanAgain => Get("Action.ScanAgain");
     public static string Action_SelectAll => Get("Action.SelectAll");
@@ -81,6 +82,7 @@ public static class Strings
     public static string Automation_MoveAllFiles => Get("Automation.MoveAllFiles");
     public static string Automation_MoveDestinationFolder => Get("Automation.MoveDestinationFolder");
     public static string Automation_OperationProgress => Get("Automation.OperationProgress");
+    public static string Automation_ReadmeLink_HelpText => Get("Automation.ReadmeLink.HelpText");
     public static string Automation_RecycleUnavailableDeletePermanently => Get("Automation.RecycleUnavailableDeletePermanently");
     public static string Automation_RecycleUnavailableMove => Get("Automation.RecycleUnavailableMove");
     public static string Automation_RescanInstaller => Get("Automation.RescanInstaller");
@@ -107,6 +109,9 @@ public static class Strings
     public static string Body_PendingReboot_MsiExecuteMutex => Get("Body.PendingReboot.MsiExecuteMutex");
     public static string Body_PendingReboot_PendingRenameInCache => Get("Body.PendingReboot.PendingRenameInCache");
     public static string Body_RegisteredMissingFromDisk => Get("Body.RegisteredMissingFromDisk");
+    public static string Body_RegisteredMissingFromDisk_SeeAlso_Link => Get("Body.RegisteredMissingFromDisk.SeeAlso.Link");
+    public static string Body_RegisteredMissingFromDisk_SeeAlso_Prefix => Get("Body.RegisteredMissingFromDisk.SeeAlso.Prefix");
+    public static string Body_RegisteredMissingFromDisk_SeeAlso_Suffix => Get("Body.RegisteredMissingFromDisk.SeeAlso.Suffix");
     public static string BrowserLaunch_ClipboardFailed => Get("BrowserLaunch.ClipboardFailed");
     public static string BrowserLaunch_ClipboardOk => Get("BrowserLaunch.ClipboardOk");
     public static string BrowserLaunch_FailedTitle => Get("BrowserLaunch.FailedTitle");
@@ -329,6 +334,7 @@ public static class Strings
     public static string Tooltip_Move => Get("Tooltip.Move");
     public static string Tooltip_MoveDestination => Get("Tooltip.MoveDestination");
     public static string Tooltip_MoveNeedsDestination => Get("Tooltip.MoveNeedsDestination");
+    public static string Tooltip_ReadmeLink => Get("Tooltip.ReadmeLink");
     public static string Tooltip_SendResultLog => Get("Tooltip.SendResultLog");
     public static string Tooltip_SendResultLog_NothingFound => Get("Tooltip.SendResultLog.NothingFound");
     public static string Tooltip_SigningCertificate => Get("Tooltip.SigningCertificate");
