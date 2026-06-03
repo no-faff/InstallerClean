@@ -329,7 +329,6 @@ public static class Strings
     public static string Tooltip_Move => Get("Tooltip.Move");
     public static string Tooltip_MoveDestination => Get("Tooltip.MoveDestination");
     public static string Tooltip_MoveNeedsDestination => Get("Tooltip.MoveNeedsDestination");
-    public static string Tooltip_OpenProjectOnGitHub => Get("Tooltip.OpenProjectOnGitHub");
     public static string Tooltip_SendResultLog => Get("Tooltip.SendResultLog");
     public static string Tooltip_SendResultLog_NothingFound => Get("Tooltip.SendResultLog.NothingFound");
     public static string Tooltip_SigningCertificate => Get("Tooltip.SigningCertificate");

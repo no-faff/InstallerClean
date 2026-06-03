@@ -207,7 +207,6 @@
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the unused files to the chosen destination folder.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unused files to a destination folder. Choose one first.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Send the unused files to the Recycle Bin.</value></data>
-  <data name="Tooltip.OpenProjectOnGitHub" xml:space="preserve"><value>Open the project on GitHub</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Subject name from the embedded Authenticode certificate. Not chain-verified.</value></data>
 
   <!-- Body copy -->
