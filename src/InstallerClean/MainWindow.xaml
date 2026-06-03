@@ -102,13 +102,45 @@
                                AutomationProperties.LiveSetting="Polite"/>
                 </DockPanel>
 
-                <!-- Registered files missing from disk. DockPanel (not a
-                     horizontal StackPanel) so the message wraps: a horizontal
-                     StackPanel gives its child infinite width, defeating
-                     TextWrapping and clipping the longer advisory text. Icon
-                     docks left and aligns to the first line; the TextBlock
-                     fills the rest and wraps. -->
-                <DockPanel Margin="{StaticResource GapBottom.Lg}"
+                <!-- Rule under the intro (and the pending-reboot warning when
+                     shown): marks the explanation as its own section above the
+                     scan counts. Matches the separator below the still-needed
+                     count. -->
+                <chrome:DecorativeBorder BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="0,1,0,0" Margin="{StaticResource GapBottom.Lg}"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Still needed -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                               Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Heading.Sm}"
+                               Text="{Binding Scan.RegisteredSummaryText}"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Scan.RegisteredSizeDisplay}"
+                               Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Heading.Sm}"
+                               VerticalAlignment="Center" MinWidth="72" TextAlignment="Right"
+                               Margin="{StaticResource GapX.Md}"/>
+                    <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource GhostPill}"
+                            Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenRegisteredDetailsCommand}"
+                            Height="28" Padding="12,0" FontSize="{StaticResource Type.Heading.Sm}"
+                            VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
+                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
+                            AutomationProperties.Name="{loc:Translate Automation.ViewRegisteredFiles}"
+                            AutomationProperties.HelpText="{loc:Translate Automation.ViewRegisteredFiles.HelpText}"/>
+                </Grid>
+
+                <!-- Registered files missing from disk. Sits as a footnote
+                     under the still-needed count: a missing file is one of the
+                     needed files, Windows still expects it, it just isn't on
+                     disk. DockPanel (not a horizontal StackPanel) so the
+                     advisory wraps; icon docks left, aligned to the first line. -->
+                <DockPanel Margin="0,8,0,0"
                            Visibility="{Binding Scan.HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
                           Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
@@ -135,35 +167,8 @@
                            Foreground="{StaticResource Text.Muted}"
                            FontStyle="Italic" FontSize="{StaticResource Type.Caption}"
                            TextWrapping="Wrap"
-                           Margin="{StaticResource GapBottom.Lg}"
+                           Margin="0,8,0,0"
                            AutomationProperties.LiveSetting="Polite"/>
-
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Still used -->
-                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
-                               Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Heading.Sm}"
-                               Text="{Binding Scan.RegisteredSummaryText}"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Scan.RegisteredSizeDisplay}"
-                               Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Heading.Sm}"
-                               VerticalAlignment="Center" MinWidth="72" TextAlignment="Right"
-                               Margin="{StaticResource GapX.Md}"/>
-                    <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource GhostPill}"
-                            Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenRegisteredDetailsCommand}"
-                            Height="28" Padding="12,0" FontSize="{StaticResource Type.Heading.Sm}"
-                            VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
-                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
-                            AutomationProperties.Name="{loc:Translate Automation.ViewRegisteredFiles}"
-                            AutomationProperties.HelpText="{loc:Translate Automation.ViewRegisteredFiles.HelpText}"/>
-                </Grid>
 
             </StackPanel>
 

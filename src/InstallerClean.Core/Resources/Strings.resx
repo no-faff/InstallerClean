@@ -337,8 +337,8 @@
        crosses the placeholder (Slavic case selection, Arabic dual,
        Japanese particle placement, etc). A translator rewrites both
        singular and plural keys per their language's rule. -->
-  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} file still used</value></data>
-  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files still used</value></data>
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} file still needed</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files still needed</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} file to clean up</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} files to clean up</value></data>
   <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from disk, removed by something before InstallerClean ran. Windows still expects it, so one day a program might fail to update or uninstall. If that happens, just reinstall that program over the top and all is put right, with nothing lost.</value></data>
