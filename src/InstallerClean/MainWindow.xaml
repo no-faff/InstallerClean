@@ -265,7 +265,7 @@
                             KeyboardNavigation.TabIndex="1"
                             Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
                             AutomationProperties.HelpText="{loc:Translate Automation.MoveAllFiles}"
-                            ToolTip="{loc:Translate Tooltip.Move}"
+                            ToolTip="{Binding Cleanup.MoveButtonTooltip}"
                             ToolTipService.ShowOnDisabled="True"/>
 
                     <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"

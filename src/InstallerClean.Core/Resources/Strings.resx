@@ -200,10 +200,11 @@
   <data name="Tooltip.Close" xml:space="preserve"><value>Close</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
-  <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the unused files will be moved. Type a path, paste one, drop a folder or click Browse.</value></data>
+  <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the unused files will be moved. Type a path, drop a folder or click Browse.</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>An anonymous summary sent to No Faff. Totally optional.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>An anonymous summary sent to No Faff. Totally optional. Worth sending even when nothing was found.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the unused files to the chosen destination folder.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unused files to a destination folder. Choose one first.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Send the unused files to the Recycle Bin.</value></data>
   <data name="Tooltip.OpenProjectOnGitHub" xml:space="preserve"><value>Open the project on GitHub</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Subject name from the embedded Authenticode certificate. Not chain-verified.</value></data>

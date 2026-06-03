@@ -46,7 +46,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// </remarks>
     internal static readonly TimeSpan MoveDestinationSaveDelay = TimeSpan.FromMilliseconds(400);
 
-    [ObservableProperty] private string _moveDestination = string.Empty;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(MoveButtonTooltip))]
+    private string _moveDestination = string.Empty;
 
     // IsOperating goes false during the confirm-dialog window between
     // pre-flight and the move call (so the modal owns the foreground
@@ -131,6 +133,14 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         DeleteAllCommand.NotifyCanExecuteChanged();
         CancelOperationCommand.NotifyCanExecuteChanged();
     }
+
+    // Surfaced on the disabled Move button (ToolTipService.ShowOnDisabled
+    // in the view): with no destination set, point the user at the one
+    // missing step rather than describing an action they cannot take yet.
+    public string MoveButtonTooltip =>
+        string.IsNullOrWhiteSpace(MoveDestination)
+            ? Strings.Tooltip_MoveNeedsDestination
+            : Strings.Tooltip_Move;
 
     partial void OnMoveDestinationChanged(string value)
     {
