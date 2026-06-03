@@ -116,6 +116,7 @@
   <!-- Placeholder shown for a registered package whose API ProductName is empty. -->
   <data name="Field.UnknownProductName" xml:space="preserve"><value>(unknown)</value></data>
   <data name="Field.PatchesOnly" xml:space="preserve"><value>(patches only)</value></data>
+  <data name="Field.Missing" xml:space="preserve"><value>missing</value></data>
 
   <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
   <data name="Action.About" xml:space="preserve"><value>_About</value></data>
@@ -218,6 +219,11 @@
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Select a file to view details.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Select a product to view details.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>No metadata available.</value></data>
+  <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
+    <value>This file is missing from disk. Windows still expects it, so reinstall {0} over the top to put it back, with nothing lost.</value>
+    <comment>{0} = the product name. Shown in the Registered Files details pane when the selected product's file is gone from disk.</comment>
+  </data>
+  <data name="Body.RegisteredMissingFromDiskNoName" xml:space="preserve"><value>This file is missing from disk. Windows still expects it, so reinstall the program that needs it to put it back, with nothing lost.</value></data>
   <data name="Body.NoPatches" xml:space="preserve"><value>(none)</value></data>
 
   <!-- Reasons (Reason column in the orphaned-files list) -->

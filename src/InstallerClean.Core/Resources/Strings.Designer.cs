@@ -106,6 +106,8 @@ public static class Strings
     public static string Body_PendingReboot_InstallerInProgress => Get("Body.PendingReboot.InstallerInProgress");
     public static string Body_PendingReboot_MsiExecuteMutex => Get("Body.PendingReboot.MsiExecuteMutex");
     public static string Body_PendingReboot_PendingRenameInCache => Get("Body.PendingReboot.PendingRenameInCache");
+    public static string Body_RegisteredMissingFromDisk => Get("Body.RegisteredMissingFromDisk");
+    public static string Body_RegisteredMissingFromDiskNoName => Get("Body.RegisteredMissingFromDiskNoName");
     public static string BrowserLaunch_ClipboardFailed => Get("BrowserLaunch.ClipboardFailed");
     public static string BrowserLaunch_ClipboardOk => Get("BrowserLaunch.ClipboardOk");
     public static string BrowserLaunch_FailedTitle => Get("BrowserLaunch.FailedTitle");
@@ -235,6 +237,7 @@ public static class Strings
     public static string Field_File => Get("Field.File");
     public static string Field_FileSize => Get("Field.FileSize");
     public static string Field_Keywords => Get("Field.Keywords");
+    public static string Field_Missing => Get("Field.Missing");
     public static string Field_Patches => Get("Field.Patches");
     public static string Field_PatchesOnly => Get("Field.PatchesOnly");
     public static string Field_ProductName => Get("Field.ProductName");

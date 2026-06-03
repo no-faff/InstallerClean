@@ -61,9 +61,19 @@
                                         x:Name="ColProductName">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding ProductName}" Foreground="{StaticResource Text.Heading}"
-                                               FontSize="{StaticResource Type.Heading.Sm}" TextTrimming="CharacterEllipsis"
-                                               ToolTip="{Binding ProductName}"/>
+                                    <DockPanel>
+                                        <!-- Warning triangle on a missing row, docked left so
+                                             the name fills the rest and still ellipsises. On a
+                                             present row it is Collapsed and takes no width, so
+                                             that name stays flush-left like every other row. -->
+                                        <Path DockPanel.Dock="Left" Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
+                                              Fill="{StaticResource Status.Warning}" Width="14" Height="14" Stretch="Uniform"
+                                              VerticalAlignment="Center" Margin="0,0,6,0"
+                                              Visibility="{Binding IsMissing, Converter={StaticResource BoolToVis}}"/>
+                                        <TextBlock Text="{Binding ProductName}" Foreground="{StaticResource Text.Heading}"
+                                                   FontSize="{StaticResource Type.Heading.Sm}" TextTrimming="CharacterEllipsis"
+                                                   VerticalAlignment="Center" ToolTip="{Binding ProductName}"/>
+                                    </DockPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -81,8 +91,26 @@
                                         x:Name="ColSizeBytes">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Text.Body}"
-                                               FontSize="{StaticResource Type.Body}" TextAlignment="Right"/>
+                                    <Grid>
+                                        <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Text.Body}"
+                                                   FontSize="{StaticResource Type.Body}" TextAlignment="Right">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsMissing}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <!-- Missing row: the file is gone, so it has no size.
+                                             "missing" in the warning colour stands in for it. -->
+                                        <TextBlock Text="{loc:Translate Field.Missing}" Foreground="{StaticResource Status.Warning}"
+                                                   FontSize="{StaticResource Type.Body}" TextAlignment="Right"
+                                                   Visibility="{Binding IsMissing, Converter={StaticResource BoolToVis}}"/>
+                                    </Grid>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -204,6 +232,19 @@
                                    VerticalAlignment="Center" HorizontalAlignment="Center"
                                    TextAlignment="Center"
                                    Visibility="{Binding ShowNoMetadata, Converter={StaticResource BoolToVis}}"/>
+                        <!-- Missing-from-disk notice. Stands in for the metadata panel
+                             when the selected product's file is gone: the summary data is
+                             read from the file, so there is none to show, only the product
+                             name (from the registration) and how to restore it. -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24,0"
+                                    Visibility="{Binding ShowMissing, Converter={StaticResource BoolToVis}}">
+                            <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
+                                  Fill="{StaticResource Status.Warning}" Width="20" Height="20" Stretch="Uniform"
+                                  VerticalAlignment="Top" Margin="0,0,10,0"/>
+                            <TextBlock Text="{Binding SelectedMissingNote}" Foreground="{StaticResource Text.Body}"
+                                       FontSize="{StaticResource Type.Body}" TextWrapping="Wrap" MaxWidth="380"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                                       Visibility="{Binding ShowDetails, Converter={StaticResource BoolToVis}}">
                             <Grid>

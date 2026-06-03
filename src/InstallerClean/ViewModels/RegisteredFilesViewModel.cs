@@ -26,6 +26,8 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
     [NotifyPropertyChangedFor(nameof(HasSelection))]
     [NotifyPropertyChangedFor(nameof(ShowDetails))]
     [NotifyPropertyChangedFor(nameof(ShowNoMetadata))]
+    [NotifyPropertyChangedFor(nameof(ShowMissing))]
+    [NotifyPropertyChangedFor(nameof(SelectedMissingNote))]
     [NotifyPropertyChangedFor(nameof(SelectedPatches))]
     [NotifyPropertyChangedFor(nameof(HasPatches))]
     private ProductRow? _selectedProduct;
@@ -38,7 +40,14 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
     public bool HasSelection => SelectedProduct is not null;
     public bool HasPatches => SelectedProduct is not null && SelectedProduct.Patches.Count > 0;
     public bool ShowDetails => SelectedProduct is not null && SelectedDetails is not null;
-    public bool ShowNoMetadata => SelectedProduct is not null && SelectedDetails is null;
+    public bool ShowMissing => SelectedProduct?.IsMissing == true;
+    // A missing file has no summary stream to read (the file is gone), so the
+    // "no metadata" panel stands down in favour of the missing notice.
+    public bool ShowNoMetadata => SelectedProduct is not null && SelectedDetails is null && !ShowMissing;
+    public string SelectedMissingNote =>
+        SelectedProduct is null || SelectedProduct.ProductName == Strings.Field_UnknownProductName
+            ? Strings.Body_RegisteredMissingFromDiskNoName
+            : string.Format(Strings.Body_RegisteredMissingFromDisk, SelectedProduct.ProductName);
     public IReadOnlyList<PatchRow> SelectedPatches => SelectedProduct?.Patches ?? Array.Empty<PatchRow>();
 
     public RegisteredFilesViewModel(
@@ -89,7 +98,8 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                     DisplayHelpers.FormatSize(msi.FileSizeBytes),
                     msi.FileSizeBytes,
                     patches.Count,
-                    patches);
+                    patches,
+                    IsMissing: !msi.FileExists);
             }
             else
             {
@@ -105,7 +115,8 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                     DisplayHelpers.FormatSize(patchBytes),
                     patchBytes,
                     patches.Count,
-                    patches);
+                    patches,
+                    IsMissing: !items.First().FileExists);
             }
             products.Add(row);
         }
@@ -124,6 +135,14 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
     {
         if (value is null)
         {
+            SelectedDetails = null;
+            return;
+        }
+
+        if (value.IsMissing)
+        {
+            // The file is gone, so there is no summary stream to read; the
+            // missing notice replaces the metadata panel via ShowMissing.
             SelectedDetails = null;
             return;
         }
