@@ -655,11 +655,11 @@
         </Setter>
     </Style>
 
-    <!-- Tooltips. WarningTooltip is the indigo accent tooltip for
+    <!-- Tooltips. AccentTooltip is the indigo accent tooltip for
          the donate / star buttons that shouts a little; the implicit
          ToolTip style below is the default for everything else. -->
 
-    <Style x:Key="WarningTooltip" TargetType="ToolTip">
+    <Style x:Key="AccentTooltip" TargetType="ToolTip">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="MaxWidth" Value="280"/>
