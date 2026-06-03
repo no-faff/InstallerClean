@@ -232,19 +232,28 @@
                                    VerticalAlignment="Center" HorizontalAlignment="Center"
                                    TextAlignment="Center"
                                    Visibility="{Binding ShowNoMetadata, Converter={StaticResource BoolToVis}}"/>
-                        <!-- Missing-from-disk notice. Stands in for the metadata panel
-                             when the selected product's file is gone: the summary data is
-                             read from the file, so there is none to show, only the product
-                             name (from the registration) and how to restore it. -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24,0"
-                                    Visibility="{Binding ShowMissing, Converter={StaticResource BoolToVis}}">
-                            <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
-                                  Fill="{StaticResource Status.Warning}" Width="20" Height="20" Stretch="Uniform"
-                                  VerticalAlignment="Top" Margin="0,0,10,0"/>
-                            <TextBlock Text="{Binding SelectedMissingNote}" Foreground="{StaticResource Text.Body}"
-                                       FontSize="{StaticResource Type.Body}" TextWrapping="Wrap" MaxWidth="380"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
+                        <!-- Missing-from-disk notice. Stands in for the metadata
+                             panel when the selected product's file is gone: there
+                             is no summary stream to read, so this explains what the
+                             missing file is and how to recover it. Top-aligned and
+                             scrollable because the note runs several paragraphs, so
+                             it reads from the top rather than floating centred, and
+                             a short window can still scroll to the end. The icon
+                             docks top-left, beside the first line. -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                      Visibility="{Binding ShowMissing, Converter={StaticResource BoolToVis}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Path Grid.Column="0" Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
+                                      Fill="{StaticResource Status.Warning}" Width="20" Height="20" Stretch="Uniform"
+                                      VerticalAlignment="Top" Margin="0,2,10,0"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SelectedMissingNote}" Foreground="{StaticResource Text.Body}"
+                                           FontSize="{StaticResource Type.Body}" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                            </Grid>
+                        </ScrollViewer>
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                                       Visibility="{Binding ShowDetails, Converter={StaticResource BoolToVis}}">
                             <Grid>
