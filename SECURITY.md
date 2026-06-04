@@ -12,7 +12,7 @@ Please do **not** open a public GitHub issue for security problems. [Open a priv
 - Steps to reproduce
 - Your InstallerClean version and Windows version
 
-You'll get an acknowledgement within a few days. Fixes will be shipped in a point release.
+Confirmed issues are fixed in a later release.
 
 ## Scope
 
