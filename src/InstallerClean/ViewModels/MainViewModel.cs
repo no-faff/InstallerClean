@@ -137,14 +137,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         else if (e.PropertyName == nameof(CompletionViewModel.HasSentResultLog) &&
                  Completion.HasSentResultLog)
         {
-            // Persist the lifetime lock immediately after a successful
-            // send. TrySave is best-effort; a failed save means the
-            // user might see the prompt one extra time on a future
-            // session, which is harmless and self-correcting on the
-            // next successful save.
-            var snapshot = _settingsService.Load();
-            snapshot.HasSentResultLog = true;
-            _settingsService.TrySave(snapshot);
+            // Persist the lifetime lock after a successful send, off the
+            // dispatcher: Load + rename can stall the UI on a OneDrive-redirected
+            // or roaming profile. Update serialises against the debounced
+            // MoveDestination save so neither write clobbers the other.
+            // Fire-and-forget and best-effort; a dropped save just shows the
+            // prompt one extra time next session, self-correcting on the next send.
+            _ = Task.Run(() => _settingsService.Update(s => s.HasSentResultLog = true));
         }
     }
 

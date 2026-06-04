@@ -191,27 +191,24 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // keystroke landing during the disk hop writes into
         // _settings.MoveDestination on the dispatcher and gets picked
         // up by the next debounce cycle without disturbing this save.
-        // The _settings field is NOT reassigned; an earlier version of
-        // this method swapped _settings = fresh and lost a keystroke
-        // that landed on the orphan instance between the worker's
-        // snapshot read and the field swap. Reload still happens so
-        // this save doesn't clobber other writers (the detail windows
-        // persist their window size on close via the same
-        // ISettingsService); the reloaded instance is only used as the
-        // payload to TrySave, not as the new _settings.
+        // The _settings field is NOT reassigned; an earlier version of this
+        // method swapped _settings = fresh and lost a keystroke that landed on
+        // the orphan instance between the worker's snapshot read and the field
+        // swap. SettingsService.Update reloads, applies the captured destination
+        // and saves atomically under its own lock, so this thread-pool debounce
+        // cannot lose the window-size or lifetime-lock persists that run on the
+        // dispatcher to a last-writer-wins rename.
         var destinationSnapshot = _settings.MoveDestination;
         await Task.Run(() =>
         {
-            var fresh = _settingsService.Load();
-            fresh.MoveDestination = destinationSnapshot;
-            if (!_settingsService.TrySave(fresh))
+            if (!_settingsService.Update(s => s.MoveDestination = destinationSnapshot))
             {
-                // TrySave returns false on disk-full / read-only-profile /
+                // Update returns false on disk-full / read-only-profile /
                 // path-redirection failure (it never throws). Without a
                 // breadcrumb a user report of "my destination reset between
                 // sessions" has no trail back to the failed write.
                 CrashLog.TryWrite(new InvalidOperationException(
-                    "Settings.TrySave returned false during MoveDestination debounced save."));
+                    "Settings.Update returned false during MoveDestination debounced save."));
             }
         }, token).ConfigureAwait(true);
 

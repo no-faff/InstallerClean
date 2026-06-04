@@ -111,8 +111,7 @@ public partial class RegisteredFilesWindow : Window
         Closed -= OnClosed;
         if (DataContext is IDisposable vm) vm.Dispose();
         if (_settingsService is null) return;
-        var settings = _settingsService.Load();
-        settings.RegisteredWindowSize = new Models.WindowSize { Width = ActualWidth, Height = ActualHeight };
-        _ = _settingsService.TrySave(settings);
+        _ = _settingsService.Update(s =>
+            s.RegisteredWindowSize = new Models.WindowSize { Width = ActualWidth, Height = ActualHeight });
     }
 }

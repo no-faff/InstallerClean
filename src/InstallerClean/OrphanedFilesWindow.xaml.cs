@@ -106,8 +106,7 @@ public partial class OrphanedFilesWindow : Window
         Closed -= OnClosed;
         if (DataContext is IDisposable vm) vm.Dispose();
         if (_settingsService is null) return;
-        var settings = _settingsService.Load();
-        settings.OrphanedWindowSize = new Models.WindowSize { Width = ActualWidth, Height = ActualHeight };
-        _ = _settingsService.TrySave(settings);
+        _ = _settingsService.Update(s =>
+            s.OrphanedWindowSize = new Models.WindowSize { Width = ActualWidth, Height = ActualHeight });
     }
 }

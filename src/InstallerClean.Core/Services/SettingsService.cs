@@ -33,6 +33,12 @@ public sealed class SettingsService : ISettingsService
 
     private readonly string _settingsFile;
 
+    // Serialises Update's read-modify-write. SettingsService is a DI singleton
+    // (CoreComposition), so one gate covers every settings writer in the
+    // process: the debounced MoveDestination save on a thread-pool thread and
+    // the window-size / lifetime-lock persists on the dispatcher.
+    private readonly object _ioGate = new();
+
     public SettingsService() : this(DefaultSettingsFile) { }
 
     internal SettingsService(string settingsFile)
@@ -111,6 +117,16 @@ public sealed class SettingsService : ISettingsService
         {
             try { if (File.Exists(tempFile)) File.Delete(tempFile); } catch { }
             return false;
+        }
+    }
+
+    public bool Update(Action<AppSettings> mutate)
+    {
+        lock (_ioGate)
+        {
+            var settings = Load();
+            mutate(settings);
+            return TrySave(settings);
         }
     }
 }
