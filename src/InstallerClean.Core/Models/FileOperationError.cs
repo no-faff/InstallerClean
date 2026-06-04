@@ -80,8 +80,20 @@ public sealed record RecycleFailed(string FilePath, int HResult)
     public override string LocalisedMessage =>
         // HResult is a COM HRESULT; hex keeps a top-bit-set code
         // recognisable (E_FAIL as 0x80004005, not the signed decimal
-        // -2147467259 the bare {0} would render).
-        string.Format(Strings.Error_ShellRecycleFailed, $"0x{HResult:X8}");
+        // -2147467259 the bare {0} would render). Only the well-documented
+        // Win32 codes are tailored to a cause; the shell copy engine's own
+        // codes (FACILITY_SHELL, 0x8027xxxx) are not publicly enumerated, so
+        // they take the generic line rather than a guessed cause.
+        HResult switch
+        {
+            // E_ACCESSDENIED: blocked by permissions or ownership, not a lock.
+            unchecked((int)0x80070005) =>
+                string.Format(Strings.Error_RecycleAccessDenied, $"0x{HResult:X8}"),
+            // ERROR_SHARING_VIOLATION / ERROR_LOCK_VIOLATION: the file is held open.
+            unchecked((int)0x80070020) or unchecked((int)0x80070021) =>
+                string.Format(Strings.Error_RecycleInUse, $"0x{HResult:X8}"),
+            _ => string.Format(Strings.Error_ShellRecycleFailed, $"0x{HResult:X8}"),
+        };
 }
 
 /// <summary>

@@ -229,6 +229,8 @@ public static class Strings
     public static string Error_NotEnoughSpaceTitle => Get("Error.NotEnoughSpaceTitle");
     public static string Error_NoUniqueFilename => Get("Error.NoUniqueFilename");
     public static string Error_PathTooLong => Get("Error.PathTooLong");
+    public static string Error_RecycleAccessDenied => Get("Error.RecycleAccessDenied");
+    public static string Error_RecycleInUse => Get("Error.RecycleInUse");
     public static string Error_ScanFailedTitle => Get("Error.ScanFailedTitle");
     public static string Error_ShellRecycleFailed => Get("Error.ShellRecycleFailed");
     public static string Error_SourceIsReparsePoint => Get("Error.SourceIsReparsePoint");

@@ -431,7 +431,9 @@ Details in {1}.</value></data>
   <data name="Error.IOFailure" xml:space="preserve"><value>The operation failed. Try again or restart Windows.</value></data>
   <data name="Error.UnknownError" xml:space="preserve"><value>Unknown error.</value></data>
   <!-- 0 = shell error code -->
-  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Windows shell reported error {0} while recycling the file.</value></data>
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead.</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead.</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead.</value></data>
   <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>The file was permanently deleted because it could not be sent to the Recycle Bin.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Refusing to move files into the Windows Installer folder (destination: {0}).</value></data>
