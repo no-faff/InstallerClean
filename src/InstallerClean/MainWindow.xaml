@@ -570,7 +570,7 @@
                             IsDefault="True"
                             HorizontalAlignment="Center" MinWidth="120"
                             Margin="{StaticResource GapBottom.Sm}"
-                            AutomationProperties.Name="{loc:Translate Automation.CloseResult}"/>
+                            AutomationProperties.HelpText="{loc:Translate Automation.CloseResult}"/>
 
                     <!-- Send-result-log button. The lifetime lock in
                          AppSettings.HasSentResultLog hides it after a
@@ -587,7 +587,6 @@
                             Margin="{StaticResource GapBottom.Sm}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             ToolTip="{Binding Completion.SendResultLogTooltip}"
-                            AutomationProperties.Name="{loc:Translate Automation.SendResultLog}"
                             AutomationProperties.HelpText="{loc:Translate Automation.SendResultLog.HelpText}"/>
 
                     <!-- Result-log status line. Shows "Sending..." while
@@ -625,7 +624,7 @@
                             HorizontalAlignment="Center"
                             Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
-                            AutomationProperties.Name="{loc:Translate Automation.RescanInstaller}"/>
+                            AutomationProperties.HelpText="{loc:Translate Automation.RescanInstaller}"/>
 
                 </StackPanel>
             </Border>

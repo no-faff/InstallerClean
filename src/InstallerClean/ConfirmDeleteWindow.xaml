@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         Title="{loc:Translate Window.ConfirmDelete.Title}"
+        AutomationProperties.HelpText="{loc:Translate Automation.ConfirmDelete}"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent"
         ShowInTaskbar="False"
@@ -60,8 +61,7 @@
                         Click="OnCancel" IsCancel="True" IsDefault="True"
                         Margin="{StaticResource GapRight.Sm}"/>
                 <Button x:Name="DeleteButton" Style="{StaticResource DangerPill}"
-                        Content="{loc:Translate Action.Delete}" Click="OnDelete"
-                        AutomationProperties.Name="{loc:Translate Automation.ConfirmDelete}"/>
+                        Content="{loc:Translate Action.Delete}" Click="OnDelete"/>
             </StackPanel>
         </StackPanel>
     </Border>

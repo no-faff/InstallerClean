@@ -74,8 +74,7 @@
                 <Button Style="{StaticResource PrimaryPill}"
                         Content="{loc:Translate Action.SendResultLogConfirm}"
                         Click="OnSend" IsDefault="True"
-                        KeyboardNavigation.TabIndex="1"
-                        AutomationProperties.Name="{loc:Translate Automation.ConfirmSendResultLog}"/>
+                        KeyboardNavigation.TabIndex="1"/>
             </StackPanel>
         </StackPanel>
     </Border>

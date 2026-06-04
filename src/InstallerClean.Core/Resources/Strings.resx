@@ -167,7 +167,6 @@
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>Confirm moving the unused files to the chosen destination folder</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Move the unused files to a folder you choose</value></data>
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Delete the unused files permanently because the Recycle Bin is unavailable for this drive</value></data>
-  <data name="Automation.SendResultLog" xml:space="preserve"><value>Send a summary of this run to No Faff</value></data>
   <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Say thanks</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Confirm sending the summary to No Faff</value></data>
@@ -189,9 +188,9 @@
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>Scan C:\Windows\Installer again</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Scanning progress</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Startup scan progress</value></data>
-  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>View unused files</value></data>
+  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Details, unused files</value></data>
   <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Available for cleanup.</value></data>
-  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>View registered files</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Details, registered files</value></data>
   <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Read-only inventory.</value></data>
 
   <!-- Tooltips -->

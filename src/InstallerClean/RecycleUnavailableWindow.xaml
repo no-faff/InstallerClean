@@ -50,10 +50,10 @@
                 <Button Style="{StaticResource DangerPill}" Content="{loc:Translate Action.DeletePermanently}"
                         Click="OnDeletePermanently"
                         Margin="{StaticResource GapRight.Sm}"
-                        AutomationProperties.Name="{loc:Translate Automation.RecycleUnavailableDeletePermanently}"/>
+                        AutomationProperties.HelpText="{loc:Translate Automation.RecycleUnavailableDeletePermanently}"/>
                 <Button Style="{StaticResource AccentPill}" Content="{loc:Translate Action.MoveInstead}"
                         Click="OnMove"
-                        AutomationProperties.Name="{loc:Translate Automation.RecycleUnavailableMove}"/>
+                        AutomationProperties.HelpText="{loc:Translate Automation.RecycleUnavailableMove}"/>
             </StackPanel>
         </StackPanel>
     </Border>
