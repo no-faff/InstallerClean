@@ -396,6 +396,8 @@ Please right-click and choose 'Run as administrator'.</value></data>
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Invalid destination</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Could not write to destination</value></data>
+  <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Move failed</value></data>
+  <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Delete failed</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>The destination cannot be inside the Windows Installer folder.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%.</value></data>

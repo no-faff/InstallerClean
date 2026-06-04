@@ -468,12 +468,21 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            // Type name + log path only; ex.Message can leak paths under elevation.
+            // A mid-move crash is surfaced the way every other failure in the
+            // app is: a dialog naming the exception type and the crash-log
+            // path, never ex.Message (it can carry another user's profile path
+            // under elevation). It is not left to the body-row status, which
+            // trims at a width cap and would cut the log path off, and the log
+            // path is the one actionable thing for a report. Reaching here is
+            // rare: the move service collects per-file errors rather than throwing.
             var crash = CrashLog.TryWrite(ex);
             var typeName = ex.GetType().Name;
-            OperationProgress = crash.Written
-                ? string.Format(Strings.Status_MoveFailed, typeName, crash.Path)
-                : string.Format(Strings.Status_MoveFailed_NoLog, typeName);
+            OperationProgress = string.Empty;
+            _dialogService.ShowWarning(
+                crash.Written
+                    ? string.Format(Strings.Status_MoveFailed, typeName, crash.Path)
+                    : string.Format(Strings.Status_MoveFailed_NoLog, typeName),
+                Strings.Error_MoveFailedTitle);
         }
         finally
         {
@@ -633,11 +642,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
+            // Same as the move crash path: a dialog naming the type and the
+            // crash-log path, not a body-row status that trims the path off.
             var crash = CrashLog.TryWrite(ex);
             var typeName = ex.GetType().Name;
-            OperationProgress = crash.Written
-                ? string.Format(Strings.Status_DeleteFailed, typeName, crash.Path)
-                : string.Format(Strings.Status_DeleteFailed_NoLog, typeName);
+            OperationProgress = string.Empty;
+            _dialogService.ShowWarning(
+                crash.Written
+                    ? string.Format(Strings.Status_DeleteFailed, typeName, crash.Path)
+                    : string.Format(Strings.Status_DeleteFailed_NoLog, typeName),
+                Strings.Error_DeleteFailedTitle);
             return false;
         }
         finally

@@ -398,6 +398,60 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task MoveAllAsync_crash_surfaces_a_dialog_not_an_inline_status()
+    {
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new IOException("boom"));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move-crash");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // A crash mid-move surfaces as a dialog (type + full crash-log path),
+        // like every other failure, not a body-row status that would trim the
+        // path; the body row is cleared.
+        _dialogService.Received(1).ShowWarning(Arg.Any<string>(), Strings.Error_MoveFailedTitle);
+        Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_crash_surfaces_a_dialog_not_an_inline_status()
+    {
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\x.msi", 524_288, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new IOException("boom"));
+        _confirmationService.ConfirmDelete(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(Arg.Any<string>(), Strings.Error_DeleteFailedTitle);
+        Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
+    }
+
+    [Fact]
     public async Task DeleteAllAsync_confirmation_cancelled_does_not_invoke_service()
     {
         var vm = CreateViewModel();

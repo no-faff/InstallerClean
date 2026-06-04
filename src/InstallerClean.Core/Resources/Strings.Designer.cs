@@ -209,6 +209,7 @@ public static class Strings
     public static string Error_AdminRequiredTitle => Get("Error.AdminRequiredTitle");
     public static string Error_CannotWriteFolder => Get("Error.CannotWriteFolder");
     public static string Error_DeletedNotRecycled => Get("Error.DeletedNotRecycled");
+    public static string Error_DeleteFailedTitle => Get("Error.DeleteFailedTitle");
     public static string Error_DestinationChangedMidBatch => Get("Error.DestinationChangedMidBatch");
     public static string Error_DestinationInsideInstaller => Get("Error.DestinationInsideInstaller");
     public static string Error_DestinationInSystemFolder => Get("Error.DestinationInSystemFolder");
@@ -222,6 +223,7 @@ public static class Strings
     public static string Error_IOWriteDestination => Get("Error.IOWriteDestination");
     public static string Error_IOWriteDestination_NoLog => Get("Error.IOWriteDestination.NoLog");
     public static string Error_MissingSourceFile => Get("Error.MissingSourceFile");
+    public static string Error_MoveFailedTitle => Get("Error.MoveFailedTitle");
     public static string Error_MoveIntoInstaller => Get("Error.MoveIntoInstaller");
     public static string Error_MsiAccessDenied => Get("Error.MsiAccessDenied");
     public static string Error_MsiNonSuccess => Get("Error.MsiNonSuccess");

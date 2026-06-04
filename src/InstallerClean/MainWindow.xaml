@@ -283,7 +283,7 @@
                          is changing, so re-announcing here doubles every
                          progress callback for screen readers. -->
                     <TextBlock DockPanel.Dock="Left" Text="{Binding Cleanup.OperationProgress}"
-                               VerticalAlignment="Center" Foreground="{StaticResource Text.Muted}"
+                               VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="{StaticResource Text.Muted}"
                                FontSize="{StaticResource Type.Body}"
                                TextTrimming="CharacterEllipsis" MaxWidth="280"/>
                 </DockPanel>
