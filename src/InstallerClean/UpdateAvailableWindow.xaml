@@ -24,6 +24,7 @@
         <StackPanel>
             <TextBlock Text="{loc:Translate UpdateCheck.UpdateAvailable.Title}"
                        Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
+                       TextWrapping="Wrap"
                        Margin="{StaticResource GapBottom.Md}"/>
 
             <TextBlock x:Name="VersionInfo"
