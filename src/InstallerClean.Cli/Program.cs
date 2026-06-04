@@ -257,11 +257,16 @@ internal static class Program
 
             var filePaths = scanResult.RemovableFiles.Select(f => f.FullPath).ToList();
 
-            // Per-file progress: prints the file name to stdout and
-            // updates processedCount so the OCE catch can attribute
-            // the cancellation correctly.
+            // Per-file progress, reported synchronously on the producing
+            // thread (see SynchronousProgress). A console Main has no
+            // SynchronizationContext, so Progress<T> would marshal each
+            // report through the thread pool and let a "[i/total]" line
+            // print after the post-await summary ("Deleted N files."),
+            // breaking the stdout line order an RMM scrapes. Report also
+            // advances processedCount so the OCE catch can attribute a
+            // cancellation to the right file count.
             totalToProcess = count;
-            var progress = new Progress<OperationProgress>(p =>
+            var progress = new SynchronousProgress<OperationProgress>(p =>
             {
                 processedCount = p.CurrentFile;
                 Console.WriteLine($"  [{p.CurrentFile}/{p.TotalFiles}] {p.CurrentFileName}");
@@ -495,5 +500,21 @@ internal static class Program
         Console.WriteLine(Strings.Cli_Help_NoteLine2);
         Console.WriteLine(Strings.Cli_Help_NoteLine3);
         Console.WriteLine();
+    }
+
+    /// <summary>
+    /// An <see cref="IProgress{T}"/> that runs its handler inline on the
+    /// thread that calls <see cref="Report"/>. <see cref="Progress{T}"/>
+    /// instead posts each report to the captured
+    /// <see cref="System.Threading.SynchronizationContext"/>, or to the
+    /// thread pool when there is none; a console host has none, so its
+    /// reports would arrive unordered relative to each other and to the
+    /// summary line printed after the awaited operation. The CLI needs
+    /// ordered progress on a single stdout stream; the GUI keeps
+    /// <see cref="Progress{T}"/> because it wants the dispatcher marshal.
+    /// </summary>
+    private sealed class SynchronousProgress<T>(Action<T> handler) : IProgress<T>
+    {
+        public void Report(T value) => handler(value);
     }
 }
