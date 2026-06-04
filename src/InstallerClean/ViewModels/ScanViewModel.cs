@@ -201,7 +201,7 @@ public partial class ScanViewModel : ObservableObject
         // Sample reboot after the scan; ordering matters. An MSI install
         // starting mid-scan could flip the _MSIExecute mutex, and
         // probing first would miss it.
-        var pendingRebootResult = _rebootService.Check();
+        var pendingRebootResult = await Task.Run(() => _rebootService.Check(), cancellationToken);
 
         var registeredCount = result.RegisteredPackages.Count;
         var registeredSize = DisplayHelpers.FormatSize(result.RegisteredTotalBytes);
