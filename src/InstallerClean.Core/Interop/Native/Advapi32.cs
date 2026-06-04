@@ -50,6 +50,31 @@ internal static partial class Advapi32
         ref STARTUPINFO startupInfo,
         out PROCESS_INFORMATION processInformation);
 
+    /// <summary>
+    /// Resolves a privilege name such as <c>SeImpersonatePrivilege</c> to
+    /// its locally unique identifier for <see cref="AdjustTokenPrivileges"/>.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "LookupPrivilegeValueW", SetLastError = true,
+                   StringMarshalling = StringMarshalling.Utf16)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool LookupPrivilegeValueW(string? systemName, string name, out LUID luid);
+
+    /// <summary>
+    /// Enables or disables privileges in an access token. Returns true even
+    /// when it could not assign every requested privilege: the caller must
+    /// read <see cref="Marshal.GetLastWin32Error"/> for ERROR_NOT_ALL_ASSIGNED
+    /// to learn whether the privilege was actually granted.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "AdjustTokenPrivileges", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool AdjustTokenPrivileges(
+        SafeAccessTokenHandle token,
+        [MarshalAs(UnmanagedType.Bool)] bool disableAllPrivileges,
+        ref TOKEN_PRIVILEGES newState,
+        uint bufferLength,
+        IntPtr previousState,
+        IntPtr returnLength);
+
     // CharSet is omitted because [assembly: DisableRuntimeMarshalling]
     // ignores it for managed structs; every string-shaped field below
     // is already IntPtr. A managed string field added here would not
@@ -87,6 +112,27 @@ internal static partial class Advapi32
         public uint dwThreadId;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct LUID
+    {
+        public uint LowPart;
+        public int HighPart;
+    }
+
+    // TOKEN_PRIVILEGES is natively a count followed by that many
+    // LUID_AND_ATTRIBUTES entries. Flattening the single entry inline is
+    // valid only because the one caller ever sets exactly one privilege:
+    // with PrivilegeCount = 1 the inline Luid and Attributes occupy the same
+    // bytes a one-element trailing array would, and the struct stays
+    // blittable under [assembly: DisableRuntimeMarshalling].
+    [StructLayout(LayoutKind.Sequential)]
+    public struct TOKEN_PRIVILEGES
+    {
+        public uint PrivilegeCount;
+        public LUID Luid;
+        public uint Attributes;
+    }
+
     public enum SecurityImpersonationLevel
     {
         SecurityAnonymous,
@@ -101,7 +147,10 @@ internal static partial class Advapi32
         TokenImpersonation,
     }
 
-    public const uint TOKEN_ASSIGN_PRIMARY  = 0x0001;
-    public const uint TOKEN_DUPLICATE       = 0x0002;
-    public const uint TOKEN_QUERY           = 0x0008;
+    public const uint TOKEN_ASSIGN_PRIMARY    = 0x0001;
+    public const uint TOKEN_DUPLICATE         = 0x0002;
+    public const uint TOKEN_QUERY             = 0x0008;
+    public const uint TOKEN_ADJUST_PRIVILEGES = 0x0020;
+
+    public const uint SE_PRIVILEGE_ENABLED = 0x0002;
 }

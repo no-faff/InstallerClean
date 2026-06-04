@@ -39,6 +39,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 - The `WarningTooltip` style is renamed `AccentTooltip`. It is the indigo accent tooltip used on the Buy-me-a-cuppa and Star buttons, never on a warning, so a use-based name misled; `AccentTooltip` names it by what it is and matches the `AccentPill` / `PrimaryPill` / `DangerPill` naming.
 - The `MainViewModelTests` clean-up-count assertions are updated to the new "unneeded" wording; they had pinned the old "{N} file(s) to clean up" string.
+- The unelevated URL launcher enables `SE_IMPERSONATE_NAME` on its own process token before `CreateProcessWithTokenW`. That call, which opens in-app links in the user's medium-integrity browser, is refused by Windows with access-denied (error 5) unless the privilege is enabled on the caller's token, not merely held. A standard UAC elevation enables it by default; a token that carries it disabled would fail the launch and fall back to copying the link to the clipboard. Enabling is best-effort: where the privilege is absent altogether the launch still fails into that same fallback, so there is no regression.
 
 ## [1.8.2] - 2026-05-27
 

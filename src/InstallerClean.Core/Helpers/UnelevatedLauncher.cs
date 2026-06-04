@@ -51,6 +51,10 @@ internal static class UnelevatedLauncher
     {
         failureReason = string.Empty;
 
+        // CreateProcessWithTokenW (below) is refused with ERROR_ACCESS_DENIED
+        // unless SE_IMPERSONATE_NAME is enabled on the calling token.
+        TryEnableImpersonatePrivilege();
+
         var shellWindow = User32.GetShellWindow();
         if (shellWindow == IntPtr.Zero)
         {
@@ -150,5 +154,41 @@ internal static class UnelevatedLauncher
         if (pi.hThread != IntPtr.Zero) Kernel32.CloseHandle(pi.hThread);
 
         return true;
+    }
+
+    // Best-effort. Where SE_IMPERSONATE_NAME is absent from the token,
+    // AdjustTokenPrivileges still returns true (with a trailing
+    // ERROR_NOT_ALL_ASSIGNED) and changes nothing, so the launch then fails
+    // into the caller's clipboard fallback and attempting this never
+    // regresses the no-privilege case.
+    private static void TryEnableImpersonatePrivilege()
+    {
+        try
+        {
+            using var process = System.Diagnostics.Process.GetCurrentProcess();
+            if (!Advapi32.OpenProcessToken(
+                    process.SafeHandle,
+                    Advapi32.TOKEN_ADJUST_PRIVILEGES | Advapi32.TOKEN_QUERY,
+                    out var tokenRaw))
+                return;
+            using var token = tokenRaw;
+
+            if (!Advapi32.LookupPrivilegeValueW(null, "SeImpersonatePrivilege", out var luid))
+                return;
+
+            var privileges = new Advapi32.TOKEN_PRIVILEGES
+            {
+                PrivilegeCount = 1,
+                Luid = luid,
+                Attributes = Advapi32.SE_PRIVILEGE_ENABLED,
+            };
+            Advapi32.AdjustTokenPrivileges(
+                token, disableAllPrivileges: false, ref privileges, 0, IntPtr.Zero, IntPtr.Zero);
+        }
+        catch
+        {
+            // Best-effort: a failure here leaves the existing clipboard
+            // fallback to handle the refused launch, as before.
+        }
     }
 }
