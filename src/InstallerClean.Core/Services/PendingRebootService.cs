@@ -50,8 +50,11 @@ public sealed class PendingRebootService : IPendingRebootService
         {
             mutexHeld = _mutex.Exists(MsiExecuteMutexName);
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
         {
+            // OOM and StackOverflow propagate, matching RegistryReader / MutexProbe:
+            // swallowing them here would downgrade a real memory-pressure failure to
+            // "no signal" and let the gate report Clean while an install is in flight.
             mutexHeld = false;
         }
         if (mutexHeld)
@@ -66,7 +69,7 @@ public sealed class PendingRebootService : IPendingRebootService
         {
             installerInProgress = _registry.LocalMachineKeyExists(InstallerInProgressKey);
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
         {
             installerInProgress = false;
         }
@@ -81,7 +84,7 @@ public sealed class PendingRebootService : IPendingRebootService
             renames = _registry.LocalMachineMultiStringValue(
                 SessionManagerKey, PendingFileRenameOperationsValue);
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
         {
             renames = null;
         }
