@@ -140,7 +140,6 @@
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Buy me a cuppa</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a _star on GitHub</value></data>
   <data name="Action.MITLicence" xml:space="preserve"><value>MIT licence</value></data>
-  <data name="Action.ReadmeLink" xml:space="preserve"><value>What it does, and why it's safe</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Move</value></data>
   <data name="Action.MoveInstead" xml:space="preserve"><value>_Move instead</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Move destination...</value></data>
@@ -176,7 +175,6 @@
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Checks the GitHub releases API over HTTPS for a newer version.</value></data>
   <data name="Automation.MITLicence" xml:space="preserve"><value>MIT licence</value></data>
   <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Opens the LICENCE file on github.com in your browser.</value></data>
-  <data name="Automation.ReadmeLink.HelpText" xml:space="preserve"><value>Opens the README on github.com in your browser.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
        DETAILS). Narrator at default verbosity spells short uppercase
@@ -199,7 +197,6 @@
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Buy me a cuppa</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>It's thirsty work!</value></data>
-  <data name="Tooltip.ReadmeLink" xml:space="preserve"><value>Opens the README on GitHub</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Cancellation requested. The app is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Close</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>

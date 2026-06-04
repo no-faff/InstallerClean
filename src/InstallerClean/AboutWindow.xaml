@@ -80,22 +80,6 @@
                 AutomationProperties.Name="{loc:Translate Automation.CheckForUpdates}"
                 AutomationProperties.HelpText="{loc:Translate Automation.CheckForUpdates.HelpText}"/>
 
-        <!-- "What it does, and why it's safe" opens the README at the repo
-             root via Hyperlink_Click, which routes through the unelevated
-             launcher (a plain Process.Start would open the browser as
-             Administrator). Top of the empty band under Check-for-updates.
-             Plain ToolTip = the grey default style; the accent tooltip is
-             reserved for the thanks buttons. -->
-        <TextBlock Grid.Row="8" VerticalAlignment="Top" Margin="0,10,0,0"
-                   Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}">
-            <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean"
-                       Click="Hyperlink_Click"
-                       Style="{StaticResource SubtleLink}"
-                       ToolTip="{loc:Translate Tooltip.ReadmeLink}"
-                       AutomationProperties.Name="{loc:Translate Action.ReadmeLink}"
-                       AutomationProperties.HelpText="{loc:Translate Automation.ReadmeLink.HelpText}"><Run Text="{loc:Translate Action.ReadmeLink}"/></Hyperlink>
-        </TextBlock>
-
         <!-- Section header above the Star + Buy-me-a-cuppa row. The
              resx value is already uppercased so screen readers don't
              see SmallCaps glyph mapping at all. Type.Heading.Sm +
