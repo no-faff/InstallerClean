@@ -137,13 +137,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         else if (e.PropertyName == nameof(CompletionViewModel.HasSentResultLog) &&
                  Completion.HasSentResultLog)
         {
-            // Persist the lifetime lock after a successful send, off the
-            // dispatcher: Load + rename can stall the UI on a OneDrive-redirected
-            // or roaming profile. Update serialises against the debounced
-            // MoveDestination save so neither write clobbers the other.
-            // Fire-and-forget and best-effort; a dropped save just shows the
-            // prompt one extra time next session, self-correcting on the next send.
-            _ = Task.Run(() => _settingsService.Update(s => s.HasSentResultLog = true));
+            // Persist the lifetime lock after a successful send. Update serialises
+            // against the debounced MoveDestination save (on a thread-pool thread)
+            // so neither write clobbers the other. Best-effort: a failed save just
+            // shows the prompt one extra time next session, self-correcting on the
+            // next successful send.
+            _settingsService.Update(s => s.HasSentResultLog = true);
         }
     }
 

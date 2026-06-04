@@ -278,6 +278,16 @@ public class MainViewModelTests
     private static readonly TimeSpan DebounceWait =
         CleanupViewModel.MoveDestinationSaveDelay + TimeSpan.FromMilliseconds(300);
 
+    // Applies a captured Update(Action<AppSettings>) to a fresh AppSettings so a
+    // Received().Update(...) assertion can check the action's effect: the writers
+    // now persist via ISettingsService.Update, not a TrySave of a prepared snapshot.
+    private static AppSettings Applied(Action<AppSettings> mutate)
+    {
+        var settings = new AppSettings();
+        mutate(settings);
+        return settings;
+    }
+
     [Fact]
     public async Task MoveDestination_change_is_persisted_through_settings_service()
     {
@@ -286,8 +296,8 @@ public class MainViewModelTests
         vm.Cleanup.MoveDestination = @"D:\Backup\Installer-cache";
         await Task.Delay(DebounceWait);
 
-        _settingsService.Received().TrySave(Arg.Is<AppSettings>(
-            s => s.MoveDestination == @"D:\Backup\Installer-cache"));
+        _settingsService.Received().Update(Arg.Is<Action<AppSettings>>(
+            a => Applied(a).MoveDestination == @"D:\Backup\Installer-cache"));
     }
 
     [Fact]
@@ -299,7 +309,7 @@ public class MainViewModelTests
         vm.Cleanup.MoveDestination = @"D:\Backup";
         await Task.Delay(DebounceWait);
 
-        _settingsService.DidNotReceive().TrySave(Arg.Any<AppSettings>());
+        _settingsService.DidNotReceive().Update(Arg.Any<Action<AppSettings>>());
     }
 
     [Fact]
@@ -716,7 +726,7 @@ public class MainViewModelTests
 
         await vm.Completion.SendResultLogCommand.ExecuteAsync(null);
 
-        _settingsService.Received().TrySave(Arg.Is<AppSettings>(s => s.HasSentResultLog));
+        _settingsService.Received().Update(Arg.Is<Action<AppSettings>>(a => Applied(a).HasSentResultLog));
     }
 
     [Fact]
@@ -731,7 +741,7 @@ public class MainViewModelTests
 
         await vm.Completion.SendResultLogCommand.ExecuteAsync(null);
 
-        _settingsService.DidNotReceive().TrySave(Arg.Is<AppSettings>(s => s.HasSentResultLog));
+        _settingsService.DidNotReceive().Update(Arg.Is<Action<AppSettings>>(a => Applied(a).HasSentResultLog));
     }
 
     [Fact]
@@ -745,7 +755,7 @@ public class MainViewModelTests
 
         _confirmationService.DidNotReceive().ConfirmSendResultLog(Arg.Any<string>());
         await _resultLogService.DidNotReceive().SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
-        _settingsService.DidNotReceive().TrySave(Arg.Is<AppSettings>(s => s.HasSentResultLog));
+        _settingsService.DidNotReceive().Update(Arg.Is<Action<AppSettings>>(a => Applied(a).HasSentResultLog));
     }
 
     [Fact]
