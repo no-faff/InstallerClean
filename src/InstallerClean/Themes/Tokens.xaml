@@ -13,7 +13,7 @@
 
     Naming: <category>.<role>[.<state>].
         Surface.*, Text.*, Action.<intent>.<state>, Status.*,
-        Decoration.*, Link.*, Selection.*, Scrollbar.*, Type.*,
+        Decoration.*, Link.*, Scrollbar.*, Type.*,
         Radius.*, Border.*, BorderThickness.*, Gap.*, GapBottom.*,
         GapRight.*, GapLeft.*, GapX.*.
 -->
@@ -25,9 +25,9 @@
         <ResourceDictionary Source="Primitives.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
-    <!-- Surfaces. The three layered backgrounds (window, sidebar-
-         level, card) plus the modal overlay tint. -->
-    <SolidColorBrush x:Key="Surface.AppBackground" Color="{StaticResource Primitive.Slate.950}"/>
+    <!-- Surfaces. Surface.Sidebar is the base window background and
+         Surface.Card the raised card surface; Surface.Overlay is the
+         modal dim tint. -->
     <SolidColorBrush x:Key="Surface.Sidebar"       Color="{StaticResource Primitive.Slate.800}"/>
     <SolidColorBrush x:Key="Surface.Card"          Color="{StaticResource Primitive.Slate.900}"/>
     <SolidColorBrush x:Key="Surface.Overlay"       Color="{StaticResource Primitive.Slate.950.Alpha50}"/>
@@ -42,7 +42,8 @@
     <!-- Actions. Each action role has Default / Hover / Pressed
          states. Buttons consume these via component styles in
          Components.xaml; raw window XAML reaches for them only for
-         one-offs (e.g. Selection.Background on a list item). -->
+         one-offs (e.g. a selected list row fills with
+         Action.Primary.Background). -->
 
     <!-- Primary: standard button (slate). -->
     <SolidColorBrush x:Key="Action.Primary.Background" Color="{StaticResource Primitive.Slate.700}"/>
@@ -94,8 +95,7 @@
     <SolidColorBrush x:Key="Link.Default" Color="{StaticResource Primitive.Indigo.400}"/>
     <SolidColorBrush x:Key="Link.Inline"  Color="{StaticResource Primitive.Indigo.400}"/>
 
-    <!-- Selection and scrollbar. -->
-    <SolidColorBrush x:Key="Selection.Background"   Color="{StaticResource Primitive.Violet.700}"/>
+    <!-- Scrollbar. -->
     <SolidColorBrush x:Key="Scrollbar.Thumb"        Color="{StaticResource Primitive.Slate.50.Alpha20}"/>
     <SolidColorBrush x:Key="Scrollbar.Thumb.Hover"  Color="{StaticResource Primitive.Slate.50.Alpha50}"/>
 
@@ -144,14 +144,9 @@
          a Thickness setter; the mismatched key raises a
          XamlParseException the first time the consuming template is
          realised at runtime. -->
-    <sys:Double x:Key="Border.None">0</sys:Double>
     <sys:Double x:Key="Border.Hairline">1</sys:Double>
-    <sys:Double x:Key="Border.Standard">2</sys:Double>
-    <sys:Double x:Key="Border.Heavy">4</sys:Double>
-    <Thickness x:Key="BorderThickness.None">0</Thickness>
     <Thickness x:Key="BorderThickness.Hairline">1</Thickness>
     <Thickness x:Key="BorderThickness.Standard">2</Thickness>
-    <Thickness x:Key="BorderThickness.Heavy">4</Thickness>
 
     <!-- Spacing. Thicknesses cover Margin/Padding sites. Directional
          (GapBottom, GapRight, GapLeft) for one-sided patterns;

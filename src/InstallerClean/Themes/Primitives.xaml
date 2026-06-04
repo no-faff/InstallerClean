@@ -33,7 +33,6 @@
     <Color x:Key="Primitive.Slate.700">#334155</Color>
     <Color x:Key="Primitive.Slate.800">#1e293b</Color>
     <Color x:Key="Primitive.Slate.900">#0f172a</Color>
-    <Color x:Key="Primitive.Slate.950">#020617</Color>
 
     <!-- Custom slate steps used for hover/pressed states on Primary
          buttons. Sit between Slate.700 and Slate.800; not on the
@@ -47,13 +46,9 @@
 
     <!-- Indigo ramp. Accent, CTA, links. -->
     <Color x:Key="Primitive.Indigo.400">#818cf8</Color>
-    <Color x:Key="Primitive.Indigo.400.Alpha66">#A8818cf8</Color>
     <Color x:Key="Primitive.Indigo.600">#4f46e5</Color>
     <Color x:Key="Primitive.Indigo.700">#443cc7</Color>
     <Color x:Key="Primitive.Indigo.800">#3b34af</Color>
-
-    <!-- Violet. One step only, used for the selection accent. -->
-    <Color x:Key="Primitive.Violet.700">#6d28d9</Color>
 
     <!-- Red ramp. Destructive actions and the close-window caption. -->
     <Color x:Key="Primitive.Red.500">#ef4444</Color>

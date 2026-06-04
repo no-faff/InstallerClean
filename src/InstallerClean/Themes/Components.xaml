@@ -65,7 +65,7 @@
     <!-- Focus visuals. Three sizes match the three pill heights
          (40 / 30 / 28). The default focus visual at the bottom of
          this file applies to anything else that takes focus
-         (LinkButton, Hyperlink, plain Button) so keyboard navigation
+         (a Hyperlink or plain Button) so keyboard navigation
          stays visible everywhere. -->
     <Style x:Key="PillFocusVisual">
         <Setter Property="Control.Template">
@@ -450,37 +450,9 @@
         </Setter>
     </Style>
 
-    <!-- Links. LinkButton is the stand-alone link control (e.g.
-         "Details..." actions). SubtleLink is an in-body Hyperlink
-         that brightens to full Link colour on hover so it does not
-         shout when sat in a paragraph. -->
-
-    <Style x:Key="LinkButton" TargetType="Button">
-        <Setter Property="Foreground" Value="{StaticResource Link.Default}"/>
-        <Setter Property="FontSize" Value="{StaticResource Type.Heading.Sm}"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <TextBlock x:Name="Tx" Text="{TemplateBinding Content}"
-                               Foreground="{TemplateBinding Foreground}"
-                               FontSize="{TemplateBinding FontSize}"
-                               VerticalAlignment="Center"/>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Tx" Property="TextDecorations" Value="Underline"/>
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Tx" Property="TextDecorations" Value="Underline"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Tx" Property="Opacity" Value="0.5"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+    <!-- Links. SubtleLink is an in-body Hyperlink that brightens to
+         full Link colour on hover so it does not shout when sat in a
+         paragraph. -->
 
     <Style x:Key="SubtleLink" TargetType="Hyperlink">
         <Setter Property="Foreground" Value="{StaticResource Link.Inline}"/>
@@ -738,9 +710,9 @@
     </Style>
 
     <!-- Default focus visual. Catches anything that takes focus but
-         has no FocusVisualStyle override (plain Buttons, LinkButtons,
-         Hyperlinks). Pill buttons opt out via their own *FocusVisual
-         styles above. -->
+         has no FocusVisualStyle override (plain Buttons, Hyperlinks).
+         Pill buttons opt out via their own *FocusVisual styles
+         above. -->
     <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
         <Setter Property="Control.Template">
             <Setter.Value>
