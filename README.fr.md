@@ -23,7 +23,7 @@
 
 - **En bref :** Trouve et supprime les fichiers inutiles dans `C:\Windows\Installer`, le dossier caché que Windows ne nettoie jamais.
 - **Combien d'espace :** Ça dépend de vos logiciels. Sur ma machine, c'était presque 1 Go. Un utilisateur d'InstallerClean a [rapporté](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 Go. Avec Adobe Acrobat installé, ça peut dépasser 100 Go. Ça peut aussi être nul. L'idée, c'est que c'est rapide et gratuit ; tout ce qui peut être supprimé le sera.
-- **Est-ce sûr :** Oui. Ne supprime que les fichiers que Windows lui-même déclare inutiles. La suppression envoie à la Corbeille. Le déplacement vous permet de garder les fichiers ailleurs en lieu sûr.
+- **Est-ce sûr :** Oui. Ne supprime que les fichiers que Windows lui-même déclare inutiles. La suppression envoie les fichiers à la Corbeille (ou, si la Corbeille n'est pas disponible pour le lecteur, vous laisse choisir Déplacer, suppression définitive ou annuler, elle ne supprime jamais définitivement sans demander). Le déplacement vous permet de garder les fichiers ailleurs en lieu sûr.
 - **Comment l'avoir :** [Téléchargez la dernière version](../../releases/latest), lancez-la, c'est tout.
 
 ---
@@ -65,9 +65,9 @@ InstallerClean détecte les correctifs remplacés par des mises à jour plus ré
 1. **Analyse** `C:\Windows\Installer` à la recherche de fichiers `.msi` et `.msp`
 2. **Interroge** l'API Windows Installer pour identifier les fichiers encore enregistrés
 3. **Affiche** ce qui est utile et ce qui ne l'est pas, avec les tailles
-4. **Supprime** les fichiers inutiles : envoi à la Corbeille, ou déplacement vers un dossier de votre choix
+4. **Supprime** les fichiers inutiles : envoi à la Corbeille (si elle n'est pas disponible pour le lecteur, l'application demande avant toute suppression définitive), ou déplacement vers un dossier de votre choix
 
-Aucune activité réseau automatique. Deux boutons opt-in déclenchent un seul appel HTTPS sur clic : **Vérifier les mises à jour** dans À propos, et **Envoyer le résultat** sur l'écran de fin. Voir [Ce qu'il ne fait pas](#ce-quil-ne-fait-pas) plus bas pour le détail.
+Aucune activité réseau automatique. Deux boutons opt-in déclenchent un seul appel HTTPS sur clic : **Vérifier les mises à jour** dans À propos, et **Envoyer le résumé** sur l'écran de fin. Voir [Ce qu'il ne fait pas](#ce-quil-ne-fait-pas) plus bas pour le détail.
 
 ## Captures d'écran
 
@@ -137,7 +137,7 @@ Après un Déplacement ou une Suppression, les sous-dossiers vides à l'intérie
 
 Oui. InstallerClean interroge la même base que Windows utilise lui-même pour suivre ce qui est installé. Si Windows indique qu'un fichier n'est plus nécessaire, l'application le croit ; elle ne devine pas à partir des noms de fichiers ou des dates.
 
-**Dans l'application.** La suppression envoie les fichiers à la Corbeille. Le déplacement les met dans un dossier de votre choix. Dans les deux cas, les fichiers peuvent être restaurés en cas de problème. Rien n'est touché tant que vous ne confirmez pas. Si Windows Installer est en train d'écrire dans le cache, a une transaction précédente suspendue, ou a un renommage post-redémarrage en attente ciblant le cache, Déplacer et Supprimer sont désactivés et la raison précise est affichée. Les services de scan, requête, déplacement, suppression, réglages et redémarrage en attente sont couverts par une suite de tests automatisés qui s'exécute à chaque commit (voir le badge CI ci-dessus).
+**Dans l'application.** La suppression envoie les fichiers à la Corbeille. Si la Corbeille n'est pas disponible pour ce lecteur (désactivée pour le lecteur, ou pleine ou endommagée), InstallerClean ne supprime pas les fichiers pour de bon en silence. Il s'arrête et vous laisse choisir : les déplacer ailleurs en lieu sûr, les supprimer définitivement ou annuler. Les fichiers ne sont supprimés définitivement que si vous le choisissez explicitement. Le déplacement est l'option encore plus sûre : il met les fichiers dans un dossier de votre choix, pour que vous puissiez les garder jusqu'à être certain que rien n'a cassé. Rien n'est touché tant que vous ne confirmez pas. Si Windows Installer est en train d'écrire dans le cache, a une transaction précédente suspendue ou a un renommage post-redémarrage en attente ciblant le cache, Déplacer et Supprimer sont désactivés et la raison précise est affichée. Les services de scan, requête, déplacement, suppression, réglages et redémarrage en attente sont couverts par une suite de tests automatisés qui s'exécute à chaque commit (voir le badge CI ci-dessus).
 
 **Vérifier le binaire.** InstallerClean n'est pas signé numériquement. Les certificats de signature de code coûtent de l'argent chaque année, et je préfère garder le projet gratuit, ouvert et financé par les dons.
 
@@ -199,7 +199,7 @@ Rien de tout cela ne peut arriver à cause d'InstallerClean. Il ne supprime jama
 
 **Pourquoi a-t-il besoin des droits Administrateur ?** `C:\Windows\Installer` appartient à SYSTEM et son accès est restreint aux administrateurs. Toutes ces opérations (lire le dossier, interroger l'API Windows Installer, déplacer ou supprimer des fichiers) nécessitent une élévation. Il n'existe pas de chemin en mode utilisateur.
 
-**Puis-je annuler une suppression ?** Oui. La suppression envoie les fichiers à la Corbeille. Restaurez-les depuis là. Si vous avez vidé la Corbeille, les fichiers sont perdus, mais vous pouvez utiliser Déplacer pour les mettre dans un dossier de votre choix, vérifier que rien ne casse, puis les supprimer de là.
+**Puis-je annuler une suppression ?** En général, oui. Quand la Corbeille est disponible pour le lecteur, la suppression y envoie les fichiers et vous pouvez les restaurer depuis la Corbeille. Si elle n'est pas disponible, l'application ne supprime jamais pour de bon d'elle-même ; elle propose Déplacer ou une suppression définitive que vous confirmez. Dans tous les cas, pour un filet de sécurité que vous maîtrisez, utilisez Déplacer pour mettre les fichiers dans un dossier de votre choix et vérifiez que rien ne casse avant de les supprimer de là.
 
 **Windows va-t-il se plaindre si je supprime ces fichiers ?** Non. InstallerClean ne supprime jamais que les fichiers dont Windows a fini de se servir, donc rien de ce qu'il supprime n'est requis pour réparer, mettre à jour ou désinstaller un programme. Si un fichier nécessaire venait malgré tout à disparaître de `C:\Windows\Installer` par un autre moyen, voir [Si un fichier nécessaire vient à manquer](#si-un-fichier-nécessaire-vient-à-manquer).
 
@@ -265,9 +265,9 @@ Utilisation :
 
 Pour lancer l'interface graphique, exécutez `InstallerClean.exe` (ou utilisez le raccourci du menu Démarrer si vous avez utilisé l'installeur setup).
 
-`/s` est un essai à blanc : il analyse, liste ce qui serait supprimé avec noms de fichiers et tailles, puis quitte. Utile pour auditer avant nettoyage. Le code de sortie est toujours 0. Tous les fichiers se trouvent dans `C:\Windows\Installer`.
+`/s` est un essai à blanc : il analyse, liste ce qui serait supprimé avec noms de fichiers et tailles, puis quitte. Utile pour auditer avant nettoyage. Le code de sortie est `0` si l'analyse réussit, `1` si elle échoue et `130` en cas de Ctrl+C. Tous les fichiers se trouvent dans `C:\Windows\Installer`.
 
-`/d` et `/m` analysent puis agissent. `/d` envoie les fichiers supprimables à la Corbeille. `/m` les déplace vers un dossier (soit celui spécifié sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Codes de sortie : `0` succès complet, `2` partiel (certains fichiers réussis, certains échoués), `1` échec total (analyse échouée, mauvais arguments, ou tous les fichiers du lot ont échoué), `75` conditions transitoires (une autre instance d'InstallerClean est en cours, ou Windows Installer signale une transaction en attente ; réessai sans risque), `130` Ctrl+C.
+`/d` et `/m` analysent puis agissent. `/d` envoie les fichiers supprimables à la Corbeille. `/m` les déplace vers un dossier (soit celui spécifié sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Codes de sortie : `0` succès complet, `2` partiel (certains fichiers réussis, certains échoués), `1` échec total (analyse échouée, mauvais arguments ou tous les fichiers du lot ont échoué), `75` une condition transitoire a bloqué l'exécution (le message affiché précise laquelle et si un nouvel essai aidera), `130` Ctrl+C.
 
 Les trois nécessitent une invite de commandes élevée (administrateur). Si la stratégie de groupe bloque l'invite d'élévation UAC, le processus refuse de démarrer et Windows renvoie l'erreur 740 à l'invite parente (`$LASTEXITCODE = 740` en PowerShell). `taskkill /pid <pid>` ne déclenche pas d'annulation propre ; le mutex d'instance unique est récupéré au prochain lancement via le chemin AbandonedMutexException.
 

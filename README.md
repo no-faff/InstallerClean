@@ -18,14 +18,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/github/v/release/no-faff/InstallerClean" alt="GitHub Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total" alt="Total downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=300" alt="Total downloads"></a>
 </p>
 
 ![Screenshot of InstallerClean after a successful clean-up: 965 MB freed, 68 files deleted](docs/screenshots/04d-deleted-freed-success.webp)
 
 - **What:** Finds and removes unneeded files from `C:\Windows\Installer`, the hidden folder Windows never cleans up.
 - **How much space:** Depends on your software. On my machine it was just shy of 1 GB. An InstallerClean user [reported](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. With Adobe Acrobat it can pass 100 GB. It could be nothing at all. The point is that it's quick and costs nothing; whatever can be removed will be gone.
-- **Is it safe:** Yes. Only removes files Windows itself says it no longer needs. Delete sends to the Recycle Bin. Move lets you keep them somewhere safe.
+- **Is it safe:** Yes. Only removes files Windows itself says it no longer needs. Delete sends files to the Recycle Bin (or, if the bin isn't available for the drive, lets you choose Move, permanent delete or cancel, it never deletes permanently without asking). Move lets you keep them somewhere safe.
 - **Get it:** [Download the latest release](../../releases/latest), run it, done.
 
 ---
@@ -67,9 +67,9 @@ InstallerClean detects which patches have been superseded by newer updates and f
 1. **Scans** `C:\Windows\Installer` for `.msi` and `.msp` files
 2. **Queries** the Windows Installer API to find which files are still registered
 3. **Shows** what's needed and what's not, with sizes
-4. **Removes** the unneeded files: delete to the Recycle Bin, or move to a folder you choose
+4. **Removes** the unneeded files: delete to the Recycle Bin (if it isn't available for the drive, the app asks before any permanent delete), or move to a folder you choose
 
-No automatic network activity. Two opt-in buttons make a single HTTPS call when clicked: **Check for updates** in About, and **Send result** on the completion screen. See [What it doesn't do](#what-it-doesnt-do) below for the full detail.
+No automatic network activity. Two opt-in buttons make a single HTTPS call when clicked: **Check for updates** in About, and **Send summary** on the completion screen. See [What it doesn't do](#what-it-doesnt-do) below for the full detail.
 
 ## Screenshots
 
@@ -132,7 +132,7 @@ After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer`
 
 Yes. InstallerClean queries the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, the app trusts it; it doesn't guess based on filenames or dates.
 
-**In the app.** Delete sends files to the Recycle Bin. Move puts them in a folder you choose. Either way the files can be restored if anything breaks. Nothing is touched until you confirm. If Windows Installer is currently writing to the cache, has a previous transaction suspended, or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown. The scan, query, move, delete, settings and pending-reboot services are covered by an automated test suite that runs on every commit (see the CI badge above).
+**In the app.** Delete sends files to the Recycle Bin. If the Recycle Bin isn't available for that drive (it's been turned off for the drive, or it's full or damaged), InstallerClean doesn't quietly delete the files for good. It stops and lets you choose: move them somewhere safe instead, delete them permanently or cancel. Files are only ever permanently deleted if you explicitly choose that. Move is the extra-safe option: it puts the files in a folder you choose, so you can keep them until you're sure nothing's gone wrong. Nothing is touched until you confirm. If Windows Installer is currently writing to the cache, has a previous transaction suspended or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown. The scan, query, move, delete, settings and pending-reboot services are covered by an automated test suite that runs on every commit (see the CI badge above).
 
 **Verifying the binary.** InstallerClean is unsigned. Code-signing certificates cost money annually and I'd rather keep the project free, open and donations-funded.
 
@@ -233,15 +233,15 @@ Across the 64 reports people have been kind enough to send in (thanks 🙏) sinc
 | Freed space | 33% | 0.2 GB | 20 GB | 327 GB |
 <!-- reports-stats-end -->
 
-**Why does it want Administrator?** `C:\Windows\Installer` is owned by SYSTEM and locked down to admins only. Reading the folder, writing to the Installer-database query API, and moving or deleting files all require elevation. There's no user-mode path.
+**Why does it want Administrator?** `C:\Windows\Installer` is owned by SYSTEM and locked down to admins only. Reading the folder, writing to the Installer-database query API and moving or deleting files all require elevation. There's no user-mode path.
 
-**Can I undo a Delete?** Yes. Delete sends files to the Recycle Bin. Restore them from there. If you emptied the Recycle Bin, the files are gone, but you can instead use Move to put them in a folder you choose, then verify nothing breaks before deleting from there.
+**Can I undo a Delete?** Usually, yes. When the Recycle Bin is available for the drive, Delete sends files there and you can restore them from the bin. If the bin isn't available, the app never deletes for good on its own; it offers Move or a permanent delete you confirm. Either way, for a safety net you control, use Move to put the files in a folder you choose and verify nothing breaks before deleting from there.
 
 **Will Windows complain if I remove these files?** No. InstallerClean only ever removes the files Windows itself reports as finished with, so nothing it removes is needed to repair, update or uninstall a program. If a needed file does go missing from `C:\Windows\Installer` by some other means, see [If a needed file goes missing](#if-a-needed-file-goes-missing).
 
 **Why no `Win32_Product` (WMI)?** [`Win32_Product` triggers MSI repair operations on every product during enumeration](https://gregramsey.net/2012/02/20/win32_product-is-evil/), which can take minutes and load the disk hard. InstallerClean calls the Windows Installer COM API directly with no side effects.
 
-**Why not just a PowerShell script?** A short script that calls `MsiEnumPatchesEx` is enough to *list* patches, but the load-bearing parts of InstallerClean are the bits a script glosses over: the orphan-vs-superseded classification, the registry fallback that only ever adds files to the "still needed" set (never to "removable"), the pending-reboot block, the Move-to-elsewhere safety net, the per-file progress with cancellation, and the Recycle-Bin-not-permanent-delete default. Edge cases on real heavy-MSI machines (corrupt registrations, junctions inside the cache, products in `HKU\.DEFAULT`, suspended Installer transactions) are easy to mishandle in a one-off script. The `installerclean-cli` is the headless face if scripting is what you want.
+**Why not just a PowerShell script?** A short script that calls `MsiEnumPatchesEx` is enough to *list* patches, but the load-bearing parts of InstallerClean are the bits a script glosses over: the orphan-vs-superseded classification, the registry fallback that only ever adds files to the "still needed" set (never to "removable"), the pending-reboot block, the Move-to-elsewhere safety net, the per-file progress with cancellation and the Recycle-Bin-not-permanent-delete default. Edge cases on real heavy-MSI machines (corrupt registrations, junctions inside the cache, products in `HKU\.DEFAULT`, suspended Installer transactions) are easy to mishandle in a one-off script. The `installerclean-cli` is the headless face if scripting is what you want.
 
 **Does it work on Windows 7 or 8?** Untested and not supported. Targets Windows 10 and 11.
 
@@ -301,9 +301,9 @@ Usage:
 
 To launch the GUI, run `InstallerClean.exe` (or use the Start-menu shortcut from the setup install).
 
-`/s` is a dry run: it scans, lists what it would remove with filenames and sizes, then exits. Useful for auditing before cleanup. Exit code is always 0. All files are in `C:\Windows\Installer`.
+`/s` is a dry run: it scans, lists what it would remove with filenames and sizes, then exits. Useful for auditing before cleanup. Exit code is `0` on a successful scan, `1` if the scan fails and `130` on Ctrl+C. All files are in `C:\Windows\Installer`.
 
-`/d` and `/m` scan and then act. `/d` sends removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments, or every file in the batch failed), `75` for transient conditions (another InstallerClean instance is running, or Windows Installer reports a pending transaction; safe to retry), `130` for Ctrl+C.
+`/d` and `/m` scan and then act. `/d` sends removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments or every file in the batch failed), `75` for a transient condition that blocked the run (the printed message explains which and whether a retry will help), `130` for Ctrl+C.
 
 All three require an elevated (administrator) command prompt. If Group Policy blocks the UAC elevation prompt the process refuses to start and Windows returns error 740 to the parent shell (`$LASTEXITCODE = 740` in PowerShell). `taskkill /pid <pid>` does not fire a graceful cancel; the single-instance mutex is recovered by the next run via the AbandonedMutexException path.
 

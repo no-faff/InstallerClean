@@ -16,14 +16,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/github/v/release/no-faff/InstallerClean" alt="Versión de GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total" alt="Descargas totales"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=300" alt="Descargas totales"></a>
 </p>
 
 ![Captura de pantalla de InstallerClean tras una limpieza exitosa: 965 MB liberados, 68 archivos eliminados](docs/screenshots/04d-deleted-freed-success.webp)
 
 - **Qué hace:** Encuentra y elimina archivos innecesarios de `C:\Windows\Installer`, la carpeta oculta que Windows nunca limpia.
 - **Cuánto espacio:** Depende de tu software. En mi equipo fue casi 1 GB. Un usuario de InstallerClean [reportó](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. Con Adobe Acrobat puede superar los 100 GB. Podría ser nada en absoluto. La cuestión es que es rápido y no cuesta nada; todo lo que se pueda eliminar, se eliminará.
-- **¿Es seguro?:** Sí. Solo elimina los archivos que el propio Windows declara como innecesarios. Eliminar los manda a la Papelera de reciclaje. Mover te permite guardarlos en un lugar seguro.
+- **¿Es seguro?:** Sí. Solo elimina los archivos que el propio Windows declara como innecesarios. Eliminar los manda a la Papelera de reciclaje (o, si la Papelera no está disponible para la unidad, te deja elegir Mover, borrado permanente o cancelar, nunca borra de forma permanente sin preguntar). Mover te permite guardarlos en un lugar seguro.
 - **Cómo obtenerlo:** [Descarga la última versión](../../releases/latest), ejecútala, listo.
 
 ---
@@ -65,9 +65,9 @@ InstallerClean detecta qué parches han sido sustituidos por actualizaciones má
 1. **Analiza** `C:\Windows\Installer` en busca de archivos `.msi` y `.msp`
 2. **Consulta** la API de Windows Installer para identificar qué archivos siguen registrados
 3. **Muestra** lo que hace falta y lo que no, con sus tamaños
-4. **Elimina** los archivos innecesarios: envía a la Papelera de reciclaje, o mueve a una carpeta que tú elijas
+4. **Elimina** los archivos innecesarios: envía a la Papelera de reciclaje (si no está disponible para la unidad, la aplicación pregunta antes de cualquier borrado permanente), o mueve a una carpeta que tú elijas
 
-Sin actividad de red automática. Dos botones opt-in hacen una sola llamada HTTPS al pulsarlos: **Buscar actualizaciones** en Acerca de, y **Enviar resultado** en la pantalla final. Más detalles en [Lo que no hace](#lo-que-no-hace) más abajo.
+Sin actividad de red automática. Dos botones opt-in hacen una sola llamada HTTPS al pulsarlos: **Buscar actualizaciones** en Acerca de, y **Enviar resumen** en la pantalla final. Más detalles en [Lo que no hace](#lo-que-no-hace) más abajo.
 
 ## Capturas de pantalla
 
@@ -137,7 +137,7 @@ Después de completar un Mover o un Eliminar, las subcarpetas vacías dentro de 
 
 Sí. InstallerClean consulta la misma base de datos que el propio Windows usa para llevar el control de lo que está instalado. Si Windows dice que un archivo ya no hace falta, la aplicación se fía; no adivina a partir de nombres de archivo ni fechas.
 
-**Dentro de la aplicación.** Eliminar envía los archivos a la Papelera de reciclaje. Mover los coloca en una carpeta que tú elijas. En ambos casos los archivos pueden restaurarse si algo se rompe. Nada se toca hasta que confirmas. Si Windows Installer está escribiendo en la caché en ese momento, tiene una transacción anterior suspendida, o tiene un renombrado post-reinicio pendiente que apunta a la caché, Mover y Eliminar quedan desactivados y se muestra el motivo concreto. Los servicios de escaneo, consulta, movimiento, borrado, configuración y reinicio pendiente están cubiertos por una suite automatizada de pruebas que se ejecuta en cada commit (mira el badge de CI más arriba).
+**Dentro de la aplicación.** Eliminar envía los archivos a la Papelera de reciclaje. Si la Papelera no está disponible para esa unidad (desactivada para la unidad, o llena o dañada), InstallerClean no borra los archivos para siempre en silencio. Se detiene y te deja elegir: moverlos a un lugar seguro, borrarlos de forma permanente o cancelar. Los archivos solo se borran de forma permanente si lo eliges explícitamente. Mover es la opción aún más segura: coloca los archivos en una carpeta que tú elijas, para que puedas conservarlos hasta estar seguro de que nada se ha roto. Nada se toca hasta que confirmas. Si Windows Installer está escribiendo en la caché en ese momento, tiene una transacción anterior suspendida o tiene un renombrado post-reinicio pendiente que apunta a la caché, Mover y Eliminar quedan desactivados y se muestra el motivo concreto. Los servicios de escaneo, consulta, movimiento, borrado, configuración y reinicio pendiente están cubiertos por una suite automatizada de pruebas que se ejecuta en cada commit (mira el badge de CI más arriba).
 
 **Verificación del binario.** InstallerClean no está firmado. Los certificados de firma de código cuestan dinero todos los años y prefiero mantener el proyecto gratuito, abierto y financiado por donaciones.
 
@@ -199,7 +199,7 @@ Nada de esto puede ocurrir por culpa de InstallerClean. Solo elimina archivos qu
 
 **¿Por qué pide Administrador?** `C:\Windows\Installer` es propiedad de SYSTEM y está restringido solo a administradores. Leer la carpeta, consultar la API de la base del Installer, y mover o eliminar archivos requieren elevación. No hay vía en modo usuario.
 
-**¿Puedo deshacer una eliminación?** Sí. Eliminar envía los archivos a la Papelera de reciclaje. Restáuralos desde ahí. Si vaciaste la Papelera, los archivos se han perdido, pero puedes usar Mover en su lugar para colocarlos en una carpeta a tu elección, verificar que nada se rompa, y borrarlos desde ahí.
+**¿Puedo deshacer una eliminación?** Normalmente, sí. Cuando la Papelera está disponible para la unidad, Eliminar envía los archivos ahí y puedes restaurarlos desde la Papelera. Si no está disponible, la aplicación nunca borra para siempre por su cuenta; ofrece Mover o un borrado permanente que confirmas. En cualquier caso, para una red de seguridad que tú controlas, usa Mover para colocar los archivos en una carpeta a tu elección y verifica que nada se rompa antes de borrarlos desde ahí.
 
 **¿Va a quejarse Windows si quito estos archivos?** No. InstallerClean solo elimina los archivos que el propio Windows da por terminados, así que nada de lo que elimina hace falta para reparar, actualizar o desinstalar un programa. Si un archivo necesario llega a desaparecer de `C:\Windows\Installer` por algún otro medio, consulta [Si falta un archivo necesario](#si-falta-un-archivo-necesario).
 
@@ -265,9 +265,9 @@ Uso:
 
 Para abrir la interfaz gráfica, ejecuta `InstallerClean.exe` (o usa el acceso directo del menú Inicio si lo instalaste con el setup).
 
-`/s` es una ejecución en seco: escanea, lista lo que eliminaría con nombres y tamaños, y sale. Útil para auditar antes de limpiar. El código de salida siempre es 0. Todos los archivos están en `C:\Windows\Installer`.
+`/s` es una ejecución en seco: escanea, lista lo que eliminaría con nombres y tamaños, y sale. Útil para auditar antes de limpiar. El código de salida es `0` si el escaneo tiene éxito, `1` si falla y `130` con Ctrl+C. Todos los archivos están en `C:\Windows\Installer`.
 
-`/d` y `/m` escanean y luego actúan. `/d` envía los archivos eliminables a la Papelera de reciclaje. `/m` los mueve a una carpeta (la que especifiques en la línea de comandos, o la guardada por defecto desde la interfaz gráfica). Códigos de salida: `0` éxito completo, `2` parcial (algunos archivos correctos, algunos fallidos), `1` fallo total (escaneo fallido, argumentos incorrectos, o todos los archivos del lote han fallado), `75` condiciones transitorias (otra instancia de InstallerClean está en ejecución, o Windows Installer reporta una transacción pendiente; es seguro reintentar), `130` Ctrl+C.
+`/d` y `/m` escanean y luego actúan. `/d` envía los archivos eliminables a la Papelera de reciclaje. `/m` los mueve a una carpeta (la que especifiques en la línea de comandos, o la guardada por defecto desde la interfaz gráfica). Códigos de salida: `0` éxito completo, `2` parcial (algunos archivos correctos, algunos fallidos), `1` fallo total (escaneo fallido, argumentos incorrectos o todos los archivos del lote han fallado), `75` una condición transitoria bloqueó la ejecución (el mensaje mostrado indica cuál y si reintentar ayudará), `130` Ctrl+C.
 
 Las tres requieren un símbolo del sistema elevado (administrador).
 
