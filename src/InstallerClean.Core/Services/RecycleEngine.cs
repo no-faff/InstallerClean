@@ -30,9 +30,14 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
     private static readonly StrategyBasedComWrappers s_cw = new();
 
     private readonly object _gate = new();
-    private BlockingCollection<Action>? _work;
-    private Thread? _sta;
-    private bool _disposed;
+    // volatile: read outside _gate by EnsureStarted's lock-free fast path and
+    // Run's disposed check. The release/acquire pairing publishes a
+    // fully-constructed BlockingCollection on a weakly-ordered target
+    // (Windows-on-ARM64) and makes a post-Dispose _disposed write visible to a
+    // racing Run.
+    private volatile BlockingCollection<Action>? _work;
+    private volatile Thread? _sta;
+    private volatile bool _disposed;
 
     private void EnsureStarted()
     {
@@ -80,6 +85,12 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
 
     private T Run<T>(Func<T> func)
     {
+        // Dispose does not null _work, so EnsureStarted's fast path would return
+        // on a disposed engine and the Add below would throw
+        // InvalidOperationException ("marked as complete"). Fail with the expected
+        // ObjectDisposedException instead; DeleteFilesService already degrades a
+        // recycle fault to the RecycleUnavailable / per-file-error path.
+        ObjectDisposedException.ThrowIf(_disposed, this);
         EnsureStarted();
         var tcs = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
         _work!.Add(() =>
