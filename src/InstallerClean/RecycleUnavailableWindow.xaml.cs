@@ -28,6 +28,11 @@ public partial class RecycleUnavailableWindow : Window
             Strings.RecycleUnavailable_Reassurance_Plural);
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
+        // Open with focus on Cancel (IsDefault/IsCancel, the safe
+        // default) so a keyboard user gets a visible focus ring at once
+        // and a reflexive Space cannot trigger a permanent delete.
+        // Deferred to Loaded so the visual tree exists when Focus runs.
+        Loaded += (_, _) => CancelButton.Focus();
     }
 
     private void OnMove(object sender, RoutedEventArgs e)

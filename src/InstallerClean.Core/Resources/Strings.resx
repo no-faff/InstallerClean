@@ -165,6 +165,7 @@
   <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all unused installer files to the Recycle Bin</value></data>
   <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Confirm sending the unused files to the Recycle Bin</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>Confirm moving the unused files to the chosen destination folder</value></data>
+  <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Choose how to handle the unused files: move them somewhere safe, delete them permanently or cancel.</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Move the unused files to a folder you choose</value></data>
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Delete the unused files permanently because the Recycle Bin is unavailable for this drive</value></data>
   <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending.</value></data>

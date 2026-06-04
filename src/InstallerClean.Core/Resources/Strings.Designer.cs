@@ -81,6 +81,7 @@ public static class Strings
     public static string Automation_MoveAllFiles => Get("Automation.MoveAllFiles");
     public static string Automation_MoveDestinationFolder => Get("Automation.MoveDestinationFolder");
     public static string Automation_OperationProgress => Get("Automation.OperationProgress");
+    public static string Automation_RecycleUnavailable => Get("Automation.RecycleUnavailable");
     public static string Automation_RecycleUnavailableDeletePermanently => Get("Automation.RecycleUnavailableDeletePermanently");
     public static string Automation_RecycleUnavailableMove => Get("Automation.RecycleUnavailableMove");
     public static string Automation_RescanInstaller => Get("Automation.RescanInstaller");

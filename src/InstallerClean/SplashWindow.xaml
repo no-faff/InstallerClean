@@ -31,7 +31,8 @@
             <Image Grid.Row="1" Source="Assets/splash-icon.png"
                    Width="96" Height="96"
                    HorizontalAlignment="Center"
-                   RenderOptions.BitmapScalingMode="HighQuality"/>
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   AutomationProperties.Name=""/>
 
             <!-- App name -->
             <TextBlock Grid.Row="3" Text="{loc:Translate Window.Main.Title}"

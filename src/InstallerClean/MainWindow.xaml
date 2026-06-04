@@ -505,21 +505,24 @@
                     <Image Source="Assets/splash-icon.png"
                            Width="64" Height="64" HorizontalAlignment="Center"
                            RenderOptions.BitmapScalingMode="HighQuality"
-                           Margin="{StaticResource GapBottom.Lg}"/>
+                           Margin="{StaticResource GapBottom.Lg}"
+                           AutomationProperties.Name=""/>
 
                     <!-- Heading -->
-                    <TextBlock Text="{Binding Completion.Heading}"
+                    <TextBlock x:Name="CompletionHeadingText" Text="{Binding Completion.Heading}"
                                Foreground="{StaticResource Status.Success}" FontSize="{StaticResource Type.Heading.Lg}" FontWeight="Bold"
-                               HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Sm}"/>
+                               HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Sm}"
+                               AutomationProperties.LiveSetting="Polite"/>
 
                     <!-- 6px bottom (off the 8/12/16/24 scale) tightens
                          the summary heading against the restore-hint
                          caption that follows; the standard GapBottom.Sm
                          (8) loosens the heading/caption pairing visibly. -->
-                    <TextBlock Text="{Binding Completion.Summary}"
+                    <TextBlock x:Name="CompletionSummaryText" Text="{Binding Completion.Summary}"
                                Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Heading.Sm}"
                                HorizontalAlignment="Center" TextAlignment="Center"
-                               TextWrapping="Wrap" Margin="0,0,0,6"/>
+                               TextWrapping="Wrap" Margin="0,0,0,6"
+                               AutomationProperties.LiveSetting="Polite"/>
 
                     <!-- Restore guidance. Collapses when empty so the
                          all-clear overlay (which has no restore hint)

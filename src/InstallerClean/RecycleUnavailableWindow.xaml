@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         Title="{loc:Translate Window.RecycleUnavailable.Title}"
+        AutomationProperties.HelpText="{loc:Translate Automation.RecycleUnavailable}"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent"
         ShowInTaskbar="False"
@@ -44,7 +45,7 @@
                      it is the recommended safe path, but it is not the
                      keyboard default: an affirmative requires an explicit
                      pointer or Tab+Space. -->
-                <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
+                <Button x:Name="CancelButton" Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True" IsDefault="True"
                         Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource DangerPill}" Content="{loc:Translate Action.DeletePermanently}"

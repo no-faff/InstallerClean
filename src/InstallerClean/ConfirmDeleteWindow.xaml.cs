@@ -30,6 +30,11 @@ public partial class ConfirmDeleteWindow : Window
 
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
+        // Open with focus on Cancel (IsDefault/IsCancel, the safe
+        // default) so a keyboard user gets a visible focus ring at once
+        // and a reflexive Space cannot delete. Deferred to Loaded so the
+        // visual tree exists when Focus runs.
+        Loaded += (_, _) => CancelButton.Focus();
     }
 
     private void OnDelete(object sender, RoutedEventArgs e)

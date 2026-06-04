@@ -55,7 +55,22 @@ public partial class MainWindow : Window
     private void OnCompletionPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(CompletionViewModel.IsComplete) && _vm.Completion.IsComplete)
+        {
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
+            // Focus lands on Done, so without an explicit raise a screen
+            // reader announces only the button and never the outcome. The
+            // heading and summary are plain TextBlocks revealed from
+            // Visibility=Collapsed, which the WPF UIA bridge does not
+            // re-announce on its own (the same gap the banners work
+            // around). Raise LiveRegionChanged on both once the reveal
+            // has settled; Loaded priority runs after the binding and
+            // visibility update so the peers carry the final text.
+            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () =>
+            {
+                RaiseLiveRegionChanged(CompletionHeadingText);
+                RaiseLiveRegionChanged(CompletionSummaryText);
+            });
+        }
 
         // ResultLogStatusMessage transitions empty -> non-empty on the
         // first "Sending..." reveal. WPF's UIA bridge does not re-fire
