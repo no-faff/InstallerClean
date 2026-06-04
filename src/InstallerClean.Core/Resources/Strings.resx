@@ -22,6 +22,7 @@
       FilePicker.*           folder-browser dialog labels
       Plural.*               singular/plural fragments used by DisplayHelpers
       Reason.*               Reason column values in the unused files list
+      RecycleUnavailable.*   recycle-bin-unavailable choice dialog
       ResultLog.*            send-summary states (Sending / Sent / Failed)
       Section.*              heading text inside windows
       Startup.*              splash + already-running messages
@@ -668,7 +669,7 @@ The crash log could not be written.</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   success: every flagged file was processed</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   failure: nothing processed (bad args, scan failed, all files failed)</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some files processed, some failed</value></data>
-  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transient: GUI is running or installer transaction pending (try later)</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transient: a temporary condition blocked the run (see the message)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 cancelled (Ctrl+C)</value></data>
 
 </root>
