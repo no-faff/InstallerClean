@@ -211,6 +211,16 @@ or uninstall goes looking for is never one it touched. Microsoft's guidance is a
 
 </details>
 
+## Accessibility
+
+InstallerClean is built to be fully usable from the keyboard and with a screen reader.
+
+- **Keyboard-operable throughout.** Tab reaches every control, and the detail-window columns sort from the keyboard, so nothing here needs a mouse. Keyboard focus stays visible wherever it lands.
+- **Narrator and Voice Access.** Every control is labelled, and the visible word on a button is the word that activates it by voice. When a Move or Delete finishes, the outcome is read aloud.
+- **Built to be read.** Text meets WCAG AA contrast throughout the dark theme.
+
+If anything here gets in your way, [open an issue](../../issues). Accessibility problems are bugs, not edge cases.
+
 ## What it doesn't do
 
 - WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, run `Dism /Online /Cleanup-Image /StartComponentCleanup` from an elevated prompt.

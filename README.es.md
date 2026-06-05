@@ -184,6 +184,16 @@ Nada de esto puede ocurrir por culpa de InstallerClean. Solo elimina archivos qu
 
 </details>
 
+## Accesibilidad
+
+InstallerClean está pensado para ser plenamente utilizable con el teclado y con un lector de pantalla.
+
+- **Totalmente operable con el teclado.** El tabulador llega a cada control, y las columnas de las ventanas de detalle se ordenan con el teclado: aquí nada necesita ratón. El foco del teclado permanece visible dondequiera que esté.
+- **Narrador y Acceso por voz.** Cada control está etiquetado, y la palabra visible en un botón es exactamente la que lo activa por voz. Cuando termina un movimiento o un borrado, el resultado se anuncia en voz alta.
+- **Hecho para leerse.** El texto cumple el contraste WCAG AA en todo el tema oscuro.
+
+Si algo aquí te estorba, [abre un issue](../../issues). Los problemas de accesibilidad son bugs, no casos límite.
+
 ## Lo que no hace
 
 - WinSxS (`C:\Windows\WinSxS`) es una carpeta distinta con reglas distintas. Para esa, ejecuta `Dism /Online /Cleanup-Image /StartComponentCleanup` desde un símbolo del sistema elevado.

@@ -184,6 +184,16 @@ Rien de tout cela ne peut arriver à cause d'InstallerClean. Il ne supprime jama
 
 </details>
 
+## Accessibilité
+
+InstallerClean est conçu pour être pleinement utilisable au clavier et avec un lecteur d'écran.
+
+- **Entièrement utilisable au clavier.** La touche Tab atteint chaque contrôle, et les colonnes des fenêtres de détail se trient au clavier : rien ici n'exige la souris. Le focus clavier reste visible où qu'il se trouve.
+- **Narrateur et Accès vocal.** Chaque contrôle est étiqueté, et le mot affiché sur un bouton est exactement celui qui l'active à la voix. Quand un déplacement ou une suppression se termine, le résultat est annoncé à voix haute.
+- **Pensé pour être lu.** Le texte respecte le contraste WCAG AA sur tout le thème sombre.
+
+Si quelque chose ici vous gêne, [ouvrez un ticket](../../issues). Les problèmes d'accessibilité sont des bugs, pas des cas marginaux.
+
 ## Ce qu'il ne fait pas
 
 - WinSxS (`C:\Windows\WinSxS`) est un dossier différent avec des règles différentes. Pour celui-là, exécutez `Dism /Online /Cleanup-Image /StartComponentCleanup` depuis une invite élevée.
