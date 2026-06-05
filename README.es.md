@@ -162,6 +162,8 @@ InstallerClean solo elimina los archivos que Windows da por terminados, así que
 
 <br>
 
+*Las citas de Microsoft que siguen se reproducen en su versión original en inglés.*
+
 `C:\Windows\Installer` es la caché de Windows Installer. Cuando instalas un programa basado en MSI o aplicas un parche, Windows guarda aquí una copia del instalador y anota, para cada producto, el archivo que espera encontrar más adelante. Estos archivos no se usan mientras el programa funciona; se usan cuando Windows lo repara, lo actualiza o lo desinstala. Borra uno que un programa todavía necesita y nada se rompe de inmediato; es justo por eso por lo que resulta fácil borrarlos sin consecuencias aparentes y solo tener problemas meses después. Microsoft lo expresa así:
 
 > "If the installer cache is compromised, you may not immediately see problems until you take an action such as uninstalling, repairing, or updating a product."

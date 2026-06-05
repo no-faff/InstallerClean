@@ -162,6 +162,8 @@ InstallerClean ne supprime jamais que les fichiers dont Windows a fini de se ser
 
 <br>
 
+*Les citations de Microsoft ci-dessous sont reproduites dans leur version anglaise d'origine.*
+
 `C:\Windows\Installer` est le cache de Windows Installer. Quand vous installez un programme basé sur MSI ou appliquez un correctif, Windows garde ici une copie de l'installeur et note, pour chaque produit, le fichier qu'il s'attend à retrouver plus tard. Ces fichiers ne servent pas pendant que le programme fonctionne ; ils servent quand Windows le répare, le met à jour ou le désinstalle. Supprimez-en un dont un programme a encore besoin et rien ne casse dans l'immédiat ; c'est précisément pour cela qu'il est facile de les supprimer sans conséquence apparente et de ne rencontrer des ennuis que des mois plus tard. Microsoft le formule ainsi :
 
 > "If the installer cache is compromised, you may not immediately see problems until you take an action such as uninstalling, repairing, or updating a product."
