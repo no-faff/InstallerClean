@@ -176,18 +176,32 @@ internal static class InstallerCacheHelpers
             IgnoreInaccessible = true,
         };
 
-        foreach (var dir in Directory.EnumerateDirectories(InstallerFolder, "*", options)
-            .OrderByDescending(d => d.Length))
+        // Best-effort: the prune runs after a move or delete has already
+        // committed, so a failure here must not undo that success.
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            try
+            foreach (var dir in Directory.EnumerateDirectories(InstallerFolder, "*", options)
+                .OrderByDescending(d => d.Length))
             {
-                if (!Directory.EnumerateFileSystemEntries(dir).Any())
-                    Directory.Delete(dir);
+                cancellationToken.ThrowIfCancellationRequested();
+                try
+                {
+                    if (!Directory.EnumerateFileSystemEntries(dir).Any())
+                        Directory.Delete(dir);
+                }
+                catch (IOException) { /* directory not empty by the time Delete fires, or filesystem busy */ }
+                catch (UnauthorizedAccessException) { /* DACL refuses the elevated process; rare but possible */ }
+                catch (SecurityException) { /* permission denied at a higher tier */ }
             }
-            catch (IOException) { /* directory not empty by the time Delete fires, or filesystem busy */ }
-            catch (UnauthorizedAccessException) { /* DACL refuses the elevated process; rare but possible */ }
-            catch (SecurityException) { /* permission denied at a higher tier */ }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            // A failure enumerating or sorting the tree (the folder vanishing
+            // mid-walk, or a share violation surfaced by the enumerator itself
+            // rather than by a per-directory Delete) is swallowed: it would
+            // otherwise propagate into a caller's generic catch and flip an
+            // already-committed delete or move to a hard error. Cancellation is
+            // excluded so the caller still sees a requested stop.
         }
     }
 
