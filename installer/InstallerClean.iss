@@ -77,6 +77,9 @@ Source: "..\publish\self-contained\InstallerClean.exe"; DestDir: "{app}"; Flags:
 ; ships alongside the GUI so PowerShell and cmd block on the process
 ; subsystem naturally.
 Source: "..\publish\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
+; pad.xml's Distribution_Permissions requires the MIT licence text to
+; travel alongside any redistributed binary, so Setup installs it too.
+Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\InstallerClean"; Filename: "{app}\InstallerClean.exe"; IconFilename: "{app}\InstallerClean.exe"
