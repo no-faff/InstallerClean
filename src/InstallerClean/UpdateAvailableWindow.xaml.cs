@@ -14,6 +14,11 @@ public partial class UpdateAvailableWindow : Window
             currentVersion, latestVersion);
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
+        // Open with focus on Cancel (IsCancel, the conservative default) so a
+        // keyboard user gets a visible focus ring at once rather than focus on
+        // the window itself. Deferred to Loaded so the visual tree exists when
+        // Focus runs. Mirrors RecycleUnavailableWindow.
+        Loaded += (_, _) => CancelButton.Focus();
     }
 
     private void OnOpen(object sender, RoutedEventArgs e) => DialogResult = true;

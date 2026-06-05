@@ -96,6 +96,7 @@ public static class Strings
     public static string Automation_SortStatus_Ascending => Get("Automation.SortStatus.Ascending");
     public static string Automation_SortStatus_Descending => Get("Automation.SortStatus.Descending");
     public static string Automation_StartupScanProgress => Get("Automation.StartupScanProgress");
+    public static string Automation_UpdateAvailable_HelpText => Get("Automation.UpdateAvailable.HelpText");
     public static string Automation_ViewOrphanedFiles => Get("Automation.ViewOrphanedFiles");
     public static string Automation_ViewOrphanedFiles_HelpText => Get("Automation.ViewOrphanedFiles.HelpText");
     public static string Automation_ViewRegisteredFiles => Get("Automation.ViewRegisteredFiles");

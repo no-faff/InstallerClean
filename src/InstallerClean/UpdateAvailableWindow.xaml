@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         Title="{loc:Translate UpdateCheck.UpdateAvailable.Title}"
+        AutomationProperties.HelpText="{loc:Translate Automation.UpdateAvailable.HelpText}"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent"
         ShowInTaskbar="False"
@@ -33,7 +34,7 @@
                        Margin="{StaticResource GapBottom.Lg}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
+                <Button x:Name="CancelButton" Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True"
                         Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource PrimaryPill}" Content="{loc:Translate Action.OpenReleasePage}"
