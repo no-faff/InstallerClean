@@ -243,6 +243,7 @@ scoop install installerclean
 | Adobe 处理 | 检测被取代补丁 | 默认排除 |
 | 用户界面 | 深色主题（WPF） | Windows Forms |
 | 数据收集 | 无 | 无 |
+| 删除安全性 | 回收站，绝不悄悄永久删除 | 永久删除，不经回收站 |
 
 > **关于 `Win32_Product` 的说明：** 列出已安装产品的常见但有缺陷的做法是 `Win32_Product`（WMI），它会在枚举时[对每个产品触发 MSI 修复操作](https://gregramsey.net/2012/02/20/win32_product-is-evil/)。InstallerClean 和 PatchCleaner 都避免使用它。两者都使用 Windows Installer COM 接口。PatchCleaner 脚本中的 `WMIProducts.vbs` 文件名具有误导性；该脚本实际使用的是 MSI COM，而非 WMI。
 

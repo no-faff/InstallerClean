@@ -243,6 +243,7 @@ scoop install installerclean
 | Gestion d'Adobe | Détecte les correctifs remplacés | Exclus par défaut |
 | Interface | Thème sombre (WPF) | Windows Forms |
 | Collecte de données | Aucune | Aucune |
+| Sécurité de la suppression | Corbeille, jamais de suppression définitive silencieuse | Définitive, sans Corbeille |
 
 > **À propos de `Win32_Product` :** L'approche courante mais cassée pour lister les produits installés est `Win32_Product` (WMI), qui [déclenche des opérations de réparation MSI](https://gregramsey.net/2012/02/20/win32_product-is-evil/) sur chaque produit pendant l'énumération. InstallerClean comme PatchCleaner l'évitent. Tous deux utilisent l'interface COM de Windows Installer. Le nom de fichier `WMIProducts.vbs` dans le script de PatchCleaner est trompeur ; le script utilise COM MSI, pas WMI.
 
