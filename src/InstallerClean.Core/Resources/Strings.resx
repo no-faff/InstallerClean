@@ -703,6 +703,7 @@ The crash log could not be written.</value></data>
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - clean up C:\Windows\Installer</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Usage:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   Show this help (also accepts /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Print the version (also accepts -v)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       Scan only - list removable files</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       Delete removable files (Recycle Bin)</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       Move to saved default location</value></data>

@@ -159,6 +159,7 @@ public static class Strings
     public static string Cli_Help_NoteLine3 => Get("Cli.Help.NoteLine3");
     public static string Cli_Help_ScanOnly => Get("Cli.Help.ScanOnly");
     public static string Cli_Help_Usage => Get("Cli.Help.Usage");
+    public static string Cli_Help_Version => Get("Cli.Help.Version");
     public static string Cli_MoveDestinationInsideInstaller => Get("Cli.MoveDestinationInsideInstaller");
     public static string Cli_MoveDestinationInSystemFolder => Get("Cli.MoveDestinationInSystemFolder");
     public static string Cli_MoveDestinationRelative => Get("Cli.MoveDestinationRelative");

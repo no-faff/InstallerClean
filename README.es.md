@@ -257,6 +257,7 @@ InstallerClean admite operación sin interfaz para uso de scripting y administra
 ```
 Uso:
   installerclean-cli --help   Muestra esta ayuda (también acepta /?, -h)
+  installerclean-cli --version  Muestra la versión (también acepta -v)
   installerclean-cli /s       Solo escaneo, lista los archivos eliminables
   installerclean-cli /d       Elimina los archivos (Papelera de reciclaje)
   installerclean-cli /m       Mueve a la ruta por defecto guardada

@@ -16,6 +16,9 @@ internal enum CliCommand
     /// <summary>An explicit help request (<c>--help</c>, <c>/?</c>, <c>-h</c>): print usage and exit Ok.</summary>
     Help,
 
+    /// <summary>A version request (<c>--version</c>, <c>-v</c>): print the version and exit Ok.</summary>
+    Version,
+
     /// <summary><c>/s</c>: scan and list removable files, read-only.</summary>
     ScanOnly,
 
@@ -154,6 +157,9 @@ internal static class CliContract
 
         if (first is "--help" or "/?" or "-h")
             return new CliInvocation(CliCommand.Help, null, null);
+
+        if (first is "--version" or "-v")
+            return new CliInvocation(CliCommand.Version, null, null);
 
         if (first is not "/d" and not "/m" and not "/s")
             return new CliInvocation(CliCommand.UnknownArgument, args[0], null);

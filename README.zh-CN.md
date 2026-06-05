@@ -257,6 +257,7 @@ InstallerClean 支持无界面运行，方便编写脚本和系统管理：
 ```
 用法：
   installerclean-cli --help   显示此帮助（也接受 /?、-h）
+  installerclean-cli --version  显示版本（也接受 -v）
   installerclean-cli /s       仅扫描，列出可删除的文件
   installerclean-cli /d       删除文件（送至回收站）
   installerclean-cli /m       移动到已保存的默认位置

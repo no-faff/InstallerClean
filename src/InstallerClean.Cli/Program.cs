@@ -43,6 +43,9 @@ internal static class Program
             case CliCommand.Help:
                 PrintUsage();
                 return ExitOk;
+            case CliCommand.Version:
+                PrintVersion();
+                return ExitOk;
             case CliCommand.NoArguments:
                 // An argless run is a misconfiguration, most often a scheduled
                 // task that dropped its flag. Print usage like --help but exit
@@ -498,12 +501,24 @@ internal static class Program
         return null;
     }
 
+    private static void PrintVersion()
+    {
+        // The embedded assembly version, formatted Major.Minor.Patch to match
+        // the user-facing version (the fourth component is always 0 in this
+        // project's scheme). AssemblyInformationalVersion carries a +<commit>
+        // suffix from the deterministic build and is deliberately not used.
+        var name = System.Reflection.Assembly.GetExecutingAssembly().GetName();
+        var version = name.Version?.ToString(3) ?? "0.0.0";
+        Console.WriteLine($"{name.Name} {version}");
+    }
+
     private static void PrintUsage()
     {
         Console.WriteLine(Strings.Cli_Help_Header);
         Console.WriteLine();
         Console.WriteLine(Strings.Cli_Help_Usage);
         Console.WriteLine(Strings.Cli_Help_Help);
+        Console.WriteLine(Strings.Cli_Help_Version);
         Console.WriteLine(Strings.Cli_Help_ScanOnly);
         Console.WriteLine(Strings.Cli_Help_Delete);
         Console.WriteLine(Strings.Cli_Help_MoveDefault);

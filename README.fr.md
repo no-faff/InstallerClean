@@ -257,6 +257,7 @@ InstallerClean prend en charge un fonctionnement sans interface graphique pour l
 ```
 Utilisation :
   installerclean-cli --help   Affiche cette aide (accepte aussi /?, -h)
+  installerclean-cli --version  Affiche la version (accepte aussi -v)
   installerclean-cli /s       Analyse seule, liste les fichiers supprimables
   installerclean-cli /d       Supprime les fichiers (Corbeille)
   installerclean-cli /m       Déplace vers l'emplacement par défaut enregistré

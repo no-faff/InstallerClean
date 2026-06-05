@@ -293,6 +293,7 @@ InstallerClean supports headless operation for scripting and sysadmin use:
 ```
 Usage:
   installerclean-cli --help   Show this help (also accepts /?, -h)
+  installerclean-cli --version  Print the version (also accepts -v)
   installerclean-cli /s       Scan only - list removable files
   installerclean-cli /d       Delete removable files (Recycle Bin)
   installerclean-cli /m       Move to saved default location
