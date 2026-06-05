@@ -2,6 +2,8 @@
   <a href="README.md">English</a> · <strong>简体中文</strong> · <a href="README.es.md">Español</a> · <a href="README.fr.md">Français</a>
 </p>
 
+<p align="center"><em>本页面为译文，但应用程序界面目前仅提供英文。</em></p>
+
 <p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
