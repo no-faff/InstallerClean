@@ -175,7 +175,7 @@
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Check for updates</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Checks the GitHub releases API over HTTPS for a newer version.</value></data>
   <data name="Automation.MITLicence" xml:space="preserve"><value>MIT licence</value></data>
-  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Opens the LICENCE file on github.com in your browser.</value></data>
+  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Opens the licence file on github.com in your browser.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
        DETAILS). Narrator at default verbosity spells short uppercase
