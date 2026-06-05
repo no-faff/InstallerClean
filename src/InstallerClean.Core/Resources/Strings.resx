@@ -322,11 +322,16 @@
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
        did not reach it and cannot be restored from it. 0 = deleted count,
-       1 = pluralised noun; the WithErrors variant adds 2 = error count,
-       3 = pluralised "error"/"errors". -->
+       1 = pluralised noun; the WithErrors variants add 2 = error count,
+       3 = pluralised "error"/"errors". Both the clean and the WithErrors
+       copy split singular/plural so the "It"/"They did not go to the
+       Recycle Bin" clause agrees with the count, and the WithErrors copy
+       carries that same clause so a partial failure still never reads as
+       though the files reached the bin. -->
   <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} permanently deleted. It did not go to the Recycle Bin.</value></data>
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} permanently deleted. They did not go to the Recycle Bin.</value></data>
-  <data name="Completion.PermanentDeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} permanently deleted. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>{0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3}</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.</value></data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for

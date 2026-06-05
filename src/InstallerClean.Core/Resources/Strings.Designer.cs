@@ -184,7 +184,8 @@ public static class Strings
     public static string Completion_PermanentDeleteRestoreHint_Singular => Get("Completion.PermanentDeleteRestoreHint.Singular");
     public static string Completion_PermanentDeleteSummary_Plural => Get("Completion.PermanentDeleteSummary.Plural");
     public static string Completion_PermanentDeleteSummary_Singular => Get("Completion.PermanentDeleteSummary.Singular");
-    public static string Completion_PermanentDeleteSummaryWithErrors => Get("Completion.PermanentDeleteSummaryWithErrors");
+    public static string Completion_PermanentDeleteSummaryWithErrors_Plural => Get("Completion.PermanentDeleteSummaryWithErrors.Plural");
+    public static string Completion_PermanentDeleteSummaryWithErrors_Singular => Get("Completion.PermanentDeleteSummaryWithErrors.Singular");
     public static string Confirm_DeleteLargeWarning => Get("Confirm.DeleteLargeWarning");
     public static string Confirm_DeleteTitle => Get("Confirm.DeleteTitle");
     public static string Confirm_DeleteToRecycleBin => Get("Confirm.DeleteToRecycleBin");

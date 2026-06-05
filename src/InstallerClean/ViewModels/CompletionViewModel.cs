@@ -219,7 +219,9 @@ public partial class CompletionViewModel : ObservableObject
                     Strings.Completion_PermanentDeleteSummary_Singular,
                     Strings.Completion_PermanentDeleteSummary_Plural),
                 deletedCount, deletedLabel)
-            : string.Format(Strings.Completion_PermanentDeleteSummaryWithErrors,
+            : string.Format(DisplayHelpers.Pluralise(deletedCount,
+                    Strings.Completion_PermanentDeleteSummaryWithErrors_Singular,
+                    Strings.Completion_PermanentDeleteSummaryWithErrors_Plural),
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = DisplayHelpers.Pluralise(deletedCount,
             Strings.Completion_PermanentDeleteRestoreHint_Singular,
