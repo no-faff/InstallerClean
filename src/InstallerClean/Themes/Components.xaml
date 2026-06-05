@@ -10,7 +10,8 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-                    xmlns:loc="clr-namespace:InstallerClean.Resources">
+                    xmlns:loc="clr-namespace:InstallerClean.Resources"
+                    xmlns:a11y="clr-namespace:InstallerClean.Helpers">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Tokens.xaml"/>
@@ -751,15 +752,16 @@
     </Style>
 
     <!-- Progress bar. Slim dark bar. Determinate uses PART_Indicator
-         (WPF stock). The indeterminate path moves the RepeatBehavior
-         onto the DoubleAnimation rather than the wrapping Storyboard
-         so the compiled BAML carries no literal "Storyboard
-         RepeatBehavior=Forever" attribute pair.
+         (WPF stock). Indeterminate has two presentations: a sweeping
+         bar when animations are on, and a static full-width fill when
+         Windows' "show animations" is off (reduced motion). The sweep
+         moves the RepeatBehavior onto the DoubleAnimation rather than
+         the wrapping Storyboard so the compiled BAML carries no literal
+         "Storyboard RepeatBehavior=Forever" attribute pair.
 
-         The indeterminate animation translates the 80 px bar from
-         X=-80 to X=320 (max bar width 240 px). DoubleAnimation can't
-         template-bind ActualWidth, so a wider indeterminate consumer
-         needs the To value raised. -->
+         The sweep translates the 80 px bar from X=-80 to X=320 (max bar
+         width 240 px). DoubleAnimation can't template-bind ActualWidth,
+         so a wider indeterminate consumer needs the To value raised. -->
     <Style TargetType="ProgressBar">
         <Setter Property="Background" Value="{StaticResource Surface.Sidebar}"/>
         <Setter Property="Foreground" Value="{StaticResource Action.Secondary.Background}"/>
@@ -787,14 +789,32 @@
                                     <TranslateTransform x:Name="IndeterminateTransform"/>
                                 </Border.RenderTransform>
                             </Border>
+                            <!-- Reduced-motion stand-in for the sweep: a static,
+                                 full-width fill shown instead of IndeterminateBar
+                                 when "show animations" is off, so an indeterminate
+                                 bar still reads as busy without moving. -->
+                            <Border x:Name="StaticBusyBar"
+                                    CornerRadius="{StaticResource Radius.Chip}"
+                                    Background="{TemplateBinding Foreground}"
+                                    Visibility="Collapsed"/>
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsIndeterminate" Value="True">
+                        <!-- Indeterminate with animations on: the bar sweeps. The
+                             storyboard is named so the companion ExitActions stop
+                             it the moment the bar stops being indeterminate or
+                             "show animations" is switched off mid-run, rather than
+                             leaving a clock running on a hidden element (and
+                             stacking a second clock if it later re-enters). -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsIndeterminate, RelativeSource={RelativeSource TemplatedParent}}" Value="True"/>
+                                <Condition Binding="{Binding Source={x:Static a11y:AccessibilitySettings.Current}, Path=ReduceMotion}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
                             <Setter TargetName="PART_Indicator" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="IndeterminateBar" Property="Visibility" Value="Visible"/>
-                            <Trigger.EnterActions>
-                                <BeginStoryboard>
+                            <MultiDataTrigger.EnterActions>
+                                <BeginStoryboard x:Name="IndeterminateMarquee">
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="IndeterminateTransform"
                                                          Storyboard.TargetProperty="X"
@@ -803,8 +823,22 @@
                                                          RepeatBehavior="Forever"/>
                                     </Storyboard>
                                 </BeginStoryboard>
-                            </Trigger.EnterActions>
-                        </Trigger>
+                            </MultiDataTrigger.EnterActions>
+                            <MultiDataTrigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="IndeterminateMarquee"/>
+                            </MultiDataTrigger.ExitActions>
+                        </MultiDataTrigger>
+                        <!-- Indeterminate with animations off: a static full-width
+                             fill stands in for the sweep, so an animation-off user
+                             sees no movement while the bar still reads as busy. -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsIndeterminate, RelativeSource={RelativeSource TemplatedParent}}" Value="True"/>
+                                <Condition Binding="{Binding Source={x:Static a11y:AccessibilitySettings.Current}, Path=ReduceMotion}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="PART_Indicator" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="StaticBusyBar" Property="Visibility" Value="Visible"/>
+                        </MultiDataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

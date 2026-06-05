@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         xmlns:chrome="clr-namespace:InstallerClean.Controls"
+        xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate Window.Main.Title}"
         Width="720"
         SizeToContent="Height"
@@ -327,26 +328,38 @@
                     <Path.Style>
                         <Style TargetType="Path">
                             <Style.Triggers>
-                                <EventTrigger RoutedEvent="MouseEnter">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
-                                                             To="1.2" Duration="0:0:0.15"/>
-                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
-                                                             To="1.2" Duration="0:0:0.15"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                                <EventTrigger RoutedEvent="MouseLeave">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
-                                                             To="1.0" Duration="0:0:0.15"/>
-                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
-                                                             To="1.0" Duration="0:0:0.15"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
+                                <!-- Hover grow honours "show animations": the scale
+                                     plays only while ReduceMotion is false, so an
+                                     animation-off user gets a static icon. IsMouseOver
+                                     and the live setting gate it together, and a
+                                     runtime toggle re-evaluates because ReduceMotion
+                                     raises PropertyChanged. -->
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                        <Condition Binding="{Binding Source={x:Static a11y:AccessibilitySettings.Current}, Path=ReduceMotion}" Value="False"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                                                 To="1.2" Duration="0:0:0.15"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                                                 To="1.2" Duration="0:0:0.15"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </MultiDataTrigger.EnterActions>
+                                    <MultiDataTrigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                                                 To="1.0" Duration="0:0:0.15"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                                                 To="1.0" Duration="0:0:0.15"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </MultiDataTrigger.ExitActions>
+                                </MultiDataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Path.Style>
@@ -371,26 +384,38 @@
                     <Path.Style>
                         <Style TargetType="Path">
                             <Style.Triggers>
-                                <EventTrigger RoutedEvent="MouseEnter">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
-                                                             To="1.2" Duration="0:0:0.15"/>
-                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
-                                                             To="1.2" Duration="0:0:0.15"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                                <EventTrigger RoutedEvent="MouseLeave">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
-                                                             To="1.0" Duration="0:0:0.15"/>
-                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
-                                                             To="1.0" Duration="0:0:0.15"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
+                                <!-- Hover grow honours "show animations": the scale
+                                     plays only while ReduceMotion is false, so an
+                                     animation-off user gets a static icon. IsMouseOver
+                                     and the live setting gate it together, and a
+                                     runtime toggle re-evaluates because ReduceMotion
+                                     raises PropertyChanged. -->
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                        <Condition Binding="{Binding Source={x:Static a11y:AccessibilitySettings.Current}, Path=ReduceMotion}" Value="False"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                                                 To="1.2" Duration="0:0:0.15"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                                                 To="1.2" Duration="0:0:0.15"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </MultiDataTrigger.EnterActions>
+                                    <MultiDataTrigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                                                 To="1.0" Duration="0:0:0.15"/>
+                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                                                 To="1.0" Duration="0:0:0.15"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </MultiDataTrigger.ExitActions>
+                                </MultiDataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Path.Style>

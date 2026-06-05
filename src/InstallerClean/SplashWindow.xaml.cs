@@ -35,6 +35,16 @@ public partial class SplashWindow : Window
     public void UpdateStep(string message, double progressPercent)
     {
         StepText.Text = message;
+        if (AccessibilitySettings.Current.ReduceMotion)
+        {
+            // Reduced motion: set the value with no easing. Clearing the
+            // animation clock first is required because an animation left
+            // holding its end value otherwise overrides a plain Value
+            // assignment.
+            SplashProgress.BeginAnimation(System.Windows.Controls.ProgressBar.ValueProperty, null);
+            SplashProgress.Value = progressPercent;
+            return;
+        }
         // ProgressBar.Value isn't implicitly animated; on a fast scan
         // the bar would jump 0 -> ~95 -> 100 in two frames. Ease each
         // step over 250ms so the splash feels like a deliberate motion
