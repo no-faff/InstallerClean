@@ -272,6 +272,8 @@ Lancé sans argument, ou avec une option non reconnue, `installerclean-cli` affi
 
 `/d` et `/m` analysent puis agissent. `/d` envoie les fichiers supprimables à la Corbeille. `/m` les déplace vers un dossier (soit celui spécifié sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Codes de sortie : `0` succès complet, `2` partiel (certains fichiers réussis, certains échoués), `1` échec total (analyse échouée, mauvais arguments ou tous les fichiers du lot ont échoué), `75` une condition transitoire a bloqué l'exécution (le message affiché précise laquelle et si un nouvel essai aidera), `130` Ctrl+C.
 
+Toute la sortie de la CLI, y compris les messages d'erreur et de diagnostic, va vers stdout ; il n'y a pas de flux stderr distinct. Le code de sortie est le signal lisible par machine (et l'entrée du journal d'événements Application par exécution le reflète), donc un script doit se baser sur le code de sortie plutôt que d'analyser le texte, et `installerclean-cli /s > audit.txt` capture toute l'exécution, y compris toute ligne d'erreur.
+
 Les trois nécessitent une invite de commandes élevée (administrateur). Si la stratégie de groupe bloque l'invite d'élévation UAC, le processus refuse de démarrer et Windows renvoie l'erreur 740 à l'invite parente (`$LASTEXITCODE = 740` en PowerShell). `taskkill /pid <pid>` ne déclenche pas d'annulation propre ; le mutex d'instance unique est récupéré au prochain lancement via le chemin AbandonedMutexException.
 
 À noter : la sortie de la CLI elle-même est en anglais. Les descriptions ci-dessus correspondent aux options disponibles.

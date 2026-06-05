@@ -272,6 +272,8 @@ Ejecutado sin argumentos, o con una opción no reconocida, `installerclean-cli` 
 
 `/d` y `/m` escanean y luego actúan. `/d` envía los archivos eliminables a la Papelera de reciclaje. `/m` los mueve a una carpeta (la que especifiques en la línea de comandos, o la guardada por defecto desde la interfaz gráfica). Códigos de salida: `0` éxito completo, `2` parcial (algunos archivos correctos, algunos fallidos), `1` fallo total (escaneo fallido, argumentos incorrectos o todos los archivos del lote han fallado), `75` una condición transitoria bloqueó la ejecución (el mensaje mostrado indica cuál y si reintentar ayudará), `130` Ctrl+C.
 
+Toda la salida de la CLI, incluidos los mensajes de error y de diagnóstico, va a stdout; no hay un flujo stderr aparte. El código de salida es la señal legible por máquina (y la entrada del registro de eventos de Aplicación por ejecución lo refleja), así que un script debe basarse en el código de salida en lugar de analizar el texto, y `installerclean-cli /s > audit.txt` captura toda la ejecución, incluida cualquier línea de error.
+
 Las tres requieren un símbolo del sistema elevado (administrador).
 
 Nota: la salida de la propia CLI está en inglés. Las descripciones anteriores se corresponden con las opciones disponibles.
