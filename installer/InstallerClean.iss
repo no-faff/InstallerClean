@@ -51,7 +51,13 @@ OutputBaseFilename=InstallerClean-setup
 ; runtime compression. bzip cleared every VirusTotal engine.
 Compression=bzip
 SolidCompression=no
-MinVersion=10.0
+; The .NET 10 Desktop Runtime's oldest supported Windows release is
+; Windows 10 version 1607 (build 14393), so an older build is blocked here
+; with a clear message instead of failing cryptically at first launch. Inno
+; Setup reads the true build via RtlGetVersion, which is not subject to the
+; GetVersionEx compatibility cap, so the build-level floor is enforced on
+; Windows 10 and 11.
+MinVersion=10.0.14393
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=admin
