@@ -41,7 +41,7 @@
                    RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"
                    AutomationProperties.Name=""/>
             <TextBlock Text="{loc:Translate Window.Main.Title}" Foreground="{StaticResource Text.Body}"
-                       FontSize="{StaticResource Type.Heading.Sm}" FontWeight="Medium"/>
+                       FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="Medium"/>
         </StackPanel>
         <StackPanel Grid.Row="0" Orientation="Horizontal"
                     HorizontalAlignment="Right" VerticalAlignment="Top">
@@ -73,7 +73,7 @@
             <StackPanel Grid.Row="0">
 
                 <!-- Explanatory text -->
-                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}" Margin="{StaticResource GapBottom.Lg}"
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Lg}"
                            Text="{Binding MainExplanationText}"/>
 
                 <!-- Pending reboot warning (Phosphor fill, tweaked !). DockPanel
@@ -121,15 +121,15 @@
 
                     <!-- Still needed -->
                     <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
-                               Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Heading.Sm}"
+                               Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Heading.Sm}"
                                Text="{Binding Scan.RegisteredSummaryText}"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Scan.RegisteredSizeDisplay}"
-                               Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Heading.Sm}"
+                               Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Heading.Sm}"
                                VerticalAlignment="Center" MinWidth="72" TextAlignment="Right"
                                Margin="{StaticResource GapX.Md}"/>
                     <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenRegisteredDetailsCommand}"
-                            Height="28" Padding="12,0" FontSize="{StaticResource Type.Heading.Sm}"
+                            Height="28" Padding="12,0" FontSize="{DynamicResource Type.Heading.Sm}"
                             VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             AutomationProperties.Name="{loc:Translate Automation.ViewRegisteredFiles}"
@@ -166,7 +166,7 @@
                            Visibility="{Binding Scan.HasStaleMsiEntries, Converter={StaticResource BoolToVis}}"
                            Text="{Binding Scan.StaleMsiEntriesText}"
                            Foreground="{StaticResource Text.Muted}"
-                           FontStyle="Italic" FontSize="{StaticResource Type.Caption}"
+                           FontStyle="Italic" FontSize="{DynamicResource Type.Caption}"
                            TextWrapping="Wrap"
                            Margin="{StaticResource GapTop.Sm}"
                            AutomationProperties.LiveSetting="Polite"/>
@@ -196,15 +196,15 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" VerticalAlignment="Center"
-                               Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
+                               Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
                                Text="{Binding Scan.OrphanedSummaryText}"/>
                     <TextBlock Grid.Column="1" Text="{Binding Scan.OrphanedSizeDisplay}"
-                               Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
+                               Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
                                VerticalAlignment="Center" MinWidth="72" TextAlignment="Right"
                                Margin="{StaticResource GapX.Md}"/>
                     <Button Grid.Column="2" Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenOrphanedDetailsCommand}"
-                            Height="28" Padding="12,0" FontSize="{StaticResource Type.Heading.Sm}"
+                            Height="28" Padding="12,0" FontSize="{DynamicResource Type.Heading.Sm}"
                             VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             AutomationProperties.Name="{loc:Translate Automation.ViewOrphanedFiles}"
@@ -213,7 +213,7 @@
 
                 <!-- Move location label -->
                 <TextBlock Grid.Row="2" Text="{loc:Translate Section.Move.Location}"
-                           Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Heading.Sm}"
+                           Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                            AutomationProperties.Name="{loc:Translate Automation.Section.MoveLocation}"/>
 
                 <!-- Move destination -->
@@ -236,7 +236,7 @@
                                  PreviewDragOver="MoveDestination_DragOver"
                                  Drop="MoveDestination_Drop"/>
                         <TextBlock Text="{loc:Translate Action.MoveDestinationPlaceholder}"
-                                   Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}" FontStyle="Italic"
+                                   Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}" FontStyle="Italic"
                                    Padding="12,0" VerticalAlignment="Center"
                                    IsHitTestVisible="False">
                             <TextBlock.Style>
@@ -285,7 +285,7 @@
                          progress callback for screen readers. -->
                     <TextBlock DockPanel.Dock="Left" Text="{Binding Cleanup.OperationProgress}"
                                VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="{StaticResource Text.Muted}"
-                               FontSize="{StaticResource Type.Body}"
+                               FontSize="{DynamicResource Type.Body}"
                                TextTrimming="CharacterEllipsis" MaxWidth="280"/>
                 </DockPanel>
             </Grid>
@@ -436,11 +436,11 @@
                 <ProgressBar IsIndeterminate="True" Width="240" Height="8" Margin="{StaticResource GapBottom.Md}"
                              AutomationProperties.Name="{loc:Translate Automation.ScanningProgress}"/>
                 <TextBlock Text="{Binding Scan.ScanProgress}" Foreground="{StaticResource Text.Heading}"
-                           FontSize="{StaticResource Type.Heading.Sm}" HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"
+                           FontSize="{DynamicResource Type.Heading.Sm}" HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"
                            AutomationProperties.LiveSetting="Polite"/>
                 <Button x:Name="ScanCancelButton" Style="{StaticResource GhostPill}"
                         Content="{loc:Translate Action.Cancel}" Command="{Binding Scan.CancelScanCommand}"
-                        Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
+                        Height="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
                         HorizontalAlignment="Center"
                         FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                         AutomationProperties.Name="{loc:Translate Automation.CancelScan}"/>
@@ -457,7 +457,7 @@
                     HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel>
                     <TextBlock Text="{Binding Cleanup.OperationProgress}" Foreground="{StaticResource Text.Heading}"
-                               FontSize="{StaticResource Type.Heading.Sm}" FontWeight="SemiBold"
+                               FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="SemiBold"
                                HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"
                                AutomationProperties.LiveSetting="Polite"/>
                     <ProgressBar Value="{Binding Cleanup.OperationProgressPercent}"
@@ -470,12 +470,12 @@
                          compact block under the progress bar, where the scale's
                          8px would loosen the grouping. -->
                     <DockPanel Margin="0,0,0,2">
-                        <TextBlock DockPanel.Dock="Right" Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Caption}">
+                        <TextBlock DockPanel.Dock="Right" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Caption}">
                             <Run Text="{Binding Cleanup.OperationProgressPercent, Mode=OneWay, StringFormat='{}{0:F0}%'}"/>
                         </TextBlock>
                         <TextBlock Text="{Binding Cleanup.OperationProgressDetail}"
                                    Foreground="{StaticResource Text.Muted}"
-                                   FontSize="{StaticResource Type.Caption}"
+                                   FontSize="{DynamicResource Type.Caption}"
                                    AutomationProperties.LiveSetting="Polite"/>
                     </DockPanel>
                     <!-- LiveSetting deliberately absent: the per-file
@@ -484,7 +484,7 @@
                          can drain it. OperationProgressDetail above
                          carries the "X of Y" count for the SR. -->
                     <TextBlock Text="{Binding Cleanup.OperationCurrentFileName}"
-                               Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Caption}"
+                               Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Caption}"
                                HorizontalAlignment="Center" Margin="0,4,0,0"
                                TextTrimming="CharacterEllipsis" MaxWidth="240"/>
                     <!-- Cancel button binds IsEnabled via the
@@ -500,7 +500,7 @@
                             AutomationProperties.Name="{loc:Translate Automation.CancelOperation}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             HorizontalAlignment="Center" Margin="{StaticResource GapTop.Sm}"
-                            Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}">
+                            Height="28" Padding="16,0" FontSize="{DynamicResource Type.Body}">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource GhostPill}">
                                 <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
@@ -540,7 +540,7 @@
 
                     <!-- Heading -->
                     <TextBlock x:Name="CompletionHeadingText" Text="{Binding Completion.Heading}"
-                               Foreground="{StaticResource Status.Success}" FontSize="{StaticResource Type.Heading.Lg}" FontWeight="Bold"
+                               Foreground="{StaticResource Status.Success}" FontSize="{DynamicResource Type.Heading.Lg}" FontWeight="Bold"
                                HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Sm}"
                                AutomationProperties.LiveSetting="Polite"/>
 
@@ -549,7 +549,7 @@
                          caption that follows; the standard GapBottom.Sm
                          (8) loosens the heading/caption pairing visibly. -->
                     <TextBlock x:Name="CompletionSummaryText" Text="{Binding Completion.Summary}"
-                               Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Heading.Sm}"
+                               Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="0,0,0,6"
                                AutomationProperties.LiveSetting="Polite"/>
@@ -561,7 +561,7 @@
                          TextBlock. Pattern matches the Errors Border
                          below. -->
                     <TextBlock Text="{Binding Completion.Restore}"
-                               Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
+                               Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="{StaticResource GapBottom.Xl}">
                         <TextBlock.Style>
@@ -590,7 +590,7 @@
                         </Border.Style>
                         <TextBox Text="{Binding Completion.Errors, Mode=OneWay}"
                                  Style="{StaticResource SelectableText}"
-                                 Foreground="{StaticResource Status.Warning}" FontSize="{StaticResource Type.Caption}"
+                                 Foreground="{StaticResource Status.Warning}" FontSize="{DynamicResource Type.Caption}"
                                  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                     </Border>
 
@@ -616,7 +616,7 @@
                             Command="{Binding Completion.SendResultLogCommand}"
                             Visibility="{Binding Completion.IsSendResultLogVisible, Converter={StaticResource BoolToVis}}"
                             HorizontalAlignment="Center"
-                            Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
+                            Height="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
                             Margin="{StaticResource GapBottom.Sm}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             ToolTip="{Binding Completion.SendResultLogTooltip}"
@@ -635,7 +635,7 @@
                                Text="{Binding Completion.ResultLogStatusMessage}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                Foreground="{StaticResource Text.Muted}"
-                               FontSize="{StaticResource Type.Body}"
+                               FontSize="{DynamicResource Type.Body}"
                                TextWrapping="Wrap" MaxWidth="380"
                                Margin="{StaticResource GapBottom.Sm}"
                                AutomationProperties.LiveSetting="Polite">
@@ -655,7 +655,7 @@
                     <Button Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.ScanAgain}" Command="{Binding Completion.RescanAfterCompletionCommand}"
                             HorizontalAlignment="Center"
-                            Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
+                            Height="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             AutomationProperties.HelpText="{loc:Translate Automation.RescanInstaller}"/>
 

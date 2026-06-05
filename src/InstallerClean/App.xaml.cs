@@ -29,6 +29,19 @@ public partial class App : Application
     // exception could fire DispatcherUnhandledException recursively.
     private static bool _handlingUnhandledException;
 
+    // The six Type.* size tokens that scale with the OS text-size
+    // setting. Type.FontFamily is deliberately absent: it is not a size.
+    private static readonly string[] TypeSizeTokenKeys =
+    {
+        "Type.Display", "Type.Heading.Lg", "Type.Heading.Md",
+        "Type.Heading.Sm", "Type.Body", "Type.Caption",
+    };
+
+    // Unscaled Type.* sizes captured once from the merged theme so
+    // Tokens.xaml stays the single definition of the base sizes and every
+    // re-scale derives from them, not from a previously scaled value.
+    private readonly Dictionary<string, double> _baseTypeSizes = new();
+
     /// <remarks>
     /// <c>async void</c> is the WPF override contract; sync and post-
     /// await throws both reach the catch blocks below.
@@ -105,6 +118,11 @@ public partial class App : Application
         SplashWindow? splash = null;
         try
         {
+            // Scale the Type.* font tokens before any window is shown so
+            // text honours the OS "Make text bigger" setting from first
+            // paint, and tracks the slider if it moves at runtime.
+            ApplyTextScaling();
+
             // Title-bar Window.Icon assignment in the class handler
             // below degrades to WPF's default icon on a pack-URI load
             // failure (resource renamed, embed step broken). XAML
@@ -217,6 +235,38 @@ public partial class App : Application
                 MessageBoxImage.Error);
             Shutdown();
         }
+    }
+
+    /// <summary>
+    /// Scales the Type.* font-size tokens by the OS text-size factor and
+    /// keeps them in step with runtime changes to that setting. The XAML
+    /// consumes the tokens via DynamicResource, so reassigning a token
+    /// here resizes live text.
+    /// </summary>
+    private void ApplyTextScaling()
+    {
+        // Capture the unscaled sizes once, before the first override is
+        // written, so re-scaling always derives from the theme definition
+        // rather than a value already multiplied by an earlier factor.
+        if (_baseTypeSizes.Count == 0)
+            foreach (var key in TypeSizeTokenKeys)
+                if (Resources[key] is double baseSize)
+                    _baseTypeSizes[key] = baseSize;
+
+        ScaleTypeTokens();
+
+        AccessibilitySettings.Current.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is null or nameof(AccessibilitySettings.TextScaleFactor))
+                ScaleTypeTokens();
+        };
+    }
+
+    private void ScaleTypeTokens()
+    {
+        var factor = AccessibilitySettings.Current.TextScaleFactor;
+        foreach (var (key, baseSize) in _baseTypeSizes)
+            Resources[key] = baseSize * factor;
     }
 
     protected override void OnExit(ExitEventArgs e)

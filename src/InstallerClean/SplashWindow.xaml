@@ -37,7 +37,7 @@
             <!-- App name -->
             <TextBlock Grid.Row="3" Text="{loc:Translate Window.Main.Title}"
                        Foreground="{StaticResource Text.Heading}"
-                       FontSize="{StaticResource Type.Display}"
+                       FontSize="{DynamicResource Type.Display}"
                        FontWeight="Bold"
                        HorizontalAlignment="Center"/>
 
@@ -57,7 +57,7 @@
                        x:Name="StepText"
                        Text="{loc:Translate Status.Scanning}"
                        Foreground="{StaticResource Text.Body}"
-                       FontSize="{StaticResource Type.Body}"
+                       FontSize="{DynamicResource Type.Body}"
                        HorizontalAlignment="Center"
                        AutomationProperties.LiveSetting="Polite"/>
 
@@ -68,7 +68,7 @@
                     Click="CancelClick"
                     IsCancel="True"
                     Style="{StaticResource GhostPill}"
-                    Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}"
+                    Height="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
                     HorizontalAlignment="Center"
                     FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     AutomationProperties.Name="{loc:Translate Automation.CancelStartupScan}"/>
@@ -77,7 +77,7 @@
             <TextBlock Grid.Row="10"
                        x:Name="VersionText"
                        Foreground="{StaticResource Text.Dim}"
-                       FontSize="{StaticResource Type.Caption}"
+                       FontSize="{DynamicResource Type.Caption}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Bottom"
                        Margin="0,0,16,12"/>

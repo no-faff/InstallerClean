@@ -24,12 +24,12 @@
             BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <StackPanel>
             <TextBlock Text="{loc:Translate UpdateCheck.UpdateAvailable.Title}"
-                       Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
+                       Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
                        TextWrapping="Wrap"
                        Margin="{StaticResource GapBottom.Md}"/>
 
             <TextBlock x:Name="VersionInfo"
-                       Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}"
+                       Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
                        TextWrapping="Wrap"
                        Margin="{StaticResource GapBottom.Lg}"/>
 

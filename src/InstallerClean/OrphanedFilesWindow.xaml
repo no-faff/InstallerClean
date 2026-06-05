@@ -33,7 +33,7 @@
                    RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"
                    AutomationProperties.Name=""/>
             <TextBlock Text="{loc:Translate Window.Orphaned.Title}" Foreground="{StaticResource Text.Body}"
-                       FontSize="{StaticResource Type.Heading.Sm}" FontWeight="Medium"/>
+                       FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="Medium"/>
         </StackPanel>
         <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#xE8BB;"
                 Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
@@ -73,7 +73,7 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding FileName}" Foreground="{StaticResource Text.Heading}"
-                                                   FontSize="{StaticResource Type.Heading.Sm}" TextTrimming="CharacterEllipsis"
+                                                   FontSize="{DynamicResource Type.Heading.Sm}" TextTrimming="CharacterEllipsis"
                                                    ToolTip="{Binding FullPath}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
@@ -83,7 +83,7 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Reason}"
-                                                   FontSize="{StaticResource Type.Caption}" VerticalAlignment="Center">
+                                                   FontSize="{DynamicResource Type.Caption}" VerticalAlignment="Center">
                                             <TextBlock.Style>
                                                 <!-- Text.Muted on the selected-row background
                                                      (Action.Primary.Background) is 4.04:1 (fails AA
@@ -109,7 +109,7 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Text.Body}"
-                                                   FontSize="{StaticResource Type.Body}" TextAlignment="Right"/>
+                                                   FontSize="{DynamicResource Type.Body}" TextAlignment="Right"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -121,7 +121,7 @@
             <Border Grid.Column="2" Style="{StaticResource Card}">
                 <Grid>
                     <TextBlock Text="{loc:Translate Body.NoFileSelected}"
-                               Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Body}" FontStyle="Italic"
+                               Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Body}" FontStyle="Italic"
                                VerticalAlignment="Center" HorizontalAlignment="Center"
                                TextAlignment="Center" TextWrapping="Wrap">
                         <TextBlock.Style>
@@ -137,7 +137,7 @@
                     </TextBlock>
 
                     <TextBlock Text="{loc:Translate Body.NoMetadata}"
-                               Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Body}" FontStyle="Italic"
+                               Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Body}" FontStyle="Italic"
                                VerticalAlignment="Center" HorizontalAlignment="Center"
                                TextAlignment="Center"
                                Visibility="{Binding ShowNoMetadata, Converter={StaticResource BoolToVis}}"/>
@@ -161,33 +161,33 @@
                                 <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Translate Field.Reason}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
-                            <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SelectedFile.Reason, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}"
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Translate Field.Reason}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
+                            <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SelectedFile.Reason, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}"
                                      AutomationProperties.Name="{loc:Translate Field.Reason}"/>
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Translate Field.Author}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
-                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding SelectedDetails.Author, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Translate Field.Author}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding SelectedDetails.Author, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
                                      AutomationProperties.Name="{loc:Translate Field.Author}"/>
-                            <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Translate Field.Application}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
-                            <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding SelectedDetails.AppName, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Translate Field.Application}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
+                            <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding SelectedDetails.AppName, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
                                      AutomationProperties.Name="{loc:Translate Field.Application}"/>
-                            <TextBlock Grid.Row="6" Grid.Column="0" Text="{loc:Translate Field.Title}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
-                            <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding SelectedDetails.Title, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"
+                            <TextBlock Grid.Row="6" Grid.Column="0" Text="{loc:Translate Field.Title}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
+                            <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding SelectedDetails.Title, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
                                      AutomationProperties.Name="{loc:Translate Field.Title}"/>
-                            <TextBlock Grid.Row="8" Grid.Column="0" Text="{loc:Translate Field.Subject}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
-                            <TextBox Grid.Row="8" Grid.Column="2" Text="{Binding SelectedDetails.Subject, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"
+                            <TextBlock Grid.Row="8" Grid.Column="0" Text="{loc:Translate Field.Subject}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
+                            <TextBox Grid.Row="8" Grid.Column="2" Text="{Binding SelectedDetails.Subject, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
                                      AutomationProperties.Name="{loc:Translate Field.Subject}"/>
-                            <TextBlock Grid.Row="10" Grid.Column="0" Text="{loc:Translate Field.Keywords}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
-                            <TextBox Grid.Row="10" Grid.Column="2" Text="{Binding SelectedDetails.Keywords, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"
+                            <TextBlock Grid.Row="10" Grid.Column="0" Text="{loc:Translate Field.Keywords}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
+                            <TextBox Grid.Row="10" Grid.Column="2" Text="{Binding SelectedDetails.Keywords, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
                                      AutomationProperties.Name="{loc:Translate Field.Keywords}"/>
-                            <TextBlock Grid.Row="12" Grid.Column="0" Text="{loc:Translate Field.SigningCertificate}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"
+                            <TextBlock Grid.Row="12" Grid.Column="0" Text="{loc:Translate Field.SigningCertificate}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"
                                        ToolTip="{loc:Translate Tooltip.SigningCertificate}"/>
-                            <TextBox Grid.Row="12" Grid.Column="2" Text="{Binding SelectedDetails.DigitalSignature, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"
+                            <TextBox Grid.Row="12" Grid.Column="2" Text="{Binding SelectedDetails.DigitalSignature, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
                                      AutomationProperties.Name="{loc:Translate Field.SigningCertificate}"/>
-                            <TextBlock Grid.Row="14" Grid.Column="0" Text="{loc:Translate Field.FileSize}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
-                            <TextBox Grid.Row="14" Grid.Column="2" Text="{Binding SelectedFile.SizeDisplay, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}"
+                            <TextBlock Grid.Row="14" Grid.Column="0" Text="{loc:Translate Field.FileSize}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
+                            <TextBox Grid.Row="14" Grid.Column="2" Text="{Binding SelectedFile.SizeDisplay, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}"
                                      AutomationProperties.Name="{loc:Translate Field.FileSize}"/>
-                            <TextBlock Grid.Row="16" Grid.Column="0" Text="{loc:Translate Field.Comment}" Foreground="{StaticResource Text.Dim}" FontSize="{StaticResource Type.Caption}"/>
-                            <TextBox Grid.Row="16" Grid.Column="2" Text="{Binding SelectedDetails.Comments, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"
+                            <TextBlock Grid.Row="16" Grid.Column="0" Text="{loc:Translate Field.Comment}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
+                            <TextBox Grid.Row="16" Grid.Column="2" Text="{Binding SelectedDetails.Comments, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
                                      AutomationProperties.Name="{loc:Translate Field.Comment}"/>
                         </Grid>
                     </ScrollViewer>
@@ -197,7 +197,7 @@
 
         <DockPanel Grid.Row="3" LastChildFill="False">
             <TextBlock DockPanel.Dock="Left" Text="{Binding Summary}"
-                       Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}" VerticalAlignment="Center"/>
+                       Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}" VerticalAlignment="Center"/>
             <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
                     Content="{loc:Translate Action.Close}" IsCancel="True"/>
         </DockPanel>

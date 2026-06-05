@@ -6,8 +6,9 @@ namespace InstallerClean.Helpers;
 
 /// <summary>
 /// Process-wide, observable view of the Windows accessibility settings
-/// WPF does not honour on its own. Today that is "show animations"
-/// (<see cref="ReduceMotion"/>); the value refreshes live when the user
+/// WPF does not honour on its own: "show animations"
+/// (<see cref="ReduceMotion"/>) and "make text bigger"
+/// (<see cref="TextScaleFactor"/>). Both refresh live when the user
 /// changes the setting while the app is running.
 /// </summary>
 /// <remarks>
@@ -22,6 +23,7 @@ public sealed class AccessibilitySettings : INotifyPropertyChanged
     public static AccessibilitySettings Current { get; } = new();
 
     private bool _reduceMotion;
+    private double _textScaleFactor = 1.0;
 
     private AccessibilitySettings()
     {
@@ -56,6 +58,22 @@ public sealed class AccessibilitySettings : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// OS text-scale multiplier (1.0 = 100%). Font sizing multiplies by
+    /// this to honour the "Make text bigger" accessibility slider, which
+    /// WPF does not apply on its own.
+    /// </summary>
+    public double TextScaleFactor
+    {
+        get => _textScaleFactor;
+        private set
+        {
+            if (_textScaleFactor == value) return;
+            _textScaleFactor = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TextScaleFactor)));
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private void Refresh()
@@ -73,5 +91,26 @@ public sealed class AccessibilitySettings : INotifyPropertyChanged
     private void ReadFromSystem()
     {
         ReduceMotion = !SystemParameters.ClientAreaAnimation;
+        TextScaleFactor = ReadTextScaleFactor();
+    }
+
+    private static double ReadTextScaleFactor()
+    {
+        // HKCU\SOFTWARE\Microsoft\Accessibility\TextScaleFactor holds the
+        // percentage (100..225) behind Settings > Accessibility > Text
+        // size. Absent means the slider was never moved, i.e. 100%.
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Accessibility");
+            if (key?.GetValue("TextScaleFactor") is int percent && percent > 0)
+                return percent / 100.0;
+        }
+        catch (Exception)
+        {
+            // A read failure (locked-down hive, transient denial) degrades
+            // to no scaling rather than taking the app down for a cosmetic
+            // setting.
+        }
+        return 1.0;
     }
 }

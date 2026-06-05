@@ -21,7 +21,7 @@
             BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <StackPanel>
             <TextBlock Text="{loc:Translate ConfirmSendResultLog.Title}"
-                       Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
+                       Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
                        TextWrapping="Wrap"
                        Margin="{StaticResource GapBottom.Md}"/>
 
@@ -44,7 +44,7 @@
                              Background="Transparent"
                              Foreground="{StaticResource Text.Body}"
                              FontFamily="Consolas, Cascadia Mono, Lucida Console, monospace"
-                             FontSize="{StaticResource Type.Body}"
+                             FontSize="{DynamicResource Type.Body}"
                              TextWrapping="NoWrap"
                              VerticalScrollBarVisibility="Disabled"
                              HorizontalScrollBarVisibility="Disabled"
@@ -55,7 +55,7 @@
             </Border>
 
             <TextBlock Text="{loc:Translate ConfirmSendResultLog.Reassurance}"
-                       Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
+                       Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
                        TextWrapping="Wrap"
                        Margin="{StaticResource GapBottom.Lg}"/>
 

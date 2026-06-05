@@ -23,10 +23,10 @@
             MaxWidth="440" MinWidth="320"
             BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <StackPanel>
-            <TextBlock x:Name="MessageText" Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Sm}"
+            <TextBlock x:Name="MessageText" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
                        TextWrapping="Wrap" Margin="{StaticResource GapBottom.Sm}"/>
 
-            <TextBlock x:Name="DestinationText" Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
+            <TextBlock x:Name="DestinationText" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
                        TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

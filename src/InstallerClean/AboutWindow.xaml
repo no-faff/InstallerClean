@@ -36,14 +36,14 @@
                    RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"
                    AutomationProperties.Name=""/>
             <TextBlock Text="{loc:Translate Window.About.Title}" Foreground="{StaticResource Text.Body}"
-                       FontSize="{StaticResource Type.Heading.Sm}" FontWeight="Medium"/>
+                       FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="Medium"/>
         </StackPanel>
         <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#xE8BB;" ToolTip="{loc:Translate Tooltip.Close}"
                 Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
                 Margin="{StaticResource CloseButtonOverhangMargin}" AutomationProperties.Name="{loc:Translate Automation.CloseWindow}"/>
 
         <TextBlock Grid.Row="1" Text="{loc:Translate Window.Main.Title}"
-                   Foreground="{StaticResource Text.Heading}" FontSize="{StaticResource Type.Heading.Md}" FontWeight="SemiBold"/>
+                   Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Md}" FontWeight="SemiBold"/>
 
         <!-- The status TextBlock to the right of the version is the
              result channel for the Check-for-updates button below.
@@ -57,15 +57,15 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0" x:Name="VersionText"
-                     Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}"
+                     Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
                      VerticalAlignment="Center" Margin="-2,0,0,0"/>
             <TextBlock Grid.Column="2" x:Name="CheckStatusText"
-                       Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}"
+                       Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
                        VerticalAlignment="Center" TextWrapping="NoWrap"
                        AutomationProperties.LiveSetting="Polite"/>
         </Grid>
 
-        <TextBlock Grid.Row="5" Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Body}">
+        <TextBlock Grid.Row="5" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
             <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/blob/main/LICENSE"
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}"
@@ -86,7 +86,7 @@
              Text.Body matches MOVE LOCATION and the registered-
              window PRODUCTS / PATCHES / PRODUCT DETAILS labels. -->
         <TextBlock Grid.Row="9" Text="{loc:Translate Section.SayThanks}"
-                   Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Heading.Sm}"
+                   Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                    AutomationProperties.Name="{loc:Translate Automation.SayThanks}"/>
 
         <Grid Grid.Row="11">

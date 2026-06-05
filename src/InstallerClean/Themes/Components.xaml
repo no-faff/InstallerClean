@@ -139,7 +139,7 @@
 
     <Style x:Key="AccentPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
-        <Setter Property="FontSize" Value="{StaticResource Type.Heading.Sm}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Heading.Sm}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="28,8"/>
         <Setter Property="Height" Value="40"/>
@@ -174,7 +174,7 @@
 
     <Style x:Key="PrimaryPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
-        <Setter Property="FontSize" Value="{StaticResource Type.Heading.Sm}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Heading.Sm}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="28,8"/>
         <Setter Property="Height" Value="40"/>
@@ -209,7 +209,7 @@
 
     <Style x:Key="DangerPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
-        <Setter Property="FontSize" Value="{StaticResource Type.Heading.Sm}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Heading.Sm}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="28,8"/>
         <Setter Property="Height" Value="40"/>
@@ -244,7 +244,7 @@
 
     <Style x:Key="GhostPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
-        <Setter Property="FontSize" Value="{StaticResource Type.Heading.Sm}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Heading.Sm}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="20,8"/>
         <Setter Property="Height" Value="40"/>
@@ -281,7 +281,7 @@
 
     <Style x:Key="CompactPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
-        <Setter Property="FontSize" Value="{StaticResource Type.Body}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="14,0"/>
         <Setter Property="Height" Value="30"/>
@@ -315,7 +315,7 @@
 
     <Style x:Key="CompactGhostPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
-        <Setter Property="FontSize" Value="{StaticResource Type.Body}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="12,0"/>
         <Setter Property="Height" Value="30"/>
@@ -353,7 +353,7 @@
         <Setter Property="Background" Value="{StaticResource Surface.Card}"/>
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <Setter Property="CaretBrush" Value="{StaticResource Text.Heading}"/>
-        <Setter Property="FontSize" Value="{StaticResource Type.Heading.Sm}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Heading.Sm}"/>
         <Setter Property="Height" Value="40"/>
         <Setter Property="Padding" Value="12,0"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -447,7 +447,7 @@
          not by the ▲/▼ glyph in the header text. -->
     <Style TargetType="GridViewColumnHeader">
         <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
-        <Setter Property="FontSize" Value="{StaticResource Type.Caption}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Caption}"/>
         <Setter Property="IsTabStop" Value="True"/>
         <Setter Property="Focusable" Value="True"/>
         <Setter Property="Template">
@@ -699,7 +699,7 @@
                             Padding="10,6">
                         <TextBlock Text="{TemplateBinding Content}"
                                    Foreground="{StaticResource Text.Heading}"
-                                   FontSize="{StaticResource Type.Body}"
+                                   FontSize="{DynamicResource Type.Body}"
                                    TextWrapping="Wrap"/>
                     </Border>
                 </ControlTemplate>
@@ -725,7 +725,7 @@
                             Padding="10,6">
                         <TextBlock Text="{TemplateBinding Content}"
                                    Foreground="{StaticResource Text.Body}"
-                                   FontSize="{StaticResource Type.Body}"
+                                   FontSize="{DynamicResource Type.Body}"
                                    TextWrapping="Wrap"/>
                     </Border>
                 </ControlTemplate>
