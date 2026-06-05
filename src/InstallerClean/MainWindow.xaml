@@ -224,7 +224,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0">
-                        <TextBox Style="{StaticResource PillTextBox}"
+                        <TextBox x:Name="MoveDestinationInput" Style="{StaticResource PillTextBox}"
                                  Text="{Binding Cleanup.MoveDestination, Mode=TwoWay,
                                                 UpdateSourceTrigger=PropertyChanged}"
                                  MaxLength="8192"
@@ -299,7 +299,7 @@
         <DockPanel Grid.Row="2" LastChildFill="False" Margin="4,8,24,8"
                    KeyboardNavigation.TabNavigation="Local"
                    IsEnabled="{Binding IsMainContentInteractive}">
-            <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
+            <Button x:Name="RescanButton" DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     KeyboardNavigation.TabIndex="0"
                     Content="{loc:Translate Action.Rescan}" Command="{Binding Scan.ScanCommand}"/>
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"

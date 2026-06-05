@@ -38,6 +38,13 @@ public partial class MainWindow : Window
         // overlay.
         if (_vm.Completion.IsComplete)
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
+        else if (!_vm.Scan.IsScanning)
+            // The startup scan runs during the splash, so it has usually
+            // finished by the time this window is built. When it found orphans
+            // (no all-clear overlay) land focus on the results default rather
+            // than leaving the bare window root unfocused, so a keyboard user
+            // has a visible focus ring on open.
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, () => FocusResultsDefault());
 
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
@@ -72,6 +79,20 @@ public partial class MainWindow : Window
             });
         }
 
+        if (e.PropertyName == nameof(CompletionViewModel.IsComplete) && !_vm.Completion.IsComplete)
+        {
+            // Overlay dismissed (Done / Esc / click-dim). The focused button is
+            // gone, so move focus to a sensible non-destructive control rather
+            // than letting it drop to the window root. RescanAfterCompletion
+            // also clears IsComplete but immediately starts a scan; the
+            // IsScanning guard defers to the scanning overlay's own focus then.
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
+            {
+                if (!_vm.Scan.IsScanning)
+                    RescanButton.Focus();
+            });
+        }
+
         // ResultLogStatusMessage transitions empty -> non-empty on the
         // first "Sending..." reveal. WPF's UIA bridge does not re-fire
         // LiveRegionChanged for the Visibility=Collapsed→Visible
@@ -99,6 +120,18 @@ public partial class MainWindow : Window
         if (e.PropertyName == nameof(ScanViewModel.IsScanning) && _vm.Scan.IsScanning)
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => ScanCancelButton.Focus());
 
+        if (e.PropertyName == nameof(ScanViewModel.IsScanning) && !_vm.Scan.IsScanning)
+            // A scan just finished. If it found orphans (no all-clear overlay)
+            // the scanning overlay's cancel-button focus is gone, so route focus
+            // to the results default. If it found nothing the all-clear overlay
+            // is up and OnCompletionPropertyChanged focuses Done; the IsComplete
+            // guard skips this path then.
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
+            {
+                if (!_vm.Completion.IsComplete)
+                    FocusResultsDefault();
+            });
+
         // WPF's UIA bridge does not re-fire LiveRegionChanged for a
         // Visibility=Collapsed→Visible transition; the bridge only
         // announces text changes inside an already-rendered subtree.
@@ -111,6 +144,13 @@ public partial class MainWindow : Window
         if (e.PropertyName == nameof(ScanViewModel.HasStaleMsiEntries) && _vm.Scan.HasStaleMsiEntries)
             Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(StaleMsiEntriesText));
     }
+
+    // Routes focus to the move-destination field, the entry point of the Move
+    // workflow, for the results-shown state that appears with no overlay (the
+    // startup scan or a manual re-scan that found orphans). Never the
+    // destructive Delete. A no-op when an overlay has disabled the main content,
+    // because Focus() cannot land on a disabled control.
+    private void FocusResultsDefault() => MoveDestinationInput.Focus();
 
     private static void RaiseLiveRegionChanged(FrameworkElement element)
     {
