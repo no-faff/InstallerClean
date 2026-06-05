@@ -13,30 +13,21 @@ namespace InstallerClean.Cli;
 /// naturally. Resolves services from a CLI-only DI container that
 /// knows nothing about MessageBox, Window or MainViewModel: the only
 /// shared surface with the GUI is <see cref="Services.CoreComposition.AddInstallerCleanCore"/>.
+/// The arg-to-command and result-to-exit-code decisions live in
+/// <see cref="CliContract"/> (Core) so they carry unit-test coverage; this
+/// host stays a thin Console/Environment shell around them.
 /// </summary>
 internal static class Program
 {
-    /// <summary>0 = every file the scan flagged was processed.</summary>
-    private const int ExitOk = 0;
-
-    /// <summary>1 = hard failure: scan failed, bad args, or every file
-    /// in the batch failed. Not transient.</summary>
-    private const int ExitError = 1;
-
-    /// <summary>2 = partial: the operation processed some files but at
-    /// least one failed. Distinct from ExitError so a retry policy
-    /// can act on the partial case differently from total failure.</summary>
-    private const int ExitPartial = 2;
-
-    /// <summary>75 = POSIX EX_TEMPFAIL: transient. The single-instance
-    /// mutex is held by the GUI or another CLI run, or a pending
-    /// Windows Installer transaction blocks cache changes. Distinct
-    /// from ExitError so a retry-on-transient policy can fire here
-    /// and back off on hard failure.</summary>
-    private const int ExitTransient = 75;
-
-    /// <summary>POSIX convention: 130 == 128 + SIGINT (Ctrl+C).</summary>
-    private const int ExitCancelled = 130;
+    // Exit codes are defined once in CliExitCode (Core) so the host and its
+    // tests cannot drift on the contract RMM tooling pins to; the per-code
+    // rationale lives on the CliExitCode members. Aliased here so the body
+    // reads ExitOk / ExitError rather than the qualified form at every return.
+    private const int ExitOk = CliExitCode.Ok;
+    private const int ExitError = CliExitCode.Error;
+    private const int ExitPartial = CliExitCode.Partial;
+    private const int ExitTransient = CliExitCode.Transient;
+    private const int ExitCancelled = CliExitCode.Cancelled;
 
     public static int Main(string[] args)
     {
@@ -46,36 +37,23 @@ internal static class Program
         // default code page.
         Console.OutputEncoding = Encoding.UTF8;
 
-        // Lowercase up front so every later comparison (--help, /?, -h,
-        // /s, /d, /m) is case-insensitive. PowerShell users frequently
-        // type /S in upper case.
-        var arg = args.Length == 0 ? string.Empty : args[0].ToLowerInvariant();
-
-        if (args.Length == 0 || arg is "--help" or "/?" or "-h")
+        var invocation = CliContract.ParseArguments(args);
+        switch (invocation.Command)
         {
-            PrintUsage();
-            return ExitOk;
+            case CliCommand.Help:
+                PrintUsage();
+                return ExitOk;
+            case CliCommand.UnknownArgument:
+            case CliCommand.TooManyArguments:
+                Console.WriteLine(string.Format(Strings.Cli_UnknownArgument, invocation.OffendingArgument));
+                Console.WriteLine();
+                PrintUsage();
+                return ExitError;
         }
 
-        if (arg is not "/d" and not "/m" and not "/s")
-        {
-            Console.WriteLine(string.Format(Strings.Cli_UnknownArgument, args[0]));
-            Console.WriteLine();
-            PrintUsage();
-            return ExitError;
-        }
-
-        // /m takes an optional second arg (the destination); /s and /d
-        // take none. Reject anything beyond so an unquoted path with
-        // spaces ("/m D:\My Backup") doesn't silently become "D:\My".
-        var maxArgs = arg == "/m" ? 2 : 1;
-        if (args.Length > maxArgs)
-        {
-            Console.WriteLine(string.Format(Strings.Cli_UnknownArgument, args[maxArgs]));
-            Console.WriteLine();
-            PrintUsage();
-            return ExitError;
-        }
+        // Only the work commands (/s, /d, /m) remain. The lower-cased flag
+        // drives the EventLog mode label and the /d-or-/m mutex check.
+        var arg = args[0].ToLowerInvariant();
 
         // Cancel handler before mutex: a Ctrl+C in the gap should
         // print "Cancelling..." rather than terminate via the default
@@ -120,7 +98,7 @@ internal static class Program
                 // InstallerClean entries needs an audit record on the
                 // skipped path to distinguish it from "the task never
                 // fired".
-                EventLogWriter.Write(EventLogWriter.Level.Information,
+                EventLogWriter.Write(CliEventClass.TransientSkip,
                     string.Format(Strings.Cli_EventLogMutexBlocked, arg));
                 if (EventLogWriter.EventLogUnavailable)
                     Console.WriteLine(Strings.Cli_EventLogUnavailable);
@@ -142,7 +120,7 @@ internal static class Program
             // AbandonedMutexException path. A console Main has no
             // SynchronizationContext, so GetResult here cannot deadlock
             // on captured-context resumption.
-            return RunWorkAsync(arg, args, cts.Token).GetAwaiter().GetResult();
+            return RunWorkAsync(arg, invocation, cts.Token).GetAwaiter().GetResult();
         }
         finally
         {
@@ -157,7 +135,7 @@ internal static class Program
         }
     }
 
-    private static async Task<int> RunWorkAsync(string arg, string[] args, CancellationToken token)
+    private static async Task<int> RunWorkAsync(string arg, CliInvocation invocation, CancellationToken token)
     {
         // Tracks the highest CurrentFile reported by the move/delete
         // progress reporter. On a Ctrl+C mid-loop the OCE catch reads
@@ -186,7 +164,7 @@ internal static class Program
             if (count == 0)
             {
                 Console.WriteLine(Strings.Cli_NothingToDo);
-                EventLogWriter.Write(EventLogWriter.Level.Information,
+                EventLogWriter.Write(CliEventClass.Ok,
                     string.Format(Strings.Cli_EventLogScanNoOrphans,
                         arg, scanResult.RegisteredPackages.Count,
                         DisplayHelpers.PluralisePackage(scanResult.RegisteredPackages.Count)));
@@ -198,7 +176,7 @@ internal static class Program
                 Console.WriteLine(string.Join(Environment.NewLine,
                     scanResult.RemovableFiles.Select(f =>
                         $"  {f.FileName}  ({f.SizeDisplay}, {f.Reason})")));
-                EventLogWriter.Write(EventLogWriter.Level.Information,
+                EventLogWriter.Write(CliEventClass.Ok,
                     string.Format(Strings.Cli_EventLogScanFound,
                         arg, count, DisplayHelpers.PluraliseFile(count), size));
                 return ExitOk;
@@ -244,7 +222,7 @@ internal static class Program
                             Strings.Cli_EventLogReason_PendingRenameInCache,
                         _ => reason.ToString(),
                     };
-                    EventLogWriter.Write(EventLogWriter.Level.Warning,
+                    EventLogWriter.Write(CliEventClass.TransientSkip,
                         string.Format(Strings.Cli_EventLogPendingRebootBlocked,
                             arg,
                             reasonLabel,
@@ -288,7 +266,7 @@ internal static class Program
                 if (result.RecycleUnavailable)
                 {
                     Console.WriteLine(Strings.Cli_RecycleUnavailable);
-                    EventLogWriter.Write(EventLogWriter.Level.Warning,
+                    EventLogWriter.Write(CliEventClass.TransientSkip,
                         string.Format(Strings.Cli_EventLogRecycleUnavailable, arg));
                     return ExitTransient;
                 }
@@ -315,14 +293,12 @@ internal static class Program
                     ? totalBytes
                     : SumBytesExcludingErrors(scanResult.RemovableFiles, result.Errors);
                 var actualSize = DisplayHelpers.FormatSize(actualBytes);
-                var level = result.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
-                EventLogWriter.Write(level,
+                var outcome = CliContract.ClassifyFileOperation(result.DeletedCount, result.Errors.Count);
+                EventLogWriter.Write(outcome.EventClass,
                     string.Format(Strings.Cli_EventLogDeleteSummary,
                         arg, result.DeletedCount, count, DisplayHelpers.PluraliseFile(count),
                         actualSize, result.Errors.Count, DisplayHelpers.PluraliseError(result.Errors.Count)));
-                if (result.Errors.Count == 0) return ExitOk;
-                if (result.DeletedCount > 0) return ExitPartial;
-                return ExitError;
+                return outcome.ExitCode;
             }
 
             // Two destination sources: a command-line argument supplied
@@ -332,14 +308,14 @@ internal static class Program
             // A stale Scheduled Task argument has the same trust posture
             // as a stale settings.json once the CLI is running elevated.
             string dest;
-            if (args.Length > 1)
-                dest = args[1].Trim();
+            if (invocation.MoveDestination is not null)
+                dest = invocation.MoveDestination.Trim();
             else
                 dest = services.GetRequiredService<ISettingsService>().Load().MoveDestination;
             if (string.IsNullOrWhiteSpace(dest))
             {
                 Console.WriteLine(Strings.Cli_NoMoveDestination);
-                EventLogWriter.Write(EventLogWriter.Level.Warning,
+                EventLogWriter.Write(CliEventClass.HardError,
                     string.Format(Strings.Cli_EventLogMoveNoDestination, arg));
                 return ExitError;
             }
@@ -350,7 +326,7 @@ internal static class Program
             if (!Path.IsPathFullyQualified(dest))
             {
                 Console.WriteLine(string.Format(Strings.Cli_MoveDestinationRelative, dest));
-                EventLogWriter.Write(EventLogWriter.Level.Warning,
+                EventLogWriter.Write(CliEventClass.HardError,
                     string.Format(Strings.Cli_EventLogMoveDestinationRelative, arg, dest));
                 return ExitError;
             }
@@ -358,7 +334,7 @@ internal static class Program
             if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
             {
                 Console.WriteLine(Strings.Cli_MoveDestinationInsideInstaller);
-                EventLogWriter.Write(EventLogWriter.Level.Warning,
+                EventLogWriter.Write(CliEventClass.HardError,
                     string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, arg, dest));
                 return ExitError;
             }
@@ -370,7 +346,7 @@ internal static class Program
             if (InstallerCacheHelpers.IsSystemFolderOrChild(dest))
             {
                 Console.WriteLine(string.Format(Strings.Cli_MoveDestinationInSystemFolder, dest));
-                EventLogWriter.Write(EventLogWriter.Level.Warning,
+                EventLogWriter.Write(CliEventClass.HardError,
                     string.Format(Strings.Cli_EventLogMoveDestinationInSystemFolder, arg, dest));
                 return ExitError;
             }
@@ -395,14 +371,12 @@ internal static class Program
                 ? totalBytes
                 : SumBytesExcludingErrors(scanResult.RemovableFiles, moveResult.Errors);
             var actualMovedSize = DisplayHelpers.FormatSize(actualMovedBytes);
-            var moveLevel = moveResult.Errors.Count > 0 ? EventLogWriter.Level.Warning : EventLogWriter.Level.Information;
-            EventLogWriter.Write(moveLevel,
+            var moveOutcome = CliContract.ClassifyFileOperation(moveResult.MovedCount, moveResult.Errors.Count);
+            EventLogWriter.Write(moveOutcome.EventClass,
                 string.Format(Strings.Cli_EventLogMoveSummary,
                     arg, moveResult.MovedCount, count, DisplayHelpers.PluraliseFile(count),
                     dest, actualMovedSize, moveResult.Errors.Count, DisplayHelpers.PluraliseError(moveResult.Errors.Count)));
-            if (moveResult.Errors.Count == 0) return ExitOk;
-            if (moveResult.MovedCount > 0) return ExitPartial;
-            return ExitError;
+            return moveOutcome.ExitCode;
         }
         catch (OperationCanceledException)
         {
@@ -412,7 +386,7 @@ internal static class Program
             // committed before the Ctrl+C arrived.
             if (processedCount > 0)
             {
-                EventLogWriter.Write(EventLogWriter.Level.Warning,
+                EventLogWriter.Write(CliEventClass.Partial,
                     string.Format(Strings.Cli_EventLogCancelledPartial,
                         arg, processedCount, totalToProcess,
                         DisplayHelpers.PluraliseFile(totalToProcess)));
@@ -431,7 +405,7 @@ internal static class Program
             // deep in the framework can carry cross-profile paths and
             // falls through to the generic catch below.
             Console.WriteLine(ex.Message);
-            EventLogWriter.Write(EventLogWriter.Level.Warning,
+            EventLogWriter.Write(CliEventClass.HardError,
                 string.Format(Strings.Cli_EventLogValidationFailed, arg, ex.Message));
             return ExitError;
         }
@@ -439,7 +413,7 @@ internal static class Program
         {
             // Same safe-to-echo contract as LocalisedAccessException.
             Console.WriteLine(ex.Message);
-            EventLogWriter.Write(EventLogWriter.Level.Warning,
+            EventLogWriter.Write(CliEventClass.HardError,
                 string.Format(Strings.Cli_EventLogValidationFailed, arg, ex.Message));
             return ExitError;
         }
@@ -454,7 +428,7 @@ internal static class Program
             Console.WriteLine(crash.Written
                 ? string.Format(Strings.Cli_GenericError, typeName, crash.Path)
                 : string.Format(Strings.Cli_GenericError_NoLog, typeName));
-            EventLogWriter.Write(EventLogWriter.Level.Warning, crash.Written
+            EventLogWriter.Write(CliEventClass.HardError, crash.Written
                 ? string.Format(Strings.Cli_EventLogHardError, arg, typeName, crash.Path)
                 : string.Format(Strings.Cli_EventLogHardError_NoLog, arg, typeName));
             return ExitError;

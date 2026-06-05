@@ -18,12 +18,6 @@ internal static class EventLogWriter
 {
     private const string SourceName = "InstallerClean";
 
-    internal enum Level
-    {
-        Information,
-        Warning,
-    }
-
     /// <summary>
     /// Sticky flag: set true on the first Write that fails (source
     /// creation denied by Group Policy, event-log service stopped,
@@ -35,12 +29,15 @@ internal static class EventLogWriter
     internal static bool EventLogUnavailable { get; private set; }
 
     /// <summary>
-    /// Writes the summary entry. Never throws; a failed write (source
-    /// creation denied, event log service stopped, non-Windows host,
-    /// source mapped to a non-Application log) is swallowed because the
-    /// primary output channel is stdout, not the event log.
+    /// Writes the summary entry, classified by <paramref name="outcome"/> so
+    /// the entry carries a stable Event ID and entry type (see
+    /// <see cref="CliContract.EventIdFor"/> / <see cref="CliContract.EntryTypeFor"/>).
+    /// Never throws; a failed write (source creation denied, event log
+    /// service stopped, non-Windows host, source mapped to a non-Application
+    /// log) is swallowed because the primary output channel is stdout, not
+    /// the event log.
     /// </summary>
-    internal static void Write(Level level, string summary)
+    internal static void Write(CliEventClass outcome, string summary)
     {
         try
         {
@@ -49,10 +46,8 @@ internal static class EventLogWriter
                 EventLogUnavailable = true;
                 return;
             }
-            var entryType = level == Level.Warning
-                ? EventLogEntryType.Warning
-                : EventLogEntryType.Information;
-            EventLog.WriteEntry(SourceName, summary, entryType);
+            EventLog.WriteEntry(SourceName, summary,
+                CliContract.EntryTypeFor(outcome), CliContract.EventIdFor(outcome));
         }
         catch
         {
