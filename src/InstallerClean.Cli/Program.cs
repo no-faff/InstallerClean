@@ -169,6 +169,17 @@ internal static class Program
                 .AddInstallerCleanCore()
                 .BuildServiceProvider(validateScopes: true);
 
+            // For /m, resolve and validate the destination before the scan so
+            // a misconfigured task fails fast instead of paying a full
+            // Installer-folder walk every run before erroring on the path.
+            string moveDest = string.Empty;
+            if (arg == "/m")
+            {
+                var destFailure = ResolveAndValidateMoveDestination(services, invocation, arg, out moveDest);
+                if (destFailure is int destExitCode)
+                    return destExitCode;
+            }
+
             var scanService = services.GetRequiredService<IFileSystemScanService>();
 
             Console.WriteLine(Strings.Cli_ScanningInstaller);
@@ -320,60 +331,13 @@ internal static class Program
                 return outcome.ExitCode;
             }
 
-            // Two destination sources: a command-line argument supplied
-            // at invocation, or the path last written into
-            // %LOCALAPPDATA%. Both go through the same fully-qualified,
-            // not-inside-Installer, not-inside-System-folder gates below.
-            // A stale Scheduled Task argument has the same trust posture
-            // as a stale settings.json once the CLI is running elevated.
-            string dest;
-            if (invocation.MoveDestination is not null)
-                dest = invocation.MoveDestination.Trim();
-            else
-                dest = services.GetRequiredService<ISettingsService>().Load().MoveDestination;
-            if (string.IsNullOrWhiteSpace(dest))
-            {
-                Console.WriteLine(Strings.Cli_NoMoveDestination);
-                EventLogWriter.Write(CliEventClass.HardError,
-                    string.Format(Strings.Cli_EventLogMoveNoDestination, arg));
-                return ExitError;
-            }
-
-            // Reject relative destinations: Path.GetFullPath would
-            // otherwise resolve them against the process CWD, and the
-            // CLI host's CWD is whatever the caller invoked it from.
-            if (!Path.IsPathFullyQualified(dest))
-            {
-                Console.WriteLine(string.Format(Strings.Cli_MoveDestinationRelative, dest));
-                EventLogWriter.Write(CliEventClass.HardError,
-                    string.Format(Strings.Cli_EventLogMoveDestinationRelative, arg, dest));
-                return ExitError;
-            }
-
-            if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
-            {
-                Console.WriteLine(Strings.Cli_MoveDestinationInsideInstaller);
-                EventLogWriter.Write(CliEventClass.HardError,
-                    string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, arg, dest));
-                return ExitError;
-            }
-
-            // System-folder gate covers both destination sources: the
-            // command-line /m argument and the settings-loaded fallback
-            // have the same trust posture (an admin's stale Scheduled
-            // Task argument can drift just like a stale settings.json).
-            if (InstallerCacheHelpers.IsSystemFolderOrChild(dest))
-            {
-                Console.WriteLine(string.Format(Strings.Cli_MoveDestinationInSystemFolder, dest));
-                EventLogWriter.Write(CliEventClass.HardError,
-                    string.Format(Strings.Cli_EventLogMoveDestinationInSystemFolder, arg, dest));
-                return ExitError;
-            }
-
+            // The /m destination was resolved and validated before the scan
+            // (see ResolveAndValidateMoveDestination); moveDest is non-empty,
+            // fully qualified and outside the Installer and system folders.
             var moveService = services.GetRequiredService<IMoveFilesService>();
             Console.WriteLine(string.Format(Strings.Cli_MovingFiles,
-                count, DisplayHelpers.PluraliseFile(count), dest));
-            var moveResult = await moveService.MoveFilesAsync(filePaths, dest, progress, token);
+                count, DisplayHelpers.PluraliseFile(count), moveDest));
+            var moveResult = await moveService.MoveFilesAsync(filePaths, moveDest, progress, token);
             Console.WriteLine(string.Format(Strings.Cli_MovedFiles,
                 moveResult.MovedCount, DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
             if (moveResult.Errors.Count > 0)
@@ -394,7 +358,7 @@ internal static class Program
             EventLogWriter.Write(moveOutcome.EventClass,
                 string.Format(Strings.Cli_EventLogMoveSummary,
                     arg, moveResult.MovedCount, count, DisplayHelpers.PluraliseFile(count),
-                    dest, actualMovedSize, moveResult.Errors.Count, DisplayHelpers.PluraliseError(moveResult.Errors.Count)));
+                    moveDest, actualMovedSize, moveResult.Errors.Count, DisplayHelpers.PluraliseError(moveResult.Errors.Count)));
             return moveOutcome.ExitCode;
         }
         catch (OperationCanceledException)
@@ -476,6 +440,62 @@ internal static class Program
         return removableFiles
             .Where(f => !errorPaths.Contains(f.FullPath))
             .Sum(f => f.SizeBytes);
+    }
+
+    /// <summary>
+    /// Resolves the /m destination (the command-line path, or the path saved
+    /// in %LOCALAPPDATA% when none was given) and runs the fully-qualified,
+    /// not-inside-Installer and not-inside-System-folder gates. Returns null
+    /// when the destination is valid, setting <paramref name="dest"/>; or the
+    /// exit code to return when it is not, after printing the stdout reason
+    /// and writing the EventLog entry. Both sources have the same trust
+    /// posture once the CLI runs elevated, so a stale Scheduled Task argument
+    /// is gated exactly like a stale settings.json. Called before the scan so
+    /// a misconfigured /m fails before paying for a full Installer-folder walk.
+    /// </summary>
+    private static int? ResolveAndValidateMoveDestination(
+        IServiceProvider services, CliInvocation invocation, string arg, out string dest)
+    {
+        dest = invocation.MoveDestination is not null
+            ? invocation.MoveDestination.Trim()
+            : services.GetRequiredService<ISettingsService>().Load().MoveDestination;
+
+        if (string.IsNullOrWhiteSpace(dest))
+        {
+            Console.WriteLine(Strings.Cli_NoMoveDestination);
+            EventLogWriter.Write(CliEventClass.HardError,
+                string.Format(Strings.Cli_EventLogMoveNoDestination, arg));
+            return ExitError;
+        }
+
+        // Reject relative destinations: Path.GetFullPath would otherwise
+        // resolve them against the process CWD, and the CLI host's CWD is
+        // whatever the caller invoked it from.
+        if (!Path.IsPathFullyQualified(dest))
+        {
+            Console.WriteLine(string.Format(Strings.Cli_MoveDestinationRelative, dest));
+            EventLogWriter.Write(CliEventClass.HardError,
+                string.Format(Strings.Cli_EventLogMoveDestinationRelative, arg, dest));
+            return ExitError;
+        }
+
+        if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
+        {
+            Console.WriteLine(Strings.Cli_MoveDestinationInsideInstaller);
+            EventLogWriter.Write(CliEventClass.HardError,
+                string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, arg, dest));
+            return ExitError;
+        }
+
+        if (InstallerCacheHelpers.IsSystemFolderOrChild(dest))
+        {
+            Console.WriteLine(string.Format(Strings.Cli_MoveDestinationInSystemFolder, dest));
+            EventLogWriter.Write(CliEventClass.HardError,
+                string.Format(Strings.Cli_EventLogMoveDestinationInSystemFolder, arg, dest));
+            return ExitError;
+        }
+
+        return null;
     }
 
     private static void PrintUsage()
