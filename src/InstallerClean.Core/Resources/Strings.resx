@@ -225,12 +225,14 @@
     <value>This installer file has been deleted. InstallerClean didn't do it, it never removes a file a program still needs; something else deleted this one before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
-  <data name="Body.RegisteredMissingFromDisk.SeeAlso.Prefix" xml:space="preserve">
-    <value>The README </value>
-    <comment>The missing-file note's closing sentence is three keys (prefix, link text, suffix) so "explains this folder" can render as a live Hyperlink to the README's recovery section, rather than as plain bound text. The trailing space on the prefix is the gap before the link; xml:space=preserve keeps it.</comment>
-  </data>
-  <data name="Body.RegisteredMissingFromDisk.SeeAlso.Link" xml:space="preserve"><value>explains this folder</value></data>
-  <data name="Body.RegisteredMissingFromDisk.SeeAlso.Suffix" xml:space="preserve"><value>, and how to recover a file, in Microsoft's own words.</value></data>
+  <!-- The missing-file note's closing sentence, rendered as a TextBlock
+       with one inline Hyperlink built at load time (RegisteredFilesWindow
+       .BuildSeeAlsoLine). The linked phrase is delimited by [ ] so a
+       translator can place it anywhere in the sentence; the code splits on
+       the first [ and ] into a prefix Run, the Hyperlink (to the README's
+       recovery section), and a suffix Run. A string with no [ ] pair
+       renders verbatim as one Run. -->
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso" xml:space="preserve"><value>The README [explains this folder], and how to recover a file, in Microsoft's own words.</value></data>
   <data name="Body.NoPatches" xml:space="preserve"><value>(none)</value></data>
 
   <!-- Reasons (Reason column in the orphaned-files list) -->

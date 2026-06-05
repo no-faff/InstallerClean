@@ -253,13 +253,15 @@
                                 <StackPanel Grid.Column="1" VerticalAlignment="Top">
                                     <TextBlock Text="{Binding SelectedMissingNote}" Foreground="{StaticResource Text.Body}"
                                                FontSize="{StaticResource Type.Body}" TextWrapping="Wrap"/>
-                                    <!-- The note's closing line is a separate TextBlock so "explains
-                                         this folder" can be a live Hyperlink (Run/Hyperlink/Run) into
-                                         the README's recovery section; Hyperlink_Click routes it through
-                                         the unelevated launcher. Top margin matches the blank-line gap
+                                    <!-- The note's closing line is built in code-behind
+                                         (BuildSeeAlsoLine) from one resx string whose linked phrase is
+                                         delimited by [ ]: a prefix Run, one Hyperlink into the README's
+                                         recovery section (Hyperlink_Click routes it through the unelevated
+                                         launcher), then a suffix Run. A single string keeps the sentence
+                                         translatable as a whole. Top margin matches the blank-line gap
                                          between the bound paragraphs above. -->
-                                    <TextBlock Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}"
-                                               TextWrapping="Wrap" Margin="0,16,0,0"><Run Text="{loc:Translate Body.RegisteredMissingFromDisk.SeeAlso.Prefix}"/><Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean#if-a-needed-file-goes-missing" Click="Hyperlink_Click" Style="{StaticResource SubtleLink}"><Run Text="{loc:Translate Body.RegisteredMissingFromDisk.SeeAlso.Link}"/></Hyperlink><Run Text="{loc:Translate Body.RegisteredMissingFromDisk.SeeAlso.Suffix}"/></TextBlock>
+                                    <TextBlock x:Name="SeeAlsoText" Foreground="{StaticResource Text.Body}" FontSize="{StaticResource Type.Body}"
+                                               TextWrapping="Wrap" Margin="0,16,0,0"/>
                                 </StackPanel>
                             </Grid>
                         </ScrollViewer>

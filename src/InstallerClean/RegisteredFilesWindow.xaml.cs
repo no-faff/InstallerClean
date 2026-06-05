@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
 using InstallerClean.Models;
@@ -60,6 +61,50 @@ public partial class RegisteredFilesWindow : Window
         _lastSortDirection = ListSortDirection.Ascending;
         _lastSortColumn = ColProductName;
         UpdateSortIndicators();
+
+        BuildSeeAlsoLine();
+    }
+
+    // README anchor for the "if a needed file goes missing" recovery
+    // section the missing-file note links to.
+    private const string MissingFileRecoveryUrl =
+        "https://github.com/no-faff/InstallerClean#if-a-needed-file-goes-missing";
+
+    /// <summary>
+    /// Builds the missing-file note's closing line from a single resx string
+    /// whose linked phrase is delimited by <c>[ ]</c>: a prefix Run, one
+    /// Hyperlink into the README's recovery section, then a suffix Run.
+    /// Holding the sentence in one string (rather than three prefix/link/suffix
+    /// keys) lets a translator move the link anywhere in it. A string with no
+    /// <c>[ ]</c> pair renders verbatim as a single Run.
+    /// </summary>
+    private void BuildSeeAlsoLine()
+    {
+        var raw = Strings.Body_RegisteredMissingFromDisk_SeeAlso;
+        SeeAlsoText.Inlines.Clear();
+
+        int open = raw.IndexOf('[');
+        int close = open >= 0 ? raw.IndexOf(']', open + 1) : -1;
+        if (open < 0 || close < 0)
+        {
+            SeeAlsoText.Inlines.Add(new Run(raw));
+            return;
+        }
+
+        var prefix = raw[..open];
+        var linkText = raw[(open + 1)..close];
+        var suffix = raw[(close + 1)..];
+
+        var link = new Hyperlink(new Run(linkText))
+        {
+            NavigateUri = new Uri(MissingFileRecoveryUrl),
+            Style = (Style)FindResource("SubtleLink"),
+        };
+        link.Click += Hyperlink_Click;
+
+        if (prefix.Length > 0) SeeAlsoText.Inlines.Add(new Run(prefix));
+        SeeAlsoText.Inlines.Add(link);
+        if (suffix.Length > 0) SeeAlsoText.Inlines.Add(new Run(suffix));
     }
 
     private (string Plain, GridViewColumn Col)[] SortableColumns => new[]
