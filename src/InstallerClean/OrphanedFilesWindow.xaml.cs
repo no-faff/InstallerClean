@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Data;
 using InstallerClean.Helpers;
@@ -95,10 +96,24 @@ public partial class OrphanedFilesWindow : Window
     private void UpdateSortIndicators()
     {
         var arrow = _lastSortDirection == ListSortDirection.Ascending ? "  ▲" : "  ▼";
+        var sortedName = string.Empty;
         foreach (var (plain, col) in SortableColumns)
         {
-            col.Header = ReferenceEquals(col, _lastSortColumn) ? plain + arrow : plain;
+            var isSorted = ReferenceEquals(col, _lastSortColumn);
+            col.Header = isSorted ? plain + arrow : plain;
+            if (isSorted) sortedName = plain;
         }
+
+        // Expose the sort state as a UIA property so a screen reader announces
+        // "Sorted by Size, descending" instead of spelling out the sort-arrow
+        // glyph in the header text. Set on the ListView because the generated
+        // header controls are not addressable from here; the glyph stays for
+        // sighted users.
+        AutomationProperties.SetItemStatus(FilesList, string.Format(
+            _lastSortDirection == ListSortDirection.Ascending
+                ? Strings.Automation_SortStatus_Ascending
+                : Strings.Automation_SortStatus_Descending,
+            sortedName));
     }
 
     private void OnClosed(object? sender, EventArgs e)

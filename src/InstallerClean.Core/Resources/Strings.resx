@@ -194,6 +194,13 @@
   <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Available for cleanup.</value></data>
   <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Details, registered files</value></data>
   <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Read-only inventory.</value></data>
+  <!-- Screen-reader sort state for the detail-window lists, set as
+       AutomationProperties.ItemStatus in UpdateSortIndicators so the sort
+       direction is a UIA property a reader can announce, rather than the
+       ▲/▼ glyph appended to the visible header text. 0 = the sorted column's
+       name (a Field.* label). -->
+  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>Sorted by {0}, ascending</value></data>
+  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>Sorted by {0}, descending</value></data>
 
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Buy me a cuppa</value></data>

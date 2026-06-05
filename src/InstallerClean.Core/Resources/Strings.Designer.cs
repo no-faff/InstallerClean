@@ -93,6 +93,8 @@ public static class Strings
     public static string Automation_Section_ProductDetails => Get("Automation.Section.ProductDetails");
     public static string Automation_Section_Products => Get("Automation.Section.Products");
     public static string Automation_SendResultLog_HelpText => Get("Automation.SendResultLog.HelpText");
+    public static string Automation_SortStatus_Ascending => Get("Automation.SortStatus.Ascending");
+    public static string Automation_SortStatus_Descending => Get("Automation.SortStatus.Descending");
     public static string Automation_StartupScanProgress => Get("Automation.StartupScanProgress");
     public static string Automation_ViewOrphanedFiles => Get("Automation.ViewOrphanedFiles");
     public static string Automation_ViewOrphanedFiles_HelpText => Get("Automation.ViewOrphanedFiles.HelpText");

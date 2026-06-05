@@ -434,20 +434,43 @@
         </Setter>
     </Style>
 
+    <!-- Detail-window column headers. Made keyboard-focusable so column sort
+         works without a mouse: GridViewColumnHeader derives from ButtonBase,
+         so Space/Enter on a focused header fires the Click the detail windows
+         already handle. The Role=Padding trigger keeps the filler header WPF
+         generates past the last column out of the tab order, where it would
+         otherwise be a focusable stop with no column behind it. The
+         IsKeyboardFocused fill gives the focused header a visible cue on the
+         dark surface; the sort direction itself is exposed to a screen reader
+         via AutomationProperties.ItemStatus (set in UpdateSortIndicators),
+         not by the ▲/▼ glyph in the header text. -->
     <Style TargetType="GridViewColumnHeader">
         <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
         <Setter Property="FontSize" Value="{StaticResource Type.Caption}"/>
+        <Setter Property="IsTabStop" Value="True"/>
+        <Setter Property="Focusable" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="GridViewColumnHeader">
-                    <Border Background="Transparent" Padding="8,6"
+                    <Border x:Name="HeaderBorder" Background="Transparent" Padding="8,6"
                             BorderThickness="0,0,0,1"
                             BorderBrush="{StaticResource Surface.Sidebar}">
                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource Action.Primary.Background}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="Role" Value="Padding">
+                <Setter Property="IsTabStop" Value="False"/>
+                <Setter Property="Focusable" Value="False"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Links. SubtleLink is an in-body Hyperlink that brightens to
