@@ -334,9 +334,12 @@
        consent, or cancel. Wording states only the confirmed fact (the probe
        found the bin unavailable for the drive); it never asserts an
        unconfirmed cause (off vs corrupt vs full). 0 = file count,
-       1 = pluralised noun, 2 = size display. -->
+       1 = pluralised noun, 2 = size display. The singular text omits
+       {0}: "this file" reads better than "this 1 file". The call site
+       passes all three args either way, so the singular's {1} and {2}
+       still resolve. -->
   <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>The Recycle Bin isn't available for this drive</value></data>
-  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>So this {0} {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently.</value></data>
+  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>So this {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently.</value></data>
   <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently.</value></data>
   <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Deleting it is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.</value></data>
   <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Deleting them is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.</value></data>
