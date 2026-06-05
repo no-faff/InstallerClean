@@ -118,6 +118,7 @@ public static class Strings
     public static string Cli_Cancelling => Get("Cli.Cancelling");
     public static string Cli_DeletedFiles => Get("Cli.DeletedFiles");
     public static string Cli_DeletingFiles => Get("Cli.DeletingFiles");
+    public static string Cli_EventLogBadArguments => Get("Cli.EventLogBadArguments");
     public static string Cli_EventLogCancelledPartial => Get("Cli.EventLogCancelledPartial");
     public static string Cli_EventLogDeleteSummary => Get("Cli.EventLogDeleteSummary");
     public static string Cli_EventLogHardError => Get("Cli.EventLogHardError");
@@ -128,6 +129,7 @@ public static class Strings
     public static string Cli_EventLogMoveNoDestination => Get("Cli.EventLogMoveNoDestination");
     public static string Cli_EventLogMoveSummary => Get("Cli.EventLogMoveSummary");
     public static string Cli_EventLogMutexBlocked => Get("Cli.EventLogMutexBlocked");
+    public static string Cli_EventLogNoArguments => Get("Cli.EventLogNoArguments");
     public static string Cli_EventLogPendingRebootBlocked => Get("Cli.EventLogPendingRebootBlocked");
     public static string Cli_EventLogReason_InstallerInProgress => Get("Cli.EventLogReason.InstallerInProgress");
     public static string Cli_EventLogReason_MsiExecuteMutex => Get("Cli.EventLogReason.MsiExecuteMutex");

@@ -43,11 +43,30 @@ internal static class Program
             case CliCommand.Help:
                 PrintUsage();
                 return ExitOk;
+            case CliCommand.NoArguments:
+                // An argless run is a misconfiguration, most often a scheduled
+                // task that dropped its flag. Print usage like --help but exit
+                // non-zero and leave an audit record, so the failure is visible
+                // instead of a silent "success" that did nothing.
+                PrintUsage();
+                EventLogWriter.Write(CliEventClass.HardError, Strings.Cli_EventLogNoArguments);
+                if (EventLogWriter.EventLogUnavailable)
+                    Console.WriteLine(Strings.Cli_EventLogUnavailable);
+                return ExitError;
             case CliCommand.UnknownArgument:
             case CliCommand.TooManyArguments:
                 Console.WriteLine(string.Format(Strings.Cli_UnknownArgument, invocation.OffendingArgument));
                 Console.WriteLine();
                 PrintUsage();
+                // Audit the bad invocation: a scheduled task with a
+                // fat-fingered flag otherwise exits 1 with no Application-channel
+                // trace, the exact ambiguity the EventLog summary exists to
+                // remove. This switch returns before the try/finally that emits
+                // the unavailable note, so emit it inline as the mutex path does.
+                EventLogWriter.Write(CliEventClass.HardError,
+                    string.Format(Strings.Cli_EventLogBadArguments, invocation.OffendingArgument));
+                if (EventLogWriter.EventLogUnavailable)
+                    Console.WriteLine(Strings.Cli_EventLogUnavailable);
                 return ExitError;
         }
 

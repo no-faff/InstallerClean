@@ -648,6 +648,16 @@ The crash log could not be written.</value></data>
        the Application channel sees a record of every scheduled-job
        firing whether or not it was able to run. -->
   <data name="Cli.EventLogMutexBlocked" xml:space="preserve"><value>{0} mode skipped: GUI or another CLI run is already holding the single-instance mutex.</value></data>
+  <!-- 0 = the offending token (original case). Audit entry written when
+       the CLI is invoked with an unrecognised or malformed argument, so a
+       scheduled task with a fat-fingered flag leaves an Application-channel
+       trace instead of exiting silently. English only, like every Cli
+       EventLog string; the stdout message carries the localised text. -->
+  <data name="Cli.EventLogBadArguments" xml:space="preserve"><value>Run aborted: unrecognised or malformed argument '{0}'. No action taken.</value></data>
+  <!-- Audit entry written when the CLI is invoked with no argument at all,
+       so an argless scheduled task fails visibly (non-zero exit) and leaves
+       a record rather than silently succeeding while doing nothing. -->
+  <data name="Cli.EventLogNoArguments" xml:space="preserve"><value>Run aborted: no argument supplied. No action taken.</value></data>
   <!-- Audit entry for the LocalisedAccessException and
        LocalisedInvalidOperationException catches: the message has been
        built from a resx template with user-controlled args only, so the
@@ -687,7 +697,7 @@ The crash log could not be written.</value></data>
   <!-- CLI help text (printed by /? -? /h) -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - clean up C:\Windows\Installer</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Usage:</value></data>
-  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   Show this help (also accepts /?, -h or no args)</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   Show this help (also accepts /?, -h)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       Scan only - list removable files</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       Delete removable files (Recycle Bin)</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       Move to saved default location</value></data>

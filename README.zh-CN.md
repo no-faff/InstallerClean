@@ -256,7 +256,7 @@ InstallerClean 支持无界面运行，方便编写脚本和系统管理：
 
 ```
 用法：
-  installerclean-cli --help   显示此帮助（也接受 /?、-h 或不带参数）
+  installerclean-cli --help   显示此帮助（也接受 /?、-h）
   installerclean-cli /s       仅扫描，列出可删除的文件
   installerclean-cli /d       删除文件（送至回收站）
   installerclean-cli /m       移动到已保存的默认位置
@@ -264,6 +264,8 @@ InstallerClean 支持无界面运行，方便编写脚本和系统管理：
 ```
 
 要启动图形界面，请运行 `InstallerClean.exe`（或使用 setup 安装后的"开始"菜单快捷方式）。
+
+不带参数运行，或使用无法识别的选项时，`installerclean-cli` 会显示此帮助并以代码 `1` 退出，因此丢失了选项的计划任务会显式失败，而不是悄无声息地"成功"却什么都不做。显式指定 `--help`、`/?` 或 `-h` 则显示相同的帮助并以代码 `0` 退出。
 
 `/s` 是空跑模式：扫描、列出将被删除的文件名和大小，然后退出。便于在清理前审核。退出码为 `0` 表示扫描成功，`1` 表示扫描失败，`130` 表示按下 Ctrl+C。所有文件都在 `C:\Windows\Installer` 中。
 

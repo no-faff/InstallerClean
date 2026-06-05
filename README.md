@@ -292,7 +292,7 @@ InstallerClean supports headless operation for scripting and sysadmin use:
 
 ```
 Usage:
-  installerclean-cli --help   Show this help (also accepts /?, -h or no args)
+  installerclean-cli --help   Show this help (also accepts /?, -h)
   installerclean-cli /s       Scan only - list removable files
   installerclean-cli /d       Delete removable files (Recycle Bin)
   installerclean-cli /m       Move to saved default location
@@ -300,6 +300,8 @@ Usage:
 ```
 
 To launch the GUI, run `InstallerClean.exe` (or use the Start-menu shortcut from the setup install).
+
+Run with no argument, or an unrecognised flag, and `installerclean-cli` prints this usage and exits `1`, so a scheduled task that drops its flag fails visibly instead of silently succeeding while doing nothing. An explicit `--help`, `/?` or `-h` prints the same usage and exits `0`.
 
 `/s` is a dry run: it scans, lists what it would remove with filenames and sizes, then exits. Useful for auditing before cleanup. Exit code is `0` on a successful scan, `1` if the scan fails and `130` on Ctrl+C. All files are in `C:\Windows\Installer`.
 

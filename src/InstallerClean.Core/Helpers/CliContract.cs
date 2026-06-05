@@ -13,7 +13,7 @@ namespace InstallerClean.Helpers;
 /// </summary>
 internal enum CliCommand
 {
-    /// <summary>Print usage and exit Ok (<c>--help</c>, <c>/?</c>, <c>-h</c>, or no arguments).</summary>
+    /// <summary>An explicit help request (<c>--help</c>, <c>/?</c>, <c>-h</c>): print usage and exit Ok.</summary>
     Help,
 
     /// <summary><c>/s</c>: scan and list removable files, read-only.</summary>
@@ -24,6 +24,13 @@ internal enum CliCommand
 
     /// <summary><c>/m</c>: scan, then move removable files to a destination.</summary>
     Move,
+
+    /// <summary>
+    /// No argument at all. Treated as a usage error (non-zero exit), not a
+    /// help request, so an argless scheduled task fails visibly instead of
+    /// "succeeding" while doing nothing. Explicit <c>--help</c> stays Ok.
+    /// </summary>
+    NoArguments,
 
     /// <summary>The first token is not a recognised flag.</summary>
     UnknownArgument,
@@ -137,10 +144,15 @@ internal static class CliContract
     /// </summary>
     internal static CliInvocation ParseArguments(string[] args)
     {
-        // No arguments is treated as a help request, the same as --help.
-        var first = args.Length == 0 ? string.Empty : args[0].ToLowerInvariant();
+        // No argument is a usage error, not a help request: an argless
+        // scheduled task must fail visibly rather than silently do nothing.
+        // An explicit --help / /? / -h is the deliberate request and stays Ok.
+        if (args.Length == 0)
+            return new CliInvocation(CliCommand.NoArguments, null, null);
 
-        if (args.Length == 0 || first is "--help" or "/?" or "-h")
+        var first = args[0].ToLowerInvariant();
+
+        if (first is "--help" or "/?" or "-h")
             return new CliInvocation(CliCommand.Help, null, null);
 
         if (first is not "/d" and not "/m" and not "/s")

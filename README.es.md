@@ -256,7 +256,7 @@ InstallerClean admite operación sin interfaz para uso de scripting y administra
 
 ```
 Uso:
-  installerclean-cli --help   Muestra esta ayuda (también acepta /?, -h o sin argumentos)
+  installerclean-cli --help   Muestra esta ayuda (también acepta /?, -h)
   installerclean-cli /s       Solo escaneo, lista los archivos eliminables
   installerclean-cli /d       Elimina los archivos (Papelera de reciclaje)
   installerclean-cli /m       Mueve a la ruta por defecto guardada
@@ -264,6 +264,8 @@ Uso:
 ```
 
 Para abrir la interfaz gráfica, ejecuta `InstallerClean.exe` (o usa el acceso directo del menú Inicio si lo instalaste con el setup).
+
+Ejecutado sin argumentos, o con una opción no reconocida, `installerclean-cli` muestra esta ayuda y sale con el código `1`, de modo que una tarea programada que pierda su opción falla de forma visible en lugar de tener éxito en silencio sin hacer nada. Un `--help`, `/?` o `-h` explícito muestra la misma ayuda y sale con el código `0`.
 
 `/s` es una ejecución en seco: escanea, lista lo que eliminaría con nombres y tamaños, y sale. Útil para auditar antes de limpiar. El código de salida es `0` si el escaneo tiene éxito, `1` si falla y `130` con Ctrl+C. Todos los archivos están en `C:\Windows\Installer`.
 

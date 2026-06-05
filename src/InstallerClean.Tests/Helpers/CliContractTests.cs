@@ -17,9 +17,11 @@ namespace InstallerClean.Tests.Helpers;
 public class CliContractTests
 {
     [Fact]
-    public void ParseArguments_no_args_is_help()
+    public void ParseArguments_no_args_is_a_usage_error_not_help()
     {
-        Assert.Equal(CliCommand.Help, CliContract.ParseArguments([]).Command);
+        // An argless run must fail visibly (a scheduled task that dropped its
+        // flag), so it is distinct from an explicit --help, which stays Ok.
+        Assert.Equal(CliCommand.NoArguments, CliContract.ParseArguments([]).Command);
     }
 
     [Theory]

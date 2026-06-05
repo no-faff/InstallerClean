@@ -256,7 +256,7 @@ InstallerClean prend en charge un fonctionnement sans interface graphique pour l
 
 ```
 Utilisation :
-  installerclean-cli --help   Affiche cette aide (accepte aussi /?, -h ou sans argument)
+  installerclean-cli --help   Affiche cette aide (accepte aussi /?, -h)
   installerclean-cli /s       Analyse seule, liste les fichiers supprimables
   installerclean-cli /d       Supprime les fichiers (Corbeille)
   installerclean-cli /m       Déplace vers l'emplacement par défaut enregistré
@@ -264,6 +264,8 @@ Utilisation :
 ```
 
 Pour lancer l'interface graphique, exécutez `InstallerClean.exe` (ou utilisez le raccourci du menu Démarrer si vous avez utilisé l'installeur setup).
+
+Lancé sans argument, ou avec une option non reconnue, `installerclean-cli` affiche cette aide et quitte avec le code `1`, de sorte qu'une tâche planifiée qui perd son option échoue de façon visible au lieu de réussir en silence sans rien faire. Un `--help`, `/?` ou `-h` explicite affiche la même aide et quitte avec le code `0`.
 
 `/s` est un essai à blanc : il analyse, liste ce qui serait supprimé avec noms de fichiers et tailles, puis quitte. Utile pour auditer avant nettoyage. Le code de sortie est `0` si l'analyse réussit, `1` si elle échoue et `130` en cas de Ctrl+C. Tous les fichiers se trouvent dans `C:\Windows\Installer`.
 
