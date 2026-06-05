@@ -119,6 +119,7 @@ public static class Strings
     public static string Cli_DeletedFiles => Get("Cli.DeletedFiles");
     public static string Cli_DeletingFiles => Get("Cli.DeletingFiles");
     public static string Cli_EventLogBadArguments => Get("Cli.EventLogBadArguments");
+    public static string Cli_EventLogCancelledNoWork => Get("Cli.EventLogCancelledNoWork");
     public static string Cli_EventLogCancelledPartial => Get("Cli.EventLogCancelledPartial");
     public static string Cli_EventLogDeleteSummary => Get("Cli.EventLogDeleteSummary");
     public static string Cli_EventLogHardError => Get("Cli.EventLogHardError");

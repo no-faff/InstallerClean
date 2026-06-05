@@ -411,6 +411,13 @@ internal static class Program
                         DisplayHelpers.PluraliseFile(totalToProcess)));
                 return ExitPartial;
             }
+            // Cancelled before any file was processed (a Ctrl+C during the
+            // scan, or before the first delete/move). Still write one entry
+            // so "each /s, /d or /m run writes one summary" holds for every
+            // run. TransientSkip, not Partial: nothing committed and a re-run
+            // can succeed.
+            EventLogWriter.Write(CliEventClass.TransientSkip,
+                string.Format(Strings.Cli_EventLogCancelledNoWork, arg));
             return ExitCancelled;
         }
         catch (LocalisedAccessException ex)

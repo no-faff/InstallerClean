@@ -636,6 +636,11 @@ The crash log could not be written.</value></data>
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
   <data name="Cli.EventLogMoveSummary" xml:space="preserve"><value>{0} mode: {1} of {2} {3} moved to {4}, {5} relocated, {6} {7}.</value></data>
   <data name="Cli.EventLogCancelledPartial" xml:space="preserve"><value>{0} mode interrupted by Ctrl+C: {1} of {2} {3} processed before cancellation. See progress output for the per-file detail.</value></data>
+  <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
+       processed (a cancel during the scan, or before the first delete or
+       move), so "each /s, /d or /m run writes one summary entry" holds for
+       every run, not only the ones that committed work. -->
+  <data name="Cli.EventLogCancelledNoWork" xml:space="preserve"><value>{0} mode interrupted by Ctrl+C before any work was done. No action taken.</value></data>
   <!-- Stdout when the CLI cannot acquire the single-instance mutex.
        The GUI variant (Strings.Startup_AlreadyRunningBody) is written
        for a user who tried to launch a second window; the CLI variant
