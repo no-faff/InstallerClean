@@ -142,7 +142,7 @@ public class MainViewModelTests
 
         await vm.Scan.ScanWithProgressAsync(null);
 
-        Assert.Equal("1 unneeded file to clean up", vm.Scan.OrphanedSummaryText);
+        Assert.Equal("1 unused file to clean up", vm.Scan.OrphanedSummaryText);
     }
 
     [Fact]
@@ -155,7 +155,7 @@ public class MainViewModelTests
         await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.Equal(10_000, vm.Scan.OrphanedFileCount);
-        Assert.Equal("10000 unneeded files to clean up", vm.Scan.OrphanedSummaryText);
+        Assert.Equal("10000 unused files to clean up", vm.Scan.OrphanedSummaryText);
         Assert.False(vm.Completion.IsComplete);
     }
 
