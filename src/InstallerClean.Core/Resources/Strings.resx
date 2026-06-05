@@ -551,9 +551,16 @@ The crash log could not be written.</value></data>
   <data name="Display.ElapsedLong.LessThanASecond" xml:space="preserve"><value>less than a second</value></data>
   <data name="Display.ElapsedLong.Seconds" xml:space="preserve"><value>{0:F1} seconds</value></data>
 
-  <!-- CLI output. Console messages emitted by installerclean-cli.exe.
-       Localised so non-English sysadmins reading scripted output get
-       text matching their UI culture. -->
+  <!-- CLI output. Two destinations with different localisation rules.
+       Stdout (everything the user reads at the console) is localised so a
+       non-English sysadmin gets text matching their UI culture. The entries
+       written INTO the Windows Application event log are English-only
+       (no-translate): an RMM tool greps that channel for a known English
+       string regardless of the machine's OS UI culture, so a satellite resx
+       must NOT translate them. Those are the Cli.EventLog* keys, with one
+       exception: Cli.EventLogUnavailable is a stdout warning (it tells the
+       operator that an event-log write failed), so it is localised like the
+       rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Unknown argument: '{0}'</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Cancelling...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Cancelled.</value></data>
@@ -598,8 +605,9 @@ The crash log could not be written.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
-       labels stay sysadmin-shaped so an Application-channel grep can
-       match a known string regardless of OS UI culture. -->
+       labels are English-only (no-translate, like every Cli.EventLog*
+       entry written to the Application channel) so an Application-channel
+       grep can match a known string regardless of OS UI culture. -->
   <data name="Cli.EventLogReason.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer mutex held</value></data>
   <data name="Cli.EventLogReason.InstallerInProgress" xml:space="preserve"><value>installer transaction in progress</value></data>
   <data name="Cli.EventLogReason.PendingRenameInCache" xml:space="preserve"><value>queued post-reboot file rename targets the Installer cache</value></data>
