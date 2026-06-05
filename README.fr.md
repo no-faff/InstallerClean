@@ -25,7 +25,7 @@
 
 - **En bref :** Trouve et supprime les fichiers inutiles dans `C:\Windows\Installer`, le dossier caché que Windows ne nettoie jamais.
 - **Combien d'espace :** Ça dépend de vos logiciels. Sur ma machine, c'était presque 1 Go. Un utilisateur d'InstallerClean a [rapporté](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 Go. Avec Adobe Acrobat installé, ça peut dépasser 100 Go. Ça peut aussi être nul. L'idée, c'est que c'est rapide et gratuit ; tout ce qui peut être supprimé le sera.
-- **Est-ce sûr :** Oui. Ne supprime que les fichiers que Windows lui-même déclare inutiles. La suppression envoie les fichiers à la Corbeille (ou, si la Corbeille n'est pas disponible pour le lecteur, vous laisse choisir Déplacer, suppression définitive ou annuler, elle ne supprime jamais définitivement sans demander). Le déplacement vous permet de garder les fichiers ailleurs en lieu sûr.
+- **Est-ce sûr :** Oui. Ne supprime que les fichiers que Windows lui-même déclare inutiles. La suppression envoie les fichiers à la Corbeille et ne supprime jamais définitivement sans demander. Le déplacement vous permet de garder les fichiers ailleurs en lieu sûr.
 - **Comment l'avoir :** [Téléchargez la dernière version](../../releases/latest), lancez-la, c'est tout.
 
 ---
@@ -213,7 +213,7 @@ Si quelque chose ici vous gêne, [ouvrez un ticket](../../issues). Les problème
 
 **Pourquoi a-t-il besoin des droits Administrateur ?** `C:\Windows\Installer` appartient à SYSTEM et son accès est restreint aux administrateurs. Toutes ces opérations (lire le dossier, interroger l'API Windows Installer, déplacer ou supprimer des fichiers) nécessitent une élévation. Il n'existe pas de chemin en mode utilisateur.
 
-**Puis-je annuler une suppression ?** En général, oui. Quand la Corbeille est disponible pour le lecteur, la suppression y envoie les fichiers et vous pouvez les restaurer depuis la Corbeille. Si elle n'est pas disponible, l'application ne supprime jamais pour de bon d'elle-même ; elle propose Déplacer ou une suppression définitive que vous confirmez. Dans tous les cas, pour un filet de sécurité que vous maîtrisez, utilisez Déplacer pour mettre les fichiers dans un dossier de votre choix et vérifiez que rien ne casse avant de les supprimer de là.
+**Puis-je annuler une suppression ?** En général, oui. Quand la Corbeille est disponible pour le lecteur, la suppression y envoie les fichiers et vous pouvez les restaurer depuis la Corbeille. Si elle n'est pas disponible, l'application ne supprime jamais pour de bon d'elle-même (voir [Est-ce sûr ?](#est-ce-sûr-)). Pour un filet de sécurité que vous maîtrisez, utilisez Déplacer pour mettre les fichiers dans un dossier de votre choix et vérifiez que rien ne casse avant de les supprimer de là.
 
 **Windows va-t-il se plaindre si je supprime ces fichiers ?** Non. InstallerClean ne supprime jamais que les fichiers dont Windows a fini de se servir, donc rien de ce qu'il supprime n'est requis pour réparer, mettre à jour ou désinstaller un programme. Si un fichier nécessaire venait malgré tout à disparaître de `C:\Windows\Installer` par un autre moyen, voir [Si un fichier nécessaire vient à manquer](#si-un-fichier-nécessaire-vient-à-manquer).
 

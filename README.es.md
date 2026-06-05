@@ -25,7 +25,7 @@
 
 - **Qué hace:** Encuentra y elimina archivos innecesarios de `C:\Windows\Installer`, la carpeta oculta que Windows nunca limpia.
 - **Cuánto espacio:** Depende de tu software. En mi equipo fue casi 1 GB. Un usuario de InstallerClean [reportó](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. Con Adobe Acrobat puede superar los 100 GB. Podría ser nada en absoluto. La cuestión es que es rápido y no cuesta nada; todo lo que se pueda eliminar, se eliminará.
-- **¿Es seguro?:** Sí. Solo elimina los archivos que el propio Windows declara como innecesarios. Eliminar los manda a la Papelera de reciclaje (o, si la Papelera no está disponible para la unidad, te deja elegir Mover, borrado permanente o cancelar, nunca borra de forma permanente sin preguntar). Mover te permite guardarlos en un lugar seguro.
+- **¿Es seguro?:** Sí. Solo elimina los archivos que el propio Windows declara como innecesarios. Eliminar los manda a la Papelera de reciclaje y nunca borra de forma permanente sin preguntar. Mover te permite guardarlos en un lugar seguro.
 - **Cómo obtenerlo:** [Descarga la última versión](../../releases/latest), ejecútala, listo.
 
 ---
@@ -213,7 +213,7 @@ Si algo aquí te estorba, [abre un issue](../../issues). Los problemas de accesi
 
 **¿Por qué pide Administrador?** `C:\Windows\Installer` es propiedad de SYSTEM y está restringido solo a administradores. Leer la carpeta, consultar la API de la base del Installer y mover o eliminar archivos requieren elevación. No hay vía en modo usuario.
 
-**¿Puedo deshacer una eliminación?** Normalmente, sí. Cuando la Papelera está disponible para la unidad, Eliminar envía los archivos ahí y puedes restaurarlos desde la Papelera. Si no está disponible, la aplicación nunca borra para siempre por su cuenta; ofrece Mover o un borrado permanente que confirmas. En cualquier caso, para una red de seguridad que tú controlas, usa Mover para colocar los archivos en una carpeta a tu elección y verifica que nada se rompa antes de borrarlos desde ahí.
+**¿Puedo deshacer una eliminación?** Normalmente, sí. Cuando la Papelera está disponible para la unidad, Eliminar envía los archivos ahí y puedes restaurarlos desde la Papelera. Si no está disponible, la aplicación nunca borra para siempre por su cuenta (véase [¿Es seguro?](#es-seguro)). Para una red de seguridad que tú controlas, usa Mover para colocar los archivos en una carpeta a tu elección y verifica que nada se rompa antes de borrarlos desde ahí.
 
 **¿Va a quejarse Windows si quito estos archivos?** No. InstallerClean solo elimina los archivos que el propio Windows da por terminados, así que nada de lo que elimina hace falta para reparar, actualizar o desinstalar un programa. Si un archivo necesario llega a desaparecer de `C:\Windows\Installer` por algún otro medio, consulta [Si falta un archivo necesario](#si-falta-un-archivo-necesario).
 
