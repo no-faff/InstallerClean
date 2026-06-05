@@ -74,6 +74,7 @@ Modern replacement for PatchCleaner, which was last updated in March 2016.</Char
       <Primary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.8.2/InstallerClean-setup.exe</Primary_Download_URL>
       <Secondary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.8.2/InstallerClean-portable.exe</Secondary_Download_URL>
       <Additional_Download_URL_1>https://github.com/no-faff/InstallerClean/releases/download/v1.8.2/InstallerClean-slim.exe</Additional_Download_URL_1>
+      <Additional_Download_URL_2>https://github.com/no-faff/InstallerClean/releases/download/v1.8.2/installerclean-cli.exe</Additional_Download_URL_2>
     </Download_URLs>
   </Web_Info>
 
