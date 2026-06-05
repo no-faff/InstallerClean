@@ -15,7 +15,7 @@
         Surface.*, Text.*, Action.<intent>.<state>, Status.*,
         Decoration.*, Link.*, Scrollbar.*, Type.*,
         Radius.*, Border.*, BorderThickness.*, Gap.*, GapBottom.*,
-        GapRight.*, GapLeft.*, GapX.*.
+        GapTop.*, GapRight.*, GapLeft.*, GapX.*.
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -149,7 +149,7 @@
     <Thickness x:Key="BorderThickness.Standard">2</Thickness>
 
     <!-- Spacing. Thicknesses cover Margin/Padding sites. Directional
-         (GapBottom, GapRight, GapLeft) for one-sided patterns;
+         (GapBottom, GapTop, GapRight, GapLeft) for one-sided patterns;
          GapX for symmetric horizontal (both sides equal);
          multi-sided literal Margins stay for genuine one-offs. A
          scalar Spacing.* ramp earns a place only when a real Width /
@@ -161,6 +161,8 @@
     <Thickness x:Key="GapBottom.Md">0,0,0,12</Thickness>
     <Thickness x:Key="GapBottom.Lg">0,0,0,16</Thickness>
     <Thickness x:Key="GapBottom.Xl">0,0,0,24</Thickness>
+
+    <Thickness x:Key="GapTop.Sm">0,8,0,0</Thickness>
 
     <Thickness x:Key="GapRight.Sm">0,0,8,0</Thickness>
     <Thickness x:Key="GapRight.Md">0,0,12,0</Thickness>

@@ -140,7 +140,7 @@
                      needed files, Windows still expects it, it just isn't on
                      disk. DockPanel (not a horizontal StackPanel) so the
                      advisory wraps; icon docks left, aligned to the first line. -->
-                <DockPanel Margin="0,8,0,0"
+                <DockPanel Margin="{StaticResource GapTop.Sm}"
                            Visibility="{Binding Scan.HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
                           Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
@@ -167,7 +167,7 @@
                            Foreground="{StaticResource Text.Muted}"
                            FontStyle="Italic" FontSize="{StaticResource Type.Caption}"
                            TextWrapping="Wrap"
-                           Margin="0,8,0,0"
+                           Margin="{StaticResource GapTop.Sm}"
                            AutomationProperties.LiveSetting="Polite"/>
 
             </StackPanel>
@@ -439,6 +439,11 @@
                                  Minimum="0" Maximum="100"
                                  Width="200" Height="8" Margin="{StaticResource GapBottom.Sm}"
                                  AutomationProperties.Name="{loc:Translate Automation.OperationProgress}"/>
+                    <!-- The 0,0,0,2 here and the 0,4,0,0 on the filename below sit
+                         off the 8/12/16/24 spacing scale on purpose: they tighten
+                         the "X of Y" / percentage row and the filename into one
+                         compact block under the progress bar, where the scale's
+                         8px would loosen the grouping. -->
                     <DockPanel Margin="0,0,0,2">
                         <TextBlock DockPanel.Dock="Right" Foreground="{StaticResource Text.Muted}" FontSize="{StaticResource Type.Caption}">
                             <Run Text="{Binding Cleanup.OperationProgressPercent, Mode=OneWay, StringFormat='{}{0:F0}%'}"/>
@@ -469,7 +474,7 @@
                             Command="{Binding Cleanup.CancelOperationCommand}"
                             AutomationProperties.Name="{loc:Translate Automation.CancelOperation}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
-                            HorizontalAlignment="Center" Margin="0,8,0,0"
+                            HorizontalAlignment="Center" Margin="{StaticResource GapTop.Sm}"
                             Height="28" Padding="16,0" FontSize="{StaticResource Type.Body}">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource GhostPill}">

@@ -47,6 +47,10 @@
                    AutomationProperties.Name="{loc:Translate Automation.Section.Products}"/>
 
         <Border Grid.Row="3" Style="{StaticResource CardNoPad}" ClipToBounds="True">
+            <!-- Negative top/bottom margin bleeds the ListView past the
+                 CardNoPad inner edges so the first and last rows sit flush with
+                 the card border instead of inside a thin inset. The Orphaned and
+                 Registered detail windows share this 0,-1,0,-6 value as a pair. -->
             <ListView x:Name="ProductsList" ItemsSource="{Binding Products}"
                       GridViewColumnHeader.Click="ColumnHeader_Click"
                       SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
