@@ -173,7 +173,7 @@ InstallerClean 会识别两类不需要的文件。
 VirusTotal：所有引擎检测均为干净。每个版本的发布说明里都有实时链接，方便您自行复查。
 
 <a id="recovery"></a>
-## 万一您真的丢了 C:\Windows\Installer 里的文件
+## 万一您真的丢了 `C:\Windows\Installer` 里的文件
 
 InstallerClean 只会清除 Windows 报告为已经用不上的文件，所以它不可能让某个程序变得无法修复、更新或卸载。手动删除 `C:\Windows\Installer` 里的文件，或用一款不先核对安装数据库的工具去删，那就完全是另一回事了，这也正是“别碰这个文件夹”这条主流建议的由来。这条建议通常没错，但用了 InstallerClean 就另当别论了。下面是更完整的来龙去脉，以及万一需要的文件已经丢了，该怎么办。
 
