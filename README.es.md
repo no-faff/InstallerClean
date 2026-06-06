@@ -173,7 +173,7 @@ Sí. InstallerClean consulta la misma base de datos que el propio Windows usa pa
 VirusTotal: limpio en todos los motores. Hay enlaces en vivo en las notas de cada versión para que puedas volver a comprobarlo.
 
 <a id="recovery"></a>
-## Si te llega a faltar un archivo de C:\Windows\Installer
+## Si te llega a faltar un archivo de `C:\Windows\Installer`
 
 InstallerClean solo elimina los archivos que Windows da por terminados, así que no puede dejar a un programa sin posibilidad de reparación, actualización o desinstalación. Quitar archivos de `C:\Windows\Installer` a mano, o con una herramienta que no consulte primero la base de datos del instalador, es otra cosa, y es la razón por la que el consejo habitual es no tocar la carpeta. Ese consejo suele ser acertado, pero no si usas InstallerClean. Aquí tienes el panorama completo, y qué hacer si un archivo necesario ya ha desaparecido.
 
