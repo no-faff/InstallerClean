@@ -85,7 +85,10 @@ Source: "..\publish\self-contained\InstallerClean.exe"; DestDir: "{app}"; Flags:
 Source: "..\publish\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; pad.xml's Distribution_Permissions requires the MIT licence text to
 ; travel alongside any redistributed binary, so Setup installs it too.
-Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
+; DestName gives the installed copy a .txt extension so a double-click opens it
+; in Notepad; a bare "LICENSE" with no extension makes Windows show the "how do
+; you want to open this file?" picker instead.
+Source: "..\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\InstallerClean"; Filename: "{app}\InstallerClean.exe"; IconFilename: "{app}\InstallerClean.exe"
