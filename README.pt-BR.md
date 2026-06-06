@@ -12,7 +12,9 @@
 
 <h1 align="center">InstallerClean</h1>
 
-<p align="center"><strong>Uma alternativa moderna e de código aberto ao <a href="https://www.homedev.com.au/free/patchcleaner">PatchCleaner</a>. Limpe com segurança o <code>C:\Windows\Installer</code>, a pasta oculta do Windows que consome silenciosamente o seu espaço em disco.</strong></p>
+<p align="center"><strong>Uma alternativa de código aberto ao <a href="https://www.homedev.com.au/free/patchcleaner">PatchCleaner</a>. Limpe com segurança o <code>C:\Windows\Installer</code>, a pasta oculta do Windows que consome silenciosamente o seu espaço em disco.</strong></p>
+
+<p align="center"><em>Use uma vez. Talvez libere um espaço. Pode jogar fora.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licença: MIT"></a>
@@ -29,6 +31,28 @@
 - **Quanto espaço:** Depende dos seus programas. Na minha máquina, deu pouco menos de 1 GB. Um usuário do InstallerClean [relatou](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. Com o Adobe Acrobat, pode passar de 100 GB. Pode ser que não dê nada. O importante é que é rápido e não custa nada: tudo o que puder ser removido vai embora.
 - **É seguro:** Sim. Só remove os arquivos que o próprio Windows declara não precisar mais. Excluir manda os arquivos para a Lixeira e nunca exclui nada de forma permanente sem perguntar. Mover deixa você guardá-los em um lugar seguro.
 - **Como obter:** [Baixe a versão mais recente](../../releases/latest), execute e pronto.
+
+## Conteúdo
+
+- [A pasta que ninguém te conta](#a-pasta-que-ninguém-te-conta)
+- [A busca por ajuda](#a-busca-por-ajuda)
+- [O que ele faz](#o-que-ele-faz)
+- [Capturas de tela](#capturas-de-tela)
+- [Como funciona](#como-funciona)
+- [É seguro?](#é-seguro)
+- [Se você estiver mesmo com um arquivo faltando em C:\Windows\Installer](#recovery)
+- [Acessibilidade](#acessibilidade)
+- [O que ele não faz](#o-que-ele-não-faz)
+- [Perguntas frequentes](#perguntas-frequentes)
+- [Download](#download)
+- [Comparado ao PatchCleaner](#comparado-ao-patchcleaner)
+- [Linha de comando](#linha-de-comando)
+- [Requisitos](#requisitos)
+- [Compilar a partir do código-fonte](#compilar-a-partir-do-código-fonte)
+- [Contribuir](#contribuir)
+- [Apoie o projeto](#apoie-o-projeto)
+- [Histórico de estrelas](#histórico-de-estrelas)
+- [Licença](#licença)
 
 ---
 
@@ -91,7 +115,7 @@ Nenhuma atividade de rede automática. Dois botões opcionais fazem uma única c
 </p>
 
 <p>
-  <img src="docs/screenshots/03b-details-unused.webp" alt="Janela de arquivos não utilizados listando os arquivos .msi removíveis com os motivos" width="900"><br>
+  <img src="docs/screenshots/03b-details-unused.webp" alt="Janela de arquivos desnecessários listando os arquivos .msi removíveis com os motivos" width="900"><br>
   <em>Os arquivos que não são mais necessários.</em>
 </p>
 
@@ -141,21 +165,19 @@ Sim. O InstallerClean consulta o mesmo banco de dados que o próprio Windows usa
 - Os hashes SHA-256 de cada versão estão listados na [página de versões](../../releases/latest).
 - Links do VirusTotal para os builds setup, portable, slim e CLI são publicados a cada versão.
 - O código-fonte está em [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), e a CI compila e testa cada commit (veja o selo verde de CI acima).
-- A [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testa cada versão em busca de vírus, spyware e adware.
 - O [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testa cada envio em uma máquina virtual e só publica se passar na avaliação deles.
+- A [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testa cada versão em busca de vírus, spyware e adware.
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificado 100% limpo pela Softpedia" width="190"></a>
 
 VirusTotal: limpo em todos os mecanismos. Há links ativos nas notas de cada versão para você verificar de novo.
 
-## Se faltar um arquivo necessário
+<a id="recovery"></a>
+## Se você estiver mesmo com um arquivo faltando em C:\Windows\Installer
 
-O InstallerClean só remove os arquivos que o Windows informa ter terminado de usar, então ele não tem como deixar um programa sem condição de ser reparado, atualizado ou desinstalado. Remover arquivos de `C:\Windows\Installer` na mão, ou com uma ferramenta que não consulta o banco de dados do instalador antes, é outra história, e é por isso que o conselho padrão é não mexer na pasta. Esse conselho está certo, até certo ponto. Aqui está o quadro completo, e o que fazer se um arquivo necessário já tiver sumido.
+O InstallerClean só remove os arquivos que o Windows informa ter terminado de usar, então ele não tem como deixar um programa sem condição de ser reparado, atualizado ou desinstalado. Remover arquivos de `C:\Windows\Installer` na mão, ou com uma ferramenta que não consulta o banco de dados do instalador antes, é outra história, e é por isso que o conselho padrão é não mexer na pasta. Esse conselho costuma estar certo, mas não se você usa o InstallerClean. Aqui está o quadro completo, e o que fazer se um arquivo necessário já tiver sumido.
 
-<details>
-<summary><strong>Sobre o <code>C:\Windows\Installer</code> e como recuperar um arquivo perdido</strong></summary>
-
-<br>
+### Sobre o `C:\Windows\Installer` e como recuperar um arquivo perdido
 
 *As citações da Microsoft abaixo são reproduzidas no original em inglês.*
 
@@ -180,8 +202,6 @@ Na prática, a solução que costuma funcionar é baixar o instalador do program
 Isso normalmente restaura o arquivo e deixa as suas configurações intactas, mas a Microsoft não garante, e o último recurso documentado dela é reinstalar o programa, ou reconstruir o Windows. Essa é a posição oficial, relatada exatamente como a encontro. Não fui eu que causei isso e não tenho como melhorar a própria orientação da Microsoft; só estou te dizendo como é.
 
 Nada disso pode acontecer por causa do InstallerClean. Ele só remove os arquivos que o próprio Windows informa não serem mais necessários, de modo que o arquivo que um futuro reparo, atualização ou desinstalação for procurar nunca é um dos que ele tocou. A orientação da Microsoft está em [Restore missing Windows Installer cache files](https://learn.microsoft.com/en-us/troubleshoot/windows-client/application-management/missing-windows-installer-cache).
-
-</details>
 
 ## Acessibilidade
 
@@ -215,11 +235,44 @@ Entre os 68 relatórios que as pessoas tiveram a gentileza de enviar (obrigado �
 | Espaço liberado | 32% | 0.2 GB | 21 GB | 327 GB |
 <!-- reports-stats-end -->
 
+<details>
+<summary>Veja como é um relatório</summary>
+
+```json
+{
+  "schemaVersion": 3,
+  "app": { "version": "1.9.0" },
+  "os": "Windows 11 (X64)",
+  "scan": {
+    "durationMs": 1820,
+    "registeredCount": 148,
+    "orphanedCount": 40,
+    "supersededCount": 25,
+    "obsoletedCount": 5,
+    "missingFromDiskCount": 0,
+    "pendingReboot": "clean"
+  },
+  "operation": {
+    "kind": "delete",
+    "outcome": "complete",
+    "filesProcessed": 70,
+    "filesFailed": 0,
+    "bytesFreed": 22548578304,
+    "errors": [],
+    "moveDestinationKind": null
+  }
+}
+```
+
+Ele carrega apenas contadores e rótulos categóricos: nenhum caminho de arquivo, nenhum nome de usuário, nenhum identificador de máquina.
+
+</details>
+
 **Por que ele pede Administrador?** O `C:\Windows\Installer` pertence ao SYSTEM e é restrito apenas a administradores. Ler a pasta, escrever na API de consulta do banco de dados do Installer e mover ou excluir arquivos exigem elevação. Não há caminho em modo de usuário.
 
 **Posso desfazer uma exclusão?** Em geral, sim. Quando a Lixeira está disponível para a unidade, Excluir manda os arquivos para lá e você pode restaurá-los pela Lixeira. Se a Lixeira não estiver disponível, o aplicativo nunca exclui de vez por conta própria (veja [É seguro?](#é-seguro)). Para uma rede de segurança que você controla, use Mover para colocar os arquivos em uma pasta que você escolher e confirme que nada quebrou antes de excluí-los de lá.
 
-**O Windows vai reclamar se eu remover esses arquivos?** Não. O InstallerClean só remove os arquivos que o próprio Windows informa ter terminado de usar, então nada do que ele remove é necessário para reparar, atualizar ou desinstalar um programa. Se um arquivo necessário acabar sumindo de `C:\Windows\Installer` por algum outro meio, veja [Se faltar um arquivo necessário](#se-faltar-um-arquivo-necessário).
+**O Windows vai reclamar se eu remover esses arquivos?** Não. O InstallerClean só remove os arquivos que o próprio Windows informa ter terminado de usar, então nada do que ele remove é necessário para reparar, atualizar ou desinstalar um programa. Se um arquivo necessário acabar sumindo de `C:\Windows\Installer` por algum outro meio, veja [Se você estiver mesmo com um arquivo faltando em C:\Windows\Installer](#recovery).
 
 **Por que não usar `Win32_Product` (WMI)?** [O `Win32_Product` dispara operações de reparo do MSI em cada produto durante a enumeração](https://gregramsey.net/2012/02/20/win32_product-is-evil/), o que pode levar minutos e sobrecarregar o disco. O InstallerClean chama a API COM do Windows Installer diretamente, sem efeitos colaterais.
 
@@ -267,7 +320,7 @@ scoop install installerclean
 
 O [Ultra Virus Killer (UVK)](https://www.carifred.com/uvk/) também oferece limpeza do Installer como parte do seu módulo System Booster, mas é uma ferramenta paga (US$ 15-25) e a limpeza é um pequeno recurso dentro de um aplicativo bem maior. O InstallerClean é gratuito, focado e de código aberto.
 
-Limpadores de sistema genéricos como o [CCleaner](https://www.ccleaner.com/) e o [BleachBit](https://www.bleachbit.org/) não tocam no `C:\Windows\Installer`. A pasta precisa de consultas à API do Windows Installer para distinguir os pacotes registrados dos não utilizados, e um limpador genérico que apenas percorresse a árvore de arquivos poderia quebrar aplicativos instalados. O InstallerClean é a ferramenta certa quando essa é exatamente a pasta que você quer limpar.
+Limpadores de sistema genéricos como o [CCleaner](https://www.ccleaner.com/) e o [BleachBit](https://www.bleachbit.org/) não tocam no `C:\Windows\Installer`. A pasta precisa de consultas à API do Windows Installer para distinguir os pacotes registrados dos desnecessários, e um limpador genérico que apenas percorresse a árvore de arquivos poderia quebrar aplicativos instalados. O InstallerClean é a ferramenta certa quando essa é exatamente a pasta que você quer limpar.
 
 ## Linha de comando
 
