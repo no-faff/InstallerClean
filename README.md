@@ -10,7 +10,9 @@
 
 <h1 align="center">InstallerClean</h1>
 
-<p align="center"><strong>A modern, open-source replacement for <a href="https://www.homedev.com.au/free/patchcleaner">PatchCleaner</a>. Safely clean up <code>C:\Windows\Installer</code>, the hidden Windows folder that quietly eats your disk space.</strong></p>
+<p align="center"><strong>An open-source replacement for <a href="https://www.homedev.com.au/free/patchcleaner">PatchCleaner</a>. Safely clean up <code>C:\Windows\Installer</code>, the hidden Windows folder that quietly eats your disk space.</strong></p>
+
+<p align="center"><em>Use it once. Maybe save some space. Chuck it away.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licence: MIT"></a>
@@ -27,6 +29,28 @@
 - **How much space:** Depends on your software. On my machine it was just shy of 1 GB. An InstallerClean user [reported](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. With Adobe Acrobat it can pass 100 GB. It could be nothing at all. The point is that it's quick and costs nothing; whatever can be removed will be gone.
 - **Is it safe:** Yes. Only removes files Windows itself says it no longer needs. Delete sends files to the Recycle Bin and never deletes anything permanently without asking. Move lets you keep them somewhere safe.
 - **Get it:** [Download the latest release](../../releases/latest), run it, done.
+
+## Contents
+
+- [The folder nobody tells you about](#the-folder-nobody-tells-you-about)
+- [The search for help](#the-search-for-help)
+- [What it does](#what-it-does)
+- [Screenshots](#screenshots)
+- [How it works](#how-it-works)
+- [Is it safe?](#is-it-safe)
+- [If you do have a file missing from C:\Windows\Installer](#recovery)
+- [Accessibility](#accessibility)
+- [What it doesn't do](#what-it-doesnt-do)
+- [FAQ](#faq)
+- [Download](#download)
+- [Compared to PatchCleaner](#compared-to-patchcleaner)
+- [Command line](#command-line)
+- [Requirements](#requirements)
+- [Building from source](#building-from-source)
+- [Contributing](#contributing)
+- [Support the project](#support-the-project)
+- [Star history](#star-history)
+- [Licence](#licence)
 
 ---
 
@@ -89,7 +113,7 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
 </p>
 
 <p>
-  <img src="docs/screenshots/03b-details-unused.webp" alt="Unused files window listing removable .msi files with reasons" width="900"><br>
+  <img src="docs/screenshots/03b-details-unused.webp" alt="Unneeded files window listing removable .msi files with reasons" width="900"><br>
   <em>The files no longer needed.</em>
 </p>
 
@@ -139,26 +163,24 @@ Yes. InstallerClean queries the same database Windows itself uses to track what'
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
 - VirusTotal links for setup, portable, slim and CLI builds are published with each release.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
-- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) tests each release for viruses, spyware and adware.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) tests each submission in a virtual machine and lists it only if it passes their review.
+- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) tests each release for viruses, spyware and adware.
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
 VirusTotal: clean across every engine. Live links in each release's notes so you can re-check.
 
-## If a needed file goes missing
+<a id="recovery"></a>
+## If you do have a file missing from C:\Windows\Installer
 
 InstallerClean only ever clears files Windows reports as finished with, so it
 can't leave a program unable to repair, update or uninstall. Removing files from
 `C:\Windows\Installer` by hand, or with a tool that doesn't check the Installer
 database first, is a different matter, and it's why the standard advice is to
-leave the folder alone. That advice is right, as far as it goes. Here's the
+leave the folder alone. That advice is usually right, but not if you use InstallerClean. Here's the
 fuller picture, and what to do if a needed file has already gone.
 
-<details>
-<summary><strong>About <code>C:\Windows\Installer</code>, and recovering a missing file</strong></summary>
-
-<br>
+### About `C:\Windows\Installer`, and recovering a missing file
 
 `C:\Windows\Installer` is the Windows Installer cache. When you install an
 MSI-based program or apply a patch, Windows keeps a copy of the installer here
@@ -209,8 +231,6 @@ Windows itself reports as no longer needed, so the file a future repair, update
 or uninstall goes looking for is never one it touched. Microsoft's guidance is at
 [Restore missing Windows Installer cache files](https://learn.microsoft.com/en-us/troubleshoot/windows-client/application-management/missing-windows-installer-cache).
 
-</details>
-
 ## Accessibility
 
 InstallerClean is built to be fully usable from the keyboard and with a screen reader.
@@ -243,11 +263,44 @@ Across the 68 reports people have been kind enough to send in (thanks 🙏) sinc
 | Freed space | 32% | 0.2 GB | 21 GB | 327 GB |
 <!-- reports-stats-end -->
 
+<details>
+<summary>Here's what a report looks like</summary>
+
+```json
+{
+  "schemaVersion": 3,
+  "app": { "version": "1.9.0" },
+  "os": "Windows 11 (X64)",
+  "scan": {
+    "durationMs": 1820,
+    "registeredCount": 148,
+    "orphanedCount": 40,
+    "supersededCount": 25,
+    "obsoletedCount": 5,
+    "missingFromDiskCount": 0,
+    "pendingReboot": "clean"
+  },
+  "operation": {
+    "kind": "delete",
+    "outcome": "complete",
+    "filesProcessed": 70,
+    "filesFailed": 0,
+    "bytesFreed": 22548578304,
+    "errors": [],
+    "moveDestinationKind": null
+  }
+}
+```
+
+It carries counts and categorical labels only: no file paths, no user names, no machine identifiers.
+
+</details>
+
 **Why does it want Administrator?** `C:\Windows\Installer` is owned by SYSTEM and locked down to admins only. Reading the folder, writing to the Installer-database query API and moving or deleting files all require elevation. There's no user-mode path.
 
 **Can I undo a Delete?** Usually, yes. When the Recycle Bin is available for the drive, Delete sends files there and you can restore them from the bin. If the bin isn't available, the app never deletes for good on its own (see [Is it safe?](#is-it-safe)). For a safety net you control, use Move to put the files in a folder you choose and verify nothing breaks before deleting from there.
 
-**Will Windows complain if I remove these files?** No. InstallerClean only ever removes the files Windows itself reports as finished with, so nothing it removes is needed to repair, update or uninstall a program. If a needed file does go missing from `C:\Windows\Installer` by some other means, see [If a needed file goes missing](#if-a-needed-file-goes-missing).
+**Will Windows complain if I remove these files?** No. InstallerClean only ever removes the files Windows itself reports as finished with, so nothing it removes is needed to repair, update or uninstall a program. If a needed file does go missing from `C:\Windows\Installer` by some other means, see [If you do have a file missing from C:\Windows\Installer](#recovery).
 
 **Why no `Win32_Product` (WMI)?** [`Win32_Product` triggers MSI repair operations on every product during enumeration](https://gregramsey.net/2012/02/20/win32_product-is-evil/), which can take minutes and load the disk hard. InstallerClean calls the Windows Installer COM API directly with no side effects.
 
@@ -295,7 +348,7 @@ scoop install installerclean
 
 [Ultra Virus Killer (UVK)](https://www.carifred.com/uvk/) also offers Installer cleanup as part of its System Booster module, but it's a paid tool ($15-25) and the cleanup is one small feature inside a much larger application. InstallerClean is free, focused and open source.
 
-General-purpose system cleaners like [CCleaner](https://www.ccleaner.com/) and [BleachBit](https://www.bleachbit.org/) do not touch `C:\Windows\Installer`. The folder needs Windows Installer API queries to tell registered packages from unused ones, and a generic cleaner that just walked the file tree could break installed apps. InstallerClean is the tool to reach for when that's the folder you actually want cleaned.
+General-purpose system cleaners like [CCleaner](https://www.ccleaner.com/) and [BleachBit](https://www.bleachbit.org/) do not touch `C:\Windows\Installer`. The folder needs Windows Installer API queries to tell registered packages from unneeded ones, and a generic cleaner that just walked the file tree could break installed apps. InstallerClean is the tool to reach for when that's the folder you actually want cleaned.
 
 ## Command line
 
