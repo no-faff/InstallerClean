@@ -66,10 +66,12 @@ public partial class RegisteredFilesWindow : Window
         BuildSeeAlsoLine();
     }
 
-    // README anchor for the "if a needed file goes missing" recovery
-    // section the missing-file note links to.
+    // Stable README anchor (an explicit <a id="recovery"> before the
+    // recovery section) the missing-file note links to. An explicit id
+    // rather than a heading-derived slug, so renaming the heading never
+    // breaks this link.
     private const string MissingFileRecoveryUrl =
-        "https://github.com/no-faff/InstallerClean#if-a-needed-file-goes-missing";
+        "https://github.com/no-faff/InstallerClean#recovery";
 
     /// <summary>
     /// Builds the missing-file note's closing line from a single resx string
