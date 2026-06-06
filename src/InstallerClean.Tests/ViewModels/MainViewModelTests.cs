@@ -698,7 +698,7 @@ public class MainViewModelTests
 
         vm.Chrome.DonateCommand.Execute(null);
 
-        _windowService.Received(1).OpenUrl("https://nofaff.netlify.app");
+        _windowService.Received(1).OpenUrl("https://nofaff.netlify.app/support");
     }
 
     // Result-log persistence path. The lifetime lock

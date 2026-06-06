@@ -125,7 +125,7 @@ public partial class AboutWindow : Window
         UrlLauncher.OpenUrl("https://github.com/no-faff/InstallerClean");
 
     private void DonateClick(object sender, RoutedEventArgs e) =>
-        UrlLauncher.OpenUrl("https://nofaff.netlify.app");
+        UrlLauncher.OpenUrl("https://nofaff.netlify.app/support");
 
     protected override void OnClosed(EventArgs e)
     {

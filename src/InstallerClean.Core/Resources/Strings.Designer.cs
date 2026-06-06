@@ -338,6 +338,7 @@ public static class Strings
     public static string Tooltip_Close => Get("Tooltip.Close");
     public static string Tooltip_Delete => Get("Tooltip.Delete");
     public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");
+    public static string Tooltip_LeaveStarOnGitHub_About => Get("Tooltip.LeaveStarOnGitHub.About");
     public static string Tooltip_Minimise => Get("Tooltip.Minimise");
     public static string Tooltip_Move => Get("Tooltip.Move");
     public static string Tooltip_MoveDestination => Get("Tooltip.MoveDestination");

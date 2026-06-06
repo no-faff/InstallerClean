@@ -151,7 +151,7 @@
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Send</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
-  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Buy me a cuppa</value></data>
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Buy me a cup of tea</value></data>
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Buy me a cuppa (About window)</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Cancel operation</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Cancel scan</value></data>
@@ -208,11 +208,12 @@
   <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>Sorted by {0}, descending</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Buy me a cuppa</value></data>
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>If it helped, buy me a cup of tea.</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>It's thirsty work!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Cancellation requested. The app is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Close</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>or report an Issue or post in Discussions. Any feedback welcome.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the unused files will be moved. Type a path, drop a folder or click Browse.</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>An anonymous summary sent to No Faff. Totally optional.</value></data>

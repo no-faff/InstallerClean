@@ -88,7 +88,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     private void StarOnGitHub() => _windowService.OpenUrl("https://github.com/no-faff/InstallerClean");
 
     [RelayCommand]
-    private void Donate() => _windowService.OpenUrl("https://nofaff.netlify.app");
+    private void Donate() => _windowService.OpenUrl("https://nofaff.netlify.app/support");
 
     [RelayCommand]
     private void CloseApp() => _windowService.CloseMainWindow();
