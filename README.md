@@ -171,7 +171,7 @@ Yes. InstallerClean queries the same database Windows itself uses to track what'
 VirusTotal: clean across every engine. Live links in each release's notes so you can re-check.
 
 <a id="recovery"></a>
-## If you do have a file missing from C:\Windows\Installer
+## If you do have a file missing from `C:\Windows\Installer`
 
 InstallerClean only ever clears files Windows reports as finished with, so it
 can't leave a program unable to repair, update or uninstall. Removing files from
