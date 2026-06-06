@@ -21,7 +21,7 @@
       Field.*                labels for metadata fields
       FilePicker.*           folder-browser dialog labels
       Plural.*               singular/plural fragments used by DisplayHelpers
-      Reason.*               Reason column values in the unused files list
+      Reason.*               Reason column values in the unneeded files list
       RecycleUnavailable.*   recycle-bin-unavailable choice dialog
       ResultLog.*            send-summary states (Sending / Sent / Failed)
       Section.*              heading text inside windows
@@ -87,8 +87,8 @@
   <!-- Window titles -->
   <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
   <data name="Window.About.Title" xml:space="preserve"><value>About</value></data>
-  <data name="Window.Registered.Title" xml:space="preserve"><value>Registered files</value></data>
-  <data name="Window.Orphaned.Title" xml:space="preserve"><value>Unused files</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>Registered files that must not be deleted</value></data>
+  <data name="Window.Orphaned.Title" xml:space="preserve"><value>Unneeded files that are safe to delete</value></data>
   <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Confirm move</value></data>
   <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Confirm delete</value></data>
   <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>Recycle Bin unavailable</value></data>
@@ -162,13 +162,13 @@
   <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub</value></data>
   <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Leave a star on GitHub (About window)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimise</value></data>
-  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Move all unused installer files to the chosen destination folder</value></data>
-  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all unused installer files to the Recycle Bin</value></data>
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Confirm sending the unused files to the Recycle Bin</value></data>
-  <data name="Automation.ConfirmMove" xml:space="preserve"><value>Confirm moving the unused files to the chosen destination folder</value></data>
-  <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Choose how to handle the unused files: move them somewhere safe, delete them permanently or cancel.</value></data>
-  <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Move the unused files to a folder you choose</value></data>
-  <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Delete the unused files permanently because the Recycle Bin is unavailable for this drive</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Move all unneeded installer files to the chosen destination folder</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all unneeded installer files to the Recycle Bin</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Confirm sending the unneeded files to the Recycle Bin</value></data>
+  <data name="Automation.ConfirmMove" xml:space="preserve"><value>Confirm moving the unneeded files to the chosen destination folder</value></data>
+  <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel.</value></data>
+  <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Move the unneeded files to a folder you choose</value></data>
+  <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive</value></data>
   <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Say thanks</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Confirm sending the summary to No Faff</value></data>
@@ -195,7 +195,7 @@
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>Scan C:\Windows\Installer again</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Scanning progress</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Startup scan progress</value></data>
-  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Details, unused files</value></data>
+  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Details, unneeded files</value></data>
   <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Available for cleanup.</value></data>
   <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Details, registered files</value></data>
   <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Read-only inventory.</value></data>
@@ -215,17 +215,17 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>or report an Issue or post in Discussions. Any feedback welcome.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
-  <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the unused files will be moved. Type a path, drop a folder or click Browse.</value></data>
+  <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the unneeded files will be moved. Type a path, drop a folder or click Browse.</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>An anonymous summary sent to No Faff. Totally optional.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>An anonymous summary sent to No Faff. Totally optional. Worth sending even when nothing was found.</value></data>
-  <data name="Tooltip.Move" xml:space="preserve"><value>Move the unused files to the chosen destination folder.</value></data>
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unused files to a destination folder. Choose one first.</value></data>
-  <data name="Tooltip.Delete" xml:space="preserve"><value>Send the unused files to the Recycle Bin.</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>Move the unneeded files to the chosen destination folder.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files to a destination folder. Choose one first.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Send the unneeded files to the Recycle Bin.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Subject name from the embedded Authenticode certificate. Not chain-verified.</value></data>
 
   <!-- Body copy -->
   <data name="Body.MainExplanation" xml:space="preserve">
-    <value>The unused files below are safe to delete. They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy.</value>
+    <value>The unneeded files below are safe to delete. They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy.</value>
     <comment>{0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer is currently processing an installation. Move and Delete are disabled until it finishes.</value></data>
@@ -375,8 +375,8 @@
        singular and plural keys per their language's rule. -->
   <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} file still needed</value></data>
   <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} files still needed</value></data>
-  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} unused file to clean up</value></data>
-  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} unused files to clean up</value></data>
+  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} unneeded file to clean up</value></data>
+  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} unneeded files to clean up</value></data>
   <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do.</value></data>
   <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do.</value></data>
   <!-- Informational line shown when the MSI database carries
@@ -390,7 +390,7 @@
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} {2}</value></data>
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} unused {1} ({2})</value></data>
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} unneeded {1} ({2})</value></data>
   <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} registered {1} ({2})</value></data>
 
   <!-- Confirmation dialogs -->
@@ -590,9 +590,9 @@ The crash log could not be written.</value></data>
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>Found {0} {1} to clean up ({2}).</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>Nothing to do.</value></data>
   <!-- 0 = mode arg ("/s"), 1 = registered package count, 2 = pluralised "package"/"packages" -->
-  <data name="Cli.EventLogScanNoOrphans" xml:space="preserve"><value>Scan mode ({0}): no unused files. Installer database has {1} registered {2}.</value></data>
+  <data name="Cli.EventLogScanNoOrphans" xml:space="preserve"><value>Scan mode ({0}): no unneeded files. Installer database has {1} registered {2}.</value></data>
   <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
-  <data name="Cli.EventLogScanFound" xml:space="preserve"><value>Scan mode ({0}): {1} unused {2} found, {3}. No action taken.</value></data>
+  <data name="Cli.EventLogScanFound" xml:space="preserve"><value>Scan mode ({0}): {1} unneeded {2} found, {3}. No action taken.</value></data>
   <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
   <data name="Cli.DeletingFiles" xml:space="preserve"><value>Deleting {0} {1}...</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
