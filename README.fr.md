@@ -12,7 +12,9 @@
 
 <h1 align="center">InstallerClean</h1>
 
-<p align="center"><strong>Une alternative moderne et open source à <a href="https://www.homedev.com.au/free/patchcleaner">PatchCleaner</a>. Nettoyez en toute sécurité <code>C:\Windows\Installer</code>, le dossier caché de Windows qui grignote silencieusement votre espace disque.</strong></p>
+<p align="center"><strong>Une alternative open source à <a href="https://www.homedev.com.au/free/patchcleaner">PatchCleaner</a>. Nettoyez en toute sécurité <code>C:\Windows\Installer</code>, le dossier caché de Windows qui grignote silencieusement votre espace disque.</strong></p>
+
+<p align="center"><em>Utilisez-le une fois. Gagnez peut-être un peu d'espace. Puis jetez-le.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licence : MIT"></a>
@@ -29,6 +31,28 @@
 - **Combien d'espace :** Ça dépend de vos logiciels. Sur ma machine, c'était presque 1 Go. Un utilisateur d'InstallerClean a [signalé](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 Go. Avec Adobe Acrobat, ça peut dépasser 100 Go. Ou ne rien donner du tout. L'important, c'est que c'est rapide et gratuit ; tout ce qui peut être supprimé le sera.
 - **Est-ce sûr :** Oui. Ne supprime que les fichiers que Windows lui-même déclare inutiles. La suppression envoie les fichiers à la Corbeille et ne supprime jamais définitivement sans vous demander. Le déplacement, lui, vous permet de les garder en lieu sûr.
 - **Comment l'obtenir :** [Téléchargez la dernière version](../../releases/latest), lancez-la, c'est tout.
+
+## Sommaire
+
+- [Le dossier dont personne ne vous parle](#le-dossier-dont-personne-ne-vous-parle)
+- [La recherche d'aide](#la-recherche-daide)
+- [Ce qu'il fait](#ce-quil-fait)
+- [Captures d'écran](#captures-décran)
+- [Comment ça marche](#comment-ça-marche)
+- [Est-ce sûr ?](#est-ce-sûr-)
+- [Si un fichier manque bel et bien dans C:\Windows\Installer](#recovery)
+- [Accessibilité](#accessibilité)
+- [Ce qu'il ne fait pas](#ce-quil-ne-fait-pas)
+- [FAQ](#faq)
+- [Téléchargement](#téléchargement)
+- [Comparaison avec PatchCleaner](#comparaison-avec-patchcleaner)
+- [Ligne de commande](#ligne-de-commande)
+- [Prérequis](#prérequis)
+- [Compilation depuis les sources](#compilation-depuis-les-sources)
+- [Contribuer](#contribuer)
+- [Soutenir le projet](#soutenir-le-projet)
+- [Historique des étoiles](#historique-des-étoiles)
+- [Licence](#licence)
 
 ---
 
@@ -91,7 +115,7 @@ Aucune activité réseau automatique. Deux boutons facultatifs déclenchent un s
 </p>
 
 <p>
-  <img src="docs/screenshots/03b-details-unused.webp" alt="Fenêtre des fichiers inutilisés listant les fichiers .msi supprimables avec la raison de leur suppression" width="900"><br>
+  <img src="docs/screenshots/03b-details-unused.webp" alt="Fenêtre des fichiers inutiles listant les fichiers .msi supprimables avec la raison de leur suppression" width="900"><br>
   <em>Les fichiers devenus inutiles.</em>
 </p>
 
@@ -141,21 +165,19 @@ Oui. InstallerClean interroge la base de données que Windows utilise lui-même 
 - Les empreintes SHA-256 de chaque version sont listées sur la [page des versions](../../releases/latest).
 - Des liens VirusTotal pour les variantes setup, portable, slim et CLI sont publiés à chaque version.
 - Le code source est sur [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) et la CI compile et teste chaque commit (voir le badge CI vert plus haut).
-- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analyse chaque version à la recherche de virus, logiciels espions et publiciels.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) teste chaque soumission dans une machine virtuelle et ne la référence que si elle passe son contrôle.
+- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analyse chaque version à la recherche de virus, logiciels espions et publiciels.
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certifié 100 % propre par Softpedia" width="190"></a>
 
 VirusTotal : propre sur tous les moteurs. Des liens à jour dans les notes de chaque version pour que vous puissiez revérifier.
 
-## Si un fichier nécessaire vient à manquer
+<a id="recovery"></a>
+## Si un fichier manque bel et bien dans C:\Windows\Installer
 
-InstallerClean ne supprime jamais que les fichiers dont Windows déclare avoir fini de se servir, il ne peut donc pas laisser un programme dans l'impossibilité de se réparer, se mettre à jour ou se désinstaller. Retirer des fichiers de `C:\Windows\Installer` à la main, ou avec un outil qui ne consulte pas d'abord la base de données de Windows Installer, est une tout autre affaire, et c'est pour cela que le conseil habituel est de ne pas toucher à ce dossier. Ce conseil est juste, dans une certaine mesure. Voici le tableau complet, et ce qu'il faut faire si un fichier nécessaire a déjà disparu.
+InstallerClean ne supprime jamais que les fichiers dont Windows déclare avoir fini de se servir, il ne peut donc pas laisser un programme dans l'impossibilité de se réparer, se mettre à jour ou se désinstaller. Retirer des fichiers de `C:\Windows\Installer` à la main, ou avec un outil qui ne consulte pas d'abord la base de données de Windows Installer, est une tout autre affaire, et c'est pour cela que le conseil habituel est de ne pas toucher à ce dossier. Ce conseil est généralement juste, mais pas si vous utilisez InstallerClean. Voici le tableau complet, et ce qu'il faut faire si un fichier nécessaire a déjà disparu.
 
-<details>
-<summary><strong>À propos de <code>C:\Windows\Installer</code>, et comment récupérer un fichier manquant</strong></summary>
-
-<br>
+### À propos de `C:\Windows\Installer`, et comment récupérer un fichier manquant
 
 *Les citations de Microsoft ci-dessous sont reproduites dans leur version anglaise d'origine.*
 
@@ -180,8 +202,6 @@ En pratique, la solution qui fonctionne le plus souvent consiste à télécharge
 Cela rétablit normalement le fichier sans toucher à vos réglages, mais Microsoft ne le garantit pas, et son dernier recours documenté est de réinstaller le programme, voire de reconstruire Windows. C'est la position officielle, rapportée telle que je la trouve. Je n'en suis pas la cause et je ne peux pas faire mieux que les indications de Microsoft elles-mêmes ; je me contente de vous dire ce qu'il en est.
 
 Rien de tout cela ne peut se produire à cause d'InstallerClean. Il ne supprime jamais que les fichiers que Windows lui-même signale comme n'étant plus nécessaires, de sorte que le fichier qu'une future réparation, mise à jour ou désinstallation ira chercher n'est jamais l'un de ceux qu'il a touchés. Les indications de Microsoft se trouvent sur [Restore missing Windows Installer cache files](https://learn.microsoft.com/en-us/troubleshoot/windows-client/application-management/missing-windows-installer-cache).
-
-</details>
 
 ## Accessibilité
 
@@ -215,11 +235,44 @@ Sur les 68 rapports que des utilisateurs nous ont gentiment envoyés (merci 🙏
 | Espace libéré | 32% | 0.2 GB | 21 GB | 327 GB |
 <!-- reports-stats-end -->
 
+<details>
+<summary>Voici à quoi ressemble un rapport</summary>
+
+```json
+{
+  "schemaVersion": 3,
+  "app": { "version": "1.9.0" },
+  "os": "Windows 11 (X64)",
+  "scan": {
+    "durationMs": 1820,
+    "registeredCount": 148,
+    "orphanedCount": 40,
+    "supersededCount": 25,
+    "obsoletedCount": 5,
+    "missingFromDiskCount": 0,
+    "pendingReboot": "clean"
+  },
+  "operation": {
+    "kind": "delete",
+    "outcome": "complete",
+    "filesProcessed": 70,
+    "filesFailed": 0,
+    "bytesFreed": 22548578304,
+    "errors": [],
+    "moveDestinationKind": null
+  }
+}
+```
+
+Il ne contient que des compteurs et des étiquettes catégorielles : aucun chemin de fichier, aucun nom d'utilisateur, aucun identifiant de machine.
+
+</details>
+
 **Pourquoi a-t-il besoin des droits d'administrateur ?** `C:\Windows\Installer` appartient à SYSTEM et son accès est restreint aux seuls administrateurs. Lire le dossier, accéder en écriture à l'API de requête de la base de données de Windows Installer, déplacer ou supprimer des fichiers : tout cela exige une élévation. Il n'existe aucune voie en mode utilisateur.
 
 **Puis-je annuler une suppression ?** En général, oui. Quand la Corbeille est disponible pour le lecteur, la suppression y envoie les fichiers et vous pouvez les restaurer depuis la Corbeille. Si elle n'est pas disponible, l'application ne supprime jamais définitivement d'elle-même (voir [Est-ce sûr ?](#est-ce-sûr-)). Pour un filet de sécurité que vous maîtrisez, utilisez le déplacement afin de placer les fichiers dans un dossier de votre choix, et vérifiez que rien ne casse avant de les supprimer de là.
 
-**Windows va-t-il se plaindre si je supprime ces fichiers ?** Non. InstallerClean ne supprime jamais que les fichiers dont Windows lui-même déclare avoir fini de se servir, donc rien de ce qu'il supprime n'est requis pour réparer, mettre à jour ou désinstaller un programme. Si un fichier nécessaire venait malgré tout à disparaître de `C:\Windows\Installer` par un autre moyen, voir [Si un fichier nécessaire vient à manquer](#si-un-fichier-nécessaire-vient-à-manquer).
+**Windows va-t-il se plaindre si je supprime ces fichiers ?** Non. InstallerClean ne supprime jamais que les fichiers dont Windows lui-même déclare avoir fini de se servir, donc rien de ce qu'il supprime n'est requis pour réparer, mettre à jour ou désinstaller un programme. Si un fichier nécessaire venait malgré tout à disparaître de `C:\Windows\Installer` par un autre moyen, voir [Si un fichier manque bel et bien dans C:\Windows\Installer](#recovery).
 
 **Pourquoi pas `Win32_Product` (WMI) ?** [`Win32_Product` déclenche des opérations de réparation MSI sur chaque produit pendant l'énumération](https://gregramsey.net/2012/02/20/win32_product-is-evil/), ce qui peut prendre plusieurs minutes et solliciter le disque très fort. InstallerClean appelle directement l'API COM de Windows Installer, sans effet de bord.
 
@@ -267,7 +320,7 @@ scoop install installerclean
 
 [Ultra Virus Killer (UVK)](https://www.carifred.com/uvk/) propose lui aussi un nettoyage du dossier Installer dans son module System Booster, mais c'est un outil payant (15 à 25 $) et le nettoyage n'y est qu'une petite fonctionnalité au sein d'une application bien plus large. InstallerClean est gratuit, ciblé et open source.
 
-Les nettoyeurs système généralistes comme [CCleaner](https://www.ccleaner.com/) et [BleachBit](https://www.bleachbit.org/) ne touchent pas à `C:\Windows\Installer`. Le dossier exige des requêtes à l'API Windows Installer pour distinguer les paquets enregistrés des fichiers inutilisés, et un nettoyeur générique qui se contenterait de parcourir l'arborescence pourrait casser des applications installées. InstallerClean est l'outil vers lequel se tourner quand c'est précisément ce dossier-là que vous voulez nettoyer.
+Les nettoyeurs système généralistes comme [CCleaner](https://www.ccleaner.com/) et [BleachBit](https://www.bleachbit.org/) ne touchent pas à `C:\Windows\Installer`. Le dossier exige des requêtes à l'API Windows Installer pour distinguer les paquets enregistrés des fichiers inutiles, et un nettoyeur générique qui se contenterait de parcourir l'arborescence pourrait casser des applications installées. InstallerClean est l'outil vers lequel se tourner quand c'est précisément ce dossier-là que vous voulez nettoyer.
 
 ## Ligne de commande
 
@@ -348,4 +401,4 @@ Si InstallerClean vous a été utile, vous pouvez [soutenir No Faff](https://nof
 
 ---
 
-🎶 [George Formby - When I'm Cleaning Windows](https://www.youtube.com/watch?v=sfmAeijj5cM). Régalez-vous !
+🎶 [George Formby - When I'm Cleaning Windows](https://www.youtube.com/watch?v=sfmAeijj5cM). Régalez-vous !
