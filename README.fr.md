@@ -173,7 +173,7 @@ Oui. InstallerClean interroge la base de données que Windows utilise lui-même 
 VirusTotal : propre sur tous les moteurs. Des liens à jour dans les notes de chaque version pour que vous puissiez revérifier.
 
 <a id="recovery"></a>
-## Si un fichier manque bel et bien dans C:\Windows\Installer
+## Si un fichier manque bel et bien dans `C:\Windows\Installer`
 
 InstallerClean ne supprime jamais que les fichiers dont Windows déclare avoir fini de se servir, il ne peut donc pas laisser un programme dans l'impossibilité de se réparer, se mettre à jour ou se désinstaller. Retirer des fichiers de `C:\Windows\Installer` à la main, ou avec un outil qui ne consulte pas d'abord la base de données de Windows Installer, est une tout autre affaire, et c'est pour cela que le conseil habituel est de ne pas toucher à ce dossier. Ce conseil est généralement juste, mais pas si vous utilisez InstallerClean. Voici le tableau complet, et ce qu'il faut faire si un fichier nécessaire a déjà disparu.
 
