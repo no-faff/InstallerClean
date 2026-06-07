@@ -232,7 +232,7 @@ Entre os 68 relatórios que as pessoas tiveram a gentileza de enviar (obrigado �
 | Resultado | Proporção | Menor | Mediana | Maior |
 |---|---|---|---|---|
 | Nada para remover | 68% | - | - | - |
-| Espaço liberado | 32% | 0.2 GB | 21 GB | 327 GB |
+| Espaço liberado | 32% | 0,2 GB | 21 GB | 327 GB |
 <!-- reports-stats-end -->
 
 <details>

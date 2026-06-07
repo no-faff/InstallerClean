@@ -168,7 +168,7 @@ InstallerClean различает два вида ненужных файлов.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) тестирует каждую присланную сборку в виртуальной машине и публикует её, только если она прошла их проверку.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) проверяет каждый выпуск на вирусы, шпионское и рекламное ПО.
 
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia: сертифицировано как 100% чистое" width="190"></a>
+<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia: сертифицировано как 100 % чистое" width="190"></a>
 
 VirusTotal: чисто по всем антивирусным движкам. В примечаниях к каждому выпуску есть актуальные ссылки, чтобы вы могли перепроверить сами.
 
@@ -231,8 +231,8 @@ InstallerClean создан так, чтобы им можно было полн
 
 | Результат | Доля | Минимум | Медиана | Максимум |
 |---|---|---|---|---|
-| Удалять нечего | 68% | - | - | - |
-| Освобождено место | 32% | 0.2 GB | 21 GB | 327 GB |
+| Удалять нечего | 68 % | - | - | - |
+| Освобождено место | 32 % | 0,2 ГБ | 21 ГБ | 327 ГБ |
 <!-- reports-stats-end -->
 
 <details>

@@ -168,7 +168,7 @@ Sí. InstallerClean consulta la misma base de datos que el propio Windows usa pa
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) prueba cada envío en una máquina virtual y solo lo publica si pasa su revisión.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analiza cada versión en busca de virus, spyware y adware.
 
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificado 100% limpio por Softpedia" width="190"></a>
+<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificado 100 % limpio por Softpedia" width="190"></a>
 
 VirusTotal: limpio en todos los motores. Hay enlaces en vivo en las notas de cada versión para que puedas volver a comprobarlo.
 
@@ -231,8 +231,8 @@ De los 68 informes que me han enviado amablemente (gracias 🙏) desde que la v1
 
 | Resultado | Proporción | Mínimo | Mediana | Máximo |
 |---|---|---|---|---|
-| Nada que eliminar | 68% | - | - | - |
-| Espacio liberado | 32% | 0.2 GB | 21 GB | 327 GB |
+| Nada que eliminar | 68 % | - | - | - |
+| Espacio liberado | 32 % | 0,2 GB | 21 GB | 327 GB |
 <!-- reports-stats-end -->
 
 <details>

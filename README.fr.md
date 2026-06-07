@@ -231,8 +231,8 @@ Sur les 68 rapports que des utilisateurs nous ont gentiment envoyés (merci 🙏
 
 | Résultat | Proportion | Minimum | Médiane | Maximum |
 |---|---|---|---|---|
-| Rien à supprimer | 68% | - | - | - |
-| Espace libéré | 32% | 0.2 GB | 21 GB | 327 GB |
+| Rien à supprimer | 68 % | - | - | - |
+| Espace libéré | 32 % | 0,2 Go | 21 Go | 327 Go |
 <!-- reports-stats-end -->
 
 <details>
