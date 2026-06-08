@@ -545,14 +545,38 @@
                                AutomationProperties.LiveSetting="Polite"/>
 
                     <!-- 6px bottom (off the 8/12/16/24 scale) tightens
-                         the summary heading against the restore-hint
-                         caption that follows; the standard GapBottom.Sm
-                         (8) loosens the heading/caption pairing visibly. -->
+                         the summary against the caption that follows
+                         (the reassurance on an all-clear, the restore
+                         hint after a Move or Delete); GapBottom.Sm (8)
+                         loosens the pairing visibly. -->
                     <TextBlock x:Name="CompletionSummaryText" Text="{Binding Completion.Summary}"
                                Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="0,0,0,6"
                                AutomationProperties.LiveSetting="Polite"/>
+
+                    <!-- All-clean reassurance. ShowAllClear sets it only
+                         on a from-scratch all-clear (showReassurance);
+                         it is empty after a post-cleanup rescan, so the
+                         "two in three find nothing" framing never shows
+                         to someone who just cleaned files. The empty-
+                         string DataTrigger collapses it, matching the
+                         Restore and Errors blocks. -->
+                    <TextBlock Text="{Binding Completion.Reassurance}"
+                               Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
+                               HorizontalAlignment="Center" TextAlignment="Center"
+                               TextWrapping="Wrap" Margin="0,0,0,6">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Completion.Reassurance}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
 
                     <!-- Restore guidance. Collapses when empty so the
                          all-clear overlay (which has no restore hint)

@@ -216,8 +216,8 @@
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>or report an Issue or post in Discussions. Any feedback welcome.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Tooltip.MoveDestination" xml:space="preserve"><value>Where the unneeded files will be moved. Type a path, drop a folder or click Browse.</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>An anonymous summary sent to No Faff. Totally optional.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>An anonymous summary sent to No Faff. Totally optional. Worth sending even when nothing was found.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Up to you but appreciated. Will send an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Up to you but appreciated. Will send an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the unneeded files to the chosen destination folder.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files to a destination folder. Choose one first.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Send the unneeded files to the Recycle Bin.</value></data>
@@ -314,10 +314,11 @@
        "less than a second"). The count is the receipt that a real
        scan ran; on fast machines a duration alone reads as "did
        nothing". Rendered in the Restore slot of the completion
-       overlay so the all-clean state has the same two-tier shape
-       (heading + summary + smaller receipt) as the post-Move and
-       post-Delete states. -->
+       overlay so the all-clean state has the same heading + summary
+       + smaller-receipt shape as the post-Move and post-Delete
+       states. -->
   <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Scanned {0} {1} in {2}</value></data>
+  <data name="Completion.NothingToCleanUpReassurance" xml:space="preserve"><value>About two in three people find nothing unneeded. (Among the third that do, the median freed is around 21 GB, and some have cleared hundreds of GB.) All good. Move on.</value></data>
   <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working</value></data>
   <!-- 0 = size freed (e.g. "120.5 MB") -->

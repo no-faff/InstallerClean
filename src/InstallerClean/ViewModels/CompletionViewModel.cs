@@ -41,6 +41,7 @@ public partial class CompletionViewModel : ObservableObject
     [ObservableProperty] private string _heading = string.Empty;
     [ObservableProperty] private string _summary = string.Empty;
     [ObservableProperty] private string _restore = string.Empty;
+    [ObservableProperty] private string _reassurance = string.Empty;
     [ObservableProperty] private string _errors = string.Empty;
 
     [ObservableProperty]
@@ -142,8 +143,12 @@ public partial class CompletionViewModel : ObservableObject
     /// count surfaced as the scan receipt; <paramref name="scanDurationMs"/>
     /// is the elapsed scan time. The count and the duration together stop
     /// the all-clean overlay from reading as "did nothing" on a fast
-    /// machine where the duration alone shows as a fraction of a second.</summary>
-    public void ShowAllClear(int installedProductCount, long scanDurationMs)
+    /// machine where the duration alone shows as a fraction of a second.
+    /// <paramref name="showReassurance"/> is false on the rescan that
+    /// follows a Move or Delete: that user did not "find nothing", so the
+    /// "two in three find nothing" line is withheld rather than
+    /// misdescribing their run.</summary>
+    public void ShowAllClear(int installedProductCount, long scanDurationMs, bool showReassurance = true)
     {
         Heading = Strings.Completion_AllClean;
         Summary = Strings.Completion_NothingToCleanUp;
@@ -152,6 +157,11 @@ public partial class CompletionViewModel : ObservableObject
             installedProductCount,
             DisplayHelpers.PluraliseProduct(installedProductCount),
             DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
+        // Shown only on a from-scratch all-clear. A post-cleanup rescan
+        // passes false: a user who has just moved or deleted files did
+        // not "find nothing", so the "two in three find nothing" framing
+        // would misdescribe their run.
+        Reassurance = showReassurance ? Strings.Completion_NothingToCleanUpReassurance : string.Empty;
         Errors = string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = true;
@@ -174,6 +184,7 @@ public partial class CompletionViewModel : ObservableObject
             : string.Format(Strings.Completion_MoveSummaryWithErrors,
                 movedCount, movedLabel, destination, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = Strings.Completion_MoveRestoreHint;
+        Reassurance = string.Empty;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = movedBytes <= 0;
@@ -193,6 +204,7 @@ public partial class CompletionViewModel : ObservableObject
             : string.Format(Strings.Completion_DeleteSummaryWithErrors,
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = Strings.Completion_DeleteRestoreHint;
+        Reassurance = string.Empty;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
@@ -226,6 +238,7 @@ public partial class CompletionViewModel : ObservableObject
         Restore = DisplayHelpers.Pluralise(deletedCount,
             Strings.Completion_PermanentDeleteRestoreHint_Singular,
             Strings.Completion_PermanentDeleteRestoreHint_Plural);
+        Reassurance = string.Empty;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
