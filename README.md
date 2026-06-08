@@ -26,9 +26,11 @@
 ![Screenshot of InstallerClean after a successful clean-up: 965 MB freed, 68 files deleted](docs/screenshots/04d-deleted-freed-success.webp)
 
 - **What:** Finds and removes unneeded files from `C:\Windows\Installer`, the hidden folder Windows never cleans up.
-- **How much space:** Depends on your software. On my machine it was just shy of 1 GB. An InstallerClean user [reported](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. With Adobe Acrobat it can pass 100 GB. It could be nothing at all. The point is that it's quick and costs nothing; whatever can be removed will be gone.
+- **How much space:** Depends on your software. On my machine it was 1.28 GB. An InstallerClean user [reported](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. With Adobe Acrobat it can pass 100 GB.
 - **Is it safe:** Yes. Only removes files Windows itself says it no longer needs. Delete sends files to the Recycle Bin and never deletes anything permanently without asking. Move lets you keep them somewhere safe.
 - **Get it:** [Download the latest release](../../releases/latest), run it, done.
+
+Only about a third of machines have orphaned installer files to clear, but for that third it is well worth it: the median freed is around 21 GB, and some have cleared hundreds of GB. The other two-thirds find nothing to remove, which simply means their Installer folder is already clean, and the scan takes seconds either way.
 
 ## Contents
 
