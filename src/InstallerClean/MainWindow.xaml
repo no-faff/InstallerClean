@@ -232,6 +232,7 @@
                                  AutomationProperties.Name="{loc:Translate Automation.MoveDestinationFolder}"
                                  AutomationProperties.IsRequiredForForm="True"
                                  ToolTip="{loc:Translate Tooltip.MoveDestination}"
+                                 ToolTipService.ShowsToolTipOnKeyboardFocus="False"
                                  AllowDrop="True"
                                  PreviewDragOver="MoveDestination_DragOver"
                                  Drop="MoveDestination_Drop"/>

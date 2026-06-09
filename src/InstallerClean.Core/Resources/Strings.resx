@@ -228,7 +228,7 @@
     <value>The unneeded files below are safe to delete. They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy.</value>
     <comment>{0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
-  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer is currently processing an installation. Move and Delete are disabled until it finishes.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Select a file to view details.</value></data>
@@ -401,7 +401,6 @@
   <data name="Confirm.MoveDestination" xml:space="preserve"><value>Files will be moved to {0}.</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Delete {0} {1} ({2})?</value></data>
   <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Files will be sent to the Recycle Bin. If you want backup copies, use Move instead.</value></data>
-  <data name="Confirm.DeleteLargeWarning" xml:space="preserve"><value>At this size some files may skip the Recycle Bin and be deleted permanently. Use Move instead if you want a guaranteed backup.</value></data>
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Administrator rights required</value></data>

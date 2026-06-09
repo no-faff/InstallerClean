@@ -93,7 +93,8 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                 <Button Style="{StaticResource CompactGhostPill}"
                         Click="StarClick" AutomationProperties.Name="{loc:Translate Automation.LeaveStarOnGitHub.About}"
-                        Margin="-12,0,0,0">
+                        Margin="-12,0,0,0"
+                        ToolTipService.InitialShowDelay="0">
                     <Button.ToolTip>
                         <ToolTip Style="{StaticResource AccentTooltip}" Content="{loc:Translate Tooltip.LeaveStarOnGitHub.About}"/>
                     </Button.ToolTip>
@@ -106,7 +107,8 @@
                 </Button>
                 <Button Style="{StaticResource CompactGhostPill}"
                         Click="DonateClick" AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa.About}"
-                        Margin="8,0,0,0">
+                        Margin="8,0,0,0"
+                        ToolTipService.InitialShowDelay="0">
                     <Button.ToolTip>
                         <ToolTip Style="{StaticResource AccentTooltip}" Content="{loc:Translate Tooltip.BuyMeACuppa.About}"/>
                     </Button.ToolTip>

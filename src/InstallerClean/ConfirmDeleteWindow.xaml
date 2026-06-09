@@ -23,30 +23,12 @@
             MaxWidth="400" MinWidth="320"
             BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="{StaticResource GapBottom.Md}">
-                <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
-                      Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
-                      VerticalAlignment="Center" Margin="{StaticResource GapRight.Sm}"/>
-                <TextBlock x:Name="MessageText" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
-                           TextWrapping="Wrap" VerticalAlignment="Center"/>
-            </StackPanel>
-
-            <StackPanel x:Name="LargeSizeWarning" Orientation="Horizontal"
-                        Margin="{StaticResource GapBottom.Md}" Visibility="Collapsed">
-                <!-- Margin literal "0,3,8,0": top=3 is the icon optical
-                     offset that lines the triangle's visual centre with
-                     the first line of multi-line text (VerticalAlignment=
-                     Top alone leaves it floating above the letterforms).
-                     Right=8 matches GapRight.Sm; an explicit Thickness
-                     token would have to be one-off because the 3 is
-                     site-specific. -->
-                <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
-                      Fill="{StaticResource Status.Warning}" Width="14" Height="14" Stretch="Uniform"
-                      VerticalAlignment="Top" Margin="0,3,8,0"/>
-                <TextBlock Text="{loc:Translate Confirm.DeleteLargeWarning}"
-                           Foreground="{StaticResource Status.Warning}" FontSize="{DynamicResource Type.Body}"
-                           TextWrapping="Wrap"/>
-            </StackPanel>
+            <!-- No warning icon: a delete to the Recycle Bin is the normal,
+                 safe action InstallerClean exists for, not a hazard to flag.
+                 Standalone wrapping TextBlock so a long heading grows the
+                 SizeToContent card instead of clipping. -->
+            <TextBlock x:Name="MessageText" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
+                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Md}"/>
 
             <TextBlock
                        Text="{loc:Translate Confirm.DeleteToRecycleBin}"
