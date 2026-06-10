@@ -282,8 +282,6 @@
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>Moving {0} {1}...</value></data>
   <data name="Status.Deleting" xml:space="preserve"><value>Deleting {0} {1}...</value></data>
-  <data name="Status.MoveCancelled" xml:space="preserve"><value>Move cancelled.</value></data>
-  <data name="Status.DeleteCancelled" xml:space="preserve"><value>Delete cancelled.</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Move cancelled. {0} of {1} {2} processed.</value></data>

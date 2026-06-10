@@ -266,8 +266,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // The move/delete loop only repaints OperationProgress on its
         // next iteration. Without a synchronous write the overlay holds
         // "Moving 23 of 100..." for one iteration past the click. The
-        // progress reporter overwrites with "Move cancelled." or
-        // "Delete cancelled." once the loop observes the cancellation.
+        // operation loop then clears it, or replaces it with a partial-
+        // progress line, once the loop observes the cancellation.
         OperationProgress = Strings.Status_Cancelling;
     }
 
@@ -335,7 +335,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         catch (OperationCanceledException)
         {
             IsOperating = false;
-            OperationProgress = Strings.Status_MoveCancelled;
+            OperationProgress = string.Empty;
             DisposeOperationCts();
             return;
         }
@@ -387,7 +387,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // User cancelled at the confirmation dialog. The pre-flight
             // CTS is no longer needed; dispose it before returning.
             DisposeOperationCts();
-            OperationProgress = Strings.Status_MoveCancelled;
+            OperationProgress = string.Empty;
             return;
         }
 
@@ -450,7 +450,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     OperationCurrentFile,
                     OperationTotalFiles,
                     DisplayHelpers.PluraliseFile(OperationTotalFiles))
-                : Strings.Status_MoveCancelled;
+                : string.Empty;
             await _scan.RefreshAsync();
         }
         catch (LocalisedInvalidOperationException ex)
@@ -633,7 +633,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     OperationCurrentFile,
                     OperationTotalFiles,
                     DisplayHelpers.PluraliseFile(OperationTotalFiles))
-                : Strings.Status_DeleteCancelled;
+                : string.Empty;
             await _scan.RefreshAsync();
             return false;
         }

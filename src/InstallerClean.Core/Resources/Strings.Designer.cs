@@ -295,7 +295,6 @@ public static class Strings
     public static string Startup_UnhandledTitle => Get("Startup.UnhandledTitle");
     public static string Status_Cancelling => Get("Status.Cancelling");
     public static string Status_CheckingRegistry => Get("Status.CheckingRegistry");
-    public static string Status_DeleteCancelled => Get("Status.DeleteCancelled");
     public static string Status_DeleteCancelled_Partial => Get("Status.DeleteCancelled.Partial");
     public static string Status_DeleteFailed => Get("Status.DeleteFailed");
     public static string Status_DeleteFailed_NoLog => Get("Status.DeleteFailed.NoLog");
@@ -304,7 +303,6 @@ public static class Strings
     public static string Status_EnumeratingProducts => Get("Status.EnumeratingProducts");
     public static string Status_FoundProducts => Get("Status.FoundProducts");
     public static string Status_FoundUnused => Get("Status.FoundUnused");
-    public static string Status_MoveCancelled => Get("Status.MoveCancelled");
     public static string Status_MoveCancelled_Partial => Get("Status.MoveCancelled.Partial");
     public static string Status_MoveFailed => Get("Status.MoveFailed");
     public static string Status_MoveFailed_NoLog => Get("Status.MoveFailed.NoLog");
