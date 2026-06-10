@@ -87,7 +87,7 @@
   <!-- Window titles -->
   <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
   <data name="Window.About.Title" xml:space="preserve"><value>About</value></data>
-  <data name="Window.Registered.Title" xml:space="preserve"><value>Registered files that must not be deleted</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>Registered files that should not be deleted</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>Unneeded files that are safe to delete</value></data>
   <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Confirm move</value></data>
   <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Confirm delete</value></data>
