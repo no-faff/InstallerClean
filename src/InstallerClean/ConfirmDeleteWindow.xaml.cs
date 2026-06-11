@@ -6,7 +6,7 @@ namespace InstallerClean;
 
 public partial class ConfirmDeleteWindow : Window
 {
-    public ConfirmDeleteWindow(int fileCount, string sizeDisplay, long totalBytes = 0, long maxSingleFileBytes = 0)
+    public ConfirmDeleteWindow(int fileCount, string sizeDisplay)
     {
         InitializeComponent();
         var label = DisplayHelpers.PluraliseFile(fileCount);

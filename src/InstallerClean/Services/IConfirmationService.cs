@@ -31,7 +31,7 @@ public interface IConfirmationService
 {
     bool ConfirmMove(int fileCount, string sizeDisplay, string destination);
 
-    bool ConfirmDelete(int fileCount, string sizeDisplay, long totalBytes, long maxSingleFileBytes);
+    bool ConfirmDelete(int fileCount, string sizeDisplay);
 
     /// <summary>
     /// Shows the choice offered when Delete finds the Recycle Bin

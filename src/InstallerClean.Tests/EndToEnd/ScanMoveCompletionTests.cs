@@ -107,7 +107,7 @@ public class ScanMoveCompletionTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _confirmationService.ConfirmDelete(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())

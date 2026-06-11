@@ -504,10 +504,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         var removableFiles = _scan.LastScanResult.RemovableFiles;
         var count = removableFiles.Count;
         var totalBytes = removableFiles.Sum(f => f.SizeBytes);
-        var maxSingleFileBytes = removableFiles.Count > 0 ? removableFiles.Max(f => f.SizeBytes) : 0;
         var sizeDisplay = _scan.OrphanedSizeDisplay;
 
-        if (!_confirmationService.ConfirmDelete(count, sizeDisplay, totalBytes, maxSingleFileBytes)) return;
+        if (!_confirmationService.ConfirmDelete(count, sizeDisplay)) return;
 
         // Snapshot the pre-operation scan state once, after the confirm so a
         // cancel costs nothing. RefreshAsync (inside RunDeleteAsync) replaces

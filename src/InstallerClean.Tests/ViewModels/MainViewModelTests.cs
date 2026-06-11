@@ -393,13 +393,13 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
 
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
-        _confirmationService.Received(1).ConfirmDelete(1, Arg.Any<string>(), 524_288, 524_288);
+        _confirmationService.Received(1).ConfirmDelete(1, Arg.Any<string>());
         await _deleteService.Received(1).DeleteFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
@@ -451,7 +451,7 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new IOException("boom"));
         _confirmationService.ConfirmDelete(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
 
@@ -468,7 +468,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
         _confirmationService.ConfirmDelete(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(false);
+            Arg.Any<int>(), Arg.Any<string>()).Returns(false);
 
         await vm.Scan.ScanWithProgressAsync(null);
 
@@ -499,7 +499,7 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true));
         _confirmationService.ConfirmDelete(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
             .Returns(RecycleUnavailableChoice.Cancel);
 
@@ -538,7 +538,7 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
             .Returns(RecycleUnavailableChoice.DeletePermanently);
 
@@ -572,7 +572,7 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true));
         _confirmationService.ConfirmDelete(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
             .Returns(RecycleUnavailableChoice.MoveInstead);
         _confirmationService.ConfirmMove(
@@ -839,7 +839,7 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<long>(), Arg.Any<long>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
