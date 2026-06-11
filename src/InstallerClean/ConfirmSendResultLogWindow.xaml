@@ -19,16 +19,32 @@
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
             MaxWidth="640" MinWidth="480"
             BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
-        <StackPanel>
-            <TextBlock Text="{loc:Translate ConfirmSendResultLog.Title}"
+        <Grid>
+            <Grid.RowDefinitions>
+                <!-- The JSON box sits in a star row rather than a
+                     StackPanel: a vertical StackPanel measures children
+                     at infinite height, so the ScrollViewer inside the
+                     box would never engage and the caption and buttons
+                     below it would clip once the window's work-area
+                     MaxHeight binds. Sized to content, the window shows
+                     the whole report with no scrollbar; the box scrolls
+                     only when the report genuinely cannot fit the
+                     screen (an error-heavy report or a very large text
+                     scale). -->
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="{loc:Translate ConfirmSendResultLog.Title}"
                        Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
                        TextWrapping="Wrap"
                        Margin="{StaticResource GapBottom.Md}"/>
 
-            <Border Background="{StaticResource Surface.Sidebar}" CornerRadius="{StaticResource Radius.Inset}"
+            <Border Grid.Row="1"
+                    Background="{StaticResource Surface.Sidebar}" CornerRadius="{StaticResource Radius.Inset}"
                     BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}"
                     Padding="12,10"
-                    MaxHeight="360"
                     Margin="{StaticResource GapBottom.Md}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                     <!-- IsReadOnly so the JSON is copy-out-able but not
@@ -54,12 +70,12 @@
                 </ScrollViewer>
             </Border>
 
-            <TextBlock Text="{loc:Translate ConfirmSendResultLog.Reassurance}"
+            <TextBlock Grid.Row="2" Text="{loc:Translate ConfirmSendResultLog.Reassurance}"
                        Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
                        TextWrapping="Wrap"
                        Margin="{StaticResource GapBottom.Lg}"/>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
                 <!-- Send is IsDefault. The modal opens in response to an
                      explicit Send-result click on the completion overlay
                      and the action is not destructive, so Enter confirms
@@ -76,6 +92,6 @@
                         Click="OnSend" IsDefault="True"
                         KeyboardNavigation.TabIndex="1"/>
             </StackPanel>
-        </StackPanel>
+        </Grid>
     </Border>
 </Window>

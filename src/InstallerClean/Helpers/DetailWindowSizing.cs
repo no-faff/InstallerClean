@@ -29,7 +29,15 @@ internal static class DetailWindowSizing
     /// device-independent units.
     /// </summary>
     public static double ClampHeightToWorkArea(Window? reference, double preferred, double minimum)
-        => Math.Max(minimum, Math.Min(preferred, WorkAreaHeight(reference) - EdgeMargin));
+        => Math.Max(minimum, Math.Min(preferred, WorkAreaHeightLimit(reference)));
+
+    /// <summary>
+    /// The tallest a window may sensibly open on the monitor hosting
+    /// <paramref name="reference"/>: the work-area height less the edge
+    /// margin. Suited to a MaxHeight on a SizeToContent window.
+    /// </summary>
+    public static double WorkAreaHeightLimit(Window? reference)
+        => WorkAreaHeight(reference) - EdgeMargin;
 
     private static double WorkAreaHeight(Window? reference)
     {
