@@ -107,6 +107,11 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 An audit-driven release: a large sweep of correctness fixes (thread affinity, exception handling, path-leak defence on the CLI), an accessibility pass on the orphans list and completion overlay, a result-log schema bump that separates obsoleted from superseded patches, and AV-false-positive work on the portable and setup builds. No single headline feature; the value is the breadth and the receipts behind each fix.
 
+### Added
+
+- Spanish README (`README.es.md`); the French and Simplified Chinese translations resynced to the current English.
+- Stale MSI registration entries (registered with Windows yet absent from disk and not removable) surface as a diagnostic info line on the main window.
+
 ### Fixed
 
 - Missing-from-disk banner no longer fires for a benign case. A registered patch marked superseded whose file was already gone (an older cleaner, a manual sweep) counted into the same total as a needed package gone missing, so a previously-cleaned machine could see a permanent banner suggesting something was broken when it was fine. The two counts are now separate; the banner fires only on the non-removable population.
@@ -125,13 +130,18 @@ An audit-driven release: a large sweep of correctness fixes (thread affinity, ex
 - CLI per-file error block emits "errors:" regardless of count, holding the documented `\d+ errors:` regex contract for RMM scripts on the one-error case.
 - CLI Ctrl+C handler guards against a double-fire; the second Ctrl+C while cancellation is already in flight no longer prints "Cancelling..." a second time.
 - Bare catch blocks in MutexProbe, RegistryReader, FileSystemScanService (size lookup) and InstallerCacheHelpers (prune) now name the documented expected exception types explicitly so a real memory-pressure failure (OutOfMemoryException, StackOverflowException) propagates rather than being silently absorbed as "no signal" by the surrounding gate.
+- The setup wizard gains matching light and dark billboards with branding text; dark mode previously showed a gap where the image should be.
+- A cross-thread race on the settings save closed; typed exception sentinels are caught before their base types so a stuck "Sending..." status clears.
+- Screen-reader announcement flooding reduced on busy transitions.
+- Operation progress also clears on the free-space refusal and confirm-cancel paths.
+- Browser-launch URL handling hardened in the unelevated launcher.
 
 ### Changed
 
 - InstallerClean-portable.exe ships ~135 MB instead of ~62 MB. The single-file LZMA-compressed embedded runtime that produced the smaller earlier shape tripped Microsoft Defender's `Trojan:Win32/Wacatac.B!ml` machine-learning heuristic as a false positive on the v1.8.2 build; the same code lineage cleared 0/70 on v1.8.1. Turning the inner compression off (the dotnet publish `EnableCompressionInSingleFile` flag) cleared every VirusTotal engine. Slim and CLI single-file builds are unaffected and unchanged in size.
 - Inno Setup wrapper now uses `Compression=bzip` with `SolidCompression=no`. The previous `Compression=zip` configuration combined with the new uncompressed-payload portable inside picked up a DeepInstinct static-ML false positive on the setup hash; bzip was the only Inno compression algorithm tested that cleared every VirusTotal engine for the v1.8.2 setup.
 - Orphans-list Reason column promoted from `Text.Dim` to `Text.Muted` so the load-bearing column that distinguishes Orphaned from Superseded is no longer the lowest text tier on the most semantically critical cell.
-- Orphans-list now renders as a ListView + GridView (matching the registered-files window) so screen readers announce each row as column-headed cells. Previously the rows announced as single cells with the three values run together.
+- Orphans-list now renders as a ListView + GridView (matching the registered-files window) so screen readers announce each row as column-headed cells, and its columns click-sort like the registered window's. Previously the rows announced as single cells with the three values run together.
 - Completion overlay's Done button gains Alt+D access key, matching the Alt mnemonics on the Cancel / Move / Delete / Browse / Rescan / ScanAgain buttons that previously had them.
 - Result-log noun aligned across surfaces. The Send-summary button label ("Send summary") was the user-visible truth since v1.8.0, but the screen-reader Automation.Name said "diagnostic log", the failure status said "Didn't work. Never mind.", and the success status said "Result log sent". All three now say "summary"; the failure status says "Sending failed. Try again later."
 - About window's Star and Buy-me-a-cuppa buttons carry distinct automation names from the main-window equivalents so a screen-reader element list with About open over Main can tell the rows apart.
@@ -151,6 +161,15 @@ An audit-driven release: a large sweep of correctness fixes (thread affinity, ex
 - SplashWindow auto-focuses the Cancel button on first frame; keyboard-only users see a focus ring and can press Space without first Tab-finding it. The Cancel button's automation name now syncs with its visible "Cancelling..." label after click.
 - AboutWindow's version TextBox is keyboard-reachable again so users can Tab to it and Ctrl+C the version string for a bug report; the previous `IsTabStop="False"` opt-out blocked that.
 - Stale-MSI banner and Send-summary status text raise `LiveRegionChanged` explicitly on first reveal, matching the existing fix for the pending-reboot and missing-from-disk banners. WPF's UIA bridge does not re-fire LiveRegionChanged for a Visibility=Collapsed→Visible transition.
+- Decorative window chrome hidden from the UIA tree via a custom automation peer.
+- Post-1.8.1 NuGet bumps reverted to preserve the AV-trained-clean binary fingerprint, and Dependabot ignores patch bumps on the three runtime packages for the same reason.
+- README accuracy pass: the CLI exit-75 description, a Move/Delete mix-up, stale alt text across the locales and the PatchCleaner API description corrected, the .NET FAQ trimmed, the VirusTotal line made timeless and the remaining "orphaned files" umbrella usages mopped up.
+- README WinSxS note no longer recommends Disk Cleanup; the Support link points at the /support landing page.
+- `pad.xml` drops the 32-bit Windows 10 support claim.
+- Spacing tokens tidied: horizontal-only `GapX.*` Thickness tokens added, five unused tokens deleted.
+- The crash log's privacy header moves into resx; the `Summary` string splits singular and plural forms instead of straddling a placeholder.
+- Comment passes across the release's new code: contract style, stale anchors and unfounded attributions removed; a dead result-log parameter dropped.
+- CI runners pinned to windows-2025.
 
 ## [1.8.1] - 2026-05-13
 
@@ -158,6 +177,8 @@ An audit-driven release: a large sweep of correctness fixes (thread affinity, ex
 
 - All-clean completion overlay now uses the same two-tier text hierarchy as the post-Move and post-Delete overlays: the "Nothing to clean up in C:\Windows\Installer" headline renders in body weight (Summary slot), and the "Scanned N products in T" receipt renders smaller and muted (Restore slot). Both lines previously rendered at the same body weight.
 - Dropped trailing full stops on every completion-overlay text line (summary, scan receipt, Move and Delete restore hints) so the overlays read consistently as labels rather than mixed sentences and labels.
+- A PAD 4.0 file (`pad.xml`) added at the repo root for Softpedia's automatic listing refresh.
+- README Screenshots section shown un-collapsed.
 
 ## [1.8.0] - 2026-05-13
 
@@ -180,6 +201,12 @@ The two new opt-in network features (a manual update check and the Send-summary 
 - Umbrella term renamed from "orphaned files" to "unused files" in window titles, screen-reader announcements, Event Log entries and the app description. Per-file Reason values ("Orphaned" / "Superseded") unchanged.
 - CLI exit code 75 reserved for transient conditions (GUI is running, Windows Installer transaction pending). The mutex-blocked path writes an Application Event Log entry under source `InstallerClean`. Stdout is UTF-8. A final "Event Log writing failed" note prints on stdout if any audit write failed during the run.
 - Installer prompts to close a running InstallerClean before upgrade (`AppMutex=Global\InstallerClean_SingleInstance`). VersionInfo metadata (`VersionInfoVersion`, `ProductName`, `Company`, `Copyright`, `Description`) embedded in `InstallerClean-setup.exe`.
+- Action buttons reordered Delete before Move, and the body copy disambiguates which files "the files listed below" are.
+- README: the app icon tops the page, a restructure pass, the MajorGeeks listing added to "Is it safe?", a downloads badge and a CCleaner/BleachBit comparison, the space claim replaced with a cited 25 GB user report, the "Best for most users" tag dropped from the build descriptions, the Send-summary copy aligned with the shipped behaviour and the screenshots refreshed against the 1.8.0 binary.
+- README easter egg: George Formby and Van Morrison join the cleaning-Windows party.
+- The CHANGELOG is backfilled with the full release history (v1.0.0 through v1.5.3), then rewritten in the terse Keep-a-Changelog house style.
+- Pre-ship copy sweeps across the resx (wording, tense, consistency).
+- Dependabot bumps grouped to cut PR noise, with patch and minor bumps auto-merged in CI.
 
 ### Fixed
 
@@ -193,6 +220,7 @@ The two new opt-in network features (a manual update check and the Send-summary 
 - Inline link colour bumped to meet WCAG AA contrast.
 - Operation progress is cleared on success so the status pill resets cleanly rather than holding the last step's text.
 - Splash-screen icon load tolerates a failure rather than taking the window down with it.
+- About window layout reworked; an underscore artefact in its text removed.
 
 ### Security and hardening
 
@@ -246,6 +274,12 @@ The largest engineering release in the project's history. The codebase was split
 - CLI arguments are case-insensitive.
 - Pending-reboot detection now blocks Move and Delete in the GUI and CLI (was warning-only in v1.5.3).
 - Three-layer design system in the WPF host: Primitives (raw colours), Tokens (semantic roles), Components (control styles).
+- Keyboard focus rings across the app, tuned per button geometry, with screen-reader HelpText on the destructive actions.
+- CI builds and smoke-publishes the CLI, audits each project for vulnerable packages and Dependabot covers all four projects.
+- README gains a sysadmin section (with the Softpedia badge and a PatchCleaner VirusTotal comparator), an FAQ, a "what it doesn't do" list and a Screenshots section, the screenshots re-cropped to a shared frame.
+- README star-history chart.
+- GitHub community-standards files (code of conduct, security policy), the contact email later redacted from both.
+- A 512px app icon for listings.
 
 ### Changed
 
@@ -276,6 +310,8 @@ The largest engineering release in the project's history. The codebase was split
 - WPF-UI dependency removed; every control style defined in `Themes/Components.xaml`. Default styles for `ToolTip`, `ContextMenu`, `MenuItem`, `ProgressBar` and the focus visual ship in the same file.
 - Caption buttons render in Segoe MDL2 Assets (the canonical Windows chrome font); previous Unicode codepoints relied on font fallback that left the maximise / restore swap visually identical.
 - Main window: maximise removed. Title-bar double-click, Win+Up and the system menu's Maximize item all intercepted at `WM_SYSCOMMAND`. Detail windows keep default resize and maximise.
+- The SDK is pinned with `rollForward: latestPatch` so releases build on a known band.
+- README "Is it safe?" VirusTotal claims tightened to per-build verifiable facts, the SecureAge slim flag stated without overclaiming its cause; a general accuracy pass over the claims and the Move/Delete framing.
 
 ### Fixed
 
@@ -292,6 +328,12 @@ The largest engineering release in the project's history. The codebase was split
 - `PendingRebootService` reads keys via `RegistryView.Registry64`.
 - About window's MIT licence Hyperlink shows the underline on hover (was colour-only; fails for users with reduced colour vision).
 - Move destination textbox right-click menu uses the dark theme; explicit themed `ContextMenu` with the four standard editing commands.
+- `SHFILEOPSTRUCT` packing reverted to `Pack=8`: `Pack=1` mis-aligns the x64 struct and crashes in the kernel.
+- Scan-failure dialog title is generic rather than database-specific.
+- Caption buttons stay out of the keyboard focus path.
+- Move and Delete tooltips read correctly in both enabled states; Esc paints "Cancelling..." immediately.
+- Keyboard-focus visuals normalised on the pill buttons and the completion overlay's Close button.
+- The indeterminate progress bar's storyboard reworked after the wpfui removal.
 
 ### Removed
 
@@ -365,18 +407,23 @@ The largest engineering release in the project's history. The codebase was split
 - CLI `/m` validates the destination is not inside `C:\Windows\Installer` (or a subfolder) before any file move.
 - Move destinations longer than 260 characters work without `\\?\` prefix workarounds.
 - Unit tests for the update-check service and the installer-folder path validation helper.
+- Scoop install documented, served from the no-faff/scoop-bucket.
+- A 32x32 icon for directory-listing submissions.
 
 ### Changed
 
-- All wildcard NuGet dependencies pinned (CommunityToolkit.Mvvm, NSubstitute); transitive dependency lockfile enabled.
+- All wildcard NuGet dependencies pinned (CommunityToolkit.Mvvm, NSubstitute); transitive dependency lockfile enabled; application manifest hardened.
 - Inno Setup script tightened with explicit `AppId`, `MinVersion=10.0`, `ArchitecturesAllowed=x64compatible`.
-- GitHub Actions in CI and CodeQL workflows pinned to commit SHAs.
+- GitHub Actions in CI and CodeQL workflows pinned to commit SHAs, and the actions bumped by Dependabot (codeql-action 4, setup-dotnet 5, checkout 6).
 - Completion screen: pressing Enter closes the window (Close button is `IsDefault`).
+- README rewritten for clearer positioning: sections trimmed, the duplicated origin paragraph cut, the PatchCleaner date corrected.
+- Comment tidy across the services; a vendor-specific historical reference removed.
 
 ### Fixed
 
 - Event-handler leaks on window close on repeated scans; subscriptions unhooked in `OnClosed`.
 - Removed an orphaned image asset that was no longer referenced.
+- A test that asserted record properties rather than service behaviour removed as misleading.
 
 ## [1.5.0] - 2026-04-04
 
@@ -391,6 +438,8 @@ The largest engineering release in the project's history. The codebase was split
 ### Changed
 
 - Donate link now points to `nofaff.netlify.app`.
+- An automatic startup update check (with an opt-out toggle) was added and removed within the release: elevated plus network at startup reads as command-and-control to ML AV engines (DeepInstinct flagged it), so the check shipped manual-only.
+- README credits PatchCleaner's author by name and softens the comparison tone.
 
 ## [1.4.1] - 2026-03-10
 
@@ -405,6 +454,8 @@ The largest engineering release in the project's history. The codebase was split
 - WCAG AA contrast pass: dim text raised from 3.2:1 to 4.7:1; orphaned-files summary brightened.
 - Design tokens: ~35 hardcoded colour values replaced with named resources (`Warning`, `Dim`, `Danger`, `Base200`, `Primary`).
 - `CommunityToolkit.Mvvm` pinned to 8.4.0 (was `8.*`).
+- Em dashes replaced with plain dashes and full stops across the UI and docs.
+- CONTRIBUTING notes that the `Func<>` testability pattern also triggers AV heuristics.
 
 ### Removed
 
@@ -421,16 +472,20 @@ The largest engineering release in the project's history. The codebase was split
 ### Changed
 
 - Test mocking framework switched from Moq to NSubstitute (Moq's SponsorLink dependency was a concern for a freely-distributed project).
+- README safety section tightened and the download-size guidance clarified.
+- A `Func<>`-delegate testability seam for `MainViewModel` was added and reverted within the release; the pattern trips AV heuristics.
 
 ## [1.3.0] - 2026-03-08
 
 ### Added
 
 - `installerclean-cli.exe /s`: scan-only CLI mode that lists removable files (filenames + sizes) without taking action. Exit code always 0.
+- Tests for `DisplayHelpers` (FormatSize, Pluralise) and `OrphanedFilesViewModel`.
 
 ### Changed
 
 - Splash screen shows real scan progress instead of fixed steps.
+- Code cleanup: verbose XML docs stripped, dead code removed, stale tracked docs cleaned up.
 
 ## [1.2.0] - 2026-03-08
 
@@ -451,6 +506,14 @@ The largest engineering release in the project's history. The codebase was split
 - Detail-window lists handle large file counts more efficiently.
 - Size column sorts numerically (was sorting as text).
 - Re-scan shows "Scan complete" feedback even on fast scans.
+- The framework-dependent build is named "slim" (was "portable-requires-dotnet8").
+- The caption buttons drop their tooltips.
+
+### Fixed
+
+- Access-key underscores no longer show as literal text in labels.
+- GitHub links updated from the old repository name.
+- The Start Menu shortcut carries an explicit app icon.
 
 ## [1.1.0] - 2026-03-05
 
@@ -459,13 +522,17 @@ The largest engineering release in the project's history. The codebase was split
 - Custom `WindowChrome` title bars across all windows; dark theme, app icon, per-window heading.
 - Custom caption buttons (minimise, close) styled to match the dark theme; close has a red hover.
 
+### Changed
+
+- README: a SmartScreen note in getting started (what the warning is and why an unsigned new download triggers it), the release badge wired up and a fresh screenshot.
+
 ### Fixed
 
 - Detail windows auto-select and focus the first item on open (keyboard navigation worked but had no visible target).
 
 ## [1.0.0] - 2026-03-04
 
-Initial public release. Built from the ground up over months: the scan-and-correlate engine, a safety model that moves rather than deletes, a full WPF application taken through nine rounds of UI redesign, a custom dark theme with bundled Poppins, the superseded-patch detection that is the real advance over PatchCleaner, a console CLI, and the distribution and trust work to ship it. The detail below is the shape of that first release, not a summary of it.
+Initial public release. Built from the ground up over months and 164 commits: the scan-and-correlate engine, a safety model that moves rather than deletes, a full WPF application taken through nine rounds of UI redesign, a custom dark theme with bundled Poppins, the superseded-patch detection that is the real advance over PatchCleaner, a console CLI, and the distribution and trust work to ship it. The detail below is the shape of that first release, not a summary of it.
 
 ### Added
 
@@ -498,7 +565,12 @@ Initial public release. Built from the ground up over months: the scan-and-corre
 - Completion screen summarising what was done.
 - About window, custom delete and move confirmation windows.
 - Scan duration shown on completion; fast scans suppress the overlay so the window does not flash.
-- Proper pluralisation throughout (no "file(s)").
+- Version shown in the main window title bar.
+- The full digital-signature subject shown in the detail panels, not just the CN.
+- First-run prompt offering a Start Menu shortcut, with a desktop one optional.
+- A "Send feedback" link in About opening GitHub Discussions.
+- GitHub star and Ko-fi donate icons in the bottom nav.
+- Proper pluralisation throughout (no "file(s)"), and British English throughout.
 
 #### Theme and visual design
 
@@ -511,6 +583,10 @@ Initial public release. Built from the ground up over months: the scan-and-corre
 
 - Console CLI: `/d` (Delete), `/m` (Move to saved default), `/m PATH` (Move to a specified path), plus `--help`.
 
+#### Engineering
+
+- xUnit test suite grown alongside the code from the first scaffold: scan, move, delete, settings, view-model and cancellation coverage, refreshed at every architecture change.
+
 #### Distribution and trust
 
 - Self-contained `InstallerClean.exe` and a framework-dependent build (needs the .NET Desktop Runtime).
@@ -522,3 +598,4 @@ Initial public release. Built from the ground up over months: the scan-and-corre
 
 - Renamed from the working title (Simple Windows Installer Cleaner) to **InstallerClean** ahead of launch.
 - The original exclusion-filter feature (substring/summary-info matching to exclude files) was removed once superseded-patch detection made it unnecessary: detecting the real patch state is more correct than asking the user to maintain exclusion rules.
+- An early light-and-dark pass that followed the Windows system theme was cut before launch; the app shipped with one deliberate dark look.
