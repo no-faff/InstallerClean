@@ -366,7 +366,8 @@
                     </Path.Style>
                 </Path>
                 <Button.ToolTip>
-                    <ToolTip Style="{StaticResource AccentTooltip}" Content="{loc:Translate Tooltip.BuyMeACuppa}"/>
+                    <ToolTip x:Name="HeartToolTip" Style="{StaticResource AccentTooltip}" Content="{loc:Translate Tooltip.BuyMeACuppa}"
+                             Placement="Custom"/>
                 </Button.ToolTip>
             </Button>
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
@@ -422,8 +423,8 @@
                     </Path.Style>
                 </Path>
                 <Button.ToolTip>
-                    <ToolTip Style="{StaticResource AccentTooltip}" Content="{loc:Translate Tooltip.LeaveStarOnGitHub}"
-                             Placement="Left"/>
+                    <ToolTip x:Name="StarToolTip" Style="{StaticResource AccentTooltip}" Content="{loc:Translate Tooltip.LeaveStarOnGitHub}"
+                             Placement="Custom"/>
                 </Button.ToolTip>
             </Button>
         </DockPanel>

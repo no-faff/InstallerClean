@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Automation.Peers;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
@@ -46,9 +47,29 @@ public partial class MainWindow : Window
             // has a visible focus ring on open.
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => FocusResultsDefault());
 
+        StarToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
+        HeartToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
+
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
     }
+
+    // PlacementMode.Top aligns the tooltip's left edge with the
+    // target's and grows rightward, so on the bottom-right corner
+    // icons the tooltip crosses the window edge onto the desktop
+    // (popups respect screen edges, not window edges), and no mode in
+    // the enum aligns right edges. This pins the tooltip's right edge
+    // to the button's right edge, flush above, which keeps it inside
+    // the window and matches the About window's pair, whose buttons
+    // sit at the window's left where plain Top placement already
+    // lands inside. The second candidate (flush below) is taken by
+    // WPF only when there is no room above, e.g. the window dragged
+    // to the top of the screen.
+    private static CustomPopupPlacement[] PlaceAboveRightAligned(Size popupSize, Size targetSize, Point offset) =>
+    [
+        new CustomPopupPlacement(new Point(targetSize.Width - popupSize.Width, -popupSize.Height), PopupPrimaryAxis.Horizontal),
+        new CustomPopupPlacement(new Point(targetSize.Width - popupSize.Width, targetSize.Height), PopupPrimaryAxis.Horizontal)
+    ];
 
     private void OnClosed(object? sender, EventArgs e)
     {
