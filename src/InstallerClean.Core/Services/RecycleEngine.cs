@@ -108,22 +108,26 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
         Run(() => ProbeRecycle(anyPathOnThatVolume));
 
     public RecycleFileOutcome RecycleFile(string filePath) =>
-        Run(() => RecycleOne(filePath));
+        Run(() => RecycleOne(filePath, captureBinItem: false).Outcome);
 
     /// <summary>
     /// Control delete: place a throwaway file on the target volume,
     /// attempt the recycle, and report whether it actually reached the
     /// bin. Recycle behaviour is per-volume, so the probe file must sit
-    /// on the same volume as the files being deleted.
+    /// on the same volume as the files being deleted. An empirical
+    /// recycle is the only reliable per-volume bin test.
     ///
-    /// On the success path the probe is genuinely recycled, so it leaves
-    /// the disk but DOES leave one ~1 KB self-describing entry (named
-    /// ic-recycle-probe-*.tmp) in the volume's Recycle Bin. That residue
-    /// is accepted, not removed: emptying the bin (SHEmptyRecycleBin)
-    /// would destroy the user's own files, and hand-deleting the specific
-    /// $R entry under $Recycle.Bin is fragile. An empirical recycle is the
-    /// only reliable per-volume bin test, so the tiny named residue is the
-    /// cost of answering that question correctly.
+    /// On the success path the probe is genuinely recycled, so a ~1 KB
+    /// entry (named ic-recycle-probe-*.tmp) appears in the volume's
+    /// Recycle Bin; the sink captures the exact IShellItem the shell
+    /// reports creating and the entry is then permanently deleted, so a
+    /// successful probe leaves nothing behind. Identity-addressed
+    /// cleanup is the safe form: emptying the bin (SHEmptyRecycleBin)
+    /// would destroy the user's own binned files and guessing at $R
+    /// names under $Recycle.Bin is unreliable, but deleting the very
+    /// item the shell handed back can only ever remove the probe. The
+    /// cleanup is best-effort; if it fails the entry stays in the bin,
+    /// which is harmless.
     /// </summary>
     private static bool ProbeRecycle(string anyPathOnThatVolume)
     {
@@ -131,9 +135,15 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
         if (probe is null)
             return false; // could not place a probe on the target volume: cannot confirm, fail safe
 
+        IntPtr binItem = IntPtr.Zero;
         try
         {
-            return RecycleOne(probe).Outcome == RecycleOutcome.Recycled;
+            var (outcome, captured) = RecycleOne(probe, captureBinItem: true);
+            binItem = captured;
+            bool recycled = outcome.Outcome == RecycleOutcome.Recycled;
+            if (recycled && binItem != IntPtr.Zero)
+                DeleteBinItemPermanently(binItem);
+            return recycled;
         }
         catch
         {
@@ -148,12 +158,49 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
         }
         finally
         {
+            if (binItem != IntPtr.Zero) Marshal.Release(binItem);
             // Removes only the failed-without-nuke case, where the probe is
-            // still on disk. A successful recycle leaves its entry in the
-            // bin (see the summary above), so File.Delete is then a no-op:
-            // the path no longer exists on disk.
+            // still on disk. A successful recycle takes it off the disk, so
+            // File.Delete is then a no-op: the path no longer exists.
             try { if (File.Exists(probe)) File.Delete(probe); }
             catch { /* best-effort cleanup of our own throwaway file */ }
+        }
+    }
+
+    /// <summary>
+    /// Permanently removes the bin entry a successful probe created,
+    /// addressed by the exact IShellItem the shell reported in
+    /// PostDeleteItem, never by a guessed path, so it can only ever
+    /// remove the probe's own ~1 KB entry. Same flags as a recycle minus
+    /// FOFX_RECYCLEONDELETE: deleting an item already in the bin without
+    /// the recycle flag removes it for good. Failures are swallowed; the
+    /// probe's verdict stands either way and a surviving entry is just
+    /// the residue the probe used to always leave.
+    /// </summary>
+    private static void DeleteBinItemPermanently(IntPtr psiBinItem)
+    {
+        int hr = ShellRecycleNative.CoCreateInstance(
+            in ShellRecycleNative.CLSID_FileOperation, IntPtr.Zero,
+            ShellRecycleNative.CLSCTX_INPROC_SERVER, in ShellRecycleNative.IID_IFileOperation, out IntPtr pOp);
+        if (hr < 0 || pOp == IntPtr.Zero)
+            return;
+
+        object rcw = s_cw.GetOrCreateObjectForComInstance(pOp, CreateObjectFlags.UniqueInstance);
+        Marshal.Release(pOp);
+        try
+        {
+            var op = (IFileOperation)rcw;
+            if (op.SetOperationFlags(ShellRecycleNative.PermanentDeleteFlags) < 0) return;
+            if (op.DeleteItem(psiBinItem, null) < 0) return;
+            op.PerformOperations();
+        }
+        catch
+        {
+            // Best-effort by design; see the summary.
+        }
+        finally
+        {
+            if (rcw is ComObject co) co.FinalRelease();
         }
     }
 
@@ -201,15 +248,18 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
     /// the per-item outcome from the sink. The aggregate HRESULTs report
     /// success even on a permanent delete, so the verdict comes from the
     /// sink: it fired, the per-item code, and whether a bin item was
-    /// created.
+    /// created. With <paramref name="captureBinItem"/> the returned
+    /// BinItem is the AddRef'd IShellItem of the created bin entry
+    /// (IntPtr.Zero when none was created); ownership transfers to the
+    /// caller, which must Release a non-zero value.
     /// </summary>
-    private static RecycleFileOutcome RecycleOne(string filePath)
+    private static (RecycleFileOutcome Outcome, IntPtr BinItem) RecycleOne(string filePath, bool captureBinItem)
     {
         int hr = ShellRecycleNative.CoCreateInstance(
             in ShellRecycleNative.CLSID_FileOperation, IntPtr.Zero,
             ShellRecycleNative.CLSCTX_INPROC_SERVER, in ShellRecycleNative.IID_IFileOperation, out IntPtr pOp);
         if (hr < 0 || pOp == IntPtr.Zero)
-            return new RecycleFileOutcome(RecycleOutcome.Failed, hr); // fail closed: never fall back to a permanent delete
+            return (new RecycleFileOutcome(RecycleOutcome.Failed, hr), IntPtr.Zero); // fail closed: never fall back to a permanent delete
 
         // GetOrCreateObjectForComInstance takes its own reference (it
         // QIs for IUnknown); the CoCreateInstance reference is still
@@ -218,22 +268,22 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
         object rcw = s_cw.GetOrCreateObjectForComInstance(pOp, CreateObjectFlags.UniqueInstance);
         Marshal.Release(pOp);
 
-        var sink = new RecycleProgressSink();
+        var sink = new RecycleProgressSink(captureBinItem);
         IntPtr psi = IntPtr.Zero;
         try
         {
             var op = (IFileOperation)rcw;
 
             int shr = op.SetOperationFlags(ShellRecycleNative.RecycleFlags);
-            if (shr < 0) return new RecycleFileOutcome(RecycleOutcome.Failed, shr);
+            if (shr < 0) return (new RecycleFileOutcome(RecycleOutcome.Failed, shr), sink.NewItem);
 
             int chr = ShellRecycleNative.SHCreateItemFromParsingName(
                 filePath, IntPtr.Zero, in ShellRecycleNative.IID_IShellItem, out psi);
             if (chr < 0 || psi == IntPtr.Zero)
-                return new RecycleFileOutcome(RecycleOutcome.Failed, chr);
+                return (new RecycleFileOutcome(RecycleOutcome.Failed, chr), sink.NewItem);
 
             int dhr = op.DeleteItem(psi, sink);
-            if (dhr < 0) return new RecycleFileOutcome(RecycleOutcome.Failed, dhr);
+            if (dhr < 0) return (new RecycleFileOutcome(RecycleOutcome.Failed, dhr), sink.NewItem);
 
             int phr = op.PerformOperations();
             // Win32 documents calling this after PerformOperations
@@ -244,13 +294,13 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
             if (!sink.Fired)
                 // The sink never fired, so the delete did not really run;
                 // report the aggregate failure code (or the sentinel).
-                return new RecycleFileOutcome(RecycleOutcome.Failed, phr < 0 ? phr : sink.HrDelete);
+                return (new RecycleFileOutcome(RecycleOutcome.Failed, phr < 0 ? phr : sink.HrDelete), sink.NewItem);
             if (sink.HrDelete < 0)
-                return new RecycleFileOutcome(RecycleOutcome.Failed, sink.HrDelete);
+                return (new RecycleFileOutcome(RecycleOutcome.Failed, sink.HrDelete), sink.NewItem);
 
-            return sink.Recycled
+            return (sink.Recycled
                 ? new RecycleFileOutcome(RecycleOutcome.Recycled, sink.HrDelete)
-                : new RecycleFileOutcome(RecycleOutcome.PermanentlyDeleted, sink.HrDelete);
+                : new RecycleFileOutcome(RecycleOutcome.PermanentlyDeleted, sink.HrDelete), sink.NewItem);
         }
         finally
         {
@@ -289,9 +339,20 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
 [GeneratedComClass]
 internal sealed partial class RecycleProgressSink : IFileOperationProgressSink
 {
+    private readonly bool _captureNewItem;
+
+    public RecycleProgressSink(bool captureNewItem = false) => _captureNewItem = captureNewItem;
+
     public bool Fired;
     public int HrDelete = unchecked((int)0xDEADBEEF);
     public bool Recycled;
+
+    /// <summary>
+    /// AddRef'd IShellItem of the bin entry the delete created, when
+    /// capture was requested and an entry was created; IntPtr.Zero
+    /// otherwise. The holder owns the release.
+    /// </summary>
+    public IntPtr NewItem;
 
     public void PostDeleteItem(uint dwFlags, IntPtr psiItem, int hrDelete, IntPtr psiNewlyCreated)
     {
@@ -301,6 +362,14 @@ internal sealed partial class RecycleProgressSink : IFileOperationProgressSink
         // recycled" signal: a new bin item was created. Null means the
         // file was permanently deleted.
         Recycled = psiNewlyCreated != IntPtr.Zero;
+        if (_captureNewItem && psiNewlyCreated != IntPtr.Zero)
+        {
+            // The pointer is borrowed for the duration of this callback;
+            // AddRef keeps the item alive past PerformOperations so the
+            // probe can remove the exact bin entry it just created.
+            Marshal.AddRef(psiNewlyCreated);
+            NewItem = psiNewlyCreated;
+        }
     }
 
     public void StartOperations() { }

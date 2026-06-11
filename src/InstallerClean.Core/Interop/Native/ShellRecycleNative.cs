@@ -46,6 +46,15 @@ internal static partial class ShellRecycleNative
     internal const uint RecycleFlags =
         FOFX_RECYCLEONDELETE | FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI;
 
+    /// <summary>
+    /// The headless flags without <c>FOFX_RECYCLEONDELETE</c>, so
+    /// <c>DeleteItem</c> keeps its permanent-delete default. Deleting an
+    /// item that already sits in the Recycle Bin removes it for good;
+    /// used only to tidy away the recycle probe's own bin entry.
+    /// </summary>
+    internal const uint PermanentDeleteFlags =
+        FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI;
+
     /// <summary>CLSID_FileOperation: the coclass, not an interface. Activated via CoCreateInstance.</summary>
     internal static readonly Guid CLSID_FileOperation = new("3ad05575-8857-4850-9277-11b85bdb8e09");
 
