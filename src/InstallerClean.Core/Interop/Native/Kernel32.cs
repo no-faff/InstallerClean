@@ -107,16 +107,4 @@ internal static partial class Kernel32
     // the form "X:\Folder\..." rather than the raw NT-namespace
     // "\\?\Volume{guid}\..." form.
     public const uint VOLUME_NAME_DOS = 0x0;
-
-    [LibraryImport(Library, EntryPoint = "OpenProcess", SetLastError = true)]
-    public static partial SafeProcessHandle OpenProcess(
-        uint desiredAccess,
-        [MarshalAs(UnmanagedType.Bool)] bool inheritHandle,
-        uint processId);
-
-    [LibraryImport(Library, EntryPoint = "CloseHandle", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool CloseHandle(IntPtr hObject);
-
-    public const uint PROCESS_QUERY_INFORMATION = 0x0400;
 }
