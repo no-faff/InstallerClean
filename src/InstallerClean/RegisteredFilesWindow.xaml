@@ -22,7 +22,14 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
-            <RowDefinition Height="2*"/><RowDefinition Height="20"/>
+            <!-- The MaxHeight holds the products list at the height the
+                 2*/3* split gives it in a 680-tall window at 100% text
+                 scale, so on a taller window every extra unit lands in
+                 the patches + product details band, where content
+                 overflows; the products list is the pane that does not
+                 need to grow. Below that height the cap is slack and
+                 the split behaves as plain 2*/3*. -->
+            <RowDefinition Height="2*" MaxHeight="208"/><RowDefinition Height="20"/>
             <RowDefinition Height="3*"/><RowDefinition Height="12"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>

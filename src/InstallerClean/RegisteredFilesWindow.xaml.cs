@@ -32,6 +32,18 @@ public partial class RegisteredFilesWindow : Window
             Width = saved.Width;
             Height = saved.Height;
         }
+        else
+        {
+            // 860 lets a typical product's whole detail list show
+            // without scrolling while arrowing down the products; the
+            // clamp keeps the window inside the screen's work area,
+            // which can be as little as ~672 device-independent units
+            // (a 1080p laptop at 150% scale). The products list does
+            // not grow with the window (its row carries a MaxHeight),
+            // so the extra height all lands in the details band.
+            Height = DetailWindowSizing.ClampHeightToWorkArea(
+                Application.Current?.MainWindow, preferred: 860, minimum: MinHeight);
+        }
 
         Closed += OnClosed;
         this.EnableAltSpaceSystemMenu();
