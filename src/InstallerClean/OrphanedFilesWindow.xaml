@@ -68,7 +68,17 @@
                           VirtualizingStackPanel.VirtualizationMode="Recycling">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="{loc:Translate Field.File}" Width="380"
+                            <!-- The three fixed column widths must total under
+                                 the list pane's ~466 units at the 920 default
+                                 (872 content minus the 12 gap, the 380 details
+                                 pane, the card border and the scrollbar).
+                                 Horizontal scrolling is disabled, so a column
+                                 past that edge is not clipped but unreachable:
+                                 at 380 the File column pushed Size wholly out
+                                 of view. Installer-cache names are short
+                                 random hex (8.3 style), so 270 still shows
+                                 them whole. -->
+                            <GridViewColumn Header="{loc:Translate Field.File}" Width="270"
                                             x:Name="ColFileName">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
