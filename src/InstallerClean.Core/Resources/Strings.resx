@@ -494,7 +494,7 @@ Details in {1}.</value></data>
   <!-- Reassurance line under the JSON. Names the URL once, calls
        out the no-PII property, and explains the purpose so the
        user has the context the modal title implies. -->
-  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Goes to nofaff.netlify.app/api/result-log. Counts and labels only, nothing identifying you or your machine. Helps me know whether the app is working.</value></data>
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Nothing identifies you or your machine; it just lets me know the app is working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log.</value></data>
   <!-- Window-chrome title (hidden in the actual UI by WindowStyle=None
        but read aloud by screen readers). Kept short so the screen
        reader announces "Confirm send" before the body header. -->
