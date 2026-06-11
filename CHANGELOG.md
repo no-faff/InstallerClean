@@ -230,7 +230,7 @@ The two new opt-in network features (a manual update check and the Send-summary 
 
 ### Changed (internal)
 
-- Codebase-wide comment and code-quality pass: comments brought to a state-the-contract standard, first-person and devlog-style phrasing removed, XAML literals (corner radii, margins, close-button overhang) replaced with design tokens, and the test suite extended to pin the result-log schema, the update-check user-agent contract, and the JSON parse-depth limits.
+- Codebase-wide comment and code-quality pass: comments brought to a state-the-contract standard, XAML literals (corner radii, margins, close-button overhang) replaced with design tokens, and the test suite extended to pin the result-log schema, the update-check user-agent contract, and the JSON parse-depth limits.
 
 ### Removed
 
