@@ -611,7 +611,7 @@ The crash log could not be written.</value></data>
   <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve"><value>{0} mode aborted: destination {1} is inside C:\Windows\Installer.</value></data>
   <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>{0} mode aborted: destination {1} is not a fully qualified path.</value></data>
   <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0} mode aborted: destination {1} resolves inside a Windows system folder.</value></data>
-  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: Windows Installer is currently processing an installation. Move and Delete are blocked until it finishes. Try again once it completes.</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes.</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning.</value></data>
