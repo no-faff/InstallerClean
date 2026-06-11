@@ -27,7 +27,7 @@
 
 - **What:** Finds and removes unneeded files from `C:\Windows\Installer`, the hidden folder Windows never cleans up.
 - **How much space:** Only about a third of machines have unneeded files to clean. Of those, the median freed is around 21 GB, and some have cleared hundreds of GB. The other two-thirds find nothing to remove, which simply means their Installer folder is already clean, and the scan takes seconds either way.
-- **Is it safe:** Yes. Only removes files Windows itself says it no longer needs. Delete sends files to the Recycle Bin and never deletes anything permanently without asking. Move lets you keep them somewhere safe.
+- **Is it safe:** Yes. Only removes files Windows itself says it no longer needs. Delete sends files to the Recycle Bin and never deletes anything permanently without asking. Move is there if you'd rather not take my word for it: it parks the files in a folder of your choice instead.
 - **Get it:** [Download the latest release](../../releases/latest), run it, done.
 
 ## Contents
@@ -156,7 +156,7 @@ After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer`
 
 Yes. InstallerClean queries the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, the app trusts it; it doesn't guess based on filenames or dates.
 
-**In the app.** Delete sends files to the Recycle Bin. If the Recycle Bin isn't available for that drive (it's been turned off for the drive, or it's full or damaged), InstallerClean doesn't quietly delete the files for good. It stops and lets you choose: move them somewhere safe instead, delete them permanently or cancel. Files are only ever permanently deleted if you explicitly choose that. Move is the extra-safe option: it puts the files in a folder you choose, so you can keep them until you're sure nothing's gone wrong. Nothing is touched until you confirm. If Windows Installer is currently writing to the cache, has a previous transaction suspended or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown. The scan, query, move, delete, settings and pending-reboot services are covered by an automated test suite that runs on every commit (see the CI badge above).
+**In the app.** Delete sends files to the Recycle Bin. If the Recycle Bin isn't available for that drive (it's been turned off for the drive, or it's full or damaged), InstallerClean doesn't quietly delete the files for good. It stops and lets you choose: move them somewhere instead, delete them permanently or cancel. Files are only ever permanently deleted if you explicitly choose that. Move isn't needed for safety, the files are safe to delete; it's there if you'd rather see for yourself first, parking them in a folder you choose for as long as you like. Nothing is touched until you confirm. If Windows Installer is currently writing to the cache, has a previous transaction suspended or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown. The scan, query, move, delete, settings and pending-reboot services are covered by an automated test suite that runs on every commit (see the CI badge above).
 
 **Verifying the binary.** InstallerClean is unsigned. Code-signing certificates cost money annually and I'd rather keep the project free, open and donations-funded.
 
@@ -298,7 +298,7 @@ It carries counts and categorical labels only: no file paths, no user names, no 
 
 **Why does it want Administrator?** `C:\Windows\Installer` is owned by SYSTEM and locked down to admins only. Reading the folder, writing to the Installer-database query API and moving or deleting files all require elevation. There's no user-mode path.
 
-**Can I undo a Delete?** Usually, yes. When the Recycle Bin is available for the drive, Delete sends files there and you can restore them from the bin. If the bin isn't available, the app never deletes for good on its own (see [Is it safe?](#is-it-safe)). For a safety net you control, use Move to put the files in a folder you choose and verify nothing breaks before deleting from there.
+**Can I undo a Delete?** Usually, yes. When the Recycle Bin is available for the drive, Delete sends files there and you can restore them from the bin. If the bin isn't available, the app never deletes for good on its own (see [Is it safe?](#is-it-safe)). And if you'd rather have a way back you control, Move puts the files in a folder you choose; delete them from there whenever you're satisfied.
 
 **Will Windows complain if I remove these files?** No. InstallerClean only ever removes the files Windows itself reports as finished with, so nothing it removes is needed to repair, update or uninstall a program. If a needed file does go missing from `C:\Windows\Installer` by some other means, see [If you do have a file missing from C:\Windows\Installer](#recovery).
 
