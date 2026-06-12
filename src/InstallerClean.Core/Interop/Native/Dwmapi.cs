@@ -13,7 +13,10 @@ internal static partial class Dwmapi
     /// <summary>
     /// Sets a Desktop Window Manager attribute. Called with
     /// <see cref="DWMWA_USE_IMMERSIVE_DARK_MODE"/> to opt into dark
-    /// chrome on Windows 10 1809+ and Windows 11.
+    /// chrome. Attribute 20 exists from Windows 10 2004 (20H1); on the
+    /// older Windows 10 builds the app's 1607 floor still admits, the
+    /// call fails with E_INVALIDARG, which is swallowed, and the title
+    /// bar stays light. Cosmetic only; everything else works there.
     /// </summary>
     [LibraryImport(Library)]
     public static partial int DwmSetWindowAttribute(

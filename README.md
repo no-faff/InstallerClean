@@ -26,7 +26,7 @@
 ![Screenshot of InstallerClean after a successful clean-up: 965 MB freed, 68 files deleted](docs/screenshots/04d-deleted-freed-success.webp)
 
 - **What:** Finds and removes unneeded files from `C:\Windows\Installer`, the hidden folder Windows never cleans up.
-- **How much space:** Only about a third of machines have unneeded files to clean. Of those, the median freed is around 21 GB, and some have cleared hundreds of GB. The other two-thirds find nothing to remove, which simply means their Installer folder is already clean, and the scan takes seconds either way.
+- **How much space:** Only about a third of machines have unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->23 GB<!-- reports-median-end -->, and some have cleared hundreds of GB. The other two-thirds find nothing to remove, which simply means their Installer folder is already clean, and the scan takes seconds either way.
 - **Is it safe:** Yes. Only removes files Windows itself says it no longer needs. Delete sends files to the Recycle Bin and never deletes anything permanently without asking. Move is there if you'd rather not take my word for it: it parks the files in a folder of your choice instead.
 - **Get it:** [Download the latest release](../../releases/latest), run it, done.
 
@@ -308,7 +308,7 @@ It carries counts and categorical labels only: no file paths, no user names, no 
 
 **Does it work on Windows 7 or 8?** Untested and not supported. Targets Windows 10 and 11.
 
-**Is it suitable for RMM / mass deployment?** Yes. The CLI exits with distinct codes per outcome (0 success, 2 partial, 1 hard failure, 75 transient, 130 Ctrl+C) so a scheduled task can retry on 75 without conflating it with hard failures. It writes a per-run summary to the Application event log and respects the same single-instance mutex as the GUI. See the Command line section.
+**Is it suitable for RMM / mass deployment?** Yes. The CLI exits with distinct codes per outcome (0 success, 2 partial, 1 hard failure, 75 transient, 130 for a Ctrl+C before any file was processed; a Ctrl+C that lands mid-batch exits 2, since work was committed) so a scheduled task can retry on 75 without conflating it with hard failures. It writes a per-run summary to the Application event log and respects the same single-instance mutex as the GUI. The setup also installs silently with the standard Inno Setup switches (`/SILENT` or `/VERYSILENT`); the post-install launch is skipped on silent installs. See the Command line section.
 
 ## Download
 
@@ -370,7 +370,7 @@ Run with no argument, or an unrecognised flag, and `installerclean-cli` prints t
 
 `/s` is a dry run: it scans, lists what it would remove with filenames and sizes, then exits. Useful for auditing before cleanup. Exit code is `0` on a successful scan, `1` if the scan fails and `130` on Ctrl+C. All files are in `C:\Windows\Installer`.
 
-`/d` and `/m` scan and then act. `/d` sends removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments or every file in the batch failed), `75` for a transient condition that blocked the run (the printed message explains which and whether a retry will help), `130` for Ctrl+C.
+`/d` and `/m` scan and then act. `/d` sends removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments or every file in the batch failed), `75` for a transient condition that blocked the run (the printed message explains which and whether a retry will help), `130` for a Ctrl+C before any file was processed (a Ctrl+C that lands mid-batch exits `2`, partial, since work was committed).
 
 All of the CLI's output, including error and diagnostic messages, goes to stdout; there is no separate stderr stream. The exit code is the machine-readable signal (and the per-run Application event log entry mirrors it), so a script should key off the exit code rather than parse the text, and `installerclean-cli /s > audit.txt` captures the whole run including any error line.
 
@@ -384,7 +384,7 @@ The portable and slim downloads contain only the GUI exe. If you want the comman
 
 ## Requirements
 
-- Windows 10 or 11
+- Windows 10 (version 1607 / build 14393 or later, the oldest the .NET 10 runtime supports) or Windows 11
 - Administrator privileges (`C:\Windows\Installer` is admin-only)
 
 See [Download](#download) for setup, portable, slim and CLI build options.
@@ -394,7 +394,7 @@ See [Download](#download) for setup, portable, slim and CLI build options.
 ```
 git clone https://github.com/no-faff/InstallerClean.git
 cd InstallerClean
-dotnet build src/InstallerClean/InstallerClean.csproj
+dotnet build src/InstallerClean.sln
 ```
 
 Run the tests:

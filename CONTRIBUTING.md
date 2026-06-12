@@ -6,9 +6,13 @@ welcomes pull requests.
 ## Build and test
 
 ```
-dotnet build src/InstallerClean/InstallerClean.csproj
+dotnet build src/InstallerClean.sln
 dotnet test src/InstallerClean.Tests/
 ```
+
+Build the whole solution, not a single project: the test project does not
+reference the CLI, so a CLI-breaking change can build and test clean from
+the GUI project alone.
 
 The app requires **administrator privileges** to run because it accesses
 `C:\Windows\Installer` and the Windows Installer API. You can run it from an

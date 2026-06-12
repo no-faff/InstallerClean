@@ -184,11 +184,11 @@
          About) so they share a consistent inset. -->
     <Thickness x:Key="DetailWindowMargin">24,4,24,24</Thickness>
 
-    <!-- Padding shared by the four modal-card Borders (ConfirmDelete,
-         ConfirmMove, ConfirmSendResultLog, UpdateAvailable). The four
-         modals also share Surface.Card, Radius.Card and the
-         Action.Primary.Background outline; the 32,28 pair completes
-         the card shape. -->
+    <!-- Padding shared by the five modal-card Borders (ConfirmDelete,
+         ConfirmMove, ConfirmSendResultLog, RecycleUnavailable,
+         UpdateAvailable). The modals also share Surface.Card,
+         Radius.Card and the Action.Primary.Background outline; the
+         32,28 pair completes the card shape. -->
     <Thickness x:Key="Padding.ModalCard">32,28</Thickness>
 
     <!-- Inset of the main-window scan-result panel. The window is

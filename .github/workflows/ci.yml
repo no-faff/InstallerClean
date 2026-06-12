@@ -24,22 +24,22 @@ jobs:
           global-json-file: global.json
 
       - name: Build
-        run: dotnet build src/InstallerClean/InstallerClean.csproj
+        run: dotnet build src/InstallerClean/InstallerClean.csproj -p:RestoreLockedMode=true
 
       - name: Build CLI
-        run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj
+        run: dotnet build src/InstallerClean.Cli/InstallerClean.Cli.csproj -p:RestoreLockedMode=true
 
       - name: Test
-        run: dotnet test src/InstallerClean.Tests/
+        run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true
 
       - name: Smoke-publish self-contained
-        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/self-contained
+        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/self-contained
 
       - name: Smoke-publish framework-dependent
-        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish/framework-dependent
+        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained false -p:RestoreLockedMode=true -p:PublishSingleFile=true -o publish/framework-dependent
 
       - name: Smoke-publish CLI framework-dependent
-        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish/cli
+        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained false -p:RestoreLockedMode=true -p:PublishSingleFile=true -o publish/cli
 
       - name: Audit vulnerable packages (GUI)
         run: dotnet list src/InstallerClean/InstallerClean.csproj package --vulnerable --include-transitive

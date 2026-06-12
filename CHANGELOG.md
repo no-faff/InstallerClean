@@ -12,7 +12,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - When the Recycle Bin turns out to be unavailable for the drive, Delete offers a choice instead of just stopping: Move (the recommended route, straight into the normal flow), delete permanently or cancel. Nothing is removed without an explicit choice, the dialog states only what is known and never guesses why the bin is off, and the completion screen after a consented permanent delete says plainly that the files did not go to the bin.
 - `installerclean-cli.exe` is offered as a download in its own right: one self-contained exe, no install, no .NET runtime needed, the same binary the setup installs. Drop it on a client, scan or clean, delete it. Requested in discussion #23.
 - `installerclean-cli --version` (or `-v`) prints the name and Major.Minor.Patch then exits 0, deliberately without the deterministic build's `+<commit>` suffix so a parsed version stays clean.
-- A README section, "If a needed file goes missing", explains in Microsoft's own words what the cache is, how a registered file can go missing by means other than InstallerClean and the recovery route: reinstall the program over itself, same version where possible, which usually restores it. Mirrored into French, Spanish and Simplified Chinese; the "Will Windows complain?" FAQ shrinks to a plain no with a pointer at the section.
+- A README section, "If a needed file goes missing", explains in Microsoft's own words what the cache is, how a registered file can go missing by means other than InstallerClean and the recovery route: reinstall the program over itself, same version where possible, which usually restores it. Mirrored into the translations; the "Will Windows complain?" FAQ shrinks to a plain no with a pointer at the section.
 - The READMEs gain an Accessibility section stating only what is implemented: full keyboard operation including column sorting, Narrator and Voice Access support, announced outcomes, an always-visible focus ring and WCAG AA contrast.
 - The all-clean screen now says that about two in three people find nothing unneeded, so a clean result reads as the normal outcome rather than a wasted run. Shown only on a from-scratch all-clean, never after a Move or Delete, so it cannot tell someone who just cleared files that they found nothing.
 
@@ -58,6 +58,10 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The About star and cuppa tooltips appear instantly, matching the main window's.
 - The installer-busy banner is reworded from jargon into plain terms: something, usually a Windows Update or a background install, is using Windows Installer, Move and Delete are paused while it runs, Re-scan once it is done. The CLI's matching gate message follows suit, keeping its retry advice, which is right for this cause.
 - The Delete confirmation drops the warning triangle by its heading; a delete to the Recycle Bin is the normal action the app is for, not a hazard.
+- The post-Move heading claims only what happened: "{N} moved" for a same-volume move, which frees nothing until the parked folder is deleted, and "{N} freed" only when the move left the drive. Delete keeps "freed".
+- The README documents the setup's silent install (`/SILENT`, `/VERYSILENT`); the installer already skipped its post-install launch on silent runs. Asked for in discussion #26.
+- The README requirements state the floor the installer enforces, Windows 10 version 1607 (build 14393) or later.
+- `pad.xml`'s descriptions stop selling Move as the restore path, matching the README's framing: deleting what the app lists is safe, and Move is for keeping a copy.
 
 <!-- RELEASE-OPERATOR: if the compressed ~65 MB portable clears VirusTotal at the Stage 2 VT pause, add this Changed bullet; if it flags and the portable stays uncompressed, drop it:
 - The portable build returns to the compressed single-file shape, roughly halving the download (about 135 MB to about 65 MB). It had shipped uncompressed since v1.8.2 to clear a Defender machine-learning false positive (`Trojan:Win32/Wacatac.B!ml`) on the compressed runtime bytes; Microsoft retrains on cleared false positives, so the compressed shape is clean again.
@@ -87,6 +91,16 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - In-app links open reliably again. The unelevated launcher's `CreateProcessWithTokenW` route needs `SeImpersonatePrivilege`, which some elevated tokens lack, so every link fell back to copying the address to the clipboard. It now drives the running Explorer through the shell-view chain (`IShellWindows` through to `IShellDispatch2.ShellExecute`), opening the user's own browser with no privilege required; the guarantee is unchanged, unelevated or the clipboard fallback, never an elevated browser, absolute http/https only.
 - The Delete and recycle-unavailable headings can no longer clip: a horizontal StackPanel gave the text unbounded width so wrapping never engaged; both now use the DockPanel the banners already use, and the card grows to fit.
 - The move-destination box no longer pops its tooltip unprompted on window open or alt-tab back (WPF shows tooltips on keyboard focus, and that box is the one the results screen auto-focuses); it shows on hover only, the focus ring unchanged.
+- Nothing under `$PatchCache$` is offered for removal. The cache walk recursed into the patch engine's baseline-copy subtree, whose contents are unknown to the API, so a payload `.msi`/`.msp` cached there read as orphaned even though a later delta patch may still want it.
+- A move to a folder on the system drive is no longer refused for lack of free space. A same-volume move is a rename and consumes none, yet the check demanded the batch's full size free, refusing exactly the nearly-full machines the app exists for; the check still guards cross-volume moves.
+- A delete that fails for mixed reasons shows each cause over its own files; the error list had grouped by category and printed the first file's sentence over the whole group.
+- A queued post-reboot rename INTO the installer cache now triggers the safety gate; the destination form Session Manager writes for a replace-existing rename (a leading `!` before the NT prefix) slipped the path match.
+- A hung Explorer can no longer hang the app on a link click: the unelevated launcher bounds its wait at ten seconds and falls back to copying the address to the clipboard.
+- A product registered in more than one context (per machine plus per user) lists every cached `.msi`, not just the first, so the Registered window's rows agree with its summary count.
+- The all-clean reassurance and the README quote the reports table's actual median rather than a hand-written figure that had drifted (21 GB against the table's 23); the README figure is now written by the same script that writes the table.
+- The README's CLI exit-code contract states the mid-batch Ctrl+C case exactly: 130 only before any file was processed, 2 (partial) once work was committed.
+- The documented build command is the whole solution, not the GUI project; a single-project build cannot catch a CLI-breaking change, since the tests do not reference the CLI.
+- Five stale comments and labels corrected: the resx help-flags note, a misplaced format-argument note, the modal-card padding consumer list, the dark-chrome Windows-version contract and a CodeQL step name.
 
 ### Changed (internal)
 
@@ -102,6 +116,10 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The delete test suite is rebuilt for the `IFileOperation` engine, unit and integration; the old `SHFileOperation` tests are removed.
 - The pending-reboot probe and the settings persists move off the UI thread; the settings tests assert the new locked `Update` call.
 - Two strings are made translation-safe: the missing-file note's linked sentence becomes one [ ]-delimited string so a translator can move the link to suit the word order, and the resx header index gains the `RecycleUnavailable.*` entry it was missing.
+- CI restores with the lock files enforced (`RestoreLockedMode`), so a perturbed `packages.lock.json` fails with a clear NU1004 instead of whatever it would have broken downstream.
+- A `.gitattributes` normalises every text file to LF at the git boundary; the working tree is shared across two machines via an NTFS mount that intermittently flips edited files to CRLF, and the flips now stop at staging whichever machine staged them.
+- The Dependabot auto-merge workflow's one mutable action tag is SHA-pinned like every other action; the job holds write permissions, so a moved tag was an arbitrary-code path onto main.
+- CodeQL analyses the whole solution; the CLI host sat outside the analysed graph.
 
 ## [1.8.2] - 2026-05-27
 

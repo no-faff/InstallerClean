@@ -1,0 +1,12 @@
+# LF everywhere: the repo is edited from Fedora and Windows against one
+# working tree, and tools on the NTFS mount intermittently rewrite files
+# as CRLF. Normalising at the git boundary stops those flips reaching
+# commits regardless of which side staged them.
+* text=auto eol=lf
+
+# Binary assets: never converted.
+*.png binary
+*.webp binary
+*.bmp binary
+*.ico binary
+*.ttf binary
