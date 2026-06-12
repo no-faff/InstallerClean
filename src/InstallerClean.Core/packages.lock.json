@@ -12,7 +12,7 @@
         "type": "Direct",
         "requested": "[10.0.8, )",
         "resolved": "10.0.8",
-        "contentHash": "e2517uM5fMb7x4561D47EVn1pGEpnBCAM/zsbS560qXNf+x1TK1dsDWtCjF704LaSI85JeVGzUejJovF/Bf1ZQ=="
+        "contentHash": "dVbSXGIFNR5nZcv2tOLoWI+a9T4jtFd77IYjuND+QVe360qWgAF7H0WtoopYhRw/+SgpGUTyrkrh+65+ClNnfw=="
       },
       "System.Diagnostics.EventLog": {
         "type": "Direct",

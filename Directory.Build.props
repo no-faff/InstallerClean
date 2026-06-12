@@ -15,6 +15,14 @@
          them out again, so the lock files churned at every machine
          change-over. -->
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <!-- Source-built SDKs (the Fedora dotnet RPM) ship their own
+         rebuilt copies of SDK packages in a library-packs folder and
+         add it as an implicit restore source; those rebuilds are
+         byte-different from nuget.org's, so a lock file written from
+         one fails NU1403 hash validation everywhere else. Restores
+         must always source from nuget.org. No effect on Windows,
+         whose SDK has no such folder. -->
+    <DisableImplicitLibraryPacksFolder>true</DisableImplicitLibraryPacksFolder>
   </PropertyGroup>
   <ItemGroup>
     <!-- The self-contained single-file publish injects this SDK task
