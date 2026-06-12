@@ -38,7 +38,17 @@ public partial class MainWindow : Window
         // rather than starting on a main-window button behind the
         // overlay.
         if (_vm.Completion.IsComplete)
+        {
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
+            // The overlay was never revealed inside this window's lifetime
+            // (the startup all-clear is set during the splash, before
+            // construction), so the PropertyChanged raise path never runs
+            // for it, and a newly shown window announces only its title
+            // and the focused control. Without these raises the most
+            // common outcome of all, the startup scan's "All clean", is
+            // never spoken.
+            AnnounceCompletionOutcome();
+        }
         else if (!_vm.Scan.IsScanning)
             // The startup scan runs during the splash, so it has usually
             // finished by the time this window is built. When it found orphans
@@ -112,17 +122,11 @@ public partial class MainWindow : Window
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
             // Focus lands on Done, so without an explicit raise a screen
             // reader announces only the button and never the outcome. The
-            // heading and summary are plain TextBlocks revealed from
-            // Visibility=Collapsed, which the WPF UIA bridge does not
-            // re-announce on its own (the same gap the banners work
-            // around). Raise LiveRegionChanged on both once the reveal
-            // has settled; Loaded priority runs after the binding and
-            // visibility update so the peers carry the final text.
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () =>
-            {
-                RaiseLiveRegionChanged(CompletionHeadingText);
-                RaiseLiveRegionChanged(CompletionSummaryText);
-            });
+            // heading, summary and restore lines are plain TextBlocks
+            // revealed from Visibility=Collapsed, which the WPF UIA
+            // bridge does not re-announce on its own (the same gap the
+            // banners work around).
+            AnnounceCompletionOutcome();
         }
 
         if (e.PropertyName == nameof(CompletionViewModel.IsComplete) && !_vm.Completion.IsComplete)
@@ -151,14 +155,24 @@ public partial class MainWindow : Window
         if (e.PropertyName == nameof(CompletionViewModel.ResultLogStatusMessage)
             && !string.IsNullOrEmpty(_vm.Completion.ResultLogStatusMessage))
         {
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(ResultLogStatusText));
+            AnnounceLiveRegions(ResultLogStatusText);
         }
     }
 
     private void OnCleanupPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(CleanupViewModel.IsOperating) && _vm.Cleanup.IsOperating)
+        {
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => OperationCancelButton.Focus());
+            // The view-model assigns the "Moving/Deleting N files..." /
+            // "Preparing destination folder..." heading after IsOperating
+            // flips, so the overlay reveals with stale text and the UIA
+            // bridge announces neither the Collapsed-to-Visible reveal nor
+            // a text change landing before the first render. Without the
+            // raise the first thing spoken about an operation is a bare
+            // file count.
+            AnnounceLiveRegions(OperationHeadingText);
+        }
     }
 
     private void OnScanPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -180,15 +194,21 @@ public partial class MainWindow : Window
 
         // WPF's UIA bridge does not re-fire LiveRegionChanged for a
         // Visibility=Collapsed→Visible transition; the bridge only
-        // announces text changes inside an already-rendered subtree.
-        // Loaded priority defers past the binding update so the peer's
-        // text is current when the explicit raise fires.
+        // announces text changes inside an already-rendered subtree, so
+        // a banner's appearance needs an explicit raise. Skipped while an
+        // operation or its completion overlay owns the foreground: the
+        // post-operation silent refresh can flip a banner while it sits
+        // behind the overlay, and its paragraph of text would queue ahead
+        // of the completion outcome; the banner stays on screen for
+        // scan-mode reading once the overlay dismisses.
+        if (_vm.Cleanup.IsOperating || _vm.Completion.IsComplete)
+            return;
         if (e.PropertyName == nameof(ScanViewModel.HasPendingReboot) && _vm.Scan.HasPendingReboot)
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(PendingRebootBannerText));
+            AnnounceLiveRegions(PendingRebootBannerText);
         if (e.PropertyName == nameof(ScanViewModel.HasMissingFromDisk) && _vm.Scan.HasMissingFromDisk)
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(MissingFromDiskBannerText));
+            AnnounceLiveRegions(MissingFromDiskBannerText);
         if (e.PropertyName == nameof(ScanViewModel.HasStaleMsiEntries) && _vm.Scan.HasStaleMsiEntries)
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => RaiseLiveRegionChanged(StaleMsiEntriesText));
+            AnnounceLiveRegions(StaleMsiEntriesText);
     }
 
     // Routes focus to the move-destination field, the entry point of the Move
@@ -197,6 +217,37 @@ public partial class MainWindow : Window
     // destructive Delete. A no-op when an overlay has disabled the main content,
     // because Focus() cannot land on a disabled control.
     private void FocusResultsDefault() => MoveDestinationInput.Focus();
+
+    /// <summary>
+    /// Queues LiveRegionChanged raises for <paramref name="elements"/> at
+    /// Background priority. The priority is the contract: dispatcher
+    /// priorities are serviced highest value first, and Loaded (6)
+    /// outranks Input (5), so a raise queued at Loaded lands BEFORE a
+    /// focus move queued at Input, and the focus announcement then
+    /// cancels the queued polite speech (NVDA documents
+    /// cancel-on-focus; Narrator behaves the same in practice, which is
+    /// how the completion outcome went unheard). Background (4) sits
+    /// below Input, so the raises follow every focus event queued in the
+    /// same drain and the polite items speak once the focus announcement
+    /// finishes. Background still runs after data binding and render, so
+    /// the peers carry the final text.
+    /// </summary>
+    private void AnnounceLiveRegions(params FrameworkElement[] elements)
+    {
+        Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+        {
+            foreach (var element in elements)
+                RaiseLiveRegionChanged(element);
+        });
+    }
+
+    // The error list stays unraised: the summary already speaks the
+    // error count, and the per-file breakdown is scan-mode reading. The
+    // restore line carries the second half of the outcome (where the
+    // files went after a Move or Delete; the scan receipt on an
+    // all-clear).
+    private void AnnounceCompletionOutcome() =>
+        AnnounceLiveRegions(CompletionHeadingText, CompletionSummaryText, CompletionRestoreText);
 
     private static void RaiseLiveRegionChanged(FrameworkElement element)
     {

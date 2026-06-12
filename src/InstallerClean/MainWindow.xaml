@@ -483,7 +483,14 @@
                     Padding="28,22" MinWidth="260"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel>
-                    <TextBlock Text="{Binding Cleanup.OperationProgress}" Foreground="{StaticResource Text.Heading}"
+                    <!-- Code-behind raises LiveRegionChanged on this heading when
+                         the overlay appears: the view-model assigns the
+                         "Moving/Deleting N files..." text after IsOperating flips,
+                         so the overlay reveals from Collapsed with stale text and
+                         the UIA bridge announces neither the reveal nor a text
+                         change that lands before the first render. -->
+                    <TextBlock x:Name="OperationHeadingText"
+                               Text="{Binding Cleanup.OperationProgress}" Foreground="{StaticResource Text.Heading}"
                                FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="SemiBold"
                                HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"
                                AutomationProperties.LiveSetting="Polite"/>
@@ -632,8 +639,12 @@
                          doesn't carry a phantom 30+ pixel gap from the
                          bottom margin plus line-height of an empty
                          TextBlock. Pattern matches the Errors Border
-                         below. -->
-                    <TextBlock Text="{Binding Completion.Restore}"
+                         below. LiveSetting + the code-behind raise on
+                         reveal: this line is the second half of the
+                         outcome (where the files went after a Move or
+                         Delete; the scan receipt on an all-clear). -->
+                    <TextBlock x:Name="CompletionRestoreText" Text="{Binding Completion.Restore}"
+                               AutomationProperties.LiveSetting="Polite"
                                Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="{StaticResource GapBottom.Xl}">
