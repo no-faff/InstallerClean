@@ -25,10 +25,11 @@
 
 ![Screenshot of InstallerClean after a successful clean-up: 965 MB freed, 68 files deleted](docs/screenshots/04d-deleted-freed-success.webp)
 
-- **What:** Finds and removes unneeded files from `C:\Windows\Installer`, the hidden folder Windows never cleans up.
-- **How much space:** Only about a third of machines have unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->23 GB<!-- reports-median-end -->, and some have cleared hundreds of GB. The other two-thirds find nothing to remove, which simply means their Installer folder is already clean, and the scan takes seconds either way.
-- **Is it safe:** Yes. Only removes files Windows itself says it no longer needs. Delete sends files to the Recycle Bin and never deletes anything permanently without asking. Move is there if you'd rather not take my word for it: it parks the files in a folder of your choice instead.
-- **Get it:** [Download the latest release](../../releases/latest), run it, done.
+InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
+
+- **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->34%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->23 GB<!-- reports-median-end -->. A couple cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->66%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean.
+- **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. Delete sends them to the Recycle Bin, and nothing is removed permanently without your explicit say-so. It's open source (MIT) with nothing to hide: no account, no ads, no tracking; the only thing that can ever leave your machine is one optional anonymous summary you see in full before sending, and even that tells me nothing about who sent it.
+- **Get it:** [Download the latest release](../../releases/latest). Run it; it scans almost instantly. Delete any unneeded files. Done.
 
 ## Contents
 
