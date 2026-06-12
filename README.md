@@ -25,10 +25,9 @@
 
 ![Screenshot of InstallerClean after a successful clean-up: 965 MB freed, 68 files deleted](docs/screenshots/04d-deleted-freed-success.webp)
 
-InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
-
+- **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
 - **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->34%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->23 GB<!-- reports-median-end -->. A couple cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->66%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean.
-- **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. Delete sends them to the Recycle Bin, and nothing is removed permanently without your explicit say-so. It's open source (MIT) with nothing to hide: no account, no ads, no tracking; the only thing that can ever leave your machine is one optional anonymous summary you see in full before sending, and even that tells me nothing about who sent it.
+- **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (MIT) and I have no interest in who you are: no account, no ads, no tracking, nothing running in the background. It only connects to the internet when you tell it to: a manual update check, and the optional anonymous summary (which you read before it goes, says nothing about you, and just lets me know the app is working and how much space people are freeing). Everything else is just links, to GitHub and a donate page, which open in your browser.
 - **Get it:** [Download the latest release](../../releases/latest). Run it; it scans almost instantly. Delete any unneeded files. Done.
 
 ## Contents
