@@ -48,7 +48,7 @@ public sealed class PendingRebootService : IPendingRebootService
         bool mutexHeld;
         try
         {
-            mutexHeld = _mutex.Exists(MsiExecuteMutexName);
+            mutexHeld = _mutex.IsHeld(MsiExecuteMutexName);
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
         {

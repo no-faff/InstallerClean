@@ -18,7 +18,7 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Mutex_held_blocks()
     {
-        _mutex.Exists(PendingRebootService.MsiExecuteMutexName).Returns(true);
+        _mutex.IsHeld(PendingRebootService.MsiExecuteMutexName).Returns(true);
 
         var result = Build().Check();
 
@@ -267,7 +267,7 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Mutex_probe_throws_fails_open_continues_to_other_checks()
     {
-        _mutex.Exists(Arg.Any<string>())
+        _mutex.IsHeld(Arg.Any<string>())
             .Returns(_ => throw new InvalidOperationException("transient"));
         _registry.LocalMachineKeyExists(
                 PendingRebootService.InstallerInProgressKey)
@@ -282,7 +282,7 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Mutex_probe_access_denied_fails_open_continues_to_other_checks()
     {
-        _mutex.Exists(Arg.Any<string>())
+        _mutex.IsHeld(Arg.Any<string>())
             .Returns(_ => throw new UnauthorizedAccessException("denied"));
         _registry.LocalMachineMultiStringValue(
                 PendingRebootService.SessionManagerKey,
@@ -349,7 +349,7 @@ public class PendingRebootServiceUnitTests
     [Fact]
     public void Mutex_wins_over_in_progress_and_pending_rename()
     {
-        _mutex.Exists(PendingRebootService.MsiExecuteMutexName).Returns(true);
+        _mutex.IsHeld(PendingRebootService.MsiExecuteMutexName).Returns(true);
         _registry.LocalMachineKeyExists(
                 PendingRebootService.InstallerInProgressKey)
             .Returns(true);
