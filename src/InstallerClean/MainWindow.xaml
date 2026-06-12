@@ -5,8 +5,7 @@
         xmlns:chrome="clr-namespace:InstallerClean.Controls"
         xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate Window.Main.Title}"
-        Width="720"
-        SizeToContent="Height"
+        SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource Surface.Sidebar}">
@@ -27,7 +26,12 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
-            <RowDefinition Height="Auto"/>
+            <!-- Star, not Auto: under SizeToContent the star row measures
+                 to its content like Auto would, but once the window's
+                 work-area MaxHeight binds (large OS text scales) the star
+                 row is what shrinks, engaging the scan panel's internal
+                 ScrollViewer, so the bottom nav below never clips. -->
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -54,23 +58,35 @@
         </StackPanel>
 
         <!-- Row 1: the scan-result panel. The window is NoResize +
-             SizeToContent="Height" (like the confirm dialogs), so it grows to
-             fit this content exactly and never needs a scrollbar; a tall
-             warning banner makes the window taller rather than clipping the
-             action buttons. -->
+             SizeToContent (like the confirm dialogs), so it grows to fit
+             this content exactly and normally never needs a scrollbar; a
+             tall warning banner makes the window taller rather than
+             clipping the action buttons. The MaxWidth is the content
+             width a 720 window gives at 100% text scale and grows with
+             the OS text-size factor, so the window widens with its text
+             (up to the work-area MaxWidth set in code-behind) instead of
+             starving the counts row. -->
         <Grid Grid.Row="1" Margin="{StaticResource MainContentMargin}"
-              MaxWidth="720" HorizontalAlignment="Center"
+              MaxWidth="{a11y:TextScaled 672}" HorizontalAlignment="Center"
               IsEnabled="{Binding IsMainContentInteractive}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="16"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="12"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Context: scan results -->
-            <StackPanel Grid.Row="0">
+            <!-- Context: scan results. The explanation and counts sit in
+                 a star row inside a ScrollViewer (NOT a StackPanel row: a
+                 vertical StackPanel measures children at infinite height,
+                 so an inner ScrollViewer never engages). When the window's
+                 work-area MaxHeight binds at large text scales, this is
+                 the block that scrolls; the separator, the action zone and
+                 the bottom nav keep their full height below it. -->
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
 
                 <!-- Explanatory text -->
                 <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Lg}"
@@ -119,17 +135,20 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Still needed -->
+                    <!-- Still needed. Wraps so a work-area width clamp at
+                         large text scales shortens the line instead of
+                         clipping it against the size column. -->
                     <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
                                Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Heading.Sm}"
+                               TextWrapping="Wrap"
                                Text="{Binding Scan.RegisteredSummaryText}"/>
                     <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Scan.RegisteredSizeDisplay}"
                                Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Heading.Sm}"
-                               VerticalAlignment="Center" MinWidth="72" TextAlignment="Right"
+                               VerticalAlignment="Center" MinWidth="{a11y:TextScaled 72}" TextAlignment="Right"
                                Margin="{StaticResource GapX.Md}"/>
                     <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenRegisteredDetailsCommand}"
-                            Height="28" Padding="12,0" FontSize="{DynamicResource Type.Heading.Sm}"
+                            MinHeight="28" Padding="12,0" FontSize="{DynamicResource Type.Heading.Sm}"
                             VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             AutomationProperties.Name="{loc:Translate Automation.ViewRegisteredFiles}"
@@ -172,6 +191,7 @@
                            AutomationProperties.LiveSetting="Polite"/>
 
             </StackPanel>
+            </ScrollViewer>
 
             <!-- Separator -->
             <chrome:DecorativeBorder Grid.Row="2" BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="0,1,0,0"/>
@@ -195,16 +215,19 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
+                    <!-- Wraps for the same width-clamp reason as the
+                         still-needed line above. -->
                     <TextBlock Grid.Column="0" VerticalAlignment="Center"
                                Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
+                               TextWrapping="Wrap"
                                Text="{Binding Scan.OrphanedSummaryText}"/>
                     <TextBlock Grid.Column="1" Text="{Binding Scan.OrphanedSizeDisplay}"
                                Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
-                               VerticalAlignment="Center" MinWidth="72" TextAlignment="Right"
+                               VerticalAlignment="Center" MinWidth="{a11y:TextScaled 72}" TextAlignment="Right"
                                Margin="{StaticResource GapX.Md}"/>
                     <Button Grid.Column="2" Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenOrphanedDetailsCommand}"
-                            Height="28" Padding="12,0" FontSize="{DynamicResource Type.Heading.Sm}"
+                            MinHeight="28" Padding="12,0" FontSize="{DynamicResource Type.Heading.Sm}"
                             VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             AutomationProperties.Name="{loc:Translate Automation.ViewOrphanedFiles}"
@@ -289,7 +312,7 @@
                     <TextBlock DockPanel.Dock="Left" Text="{Binding Cleanup.OperationProgress}"
                                VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="{StaticResource Text.Muted}"
                                FontSize="{DynamicResource Type.Body}"
-                               TextTrimming="CharacterEllipsis" MaxWidth="280"/>
+                               TextTrimming="CharacterEllipsis" MaxWidth="{a11y:TextScaled 280}"/>
                 </DockPanel>
             </Grid>
 
@@ -321,7 +344,7 @@
                     AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa}"
                     FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     ToolTipService.InitialShowDelay="0"
-                    Padding="6,0" Height="28">
+                    Padding="6,0" MinHeight="28">
                 <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
                       Fill="{StaticResource Decoration.Heart}" Width="18" Height="18" Stretch="Uniform"
                       RenderTransformOrigin="0.5,0.5">
@@ -378,7 +401,7 @@
                     AutomationProperties.Name="{loc:Translate Automation.LeaveStarOnGitHub}"
                     FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     ToolTipService.InitialShowDelay="0"
-                    Padding="6,0" Height="28" Margin="{StaticResource GapRight.Md}">
+                    Padding="6,0" MinHeight="28" Margin="{StaticResource GapRight.Md}">
                 <Path Data="m12.672.668 3.059 6.197 6.838.993a.75.75 0 0 1 .416 1.28l-4.948 4.823 1.168 6.812a.75.75 0 0 1-1.088.79L12 18.347l-6.116 3.216a.75.75 0 0 1-1.088-.791l1.168-6.811-4.948-4.823a.749.749 0 0 1 .416-1.279l6.838-.994L11.327.668a.75.75 0 0 1 1.345 0Z"
                       Fill="{StaticResource Decoration.Star}" Width="18" Height="18" Stretch="Uniform"
                       RenderTransformOrigin="0.5,0.5">
@@ -444,7 +467,7 @@
                            AutomationProperties.LiveSetting="Polite"/>
                 <Button x:Name="ScanCancelButton" Style="{StaticResource GhostPill}"
                         Content="{loc:Translate Action.Cancel}" Command="{Binding Scan.CancelScanCommand}"
-                        Height="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
+                        MinHeight="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
                         HorizontalAlignment="Center"
                         FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                         AutomationProperties.Name="{loc:Translate Automation.CancelScan}"/>
@@ -490,7 +513,7 @@
                     <TextBlock Text="{Binding Cleanup.OperationCurrentFileName}"
                                Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Caption}"
                                HorizontalAlignment="Center" Margin="0,4,0,0"
-                               TextTrimming="CharacterEllipsis" MaxWidth="240"/>
+                               TextTrimming="CharacterEllipsis" MaxWidth="{a11y:TextScaled 240}"/>
                     <!-- Cancel button binds IsEnabled via the
                          CanCancelOperation predicate so a second click
                          after the cancel-in-flight is dropped. The
@@ -504,7 +527,7 @@
                             AutomationProperties.Name="{loc:Translate Automation.CancelOperation}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             HorizontalAlignment="Center" Margin="{StaticResource GapTop.Sm}"
-                            Height="28" Padding="16,0" FontSize="{DynamicResource Type.Body}">
+                            MinHeight="28" Padding="16,0" FontSize="{DynamicResource Type.Body}">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource GhostPill}">
                                 <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
@@ -530,23 +553,45 @@
             <chrome:DecorativeBorder Background="{StaticResource Surface.Overlay}"
                        MouseLeftButtonDown="CompletionDimAreaClick"
                        Cursor="Arrow"/>
+            <!-- Card width scales with the OS text size so the copy keeps
+                 its line length instead of wrapping into a tall sliver. -->
             <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Pill}"
                     BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}"
-                    Padding="36,32" MinWidth="340" MaxWidth="420"
+                    Padding="36,32" MinWidth="{a11y:TextScaled 340}" MaxWidth="{a11y:TextScaled 420}"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
-                <StackPanel HorizontalAlignment="Center">
+                <!-- Grid, not a StackPanel: the icon, heading and buttons
+                     sit in Auto rows and the variable-length copy in a
+                     star row, so when the card runs out of window height
+                     at large text scales the copy scrolls and the buttons
+                     stay visible. A vertical StackPanel would measure at
+                     infinite height and clip the buttons instead. -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
                     <!-- Icon -->
-                    <Image Source="Assets/splash-icon.png"
+                    <Image Grid.Row="0" Source="Assets/splash-icon.png"
                            Width="64" Height="64" HorizontalAlignment="Center"
                            RenderOptions.BitmapScalingMode="HighQuality"
                            Margin="{StaticResource GapBottom.Lg}"
                            AutomationProperties.Name=""/>
 
                     <!-- Heading -->
-                    <TextBlock x:Name="CompletionHeadingText" Text="{Binding Completion.Heading}"
+                    <TextBlock x:Name="CompletionHeadingText" Grid.Row="1" Text="{Binding Completion.Heading}"
                                Foreground="{StaticResource Status.Success}" FontSize="{DynamicResource Type.Heading.Lg}" FontWeight="Bold"
                                HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Sm}"
                                AutomationProperties.LiveSetting="Polite"/>
+
+                    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
 
                     <!-- 6px bottom (off the 8/12/16/24 scale) tightens
                          the summary against the caption that follows
@@ -605,7 +650,7 @@
                     </TextBlock>
 
                     <!-- Error details (only visible when there are errors) -->
-                    <Border Margin="{StaticResource GapBottom.Xl}" MaxHeight="80">
+                    <Border Margin="{StaticResource GapBottom.Xl}" MaxHeight="{a11y:TextScaled 80}">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Visibility" Value="Visible"/>
@@ -621,12 +666,14 @@
                                  Foreground="{StaticResource Status.Warning}" FontSize="{DynamicResource Type.Caption}"
                                  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                     </Border>
+                    </StackPanel>
+                    </ScrollViewer>
 
                     <!-- Closes the result overlay, NOT the app: exiting
                          from here would trap the user with no way to
                          re-scan or open About. Auto-focused on overlay
                          show so Esc/Enter dismiss without mouse. -->
-                    <Button x:Name="CompletionCloseButton" Style="{StaticResource AccentPill}"
+                    <Button x:Name="CompletionCloseButton" Grid.Row="3" Style="{StaticResource AccentPill}"
                             Content="{loc:Translate Action.Done}" Command="{Binding Completion.DismissCommand}"
                             IsDefault="True"
                             HorizontalAlignment="Center" MinWidth="120"
@@ -639,12 +686,12 @@
                          sessions, so no user is asked twice.
                          FocusVisualStyle is set explicitly so this
                          GhostPill paints a ring under Tab navigation. -->
-                    <Button Style="{StaticResource GhostPill}"
+                    <Button Grid.Row="4" Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.SendResultLog}"
                             Command="{Binding Completion.SendResultLogCommand}"
                             Visibility="{Binding Completion.IsSendResultLogVisible, Converter={StaticResource BoolToVis}}"
                             HorizontalAlignment="Center"
-                            Height="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
+                            MinHeight="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
                             Margin="{StaticResource GapBottom.Sm}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             ToolTip="{Binding Completion.SendResultLogTooltip}"
@@ -659,12 +706,12 @@
                          though focus is on Done; otherwise the silent-
                          skip and post-POST status copy is invisible to
                          users on Narrator/NVDA/JAWS. -->
-                    <TextBlock x:Name="ResultLogStatusText"
+                    <TextBlock x:Name="ResultLogStatusText" Grid.Row="5"
                                Text="{Binding Completion.ResultLogStatusMessage}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                Foreground="{StaticResource Text.Muted}"
                                FontSize="{DynamicResource Type.Body}"
-                               TextWrapping="Wrap" MaxWidth="380"
+                               TextWrapping="Wrap" MaxWidth="{a11y:TextScaled 380}"
                                Margin="{StaticResource GapBottom.Sm}"
                                AutomationProperties.LiveSetting="Polite">
                         <TextBlock.Style>
@@ -680,14 +727,14 @@
                     </TextBlock>
 
                     <!-- Scan again -->
-                    <Button Style="{StaticResource GhostPill}"
+                    <Button Grid.Row="6" Style="{StaticResource GhostPill}"
                             Content="{loc:Translate Action.ScanAgain}" Command="{Binding Completion.RescanAfterCompletionCommand}"
                             HorizontalAlignment="Center"
-                            Height="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
+                            MinHeight="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             AutomationProperties.HelpText="{loc:Translate Automation.RescanInstaller}"/>
 
-                </StackPanel>
+                </Grid>
             </Border>
         </Grid>
     </Grid>

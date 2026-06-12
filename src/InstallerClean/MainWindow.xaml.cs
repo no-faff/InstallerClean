@@ -50,9 +50,33 @@ public partial class MainWindow : Window
         StarToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
         HeartToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
 
+        // SizeToContent must never outgrow the screen: at large OS text
+        // scales the content wants more height than the work area has,
+        // and without the clamp the bottom nav renders under the taskbar.
+        // No handle exists yet, so this resolves against the primary
+        // work area; OnSourceInitialized re-applies it for the actual
+        // monitor.
+        ApplyWorkAreaBounds();
+
+        // A live text-scale increase grows a shown SizeToContent window
+        // down and right from its fixed top-left, which can push the
+        // action rows off the work area even though the size clamps
+        // hold. NoResize means SizeChanged only ever fires for that
+        // content-driven growth, never a user drag-resize.
+        SizeChanged += OnWindowSizeChanged;
+
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
     }
+
+    private void ApplyWorkAreaBounds()
+    {
+        MaxWidth = DetailWindowSizing.WorkAreaWidthLimit(this);
+        MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(this);
+    }
+
+    private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        => DetailWindowSizing.NudgeIntoWorkArea(this);
 
     // PlacementMode.Top aligns the tooltip's left edge with the
     // target's and grows rightward, so on the bottom-right corner
@@ -77,6 +101,7 @@ public partial class MainWindow : Window
         _vm.Cleanup.PropertyChanged -= OnCleanupPropertyChanged;
         _vm.Scan.PropertyChanged -= OnScanPropertyChanged;
         PreviewKeyDown -= OnPreviewKeyDown;
+        SizeChanged -= OnWindowSizeChanged;
         Closed -= OnClosed;
     }
 
@@ -211,10 +236,14 @@ public partial class MainWindow : Window
         base.OnSourceInitialized(e);
         var hwnd = new WindowInteropHelper(this).Handle;
         HwndSource.FromHwnd(hwnd)?.AddHook(SuppressMaximize);
+        // The handle exists now, so the limits resolve against the
+        // monitor actually hosting the window rather than the primary.
+        ApplyWorkAreaBounds();
     }
 
-    // The main window's centred-column layout caps at 720px and does
-    // not fill a maximised viewport: the content stays in the middle
+    // The main window's centred-column layout caps its width (672
+    // content units, text-scaled) and does not fill a maximised
+    // viewport: the content stays in the middle
     // with the dark sidebar surface around it. The custom chrome
     // therefore offers Minimise and Close only, but title-bar
     // double-click, Win+Up and the system menu's Maximize item still
