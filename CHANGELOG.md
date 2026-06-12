@@ -101,6 +101,9 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The README's CLI exit-code contract states the mid-batch Ctrl+C case exactly: 130 only before any file was processed, 2 (partial) once work was committed.
 - The documented build command is the whole solution, not the GUI project; a single-project build cannot catch a CLI-breaking change, since the tests do not reference the CLI.
 - Five stale comments and labels corrected: the resx help-flags note, a misplaced format-argument note, the modal-card padding consumer list, the dark-chrome Windows-version contract and a CodeQL step name.
+- The installer-busy gate no longer reads the lingering Windows Installer service as an active install. The probe tested whether the `Global\_MSIExecute` mutex existed, but the service idles for several minutes after its last job and can keep the object alive unheld, so Move and Delete could stay blocked long after an install finished; the probe now takes a zero-timeout acquire and immediate release, which measures ownership itself.
+- The move-destination box no longer offers a folder drop it can never receive: Windows refuses drags from Explorer into an elevated window (verified on a real machine, the cursor shows not-allowed), so the dead drop handlers are removed and the tooltip reads "Type a path or click Browse".
+- The move-destination watermark starts where typed text starts; it sat a few pixels left of the caret's leftmost position.
 
 ### Changed (internal)
 
@@ -120,6 +123,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - A `.gitattributes` normalises every text file to LF at the git boundary; the working tree is shared across two machines via an NTFS mount that intermittently flips edited files to CRLF, and the flips now stop at staging whichever machine staged them.
 - The Dependabot auto-merge workflow's one mutable action tag is SHA-pinned like every other action; the job holds write permissions, so a moved tag was an arbitrary-code path onto main.
 - CodeQL analyses the whole solution; the CLI host sat outside the analysed graph.
+- The `packages.lock.json` churn is fixed at the root. The win-x64 sections existed only after a `-r win-x64` publish restore and every plain restore stripped them out again, so the locks flip-flopped between commands and machines; the RID is now declared in `Directory.Build.props` and the publish-injected ILLink task package referenced explicitly, so every restore computes one identical graph, verified by running both the plain build and the full self-contained publish in locked mode against the regenerated locks.
 
 ## [1.8.2] - 2026-05-27
 
