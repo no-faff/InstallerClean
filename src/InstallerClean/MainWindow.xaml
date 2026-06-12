@@ -5,7 +5,7 @@
         xmlns:chrome="clr-namespace:InstallerClean.Controls"
         xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate Window.Main.Title}"
-        SizeToContent="WidthAndHeight"
+        SizeToContent="Height"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource Surface.Sidebar}">
@@ -23,14 +23,18 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
 
-    <Grid>
+    <Grid x:Name="RootLayout">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <!-- Star, not Auto: under SizeToContent the star row measures
-                 to its content like Auto would, but once the window's
-                 work-area MaxHeight binds (large OS text scales) the star
-                 row is what shrinks, engaging the scan panel's internal
-                 ScrollViewer, so the bottom nav below never clips. -->
+                 to its content like Auto would, but once this grid's
+                 work-area MaxHeight (set in code-behind) binds at large
+                 OS text scales the star row is what shrinks, engaging
+                 the scan panel's internal ScrollViewer, so the bottom
+                 nav below never clips. The cap sits on the grid rather
+                 than the window so it constrains the measure pass and
+                 the ScrollViewer learns its real budget; a window-level
+                 MaxHeight only clamps the arrange. -->
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -69,14 +73,14 @@
                    AutomationProperties.LiveSetting="Polite"/>
 
         <!-- Row 1: the scan-result panel. The window is NoResize +
-             SizeToContent (like the confirm dialogs), so it grows to fit
-             this content exactly and normally never needs a scrollbar; a
-             tall warning banner makes the window taller rather than
-             clipping the action buttons. The MaxWidth is the content
-             width a 720 window gives at 100% text scale and grows with
-             the OS text-size factor, so the window widens with its text
-             (up to the work-area MaxWidth set in code-behind) instead of
-             starving the counts row. -->
+             SizeToContent="Height", so it grows to fit this content
+             exactly and normally never needs a scrollbar; a tall warning
+             banner makes the window taller rather than clipping the
+             action buttons. The MaxWidth is the content width a 720
+             window gives at 100% text scale and grows with the OS
+             text-size factor in step with the explicit scaled window
+             width set in code-behind, so the window widens with its
+             text instead of starving the counts row. -->
         <Grid Grid.Row="1" Margin="{StaticResource MainContentMargin}"
               MaxWidth="{a11y:TextScaled 672}" HorizontalAlignment="Center"
               IsEnabled="{Binding IsMainContentInteractive}">

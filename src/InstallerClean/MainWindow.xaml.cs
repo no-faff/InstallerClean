@@ -69,19 +69,32 @@ public partial class MainWindow : Window
         StarToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
         HeartToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
 
-        // SizeToContent must never outgrow the screen: at large OS text
-        // scales the content wants more height than the work area has,
-        // and without the clamp the bottom nav renders under the taskbar.
-        // No handle exists yet, so this resolves against the primary
-        // work area; OnSourceInitialized re-applies it for the actual
-        // monitor.
+        // Width is explicit, the designed 720 (the content column's 672
+        // MaxWidth plus the content margins) multiplied by the
+        // text-scale factor; height sizes to content with the root
+        // grid's work-area MaxHeight as its ceiling, so at large OS
+        // text scales the bottom nav stays above the taskbar. Both are
+        // first assigned here, before the window handle exists, the
+        // shape every band-free window in the app uses, and no
+        // constraint sits on the window itself. Sized to content in
+        // both axes instead
+        // (SizeToContent="WidthAndHeight" with work-area limits
+        // re-applied from OnSourceInitialized), the window opened
+        // larger than its arranged content by exactly the standard
+        // caption frame, 37 by 14 device-independent units of unpainted
+        // black along the bottom and right edges (observed 2026-06-13
+        // at 125% monitor scale, custom WindowChrome active). With no
+        // handle yet this resolves against the primary work area, where
+        // CenterScreen opens the window anyway; a live text-scale
+        // change re-resolves against the actual monitor.
         ApplyWorkAreaBounds();
+        AccessibilitySettings.Current.PropertyChanged += OnAccessibilitySettingsChanged;
 
-        // A live text-scale increase grows a shown SizeToContent window
-        // down and right from its fixed top-left, which can push the
-        // action rows off the work area even though the size clamps
-        // hold. NoResize means SizeChanged only ever fires for that
-        // content-driven growth, never a user drag-resize.
+        // A live text-scale increase re-applies the scaled bounds and
+        // the shown window grows down and right from its fixed
+        // top-left, which can push the action rows off the work area
+        // even though the size clamps hold. NoResize means SizeChanged
+        // only ever fires for that growth, never a user drag-resize.
         SizeChanged += OnWindowSizeChanged;
 
         this.EnableAltSpaceSystemMenu();
@@ -90,8 +103,15 @@ public partial class MainWindow : Window
 
     private void ApplyWorkAreaBounds()
     {
-        MaxWidth = DetailWindowSizing.WorkAreaWidthLimit(this);
-        MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(this);
+        RootLayout.MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(this);
+        Width = DetailWindowSizing.ClampWidthToWorkArea(
+            this, 720 * AccessibilitySettings.Current.TextScaleFactor, 0);
+    }
+
+    private void OnAccessibilitySettingsChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is null or nameof(AccessibilitySettings.TextScaleFactor))
+            ApplyWorkAreaBounds();
     }
 
     private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
@@ -121,6 +141,7 @@ public partial class MainWindow : Window
         _vm.Scan.PropertyChanged -= OnScanPropertyChanged;
         _vm.Scan.ScanCompleted -= OnScanCompleted;
         PreviewKeyDown -= OnPreviewKeyDown;
+        AccessibilitySettings.Current.PropertyChanged -= OnAccessibilitySettingsChanged;
         SizeChanged -= OnWindowSizeChanged;
         Closed -= OnClosed;
     }
@@ -355,9 +376,6 @@ public partial class MainWindow : Window
         base.OnSourceInitialized(e);
         var hwnd = new WindowInteropHelper(this).Handle;
         HwndSource.FromHwnd(hwnd)?.AddHook(SuppressMaximize);
-        // The handle exists now, so the limits resolve against the
-        // monitor actually hosting the window rather than the primary.
-        ApplyWorkAreaBounds();
     }
 
     // The main window's centred-column layout caps its width (672

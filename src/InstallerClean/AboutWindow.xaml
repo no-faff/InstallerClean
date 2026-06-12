@@ -4,7 +4,6 @@
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         xmlns:chrome="clr-namespace:InstallerClean.Controls"
         Title="{loc:Translate Window.About.Title}"
-        SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
