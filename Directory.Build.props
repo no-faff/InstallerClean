@@ -7,7 +7,25 @@
          the assembly. -->
     <Version>1.9.0</Version>
     <Deterministic>true</Deterministic>
+    <!-- Declaring the RID makes every restore compute the same graph,
+         so packages.lock.json holds one shape regardless of which
+         command wrote it. Without it the win-x64 sections exist only
+         after a "-r win-x64" publish restore, and every plain restore
+         (a build, an IDE design-time restore, on either OS) strips
+         them out again, so the lock files churned at every machine
+         change-over. -->
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- The self-contained single-file publish injects this SDK task
+         package into its restore graph; referencing it explicitly puts
+         it in EVERY graph, so the lock files hold one shape for plain
+         builds and publishes alike (locked-mode restore compares the
+         reference SETS and fails on any difference). The version
+         tracks the pinned SDK band: when absent, the SDK injects its
+         own matching version, so bump this with the SDK. -->
+    <PackageReference Include="Microsoft.NET.ILLink.Tasks" Version="10.0.8" PrivateAssets="all" />
+  </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <DebugType>embedded</DebugType>

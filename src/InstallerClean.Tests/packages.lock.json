@@ -8,6 +8,12 @@
         "resolved": "10.0.1",
         "contentHash": "27jXSV/0DbVqF5jDrAxuQFZ9oaz6gmG03p8ttxAFk+X0M4woFYj7MoWDLCna5EGLb0CE6OE7X6ZH3Wt5smTtaA=="
       },
+      "Microsoft.NET.ILLink.Tasks": {
+        "type": "Direct",
+        "requested": "[10.0.8, )",
+        "resolved": "10.0.8",
+        "contentHash": "e2517uM5fMb7x4561D47EVn1pGEpnBCAM/zsbS560qXNf+x1TK1dsDWtCjF704LaSI85JeVGzUejJovF/Bf1ZQ=="
+      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[18.6.0, )",
@@ -191,7 +197,7 @@
         "type": "Project",
         "dependencies": {
           "CommunityToolkit.Mvvm": "[8.4.2, )",
-          "InstallerClean.Core": "[1.8.2, )",
+          "InstallerClean.Core": "[1.9.0, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.7, )"
         }
       },
@@ -202,6 +208,13 @@
           "System.Diagnostics.EventLog": "[10.0.7, )",
           "System.IO.Abstractions": "[22.1.1, )"
         }
+      }
+    },
+    "net10.0-windows7.0/win-x64": {
+      "System.Diagnostics.EventLog": {
+        "type": "Transitive",
+        "resolved": "10.0.7",
+        "contentHash": "WbmDLeTPYhEzXhvYVioTVn/D1XX6bovyny9n5p8Zxtf03+eY385RB818teZm6n+fA63iZNvng0/Np4tLuhkMhQ=="
       }
     }
   }
