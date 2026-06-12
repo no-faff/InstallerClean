@@ -247,29 +247,4 @@ public partial class MainWindow : Window
         }
     }
 
-    private void MoveDestination_DragOver(object sender, DragEventArgs e)
-    {
-        e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Copy : DragDropEffects.None;
-        e.Handled = true;
-    }
-
-    private void MoveDestination_Drop(object sender, DragEventArgs e)
-    {
-        if (!e.Data.GetDataPresent(DataFormats.FileDrop))
-            return;
-        var paths = (string[])e.Data.GetData(DataFormats.FileDrop);
-        if (paths is null || paths.Length == 0)
-            return;
-        // Folder-only convention: dropping a file resolves to the
-        // containing folder. The validation pipeline later refuses
-        // anything inside C:\Windows\Installer or below the user's
-        // ownership, so an unsafe drop still gets blocked.
-        var first = paths[0];
-        var folder = System.IO.Directory.Exists(first)
-            ? first
-            : System.IO.Path.GetDirectoryName(first);
-        if (!string.IsNullOrEmpty(folder))
-            _vm.Cleanup.MoveDestination = folder;
-        e.Handled = true;
-    }
 }
