@@ -131,18 +131,24 @@
     </Style>
 
     <!-- Pill buttons. Four flavours share one visual language (40px
-         tall, fully rounded, 14pt Medium label):
+         minimum height, fully rounded, 14pt Medium label):
            AccentPill  - secondary action colour (CTA / Move).
            PrimaryPill - primary action colour (Browse / Add / Close).
            DangerPill  - destructive action colour (Delete).
-           GhostPill   - text-only action with no fill (Settings / About). -->
+           GhostPill   - text-only action with no fill (Settings / About).
+
+         The pill heights here (and on the compact pills and PillTextBox
+         below) are MinHeight, never Height: the label's font size tracks
+         the OS text-scale factor, and a fixed height clips the label
+         vertically once the scaled line height outgrows it. At 100% the
+         minimum is exactly what renders. -->
 
     <Style x:Key="AccentPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <Setter Property="FontSize" Value="{DynamicResource Type.Heading.Sm}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="28,8"/>
-        <Setter Property="Height" Value="40"/>
+        <Setter Property="MinHeight" Value="40"/>
         <Setter Property="MinWidth" Value="120"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource PillFocusVisual}"/>
@@ -151,8 +157,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bg" Background="{StaticResource Action.Secondary.Background}"
                             CornerRadius="{StaticResource Radius.Pill}"
-                            Padding="{TemplateBinding Padding}"
-                            Height="{TemplateBinding Height}">
+                            Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                           RecognizesAccessKey="True"/>
                     </Border>
@@ -177,7 +182,7 @@
         <Setter Property="FontSize" Value="{DynamicResource Type.Heading.Sm}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="28,8"/>
-        <Setter Property="Height" Value="40"/>
+        <Setter Property="MinHeight" Value="40"/>
         <Setter Property="MinWidth" Value="120"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource PillFocusVisual}"/>
@@ -186,8 +191,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bg" Background="{StaticResource Action.Primary.Background}"
                             CornerRadius="{StaticResource Radius.Pill}"
-                            Padding="{TemplateBinding Padding}"
-                            Height="{TemplateBinding Height}">
+                            Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                           RecognizesAccessKey="True"/>
                     </Border>
@@ -212,7 +216,7 @@
         <Setter Property="FontSize" Value="{DynamicResource Type.Heading.Sm}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="28,8"/>
-        <Setter Property="Height" Value="40"/>
+        <Setter Property="MinHeight" Value="40"/>
         <Setter Property="MinWidth" Value="120"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource PillFocusVisual}"/>
@@ -221,8 +225,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bg" Background="{StaticResource Action.Danger.Background}"
                             CornerRadius="{StaticResource Radius.Pill}"
-                            Padding="{TemplateBinding Padding}"
-                            Height="{TemplateBinding Height}">
+                            Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                           RecognizesAccessKey="True"/>
                     </Border>
@@ -247,7 +250,7 @@
         <Setter Property="FontSize" Value="{DynamicResource Type.Heading.Sm}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="20,8"/>
-        <Setter Property="Height" Value="40"/>
+        <Setter Property="MinHeight" Value="40"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource PillFocusVisual}"/>
         <Setter Property="Template">
@@ -255,8 +258,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bg" Background="Transparent"
                             CornerRadius="{StaticResource Radius.Pill}"
-                            Padding="{TemplateBinding Padding}"
-                            Height="{TemplateBinding Height}">
+                            Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                           RecognizesAccessKey="True"/>
                     </Border>
@@ -276,15 +278,15 @@
         </Setter>
     </Style>
 
-    <!-- Compact pill buttons (30 px tall). Compact variants for the
-         About dialog action row. -->
+    <!-- Compact pill buttons (30 px minimum height). Compact variants
+         for the About dialog action row. -->
 
     <Style x:Key="CompactPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="14,0"/>
-        <Setter Property="Height" Value="30"/>
+        <Setter Property="MinHeight" Value="30"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource CompactPillFocusVisual}"/>
         <Setter Property="Template">
@@ -292,8 +294,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bg" Background="{StaticResource Action.Primary.Background}"
                             CornerRadius="{StaticResource Radius.CompactPill}"
-                            Padding="{TemplateBinding Padding}"
-                            Height="{TemplateBinding Height}">
+                            Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                           RecognizesAccessKey="True"/>
                     </Border>
@@ -318,7 +319,7 @@
         <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="Padding" Value="12,0"/>
-        <Setter Property="Height" Value="30"/>
+        <Setter Property="MinHeight" Value="30"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource CompactPillFocusVisual}"/>
         <Setter Property="Template">
@@ -326,8 +327,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bg" Background="Transparent"
                             CornerRadius="{StaticResource Radius.CompactPill}"
-                            Padding="{TemplateBinding Padding}"
-                            Height="{TemplateBinding Height}">
+                            Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                           RecognizesAccessKey="True"/>
                     </Border>
@@ -354,7 +354,7 @@
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <Setter Property="CaretBrush" Value="{StaticResource Text.Heading}"/>
         <Setter Property="FontSize" Value="{DynamicResource Type.Heading.Sm}"/>
-        <Setter Property="Height" Value="40"/>
+        <Setter Property="MinHeight" Value="40"/>
         <Setter Property="Padding" Value="12,0"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource PillFocusVisual}"/>
@@ -688,7 +688,9 @@
     <Style x:Key="AccentTooltip" TargetType="ToolTip">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="MaxWidth" Value="280"/>
+        <!-- Wrap width scales with the OS text size; a fixed cap
+             squeezes scaled text into an ever taller, thinner column. -->
+        <Setter Property="MaxWidth" Value="{a11y:TextScaled 280}"/>
         <Setter Property="Placement" Value="Top"/>
         <Setter Property="HasDropShadow" Value="False"/>
         <Setter Property="Template">
@@ -713,7 +715,8 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="HasDropShadow" Value="False"/>
-        <Setter Property="MaxWidth" Value="320"/>
+        <!-- Wrap width scales with the OS text size, as on AccentTooltip. -->
+        <Setter Property="MaxWidth" Value="{a11y:TextScaled 320}"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>
