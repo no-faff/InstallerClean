@@ -50,7 +50,7 @@ public class ScanMoveCompletionTests
             new OrphanedFile(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, InstallerClean.Resources.Strings.Reason_Orphaned),
             new OrphanedFile(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, InstallerClean.Resources.Strings.Reason_Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
@@ -79,13 +79,13 @@ public class ScanMoveCompletionTests
         Assert.Contains("3.0 MB", vm.Completion.Heading);  // 1MB + 2MB freed
         Assert.False(vm.Cleanup.IsOperating);
         await _scanService.Received(2).ScanAsync(  // initial + post-move refresh
-            Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task Scan_finding_no_orphans_immediately_paints_all_clear()
     {
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0));
 
         var vm = CreateMain();
@@ -104,7 +104,7 @@ public class ScanMoveCompletionTests
         {
             new OrphanedFile(@"C:\Windows\Installer\x.msi", 524_288, false, false, false, InstallerClean.Resources.Strings.Reason_Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -124,7 +124,7 @@ public class ScanMoveCompletionTests
     [Fact]
     public async Task Rescan_from_completion_overlay_runs_another_scan()
     {
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0));
 
         var vm = CreateMain();
@@ -134,7 +134,7 @@ public class ScanMoveCompletionTests
         await vm.Completion.RescanAfterCompletionCommand.ExecuteAsync(null);
 
         await _scanService.Received(2).ScanAsync(
-            Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public class ScanMoveCompletionTests
         // orphans remain unaccounted for and become removables.
         var queryService = Substitute.For<IInstallerQueryService>();
         queryService.GetRegisteredPackagesAsync(
-                Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+                Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new List<RegisteredPackage>
             {
                 new($@"{installerFolder}\registered.msi", "Registered", "{AAA}", FileSizeBytes: 1024),
@@ -230,7 +230,7 @@ public class ScanMoveCompletionTests
             new OrphanedFile(@"C:\Windows\Installer\b.msi", 2048, false, false, false, InstallerClean.Resources.Strings.Reason_Orphaned),
             new OrphanedFile(@"C:\Windows\Installer\c.msi", 4096, false, false, false, InstallerClean.Resources.Strings.Reason_Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);

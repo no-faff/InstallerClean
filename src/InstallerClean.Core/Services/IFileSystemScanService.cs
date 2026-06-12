@@ -19,7 +19,9 @@ public interface IFileSystemScanService
 {
     /// <summary>
     /// Run the scan. Reports human-readable progress via
-    /// <paramref name="progress"/> (status text only, not percentages).
+    /// <paramref name="progress"/> (status text only, not percentages):
+    /// milestone updates carry the fixed phase messages, non-milestone
+    /// updates the per-product ticker (see <see cref="ScanProgressUpdate"/>).
     /// Throws <see cref="UnauthorizedAccessException"/> if the process
     /// cannot read the MSI database (typically: not elevated), or
     /// <see cref="InvalidOperationException"/> if Windows Installer
@@ -29,6 +31,6 @@ public interface IFileSystemScanService
     /// as orphaned).
     /// </summary>
     Task<ScanResult> ScanAsync(
-        IProgress<string>? progress = null,
+        IProgress<ScanProgressUpdate>? progress = null,
         CancellationToken cancellationToken = default);
 }

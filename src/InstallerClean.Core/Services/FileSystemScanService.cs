@@ -53,10 +53,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
     }
 
     public async Task<ScanResult> ScanAsync(
-        IProgress<string>? progress = null,
+        IProgress<ScanProgressUpdate>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        progress?.Report(Strings.Status_QueryingApi);
+        progress?.Report(new ScanProgressUpdate(Strings.Status_QueryingApi));
 
         // ConfigureAwait(false): Core services do not bind to a caller's
         // SynchronizationContext. The continuation under a WPF host
@@ -70,7 +70,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             registered.Select(p => p.LocalPackagePath),
             StringComparer.OrdinalIgnoreCase);
 
-        progress?.Report(Strings.Status_ScanningCache);
+        progress?.Report(new ScanProgressUpdate(Strings.Status_ScanningCache));
 
         var diskFiles = _overrideFiles ?? GetInstallerFiles(_installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder);
         var removable = new List<OrphanedFile>();
@@ -182,8 +182,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         }
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
 
-        progress?.Report(string.Format(Strings.Status_FoundUnused,
-            removable.Count, DisplayHelpers.PluraliseFile(removable.Count)));
+        progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_FoundUnused,
+            removable.Count, DisplayHelpers.PluraliseFile(removable.Count))));
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingNonRemovable, missingRemovable);
     }
 

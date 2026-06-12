@@ -27,14 +27,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
     /// <inheritdoc />
     public Task<IReadOnlyList<RegisteredPackage>> GetRegisteredPackagesAsync(
-        IProgress<string>? progress = null,
+        IProgress<ScanProgressUpdate>? progress = null,
         CancellationToken cancellationToken = default)
     {
         return Task.Run(() => GetRegisteredPackagesCore(progress, cancellationToken), cancellationToken);
     }
 
     private IReadOnlyList<RegisteredPackage> GetRegisteredPackagesCore(
-        IProgress<string>? progress,
+        IProgress<ScanProgressUpdate>? progress,
         CancellationToken ct)
     {
         // TryAdd on this dictionary means the API enumeration wins over the
@@ -42,11 +42,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // API entry carries product metadata the fallback lacks.
         var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
 
-        progress?.Report(Strings.Status_EnumeratingProducts);
+        progress?.Report(new ScanProgressUpdate(Strings.Status_EnumeratingProducts));
 
         var products = EnumerateProducts(ct);
 
-        progress?.Report(Strings.Status_FoundProducts);
+        progress?.Report(new ScanProgressUpdate(Strings.Status_FoundProducts));
 
         foreach (var (productCode, userSid, context) in products)
         {
@@ -57,7 +57,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             if (!string.IsNullOrEmpty(localPackage))
             {
-                progress?.Report(productName.Length > 0 ? productName : productCode);
+                // Ticker, not milestone: one of these fires per product,
+                // up to hundreds in a few seconds, so the consumer must
+                // not feed it to a screen-reader live region.
+                progress?.Report(new ScanProgressUpdate(
+                    productName.Length > 0 ? productName : productCode, IsMilestone: false));
                 claimed.TryAdd(localPackage, new RegisteredPackage(localPackage, productName, productCode));
             }
 
@@ -84,7 +88,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
         }
 
-        progress?.Report(Strings.Status_CheckingRegistry);
+        progress?.Report(new ScanProgressUpdate(Strings.Status_CheckingRegistry));
         try
         {
             // Registry64 is pinned explicitly. Registry.LocalMachine
@@ -143,8 +147,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (claimed.Count == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty);
 
-        progress?.Report(string.Format(Strings.Status_RegisteredPackagesFound,
-            claimed.Count, Helpers.DisplayHelpers.PluralisePackage(claimed.Count)));
+        progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_RegisteredPackagesFound,
+            claimed.Count, Helpers.DisplayHelpers.PluralisePackage(claimed.Count))));
 
         return claimed.Values.ToList().AsReadOnly();
     }

@@ -26,6 +26,6 @@ public interface IInstallerQueryService
     /// Windows itself has marked the patch unused.
     /// </summary>
     Task<IReadOnlyList<RegisteredPackage>> GetRegisteredPackagesAsync(
-        IProgress<string>? progress = null,
+        IProgress<ScanProgressUpdate>? progress = null,
         CancellationToken cancellationToken = default);
 }

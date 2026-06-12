@@ -24,7 +24,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "readme.txt"), new byte[] { 7 });
 
         var query = Substitute.For<IInstallerQueryService>();
-        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new List<RegisteredPackage>().AsReadOnly());
 
         var svc = new FileSystemScanService(query, null, _fakeInstallerDir);
@@ -44,7 +44,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "orphan.msi"), new byte[] { 2 });
 
         var query = Substitute.For<IInstallerQueryService>();
-        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new List<RegisteredPackage>
             {
                 new(Path.Combine(_fakeInstallerDir, "kept.msi"), "Kept Product", "{K}"),

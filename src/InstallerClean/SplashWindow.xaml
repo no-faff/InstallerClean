@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         xmlns:chrome="clr-namespace:InstallerClean.Controls"
+        xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate Window.Main.Title}"
         Width="480" Height="320"
         WindowStyle="None"
@@ -23,6 +24,11 @@
                 <RowDefinition Height="Auto"/>  <!-- progress bar -->
                 <RowDefinition Height="8"/>     <!-- gap -->
                 <RowDefinition Height="Auto"/>  <!-- step text -->
+                <!-- 4, off the 8/12/16/24 scale: ties the ticker to the
+                     step line as one block, the way the operating
+                     overlay pairs its count and filename lines. -->
+                <RowDefinition Height="4"/>     <!-- gap -->
+                <RowDefinition Height="Auto"/>  <!-- product ticker -->
                 <RowDefinition Height="12"/>    <!-- gap -->
                 <RowDefinition Height="Auto"/>  <!-- cancel button -->
                 <RowDefinition Height="*"/>     <!-- bottom spacer -->
@@ -61,8 +67,21 @@
                        HorizontalAlignment="Center"
                        AutomationProperties.LiveSetting="Polite"/>
 
+            <!-- Per-product ticker: names each package as the enumeration
+                 passes it. Display-only; no LiveSetting, because it
+                 updates once per installed product and a live region
+                 would queue one announcement per product. The step text
+                 above stays the announced line. -->
+            <TextBlock Grid.Row="9"
+                       x:Name="ProductTicker"
+                       Foreground="{StaticResource Text.Dim}"
+                       FontSize="{DynamicResource Type.Caption}"
+                       HorizontalAlignment="Center"
+                       TextTrimming="CharacterEllipsis"
+                       MaxWidth="{a11y:TextScaled 360}"/>
+
             <!-- Cancel button -->
-            <Button Grid.Row="9"
+            <Button Grid.Row="11"
                     x:Name="CancelButton"
                     Content="{loc:Translate Action.Cancel}"
                     Click="CancelClick"
@@ -74,7 +93,7 @@
                     AutomationProperties.Name="{loc:Translate Automation.CancelStartupScan}"/>
 
             <!-- Version (bottom right, overlaid) -->
-            <TextBlock Grid.Row="10"
+            <TextBlock Grid.Row="12"
                        x:Name="VersionText"
                        Foreground="{StaticResource Text.Dim}"
                        FontSize="{DynamicResource Type.Caption}"

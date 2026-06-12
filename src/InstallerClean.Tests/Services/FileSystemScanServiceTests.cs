@@ -27,7 +27,7 @@ public class FileSystemScanServiceTests
 
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
         var fakeFiles = new[]
@@ -49,7 +49,7 @@ public class FileSystemScanServiceTests
     {
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new List<RegisteredPackage>().AsReadOnly());
 
         // A payload .msp under $PatchCache$ is the patch engine's
@@ -79,7 +79,7 @@ public class FileSystemScanServiceTests
 
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
         var fakeFiles = new[] { @"C:\Windows\Installer\aaa.msi" };
@@ -102,7 +102,7 @@ public class FileSystemScanServiceTests
 
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
         var fakeFiles = new[] { @"C:\Windows\Installer\ccc.msi" }; // orphan
@@ -128,7 +128,7 @@ public class FileSystemScanServiceTests
 
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
         // Both registered files present on disk so the superseded entry
@@ -161,7 +161,7 @@ public class FileSystemScanServiceTests
 
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
         var fs = new MockFileSystem();
@@ -189,7 +189,7 @@ public class FileSystemScanServiceTests
 
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
         // Empty MockFileSystem: ghost.msp is registered but not present.
@@ -220,7 +220,7 @@ public class FileSystemScanServiceTests
 
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
         var fs = new MockFileSystem();
@@ -246,7 +246,7 @@ public class FileSystemScanServiceTests
 
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
         var fakeFiles = Array.Empty<string>();
@@ -264,7 +264,7 @@ public class FileSystemScanServiceTests
     {
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new List<RegisteredPackage>().AsReadOnly());
 
         var fakeFiles = Enumerable.Range(0, 10_000)
@@ -288,7 +288,7 @@ public class FileSystemScanServiceTests
 
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
         var fakeFiles = Enumerable.Range(0, 5_000)
@@ -309,7 +309,7 @@ public class FileSystemScanServiceTests
     {
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new List<RegisteredPackage>().AsReadOnly());
 
         var fakeFiles = Enumerable.Range(0, 10_000)
@@ -329,7 +329,7 @@ public class FileSystemScanServiceTests
     {
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new List<RegisteredPackage>().AsReadOnly());
 
         var fakeFiles = new[]
@@ -354,7 +354,7 @@ public class FileSystemScanServiceTests
     {
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
-            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new UnauthorizedAccessException("Access denied"));
 
         var svc = new FileSystemScanService(mockQuery, Array.Empty<string>());

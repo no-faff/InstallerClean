@@ -58,7 +58,7 @@ public class MainViewModelTests
     public async Task ScanAsync_sets_HasScanned_after_scan()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(EmptyScanResult());
 
         Assert.False(vm.Scan.HasScanned);
@@ -79,7 +79,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\c.msi", "Product", "{AAA}"),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, registered, 5_000_000));
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -94,7 +94,7 @@ public class MainViewModelTests
     public async Task ScanAsync_shows_all_clear_when_no_orphans()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(EmptyScanResult());
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -107,7 +107,7 @@ public class MainViewModelTests
     public async Task ScanAsync_does_not_show_completion_when_orphans_exist()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(3));
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -137,7 +137,7 @@ public class MainViewModelTests
     public async Task SummaryText_uses_correct_pluralisation()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(1));
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -149,7 +149,7 @@ public class MainViewModelTests
     public async Task ScanAsync_handles_10000_orphans()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(10_000));
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -167,7 +167,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\huge.msi", 107_374_182_400, false, false, false, Orphaned), // 100 GB
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -179,7 +179,7 @@ public class MainViewModelTests
     public async Task ScanAsync_propagates_access_denied()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new UnauthorizedAccessException("denied"));
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(
@@ -194,7 +194,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\empty.msi", 0, false, false, false, Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -207,7 +207,7 @@ public class MainViewModelTests
     public async Task ScanCommand_access_denied_shows_warning_via_dialog_service()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new UnauthorizedAccessException("denied"));
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
@@ -221,7 +221,7 @@ public class MainViewModelTests
     public async Task ScanCommand_empty_installer_database_shows_targeted_error()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new LocalisedInvalidOperationException(
                 "The Windows Installer database appears to be empty or inaccessible."));
 
@@ -241,7 +241,7 @@ public class MainViewModelTests
         // sleep-based race on when the mock has registered for the token.
         var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var completion = new TaskCompletionSource<ScanResult>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(call =>
             {
                 var ct = call.Arg<CancellationToken>();
@@ -316,7 +316,7 @@ public class MainViewModelTests
     public async Task RescanAfterCompletion_dismisses_and_triggers_scan()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(EmptyScanResult());
 
         await vm.Scan.ScanWithProgressAsync(null);
@@ -325,7 +325,7 @@ public class MainViewModelTests
         await vm.Completion.RescanAfterCompletionCommand.ExecuteAsync(null);
 
         await _scanService.Received(2).ScanAsync(
-            Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -337,7 +337,7 @@ public class MainViewModelTests
             new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
             new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
@@ -365,7 +365,7 @@ public class MainViewModelTests
     public async Task MoveAllAsync_confirmation_cancelled_does_not_invoke_service()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(3));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(false);
@@ -388,7 +388,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\x.msi", 524_288, false, false, false, Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
@@ -417,7 +417,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
@@ -446,7 +446,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\x.msi", 524_288, false, false, false, Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
@@ -467,7 +467,7 @@ public class MainViewModelTests
     public async Task DeleteAllAsync_confirmation_cancelled_does_not_invoke_service()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>()).Returns(false);
@@ -494,7 +494,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\big.msi", 200_000_000, false, false, false, Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Is(false),
@@ -528,7 +528,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\big.msi", 200_000_000, false, false, false, Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         // First (recycle) pass refuses; the consented retry succeeds.
         _deleteService.DeleteFilesAsync(
@@ -567,7 +567,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\big.msi", 1_048_576, false, false, false, Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Is(false),
@@ -606,7 +606,7 @@ public class MainViewModelTests
     public async Task OpenOrphanedDetails_after_scan_invokes_window_service_with_scanned_files()
     {
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
         await vm.Scan.ScanWithProgressAsync(null);
 
@@ -638,7 +638,7 @@ public class MainViewModelTests
         Assert.False(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
         Assert.False(vm.Chrome.OpenRegisteredDetailsCommand.CanExecute(null));
 
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(1));
         await vm.Scan.ScanWithProgressAsync(null);
 
@@ -655,7 +655,7 @@ public class MainViewModelTests
             new(@"C:\Windows\Installer\a.msi", "Product A", "{aaa}", FileSizeBytes: 1024),
             new(@"C:\Windows\Installer\b.msi", "Product B", "{bbb}", FileSizeBytes: 2048),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(Array.Empty<OrphanedFile>(), packages, 3072));
         await vm.Scan.ScanWithProgressAsync(null);
 
@@ -775,7 +775,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\a.msi", 1024, false, false, false, Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
@@ -803,7 +803,7 @@ public class MainViewModelTests
         // Without the gate the file is overwritten on every all-clear
         // with a payload nobody can read.
         var vm = CreateViewModel(new AppSettings { HasSentResultLog = true });
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(
                 Array.Empty<OrphanedFile>(),
                 Array.Empty<RegisteredPackage>(),
@@ -836,7 +836,7 @@ public class MainViewModelTests
         {
             new(@"C:\Windows\Installer\y.msi", 2048, false, false, false, Orphaned),
         };
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
@@ -863,7 +863,7 @@ public class MainViewModelTests
         // does NOT call WriteAsync or MarkResultLogReady. The button
         // stays hidden even though the second all-clear ran.
         var vm = CreateViewModel();
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(EmptyScanResult());
         _resultLogService.WriteAsync(Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(true));
@@ -899,7 +899,7 @@ public class MainViewModelTests
             RegisteredPackages: new[] { nonRemovable },
             RegisteredTotalBytes: 0,
             MissingNonRemovableCount: 1);
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(scan);
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
@@ -928,7 +928,7 @@ public class MainViewModelTests
             RegisteredTotalBytes: 0,
             MissingNonRemovableCount: 0,
             MissingRemovableCount: 2);
-        _scanService.ScanAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(scan);
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);

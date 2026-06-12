@@ -3,6 +3,7 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using InstallerClean.Helpers;
+using InstallerClean.Models;
 using InstallerClean.Resources;
 
 namespace InstallerClean;
@@ -35,17 +36,37 @@ public partial class SplashWindow : Window
         Loaded += (_, _) => CancelButton.Focus();
     }
 
-    public void OnScanProgress(string message)
+    public void OnScanProgress(ScanProgressUpdate update)
     {
-        // Asymptote to 95; the closing UpdateStep("Done", 100) finishes the fill.
+        // Asymptote to 95; every update, milestone or ticker, advances
+        // the bar so the fill tracks the enumeration. The closing
+        // UpdateStep("Done", 100) finishes the fill.
         _progressMessageCount++;
         var percent = 10 + 85.0 * _progressMessageCount / (_progressMessageCount + 15);
-        UpdateStep(message, percent);
+        if (update.IsMilestone)
+        {
+            UpdateStep(update.Message, percent);
+            return;
+        }
+        // Ticker: per-product, display-only. The step text (the live
+        // region) is left alone so the splash does not queue one
+        // announcement per installed product.
+        ProductTicker.Text = update.Message;
+        AnimateProgress(percent);
     }
 
     public void UpdateStep(string message, double progressPercent)
     {
         StepText.Text = message;
+        // A milestone closes the phase the ticker was narrating; clear
+        // it so the last product name does not sit stale beside the next
+        // phase's message.
+        ProductTicker.Text = string.Empty;
+        AnimateProgress(progressPercent);
+    }
+
+    private void AnimateProgress(double progressPercent)
+    {
         if (AccessibilitySettings.Current.ReduceMotion)
         {
             // Reduced motion: set the value with no easing. Clearing the
@@ -85,6 +106,7 @@ public partial class SplashWindow : Window
         ToolTipService.SetShowOnDisabled(CancelButton, true);
         CancelButton.ToolTip = Strings.Tooltip_CancellingPending;
         StepText.Text = Strings.Status_Cancelling;
+        ProductTicker.Text = string.Empty;
         CancelRequested?.Invoke(this, EventArgs.Empty);
     }
 }

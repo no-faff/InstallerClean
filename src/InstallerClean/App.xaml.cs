@@ -7,6 +7,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.Extensions.DependencyInjection;
 using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
+using InstallerClean.Models;
 using InstallerClean.Resources;
 using InstallerClean.ViewModels;
 
@@ -184,7 +185,7 @@ public partial class App : Application
             using var startupCts = new CancellationTokenSource();
             splash.CancelRequested += (_, _) => startupCts.Cancel();
 
-            var splashProgress = new Progress<string>(splash.OnScanProgress);
+            var splashProgress = new Progress<ScanProgressUpdate>(splash.OnScanProgress);
             var cancelled = false;
             try
             {

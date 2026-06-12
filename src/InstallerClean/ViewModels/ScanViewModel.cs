@@ -31,6 +31,16 @@ public partial class ScanViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(ScanCommand))]
     private bool _isScanning;
     [ObservableProperty] private string _scanProgress = string.Empty;
+
+    /// <summary>
+    /// Per-product ticker line under the scan overlay's milestone text.
+    /// Display-only: the bound TextBlock carries no LiveSetting because
+    /// the ticker updates once per registered product, up to hundreds in
+    /// a few seconds, and a live region would queue an announcement for
+    /// every one of them.
+    /// </summary>
+    [ObservableProperty] private string _scanTicker = string.Empty;
+
     [ObservableProperty] private bool _hasScanned;
 
     [ObservableProperty] private int _registeredFileCount;
@@ -192,7 +202,7 @@ public partial class ScanViewModel : ObservableObject
     /// <see cref="ScanWithProgressAsync"/> after their respective
     /// success paths.
     /// </summary>
-    private async Task RunScanCoreAsync(IProgress<string>? progress, CancellationToken cancellationToken = default)
+    private async Task RunScanCoreAsync(IProgress<ScanProgressUpdate>? progress, CancellationToken cancellationToken = default)
     {
         // Compute everything off the call results before touching any
         // observable property; on throw or cancel the VM stays at its
@@ -231,13 +241,14 @@ public partial class ScanViewModel : ObservableObject
     private async Task ScanAsync()
     {
         ScanProgress = Strings.Status_StartingScan;
+        ScanTicker = string.Empty;
         var sw = Stopwatch.StartNew();
         var cts = new CancellationTokenSource();
         _scanCts = cts;
 
         try
         {
-            var progress = new Progress<string>(message => ScanProgress = message);
+            var progress = new Progress<ScanProgressUpdate>(ApplyProgressUpdate);
             var scanTask = RunScanCoreAsync(progress, cts.Token);
             if (await Task.WhenAny(scanTask, Task.Delay(200, cts.Token)) != scanTask)
                 IsScanning = true;
@@ -306,6 +317,26 @@ public partial class ScanViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Routes one scan progress update to the overlay's two lines:
+    /// milestones to the announced status text, the per-product ticker
+    /// to the display-only line beneath it. A milestone also clears the
+    /// ticker so the last product name does not sit stale beside the
+    /// next phase's message.
+    /// </summary>
+    private void ApplyProgressUpdate(ScanProgressUpdate update)
+    {
+        if (update.IsMilestone)
+        {
+            ScanProgress = update.Message;
+            ScanTicker = string.Empty;
+        }
+        else
+        {
+            ScanTicker = update.Message;
+        }
+    }
+
     [RelayCommand]
     private void CancelScan()
     {
@@ -330,7 +361,7 @@ public partial class ScanViewModel : ObservableObject
     /// <see cref="ScanCompleted"/> on success so MainViewModel can
     /// trigger the all-clear path if appropriate.
     /// </summary>
-    public async Task ScanWithProgressAsync(IProgress<string>? progress, CancellationToken cancellationToken = default)
+    public async Task ScanWithProgressAsync(IProgress<ScanProgressUpdate>? progress, CancellationToken cancellationToken = default)
     {
         var sw = Stopwatch.StartNew();
         await RunScanCoreAsync(progress, cancellationToken);

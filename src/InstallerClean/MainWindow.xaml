@@ -462,8 +462,17 @@
                 <ProgressBar IsIndeterminate="True" Width="240" Height="8" Margin="{StaticResource GapBottom.Md}"
                              AutomationProperties.Name="{loc:Translate Automation.ScanningProgress}"/>
                 <TextBlock Text="{Binding Scan.ScanProgress}" Foreground="{StaticResource Text.Heading}"
-                           FontSize="{DynamicResource Type.Heading.Sm}" HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"
+                           FontSize="{DynamicResource Type.Heading.Sm}" HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Sm}"
                            AutomationProperties.LiveSetting="Polite"/>
+                <!-- Per-product ticker: names each package as the
+                     enumeration passes it. Display-only; no LiveSetting,
+                     because it updates once per installed product and a
+                     live region would queue one announcement per product.
+                     The milestone line above stays the announced one. -->
+                <TextBlock Text="{Binding Scan.ScanTicker}"
+                           Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Caption}"
+                           HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"
+                           TextTrimming="CharacterEllipsis" MaxWidth="{a11y:TextScaled 240}"/>
                 <Button x:Name="ScanCancelButton" Style="{StaticResource GhostPill}"
                         Content="{loc:Translate Action.Cancel}" Command="{Binding Scan.CancelScanCommand}"
                         MinHeight="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
@@ -506,16 +515,35 @@
                         <TextBlock DockPanel.Dock="Right" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Caption}">
                             <Run Text="{Binding Cleanup.OperationProgressPercent, Mode=OneWay, StringFormat='{}{0:F0}%'}"/>
                         </TextBlock>
-                        <TextBlock Text="{Binding Cleanup.OperationProgressDetail}"
-                                   Foreground="{StaticResource Text.Muted}"
-                                   FontSize="{DynamicResource Type.Caption}"
-                                   AutomationProperties.LiveSetting="Polite"/>
+                        <Grid>
+                            <!-- Visible count: updates once per file. No
+                                 LiveSetting; on a LiveSetting element every
+                                 text change is announced, so a per-file
+                                 binding queues one announcement per file and
+                                 a large batch floods the speech queue. -->
+                            <TextBlock Text="{Binding Cleanup.OperationProgressDetail}"
+                                       Foreground="{StaticResource Text.Muted}"
+                                       FontSize="{DynamicResource Type.Caption}"/>
+                            <!-- Screen-reader twin: the same "X of Y files"
+                                 line, updated at most once per tenth of the
+                                 batch (first and last file always), so the
+                                 announcements keep pace with speech. Opacity
+                                 0 keeps it in the rendered tree, which the
+                                 UIA bridge requires before it announces a
+                                 text change, without painting over the live
+                                 count. -->
+                            <TextBlock Text="{Binding Cleanup.OperationProgressAnnouncement}"
+                                       Foreground="{StaticResource Text.Muted}"
+                                       FontSize="{DynamicResource Type.Caption}"
+                                       Opacity="0" IsHitTestVisible="False"
+                                       AutomationProperties.LiveSetting="Polite"/>
+                        </Grid>
                     </DockPanel>
                     <!-- LiveSetting deliberately absent: the per-file
                          filename changes at I/O speed and would flood
                          the screen-reader queue faster than the user
-                         can drain it. OperationProgressDetail above
-                         carries the "X of Y" count for the SR. -->
+                         can drain it. The throttled twin above carries
+                         the "X of Y" count for the SR. -->
                     <TextBlock Text="{Binding Cleanup.OperationCurrentFileName}"
                                Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Caption}"
                                HorizontalAlignment="Center" Margin="0,4,0,0"

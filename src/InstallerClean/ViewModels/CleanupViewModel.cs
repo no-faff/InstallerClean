@@ -64,6 +64,18 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [ObservableProperty] private double _operationProgressPercent;
 
     /// <summary>
+    /// Throttled copy of <see cref="OperationProgressDetail"/> for the
+    /// screen-reader live region: updated on the first file, the last
+    /// file and each time the batch crosses a tenth, never per file. A
+    /// live region announces every text change, and per-file changes
+    /// queue speech far faster than it can be spoken.
+    /// </summary>
+    [ObservableProperty] private string _operationProgressAnnouncement = string.Empty;
+
+    /// <summary>Last tenth-of-batch boundary announced; -1 between operations.</summary>
+    private int _lastAnnouncedDecile = -1;
+
+    /// <summary>
     /// True between a Cancel click and the worker's next
     /// CancellationToken checkpoint. Gates the overlay Cancel button's
     /// IsEnabled binding and the disabled-state tooltip.
@@ -506,6 +518,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             OperationCurrentFile = 0;
             OperationTotalFiles = 0;
             OperationCurrentFileName = string.Empty;
+            OperationProgressAnnouncement = string.Empty;
+            _lastAnnouncedDecile = -1;
         }
     }
 
@@ -675,6 +689,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             OperationCurrentFile = 0;
             OperationTotalFiles = 0;
             OperationCurrentFileName = string.Empty;
+            OperationProgressAnnouncement = string.Empty;
+            _lastAnnouncedDecile = -1;
         }
     }
 
@@ -770,6 +786,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // N files..." action verb for the operation's duration; the
         // DockPanel below the bar shows the live count via
         // OperationProgressDetail.
+
+        var decile = p.TotalFiles > 0 ? p.CurrentFile * 10 / p.TotalFiles : 0;
+        if (p.CurrentFile == 1 || p.CurrentFile == p.TotalFiles || decile != _lastAnnouncedDecile)
+        {
+            _lastAnnouncedDecile = decile;
+            OperationProgressAnnouncement = OperationProgressDetail;
+        }
     }
 
     /// <summary>

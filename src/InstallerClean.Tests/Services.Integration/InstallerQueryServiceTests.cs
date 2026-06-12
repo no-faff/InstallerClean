@@ -53,7 +53,7 @@ public class InstallerQueryServiceTests
     {
         var svc = new InstallerQueryService();
         var messages = new List<string>();
-        var progress = new SyncProgress<string>(m => messages.Add(m));
+        var progress = new SyncProgress<ScanProgressUpdate>(u => messages.Add(u.Message));
 
         // The service reports "Enumerating installed products..." before
         // calling the API. Even if the API fails, we should see that message.
@@ -143,7 +143,7 @@ public class InstallerQueryServiceTests
     {
         var svc = new InstallerQueryService();
         var messages = new List<string>();
-        var progress = new SyncProgress<string>(m => messages.Add(m));
+        var progress = new SyncProgress<ScanProgressUpdate>(u => messages.Add(u.Message));
 
         var packages = await svc.GetRegisteredPackagesAsync(progress);
 
