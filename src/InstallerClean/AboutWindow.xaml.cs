@@ -45,6 +45,12 @@ public partial class AboutWindow : Window
 
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
+        // Open with focus on Close (IsCancel, the non-committal control),
+        // matching the modals' Cancel-first rule: a visible ring at once,
+        // and the first Tab is not left to land on whatever happens to be
+        // the first stop. Deferred to Loaded so the visual tree exists
+        // when Focus runs.
+        Loaded += (_, _) => CloseButton.Focus();
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -159,6 +165,11 @@ public partial class AboutWindow : Window
             {
                 CheckStatusText.Text = string.Empty;
                 button.IsEnabled = true;
+                // Disabling the focused button orphans keyboard focus.
+                // Restore it to the button on re-enable, but only when
+                // focus has not moved on to another control meanwhile.
+                if (FocusManager.GetFocusedElement(this) is null or AboutWindow)
+                    button.Focus();
             }
         }
     }

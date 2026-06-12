@@ -120,7 +120,7 @@
                     </StackPanel>
                 </Button>
             </StackPanel>
-            <Button Style="{StaticResource CompactPill}"
+            <Button x:Name="CloseButton" Style="{StaticResource CompactPill}"
                     Content="{loc:Translate Action.Close}" IsCancel="True"
                     HorizontalAlignment="Right"
                     AutomationProperties.Name="{loc:Translate Automation.Close}"/>

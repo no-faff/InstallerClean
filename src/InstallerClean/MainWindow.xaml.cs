@@ -143,6 +143,23 @@ public partial class MainWindow : Window
             });
         }
 
+        // The Send-summary button collapses the moment the user consents
+        // (the modal closes and IsSendingResultLog hides it) or the
+        // silent no-log-to-send path hides it; WPF's focus restore after
+        // the confirm modal then has no target and keyboard focus drops
+        // to the window root. Done is the landing that keeps the user
+        // inside the overlay. Dismissal paths are excluded because they
+        // clear IsComplete before the visibility recomputes.
+        if (e.PropertyName == nameof(CompletionViewModel.IsSendResultLogVisible)
+            && !_vm.Completion.IsSendResultLogVisible && _vm.Completion.IsComplete)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
+            {
+                if (_vm.Completion.IsComplete)
+                    CompletionCloseButton.Focus();
+            });
+        }
+
         // ResultLogStatusMessage transitions empty -> non-empty on the
         // first "Sending..." reveal. WPF's UIA bridge does not re-fire
         // LiveRegionChanged for the Visibility=Collapsed→Visible
@@ -161,6 +178,28 @@ public partial class MainWindow : Window
 
     private void OnCleanupPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(CleanupViewModel.IsOperating) && !_vm.Cleanup.IsOperating)
+        {
+            // The overlay's focused Cancel button collapses with the
+            // overlay, and when no completion overlay follows (a
+            // cancelled operation, a failure dialog, the bin-unavailable
+            // refusal) keyboard focus would drop to the window root:
+            // no ring, Tab restarting from the first stop, a screen
+            // reader gone quiet. Normal priority, not Input:
+            // PropertyChanged fires inside the operation's finally,
+            // before the awaiting caller's continuation is posted
+            // (DispatcherSynchronizationContext posts at Normal), so
+            // same-priority FIFO runs this callback first and a
+            // follow-up modal (the bin-unavailable choice) opens with a
+            // live focus target in the owner window to restore to on
+            // close.
+            Dispatcher.BeginInvoke(DispatcherPriority.Normal, () =>
+            {
+                if (!_vm.Completion.IsComplete && !_vm.Scan.IsScanning && !_vm.Cleanup.IsOperating)
+                    FocusResultsDefault();
+            });
+        }
+
         if (e.PropertyName == nameof(CleanupViewModel.IsOperating) && _vm.Cleanup.IsOperating)
         {
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => OperationCancelButton.Focus());

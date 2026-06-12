@@ -18,6 +18,12 @@ public partial class ConfirmSendResultLogWindow : Window
 
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
+        // Open with focus on Cancel so a keyboard user gets a visible
+        // ring at once, matching the other modals. Send stays IsDefault
+        // (the action is not destructive), and Enter on the focused
+        // Cancel still activates Cancel, so a reflexive Enter dismisses.
+        // Deferred to Loaded so the visual tree exists when Focus runs.
+        Loaded += (_, _) => CancelButton.Focus();
     }
 
     private void OnSend(object sender, RoutedEventArgs e)

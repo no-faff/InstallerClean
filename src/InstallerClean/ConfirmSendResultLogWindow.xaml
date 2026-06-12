@@ -87,7 +87,7 @@
                      (Cancel as default) because Delete is destructive
                      and IsDefault on the affirmative would let a
                      reflexive Enter delete. -->
-                <Button Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
+                <Button x:Name="CancelButton" Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True"
                         KeyboardNavigation.TabIndex="0"
                         Margin="{StaticResource GapRight.Sm}"/>
