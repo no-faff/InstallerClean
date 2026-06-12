@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=300" alt="Total downloads"></a>
 </p>
 
-![Screenshot of InstallerClean after a successful clean-up: 965 MB freed, 68 files deleted](docs/screenshots/04d-deleted-freed-success.webp)
+![Screenshot of InstallerClean after a successful clean-up: 1.28 GB freed, 69 files sent to the Recycle Bin](docs/screenshots/06-freed-success-done.webp)
 
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
 - **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->35%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->22 GB<!-- reports-median-end -->. A couple cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->65%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean.
@@ -98,38 +98,45 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
 ## Screenshots
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="Splash screen showing the scan in progress, having found 68 files to clean up" width="900"><br>
+  <img src="docs/screenshots/01-initial-scan.webp" alt="Splash screen with the InstallerClean logo while the scan runs" width="900"><br>
   <em>Initial scan. This is very quick.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Main window showing 116 files still used and 68 files to clean up" width="900"><br>
-  <em>Results: how much is in use, how much is removable.</em>
+  <img src="docs/screenshots/02-main-window.webp" alt="Main window showing 116 files still needed (2.78 GB) and 69 unneeded files to clean up (1.28 GB), with a move location box and Delete and Move buttons" width="900"><br>
+  <em>Results: how much is still needed, how much is removable.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03a-details-registered.webp" alt="Registered files window listing installed products and their installer-database metadata" width="900"><br>
-  <em>The files still in use, with metadata read from the installer database.</em>
+  <img src="docs/screenshots/03-details-registered.webp" alt="Registered files window listing installed products, with installer-database details for the selected product" width="900"><br>
+  <em>The files still needed, with metadata read from the installer database.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03b-details-unused.webp" alt="Unneeded files window listing removable .msi files with reasons" width="900"><br>
+  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Unneeded files window listing removable .msi files sorted by size, with the reason each is removable and details for the selected file" width="900"><br>
   <em>The files no longer needed.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04b-Delete-dialogue.webp" alt="Delete confirmation dialog showing 68 files (965 MB) will go to the Recycle Bin" width="900"><br>
+  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Delete confirmation asking to delete 69 files (1.28 GB), noting the files will be sent to the Recycle Bin" width="900"><br>
   <em>Confirmation before either action. Delete sends to the Recycle Bin; Move puts the files somewhere of your choice.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04d-deleted-freed-success.webp" alt="Success overlay showing 965 MB freed after a delete operation, with 68 files sent to the Recycle Bin" width="900"><br>
+  <img src="docs/screenshots/06-freed-success-done.webp" alt="Success overlay showing 1.28 GB freed, with 69 files sent to the Recycle Bin" width="900"><br>
   <em>After a successful Delete.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06a-scanned-again-all-clean.webp" alt="All clean overlay shown when nothing is removable on a subsequent scan" width="900"><br>
+  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="All clean overlay after scanning again: nothing to clean up in C:\Windows\Installer" width="900"><br>
   <em>After scanning again. Nothing left to clean.</em>
+  <br><br>
 </p>
 
 ## How it works
