@@ -329,8 +329,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // Goes through IFileSystem so MockFileSystem-backed tests
         // don't hit real disk.
         _operationCts = new CancellationTokenSource();
-        IsOperating = true;
+        // Heading before IsOperating: a heading assigned after the reveal
+        // can be spoken twice (see OperationHeadingText in MainWindow.xaml).
         OperationProgress = Strings.Status_PreparingDestination;
+        IsOperating = true;
         try
         {
             var probeToken = _operationCts.Token;
@@ -411,8 +413,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             return;
         }
 
-        IsOperating = true;
+        // Heading before IsOperating: a heading assigned after the reveal
+        // can be spoken twice (see OperationHeadingText in MainWindow.xaml).
         OperationProgress = string.Format(Strings.Status_Moving, count, DisplayHelpers.PluraliseFile(count));
+        IsOperating = true;
 
         try
         {
@@ -588,10 +592,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// </returns>
     private async Task<bool> RunDeleteAsync(DeleteContext ctx, bool permitPermanentDelete)
     {
-        IsOperating = true;
         _operationCts = new CancellationTokenSource();
+        // Heading before IsOperating: a heading assigned after the reveal
+        // can be spoken twice (see OperationHeadingText in MainWindow.xaml).
         OperationProgress = string.Format(Strings.Status_Deleting,
             ctx.Count, DisplayHelpers.PluraliseFile(ctx.Count));
+        IsOperating = true;
 
         try
         {

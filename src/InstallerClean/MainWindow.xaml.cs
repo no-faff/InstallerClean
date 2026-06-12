@@ -234,11 +234,9 @@ public partial class MainWindow : Window
         if (e.PropertyName == nameof(CleanupViewModel.IsOperating) && _vm.Cleanup.IsOperating)
         {
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => OperationCancelButton.Focus());
-            // The view-model assigns the "Moving/Deleting N files..." /
-            // "Preparing destination folder..." heading after IsOperating
-            // flips, so the overlay reveals with stale text and the UIA
-            // bridge announces neither the Collapsed-to-Visible reveal nor
-            // a text change landing before the first render. Without the
+            // The heading is already bound when IsOperating flips (the
+            // view-model assigns it first) and the UIA bridge does not
+            // announce a Collapsed-to-Visible reveal, so without this
             // raise the first thing spoken about an operation is a bare
             // file count.
             AnnounceLiveRegions(OperationHeadingText);

@@ -506,11 +506,14 @@
                     HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel>
                     <!-- Code-behind raises LiveRegionChanged on this heading when
-                         the overlay appears: the view-model assigns the
-                         "Moving/Deleting N files..." text after IsOperating flips,
-                         so the overlay reveals from Collapsed with stale text and
-                         the UIA bridge announces neither the reveal nor a text
-                         change that lands before the first render. -->
+                         the overlay appears. The UIA bridge announces neither a
+                         Collapsed-to-Visible reveal nor a text change inside a
+                         collapsed subtree, so the view-model assigns the heading
+                         before IsOperating reveals the overlay and that raise is
+                         the only path that speaks. Assigned after the reveal, the
+                         text change also fires the bridge once the heading's peer
+                         exists from an earlier operation, and the heading is
+                         spoken twice. -->
                     <TextBlock x:Name="OperationHeadingText"
                                Text="{Binding Cleanup.OperationProgress}" Foreground="{StaticResource Text.Heading}"
                                FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="SemiBold"
