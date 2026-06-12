@@ -203,7 +203,18 @@ public sealed class FileSystemScanService : IFileSystemScanService
             IgnoreInaccessible = true,
         };
 
+        // $PatchCache$ holds the patch engine's baseline copies of
+        // product payload files; registered LocalPackage paths only
+        // ever sit at the folder root, so a payload .msi/.msp cached
+        // under it is unknown to the API and would be reported
+        // "orphaned" without Windows ever having been asked about it,
+        // while a later delta patch may still want it. Nothing under
+        // that subtree is a removal candidate.
+        var patchCachePrefix = _fs.Path.Combine(folder, "$PatchCache$")
+            + _fs.Path.DirectorySeparatorChar;
+
         return _fs.Directory.EnumerateFiles(folder, "*.msi", options)
-            .Concat(_fs.Directory.EnumerateFiles(folder, "*.msp", options));
+            .Concat(_fs.Directory.EnumerateFiles(folder, "*.msp", options))
+            .Where(p => !p.StartsWith(patchCachePrefix, StringComparison.OrdinalIgnoreCase));
     }
 }

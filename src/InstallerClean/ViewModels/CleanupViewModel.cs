@@ -360,10 +360,18 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         var totalBytes = removableFiles.Sum(f => f.SizeBytes);
         var sizeDisplay = _scan.OrphanedSizeDisplay;
 
+        // A same-volume move is a rename and consumes no space, so the
+        // free-space check below would refuse exactly the nearly-full
+        // system drive this app exists for; the check applies only when
+        // the move really copies, i.e. the destination is on another
+        // volume.
+        var destinationKind = ClassifyMoveDestination(dest);
+
         // Free-space check. Skip silently for paths the API can't
         // measure (UNC shares where the caller lacks query rights, etc).
         var availableFreeSpace = StorageHelpers.GetAvailableFreeSpace(dest);
-        if (availableFreeSpace is long free && free < totalBytes)
+        if (destinationKind != MoveDestinationKinds.SameDrive
+            && availableFreeSpace is long free && free < totalBytes)
         {
             // Pre-flight CTS no longer needed; dispose before returning.
             DisposeOperationCts();
@@ -420,7 +428,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // this finally block clears it.
             await _scan.RefreshAsync();
 
-            _completion.ShowMoveSummary(movedCount, movedBytes, movedDest, result.Errors);
+            // "Freed" only when the move left the cache's volume; a
+            // same-volume or unclassifiable destination claims "moved".
+            var freesSpace = destinationKind is MoveDestinationKinds.DifferentFixedDrive
+                or MoveDestinationKinds.RemovableDrive
+                or MoveDestinationKinds.UncShare;
+            _completion.ShowMoveSummary(movedCount, movedBytes, movedDest, result.Errors, freesSpace);
 
             // Skip the last-run.json write once the result-log surface
             // is locked. Nothing will ever read the file from this point
@@ -432,7 +445,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 var entry = ResultLogEntry.ForMove(
                     preOpScan, preOpDurationMs, preOpRebootLabel,
                     result, movedBytes,
-                    ClassifyMoveDestination(movedDest));
+                    destinationKind);
                 if (await _resultLogService.WriteAsync(entry).ConfigureAwait(true))
                     _completion.MarkResultLogReady();
             }

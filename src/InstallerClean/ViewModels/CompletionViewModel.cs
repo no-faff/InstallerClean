@@ -168,15 +168,24 @@ public partial class CompletionViewModel : ObservableObject
         IsComplete = true;
     }
 
-    /// <summary>Shows the post-Move summary including any per-file errors.</summary>
+    /// <summary>
+    /// Shows the post-Move summary including any per-file errors.
+    /// <paramref name="freesSpace"/> picks the heading verb: a move to
+    /// another volume genuinely frees space on the system drive, so it
+    /// reads "freed"; a same-volume move is a rename that frees nothing
+    /// until the parked folder is deleted, so it reads "moved" (the
+    /// claim-less verb also covers an unclassifiable destination).
+    /// </summary>
     public void ShowMoveSummary(int movedCount, long movedBytes, string destination,
-        IReadOnlyList<FileOperationError> errors)
+        IReadOnlyList<FileOperationError> errors, bool freesSpace)
     {
         // Distinct heading on partial-failure paths so a user whose
         // Move only half-completed doesn't see a green "120 MB freed"
         // banner that hides the per-file error list below it.
         Heading = string.Format(
-            errors.Count == 0 ? Strings.Completion_Freed : Strings.Completion_PartlyFreed,
+            errors.Count == 0
+                ? (freesSpace ? Strings.Completion_Freed : Strings.Completion_Moved)
+                : (freesSpace ? Strings.Completion_PartlyFreed : Strings.Completion_PartlyMoved),
             DisplayHelpers.FormatSize(movedBytes));
         var movedLabel = DisplayHelpers.PluraliseFile(movedCount);
         Summary = errors.Count == 0
@@ -412,17 +421,20 @@ public partial class CompletionViewModel : ObservableObject
     {
         if (errors.Count == 0) return string.Empty;
 
-        // Group by runtime type so MissingSourceFile, RecycleFailed etc
-        // each get their own bucket. Within a bucket, list each file
-        // by name; the LocalisedMessage is shown once per category.
+        // Group by type AND message, not type alone: one error type can
+        // carry different sentences (RecycleFailed tailors its message by
+        // HRESULT, access-denied vs in-use vs generic), and a type-keyed
+        // bucket would print the first file's sentence over files that
+        // failed differently. Within a bucket, list each file by name;
+        // the LocalisedMessage is shown once per bucket.
         var buckets = errors
-            .GroupBy(e => e.GetType())
+            .GroupBy(e => (Type: e.GetType(), e.LocalisedMessage))
             .OrderByDescending(g => g.Count());
 
         var sb = new System.Text.StringBuilder();
         foreach (var bucket in buckets)
         {
-            var sample = bucket.First().LocalisedMessage;
+            var sample = bucket.Key.LocalisedMessage;
             sb.Append(sample).Append(" (").Append(bucket.Count()).Append(')').AppendLine();
             foreach (var err in bucket)
                 sb.Append("  ").Append(Path.GetFileName(err.FilePath)).AppendLine();

@@ -139,7 +139,12 @@ internal static partial class Msi
         uint uiProperty,
         out uint puiDataType,
         out int piValue,
-        IntPtr pftValue,
+        // The FILETIME* receiver, as its 8 raw bytes. A real target is
+        // always supplied rather than NULL: the API writes through the
+        // pointer whenever the property's stored type is VT_FILETIME,
+        // including when a malformed file declares that type in a slot
+        // read for a string.
+        out long pftValue,
         [MarshalUsing(CountElementName = nameof(pcchValueBuf))] char[]? szValueBuf,
         ref uint pcchValueBuf);
 

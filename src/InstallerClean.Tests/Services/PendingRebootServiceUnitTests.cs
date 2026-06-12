@@ -89,6 +89,24 @@ public class PendingRebootServiceUnitTests
     }
 
     [Fact]
+    public void Replace_existing_destination_prefix_still_matches()
+    {
+        // A destination queued with MOVEFILE_REPLACE_EXISTING carries a
+        // leading '!' before the NT prefix; the entry still targets the
+        // cache and must block.
+        _registry.LocalMachineMultiStringValue(
+                PendingRebootService.SessionManagerKey,
+                PendingRebootService.PendingFileRenameOperationsValue)
+            .Returns(new[] { @"\??\C:\Users\elsewhere.tmp", @"!\??\C:\Windows\Installer\1234.msi" });
+
+        var result = Build().Check();
+
+        Assert.Equal(PendingRebootVerdict.Block, result.Verdict);
+        Assert.Equal(PendingRebootReason.PendingRenameInCache, result.Reason);
+        Assert.Equal(@"C:\Windows\Installer\1234.msi", result.Detail);
+    }
+
+    [Fact]
     public void Rename_targets_per_product_folder_blocks()
     {
         _registry.LocalMachineMultiStringValue(

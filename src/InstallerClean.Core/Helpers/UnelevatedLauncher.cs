@@ -102,7 +102,21 @@ internal static class UnelevatedLauncher
             sta.SetApartmentState(ApartmentState.STA);
             sta.IsBackground = true;
             sta.Start();
-            sta.Join();
+
+            // Bounded join: the chain is cross-process COM into Explorer,
+            // and a hung shell would otherwise hang this call (and with
+            // it the UI thread of any GUI caller) indefinitely. On
+            // timeout the caller falls back to the clipboard path; the
+            // worker is a background thread, so an abandoned chain cannot
+            // keep the process alive, and if it completes late the
+            // browser simply opens after the fallback dialog, which is
+            // harmless.
+            if (!sta.Join(TimeSpan.FromSeconds(10)))
+            {
+                CrashLog.Write(new TimeoutException(
+                    "UnelevatedLauncher shell dispatch chain did not return within 10 seconds"));
+                return new OpenUrlResult(false, "shell did not respond");
+            }
 
             if (launched) return new OpenUrlResult(true, string.Empty);
 

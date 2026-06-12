@@ -130,9 +130,21 @@ public sealed class PendingRebootService : IPendingRebootService
         return PendingRebootResult.Clean;
     }
 
-    /// <summary>Strips the NT object form (\??\) and long-path (\\?\) prefixes used by Session Manager.</summary>
-    private static string StripNtPathPrefix(string s) =>
-        s.StartsWith(@"\??\", StringComparison.Ordinal) ? s[4..] :
-        s.StartsWith(@"\\?\", StringComparison.Ordinal) ? s[4..] :
-        s;
+    /// <summary>
+    /// Strips the NT object form (\??\) and long-path (\\?\) prefixes
+    /// used by Session Manager. A destination entry queued with
+    /// MOVEFILE_REPLACE_EXISTING carries a leading '!' before the
+    /// prefix ("!\??\C:\..."); it encodes the replace flag, not the
+    /// path, and must come off first or the prefix never matches and a
+    /// rename INTO the cache slips the gate.
+    /// </summary>
+    private static string StripNtPathPrefix(string s)
+    {
+        if (s.StartsWith("!", StringComparison.Ordinal))
+            s = s[1..];
+        return
+            s.StartsWith(@"\??\", StringComparison.Ordinal) ? s[4..] :
+            s.StartsWith(@"\\?\", StringComparison.Ordinal) ? s[4..] :
+            s;
+    }
 }

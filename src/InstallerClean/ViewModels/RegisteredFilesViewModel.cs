@@ -89,10 +89,9 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
             var productName = items.First().ProductName;
             if (string.IsNullOrEmpty(productName)) productName = Strings.Field_UnknownProductName;
 
-            ProductRow row;
             if (msi is not null)
             {
-                row = new ProductRow(
+                products.Add(new ProductRow(
                     productName,
                     Path.GetFileName(msi.LocalPackagePath),
                     msi.LocalPackagePath,
@@ -100,7 +99,29 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                     msi.FileSizeBytes,
                     patches.Count,
                     patches,
-                    IsMissing: !msi.FileExists);
+                    IsMissing: !msi.FileExists));
+
+                // One ProductCode can be registered with several .msi
+                // caches (a product installed per machine AND per user
+                // shares the code across contexts). Each extra cache is
+                // counted in the window summary, so each gets its own
+                // row; the patches stay on the first row only, since
+                // they too are keyed by the shared code and would
+                // double-list otherwise.
+                foreach (var extra in items.Where(p =>
+                    p.LocalPackagePath.EndsWith(".msi", StringComparison.OrdinalIgnoreCase)
+                    && !ReferenceEquals(p, msi)))
+                {
+                    products.Add(new ProductRow(
+                        productName,
+                        Path.GetFileName(extra.LocalPackagePath),
+                        extra.LocalPackagePath,
+                        DisplayHelpers.FormatSize(extra.FileSizeBytes),
+                        extra.FileSizeBytes,
+                        PatchCount: 0,
+                        new List<PatchRow>(),
+                        IsMissing: !extra.FileExists));
+                }
             }
             else
             {
@@ -109,7 +130,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                 // duplicated as both the product line AND the first
                 // patch-list entry.
                 var patchBytes = items.Sum(p => p.FileSizeBytes);
-                row = new ProductRow(
+                products.Add(new ProductRow(
                     productName,
                     Strings.Field_PatchesOnly,
                     items.First().LocalPackagePath,
@@ -117,9 +138,8 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                     patchBytes,
                     patches.Count,
                     patches,
-                    IsMissing: !items.First().FileExists);
+                    IsMissing: !items.First().FileExists));
             }
-            products.Add(row);
         }
 
         Products = products;

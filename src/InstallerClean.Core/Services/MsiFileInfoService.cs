@@ -61,7 +61,7 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
 
         var error = Msi.MsiSummaryInfoGetProperty(
             hSummary, propertyId,
-            out var dataType, out _, IntPtr.Zero,
+            out var dataType, out _, out _,
             null, ref bufferLen);
 
         // MoreData is the first-call "tell me the buffer size" code.
@@ -76,7 +76,7 @@ public sealed class MsiFileInfoService : IMsiFileInfoService
 
         error = Msi.MsiSummaryInfoGetProperty(
             hSummary, propertyId,
-            out dataType, out _, IntPtr.Zero,
+            out dataType, out _, out _,
             buffer, ref bufferLen);
 
         // Defensive clamp: a successful MsiSummaryInfoGetProperty

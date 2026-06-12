@@ -316,11 +316,13 @@
        + smaller-receipt shape as the post-Move and post-Delete
        states. -->
   <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Scanned {0} {1} in {2}</value></data>
-  <data name="Completion.NothingToCleanUpReassurance" xml:space="preserve"><value>About two in three people find nothing unneeded. (Among the third that do, the median freed is around 21 GB, and some have cleared hundreds of GB.) All good. Move on.</value></data>
+  <data name="Completion.NothingToCleanUpReassurance" xml:space="preserve"><value>About two in three people find nothing unneeded. (Among the third that do, the median freed is around 23 GB, and some have cleared hundreds of GB.) All good. Move on.</value></data>
   <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working</value></data>
   <!-- 0 = size freed (e.g. "120.5 MB") -->
   <data name="Completion.Freed" xml:space="preserve"><value>{0} freed</value></data>
+  <data name="Completion.Moved" xml:space="preserve"><value>{0} moved</value></data>
+  <data name="Completion.PartlyMoved" xml:space="preserve"><value>{0} moved, some files could not be processed</value></data>
   <!-- Heading shown when an operation succeeded for SOME files but
        errored for others. 0 = total size freed (e.g. "120.5 MB"). -->
   <data name="Completion.PartlyFreed" xml:space="preserve"><value>{0} freed, some files could not be processed</value></data>
@@ -607,7 +609,7 @@ The crash log could not be written.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Error: destination must be a fully qualified path. Got: {0}</value></data>
   <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%.</value></data>
-  <!-- 0 = destination -->
+  <!-- 0 = mode, 1 = destination -->
   <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve"><value>{0} mode aborted: destination {1} is inside C:\Windows\Installer.</value></data>
   <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>{0} mode aborted: destination {1} is not a fully qualified path.</value></data>
   <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0} mode aborted: destination {1} resolves inside a Windows system folder.</value></data>
@@ -698,7 +700,7 @@ The crash log could not be written.</value></data>
 # public bug report.
 </value></data>
 
-  <!-- CLI help text (printed by /? -? /h) -->
+  <!-- CLI help text (printed by /?, -h and the long help flag) -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - clean up C:\Windows\Installer</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Usage:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   Show this help (also accepts /?, -h)</value></data>

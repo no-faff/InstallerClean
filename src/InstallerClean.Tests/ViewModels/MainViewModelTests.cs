@@ -356,7 +356,9 @@ public class MainViewModelTests
             Arg.Any<IEnumerable<string>>(), vm.Cleanup.MoveDestination,
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
-        Assert.Contains("freed", vm.Completion.Heading);
+        // %TEMP% sits on the system drive, so this is a same-volume move
+        // and the heading claims "moved", not "freed".
+        Assert.Contains("moved", vm.Completion.Heading);
     }
 
     [Fact]
@@ -595,7 +597,9 @@ public class MainViewModelTests
             Arg.Any<IEnumerable<string>>(), Arg.Is(true),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
-        Assert.Contains("freed", vm.Completion.Heading);
+        // %TEMP% sits on the system drive, so the routed move is
+        // same-volume and the heading claims "moved", not "freed".
+        Assert.Contains("moved", vm.Completion.Heading);
     }
 
     [Fact]

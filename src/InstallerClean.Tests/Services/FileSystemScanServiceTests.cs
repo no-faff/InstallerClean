@@ -45,6 +45,31 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
+    public async Task ScanAsync_excludes_PatchCache_subtree_from_candidates()
+    {
+        var mockQuery = Substitute.For<IInstallerQueryService>();
+        mockQuery
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<string>?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<RegisteredPackage>().AsReadOnly());
+
+        // A payload .msp under $PatchCache$ is the patch engine's
+        // baseline copy: unknown to the API, so correlation would call
+        // it orphaned, yet a later delta patch may still want it.
+        var fs = new MockFileSystem(new Dictionary<string, MockFileData>
+        {
+            [@"C:\Windows\Installer\bbb.msi"] = new("x"),
+            [@"C:\Windows\Installer\$PatchCache$\Managed\abc\1.0.0\payload.msp"] = new("x"),
+        });
+
+        var svc = new FileSystemScanService(mockQuery, fs);
+
+        var result = await svc.ScanAsync();
+
+        Assert.Single(result.RemovableFiles);
+        Assert.Equal(@"C:\Windows\Installer\bbb.msi", result.RemovableFiles[0].FullPath);
+    }
+
+    [Fact]
     public async Task ScanAsync_path_comparison_is_case_insensitive()
     {
         var registered = new List<RegisteredPackage>
