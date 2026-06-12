@@ -11,6 +11,11 @@ public partial class ConfirmDeleteWindow : Window
         InitializeComponent();
         var label = DisplayHelpers.PluraliseFile(fileCount);
         MessageText.Text = string.Format(Strings.Confirm_DeleteTitle, fileCount, label, sizeDisplay);
+        // The window title is what a screen reader announces when a
+        // dialog opens; the static "Confirm delete" left the question
+        // itself, the count and size, unspoken. ShowInTaskbar is false,
+        // so the title serves announcements only.
+        Title = MessageText.Text;
 
         // Sized to content; the clamp stops a very large text scale
         // pushing the card past the work area, at which point the body

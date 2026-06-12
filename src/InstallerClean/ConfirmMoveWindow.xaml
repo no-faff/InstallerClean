@@ -4,7 +4,6 @@
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate Window.ConfirmMove.Title}"
-        AutomationProperties.HelpText="{loc:Translate Automation.ConfirmMove}"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent"
         ShowInTaskbar="False"
@@ -41,7 +40,9 @@
                        TextWrapping="Wrap" Margin="{StaticResource GapBottom.Sm}"/>
 
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled">
+                          HorizontalScrollBarVisibility="Disabled"
+                          Style="{StaticResource BodyScrollRegion}"
+                          AutomationProperties.Name="{loc:Translate Automation.Scroll.DialogBody}">
                 <TextBlock x:Name="DestinationText" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
                            TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
             </ScrollViewer>
@@ -49,9 +50,11 @@
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
                 <!-- Cancel is the default for symmetry with the Confirm
                      Delete dialog: a reflexive Enter dismisses, never
-                     commits. -->
+                     commits. The help text describes the dialog's choice
+                     from the first focus, as on Confirm Delete. -->
                 <Button x:Name="CancelButton" Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True" IsDefault="True"
+                        AutomationProperties.HelpText="{loc:Translate Automation.ConfirmMove}"
                         Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource AccentPill}" Content="{loc:Translate Action.Move}"
                         Click="OnMove"/>

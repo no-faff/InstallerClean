@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using InstallerClean.Helpers;
+using InstallerClean.Resources;
 using InstallerClean.ViewModels;
 
 namespace InstallerClean;
@@ -24,6 +25,7 @@ public partial class MainWindow : Window
         _vm.Completion.PropertyChanged += OnCompletionPropertyChanged;
         _vm.Cleanup.PropertyChanged += OnCleanupPropertyChanged;
         _vm.Scan.PropertyChanged += OnScanPropertyChanged;
+        _vm.Scan.ScanCompleted += OnScanCompleted;
         PreviewKeyDown += OnPreviewKeyDown;
         Closed += OnClosed;
 
@@ -50,12 +52,19 @@ public partial class MainWindow : Window
             AnnounceCompletionOutcome();
         }
         else if (!_vm.Scan.IsScanning)
+        {
             // The startup scan runs during the splash, so it has usually
             // finished by the time this window is built. When it found orphans
             // (no all-clear overlay) land focus on the results default rather
             // than leaving the bare window root unfocused, so a keyboard user
             // has a visible focus ring on open.
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => FocusResultsDefault());
+            // Its ScanCompleted fired during the splash, before this
+            // window existed, so the subscription above never saw it;
+            // replay the result announcement the same way the all-clear
+            // branch replays its raises.
+            OnScanCompleted(this, EventArgs.Empty);
+        }
 
         StarToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
         HeartToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
@@ -110,9 +119,31 @@ public partial class MainWindow : Window
         _vm.Completion.PropertyChanged -= OnCompletionPropertyChanged;
         _vm.Cleanup.PropertyChanged -= OnCleanupPropertyChanged;
         _vm.Scan.PropertyChanged -= OnScanPropertyChanged;
+        _vm.Scan.ScanCompleted -= OnScanCompleted;
         PreviewKeyDown -= OnPreviewKeyDown;
         SizeChanged -= OnWindowSizeChanged;
         Closed -= OnClosed;
+    }
+
+    /// <summary>
+    /// Announces the headline result of a user-visible scan that found
+    /// files ("12 unneeded files to clean up (3.2 GB)"). The all-clear
+    /// path announces through the completion overlay instead, and the
+    /// silent post-operation refresh must stay silent because the
+    /// completion outcome is about to speak. Writing the announcer's
+    /// text is itself what fires the UIA bridge's text-change
+    /// announcement; an explicit raise on top would queue the same line
+    /// twice. A repeat scan with identical counts sets an equal string,
+    /// which raises no event and stays unannounced; the "Scan complete"
+    /// milestone still speaks then.
+    /// </summary>
+    private void OnScanCompleted(object? sender, EventArgs e)
+    {
+        if (_vm.Cleanup.IsOperating || _vm.Completion.IsComplete || _vm.Scan.OrphanedFileCount == 0)
+            return;
+        Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+            ScanResultAnnouncer.Text = string.Format(Strings.Automation_ScanResultAnnouncement,
+                _vm.Scan.OrphanedSummaryText, _vm.Scan.OrphanedSizeDisplay));
     }
 
     private void OnCompletionPropertyChanged(object? sender, PropertyChangedEventArgs e)

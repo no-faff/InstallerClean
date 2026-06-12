@@ -474,6 +474,27 @@
         </Style.Triggers>
     </Style>
 
+    <!-- Body scroll regions. A bare ScrollViewer is focusable and a tab
+         stop by default, so every scrollable text block was an
+         anonymous, unnamed pane stop in the tab order even when there
+         was nothing to scroll. The trigger keeps it out of the tab
+         order until its content actually overflows; once it can
+         scroll, it takes focus (arrow and page keys are the only
+         keyboard route for text-only content) and announces by the
+         AutomationProperties.Name each consuming site sets. -->
+    <Style x:Key="BodyScrollRegion" TargetType="ScrollViewer">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding ScrollableHeight, RelativeSource={RelativeSource Self}}" Value="0"/>
+                    <Condition Binding="{Binding ScrollableWidth, RelativeSource={RelativeSource Self}}" Value="0"/>
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Focusable" Value="False"/>
+                <Setter Property="IsTabStop" Value="False"/>
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <!-- Links. SubtleLink is an in-body Hyperlink that brightens to
          full Link colour on hover so it does not shout when sat in a
          paragraph. -->

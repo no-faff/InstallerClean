@@ -173,6 +173,8 @@
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled"
+                                  Style="{StaticResource BodyScrollRegion}"
+                                  AutomationProperties.Name="{loc:Translate Automation.Scroll.FileDetails}"
                                   Visibility="{Binding ShowDetails, Converter={StaticResource BoolToVis}}">
                         <Grid>
                             <Grid.ColumnDefinitions>

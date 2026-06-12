@@ -3,8 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         xmlns:a11y="clr-namespace:InstallerClean.Helpers"
-        Title="{loc:Translate Window.ConfirmSendResultLog.Title}"
-        AutomationProperties.HelpText="{loc:Translate Automation.ConfirmSendResultLog}"
+        Title="{loc:Translate ConfirmSendResultLog.Title}"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent"
         ShowInTaskbar="False"
@@ -50,7 +49,13 @@
                     BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}"
                     Padding="12,10"
                     Margin="{StaticResource GapBottom.Md}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <!-- Out of the tab order outright, not via BodyScrollRegion:
+                     the named TextBox inside is the keyboard route (caret
+                     movement scrolls this viewer through BringIntoView), so
+                     a second, outer stop for the same content would be
+                     noise. -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                              Focusable="False" IsTabStop="False">
                     <!-- IsReadOnly so the JSON is copy-out-able but not
                          edit-before-Send. FontFamily is system monospace
                          so the JSON keys line up. KeyboardNavigation.TabIndex
@@ -87,9 +92,14 @@
                      (Cancel as default) because Delete is destructive
                      and IsDefault on the affirmative would let a
                      reflexive Enter delete. -->
+                <!-- The help text describes the dialog's choice: Cancel is
+                     the first focus, and help text is only spoken for the
+                     focused element (a window-level description is never
+                     read because the window never has focus). -->
                 <Button x:Name="CancelButton" Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True"
                         KeyboardNavigation.TabIndex="0"
+                        AutomationProperties.HelpText="{loc:Translate Automation.ConfirmSendResultLog}"
                         Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource PrimaryPill}"
                         Content="{loc:Translate Action.SendResultLogConfirm}"

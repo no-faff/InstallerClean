@@ -56,6 +56,18 @@
                     ToolTip="{loc:Translate Tooltip.Close}"/>
         </StackPanel>
 
+        <!-- Invisible scan-result announcer. Code-behind writes the
+             composed "N unneeded files to clean up (size)" line here
+             after a scan that found files; the visible count rows carry
+             no LiveSetting because they rebind on every refresh,
+             including the silent post-operation one. Opacity 0 keeps the
+             element in the rendered tree, which the UIA bridge requires
+             before it announces a text change. -->
+        <TextBlock x:Name="ScanResultAnnouncer" Grid.Row="0"
+                   HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Opacity="0" IsHitTestVisible="False"
+                   AutomationProperties.LiveSetting="Polite"/>
+
         <!-- Row 1: the scan-result panel. The window is NoResize +
              SizeToContent (like the confirm dialogs), so it grows to fit
              this content exactly and normally never needs a scrollbar; a
@@ -84,7 +96,9 @@
                  the block that scrolls; the separator, the action zone and
                  the bottom nav keep their full height below it. -->
             <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled">
+                          HorizontalScrollBarVisibility="Disabled"
+                          Style="{StaticResource BodyScrollRegion}"
+                          AutomationProperties.Name="{loc:Translate Automation.Scroll.ScanResults}">
             <StackPanel>
 
                 <!-- Explanatory text -->
@@ -623,7 +637,9 @@
                                AutomationProperties.LiveSetting="Polite"/>
 
                     <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
-                                  HorizontalScrollBarVisibility="Disabled">
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Style="{StaticResource BodyScrollRegion}"
+                                  AutomationProperties.Name="{loc:Translate Automation.Scroll.ResultDetails}">
                     <StackPanel>
 
                     <!-- 6px bottom (off the 8/12/16/24 scale) tightens

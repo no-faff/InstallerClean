@@ -12,6 +12,11 @@ public partial class ConfirmMoveWindow : Window
         var label = DisplayHelpers.PluraliseFile(fileCount);
         MessageText.Text = string.Format(Strings.Confirm_MoveTitle, fileCount, label, sizeDisplay);
         DestinationText.Text = string.Format(Strings.Confirm_MoveDestination, destination);
+        // The window title is what a screen reader announces when a
+        // dialog opens; the static "Confirm move" left the question
+        // itself, the count and size, unspoken. ShowInTaskbar is false,
+        // so the title serves announcements only.
+        Title = MessageText.Text;
 
         // Sized to content; the clamp stops a very large text scale
         // pushing the card past the work area, at which point the

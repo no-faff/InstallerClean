@@ -283,6 +283,8 @@
                              a short window can still scroll to the end. The icon
                              docks top-left, beside the first line. -->
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                      Style="{StaticResource BodyScrollRegion}"
+                                      AutomationProperties.Name="{loc:Translate Automation.Section.ProductDetails}"
                                       Visibility="{Binding ShowMissing, Converter={StaticResource BoolToVis}}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -308,6 +310,8 @@
                             </Grid>
                         </ScrollViewer>
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                      Style="{StaticResource BodyScrollRegion}"
+                                      AutomationProperties.Name="{loc:Translate Automation.Section.ProductDetails}"
                                       Visibility="{Binding ShowDetails, Converter={StaticResource BoolToVis}}">
                             <Grid>
                                 <Grid.ColumnDefinitions>

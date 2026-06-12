@@ -90,6 +90,11 @@ public static class Strings
     public static string Automation_ResultLogPreview => Get("Automation.ResultLogPreview");
     public static string Automation_SayThanks => Get("Automation.SayThanks");
     public static string Automation_ScanningProgress => Get("Automation.ScanningProgress");
+    public static string Automation_ScanResultAnnouncement => Get("Automation.ScanResultAnnouncement");
+    public static string Automation_Scroll_DialogBody => Get("Automation.Scroll.DialogBody");
+    public static string Automation_Scroll_FileDetails => Get("Automation.Scroll.FileDetails");
+    public static string Automation_Scroll_ResultDetails => Get("Automation.Scroll.ResultDetails");
+    public static string Automation_Scroll_ScanResults => Get("Automation.Scroll.ScanResults");
     public static string Automation_Section_MoveLocation => Get("Automation.Section.MoveLocation");
     public static string Automation_Section_Patches => Get("Automation.Section.Patches");
     public static string Automation_Section_ProductDetails => Get("Automation.Section.ProductDetails");
@@ -364,7 +369,6 @@ public static class Strings
     public static string Window_About_Title => Get("Window.About.Title");
     public static string Window_ConfirmDelete_Title => Get("Window.ConfirmDelete.Title");
     public static string Window_ConfirmMove_Title => Get("Window.ConfirmMove.Title");
-    public static string Window_ConfirmSendResultLog_Title => Get("Window.ConfirmSendResultLog.Title");
     public static string Window_Main_Title => Get("Window.Main.Title");
     public static string Window_Orphaned_Title => Get("Window.Orphaned.Title");
     public static string Window_RecycleUnavailable_Title => Get("Window.RecycleUnavailable.Title");

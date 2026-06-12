@@ -4,7 +4,6 @@
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate UpdateCheck.UpdateAvailable.Title}"
-        AutomationProperties.HelpText="{loc:Translate Automation.UpdateAvailable.HelpText}"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent"
         ShowInTaskbar="False"
@@ -42,7 +41,9 @@
                        Margin="{StaticResource GapBottom.Md}"/>
 
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled">
+                          HorizontalScrollBarVisibility="Disabled"
+                          Style="{StaticResource BodyScrollRegion}"
+                          AutomationProperties.Name="{loc:Translate Automation.Scroll.DialogBody}">
                 <TextBlock x:Name="VersionInfo"
                            Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
                            TextWrapping="Wrap"
@@ -50,8 +51,13 @@
             </ScrollViewer>
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- The help text describes the dialog's choice: Cancel is
+                     the first focus, and help text is only spoken for the
+                     focused element (a window-level description is never
+                     read because the window never has focus). -->
                 <Button x:Name="CancelButton" Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True"
+                        AutomationProperties.HelpText="{loc:Translate Automation.UpdateAvailable.HelpText}"
                         Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource PrimaryPill}" Content="{loc:Translate Action.OpenReleasePage}"
                         Click="OnOpen" IsDefault="True"/>

@@ -118,16 +118,37 @@ public partial class OrphanedFilesWindow : Window
             if (isSorted) sortedName = plain;
         }
 
-        // Expose the sort state as a UIA property so a screen reader announces
-        // "Sorted by Size, descending" instead of spelling out the sort-arrow
-        // glyph in the header text. Set on the ListView because the generated
-        // header controls are not addressable from here; the glyph stays for
-        // sighted users.
-        AutomationProperties.SetItemStatus(FilesList, string.Format(
+        var sortStatus = string.Format(
             _lastSortDirection == ListSortDirection.Ascending
                 ? Strings.Automation_SortStatus_Ascending
                 : Strings.Automation_SortStatus_Descending,
-            sortedName));
+            sortedName);
+
+        // The sorted column's header carries the sort state as its
+        // accessible name. A name change on the focused element is
+        // announced, so activating a header with Space speaks the new
+        // state, and the name override keeps the sort-arrow glyph
+        // appended to the visible header text out of speech. ItemStatus
+        // on the ListView alone is not enough: it is only surfaced for
+        // the element with focus, and during a keyboard sort focus sits
+        // on the header. The generated header controls are reached
+        // through the visual tree; they exist whenever this runs,
+        // because the first call comes from Loaded, after the template
+        // is applied.
+        foreach (var header in VisualTreeSearch.Descendants<GridViewColumnHeader>(FilesList))
+        {
+            if (header.Column is null)
+                continue; // the filler header WPF generates past the last column
+            var match = SortableColumns.FirstOrDefault(c => ReferenceEquals(c.Col, header.Column));
+            if (match.Col is null)
+                continue;
+            AutomationProperties.SetName(header,
+                ReferenceEquals(header.Column, _lastSortColumn) ? sortStatus : match.Plain);
+        }
+
+        // Mirrored onto the list as a queryable property; nothing relies
+        // on it being announced.
+        AutomationProperties.SetItemStatus(FilesList, sortStatus);
     }
 
     private void OnClosed(object? sender, EventArgs e)

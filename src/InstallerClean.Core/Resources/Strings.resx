@@ -164,14 +164,19 @@
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Move all unneeded installer files to the chosen destination folder</value></data>
   <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all unneeded installer files to the Recycle Bin</value></data>
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Confirm sending the unneeded files to the Recycle Bin</value></data>
-  <data name="Automation.ConfirmMove" xml:space="preserve"><value>Confirm moving the unneeded files to the chosen destination folder</value></data>
+  <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
+       They describe the dialog's choice, worded to read correctly
+       straight after "Cancel, button": the window-level alternative is
+       never read, because help text is only spoken for the element with
+       focus and the window itself never has it. -->
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting.</value></data>
+  <data name="Automation.ConfirmMove" xml:space="preserve"><value>Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are.</value></data>
   <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel.</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Move the unneeded files to a folder you choose</value></data>
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive</value></data>
   <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Say thanks</value></data>
-  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Confirm sending the summary to No Faff</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Send posts the summary shown to No Faff. Cancel sends nothing.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Check for updates</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Checks the GitHub releases API over HTTPS for a newer version.</value></data>
   <!-- Window-level description for the update-available modal, read by a
@@ -199,13 +204,24 @@
   <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Available for cleanup.</value></data>
   <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Details, registered files</value></data>
   <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Read-only inventory.</value></data>
-  <!-- Screen-reader sort state for the detail-window lists, set as
-       AutomationProperties.ItemStatus in UpdateSortIndicators so the sort
-       direction is a UIA property a reader can announce, rather than the
-       ▲/▼ glyph appended to the visible header text. 0 = the sorted column's
+  <!-- Screen-reader sort state for the detail-window lists, set in
+       UpdateSortIndicators as the sorted column header's accessible
+       name (a focused header's name change is announced, and the name
+       override keeps the ▲/▼ glyph out of speech) and mirrored into the
+       list's ItemStatus as a queryable surface. 0 = the sorted column's
        name (a Field.* label). -->
   <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>Sorted by {0}, ascending</value></data>
   <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>Sorted by {0}, descending</value></data>
+  <!-- Names for the scrollable text regions, spoken only once a region
+       can actually scroll and so joins the tab order (the
+       BodyScrollRegion style). -->
+  <data name="Automation.Scroll.ScanResults" xml:space="preserve"><value>Scan results</value></data>
+  <data name="Automation.Scroll.ResultDetails" xml:space="preserve"><value>Result details</value></data>
+  <data name="Automation.Scroll.FileDetails" xml:space="preserve"><value>File details</value></data>
+  <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>Dialog text</value></data>
+  <!-- Composes the announced outcome of a scan that found files:
+       0 = the "N unneeded files to clean up" line, 1 = the total size. -->
+  <data name="Automation.ScanResultAnnouncement" xml:space="preserve"><value>{0} ({1})</value></data>
   <data name="Automation.CompletionErrors" xml:space="preserve"><value>Files that could not be processed</value></data>
   <!-- Spoken name for the missing-file note's closing hyperlink. The visible
        link text is a phrase mid-sentence (the [ ]-delimited span of
@@ -505,10 +521,6 @@ Details in {1}.</value></data>
        out the no-PII property, and explains the purpose so the
        user has the context the modal title implies. -->
   <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Nothing identifies you or your machine; it just lets me know the app is working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log.</value></data>
-  <!-- Window-chrome title (hidden in the actual UI by WindowStyle=None
-       but read aloud by screen readers). Kept short so the screen
-       reader announces "Confirm send" before the body header. -->
-  <data name="Window.ConfirmSendResultLog.Title" xml:space="preserve"><value>Confirm send</value></data>
   <!-- AutomationProperties.Name on the JSON preview TextBox so screen
        readers announce its content rather than "edit, read-only". -->
   <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Result log preview</value></data>

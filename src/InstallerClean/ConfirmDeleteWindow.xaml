@@ -4,7 +4,6 @@
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate Window.ConfirmDelete.Title}"
-        AutomationProperties.HelpText="{loc:Translate Automation.ConfirmDelete}"
         WindowStyle="None" AllowsTransparency="True"
         Background="Transparent"
         ShowInTaskbar="False"
@@ -44,7 +43,9 @@
                        TextWrapping="Wrap" Margin="{StaticResource GapBottom.Md}"/>
 
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled">
+                          HorizontalScrollBarVisibility="Disabled"
+                          Style="{StaticResource BodyScrollRegion}"
+                          AutomationProperties.Name="{loc:Translate Automation.Scroll.DialogBody}">
                 <TextBlock
                            Text="{loc:Translate Confirm.DeleteToRecycleBin}"
                            Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
@@ -54,9 +55,14 @@
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
                 <!-- Cancel is the default to stop a reflexive Enter from
                      deleting; affirmative click requires explicit pointer
-                     or Tab+Space. -->
+                     or Tab+Space. The help text describes the dialog's
+                     choice: Cancel is the first focus, and help text is
+                     only spoken for the focused element (a window-level
+                     description is never read because the window never
+                     has focus). -->
                 <Button x:Name="CancelButton" Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True" IsDefault="True"
+                        AutomationProperties.HelpText="{loc:Translate Automation.ConfirmDelete}"
                         Margin="{StaticResource GapRight.Sm}"/>
                 <Button x:Name="DeleteButton" Style="{StaticResource DangerPill}"
                         Content="{loc:Translate Action.Delete}" Click="OnDelete"/>
