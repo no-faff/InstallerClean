@@ -68,7 +68,7 @@
                     Click="CancelClick"
                     IsCancel="True"
                     Style="{StaticResource GhostPill}"
-                    Height="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
+                    MinHeight="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
                     HorizontalAlignment="Center"
                     FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     AutomationProperties.Name="{loc:Translate Automation.CancelStartupScan}"/>

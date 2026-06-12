@@ -17,6 +17,17 @@ public partial class SplashWindow : Window
     {
         InitializeComponent();
         VersionText.Text = DisplayHelpers.GetVersionString();
+
+        // The 480 x 320 box is the 100% design; at larger OS text
+        // scales the hero name, step text and Cancel outgrow it, so
+        // the whole box scales with the factor (the star spacer rows
+        // absorb any slack). The splash opens before any other window
+        // exists, so the clamp resolves against the primary monitor's
+        // work area, the helper's null fallback.
+        var factor = AccessibilitySettings.Current.TextScaleFactor;
+        Width = Math.Min(480 * factor, DetailWindowSizing.WorkAreaWidthLimit(null));
+        Height = Math.Min(320 * factor, DetailWindowSizing.WorkAreaHeightLimit(null));
+
         this.SuppressFocusVisualOnDeactivation();
         // Loaded fires after the visual tree is realised, so Focus()
         // on the only focusable element lands on first paint and the

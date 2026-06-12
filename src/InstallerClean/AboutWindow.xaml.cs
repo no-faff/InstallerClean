@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,9 +26,57 @@ public partial class AboutWindow : Window
         InitializeComponent();
         _updateCheckService = updateCheckService;
         VersionText.Text = DisplayHelpers.GetVersionString();
+
+        ApplyScaledBounds();
+        AccessibilitySettings.Current.PropertyChanged += OnAccessibilitySettingsChanged;
+        // A live text-scale increase grows a shown SizeToContent window
+        // down and right from a fixed top-left; the nudge brings the
+        // Close row back inside the work area. NoResize means
+        // SizeChanged only ever fires for that content-driven growth.
+        SizeChanged += OnWindowSizeChanged;
+
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
     }
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        // The handle (and Owner) exist now, so the limits resolve
+        // against the monitor actually hosting the window.
+        ApplyScaledBounds();
+    }
+
+    /// <summary>
+    /// 500 x 320 is the designed box at 100% text scale; the slack
+    /// between the content's natural height and 320 sits in the
+    /// layout's star spacer row, which pins the say-thanks block to
+    /// the bottom. Scaling the minimums rather than fixing Width and
+    /// Height keeps that look proportional at any text scale while
+    /// letting taller content grow the window, with the work area as
+    /// the ceiling, so the Close row can never be pushed off screen
+    /// the way a fixed 320 height cut it off at 208%.
+    /// </summary>
+    private void ApplyScaledBounds()
+    {
+        var reference = Owner ?? Application.Current?.MainWindow;
+        var widthLimit = DetailWindowSizing.WorkAreaWidthLimit(reference);
+        var heightLimit = DetailWindowSizing.WorkAreaHeightLimit(reference);
+        var factor = AccessibilitySettings.Current.TextScaleFactor;
+        MaxWidth = widthLimit;
+        MaxHeight = heightLimit;
+        MinWidth = Math.Min(500 * factor, widthLimit);
+        MinHeight = Math.Min(320 * factor, heightLimit);
+    }
+
+    private void OnAccessibilitySettingsChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is null or nameof(AccessibilitySettings.TextScaleFactor))
+            ApplyScaledBounds();
+    }
+
+    private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        => DetailWindowSizing.NudgeIntoWorkArea(this);
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
 
@@ -129,6 +178,8 @@ public partial class AboutWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        AccessibilitySettings.Current.PropertyChanged -= OnAccessibilitySettingsChanged;
+        SizeChanged -= OnWindowSizeChanged;
         _checkCts?.Cancel();
         _checkCts?.Dispose();
         base.OnClosed(e);
