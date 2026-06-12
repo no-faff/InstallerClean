@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
+        xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate Window.ConfirmMove.Title}"
         AutomationProperties.HelpText="{loc:Translate Automation.ConfirmMove}"
         WindowStyle="None" AllowsTransparency="True"
@@ -19,17 +20,33 @@
                       ResizeBorderThickness="0"/>
     </WindowChrome.WindowChrome>
 
+    <!-- Card width scales with the OS text size so the copy keeps its
+         line length instead of wrapping into a tall sliver. -->
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
-            MaxWidth="440" MinWidth="320"
+            MaxWidth="{a11y:TextScaled 440}" MinWidth="{a11y:TextScaled 320}"
             BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
-        <StackPanel>
-            <TextBlock x:Name="MessageText" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
+        <!-- Grid, not a StackPanel: the destination (the one line that
+             can run long) sits in a star row so it scrolls once the
+             window's work-area MaxHeight binds (very large text scales),
+             keeping the heading and the action buttons visible; a
+             vertical StackPanel measures children at infinite height,
+             so the buttons would clip instead. -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock x:Name="MessageText" Grid.Row="0" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
                        TextWrapping="Wrap" Margin="{StaticResource GapBottom.Sm}"/>
 
-            <TextBlock x:Name="DestinationText" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
-                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <TextBlock x:Name="DestinationText" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
+                           TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
+            </ScrollViewer>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
                 <!-- Cancel is the default for symmetry with the Confirm
                      Delete dialog: a reflexive Enter dismisses, never
                      commits. -->
@@ -39,6 +56,6 @@
                 <Button Style="{StaticResource AccentPill}" Content="{loc:Translate Action.Move}"
                         Click="OnMove"/>
             </StackPanel>
-        </StackPanel>
+        </Grid>
     </Border>
 </Window>

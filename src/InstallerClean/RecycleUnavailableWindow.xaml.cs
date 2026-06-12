@@ -26,6 +26,12 @@ public partial class RecycleUnavailableWindow : Window
         ReassuranceText.Text = DisplayHelpers.Pluralise(fileCount,
             Strings.RecycleUnavailable_Reassurance_Singular,
             Strings.RecycleUnavailable_Reassurance_Plural);
+
+        // Sized to content; the clamp stops a very large text scale
+        // pushing the card past the work area, at which point the body
+        // row scrolls and the three choice buttons stay visible.
+        MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(Application.Current?.MainWindow);
+
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
         // Open with focus on Cancel (IsDefault/IsCancel, the safe

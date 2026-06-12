@@ -12,6 +12,12 @@ public partial class UpdateAvailableWindow : Window
         VersionInfo.Text = string.Format(
             Strings.UpdateCheck_UpdateAvailable_Body,
             currentVersion, latestVersion);
+
+        // Sized to content; the clamp stops a very large text scale
+        // pushing the card past the work area, at which point the
+        // version row scrolls and the action buttons stay visible.
+        MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(Application.Current?.MainWindow);
+
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
         // Open with focus on Cancel (IsCancel, the conservative default) so a

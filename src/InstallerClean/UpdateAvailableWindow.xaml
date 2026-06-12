@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
+        xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate UpdateCheck.UpdateAvailable.Title}"
         AutomationProperties.HelpText="{loc:Translate Automation.UpdateAvailable.HelpText}"
         WindowStyle="None" AllowsTransparency="True"
@@ -19,27 +20,42 @@
                       ResizeBorderThickness="0"/>
     </WindowChrome.WindowChrome>
 
+    <!-- Card width scales with the OS text size so the copy keeps its
+         line length instead of wrapping into a tall sliver. -->
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
-            MaxWidth="400" MinWidth="320"
+            MaxWidth="{a11y:TextScaled 400}" MinWidth="{a11y:TextScaled 320}"
             BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
-        <StackPanel>
-            <TextBlock Text="{loc:Translate UpdateCheck.UpdateAvailable.Title}"
+        <!-- Grid, not a StackPanel: the version copy sits in a star row
+             so it scrolls once the window's work-area MaxHeight binds
+             (very large text scales), keeping the heading and the action
+             buttons visible; a vertical StackPanel measures children at
+             infinite height, so the buttons would clip instead. -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="{loc:Translate UpdateCheck.UpdateAvailable.Title}"
                        Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
                        TextWrapping="Wrap"
                        Margin="{StaticResource GapBottom.Md}"/>
 
-            <TextBlock x:Name="VersionInfo"
-                       Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
-                       TextWrapping="Wrap"
-                       Margin="{StaticResource GapBottom.Lg}"/>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <TextBlock x:Name="VersionInfo"
+                           Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
+                           TextWrapping="Wrap"
+                           Margin="{StaticResource GapBottom.Lg}"/>
+            </ScrollViewer>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button x:Name="CancelButton" Style="{StaticResource GhostPill}" Content="{loc:Translate Action.Cancel}"
                         Click="OnCancel" IsCancel="True"
                         Margin="{StaticResource GapRight.Sm}"/>
                 <Button Style="{StaticResource PrimaryPill}" Content="{loc:Translate Action.OpenReleasePage}"
                         Click="OnOpen" IsDefault="True"/>
             </StackPanel>
-        </StackPanel>
+        </Grid>
     </Border>
 </Window>

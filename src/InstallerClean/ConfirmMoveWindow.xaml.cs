@@ -12,6 +12,12 @@ public partial class ConfirmMoveWindow : Window
         var label = DisplayHelpers.PluraliseFile(fileCount);
         MessageText.Text = string.Format(Strings.Confirm_MoveTitle, fileCount, label, sizeDisplay);
         DestinationText.Text = string.Format(Strings.Confirm_MoveDestination, destination);
+
+        // Sized to content; the clamp stops a very large text scale
+        // pushing the card past the work area, at which point the
+        // destination row scrolls and the action buttons stay visible.
+        MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(Application.Current?.MainWindow);
+
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
         // Open with focus on Cancel (IsDefault/IsCancel) so a keyboard

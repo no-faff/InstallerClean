@@ -12,6 +12,11 @@ public partial class ConfirmDeleteWindow : Window
         var label = DisplayHelpers.PluraliseFile(fileCount);
         MessageText.Text = string.Format(Strings.Confirm_DeleteTitle, fileCount, label, sizeDisplay);
 
+        // Sized to content; the clamp stops a very large text scale
+        // pushing the card past the work area, at which point the body
+        // row scrolls and the action buttons stay visible.
+        MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(Application.Current?.MainWindow);
+
         this.EnableAltSpaceSystemMenu();
         this.SuppressFocusVisualOnDeactivation();
         // Open with focus on Cancel (IsDefault/IsCancel, the safe

@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
+        xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate Window.RecycleUnavailable.Title}"
         AutomationProperties.HelpText="{loc:Translate Automation.RecycleUnavailable}"
         WindowStyle="None" AllowsTransparency="True"
@@ -19,15 +20,28 @@
                       ResizeBorderThickness="0"/>
     </WindowChrome.WindowChrome>
 
+    <!-- Card width scales with the OS text size so the copy keeps its
+         line length instead of wrapping into a tall sliver. -->
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
-            MaxWidth="480" MinWidth="380"
+            MaxWidth="{a11y:TextScaled 480}" MinWidth="{a11y:TextScaled 380}"
             BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
-        <StackPanel>
+        <!-- Grid, not a StackPanel: the body and reassurance sit in a
+             star row so they scroll once the window's work-area
+             MaxHeight binds (very large text scales), keeping the
+             heading and the three choice buttons visible; a vertical
+             StackPanel measures children at infinite height, so the
+             buttons would clip instead. -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <!-- DockPanel, not a horizontal StackPanel: a StackPanel hands
                  the TextBlock unbounded width, so TextWrapping never engages
                  and a long heading clips off the card edge. Icon docks left;
                  the TextBlock fills the rest and wraps. -->
-            <DockPanel Margin="{StaticResource GapBottom.Md}">
+            <DockPanel Grid.Row="0" Margin="{StaticResource GapBottom.Md}">
                 <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
                       Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
                       DockPanel.Dock="Left" VerticalAlignment="Center" Margin="{StaticResource GapRight.Sm}"/>
@@ -35,14 +49,24 @@
                            TextWrapping="Wrap" VerticalAlignment="Center"/>
             </DockPanel>
 
-            <TextBlock x:Name="BodyText" Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
-                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Md}"/>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <TextBlock x:Name="BodyText" Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
+                               TextWrapping="Wrap" Margin="{StaticResource GapBottom.Md}"/>
 
-            <TextBlock x:Name="ReassuranceText"
-                       Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
-                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
+                    <TextBlock x:Name="ReassuranceText"
+                               Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
+                               TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
+                </StackPanel>
+            </ScrollViewer>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <!-- WrapPanel rather than a horizontal StackPanel: three wide
+                 buttons at a large text scale can outgrow even the scaled
+                 card, and a StackPanel would push the leftmost off the
+                 card edge; wrapping onto a second line keeps every choice
+                 clickable. While they fit, it renders identically. -->
+            <WrapPanel Grid.Row="2" HorizontalAlignment="Right">
                 <!-- Cancel is the default to stop a reflexive Enter from
                      deleting; the same stance as ConfirmDeleteWindow. Move
                      is the visual primary (AccentPill, rightmost) because
@@ -59,7 +83,7 @@
                 <Button Style="{StaticResource AccentPill}" Content="{loc:Translate Action.MoveInstead}"
                         Click="OnMove"
                         AutomationProperties.HelpText="{loc:Translate Automation.RecycleUnavailableMove}"/>
-            </StackPanel>
-        </StackPanel>
+            </WrapPanel>
+        </Grid>
     </Border>
 </Window>
