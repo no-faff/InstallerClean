@@ -31,6 +31,20 @@ public partial class OrphanedFilesWindow : Window
             Width = saved.Width;
             Height = saved.Height;
         }
+        else
+        {
+            // 920 x 540 is the 100% default; both multiply by the OS
+            // text-scale factor because the columns and the details
+            // pane inside scale with it, so an unscaled default would
+            // open with the list overflowing into a horizontal
+            // scrollbar. The clamps keep the window inside the
+            // screen's work area.
+            var factor = AccessibilitySettings.Current.TextScaleFactor;
+            Width = DetailWindowSizing.ClampWidthToWorkArea(
+                Application.Current?.MainWindow, preferred: 920 * factor, minimum: MinWidth);
+            Height = DetailWindowSizing.ClampHeightToWorkArea(
+                Application.Current?.MainWindow, preferred: 540 * factor, minimum: MinHeight);
+        }
 
         Closed += OnClosed;
         this.EnableAltSpaceSystemMenu();

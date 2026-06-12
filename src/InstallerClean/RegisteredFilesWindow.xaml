@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
+        xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate Window.Registered.Title}"
         Width="950" Height="680"
         MinWidth="700" MinHeight="500"
@@ -28,8 +29,10 @@
                  the patches + product details band, where content
                  overflows; the products list is the pane that does not
                  need to grow. Below that height the cap is slack and
-                 the split behaves as plain 2*/3*. -->
-            <RowDefinition Height="2*" MaxHeight="208"/><RowDefinition Height="20"/>
+                 the split behaves as plain 2*/3*. The cap scales with
+                 the OS text size so the list keeps showing the same
+                 number of rows as they get taller. -->
+            <RowDefinition Height="2*" MaxHeight="{a11y:TextScaled 208}"/><RowDefinition Height="20"/>
             <RowDefinition Height="3*"/><RowDefinition Height="12"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -58,17 +61,25 @@
                  CardNoPad inner edges so the first and last rows sit flush with
                  the card border instead of inside a thin inset. The Orphaned and
                  Registered detail windows share this 0,-1,0,-6 value as a pair. -->
+            <!-- Column widths scale with the OS text size so the file
+                 names, sizes and patch counts stay whole as they grow;
+                 horizontal scrolling is Auto, not Disabled, so when the
+                 scaled columns outgrow the pane (a large scale on a
+                 small screen, or a user-shrunk window) a scrollbar
+                 appears rather than the rightmost columns sitting
+                 unreachable past the edge. At 100% in the default
+                 window the columns fit and no scrollbar shows. -->
             <ListView x:Name="ProductsList" ItemsSource="{Binding Products}"
                       GridViewColumnHeader.Click="ColumnHeader_Click"
                       SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
                       BorderThickness="0" Background="Transparent"
                       Padding="0" Margin="0,-1,0,-6"
-                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
                       VirtualizingStackPanel.IsVirtualizing="True"
                       VirtualizingStackPanel.VirtualizationMode="Recycling">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="{loc:Translate Field.ProductName}" Width="520"
+                        <GridViewColumn Header="{loc:Translate Field.ProductName}" Width="{a11y:TextScaled 520}"
                                         x:Name="ColProductName">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -88,7 +99,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="{loc:Translate Field.File}" Width="170"
+                        <GridViewColumn Header="{loc:Translate Field.File}" Width="{a11y:TextScaled 170}"
                                         x:Name="ColFileName">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -98,7 +109,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="{loc:Translate Field.Size}" Width="90"
+                        <GridViewColumn Header="{loc:Translate Field.Size}" Width="{a11y:TextScaled 90}"
                                         x:Name="ColSizeBytes">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -125,7 +136,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="{loc:Translate Field.Patches}" Width="80"
+                        <GridViewColumn Header="{loc:Translate Field.Patches}" Width="{a11y:TextScaled 80}"
                                         x:Name="ColPatchCount">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -141,11 +152,14 @@
 
         <Grid Grid.Row="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="220"/><ColumnDefinition Width="12"/>
+                <!-- Auto plus an explicit text-scaled width on the pane
+                     itself: ColumnDefinition.Width is a GridLength, which
+                     the double-typed TextScaled binding cannot target. -->
+                <ColumnDefinition Width="Auto"/><ColumnDefinition Width="12"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0">
+            <Grid Grid.Column="0" Width="{a11y:TextScaled 220}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
                     <RowDefinition Height="*"/>

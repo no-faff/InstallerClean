@@ -34,15 +34,22 @@ public partial class RegisteredFilesWindow : Window
         }
         else
         {
-            // 860 lets a typical product's whole detail list show
-            // without scrolling while arrowing down the products; the
-            // clamp keeps the window inside the screen's work area,
-            // which can be as little as ~672 device-independent units
-            // (a 1080p laptop at 150% scale). The products list does
-            // not grow with the window (its row carries a MaxHeight),
-            // so the extra height all lands in the details band.
+            // 950 x 860 is the 100% default; both multiply by the OS
+            // text-scale factor because the columns and rows inside
+            // scale with it, so an unscaled default would open with the
+            // columns overflowing into a horizontal scrollbar. 860 lets
+            // a typical product's whole detail list show without
+            // scrolling while arrowing down the products; the clamps
+            // keep the window inside the screen's work area, which can
+            // be as little as ~672 device-independent units of height
+            // (a 1080p laptop at 150% display scale). The products list
+            // does not grow with the window (its row carries a
+            // MaxHeight), so extra height all lands in the details band.
+            var factor = AccessibilitySettings.Current.TextScaleFactor;
+            Width = DetailWindowSizing.ClampWidthToWorkArea(
+                Application.Current?.MainWindow, preferred: 950 * factor, minimum: MinWidth);
             Height = DetailWindowSizing.ClampHeightToWorkArea(
-                Application.Current?.MainWindow, preferred: 860, minimum: MinHeight);
+                Application.Current?.MainWindow, preferred: 860 * factor, minimum: MinHeight);
         }
 
         Closed += OnClosed;

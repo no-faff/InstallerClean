@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
+        xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         Title="{loc:Translate Window.Orphaned.Title}"
         Width="920" Height="540"
         MinWidth="600" MinHeight="380"
@@ -43,7 +44,11 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="380"/>
+                <!-- Auto plus an explicit text-scaled width on the details
+                     card itself: ColumnDefinition.Width is a GridLength,
+                     which the double-typed TextScaled binding cannot
+                     target. -->
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Style="{StaticResource CardNoPad}" ClipToBounds="True">
@@ -63,22 +68,27 @@
                           BorderThickness="0" Background="Transparent"
                           Padding="0" Margin="0,-1,0,-6"
                           GridViewColumnHeader.Click="ColumnHeader_Click"
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
                           VirtualizingStackPanel.IsVirtualizing="True"
                           VirtualizingStackPanel.VirtualizationMode="Recycling">
                     <ListView.View>
                         <GridView>
-                            <!-- The three fixed column widths must total under
-                                 the list pane's ~466 units at the 920 default
-                                 (872 content minus the 12 gap, the 380 details
-                                 pane, the card border and the scrollbar).
-                                 Horizontal scrolling is disabled, so a column
-                                 past that edge is not clipped but unreachable:
-                                 at 380 the File column pushed Size wholly out
-                                 of view. Installer-cache names are short
-                                 random hex (8.3 style), so 270 still shows
-                                 them whole. -->
-                            <GridViewColumn Header="{loc:Translate Field.File}" Width="270"
+                            <!-- The three column widths total under the list
+                                 pane's ~466 units at the 920 default (872
+                                 content minus the 12 gap, the 380 details
+                                 pane, the card border and the scrollbar),
+                                 and they scale with the OS text size so the
+                                 names and sizes stay whole as they grow.
+                                 Horizontal scrolling is Auto, not Disabled:
+                                 when the scaled columns outgrow the pane (a
+                                 large scale on a small screen, or a
+                                 user-shrunk window) a scrollbar appears
+                                 rather than the rightmost columns sitting
+                                 unreachable past the edge; at 100% in the
+                                 default window no scrollbar shows.
+                                 Installer-cache names are short random hex
+                                 (8.3 style), so 270 shows them whole. -->
+                            <GridViewColumn Header="{loc:Translate Field.File}" Width="{a11y:TextScaled 270}"
                                             x:Name="ColFileName">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
@@ -88,7 +98,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="{loc:Translate Field.Reason}" Width="100"
+                            <GridViewColumn Header="{loc:Translate Field.Reason}" Width="{a11y:TextScaled 100}"
                                             x:Name="ColReason">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
@@ -114,7 +124,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="{loc:Translate Field.Size}" Width="90"
+                            <GridViewColumn Header="{loc:Translate Field.Size}" Width="{a11y:TextScaled 90}"
                                             x:Name="ColSize">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
@@ -128,7 +138,7 @@
                 </ListView>
             </Border>
 
-            <Border Grid.Column="2" Style="{StaticResource Card}">
+            <Border Grid.Column="2" Style="{StaticResource Card}" Width="{a11y:TextScaled 380}">
                 <Grid>
                     <TextBlock Text="{loc:Translate Body.NoFileSelected}"
                                Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Body}" FontStyle="Italic"
