@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         xmlns:a11y="clr-namespace:InstallerClean.Helpers"
+        xmlns:chrome="clr-namespace:InstallerClean.Controls"
         Title="{loc:Translate Window.Registered.Title}"
         Width="950" Height="680"
         MinWidth="700" MinHeight="500"
@@ -42,9 +43,8 @@
              matching About / Orphaned. -->
         <StackPanel Grid.Row="0" Orientation="Horizontal"
                     VerticalAlignment="Center" Margin="-8,-4,0,0">
-            <Image Source="Assets/splash-icon.png" Width="16" Height="16"
-                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"
-                   AutomationProperties.Name=""/>
+            <chrome:DecorativeImage Source="Assets/splash-icon.png" Width="16" Height="16"
+                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"/>
             <TextBlock Text="{loc:Translate Window.Registered.Title}" Foreground="{StaticResource Text.Body}"
                        FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="Medium"/>
         </StackPanel>
@@ -77,6 +77,15 @@
                       ScrollViewer.HorizontalScrollBarVisibility="Auto"
                       VirtualizingStackPanel.IsVirtualizing="True"
                       VirtualizingStackPanel.VirtualizationMode="Recycling">
+                <!-- Spoken row name from the visible cells. Without the
+                     override, the item automation peer falls back to the
+                     bound record's generated ToString and a screen reader
+                     reads the whole member dump per row. -->
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                        <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="{loc:Translate Field.ProductName}" Width="{a11y:TextScaled 520}"
@@ -185,6 +194,14 @@
                         <ListBox ItemsSource="{Binding SelectedPatches}"
                                  BorderThickness="0" Background="Transparent"
                                  Padding="12,8" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <!-- Same spoken-name override as the products list:
+                                 the fallback is the PatchRow record's ToString
+                                 dump. -->
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                    <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
                             <ListBox.Style>
                                 <Style TargetType="ListBox">
                                     <Setter Property="Visibility" Value="Collapsed"/>

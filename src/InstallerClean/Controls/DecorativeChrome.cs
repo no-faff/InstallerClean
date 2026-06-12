@@ -37,3 +37,16 @@ internal sealed class DecorativeBorder : Border
 {
     protected override AutomationPeer OnCreateAutomationPeer() => new RawAutomationPeer(this);
 }
+
+/// <summary>
+/// Image that hides itself from the UIA tree. Used for decorative
+/// artwork whose meaning is carried by neighbouring text (the icon
+/// beside a window title, the splash hero, the completion overlay's
+/// icon). <c>AutomationProperties.Name=""</c> only empties an image's
+/// name and leaves an unnamed image element for scan-mode navigation
+/// to stop on; the peer override is what removes it.
+/// </summary>
+internal sealed class DecorativeImage : Image
+{
+    protected override AutomationPeer OnCreateAutomationPeer() => new RawAutomationPeer(this);
+}

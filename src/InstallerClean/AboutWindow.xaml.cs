@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Input;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
@@ -25,7 +26,14 @@ public partial class AboutWindow : Window
     {
         InitializeComponent();
         _updateCheckService = updateCheckService;
-        VersionText.Text = DisplayHelpers.GetVersionString();
+        var version = DisplayHelpers.GetVersionString();
+        VersionText.Text = version;
+        // The version sits in a read-only TextBox so it can be selected
+        // and copied, and an UNNAMED edit control is announced
+        // control-type first ("edit, read-only" before the version).
+        // Naming the box with its own text puts the content first; there
+        // is no visible label to use instead.
+        AutomationProperties.SetName(VersionText, version);
 
         ApplyScaledBounds();
         AccessibilitySettings.Current.PropertyChanged += OnAccessibilitySettingsChanged;

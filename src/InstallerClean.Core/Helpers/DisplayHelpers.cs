@@ -64,4 +64,7 @@ internal static class DisplayHelpers
     /// <summary>"product"/"products" pair, sourced from Strings.resx.</summary>
     internal static string PluraliseProduct(int count) =>
         Pluralise(count, Strings.Plural_Product_Singular, Strings.Plural_Product_Plural);
+
+    internal static string PluralisePatch(int count) =>
+        Pluralise(count, Strings.Plural_Patch_Singular, Strings.Plural_Patch_Plural);
 }

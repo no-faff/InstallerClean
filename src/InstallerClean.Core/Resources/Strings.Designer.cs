@@ -69,6 +69,7 @@ public static class Strings
     public static string Automation_Close => Get("Automation.Close");
     public static string Automation_CloseResult => Get("Automation.CloseResult");
     public static string Automation_CloseWindow => Get("Automation.CloseWindow");
+    public static string Automation_CompletionErrors => Get("Automation.CompletionErrors");
     public static string Automation_ConfirmDelete => Get("Automation.ConfirmDelete");
     public static string Automation_ConfirmMove => Get("Automation.ConfirmMove");
     public static string Automation_ConfirmSendResultLog => Get("Automation.ConfirmSendResultLog");
@@ -84,6 +85,7 @@ public static class Strings
     public static string Automation_RecycleUnavailable => Get("Automation.RecycleUnavailable");
     public static string Automation_RecycleUnavailableDeletePermanently => Get("Automation.RecycleUnavailableDeletePermanently");
     public static string Automation_RecycleUnavailableMove => Get("Automation.RecycleUnavailableMove");
+    public static string Automation_RegisteredMissingSeeAlso => Get("Automation.RegisteredMissingSeeAlso");
     public static string Automation_RescanInstaller => Get("Automation.RescanInstaller");
     public static string Automation_ResultLogPreview => Get("Automation.ResultLogPreview");
     public static string Automation_SayThanks => Get("Automation.SayThanks");
@@ -268,6 +270,8 @@ public static class Strings
     public static string Plural_File_Singular => Get("Plural.File.Singular");
     public static string Plural_Package_Plural => Get("Plural.Package.Plural");
     public static string Plural_Package_Singular => Get("Plural.Package.Singular");
+    public static string Plural_Patch_Plural => Get("Plural.Patch.Plural");
+    public static string Plural_Patch_Singular => Get("Plural.Patch.Singular");
     public static string Plural_Product_Plural => Get("Plural.Product.Plural");
     public static string Plural_Product_Singular => Get("Plural.Product.Singular");
     public static string Reason_Obsoleted => Get("Reason.Obsoleted");

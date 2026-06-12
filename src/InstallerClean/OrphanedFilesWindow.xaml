@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:InstallerClean.Resources"
         xmlns:a11y="clr-namespace:InstallerClean.Helpers"
+        xmlns:chrome="clr-namespace:InstallerClean.Controls"
         Title="{loc:Translate Window.Orphaned.Title}"
         Width="920" Height="540"
         MinWidth="600" MinHeight="380"
@@ -30,9 +31,8 @@
         <!-- Title bar -->
         <StackPanel Grid.Row="0" Orientation="Horizontal"
                     VerticalAlignment="Center" Margin="-8,-4,0,0">
-            <Image Source="Assets/splash-icon.png" Width="16" Height="16"
-                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"
-                   AutomationProperties.Name=""/>
+            <chrome:DecorativeImage Source="Assets/splash-icon.png" Width="16" Height="16"
+                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"/>
             <TextBlock Text="{loc:Translate Window.Orphaned.Title}" Foreground="{StaticResource Text.Body}"
                        FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="Medium"/>
         </StackPanel>
@@ -71,6 +71,15 @@
                           ScrollViewer.HorizontalScrollBarVisibility="Auto"
                           VirtualizingStackPanel.IsVirtualizing="True"
                           VirtualizingStackPanel.VirtualizationMode="Recycling">
+                    <!-- Spoken row name from the visible cells. Without the
+                         override, the item automation peer falls back to the
+                         bound record's generated ToString and a screen reader
+                         reads the whole member dump per row. -->
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                            <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
                             <!-- The three column widths total under the list

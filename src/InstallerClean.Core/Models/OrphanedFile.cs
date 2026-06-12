@@ -44,4 +44,13 @@ public record OrphanedFile(
 {
     public string FileName => Path.GetFileName(FullPath);
     public string SizeDisplay => DisplayHelpers.FormatSize(SizeBytes);
+
+    /// <summary>
+    /// Spoken name for the row, composed from the visible cells (File,
+    /// Reason, Size). The list container binds it to
+    /// AutomationProperties.Name; without that, UI Automation's item peer
+    /// falls back to the record's generated ToString and a screen reader
+    /// reads the whole member dump per row.
+    /// </summary>
+    public string AccessibleName => string.Join(", ", FileName, Reason, SizeDisplay);
 }

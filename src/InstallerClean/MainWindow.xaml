@@ -41,9 +41,8 @@
              land (DetailWindowMargin 24 + StackPanel -8). -->
         <StackPanel Grid.Row="0" Orientation="Horizontal"
                     VerticalAlignment="Center" Margin="16,0,0,0">
-            <Image Source="Assets/splash-icon.png" Width="16" Height="16"
-                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"
-                   AutomationProperties.Name=""/>
+            <chrome:DecorativeImage Source="Assets/splash-icon.png" Width="16" Height="16"
+                   RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"/>
             <TextBlock Text="{loc:Translate Window.Main.Title}" Foreground="{StaticResource Text.Body}"
                        FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="Medium"/>
         </StackPanel>
@@ -584,11 +583,10 @@
                     </Grid.RowDefinitions>
 
                     <!-- Icon -->
-                    <Image Grid.Row="0" Source="Assets/splash-icon.png"
+                    <chrome:DecorativeImage Grid.Row="0" Source="Assets/splash-icon.png"
                            Width="64" Height="64" HorizontalAlignment="Center"
                            RenderOptions.BitmapScalingMode="HighQuality"
-                           Margin="{StaticResource GapBottom.Lg}"
-                           AutomationProperties.Name=""/>
+                           Margin="{StaticResource GapBottom.Lg}"/>
 
                     <!-- Heading -->
                     <TextBlock x:Name="CompletionHeadingText" Grid.Row="1" Text="{Binding Completion.Heading}"
@@ -672,8 +670,12 @@
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
+                        <!-- Named so the tab stop reads as a labelled field; an
+                             unnamed read-only TextBox announces a bare "edit,
+                             read-only" with no hint of what the text is. -->
                         <TextBox Text="{Binding Completion.Errors, Mode=OneWay}"
                                  Style="{StaticResource SelectableText}"
+                                 AutomationProperties.Name="{loc:Translate Automation.CompletionErrors}"
                                  Foreground="{StaticResource Status.Warning}" FontSize="{DynamicResource Type.Caption}"
                                  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
                     </Border>

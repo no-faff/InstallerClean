@@ -123,6 +123,12 @@ public partial class RegisteredFilesWindow : Window
             Style = (Style)FindResource("SubtleLink"),
         };
         link.Click += Hyperlink_Click;
+        // The visible link text is a phrase mid-sentence ("explains this
+        // folder"), meaningless on its own when a screen reader tabs onto
+        // the link; the automation name carries the self-contained
+        // purpose and still contains the visible phrase so voice control
+        // can click the on-screen words.
+        AutomationProperties.SetName(link, Strings.Automation_RegisteredMissingSeeAlso);
 
         if (prefix.Length > 0) SeeAlsoText.Inlines.Add(new Run(prefix));
         SeeAlsoText.Inlines.Add(link);

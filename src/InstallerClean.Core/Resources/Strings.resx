@@ -206,6 +206,14 @@
        name (a Field.* label). -->
   <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>Sorted by {0}, ascending</value></data>
   <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>Sorted by {0}, descending</value></data>
+  <data name="Automation.CompletionErrors" xml:space="preserve"><value>Files that could not be processed</value></data>
+  <!-- Spoken name for the missing-file note's closing hyperlink. The visible
+       link text is a phrase mid-sentence (the [ ]-delimited span of
+       Body.RegisteredMissingFromDisk.SeeAlso, movable by a translator), so a
+       screen reader tabbing onto the link needs a self-contained purpose;
+       it must still contain the visible phrase so voice control can click
+       it by its on-screen words. -->
+  <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Explains this folder, and how to recover a file, in the README</value></data>
 
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>If it helped, buy me a cup of tea.</value></data>
@@ -551,6 +559,8 @@ The crash log could not be written.</value></data>
   <data name="Plural.Package.Plural" xml:space="preserve"><value>packages</value></data>
   <data name="Plural.Product.Singular" xml:space="preserve"><value>product</value></data>
   <data name="Plural.Product.Plural" xml:space="preserve"><value>products</value></data>
+  <data name="Plural.Patch.Singular" xml:space="preserve"><value>patch</value></data>
+  <data name="Plural.Patch.Plural" xml:space="preserve"><value>patches</value></data>
 
   <!-- Display-format fragments used by DisplayHelpers.FormatSize /
        FormatElapsed / FormatElapsedLong. Number portion stays in
