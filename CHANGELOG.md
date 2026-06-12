@@ -104,6 +104,14 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The installer-busy gate no longer reads the lingering Windows Installer service as an active install. The probe tested whether the `Global\_MSIExecute` mutex existed, but the service idles for several minutes after its last job and can keep the object alive unheld, so Move and Delete could stay blocked long after an install finished; the probe now takes a zero-timeout acquire and immediate release, which measures ownership itself.
 - The move-destination box no longer offers a folder drop it can never receive: Windows refuses drags from Explorer into an elevated window (verified on a real machine, the cursor shows not-allowed), so the dead drop handlers are removed and the tooltip reads "Type a path or click Browse".
 - The move-destination watermark starts where typed text starts; it sat a few pixels left of the caret's leftmost position.
+- Buttons grow with the Windows text-size setting instead of clipping their labels; every pill's fixed height (and the destination box's) became a minimum, so at 100% nothing changes.
+- The main window stays usable at large text sizes: it widens with its text within the screen's work area, never grows taller than it, and when height runs out the explanation scrolls while the counts, Delete, Move and the bottom row stay visible. The count lines wrap rather than truncate when width is tight.
+- The completion overlay pins its buttons and scrolls its summary text once the window cannot grow further, so Done, Send summary and Scan again survive any text size.
+- The About window sizes to its content with the text scale rather than a fixed 500 by 320 box, which cut off its Close button at 208%; the splash box scales the same way.
+- The confirmation cards (Delete, Move, send-summary, recycle-unavailable, update) widen with the text scale, cap at the screen's work area and scroll their body text when the cap binds; the recycle-unavailable choices wrap onto a second line rather than pushing Cancel off the card.
+- The two Details windows scale their columns, panes and default size with the text setting, and a horizontal scrollbar appears when the scaled columns no longer fit instead of leaving them unreachable.
+- Tooltips widen with the text scale rather than wrapping into ever narrower columns.
+- A window that grows on a live text-size change moves itself back inside the work area when the growth would push its buttons under the taskbar.
 
 ### Changed (internal)
 
