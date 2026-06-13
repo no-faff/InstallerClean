@@ -602,6 +602,18 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// </returns>
     private async Task<bool> RunDeleteAsync(DeleteContext ctx, bool permitPermanentDelete)
     {
+        // Probe the volume before showing any overlay on the recycle-first
+        // pass: when the bin is unavailable the service deletes nothing, so a
+        // "Deleting N files..." overlay (and its screen-reader announcement)
+        // for that pass would describe an operation that never happens. Hand
+        // straight back so DeleteAllAsync offers the Move / permanent / cancel
+        // choice. The permanent-retry pass (permitPermanentDelete) skips this
+        // and always runs. DeleteFilesAsync re-checks the same volume and
+        // still fails closed, so this only governs whether the overlay shows.
+        if (!permitPermanentDelete && ctx.FilePaths.Count > 0
+            && !_deleteService.CanRecycleToVolume(ctx.FilePaths[0]))
+            return true;
+
         _operationCts = new CancellationTokenSource();
         // Heading before IsOperating: a heading assigned after the reveal
         // can be spoken twice (see OperationHeadingText in MainWindow.xaml).

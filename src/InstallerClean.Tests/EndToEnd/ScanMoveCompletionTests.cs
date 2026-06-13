@@ -35,6 +35,11 @@ public class ScanMoveCompletionTests
     private MainViewModel CreateMain()
     {
         _settingsService.Load().Returns(new AppSettings());
+        // Default the recycle-volume probe to available so the delete flow
+        // reaches DeleteFilesAsync; the bin-unavailable path is exercised by
+        // returning RecycleUnavailable from DeleteFilesAsync (or stubbing this
+        // false) in the specific tests that cover it.
+        _deleteService.CanRecycleToVolume(Arg.Any<string>()).Returns(true);
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,

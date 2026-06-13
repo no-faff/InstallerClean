@@ -36,6 +36,18 @@ public interface IDeleteFilesService
         bool permitPermanentDelete = false,
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Whether the Recycle Bin is available for the volume holding
+    /// <paramref name="path"/>. This is the same probe
+    /// <see cref="DeleteFilesAsync"/> runs before a recycle-first batch,
+    /// exposed so a caller can decide whether to present an operation at
+    /// all: a batch the volume will refuse deletes nothing, so showing a
+    /// "Deleting..." overlay for it is misleading. Advisory only;
+    /// <see cref="DeleteFilesAsync"/> re-checks and still fails closed if
+    /// the volume's state changes between the two calls.
+    /// </summary>
+    bool CanRecycleToVolume(string path);
 }
 
 /// <summary>

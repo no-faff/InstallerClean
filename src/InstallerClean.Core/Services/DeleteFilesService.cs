@@ -22,6 +22,8 @@ public sealed class DeleteFilesService : IDeleteFilesService
         _engine = engine;
     }
 
+    public bool CanRecycleToVolume(string path) => _engine.CanRecycleToVolume(path);
+
     public Task<DeleteResult> DeleteFilesAsync(
         IEnumerable<string> filePaths,
         bool permitPermanentDelete = false,

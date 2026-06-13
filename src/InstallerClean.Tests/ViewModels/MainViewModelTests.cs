@@ -35,6 +35,10 @@ public class MainViewModelTests
     private MainViewModel CreateViewModel(AppSettings settings)
     {
         _settingsService.Load().Returns(settings);
+        // Default the recycle-volume probe to available so the delete flow
+        // reaches DeleteFilesAsync; tests covering the bin-unavailable path
+        // stub this false or return RecycleUnavailable from DeleteFilesAsync.
+        _deleteService.CanRecycleToVolume(Arg.Any<string>()).Returns(true);
 
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
@@ -515,6 +519,38 @@ public class MainViewModelTests
         Assert.False(vm.Completion.IsComplete);
         await _resultLogService.DidNotReceive().WriteAsync(
             Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_recycle_unavailable_offers_choice_without_starting_the_delete()
+    {
+        // When the volume cannot recycle, the recycle-first pass presents no
+        // operation: the VM offers the Move / permanent / cancel choice
+        // without calling DeleteFilesAsync, so no "Deleting..." overlay (and
+        // no screen-reader announcement of it) appears for a pass that would
+        // delete nothing. DeleteFilesAsync still re-checks and fails closed;
+        // the probe here only governs whether the overlay shows.
+        var vm = CreateViewModel();
+        _deleteService.CanRecycleToVolume(Arg.Any<string>()).Returns(false);
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\big.msi", 200_000_000, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+        _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
+            .Returns(RecycleUnavailableChoice.Cancel);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        _confirmationService.Received(1).ConfirmRecycleUnavailable(1, Arg.Any<string>());
+        await _deleteService.DidNotReceive().DeleteFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Is(false),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.False(vm.Cleanup.IsOperating);
+        Assert.False(vm.Completion.IsComplete);
     }
 
     [Fact]
