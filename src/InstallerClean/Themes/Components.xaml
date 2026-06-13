@@ -379,10 +379,32 @@
                 <ControlTemplate TargetType="TextBox">
                     <Border x:Name="Bg" Background="{TemplateBinding Background}"
                             CornerRadius="{StaticResource Radius.Pill}">
-                        <ScrollViewer x:Name="PART_ContentHost"
-                                      VerticalAlignment="Center"
-                                      Margin="{TemplateBinding Padding}"/>
+                        <Grid>
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}"/>
+                            <!-- Placeholder text comes from the box's Tag.
+                                 It shares PART_ContentHost's cell and the
+                                 same Margin, so it begins at exactly the x
+                                 the typed text and caret do, rather than an
+                                 overlay sibling having to guess the caret
+                                 inset. IsHitTestVisible=False lets a click
+                                 fall through to the TextBox; shown only
+                                 while the box is empty. -->
+                            <TextBlock x:Name="Placeholder"
+                                       Text="{TemplateBinding Tag}"
+                                       Margin="{TemplateBinding Padding}"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource Text.Muted}"
+                                       FontSize="{DynamicResource Type.Body}" FontStyle="Italic"
+                                       IsHitTestVisible="False" Visibility="Collapsed"/>
+                        </Grid>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -264,36 +264,17 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <Grid Grid.Column="0">
-                        <TextBox x:Name="MoveDestinationInput" Style="{StaticResource PillTextBox}"
-                                 Text="{Binding Cleanup.MoveDestination, Mode=TwoWay,
-                                                UpdateSourceTrigger=PropertyChanged}"
-                                 MaxLength="8192"
-                                 AutomationProperties.Name="{loc:Translate Automation.MoveDestinationFolder}"
-                                 AutomationProperties.IsRequiredForForm="True"
-                                 ToolTip="{loc:Translate Tooltip.MoveDestination}"
-                                 ToolTipService.ShowsToolTipOnKeyboardFocus="False"/>
-                        <!-- 15 = the box's 12 content padding + its 1px
-                             border + the ~2px caret margin TextBoxView
-                             reserves, so the watermark starts where the
-                             typed text will. At 12 it sat visibly left
-                             of the caret's leftmost position. -->
-                        <TextBlock Text="{loc:Translate Action.MoveDestinationPlaceholder}"
-                                   Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}" FontStyle="Italic"
-                                   Padding="15,0" VerticalAlignment="Center"
-                                   IsHitTestVisible="False">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Cleanup.MoveDestination}" Value="">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </Grid>
+                    <!-- The placeholder is the box's Tag, rendered inside the
+                         PillTextBox template so it lines up with the caret;
+                         the tooltip is dropped because the placeholder now
+                         carries the what and the why. -->
+                    <TextBox Grid.Column="0" x:Name="MoveDestinationInput" Style="{StaticResource PillTextBox}"
+                             Text="{Binding Cleanup.MoveDestination, Mode=TwoWay,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                             MaxLength="8192"
+                             Tag="{loc:Translate Action.MoveDestinationPlaceholder}"
+                             AutomationProperties.Name="{loc:Translate Automation.MoveDestinationFolder}"
+                             AutomationProperties.IsRequiredForForm="True"/>
 
                     <Button Grid.Column="2" Style="{StaticResource GhostPill}" Padding="12,8"
                             Content="{loc:Translate Action.Browse}" Command="{Binding Cleanup.BrowseDestinationCommand}"/>
