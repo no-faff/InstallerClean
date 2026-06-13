@@ -104,8 +104,26 @@ public partial class MainWindow : Window
     private void ApplyWorkAreaBounds()
     {
         RootLayout.MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(this);
-        Width = DetailWindowSizing.ClampWidthToWorkArea(
+        var targetWidth = DetailWindowSizing.ClampWidthToWorkArea(
             this, 720 * AccessibilitySettings.Current.TextScaleFactor, 0);
+        if (Math.Abs(Width - targetWidth) < 0.5)
+            return;
+
+        // Assigning Width grows this window to a wider value but does not
+        // shrink it to a narrower one while SizeToContent="Height" is
+        // active: lowering the OS text-size slider with the app open left
+        // the window at its wider high-scale width, the fonts and
+        // everything else having rescaled down around it (measured
+        // 2026-06-13, the body stayed 1438 DIP wide after the factor
+        // dropped). Dropping SizeToContent to Manual for the assignment
+        // and restoring it forces the re-fit, so the width tracks the
+        // factor both ways. A fresh launch was always correct because the
+        // width is set once before the first content fit; this only bites
+        // a live downward change.
+        var heightFit = SizeToContent;
+        SizeToContent = SizeToContent.Manual;
+        Width = targetWidth;
+        SizeToContent = heightFit;
     }
 
     private void OnAccessibilitySettingsChanged(object? sender, PropertyChangedEventArgs e)
