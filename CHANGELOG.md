@@ -14,7 +14,6 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - `installerclean-cli --version` (or `-v`) prints the name and Major.Minor.Patch then exits 0, deliberately without the deterministic build's `+<commit>` suffix so a parsed version stays clean.
 - A README section, "If a needed file goes missing", explains in Microsoft's own words what the cache is, how a registered file can go missing by means other than InstallerClean and the recovery route: reinstall the program over itself, same version where possible, which usually restores it. Mirrored into the translations; the "Will Windows complain?" FAQ shrinks to a plain no with a pointer at the section.
 - The READMEs gain an Accessibility section stating only what is implemented: full keyboard operation including column sorting, Narrator and Voice Access support, announced outcomes, an always-visible focus ring and WCAG AA contrast.
-- The all-clean screen now says that about two in three people find nothing unneeded, so a clean result reads as the normal outcome rather than a wasted run. Shown only on a from-scratch all-clean, never after a Move or Delete, so it cannot tell someone who just cleared files that they found nothing.
 
 ### Changed
 
@@ -98,7 +97,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - A queued post-reboot rename INTO the installer cache now triggers the safety gate; the destination form Session Manager writes for a replace-existing rename (a leading `!` before the NT prefix) slipped the path match.
 - A hung Explorer can no longer hang the app on a link click: the unelevated launcher bounds its wait at ten seconds and falls back to copying the address to the clipboard.
 - A product registered in more than one context (per machine plus per user) lists every cached `.msi`, not just the first, so the Registered window's rows agree with its summary count.
-- The all-clean reassurance and the README quote the reports table's actual median rather than a hand-written figure that had drifted (21 GB against the table's 23); the README figure is now written by the same script that writes the table.
+- The README quotes the reports table's actual median rather than a hand-written figure that had drifted; the figure is now written by the same script that writes the table, so the two cannot disagree.
 - The README's CLI exit-code contract states the mid-batch Ctrl+C case exactly: 130 only before any file was processed, 2 (partial) once work was committed.
 - The documented build command is the whole solution, not the GUI project; a single-project build cannot catch a CLI-breaking change, since the tests do not reference the CLI.
 - Five stale comments and labels corrected: the resx help-flags note, a misplaced format-argument note, the modal-card padding consumer list, the dark-chrome Windows-version contract and a CodeQL step name.

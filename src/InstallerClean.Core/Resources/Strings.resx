@@ -339,7 +339,6 @@
        + smaller-receipt shape as the post-Move and post-Delete
        states. -->
   <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Scanned {0} {1} in {2}</value></data>
-  <data name="Completion.NothingToCleanUpReassurance" xml:space="preserve"><value>About two in three people find nothing unneeded. (Among the third that do, the median freed is around 23 GB, and some have cleared hundreds of GB.) All good. Move on.</value></data>
   <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working</value></data>
   <!-- 0 = size freed (e.g. "120.5 MB") -->

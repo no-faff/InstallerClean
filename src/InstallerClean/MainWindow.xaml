@@ -641,29 +641,6 @@
                                TextWrapping="Wrap" Margin="0,0,0,6"
                                AutomationProperties.LiveSetting="Polite"/>
 
-                    <!-- All-clean reassurance. ShowAllClear sets it only
-                         on a from-scratch all-clear (showReassurance);
-                         it is empty after a post-cleanup rescan, so the
-                         "two in three find nothing" framing never shows
-                         to someone who just cleaned files. The empty-
-                         string DataTrigger collapses it, matching the
-                         Restore and Errors blocks. -->
-                    <TextBlock Text="{Binding Completion.Reassurance}"
-                               Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
-                               HorizontalAlignment="Center" TextAlignment="Center"
-                               TextWrapping="Wrap" Margin="0,0,0,6">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility" Value="Visible"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Completion.Reassurance}" Value="">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-
                     <!-- Restore guidance. Collapses when empty so the
                          all-clear overlay (which has no restore hint)
                          doesn't carry a phantom 30+ pixel gap from the

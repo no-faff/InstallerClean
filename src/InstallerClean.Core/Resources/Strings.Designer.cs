@@ -191,7 +191,6 @@ public static class Strings
     public static string Completion_MoveSummary => Get("Completion.MoveSummary");
     public static string Completion_MoveSummaryWithErrors => Get("Completion.MoveSummaryWithErrors");
     public static string Completion_NothingToCleanUp => Get("Completion.NothingToCleanUp");
-    public static string Completion_NothingToCleanUpReassurance => Get("Completion.NothingToCleanUpReassurance");
     public static string Completion_NothingToCleanUpReceipt => Get("Completion.NothingToCleanUpReceipt");
     public static string Completion_PartlyFreed => Get("Completion.PartlyFreed");
     public static string Completion_PartlyMoved => Get("Completion.PartlyMoved");
