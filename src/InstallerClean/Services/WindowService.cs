@@ -6,21 +6,17 @@ namespace InstallerClean.Services;
 
 public sealed class WindowService : IWindowService
 {
-    private readonly ISettingsService _settingsService;
     private readonly IUpdateCheckService _updateCheckService;
 
-    public WindowService(
-        ISettingsService settingsService,
-        IUpdateCheckService updateCheckService)
+    public WindowService(IUpdateCheckService updateCheckService)
     {
-        _settingsService = settingsService;
         _updateCheckService = updateCheckService;
     }
 
     public void ShowOrphanedDetails(OrphanedFilesViewModel viewModel)
     {
         if (Application.Current is null) return;
-        var window = new OrphanedFilesWindow(viewModel, _settingsService)
+        var window = new OrphanedFilesWindow(viewModel)
         {
             Owner = Application.Current.MainWindow,
         };
@@ -30,7 +26,7 @@ public sealed class WindowService : IWindowService
     public void ShowRegisteredDetails(RegisteredFilesViewModel viewModel)
     {
         if (Application.Current is null) return;
-        var window = new RegisteredFilesWindow(viewModel, _settingsService)
+        var window = new RegisteredFilesWindow(viewModel)
         {
             Owner = Application.Current.MainWindow,
         };

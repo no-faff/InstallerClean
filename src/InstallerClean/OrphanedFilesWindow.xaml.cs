@@ -17,34 +17,23 @@ public partial class OrphanedFilesWindow : Window
     private ListSortDirection _lastSortDirection;
     private GridViewColumn? _lastSortColumn;
 
-    private readonly ISettingsService? _settingsService;
-
-    public OrphanedFilesWindow(OrphanedFilesViewModel viewModel, ISettingsService? settingsService = null)
+    public OrphanedFilesWindow(OrphanedFilesViewModel viewModel)
     {
         InitializeComponent();
         DataContext = viewModel;
-        _settingsService = settingsService;
 
-        var saved = settingsService?.Load().OrphanedWindowSize;
-        if (saved is { Width: > 0, Height: > 0 })
-        {
-            Width = saved.Width;
-            Height = saved.Height;
-        }
-        else
-        {
-            // 920 x 540 is the 100% default; both multiply by the OS
-            // text-scale factor because the columns and the details
-            // pane inside scale with it, so an unscaled default would
-            // open with the list overflowing into a horizontal
-            // scrollbar. The clamps keep the window inside the
-            // screen's work area.
-            var factor = AccessibilitySettings.Current.TextScaleFactor;
-            Width = DetailWindowSizing.ClampWidthToWorkArea(
-                Application.Current?.MainWindow, preferred: 920 * factor, minimum: MinWidth);
-            Height = DetailWindowSizing.ClampHeightToWorkArea(
-                Application.Current?.MainWindow, preferred: 540 * factor, minimum: MinHeight);
-        }
+        // The window always opens at this computed size; it does not
+        // remember a previous one, so the size always suits the current OS
+        // text setting and screen (a saved size scales with neither). 920 x
+        // 540 is the 100% default, multiplied by the text-scale factor
+        // because the columns and the details pane inside scale with it, so
+        // an unscaled default would overflow into a horizontal scrollbar.
+        // The clamps keep the window inside the screen's work area.
+        var factor = AccessibilitySettings.Current.TextScaleFactor;
+        Width = DetailWindowSizing.ClampWidthToWorkArea(
+            Application.Current?.MainWindow, preferred: 920 * factor, minimum: MinWidth);
+        Height = DetailWindowSizing.ClampHeightToWorkArea(
+            Application.Current?.MainWindow, preferred: 540 * factor, minimum: MinHeight);
 
         Closed += OnClosed;
         this.EnableAltSpaceSystemMenu();
@@ -155,8 +144,5 @@ public partial class OrphanedFilesWindow : Window
     {
         Closed -= OnClosed;
         if (DataContext is IDisposable vm) vm.Dispose();
-        if (_settingsService is null) return;
-        _ = _settingsService.Update(s =>
-            s.OrphanedWindowSize = new Models.WindowSize { Width = ActualWidth, Height = ActualHeight });
     }
 }

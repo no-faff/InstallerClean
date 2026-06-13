@@ -18,46 +18,34 @@ public partial class RegisteredFilesWindow : Window
     private ListSortDirection _lastSortDirection;
     private GridViewColumn? _lastSortColumn;
 
-    private readonly ISettingsService? _settingsService;
-
-    public RegisteredFilesWindow(RegisteredFilesViewModel viewModel, ISettingsService? settingsService = null)
+    public RegisteredFilesWindow(RegisteredFilesViewModel viewModel)
     {
         InitializeComponent();
         DataContext = viewModel;
-        _settingsService = settingsService;
 
-        var saved = settingsService?.Load().RegisteredWindowSize;
-        if (saved is { Width: > 0, Height: > 0 })
-        {
-            Width = saved.Width;
-            Height = saved.Height;
-        }
-        else
-        {
-            // 950 x 770 is the 100% default; both multiply by the OS
-            // text-scale factor because the columns and rows inside
-            // scale with it, so an unscaled default would open with the
-            // columns overflowing into a horizontal scrollbar. The
-            // height lets the longest products' whole details, down to
-            // the comment line, read by arrowing down the list without
-            // clicking into the details pane to scroll: the products
-            // list is capped (MaxHeight 208 scaled, the rows a 680
-            // window showed) so every unit above 680 lands in the
-            // patches/details band rather than growing the list, and the
-            // longest real metadata (a product with a 7-line signing
-            // identity and a 2-line comment) needs about 90 of those
-            // units beyond the old 680. 770 fits that with a small
-            // margin; a rarer longer entry still scrolls, as all three
-            // panes (products, patches, details) do. The clamps keep the
-            // window inside the screen's work area, which can be as
-            // little as ~672 device-independent units of height (a
-            // 1080p laptop at 150% display scale).
-            var factor = AccessibilitySettings.Current.TextScaleFactor;
-            Width = DetailWindowSizing.ClampWidthToWorkArea(
-                Application.Current?.MainWindow, preferred: 950 * factor, minimum: MinWidth);
-            Height = DetailWindowSizing.ClampHeightToWorkArea(
-                Application.Current?.MainWindow, preferred: 770 * factor, minimum: MinHeight);
-        }
+        // The window always opens at this computed size; it does not
+        // remember a previous one. A saved size does not scale with the OS
+        // text setting nor adapt to the current screen, so a size kept from
+        // one text scale or monitor could reopen too small to read or off
+        // another's edge; the computed default is always right for the
+        // current setting. 950 x 770 is the 100% default, multiplied by the
+        // text-scale factor because the columns and rows inside scale with
+        // it, so an unscaled default would overflow into a horizontal
+        // scrollbar. 770 lets the longest products' whole details, down to
+        // the comment line, read by arrowing down the list without clicking
+        // into the details pane to scroll: the products list is capped
+        // (MaxHeight 208 scaled, the rows a 680 window showed) so every unit
+        // above 680 lands in the patches/details band, and the longest real
+        // metadata (a 7-line signing identity plus a 2-line comment) needs
+        // about 90 of those units beyond 680. A rarer longer entry still
+        // scrolls, as all three panes do. The clamps keep the window inside
+        // the work area, as little as ~672 device-independent units of
+        // height on a 1080p laptop at 150% display scale.
+        var factor = AccessibilitySettings.Current.TextScaleFactor;
+        Width = DetailWindowSizing.ClampWidthToWorkArea(
+            Application.Current?.MainWindow, preferred: 950 * factor, minimum: MinWidth);
+        Height = DetailWindowSizing.ClampHeightToWorkArea(
+            Application.Current?.MainWindow, preferred: 770 * factor, minimum: MinHeight);
 
         Closed += OnClosed;
         this.EnableAltSpaceSystemMenu();
@@ -224,8 +212,5 @@ public partial class RegisteredFilesWindow : Window
     {
         Closed -= OnClosed;
         if (DataContext is IDisposable vm) vm.Dispose();
-        if (_settingsService is null) return;
-        _ = _settingsService.Update(s =>
-            s.RegisteredWindowSize = new Models.WindowSize { Width = ActualWidth, Height = ActualHeight });
     }
 }

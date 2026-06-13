@@ -30,12 +30,6 @@ public sealed class AppSettings
     /// </remarks>
     public string MoveDestination { get; set; } = string.Empty;
 
-    /// <summary>Last-saved size of the orphaned-files window. Null until the user resizes it.</summary>
-    public WindowSize? OrphanedWindowSize { get; set; }
-
-    /// <summary>Last-saved size of the registered-files window. Null until the user resizes it.</summary>
-    public WindowSize? RegisteredWindowSize { get; set; }
-
     /// <summary>
     /// Set to true once the user has successfully sent a result log
     /// to No Faff. The Send button is then hidden across sessions and
@@ -49,11 +43,4 @@ public sealed class AppSettings
     /// profile-clobbered between sessions can submit again.
     /// </summary>
     public bool HasSentResultLog { get; set; }
-}
-
-/// <summary>Persisted Width/Height pair for a remembered window size.</summary>
-public sealed class WindowSize
-{
-    public double Width { get; set; }
-    public double Height { get; set; }
 }
