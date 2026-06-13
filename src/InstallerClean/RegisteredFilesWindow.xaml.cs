@@ -34,22 +34,29 @@ public partial class RegisteredFilesWindow : Window
         }
         else
         {
-            // 950 x 860 is the 100% default; both multiply by the OS
+            // 950 x 770 is the 100% default; both multiply by the OS
             // text-scale factor because the columns and rows inside
             // scale with it, so an unscaled default would open with the
-            // columns overflowing into a horizontal scrollbar. 860 lets
-            // a typical product's whole detail list show without
-            // scrolling while arrowing down the products; the clamps
-            // keep the window inside the screen's work area, which can
-            // be as little as ~672 device-independent units of height
-            // (a 1080p laptop at 150% display scale). The products list
-            // does not grow with the window (its row carries a
-            // MaxHeight), so extra height all lands in the details band.
+            // columns overflowing into a horizontal scrollbar. The
+            // height lets the longest products' whole details, down to
+            // the comment line, read by arrowing down the list without
+            // clicking into the details pane to scroll: the products
+            // list is capped (MaxHeight 208 scaled, the rows a 680
+            // window showed) so every unit above 680 lands in the
+            // patches/details band rather than growing the list, and the
+            // longest real metadata (a product with a 7-line signing
+            // identity and a 2-line comment) needs about 90 of those
+            // units beyond the old 680. 770 fits that with a small
+            // margin; a rarer longer entry still scrolls, as all three
+            // panes (products, patches, details) do. The clamps keep the
+            // window inside the screen's work area, which can be as
+            // little as ~672 device-independent units of height (a
+            // 1080p laptop at 150% display scale).
             var factor = AccessibilitySettings.Current.TextScaleFactor;
             Width = DetailWindowSizing.ClampWidthToWorkArea(
                 Application.Current?.MainWindow, preferred: 950 * factor, minimum: MinWidth);
             Height = DetailWindowSizing.ClampHeightToWorkArea(
-                Application.Current?.MainWindow, preferred: 860 * factor, minimum: MinHeight);
+                Application.Current?.MainWindow, preferred: 770 * factor, minimum: MinHeight);
         }
 
         Closed += OnClosed;

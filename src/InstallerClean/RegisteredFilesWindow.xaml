@@ -5,7 +5,7 @@
         xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         xmlns:chrome="clr-namespace:InstallerClean.Controls"
         Title="{loc:Translate Window.Registered.Title}"
-        Width="950" Height="680"
+        Width="950" Height="770"
         MinWidth="700" MinHeight="500"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource Surface.Sidebar}"
