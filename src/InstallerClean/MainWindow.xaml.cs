@@ -103,27 +103,18 @@ public partial class MainWindow : Window
 
     private void ApplyWorkAreaBounds()
     {
+        // Set Width directly; do NOT toggle SizeToContent here. Toggling it
+        // to Manual around the Width assignment opens a fresh high-text-scale
+        // launch NARROW, the enlarged text wrapping cramped (observed
+        // 2026-06-13 at ~199%): the toggle runs in this constructor-time call
+        // and disturbs the first content fit. The plain assignment keeps the
+        // XAML SizeToContent="Height" and the explicit width intact, which
+        // sizes correctly. The trade-off is no live shrink when the text size
+        // is lowered with the app already open; a restart re-fits, which is
+        // acceptable.
         RootLayout.MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(this);
-        var targetWidth = DetailWindowSizing.ClampWidthToWorkArea(
+        Width = DetailWindowSizing.ClampWidthToWorkArea(
             this, 720 * AccessibilitySettings.Current.TextScaleFactor, 0);
-        if (Math.Abs(Width - targetWidth) < 0.5)
-            return;
-
-        // Assigning Width grows this window to a wider value but does not
-        // shrink it to a narrower one while SizeToContent="Height" is
-        // active: lowering the OS text-size slider with the app open left
-        // the window at its wider high-scale width, the fonts and
-        // everything else having rescaled down around it (measured
-        // 2026-06-13, the body stayed 1438 DIP wide after the factor
-        // dropped). Dropping SizeToContent to Manual for the assignment
-        // and restoring it forces the re-fit, so the width tracks the
-        // factor both ways. A fresh launch was always correct because the
-        // width is set once before the first content fit; this only bites
-        // a live downward change.
-        var heightFit = SizeToContent;
-        SizeToContent = SizeToContent.Manual;
-        Width = targetWidth;
-        SizeToContent = heightFit;
     }
 
     private void OnAccessibilitySettingsChanged(object? sender, PropertyChangedEventArgs e)
