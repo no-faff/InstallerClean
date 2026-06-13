@@ -182,7 +182,8 @@ public partial class CompletionViewModel : ObservableObject
             ? string.Format(Strings.Completion_MoveSummary, movedCount, movedLabel, destination)
             : string.Format(Strings.Completion_MoveSummaryWithErrors,
                 movedCount, movedLabel, destination, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
-        Restore = Strings.Completion_MoveRestoreHint;        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        Restore = Strings.Completion_MoveRestoreHint;
+        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = movedBytes <= 0;
         IsComplete = true;
@@ -200,7 +201,8 @@ public partial class CompletionViewModel : ObservableObject
             ? string.Format(Strings.Completion_DeleteSummary, deletedCount, deletedLabel)
             : string.Format(Strings.Completion_DeleteSummaryWithErrors,
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
-        Restore = Strings.Completion_DeleteRestoreHint;        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        Restore = Strings.Completion_DeleteRestoreHint;
+        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
         IsComplete = true;
@@ -232,7 +234,8 @@ public partial class CompletionViewModel : ObservableObject
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = DisplayHelpers.Pluralise(deletedCount,
             Strings.Completion_PermanentDeleteRestoreHint_Singular,
-            Strings.Completion_PermanentDeleteRestoreHint_Plural);        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+            Strings.Completion_PermanentDeleteRestoreHint_Plural);
+        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
         IsComplete = true;
