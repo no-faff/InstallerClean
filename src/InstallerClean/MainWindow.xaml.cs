@@ -179,7 +179,16 @@ public partial class MainWindow : Window
     private void OnScanCompleted(object? sender, EventArgs e)
     {
         if (_vm.Cleanup.IsOperating || _vm.Completion.IsComplete || _vm.Scan.OrphanedFileCount == 0)
+        {
+            // Clear any prior found-files headline so scan-mode / Inspect
+            // navigation cannot land on a stale "N unneeded files to clean
+            // up" after a clean-up or an all-clear, where the visible counts
+            // now read zero. The element is always rendered (Opacity 0), so
+            // it persists its last text until overwritten; the sibling
+            // progress twin is reset the same way in the operation finally.
+            ScanResultAnnouncer.Text = string.Empty;
             return;
+        }
         Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
             ScanResultAnnouncer.Text = string.Format(Strings.Automation_ScanResultAnnouncement,
                 _vm.Scan.OrphanedSummaryText, _vm.Scan.OrphanedSizeDisplay));
@@ -288,6 +297,7 @@ public partial class MainWindow : Window
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => ScanCancelButton.Focus());
 
         if (e.PropertyName == nameof(ScanViewModel.IsScanning) && !_vm.Scan.IsScanning)
+        {
             // A scan just finished. If it found orphans (no all-clear overlay)
             // the scanning overlay's cancel-button focus is gone, so route focus
             // to the results default. If it found nothing the all-clear overlay
@@ -298,6 +308,19 @@ public partial class MainWindow : Window
                 if (!_vm.Completion.IsComplete)
                     FocusResultsDefault();
             });
+
+            // The cancelled-scan outcome ("Scan cancelled.") is set on the
+            // overlay's status line as the overlay collapses, in the same
+            // dispatcher frame as the focus move above; the focus move's own
+            // name announcement cancels that pending polite speech, so it
+            // goes unspoken. Re-announce it on the persistent announcer at
+            // Background, below the Input focus, so it survives. Only on a
+            // user cancel, and not when an all-clear overlay will speak its
+            // own outcome.
+            if (_vm.Scan.LastScanWasCancelled && !_vm.Completion.IsComplete)
+                Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+                    ScanResultAnnouncer.Text = Strings.Status_ScanCancelled);
+        }
 
         // WPF's UIA bridge does not re-fire LiveRegionChanged for a
         // Visibility=Collapsed→Visible transition; the bridge only

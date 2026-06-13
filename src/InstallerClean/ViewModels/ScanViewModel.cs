@@ -237,9 +237,19 @@ public partial class ScanViewModel : ObservableObject
     /// </summary>
     private bool CanScan() => !IsScanning && !_isExternallyBlocked();
 
+    /// <summary>
+    /// True when the most recent scan ended because the user cancelled it
+    /// (rather than completing or failing). The view reads this when the
+    /// scanning overlay collapses to re-announce "Scan cancelled." past the
+    /// focus move that would otherwise swallow it. Reset at the start of
+    /// every scan.
+    /// </summary>
+    public bool LastScanWasCancelled { get; private set; }
+
     [RelayCommand(CanExecute = nameof(CanScan))]
     private async Task ScanAsync()
     {
+        LastScanWasCancelled = false;
         ScanProgress = Strings.Status_StartingScan;
         ScanTicker = string.Empty;
         var sw = Stopwatch.StartNew();
@@ -261,6 +271,7 @@ public partial class ScanViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
+            LastScanWasCancelled = true;
             ScanProgress = Strings.Status_ScanCancelled;
         }
         catch (LocalisedAccessException ex)

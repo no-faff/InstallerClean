@@ -26,6 +26,11 @@ public partial class RecycleUnavailableWindow : Window
         ReassuranceText.Text = DisplayHelpers.Pluralise(fileCount,
             Strings.RecycleUnavailable_Reassurance_Singular,
             Strings.RecycleUnavailable_Reassurance_Plural);
+        // Title carries the file count and size so they are spoken when the
+        // dialog opens, matching the Confirm dialogs' Title = on-card text.
+        // ShowInTaskbar=false and the custom chrome mean the Title is never
+        // rendered, so this is announcement-only, not a visible change.
+        Title = BodyText.Text;
 
         // Sized to content; the clamp stops a very large text scale
         // pushing the card past the work area, at which point the body

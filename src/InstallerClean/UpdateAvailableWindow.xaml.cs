@@ -12,6 +12,11 @@ public partial class UpdateAvailableWindow : Window
         VersionInfo.Text = string.Format(
             Strings.UpdateCheck_UpdateAvailable_Body,
             currentVersion, latestVersion);
+        // Title carries the version specifics so they are spoken when the
+        // dialog opens, matching the Confirm dialogs' Title = on-card text.
+        // ShowInTaskbar=false and the custom chrome mean the Title is never
+        // rendered, so this is announcement-only, not a visible change.
+        Title = VersionInfo.Text;
 
         // Sized to content; the clamp stops a very large text scale
         // pushing the card past the work area, at which point the
