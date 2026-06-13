@@ -349,7 +349,7 @@ scoop install installerclean
 | Adobe handling | Detects superseded patches | Excludes by default |
 | UI | Dark theme (WPF) | Windows Forms |
 | Data collection | None | None |
-| Delete safety | Recycle Bin, never a silent permanent delete | Permanent, no Recycle Bin |
+| Delete safety | Recycle Bin. If it isn't available for the drive, it asks: move instead or delete permanently | Permanent, no Recycle Bin |
 
 > **A note on `Win32_Product`:** The common-but-broken approach for listing installed products is `Win32_Product` (WMI), which [triggers MSI repair operations](https://gregramsey.net/2012/02/20/win32_product-is-evil/) on every product during enumeration. Both InstallerClean and PatchCleaner avoid it. Both use the Windows Installer COM interface. The `WMIProducts.vbs` filename in PatchCleaner's script is misleading; the script uses MSI COM, not WMI.
 
