@@ -189,6 +189,14 @@ public partial class MainWindow : Window
             ScanResultAnnouncer.Text = string.Empty;
             return;
         }
+        // Clear synchronously before the Background re-set so a manual
+        // Re-scan that finds the SAME files still re-announces: a live region
+        // raises no event when assigned the text it already holds, so without
+        // the clear a re-scan with an unchanged count would speak nothing and
+        // the user, who deliberately asked to scan again, would hear only the
+        // window. Clear-then-set guarantees a text change either way; the
+        // empty value speaks nothing, the headline that follows speaks once.
+        ScanResultAnnouncer.Text = string.Empty;
         Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
             ScanResultAnnouncer.Text = string.Format(Strings.Automation_ScanResultAnnouncement,
                 _vm.Scan.OrphanedSummaryText, _vm.Scan.OrphanedSizeDisplay));
