@@ -329,22 +329,32 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // Goes through IFileSystem so MockFileSystem-backed tests
         // don't hit real disk.
         _operationCts = new CancellationTokenSource();
-        // Heading before IsOperating: a heading assigned after the reveal
-        // can be spoken twice (see OperationHeadingText in MainWindow.xaml).
-        OperationProgress = Strings.Status_PreparingDestination;
-        IsOperating = true;
+        var probeToken = _operationCts.Token;
+        var probeTask = Task.Run(() =>
+        {
+            _fs.Directory.CreateDirectory(dest);
+            probeToken.ThrowIfCancellationRequested();
+            var probe = _fs.Path.Combine(dest, _fs.Path.GetRandomFileName());
+            _fs.File.WriteAllBytes(probe, Array.Empty<byte>());
+            probeToken.ThrowIfCancellationRequested();
+            _fs.File.Delete(probe);
+        }, probeToken);
         try
         {
-            var probeToken = _operationCts.Token;
-            await Task.Run(() =>
+            // Reveal the operating overlay only if the probe is slow, the way
+            // the scan waits 200 ms before showing its overlay. A local
+            // destination probes in well under that, so the overlay (and a
+            // screen reader's "Preparing destination folder...") never flashes
+            // in the instant before the confirm dialog; a UNC share that
+            // stalls on the SMB timeout still gets the overlay and its
+            // cancellable Cancel button. Heading before IsOperating keeps the
+            // start announced exactly once if the overlay does appear.
+            if (await Task.WhenAny(probeTask, Task.Delay(200, probeToken)) != probeTask)
             {
-                _fs.Directory.CreateDirectory(dest);
-                probeToken.ThrowIfCancellationRequested();
-                var probe = _fs.Path.Combine(dest, _fs.Path.GetRandomFileName());
-                _fs.File.WriteAllBytes(probe, Array.Empty<byte>());
-                probeToken.ThrowIfCancellationRequested();
-                _fs.File.Delete(probe);
-            }, probeToken);
+                OperationProgress = Strings.Status_PreparingDestination;
+                IsOperating = true;
+            }
+            await probeTask;
         }
         catch (OperationCanceledException)
         {
