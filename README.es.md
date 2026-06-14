@@ -12,7 +12,7 @@
 
 <h1 align="center">InstallerClean</h1>
 
-<p align="center"><strong>Un reemplazo de código abierto para <a href="https://www.homedev.com.au/free/patchcleaner">PatchCleaner</a>. Limpia con seguridad <code>C:\Windows\Installer</code>, la carpeta oculta de Windows que se va comiendo tu espacio en disco sin que te des cuenta.</strong></p>
+<p align="center"><strong>Una herramienta de código abierto para limpiar con seguridad <code>C:\Windows\Installer</code>, la carpeta oculta de Windows que se va comiendo tu espacio en disco sin que te des cuenta.</strong></p>
 
 <p align="center"><em>Úsala una vez. Quizá liberes algo de espacio. Tírala.</em></p>
 
@@ -25,12 +25,12 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=300" alt="Descargas totales"></a>
 </p>
 
-![Captura de pantalla de InstallerClean tras limpiar con éxito: 965 MB liberados, 68 archivos eliminados](docs/screenshots/04d-deleted-freed-success.webp)
+![Captura de pantalla de InstallerClean tras limpiar con éxito: 1,28 GB liberados, 69 archivos enviados a la Papelera de reciclaje](docs/screenshots/06-freed-success-done.webp)
 
-- **Qué hace:** Encuentra y elimina archivos innecesarios de `C:\Windows\Installer`, la carpeta oculta que Windows nunca limpia.
-- **Cuánto espacio:** Depende de tu software. En mi equipo fue de casi 1 GB. Un usuario de InstallerClean [informó de](https://github.com/no-faff/InstallerClean/issues/12#issuecomment-4395580816) 25 GB. Con Adobe Acrobat puede superar los 100 GB. Podría no ser nada en absoluto. La cuestión es que es rápido y no cuesta nada; todo lo que se pueda eliminar desaparecerá.
-- **¿Es seguro?** Sí. Solo elimina los archivos que el propio Windows declara que ya no necesita. Eliminar envía los archivos a la Papelera de reciclaje y nunca borra nada de forma permanente sin preguntar. Mover te permite guardarlos en un lugar seguro.
-- **Cómo obtenerlo:** [Descarga la última versión](../../releases/latest), ejecútala, listo.
+- **Qué hace:** InstallerClean hace una sola cosa: elimina archivos innecesarios de `C:\Windows\Installer`, una carpeta oculta que Windows nunca limpia. Tras un análisis casi instantáneo te dice si tienes alguno, muestra más detalle para los curiosos y te deja eliminarlos para liberar espacio en tu unidad C:. Lo usas una vez y a otra cosa.
+- **Cuánto espacio:** Los informes (opcionales) enviados hasta ahora muestran que el <!-- reports-freedpct-start -->36 %<!-- reports-freedpct-end --> de los equipos tenían archivos innecesarios que limpiar. De esos, la mediana liberada es de <!-- reports-median-start -->22 GB<!-- reports-median-end -->. Un par liberaron cientos de GB. En mi caso fue de 1,28 GB. El otro <!-- reports-nothingpct-start -->64 %<!-- reports-nothingpct-end --> no encontró nada que eliminar, lo que solo significa que su carpeta Installer ya estaba limpia. Más detalle en las [Preguntas frecuentes](#preguntas-frecuentes) más abajo.
+- **¿Es seguro?** Sí. Le pregunta a la propia API de Windows Installer qué archivos siguen haciendo falta y solo enumera los que Windows da por terminados. Es de código abierto (MIT) y no pregunta nada sobre ti: sin cuenta, sin anuncios, sin seguimiento, sin telemetría, nada corriendo en segundo plano. Nunca se conecta a internet por su cuenta.
+- **Cómo obtenerlo:** [Descarga la última versión](../../releases/latest). Ejecútala; analiza casi al instante. Elimina los archivos innecesarios. Listo.
 
 ## Contenido
 
@@ -58,89 +58,86 @@
 
 ## La carpeta de la que nadie te habla
 
-En todo PC con Windows existe una carpeta oculta llamada `C:\Windows\Installer`. Cada vez que instalas software que usa el sistema Windows Installer, o aplicas un parche a Microsoft Office, Adobe Acrobat, Visual Studio o cualquier otra aplicación basada en `.msi`, una copia de ese instalador o de ese archivo de parche `.msp` va a parar a esta carpeta. Y allí se queda.
+En todo PC con Windows existe una carpeta oculta llamada `C:\Windows\Installer`. Cada vez que instalas software que usa el sistema Windows Installer, o aplicas un parche a Microsoft Office, Adobe Acrobat, Visual Studio o cualquier otra aplicación basada en `.msi`, una copia de ese instalador o de ese archivo de parche `.msp` va a parar a esta carpeta, y allí se queda.
 
-Cuando desinstalas el software, los archivos siguen ahí. Cuando un parche nuevo sustituye a uno antiguo, los dos siguen ahí. Windows nunca los limpia. El Liberador de espacio en disco no los toca. DISM se ocupa de otra carpeta distinta. Con los años, la carpeta crece: 10 GB, 30 GB, 50 GB. En equipos con mucho software basado en MSI (Acrobat es un sospechoso habitual), puede [superar los 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
+Cuando desinstalas el software, los archivos siguen ahí. Cuando un parche nuevo sustituye a uno antiguo, los dos siguen ahí. Windows nunca los limpia. El Liberador de espacio en disco no los toca. DISM se ocupa de otra carpeta distinta. Con el tiempo, la carpeta crece: 1 GB, 5 GB, 20 GB, 50 GB. En equipos con mucho software basado en MSI (Acrobat es un sospechoso habitual), puede [superar los 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
 
 No son archivos temporales que reaparezcan en cuanto cierras una herramienta de limpieza. Son peso muerto de verdad: instaladores antiguos de software que desinstalaste hace años y parches que ya se han sustituido tres veces. Una vez fuera, no vuelven.
 
-**Si buscas una manera sencilla de liberar espacio en disco en Windows, esta carpeta es uno de los mejores sitios por donde empezar.** InstallerClean encuentra los archivos innecesarios y los elimina con seguridad.
-
-[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) ha sido la herramienta de referencia para esto, pero no se actualiza desde marzo de 2016 y es de código cerrado. InstallerClean es una alternativa de código abierto, con detección de parches sustituidos (que captura los parches de Acrobat que PatchCleaner excluye) y una interfaz moderna.
+**Si buscas una manera sencilla de liberar espacio en disco en Windows, esta carpeta es un buen sitio por donde empezar.** InstallerClean encuentra los archivos innecesarios y los elimina con seguridad.
 
 ## La búsqueda de ayuda
 
-Si alguna vez has buscado ayuda con esta carpeta, ya sabes cómo va la cosa. Alguien pregunta cómo limpiarla. Le dicen que ejecute el Liberador de espacio en disco. Lo prueba. Libera [600 MB de una carpeta de 180 GB](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb). El hilo se apaga.
+Si alguna vez has buscado ayuda con esta carpeta, seguramente ya sabes cómo va la cosa. Alguien pregunta cómo limpiarla. Le [dicen que ejecute el Liberador de espacio en disco](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb). Lo prueba. Libera 600 MB, ninguno de ellos de la carpeta de 180 GB (porque el Liberador de espacio en disco no toca `C:\Windows\Installer`). El hilo se apaga.
 
 > *«Todos los hilos que he encontrado suelen recomendar las mismas cosas, que no resuelven el problema, y luego mueren.»*
 >
-> ksparks519, r/Windows10 (traducido del inglés)
+> [ksparks519, r/Windows10](https://www.reddit.com/r/Windows10/comments/1bt8c5p/anyone_ever_figure_out_giant_installer_folders/) (traducido del inglés)
 
 O bien le dicen que ni la toque. En un hilo, a alguien con una carpeta Installer de 60 GB le dijeron que [«no la toques»](https://www.reddit.com/r/techsupport/comments/1hw4suq/my_windows_installer_folder_is_like_60gb_so_i/). Cuando preguntó qué debía hacer en su lugar, la respuesta fue: *«Acabo de decírtelo.»*
 
 El consejo habitual confunde borrar archivos al azar (lo cual sí es peligroso) con eliminar archivos que el propio Windows da por innecesarios (lo cual no lo es). InstallerClean hace lo segundo.
 
-Si ya has buscado ayuda con esto antes, probablemente ya hayas encontrado [PatchCleaner](https://www.homedev.com.au/free/patchcleaner) de [John Crawford](https://www.homedev.com.au/). Es una aplicación estupenda. La descargué e hizo exactamente lo que prometía: liberar muchísimo espacio. Lo único que no gestiona son los parches de Adobe; los excluye por defecto, y en equipos donde Adobe es el mayor responsable, quedan atrás muchos archivos que se podrían eliminar:
-
-> *«He descargado PatchCleaner para borrar los archivos `.msp` huérfanos... 29 GB de los archivos están "excluidos por filtros", así que PatchCleaner no parece servir de ayuda.»*
->
-> HeatherBunny1111, [r/techsupport](https://www.reddit.com/r/techsupport/comments/1qc4tcf/how_to_delete_msp_files_safely/) (traducido del inglés)
-
-InstallerClean detecta qué parches han sido sustituidos por actualizaciones más recientes y los marca como eliminables, incluidos los parches de Acrobat que PatchCleaner excluye.
-
 ## Qué hace
 
 1. **Analiza** `C:\Windows\Installer` en busca de archivos `.msi` y `.msp`
 2. **Consulta** la API de Windows Installer para identificar qué archivos siguen registrados
-3. **Muestra** lo que hace falta y lo que no, con sus tamaños
-4. **Elimina** los archivos innecesarios: los envía a la Papelera de reciclaje (si no está disponible para la unidad, la aplicación pregunta antes de cualquier borrado permanente) o los mueve a una carpeta que tú elijas
-
-Sin actividad de red automática. Dos botones opcionales hacen una sola llamada HTTPS, y solo al pulsarlos: **Buscar actualizaciones** en Acerca de, y **Enviar resumen** en la pantalla final. Encontrarás todos los detalles en [Lo que no hace](#lo-que-no-hace), más abajo.
+3. **Muestra** cuánto puedes liberar y cuánto sigue haciendo falta, con ventanas de detalle opcionales que enumeran cada archivo
+4. **Elimina** los archivos innecesarios: los envía a la Papelera de reciclaje, o los mueve a una carpeta que tú elijas
 
 ## Capturas de pantalla
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="Pantalla de bienvenida con el análisis en curso, tras encontrar 68 archivos para limpiar" width="900"><br>
+  <img src="docs/screenshots/01-initial-scan.webp" alt="Pantalla de bienvenida con el logotipo de InstallerClean mientras se ejecuta el análisis" width="900"><br>
   <em>Análisis inicial. Es muy rápido.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Ventana principal con 116 archivos aún en uso y 68 archivos para limpiar" width="900"><br>
-  <em>Resultados: cuánto se está usando y cuánto se puede eliminar.</em>
+  <img src="docs/screenshots/02-main-window.webp" alt="Ventana principal con 120 archivos que siguen haciendo falta (2,83 GB) y 69 archivos innecesarios para limpiar (1,28 GB), con un cuadro de ubicación para mover y los botones Eliminar y Mover" width="900"><br>
+  <em>Resultados: cuánto sigue haciendo falta y cuánto se puede eliminar.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03a-details-registered.webp" alt="Ventana de archivos registrados con los productos instalados y sus metadatos de la base de datos del instalador" width="900"><br>
-  <em>Los archivos aún en uso, con los metadatos leídos de la base de datos del instalador.</em>
+  <img src="docs/screenshots/03-details-registered.webp" alt="Ventana de archivos registrados con los productos instalados y los detalles de la base de datos del instalador para el producto seleccionado" width="900"><br>
+  <em>Detalle de los archivos que siguen haciendo falta, con los metadatos leídos de la base de datos del instalador.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03b-details-unused.webp" alt="Ventana de archivos innecesarios con los archivos .msi eliminables y sus motivos" width="900"><br>
-  <em>Los archivos que ya no hacen falta.</em>
+  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Ventana de archivos innecesarios con los archivos .msi eliminables ordenados por tamaño, el motivo por el que cada uno es eliminable y los detalles del archivo seleccionado" width="900"><br>
+  <em>Detalle de los archivos que ya no hacen falta.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04b-Delete-dialogue.webp" alt="Diálogo de confirmación de eliminación que indica que 68 archivos (965 MB) irán a la Papelera de reciclaje" width="900"><br>
+  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Confirmación de eliminación que pregunta si eliminar 69 archivos (1,28 GB) e indica que los archivos se enviarán a la Papelera de reciclaje" width="900"><br>
   <em>Confirmación antes de cada acción. Eliminar envía a la Papelera de reciclaje; Mover coloca los archivos donde tú elijas.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04d-deleted-freed-success.webp" alt="Superposición de éxito que muestra 965 MB liberados tras una eliminación, con 68 archivos enviados a la Papelera de reciclaje" width="900"><br>
+  <img src="docs/screenshots/06-freed-success-done.webp" alt="Superposición de éxito que muestra 1,28 GB liberados, con 69 archivos enviados a la Papelera de reciclaje" width="900"><br>
   <em>Tras una eliminación correcta.</em>
+  <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06a-scanned-again-all-clean.webp" alt="Superposición de «todo limpio» que aparece cuando no queda nada que eliminar en un análisis posterior" width="900"><br>
+  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="Superposición de «todo limpio» tras un nuevo análisis: no queda nada que limpiar en C:\Windows\Installer" width="900"><br>
   <em>Tras un nuevo análisis. No queda nada que limpiar.</em>
+  <br><br>
 </p>
 
 ## Cómo funciona
 
-InstallerClean identifica dos tipos de archivos innecesarios.
+InstallerClean identifica tres tipos de archivos innecesarios.
 
-**Los archivos huérfanos** son instaladores y parches que quedan tras desinstalar un programa. Windows ya no los referencia, pero siguen en la carpeta ocupando espacio.
+**Los archivos huérfanos** son los instaladores `.msi` (y cualquier parche `.msp`) que quedan tras desinstalar un programa. Windows ya no los referencia, pero siguen en la carpeta ocupando espacio.
 
 **Los parches sustituidos** son parches `.msp` antiguos que han sido reemplazados por otros más nuevos. Windows los marca como sustituidos en su propia base de datos, pero nunca los borra. Los proveedores que publican parches con frecuencia (Acrobat, Office, grandes herramientas de desarrollo) van acumulando parches sustituidos de forma indefinida.
+
+**Los parches obsoletos** son parches `.msp` que el fabricante ha retirado o dado de baja en lugar de reemplazarlos por una versión más reciente. Windows también registra ese estado y, de igual modo, deja el archivo en la carpeta.
 
 Para encontrarlos, InstallerClean llama directamente a la interfaz COM de Windows Installer mediante P/Invoke:
 
@@ -148,17 +145,17 @@ Para encontrarlos, InstallerClean llama directamente a la interfaz COM de Window
 - `MsiEnumPatchesEx` para encontrar todos los parches registrados de cada producto
 - `MsiGetPatchInfoEx` para leer el estado de cada parche (aplicado, sustituido u obsoleto)
 
-Todo archivo `.msi` o `.msp` de `C:\Windows\Installer` que no pertenezca a ningún producto registrado es huérfano. Todo parche marcado como sustituido y que no haga falta para la desinstalación se marca como eliminable.
+Todo archivo `.msi` o `.msp` de `C:\Windows\Installer` que no pertenezca a ningún producto registrado es huérfano y se marca como eliminable. Lo mismo ocurre con cualquier parche que la base de datos marque como sustituido u obsoleto y que no haga falta para la desinstalación.
 
 Si la API devuelve datos incompletos (algo raro, pero que puede ocurrir si el estado del instalador está dañado), la aplicación recurre a leer el registro. Esa lectura de reserva solo añade archivos al conjunto de «aún necesarios», nunca al de «eliminables».
 
-Tras completar un Mover o un Eliminar, las subcarpetas vacías que haya dentro de `C:\Windows\Installer` (los directorios que la caché deja atrás cuando su contenido desaparece) se podan en la misma pasada. Los puntos de reanálisis (reparse points) se omiten durante la poda para que un punto de unión (junction) creado dentro de la caché no pueda redirigir la limpieza fuera de ella.
+Tras completar un Mover o un Eliminar, las subcarpetas vacías que haya dentro de `C:\Windows\Installer` (los directorios que la caché deja atrás cuando su contenido desaparece) se podan en la misma pasada.
 
 ## ¿Es seguro?
 
 Sí. InstallerClean consulta la misma base de datos que el propio Windows usa para llevar el control de lo que está instalado. Si Windows dice que un archivo ya no hace falta, la aplicación se fía; no adivina a partir de nombres de archivo ni fechas.
 
-**Dentro de la aplicación.** Eliminar envía los archivos a la Papelera de reciclaje. Si la Papelera no está disponible para esa unidad (desactivada para la unidad, llena o dañada), InstallerClean no borra los archivos para siempre en silencio. Se detiene y te deja elegir: moverlos a un lugar seguro, borrarlos de forma permanente o cancelar. Los archivos solo se borran de forma permanente si lo eliges explícitamente. Mover es la opción aún más segura: coloca los archivos en una carpeta que tú elijas, para que puedas conservarlos hasta estar seguro de que nada se ha roto. Nada se toca hasta que confirmas. Si Windows Installer está escribiendo en la caché en ese momento, tiene una transacción anterior suspendida o tiene un renombrado pendiente tras reiniciar que apunta a la caché, Mover y Eliminar quedan desactivados y se muestra el motivo concreto. Los servicios de análisis, consulta, movimiento, eliminación, configuración y comprobación de reinicio pendiente están cubiertos por una batería de pruebas automatizadas que se ejecuta en cada commit (consulta la insignia de CI más arriba).
+**Dentro de la aplicación.** Eliminar envía los archivos a la Papelera de reciclaje. Si la Papelera no está disponible para esa unidad (desactivada para la unidad, llena o dañada), InstallerClean no borra los archivos para siempre en silencio. Se detiene y te deja elegir: moverlos a otro sitio, borrarlos de forma permanente o cancelar. Los archivos solo se borran de forma permanente si lo eliges explícitamente. Mover no hace falta por seguridad, los archivos se pueden eliminar sin riesgo; está ahí por si prefieres comprobarlo tú mismo primero, dejándolos en una carpeta que tú elijas durante el tiempo que quieras. Nada se toca hasta que confirmas. Si Windows Installer está escribiendo en la caché en ese momento, tiene una transacción anterior suspendida o tiene un renombrado pendiente tras reiniciar que apunta a la caché, Mover y Eliminar quedan desactivados y se muestra el motivo concreto. Los servicios de análisis, consulta, movimiento, eliminación, configuración y comprobación de reinicio pendiente están cubiertos por una batería de pruebas automatizadas que se ejecuta en cada commit (consulta la insignia de CI más arriba).
 
 **Verificación del binario.** InstallerClean no está firmado. Los certificados de firma de código cuestan dinero todos los años y prefiero mantener el proyecto gratuito, abierto y financiado por donaciones.
 
@@ -175,33 +172,37 @@ VirusTotal: limpio en todos los motores. Hay enlaces en vivo en las notas de cad
 <a id="recovery"></a>
 ## Si te llega a faltar un archivo de `C:\Windows\Installer`
 
-InstallerClean solo elimina los archivos que Windows da por terminados, así que no puede dejar a un programa sin posibilidad de reparación, actualización o desinstalación. Quitar archivos de `C:\Windows\Installer` a mano, o con una herramienta que no consulte primero la base de datos del instalador, es otra cosa, y es la razón por la que el consejo habitual es no tocar la carpeta. Ese consejo suele ser acertado, pero no si usas InstallerClean. Aquí tienes el panorama completo, y qué hacer si un archivo necesario ya ha desaparecido.
+InstallerClean solo elimina los archivos que el propio Windows da por innecesarios, así que nunca puede ser la causa de que falte un archivo. Pero si ya ha desaparecido alguno, InstallerClean lo detecta y lo señala. Aquí tienes la solución.
 
-### Acerca de `C:\Windows\Installer`, y cómo recuperar un archivo que falta
+Descarga el instalador de ese programa desde su fabricante y ejecútalo sobre tu instalación existente; no desinstales primero. Usa la versión que tienes ahora si puedes, porque Windows puede rechazar una distinta. Eso normalmente devuelve el archivo a su sitio y deja tu configuración intacta. Vuelve a analizar en InstallerClean y, si ha funcionado, el aviso habrá desaparecido.
+
+Eso suele funcionar. Lo que sigue es la versión más completa de la propia Microsoft: el detalle oficial, y los casos más difíciles para cuando no es tan sencillo. Nada de esto tiene que ver con InstallerClean, y no puedo mejorar las indicaciones de Microsoft, así que me limito a transmitírtelas.
+
+<details>
+<summary>La posición más completa de Microsoft</summary>
 
 *Las citas de Microsoft que aparecen a continuación se reproducen en su versión original en inglés.*
 
-`C:\Windows\Installer` es la caché de Windows Installer. Cuando instalas un programa basado en MSI o aplicas un parche, Windows guarda aquí una copia del instalador y anota, para cada producto, el archivo que espera encontrar más adelante. Estos archivos no se usan mientras el programa funciona; se usan cuando Windows lo repara, lo actualiza o lo desinstala. Borra uno que un programa todavía necesita y nada se rompe de inmediato; es justo por eso por lo que resulta fácil borrarlos sin consecuencias aparentes y solo tener problemas meses después. Microsoft lo expresa así:
+Guía completa: [Restore missing Windows Installer cache files](https://learn.microsoft.com/en-us/troubleshoot/windows-client/application-management/missing-windows-installer-cache).
 
+*Puede que no se manifieste de inmediato:*
 > "If the installer cache is compromised, you may not immediately see problems until you take an action such as uninstalling, repairing, or updating a product."
 
-La recuperación no es sencilla, y Microsoft es franco al respecto:
-
-> "If application files are missing from the Windows Installer Cache, ask the vendor or support team for the application about the missing files. You must follow the procedures or steps recommended by the application vendor to restore the files. In some cases, you may have to rebuild the operating system and reinstall the application to fix the problem."
-
-> "Windows support engineers cannot help you recover missing application files from the Windows Installer cache."
-
-Tampoco puedes tomar prestado el archivo de otra máquina:
-
+*Los archivos son únicos en cada equipo, así que no puedes copiar uno desde otro PC:*
 > "Missing files cannot be copied between computers because the files are unique."
 
-En la práctica, la solución que suele funcionar es descargar el instalador del programa afectado desde su fabricante y ejecutarlo sobre tu instalación existente. No desinstales primero: desinstalar es en sí mismo uno de los pasos que necesita el archivo que falta. Usa la versión que tienes instalada actualmente si todavía puedes conseguirla, porque Windows puede rechazar una distinta:
+*Tampoco puedes recuperar solo el archivo de una copia de seguridad:*
+> "To restore the missing files, a full system state restoration is required. It is not possible to replace only the missing files from a previous backup."
 
+*La recuperación recomendada, y sus límites sin rodeos:*
+> "If application files are missing from the Windows Installer Cache, ask the vendor or support team for the application about the missing files. You must follow the procedures or steps recommended by the application vendor to restore the files. In some cases, you may have to rebuild the operating system and reinstall the application to fix the problem."
+>
+> "Windows support engineers cannot help you recover missing application files from the Windows Installer cache."
+
+*Por qué importa usar la misma versión:*
 > "The upgrade cannot be installed by the Windows Installer service because the program to be upgraded may be missing, or the upgrade may update a different version of the program."
 
-Esto normalmente restaura el archivo y deja tu configuración intacta, pero Microsoft no lo garantiza, y su último recurso documentado es reinstalar el programa, o reconstruir Windows. Esa es la posición oficial, contada tal como la encuentro. No la he causado yo y no puedo mejorar las propias indicaciones de Microsoft; me limito a decirte cuál es.
-
-Nada de esto puede ocurrir por culpa de InstallerClean. Solo elimina archivos que el propio Windows da por innecesarios, de modo que el archivo que una futura reparación, actualización o desinstalación irá a buscar nunca es uno que haya tocado. Las indicaciones de Microsoft están en [Restore missing Windows Installer cache files](https://learn.microsoft.com/en-us/troubleshoot/windows-client/application-management/missing-windows-installer-cache).
+</details>
 
 ## Accesibilidad
 
@@ -218,13 +219,12 @@ Si algo aquí te estorba, [abre un issue](../../issues). Los problemas de accesi
 - WinSxS (`C:\Windows\WinSxS`) es una carpeta distinta con reglas distintas. Para esa, ejecuta `Dism /Online /Cleanup-Image /StartComponentCleanup` desde un símbolo del sistema elevado.
 - Sin servicio en segundo plano, sin tarea programada, sin limpieza automática. La aplicación se ejecuta cuando tú la inicias.
 - El acceso al registro es de solo lectura. La aplicación consulta la base de datos de Windows Installer; no la modifica.
-- Sin telemetría automática, sin red en segundo plano. La aplicación no hace ninguna llamada de red hasta que pulses uno de los dos botones. **Buscar actualizaciones** en Acerca de consulta la API pública de releases de GitHub al pulsarlo y te dice si tienes la última versión (un solo GET HTTPS, cadena identificadora `InstallerClean/<version>`). **Enviar resumen** en la pantalla final lee `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` y lo envía mediante POST HTTPS a un endpoint de No Faff para que yo pueda ver si la ejecución funcionó. El JSON contiene únicamente contadores y etiquetas categóricas: ninguna ruta de archivo, ningún nombre de usuario, ningún identificador de equipo, ninguna hora del día. Al pulsar se abre una ventana de confirmación que muestra el JSON exacto que se va a enviar; revísalo ahí y pulsa Enviar para confirmar, o Cancelar para echarte atrás. Una vez por equipo: tras un envío correcto el botón queda oculto para siempre; si el primer intento falla con un error transitorio, la próxima sesión vuelve a preguntar.
-- Sin extras incluidos. Sin barras de herramientas, sin ofertas de terceros, sin que intenten venderte nada.
-- El único permiso que se pide, más allá de iniciar la aplicación, es el de Administrador, necesario porque a `C:\Windows\Installer` solo pueden acceder los administradores.
+- Solo se conecta a internet cuando se lo pides: una comprobación de actualizaciones manual; el resumen anónimo opcional (solo para que yo sepa que funciona); y enlaces a la documentación de GitHub y a una página de donaciones, que se abren en tu navegador si decides pulsarlos.
+- Sin barras de herramientas, sin software incluido, sin adware.
 
 ## Preguntas frecuentes
 
-**¿Realmente voy a liberar GB de espacio?** Depende de tu equipo. Una instalación limpia de Windows 11 sin software adicional no tiene nada que eliminar. Una estación de trabajo de desarrollo de larga vida, o cualquier equipo con mucho software basado en MSI (Acrobat, Office, LibreOffice, grandes herramientas de desarrollo), puede tener decenas de GB. Ejecuta `installerclean-cli /s` para ver exactamente qué se eliminaría antes de comprometerte.
+**¿Realmente voy a liberar GB de espacio?** Depende de tu equipo. Una instalación limpia de Windows 11 sin software adicional no tiene nada que eliminar. Una estación de trabajo de desarrollo de larga vida, o cualquier equipo con mucho software basado en MSI (Acrobat, Office, LibreOffice, grandes herramientas de desarrollo), puede tener decenas de GB. En cualquier caso, verás exactamente cuánto en cuanto lo ejecutes.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
 De los 75 informes que me han enviado amablemente (gracias 🙏) desde que la v1.8.0 añadió la opción:
@@ -236,41 +236,17 @@ De los 75 informes que me han enviado amablemente (gracias 🙏) desde que la v1
 <!-- reports-stats-end -->
 
 <details>
-<summary>Así es como se ve un informe</summary>
+<summary>Esos informes provienen del botón opcional «Enviar resumen». Esto es lo que verás antes de que se envíe nada.</summary>
 
-```json
-{
-  "schemaVersion": 3,
-  "app": { "version": "1.9.0" },
-  "os": "Windows 11 (X64)",
-  "scan": {
-    "durationMs": 1820,
-    "registeredCount": 148,
-    "orphanedCount": 40,
-    "supersededCount": 25,
-    "obsoletedCount": 5,
-    "missingFromDiskCount": 0,
-    "pendingReboot": "clean"
-  },
-  "operation": {
-    "kind": "delete",
-    "outcome": "complete",
-    "filesProcessed": 70,
-    "filesFailed": 0,
-    "bytesFreed": 22548578304,
-    "errors": [],
-    "moveDestinationKind": null
-  }
-}
-```
-
-Solo contiene contadores y etiquetas categóricas: ninguna ruta de archivo, ningún nombre de usuario, ningún identificador de equipo.
+![Diálogo de confirmación titulado «¿Enviar esto a No Faff?» que muestra el informe completo que se enviaría: la versión de la aplicación, la versión de Windows, los recuentos del análisis, los archivos procesados y los bytes liberados, sin rutas de archivo, sin nombres ni identificadores de equipo, y con una nota de que nada te identifica a ti ni a tu equipo, solo si la aplicación funcionó y cuánto espacio se liberó, con los botones Cancelar y Enviar.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
 
 </details>
 
-**¿Por qué pide Administrador?** `C:\Windows\Installer` es propiedad de SYSTEM y está restringido solo a administradores. Leer la carpeta, consultar la API de la base de datos del Installer y mover o eliminar archivos requieren elevación. No existe ninguna vía en modo usuario.
+**¿Por qué pide Administrador?** `C:\Windows\Installer` está restringido a los administradores. Leer la carpeta, consultar la base de datos del Installer y mover o eliminar archivos lo requieren, así que la aplicación tiene que ejecutarse como administrador.
 
-**¿Puedo deshacer una eliminación?** Normalmente, sí. Cuando la Papelera está disponible para la unidad, Eliminar envía los archivos ahí y puedes restaurarlos desde la Papelera. Si no está disponible, la aplicación nunca borra para siempre por su cuenta (consulta [¿Es seguro?](#es-seguro)). Para una red de seguridad que tú controlas, usa Mover para colocar los archivos en una carpeta a tu elección y verifica que nada se rompa antes de borrarlos desde ahí.
+**¿Por qué dice Windows «Editor desconocido»?** Porque InstallerClean no está firmado digitalmente. Un certificado de firma cuesta dinero todos los años, y prefiero mantener la aplicación gratuita antes que pagar por uno. Así que, al ejecutarla, Windows SmartScreen muestra «Windows protegió su PC». Pulsa **Más información** y luego **Ejecutar de todas formas**. Hacerlo es seguro: el código fuente es público, y cada versión incluye enlaces a VirusTotal y hashes SHA-256 que puedes comprobar antes.
+
+**¿Puedo deshacer una eliminación?** Normalmente, sí. Cuando la Papelera está disponible para la unidad, Eliminar envía los archivos ahí y puedes restaurarlos desde la Papelera. Si no está disponible, la aplicación nunca borra para siempre por su cuenta (consulta [¿Es seguro?](#es-seguro)). Y si prefieres tener una vía de vuelta que tú controlas, Mover coloca los archivos en una carpeta que tú elijas; bórralos de ahí cuando te quedes tranquilo.
 
 **¿Va a quejarse Windows si quito estos archivos?** No. InstallerClean solo elimina los archivos que el propio Windows da por terminados, así que nada de lo que elimina hace falta para reparar, actualizar o desinstalar un programa. Si un archivo necesario llega a desaparecer de `C:\Windows\Installer` por algún otro medio, consulta [Si te llega a faltar un archivo de C:\Windows\Installer](#recovery).
 
@@ -280,7 +256,7 @@ Solo contiene contadores y etiquetas categóricas: ninguna ruta de archivo, ning
 
 **¿Funciona en Windows 7 u 8?** Sin probar y sin soporte. Está pensado para Windows 10 y 11.
 
-**¿Sirve para RMM o despliegue masivo?** Sí. La CLI sale con códigos distintos por resultado (0 éxito, 2 parcial, 1 fallo total, 75 transitorio, 130 Ctrl+C), de modo que una tarea programada puede reintentar en 75 sin confundirlo con un fallo total. Escribe un resumen por ejecución en el registro de eventos de Aplicación y respeta el mismo mutex de instancia única que la interfaz gráfica. Consulta la sección Línea de comandos.
+**¿Sirve para RMM o despliegue masivo?** Sí. La CLI sale con códigos distintos por resultado (0 éxito, 2 parcial, 1 fallo total, 75 transitorio, 130 para un Ctrl+C antes de procesar ningún archivo; un Ctrl+C que cae a mitad del lote sale con 2, parcial, porque ya se había hecho trabajo), de modo que una tarea programada puede reintentar en 75 sin confundirlo con un fallo total. Escribe un resumen por ejecución en el registro de eventos de Aplicación y respeta el mismo mutex de instancia única que la interfaz gráfica. El programa de instalación también se instala en silencio con los modificadores estándar de Inno Setup (`/SILENT` o `/VERYSILENT`); el lanzamiento posterior a la instalación se omite en las instalaciones silenciosas. Consulta la sección Línea de comandos.
 
 ## Descarga
 
@@ -304,6 +280,14 @@ scoop install installerclean
 
 ## Comparativa con PatchCleaner
 
+Si ya has buscado esta carpeta antes, la herramienta que con más probabilidad habrás encontrado es [PatchCleaner](https://www.homedev.com.au/free/patchcleaner). Sigue funcionando bien, pero hice InstallerClean porque PatchCleaner es de código cerrado, no se actualiza desde marzo de 2016 y, por defecto, no toca los productos de Adobe. Su comprobación de huérfanos marcaba por error los parches de Adobe, y quitarlos rompía las actualizaciones de Adobe, así que deja en paz todos los archivos de Adobe a menos que desactives el filtro. En los equipos donde Adobe es el mayor responsable, ahí está la mayor parte del espacio:
+
+> *«He descargado PatchCleaner para borrar los archivos `.msp` huérfanos, pero al parecer esto solo liberaría 250 MB de espacio. 29 GB de los archivos están "excluidos por filtros", así que PatchCleaner no parece servir de ayuda.»*
+>
+> HeatherBunny1111, [r/techsupport](https://www.reddit.com/r/techsupport/comments/1qc4tcf/how_to_delete_msp_files_safely/) (traducido del inglés)
+
+InstallerClean lee los propios registros de parches de Windows Installer, así que puede distinguir qué parches de Adobe están realmente sustituidos y eliminarlos con seguridad, sin un filtro general. Así es como se comparan las dos:
+
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | Última actualización | 2026 (activo) | 3 de marzo de 2016 |
@@ -314,7 +298,7 @@ scoop install installerclean
 | Gestión de Adobe | Detecta los parches sustituidos | Excluye por defecto |
 | Interfaz | Tema oscuro (WPF) | Windows Forms |
 | Recopilación de datos | Ninguna | Ninguna |
-| Seguridad al eliminar | Papelera de reciclaje, nunca un borrado permanente silencioso | Permanente, sin Papelera |
+| Seguridad al eliminar | Papelera de reciclaje. Si no está disponible, pregunta: mover en su lugar o borrar de forma permanente | Permanente, sin Papelera |
 
 > **Nota sobre `Win32_Product`:** El enfoque común pero defectuoso para listar productos instalados es `Win32_Product` (WMI), que [desencadena operaciones de reparación de MSI](https://gregramsey.net/2012/02/20/win32_product-is-evil/) en cada producto durante la enumeración. Tanto InstallerClean como PatchCleaner lo evitan. Ambos usan la interfaz COM de Windows Installer. El nombre de archivo `WMIProducts.vbs` del script de PatchCleaner resulta engañoso; el script usa COM de MSI, no WMI.
 
@@ -342,7 +326,7 @@ Ejecutado sin argumentos, o con una opción no reconocida, `installerclean-cli` 
 
 `/s` es una ejecución en seco: analiza, enumera lo que eliminaría con nombres y tamaños, y sale. Útil para auditar antes de limpiar. El código de salida es `0` si el análisis tiene éxito, `1` si falla y `130` con Ctrl+C. Todos los archivos están en `C:\Windows\Installer`.
 
-`/d` y `/m` analizan y luego actúan. `/d` envía los archivos eliminables a la Papelera de reciclaje. `/m` los mueve a una carpeta (la que indiques en la línea de comandos, o la guardada por defecto desde la interfaz gráfica). Códigos de salida: `0` éxito completo, `2` parcial (algunos archivos correctos, otros fallidos), `1` fallo total (análisis fallido, argumentos incorrectos o todos los archivos del lote han fallado), `75` una condición transitoria bloqueó la ejecución (el mensaje mostrado indica cuál y si reintentar servirá de algo), `130` Ctrl+C.
+`/d` y `/m` analizan y luego actúan. `/d` envía los archivos eliminables a la Papelera de reciclaje. `/m` los mueve a una carpeta (la que indiques en la línea de comandos, o la guardada por defecto desde la interfaz gráfica). Códigos de salida: `0` éxito completo, `2` parcial (algunos archivos correctos, otros fallidos), `1` fallo total (análisis fallido, argumentos incorrectos o todos los archivos del lote han fallado), `75` una condición transitoria bloqueó la ejecución (el mensaje mostrado indica cuál y si reintentar servirá de algo), `130` para un Ctrl+C antes de procesar ningún archivo (un Ctrl+C que cae a mitad del lote sale con `2`, parcial, porque ya se había hecho trabajo).
 
 Toda la salida de la CLI, incluidos los mensajes de error y de diagnóstico, va a stdout; no hay un flujo stderr aparte. El código de salida es la señal legible por máquina (y la entrada por ejecución en el registro de eventos de Aplicación lo refleja), así que un script debería basarse en el código de salida en lugar de analizar el texto, y `installerclean-cli /s > audit.txt` captura toda la ejecución, incluida cualquier línea de error.
 
@@ -358,7 +342,7 @@ Las descargas portable y slim solo contienen el exe de la interfaz gráfica. Si 
 
 ## Requisitos
 
-- Windows 10 u 11
+- Windows 10 (versión 1607 / compilación 14393 o posterior, la más antigua que admite el runtime de .NET 10) o Windows 11
 - Privilegios de administrador (a `C:\Windows\Installer` solo pueden acceder los administradores)
 
 Consulta [Descarga](#descarga) para ver las variantes setup, portable, slim y CLI.
@@ -368,7 +352,7 @@ Consulta [Descarga](#descarga) para ver las variantes setup, portable, slim y CL
 ```
 git clone https://github.com/no-faff/InstallerClean.git
 cd InstallerClean
-dotnet build src/InstallerClean/InstallerClean.csproj
+dotnet build src/InstallerClean.sln
 ```
 
 Ejecutar las pruebas:
