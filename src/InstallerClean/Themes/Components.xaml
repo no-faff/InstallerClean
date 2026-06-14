@@ -380,17 +380,23 @@
                     <Border x:Name="Bg" Background="{TemplateBinding Background}"
                             CornerRadius="{StaticResource Radius.Pill}">
                         <Grid>
+                            <!-- No Margin here. WPF's TextBoxView applies
+                                 TextBox.Padding to the typed text itself (the
+                                 stock TextBox template leaves PART_ContentHost
+                                 marginless, yet Padding still insets the
+                                 text), so binding Padding to this ScrollViewer's
+                                 Margin too would apply it twice and push the
+                                 typed text and caret a whole Padding.Left right
+                                 of the placeholder. -->
                             <ScrollViewer x:Name="PART_ContentHost"
-                                          VerticalAlignment="Center"
-                                          Margin="{TemplateBinding Padding}"/>
-                            <!-- Placeholder text comes from the box's Tag.
-                                 It shares PART_ContentHost's cell and the
-                                 same Margin, so it begins at exactly the x
-                                 the typed text and caret do, rather than an
-                                 overlay sibling having to guess the caret
-                                 inset. IsHitTestVisible=False lets a click
-                                 fall through to the TextBox; shown only
-                                 while the box is empty. -->
+                                          VerticalAlignment="Center"/>
+                            <!-- Placeholder text comes from the box's Tag. Its
+                                 Margin is the box Padding, the single inset
+                                 TextBoxView gives the typed text, so the
+                                 placeholder begins where the typed text and
+                                 the caret do. A click falls through to it
+                                 (IsHitTestVisible=False); shown only while the
+                                 box is empty. -->
                             <TextBlock x:Name="Placeholder"
                                        Text="{TemplateBinding Tag}"
                                        Margin="{TemplateBinding Padding}"
