@@ -103,7 +103,7 @@ public partial class MainWindow : Window
 
     private void ApplyWorkAreaBounds()
     {
-        // Set Width directly; do NOT toggle SizeToContent here. Toggling it
+        // Width is assigned directly; SizeToContent is not toggled here. Toggling it
         // to Manual around the Width assignment opens a fresh high-text-scale
         // launch NARROW, the enlarged text wrapping cramped (observed
         // 2026-06-13 at ~199%): the toggle runs in this constructor-time call

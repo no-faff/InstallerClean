@@ -77,7 +77,7 @@ public class ResultLogEntryTests
         // deliberate, reviewed act. Schema 3 carries the per-file
         // delete error code (the IFileOperation HRESULT) on each error
         // bucket and uses the IFileOperation-era category names
-        // (RecycleFailed / PermanentlyDeleted) the v1.8.3 delete engine
+        // (RecycleFailed / PermanentlyDeleted) the IFileOperation delete engine
         // produces, where schema 2 had ShellRefused and no code.
         Assert.Equal(3, ResultLogEntry.CurrentSchemaVersion);
     }

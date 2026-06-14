@@ -283,8 +283,8 @@ public class MainViewModelTests
         CleanupViewModel.MoveDestinationSaveDelay + TimeSpan.FromMilliseconds(300);
 
     // Applies a captured Update(Action<AppSettings>) to a fresh AppSettings so a
-    // Received().Update(...) assertion can check the action's effect: the writers
-    // now persist via ISettingsService.Update, not a TrySave of a prepared snapshot.
+    // Received().Update(...) assertion can check the action's effect:
+    // ISettingsService.Update takes a mutator action, not a prepared snapshot to save.
     private static AppSettings Applied(Action<AppSettings> mutate)
     {
         var settings = new AppSettings();

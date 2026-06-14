@@ -8,11 +8,11 @@ on:
 
 jobs:
   build-and-test:
-    # Pinned to the soon-to-be-default image. windows-latest flips
-    # from Server 2022 (VS2022) to Server 2025 (VS2026) on 2026-06-15;
-    # pinning now eats the migration with weeks of buffer to find any
-    # incompatibility instead of meeting it on flip day. Revert to
-    # windows-2022 if the image regresses.
+    # Pinned to windows-2025 ahead of the windows-latest image flip from
+    # Server 2022 (VS2022) to Server 2025 (VS2026) on 2026-06-15: pinning
+    # before the flip surfaces any incompatibility on a controlled schedule
+    # rather than on flip day. windows-2022 is the fallback if the 2025
+    # image regresses.
     runs-on: windows-2025
 
     steps:

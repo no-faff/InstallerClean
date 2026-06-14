@@ -31,7 +31,7 @@
          builds and publishes alike (locked-mode restore compares the
          reference SETS and fails on any difference). The version
          tracks the pinned SDK band: when absent, the SDK injects its
-         own matching version, so bump this with the SDK. -->
+         own matching version, so this version moves in step with the SDK band. -->
     <PackageReference Include="Microsoft.NET.ILLink.Tasks" Version="10.0.8" PrivateAssets="all" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">

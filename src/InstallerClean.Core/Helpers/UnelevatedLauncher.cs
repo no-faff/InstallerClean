@@ -79,7 +79,7 @@ internal static class UnelevatedLauncher
             // apartment (the WPF UI thread is STA, but Core asserts
             // nothing about its callers). The chain is a handful of
             // cross-process COM calls and returns quickly; Join keeps the
-            // call synchronous for the caller, as the old token chain was.
+            // call synchronous for the caller.
             var sta = new Thread(() =>
             {
                 var co = ShellDispatchNative.CoInitializeEx(IntPtr.Zero, ShellDispatchNative.COINIT_APARTMENTTHREADED);

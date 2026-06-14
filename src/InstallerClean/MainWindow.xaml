@@ -266,7 +266,7 @@
 
                     <!-- The placeholder is the box's Tag, rendered inside the
                          PillTextBox template so it lines up with the caret;
-                         the tooltip is dropped because the placeholder now
+                         there is no separate tooltip: the placeholder
                          carries the what and the why. -->
                     <TextBox Grid.Column="0" x:Name="MoveDestinationInput" Style="{StaticResource PillTextBox}"
                              Text="{Binding Cleanup.MoveDestination, Mode=TwoWay,

@@ -53,7 +53,7 @@ esc() { printf '%s' "$1" | sed 's/[.]/\\./g'; }
 # an identifier char nor a dot, so Type.Body does not match Type.Body.Strong.
 bounded_strict() { grep -qE "(^|[^A-Za-z0-9_.])$(esc "$1")([^A-Za-z0-9_.]|$)"; }
 
-# --- resx keys ---
+# resx keys
 mapfile -t RESX_KEYS < <(grep -oE '<data name="[A-Za-z][A-Za-z0-9._]+' "$RESX" \
                            | sed 's|<data name="||' | sort -u)
 resx_unused=()
@@ -67,7 +67,7 @@ for k in "${RESX_KEYS[@]}"; do
     resx_unused+=("$k")
 done
 
-# --- XAML x:Key resources ---
+# XAML x:Key resources
 mapfile -t XAML_KEYS < <(grep -hoE 'x:Key="[^"]+"' "${XAML[@]}" \
                            | sed -E 's/x:Key="//; s/"$//' | sort -u)
 xaml_unused=()
@@ -79,7 +79,7 @@ for k in "${XAML_KEYS[@]}"; do
     xaml_unused+=("$k")
 done
 
-# --- report ---
+# report
 echo "Unused-resource report (read-only; nothing is modified)."
 echo
 echo "Resx keys in Strings.resx with no consumer (${#resx_unused[@]}):"

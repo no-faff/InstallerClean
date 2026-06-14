@@ -175,7 +175,7 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
     /// FOFX_RECYCLEONDELETE: deleting an item already in the bin without
     /// the recycle flag removes it for good. Failures are swallowed; the
     /// probe's verdict stands either way and a surviving entry is just
-    /// the residue the probe used to always leave.
+    /// the probe's own throwaway file left in the bin, which is harmless.
     /// </summary>
     private static void DeleteBinItemPermanently(IntPtr psiBinItem)
     {
