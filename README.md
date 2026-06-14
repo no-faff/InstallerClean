@@ -104,7 +104,7 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Main window showing 116 files still needed (2.78 GB) and 69 unneeded files to clean up (1.28 GB), with a move location box and Delete and Move buttons" width="900"><br>
+  <img src="docs/screenshots/02-main-window.webp" alt="Main window showing 120 files still needed (2.83 GB) and 69 unneeded files to clean up (1.28 GB), with a move location box and Delete and Move buttons" width="900"><br>
   <em>Results: how much is still needed, how much is removable.</em>
   <br><br>
 </p>
