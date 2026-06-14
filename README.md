@@ -10,7 +10,7 @@
 
 <h1 align="center">InstallerClean</h1>
 
-<p align="center"><strong>An open-source replacement for <a href="https://www.homedev.com.au/free/patchcleaner">PatchCleaner</a>. Safely clean up <code>C:\Windows\Installer</code>, the hidden Windows folder that quietly eats your disk space.</strong></p>
+<p align="center"><strong>An open-source tool to safely clean up <code>C:\Windows\Installer</code>, the hidden Windows folder that quietly eats your disk space.</strong></p>
 
 <p align="center"><em>Use it once. Maybe save some space. Chuck it away.</em></p>
 
@@ -26,8 +26,8 @@
 ![Screenshot of InstallerClean after a successful clean-up: 1.28 GB freed, 69 files sent to the Recycle Bin](docs/screenshots/06-freed-success-done.webp)
 
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
-- **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->36%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->22 GB<!-- reports-median-end -->. A couple cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->64%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean.
-- **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (MIT) and I have no interest in who you are: no account, no ads, no tracking, nothing running in the background. It only connects to the internet when you tell it to: a manual update check, and the optional anonymous summary (which you read before it goes, says nothing about you, and just lets me know the app is working and how much space people are freeing). Everything else is just links, to GitHub and a donate page, which open in your browser.
+- **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->36%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->22 GB<!-- reports-median-end -->. A couple cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->64%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean. More detail in the [FAQ](#faq) below.
+- **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (MIT) and asks nothing about you: no account, no ads, no tracking, no telemetry, nothing running in the background. It never goes online by itself.
 - **Get it:** [Download the latest release](../../releases/latest). Run it; it scans almost instantly. Delete any unneeded files. Done.
 
 ## Contents
@@ -56,44 +56,32 @@
 
 ## The folder nobody tells you about
 
-There's a hidden folder on every Windows PC called `C:\Windows\Installer`. Every time you install software that uses the Windows Installer system, or apply a patch to Microsoft Office, Adobe Acrobat, Visual Studio or any other `.msi`-based application, a copy of that installer or `.msp` patch file goes into this folder. And stays there.
+There's a hidden folder on every Windows PC called `C:\Windows\Installer`. Every time you install software that uses the Windows Installer system, or apply a patch to Microsoft Office, Adobe Acrobat, Visual Studio or any other `.msi`-based application, a copy of that installer or `.msp` patch file goes into this folder - and stays there.
 
-When you uninstall the software, the files stay. When a newer patch replaces an older one, both stay. Windows never cleans them up. Disk Cleanup doesn't touch them. DISM is for a different folder entirely. Over the years, the folder grows: 10 GB, 30 GB, 50 GB. On machines with heavy MSI-using software (Acrobat is a frequent culprit), it can [pass 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
+When you uninstall the software, the files stay. When a newer patch replaces an older one, both stay. Windows never cleans them up. Disk Cleanup doesn't touch them. DISM is for a different folder entirely. Over time, the folder grows: 1 GB, 5 GB, 20 GB, 50 GB. On machines with heavy MSI-using software (Acrobat is a frequent culprit), it can [pass 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
 
 These aren't temp files that get recreated the moment you close a cleaning tool. They're genuine dead weight: old installers from software you uninstalled years ago and patches that have been replaced three times over. Once they're gone, they don't come back.
 
-**If you're looking for an easy way to free up disk space on Windows, this folder is one of the best places to start.** InstallerClean finds the unneeded files and removes them safely.
-
-[PatchCleaner](https://www.homedev.com.au/free/patchcleaner) has been the go-to tool for this, but it hasn't been updated since March 2016 and it's closed source. InstallerClean is an open-source alternative, with superseded-patch detection (which catches the Acrobat patches PatchCleaner excludes) and a modern UI.
+**If you're looking for an easy way to free up disk space on Windows, this folder is a good place to start.** InstallerClean finds the unneeded files and removes them safely.
 
 ## The search for help
 
-If you've ever searched for help with this folder, you know how it goes. Someone asks how to clean it. They're told to run Disk Cleanup. They try it. It frees up [600 MB of a 180 GB folder](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb). The thread goes quiet.
+If you've ever searched for help with this folder, you probably know how it goes. Someone asks how to clean it. They're [told to run Disk Cleanup](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb). They try it. It clears 600 MB, none of it from the 180 GB folder (because Disk Cleanup doesn't touch `C:\Windows\Installer`). The thread goes quiet.
 
 > *"All of the threads I've found tend to recommend the same things which don't solve the problem, and then go dead."*
 >
-> ksparks519, r/Windows10
+> [ksparks519, r/Windows10](https://www.reddit.com/r/Windows10/comments/1bt8c5p/anyone_ever_figure_out_giant_installer_folders/)
 
 Or they're told not to touch it at all. In one thread, someone with a 60 GB Installer folder was told to ["don't mess with it."](https://www.reddit.com/r/techsupport/comments/1hw4suq/my_windows_installer_folder_is_like_60gb_so_i/) When they asked what they should do instead, the reply was: *"I just told you."*
 
 The standard advice confuses deleting files at random (which genuinely is dangerous) with removing files that Windows itself says it no longer needs (which isn't). InstallerClean does the latter.
 
-If you've searched for help with this before, you've probably already found [PatchCleaner](https://www.homedev.com.au/free/patchcleaner) by [John Crawford](https://www.homedev.com.au/). It's a fantastic app. I downloaded it and it did exactly what it said: freed up a ton of space. The one thing it doesn't handle is Adobe patches; it excludes them by default, and on machines where Adobe is the biggest offender, a lot of removable files get left behind:
-
-> *"I've downloaded Patchcleaner to delete the orphaned .msp files... 29 GB of the files are 'excluded by filters', so Patchcleaner doesn't seem to help."*
->
-> HeatherBunny1111, [r/techsupport](https://www.reddit.com/r/techsupport/comments/1qc4tcf/how_to_delete_msp_files_safely/)
-
-InstallerClean detects which patches have been superseded by newer updates and flags them as removable, including the Acrobat patches PatchCleaner excludes.
-
 ## What it does
 
 1. **Scans** `C:\Windows\Installer` for `.msi` and `.msp` files
 2. **Queries** the Windows Installer API to find which files are still registered
-3. **Shows** what's needed and what's not, with sizes
-4. **Removes** the unneeded files: delete to the Recycle Bin (if it isn't available for the drive, the app asks before any permanent delete), or move to a folder you choose
-
-No automatic network activity. Two opt-in buttons make a single HTTPS call when clicked: **Check for updates** in About, and **Send summary** on the completion screen. See [What it doesn't do](#what-it-doesnt-do) below for the full detail.
+3. **Shows** how much you can free and how much is still needed, with optional detail windows listing every file
+4. **Removes** the unneeded files: delete to the Recycle Bin, or move to a folder you choose
 
 ## Screenshots
 
@@ -111,13 +99,13 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
 
 <p>
   <img src="docs/screenshots/03-details-registered.webp" alt="Registered files window listing installed products, with installer-database details for the selected product" width="900"><br>
-  <em>The files still needed, with metadata read from the installer database.</em>
+  <em>Details of the files still needed, with metadata read from the installer database.</em>
   <br><br>
 </p>
 
 <p>
   <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Unneeded files window listing removable .msi files sorted by size, with the reason each is removable and details for the selected file" width="900"><br>
-  <em>The files no longer needed.</em>
+  <em>Details of the files no longer needed.</em>
   <br><br>
 </p>
 
@@ -141,11 +129,13 @@ No automatic network activity. Two opt-in buttons make a single HTTPS call when 
 
 ## How it works
 
-InstallerClean identifies two kinds of unneeded files.
+InstallerClean identifies three kinds of unneeded files.
 
-**Orphaned files** are installers and patches left behind after you uninstall software. Windows no longer references them, but the files sit in the folder taking up space.
+**Orphaned files** are the `.msi` installers (and any `.msp` patches) left behind after you uninstall software. Windows no longer references them, but the files sit in the folder taking up space.
 
 **Superseded patches** are old `.msp` patches that have been replaced by newer ones. Windows marks them as superseded in its own database but never deletes them. Vendors that ship frequent patches (Acrobat, Office, large dev tools) accumulate superseded ones indefinitely.
+
+**Obsoleted patches** are `.msp` patches the publisher has withdrawn or deprecated rather than replaced with a newer version. Windows records that state too, and likewise leaves the file in the folder.
 
 To find them, InstallerClean calls the Windows Installer COM interface directly via P/Invoke:
 
@@ -153,11 +143,11 @@ To find them, InstallerClean calls the Windows Installer COM interface directly 
 - `MsiEnumPatchesEx` to find all registered patches for each product
 - `MsiGetPatchInfoEx` to read patch state (applied, superseded or obsoleted)
 
-Any `.msi` or `.msp` file in `C:\Windows\Installer` that isn't claimed by a registered product is orphaned. Any patch marked as superseded and not required for uninstall is flagged as removable.
+Any `.msi` or `.msp` file in `C:\Windows\Installer` that isn't claimed by a registered product is orphaned and flagged as removable. So is any patch the database marks superseded or obsoleted that isn't required for uninstall.
 
 If the API returns incomplete data (rare, but it can happen with corrupted installer state), the app falls back to reading the registry. The fallback only adds files to the "still needed" set, never to the "removable" set.
 
-After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer` (the directories the cache leaves behind once their contents are gone) are pruned in the same pass. Reparse points are skipped during the prune so a junction planted inside the cache cannot redirect the cleanup outside it.
+After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer` (the directories the cache leaves behind once their contents are gone) are pruned in the same pass.
 
 ## Is it safe?
 
@@ -180,63 +170,35 @@ VirusTotal: clean across every engine. Live links in each release's notes so you
 <a id="recovery"></a>
 ## If you do have a file missing from `C:\Windows\Installer`
 
-InstallerClean only ever clears files Windows reports as finished with, so it
-can't leave a program unable to repair, update or uninstall. Removing files from
-`C:\Windows\Installer` by hand, or with a tool that doesn't check the Installer
-database first, is a different matter, and it's why the standard advice is to
-leave the folder alone. That advice is usually right, but not if you use InstallerClean. Here's the
-fuller picture, and what to do if a needed file has already gone.
+InstallerClean only removes files Windows itself reports as no longer needed, so it can never be the reason a file is missing. But if one has already gone, InstallerClean spots it and flags it. Here's the fix.
 
-### About `C:\Windows\Installer`, and recovering a missing file
+Download that program's installer from its maker and run it over your existing installation; don't uninstall first. Use the version you have now if you can, because Windows may turn down a different one. That usually puts the file back and leaves your settings alone. Re-scan in InstallerClean and the warning will be gone if it worked.
 
-`C:\Windows\Installer` is the Windows Installer cache. When you install an
-MSI-based program or apply a patch, Windows keeps a copy of the installer here
-and records, per product, the file it expects to find later. These files aren't
-used while the program runs; they're used when Windows repairs, updates or
-uninstalls it. Delete one a program still needs and nothing breaks straight
-away, which is exactly why it's easy to get away with deleting them and only hit
-trouble months later. Microsoft puts it like this:
+That usually works. What follows is Microsoft's own, fuller account: the official detail, and the harder cases for when it isn't that simple. None of it is InstallerClean's doing, and I can't improve on Microsoft's guidance, so I'm just passing it on.
 
-> "If the installer cache is compromised, you may not immediately see problems
-> until you take an action such as uninstalling, repairing, or updating a
-> product."
+<details>
+<summary>Microsoft's fuller position</summary>
 
-Recovery is not straightforward, and Microsoft is candid about that:
+Full guidance: [Restore missing Windows Installer cache files](https://learn.microsoft.com/en-us/troubleshoot/windows-client/application-management/missing-windows-installer-cache).
 
-> "If application files are missing from the Windows Installer Cache, ask the
-> vendor or support team for the application about the missing files. You must
-> follow the procedures or steps recommended by the application vendor to
-> restore the files. In some cases, you may have to rebuild the operating system
-> and reinstall the application to fix the problem."
+*It may not show up straight away:*
+> "If the installer cache is compromised, you may not immediately see problems until you take an action such as uninstalling, repairing, or updating a product."
 
-> "Windows support engineers cannot help you recover missing application files
-> from the Windows Installer cache."
+*The files are unique per machine, so you can't copy one from another PC:*
+> "Missing files cannot be copied between computers because the files are unique."
 
-You can't borrow the file from another machine, either:
+*You can't pull just the file from a backup, either:*
+> "To restore the missing files, a full system state restoration is required. It is not possible to replace only the missing files from a previous backup."
 
-> "Missing files cannot be copied between computers because the files are
-> unique."
+*The recommended recovery, and its blunt limits:*
+> "If application files are missing from the Windows Installer Cache, ask the vendor or support team for the application about the missing files. You must follow the procedures or steps recommended by the application vendor to restore the files. In some cases, you may have to rebuild the operating system and reinstall the application to fix the problem."
+>
+> "Windows support engineers cannot help you recover missing application files from the Windows Installer cache."
 
-In practice, the fix that usually works is to download the affected program's
-installer from its maker and run it over your existing install. Don't uninstall
-first: uninstalling is itself one of the steps that needs the missing file. Use
-the version you currently have installed if you can still get hold of it,
-because Windows may reject a different one:
+*Why the same version matters:*
+> "The upgrade cannot be installed by the Windows Installer service because the program to be upgraded may be missing, or the upgrade may update a different version of the program."
 
-> "The upgrade cannot be installed by the Windows Installer service because the
-> program to be upgraded may be missing, or the upgrade may update a different
-> version of the program."
-
-This normally restores the file and leaves your settings untouched, but
-Microsoft doesn't guarantee it, and its documented last resort is reinstalling
-the program, or rebuilding Windows. That's the official position, reported as I
-find it. I didn't cause it and I can't improve on Microsoft's own guidance; I'm
-simply telling you what it is.
-
-None of this can happen because of InstallerClean. It only ever removes files
-Windows itself reports as no longer needed, so the file a future repair, update
-or uninstall goes looking for is never one it touched. Microsoft's guidance is at
-[Restore missing Windows Installer cache files](https://learn.microsoft.com/en-us/troubleshoot/windows-client/application-management/missing-windows-installer-cache).
+</details>
 
 ## Accessibility
 
@@ -253,13 +215,12 @@ If anything here gets in your way, [open an issue](../../issues). Accessibility 
 - WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, run `Dism /Online /Cleanup-Image /StartComponentCleanup` from an elevated prompt.
 - No background service, no scheduled task, no auto-clean. The app runs when you launch it.
 - The registry is read-only. The app queries the Windows Installer database; it doesn't change it.
-- No automatic telemetry, no background network. The app makes no network call until you click one of two buttons. **Check for updates** in About queries GitHub's public releases API on click and tells you whether you have the latest version (single HTTPS GET, identifying string `InstallerClean/<version>`). **Send summary** on the completion screen reads `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` and HTTPS-POSTs it to a No Faff endpoint so I can see whether the run worked. The JSON contains counts and categorical labels only: no file paths, no user names, no machine identifiers, no time-of-day. Clicking opens a confirmation window showing the exact JSON about to be sent; review it there and press Send to confirm, or Cancel to back out. Once per machine: after a successful send the button stays hidden for ever; if the first attempt fails with a transient error the next session re-prompts.
-- No bundled extras. No toolbars, no third-party offers, no upsells.
-- The only permission asked for beyond launching is Administrator, which is required because `C:\Windows\Installer` is admin-only.
+- It only connects to the internet when you tell it to: a manual update check; the optional anonymous summary (just to let me know it's working); and links to the GitHub docs and a donate page, which open in your browser if you choose to click them.
+- No toolbars, no bundled software, no adware.
 
 ## FAQ
 
-**Will I actually free up GBs of space?** Depends on your machine. A clean Windows 11 install with no extra software has nothing to remove. A long-running developer workstation, or any machine with heavy MSI-based software (Acrobat, Office, LibreOffice, large dev tools), can have tens of GB. Run `installerclean-cli /s` to see exactly what would be removed before you commit.
+**Will I actually free up GBs of space?** It depends on your machine. A clean Windows 11 install with no extra software has nothing to remove. A long-running developer workstation, or any machine with heavy MSI-based software (Acrobat, Office, LibreOffice, large dev tools), can have tens of GB. Either way, you'll see exactly how much the moment you run it.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
 Across the 75 reports people have sent in (thanks 🙏) since v1.8.0 added the option:
@@ -271,39 +232,15 @@ Across the 75 reports people have sent in (thanks 🙏) since v1.8.0 added the o
 <!-- reports-stats-end -->
 
 <details>
-<summary>Here's what a report looks like</summary>
+<summary>Those reports come from the optional "Send summary" button. Here's what you'll see before anything's sent.</summary>
 
-```json
-{
-  "schemaVersion": 3,
-  "app": { "version": "1.9.0" },
-  "os": "Windows 11 (X64)",
-  "scan": {
-    "durationMs": 1820,
-    "registeredCount": 148,
-    "orphanedCount": 40,
-    "supersededCount": 25,
-    "obsoletedCount": 5,
-    "missingFromDiskCount": 0,
-    "pendingReboot": "clean"
-  },
-  "operation": {
-    "kind": "delete",
-    "outcome": "complete",
-    "filesProcessed": 70,
-    "filesFailed": 0,
-    "bytesFreed": 22548578304,
-    "errors": [],
-    "moveDestinationKind": null
-  }
-}
-```
-
-It carries counts and categorical labels only: no file paths, no user names, no machine identifiers.
+![Confirmation dialogue titled "Send this to No Faff?" showing the full report that would be sent: app version, Windows version, scan counts, files processed and bytes freed, with no file paths, names or machine IDs, and a note that nothing identifies you or your machine, just whether the app worked and how much space was freed, with Cancel and Send buttons.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
 
 </details>
 
-**Why does it want Administrator?** `C:\Windows\Installer` is owned by SYSTEM and locked down to admins only. Reading the folder, writing to the Installer-database query API and moving or deleting files all require elevation. There's no user-mode path.
+**Why does it want Administrator?** `C:\Windows\Installer` is locked down to administrators. Reading it, querying the Installer database and moving or deleting files all need that, so the app has to run as admin.
+
+**Why does Windows say "Unknown publisher"?** Because InstallerClean isn't code-signed. A signing certificate costs money every year, and I'd rather keep the app free than pay for one. So when you run it, Windows SmartScreen shows "Windows protected your PC". Click **More info**, then **Run anyway**. It's safe to do: the source code is public, and every release has VirusTotal links and SHA-256 hashes you can check first.
 
 **Can I undo a Delete?** Usually, yes. When the Recycle Bin is available for the drive, Delete sends files there and you can restore them from the bin. If the bin isn't available, the app never deletes for good on its own (see [Is it safe?](#is-it-safe)). And if you'd rather have a way back you control, Move puts the files in a folder you choose; delete them from there whenever you're satisfied.
 
@@ -338,6 +275,14 @@ scoop install installerclean
 ```
 
 ## Compared to PatchCleaner
+
+If you've searched for this folder before, the tool you'll most likely have found is [PatchCleaner](https://www.homedev.com.au/free/patchcleaner). It's still going strong, but I made InstallerClean because PatchCleaner is closed source, hasn't had an update since March 2016 and, by default, won't touch Adobe products. Its orphan check wrongly flagged Adobe's patches, and removing them broke Adobe's updates, so it leaves all Adobe files alone unless you switch the filter off. On the machines where Adobe is the worst offender, that's most of the space:
+
+> *"I've downloaded Patchcleaner to delete the orphaned .msp files, but apparently this would only free up 250 MB of space. 29 GB of the files are 'excluded by filters', so Patchcleaner doesn't seem to help."*
+>
+> HeatherBunny1111, [r/techsupport](https://www.reddit.com/r/techsupport/comments/1qc4tcf/how_to_delete_msp_files_safely/)
+
+InstallerClean reads the Windows Installer's own patch records, so it can tell which Adobe patches are genuinely superseded and clear those safely, with no blanket filter. Here's how the two compare:
 
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
