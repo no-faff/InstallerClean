@@ -32,7 +32,7 @@
          reference SETS and fails on any difference). The version
          tracks the pinned SDK band: when absent, the SDK injects its
          own matching version, so this version moves in step with the SDK band. -->
-    <PackageReference Include="Microsoft.NET.ILLink.Tasks" Version="10.0.8" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.ILLink.Tasks" Version="10.0.9" PrivateAssets="all" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
