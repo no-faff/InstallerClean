@@ -14,26 +14,26 @@
 
   <Program_Info>
     <Program_Name>InstallerClean</Program_Name>
-    <Program_Version>1.8.2</Program_Version>
-    <Program_Release_Month>05</Program_Release_Month>
-    <Program_Release_Day>27</Program_Release_Day>
+    <Program_Version>1.9.0</Program_Version>
+    <Program_Release_Month>06</Program_Release_Month>
+    <Program_Release_Day>15</Program_Release_Day>
     <Program_Release_Year>2026</Program_Release_Year>
     <Program_Cost_Dollars>0</Program_Cost_Dollars>
     <Program_Cost_Other_Code>GBP</Program_Cost_Other_Code>
     <Program_Cost_Other>0</Program_Cost_Other>
     <Program_Type>Open Source</Program_Type>
-    <Program_Release_Status>Minor Update</Program_Release_Status>
+    <Program_Release_Status>Major Update</Program_Release_Status>
     <Program_Install_Support>Install and Uninstall</Program_Install_Support>
     <Program_OS_Support>Win10x64,Win11</Program_OS_Support>
     <Program_Language>English</Program_Language>
-    <Program_Change_Info>Fixes. Accessibility. CLI documentation. Translator-facing. Build.</Program_Change_Info>
+    <Program_Change_Info>See release notes.</Program_Change_Info>
     <Program_Specific_Category>System</Program_Specific_Category>
     <Program_Category_Class>System &amp; Desktop Utilities::File &amp; Disk Management</Program_Category_Class>
     <Program_System_Requirements>Windows 10 or 11 (64-bit). Administrator rights required to access C:\Windows\Installer. The slim build needs the .NET 10 Desktop Runtime; the setup and portable builds are self-contained.</Program_System_Requirements>
     <File_Info>
-      <File_Size_Bytes>94532316</File_Size_Bytes>
-      <File_Size_K>92317</File_Size_K>
-      <File_Size_MB>90.15</File_Size_MB>
+      <File_Size_Bytes>95456096</File_Size_Bytes>
+      <File_Size_K>93219</File_Size_K>
+      <File_Size_MB>91.03</File_Size_MB>
     </File_Info>
     <Expire_Info>
       <Has_Expire_Info>N</Has_Expire_Info>
@@ -71,10 +71,10 @@ Modern replacement for PatchCleaner, which was last updated in March 2016.</Char
       <Application_XML_File_URL>https://raw.githubusercontent.com/no-faff/InstallerClean/main/pad.xml</Application_XML_File_URL>
     </Application_URLs>
     <Download_URLs>
-      <Primary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.8.2/InstallerClean-setup.exe</Primary_Download_URL>
-      <Secondary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.8.2/InstallerClean-portable.exe</Secondary_Download_URL>
-      <Additional_Download_URL_1>https://github.com/no-faff/InstallerClean/releases/download/v1.8.2/InstallerClean-slim.exe</Additional_Download_URL_1>
-      <Additional_Download_URL_2>https://github.com/no-faff/InstallerClean/releases/download/v1.8.2/installerclean-cli.exe</Additional_Download_URL_2>
+      <Primary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.9.0/InstallerClean-setup.exe</Primary_Download_URL>
+      <Secondary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.9.0/InstallerClean-portable.exe</Secondary_Download_URL>
+      <Additional_Download_URL_1>https://github.com/no-faff/InstallerClean/releases/download/v1.9.0/InstallerClean-slim.exe</Additional_Download_URL_1>
+      <Additional_Download_URL_2>https://github.com/no-faff/InstallerClean/releases/download/v1.9.0/installerclean-cli.exe</Additional_Download_URL_2>
     </Download_URLs>
   </Web_Info>
 
