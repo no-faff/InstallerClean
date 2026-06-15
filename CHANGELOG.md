@@ -63,10 +63,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The README documents the setup's silent install (`/SILENT`, `/VERYSILENT`); the installer already skipped its post-install launch on silent runs. Asked for in discussion #26.
 - The README requirements state the floor the installer enforces, Windows 10 version 1607 (build 14393) or later.
 - `pad.xml`'s descriptions stop selling Move as the restore path, matching the README's framing: deleting what the app lists is safe, and Move is for keeping a copy.
-
-<!-- RELEASE-OPERATOR: if the compressed ~65 MB portable clears VirusTotal at the Stage 2 VT pause, add this Changed bullet; if it flags and the portable stays uncompressed, drop it:
 - The portable build returns to the compressed single-file shape, roughly halving the download (about 135 MB to about 65 MB). It had shipped uncompressed since v1.8.2 to clear a Defender machine-learning false positive (`Trojan:Win32/Wacatac.B!ml`) on the compressed runtime bytes; Microsoft retrains on cleared false positives, so the compressed shape is clean again.
--->
 
 ### Fixed
 
