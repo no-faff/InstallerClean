@@ -352,4 +352,31 @@ public static class Strings
     public static string Tooltip_BuyMeACuppa_About => Get("Tooltip.BuyMeACuppa.About");
     public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");
     public static string Tooltip_Close => Get("Tooltip.Close");
-    public static
+    public static string Tooltip_Delete => Get("Tooltip.Delete");
+    public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");
+    public static string Tooltip_LeaveStarOnGitHub_About => Get("Tooltip.LeaveStarOnGitHub.About");
+    public static string Tooltip_Minimise => Get("Tooltip.Minimise");
+    public static string Tooltip_Move => Get("Tooltip.Move");
+    public static string Tooltip_MoveNeedsDestination => Get("Tooltip.MoveNeedsDestination");
+    public static string Tooltip_SendResultLog => Get("Tooltip.SendResultLog");
+    public static string Tooltip_SendResultLog_NothingFound => Get("Tooltip.SendResultLog.NothingFound");
+    public static string Tooltip_SigningCertificate => Get("Tooltip.SigningCertificate");
+    public static string UpdateCheck_Failed_NetworkUnavailable => Get("UpdateCheck.Failed.NetworkUnavailable");
+    public static string UpdateCheck_Failed_ResponseParseError => Get("UpdateCheck.Failed.ResponseParseError");
+    public static string UpdateCheck_Failed_ServerError => Get("UpdateCheck.Failed.ServerError");
+    public static string UpdateCheck_Failed_Timeout => Get("UpdateCheck.Failed.Timeout");
+    public static string UpdateCheck_Failed_Unknown => Get("UpdateCheck.Failed.Unknown");
+    public static string UpdateCheck_Status_Checking => Get("UpdateCheck.Status.Checking");
+    public static string UpdateCheck_Status_UpToDate => Get("UpdateCheck.Status.UpToDate");
+    public static string UpdateCheck_Title => Get("UpdateCheck.Title");
+    public static string UpdateCheck_UpdateAvailable_Body => Get("UpdateCheck.UpdateAvailable.Body");
+    public static string UpdateCheck_UpdateAvailable_Title => Get("UpdateCheck.UpdateAvailable.Title");
+    public static string Version_Display => Get("Version.Display");
+    public static string Window_About_Title => Get("Window.About.Title");
+    public static string Window_ConfirmDelete_Title => Get("Window.ConfirmDelete.Title");
+    public static string Window_ConfirmMove_Title => Get("Window.ConfirmMove.Title");
+    public static string Window_Main_Title => Get("Window.Main.Title");
+    public static string Window_Orphaned_Title => Get("Window.Orphaned.Title");
+    public static string Window_RecycleUnavailable_Title => Get("Window.RecycleUnavailable.Title");
+    public static string Window_Registered_Title => Get("Window.Registered.Title");
+}
