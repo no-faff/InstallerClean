@@ -55,6 +55,7 @@ public static class Strings
     public static string Action_OpenReleasePage => Get("Action.OpenReleasePage");
     public static string Action_Paste => Get("Action.Paste");
     public static string Action_Rescan => Get("Action.Rescan");
+    public static string Action_RestartNow => Get("Action.RestartNow");
     public static string Action_ScanAgain => Get("Action.ScanAgain");
     public static string Action_SelectAll => Get("Action.SelectAll");
     public static string Action_SendResultLog => Get("Action.SendResultLog");
@@ -74,6 +75,8 @@ public static class Strings
     public static string Automation_ConfirmMove => Get("Automation.ConfirmMove");
     public static string Automation_ConfirmSendResultLog => Get("Automation.ConfirmSendResultLog");
     public static string Automation_DeleteAllFiles => Get("Automation.DeleteAllFiles");
+    public static string Automation_Language => Get("Automation.Language");
+    public static string Automation_Language_HelpText => Get("Automation.Language.HelpText");
     public static string Automation_LeaveStarOnGitHub => Get("Automation.LeaveStarOnGitHub");
     public static string Automation_LeaveStarOnGitHub_About => Get("Automation.LeaveStarOnGitHub.About");
     public static string Automation_Minimise => Get("Automation.Minimise");
@@ -87,6 +90,8 @@ public static class Strings
     public static string Automation_RecycleUnavailableMove => Get("Automation.RecycleUnavailableMove");
     public static string Automation_RegisteredMissingSeeAlso => Get("Automation.RegisteredMissingSeeAlso");
     public static string Automation_RescanInstaller => Get("Automation.RescanInstaller");
+    public static string Automation_RestartNow => Get("Automation.RestartNow");
+    public static string Automation_RestartNow_HelpText => Get("Automation.RestartNow.HelpText");
     public static string Automation_ResultLogPreview => Get("Automation.ResultLogPreview");
     public static string Automation_SayThanks => Get("Automation.SayThanks");
     public static string Automation_ScanningProgress => Get("Automation.ScanningProgress");
@@ -268,6 +273,9 @@ public static class Strings
     public static string Field_Title => Get("Field.Title");
     public static string Field_UnknownProductName => Get("Field.UnknownProductName");
     public static string FilePicker_ChooseDestinationTitle => Get("FilePicker.ChooseDestinationTitle");
+    public static string Label_Language => Get("Label.Language");
+    public static string Language_Automatic => Get("Language.Automatic");
+    public static string Language_RestartNote => Get("Language.RestartNote");
     public static string Plural_Error_Plural => Get("Plural.Error.Plural");
     public static string Plural_Error_Singular => Get("Plural.Error.Singular");
     public static string Plural_File_Plural => Get("Plural.File.Plural");
@@ -344,31 +352,4 @@ public static class Strings
     public static string Tooltip_BuyMeACuppa_About => Get("Tooltip.BuyMeACuppa.About");
     public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");
     public static string Tooltip_Close => Get("Tooltip.Close");
-    public static string Tooltip_Delete => Get("Tooltip.Delete");
-    public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");
-    public static string Tooltip_LeaveStarOnGitHub_About => Get("Tooltip.LeaveStarOnGitHub.About");
-    public static string Tooltip_Minimise => Get("Tooltip.Minimise");
-    public static string Tooltip_Move => Get("Tooltip.Move");
-    public static string Tooltip_MoveNeedsDestination => Get("Tooltip.MoveNeedsDestination");
-    public static string Tooltip_SendResultLog => Get("Tooltip.SendResultLog");
-    public static string Tooltip_SendResultLog_NothingFound => Get("Tooltip.SendResultLog.NothingFound");
-    public static string Tooltip_SigningCertificate => Get("Tooltip.SigningCertificate");
-    public static string UpdateCheck_Failed_NetworkUnavailable => Get("UpdateCheck.Failed.NetworkUnavailable");
-    public static string UpdateCheck_Failed_ResponseParseError => Get("UpdateCheck.Failed.ResponseParseError");
-    public static string UpdateCheck_Failed_ServerError => Get("UpdateCheck.Failed.ServerError");
-    public static string UpdateCheck_Failed_Timeout => Get("UpdateCheck.Failed.Timeout");
-    public static string UpdateCheck_Failed_Unknown => Get("UpdateCheck.Failed.Unknown");
-    public static string UpdateCheck_Status_Checking => Get("UpdateCheck.Status.Checking");
-    public static string UpdateCheck_Status_UpToDate => Get("UpdateCheck.Status.UpToDate");
-    public static string UpdateCheck_Title => Get("UpdateCheck.Title");
-    public static string UpdateCheck_UpdateAvailable_Body => Get("UpdateCheck.UpdateAvailable.Body");
-    public static string UpdateCheck_UpdateAvailable_Title => Get("UpdateCheck.UpdateAvailable.Title");
-    public static string Version_Display => Get("Version.Display");
-    public static string Window_About_Title => Get("Window.About.Title");
-    public static string Window_ConfirmDelete_Title => Get("Window.ConfirmDelete.Title");
-    public static string Window_ConfirmMove_Title => Get("Window.ConfirmMove.Title");
-    public static string Window_Main_Title => Get("Window.Main.Title");
-    public static string Window_Orphaned_Title => Get("Window.Orphaned.Title");
-    public static string Window_RecycleUnavailable_Title => Get("Window.RecycleUnavailable.Title");
-    public static string Window_Registered_Title => Get("Window.Registered.Title");
-}
+    public static

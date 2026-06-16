@@ -738,5 +738,13 @@ The crash log could not be written.</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some files processed, some failed</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transient: a temporary condition blocked the run (see the message)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 cancelled (Ctrl+C)</value></data>
+  <data name="Label.Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Language.Automatic" xml:space="preserve"><value>Automatic</value></data>
+  <data name="Language.RestartNote" xml:space="preserve"><value>Language changes apply the next time you open InstallerClean.</value></data>
+  <data name="Action.RestartNow" xml:space="preserve"><value>Restart now</value></data>
+  <data name="Automation.Language" xml:space="preserve"><value>Display language</value></data>
+  <data name="Automation.Language.HelpText" xml:space="preserve"><value>Choose the language InstallerClean displays in. Automatic follows your Windows language.</value></data>
+  <data name="Automation.RestartNow" xml:space="preserve"><value>Restart now</value></data>
+  <data name="Automation.RestartNow.HelpText" xml:space="preserve"><value>Restarts InstallerClean to apply the new language.</value></data>
 
 </root>
