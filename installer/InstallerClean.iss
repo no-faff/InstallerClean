@@ -1,4 +1,4 @@
-; InstallerClean Inno Setup script.
+﻿; InstallerClean Inno Setup script.
 ;
 ; AppId stays constant across versions ("InstallerClean") so Windows
 ; treats every shipped version as the same product; the uninstall
@@ -69,13 +69,33 @@ WizardImageFileDynamicDark=wizard-image-dark.bmp
 WizardSmallImageFile=wizard-small.png
 WizardSmallImageFileDynamicDark=wizard-small.png
 WizardImageAlphaFormat=defined
+ShowLanguageDialog=yes
 
+[Languages]
+Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
+
+; Welcome/Finished are standard Inno [Messages], overridden per language with
+; the language-name prefix. They must live here, NOT in [CustomMessages]:
+; [CustomMessages] entries are only reachable via {cm:Name} and would not
+; override the wizard's own text. Italian.isl supplies the rest of the wizard.
 [Messages]
-WelcomeLabel1=Welcome to InstallerClean setup
-WelcomeLabel2=This will install InstallerClean on your computer.
-FinishedHeadingLabel=Setup complete
-FinishedLabel=InstallerClean has been installed on your computer.
-ClickFinish=Click Finish to close setup.
+english.WelcomeLabel1=Welcome to InstallerClean setup
+english.WelcomeLabel2=This will install InstallerClean on your computer.
+english.FinishedHeadingLabel=Setup complete
+english.FinishedLabel=InstallerClean has been installed on your computer.
+english.ClickFinish=Click Finish to close setup.
+italian.WelcomeLabel1=Benvenuto nell'installazione di InstallerClean
+italian.WelcomeLabel2=Questo installerà InstallerClean nel computer.
+italian.FinishedHeadingLabel=Installazione completata
+italian.FinishedLabel=InstallerClean è stato installato nel computer.
+italian.ClickFinish=Per chiudere l'installazione seleziona 'Fine'.
+
+[CustomMessages]
+english.UninstallApp=Uninstall InstallerClean
+english.LaunchApp=Launch InstallerClean
+italian.UninstallApp=Disinstalla InstallerClean
+italian.LaunchApp=Esegui InstallerClean
 
 [Files]
 Source: "..\publish\self-contained\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -92,7 +112,7 @@ Source: "..\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreve
 
 [Icons]
 Name: "{group}\InstallerClean"; Filename: "{app}\InstallerClean.exe"; IconFilename: "{app}\InstallerClean.exe"
-Name: "{group}\Uninstall InstallerClean"; Filename: "{uninstallexe}"
+Name: "{group}\{cm:UninstallApp}"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\InstallerClean.exe"; Description: "Launch InstallerClean"; Flags: nowait postinstall skipifsilent shellexec
+Filename: "{app}\InstallerClean.exe"; Description: "{cm:LaunchApp}"; Flags: nowait postinstall skipifsilent shellexec
