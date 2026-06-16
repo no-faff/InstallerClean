@@ -20,12 +20,32 @@ public partial class AboutWindow : Window
     private static readonly TimeSpan CheckForUpdatesCooldown = TimeSpan.FromSeconds(5);
 
     private readonly IUpdateCheckService _updateCheckService;
+    private readonly ISettingsService _settingsService;
     private CancellationTokenSource? _checkCts;
 
-    public AboutWindow(IUpdateCheckService updateCheckService)
+    // Captured at construction so a no-op re-selection (picking the
+    // language the app already started in) does not raise the restart
+    // prompt.
+    private string? _savedLanguage;
+
+    // CultureName null = Automatic (follow the Windows display language).
+    // The endonyms are literal and never translated: a language is shown
+    // in its own name, as browsers and Windows do. The culture names stay
+    // in step with Core's SupportedLanguages.
+    private sealed record LanguageOption(string? CultureName, string Display);
+
+    private static LanguageOption[] BuildLanguageOptions() => new[]
+    {
+        new LanguageOption(null, Strings.Language_Automatic),
+        new LanguageOption("en-GB", "English"),
+        new LanguageOption("it", "Italiano"),
+    };
+
+    public AboutWindow(IUpdateCheckService updateCheckService, ISettingsService settingsService)
     {
         InitializeComponent();
         _updateCheckService = updateCheckService;
+        _settingsService = settingsService;
         var version = DisplayHelpers.GetVersionString();
         VersionText.Text = version;
         // The version sits in a read-only TextBox so it can be selected
@@ -34,6 +54,8 @@ public partial class AboutWindow : Window
         // Naming the box with its own text puts the content first; there
         // is no visible label to use instead.
         AutomationProperties.SetName(VersionText, version);
+
+        PopulateLanguagePicker();
 
         ApplyScaledBounds();
         AccessibilitySettings.Current.PropertyChanged += OnAccessibilitySettingsChanged;
@@ -53,14 +75,42 @@ public partial class AboutWindow : Window
         Loaded += (_, _) => CloseButton.Focus();
     }
 
+    private void PopulateLanguagePicker()
+    {
+        _savedLanguage = _settingsService.Load().Language;
+        var options = BuildLanguageOptions();
+        LanguagePicker.ItemsSource = options;
+        LanguagePicker.DisplayMemberPath = nameof(LanguageOption.Display);
+        LanguagePicker.SelectedItem =
+            options.FirstOrDefault(o => string.Equals(o.CultureName, _savedLanguage, StringComparison.OrdinalIgnoreCase))
+            ?? options[0];
+        // Subscribe after the initial select so the programmatic selection
+        // above is not treated as a user change.
+        LanguagePicker.SelectionChanged += LanguagePicker_SelectionChanged;
+    }
+
+    private void LanguagePicker_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (LanguagePicker.SelectedItem is not LanguageOption option)
+            return;
+        _settingsService.Update(s => s.Language = option.CultureName);
+        // Show the restart prompt only when the choice differs from the
+        // language this process actually started in.
+        var changed = !string.Equals(option.CultureName, _savedLanguage, StringComparison.OrdinalIgnoreCase);
+        RestartPanel.Visibility = changed ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void RestartNowClick(object sender, RoutedEventArgs e)
+        => (Application.Current as App)?.RelaunchForLanguageChange();
+
     /// <summary>
-    /// 500 x 320 at 100% text scale is the designed box; the slack
+    /// 500 x 400 at 100% text scale is the designed box; the slack
     /// between the content's natural height and the box sits in the
     /// layout's star spacer row, which pins the say-thanks block to
     /// the bottom. The box multiplies by the text-scale factor (the
     /// fixed margins and gaps make the content grow sub-linearly, so
     /// it always fits) and clamps to the work area, so the Close row
-    /// can never be pushed off screen the way a fixed 320 height cut
+    /// can never be pushed off screen the way a fixed height cut
     /// it off at 208%. Width and Height are explicit and first
     /// assigned before the window handle exists, the shape every
     /// band-free window in the app uses. Sized to content instead
@@ -79,7 +129,7 @@ public partial class AboutWindow : Window
         var reference = Owner ?? Application.Current?.MainWindow;
         var factor = AccessibilitySettings.Current.TextScaleFactor;
         Width = DetailWindowSizing.ClampWidthToWorkArea(reference, 500 * factor, 0);
-        Height = DetailWindowSizing.ClampHeightToWorkArea(reference, 320 * factor, 0);
+        Height = DetailWindowSizing.ClampHeightToWorkArea(reference, 400 * factor, 0);
     }
 
     private void OnAccessibilitySettingsChanged(object? sender, PropertyChangedEventArgs e)
