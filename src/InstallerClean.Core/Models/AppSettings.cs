@@ -43,4 +43,14 @@ public sealed class AppSettings
     /// profile-clobbered between sessions can submit again.
     /// </summary>
     public bool HasSentResultLog { get; set; }
+
+    /// <summary>
+    /// UI-language preference. <c>null</c> or absent means Automatic:
+    /// follow the Windows display language. A non-null value is a culture
+    /// name the app ships a translation for (<c>"en-GB"</c> or <c>"it"</c>),
+    /// validated against the supported-language list at startup and
+    /// otherwise ignored. Applied by <c>App.OnStartup</c> before any window
+    /// loads; changing it in the About picker takes effect on the next launch.
+    /// </summary>
+    public string? Language { get; set; }
 }

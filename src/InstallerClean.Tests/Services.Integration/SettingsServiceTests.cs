@@ -117,4 +117,29 @@ public class SettingsServiceTests : IDisposable
 
         Assert.Null(ex);
     }
+
+    [Fact]
+    public void Language_defaults_to_null_for_a_file_without_it()
+    {
+        // An older settings.json predating the field must deserialise
+        // cleanly to null (Automatic), never trip the .bad recovery.
+        File.WriteAllText(_tempFile, "{\"moveDestination\":\"D:\\\\Backup\"}");
+        var svc = new SettingsService(_tempFile);
+
+        var loaded = svc.Load();
+
+        Assert.Null(loaded.Language);
+        Assert.Equal(@"D:\Backup", loaded.MoveDestination);
+    }
+
+    [Fact]
+    public void Language_round_trips()
+    {
+        var svc = new SettingsService(_tempFile);
+
+        svc.TrySave(new AppSettings { Language = "it" });
+        var loaded = svc.Load();
+
+        Assert.Equal("it", loaded.Language);
+    }
 }
