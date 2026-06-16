@@ -6,6 +6,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 ### Added
 
+- InstallerClean's interface is available in Italian: every window, dialog, tooltip, button and screen-reader label is translated, chosen from the About language picker or applied automatically on an Italian-language Windows. The command line stays English by design.
 - The display language can be chosen: a picker in the About window offers Automatic (follow the Windows display language), English and Italiano, saved across runs and applied on the next launch, with a one-click Restart now.
 - The Windows installer is offered in Italian: setup shows a language dialog and runs in Italian or English. Italian wording contributed by bovirus (#30).
 
