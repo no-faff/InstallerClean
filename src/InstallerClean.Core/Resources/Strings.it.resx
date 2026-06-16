@@ -138,7 +138,7 @@
        keyboard shortcut. -->
   <data name="Action.Done" xml:space="preserve"><value>_Fatto</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Dettagli</value></data>
-  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Offrimi un tè</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Offrimi un caffè</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Lascia una _stella su GitHub</value></data>
   <data name="Action.MITLicence" xml:space="preserve"><value>Licenza MIT</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Sposta</value></data>
@@ -151,8 +151,8 @@
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Invia</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
-  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Offrimi una tazza di tè</value></data>
-  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Offrimi un tè (finestra Informazioni)</value></data>
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Offrimi una tazza di caffè</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Offrimi un caffè (finestra Informazioni)</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Annulla operazione</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Annulla scansione</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Annulla la scansione all'avvio</value></data>
@@ -232,8 +232,8 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Spiega questa cartella, e come recuperare un file, nel README</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Se ti è stato utile, offrimi una tazza di tè.</value></data>
-  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Fa venire sete!</value></data>
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Se ti è stato utile, offrimi una tazza di caffè.</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Ci vuole un caffè!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Annullamento richiesto. L'app sta aspettando che il passaggio in corso arrivi a un punto in cui fermarsi. Può richiedere qualche secondo durante operazioni di I/O intense o una chiamata al database MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Chiudi</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Lascia una stella su GitHub, segnala un problema (Issue) o scrivi nelle Discussions. Ogni feedback è benvenuto.</value></data>
