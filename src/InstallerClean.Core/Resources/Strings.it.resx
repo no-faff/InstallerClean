@@ -125,7 +125,7 @@
   <data name="Action.Cut" xml:space="preserve"><value>Taglia</value></data>
   <data name="Action.Paste" xml:space="preserve"><value>Incolla</value></data>
   <data name="Action.SelectAll" xml:space="preserve"><value>Seleziona tutto</value></data>
-  <data name="Action.Browse" xml:space="preserve"><value>_Sfoglia...</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>S_foglia...</value></data>
   <data name="Action.Cancel" xml:space="preserve"><value>_Annulla</value></data>
   <data name="Action.CheckForUpdates" xml:space="preserve"><value>Controlla _aggiornamenti</value></data>
   <data name="Action.Close" xml:space="preserve"><value>_Chiudi</value></data>
@@ -307,8 +307,8 @@
   <data name="Status.Deleting" xml:space="preserve"><value>Eliminazione di {0} {1}...</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
-  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Spostamento annullato. Elaborati {0} di {1} {2}.</value></data>
-  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>Eliminazione annullata. Elaborati {0} di {1} {2}.</value></data>
+  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Spostamento annullato dopo {0} di {1} {2}.</value></data>
+  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>Eliminazione annullata dopo {0} di {1} {2}.</value></data>
   <!-- 0 = exception type name, 1 = crash log path. Both surface in
        the status pill so the user can find the log; full message +
        stack trace go to the log itself. -->
@@ -349,11 +349,11 @@
        errored for others. 0 = total size freed (e.g. "120.5 MB"). -->
   <data name="Completion.PartlyFreed" xml:space="preserve"><value>Liberati {0}, non è stato possibile elaborare alcuni file</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
-  <data name="Completion.MoveSummary" xml:space="preserve"><value>Spostati {0} {1} in {2}</value></data>
+  <data name="Completion.MoveSummary" xml:space="preserve"><value>{0} {1} in {2}</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
   <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>Spostati {0} {1} in {2}. {3} {4}</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
-  <data name="Completion.DeleteSummary" xml:space="preserve"><value>Inviati {0} {1} al Cestino</value></data>
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} nel Cestino</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
   <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>Inviati {0} {1} al Cestino. {2} {3}</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
@@ -413,7 +413,7 @@
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} di {1} {2}</value></data>
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} {1} non necessari ({2})</value></data>
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} {1} da ripulire ({2})</value></data>
   <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} {1} registrati ({2})</value></data>
 
   <!-- Confirmation dialogs -->
