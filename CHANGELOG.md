@@ -2,6 +2,18 @@
 
 Every change to InstallerClean, logged in full (not just the user-facing highlights). Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - Unreleased
+
+### Added
+
+- The display language can be chosen: a picker in the About window offers Automatic (follow the Windows display language), English and Italiano, saved across runs and applied on the next launch, with a one-click Restart now.
+- The Windows installer is offered in Italian: setup shows a language dialog and runs in Italian or English. Italian wording contributed by bovirus (#30).
+
+### Changed
+
+- On startup the saved display-language preference (or the Windows display language when none is set) is applied before any window paints, so the whole app, the splash included, opens in one language and one number format.
+- The command-line tool pins itself to English regardless of the Windows display language, keeping its stdout summary lines and English event-log entries in the stable shape monitoring tools match on; file sizes still format to the local region.
+
 ## [1.9.0] - 2026-06-15
 
 ### Added
