@@ -37,6 +37,17 @@ internal static class Program
         // default code page.
         Console.OutputEncoding = Encoding.UTF8;
 
+        // Render English regardless of the OS display language. The CLI's
+        // stdout carries machine contracts (the "\d+ errors:" scrape, ordered
+        // progress lines) and its Application-channel Event Log is English by
+        // convention for RMM greps; a satellite resx would otherwise pull
+        // shared keys (the plural words, size units) into the CLI on a
+        // localised machine and break both. CurrentCulture is left on the OS
+        // region, so file sizes still format natively ("3,2 GB"). Removing this
+        // pin is how a future release opts the CLI into localisation.
+        System.Globalization.CultureInfo.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-GB");
+        System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-GB");
+
         var invocation = CliContract.ParseArguments(args);
         switch (invocation.Command)
         {
