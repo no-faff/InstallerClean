@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Globalization;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +11,7 @@ using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 using InstallerClean.Models;
 using InstallerClean.Resources;
+using InstallerClean.Services;
 using InstallerClean.ViewModels;
 
 namespace InstallerClean;
@@ -50,6 +53,23 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // Apply the saved UI-language preference before anything reads a
+        // resx string: the "already running" message below, the splash, and
+        // every window. SettingsService has a no-dependency constructor, so
+        // this runs without the DI container (not built until later). Resolve
+        // returns null for Automatic or an unsupported value, leaving the OS
+        // culture in place. Both UICulture (which strings) and Culture (number
+        // formatting) are set, so a deliberate pick reads fully in that
+        // language, file sizes ("3,2 GB") included.
+        var languagePreference = LanguagePreference.Resolve(new SettingsService().Load().Language);
+        if (languagePreference is not null)
+        {
+            CultureInfo.CurrentUICulture = languagePreference;
+            CultureInfo.CurrentCulture = languagePreference;
+            CultureInfo.DefaultThreadCurrentUICulture = languagePreference;
+            CultureInfo.DefaultThreadCurrentCulture = languagePreference;
+        }
 
         // Single-instance pattern: open the mutex without taking
         // ownership, acquire via WaitOne(0), release explicitly in
@@ -281,5 +301,31 @@ public partial class App : Application
             _singleInstanceMutex?.ReleaseMutex();
         _singleInstanceMutex?.Dispose();
         base.OnExit(e);
+    }
+
+    /// <summary>
+    /// Relaunches the app to apply a new UI language. Releases the
+    /// single-instance mutex BEFORE starting the child: the child takes the
+    /// same Global\InstallerClean_SingleInstance mutex on startup, and a
+    /// still-held mutex would send it down the "already running" exit, so the
+    /// release order is load-bearing. ReleaseMutex must run on the thread that
+    /// acquired it (Win32 owner-thread rule); OnStartup acquired it on the
+    /// dispatcher thread and this runs on the dispatcher thread (a button
+    /// click), so the release is legal here. The already-elevated process
+    /// launches the admin-manifest child without a second UAC prompt.
+    /// </summary>
+    public void RelaunchForLanguageChange()
+    {
+        if (_holdsSingleInstanceMutex)
+        {
+            _singleInstanceMutex?.ReleaseMutex();
+            _holdsSingleInstanceMutex = false;
+        }
+
+        var exePath = Environment.ProcessPath;
+        if (exePath is not null)
+            Process.Start(new ProcessStartInfo(exePath) { UseShellExecute = true });
+
+        Shutdown();
     }
 }
