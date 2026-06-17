@@ -19,15 +19,20 @@ public partial class SplashWindow : Window
         InitializeComponent();
         VersionText.Text = DisplayHelpers.GetVersionString();
 
-        // The 480 x 320 box is the 100% design; at larger OS text
-        // scales the hero name, step text and Cancel outgrow it, so
-        // the whole box scales with the factor (the star spacer rows
-        // absorb any slack). The splash opens before any other window
-        // exists, so the clamp resolves against the primary monitor's
-        // work area, the helper's null fallback.
+        // The 480 x 320 box is the 100% design. The card sizes its height to
+        // content (SizeToContent="Height"); MinHeight holds the designed box,
+        // the star spacer rows absorbing the slack while the content is
+        // shorter, and the card grows when the content is taller, e.g. a
+        // larger OS text scale or a longer-language hero name / step text /
+        // Cancel outgrowing 320. A fixed Height clipped the bottom-pinned
+        // version against the card's edge. MaxHeight caps growth at the work
+        // area. The splash opens before any other window exists, so the clamp
+        // resolves against the primary monitor's work area (the helper's null
+        // fallback). Width stays fixed; the content fits 480 in every language.
         var factor = AccessibilitySettings.Current.TextScaleFactor;
         Width = Math.Min(480 * factor, DetailWindowSizing.WorkAreaWidthLimit(null));
-        Height = Math.Min(320 * factor, DetailWindowSizing.WorkAreaHeightLimit(null));
+        MinHeight = Math.Min(320 * factor, DetailWindowSizing.WorkAreaHeightLimit(null));
+        MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(null);
 
         this.SuppressFocusVisualOnDeactivation();
         // Loaded fires after the visual tree is realised, so Focus()
