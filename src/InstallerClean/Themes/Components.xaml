@@ -1000,23 +1000,28 @@
                                     <Border Background="{StaticResource Surface.Card}"
                                             CornerRadius="{StaticResource Radius.CompactPill}"
                                             Padding="{TemplateBinding Padding}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <ContentPresenter VerticalAlignment="Center"
-                                                              Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
-                                                              ContentTemplate="{Binding SelectionBoxItemTemplate, RelativeSource={RelativeSource AncestorType=ComboBox}}"/>
-                                            <TextBlock Grid.Column="1" Text="&#xE70D;"
-                                                       FontFamily="Segoe MDL2 Assets" FontSize="10"
-                                                       Foreground="{StaticResource Text.Muted}"
-                                                       VerticalAlignment="Center" Margin="8,0,0,0"/>
-                                        </Grid>
+                                        <TextBlock Text="&#xE70D;"
+                                                   FontFamily="Segoe MDL2 Assets" FontSize="10"
+                                                   Foreground="{StaticResource Text.Muted}"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                     </Border>
                                 </ControlTemplate>
                             </ToggleButton.Template>
                         </ToggleButton>
+                        <!-- Selection text drawn over the toggle as a direct child of
+                             the template, so TemplateBinding reaches the ComboBox: the
+                             SelectionBoxItemTemplate generated from DisplayMemberPath
+                             and the Text.Heading foreground apply here. Inside the nested
+                             ToggleButton template the closed box otherwise showed the
+                             item's ToString() in the inherited (dark) foreground.
+                             IsHitTestVisible=False lets a click fall through to the toggle. -->
+                        <ContentPresenter IsHitTestVisible="False"
+                                          Content="{TemplateBinding SelectionBoxItem}"
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                          ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                          TextElement.Foreground="{StaticResource Text.Heading}"
+                                          VerticalAlignment="Center" HorizontalAlignment="Left"
+                                          Margin="12,0,28,0"/>
                         <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom"
                                IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="None" Focusable="False">
                             <Border Background="{StaticResource Surface.Sidebar}"
