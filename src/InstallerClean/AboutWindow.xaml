@@ -5,6 +5,7 @@
         xmlns:chrome="clr-namespace:InstallerClean.Controls"
         Title="{loc:Translate Window.About.Title}"
         ResizeMode="NoResize"
+        SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         Background="{StaticResource Surface.Sidebar}">
@@ -26,6 +27,12 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="14"/>
             <RowDefinition Height="Auto"/>
+            <!-- Star spacer. Under SizeToContent="Height" this row measures
+                 to nothing; while the content is shorter than MinHeight (set
+                 in code-behind) it takes up the slack in the arrange pass and
+                 pins the say-thanks block to the bottom, the airy box. Once
+                 the language-restart panel makes the content taller than the
+                 box the window grows and this row collapses to zero. -->
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="6"/>

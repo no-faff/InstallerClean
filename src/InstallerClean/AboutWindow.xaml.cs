@@ -59,10 +59,12 @@ public partial class AboutWindow : Window
 
         ApplyScaledBounds();
         AccessibilitySettings.Current.PropertyChanged += OnAccessibilitySettingsChanged;
-        // A live text-scale increase re-applies the scaled bounds and
-        // the shown window grows down and right from a fixed top-left;
-        // the nudge brings the Close row back inside the work area.
-        // NoResize means SizeChanged only ever fires for that growth.
+        // SizeChanged fires when the height-sized window grows: a live
+        // text-scale increase re-applies the bounds, and revealing the
+        // language-restart panel makes the content (and so the window)
+        // taller. Either way the window grows down from a fixed top-left,
+        // and the nudge brings the Close row back inside the work area.
+        // NoResize means SizeChanged never fires for a user drag-resize.
         SizeChanged += OnWindowSizeChanged;
 
         this.EnableAltSpaceSystemMenu();
@@ -108,32 +110,41 @@ public partial class AboutWindow : Window
         => (Application.Current as App)?.RelaunchForLanguageChange();
 
     /// <summary>
-    /// 500 x 400 at 100% text scale is the designed box; the slack
-    /// between the content's natural height and the box sits in the
-    /// layout's star spacer row, which pins the say-thanks block to
-    /// the bottom. The box multiplies by the text-scale factor (the
-    /// fixed margins and gaps make the content grow sub-linearly, so
-    /// it always fits) and clamps to the work area, so the Close row
-    /// can never be pushed off screen the way a fixed height cut
-    /// it off at 208%. Width and Height are explicit and first
-    /// assigned before the window handle exists, the shape every
-    /// band-free window in the app uses. Sized to content instead
-    /// (SizeToContent="WidthAndHeight" with the scaled box as window
-    /// minimums, re-applied from OnSourceInitialized), the window
-    /// opened larger than its arranged content by exactly the
-    /// standard caption frame, 37 by 14 device-independent units of
-    /// unpainted black along the bottom and right edges (observed
-    /// 2026-06-13 at 125% monitor scale, custom WindowChrome active).
-    /// The constructor resolves the work area against the owner-to-be
-    /// (the main window); a live text-scale change re-resolves against
-    /// the actual owner.
+    /// The About box sizes its height to its content
+    /// (SizeToContent="Height", set in XAML) so a taller content set grows
+    /// the window instead of overflowing it: the language-restart note
+    /// wraps to two lines in Italian where it is one in English, and a
+    /// fixed height clipped the say-thanks and Close rows off the bottom in
+    /// that state. MinHeight holds the designed 500 x 400 box at 100% text
+    /// scale; while the content is shorter than the box the layout's star
+    /// spacer row takes up the slack and pins the say-thanks block to the
+    /// bottom. MaxHeight caps growth at the work area so a large OS text
+    /// scale cannot push the box past the screen (a fixed height cut the
+    /// Close row off this way at 208%). The box grows sub-linearly with
+    /// text scale because the margins and gaps are fixed. Width is
+    /// explicit; Height itself is never assigned, which would re-pin the
+    /// fixed box the restart note overflows.
+    ///
+    /// Height-only is deliberate. SizeToContent="WidthAndHeight" with this
+    /// custom WindowChrome opened the window larger than its arranged
+    /// content by exactly the caption frame, 37 by 14 device-independent
+    /// units of unpainted black along the bottom and right edges (observed
+    /// 2026-06-13 at 125% monitor scale); MainWindow sizes its height the
+    /// same way and for the same reason.
+    ///
+    /// The constructor resolves the work area against the owner-to-be (the
+    /// main window); a live text-scale change re-resolves against the
+    /// actual owner.
     /// </summary>
     private void ApplyScaledBounds()
     {
         var reference = Owner ?? Application.Current?.MainWindow;
         var factor = AccessibilitySettings.Current.TextScaleFactor;
         Width = DetailWindowSizing.ClampWidthToWorkArea(reference, 500 * factor, 0);
-        Height = DetailWindowSizing.ClampHeightToWorkArea(reference, 400 * factor, 0);
+        // MinHeight can never exceed MaxHeight: ClampHeightToWorkArea caps
+        // the scaled box at the same work-area limit MaxHeight uses.
+        MinHeight = DetailWindowSizing.ClampHeightToWorkArea(reference, 400 * factor, 0);
+        MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(reference);
     }
 
     private void OnAccessibilitySettingsChanged(object? sender, PropertyChangedEventArgs e)
