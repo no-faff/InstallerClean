@@ -1000,10 +1000,16 @@
                                     <Border Background="{StaticResource Surface.Card}"
                                             CornerRadius="{StaticResource Radius.CompactPill}"
                                             Padding="{TemplateBinding Padding}">
+                                        <!-- The pill end is a 15px radius (Radius.CompactPill,
+                                             fully rounded at the 30px box height). 12px box
+                                             padding + 8px here = 20px from the edge, clearing
+                                             that curve so the glyph sits on the flat run, not
+                                             in the rounded corner. -->
                                         <TextBlock Text="&#xE70D;"
                                                    FontFamily="Segoe MDL2 Assets" FontSize="12"
                                                    Foreground="{StaticResource Text.Muted}"
-                                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                   Margin="0,0,8,0"/>
                                     </Border>
                                 </ControlTemplate>
                             </ToggleButton.Template>
@@ -1021,7 +1027,7 @@
                                           ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
                                           TextElement.Foreground="{StaticResource Text.Heading}"
                                           VerticalAlignment="Center" HorizontalAlignment="Left"
-                                          Margin="12,0,28,0"/>
+                                          Margin="12,0,36,0"/>
                         <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom"
                                IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="None" Focusable="False">
                             <Border Background="{StaticResource Surface.Sidebar}"
