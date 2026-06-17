@@ -104,12 +104,12 @@
          instead of renaming consumers. -->
     <FontFamily x:Key="Type.FontFamily">pack://application:,,,/Fonts/#Poppins</FontFamily>
 
-    <sys:Double x:Key="Type.Display">28</sys:Double>     <!-- splash hero -->
-    <sys:Double x:Key="Type.Heading.Lg">22</sys:Double>  <!-- completion heading -->
-    <sys:Double x:Key="Type.Heading.Md">20</sys:Double>  <!-- about title -->
-    <sys:Double x:Key="Type.Heading.Sm">14</sys:Double>  <!-- window titles, status -->
-    <sys:Double x:Key="Type.Body">12</sys:Double>        <!-- body copy, descriptions -->
-    <sys:Double x:Key="Type.Caption">11</sys:Double>     <!-- metadata labels, footer -->
+    <sys:Double x:Key="Type.Display">29</sys:Double>     <!-- splash hero -->
+    <sys:Double x:Key="Type.Heading.Lg">23</sys:Double>  <!-- completion heading -->
+    <sys:Double x:Key="Type.Heading.Md">21</sys:Double>  <!-- about title -->
+    <sys:Double x:Key="Type.Heading.Sm">15</sys:Double>  <!-- window titles, status -->
+    <sys:Double x:Key="Type.Body">13</sys:Double>        <!-- body copy, descriptions -->
+    <sys:Double x:Key="Type.Caption">12</sys:Double>     <!-- metadata labels, footer -->
 
     <!-- Radius. Seven roles cover the app:
            Pill         - fully rounded 40 px action buttons.
