@@ -14,6 +14,8 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 - On startup the saved display-language preference (or the Windows display language when none is set) is applied before any window paints, so the whole app, the splash included, opens in one language and one number format.
 - The command-line tool pins itself to English regardless of the Windows display language, keeping its stdout summary lines and English event-log entries in the stable shape monitoring tools match on; file sizes still format to the local region.
+- Every text size in the app is a step larger (body, captions, headings and the splash all moved up a notch); the previous sizes were a little small. The layout and proportions are unchanged; only the type size grew.
+- The main window's opening explanation now reads in three tiers: the reassurance that the unneeded files are safe to delete leads, prominent; the detail about why they accumulate sits quieter beneath it; and the Delete or Move line follows at body weight. It was one muted block before, so the safety line sat dimmer than the file count under it.
 
 ## [1.9.0] - 2026-06-15
 
