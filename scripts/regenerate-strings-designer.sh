@@ -26,8 +26,8 @@ BEGIN {
     print ""
     print "namespace InstallerClean.Resources;"
     print ""
-    print "using System.Globalization;"
     print "using System.Resources;"
+    print "using InstallerClean.Helpers;"
     print ""
     print "/// <summary>"
     print "/// Strongly-typed accessor over Strings.resx. C# code paths use these"
@@ -50,7 +50,7 @@ BEGIN {
     print "    public static ResourceManager ResourceManager => Manager;"
     print ""
     print "    private static string Get(string key) =>"
-    print "        Manager.GetString(key, CultureInfo.CurrentUICulture) ?? key;"
+    print "        Manager.GetString(key, Localisation.UiCulture) ?? key;"
     print ""
 
     n = split(keys, arr, "\n")

@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Markup;
 using System.Windows.Media.Imaging;
 using Microsoft.Extensions.DependencyInjection;
 using InstallerClean.Helpers;
@@ -65,10 +66,23 @@ public partial class App : Application
         var languagePreference = LanguagePreference.Resolve(new SettingsService().Load().Language);
         if (languagePreference is not null)
         {
+            // Localisation.Set is the load-bearing one: the resx lookups and the
+            // size formatting read it directly, so the chosen language holds for
+            // every window, not just the ones built during startup. A culture set
+            // only on the thread does not survive the dispatcher's later
+            // callbacks, so a window opened from a click would otherwise fall back
+            // to the OS language. The thread/default-thread cultures and the
+            // FrameworkElement.Language default cover other culture-dependent
+            // framework code and XAML number bindings.
+            Localisation.Set(languagePreference, languagePreference);
             CultureInfo.CurrentUICulture = languagePreference;
             CultureInfo.CurrentCulture = languagePreference;
             CultureInfo.DefaultThreadCurrentUICulture = languagePreference;
             CultureInfo.DefaultThreadCurrentCulture = languagePreference;
+            FrameworkElement.LanguageProperty.OverrideMetadata(
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(
+                    XmlLanguage.GetLanguage(languagePreference.IetfLanguageTag)));
         }
 
         // Single-instance pattern: open the mutex without taking

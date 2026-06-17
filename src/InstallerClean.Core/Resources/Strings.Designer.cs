@@ -9,8 +9,8 @@
 
 namespace InstallerClean.Resources;
 
-using System.Globalization;
 using System.Resources;
+using InstallerClean.Helpers;
 
 /// <summary>
 /// Strongly-typed accessor over Strings.resx. C# code paths use these
@@ -33,7 +33,7 @@ public static class Strings
     public static ResourceManager ResourceManager => Manager;
 
     private static string Get(string key) =>
-        Manager.GetString(key, CultureInfo.CurrentUICulture) ?? key;
+        Manager.GetString(key, Localisation.UiCulture) ?? key;
 
     public static string Action_About => Get("Action.About");
     public static string Action_Browse => Get("Action.Browse");

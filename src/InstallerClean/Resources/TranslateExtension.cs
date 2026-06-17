@@ -1,7 +1,7 @@
 using System;
-using System.Globalization;
 using System.Resources;
 using System.Windows.Markup;
+using InstallerClean.Helpers;
 
 namespace InstallerClean.Resources;
 
@@ -46,7 +46,7 @@ public sealed class TranslateExtension : MarkupExtension
         if (string.IsNullOrEmpty(Key))
             return string.Empty;
 
-        return ResourceManager.GetString(Key, CultureInfo.CurrentUICulture)
+        return ResourceManager.GetString(Key, Localisation.UiCulture)
             ?? Key;
     }
 }
