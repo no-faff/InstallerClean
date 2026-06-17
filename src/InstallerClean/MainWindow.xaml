@@ -341,19 +341,39 @@
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     KeyboardNavigation.TabIndex="1"
                     Content="{loc:Translate Action.About}" Command="{Binding Chrome.ShowAboutCommand}" Margin="4,0,0,0"/>
-            <!-- TabIndex puts Star then Heart in keyboard order so Tab
-                 follows the left-to-right visual order. DockPanel
-                 Dock="Right" places Heart at the far right and Star to
-                 its left; XAML order has Heart first, so without explicit
-                 TabIndex the tab visit is Heart -> Star, reverse of
-                 reading. -->
+            <!-- Docked-right group, declared far-right-first: the globe is
+                 declared first (far right), then Heart, then Star, so the
+                 visual order left-to-right is Star, Heart, Globe. TabIndex
+                 (2, 3, 4) restores that reading order for Tab, which would
+                 otherwise follow declaration order (Globe -> Heart -> Star,
+                 reversed). Each item carries the gap to the one on its right. -->
+            <!-- Language switcher: a wordless globe so it reads in any UI
+                 language. It opens a menu of language names (endonyms) with
+                 the running one ticked (LanguageButton_Click); picking
+                 another restarts the app into it. Functional, not an
+                 affective ask, so it uses the default tooltip (the accent
+                 tooltip is the star's and heart's) and has no hover-grow. -->
+            <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
+                    x:Name="LanguageButton"
+                    KeyboardNavigation.TabIndex="4"
+                    Click="LanguageButton_Click"
+                    AutomationProperties.Name="{loc:Translate Automation.ChangeLanguage}"
+                    AutomationProperties.HelpText="{loc:Translate Automation.ChangeLanguage.HelpText}"
+                    FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
+                    ToolTipService.InitialShowDelay="0"
+                    ToolTip="{loc:Translate Tooltip.ChangeLanguage}"
+                    Padding="6,0" MinHeight="28">
+                <Path Data="M2 12 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0 M12 2 a4.2 10 0 1 0 0 20 a4.2 10 0 1 0 0 -20 M2 12 h20"
+                      Stroke="{StaticResource Text.Muted}" StrokeThickness="2" Fill="{x:Null}"
+                      Width="18" Height="18" Stretch="Uniform"/>
+            </Button>
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
                     KeyboardNavigation.TabIndex="3"
                     Command="{Binding Chrome.DonateCommand}"
                     AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa}"
                     FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     ToolTipService.InitialShowDelay="0"
-                    Padding="6,0" MinHeight="28">
+                    Padding="6,0" MinHeight="28" Margin="{StaticResource GapRight.Md}">
                 <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
                       Fill="{StaticResource Decoration.Heart}" Width="18" Height="18" Stretch="Uniform"
                       RenderTransformOrigin="0.5,0.5">

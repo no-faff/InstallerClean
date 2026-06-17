@@ -19,4 +19,12 @@ public interface IWindowService
     void CloseMainWindow();
 
     void OpenUrl(string url);
+
+    /// <summary>
+    /// Relaunches the app so a newly chosen display-language preference
+    /// takes effect. The resx strings resolve once when each window is
+    /// built, so a culture swapped at runtime does not reach text already
+    /// painted; a fresh process is the reliable way to apply it.
+    /// </summary>
+    void RelaunchForLanguageChange();
 }

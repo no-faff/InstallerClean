@@ -611,13 +611,8 @@ Non è stato possibile scrivere il file crash.log.</value></data>
 # questo file a una segnalazione di bug pubblica.
 </value></data>
 
-  <data name="Label.Language" xml:space="preserve"><value>LINGUA</value></data>
-  <data name="Language.Automatic" xml:space="preserve"><value>Automatica</value></data>
-  <data name="Language.RestartNote" xml:space="preserve"><value>Le modifiche alla lingua hanno effetto alla prossima apertura di InstallerClean.</value></data>
-  <data name="Action.RestartNow" xml:space="preserve"><value>Riavvia ora</value></data>
-  <data name="Automation.Language" xml:space="preserve"><value>Lingua di visualizzazione</value></data>
-  <data name="Automation.Language.HelpText" xml:space="preserve"><value>Scegli la lingua in cui InstallerClean viene visualizzato. Automatica segue la lingua di Windows.</value></data>
-  <data name="Automation.RestartNow" xml:space="preserve"><value>Riavvia ora</value></data>
-  <data name="Automation.RestartNow.HelpText" xml:space="preserve"><value>Riavvia InstallerClean per applicare la nuova lingua.</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Cambia la lingua di visualizzazione. InstallerClean verrà riavviato per applicarla.</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Cambia la lingua di visualizzazione</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>InstallerClean verrà riavviato per applicarla.</value></data>
 
 </root>

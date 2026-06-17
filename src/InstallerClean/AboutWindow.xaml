@@ -25,17 +25,14 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="14"/>
-            <RowDefinition Height="Auto"/>
             <!-- Star spacer: the gap before the say-thanks block. Under
                  SizeToContent="Height" it sits at MinHeight and expands past it
                  only in the arrange pass, when the content is shorter than the
                  window MinHeight (set in code-behind), taking up the slack to
-                 pin say-thanks to the bottom, the airy box. The MinHeight floor
-                 keeps a section gap above say-thanks once the language-restart
-                 panel grows the window to fit its content: the two-line Italian
-                 restart note jammed say-thanks against the restart button with
-                 an un-floored (zero) star row. -->
+                 pin the say-thanks block to the bottom, the airy box. The
+                 MinHeight floor keeps a section gap above say-thanks if the
+                 window ever grows to fit taller content (a large OS text
+                 scale), rather than letting the spacer collapse to zero. -->
             <RowDefinition Height="*" MinHeight="24"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="6"/>
@@ -91,41 +88,16 @@
                 AutomationProperties.Name="{loc:Translate Automation.CheckForUpdates}"
                 AutomationProperties.HelpText="{loc:Translate Automation.CheckForUpdates.HelpText}"/>
 
-        <StackPanel Grid.Row="9">
-            <TextBlock Text="{loc:Translate Label.Language}"
-                       Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
-                       Margin="0,0,0,6"/>
-            <ComboBox x:Name="LanguagePicker" Style="{StaticResource PillComboBox}"
-                      HorizontalAlignment="Left" Width="180"
-                      AutomationProperties.Name="{loc:Translate Automation.Language}"
-                      AutomationProperties.HelpText="{loc:Translate Automation.Language.HelpText}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Display}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-            <StackPanel x:Name="RestartPanel" Visibility="Collapsed" Margin="0,12,0,0">
-                <TextBlock Text="{loc:Translate Language.RestartNote}"
-                           Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
-                           TextWrapping="Wrap" Margin="0,0,0,8"/>
-                <Button Style="{StaticResource CompactPill}" Click="RestartNowClick"
-                        Content="{loc:Translate Action.RestartNow}" HorizontalAlignment="Left"
-                        AutomationProperties.Name="{loc:Translate Automation.RestartNow}"
-                        AutomationProperties.HelpText="{loc:Translate Automation.RestartNow.HelpText}"/>
-            </StackPanel>
-        </StackPanel>
-
         <!-- Section header above the Star + Buy-me-a-cuppa row. The
              resx value is already uppercased so screen readers don't
              see SmallCaps glyph mapping at all. Type.Heading.Sm +
              Text.Body matches MOVE LOCATION and the registered-
              window PRODUCTS / PATCHES / PRODUCT DETAILS labels. -->
-        <TextBlock Grid.Row="11" Text="{loc:Translate Section.SayThanks}"
+        <TextBlock Grid.Row="9" Text="{loc:Translate Section.SayThanks}"
                    Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                    AutomationProperties.Name="{loc:Translate Automation.SayThanks}"/>
 
-        <Grid Grid.Row="13">
+        <Grid Grid.Row="11">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                 <Button Style="{StaticResource CompactGhostPill}"
                         Click="StarClick" AutomationProperties.Name="{loc:Translate Automation.LeaveStarOnGitHub.About}"

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Automation.Peers;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -410,6 +411,59 @@ public partial class MainWindow : Window
     private void MinimizeClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
+
+    // The bottom-bar globe opens this language menu. Endonyms are literal
+    // (a language is shown in its own name, as browsers and Windows do);
+    // the running language is ticked with a Segoe MDL2 check glyph drawn by
+    // an explicit TextBlock, because the shared MenuItem template renders
+    // only the Header (no icon column) and the app-wide implicit TextBlock
+    // style would otherwise impose the bundled body font on the glyph.
+    // Placement=Top opens the menu upward, clear of the taskbar under a
+    // button at the bottom of the window. Rebuilt per click so the tick
+    // always reflects the running language.
+    private static readonly System.Windows.Media.FontFamily SegoeMdl2 = new("Segoe MDL2 Assets");
+
+    private static readonly (string Culture, string Endonym)[] LanguageChoices =
+    {
+        ("en-GB", "English"),
+        ("it", "Italiano"),
+    };
+
+    private void LanguageButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button) return;
+        var running = Localisation.UiCultureOverride?.Name;
+        var menu = new ContextMenu
+        {
+            PlacementTarget = button,
+            Placement = PlacementMode.Top,
+        };
+        foreach (var (culture, endonym) in LanguageChoices)
+        {
+            var isRunning = string.Equals(culture, running, StringComparison.OrdinalIgnoreCase);
+            var header = new StackPanel { Orientation = Orientation.Horizontal };
+            header.Children.Add(new TextBlock
+            {
+                Text = isRunning ? "\uE73E" : string.Empty,
+                FontFamily = SegoeMdl2,
+                FontSize = 12,
+                Width = 20,
+                VerticalAlignment = VerticalAlignment.Center,
+            });
+            header.Children.Add(new TextBlock
+            {
+                Text = endonym,
+                VerticalAlignment = VerticalAlignment.Center,
+            });
+            menu.Items.Add(new MenuItem
+            {
+                Header = header,
+                Command = _vm.Chrome.SetLanguageCommand,
+                CommandParameter = culture,
+            });
+        }
+        menu.IsOpen = true;
+    }
 
     protected override void OnSourceInitialized(EventArgs e)
     {

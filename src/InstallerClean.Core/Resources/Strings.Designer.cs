@@ -55,7 +55,6 @@ public static class Strings
     public static string Action_OpenReleasePage => Get("Action.OpenReleasePage");
     public static string Action_Paste => Get("Action.Paste");
     public static string Action_Rescan => Get("Action.Rescan");
-    public static string Action_RestartNow => Get("Action.RestartNow");
     public static string Action_ScanAgain => Get("Action.ScanAgain");
     public static string Action_SelectAll => Get("Action.SelectAll");
     public static string Action_SendResultLog => Get("Action.SendResultLog");
@@ -65,6 +64,8 @@ public static class Strings
     public static string Automation_CancelOperation => Get("Automation.CancelOperation");
     public static string Automation_CancelScan => Get("Automation.CancelScan");
     public static string Automation_CancelStartupScan => Get("Automation.CancelStartupScan");
+    public static string Automation_ChangeLanguage => Get("Automation.ChangeLanguage");
+    public static string Automation_ChangeLanguage_HelpText => Get("Automation.ChangeLanguage.HelpText");
     public static string Automation_CheckForUpdates => Get("Automation.CheckForUpdates");
     public static string Automation_CheckForUpdates_HelpText => Get("Automation.CheckForUpdates.HelpText");
     public static string Automation_Close => Get("Automation.Close");
@@ -75,8 +76,6 @@ public static class Strings
     public static string Automation_ConfirmMove => Get("Automation.ConfirmMove");
     public static string Automation_ConfirmSendResultLog => Get("Automation.ConfirmSendResultLog");
     public static string Automation_DeleteAllFiles => Get("Automation.DeleteAllFiles");
-    public static string Automation_Language => Get("Automation.Language");
-    public static string Automation_Language_HelpText => Get("Automation.Language.HelpText");
     public static string Automation_LeaveStarOnGitHub => Get("Automation.LeaveStarOnGitHub");
     public static string Automation_LeaveStarOnGitHub_About => Get("Automation.LeaveStarOnGitHub.About");
     public static string Automation_Minimise => Get("Automation.Minimise");
@@ -90,8 +89,6 @@ public static class Strings
     public static string Automation_RecycleUnavailableMove => Get("Automation.RecycleUnavailableMove");
     public static string Automation_RegisteredMissingSeeAlso => Get("Automation.RegisteredMissingSeeAlso");
     public static string Automation_RescanInstaller => Get("Automation.RescanInstaller");
-    public static string Automation_RestartNow => Get("Automation.RestartNow");
-    public static string Automation_RestartNow_HelpText => Get("Automation.RestartNow.HelpText");
     public static string Automation_ResultLogPreview => Get("Automation.ResultLogPreview");
     public static string Automation_SayThanks => Get("Automation.SayThanks");
     public static string Automation_ScanningProgress => Get("Automation.ScanningProgress");
@@ -275,9 +272,6 @@ public static class Strings
     public static string Field_Title => Get("Field.Title");
     public static string Field_UnknownProductName => Get("Field.UnknownProductName");
     public static string FilePicker_ChooseDestinationTitle => Get("FilePicker.ChooseDestinationTitle");
-    public static string Label_Language => Get("Label.Language");
-    public static string Language_Automatic => Get("Language.Automatic");
-    public static string Language_RestartNote => Get("Language.RestartNote");
     public static string Plural_Error_Plural => Get("Plural.Error.Plural");
     public static string Plural_Error_Singular => Get("Plural.Error.Singular");
     public static string Plural_File_Plural => Get("Plural.File.Plural");
@@ -353,6 +347,7 @@ public static class Strings
     public static string Tooltip_BuyMeACuppa => Get("Tooltip.BuyMeACuppa");
     public static string Tooltip_BuyMeACuppa_About => Get("Tooltip.BuyMeACuppa.About");
     public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");
+    public static string Tooltip_ChangeLanguage => Get("Tooltip.ChangeLanguage");
     public static string Tooltip_Close => Get("Tooltip.Close");
     public static string Tooltip_Delete => Get("Tooltip.Delete");
     public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");

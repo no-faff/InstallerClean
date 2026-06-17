@@ -71,7 +71,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             moveService, deleteService, settingsService,
             dialogService, confirmationService, fileSystem,
             Scan, Completion, resultLogService);
-        Chrome = new ChromeViewModel(windowService, msiInfoService, Scan);
+        Chrome = new ChromeViewModel(windowService, msiInfoService, settingsService, Scan);
 
         // Surface the all-clear overlay when a scan finishes with no
         // orphans. Cleanup sets IsOperating=false after the post-

@@ -51,4 +51,7 @@ public sealed class WindowService : IWindowService
     }
 
     public void OpenUrl(string url) => UrlLauncher.OpenUrl(url);
+
+    public void RelaunchForLanguageChange()
+        => (Application.Current as App)?.RelaunchForLanguageChange();
 }

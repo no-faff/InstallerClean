@@ -23,24 +23,6 @@ public partial class AboutWindow : Window
     private readonly ISettingsService _settingsService;
     private CancellationTokenSource? _checkCts;
 
-    // Captured at construction so a no-op re-selection (picking the
-    // language the app already started in) does not raise the restart
-    // prompt.
-    private string? _savedLanguage;
-
-    // CultureName null = Automatic (follow the Windows display language).
-    // The endonyms are literal and never translated: a language is shown
-    // in its own name, as browsers and Windows do. The culture names stay
-    // in step with Core's SupportedLanguages.
-    private sealed record LanguageOption(string? CultureName, string Display);
-
-    private static LanguageOption[] BuildLanguageOptions() => new[]
-    {
-        new LanguageOption(null, Strings.Language_Automatic),
-        new LanguageOption("en-GB", "English"),
-        new LanguageOption("it", "Italiano"),
-    };
-
     public AboutWindow(IUpdateCheckService updateCheckService, ISettingsService settingsService)
     {
         InitializeComponent();
@@ -55,16 +37,14 @@ public partial class AboutWindow : Window
         // is no visible label to use instead.
         AutomationProperties.SetName(VersionText, version);
 
-        PopulateLanguagePicker();
-
         ApplyScaledBounds();
         AccessibilitySettings.Current.PropertyChanged += OnAccessibilitySettingsChanged;
         // SizeChanged fires when the height-sized window grows: a live
-        // text-scale increase re-applies the bounds, and revealing the
-        // language-restart panel makes the content (and so the window)
-        // taller. Either way the window grows down from a fixed top-left,
-        // and the nudge brings the Close row back inside the work area.
-        // NoResize means SizeChanged never fires for a user drag-resize.
+        // text-scale increase re-applies the bounds and the content grows
+        // with the larger type. The window grows down from a fixed
+        // top-left, and the nudge brings the Close row back inside the
+        // work area. NoResize means SizeChanged never fires for a user
+        // drag-resize.
         SizeChanged += OnWindowSizeChanged;
 
         this.EnableAltSpaceSystemMenu();
@@ -77,45 +57,12 @@ public partial class AboutWindow : Window
         Loaded += (_, _) => CloseButton.Focus();
     }
 
-    private void PopulateLanguagePicker()
-    {
-        _savedLanguage = _settingsService.Load().Language;
-        var options = BuildLanguageOptions();
-        LanguagePicker.ItemsSource = options;
-        // The XAML ItemTemplate (not DisplayMemberPath) drives the display:
-        // only an explicit ItemTemplate populates ComboBox.SelectionBoxItemTemplate,
-        // which the closed-box presenter binds; DisplayMemberPath leaves it null and
-        // the closed box renders the item's ToString(). The two are mutually
-        // exclusive, so DisplayMemberPath is deliberately not set here.
-        LanguagePicker.SelectedItem =
-            options.FirstOrDefault(o => string.Equals(o.CultureName, _savedLanguage, StringComparison.OrdinalIgnoreCase))
-            ?? options[0];
-        // Subscribe after the initial select so the programmatic selection
-        // above is not treated as a user change.
-        LanguagePicker.SelectionChanged += LanguagePicker_SelectionChanged;
-    }
-
-    private void LanguagePicker_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-    {
-        if (LanguagePicker.SelectedItem is not LanguageOption option)
-            return;
-        _settingsService.Update(s => s.Language = option.CultureName);
-        // Show the restart prompt only when the choice differs from the
-        // language this process actually started in.
-        var changed = !string.Equals(option.CultureName, _savedLanguage, StringComparison.OrdinalIgnoreCase);
-        RestartPanel.Visibility = changed ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    private void RestartNowClick(object sender, RoutedEventArgs e)
-        => (Application.Current as App)?.RelaunchForLanguageChange();
-
     /// <summary>
     /// The About box sizes its height to its content
     /// (SizeToContent="Height", set in XAML) so a taller content set grows
-    /// the window instead of overflowing it: the language-restart note
-    /// wraps to two lines in Italian where it is one in English, and a
-    /// fixed height clipped the say-thanks and Close rows off the bottom in
-    /// that state. MinHeight holds the designed 500 x 400 box at 100% text
+    /// the window instead of overflowing it; a fixed height clipped the
+    /// say-thanks and Close rows off the bottom. MinHeight holds the
+    /// designed 500 x 400 box at 100% text
     /// scale; while the content is shorter than the box the layout's star
     /// spacer row takes up the slack and pins the say-thanks block to the
     /// bottom. MaxHeight caps growth at the work area so a large OS text
@@ -123,7 +70,7 @@ public partial class AboutWindow : Window
     /// Close row off this way at 208%). The box grows sub-linearly with
     /// text scale because the margins and gaps are fixed. Width is
     /// explicit; Height itself is never assigned, which would re-pin the
-    /// fixed box the restart note overflows.
+    /// fixed box.
     ///
     /// Height-only is deliberate. SizeToContent="WidthAndHeight" with this
     /// custom WindowChrome opened the window larger than its arranged
