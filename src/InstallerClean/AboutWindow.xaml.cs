@@ -80,7 +80,11 @@ public partial class AboutWindow : Window
         _savedLanguage = _settingsService.Load().Language;
         var options = BuildLanguageOptions();
         LanguagePicker.ItemsSource = options;
-        LanguagePicker.DisplayMemberPath = nameof(LanguageOption.Display);
+        // The XAML ItemTemplate (not DisplayMemberPath) drives the display:
+        // only an explicit ItemTemplate populates ComboBox.SelectionBoxItemTemplate,
+        // which the closed-box presenter binds; DisplayMemberPath leaves it null and
+        // the closed box renders the item's ToString(). The two are mutually
+        // exclusive, so DisplayMemberPath is deliberately not set here.
         LanguagePicker.SelectedItem =
             options.FirstOrDefault(o => string.Equals(o.CultureName, _savedLanguage, StringComparison.OrdinalIgnoreCase))
             ?? options[0];
