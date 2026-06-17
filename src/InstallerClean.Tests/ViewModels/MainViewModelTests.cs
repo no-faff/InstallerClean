@@ -976,18 +976,18 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void MainExplanationText_carries_all_three_reason_labels()
+    public void MainExplanationWhyText_carries_all_three_reason_labels()
     {
-        // The body copy template carries three Reason format slots;
-        // a missing arg would surface as a literal "{2}" in the
+        // The "why" sentence of the intro carries the three Reason format
+        // slots; a missing arg would surface as a literal "{2}" in the
         // rendered text rather than a localised tag.
         var vm = CreateViewModel();
 
-        Assert.Contains(Strings.Reason_Orphaned, vm.MainExplanationText);
-        Assert.Contains(Strings.Reason_Superseded, vm.MainExplanationText);
-        Assert.Contains(Strings.Reason_Obsoleted, vm.MainExplanationText);
-        Assert.DoesNotContain("{0}", vm.MainExplanationText);
-        Assert.DoesNotContain("{1}", vm.MainExplanationText);
-        Assert.DoesNotContain("{2}", vm.MainExplanationText);
+        Assert.Contains(Strings.Reason_Orphaned, vm.MainExplanationWhyText);
+        Assert.Contains(Strings.Reason_Superseded, vm.MainExplanationWhyText);
+        Assert.Contains(Strings.Reason_Obsoleted, vm.MainExplanationWhyText);
+        Assert.DoesNotContain("{0}", vm.MainExplanationWhyText);
+        Assert.DoesNotContain("{1}", vm.MainExplanationWhyText);
+        Assert.DoesNotContain("{2}", vm.MainExplanationWhyText);
     }
 }

@@ -113,7 +113,9 @@ public static class Strings
     public static string Automation_ViewOrphanedFiles_HelpText => Get("Automation.ViewOrphanedFiles.HelpText");
     public static string Automation_ViewRegisteredFiles => Get("Automation.ViewRegisteredFiles");
     public static string Automation_ViewRegisteredFiles_HelpText => Get("Automation.ViewRegisteredFiles.HelpText");
-    public static string Body_MainExplanation => Get("Body.MainExplanation");
+    public static string Body_MainExplanation_Action => Get("Body.MainExplanation.Action");
+    public static string Body_MainExplanation_Lead => Get("Body.MainExplanation.Lead");
+    public static string Body_MainExplanation_Why => Get("Body.MainExplanation.Why");
     public static string Body_NoFileSelected => Get("Body.NoFileSelected");
     public static string Body_NoMetadata => Get("Body.NoMetadata");
     public static string Body_NoPatches => Get("Body.NoPatches");

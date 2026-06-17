@@ -247,9 +247,17 @@
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Nome del soggetto dal certificato Authenticode incorporato. Catena non verificata.</value></data>
 
   <!-- Body copy -->
-  <data name="Body.MainExplanation" xml:space="preserve">
-    <value>I file non necessari qui sotto si possono eliminare senza rischi. Si trovano in C:\Windows\Installer, lasciati lì quando un programma è stato disinstallato ({0}), una patch più recente ne ha sostituita una ({1}) o il produttore l'ha ritirata ({2}). InstallerClean elenca soltanto i file che Windows stesso segnala come non più in uso. Eliminali nel Cestino, oppure spostali prima altrove, se preferisci tenerne una copia.</value>
-    <comment>{0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
+  <data name="Body.MainExplanation.Lead" xml:space="preserve">
+    <value>I file non necessari qui sotto si possono eliminare senza rischi.</value>
+    <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. Keep it one short clause.</comment>
+  </data>
+  <data name="Body.MainExplanation.Why" xml:space="preserve">
+    <value>Si trovano in C:\Windows\Installer, lasciati lì quando un programma è stato disinstallato ({0}), una patch più recente ne ha sostituita una ({1}) o il produttore l'ha ritirata ({2}). InstallerClean elenca soltanto i file che Windows stesso segnala come non più in uso.</value>
+    <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
+  </data>
+  <data name="Body.MainExplanation.Action" xml:space="preserve">
+    <value>Eliminali nel Cestino, oppure spostali prima altrove, se preferisci tenerne una copia.</value>
+    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Qualcosa sta usando Windows Installer in questo momento, di solito un aggiornamento di Windows o un programma che si sta installando in background. Sposta ed Elimina sono in pausa mentre questo avviene, così InstallerClean non tocca la cache di installazione mentre sta cambiando. Quando ha finito, ripeti la scansione e torneranno disponibili.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Una precedente transazione di Windows Installer è sospesa su questo computer. Riprendi o annulla quell'installazione (oppure riavvia Windows) prima di pulire la cache.</value></data>

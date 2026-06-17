@@ -105,9 +105,20 @@
                           AutomationProperties.Name="{loc:Translate Automation.Scroll.ScanResults}">
             <StackPanel>
 
-                <!-- Explanatory text -->
-                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Lg}"
-                           Text="{Binding MainExplanationText}"/>
+                <!-- Explanatory text in three tiers: the lead reassurance reads
+                     prominent (heading tier), the "why" detail recedes (muted),
+                     the action line sits at body tier. Three resx keys so each
+                     styles independently; only the "why" interpolates the Reason
+                     labels, so only it binds to the view-model. -->
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Heading}"
+                           FontSize="{DynamicResource Type.Heading.Sm}" Margin="{StaticResource GapBottom.Sm}"
+                           Text="{loc:Translate Body.MainExplanation.Lead}"/>
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Muted}"
+                           FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Sm}"
+                           Text="{Binding MainExplanationWhyText}"/>
+                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Body}"
+                           FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Lg}"
+                           Text="{loc:Translate Body.MainExplanation.Action}"/>
 
                 <!-- Pending reboot warning (Phosphor fill, tweaked !). DockPanel
                      (not a horizontal StackPanel) so the message wraps: a

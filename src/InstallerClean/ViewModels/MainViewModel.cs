@@ -112,15 +112,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
         !Scan.IsScanning && !Cleanup.IsOperating && !Completion.IsComplete;
 
     /// <summary>
-    /// Body explanation paragraph with the three Reason values formatted
-    /// in. The resx template carries <c>{0}</c>, <c>{1}</c> and <c>{2}</c>
-    /// for Reason.Orphaned, Reason.Superseded and Reason.Obsoleted so a
-    /// translator can edit the column labels in one place and have the
-    /// body copy follow. Obsoleted (PatchState 4) is publisher-withdrawn
-    /// rather than newer-patch-replaced; the body distinguishes both.
+    /// The middle ("why") sentence of the main-window intro, with the three
+    /// Reason values formatted in. The intro is three resx keys
+    /// (<c>Body.MainExplanation.Lead</c> / <c>.Why</c> / <c>.Action</c>) so each
+    /// reads at its own text tier; only this one interpolates, so only it binds
+    /// to the view-model. The <c>{0}</c>, <c>{1}</c> and <c>{2}</c> slots carry
+    /// Reason.Orphaned, Reason.Superseded and Reason.Obsoleted so a translator
+    /// edits the column labels in one place and the copy follows. Obsoleted
+    /// (PatchState 4) is publisher-withdrawn rather than newer-patch-replaced;
+    /// the copy distinguishes both.
     /// </summary>
-    public string MainExplanationText =>
-        string.Format(Strings.Body_MainExplanation,
+    public string MainExplanationWhyText =>
+        string.Format(Strings.Body_MainExplanation_Why,
             Strings.Reason_Orphaned, Strings.Reason_Superseded, Strings.Reason_Obsoleted);
 
     private void OnChildPropertyChanged(object? sender, PropertyChangedEventArgs e)
