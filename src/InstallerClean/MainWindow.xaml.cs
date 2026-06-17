@@ -414,13 +414,13 @@ public partial class MainWindow : Window
 
     // The bottom-bar globe opens this language menu. Endonyms are literal
     // (a language is shown in its own name, as browsers and Windows do);
-    // the running language is ticked with a Segoe MDL2 check glyph drawn by
+    // the displayed language is ticked with a Segoe MDL2 check glyph drawn by
     // an explicit TextBlock, because the shared MenuItem template renders
     // only the Header (no icon column) and the app-wide implicit TextBlock
     // style would otherwise impose the bundled body font on the glyph.
     // Placement=Top opens the menu upward, clear of the taskbar under a
     // button at the bottom of the window. Rebuilt per click so the tick
-    // always reflects the running language.
+    // always reflects the displayed language.
     private static readonly System.Windows.Media.FontFamily SegoeMdl2 = new("Segoe MDL2 Assets");
 
     private static readonly (string Culture, string Endonym)[] LanguageChoices =
@@ -432,7 +432,7 @@ public partial class MainWindow : Window
     private void LanguageButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button button) return;
-        var running = Localisation.UiCultureOverride?.Name;
+        var active = SupportedLanguages.Active(Localisation.UiCulture);
         var menu = new ContextMenu
         {
             PlacementTarget = button,
@@ -440,11 +440,11 @@ public partial class MainWindow : Window
         };
         foreach (var (culture, endonym) in LanguageChoices)
         {
-            var isRunning = string.Equals(culture, running, StringComparison.OrdinalIgnoreCase);
+            var isActive = string.Equals(culture, active, StringComparison.OrdinalIgnoreCase);
             var header = new StackPanel { Orientation = Orientation.Horizontal };
             header.Children.Add(new TextBlock
             {
-                Text = isRunning ? "\uE73E" : string.Empty,
+                Text = isActive ? "\uE73E" : string.Empty,
                 FontFamily = SegoeMdl2,
                 FontSize = 12,
                 Width = 20,

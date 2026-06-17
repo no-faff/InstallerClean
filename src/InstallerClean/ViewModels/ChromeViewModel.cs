@@ -98,17 +98,18 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     private void CloseApp() => _windowService.CloseMainWindow();
 
     // Invoked by the bottom-bar language menu with a culture name
-    // ("en-GB", "it") or null. Re-picking the language the process is
-    // already running in is a no-op, so an accidental tap on the current
-    // language does not pointlessly restart. The comparison is against the
-    // running culture (the startup override), not the saved setting, which
-    // this write changes. A real change is saved and applied by a relaunch,
-    // because the resx strings resolve once when each window is built and
-    // do not re-read a culture swapped at runtime.
+    // ("en-GB", "it"). Re-picking the language already on screen is a no-op,
+    // so it does not pointlessly restart; the comparison is against the
+    // DISPLAYED language (SupportedLanguages.Active), not the saved setting
+    // (which this write changes) nor an explicit override alone (a default
+    // install follows the OS with no override, yet still shows a language).
+    // A real change is saved and applied by a relaunch, because the resx
+    // strings resolve once when each window is built and do not re-read a
+    // culture swapped at runtime.
     [RelayCommand]
     private void SetLanguage(string? culture)
     {
-        if (string.Equals(culture, Localisation.UiCultureOverride?.Name, StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(culture, SupportedLanguages.Active(Localisation.UiCulture), StringComparison.OrdinalIgnoreCase))
             return;
         _settings.Update(s => s.Language = culture);
         _windowService.RelaunchForLanguageChange();
