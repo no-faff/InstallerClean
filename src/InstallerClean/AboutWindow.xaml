@@ -27,13 +27,16 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="14"/>
             <RowDefinition Height="Auto"/>
-            <!-- Star spacer. Under SizeToContent="Height" this row measures
-                 to nothing; while the content is shorter than MinHeight (set
-                 in code-behind) it takes up the slack in the arrange pass and
-                 pins the say-thanks block to the bottom, the airy box. Once
-                 the language-restart panel makes the content taller than the
-                 box the window grows and this row collapses to zero. -->
-            <RowDefinition Height="*"/>
+            <!-- Star spacer: the gap before the say-thanks block. Under
+                 SizeToContent="Height" it sits at MinHeight and expands past it
+                 only in the arrange pass, when the content is shorter than the
+                 window MinHeight (set in code-behind), taking up the slack to
+                 pin say-thanks to the bottom, the airy box. The MinHeight floor
+                 keeps a section gap above say-thanks once the language-restart
+                 panel grows the window to fit its content: the two-line Italian
+                 restart note jammed say-thanks against the restart button with
+                 an un-floored (zero) star row. -->
+            <RowDefinition Height="*" MinHeight="24"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="6"/>
             <RowDefinition Height="Auto"/>
