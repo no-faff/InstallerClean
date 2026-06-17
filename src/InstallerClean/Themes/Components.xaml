@@ -1001,7 +1001,7 @@
                                             CornerRadius="{StaticResource Radius.CompactPill}"
                                             Padding="{TemplateBinding Padding}">
                                         <TextBlock Text="&#xE70D;"
-                                                   FontFamily="Segoe MDL2 Assets" FontSize="10"
+                                                   FontFamily="Segoe MDL2 Assets" FontSize="12"
                                                    Foreground="{StaticResource Text.Muted}"
                                                    HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                     </Border>
