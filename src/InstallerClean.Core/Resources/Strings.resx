@@ -430,7 +430,7 @@
   <!-- 0 = destination path -->
   <data name="Confirm.MoveDestination" xml:space="preserve"><value>Files will be moved to {0}.</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Delete {0} {1} ({2})?</value></data>
-  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Files will be sent to the Recycle Bin. If you want backup copies, use Move instead.</value></data>
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead.</value></data>
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Administrator rights required</value></data>
