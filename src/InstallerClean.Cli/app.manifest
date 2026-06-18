@@ -2,7 +2,7 @@
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
   <!-- assemblyIdentity is advisory; Windows ignores it for trust.
        Version matches Directory.Build.props <Version>. -->
-  <assemblyIdentity version="1.9.0.0" name="InstallerClean.cli"/>
+  <assemblyIdentity version="1.9.1.0" name="InstallerClean.cli"/>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
