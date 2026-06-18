@@ -98,7 +98,7 @@
   <data name="Section.Registered.Patches" xml:space="preserve"><value>PATCH</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>DETTAGLI PRODOTTO</value></data>
   <data name="Section.Move.Location" xml:space="preserve"><value>DESTINAZIONE SPOSTAMENTO</value></data>
-  <data name="Section.SayThanks" xml:space="preserve"><value>UN GRAZIE</value></data>
+  <data name="Section.SayThanks" xml:space="preserve"><value>PER RINGRAZIARMI</value></data>
 
   <!-- Field labels (used in detail panels) -->
   <data name="Field.Reason" xml:space="preserve"><value>Motivo</value></data>
@@ -175,7 +175,7 @@
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Sposta i file non necessari in una specifica cartella</value></data>
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Elimina definitivamente i file non necessari perché per questa unità il Cestino non è disponibile</value></data>
   <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Invia a nofaff.netlify.app. vengono inviati solo conteggi ed etichette. Prima dell'invio vedrai esattamente cosa viene inviato.</value></data>
-  <data name="Automation.SayThanks" xml:space="preserve"><value>Di' grazie</value></data>
+  <data name="Automation.SayThanks" xml:space="preserve"><value>Per ringraziarmi</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>'Invia' trasmette a No Faff il riepilogo mostrato. Annulla non invia nulla.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Controlla aggiornamenti</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Verifica tramite l'API delle release di GitHub, via HTTPS, se è disponibile una versione più recente.</value></data>
