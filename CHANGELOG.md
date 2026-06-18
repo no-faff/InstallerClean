@@ -17,6 +17,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - Every text size in the app is a step larger (body, captions, headings and the splash all moved up a notch); the previous sizes were a little small. The layout and proportions are unchanged; only the type size grew.
 - The main window's opening explanation now reads in three tiers: the reassurance that the unneeded files are safe to delete leads, prominent; the detail about why they accumulate sits quieter beneath it; and the Delete or Move line follows at body weight. It was one muted block before, so the safety line sat dimmer than the file count under it.
 - The delete confirmation reads "If you'd like backup copies, use Move instead." in place of "If you want ...", a touch more courteous for the same advice.
+- The installer's copyright notice takes its year from the build date rather than a hardcoded 2026, and drops the duplicate word "Copyright" (the file-properties field is already labelled that). Suggested by bovirus (#33).
 
 ## [1.9.0] - 2026-06-15
 

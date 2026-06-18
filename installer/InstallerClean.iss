@@ -13,8 +13,11 @@
 ; Programs entry.
 [Setup]
 #ifndef AppVersion
-  #define AppVersion "1.9.0"
+  #define AppVersion "1.9.1"
 #endif
+; Copyright year comes from the build clock (compile-time) so the
+; notice never goes stale.
+#define CurrentYear GetDateTimeString('yyyy','','')
 AppId=InstallerClean
 AppName=InstallerClean
 AppVersion={#AppVersion}
@@ -29,14 +32,14 @@ AppMutex=Global\InstallerClean_SingleInstance
 AppPublisher=No Faff
 AppPublisherURL=https://github.com/no-faff/InstallerClean
 AppSupportURL=https://github.com/no-faff/InstallerClean/discussions
-AppCopyright=Copyright (c) 2026 No Faff
+AppCopyright=(c) {#CurrentYear} No Faff
 ; Win32 VS_FIXEDFILEINFO is a four-part version; AppVersion is three,
 ; so VersionInfoVersion / VersionInfoProductVersion pad with .0.
 VersionInfoVersion={#AppVersion}.0
 VersionInfoProductVersion={#AppVersion}.0
 VersionInfoProductName=InstallerClean
 VersionInfoCompany=No Faff
-VersionInfoCopyright=Copyright (c) 2026 No Faff
+VersionInfoCopyright=(c) {#CurrentYear} No Faff
 VersionInfoDescription=InstallerClean Setup
 DefaultDirName={autopf}\InstallerClean
 DefaultGroupName=InstallerClean
