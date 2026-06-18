@@ -18,6 +18,10 @@
 ; Copyright year comes from the build clock (compile-time) so the
 ; notice never goes stale.
 #define CurrentYear GetDateTimeString('yyyy','','')
+; The publisher name and repo URL each appear in several directives below;
+; defined once here so they cannot drift apart.
+#define MyCompany "No Faff"
+#define MyRepoUrl "https://github.com/no-faff/InstallerClean"
 AppId=InstallerClean
 AppName=InstallerClean
 AppVersion={#AppVersion}
@@ -29,17 +33,17 @@ AppMutex=Global\InstallerClean_SingleInstance
 ; last-run.json, settings.json.bad on a corrupt-and-recovered run,
 ; crash.log) survives uninstall by design: the saved move destination
 ; and the lifetime result-log lock carry across upgrades.
-AppPublisher=No Faff
-AppPublisherURL=https://github.com/no-faff/InstallerClean
-AppSupportURL=https://github.com/no-faff/InstallerClean/discussions
-AppCopyright=(c) {#CurrentYear} No Faff
+AppPublisher={#MyCompany}
+AppPublisherURL={#MyRepoUrl}
+AppSupportURL={#MyRepoUrl}/discussions
+AppCopyright=(c) {#CurrentYear} {#MyCompany}
 ; Win32 VS_FIXEDFILEINFO is a four-part version; AppVersion is three,
 ; so VersionInfoVersion / VersionInfoProductVersion pad with .0.
 VersionInfoVersion={#AppVersion}.0
 VersionInfoProductVersion={#AppVersion}.0
 VersionInfoProductName=InstallerClean
-VersionInfoCompany=No Faff
-VersionInfoCopyright=(c) {#CurrentYear} No Faff
+VersionInfoCompany={#MyCompany}
+VersionInfoCopyright=(c) {#CurrentYear} {#MyCompany}
 VersionInfoDescription=InstallerClean Setup
 DefaultDirName={autopf}\InstallerClean
 DefaultGroupName=InstallerClean
@@ -73,6 +77,10 @@ WizardSmallImageFile=wizard-small.png
 WizardSmallImageFileDynamicDark=wizard-small.png
 WizardImageAlphaFormat=defined
 ShowLanguageDialog=yes
+; Re-detect the wizard language each run rather than reusing the previous
+; install's pick, so a language added in a later version becomes the default
+; for an upgrading user whose OS matches it; the dialog still lists them all.
+UsePreviousLanguage=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
