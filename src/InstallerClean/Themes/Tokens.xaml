@@ -107,7 +107,14 @@
     <sys:Double x:Key="Type.Display">29</sys:Double>     <!-- splash hero -->
     <sys:Double x:Key="Type.Heading.Lg">23</sys:Double>  <!-- completion heading -->
     <sys:Double x:Key="Type.Heading.Md">21</sys:Double>  <!-- about title -->
-    <sys:Double x:Key="Type.Heading.Sm">15</sys:Double>  <!-- window titles, status -->
+    <sys:Double x:Key="Type.Heading.Sm">15</sys:Double>  <!-- status, section labels, pills -->
+    <!-- Window title-bar text. A fixed size, deliberately NOT in App's
+         text-scaled set, because the caption bar is a fixed 32px
+         (WindowChrome.CaptionHeight): a title that grew with the OS text-size
+         slider would outgrow and clip the bar at large scales (observed at
+         225%). The caption buttons are fixed for the same reason. Consumed via
+         StaticResource since it never changes. -->
+    <sys:Double x:Key="Type.TitleBar">15</sys:Double>    <!-- window title bar (fixed) -->
     <sys:Double x:Key="Type.Body">13</sys:Double>        <!-- body copy, descriptions -->
     <sys:Double x:Key="Type.Caption">12</sys:Double>     <!-- metadata labels, footer -->
 

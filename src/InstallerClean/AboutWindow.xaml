@@ -44,7 +44,7 @@
             <chrome:DecorativeImage Source="Assets/splash-icon.png" Width="16" Height="16"
                    RenderOptions.BitmapScalingMode="HighQuality" Margin="{StaticResource GapRight.Sm}"/>
             <TextBlock Text="{loc:Translate Window.About.Title}" Foreground="{StaticResource Text.Body}"
-                       FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="Medium"/>
+                       FontSize="{StaticResource Type.TitleBar}" FontWeight="Medium"/>
         </StackPanel>
         <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#xE8BB;" ToolTip="{loc:Translate Tooltip.Close}"
                 Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
