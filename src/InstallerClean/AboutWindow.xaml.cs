@@ -20,14 +20,12 @@ public partial class AboutWindow : Window
     private static readonly TimeSpan CheckForUpdatesCooldown = TimeSpan.FromSeconds(5);
 
     private readonly IUpdateCheckService _updateCheckService;
-    private readonly ISettingsService _settingsService;
     private CancellationTokenSource? _checkCts;
 
-    public AboutWindow(IUpdateCheckService updateCheckService, ISettingsService settingsService)
+    public AboutWindow(IUpdateCheckService updateCheckService)
     {
         InitializeComponent();
         _updateCheckService = updateCheckService;
-        _settingsService = settingsService;
         var version = DisplayHelpers.GetVersionString();
         VersionText.Text = version;
         // The version sits in a read-only TextBox so it can be selected

@@ -50,7 +50,7 @@ public sealed class AppSettings
     /// name the app ships a translation for (<c>"en-GB"</c> or <c>"it"</c>),
     /// validated against the supported-language list at startup and
     /// otherwise ignored. Applied by <c>App.OnStartup</c> before any window
-    /// loads; changing it in the About picker takes effect on the next launch.
+    /// loads; changing it in the bottom-bar language menu takes effect on the next launch.
     /// </summary>
     public string? Language { get; set; }
 }
