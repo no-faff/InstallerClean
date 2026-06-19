@@ -20,7 +20,7 @@
          line length instead of forcing horizontal scrolling ever
          earlier as the text grows. -->
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
-            MaxWidth="{a11y:TextScaled 640}" MinWidth="{a11y:TextScaled 480}"
+            MaxWidth="{a11y:TextScaled 615}" MinWidth="{a11y:TextScaled 480}"
             BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <Grid>
             <Grid.RowDefinitions>
