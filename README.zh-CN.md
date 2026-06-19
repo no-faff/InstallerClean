@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="README.md">English</a> · <strong>简体中文</strong> · <a href="README.es.md">Español</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.ru.md">Русский</a> · <a href="README.fr.md">Français</a>
+  <a href="README.md">English</a> · <strong>简体中文</strong> · <a href="README.es.md">Español</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.ru.md">Русский</a> · <a href="README.fr.md">Français</a> · <a href="README.it.md">Italiano</a>
 </p>
 
 <p align="center"><em>本页面为译文，应用程序的界面目前仅提供英文。</em></p>
@@ -22,7 +22,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.0-blue" alt="GitHub 版本"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=300" alt="总下载量"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-21k-brightgreen" alt="总下载量"></a>
 </p>
 
 ![InstallerClean 成功清理后的截图：已释放 1.28 GB，69 个文件已送进回收站](docs/screenshots/06-freed-success-done.webp)
@@ -30,7 +30,7 @@
 - **简介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 里不需要的文件，这是个 Windows 从不清理的隐藏文件夹。它几乎瞬间扫描完，告诉您有没有这类文件，想细看的还能查看更多细节，并让您删掉它们，给 C: 盘腾出空间。用上一次，就可以不再惦记了。
 - **能释放多少空间：** 目前收到的（自愿）报告显示，<!-- reports-freedpct-start -->41%<!-- reports-freedpct-end --> 的机器有需要清理的文件。这些机器里，释放空间的中位数是 <!-- reports-median-start -->22 GB<!-- reports-median-end -->。有几台清出了好几百 GB。我自己是 1.28 GB。其余 <!-- reports-nothingpct-start -->59%<!-- reports-nothingpct-end --> 没找到可清理的，这只是说明它们的 Installer 文件夹本来就是干净的。更多细节见下文的[常见问题](#常见问题)。
 - **是否安全：** 是的。它直接问 Windows Installer API 哪些文件还需要，只会列出 Windows 报告为已经用完的那些。它是开源的（MIT），不向您索取任何信息：没有账号、没有广告、没有跟踪、没有遥测，也没有任何东西在后台运行。它从不自行联网。
-- **如何获取：** [下载最新版本](../../releases/latest)。运行；它几乎瞬间完成扫描。删掉任何不需要的文件。搞定。
+- **如何获取：** [下载最新版本](../../releases/latest)。运行；点过 [Windows 的警告](#unknown-publisher)和[管理员提示](#admin)。删掉任何不需要的文件。搞定。
 
 ## 目录
 
@@ -62,13 +62,13 @@
 
 卸载软件时，这些文件还在。新补丁取代旧补丁时，两个都还在。Windows 从不清理它们。磁盘清理碰都不碰。DISM 针对的完全是另一个文件夹。时间一长，文件夹越来越大：1 GB、5 GB、20 GB、50 GB。在大量使用 MSI 软件的电脑上（Acrobat 是常见的元凶），它能[突破 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/)。
 
-这些不是那种您一关掉清理工具就又重新冒出来的临时文件。它们是实打实的累赘：多年前卸载的软件留下的旧安装程序，以及被替换了三次的补丁。一旦清掉，就不会再回来。
+这些不是那种会自己重新冒出来的临时文件。它们是实打实的累赘：多年前卸载的软件留下的旧安装程序，以及被替换了好几次的补丁。一旦清掉，就不会再回来。
 
 **如果您想找个简单的办法给 Windows 腾出磁盘空间，这个文件夹是个不错的起点。** InstallerClean 找出这些不需要的文件，安全地删掉。
 
 ## 寻求帮助
 
-只要您为这个文件夹找过帮助，多半就知道是怎么个套路。有人问怎么清理，[得到的回答是运行磁盘清理](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb)。一试，清出了 600 MB，但没有一点来自那个 180 GB 的文件夹（因为磁盘清理根本不碰 `C:\Windows\Installer`）。然后帖子就没了下文。
+只要您为这个文件夹找过帮助，多半就知道是怎么个套路。有人的 `C:\Windows\Installer` 有 180 GB，问怎么清理，[得到的回答是运行磁盘清理](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb)。一试，清出了 600 MB，但没有一点来自那个文件夹（因为磁盘清理根本不碰 `C:\Windows\Installer`）。然后帖子就没了下文。
 
 > *“我找到的帖子几乎都在翻来覆去地推荐同样那几招，根本解决不了问题，然后就没了动静。”*
 >
@@ -153,21 +153,26 @@ InstallerClean 会识别三类不需要的文件。
 
 ## 是否安全？
 
-是的。InstallerClean 查询的，正是 Windows 自己用来记录已安装内容的那个数据库。如果 Windows 说某个文件不再需要，应用就信它；它不会根据文件名或日期来猜测。
+是的。InstallerClean 查询的，正是 Windows 自己用来记录已安装内容的那个 Windows Installer API 数据库。如果 Windows 说某个文件不再需要，应用就信它；它不会根据文件名或日期来猜测。
 
-**在应用内。** 删除会把文件送进回收站。如果该驱动器的回收站不可用（被关闭、已满或已损坏），InstallerClean 不会闷声把文件彻底删掉。它会停下来，让您选择：改为把文件移动到别处、永久删除，或者取消。只有在您明确选择时，文件才会被永久删除。移动并不是为了安全才有的，这些文件本来就可以放心删除；它只是给那些想先自己确认一下的人留的，把文件停放在您选定的文件夹里，想放多久就放多久。在您确认之前，什么都不会动。如果 Windows Installer 正在写入缓存、有上一笔事务被挂起，或有一项排队等候的、指向该缓存的重启后重命名，移动和删除都会被禁用，并显示具体原因。扫描、查询、移动、删除、设置和待重启检查这些服务，都有一套自动化测试覆盖，每次提交都会运行（见上方的 CI 徽章）。
+**关于删除和移动。** InstallerClean 删除的这些文件，永久删掉也是安全的。**删除**会把它们送进回收站（回收站不可用时会有提示）；等您清空回收站，C: 盘上的空间就回来了。
 
-**验证二进制文件。** InstallerClean 没有数字签名。代码签名证书每年都要花钱，我宁愿让这个项目保持免费、开源、靠捐赠维持。
+不过，这些文件能否放心删除，您不必只听我说。趁它们还在回收站里，您有机会确认一下：用到这个文件夹的那些应用（Office、Acrobat、Visual Studio 之类）是否还能照常更新和卸载。万一有什么坏了（不会的！），从回收站把文件还原回去就能修好。想格外稳妥，也可以改用**移动**，把文件停放到您选定的文件夹里（当然，如果您是想给 C: 盘腾空间，就该选另一个分区或驱动器上的文件夹）。想恢复原状，把文件复制回 `C:\Windows\Installer` 就行（不过您用不着这么做！）。
+
+如果 Windows Installer 正在写入缓存、有上一笔事务被挂起，或有一项排队等候的、指向该缓存的重启后重命名，移动和删除都会被禁用，并显示具体原因。
+
+扫描、查询、移动、删除、设置和待重启检查这些服务，都有一套自动化测试覆盖，每次提交都会运行（见上方的 CI 徽章）。
+
+**验证二进制文件。** InstallerClean 没有数字签名，所以您不必只凭信任：
 
 - 每个版本的 SHA-256 哈希值都列在[发布页面](../../releases/latest)上。
-- 每个版本都会附带 setup、portable、slim 和 CLI 各个构建的 VirusTotal 链接。
+- VirusTotal：所有引擎检测均为干净。每个版本的发布说明里都有实时链接，方便您自行复查。
 - 源代码在 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)，CI 会对每次提交进行构建和测试（见上方绿色的 CI 徽章）。
+- 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->21k<!-- downloads-end --> 次下载。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 会在虚拟机中测试每一个提交上来的版本，只有通过审核才会收录。
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) 会对每个版本做病毒、间谍软件和广告软件检测。
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 认证 100% 干净" width="190"></a>
-
-VirusTotal：所有引擎检测均为干净。每个版本的发布说明里都有实时链接，方便您自行复查。
 
 <a id="recovery"></a>
 ## 万一您真的丢了 `C:\Windows\Installer` 里的文件
@@ -242,7 +247,11 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 
 </details>
 
+<a id="admin"></a>
+
 **为什么需要管理员权限？** `C:\Windows\Installer` 被锁定为仅限管理员访问。读取它、查询 Installer 数据库、移动或删除文件，都需要管理员权限，所以应用必须以管理员身份运行。
+
+<a id="unknown-publisher"></a>
 
 **为什么 Windows 说“未知发布者”？** 因为 InstallerClean 没有代码签名。签名证书每年都要花钱，我宁愿让应用保持免费，也不想为它掏钱。所以您运行它时，Windows SmartScreen 会显示“Windows 已保护你的电脑”。点击**更多信息**，再点**仍要运行**。这么做是安全的：源代码是公开的，每个版本都有 VirusTotal 链接和 SHA-256 哈希值供您事先核对。
 
@@ -267,7 +276,7 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 - **Slim**（`InstallerClean-slim.exe`）：体积最小的下载。需要系统中已经装有 [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)（如果您的 Visual Studio 是最新的，那就已经有了）。
 - **CLI**（`installerclean-cli.exe`）：单独的命令行版本，一个自包含的 exe。无需安装，用完不在机器上留下任何东西。把它丢到客户端机器上，跑一次扫描或清理，再删掉。专为脚本、计划任务和批量部署而生，适合那种想执行操作、又不想在客户端装桌面应用的场景。参数和退出码见[命令行](#命令行)。
 
-从[发布页面](../../releases/latest)下载，然后运行。Windows SmartScreen 会显示“未知发布者”。点击**更多信息**，再点**仍要运行**。这对未签名的开源软件来说很正常。
+从[发布页面](../../releases/latest)下载，然后运行。它没有签名，所以 Windows 会显示一条“未知发布者”的警告；[常见问题](#unknown-publisher)解释了您会看到什么，以及为什么它是安全的。
 
 应用启动时会自动扫描。查看结果，然后点击**删除**或**移动**。
 

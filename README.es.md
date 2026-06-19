@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <strong>Español</strong> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.ru.md">Русский</a> · <a href="README.fr.md">Français</a>
+  <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <strong>Español</strong> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.ru.md">Русский</a> · <a href="README.fr.md">Français</a> · <a href="README.it.md">Italiano</a>
 </p>
 
 <p align="center"><em>Esta página está traducida, pero la interfaz de la aplicación está actualmente solo en inglés.</em></p>
@@ -22,15 +22,15 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.0-blue" alt="Versión de GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=300" alt="Descargas totales"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-21k-brightgreen" alt="Descargas totales"></a>
 </p>
 
 ![Captura de pantalla de InstallerClean tras limpiar con éxito: 1,28 GB liberados, 69 archivos enviados a la Papelera de reciclaje](docs/screenshots/06-freed-success-done.webp)
 
 - **Qué hace:** InstallerClean hace una sola cosa: elimina archivos innecesarios de `C:\Windows\Installer`, una carpeta oculta que Windows nunca limpia. Tras un análisis casi instantáneo te dice si tienes alguno, muestra más detalle para los curiosos y te deja eliminarlos para liberar espacio en tu unidad C:. Lo usas una vez y a otra cosa.
-- **Cuánto espacio:** Los informes (opcionales) enviados hasta ahora muestran que el <!-- reports-freedpct-start -->41 %<!-- reports-freedpct-end --> de los equipos tenían archivos innecesarios que limpiar. De esos, la mediana liberada es de <!-- reports-median-start -->22 GB<!-- reports-median-end -->. Unas pocas liberaron cientos de GB. En mi caso fue de 1,28 GB. El otro <!-- reports-nothingpct-start -->59 %<!-- reports-nothingpct-end --> no encontró nada que eliminar, lo que solo significa que su carpeta Installer ya estaba limpia. Más detalle en las [Preguntas frecuentes](#preguntas-frecuentes) más abajo.
+- **Cuánto espacio:** Los informes (opcionales) enviados hasta ahora muestran que el <!-- reports-freedpct-start -->41 %<!-- reports-freedpct-end --> de los equipos tenían archivos innecesarios que limpiar. De esos, la mediana liberada es de <!-- reports-median-start -->22 GB<!-- reports-median-end -->. Unos pocos liberaron cientos de GB. En mi caso fue de 1,28 GB. El otro <!-- reports-nothingpct-start -->59 %<!-- reports-nothingpct-end --> no encontró nada que eliminar, lo que solo significa que su carpeta Installer ya estaba limpia. Más detalle en las [Preguntas frecuentes](#preguntas-frecuentes) más abajo.
 - **¿Es seguro?** Sí. Le pregunta a la propia API de Windows Installer qué archivos siguen haciendo falta y solo enumera los que Windows da por terminados. Es de código abierto (MIT) y no pregunta nada sobre ti: sin cuenta, sin anuncios, sin seguimiento, sin telemetría, nada corriendo en segundo plano. Nunca se conecta a internet por su cuenta.
-- **Cómo obtenerlo:** [Descarga la última versión](../../releases/latest). Ejecútala; analiza casi al instante. Elimina los archivos innecesarios. Listo.
+- **Cómo obtenerlo:** [Descarga la última versión](../../releases/latest). Ejecútala; pasa [el aviso de Windows](#unknown-publisher) y [la solicitud de permisos de administrador](#admin). Elimina los archivos innecesarios. Listo.
 
 ## Contenido
 
@@ -62,13 +62,13 @@ En todo PC con Windows existe una carpeta oculta llamada `C:\Windows\Installer`.
 
 Cuando desinstalas el software, los archivos siguen ahí. Cuando un parche nuevo sustituye a uno antiguo, los dos siguen ahí. Windows nunca los limpia. El Liberador de espacio en disco no los toca. DISM se ocupa de otra carpeta distinta. Con el tiempo, la carpeta crece: 1 GB, 5 GB, 20 GB, 50 GB. En equipos con mucho software basado en MSI (Acrobat es un sospechoso habitual), puede [superar los 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
 
-No son archivos temporales que reaparezcan en cuanto cierras una herramienta de limpieza. Son peso muerto de verdad: instaladores antiguos de software que desinstalaste hace años y parches que ya se han sustituido tres veces. Una vez fuera, no vuelven.
+No son archivos temporales que vuelvan por su cuenta. Son peso muerto de verdad: instaladores antiguos de software que desinstalaste hace años y parches que se han sustituido varias veces. Una vez fuera, no vuelven.
 
 **Si buscas una manera sencilla de liberar espacio en disco en Windows, esta carpeta es un buen sitio por donde empezar.** InstallerClean encuentra los archivos innecesarios y los elimina con seguridad.
 
 ## La búsqueda de ayuda
 
-Si alguna vez has buscado ayuda con esta carpeta, seguramente ya sabes cómo va la cosa. Alguien pregunta cómo limpiarla. Le [dicen que ejecute el Liberador de espacio en disco](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb). Lo prueba. Libera 600 MB, ninguno de ellos de la carpeta de 180 GB (porque el Liberador de espacio en disco no toca `C:\Windows\Installer`). El hilo se apaga.
+Si alguna vez has buscado ayuda con esta carpeta, seguramente ya sabes cómo va la cosa. Alguien con 180 GB en `C:\Windows\Installer` pregunta cómo limpiarla. Le [dicen que ejecute el Liberador de espacio en disco](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb). Lo prueba. Libera 600 MB, ninguno de ellos de esa carpeta (porque el Liberador de espacio en disco no toca `C:\Windows\Installer`). El hilo se apaga.
 
 > *«Todos los hilos que he encontrado suelen recomendar las mismas cosas, que no resuelven el problema, y luego mueren.»*
 >
@@ -153,21 +153,26 @@ Tras completar un Mover o un Eliminar, las subcarpetas vacías que haya dentro d
 
 ## ¿Es seguro?
 
-Sí. InstallerClean consulta la misma base de datos que el propio Windows usa para llevar el control de lo que está instalado. Si Windows dice que un archivo ya no hace falta, la aplicación se fía; no adivina a partir de nombres de archivo ni fechas.
+Sí. InstallerClean consulta la misma base de datos de la API de Windows Installer que el propio Windows usa para llevar el control de lo que está instalado. Si Windows dice que un archivo ya no hace falta, la aplicación se fía; no adivina a partir de nombres de archivo ni fechas.
 
-**Dentro de la aplicación.** Eliminar envía los archivos a la Papelera de reciclaje. Si la Papelera no está disponible para esa unidad (desactivada para la unidad, llena o dañada), InstallerClean no borra los archivos para siempre en silencio. Se detiene y te deja elegir: moverlos a otro sitio, borrarlos de forma permanente o cancelar. Los archivos solo se borran de forma permanente si lo eliges explícitamente. Mover no hace falta por seguridad, los archivos se pueden eliminar sin riesgo; está ahí por si prefieres comprobarlo tú mismo primero, dejándolos en una carpeta que tú elijas durante el tiempo que quieras. Nada se toca hasta que confirmas. Si Windows Installer está escribiendo en la caché en ese momento, tiene una transacción anterior suspendida o tiene un renombrado pendiente tras reiniciar que apunta a la caché, Mover y Eliminar quedan desactivados y se muestra el motivo concreto. Los servicios de análisis, consulta, movimiento, eliminación, configuración y comprobación de reinicio pendiente están cubiertos por una batería de pruebas automatizadas que se ejecuta en cada commit (consulta la insignia de CI más arriba).
+**Sobre Eliminar y Mover.** Los archivos que InstallerClean elimina se pueden borrar de forma permanente sin riesgo. **Eliminar** los envía a la Papelera de reciclaje (se te avisará si no está disponible); recuperas el espacio en tu unidad C: cuando vacías la Papelera de reciclaje.
 
-**Verificación del binario.** InstallerClean no está firmado. Los certificados de firma de código cuestan dinero todos los años y prefiero mantener el proyecto gratuito, abierto y financiado por donaciones.
+Aun así, no tienes que fiarte de mi palabra de que se pueden borrar sin riesgo. Mientras están en la Papelera de reciclaje, tienes ocasión de comprobar que las aplicaciones que usan esta carpeta (Office, Acrobat, Visual Studio y similares) siguen actualizándose y desinstalándose sin problemas. Si algo falla (¡no fallará!), restaura los archivos desde la Papelera de reciclaje para arreglarlo. Para mayor seguridad todavía, puedes usar **Mover** en su lugar, para dejar los archivos en una carpeta que tú elijas (obviamente, elige una carpeta en otra partición o unidad si lo que buscas es liberar espacio en C:). Solo tienes que volver a copiar los archivos a `C:\Windows\Installer` para dejar las cosas como estaban (¡pero no te hará falta!).
+
+Si Windows Installer está escribiendo en la caché en ese momento, tiene una transacción anterior suspendida o tiene un renombrado pendiente tras reiniciar que apunta a la caché, Mover y Eliminar quedan desactivados y se muestra el motivo concreto.
+
+Los servicios de análisis, consulta, movimiento, eliminación, configuración y comprobación de reinicio pendiente están cubiertos por una batería de pruebas automatizadas que se ejecuta en cada commit (consulta la insignia de CI más arriba).
+
+**Verificación del binario.** InstallerClean no está firmado, así que no tienes que fiarte sin más:
 
 - Los hashes SHA-256 de cada versión están listados en la [página de versiones](../../releases/latest).
-- Se publican enlaces a VirusTotal de las variantes setup, portable, slim y CLI con cada versión.
+- VirusTotal: limpio en todos los motores. Hay enlaces en vivo en las notas de cada versión para que puedas volver a comprobarlo.
 - El código fuente está en [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) y la CI compila y prueba cada commit (consulta la insignia verde de CI más arriba).
+- <!-- downloads-start -->21k<!-- downloads-end --> descargas entre GitHub, MajorGeeks y Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) prueba cada envío en una máquina virtual y solo lo publica si pasa su revisión.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analiza cada versión en busca de virus, spyware y adware.
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificado 100 % limpio por Softpedia" width="190"></a>
-
-VirusTotal: limpio en todos los motores. Hay enlaces en vivo en las notas de cada versión para que puedas volver a comprobarlo.
 
 <a id="recovery"></a>
 ## Si te llega a faltar un archivo de `C:\Windows\Installer`
@@ -242,7 +247,11 @@ De los 82 informes que me han enviado amablemente (gracias 🙏) desde que la v1
 
 </details>
 
+<a id="admin"></a>
+
 **¿Por qué pide Administrador?** `C:\Windows\Installer` está restringido a los administradores. Leer la carpeta, consultar la base de datos del Installer y mover o eliminar archivos lo requieren, así que la aplicación tiene que ejecutarse como administrador.
+
+<a id="unknown-publisher"></a>
 
 **¿Por qué dice Windows «Editor desconocido»?** Porque InstallerClean no está firmado digitalmente. Un certificado de firma cuesta dinero todos los años, y prefiero mantener la aplicación gratuita antes que pagar por uno. Así que, al ejecutarla, Windows SmartScreen muestra «Windows protegió su PC». Pulsa **Más información** y luego **Ejecutar de todas formas**. Hacerlo es seguro: el código fuente es público, y cada versión incluye enlaces a VirusTotal y hashes SHA-256 que puedes comprobar antes.
 
@@ -267,7 +276,7 @@ Cuatro variantes, elige una:
 - **Slim** (`InstallerClean-slim.exe`): la descarga más pequeña. Requiere tener ya instalado el [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) (ya lo tienes si tu Visual Studio está al día).
 - **CLI** (`installerclean-cli.exe`): la versión de línea de comandos por sí sola, un único exe autónomo. Sin instalación, sin dejar nada en la máquina después. Déjalo en un equipo cliente, ejecuta un análisis o una limpieza, y bórralo. Pensado para scripting, tareas programadas y despliegue masivo, cuando quieres las operaciones sin una aplicación de escritorio en el cliente. Consulta [Línea de comandos](#línea-de-comandos) para los argumentos y los códigos de salida.
 
-Descárgala desde la [página de versiones](../../releases/latest) y ejecútala. Windows SmartScreen dirá «Editor desconocido». Pulsa **Más información** y luego **Ejecutar de todas formas**. Es normal en software de código abierto sin firmar.
+Descárgala desde la [página de versiones](../../releases/latest) y ejecútala. No está firmada, así que Windows muestra un aviso de «editor desconocido»; las [Preguntas frecuentes](#unknown-publisher) explican lo que verás y por qué es seguro.
 
 La aplicación analiza automáticamente al arrancar. Revisa los resultados y pulsa **Eliminar** o **Mover**.
 

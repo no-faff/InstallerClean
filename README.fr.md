@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.es.md">Español</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.ru.md">Русский</a> · <strong>Français</strong>
+  <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.es.md">Español</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.ru.md">Русский</a> · <strong>Français</strong> · <a href="README.it.md">Italiano</a>
 </p>
 
 <p align="center"><em>Cette page est traduite, mais l'interface de l'application est actuellement en anglais uniquement.</em></p>
@@ -22,7 +22,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.0-blue" alt="Version GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=300" alt="Total des téléchargements"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-21k-brightgreen" alt="Total des téléchargements"></a>
 </p>
 
 ![Capture d'écran d'InstallerClean après un nettoyage réussi : 1,28 Go libérés, 69 fichiers envoyés à la Corbeille](docs/screenshots/06-freed-success-done.webp)
@@ -30,7 +30,7 @@
 - **En bref :** InstallerClean fait une seule chose : il supprime les fichiers inutiles de `C:\Windows\Installer`, un dossier caché que Windows ne nettoie jamais. Après une analyse quasi instantanée, il vous dit si vous en avez, donne plus de détails pour les curieux, et vous permet de les supprimer pour libérer de l'espace sur votre disque C:. Vous l'utilisez une fois, puis vous passez à autre chose.
 - **Combien d'espace :** Les rapports (facultatifs) reçus jusqu'ici montrent que <!-- reports-freedpct-start -->41 %<!-- reports-freedpct-end --> des machines avaient des fichiers inutiles à nettoyer. Pour celles-ci, la médiane libérée est de <!-- reports-median-start -->22 Go<!-- reports-median-end -->. Quelques-unes ont récupéré des centaines de Go. Pour moi, c'était 1,28 Go. Les <!-- reports-nothingpct-start -->59 %<!-- reports-nothingpct-end --> restants n'avaient rien à supprimer, ce qui veut simplement dire que leur dossier Installer était déjà propre. Plus de détails dans la [FAQ](#faq) ci-dessous.
 - **Est-ce sûr :** Oui. Il demande à l'API Windows Installer elle-même quels fichiers sont encore nécessaires et ne liste jamais que ceux dont Windows déclare avoir fini de se servir. C'est un logiciel open source (MIT) qui ne demande rien sur vous : pas de compte, pas de publicité, pas de pistage, pas de télémétrie, rien qui tourne en arrière-plan. Il ne se connecte jamais de lui-même.
-- **Comment l'obtenir :** [Téléchargez la dernière version](../../releases/latest). Lancez-la ; l'analyse est quasi instantanée. Supprimez les fichiers inutiles. C'est tout.
+- **Comment l'obtenir :** [Téléchargez la dernière version](../../releases/latest). Lancez-la ; cliquez pour passer [l'avertissement de Windows](#unknown-publisher) et [l'invite d'administrateur](#admin). Supprimez les fichiers inutiles. C'est tout.
 
 ## Sommaire
 
@@ -62,13 +62,13 @@ Il existe un dossier caché sur tout PC Windows, nommé `C:\Windows\Installer`. 
 
 Quand vous désinstallez le logiciel, les fichiers restent. Quand un nouveau correctif en remplace un ancien, les deux restent. Windows ne les nettoie jamais. Le Nettoyage de disque n'y touche pas. DISM concerne un tout autre dossier. Au fil du temps, le dossier grossit : 1 Go, 5 Go, 20 Go, 50 Go. Sur les machines chargées de logiciels MSI (Acrobat est un coupable récurrent), il peut [dépasser les 100 Go](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
 
-Ce ne sont pas des fichiers temporaires qui réapparaissent dès que vous fermez un outil de nettoyage. C'est du véritable poids mort : de vieux programmes d'installation de logiciels désinstallés depuis des années, et des correctifs remplacés trois fois plutôt qu'une. Une fois supprimés, ils ne reviennent pas.
+Ce ne sont pas des fichiers temporaires qui reviennent d'eux-mêmes. C'est du véritable poids mort : de vieux programmes d'installation de logiciels désinstallés depuis des années, et des correctifs remplacés plusieurs fois. Une fois supprimés, ils ne reviennent pas.
 
 **Si vous cherchez un moyen simple de libérer de l'espace disque sous Windows, ce dossier est un bon point de départ.** InstallerClean repère les fichiers inutiles et les supprime sans risque.
 
 ## La recherche d'aide
 
-Si vous avez déjà cherché de l'aide pour ce dossier, vous savez sans doute comment ça se passe. Quelqu'un demande comment le nettoyer. On lui [répond de lancer le Nettoyage de disque](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb). Il essaie. Ça libère 600 Mo, mais rien du dossier de 180 Go (parce que le Nettoyage de disque ne touche pas à `C:\Windows\Installer`). Et le fil de discussion retombe dans le silence.
+Si vous avez déjà cherché de l'aide pour ce dossier, vous savez sans doute comment ça se passe. Une personne ayant 180 Go dans `C:\Windows\Installer` demande comment le nettoyer. On lui [répond de lancer le Nettoyage de disque](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb). Elle essaie. Ça libère 600 Mo, mais rien de ce dossier (parce que le Nettoyage de disque ne touche pas à `C:\Windows\Installer`). Et le fil de discussion retombe dans le silence.
 
 > *« Tous les fils que j'ai trouvés ont tendance à recommander les mêmes choses, qui ne résolvent pas le problème, avant de s'éteindre. »*
 >
@@ -153,21 +153,26 @@ Une fois un déplacement ou une suppression terminé, les sous-dossiers vides de
 
 ## Est-ce sûr ?
 
-Oui. InstallerClean interroge la base de données que Windows utilise lui-même pour suivre ce qui est installé. Si Windows indique qu'un fichier n'est plus nécessaire, l'application le croit ; elle ne devine pas à partir des noms de fichiers ou des dates.
+Oui. InstallerClean interroge la même base de données de l'API Windows Installer que Windows utilise lui-même pour suivre ce qui est installé. Si Windows indique qu'un fichier n'est plus nécessaire, l'application le croit ; elle ne devine pas à partir des noms de fichiers ou des dates.
 
-**Dans l'application.** La suppression envoie les fichiers à la Corbeille. Si la Corbeille n'est pas disponible pour ce lecteur (désactivée pour le lecteur, pleine ou endommagée), InstallerClean ne supprime pas vos fichiers définitivement en douce. Il s'arrête et vous laisse choisir : les déplacer ailleurs, les supprimer définitivement ou tout annuler. Un fichier n'est jamais supprimé définitivement sans que vous l'ayez explicitement choisi. Le déplacement n'est pas nécessaire pour la sécurité, les fichiers peuvent être supprimés sans risque ; il est là si vous préférez d'abord vérifier par vous-même, en les mettant de côté dans un dossier de votre choix aussi longtemps que vous le souhaitez. Rien n'est touché tant que vous n'avez pas confirmé. Si Windows Installer est en train d'écrire dans le cache, qu'une transaction précédente est suspendue ou qu'un renommage post-redémarrage visant le cache est en attente, le déplacement et la suppression sont désactivés et la raison précise est affichée. Les services d'analyse, de requête, de déplacement, de suppression, de réglages et de vérification du redémarrage en attente sont couverts par une suite de tests automatisés qui s'exécute à chaque commit (voir le badge CI plus haut).
+**À propos de Supprimer et Déplacer.** Les fichiers qu'InstallerClean supprime peuvent être supprimés définitivement sans risque. **Supprimer** les envoie à la Corbeille (vous serez prévenu si elle n'est pas disponible) ; vous récupérez l'espace sur votre disque C: une fois la Corbeille vidée.
 
-**Vérifier le binaire.** InstallerClean n'est pas signé numériquement. Les certificats de signature de code coûtent de l'argent chaque année, et je préfère garder le projet gratuit, ouvert et financé par les dons.
+Cela dit, vous n'avez pas à me croire sur parole quand je vous dis que ces fichiers peuvent être supprimés sans risque. Tant qu'ils sont dans votre Corbeille, vous avez la possibilité de vérifier que les applications qui utilisent ce dossier, Office, Acrobat, Visual Studio et compagnie, continuent de se mettre à jour et de se désinstaller sans problème. Si quelque chose ne fonctionne plus (ce ne sera pas le cas !), restaurez les fichiers depuis la Corbeille pour régler le problème. Pour être encore plus tranquille, vous pouvez plutôt utiliser **Déplacer**, qui met les fichiers de côté dans un dossier de votre choix (choisissez évidemment un dossier sur une autre partition ou un autre disque si vous cherchez à libérer de l'espace sur C:). Il suffit ensuite de recopier les fichiers dans `C:\Windows\Installer` pour tout remettre comme avant (mais vous n'en aurez pas besoin !).
+
+Si Windows Installer est en train d'écrire dans le cache, qu'une transaction précédente est suspendue ou qu'un renommage post-redémarrage visant le cache est en attente, le déplacement et la suppression sont désactivés et la raison précise est affichée.
+
+Les services d'analyse, de requête, de déplacement, de suppression, de réglages et de vérification du redémarrage en attente sont couverts par une suite de tests automatisés qui s'exécute à chaque commit (voir le badge CI plus haut).
+
+**Vérifier le binaire.** InstallerClean n'est pas signé numériquement, vous n'avez donc pas à lui faire confiance les yeux fermés :
 
 - Les empreintes SHA-256 de chaque version sont listées sur la [page des versions](../../releases/latest).
-- Des liens VirusTotal pour les variantes setup, portable, slim et CLI sont publiés à chaque version.
+- VirusTotal : propre sur tous les moteurs. Des liens à jour dans les notes de chaque version pour que vous puissiez revérifier.
 - Le code source est sur [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) et la CI compile et teste chaque commit (voir le badge CI vert plus haut).
+- <!-- downloads-start -->21k<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) teste chaque soumission dans une machine virtuelle et ne la référence que si elle passe son contrôle.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analyse chaque version à la recherche de virus, logiciels espions et publiciels.
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certifié 100 % propre par Softpedia" width="190"></a>
-
-VirusTotal : propre sur tous les moteurs. Des liens à jour dans les notes de chaque version pour que vous puissiez revérifier.
 
 <a id="recovery"></a>
 ## Si un fichier manque bel et bien dans `C:\Windows\Installer`
@@ -242,7 +247,11 @@ Sur les 82 rapports que des utilisateurs nous ont gentiment envoyés (merci 🙏
 
 </details>
 
+<a id="admin"></a>
+
 **Pourquoi a-t-il besoin des droits d'administrateur ?** L'accès à `C:\Windows\Installer` est réservé aux administrateurs. Le lire, interroger la base de données de Windows Installer et déplacer ou supprimer des fichiers le nécessitent tous ; l'application doit donc s'exécuter en tant qu'administrateur.
+
+<a id="unknown-publisher"></a>
 
 **Pourquoi Windows affiche-t-il « Éditeur inconnu » ?** Parce qu'InstallerClean n'est pas signé numériquement. Un certificat de signature coûte de l'argent chaque année, et je préfère garder l'application gratuite plutôt que d'en payer un. Du coup, quand vous la lancez, Windows SmartScreen affiche « Windows a protégé votre ordinateur ». Cliquez sur **Informations complémentaires**, puis sur **Exécuter quand même**. C'est sans danger : le code source est public, et chaque version est accompagnée de liens VirusTotal et d'empreintes SHA-256 que vous pouvez vérifier au préalable.
 
@@ -267,7 +276,7 @@ Quatre variantes, choisissez-en une :
 - **Slim** (`InstallerClean-slim.exe`) : le téléchargement le plus léger. Nécessite que le [runtime .NET 10 Desktop](https://dotnet.microsoft.com/download/dotnet/10.0) soit déjà installé (ce qui est le cas si vous avez un Visual Studio à jour).
 - **CLI** (`installerclean-cli.exe`) : la version en ligne de commande seule, un exe unique et autonome. Pas d'installation, rien laissé sur la machine ensuite. Déposez-le sur un poste client, lancez une analyse ou un nettoyage, supprimez-le. Conçu pour le scripting, les tâches planifiées et le déploiement de masse, quand vous voulez les opérations sans application de bureau sur le client. Voir [Ligne de commande](#ligne-de-commande) pour les arguments et les codes de sortie.
 
-Téléchargez depuis la [page des versions](../../releases/latest), puis lancez. Windows SmartScreen affichera « Éditeur inconnu ». Cliquez sur **Informations complémentaires** puis sur **Exécuter quand même**. C'est normal pour un logiciel open source non signé.
+Téléchargez depuis la [page des versions](../../releases/latest), puis lancez. Il n'est pas signé, donc Windows affiche un avertissement « Éditeur inconnu » ; la [FAQ](#unknown-publisher) explique ce que vous verrez et pourquoi c'est sans danger.
 
 L'application analyse automatiquement au démarrage. Examinez les résultats, puis cliquez sur **Supprimer** ou **Déplacer**.
 
