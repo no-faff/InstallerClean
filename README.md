@@ -161,7 +161,7 @@ If Windows Installer is currently writing to the cache, has a previous transacti
 
 The scan, query, move, delete, settings and pending-reboot services are covered by an automated test suite that runs on every commit (see the CI badge above).
 
-**Verifying the binary.** InstallerClean is unsigned. Code-signing certificates cost money annually and I'd rather keep the project free, open and donations-funded.
+**Verifying the binary.** InstallerClean is unsigned, so you don't have to take it on trust:
 
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
 - VirusTotal: clean across every engine. Live links in each release's notes so you can re-check.
@@ -270,7 +270,7 @@ Four builds, choose one:
 - **Slim** (`InstallerClean-slim.exe`): the smallest download. Requires the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) to be installed already (which you have if you have an up-to-date Visual Studio).
 - **CLI** (`installerclean-cli.exe`): the command-line version on its own, a single self-contained exe. No install, nothing left on the machine afterwards. Drop it on a client, run a scan or a clean, delete it. Built for scripting, scheduled tasks and mass deployment, where you want the operations without a desktop app on the client. See [Command line](#command-line) for the arguments and exit codes.
 
-Download from the [releases page](../../releases/latest), then run. Windows SmartScreen will say "Unknown publisher". Click **More info** then **Run anyway**. This is normal for unsigned open-source software.
+Download from the [releases page](../../releases/latest), then run. It's unsigned, so Windows shows an "unknown publisher" warning; the [FAQ](#first-run) explains what you'll see and why it's safe.
 
 The app scans automatically on startup. Review the results, then click **Delete** or **Move**.
 
