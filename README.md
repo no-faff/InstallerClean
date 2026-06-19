@@ -28,7 +28,7 @@
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
 - **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->41%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->22 GB<!-- reports-median-end -->. A few cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->59%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean. More detail in the [FAQ](#faq) below.
 - **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (MIT) and asks nothing about you: no account, no ads, no tracking, no telemetry, nothing running in the background. It never goes online by itself.
-- **Get it:** [Download the latest release](../../releases/latest). Run it; click through [Windows's warning and the admin prompt](#first-run). Delete any unneeded files. Done.
+- **Get it:** [Download the latest release](../../releases/latest). Run it; click through [Windows's warning](#unknown-publisher) and [the admin prompt](#admin). Delete any unneeded files. Done.
 
 ## Contents
 
@@ -243,9 +243,11 @@ Across the 82 reports people have sent in (thanks 🙏) since v1.8.0 added the o
 
 </details>
 
-<a id="first-run"></a>
+<a id="admin"></a>
 
 **Why does it want Administrator?** `C:\Windows\Installer` is locked down to administrators. Reading it, querying the Installer database and moving or deleting files all need that, so the app has to run as admin.
+
+<a id="unknown-publisher"></a>
 
 **Why does Windows say "Unknown publisher"?** Because InstallerClean isn't code-signed. A signing certificate costs money every year, and I'd rather keep the app free than pay for one. So when you run it, Windows SmartScreen shows "Windows protected your PC". Click **More info**, then **Run anyway**. It's safe to do: the source code is public, and every release has VirusTotal links and SHA-256 hashes you can check first.
 
@@ -270,7 +272,7 @@ Four builds, choose one:
 - **Slim** (`InstallerClean-slim.exe`): the smallest download. Requires the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) to be installed already (which you have if you have an up-to-date Visual Studio).
 - **CLI** (`installerclean-cli.exe`): the command-line version on its own, a single self-contained exe. No install, nothing left on the machine afterwards. Drop it on a client, run a scan or a clean, delete it. Built for scripting, scheduled tasks and mass deployment, where you want the operations without a desktop app on the client. See [Command line](#command-line) for the arguments and exit codes.
 
-Download from the [releases page](../../releases/latest), then run. It's unsigned, so Windows shows an "unknown publisher" warning; the [FAQ](#first-run) explains what you'll see and why it's safe.
+Download from the [releases page](../../releases/latest), then run. It's unsigned, so Windows shows an "unknown publisher" warning; the [FAQ](#unknown-publisher) explains what you'll see and why it's safe.
 
 The app scans automatically on startup. Review the results, then click **Delete** or **Move**.
 
