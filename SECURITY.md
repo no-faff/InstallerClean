@@ -12,6 +12,8 @@ Please do **not** open a public GitHub issue for security problems. [Open a priv
 - Steps to reproduce
 - Your InstallerClean version and Windows version
 
+I'll confirm I've received it, keep you posted on the fix and credit you in the release notes if you'd like.
+
 ## Scope
 
 InstallerClean runs with administrator privileges and touches the Windows Installer database. Of particular interest:
