@@ -9,6 +9,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - InstallerClean's interface is available in Italian: every window, dialog, tooltip, button and screen-reader label is translated, chosen from the main-window language menu or applied automatically on an Italian-language Windows. The command line stays English by design.
 - The display language can be chosen from a globe in the main window: the menu lists the available languages in their own names (English, Italiano) with the current one ticked, and picking another saves it and restarts InstallerClean into it. With none chosen it follows the Windows display language.
 - The Windows installer is offered in Italian: setup shows a language dialog and runs in Italian or English. Italian wording contributed by bovirus (#30).
+- The README shows a running cross-channel download total (a top badge plus a line in the safety section), refreshed automatically from the stats data so it never needs hand-editing.
 
 ### Changed
 
@@ -20,6 +21,8 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The installer's copyright notice takes its year from the build date rather than a hardcoded 2026, and drops the duplicate word "Copyright" (the file-properties field is already labelled that). Suggested by bovirus (#33).
 - The opt-in send-summary window is slightly narrower, so the privacy line under the report wraps cleanly to two lines with the result-log address kept whole, rather than the window stretching wider than its content needs.
 - The README walkthrough screenshots are re-shot against the 1.9.1 build so they show the enlarged text and the bottom-bar language globe.
+- The README's "Is it safe?" section now leads with the plain point, the files InstallerClean removes are safe to delete, and frames the Recycle Bin and Move as reassurance for the wary rather than the safety itself.
+- Sharpened several README passages: the quick-start links to the FAQ for the first-run Windows warning and admin prompt; the leftover files are described as not coming back on their own; and the real-world example names the 180 GB folder up front.
 
 ## [1.9.0] - 2026-06-15
 

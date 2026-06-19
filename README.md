@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.0-blue" alt="GitHub Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/github/downloads/no-faff/InstallerClean/total?cacheSeconds=300" alt="Total downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-21k-brightgreen" alt="Total downloads"></a>
 </p>
 
 ![Screenshot of InstallerClean after a successful clean-up: 1.28 GB freed, 69 files sent to the Recycle Bin](docs/screenshots/06-freed-success-done.webp)
@@ -28,7 +28,7 @@
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
 - **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->41%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->22 GB<!-- reports-median-end -->. A few cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->59%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean. More detail in the [FAQ](#faq) below.
 - **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (MIT) and asks nothing about you: no account, no ads, no tracking, no telemetry, nothing running in the background. It never goes online by itself.
-- **Get it:** [Download the latest release](../../releases/latest). Run it; it scans almost instantly. Delete any unneeded files. Done.
+- **Get it:** [Download the latest release](../../releases/latest). Run it; click through [Windows's warning and the admin prompt](#first-run). Delete any unneeded files. Done.
 
 ## Contents
 
@@ -60,13 +60,13 @@ There's a hidden folder on every Windows PC called `C:\Windows\Installer`. Every
 
 When you uninstall the software, the files stay. When a newer patch replaces an older one, both stay. Windows never cleans them up. Disk Cleanup doesn't touch them. DISM is for a different folder entirely. Over time, the folder grows: 1 GB, 5 GB, 20 GB, 50 GB. On machines with heavy MSI-using software (Acrobat is a frequent culprit), it can [pass 100 GB](https://www.reddit.com/r/sysadmin/comments/1oxcrmh/acrobat_filling_up_the_cwindowsinstaller_folder/).
 
-These aren't temp files that get recreated the moment you close a cleaning tool. They're genuine dead weight: old installers from software you uninstalled years ago and patches that have been replaced three times over. Once they're gone, they don't come back.
+These aren't temp files that come back on their own. They're genuine dead weight: old installers from software you uninstalled years ago and patches that have been replaced several times over. Once they're gone, they don't come back.
 
 **If you're looking for an easy way to free up disk space on Windows, this folder is a good place to start.** InstallerClean finds the unneeded files and removes them safely.
 
 ## The search for help
 
-If you've ever searched for help with this folder, you probably know how it goes. Someone asks how to clean it. They're [told to run Disk Cleanup](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb). They try it. It clears 600 MB, none of it from the 180 GB folder (because Disk Cleanup doesn't touch `C:\Windows\Installer`). The thread goes quiet.
+If you've ever searched for help with this folder, you probably know how it goes. Someone with 180 GB in `C:\Windows\Installer` asks how to clean it. They're [told to run Disk Cleanup](https://learn.microsoft.com/en-us/answers/questions/4238108/windows-installer-folder-has-occupied-180gb). They try it. It clears 600 MB, none of it from that folder (because Disk Cleanup doesn't touch `C:\Windows\Installer`). The thread goes quiet.
 
 > *"All of the threads I've found tend to recommend the same things which don't solve the problem, and then go dead."*
 >
@@ -145,27 +145,32 @@ To find them, InstallerClean calls the Windows Installer COM interface directly 
 
 Any `.msi` or `.msp` file in `C:\Windows\Installer` that isn't claimed by a registered product is orphaned and flagged as removable. So is any patch the database marks superseded or obsoleted that isn't required for uninstall.
 
-If the API returns incomplete data (rare, but it can happen with corrupted installer state), the app falls back to reading the registry. The fallback only adds files to the "still needed" set, never to the "removable" set.
+If the API returns incomplete data (rare, but it can happen with a corrupted installer state), the app falls back to reading the registry. The fallback only adds files to the "still needed" set, never to the "removable" set.
 
 After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer` (the directories the cache leaves behind once their contents are gone) are pruned in the same pass.
 
 ## Is it safe?
 
-Yes. InstallerClean queries the same database Windows itself uses to track what's installed. If Windows says a file is no longer needed, the app trusts it; it doesn't guess based on filenames or dates.
+Yes. InstallerClean queries the same Windows Installer API database that Windows itself uses to track what's installed. If Windows says a file is no longer needed, the app trusts it; it doesn't guess based on filenames or dates.
 
-**In the app.** Delete sends files to the Recycle Bin. If the Recycle Bin isn't available for that drive (it's been turned off for the drive, or it's full or damaged), InstallerClean doesn't quietly delete the files for good. It stops and lets you choose: move them somewhere instead, delete them permanently or cancel. Files are only ever permanently deleted if you explicitly choose that. Move isn't needed for safety, the files are safe to delete; it's there if you'd rather see for yourself first, parking them in a folder you choose for as long as you like. Nothing is touched until you confirm. If Windows Installer is currently writing to the cache, has a previous transaction suspended or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown. The scan, query, move, delete, settings and pending-reboot services are covered by an automated test suite that runs on every commit (see the CI badge above).
+**About Delete and Move.** The files InstallerClean deletes are safe to delete permanently. **Delete** sends them to the Recycle Bin (you'll be warned if it's not available); you gain the space back on your C: drive when you empty your Recycle Bin.
+
+You don't have to trust me that the files are safe to delete, though. While they're in your Recycle Bin, you have a chance to check that the apps that use this folder, Office, Acrobat, Visual Studio and the like, still update and uninstall without trouble. If anything's broken (it won't be!), restore the files from the Recycle Bin to fix it. To be super safe, you can instead use **Move** - to park the files in a folder of your choice (obviously choose a folder on another partition/drive if you're looking to free space on C:). Just copy the files back to `C:\Windows\Installer` to restore things back to how they were (but you won't need to!).
+
+If Windows Installer is currently writing to the cache, has a previous transaction suspended or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown.
+
+The scan, query, move, delete, settings and pending-reboot services are covered by an automated test suite that runs on every commit (see the CI badge above).
 
 **Verifying the binary.** InstallerClean is unsigned. Code-signing certificates cost money annually and I'd rather keep the project free, open and donations-funded.
 
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
-- VirusTotal links for setup, portable, slim and CLI builds are published with each release.
+- VirusTotal: clean across every engine. Live links in each release's notes so you can re-check.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
+- <!-- downloads-start -->21k<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) tests each submission in a virtual machine and lists it only if it passes their review.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) tests each release for viruses, spyware and adware.
 
 <a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
-
-VirusTotal: clean across every engine. Live links in each release's notes so you can re-check.
 
 <a id="recovery"></a>
 ## If you do have a file missing from `C:\Windows\Installer`
@@ -237,6 +242,8 @@ Across the 82 reports people have sent in (thanks 🙏) since v1.8.0 added the o
 ![Confirmation dialogue titled "Send this to No Faff?" showing the full report that would be sent: app version, Windows version, scan counts, files processed and bytes freed, with no file paths, names or machine IDs, and a note that nothing identifies you or your machine, just whether the app worked and how much space was freed, with Cancel and Send buttons.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
 
 </details>
+
+<a id="first-run"></a>
 
 **Why does it want Administrator?** `C:\Windows\Installer` is locked down to administrators. Reading it, querying the Installer database and moving or deleting files all need that, so the app has to run as admin.
 
