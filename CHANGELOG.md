@@ -19,7 +19,6 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The delete confirmation reads "If you'd like backup copies, use Move instead." in place of "If you want ...", a touch more courteous for the same advice.
 - The installer's copyright notice takes its year from the build date rather than a hardcoded 2026, and drops the duplicate word "Copyright" (the file-properties field is already labelled that). Suggested by bovirus (#33).
 - The opt-in send-summary window is slightly narrower, so the privacy line under the report wraps cleanly to two lines with the result-log address kept whole, rather than the window stretching wider than its content needs.
-- The README walkthrough screenshots are re-shot against the 1.9.1 build so they show the enlarged text and the bottom-bar language globe.
 
 ## [1.9.0] - 2026-06-15
 
@@ -31,8 +30,6 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - When the Recycle Bin turns out to be unavailable for the drive, Delete offers a choice instead of just stopping: Move (the recommended route, straight into the normal flow), delete permanently or cancel. Nothing is removed without an explicit choice, the dialog states only what is known and never guesses why the bin is off, and the completion screen after a consented permanent delete says plainly that the files did not go to the bin.
 - `installerclean-cli.exe` is offered as a download in its own right: one self-contained exe, no install, no .NET runtime needed, the same binary the setup installs. Drop it on a client, scan or clean, delete it. Requested in discussion #23.
 - `installerclean-cli --version` (or `-v`) prints the name and Major.Minor.Patch then exits 0, deliberately without the deterministic build's `+<commit>` suffix so a parsed version stays clean.
-- A README section, "If a needed file goes missing", explains in Microsoft's own words what the cache is, how a registered file can go missing by means other than InstallerClean and the recovery route: reinstall the program over itself, same version where possible, which usually restores it. Mirrored into the translations; the "Will Windows complain?" FAQ shrinks to a plain no with a pointer at the section.
-- The READMEs gain an Accessibility section stating only what is implemented: full keyboard operation including column sorting, Narrator and Voice Access support, announced outcomes, an always-visible focus ring and WCAG AA contrast.
 
 ### Changed
 
@@ -66,21 +63,14 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The Registered files window opens tall enough to read a product's whole details, down to the comment line, by arrowing through the products list rather than clicking into the details pane to scroll: the products list keeps its row count and the extra height feeds the details, sized to the longest entries (a rarer longer one still scrolls). Both Details windows clamp their opening size to the monitor's work area so they open fully on screen, and always open at that computed size: it scales with the OS text setting and fits the current screen, which a remembered past size did not, so neither window now persists a size between opens.
 - Two delete-path messages are tightened: a partly-failed consented permanent delete keeps the "did not go to the Recycle Bin" clause and gains a singular form, and the one-file recycle-unavailable dialog reads "So this file ..." rather than "So this 1 file ...".
 - The About window's "What it does, and why it's safe" link is removed; it opened the same repository as the Star and licence links one hop away. The pane's recovery link stays.
-- The README is published in seven languages: Japanese, Brazilian Portuguese and Russian join English, Simplified Chinese, Spanish and French, the existing three resynced to native quality. Languages chosen by which developer audiences value a native README, not by speaker counts.
-- The READMEs are reconciled with the 1.9.0 delete and CLI behaviour: the unconditional "goes to the Recycle Bin, restore from there" promise is softened to the conditional truth, single-sourced in "Is it safe?" so the locales cannot drift, and the CLI exit codes are corrected.
 - The delete copy no longer frames Move as the safe option. The safety is in what gets listed (only files Windows reports as finished with), so Delete is the normal action; Move is for anyone who'd rather see for themselves first.
 - The PatchCleaner comparison table gains a delete-safety row: InstallerClean never silently permanently deletes, PatchCleaner's delete is permanent with no bin step. Mirrored across the locales.
-- The README FAQ gains a table of what recent runs have found, from the opt-in summaries, so a visitor can see the range of space freed on real machines.
-- The reports table's figures follow each translation's own conventions (comma decimals, the French, Spanish and Russian space before %, "Go" and "ГБ" units), produced from each file's locale rather than hand-formatted.
-- The README opening now stands alone: what the app does and that it's a run-once tool, the reports' live split (the percentages and the median are script-written, so they track the table), a safety bullet naming the Windows Installer API as the source of truth, the open-source stance and the closed list of when the app ever connects, and a download line. Replaces the per-machine anecdotes and the earlier What/space/safe/get bullets.
-- The README screenshots are re-shot against the 1.9.0 build, so they show the shipped UI: the "still needed" and "unneeded" wording, the taller Registered window, the Size column sorted biggest-first and the current dialogs. All seven share one canvas width so every window renders at the same scale, alt texts match what each shot shows, and the captions gained breathing room.
 - The Delete confirmation no longer warns that a large delete may skip the Recycle Bin. The warning (shown since 1.5.2) fired on ordinary deletes: Windows only bypasses the bin for a single file larger than the per-drive quota, not for a large total. The genuine bin-unavailable case keeps its choice dialog.
 - The About star and cuppa tooltips appear instantly, matching the main window's.
 - The installer-busy banner is reworded from jargon into plain terms: something, usually a Windows Update or a background install, is using Windows Installer, Move and Delete are paused while it runs, Re-scan once it is done. The CLI's matching gate message follows suit, keeping its retry advice, which is right for this cause.
 - The Delete confirmation drops the warning triangle by its heading; a delete to the Recycle Bin is the normal action the app is for, not a hazard.
 - The post-Move heading claims only what happened: "{N} moved" for a same-volume move, which frees nothing until the parked folder is deleted, and "{N} freed" only when the move left the drive. Delete keeps "freed".
 - The README documents the setup's silent install (`/SILENT`, `/VERYSILENT`); the installer already skipped its post-install launch on silent runs. Asked for in discussion #26.
-- The README requirements state the floor the installer enforces, Windows 10 version 1607 (build 14393) or later.
 - `pad.xml`'s descriptions stop selling Move as the restore path, matching the README's framing: deleting what the app lists is safe, and Move is for keeping a copy.
 - The portable build returns to the compressed single-file shape, roughly halving the download (about 135 MB to about 65 MB). It had shipped uncompressed since v1.8.2 to clear a Defender machine-learning false positive (`Trojan:Win32/Wacatac.B!ml`) on the compressed runtime bytes; Microsoft retrains on cleared false positives, so the compressed shape is clean again.
 
@@ -113,8 +103,6 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - A queued post-reboot rename INTO the installer cache now triggers the safety gate; the destination form Session Manager writes for a replace-existing rename (a leading `!` before the NT prefix) slipped the path match.
 - A hung Explorer can no longer hang the app on a link click: the unelevated launcher bounds its wait at ten seconds and falls back to copying the address to the clipboard.
 - A product registered in more than one context (per machine plus per user) lists every cached `.msi`, not just the first, so the Registered window's rows agree with its summary count.
-- The README quotes the reports table's actual median rather than a hand-written figure that had drifted; the figure is now written by the same script that writes the table, so the two cannot disagree.
-- The README's CLI exit-code contract states the mid-batch Ctrl+C case exactly: 130 only before any file was processed, 2 (partial) once work was committed.
 - The documented build command is the whole solution, not the GUI project; a single-project build cannot catch a CLI-breaking change, since the tests do not reference the CLI.
 - Five stale comments and labels corrected: the resx help-flags note, a misplaced format-argument note, the modal-card padding consumer list, the dark-chrome Windows-version contract and a CodeQL step name.
 - The installer-busy gate no longer reads the lingering Windows Installer service as an active install. The probe tested whether the `Global\_MSIExecute` mutex existed, but the service idles for several minutes after its last job and can keep the object alive unheld, so Move and Delete could stay blocked long after an install finished; the probe now takes a zero-timeout acquire and immediate release, which measures ownership itself.
@@ -168,7 +156,6 @@ An audit-driven release: a large sweep of correctness fixes (thread affinity, ex
 
 ### Added
 
-- Spanish README (`README.es.md`); the French and Simplified Chinese translations resynced to the current English.
 - Stale MSI registration entries (registered with Windows yet absent from disk and not removable) surface as a diagnostic info line on the main window.
 
 ### Fixed
@@ -205,7 +192,6 @@ An audit-driven release: a large sweep of correctness fixes (thread affinity, ex
 - Result-log noun aligned across surfaces. The Send-summary button label ("Send summary") was the user-visible truth since v1.8.0, but the screen-reader Automation.Name said "diagnostic log", the failure status said "Didn't work. Never mind.", and the success status said "Result log sent". All three now say "summary"; the failure status says "Sending failed. Try again later."
 - About window's Star and Buy-me-a-cuppa buttons carry distinct automation names from the main-window equivalents so a screen-reader element list with About open over Main can tell the rows apart.
 - SubtleLink picks up an underline + brighten on keyboard focus matching the existing hover behaviour, so the About window's MIT licence link surfaces the same visual cue to a tabbing keyboard-only user that a mouse hover already shows.
-- README gains short notes that `taskkill` bypasses `Console.CancelKeyPress` (the abandoned mutex is recovered by the next CLI run) and that Group Policy denying UAC elevation surfaces as Windows error 740 to the parent shell. Same notes ported to README.fr and README.zh-CN.
 - Body explanation paragraph now templates three Reason values (Orphaned, Superseded, Obsoleted) so a translator can edit the column labels in one place and have the body copy follow. The Obsoleted case (PatchState 4, publisher-withdrawn) gets its own clause distinct from Superseded.
 - `BrowserLaunchFailed*` resx keys renamed to the `BrowserLaunch.*` dotted-category prefix every other key uses.
 - `installerclean-cli.csproj` pins `PublishReadyToRun=false` matching the WPF host so a future SDK feature-band change to the default cannot silently shift the CLI's R2R section count (same AV-signal-stability rationale).
@@ -222,8 +208,6 @@ An audit-driven release: a large sweep of correctness fixes (thread affinity, ex
 - Stale-MSI banner and Send-summary status text raise `LiveRegionChanged` explicitly on first reveal, matching the existing fix for the pending-reboot and missing-from-disk banners. WPF's UIA bridge does not re-fire LiveRegionChanged for a Visibility=Collapsed→Visible transition.
 - Decorative window chrome hidden from the UIA tree via a custom automation peer.
 - Post-1.8.1 NuGet bumps reverted to preserve the AV-trained-clean binary fingerprint, and Dependabot ignores patch bumps on the three runtime packages for the same reason.
-- README accuracy pass: the CLI exit-75 description, a Move/Delete mix-up, stale alt text across the locales and the PatchCleaner API description corrected, the .NET FAQ trimmed, the VirusTotal line made timeless and the remaining "orphaned files" umbrella usages mopped up.
-- README WinSxS note no longer recommends Disk Cleanup; the Support link points at the /support landing page.
 - `pad.xml` drops the 32-bit Windows 10 support claim.
 - Spacing tokens tidied: horizontal-only `GapX.*` Thickness tokens added, five unused tokens deleted.
 - The crash log's privacy header moves into resx; the `Summary` string splits singular and plural forms instead of straddling a placeholder.
@@ -237,7 +221,6 @@ An audit-driven release: a large sweep of correctness fixes (thread affinity, ex
 - All-clean completion overlay now uses the same two-tier text hierarchy as the post-Move and post-Delete overlays: the "Nothing to clean up in C:\Windows\Installer" headline renders in body weight (Summary slot), and the "Scanned N products in T" receipt renders smaller and muted (Restore slot). Both lines previously rendered at the same body weight.
 - Dropped trailing full stops on every completion-overlay text line (summary, scan receipt, Move and Delete restore hints) so the overlays read consistently as labels rather than mixed sentences and labels.
 - A PAD 4.0 file (`pad.xml`) added at the repo root for Softpedia's automatic listing refresh.
-- README Screenshots section shown un-collapsed.
 
 ## [1.8.0] - 2026-05-13
 
@@ -247,7 +230,6 @@ The two new opt-in network features (a manual update check and the Send-summary 
 
 - Check for updates in About now performs the version check itself rather than opening the releases page. Single HTTPS GET to `api.github.com/repos/no-faff/InstallerClean/releases/latest` on click; UA `InstallerClean/<version>`; 8 s timeout; localised result dialog; a styled "update available" window when behind.
 - Send summary on the completion overlay. Writes `%LOCALAPPDATA%\NoFaff\InstallerClean\last-run.json` after every Move, Delete or all-clear; opens a confirmation window showing the exact JSON; POSTs to `https://nofaff.netlify.app/api/result-log` on confirm. Counts and categorical labels only. No paths, no usernames, no machine identifiers, no time-of-day. Once per machine, ever, with a confirm-before-send window and a lifetime lock.
-- French (`README.fr.md`) and Simplified Chinese (`README.zh-CN.md`) translations of the README.
 
 ### Changed
 
@@ -261,8 +243,6 @@ The two new opt-in network features (a manual update check and the Send-summary 
 - CLI exit code 75 reserved for transient conditions (GUI is running, Windows Installer transaction pending). The mutex-blocked path writes an Application Event Log entry under source `InstallerClean`. Stdout is UTF-8. A final "Event Log writing failed" note prints on stdout if any audit write failed during the run.
 - Installer prompts to close a running InstallerClean before upgrade (`AppMutex=Global\InstallerClean_SingleInstance`). VersionInfo metadata (`VersionInfoVersion`, `ProductName`, `Company`, `Copyright`, `Description`) embedded in `InstallerClean-setup.exe`.
 - Action buttons reordered Delete before Move, and the body copy disambiguates which files "the files listed below" are.
-- README: the app icon tops the page, a restructure pass, the MajorGeeks listing added to "Is it safe?", a downloads badge and a CCleaner/BleachBit comparison, the space claim replaced with a cited 25 GB user report, the "Best for most users" tag dropped from the build descriptions, the Send-summary copy aligned with the shipped behaviour and the screenshots refreshed against the 1.8.0 binary.
-- README easter egg: George Formby and Van Morrison join the cleaning-Windows party.
 - The CHANGELOG is backfilled with the full release history (v1.0.0 through v1.5.3), then rewritten in the terse Keep-a-Changelog house style.
 - Pre-ship copy sweeps across the resx (wording, tense, consistency).
 - Dependabot bumps grouped to cut PR noise, with patch and minor bumps auto-merged in CI.
@@ -335,8 +315,6 @@ The largest engineering release in the project's history. The codebase was split
 - Three-layer design system in the WPF host: Primitives (raw colours), Tokens (semantic roles), Components (control styles).
 - Keyboard focus rings across the app, tuned per button geometry, with screen-reader HelpText on the destructive actions.
 - CI builds and smoke-publishes the CLI, audits each project for vulnerable packages and Dependabot covers all four projects.
-- README gains a sysadmin section (with the Softpedia badge and a PatchCleaner VirusTotal comparator), an FAQ, a "what it doesn't do" list and a Screenshots section, the screenshots re-cropped to a shared frame.
-- README star-history chart.
 - GitHub community-standards files (code of conduct, security policy), the contact email later redacted from both.
 - A 512px app icon for listings.
 
@@ -370,7 +348,6 @@ The largest engineering release in the project's history. The codebase was split
 - Caption buttons render in Segoe MDL2 Assets (the canonical Windows chrome font); previous Unicode codepoints relied on font fallback that left the maximise / restore swap visually identical.
 - Main window: maximise removed. Title-bar double-click, Win+Up and the system menu's Maximize item all intercepted at `WM_SYSCOMMAND`. Detail windows keep default resize and maximise.
 - The SDK is pinned with `rollForward: latestPatch` so releases build on a known band.
-- README "Is it safe?" VirusTotal claims tightened to per-build verifiable facts, the SecureAge slim flag stated without overclaiming its cause; a general accuracy pass over the claims and the Move/Delete framing.
 
 ### Fixed
 
@@ -475,7 +452,6 @@ The largest engineering release in the project's history. The codebase was split
 - Inno Setup script tightened with explicit `AppId`, `MinVersion=10.0`, `ArchitecturesAllowed=x64compatible`.
 - GitHub Actions in CI and CodeQL workflows pinned to commit SHAs, and the actions bumped by Dependabot (codeql-action 4, setup-dotnet 5, checkout 6).
 - Completion screen: pressing Enter closes the window (Close button is `IsDefault`).
-- README rewritten for clearer positioning: sections trimmed, the duplicated origin paragraph cut, the PatchCleaner date corrected.
 - Comment tidy across the services; a vendor-specific historical reference removed.
 
 ### Fixed
@@ -498,7 +474,6 @@ The largest engineering release in the project's history. The codebase was split
 
 - Donate link now points to `nofaff.netlify.app`.
 - An automatic startup update check (with an opt-out toggle) was added and removed within the release: elevated plus network at startup reads as command-and-control to ML AV engines (DeepInstinct flagged it), so the check shipped manual-only.
-- README credits PatchCleaner's author by name and softens the comparison tone.
 
 ## [1.4.1] - 2026-03-10
 
@@ -506,7 +481,6 @@ The largest engineering release in the project's history. The codebase was split
 
 - 99 tests (was 56): coverage for `InstallerQueryService`, `MsiFileInfoService`, `PendingRebootService` and the model records.
 - Project metadata: `Authors`, `Description`, `RepositoryUrl`, `Licence` populated in the assembly info.
-- README troubleshooting section, clearer portable-vs-slim guidance, Recycle Bin safety reinforced.
 
 ### Changed
 
@@ -531,7 +505,6 @@ The largest engineering release in the project's history. The codebase was split
 ### Changed
 
 - Test mocking framework switched from Moq to NSubstitute (Moq's SponsorLink dependency was a concern for a freely-distributed project).
-- README safety section tightened and the download-size guidance clarified.
 - A `Func<>`-delegate testability seam for `MainViewModel` was added and reverted within the release; the pattern trips AV heuristics.
 
 ## [1.3.0] - 2026-03-08
@@ -583,7 +556,6 @@ The largest engineering release in the project's history. The codebase was split
 
 ### Changed
 
-- README: a SmartScreen note in getting started (what the warning is and why an unsigned new download triggers it), the release badge wired up and a fresh screenshot.
 
 ### Fixed
 
@@ -649,7 +621,6 @@ Initial public release. Built from the ground up over months and 164 commits: th
 #### Distribution and trust
 
 - Self-contained `InstallerClean.exe` and a framework-dependent build (needs the .NET Desktop Runtime).
-- README written for the target user, with sourced forum quotes, an honest space-range claim, and credit to PatchCleaner's author.
 - VirusTotal scan published (1/70 on the final release build) and linked from the README.
 - No data collection.
 
