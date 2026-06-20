@@ -86,7 +86,7 @@
 
   <!-- Window titles -->
   <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
-  <data name="Window.About.Title" xml:space="preserve"><value>Info applicazioni</value></data>
+  <data name="Window.About.Title" xml:space="preserve"><value>Informazioni</value></data>
   <data name="Window.Registered.Title" xml:space="preserve"><value>File registrati che non andrebbero eliminati</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>File non necessari, sicuri da eliminare</value></data>
   <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Conferma spostamento</value></data>
@@ -120,7 +120,7 @@
   <data name="Field.Missing" xml:space="preserve"><value>mancante</value></data>
 
   <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
-  <data name="Action.About" xml:space="preserve"><value>_Inf programma</value></data>
+  <data name="Action.About" xml:space="preserve"><value>_Informazioni</value></data>
   <data name="Action.Copy" xml:space="preserve"><value>Copia</value></data>
   <data name="Action.Cut" xml:space="preserve"><value>Taglia</value></data>
   <data name="Action.Paste" xml:space="preserve"><value>Incolla</value></data>
@@ -152,7 +152,7 @@
 
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Offrimi una tazzina di caffè</value></data>
-  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Offrimi un caffè (finestra Info programma)</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Offrimi un caffè (finestra Informazioni)</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Annulla operazione</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Annulla scansione</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Annulla scansione all'avvio</value></data>
@@ -160,7 +160,7 @@
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Chiudi finestra</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Chiudi finestra risultato e torna alla finestra principale</value></data>
   <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Lascia una stella su GitHub</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Lascia una stella su GitHub (finestra Info programmi)</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Lascia una stella su GitHub (finestra Informazioni)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Riduci a icona</value></data>
   <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Sposta tutti i file di installazione non necessari nella cartella destinazione scelta</value></data>
   <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Sposta nel Cestino tutti i file di installazione non necessari</value></data>
@@ -169,14 +169,14 @@
        straight after "Cancel, button": the window-level alternative is
        never read, because help text is only spoken for the element with
        focus and the window itself never has it. -->
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>'Elimina' sposta i file non necessari nel Cestino. 'Annulla' chiude senza eliminare.</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>'Elimina' sposta i file non necessari nel Cestino.&#10;'Annulla' chiude senza eliminare.</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>'Sposta' colloca i file non necessari nella cartella destinazione scelta. 'Annulla' li lascia dove sono.</value></data>
   <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Scegli come gestire i file non necessari: spostarli in un luogo sicuro, eliminarli definitivamente o annullare.</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Sposta i file non necessari in una specifica cartella</value></data>
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Elimina definitivamente i file non necessari perché per questa unità il Cestino non è disponibile </value></data>
-  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Invia a nofaff.netlify.app. vengono inviati solo conteggi ed etichette. Prima dell'invio vedrai esattamente cosa viene inviato.</value></data>
+  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Invia a nofaff.netlify.app.&#10;Verranno inviati solo conteggi ed etichette.&#10;Prima dell'invio vedrai esattamente cosa verrà inviato.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Per ringraziarmi</value></data>
-  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>'Invia' trasmette a No Faff il riepilogo mostrato. Annulla non invia nulla.</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>'Invia' trasmette a No Faff il riepilogo visualizzato.&#10;Annulla non invia nulla.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Controlla aggiornamenti</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Verifica tramite l'API delle release di GitHub, via HTTPS, se è disponibile una versione più recente.</value></data>
   <!-- Window-level description for the update-available modal, read by a
@@ -185,7 +185,7 @@
        text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Apri pagina release per scaricare la versione più recente, o scegli 'Annulla' per mantenere quella attuale.</value></data>
   <data name="Automation.MITLicence" xml:space="preserve"><value>Licenza MIT</value></data>
-  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Apre file licenza in github.com nel browser.</value></data>
+  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Apri file licenza in github.com nel browser.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
        DETAILS). Narrator at default verbosity spells short uppercase
@@ -234,39 +234,39 @@
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Se ti è stato utile, offrimi una tazzina di caffè.</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Ci vuole un caffè!</value></data>
-  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Richiesto annullamento. L'app sta aspettando che il passaggio in corso arrivi a un punto in cui fermarsi. Può richiedere qualche secondo durante operazioni di I/O intense o una chiamata al database MSI.</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Richiesto annullamento richiesto.&#10;L'app sta aspettando che il passaggio in corso arrivi a un punto in cui fermarsi.&#10;Può richiedere qualche secondo durante operazioni di I/O intense o una chiamata al database MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Chiudi</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Lascia una stella su GitHub, segnala un problema (issue) o scrivi nelle discussioni. Ogni feedback è il benvenuto.</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>o segnala un problema (issue) o scrivi nelle discussioni. Ogni feedback è il benvenuto.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Lascia una stella su GitHub, segnala un problema (issue) o scrivi nelle discussioni.&#10;Ogni feedback è il benvenuto.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>o segnala un problema (issue) o scrivi nelle discussioni.&#10;Ogni feedback è il benvenuto.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Riduci a icona</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Come preferisci, ma è apprezzato. Invia un riepilogo anonimo che mi fa solo sapere se funziona e quanto spazio le persone stanno liberando. La schermata successiva visualizza cosa verrà inviato prima di confermare.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Come preferisci, ma è apprezzato. Invia un riepilogo anonimo che mi fa solo sapere se funziona. La schermata successiva ti mostra cosa verrà inviato prima di confermare.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Come preferisci, ma è apprezzato.&#10;Invia un riepilogo anonimo che mi fa solo sapere se funziona e quanto spazio le persone stanno liberando.&#10;La schermata successiva visualizza cosa verrà inviato prima di confermare.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Come preferisci, ma è apprezzato.&#10;Invia un riepilogo anonimo che mi fa solo sapere se funziona.&#10;La schermata successiva visualizza cosa verrà inviato prima di confermare.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Sposta i file non necessari nella destinazione spostamento.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Sposta i file non necessari nella destinazione spostamento. Scegli la cartella per lo spostamento.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Sposta i file non necessari nel Cestino.</value></data>
-  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Nome soggetto dal certificato Authenticode incorporato. Catena non verificata.</value></data>
+  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Nome soggetto dal certificato Authenticode incorporato.&#10;Catena non verificata.</value></data>
 
   <!-- Body copy -->
   <data name="Body.MainExplanation.Lead" xml:space="preserve">
-    <value>I file non necessari qui sotto si possono eliminare senza rischi. Si trovano in C:\Windows\Installer, lasciati lì quando un programma è stato disinstallato ({0}), una patch più recente ne ha sostituita una ({1}) o il produttore l'ha ritirata ({2}). InstallerClean elenca soltanto i file che Windows stesso segnala come non più in uso. Spostali nel Cestino, o spostali altrove, se preferisci tenerne una copia.</value>
+    <value>I file non necessari qui sotto si possono eliminare senza rischi. Si trovano in C:\Windows\Installer, lasciati lì quando un programma è stato disinstallato ({0}), una patch più recente ne ha sostituita una ({1}) o il produttore l'ha ritirata ({2}).&#10;InstallerClean elenca soltanto i file che Windows stesso segnala come non più in uso.&#10;Spostali nel Cestino, o spostali altrove, se preferisci tenerne una copia.</value>
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>Si trovano in C:\Windows\Installer, lasciati indietro quando un programma è stato disinstallato ({0}), una patch più recente ne ha sostituito uno ({1}) o l'editore lo ha ritirato ({2}). InstallerClean elenca sempre e solo i file che Windows stesso segnala come non più necessari.</value>
+    <value>Si trovano in C:\Windows\Installer, lasciati indietro quando un programma è stato disinstallato ({0}), una patch più recente ne ha sostituito uno ({1}) o l'editore lo ha ritirato ({2}).&#10;InstallerClean elenca sempre e solo i file che Windows stesso segnala come non più necessari.</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy.</value>
+    <value>Spostali nel Cestino o spostali prima altrove se preferisci conservarne una copia.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
-  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>In questo momento qualcosa sta usando Windows Installer, di solito un aggiornamento di Windows o un programma che si sta installando in background. Mentre questo avviene 'Sposta' ed 'Elimina' sono in pausa, così InstallerClean non tocca la cache di installazione quando ci sono modifiche in corso. Ad attività completate ripeti la scansione e torneranno disponibili.</value></data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>In questo momento qualcosa sta usando Windows Installer, di solito un aggiornamento di Windows o un programma che si sta installando in background.&#10;Mentre questo avviene 'Sposta' ed 'Elimina' sono in pausa, così InstallerClean non tocca la cache di installazione quando ci sono modifiche in corso.&#10;Ad attività completate ripeti la scansione e torneranno disponibili.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>In questo computer è in sospeso una precedente transazione di Windows Installer. Prima di pulire la cache riprendi o annulla quell'installazione (o riavvia Windows).</value></data>
-  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows ha in coda, per il prossimo riavvio, la ridenominazione di un file che riguarda la cache di installazione. Prima di pulire riavvia Windows .</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows ha in coda, per il prossimo riavvio, la ridenominazione di un file che riguarda la cache di installazione.&#10;Prima di pulire riavvia Windows .</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Seleziona un file per vederne i dettagli.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Seleziona un prodotto per vederne i dettagli.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Nessun metadato disponibile.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>Questo file di installazione è stato eliminato. Non è stato InstallerClean: non rimuove mai un file che un programma usa ancora; qualcos'altro lo ha eliminato prima che venisse eseguito InstallerClean.&#10;&#10;Per ora non crea problemi, e non ne creerà fino al giorno in cui si proverà a riparare, aggiornare o disinstallare il programma a cui appartiene. Quel passaggio può allora non riuscire, perché Windows cerca questo file e non lo trova.&#10;&#10;Per provare a risolvere, scarica il programma di installazione di quel software dal produttore ed eseguilo sopra la copia esistente (non disinstallare prima: la disinstallazione è essa stessa un passaggio che richiede questo file). Usa la stessa versione che hai installato, se riesci a procurartela, perché Windows potrebbe rifiutarne una diversa. Di solito questo ripristina il file, e le tue impostazioni di norma restano intatte, ma Microsoft non lo garantisce: l'ultima opzione è reinstallare il programma, o Windows stesso.</value>
+    <value>Questo file di installazione è stato eliminato.&#10;Non è stato InstallerClean: non rimuove mai un file che un programma usa ancora; qualcos'altro lo ha eliminato prima che venisse eseguito InstallerClean.&#10;Per ora non crea problemi, e non ne creerà fino al giorno in cui si proverà a riparare, aggiornare o disinstallare il programma a cui appartiene.&#10;Quel passaggio può allora non riuscire, perché Windows cerca questo file e non lo trova.&#10;Per provare a risolvere, scarica il programma di installazione di quel software dal produttore ed eseguilo sopra la copia esistente (non disinstallare prima: la disinstallazione è essa stessa un passaggio che richiede questo file).&#10;Usa la stessa versione che hai installato, se riesci a procurartela, perché Windows potrebbe rifiutarne una diversa.&#10;Di solito questo ripristina il file, e le tue impostazioni di norma restano intatte, ma Microsoft non lo garantisce: l'ultima opzione è reinstallare il programma, o Windows stesso.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -320,10 +320,10 @@
   <!-- 0 = exception type name, 1 = crash log path. Both surface in
        the status pill so the user can find the log; full message +
        stack trace go to the log itself. -->
-  <data name="Status.MoveFailed" xml:space="preserve"><value>Spostamento non riuscito ({0}). Dettagli in {1}.</value></data>
-  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Spostamento non riuscito ({0}). Non è stato possibile scrivere il file crash.log.</value></data>
-  <data name="Status.DeleteFailed" xml:space="preserve"><value>Eliminazione non riuscita ({0}). Dettagli in {1}.</value></data>
-  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Eliminazione non riuscita ({0}). Non è stato possibile scrivere il file crash.log.</value></data>
+  <data name="Status.MoveFailed" xml:space="preserve"><value>Spostamento non riuscito ({0}).&#10;Dettagli in {1}.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Spostamento non riuscito ({0}).&#10;Non è stato possibile scrivere il file crash.log.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>Eliminazione non riuscita ({0}).&#10;Dettagli in {1}.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Eliminazione non riuscita ({0}).&#10;Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Accesso negato. Esegui come amministratore.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scansione non riuscita: database installazioni non disponibile.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scansione annullata.</value></data>
@@ -332,8 +332,8 @@
        the crash log because exception messages from elevated framework
        calls can contain paths from another user's profile. 1 = crash
        log path. -->
-  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Scansione non riuscita ({0}). Dettagli in {1}.</value></data>
-  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Scansione non riuscita ({0}). Non è stato possibile scrivere il file crash.log.</value></data>
+  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Scansione non riuscita ({0}).&#10;Dettagli in {1}.</value></data>
+  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Scansione non riuscita ({0}).&#10;Non è stato possibile scrivere il file crash.log.</value></data>
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>Tutto pulito</value></data>
@@ -374,12 +374,12 @@
        Recycle Bin" clause agrees with the count, and the WithErrors copy
        carries that same clause so a partial failure still never reads as
        though the files reached the bin. -->
-  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>Eliminato definitivamente {0} {1}. Non è stato spostato nel Cestino.</value></data>
-  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>Eliminati definitivamente {0} {1}. Non è stati spostati nel Cestino.</value></data>
-  <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>Eliminato definitivamente {0} {1}. Non è stato spostato  nel Cestino. {2} {3}</value></data>
-  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>Eliminati definitivamente {0} {1}. Non Non è stati spostati nel Cestino. {2} {3}</value></data>
-  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Va bene così, si poteva rimuovere senza rischi. InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora. Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce.</value></data>
-  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Va bene così, si potevano rimuovere senza rischi. InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora. Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce.</value></data>
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>Eliminato definitivamente {0} {1}.&#10;Non è stato spostato nel Cestino.</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>Eliminati definitivamente {0} {1}.&#10;Non sono stati spostati nel Cestino.</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>Eliminato definitivamente {0} {1}.&#10;Non è stato spostato  nel Cestino. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>Eliminati definitivamente {0} {1}.&#10;Non sono stati spostati nel Cestino. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Va bene così, si poteva rimuovere senza rischi.&#10;InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora.&#10;Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Va bene così, si potevano rimuovere senza rischi.&#10;InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora.&#10;Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce.</value></data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
        the files' volume: Move (the safe default), delete permanently with
        consent, or cancel. Wording states only the confirmed fact (the probe
@@ -390,10 +390,10 @@
        passes all three args either way, so the singular's {1} and {2}
        still resolve. -->
   <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>Per questa unità il Cestino non è disponibile </value></data>
-  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>Quindi questo {1} ({2}) non è stato eliminato. Puoi spostarlo in un luogo sicuro, oppure eliminarlo definitivamente.</value></data>
-  <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>Quindi questi {0} {1} ({2}) non sono stati eliminati. Puoi spostarli in un luogo sicuro, oppure eliminarli definitivamente.</value></data>
-  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Eliminarlo è sicuro. InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora, e il Cestino è soltanto una garanzia in più. Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce.</value></data>
-  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Eliminarli è sicuro. InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora, e il Cestino è soltanto una garanzia in più. Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce.</value></data>
+  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>Quindi questo {1} ({2}) non è stato eliminato.&#10;Puoi spostarlo in un luogo sicuro, oppure eliminarlo definitivamente.</value></data>
+  <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>Quindi questi {0} {1} ({2}) non sono stati eliminati.&#10;Puoi spostarli in un luogo sicuro, oppure eliminarli definitivamente.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Eliminarlo è sicuro.&#10;InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora, e il Cestino è soltanto una garanzia in più.&#10;Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Eliminarli è sicuro.&#10;InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora, e il Cestino è soltanto una garanzia in più.&#10;Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce.</value></data>
 
   <!-- Summaries -->
   <!-- 0 = file count. Singular / plural pairs picked at the call
@@ -409,7 +409,7 @@
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} file non necessario da eliminare</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} file non necessari da eliminare</value></data>
   <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} file registrato risulta mancante (non eliminato da InstallerClean). Per ora nessun problema, ma in futuro una riparazione, un aggiornamento o una disinstallazione di quel programma potrebbe non riuscire. Per sapere cosa fare apri 'Dettagli'.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} file registrati risultano mancanti (non eliminati da InstallerClean). Per ora nessun problema, ma in futuro una riparazione, un aggiornamento o una disinstallazione di quei programmi potrebbe non riuscire. Per sapere cosa fare apri 'Dettagli'.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} file registrati risultano mancanti (non eliminati da InstallerClean).&#10;Per ora nessun problema, ma in futuro una riparazione, un aggiornamento o una disinstallazione di quei programmi potrebbe non riuscire.&#10;Per sapere cosa fare apri 'Dettagli'.</value></data>
   <!-- Informational line shown when the MSI database carries
        superseded-patch registrations whose files are already gone
        from disk. Distinct from the missing-from-disk warning
@@ -430,7 +430,7 @@
   <!-- 0 = destination path -->
   <data name="Confirm.MoveDestination" xml:space="preserve"><value>I file verranno spostati in {0}.</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Vuoi eliminare {0} {1} ({2})?</value></data>
-  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>I file verranno spostati nel Cestino. Se vuoi fare delle copie di backup, usa invece 'Sposta'.</value></data>
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>I file verranno spostati nel Cestino.&#10;Se vuoi fare delle copie di backup, usa invece 'Sposta'.</value></data>
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Sono richiesti i diritti di amministratore</value></data>
@@ -439,19 +439,19 @@
 Fai clic con il pulsante destro e scegli 'Esegui come amministratore'.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Database installazioni non disponibile</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scansione non riuscita</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Il database di Windows Installer risulta vuoto o non accessibile. È una cosa insolita anche in un'installazione di Windows appena fatta e di solito significa che il database è danneggiato o che uno strumento di terze parti lo ha svuotato. L'esecuzione di 'sfc /scannow' da un prompt con privilegi elevati di solito lo ripara.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Accesso negato durante l'enumerazione dei prodotti installati. Esegui come amministratore.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Il database di Windows Installer risulta vuoto o non accessibile.&#10;È una cosa insolita anche in un'installazione di Windows appena fatta e di solito significa che il database è danneggiato o che uno strumento di terze parti lo ha svuotato.&#10;L'esecuzione di 'sfc /scannow' da un prompt con privilegi elevati di solito lo ripara.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Accesso negato durante l'enumerazione dei prodotti installati.&#10;Esegui come amministratore.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer ha rifiutato di elencare i prodotti dopo {0} errori consecutivi (ultimo codice di errore {1}). Prova a riavviare Windows, oppure esegui 'sfc /scannow' da un prompt con privilegi elevati.</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer ha rifiutato di elencare i prodotti dopo {0} errori consecutivi (ultimo codice di errore {1}).&#10;Prova a riavviare Windows, oppure esegui 'sfc /scannow' da un prompt con privilegi elevati.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Destinazione non valida</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Impossibile scrivere nella destinazione</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Spostamento non riuscito</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Eliminazione non riuscita</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>La destinazione non può trovarsi all'interno della cartella di Windows Installer.</value></data>
   <!-- 0 = the destination path the user typed -->
-  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>La destinazione {0} si trova in una cartella di sistema di Windows. Scegli un percorso al di fuori di %SystemRoot%, %ProgramFiles% e %ProgramData%.</value></data>
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>La destinazione {0} si trova in una cartella di sistema di Windows.&#10;Scegli un percorso al di fuori di %SystemRoot%, %ProgramFiles% e %ProgramData%.</value></data>
   <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Spazio insufficiente</value></data>
   <!-- 0 = destination, 1 = required size, 2 = available size -->
   <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Spazio insufficiente in {0}
@@ -461,18 +461,18 @@ Disponibile: {2}</value></data>
   <!-- 0 = destination -->
   <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>Non hai i permessi per scrivere in {0}.
 Prova una cartella nel profilo utente o in un'unità di tua proprietà.</value></data>
-  <data name="Error.PathTooLong" xml:space="preserve"><value>Il percorso {0} è troppo lungo per Windows. Scegli un percorso più corto.</value></data>
-  <data name="Error.DestinationMissing" xml:space="preserve"><value>La cartella {0} non esiste e non è stato possibile crearla. Controlla la lettera dell'unità o il percorso di rete.</value></data>
+  <data name="Error.PathTooLong" xml:space="preserve"><value>Il percorso {0} è troppo lungo per Windows.&#10;Scegli un percorso più corto.</value></data>
+  <data name="Error.DestinationMissing" xml:space="preserve"><value>La cartella {0} non esiste e non è stato possibile crearla.&#10;Controlla la lettera dell'unità o il percorso di rete.</value></data>
   <!-- 0 = destination, 1 = crash log path. The exception's .Message
        intentionally does NOT appear in either string: under elevation
        framework messages can carry paths from another user's profile.
        Detail goes to the crash log; the user is pointed at it. -->
   <data name="Error.IOWriteDestination" xml:space="preserve"><value>Windows non può scrivere in {0}.
 Dettagli in {1}.</value></data>
-  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows non può scrivere in {0}. Non è stato possibile scrivere il file crash.log.</value></data>
+  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows non può scrivere in {0}.&#10;Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Error.WriteDestination" xml:space="preserve"><value>Impossibile scrivere in {0}.
 Dettagli in {1}.</value></data>
-  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Impossibile scrivere in {0}. Non è stato possibile scrivere il file crash.log.</value></data>
+  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Impossibile scrivere in {0}.&#10;Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Error.MissingSourceFile" xml:space="preserve"><value>Il file non esiste più.</value></data>
   <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Il file sorgente è un collegamento simbolico o una giunzione; rifiutato per sicurezza.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
@@ -484,9 +484,9 @@ Dettagli in {1}.</value></data>
   <data name="Error.IOFailure" xml:space="preserve"><value>L'operazione non è riuscita. Riprova o riavvia Windows.</value></data>
   <data name="Error.UnknownError" xml:space="preserve"><value>Errore sconosciuto.</value></data>
   <!-- 0 = shell error code -->
-  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Impossibile spostare questo file nel Cestino (errore {0}). Potrebbe essere bloccato, in uso o impedito da Windows. Usa 'Sposta'.</value></data>
-  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows ha bloccato l'accesso a questo file, anche con i diritti di amministratore (errore {0}). Di solito è un blocco di proprietà o di permessi. Usa 'Sposta'.</value></data>
-  <data name="Error.RecycleInUse" xml:space="preserve"><value>Questo file è aperto o bloccato da un altro programma (errore {0}). Chiudi quel programma, o qualunque cosa lo stia analizzando, poi riprova, o usa 'Sposta'.</value></data>
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Impossibile spostare questo file nel Cestino (errore {0}).&#10;Potrebbe essere bloccato, in uso o impedito da Windows. Usa 'Sposta'.</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows ha bloccato l'accesso a questo file, anche con i diritti di amministratore (errore {0}).&#10;Di solito è un blocco di proprietà o di permessi.&#10;Usa 'Sposta'.</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>Questo file è aperto o bloccato da un altro programma (errore {0}).&#10;Chiudi quel programma, o qualunque cosa lo stia analizzando, poi riprova, o usa 'Sposta'.</value></data>
   <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Il file è stato eliminato definitivamente perché non è stato possibile spostarlo nel Cestino.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Spostamento dei file nella cartella di Windows Installer rifiutato (destinazione: {0}).</value></data>
@@ -499,13 +499,13 @@ Dettagli in {1}.</value></data>
   <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Aggiornamento disponibile</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>La versione in uso è la versione {0}.&#10;È disponibile la versione {1}.</value></data>
-  <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Impossibile raggiungere GitHub. Controlla la connessione internet e riprova.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub ha restituito una risposta di errore. L'API delle release potrebbe avere un limite di frequenza; riprova tra qualche minuto.</value></data>
-  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>La risposta di GitHub non conteneva una release riconoscibile. Riprova più tardi, o apri direttamente la pagina delle release.</value></data>
-  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Il controllo è scaduto. La connessione a GitHub potrebbe essere lenta; riprova.</value></data>
-  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Il controllo non è riuscito per un motivo sconosciuto. I dettagli sono nel file crash.log, se devi segnalarlo.</value></data>
+  <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Impossibile raggiungere GitHub.&#10;Controlla la connessione internet e riprova.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub ha restituito una risposta di errore.&#10;L'API delle release potrebbe avere un limite di frequenza; riprova tra qualche minuto.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>La risposta di GitHub non conteneva una release riconoscibile.&#10; Riprova più tardi, o apri direttamente la pagina delle release.</value></data>
+  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Il controllo è scaduto.&#10;La connessione a GitHub potrebbe essere lenta; riprova.</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Il controllo non è riuscito per un motivo sconosciuto.&#10;I dettagli sono nel file crash.log, se devi segnalarlo.</value></data>
   <!-- 0 = the URL the user was trying to reach -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>Impossibile aprire il collegamento nel browser. L'URL è stato copiato negli appunti, così puoi aprirlo manualmente:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>Impossibile aprire il collegamento nel browser.&#10;L'URL è stato copiato negli appunti, così puoi aprirlo manualmente:&#10;&#10;{0}</value></data>
   <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>Impossibile aprire il collegamento nel browser, e anche la copia negli appunti non è riuscita. L'URL è:&#10;&#10;{0}</value></data>
   <!-- 0 = the destination folder whose canonical path changed mid-batch -->
   <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Il percorso canonico della cartella destinazione è stato modificato durante l'operazione: {0}</value></data>
@@ -522,11 +522,11 @@ Dettagli in {1}.</value></data>
   <!-- Body header shown in the confirmation modal. Names the
        recipient and the full URL so the user sees the destination
        without having to scroll the JSON. -->
-  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>Vuoi inviare questo a No Faff?</value></data>
+  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>Vuoi inviare questo rapporto a No Faff?</value></data>
   <!-- Reassurance line under the JSON. Names the URL once, calls
        out the no-PII property, and explains the purpose so the
        user has the context the modal title implies. -->
-  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Niente ti identifica, né identifica il computer; mi fa solo sapere che l'app funziona e quanto spazio le persone stanno liberando. Viene inviato a nofaff.netlify.app/api/result-log.</value></data>
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Niente ti identifica, né identifica il computer; mi fa solo sapere che l'app funziona e quanto spazio le persone stanno liberando.&#10;Il rapporto verrà inviato a nofaff.netlify.app/api/result-log.</value></data>
   <!-- AutomationProperties.Name on the JSON preview TextBox so screen
        readers announce its content rather than "edit, read-only". -->
   <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Anteprima registro risultati</value></data>
@@ -554,9 +554,9 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Startup.ErrorTitle" xml:space="preserve"><value>Errore in avvio</value></data>
   <!-- 0 = exception type name (see Startup.UnhandledBody for why this
        is the type name and not the message), 1 = crash log path. -->
-  <data name="Startup.FailedToStart" xml:space="preserve"><value>Avvio non riuscito ({0}). Dettagli salvati in:
+  <data name="Startup.FailedToStart" xml:space="preserve"><value>Avvio non riuscito ({0}).&#10;Dettagli salvati in:
 {1}</value></data>
-  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>Avvio non riuscito ({0}). Non è stato possibile scrivere il file crash.log.</value></data>
+  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>Avvio non riuscito ({0}).&#10;Non è stato possibile scrivere il file crash.log.</value></data>
 
   <!-- File picker -->
   <data name="FilePicker.ChooseDestinationTitle" xml:space="preserve"><value>Scegli la cartella destinazione per i file spostati</value></data>
@@ -628,23 +628,23 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.EventLogDeleteSummary" xml:space="preserve"><value>Modalità {0}: {1} di {2} {3} spostati nel cestino, {4} ripristinati, {5} {6}.</value></data>
-  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Errore: per questo volume il Cestino non è disponibile, quindi non è stato eliminato nulla. Usa /m per spostare i file oppure riattiva il Cestino ed eseguire di nuovo.</value></data>
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Errore: per questo volume il Cestino non è disponibile, quindi non è stato eliminato nulla.&#10;Usa /m per spostare i file oppure riattiva il Cestino ed eseguire di nuovo.</value></data>
   <!-- 0 = mode arg ("/d") -->
   <data name="Cli.EventLogRecycleUnavailable" xml:space="preserve"><value>Modalità {0} interrotta: per il volume Windows il Cestino non è disponibile; nessun file è stato eliminato.</value></data>
   <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Errore: nessuna destinazione spostamento specificata. Usa /m PERCORSO o imposta un valore predefinito nella GUI.</value></data>
   <data name="Cli.EventLogMoveNoDestination" xml:space="preserve"><value>Modalità {0} interrotta: nessuna destinazione specificata.</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Errore: la destinazione non può essere all'interno della cartella Windows Installer.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
-  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Errore: la destinazione deve essere un percorso completo. Ottenuto: {0}</value></data>
-  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Errore: la destinazione {0}è una cartella di sistema Windows. Scegli un percorso esterno a %SystemRoot%, %ProgramFiles% e %ProgramData%.</value></data>
+  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Errore: la destinazione deve essere un percorso completo.&#10;Ottenuto: {0}</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Errore: la destinazione {0}è una cartella di sistema Windows.&#10;Scegli un percorso esterno a %SystemRoot%, %ProgramFiles% e %ProgramData%.</value></data>
   <!-- 0 = mode, 1 = destination -->
   <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve"><value>Modalità {0} interrotta: la destinazione {1} è all'interno di C:\Windows\Installer.</value></data>
   <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>Modalità {0} interrotta: la destinazione {1} non è un percorso completamente qualificato.</value></data>
   <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>Modalità {0} interrotta: la destinazione {1} è una cartella di sistema Windows.</value></data>
-  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Errore: in questo momento qualcosa sta usando Windows Installer, in genere un Windows Update o un programma installato in background. Durante l'esecuzione di Windows Installer lo spostamento e l'eliminazione sono bloccati. Riprova una volta chiuso Windows Installer.</value></data>
-  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Errore: in questo computer è in sospeso una precedente transazione di Windows Installer. Prima di pulire la cache riprendi o ripristina l'installazione (o riavvia Windows).</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Errore: in questo momento qualcosa sta usando Windows Installer, in genere un Windows Update o un programma installato in background.&#10;Durante l'esecuzione di Windows Installer lo spostamento e l'eliminazione sono bloccati.&#10;Riprova una volta chiuso Windows Installer.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Errore: in questo computer è in sospeso una precedente transazione di Windows Installer.&#10;Prima di pulire la cache riprendi o ripristina l'installazione (o riavvia Windows).</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
-  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Errore: un'operazione sul file post-riavvio in coda riguarda la cache del programma di installazione ({0}). Per completare l'operazione prima della pulizia riavvia Windows.</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Errore: un'operazione sul file post-riavvio in coda riguarda la cache del programma di installazione ({0}).&#10;Per completare l'operazione prima della pulizia riavvia Windows.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -664,19 +664,19 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
   <data name="Cli.EventLogMoveSummary" xml:space="preserve"><value>Modalità {0}: {1} di {2} {3} spostato in {4}, {5} trasferito, {6} {7}.</value></data>
-  <data name="Cli.EventLogCancelledPartial" xml:space="preserve"><value>Modalità {0} interrotta da Ctrl+C: {1} di {2} {3} elaborato prima dell'annullamento. Per i dettagli dei file vedi l'output avanzamento.</value></data>
+  <data name="Cli.EventLogCancelledPartial" xml:space="preserve"><value>Modalità {0} interrotta da Ctrl+C: {1} di {2} {3} elaborato prima dell'annullamento.&#10;Per i dettagli dei file vedi l'output avanzamento.</value></data>
   <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
        processed (a cancel during the scan, or before the first delete or
        move), so "each /s, /d or /m run writes one summary entry" holds for
        every run, not only the ones that committed work. -->
-  <data name="Cli.EventLogCancelledNoWork" xml:space="preserve"><value>Modalità {0} interrotta da Ctrl+C prima dell'esecuzione di qualsiasi operazione. Nessuna azione intrapresa.</value></data>
+  <data name="Cli.EventLogCancelledNoWork" xml:space="preserve"><value>Modalità {0} interrotta da Ctrl+C prima dell'esecuzione di qualsiasi operazione.&#10;Nessuna azione intrapresa.</value></data>
   <!-- Stdout when the CLI cannot acquire the single-instance mutex.
        The GUI variant (Strings.Startup_AlreadyRunningBody) is written
        for a user who tried to launch a second window; the CLI variant
        names the contending parties (GUI or another CLI run) and
        points at exit code 75 so an RMM operator parsing stdout
        knows it is transient and safe to retry. -->
-  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Un altro processo InstallerClean mantiene il blocco a istanza singola (GUI o un'altra esecuzione CLI). Uscita 75 (transitoria); più sicuro riprovare più tardi.</value></data>
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Un altro processo InstallerClean mantiene il blocco a istanza singola (GUI o un'altra esecuzione CLI).&#10;Codice uscita 75 (transitoria); è più sicuro riprovare più tardi.</value></data>
   <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
        can't acquire the single-instance mutex, so an RMM consumer of
        the Application channel sees a record of every scheduled-job
@@ -687,11 +687,11 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        scheduled task with a fat-fingered flag leaves an Application-channel
        trace instead of exiting silently. English only, like every Cli
        EventLog string; the stdout message carries the localised text. -->
-  <data name="Cli.EventLogBadArguments" xml:space="preserve"><value>Esecuzione interrotta: argomento '{0}' non riconosciuto o non valido. Nessuna azione intrapresa.</value></data>
+  <data name="Cli.EventLogBadArguments" xml:space="preserve"><value>Esecuzione interrotta: argomento '{0}' non riconosciuto o non valido.&#10;Nessuna azione intrapresa.</value></data>
   <!-- Audit entry written when the CLI is invoked with no argument at all,
        so an argless scheduled task fails visibly (non-zero exit) and leaves
        a record rather than silently succeeding while doing nothing. -->
-  <data name="Cli.EventLogNoArguments" xml:space="preserve"><value>Esecuzione interrotta: nessun argomento fornito. Nessuna azione intrapresa.</value></data>
+  <data name="Cli.EventLogNoArguments" xml:space="preserve"><value>Esecuzione interrotta: nessun argomento fornito.&#10;Nessuna azione intrapresa.</value></data>
   <!-- Audit entry for the LocalisedAccessException and
        LocalisedInvalidOperationException catches: the message has been
        built from a resx template with user-controlled args only, so the
@@ -704,8 +704,8 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        back (path-leak risk under elevation), only the type name and
        crash log path travel to the EventLog. 0 = mode arg, 1 = type
        name, 2 = crash log path. -->
-  <data name="Cli.EventLogHardError" xml:space="preserve"><value>Modalità {0} non riuscita: {1}. Dettagli in {2}.</value></data>
-  <data name="Cli.EventLogHardError.NoLog" xml:space="preserve"><value>Modalità {0} non riuscita: {1}. Impossibile scrivere il registro crash.</value></data>
+  <data name="Cli.EventLogHardError" xml:space="preserve"><value>Modalità {0} non riuscita: {1}.&#10;Dettagli in {2}.</value></data>
+  <data name="Cli.EventLogHardError.NoLog" xml:space="preserve"><value>Modalità {0} non riuscita: {1}.&#10;Impossibile scrivere il registro crash.</value></data>
   <!-- Stdout warning printed once at the end of a CLI run if any
        Event Log write failed (Group Policy or service unavailable).
        Tells an RMM consumer expecting an Application entry that the
@@ -738,7 +738,7 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       Sposta nella posizione predefinita impostata</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PERCORSO  Sposta nel percorso specificato</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli è un vero processo console e blocca il prompt</value></data>
-  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>finché non finisce; reindirizza il suo output come faresti con qualsiasi altro</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>finché non finisce; reindirizza l'output come faresti con qualsiasi altro</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>exe console. La GUI risiede nel file InstallerClean.exe.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Codice sucita:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   successo: ogni file contrassegnato è stato elaborato</value></data>
@@ -746,7 +746,7 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   parziale: alcuni file sono stati elaborati, altri non sono stati elaborati</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transitorio: una condizione temporanea ha bloccato la corsa (vedi messaggio)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 annullato (Ctrl+C)</value></data>
-  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Modifica la lingua dell'interfaccia. Per applicare le modifiche InstallerClean verrà riavviato.</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Modifica la lingua dell'interfaccia.&#10;Per applicare le modifiche InstallerClean verrà riavviato.</value></data>
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Modifica lingua interfaccia</value></data>
   <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Per applicare le modifiche InstallerClean verrà riavviato.</value></data>
 
