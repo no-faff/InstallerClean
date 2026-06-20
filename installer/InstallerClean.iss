@@ -25,6 +25,7 @@
 AppId=InstallerClean
 AppName=InstallerClean
 AppVersion={#AppVersion}
+AppVername=InstallerClean {#AppVersion}
 ; Mutex name matches App.xaml.cs and Cli/Program.cs. Setup pauses with
 ; a "close the running app" prompt when the user upgrades while
 ; InstallerClean.exe or installerclean-cli.exe is holding it.
