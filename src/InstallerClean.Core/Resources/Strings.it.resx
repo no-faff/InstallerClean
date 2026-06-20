@@ -120,7 +120,7 @@
   <data name="Field.Missing" xml:space="preserve"><value>mancante</value></data>
 
   <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
-  <data name="Action.About" xml:space="preserve"><value>_Inf programma</value></data>
+  <data name="Action.About" xml:space="preserve"><value>_Informazioni</value></data>
   <data name="Action.Copy" xml:space="preserve"><value>Copia</value></data>
   <data name="Action.Cut" xml:space="preserve"><value>Taglia</value></data>
   <data name="Action.Paste" xml:space="preserve"><value>Incolla</value></data>
