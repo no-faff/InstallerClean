@@ -6,7 +6,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 ### Added
 
-- InstallerClean's interface is available in Italian: every window, dialog, tooltip, button and screen-reader label is translated, chosen from the main-window language menu or applied automatically on an Italian-language Windows. The command line stays English by design.
+- InstallerClean's interface is available in Italian: every window, dialog, tooltip, button and screen-reader label is translated, chosen from the main-window language menu or applied automatically on an Italian-language Windows. The command line stays English by design. Italian wording reviewed and corrected by bovirus (#32).
 - The display language can be chosen from a globe in the main window: the menu lists the available languages in their own names (English, Italiano) with the current one ticked, and picking another saves it and restarts InstallerClean into it. With none chosen it follows the Windows display language.
 - The Windows installer is offered in Italian: setup shows a language dialog and runs in Italian or English. Italian wording contributed by bovirus (#30).
 
@@ -18,6 +18,8 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The main window's opening explanation now reads in three tiers: the reassurance that the unneeded files are safe to delete leads, prominent; the detail about why they accumulate sits quieter beneath it; and the Delete or Move line follows at body weight. It was one muted block before, so the safety line sat dimmer than the file count under it.
 - The delete confirmation reads "If you'd like backup copies, use Move instead." in place of "If you want ...", a touch more courteous for the same advice.
 - The installer's copyright notice takes its year from the build date rather than a hardcoded 2026, and drops the duplicate word "Copyright" (the file-properties field is already labelled that). Suggested by bovirus (#33).
+- The installer defines the publisher name and the repository URL once each and reuses them across the setup directives, rather than repeating the literals, so they cannot drift apart. Suggested by bovirus (#33).
+- The setup re-detects its language each run to match the Windows UI language (`UsePreviousLanguage=no`) instead of reusing the previous install's pick, so a setup language added in a later version becomes the default for an upgrading user whose Windows matches it; the dialog still lists every language. Suggested by bovirus (#33).
 - The opt-in send-summary window is slightly narrower, so the privacy line under the report wraps cleanly to two lines with the result-log address kept whole, rather than the window stretching wider than its content needs.
 
 ### Fixed
@@ -25,6 +27,8 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - On the language menu, pressing Enter on the language already on screen (the ticked one) now closes the menu, the same as clicking it does; before, the keyboard left the menu open where the mouse dismissed it.
 - The language menu now closes when the globe is clicked a second time, so the globe toggles its own menu instead of leaving it open.
 - The keyboard focus ring on the still-needed row's Details button is no longer clipped on its right and bottom edges. That button sits in the scrolling results area, whose viewport was cropping the part of the ring that extends just outside the button.
+- The window title-bar text no longer clips at large Windows text sizes or with long titles. It was the one chrome element still scaling with the text-size slider while the caption bar stayed a fixed height; the titles now use a fixed size, matching the caption buttons.
+- The splash sizes to its content so its version line no longer clips. The enlarged base text had grown the splash past its fixed height, leaving the bottom-pinned version straddling the card's bottom edge where the transparent window did not paint it.
 
 ## [1.9.0] - 2026-06-15
 
