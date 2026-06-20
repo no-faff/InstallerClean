@@ -29,7 +29,7 @@
     <Program_Change_Info>See release notes.</Program_Change_Info>
     <Program_Specific_Category>System</Program_Specific_Category>
     <Program_Category_Class>System &amp; Desktop Utilities::File &amp; Disk Management</Program_Category_Class>
-    <Program_System_Requirements>Windows 10 or 11 (64-bit). Administrator rights required to access C:\Windows\Installer. The slim build needs the .NET 10 Desktop Runtime; the setup and portable builds are self-contained.</Program_System_Requirements>
+    <Program_System_Requirements>Windows 10 or 11 (64-bit). Administrator rights required to access C:\Windows\Installer.</Program_System_Requirements>
     <File_Info>
       <File_Size_Bytes>95456096</File_Size_Bytes>
       <File_Size_K>93219</File_Size_K>
@@ -57,7 +57,7 @@ Other safety measures include a hard block on cleaning during an active Windows 
 
 A separate console executable (installerclean-cli.exe) ships both in the setup build and as a standalone download, for scheduled tasks and unattended use, with distinct exit codes per outcome for scripting.
 
-The application is open source under the MIT licence. Setup, portable and slim distributions are available. The setup and portable builds are self-contained and require no .NET runtime; the slim build is framework-dependent and needs the .NET 10 Desktop Runtime.
+The application is open source under the MIT licence. Setup and portable distributions are available, both self-contained and requiring no .NET runtime.
 
 Modern replacement for PatchCleaner, which was last updated in March 2016.</Char_Desc_2000>
     </English>
@@ -73,8 +73,7 @@ Modern replacement for PatchCleaner, which was last updated in March 2016.</Char
     <Download_URLs>
       <Primary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.9.0/InstallerClean-setup.exe</Primary_Download_URL>
       <Secondary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.9.0/InstallerClean-portable.exe</Secondary_Download_URL>
-      <Additional_Download_URL_1>https://github.com/no-faff/InstallerClean/releases/download/v1.9.0/InstallerClean-slim.exe</Additional_Download_URL_1>
-      <Additional_Download_URL_2>https://github.com/no-faff/InstallerClean/releases/download/v1.9.0/installerclean-cli.exe</Additional_Download_URL_2>
+      <Additional_Download_URL_1>https://github.com/no-faff/InstallerClean/releases/download/v1.9.0/installerclean-cli.exe</Additional_Download_URL_1>
     </Download_URLs>
   </Web_Info>
 
