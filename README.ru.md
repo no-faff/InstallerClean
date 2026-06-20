@@ -279,6 +279,12 @@ InstallerClean создан так, чтобы им можно было полн
 
 Приложение автоматически выполняет сканирование при запуске. Просмотрите результаты и нажмите **Удалить** или **Переместить**.
 
+Или установите через [winget](https://learn.microsoft.com/windows/package-manager/winget/):
+
+```
+winget install NoFaff.InstallerClean
+```
+
 Или установите через [Scoop](https://scoop.sh):
 
 ```

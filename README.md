@@ -275,6 +275,12 @@ Download from the [releases page](../../releases/latest), then run. It's unsigne
 
 The app scans automatically on startup. Review the results, then click **Delete** or **Move**.
 
+Or install via [winget](https://learn.microsoft.com/windows/package-manager/winget/):
+
+```
+winget install NoFaff.InstallerClean
+```
+
 Or install via [Scoop](https://scoop.sh):
 
 ```

@@ -279,6 +279,12 @@ Téléchargez depuis la [page des versions](../../releases/latest), puis lancez.
 
 L'application analyse automatiquement au démarrage. Examinez les résultats, puis cliquez sur **Supprimer** ou **Déplacer**.
 
+Ou installez via [winget](https://learn.microsoft.com/windows/package-manager/winget/) :
+
+```
+winget install NoFaff.InstallerClean
+```
+
 Ou installez via [Scoop](https://scoop.sh) :
 
 ```

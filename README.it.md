@@ -279,6 +279,12 @@ Scaricala dalla [pagina delle release](../../releases/latest), poi eseguila. Non
 
 L'app esegue la scansione automaticamente all'avvio. Esamina i risultati, poi clicca su **Elimina** o **Sposta**.
 
+Oppure installala tramite [winget](https://learn.microsoft.com/windows/package-manager/winget/):
+
+```
+winget install NoFaff.InstallerClean
+```
+
 Oppure installala tramite [Scoop](https://scoop.sh):
 
 ```

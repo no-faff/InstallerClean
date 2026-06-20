@@ -279,6 +279,12 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 
 应用启动时会自动扫描。查看结果，然后点击**删除**或**移动**。
 
+或者通过 [winget](https://learn.microsoft.com/windows/package-manager/winget/) 安装：
+
+```
+winget install NoFaff.InstallerClean
+```
+
 或者通过 [Scoop](https://scoop.sh) 安装：
 
 ```

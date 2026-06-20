@@ -279,6 +279,12 @@ Baixe na [página de versões](../../releases/latest) e execute. Ele não é ass
 
 O aplicativo analisa automaticamente ao iniciar. Veja os resultados e clique em **Excluir** ou **Mover**.
 
+Ou instale pelo [winget](https://learn.microsoft.com/windows/package-manager/winget/):
+
+```
+winget install NoFaff.InstallerClean
+```
+
 Ou instale pelo [Scoop](https://scoop.sh):
 
 ```
