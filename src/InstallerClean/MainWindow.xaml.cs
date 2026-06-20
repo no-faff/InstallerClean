@@ -429,21 +429,24 @@ public partial class MainWindow : Window
         ("it", "Italiano"),
     };
 
-    // When the globe's menu is open, a mouse-down outside it dismisses it
-    // before the globe's Click (a mouse-up) fires, so by the time a re-click
-    // reaches LanguageButton_Click the menu has already closed and a naive
-    // handler would reopen it. Recording when it last closed lets a click
-    // within this window be read as the toggle-off rather than a reopen, so
-    // clicking the globe again closes the menu. The window only needs to span
-    // one dismiss-then-click, and is short enough not to swallow a deliberate
-    // reopen after an Escape or an outside click.
-    private DateTime _languageMenuClosedAt = DateTime.MinValue;
-    private static readonly TimeSpan LanguageMenuToggleWindow = TimeSpan.FromMilliseconds(250);
+    // Tracks whether the globe's menu is open, so a second click on the globe
+    // closes it instead of reopening it. A ContextMenu auto-dismisses on the
+    // mouse-down of an outside click but raises Closed on a later dispatcher
+    // pass, so at the globe's Click (the mouse-up of that same gesture) this
+    // flag is still set and the click is read as the toggle-off; a deliberate
+    // later click finds it already cleared, Closed having run long before the
+    // next human click. (A close-time timestamp does the opposite and fails:
+    // Closed has not fired yet at the Click, so the menu reopens in a flicker.)
+    private bool _languageMenuOpen;
 
     private void LanguageButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button button) return;
-        if (DateTime.UtcNow - _languageMenuClosedAt < LanguageMenuToggleWindow) return;
+        if (_languageMenuOpen)
+        {
+            _languageMenuOpen = false;
+            return;
+        }
 
         var active = SupportedLanguages.Active(Localisation.UiCulture);
         var menu = new ContextMenu
@@ -451,7 +454,9 @@ public partial class MainWindow : Window
             PlacementTarget = button,
             Placement = PlacementMode.Top,
         };
-        menu.Closed += (_, _) => _languageMenuClosedAt = DateTime.UtcNow;
+        menu.Closed += (_, _) => _languageMenuOpen = false;
+
+        MenuItem? activeItem = null;
         foreach (var (culture, endonym) in LanguageChoices)
         {
             var isActive = string.Equals(culture, active, StringComparison.OrdinalIgnoreCase);
@@ -482,8 +487,23 @@ public partial class MainWindow : Window
             // consistent. For a real change the relaunch tears the menu down
             // anyway, so this is harmless there.
             item.Click += (_, _) => menu.IsOpen = false;
+            if (isActive) activeItem = item;
             menu.Items.Add(item);
         }
+
+        // A ContextMenu opened via IsOpen puts keyboard focus nowhere, so the
+        // first Enter falls through and does nothing until an arrow key moves
+        // focus onto an item. Focusing the displayed language (the ticked item)
+        // once the menu is up makes the first Enter act on it immediately, and
+        // mirrors a mouse open showing the current choice highlighted. Deferred
+        // to a later dispatcher pass because the item is not yet focusable from
+        // inside the Opened handler itself.
+        menu.Opened += (_, _) =>
+        {
+            _languageMenuOpen = true;
+            button.Dispatcher.BeginInvoke(DispatcherPriority.Input,
+                new Action(() => activeItem?.Focus()));
+        };
         menu.IsOpen = true;
     }
 
