@@ -2,7 +2,7 @@
 
 Every change to InstallerClean, logged in full (not just the user-facing highlights). Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
-## [1.9.1] - Unreleased
+## [1.9.1] - 2026-06-20
 
 ### Added
 
