@@ -20,6 +20,12 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The installer's copyright notice takes its year from the build date rather than a hardcoded 2026, and drops the duplicate word "Copyright" (the file-properties field is already labelled that). Suggested by bovirus (#33).
 - The opt-in send-summary window is slightly narrower, so the privacy line under the report wraps cleanly to two lines with the result-log address kept whole, rather than the window stretching wider than its content needs.
 
+### Fixed
+
+- On the language menu, pressing Enter on the language already on screen (the ticked one) now closes the menu, the same as clicking it does; before, the keyboard left the menu open where the mouse dismissed it.
+- The language menu now closes when the globe is clicked a second time, so the globe toggles its own menu instead of leaving it open.
+- The keyboard focus ring on the still-needed row's Details button is no longer clipped on its right and bottom edges. That button sits in the scrolling results area, whose viewport was cropping the part of the ring that extends just outside the button.
+
 ## [1.9.0] - 2026-06-15
 
 ### Added

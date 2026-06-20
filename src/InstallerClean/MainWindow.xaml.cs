@@ -429,15 +429,29 @@ public partial class MainWindow : Window
         ("it", "Italiano"),
     };
 
+    // When the globe's menu is open, a mouse-down outside it dismisses it
+    // before the globe's Click (a mouse-up) fires, so by the time a re-click
+    // reaches LanguageButton_Click the menu has already closed and a naive
+    // handler would reopen it. Recording when it last closed lets a click
+    // within this window be read as the toggle-off rather than a reopen, so
+    // clicking the globe again closes the menu. The window only needs to span
+    // one dismiss-then-click, and is short enough not to swallow a deliberate
+    // reopen after an Escape or an outside click.
+    private DateTime _languageMenuClosedAt = DateTime.MinValue;
+    private static readonly TimeSpan LanguageMenuToggleWindow = TimeSpan.FromMilliseconds(250);
+
     private void LanguageButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button button) return;
+        if (DateTime.UtcNow - _languageMenuClosedAt < LanguageMenuToggleWindow) return;
+
         var active = SupportedLanguages.Active(Localisation.UiCulture);
         var menu = new ContextMenu
         {
             PlacementTarget = button,
             Placement = PlacementMode.Top,
         };
+        menu.Closed += (_, _) => _languageMenuClosedAt = DateTime.UtcNow;
         foreach (var (culture, endonym) in LanguageChoices)
         {
             var isActive = string.Equals(culture, active, StringComparison.OrdinalIgnoreCase);
@@ -455,12 +469,20 @@ public partial class MainWindow : Window
                 Text = endonym,
                 VerticalAlignment = VerticalAlignment.Center,
             });
-            menu.Items.Add(new MenuItem
+            var item = new MenuItem
             {
                 Header = header,
                 Command = _vm.Chrome.SetLanguageCommand,
                 CommandParameter = culture,
-            });
+            };
+            // Close on invoke regardless of what the command does. Picking the
+            // displayed language is a no-op command (no relaunch), and a
+            // keyboard Enter on that ticked item does not dismiss the menu on
+            // its own the way a mouse click does; closing here makes both routes
+            // consistent. For a real change the relaunch tears the menu down
+            // anyway, so this is harmless there.
+            item.Click += (_, _) => menu.IsOpen = false;
+            menu.Items.Add(item);
         }
         menu.IsOpen = true;
     }

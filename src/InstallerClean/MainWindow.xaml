@@ -99,11 +99,25 @@
                  work-area MaxHeight binds at large text scales, this is
                  the block that scrolls; the separator, the action zone and
                  the bottom nav keep their full height below it. -->
+            <!-- Negative right margin extends this region's viewport 4px past
+                 the content's right edge; the inner StackPanel's matching
+                 positive right margin holds the content back at that edge, and
+                 its bottom margin grows the content the same 4px below its last
+                 element. A ScrollContentPresenter owns an adorner layer clipped
+                 to its viewport, so a focus visual (drawn 2px outside its
+                 control by the *FocusVisual styles' Margin=-2) on a control
+                 flush against the viewport edge is clipped on that side. The
+                 still-needed row's "Details" pill sits flush right and, with no
+                 missing-from-disk or stale-MSI banner below it, flush bottom, so
+                 its ring was cut on both; the 4px of viewport headroom clears it
+                 while the pill stays aligned with the orphaned row's "Details"
+                 and the action buttons at the content edge. -->
             <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
                           Style="{StaticResource BodyScrollRegion}"
+                          Margin="0,0,-4,0"
                           AutomationProperties.Name="{loc:Translate Automation.Scroll.ScanResults}">
-            <StackPanel>
+            <StackPanel Margin="0,0,4,4">
 
                 <!-- Explanatory text in three tiers: the lead reassurance reads
                      prominent (heading tier), the "why" detail recedes (muted),
