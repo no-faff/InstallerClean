@@ -269,11 +269,10 @@ Entre os 82 relatórios que as pessoas tiveram a gentileza de enviar (obrigado �
 
 ## Download
 
-Quatro builds, escolha um:
+Três builds, escolha um:
 
 - **Setup** (`InstallerClean-setup.exe`): um instalador comum do Windows com o runtime do .NET 10 embutido. Adiciona um atalho no menu Iniciar e desinstala sem deixar resíduos. Fica guardadinho nos Programas, fácil de achar daqui a seis meses.
 - **Portable** (`InstallerClean-portable.exe`): um único exe autônomo com o runtime embutido. Sem instalação, sem desinstalador. Execute, use, apague. Execute de novo quando quiser.
-- **Slim** (`InstallerClean-slim.exe`): o menor download. Exige que o [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) já esteja instalado (o que você tem se estiver com um Visual Studio atualizado).
 - **CLI** (`installerclean-cli.exe`): a versão de linha de comando sozinha, um único exe autônomo. Sem instalação, sem deixar nada na máquina depois. Largue num cliente, rode uma análise ou uma limpeza, apague. Feito para scripting, tarefas agendadas e implantação em massa, quando você quer as operações sem um aplicativo de desktop no cliente. Veja [Linha de comando](#linha-de-comando) para os argumentos e códigos de saída.
 
 Baixe na [página de versões](../../releases/latest) e execute. Ele não é assinado, então o Windows mostra um aviso de "editor desconhecido"; as [Perguntas frequentes](#unknown-publisher) explicam o que você vai ver e por que é seguro.
@@ -347,14 +346,14 @@ Observação: a saída da própria CLI está em inglês. As descrições acima c
 
 O `InstallerClean.exe` é a interface gráfica WPF; ela não responde a argumentos de linha de comando. O `installerclean-cli.exe` é um executável de console separado, entregue no mesmo diretório de instalação, que expõe as mesmas operações de análise / movimentação / exclusão para o PowerShell, o cmd e tarefas agendadas. Como é um processo de console de verdade, ele bloqueia o prompt até terminar; redirecione ou canalize a saída dele como faria com qualquer outro exe de console.
 
-Os downloads portable e slim contêm apenas o exe da interface gráfica. Se você quer a linha de comando sem a interface, baixe o `installerclean-cli.exe` na [página de versões](../../releases/latest) e execute-o diretamente. O setup também o instala ao lado da interface gráfica.
+O download portable contém apenas o exe da interface gráfica. Se você quer a linha de comando sem a interface, baixe o `installerclean-cli.exe` na [página de versões](../../releases/latest) e execute-o diretamente. O setup também o instala ao lado da interface gráfica.
 
 ## Requisitos
 
 - Windows 10 (versão 1607 / build 14393 ou posterior, a mais antiga compatível com o runtime do .NET 10) ou Windows 11
 - Privilégios de administrador (`C:\Windows\Installer` é restrito a administradores)
 
-Veja [Download](#download) para as opções setup, portable, slim e CLI.
+Veja [Download](#download) para as opções setup, portable e CLI.
 
 ## Compilar a partir do código-fonte
 

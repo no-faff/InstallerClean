@@ -269,11 +269,10 @@ Sur les 82 rapports que des utilisateurs nous ont gentiment envoyés (merci 🙏
 
 ## Téléchargement
 
-Quatre variantes, choisissez-en une :
+Trois variantes, choisissez-en une :
 
 - **Setup** (`InstallerClean-setup.exe`) : un programme d'installation Windows classique, avec le runtime .NET 10 intégré. Ajoute une entrée au menu Démarrer et se désinstalle proprement. Bien rangé dans les Programmes, facile à retrouver dans six mois.
 - **Portable** (`InstallerClean-portable.exe`) : un exe unique et autonome, runtime intégré. Pas d'installation, pas de désinstallation. Lancez-le, utilisez-le, supprimez-le. Relancez-le quand vous voulez.
-- **Slim** (`InstallerClean-slim.exe`) : le téléchargement le plus léger. Nécessite que le [runtime .NET 10 Desktop](https://dotnet.microsoft.com/download/dotnet/10.0) soit déjà installé (ce qui est le cas si vous avez un Visual Studio à jour).
 - **CLI** (`installerclean-cli.exe`) : la version en ligne de commande seule, un exe unique et autonome. Pas d'installation, rien laissé sur la machine ensuite. Déposez-le sur un poste client, lancez une analyse ou un nettoyage, supprimez-le. Conçu pour le scripting, les tâches planifiées et le déploiement de masse, quand vous voulez les opérations sans application de bureau sur le client. Voir [Ligne de commande](#ligne-de-commande) pour les arguments et les codes de sortie.
 
 Téléchargez depuis la [page des versions](../../releases/latest), puis lancez. Il n'est pas signé, donc Windows affiche un avertissement « Éditeur inconnu » ; la [FAQ](#unknown-publisher) explique ce que vous verrez et pourquoi c'est sans danger.
@@ -347,14 +346,14 @@ Les trois nécessitent une invite de commandes élevée (administrateur). Si une
 
 `InstallerClean.exe` est l'interface graphique WPF ; elle ne répond pas aux arguments de ligne de commande. `installerclean-cli.exe` est un exécutable console distinct, livré dans le même répertoire d'installation, qui expose les mêmes opérations d'analyse, de déplacement et de suppression à PowerShell, cmd et aux tâches planifiées. Comme c'est un véritable processus console, il bloque l'invite jusqu'à sa fin ; vous pouvez rediriger sa sortie ou la passer dans un tube, comme pour n'importe quel autre exe console.
 
-Les téléchargements portable et slim ne contiennent que l'exe de l'interface graphique. Si vous voulez la ligne de commande sans l'interface, téléchargez `installerclean-cli.exe` depuis la [page des versions](../../releases/latest) et lancez-le directement. Le setup l'installe lui aussi à côté de l'interface graphique.
+Le téléchargement portable ne contient que l'exe de l'interface graphique. Si vous voulez la ligne de commande sans l'interface, téléchargez `installerclean-cli.exe` depuis la [page des versions](../../releases/latest) et lancez-le directement. Le setup l'installe lui aussi à côté de l'interface graphique.
 
 ## Prérequis
 
 - Windows 10 (version 1607 / build 14393 ou ultérieure, la plus ancienne prise en charge par le runtime .NET 10) ou Windows 11
 - Privilèges d'administrateur (`C:\Windows\Installer` est réservé aux administrateurs)
 
-Voir [Téléchargement](#téléchargement) pour les options setup, portable, slim et CLI.
+Voir [Téléchargement](#téléchargement) pour les options setup, portable et CLI.
 
 ## Compilation depuis les sources
 

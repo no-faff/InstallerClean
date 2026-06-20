@@ -265,11 +265,10 @@ Across the 82 reports people have sent in (thanks 🙏) since v1.8.0 added the o
 
 ## Download
 
-Four builds, choose one:
+Three builds, choose one:
 
 - **Setup** (`InstallerClean-setup.exe`): a regular Windows installer with the .NET 10 runtime bundled. Adds a Start Menu entry and uninstalls cleanly. Tucked into Programs so it's easy to find six months from now.
 - **Portable** (`InstallerClean-portable.exe`): a single self-contained exe with the runtime bundled. No install, no uninstaller. Run it, use it, delete it. Run it again whenever.
-- **Slim** (`InstallerClean-slim.exe`): the smallest download. Requires the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) to be installed already (which you have if you have an up-to-date Visual Studio).
 - **CLI** (`installerclean-cli.exe`): the command-line version on its own, a single self-contained exe. No install, nothing left on the machine afterwards. Drop it on a client, run a scan or a clean, delete it. Built for scripting, scheduled tasks and mass deployment, where you want the operations without a desktop app on the client. See [Command line](#command-line) for the arguments and exit codes.
 
 Download from the [releases page](../../releases/latest), then run. It's unsigned, so Windows shows an "unknown publisher" warning; the [FAQ](#unknown-publisher) explains what you'll see and why it's safe.
@@ -341,14 +340,14 @@ All three require an elevated (administrator) command prompt. If Group Policy bl
 
 `InstallerClean.exe` is the WPF GUI; it does not respond to command-line arguments. `installerclean-cli.exe` is a separate console executable that ships in the same install directory and exposes the same scan / move / delete operations to PowerShell, cmd and scheduled tasks. Because it is a real console process, it blocks the prompt until it finishes; redirect or pipe its output as you would any other console exe.
 
-The portable and slim downloads contain only the GUI exe. If you want the command line without the GUI, download `installerclean-cli.exe` from the [releases page](../../releases/latest) and run it directly. The setup installs it alongside the GUI as well.
+The portable download contains only the GUI exe. If you want the command line without the GUI, download `installerclean-cli.exe` from the [releases page](../../releases/latest) and run it directly. The setup installs it alongside the GUI as well.
 
 ## Requirements
 
 - Windows 10 (version 1607 / build 14393 or later, the oldest the .NET 10 runtime supports) or Windows 11
 - Administrator privileges (`C:\Windows\Installer` is admin-only)
 
-See [Download](#download) for setup, portable, slim and CLI build options.
+See [Download](#download) for setup, portable and CLI build options.
 
 ## Building from source
 

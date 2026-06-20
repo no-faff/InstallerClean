@@ -269,11 +269,10 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 
 ## 下载
 
-四种构建，任选其一：
+三种构建，任选其一：
 
 - **Setup**（`InstallerClean-setup.exe`）：标准的 Windows 安装程序，内置 .NET 10 运行时。会在开始菜单里添加条目，也能干净地卸载。安安稳稳待在“程序”列表里，半年后也好找。
 - **Portable**（`InstallerClean-portable.exe`）：单个自包含的 exe，运行时已打包在内。无需安装，没有卸载程序。运行、使用、删掉。想用了随时再运行。
-- **Slim**（`InstallerClean-slim.exe`）：体积最小的下载。需要系统中已经装有 [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)（如果您的 Visual Studio 是最新的，那就已经有了）。
 - **CLI**（`installerclean-cli.exe`）：单独的命令行版本，一个自包含的 exe。无需安装，用完不在机器上留下任何东西。把它丢到客户端机器上，跑一次扫描或清理，再删掉。专为脚本、计划任务和批量部署而生，适合那种想执行操作、又不想在客户端装桌面应用的场景。参数和退出码见[命令行](#命令行)。
 
 从[发布页面](../../releases/latest)下载，然后运行。它没有签名，所以 Windows 会显示一条“未知发布者”的警告；[常见问题](#unknown-publisher)解释了您会看到什么，以及为什么它是安全的。
@@ -347,14 +346,14 @@ CLI 的所有输出，包括错误和诊断信息，都写到 stdout；没有单
 
 `InstallerClean.exe` 是 WPF 图形界面，它不响应命令行参数。`installerclean-cli.exe` 是另一个独立的控制台程序，与图形界面装在同一个目录下，把相同的扫描 / 移动 / 删除操作开放给 PowerShell、cmd 和计划任务。因为它是一个真正的控制台进程，会阻塞命令行直到运行结束；可以像对待任何其他控制台 exe 一样，对它的输出做重定向或管道。
 
-portable 和 slim 这两个下载只包含图形界面 exe。如果您想要不带图形界面的命令行，请从[发布页面](../../releases/latest)下载 `installerclean-cli.exe` 直接运行。setup 也会把它和图形界面一起装上。
+portable 下载只包含图形界面 exe。如果您想要不带图形界面的命令行，请从[发布页面](../../releases/latest)下载 `installerclean-cli.exe` 直接运行。setup 也会把它和图形界面一起装上。
 
 ## 系统要求
 
 - Windows 10（版本 1607 / 内部版本 14393 或更高，这是 .NET 10 运行时支持的最低版本）或 Windows 11
 - 管理员权限（`C:\Windows\Installer` 仅限管理员访问）
 
-setup、portable、slim 和 CLI 各种构建的选项见[下载](#下载)。
+setup、portable 和 CLI 各种构建的选项见[下载](#下载)。
 
 ## 从源码构建
 
