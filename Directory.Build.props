@@ -5,7 +5,7 @@
          and the release script reads it from here to pass /DAppVersion
          to the Inno Setup compiler, so the installer never drifts from
          the assembly. -->
-    <Version>1.9.1</Version>
+    <Version>1.9.2</Version>
     <Deterministic>true</Deterministic>
     <!-- Declaring the RID makes every restore compute the same graph,
          so packages.lock.json holds one shape regardless of which

@@ -2,11 +2,13 @@
 
 Every change to InstallerClean, logged in full (not just the user-facing highlights). Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.9.2] - Unreleased
 
 ### Changed
 
+- The installer window title and the Add/Remove Programs entry now read "InstallerClean 1.9.2" rather than "InstallerClean version 1.9.2" (and, in Italian, no longer "InstallerClean versione 1.9.2"): the word between the name and the version is dropped by overriding the `NameAndVersion` message in both languages, which matches the new default in Inno Setup 7. Suggested by bovirus (#36).
 - The installer's file sources and output directory reference the `..\publish` folder through a single `#define` rather than repeating the literal path, so they cannot drift apart. Suggested by bovirus (#29).
+- The installer's language, message and custom-message definitions move into their own `InstallerClean_Languages.iss` file, pulled in with `#include`, so the main script stays focused on install logic and each language added later touches only that one file. Suggested by bovirus (#36).
 
 ## [1.9.1] - 2026-06-20
 
