@@ -105,6 +105,15 @@ italian.FinishedHeadingLabel=Installazione completata
 italian.FinishedLabel=InstallerClean è stato installato nel computer.
 italian.ClickFinish=Per chiudere l'installazione seleziona 'Fine'.
 
+; AppVerName is left unset (it is deprecated), so Inno composes the wizard
+; title bar and the Add/Remove Programs name from the NameAndVersion message:
+; Default.isl is "%1 version %2", Italian.isl "%1 versione %2". Inno Setup 7
+; drops that middle word as its new default; overriding NameAndVersion in both
+; languages matches that, so the title reads "InstallerClean 1.9.1" rather than
+; "InstallerClean version/versione 1.9.1".
+english.NameAndVersion=%1 %2
+italian.NameAndVersion=%1 %2
+
 [CustomMessages]
 english.UninstallApp=Uninstall InstallerClean
 english.LaunchApp=Launch InstallerClean
