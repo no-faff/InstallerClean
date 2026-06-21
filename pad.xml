@@ -14,9 +14,9 @@
 
   <Program_Info>
     <Program_Name>InstallerClean</Program_Name>
-    <Program_Version>1.9.1</Program_Version>
+    <Program_Version>1.9.2</Program_Version>
     <Program_Release_Month>06</Program_Release_Month>
-    <Program_Release_Day>20</Program_Release_Day>
+    <Program_Release_Day>21</Program_Release_Day>
     <Program_Release_Year>2026</Program_Release_Year>
     <Program_Cost_Dollars>0</Program_Cost_Dollars>
     <Program_Cost_Other_Code>GBP</Program_Cost_Other_Code>
@@ -31,9 +31,9 @@
     <Program_Category_Class>System &amp; Desktop Utilities::File &amp; Disk Management</Program_Category_Class>
     <Program_System_Requirements>Windows 10 or 11 (64-bit). Administrator rights required to access C:\Windows\Installer.</Program_System_Requirements>
     <File_Info>
-      <File_Size_Bytes>95501505</File_Size_Bytes>
-      <File_Size_K>93264</File_Size_K>
-      <File_Size_MB>91.08</File_Size_MB>
+      <File_Size_Bytes>95498806</File_Size_Bytes>
+      <File_Size_K>93261</File_Size_K>
+      <File_Size_MB>91.07</File_Size_MB>
     </File_Info>
     <Expire_Info>
       <Has_Expire_Info>N</Has_Expire_Info>
@@ -71,9 +71,9 @@ Modern replacement for PatchCleaner, which was last updated in March 2016.</Char
       <Application_XML_File_URL>https://raw.githubusercontent.com/no-faff/InstallerClean/main/pad.xml</Application_XML_File_URL>
     </Application_URLs>
     <Download_URLs>
-      <Primary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.9.1/InstallerClean-setup.exe</Primary_Download_URL>
-      <Secondary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.9.1/InstallerClean-portable.exe</Secondary_Download_URL>
-      <Additional_Download_URL_1>https://github.com/no-faff/InstallerClean/releases/download/v1.9.1/installerclean-cli.exe</Additional_Download_URL_1>
+      <Primary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.9.2/InstallerClean-setup.exe</Primary_Download_URL>
+      <Secondary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v1.9.2/InstallerClean-portable.exe</Secondary_Download_URL>
+      <Additional_Download_URL_1>https://github.com/no-faff/InstallerClean/releases/download/v1.9.2/installerclean-cli.exe</Additional_Download_URL_1>
     </Download_URLs>
   </Web_Info>
 
