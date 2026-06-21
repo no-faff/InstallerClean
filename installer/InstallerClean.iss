@@ -22,6 +22,9 @@
 ; defined once here so they cannot drift apart.
 #define MyCompany "No Faff"
 #define MyRepoUrl "https://github.com/no-faff/InstallerClean"
+; The published binaries and the setup output all sit under ..\publish;
+; defined once here so the [Files] sources and OutputDir cannot drift apart.
+#define PublishDir "..\publish"
 AppId=InstallerClean
 AppName=InstallerClean
 AppVersion={#AppVersion}
@@ -48,7 +51,7 @@ VersionInfoDescription=InstallerClean Setup
 DefaultDirName={autopf}\InstallerClean
 DefaultGroupName=InstallerClean
 UninstallDisplayIcon={app}\InstallerClean.exe
-OutputDir=..\publish
+OutputDir={#PublishDir}
 OutputBaseFilename=InstallerClean-setup
 ; Compression=bzip; SolidCompression=no. Every other Inno
 ; compression combination tested on this project has tripped a
@@ -109,11 +112,11 @@ italian.UninstallApp=Disinstalla InstallerClean
 italian.LaunchApp=Esegui InstallerClean
 
 [Files]
-Source: "..\publish\self-contained\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\self-contained\InstallerClean.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; CLI is a .NET console exe published from src/InstallerClean.Cli;
 ; ships alongside the GUI so PowerShell and cmd block on the process
 ; subsystem naturally.
-Source: "..\publish\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#PublishDir}\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; pad.xml's Distribution_Permissions requires the MIT licence text to
 ; travel alongside any redistributed binary, so Setup installs it too.
 ; DestName gives the installed copy a .txt extension so a double-click opens it

@@ -2,6 +2,12 @@
 
 Every change to InstallerClean, logged in full (not just the user-facing highlights). Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- The installer's file sources and output directory reference the `..\publish` folder through a single `#define` rather than repeating the literal path, so they cannot drift apart. Suggested by bovirus (#29).
+
 ## [1.9.1] - 2026-06-20
 
 ### Added
