@@ -29,8 +29,8 @@ italian.ClickFinish=Per chiudere l'installazione seleziona 'Fine'.
 ; title bar and the Add/Remove Programs name from the NameAndVersion message:
 ; Default.isl is "%1 version %2", Italian.isl "%1 versione %2". Inno Setup 7
 ; drops that middle word as its new default; overriding NameAndVersion in both
-; languages matches that, so the title reads "InstallerClean 1.9.1" rather than
-; "InstallerClean version/versione 1.9.1".
+; languages matches that, so the wizard title shows just the name and version
+; ("InstallerClean 1.9.2") with no "version"/"versione" word between them.
 english.NameAndVersion=%1 %2
 italian.NameAndVersion=%1 %2
 
