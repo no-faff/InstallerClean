@@ -7,9 +7,6 @@
     <LangVersion>12</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <!-- AllowUnsafeBlocks lets the LibraryImport source generator emit
-         the pointer-handling stubs it needs. -->
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- R2R is off by .NET 10 default for PublishSingleFile +
          framework-dependent; pinning here makes the absence explicit
          so a future SDK feature-band change to the default cannot

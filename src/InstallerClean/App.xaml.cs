@@ -220,13 +220,10 @@ public partial class App : Application
             splash.CancelRequested += (_, _) => startupCts.Cancel();
 
             var splashProgress = new Progress<ScanProgressUpdate>(splash.OnScanProgress);
-            // ScanStepGate pauses the scan at each milestone for screenshots
-            // when IC_SCAN_STEP=1; a pass-through otherwise (see ScanStepConsole).
-            var scanProgress = ScanStepGate.Wrap(splashProgress, Dispatcher);
             var cancelled = false;
             try
             {
-                var scanTask = viewModel.Scan.ScanWithProgressAsync(scanProgress, startupCts.Token);
+                var scanTask = viewModel.Scan.ScanWithProgressAsync(splashProgress, startupCts.Token);
                 await Task.WhenAll(scanTask, Task.Delay(800, startupCts.Token));
             }
             catch (OperationCanceledException)
