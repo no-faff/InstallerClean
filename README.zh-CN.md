@@ -2,8 +2,6 @@
   <a href="README.md">English</a> · <strong>简体中文</strong> · <a href="README.ru.md">Русский</a> · <a href="README.es.md">Español</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.ja.md">日本語</a> · <a href="README.ko.md">한국어</a> · <a href="README.fr.md">Français</a> · <a href="README.de.md">Deutsch</a> · <a href="README.it.md">Italiano</a>
 </p>
 
-<p align="center"><em>本页面为译文，应用程序的界面目前仅提供英文。</em></p>
-
 <p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
@@ -34,6 +32,7 @@
 
 ## 目录
 
+- [Can you help translate the GUI?](#can-you-help-translate-the-gui)
 - [没有人告诉您的文件夹](#没有人告诉您的文件夹)
 - [寻求帮助](#寻求帮助)
 - [它做什么](#它做什么)
@@ -55,6 +54,20 @@
 - [许可证](#许可证)
 
 ---
+
+## Can you help translate the GUI?
+
+You're reading a machine-translated version of this README (I put a lot of work into it), but InstallerClean's interface itself, every button, message and label, is still only in English or Italian.
+
+The interface has also been machine-translated into Simplified Chinese (again, I've gone to great lengths to get it as good as I can), but I'm not going to ship a machine translation unchecked; it needs someone who speaks both Chinese and English to go through the translated file, keep what's already correct and put right what isn't.
+
+If you can read this English comfortably and you've got a good ear for what reads well in Chinese, you're exactly the person I'm hoping to reach and I'd be really grateful if you can help - so, I'm sure, will lots of other Chinese speakers.
+
+You can see the whole thing [here](docs/translations/zh-Hans.md), the English beside the translation, as a plain table. And the complete resx file is [here](src/InstallerClean.Core/Resources/Strings.zh-Hans.resx).
+
+You don't have to take it all on: if a term reads wrong, open an [issue](../../issues/new?template=translation_review.md) saying what you'd put instead, as few or as many as you like. A pull request's just as welcome, whichever is easier for you.
+
+Do that and InstallerClean will speak Simplified Chinese too, alongside English and Italian, and you'd be credited as the person who got it there.
 
 ## 没有人告诉您的文件夹
 
