@@ -372,7 +372,7 @@ dotnet test src/InstallerClean.Tests/
 
 ## Can you help translate the GUI?
 
-InstallerClean's interface, every button, message and label, is in English or Italian. I've also had it machine-translated into other languages and gone to great lengths to get each as good as I can, but I'm not going to ship a machine translation unchecked: each one needs someone who really knows the language to go through the translated file, keep what's already right and put right what isn't.
+InstallerClean's interface, every button, message and label, is in English or Italian. I've also had it machine-translated into other languages and gone to great lengths to get each as good as I can, but I'm not going to ship a machine translation unchecked: each one needs someone who really knows the language to go through the translated file, keep what's already correct and put right what isn't.
 
 If you've got a good ear for what reads well in one of these languages, you're exactly the person I'm hoping to reach, and so are plenty of other speakers of it. Each one is here as a plain table, the English beside the translation, with the complete resx file alongside:
 
