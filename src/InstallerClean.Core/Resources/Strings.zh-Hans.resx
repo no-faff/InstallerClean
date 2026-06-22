@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    InstallerClean string resources. Source-of-truth language: en-GB.
+
+    Naming convention: every key starts with a dot-delimited category
+    prefix and is generated as an underscore-delimited C# property name
+    (Window.Main.Title becomes Strings.Window_Main_Title). The visible
+    categories are:
+      Action.*               button labels and verbs
+      Automation.*           AutomationProperties.Name / HelpText values
+      Body.*                 multi-sentence body copy
+      BrowserLaunch.*        copy for the URL-launch failure dialog
+      Cli.*                  console output for the CLI launcher
+      Completion.*           completion overlay copy
+      Confirm.*              confirmation dialog body text
+      ConfirmSendResultLog.* result-log Send confirmation modal
+      CrashLog.*             crash.log header copy
+      Display.*              size/duration formatting fragments
+      Error.*                user-facing error messages
+      Field.*                labels for metadata fields
+      FilePicker.*           folder-browser dialog labels
+      Plural.*               singular/plural fragments used by DisplayHelpers
+      Reason.*               Reason column values in the unneeded files list
+      RecycleUnavailable.*   recycle-bin-unavailable choice dialog
+      ResultLog.*            send-summary states (Sending / Sent / Failed)
+      Section.*              heading text inside windows
+      Startup.*              splash + already-running messages
+      Status.*               transient status / progress text
+      Summary.*              status-line counts (registered / orphaned / missing)
+      Tooltip.*              hover tooltips
+      UpdateCheck.*          update-check status / failure detail
+      Version.*              version display string
+      Window.*               window titles and chrome strings
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Window titles -->
+  <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Window.About.Title" xml:space="preserve"><value>关于</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>不应删除的已注册文件</value></data>
+  <data name="Window.Orphaned.Title" xml:space="preserve"><value>不需要的文件，可安全删除</value></data>
+  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>确认移动</value></data>
+  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>确认删除</value></data>
+  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>回收站不可用</value></data>
+
+  <!-- Section headings -->
+  <data name="Section.Registered.Products" xml:space="preserve"><value>产品</value></data>
+  <data name="Section.Registered.Patches" xml:space="preserve"><value>补丁</value></data>
+  <data name="Section.Registered.Details" xml:space="preserve"><value>产品详情</value></data>
+  <data name="Section.Move.Location" xml:space="preserve"><value>移动位置</value></data>
+  <data name="Section.SayThanks" xml:space="preserve"><value>道声谢</value></data>
+
+  <!-- Field labels (used in detail panels) -->
+  <data name="Field.Reason" xml:space="preserve"><value>原因</value></data>
+  <data name="Field.Author" xml:space="preserve"><value>作者</value></data>
+  <data name="Field.Application" xml:space="preserve"><value>应用程序</value></data>
+  <data name="Field.Title" xml:space="preserve"><value>标题</value></data>
+  <data name="Field.Subject" xml:space="preserve"><value>主题</value></data>
+  <data name="Field.Keywords" xml:space="preserve"><value>关键字</value></data>
+  <data name="Field.SigningCertificate" xml:space="preserve"><value>签名证书</value></data>
+  <data name="Field.FileSize" xml:space="preserve"><value>文件大小</value></data>
+  <data name="Field.Comment" xml:space="preserve"><value>备注</value></data>
+  <data name="Field.ProductName" xml:space="preserve"><value>产品名称</value></data>
+  <data name="Field.File" xml:space="preserve"><value>文件</value></data>
+  <data name="Field.Size" xml:space="preserve"><value>大小</value></data>
+  <data name="Field.Patches" xml:space="preserve"><value>补丁</value></data>
+  <!-- Placeholder shown for a registered package whose API ProductName is empty. -->
+  <data name="Field.UnknownProductName" xml:space="preserve"><value>（未知）</value></data>
+  <data name="Field.PatchesOnly" xml:space="preserve"><value>（仅补丁）</value></data>
+  <data name="Field.Missing" xml:space="preserve"><value>缺失</value></data>
+
+  <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
+  <data name="Action.About" xml:space="preserve"><value>关于(_A)</value></data>
+  <data name="Action.Copy" xml:space="preserve"><value>复制</value></data>
+  <data name="Action.Cut" xml:space="preserve"><value>剪切</value></data>
+  <data name="Action.Paste" xml:space="preserve"><value>粘贴</value></data>
+  <data name="Action.SelectAll" xml:space="preserve"><value>全选</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>浏览(_B)…</value></data>
+  <data name="Action.Cancel" xml:space="preserve"><value>取消(_C)</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>检查更新(_U)</value></data>
+  <data name="Action.Close" xml:space="preserve"><value>关闭(_C)</value></data>
+  <data name="Action.Delete" xml:space="preserve"><value>删除(_D)</value></data>
+  <data name="Action.DeletePermanently" xml:space="preserve"><value>永久删除(_D)</value></data>
+  <!-- Alt+D safe here because the Delete button under the overlay is
+       disabled while Completion.IsComplete is true (IsMainContentInteractive
+       binds the body region to false); the mnemonic only resolves to
+       this Done button. IsDefault=True keeps Enter as the primary
+       keyboard shortcut. -->
+  <data name="Action.Done" xml:space="preserve"><value>完成(_D)</value></data>
+  <data name="Action.Details" xml:space="preserve"><value>详情</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>请我喝杯茶(_B)</value></data>
+  <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>在 GitHub 上点个星(_S)</value></data>
+  <data name="Action.MITLicence" xml:space="preserve"><value>MIT 许可证</value></data>
+  <data name="Action.Move" xml:space="preserve"><value>移动(_M)</value></data>
+  <data name="Action.MoveInstead" xml:space="preserve"><value>改为移动(_M)</value></data>
+  <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>文件夹路径（若选择移动而非删除）</value></data>
+  <data name="Action.OpenReleasePage" xml:space="preserve"><value>打开发布页面(_R)</value></data>
+  <data name="Action.Rescan" xml:space="preserve"><value>重新扫描(_R)</value></data>
+  <data name="Action.ScanAgain" xml:space="preserve"><value>再次扫描(_S)</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>发送摘要</value></data>
+  <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>发送(_S)</value></data>
+
+  <!-- Automation names (screen reader / accessibility) -->
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>请我喝杯茶</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>请我喝杯茶（关于窗口）</value></data>
+  <data name="Automation.CancelOperation" xml:space="preserve"><value>取消操作</value></data>
+  <data name="Automation.CancelScan" xml:space="preserve"><value>取消扫描</value></data>
+  <data name="Automation.CancelStartupScan" xml:space="preserve"><value>取消启动扫描</value></data>
+  <data name="Automation.Close" xml:space="preserve"><value>关闭</value></data>
+  <data name="Automation.CloseWindow" xml:space="preserve"><value>关闭窗口</value></data>
+  <data name="Automation.CloseResult" xml:space="preserve"><value>关闭结果并返回主窗口</value></data>
+  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>在 GitHub 上点个星</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>在 GitHub 上点个星（关于窗口）</value></data>
+  <data name="Automation.Minimise" xml:space="preserve"><value>最小化</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>将所有不需要的安装程序文件移动到所选的目标文件夹</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>将所有不需要的安装程序文件送入回收站</value></data>
+  <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
+       They describe the dialog's choice, worded to read correctly
+       straight after "Cancel, button": the window-level alternative is
+       never read, because help text is only spoken for the element with
+       focus and the window itself never has it. -->
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>删除会将不需要的文件送入回收站。取消则关闭且不删除。</value></data>
+  <data name="Automation.ConfirmMove" xml:space="preserve"><value>移动会将不需要的文件放入所选的目标文件夹。取消则让它们留在原处。</value></data>
+  <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>选择如何处理这些不需要的文件：移动到安全的位置、永久删除或取消。</value></data>
+  <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>将不需要的文件移动到您选择的文件夹</value></data>
+  <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>由于此驱动器的回收站不可用，永久删除这些不需要的文件</value></data>
+  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>发送到 nofaff.netlify.app。仅包含计数和标签。发送前您会看到完整的内容。</value></data>
+  <data name="Automation.SayThanks" xml:space="preserve"><value>道声谢</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>发送会将所示摘要提交给 No Faff。取消则不发送任何内容。</value></data>
+  <data name="Automation.CheckForUpdates" xml:space="preserve"><value>检查更新</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>通过 HTTPS 查询 GitHub 发布 API，检查是否有更新版本。</value></data>
+  <!-- Window-level description for the update-available modal, read by a
+       screen reader on open, mirroring the RecycleUnavailable and
+       ConfirmSendResultLog windows. The version numbers are in the body
+       text; this states the choice. -->
+  <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>打开发布页面以下载更新版本，或取消以保留当前版本。</value></data>
+  <data name="Automation.MITLicence" xml:space="preserve"><value>MIT 许可证</value></data>
+  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>在浏览器中打开 github.com 上的许可证文件。</value></data>
+  <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
+       Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
+       DETAILS). Narrator at default verbosity spells short uppercase
+       tokens letter-by-letter; the override gives it a phrase to read
+       while the visible text stays uppercased for SmallCaps. -->
+  <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>移动位置</value></data>
+  <data name="Automation.Section.Products" xml:space="preserve"><value>产品</value></data>
+  <data name="Automation.Section.Patches" xml:space="preserve"><value>补丁</value></data>
+  <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>产品详情</value></data>
+  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>移动目标文件夹</value></data>
+  <data name="Automation.OperationProgress" xml:space="preserve"><value>操作进度</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>重新扫描 C:\Windows\Installer</value></data>
+  <data name="Automation.ScanningProgress" xml:space="preserve"><value>扫描进度</value></data>
+  <data name="Automation.StartupScanProgress" xml:space="preserve"><value>启动扫描进度</value></data>
+  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>详情，不需要的文件</value></data>
+  <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>可供清理。</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>详情，已注册文件</value></data>
+  <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>只读清单。</value></data>
+  <!-- Screen-reader sort state for the detail-window lists, set in
+       UpdateSortIndicators as the sorted column header's accessible
+       name (a focused header's name change is announced, and the name
+       override keeps the ▲/▼ glyph out of speech) and mirrored into the
+       list's ItemStatus as a queryable surface. 0 = the sorted column's
+       name (a Field.* label). -->
+  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>已按{0}升序排序</value></data>
+  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>已按{0}降序排序</value></data>
+  <!-- Names for the scrollable text regions, spoken only once a region
+       can actually scroll and so joins the tab order (the
+       BodyScrollRegion style). -->
+  <data name="Automation.Scroll.ScanResults" xml:space="preserve"><value>扫描结果</value></data>
+  <data name="Automation.Scroll.ResultDetails" xml:space="preserve"><value>结果详情</value></data>
+  <data name="Automation.Scroll.FileDetails" xml:space="preserve"><value>文件详情</value></data>
+  <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>对话框文本</value></data>
+  <!-- Composes the announced outcome of a scan that found files:
+       0 = the "N unneeded files to clean up" line, 1 = the total size. -->
+  <data name="Automation.ScanResultAnnouncement" xml:space="preserve"><value>{0} ({1})</value></data>
+  <data name="Automation.CompletionErrors" xml:space="preserve"><value>无法处理的文件</value></data>
+  <!-- Spoken name for the missing-file note's closing hyperlink. The visible
+       link text is a phrase mid-sentence (the [ ]-delimited span of
+       Body.RegisteredMissingFromDisk.SeeAlso, movable by a translator), so a
+       screen reader tabbing onto the link needs a self-contained purpose;
+       it must still contain the visible phrase so voice control can click
+       it by its on-screen words. -->
+  <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>在 README 中解释了这个文件夹，以及如何恢复文件</value></data>
+
+  <!-- Tooltips -->
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>如果它帮到了您，请我喝杯茶。</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>该来杯茶了！</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>已请求取消。应用正在等待当前步骤到达一个可以停下来的位置。在大量 I/O 操作或 MSI 数据库调用期间，这可能需要几秒钟。</value></data>
+  <data name="Tooltip.Close" xml:space="preserve"><value>关闭</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>在 GitHub 上点个星、提交 Issue 或在 Discussions 中发帖。欢迎任何反馈。</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>或提交 Issue，或在 Discussions 中发帖。欢迎任何反馈。</value></data>
+  <data name="Tooltip.Minimise" xml:space="preserve"><value>最小化</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>将不需要的文件移动到移动位置。</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>将不需要的文件移动到移动位置。请先选择一个位置。</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>将不需要的文件送入回收站。</value></data>
+  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>来自内嵌 Authenticode 证书的主题名称。未验证证书链。</value></data>
+
+  <!-- Body copy -->
+  <data name="Body.MainExplanation.Lead" xml:space="preserve">
+    <value>下面这些不需要的文件可以安全删除。</value>
+    <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. Keep it one short clause.</comment>
+  </data>
+  <data name="Body.MainExplanation.Why" xml:space="preserve">
+    <value>它们位于 C:\Windows\Installer，是在卸载程序（{0}）、新补丁取代旧补丁（{1}）或发布者撤回补丁（{2}）时遗留下来的。InstallerClean 只会列出 Windows 自己报告为已经用完的文件。</value>
+    <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
+  </data>
+  <data name="Body.MainExplanation.Action" xml:space="preserve">
+    <value>将它们删除到回收站；如果您想保留副本，也可以先把它们移动到别处。</value>
+    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
+  </data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>现在有程序正在使用 Windows Installer，通常是 Windows 更新或某个正在后台安装的程序。在此期间，移动和删除会暂停，这样 InstallerClean 就不会在安装程序缓存发生变化时去动它。等它完成后，重新扫描，这两项操作便会恢复。</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>此计算机上有一个先前的 Windows Installer 事务处于挂起状态。请先继续或回滚该安装（或重启 Windows），再清理缓存。</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows 已排队一项将在下次重启时执行的文件重命名操作，会影响安装程序缓存。请先重启 Windows，再进行清理。</value></data>
+  <data name="Body.NoFileSelected" xml:space="preserve"><value>选择一个文件以查看详情。</value></data>
+  <data name="Body.NoProductSelected" xml:space="preserve"><value>选择一个产品以查看详情。</value></data>
+  <data name="Body.NoMetadata" xml:space="preserve"><value>没有可用的元数据。</value></data>
+  <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
+    <value>这个安装程序文件已被删除。这不是 InstallerClean 干的，它从不删除程序仍然需要的文件；是在您运行 InstallerClean 之前，别的东西删掉了它。&#10;&#10;现在它不会造成任何麻烦，直到有一天您尝试修复、更新或卸载它所属的程序时才会显现。那一步可能会失败，因为 Windows 会去找这个文件，却找不到。&#10;&#10;要尝试修复，请从该程序的厂商处下载它的安装程序，在您现有的安装之上运行一遍（不要先卸载，卸载本身就是一个需要这个文件的步骤）。如果能找到，请使用您已安装的那个版本，因为 Windows 可能会拒绝其他版本。这通常会把文件恢复回来，您的设置一般也不受影响，但 Microsoft 并不保证，它自己的最后手段是重新安装该程序，或重装 Windows 本身。</value>
+    <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
+  </data>
+  <!-- The missing-file note's closing sentence, rendered as a TextBlock
+       with one inline Hyperlink built at load time (RegisteredFilesWindow
+       .BuildSeeAlsoLine). The linked phrase is delimited by [ ] so a
+       translator can place it anywhere in the sentence; the code splits on
+       the first [ and ] into a prefix Run, the Hyperlink (to the README's
+       recovery section), and a suffix Run. A string with no [ ] pair
+       renders verbatim as one Run. -->
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso" xml:space="preserve"><value>README 用 Microsoft 自己的原话[解释了这个文件夹]，以及如何恢复文件。</value></data>
+  <data name="Body.NoPatches" xml:space="preserve"><value>（无）</value></data>
+
+  <!-- Reasons (Reason column in the orphaned-files list) -->
+  <data name="Reason.Orphaned" xml:space="preserve"><value>孤立</value></data>
+  <data name="Reason.Superseded" xml:space="preserve"><value>被取代</value></data>
+  <!-- MSI PatchState 4 (obsoleted) is a distinct state from 2
+       (superseded): superseded means a newer patch has replaced
+       this one, obsoleted means the patch has been withdrawn /
+       deprecated by the publisher independent of a replacement.
+       The user-visible outcome (the patch is removable) is the
+       same; the Reason column distinguishes them for users who
+       want the MSI-state precision. -->
+  <data name="Reason.Obsoleted" xml:space="preserve"><value>已废弃</value></data>
+
+  <!-- Status / progress text -->
+  <data name="Status.Scanning" xml:space="preserve"><value>正在扫描…</value></data>
+  <data name="Status.Cancelling" xml:space="preserve"><value>正在取消…</value></data>
+  <data name="Status.StartingScan" xml:space="preserve"><value>正在开始扫描…</value></data>
+  <data name="Status.QueryingApi" xml:space="preserve"><value>正在向 Windows 查询已安装的软件…</value></data>
+  <data name="Status.ScanningCache" xml:space="preserve"><value>正在扫描安装程序缓存文件夹…</value></data>
+  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>正在枚举已安装的产品…</value></data>
+  <data name="Status.CheckingRegistry" xml:space="preserve"><value>正在检查注册表中的其他程序包…</value></data>
+  <!-- 0 = registered package count, 1 = pluralised "package"/"packages" -->
+  <!-- Fires mid-scan as a step-progress update after the registry-
+       fallback pass; not the end-of-scan pill (that's Status.ScanComplete).
+       0 = registered package count, 1 = pluralised "package"/"packages". -->
+  <data name="Status.RegisteredPackagesFound" xml:space="preserve"><value>找到 {0} 个已注册的{1}。</value></data>
+  <!-- 0 = elapsed time text (e.g. "1.2s") -->
+  <data name="Status.ScanComplete" xml:space="preserve"><value>扫描完成（{0}）</value></data>
+  <data name="Status.FoundProducts" xml:space="preserve"><value>正在扫描本地程序包…</value></data>
+  <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
+  <data name="Status.FoundUnused" xml:space="preserve"><value>找到 {0} 个{1}，可清理。</value></data>
+  <data name="Status.PreparingDestination" xml:space="preserve"><value>正在准备目标文件夹…</value></data>
+  <!-- 0 = file count, 1 = pluralised noun -->
+  <data name="Status.Moving" xml:space="preserve"><value>正在移动 {0} 个{1}…</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>正在删除 {0} 个{1}…</value></data>
+  <!-- 0 = files processed before cancel, 1 = total files in the batch,
+       2 = pluralised "file"/"files" agreeing with the total. -->
+  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>移动已取消。{1} 个{2}中已处理 {0} 个。</value></data>
+  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>删除已取消。{1} 个{2}中已处理 {0} 个。</value></data>
+  <!-- 0 = exception type name, 1 = crash log path. Both surface in
+       the status pill so the user can find the log; full message +
+       stack trace go to the log itself. -->
+  <data name="Status.MoveFailed" xml:space="preserve"><value>移动失败（{0}）。详情见 {1}。</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>移动失败（{0}）。无法写入崩溃日志。</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>删除失败（{0}）。详情见 {1}。</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>删除失败（{0}）。无法写入崩溃日志。</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>访问被拒绝。请以管理员身份运行。</value></data>
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>扫描失败：安装程序数据库不可用。</value></data>
+  <data name="Status.ScanCancelled" xml:space="preserve"><value>扫描已取消。</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>完成</value></data>
+  <!-- 0 = exception type name. Full message + stack trace go only to
+       the crash log because exception messages from elevated framework
+       calls can contain paths from another user's profile. 1 = crash
+       log path. -->
+  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>扫描失败（{0}）。详情见 {1}。</value></data>
+  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>扫描失败（{0}）。无法写入崩溃日志。</value></data>
+
+  <!-- Completion screen -->
+  <data name="Completion.AllClean" xml:space="preserve"><value>全部干净</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>C:\Windows\Installer 中没有需要清理的内容</value></data>
+  <!-- 0 = installed product count, 1 = pluralised "product"/"products",
+       2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
+       "less than a second"). The count is the receipt that a real
+       scan ran; on fast machines a duration alone reads as "did
+       nothing". Rendered in the Restore slot of the completion
+       overlay so the all-clean state has the same heading + summary
+       + smaller-receipt shape as the post-Move and post-Delete
+       states. -->
+  <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>扫描了 {0} 个{1}，用时 {2}</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>如果有什么不能正常工作，把它们复制回原处即可</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>如果有什么不能正常工作，从回收站把它们还原即可</value></data>
+  <!-- 0 = size freed (e.g. "120.5 MB") -->
+  <data name="Completion.Freed" xml:space="preserve"><value>已释放 {0}</value></data>
+  <data name="Completion.Moved" xml:space="preserve"><value>已移动 {0}</value></data>
+  <data name="Completion.PartlyMoved" xml:space="preserve"><value>已移动 {0}，部分文件无法处理</value></data>
+  <!-- Heading shown when an operation succeeded for SOME files but
+       errored for others. 0 = total size freed (e.g. "120.5 MB"). -->
+  <data name="Completion.PartlyFreed" xml:space="preserve"><value>已释放 {0}，部分文件无法处理</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
+  <data name="Completion.MoveSummary" xml:space="preserve"><value>已将 {0} 个{1}移动到 {2}</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
+  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>已将 {0} 个{1}移动到 {2}。{3} 个{4}</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>已将 {0} 个{1}送入回收站</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>已将 {0} 个{1}送入回收站。{2} 个{3}</value></data>
+  <!-- Completion copy for a consented permanent delete (the Recycle Bin
+       was unavailable for the volume and the user chose to delete anyway).
+       Distinct from DeleteSummary so it never claims the bin: these files
+       did not reach it and cannot be restored from it. 0 = deleted count,
+       1 = pluralised noun; the WithErrors variants add 2 = error count,
+       3 = pluralised "error"/"errors". Both the clean and the WithErrors
+       copy split singular/plural so the "It"/"They did not go to the
+       Recycle Bin" clause agrees with the count, and the WithErrors copy
+       carries that same clause so a partial failure still never reads as
+       though the files reached the bin. -->
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>已永久删除 {0} 个{1}。它没有进入回收站。</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>已永久删除 {0} 个{1}。它们没有进入回收站。</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>已永久删除 {0} 个{1}。它没有进入回收站。{2} 个{3}</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>已永久删除 {0} 个{1}。它们没有进入回收站。{2} 个{3}</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>没关系，它本来就可以安全删除。InstallerClean 只清除 Windows 报告为已经用完的文件，绝不会删除程序仍然需要的文件。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>没关系，它们本来就可以安全删除。InstallerClean 只清除 Windows 报告为已经用完的文件，绝不会删除程序仍然需要的文件。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。</value></data>
+  <!-- The choice offered when Delete finds the Recycle Bin unavailable for
+       the files' volume: Move (the safe default), delete permanently with
+       consent, or cancel. Wording states only the confirmed fact (the probe
+       found the bin unavailable for the drive); it never asserts an
+       unconfirmed cause (off vs corrupt vs full). 0 = file count,
+       1 = pluralised noun, 2 = size display. The singular text omits
+       {0}: "this file" reads better than "this 1 file". The call site
+       passes all three args either way, so the singular's {1} and {2}
+       still resolve. -->
+  <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>此驱动器的回收站不可用</value></data>
+  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>所以这个{1}（{2}）还没有被删除。您可以把它移动到安全的位置，或将它永久删除。</value></data>
+  <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>所以这 {0} 个{1}（{2}）还没有被删除。您可以把它们移动到安全的位置，或将它们永久删除。</value></data>
+  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>删除它是安全的。InstallerClean 只清除 Windows 报告为已经用完的文件，绝不会删除程序仍然需要的文件，回收站只是一道额外的保险。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。</value></data>
+  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>删除它们是安全的。InstallerClean 只清除 Windows 报告为已经用完的文件，绝不会删除程序仍然需要的文件，回收站只是一道额外的保险。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。</value></data>
+
+  <!-- Summaries -->
+  <!-- 0 = file count. Singular / plural pairs picked at the call
+       site by Pluralise(count, Singular, Plural); this avoids
+       concatenating a count and a "file is"/"files are" fragment
+       across a placeholder boundary, which does not survive
+       translation into languages where the noun-verb-count agreement
+       crosses the placeholder (Slavic case selection, Arabic dual,
+       Japanese particle placement, etc). A translator rewrites both
+       singular and plural keys per their language's rule. -->
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>仍需要 {0} 个文件</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>仍需要 {0} 个文件</value></data>
+  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} 个不需要的文件可清理</value></data>
+  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} 个不需要的文件可清理</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>有 {0} 个已注册文件缺失（并非 InstallerClean 删除）。目前没有问题，但日后修复、更新或卸载该程序时可能会失败。打开“详情”了解该怎么做。</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>有 {0} 个已注册文件缺失（并非 InstallerClean 删除）。目前没有问题，但日后修复、更新或卸载这些程序时可能会失败。打开“详情”了解该怎么做。</value></data>
+  <!-- Informational line shown when the MSI database carries
+       superseded-patch registrations whose files are already gone
+       from disk. Distinct from the missing-from-disk warning
+       because the files are removable already; only the MSI
+       registration is stale. InstallerClean doesn't unregister
+       anything, so this is purely diagnostic. -->
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>检测到 {0} 个过时的 MSI 条目（文件已从磁盘上消失；InstallerClean 不会取消它的注册）。</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>检测到 {0} 个过时的 MSI 条目（文件已从磁盘上消失；InstallerClean 不会取消它们的注册）。</value></data>
+  <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
+  <data name="Summary.OperationFiles" xml:space="preserve"><value>{1} 个{2}中的 {0} 个</value></data>
+  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} 个不需要的{1}（{2}）</value></data>
+  <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} 个已注册的{1}（{2}）</value></data>
+
+  <!-- Confirmation dialogs -->
+  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
+  <data name="Confirm.MoveTitle" xml:space="preserve"><value>移动 {0} 个{1}（{2}）？</value></data>
+  <!-- 0 = destination path -->
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>文件将被移动到 {0}。</value></data>
+  <data name="Confirm.DeleteTitle" xml:space="preserve"><value>删除 {0} 个{1}（{2}）？</value></data>
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>文件将被送入回收站。如果您想要备份副本，请改用移动。</value></data>
+
+  <!-- Error messages -->
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>需要管理员权限</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>此应用需要管理员权限。
+
+请右键单击并选择“以管理员身份运行”。</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>安装程序数据库不可用</value></data>
+  <data name="Error.ScanFailedTitle" xml:space="preserve"><value>扫描失败</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer 数据库似乎为空或无法访问。即便在全新安装的 Windows 上这也很不寻常，通常意味着数据库已损坏，或被某个第三方工具清空了。在提权的命令提示符中运行“sfc /scannow”通常可以修复它。</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>枚举已安装产品时访问被拒绝。请以管理员身份运行。</value></data>
+  <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
+       in the message because a sysadmin reading the dialog may want
+       to look it up). -->
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>在连续 {0} 次失败后，Windows Installer 拒绝列出产品（最后的错误代码为 {1}）。请尝试重启 Windows，或在提权的命令提示符中运行“sfc /scannow”。</value></data>
+  <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>目标无效</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>无法写入目标</value></data>
+  <data name="Error.MoveFailedTitle" xml:space="preserve"><value>移动失败</value></data>
+  <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>删除失败</value></data>
+  <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>目标不能位于 Windows Installer 文件夹内。</value></data>
+  <!-- 0 = the destination path the user typed -->
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>目标 {0} 解析后位于 Windows 系统文件夹下。请选择 %SystemRoot%、%ProgramFiles% 和 %ProgramData% 之外的路径。</value></data>
+  <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>空间不足</value></data>
+  <!-- 0 = destination, 1 = required size, 2 = available size -->
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>{0} 上的空间不足
+
+所需：{1}
+可用：{2}</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>您没有写入 {0} 的权限。
+请尝试您的用户配置文件中的文件夹，或您拥有的驱动器。</value></data>
+  <data name="Error.PathTooLong" xml:space="preserve"><value>路径 {0} 对 Windows 来说太长了。请选择更短的路径。</value></data>
+  <data name="Error.DestinationMissing" xml:space="preserve"><value>文件夹 {0} 不存在，且无法创建。请检查驱动器盘符或网络路径。</value></data>
+  <!-- 0 = destination, 1 = crash log path. The exception's .Message
+       intentionally does NOT appear in either string: under elevation
+       framework messages can carry paths from another user's profile.
+       Detail goes to the crash log; the user is pointed at it. -->
+  <data name="Error.IOWriteDestination" xml:space="preserve"><value>Windows 无法写入 {0}。
+详情见 {1}。</value></data>
+  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows 无法写入 {0}。无法写入崩溃日志。</value></data>
+  <data name="Error.WriteDestination" xml:space="preserve"><value>无法写入 {0}。
+详情见 {1}。</value></data>
+  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>无法写入 {0}。无法写入崩溃日志。</value></data>
+  <data name="Error.MissingSourceFile" xml:space="preserve"><value>文件已不存在。</value></data>
+  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>源文件是符号链接或目录联接；为安全起见已拒绝。</value></data>
+  <!-- Category-only sentences for FileOperationError.LocalisedMessage.
+       These intentionally do NOT include a path or framework message
+       fragment: with the app running elevated, the per-file
+       UnauthorizedAccessException / IOException messages can carry
+       paths from other users' profiles into the displayed error list. -->
+  <data name="Error.AccessDenied" xml:space="preserve"><value>访问被拒绝。</value></data>
+  <data name="Error.IOFailure" xml:space="preserve"><value>操作失败。请重试或重启 Windows。</value></data>
+  <data name="Error.UnknownError" xml:space="preserve"><value>未知错误。</value></data>
+  <!-- 0 = shell error code -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>无法将此文件送入回收站（错误 {0}）。它可能被锁定、正在使用，或被 Windows 阻止。请改为移动它。</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>即使拥有管理员权限，Windows 仍阻止了对此文件的访问（错误 {0}）。这通常是所有权或权限锁定。请改为移动它。</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>此文件正被另一个程序打开或锁定（错误 {0}）。请关闭那个程序，或任何正在扫描它的程序，然后重试，或改为移动它。</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>由于无法将该文件送入回收站，它已被永久删除。</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>拒绝将文件移动到 Windows Installer 文件夹（目标：{0}）。</value></data>
+  <!-- 0 = the relative path the caller passed -->
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>目标必须是完全限定的路径（相对路径会相对于进程的当前目录解析，在提权运行时不安全）：{0}</value></data>
+  <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>无法打开您的浏览器</value></data>
+  <data name="UpdateCheck.Title" xml:space="preserve"><value>检查更新</value></data>
+  <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>正在检查…</value></data>
+  <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>已是最新版本。</value></data>
+  <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>有可用更新</value></data>
+  <!-- 0 = installed version, 1 = latest version on GitHub -->
+  <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>您正在运行 {0} 版。&#10;{1} 版现已推出。</value></data>
+  <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>无法连接到 GitHub。请检查您的网络连接后重试。</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub 返回了错误响应。发布 API 可能受到了速率限制；请过几分钟后重试。</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub 的响应中没有可识别的发布版本。请稍后重试，或直接打开发布页面。</value></data>
+  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>检查超时。您与 GitHub 的连接可能较慢；请重试。</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>检查因未知原因失败。如果您需要报告此问题，详情在 crash.log 中。</value></data>
+  <!-- 0 = the URL the user was trying to reach -->
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>无法在您的普通用户浏览器中打开该链接。网址已复制到您的剪贴板，您可以手动打开：&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>无法在您的普通用户浏览器中打开该链接，复制到剪贴板也失败了。网址为：&#10;&#10;{0}</value></data>
+  <!-- 0 = the destination folder whose canonical path changed mid-batch -->
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>目标文件夹的规范路径在批处理过程中发生了变化：{0}</value></data>
+  <!-- 0 = folder, 1 = inner exception message -->
+  <data name="Error.CannotWriteFolder" xml:space="preserve"><value>无法写入 {0}。</value></data>
+  <!-- 0 = file name -->
+  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>尝试 10,000 次后仍无法为“{0}”找到唯一的文件名。</value></data>
+
+  <!-- Result log (post-cleanup diagnostic send) -->
+  <data name="ResultLog.Sending" xml:space="preserve"><value>正在发送…</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>谢谢！摘要已发送。</value></data>
+  <data name="ResultLog.Failed" xml:space="preserve"><value>发送失败。请稍后重试。</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>没有可发送的摘要。</value></data>
+  <!-- Body header shown in the confirmation modal. Names the
+       recipient and the full URL so the user sees the destination
+       without having to scroll the JSON. -->
+  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>把这个发送给 No Faff 吗？</value></data>
+  <!-- Reassurance line under the JSON. Names the URL once, calls
+       out the no-PII property, and explains the purpose so the
+       user has the context the modal title implies. -->
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>没有任何内容能识别您或您的机器；它只是让我知道应用是否正常工作，以及大家释放了多少空间。它会发送到 nofaff.netlify.app/api/result-log。</value></data>
+  <!-- AutomationProperties.Name on the JSON preview TextBox so screen
+       readers announce its content rather than "edit, read-only". -->
+  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>结果日志预览</value></data>
+
+  <!-- Single instance / startup / crash -->
+  <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean 已在运行。</value></data>
+  <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <!-- 0 = exception type name (e.g. "IOException"), 1 = crash log path.
+       The full exception message is intentionally NOT formatted in here:
+       framework-provided messages can carry absolute paths from other
+       users' profiles into a dialog the current user reads. The full
+       detail is written to the crash log instead. -->
+  <data name="Startup.UnhandledBody" xml:space="preserve"><value>发生了意外错误，InstallerClean 需要关闭。
+
+{0}
+
+详情已写入：
+{1}</value></data>
+  <data name="Startup.UnhandledBody.NoLog" xml:space="preserve"><value>发生了意外错误，InstallerClean 需要关闭。
+
+{0}
+
+无法写入崩溃日志。</value></data>
+  <data name="Startup.ErrorTitle" xml:space="preserve"><value>启动错误</value></data>
+  <!-- 0 = exception type name (see Startup.UnhandledBody for why this
+       is the type name and not the message), 1 = crash log path. -->
+  <data name="Startup.FailedToStart" xml:space="preserve"><value>启动失败（{0}）。详情已写入：
+{1}</value></data>
+  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>启动失败（{0}）。无法写入崩溃日志。</value></data>
+
+  <!-- File picker -->
+  <data name="FilePicker.ChooseDestinationTitle" xml:space="preserve"><value>为移动的文件选择目标文件夹</value></data>
+
+  <!-- Version display -->
+  <!-- 0 = major.minor.patch (e.g. "1.5.4") -->
+  <data name="Version.Display" xml:space="preserve"><value>版本 {0}</value></data>
+
+  <!-- Plural fragments. Consumed by DisplayHelpers.Pluralise. The
+       singular/plural pair is English-style (n != 1 -> plural). A
+       Slavic / Arabic / etc. host replaces this layer; consumers do
+       not change. -->
+  <data name="Plural.File.Singular" xml:space="preserve"><value>文件</value></data>
+  <data name="Plural.File.Plural" xml:space="preserve"><value>文件</value></data>
+  <data name="Plural.Error.Singular" xml:space="preserve"><value>错误</value></data>
+  <data name="Plural.Error.Plural" xml:space="preserve"><value>错误</value></data>
+  <data name="Plural.Package.Singular" xml:space="preserve"><value>程序包</value></data>
+  <data name="Plural.Package.Plural" xml:space="preserve"><value>程序包</value></data>
+  <data name="Plural.Product.Singular" xml:space="preserve"><value>产品</value></data>
+  <data name="Plural.Product.Plural" xml:space="preserve"><value>产品</value></data>
+  <data name="Plural.Patch.Singular" xml:space="preserve"><value>补丁</value></data>
+  <data name="Plural.Patch.Plural" xml:space="preserve"><value>补丁</value></data>
+
+  <!-- Display-format fragments used by DisplayHelpers.FormatSize /
+       FormatElapsed / FormatElapsedLong. Number portion stays in
+       string.Format with the consumer's CurrentCulture (so 1.5 GB
+       becomes 1,5 GB on de-DE etc.); only the unit suffix and the
+       sub-second long-form sentence are localisable. -->
+  <data name="Display.Size.GB" xml:space="preserve"><value>{0:F2} GB</value></data>
+  <data name="Display.Size.MB" xml:space="preserve"><value>{0:F1} MB</value></data>
+  <data name="Display.Size.KB" xml:space="preserve"><value>{0:F1} KB</value></data>
+  <data name="Display.Size.B" xml:space="preserve"><value>{0} B</value></data>
+  <data name="Display.Elapsed.Ms" xml:space="preserve"><value>{0:F0}ms</value></data>
+  <data name="Display.Elapsed.S" xml:space="preserve"><value>{0:F1}s</value></data>
+  <data name="Display.ElapsedLong.LessThanASecond" xml:space="preserve"><value>不到一秒</value></data>
+  <data name="Display.ElapsedLong.Seconds" xml:space="preserve"><value>{0:F1} 秒</value></data>
+
+  <!-- CLI output. Two destinations with different localisation rules.
+       Stdout (everything the user reads at the console) is localised so a
+       non-English sysadmin gets text matching their UI culture. The entries
+       written INTO the Windows Application event log are English-only
+       (no-translate): an RMM tool greps that channel for a known English
+       string regardless of the machine's OS UI culture, so a satellite resx
+       must NOT translate them. Those are the Cli.EventLog* keys, with one
+       exception: Cli.EventLogUnavailable is a stdout warning (it tells the
+       operator that an event-log write failed), so it is localised like the
+       rest of stdout despite the EventLog prefix. -->
+  <!-- 0 = exception type name (full message + stack trace go to the
+       crash log; the CLI runs elevated so .Message could include paths
+       from another user's profile if logged to a shared file).
+       1 = crash log path. -->
+  <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
+  <!-- 0 = mode arg ("/s"), 1 = registered package count, 2 = pluralised "package"/"packages" -->
+  <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
+       4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
+  <!-- 0 = mode arg ("/d") -->
+  <!-- 0 = the relative or otherwise unsafe path -->
+  <!-- 0 = mode, 1 = destination -->
+  <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
+  <!-- Short human labels for the EventLog ({1} slot in
+       Cli.EventLogPendingRebootBlocked). The stdout sentences in
+       Cli.PendingRebootBlocked.* are full localised text; these short
+       labels are English-only (no-translate, like every Cli.EventLog*
+       entry written to the Application channel) so an Application-channel
+       grep can match a known string regardless of OS UI culture. -->
+  <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
+       2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination -->
+  <!-- 0 = moved count, 1 = pluralised noun -->
+  <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
+       4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
+  <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
+       processed (a cancel during the scan, or before the first delete or
+       move), so "each /s, /d or /m run writes one summary entry" holds for
+       every run, not only the ones that committed work. -->
+  <!-- Stdout when the CLI cannot acquire the single-instance mutex.
+       The GUI variant (Strings.Startup_AlreadyRunningBody) is written
+       for a user who tried to launch a second window; the CLI variant
+       names the contending parties (GUI or another CLI run) and
+       points at exit code 75 so an RMM operator parsing stdout
+       knows it is transient and safe to retry. -->
+  <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
+       can't acquire the single-instance mutex, so an RMM consumer of
+       the Application channel sees a record of every scheduled-job
+       firing whether or not it was able to run. -->
+  <!-- 0 = the offending token (original case). Audit entry written when
+       the CLI is invoked with an unrecognised or malformed argument, so a
+       scheduled task with a fat-fingered flag leaves an Application-channel
+       trace instead of exiting silently. English only, like every Cli
+       EventLog string; the stdout message carries the localised text. -->
+  <!-- Audit entry written when the CLI is invoked with no argument at all,
+       so an argless scheduled task fails visibly (non-zero exit) and leaves
+       a record rather than silently succeeding while doing nothing. -->
+  <!-- Audit entry for the LocalisedAccessException and
+       LocalisedInvalidOperationException catches: the message has been
+       built from a resx template with user-controlled args only, so the
+       full text is safe to record. 0 = mode arg, 1 = the localised
+       message (already-formatted). RMM consumers parsing the
+       Application channel see the actionable reason without a separate
+       crash-log lookup. -->
+  <!-- Audit entry for the generic Exception catch: ex.Message is held
+       back (path-leak risk under elevation), only the type name and
+       crash log path travel to the EventLog. 0 = mode arg, 1 = type
+       name, 2 = crash log path. -->
+  <!-- Stdout warning printed once at the end of a CLI run if any
+       Event Log write failed (Group Policy or service unavailable).
+       Tells an RMM consumer expecting an Application entry that the
+       channel was unwritable, not just empty. -->
+
+  <!-- crash.log privacy header. Prepended to a fresh crash.log so a
+       user attaching the file to a public bug report has the
+       disclosure before sharing. The "# " prefix lets log readers
+       that skip comment lines (less, grep -v, jq pipelines) skip
+       the header. Stored as one multi-line block; the C# side reads
+       it verbatim and normalises line endings to the host platform. -->
+  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log 记录 InstallerClean 未处理的异常。
+# 在提权运行时，框架的异常消息可能包含当前会话的文件
+# 路径（包括 Windows Installer 查询所枚举到的其他用户的
+# 配置文件）。来自检查更新或结果日志 POST 的网络失败
+# 消息，可能包含目标 URL 以及解析出的 IP / 代理地址。
+# 在将此文件附加到公开的错误报告之前，请先删除这两类
+# 细节。
+</value></data>
+
+  <!-- CLI help text (printed by /?, -h and the long help flag) -->
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>更改显示语言。InstallerClean 会重启以应用更改。</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>更改显示语言</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>InstallerClean 会重启以应用更改。</value></data>
+
+</root>
