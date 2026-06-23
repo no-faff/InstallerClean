@@ -15,6 +15,15 @@ updates:
     # hash and have tripped Avast/AVG/DeepInstinct ML classifiers
     # before. Security advisories still PR through because Dependabot's
     # security-update path overrides version-update:ignore.
+    #
+    # Microsoft.NET.ILLink.Tasks is ignored outright (every version): it
+    # is SDK plumbing pinned in the root Directory.Build.props only so
+    # plain and publish restores compute one graph (locked-mode restore
+    # compares reference sets). Its version must match the SDK band the
+    # build pins, not nuget.org's latest, so it moves by hand when the
+    # SDK pin moves. Dependabot also can't bump it cleanly: it
+    # regenerates only the lock file in the directory it runs in, leaving
+    # the other three inconsistent (NU1004 under locked-mode restore).
     ignore:
       - dependency-name: Microsoft.Extensions.DependencyInjection
         update-types:
@@ -25,6 +34,7 @@ updates:
       - dependency-name: System.Diagnostics.EventLog
         update-types:
           - version-update:semver-patch
+      - dependency-name: Microsoft.NET.ILLink.Tasks
 
   - package-ecosystem: nuget
     directory: /src/InstallerClean.Core
@@ -45,6 +55,7 @@ updates:
       - dependency-name: System.Diagnostics.EventLog
         update-types:
           - version-update:semver-patch
+      - dependency-name: Microsoft.NET.ILLink.Tasks
 
   - package-ecosystem: nuget
     directory: /src/InstallerClean.Cli
@@ -65,6 +76,7 @@ updates:
       - dependency-name: System.Diagnostics.EventLog
         update-types:
           - version-update:semver-patch
+      - dependency-name: Microsoft.NET.ILLink.Tasks
 
   - package-ecosystem: nuget
     directory: /src/InstallerClean.Tests
@@ -85,6 +97,7 @@ updates:
       - dependency-name: System.Diagnostics.EventLog
         update-types:
           - version-update:semver-patch
+      - dependency-name: Microsoft.NET.ILLink.Tasks
 
   - package-ecosystem: github-actions
     directory: /
