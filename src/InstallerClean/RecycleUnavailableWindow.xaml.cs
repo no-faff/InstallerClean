@@ -21,11 +21,13 @@ public partial class RecycleUnavailableWindow : Window
         var label = DisplayHelpers.PluraliseFile(fileCount);
         var bodyFormat = DisplayHelpers.Pluralise(fileCount,
             Strings.RecycleUnavailable_Body_Singular,
-            Strings.RecycleUnavailable_Body_Plural);
+            Strings.RecycleUnavailable_Body_Plural,
+            "RecycleUnavailable.Body");
         BodyText.Text = string.Format(bodyFormat, fileCount, label, sizeDisplay);
         ReassuranceText.Text = DisplayHelpers.Pluralise(fileCount,
             Strings.RecycleUnavailable_Reassurance_Singular,
-            Strings.RecycleUnavailable_Reassurance_Plural);
+            Strings.RecycleUnavailable_Reassurance_Plural,
+            "RecycleUnavailable.Reassurance");
         // Title carries the file count and size so they are spoken when the
         // dialog opens, matching the Confirm dialogs' Title = on-card text.
         // ShowInTaskbar=false and the custom chrome mean the Title is never

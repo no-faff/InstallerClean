@@ -151,14 +151,16 @@ public partial class ScanViewModel : ObservableObject
         string.Format(
             DisplayHelpers.Pluralise(RegisteredFileCount,
                 Strings.Summary_RegisteredStillUsed_Singular,
-                Strings.Summary_RegisteredStillUsed_Plural),
+                Strings.Summary_RegisteredStillUsed_Plural,
+                "Summary.RegisteredStillUsed"),
             RegisteredFileCount);
 
     public string OrphanedSummaryText =>
         string.Format(
             DisplayHelpers.Pluralise(OrphanedFileCount,
                 Strings.Summary_OrphanedToCleanUp_Singular,
-                Strings.Summary_OrphanedToCleanUp_Plural),
+                Strings.Summary_OrphanedToCleanUp_Plural,
+                "Summary.OrphanedToCleanUp"),
             OrphanedFileCount);
 
     public bool HasMissingFromDisk => MissingNonRemovableCount > 0;
@@ -167,7 +169,8 @@ public partial class ScanViewModel : ObservableObject
         string.Format(
             DisplayHelpers.Pluralise(MissingNonRemovableCount,
                 Strings.Summary_MissingFromDisk_Singular,
-                Strings.Summary_MissingFromDisk_Plural),
+                Strings.Summary_MissingFromDisk_Plural,
+                "Summary.MissingFromDisk"),
             MissingNonRemovableCount);
 
     /// <summary>
@@ -185,7 +188,8 @@ public partial class ScanViewModel : ObservableObject
         string.Format(
             DisplayHelpers.Pluralise(MissingRemovableCount,
                 Strings.Summary_StaleMsiEntries_Singular,
-                Strings.Summary_StaleMsiEntries_Plural),
+                Strings.Summary_StaleMsiEntries_Plural,
+                "Summary.StaleMsiEntries"),
             MissingRemovableCount);
 
     partial void OnRegisteredFileCountChanged(int value) =>

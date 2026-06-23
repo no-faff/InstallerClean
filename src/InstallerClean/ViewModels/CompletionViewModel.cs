@@ -226,15 +226,18 @@ public partial class CompletionViewModel : ObservableObject
         Summary = errors.Count == 0
             ? string.Format(DisplayHelpers.Pluralise(deletedCount,
                     Strings.Completion_PermanentDeleteSummary_Singular,
-                    Strings.Completion_PermanentDeleteSummary_Plural),
+                    Strings.Completion_PermanentDeleteSummary_Plural,
+                    "Completion.PermanentDeleteSummary"),
                 deletedCount, deletedLabel)
             : string.Format(DisplayHelpers.Pluralise(deletedCount,
                     Strings.Completion_PermanentDeleteSummaryWithErrors_Singular,
-                    Strings.Completion_PermanentDeleteSummaryWithErrors_Plural),
+                    Strings.Completion_PermanentDeleteSummaryWithErrors_Plural,
+                    "Completion.PermanentDeleteSummaryWithErrors"),
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = DisplayHelpers.Pluralise(deletedCount,
             Strings.Completion_PermanentDeleteRestoreHint_Singular,
-            Strings.Completion_PermanentDeleteRestoreHint_Plural);
+            Strings.Completion_PermanentDeleteRestoreHint_Plural,
+            "Completion.PermanentDeleteRestoreHint");
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;

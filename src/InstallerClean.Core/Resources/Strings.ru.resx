@@ -23,7 +23,7 @@
       Plural.*               singular/plural fragments used by DisplayHelpers
       Reason.*               Reason column values in the unneeded files list
       RecycleUnavailable.*   recycle-bin-unavailable choice dialog
-      ResultLog.*            send-summary states (Sending / Sent / Failed)
+      ResultLog.*            send-report states (Sending / Sent / Failed)
       Section.*              heading text inside windows
       Startup.*              splash + already-running messages
       Status.*               transient status / progress text
@@ -315,8 +315,8 @@
   <data name="Status.Deleting" xml:space="preserve"><value>Удаление: {0} {1}...</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
-  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Перемещение отменено. Обработано {0} из {1} {2}.</value></data>
-  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>Удаление отменено. Обработано {0} из {1} {2}.</value></data>
+  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Перемещение отменено. Обработано {0}/{1} {2}.</value></data>
+  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>Удаление отменено. Обработано {0}/{1} {2}.</value></data>
   <!-- 0 = exception type name, 1 = crash log path. Both surface in
        the status pill so the user can find the log; full message +
        stack trace go to the log itself. -->
@@ -419,7 +419,7 @@
   <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Обнаружена {0} устаревшая запись MSI (файл уже исчез с диска; InstallerClean её не удаляет из реестра).</value></data>
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Обнаружено {0} устаревших записей MSI (файлы уже исчезли с диска; InstallerClean их не удаляет из реестра).</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
-  <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} из {1} {2}</value></data>
+  <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} {1} для очистки ({2})</value></data>
   <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} {1} ещё нужно ({2})</value></data>
@@ -690,4 +690,17 @@
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Изменить язык интерфейса</value></data>
   <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Для применения InstallerClean перезапустится.</value></data>
 
+
+  <!-- Russian CLDR few (2-4) plural forms; satellite-only, read by name via ResourceManager -->
+  <data name="Plural.File.Few" xml:space="preserve"><value>файла</value></data>
+  <data name="Plural.Package.Few" xml:space="preserve"><value>пакета</value></data>
+  <data name="Plural.Product.Few" xml:space="preserve"><value>продукта</value></data>
+  <data name="Plural.Error.Few" xml:space="preserve"><value>ошибки</value></data>
+  <data name="Plural.Patch.Few" xml:space="preserve"><value>патча</value></data>
+  <data name="Summary.RegisteredStillUsed.Few" xml:space="preserve"><value>{0} файла ещё нужны</value></data>
+  <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} ненужных файла для очистки</value></data>
+  <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>Отсутствует {0} зарегистрированных файла (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
+  <data name="Summary.StaleMsiEntries.Few" xml:space="preserve"><value>Обнаружено {0} устаревшие записи MSI (файлы уже исчезли с диска; InstallerClean их не удаляет из реестра).</value></data>
+  <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину.</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину. {2} {3}</value></data>
 </root>

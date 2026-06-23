@@ -7,11 +7,12 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 ### Added
 
 - A Simplified Chinese (zh-Hans) interface translation: all 281 interface strings, ready for a native speaker to review and refine via the README before it goes live in the app. The satellite is script-neutral, reaching every Simplified-Chinese Windows; the command line stays English by design.
-- A Russian (ru) interface translation on the same basis. Its plurals use the general/genitive form for now, as the two-form plural engine cannot express the Slavic 2-4 case; a three-form fix is left for later.
+- A Russian (ru) interface translation on the same basis.
 - A Spanish (es) interface translation on the same basis, in neutral international Spanish, with terms following Microsoft's Spanish Windows.
 
 ### Changed
 
+- The plural engine now selects the count form by the display language's Unicode CLDR category (one/few/many/other) rather than a fixed singular-vs-plural split, so a language that needs more than two forms renders its counts correctly, for example Russian's 2-4 "few" form now shows as "2 файла", not "2 файлов". A language supplies its extra forms as optional Plural.<Noun>.Few/.Many satellite keys, read by name so they touch no other language.
 - Two small refinements to the Italian interface text: the post-scan count line now describes the unneeded files as ones you can delete rather than ones to delete, and the delete summary now names the move into the Recycle Bin (matching its with-errors counterpart). Suggested by bovirus (#39).
 - The opt-in result send-back is now called a "report" rather than a "summary" across the interface: the completion-screen button (now "Send report"), its tooltip, the confirmation dialog's screen-reader text and the sent / nothing-to-send status lines, in English and in Italian ("rapporto"). It matches what the sent data and the README have always called it, and reads a touch clearer. Suggested by bovirus (#34).
 
