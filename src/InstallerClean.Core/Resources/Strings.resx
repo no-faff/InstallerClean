@@ -23,7 +23,7 @@
       Plural.*               singular/plural fragments used by DisplayHelpers
       Reason.*               Reason column values in the unneeded files list
       RecycleUnavailable.*   recycle-bin-unavailable choice dialog
-      ResultLog.*            send-summary states (Sending / Sent / Failed)
+      ResultLog.*            send-report states (Sending / Sent / Failed)
       Section.*              heading text inside windows
       Startup.*              splash + already-running messages
       Status.*               transient status / progress text
@@ -147,7 +147,7 @@
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>Open _release page</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Re-scan</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Scan again</value></data>
-  <data name="Action.SendResultLog" xml:space="preserve"><value>Send summary</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>Send report</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Send</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
@@ -176,7 +176,7 @@
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive</value></data>
   <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Say thanks</value></data>
-  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Send posts the summary shown to No Faff. Cancel sends nothing.</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Send posts the report shown to No Faff. Cancel sends nothing.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Check for updates</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Checks the GitHub releases API over HTTPS for a newer version.</value></data>
   <!-- Window-level description for the update-available modal, read by a
@@ -239,8 +239,8 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>or report an Issue or post in Discussions. Any feedback welcome.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Up to you but appreciated. Sends an anonymous report that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Up to you but appreciated. Sends an anonymous report that just lets me know if it's working. The next screen lets you see what will be sent before you confirm.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the unneeded files to the Move location.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files to the Move location. Choose one first.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Send the unneeded files to the Recycle Bin.</value></data>
@@ -516,9 +516,9 @@ Details in {1}.</value></data>
 
   <!-- Result log (post-cleanup diagnostic send) -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Sending...</value></data>
-  <data name="ResultLog.Sent" xml:space="preserve"><value>Thanks! Summary sent.</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>Thanks! Report sent.</value></data>
   <data name="ResultLog.Failed" xml:space="preserve"><value>Sending failed. Try again later.</value></data>
-  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>No summary to send.</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>No report to send.</value></data>
   <!-- Body header shown in the confirmation modal. Names the
        recipient and the full URL so the user sees the destination
        without having to scroll the JSON. -->

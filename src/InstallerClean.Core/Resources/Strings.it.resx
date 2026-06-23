@@ -147,7 +147,7 @@
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>Apri pagina _release</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Ripeti scansione</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Nuova scansione</value></data>
-  <data name="Action.SendResultLog" xml:space="preserve"><value>Invia riepilogo</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>Invia rapporto</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Invia</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
@@ -176,7 +176,7 @@
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Elimina definitivamente i file non necessari perché per questa unità il Cestino non è disponibile</value></data>
   <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Invia a nofaff.netlify.app. vengono inviati solo conteggi ed etichette. Prima dell'invio vedrai esattamente cosa viene inviato.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Per ringraziarmi</value></data>
-  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>'Invia' trasmette a No Faff il riepilogo mostrato. Annulla non invia nulla.</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>'Invia' trasmette a No Faff il rapporto mostrato. Annulla non invia nulla.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Controlla aggiornamenti</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Verifica tramite l'API delle release di GitHub, via HTTPS, se è disponibile una versione più recente.</value></data>
   <!-- Window-level description for the update-available modal, read by a
@@ -239,8 +239,8 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Lascia una stella su GitHub, segnala un problema (issue) o scrivi nelle discussioni. Ogni feedback è il benvenuto.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>o segnala un problema (issue) o scrivi nelle discussioni. Ogni feedback è il benvenuto.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Riduci a icona</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Come preferisci, ma è apprezzato. Invia un riepilogo anonimo che mi fa solo sapere se funziona e quanto spazio le persone stanno liberando. La schermata successiva visualizza cosa verrà inviato prima di confermare.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Come preferisci, ma è apprezzato. Invia un riepilogo anonimo che mi fa solo sapere se funziona. La schermata successiva ti mostra cosa verrà inviato prima di confermare.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Come preferisci, ma è apprezzato. Invia un rapporto anonimo che mi fa solo sapere se funziona e quanto spazio le persone stanno liberando. La schermata successiva visualizza cosa verrà inviato prima di confermare.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Come preferisci, ma è apprezzato. Invia un rapporto anonimo che mi fa solo sapere se funziona. La schermata successiva ti mostra cosa verrà inviato prima di confermare.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Sposta i file non necessari nella destinazione spostamento.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Sposta i file non necessari nella destinazione spostamento. Scegli la cartella per lo spostamento.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Sposta i file non necessari nel Cestino.</value></data>
@@ -516,9 +516,9 @@ Dettagli in {1}.</value></data>
 
   <!-- Result log (post-cleanup diagnostic send) -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Invio...</value></data>
-  <data name="ResultLog.Sent" xml:space="preserve"><value>Grazie! Riepilogo inviato.</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>Grazie! Rapporto inviato.</value></data>
   <data name="ResultLog.Failed" xml:space="preserve"><value>Invio non riuscito. Riprova più tardi.</value></data>
-  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>Nessun riepilogo da inviare.</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>Nessun rapporto da inviare.</value></data>
   <!-- Body header shown in the confirmation modal. Names the
        recipient and the full URL so the user sees the destination
        without having to scroll the JSON. -->

@@ -13,6 +13,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 ### Changed
 
 - Two small refinements to the Italian interface text: the post-scan count line now describes the unneeded files as ones you can delete rather than ones to delete, and the delete summary now names the move into the Recycle Bin (matching its with-errors counterpart). Suggested by bovirus (#39).
+- The opt-in result send-back is now called a "report" rather than a "summary" across the interface: the completion-screen button (now "Send report"), its tooltip, the confirmation dialog's screen-reader text and the sent / nothing-to-send status lines, in English and in Italian ("rapporto"). It matches what the sent data and the README have always called it, and reads a touch clearer. Suggested by bovirus (#34).
 
 ## [1.9.2] - 2026-06-21
 
