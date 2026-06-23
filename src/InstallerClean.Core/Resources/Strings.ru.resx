@@ -147,7 +147,7 @@
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>Открыть страницу _выпуска</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Повторить сканирование</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Сканировать снова</value></data>
-  <data name="Action.SendResultLog" xml:space="preserve"><value>Отправить сводку</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>Отправить отчёт</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>От_править</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
@@ -176,7 +176,7 @@
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Удалить ненужные файлы безвозвратно, потому что Корзина недоступна для этого диска</value></data>
   <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Отправляется на nofaff.netlify.app. Только счётчики и метки. Перед отправкой вы увидите точное содержимое.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Поблагодарить</value></data>
-  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>«Отправить» передаёт показанную сводку в No Faff. «Отмена» не отправляет ничего.</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>«Отправить» передаёт показанный отчёт в No Faff. «Отмена» не отправляет ничего.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Проверить обновления</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Проверяет наличие более новой версии через API выпусков GitHub по HTTPS.</value></data>
   <!-- Window-level description for the update-available modal, read by a
@@ -239,8 +239,8 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Поставьте звезду на GitHub, сообщите о проблеме (Issue) или напишите в обсуждениях (Discussions). Любые отзывы приветствуются.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>или сообщите о проблеме (Issue), или напишите в обсуждениях (Discussions). Любые отзывы приветствуются.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Свернуть</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение и сколько места люди освобождают. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>На ваше усмотрение, но будет приятно. Отправляет анонимный отчёт, который просто даёт мне знать, работает ли приложение и сколько места люди освобождают. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>На ваше усмотрение, но будет приятно. Отправляет анонимный отчёт, который просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Переместить ненужные файлы в папку для перемещения.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Переместить ненужные файлы в папку для перемещения. Сначала выберите её.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Отправить ненужные файлы в Корзину.</value></data>
@@ -516,9 +516,9 @@
 
   <!-- Result log (post-cleanup diagnostic send) -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Отправка...</value></data>
-  <data name="ResultLog.Sent" xml:space="preserve"><value>Спасибо! Сводка отправлена.</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>Спасибо! Отчёт отправлен.</value></data>
   <data name="ResultLog.Failed" xml:space="preserve"><value>Не удалось отправить. Повторите попытку позже.</value></data>
-  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>Нет сводки для отправки.</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>Нет отчёта для отправки.</value></data>
   <!-- Body header shown in the confirmation modal. Names the
        recipient and the full URL so the user sees the destination
        without having to scroll the JSON. -->

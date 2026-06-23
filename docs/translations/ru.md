@@ -52,7 +52,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Open _release page | Открыть страницу _выпуска |
 | _Re-scan | _Повторить сканирование |
 | _Scan again | _Сканировать снова |
-| Send summary | Отправить сводку |
+| Send report | Отправить отчёт |
 | _Send | От_править |
 
 ## Field labels
@@ -94,8 +94,8 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Preparing destination folder... | Подготовка папки назначения... |
 | Moving {0} {1}... | Перемещение: {0} {1}... |
 | Deleting {0} {1}... | Удаление: {0} {1}... |
-| Move cancelled. {0} of {1} {2} processed. | Перемещение отменено. Обработано {0} из {1} {2}. |
-| Delete cancelled. {0} of {1} {2} processed. | Удаление отменено. Обработано {0} из {1} {2}. |
+| Move cancelled. {0} of {1} {2} processed. | Перемещение отменено. Обработано {0}/{1} {2}. |
+| Delete cancelled. {0} of {1} {2} processed. | Удаление отменено. Обработано {0}/{1} {2}. |
 | Move failed ({0}). Details in {1}. | Не удалось переместить ({0}). Подробности в {1}. |
 | Move failed ({0}). The crash log could not be written. | Не удалось переместить ({0}). Не удалось записать журнал сбоев. |
 | Delete failed ({0}). Details in {1}. | Не удалось удалить ({0}). Подробности в {1}. |
@@ -178,7 +178,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | Отсутствует {0} зарегистрированных файлов (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать. |
 | {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | Обнаружена {0} устаревшая запись MSI (файл уже исчез с диска; InstallerClean её не удаляет из реестра). |
 | {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | Обнаружено {0} устаревших записей MSI (файлы уже исчезли с диска; InstallerClean их не удаляет из реестра). |
-| {0} of {1} {2} | {0} из {1} {2} |
+| {0} of {1} {2} | {0}/{1} {2} |
 | {0} unneeded {1} ({2}) | {0} {1} для очистки ({2}) |
 | {0} registered {1} ({2}) | {0} {1} ещё нужно ({2}) |
 
@@ -260,9 +260,9 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | English | Русский |
 | --- | --- |
 | Sending... | Отправка... |
-| Thanks! Summary sent. | Спасибо! Сводка отправлена. |
+| Thanks! Report sent. | Спасибо! Отчёт отправлен. |
 | Sending failed. Try again later. | Не удалось отправить. Повторите попытку позже. |
-| No summary to send. | Нет сводки для отправки. |
+| No report to send. | Нет отчёта для отправки. |
 | Send this to No Faff? | Отправить это в No Faff? |
 | Nothing identifies you or your machine; it just lets me know the app is working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | Ничто не идентифицирует вас или ваш компьютер; это просто даёт мне знать, что приложение работает и сколько места люди освобождают. Отправляется на nofaff.netlify.app/api/result-log. |
 
@@ -291,8 +291,8 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Поставьте звезду на GitHub, сообщите о проблеме (Issue) или напишите в обсуждениях (Discussions). Любые отзывы приветствуются. |
 | or report an Issue or post in Discussions. Any feedback welcome. | или сообщите о проблеме (Issue), или напишите в обсуждениях (Discussions). Любые отзывы приветствуются. |
 | Minimise | Свернуть |
-| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение и сколько места люди освобождают. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
-| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
+| Up to you but appreciated. Sends an anonymous report that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимный отчёт, который просто даёт мне знать, работает ли приложение и сколько места люди освобождают. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
+| Up to you but appreciated. Sends an anonymous report that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимный отчёт, который просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
 | Move the unneeded files to the Move location. | Переместить ненужные файлы в папку для перемещения. |
 | Move the unneeded files to the Move location. Choose one first. | Переместить ненужные файлы в папку для перемещения. Сначала выберите её. |
 | Send the unneeded files to the Recycle Bin. | Отправить ненужные файлы в Корзину. |
@@ -323,7 +323,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Удалить ненужные файлы безвозвратно, потому что Корзина недоступна для этого диска |
 | Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | Отправляется на nofaff.netlify.app. Только счётчики и метки. Перед отправкой вы увидите точное содержимое. |
 | Say thanks | Поблагодарить |
-| Send posts the summary shown to No Faff. Cancel sends nothing. | «Отправить» передаёт показанную сводку в No Faff. «Отмена» не отправляет ничего. |
+| Send posts the report shown to No Faff. Cancel sends nothing. | «Отправить» передаёт показанный отчёт в No Faff. «Отмена» не отправляет ничего. |
 | Check for updates | Проверить обновления |
 | Checks the GitHub releases API over HTTPS for a newer version. | Проверяет наличие более новой версии через API выпусков GitHub по HTTPS. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Откройте страницу выпуска, чтобы скачать более новую версию, или нажмите «Отмена», чтобы оставить текущую. |
