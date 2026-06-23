@@ -2,8 +2,6 @@
   <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <strong>Español</strong> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.ja.md">日本語</a> · <a href="README.ko.md">한국어</a> · <a href="README.fr.md">Français</a> · <a href="README.de.md">Deutsch</a> · <a href="README.it.md">Italiano</a>
 </p>
 
-<p align="center"><em>Esta página está traducida, pero la interfaz de la aplicación está actualmente solo en inglés.</em></p>
-
 <p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
@@ -34,6 +32,7 @@
 
 ## Contenido
 
+- [Can you help translate the GUI?](#can-you-help-translate-the-gui)
 - [La carpeta de la que nadie te habla](#la-carpeta-de-la-que-nadie-te-habla)
 - [La búsqueda de ayuda](#la-búsqueda-de-ayuda)
 - [Qué hace](#qué-hace)
@@ -55,6 +54,17 @@
 - [Licencia](#licencia)
 
 ---
+
+## Can you help translate the GUI?
+
+<details>
+<summary>Interface is English or Italian only; click to help check a machine translation</summary>
+
+I'd like to make the app available in more languages. I've got a machine-translated file for eight more languages, containing a list of all 281 strings, ready to go, but I don't want to ship them without the approval of a native speaker. [bovirus](https://github.com/bovirus) has already kindly corrected and approved the Italian, so InstallerClean is now bilingual. With your help, I can add Spanish to the list.
+
+I'd be very grateful to anyone with a good grasp of both English and Spanish who can look over the translation as it stands and either approve what's there or suggest improvements where necessary. You can see it all [here](docs/translations/es.md), the English beside the Spanish, and the file itself is [here](src/InstallerClean.Core/Resources/Strings.es.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking. Tell me in an [issue](../../issues/new?template=translation_review.md) or a [pull request](../../edit/main/src/InstallerClean.Core/Resources/Strings.es.resx), whichever's easier, and Spanish joins English and Italian, with the credit going to you.
+
+</details>
 
 ## La carpeta de la que nadie te habla
 
