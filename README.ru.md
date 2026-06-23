@@ -55,9 +55,10 @@
 
 ---
 
-<a name="can-you-help-translate-the-gui"></a>
+## Can you help translate the GUI?
+
 <details>
-<summary><strong>Can you help translate the GUI?</strong></summary>
+<summary>Interface is English or Italian only; click to help check a machine translation</summary>
 
 You're reading a machine-translated version of this README (I did put a lot of work into it), but InstallerClean's interface itself - every button, message and label - is still only in English or Italian.
 

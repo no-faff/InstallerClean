@@ -376,9 +376,10 @@ Run the tests:
 dotnet test src/InstallerClean.Tests/
 ```
 
-<a name="can-you-help-translate-the-gui"></a>
+## Can you help translate the GUI?
+
 <details>
-<summary><strong>Can you help translate the GUI?</strong></summary>
+<summary>Interface is English or Italian only; click to help check a machine translation</summary>
 
 InstallerClean's interface - every button, message and label - is in English or Italian. I've also had it machine-translated into other languages and gone to great lengths to get each as good as I can, but I'm not going to ship a machine translation unchecked: each one needs someone who really knows the language to go through the translated file, keep what's already correct and put right what isn't.
 
