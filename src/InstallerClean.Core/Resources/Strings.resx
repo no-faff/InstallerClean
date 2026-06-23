@@ -746,8 +746,8 @@ The crash log could not be written.</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some files processed, some failed</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transient: a temporary condition blocked the run (see the message)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 cancelled (Ctrl+C)</value></data>
-  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Change the display language. InstallerClean restarts to apply it.</value></data>
-  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Change the display language</value></data>
-  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>InstallerClean restarts to apply it.</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Change language. InstallerClean will restart.</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Change language</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>InstallerClean will restart.</value></data>
 
 </root>

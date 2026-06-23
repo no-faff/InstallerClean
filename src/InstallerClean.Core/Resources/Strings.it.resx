@@ -611,8 +611,8 @@ Non è stato possibile scrivere il file crash.log.</value></data>
 # questo file a una segnalazione di bug pubblica.
 </value></data>
 
-  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Cambia la lingua di visualizzazione. InstallerClean verrà riavviato per applicarla.</value></data>
-  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Cambia la lingua di visualizzazione</value></data>
-  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>InstallerClean verrà riavviato per applicarla.</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Cambia lingua. InstallerClean verrà riavviato.</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Cambia lingua</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>InstallerClean verrà riavviato.</value></data>
 
 </root>
