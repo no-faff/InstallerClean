@@ -1,6 +1,6 @@
 ---
 name: Translation review
-about: Suggest better wording for InstallerClean's interface in your language
+about: Approve a language's GUI translation, or say what needs changing
 labels: translation
 ---
 
@@ -8,10 +8,14 @@ labels: translation
 
 <!-- e.g. Simplified Chinese, German, Russian. -->
 
-## What reads wrong, and what you'd put instead
+## Your verdict
 
-<!-- Quote the current wording (from the translation table or the resx) and where it shows up,
-     then what you'd put instead. As few or as many as you like; you don't have to do the whole file. -->
+<!-- Good to ship as it stands? Or good once the changes below are made? Your call as a native speaker. -->
+
+## Changes, if any
+
+<!-- Quote the current wording (from the translation table or the resx) and what you'd put instead.
+     As few or as many as you like; you don't have to do the whole file. -->
 
 ## Anything else
 

@@ -60,17 +60,9 @@
 <details>
 <summary>Interface is English or Italian only; click to help check a machine translation</summary>
 
-You're reading a machine-translated version of this README (I did put a lot of work into it), but InstallerClean's interface itself - every button, message and label - is still only in English or Italian.
+I'd like to make the app available in more languages. I've got a machine-translated file for eight more languages, containing a list of all 281 strings, ready to go, but I don't want to ship them without the approval of a native speaker. [bovirus](https://github.com/bovirus) has already kindly corrected and approved the Italian, so InstallerClean is now bilingual. With your help, I can add Simplified Chinese to the list.
 
-The interface has also been machine-translated into Simplified Chinese (again, I've gone to great lengths to get it as good as I can), but I'm not going to ship a machine translation unchecked; it needs someone who speaks both Chinese and English to go through the translated file, keep what's already correct and put right what isn't.
-
-If you can read this English comfortably and you've got a good ear for what reads well in Chinese, you're exactly the person I'm hoping to reach and I'd be really grateful if you can help - so, I'm sure, will lots of other Chinese speakers.
-
-You can see the whole thing [here](docs/translations/zh-Hans.md), the English beside the translation, as a plain table. And the complete resx file is [here](src/InstallerClean.Core/Resources/Strings.zh-Hans.resx).
-
-You don't have to take it all on: if a term reads wrong, open an [issue](../../issues/new?template=translation_review.md) saying what you'd put instead, as few or as many as you like. A [pull request](../../edit/main/src/InstallerClean.Core/Resources/Strings.zh-Hans.resx)'s just as welcome, whichever is easier for you.
-
-Do that and InstallerClean will speak Simplified Chinese too, alongside English and Italian, and you'd be credited as the person who got it there.
+I'd be very grateful to anyone with a good grasp of both English and Chinese who can look over the translation as it stands and either approve what's there or suggest improvements where necessary. You can see it all [here](docs/translations/zh-Hans.md), the English beside the Chinese, and the file itself is [here](src/InstallerClean.Core/Resources/Strings.zh-Hans.resx). Tell me in an [issue](../../issues/new?template=translation_review.md) or a [pull request](../../edit/main/src/InstallerClean.Core/Resources/Strings.zh-Hans.resx), whichever's easier, and Simplified Chinese joins English and Italian, with the credit going to you.
 
 </details>
 
