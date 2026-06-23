@@ -4,6 +4,12 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 ## [Unreleased]
 
+### Added
+
+- A Simplified Chinese (zh-Hans) interface translation: all 281 interface strings, ready for a native speaker to review and refine via the README before it goes live in the app. The satellite is script-neutral, reaching every Simplified-Chinese Windows; the command line stays English by design.
+- A Russian (ru) interface translation on the same basis. Its plurals use the general/genitive form for now, as the two-form plural engine cannot express the Slavic 2-4 case; a three-form fix is left for later.
+- A Spanish (es) interface translation on the same basis, in neutral international Spanish, with terms following Microsoft's Spanish Windows.
+
 ### Changed
 
 - Two small refinements to the Italian interface text: the post-scan count line now describes the unneeded files as ones you can delete rather than ones to delete, and the delete summary now names the move into the Recycle Bin (matching its with-errors counterpart). Suggested by bovirus (#39).
