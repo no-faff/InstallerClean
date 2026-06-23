@@ -615,4 +615,6 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Cambia lingua</value></data>
   <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Il programma verrà riavviato.</value></data>
 
+  <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Trovato {0} {1} registrato.</value></data>
+  <data name="Summary.RegisteredWindow.One" xml:space="preserve"><value>{0} {1} registrato ({2})</value></data>
 </root>

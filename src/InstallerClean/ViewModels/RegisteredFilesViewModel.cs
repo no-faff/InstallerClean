@@ -143,7 +143,8 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         }
 
         Products = products;
-        Summary = string.Format(Strings.Summary_RegisteredWindow,
+        Summary = string.Format(
+            DisplayHelpers.Pluralise(packages.Count, Strings.Summary_RegisteredWindow, Strings.Summary_RegisteredWindow, "Summary.RegisteredWindow"),
             packages.Count,
             DisplayHelpers.PluraliseFile(packages.Count),
             DisplayHelpers.FormatSize(totalBytes));

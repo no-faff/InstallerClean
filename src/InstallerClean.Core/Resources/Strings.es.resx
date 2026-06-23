@@ -691,4 +691,6 @@ No se pudo escribir el archivo crash.log.</value></data>
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Cambiar el idioma de visualización</value></data>
   <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>InstallerClean se reiniciará para aplicarlo.</value></data>
 
+  <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Se encontró {0} {1} registrado.</value></data>
+  <data name="Summary.RegisteredWindow.One" xml:space="preserve"><value>{0} {1} registrado ({2})</value></data>
 </root>

@@ -74,16 +74,18 @@ internal static class DisplayHelpers
     /// <summary>
     /// Picks the count fragment for <paramref name="count"/> in the current UI
     /// language. <paramref name="singular"/>/<paramref name="plural"/> are the resx
-    /// one/other forms; a language needing the few/many categories supplies them as
-    /// <c>{keyPrefix}.Few</c> / <c>.Many</c> in its own satellite, read here by name
-    /// (an absent one falls back to plural). <paramref name="keyPrefix"/> is the resx
-    /// key without the form suffix and MUST match it exactly, or the few/many lookup
-    /// silently misses and falls back to plural.
+    /// one/other forms; a language may override any CLDR category with a satellite-only
+    /// <c>{keyPrefix}.One</c> / <c>.Few</c> / <c>.Many</c> key, read here by name
+    /// (absent ones fall back to <paramref name="singular"/> for One, else
+    /// <paramref name="plural"/>). The <c>.One</c> override lets a flat string (passed
+    /// as singular==plural) gain a correct n==1 form in an inflecting language without
+    /// splitting the neutral key. <paramref name="keyPrefix"/> is the resx key without
+    /// the form suffix and MUST match it exactly, or the lookup silently misses.
     /// </summary>
     internal static string Pluralise(int count, string singular, string plural, string keyPrefix) =>
         CategoryFor(Localisation.UiCulture, count) switch
         {
-            PluralCategory.One => singular,
+            PluralCategory.One => Strings.ResourceManager.GetString($"{keyPrefix}.One", Localisation.UiCulture) ?? singular,
             PluralCategory.Few => Strings.ResourceManager.GetString($"{keyPrefix}.Few", Localisation.UiCulture) ?? plural,
             PluralCategory.Many => Strings.ResourceManager.GetString($"{keyPrefix}.Many", Localisation.UiCulture) ?? plural,
             _ => plural,
