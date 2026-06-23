@@ -224,7 +224,7 @@ Si quelque chose ici vous gêne, [ouvrez un ticket](../../issues). Les problème
 - WinSxS (`C:\Windows\WinSxS`) est un dossier différent, avec des règles différentes. Pour celui-là, exécutez `Dism /Online /Cleanup-Image /StartComponentCleanup` depuis une invite élevée.
 - Aucun service en arrière-plan, aucune tâche planifiée, aucun nettoyage automatique. L'application s'exécute quand vous la lancez.
 - Le registre est lu en lecture seule. L'application interroge la base de données de Windows Installer ; elle ne la modifie pas.
-- Il ne se connecte à Internet que lorsque vous le lui demandez : une vérification manuelle des mises à jour ; le résumé anonyme facultatif (juste pour me faire savoir que ça fonctionne) ; et des liens vers la documentation GitHub et une page de dons, qui s'ouvrent dans votre navigateur si vous choisissez de cliquer.
+- Il ne se connecte à Internet que lorsque vous le lui demandez : une vérification manuelle des mises à jour ; le rapport anonyme facultatif (juste pour me faire savoir que ça fonctionne) ; et des liens vers la documentation GitHub et une page de dons, qui s'ouvrent dans votre navigateur si vous choisissez de cliquer.
 - Pas de barres d'outils, pas de logiciels groupés, pas de publiciels.
 
 ## FAQ
@@ -241,7 +241,7 @@ Sur les 93 rapports que des utilisateurs nous ont gentiment envoyés (merci 🙏
 <!-- reports-stats-end -->
 
 <details>
-<summary>Ces rapports proviennent du bouton facultatif « Envoyer le résumé ». Voici ce que vous verrez avant que quoi que ce soit ne soit envoyé.</summary>
+<summary>Ces rapports proviennent du bouton facultatif « Envoyer le rapport ». Voici ce que vous verrez avant que quoi que ce soit ne soit envoyé.</summary>
 
 ![Boîte de dialogue de confirmation intitulée « Send this to No Faff? », montrant l'intégralité du rapport qui serait envoyé : version de l'application, version de Windows, compteurs d'analyse, fichiers traités et octets libérés, sans aucun chemin de fichier, nom ou identifiant de machine, et une note précisant que rien ne vous identifie, vous ou votre machine, seulement si l'application a fonctionné et combien d'espace a été libéré, avec les boutons Annuler et Envoyer.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
 

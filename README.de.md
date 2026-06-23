@@ -224,7 +224,7 @@ Wenn dir hier etwas im Weg ist, [erstelle ein Issue](../../issues). Barrierefrei
 - WinSxS (`C:\Windows\WinSxS`) ist ein anderer Ordner mit anderen Regeln. Dafür führe `Dism /Online /Cleanup-Image /StartComponentCleanup` in einer Eingabeaufforderung mit erhöhten Rechten aus.
 - Kein Hintergrunddienst, keine geplante Aufgabe, kein automatisches Aufräumen. Die App läuft, wenn du sie startest.
 - Die Registrierung wird nur gelesen. Die App fragt die Windows-Installer-Datenbank ab; sie verändert sie nicht.
-- Sie verbindet sich nur mit dem Internet, wenn du es ihr sagst: eine manuelle Update-Prüfung; die optionale anonyme Zusammenfassung (nur damit ich weiß, dass es funktioniert); und Links zur GitHub-Dokumentation und einer Spendenseite, die sich in deinem Browser öffnen, wenn du sie anklickst.
+- Sie verbindet sich nur mit dem Internet, wenn du es ihr sagst: eine manuelle Update-Prüfung; der optionale anonyme Bericht (nur damit ich weiß, dass es funktioniert); und Links zur GitHub-Dokumentation und einer Spendenseite, die sich in deinem Browser öffnen, wenn du sie anklickst.
 - Keine Symbolleisten, keine gebündelte Software, keine Adware.
 
 ## FAQ
@@ -241,7 +241,7 @@ Von den 93 Berichten, die seit der Einführung der Option in v1.8.0 freundlicher
 <!-- reports-stats-end -->
 
 <details>
-<summary>Diese Berichte stammen von der optionalen Schaltfläche „Zusammenfassung senden“. Das siehst du, bevor etwas gesendet wird.</summary>
+<summary>Diese Berichte stammen von der optionalen Schaltfläche „Bericht senden“. Das siehst du, bevor etwas gesendet wird.</summary>
 
 ![Bestätigungsdialog mit dem Titel „Send this to No Faff?“, der den vollständigen Bericht zeigt, der gesendet würde: App-Version, Windows-Version, Scan-Zähler, verarbeitete Dateien und freigegebene Bytes, ohne Dateipfade, Namen oder Geräte-IDs, mit dem Hinweis, dass nichts dich oder deinen Rechner identifiziert, nur ob die App funktioniert hat und wie viel Platz freigegeben wurde, mit den Schaltflächen Abbrechen und Senden.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
 

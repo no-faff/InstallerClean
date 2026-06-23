@@ -221,7 +221,7 @@ If anything here gets in your way, [open an issue](../../issues). Accessibility 
 - WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, run `Dism /Online /Cleanup-Image /StartComponentCleanup` from an elevated prompt.
 - No background service, no scheduled task, no auto-clean. The app runs when you launch it.
 - The registry is read-only. The app queries the Windows Installer database; it doesn't change it.
-- It only connects to the internet when you tell it to: a manual update check; the optional anonymous summary (just to let me know it's working); and links to the GitHub docs and a donate page, which open in your browser if you choose to click them.
+- It only connects to the internet when you tell it to: a manual update check; the optional anonymous report (just to let me know it's working); and links to the GitHub docs and a donate page, which open in your browser if you choose to click them.
 - No toolbars, no bundled software, no adware.
 
 ## FAQ
@@ -238,7 +238,7 @@ Across the 93 reports people have sent in (thanks 🙏) since v1.8.0 added the o
 <!-- reports-stats-end -->
 
 <details>
-<summary>Those reports come from the optional "Send summary" button. Here's what you'll see before anything's sent.</summary>
+<summary>Those reports come from the optional "Send report" button. Here's what you'll see before anything's sent.</summary>
 
 ![Confirmation dialogue titled "Send this to No Faff?" showing the full report that would be sent: app version, Windows version, scan counts, files processed and bytes freed, with no file paths, names or machine IDs, and a note that nothing identifies you or your machine, just whether the app worked and how much space was freed, with Cancel and Send buttons.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
 

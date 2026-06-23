@@ -224,7 +224,7 @@ Se algo aqui atrapalhar você, [abra uma issue](../../issues). Problemas de aces
 - O WinSxS (`C:\Windows\WinSxS`) é uma pasta diferente, com regras diferentes. Para essa, rode `Dism /Online /Cleanup-Image /StartComponentCleanup` em um prompt elevado.
 - Sem serviço em segundo plano, sem tarefa agendada, sem limpeza automática. O aplicativo roda quando você o abre.
 - O registro é acessado apenas para leitura. O aplicativo consulta o banco de dados do Windows Installer; não o modifica.
-- Ele só se conecta à internet quando você manda: uma verificação manual de atualizações; o resumo anônimo opcional (só para eu saber que está funcionando); e links para a documentação no GitHub e para uma página de doação, que abrem no seu navegador se você optar por clicar.
+- Ele só se conecta à internet quando você manda: uma verificação manual de atualizações; o relatório anônimo opcional (só para eu saber que está funcionando); e links para a documentação no GitHub e para uma página de doação, que abrem no seu navegador se você optar por clicar.
 - Sem barras de ferramentas, sem software empacotado, sem adware.
 
 ## Perguntas frequentes
@@ -241,7 +241,7 @@ Entre os 93 relatórios que as pessoas tiveram a gentileza de enviar (obrigado �
 <!-- reports-stats-end -->
 
 <details>
-<summary>Esses relatórios vêm do botão opcional "Enviar resumo". Veja o que você verá antes de qualquer coisa ser enviada.</summary>
+<summary>Esses relatórios vêm do botão opcional "Enviar relatório". Veja o que você verá antes de qualquer coisa ser enviada.</summary>
 
 ![Caixa de diálogo de confirmação intitulada "Enviar isto para o No Faff?" mostrando o relatório completo que seria enviado: versão do aplicativo, versão do Windows, contagens da análise, arquivos processados e bytes liberados, sem nenhum caminho de arquivo, nome ou ID de máquina, e uma observação de que nada identifica você ou a sua máquina, apenas se o aplicativo funcionou e quanto espaço foi liberado, com os botões Cancelar e Enviar.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
 

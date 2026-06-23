@@ -234,7 +234,7 @@ Si algo aquí te estorba, [abre un issue](../../issues). Los problemas de accesi
 - WinSxS (`C:\Windows\WinSxS`) es una carpeta distinta con reglas distintas. Para esa, ejecuta `Dism /Online /Cleanup-Image /StartComponentCleanup` desde un símbolo del sistema elevado.
 - Sin servicio en segundo plano, sin tarea programada, sin limpieza automática. La aplicación se ejecuta cuando tú la inicias.
 - El acceso al registro es de solo lectura. La aplicación consulta la base de datos de Windows Installer; no la modifica.
-- Solo se conecta a internet cuando se lo pides: una comprobación de actualizaciones manual; el resumen anónimo opcional (solo para que yo sepa que funciona); y enlaces a la documentación de GitHub y a una página de donaciones, que se abren en tu navegador si decides pulsarlos.
+- Solo se conecta a internet cuando se lo pides: una comprobación de actualizaciones manual; el informe anónimo opcional (solo para que yo sepa que funciona); y enlaces a la documentación de GitHub y a una página de donaciones, que se abren en tu navegador si decides pulsarlos.
 - Sin barras de herramientas, sin software incluido, sin adware.
 
 ## Preguntas frecuentes
@@ -251,7 +251,7 @@ De los 93 informes que me han enviado amablemente (gracias 🙏) desde que la v1
 <!-- reports-stats-end -->
 
 <details>
-<summary>Esos informes provienen del botón opcional «Enviar resumen». Esto es lo que verás antes de que se envíe nada.</summary>
+<summary>Esos informes provienen del botón opcional «Enviar informe». Esto es lo que verás antes de que se envíe nada.</summary>
 
 ![Diálogo de confirmación titulado «¿Enviar esto a No Faff?» que muestra el informe completo que se enviaría: la versión de la aplicación, la versión de Windows, los recuentos del análisis, los archivos procesados y los bytes liberados, sin rutas de archivo, sin nombres ni identificadores de equipo, y con una nota de que nada te identifica a ti ni a tu equipo, solo si la aplicación funcionó y cuánto espacio se liberó, con los botones Cancelar y Enviar.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
 
