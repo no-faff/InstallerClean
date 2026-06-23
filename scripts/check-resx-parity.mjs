@@ -30,13 +30,20 @@ const parse = (file) => {
   return map;
 };
 
-// Optional per-language plural fragments (CLDR "few"/"many"). A language whose
-// plural rules need more than the neutral's one/other pair adds these; they are
-// read by name via the ResourceManager, never generated into the Designer, so
-// they live only in the satellites that use them.
-const isOptionalPlural = (key) => /^Plural\.[A-Za-z]+\.(Few|Many)$/.test(key);
-
 const neutral = parse('Strings.resx');
+
+// Optional per-language plural fragments (CLDR "few"/"many"). A language whose
+// plural rules need more than the neutral's one/other pair adds these as
+// satellite-only keys: a noun fragment (Plural.File.Few) or a whole count template
+// whose noun is baked in (Summary.RegisteredStillUsed.Few). They are read by name
+// via the ResourceManager, never generated into the Designer, so they live only in
+// the satellites that use them. Allowed when the base key's .Plural is in the
+// neutral, which ties each .Few/.Many to a real pluralised string and still catches
+// a typo'd key.
+const isOptionalPlural = (key) => {
+  const m = key.match(/^(.+)\.(?:Few|Many)$/);
+  return m !== null && neutral.has(`${m[1]}.Plural`);
+};
 const satellites = readdirSync(dir)
   .filter((f) => /^Strings\.[A-Za-z-]+\.resx$/.test(f) && f !== 'Strings.resx')
   .sort();
