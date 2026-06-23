@@ -23,7 +23,7 @@
       Plural.*               singular/plural fragments used by DisplayHelpers
       Reason.*               Reason column values in the unneeded files list
       RecycleUnavailable.*   recycle-bin-unavailable choice dialog
-      ResultLog.*            send-summary states (Sending / Sent / Failed)
+      ResultLog.*            send-report states (Sending / Sent / Failed)
       Section.*              heading text inside windows
       Startup.*              splash + already-running messages
       Status.*               transient status / progress text
