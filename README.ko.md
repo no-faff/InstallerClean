@@ -285,6 +285,12 @@ v1.8.0에서 이 옵션이 추가된 이후 보내 주신 93건의 보고서(감
 winget install NoFaff.InstallerClean
 ```
 
+또는 [Chocolatey](https://chocolatey.org)로 설치하세요:
+
+```
+choco install installerclean
+```
+
 또는 [Scoop](https://scoop.sh)으로 설치하세요:
 
 ```

@@ -285,6 +285,12 @@ Ou installez via [winget](https://learn.microsoft.com/windows/package-manager/wi
 winget install NoFaff.InstallerClean
 ```
 
+Ou installez via [Chocolatey](https://chocolatey.org) :
+
+```
+choco install installerclean
+```
+
 Ou installez via [Scoop](https://scoop.sh) :
 
 ```

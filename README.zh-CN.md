@@ -295,6 +295,12 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 winget install NoFaff.InstallerClean
 ```
 
+或者通过 [Chocolatey](https://chocolatey.org) 安装：
+
+```
+choco install installerclean
+```
+
 或者通过 [Scoop](https://scoop.sh) 安装：
 
 ```

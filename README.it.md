@@ -285,6 +285,12 @@ Oppure installala tramite [winget](https://learn.microsoft.com/windows/package-m
 winget install NoFaff.InstallerClean
 ```
 
+Oppure installala tramite [Chocolatey](https://chocolatey.org):
+
+```
+choco install installerclean
+```
+
 Oppure installala tramite [Scoop](https://scoop.sh):
 
 ```
