@@ -147,7 +147,7 @@
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>打开发布页面(_R)</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>重新扫描(_R)</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>再次扫描(_S)</value></data>
-  <data name="Action.SendResultLog" xml:space="preserve"><value>发送摘要</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>发送报告</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>发送(_S)</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
@@ -176,7 +176,7 @@
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>由于此驱动器的回收站不可用，永久删除这些不需要的文件</value></data>
   <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>发送到 nofaff.netlify.app。仅包含计数和标签。发送前您会看到完整的内容。</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>道声谢</value></data>
-  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>发送会将所示摘要提交给 No Faff。取消则不发送任何内容。</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>发送会将所示报告提交给 No Faff。取消则不发送任何内容。</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>检查更新</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>通过 HTTPS 查询 GitHub 发布 API，检查是否有更新版本。</value></data>
   <!-- Window-level description for the update-available modal, read by a
@@ -239,8 +239,8 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>在 GitHub 上点个星、提交 Issue 或在 Discussions 中发帖。欢迎任何反馈。</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>或提交 Issue，或在 Discussions 中发帖。欢迎任何反馈。</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>最小化</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名报告，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名报告，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>将不需要的文件移动到移动位置。</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>将不需要的文件移动到移动位置。请先选择一个位置。</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>将不需要的文件送入回收站。</value></data>
@@ -516,9 +516,9 @@
 
   <!-- Result log (post-cleanup diagnostic send) -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>正在发送…</value></data>
-  <data name="ResultLog.Sent" xml:space="preserve"><value>谢谢！摘要已发送。</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>谢谢！报告已发送。</value></data>
   <data name="ResultLog.Failed" xml:space="preserve"><value>发送失败。请稍后重试。</value></data>
-  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>没有可发送的摘要。</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>没有可发送的报告。</value></data>
   <!-- Body header shown in the confirmation modal. Names the
        recipient and the full URL so the user sees the destination
        without having to scroll the JSON. -->

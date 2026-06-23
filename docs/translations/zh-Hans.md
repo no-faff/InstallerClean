@@ -52,7 +52,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Open _release page | 打开发布页面(_R) |
 | _Re-scan | 重新扫描(_R) |
 | _Scan again | 再次扫描(_S) |
-| Send summary | 发送摘要 |
+| Send report | 发送报告 |
 | _Send | 发送(_S) |
 
 ## Field labels
@@ -260,9 +260,9 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | English | 简体中文 |
 | --- | --- |
 | Sending... | 正在发送… |
-| Thanks! Summary sent. | 谢谢！摘要已发送。 |
+| Thanks! Report sent. | 谢谢！报告已发送。 |
 | Sending failed. Try again later. | 发送失败。请稍后重试。 |
-| No summary to send. | 没有可发送的摘要。 |
+| No report to send. | 没有可发送的报告。 |
 | Send this to No Faff? | 把这个发送给 No Faff 吗？ |
 | Nothing identifies you or your machine; it just lets me know the app is working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | 没有任何内容能识别您或您的机器；它只是让我知道应用是否正常工作，以及大家释放了多少空间。它会发送到 nofaff.netlify.app/api/result-log。 |
 
@@ -291,8 +291,8 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | 在 GitHub 上点个星、提交 Issue 或在 Discussions 中发帖。欢迎任何反馈。 |
 | or report an Issue or post in Discussions. Any feedback welcome. | 或提交 Issue，或在 Discussions 中发帖。欢迎任何反馈。 |
 | Minimise | 最小化 |
-| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。 |
-| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。 |
+| Up to you but appreciated. Sends an anonymous report that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 由您决定，但非常感谢。会发送一份匿名报告，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。 |
+| Up to you but appreciated. Sends an anonymous report that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 由您决定，但非常感谢。会发送一份匿名报告，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。 |
 | Move the unneeded files to the Move location. | 将不需要的文件移动到移动位置。 |
 | Move the unneeded files to the Move location. Choose one first. | 将不需要的文件移动到移动位置。请先选择一个位置。 |
 | Send the unneeded files to the Recycle Bin. | 将不需要的文件送入回收站。 |
@@ -323,7 +323,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | 由于此驱动器的回收站不可用，永久删除这些不需要的文件 |
 | Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | 发送到 nofaff.netlify.app。仅包含计数和标签。发送前您会看到完整的内容。 |
 | Say thanks | 道声谢 |
-| Send posts the summary shown to No Faff. Cancel sends nothing. | 发送会将所示摘要提交给 No Faff。取消则不发送任何内容。 |
+| Send posts the report shown to No Faff. Cancel sends nothing. | 发送会将所示报告提交给 No Faff。取消则不发送任何内容。 |
 | Check for updates | 检查更新 |
 | Checks the GitHub releases API over HTTPS for a newer version. | 通过 HTTPS 查询 GitHub 发布 API，检查是否有更新版本。 |
 | Open the release page to download the newer version, or cancel to keep the current version. | 打开发布页面以下载更新版本，或取消以保留当前版本。 |

@@ -52,7 +52,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Open _release page | Abrir la página de la _versión |
 | _Re-scan | _Volver a analizar |
 | _Scan again | Analizar de _nuevo |
-| Send summary | Enviar resumen |
+| Send report | Enviar informe |
 | _Send | _Enviar |
 
 ## Field labels
@@ -260,9 +260,9 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | English | Español |
 | --- | --- |
 | Sending... | Enviando... |
-| Thanks! Summary sent. | ¡Gracias! Resumen enviado. |
+| Thanks! Report sent. | ¡Gracias! Informe enviado. |
 | Sending failed. Try again later. | Envío fallido. Inténtalo de nuevo más tarde. |
-| No summary to send. | No hay ningún resumen que enviar. |
+| No report to send. | No hay ningún informe que enviar. |
 | Send this to No Faff? | ¿Enviar esto a No Faff? |
 | Nothing identifies you or your machine; it just lets me know the app is working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | Nada te identifica a ti ni a tu equipo; solo sirve para que yo sepa que la aplicación funciona y cuánto espacio libera la gente. Se envía a nofaff.netlify.app/api/result-log. |
 
@@ -291,8 +291,8 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Deja una estrella en GitHub, informa de un problema (Issue) o escribe en Discussions. Cualquier comentario es bienvenido. |
 | or report an Issue or post in Discussions. Any feedback welcome. | o informa de un problema (Issue) o escribe en Discussions. Cualquier comentario es bienvenido. |
 | Minimise | Minimizar |
-| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Tú decides, pero se agradece. Envía un resumen anónimo que solo sirve para que yo sepa si funciona y cuánto espacio libera la gente. La pantalla siguiente te muestra lo que se enviará antes de confirmar. |
-| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Tú decides, pero se agradece. Envía un resumen anónimo que solo sirve para que yo sepa si funciona. La pantalla siguiente te muestra lo que se enviará antes de confirmar. |
+| Up to you but appreciated. Sends an anonymous report that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Tú decides, pero se agradece. Envía un informe anónimo que solo sirve para que yo sepa si funciona y cuánto espacio libera la gente. La pantalla siguiente te muestra lo que se enviará antes de confirmar. |
+| Up to you but appreciated. Sends an anonymous report that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Tú decides, pero se agradece. Envía un informe anónimo que solo sirve para que yo sepa si funciona. La pantalla siguiente te muestra lo que se enviará antes de confirmar. |
 | Move the unneeded files to the Move location. | Mueve los archivos innecesarios a la ubicación de destino. |
 | Move the unneeded files to the Move location. Choose one first. | Mueve los archivos innecesarios a la ubicación de destino. Elige una primero. |
 | Send the unneeded files to the Recycle Bin. | Envía los archivos innecesarios a la Papelera de reciclaje. |
@@ -323,7 +323,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Eliminar definitivamente los archivos innecesarios porque la Papelera de reciclaje no está disponible para esta unidad |
 | Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | Se envía a nofaff.netlify.app. Solo recuentos y etiquetas. Verás exactamente lo que se envía antes de enviarlo. |
 | Say thanks | Dar las gracias |
-| Send posts the summary shown to No Faff. Cancel sends nothing. | Enviar transmite a No Faff el resumen mostrado. Cancelar no envía nada. |
+| Send posts the report shown to No Faff. Cancel sends nothing. | Enviar transmite a No Faff el informe mostrado. Cancelar no envía nada. |
 | Check for updates | Buscar actualizaciones |
 | Checks the GitHub releases API over HTTPS for a newer version. | Consulta la API de versiones de GitHub por HTTPS para ver si hay una versión más reciente. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Abre la página de la versión para descargar la más reciente, o cancela para conservar la actual. |

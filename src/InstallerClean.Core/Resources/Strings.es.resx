@@ -147,7 +147,7 @@
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>Abrir la página de la _versión</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Volver a analizar</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>Analizar de _nuevo</value></data>
-  <data name="Action.SendResultLog" xml:space="preserve"><value>Enviar resumen</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>Enviar informe</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Enviar</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
@@ -176,7 +176,7 @@
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Eliminar definitivamente los archivos innecesarios porque la Papelera de reciclaje no está disponible para esta unidad</value></data>
   <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Se envía a nofaff.netlify.app. Solo recuentos y etiquetas. Verás exactamente lo que se envía antes de enviarlo.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Dar las gracias</value></data>
-  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Enviar transmite a No Faff el resumen mostrado. Cancelar no envía nada.</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Enviar transmite a No Faff el informe mostrado. Cancelar no envía nada.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Buscar actualizaciones</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Consulta la API de versiones de GitHub por HTTPS para ver si hay una versión más reciente.</value></data>
   <!-- Window-level description for the update-available modal, read by a
@@ -239,8 +239,8 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Deja una estrella en GitHub, informa de un problema (Issue) o escribe en Discussions. Cualquier comentario es bienvenido.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>o informa de un problema (Issue) o escribe en Discussions. Cualquier comentario es bienvenido.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimizar</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Tú decides, pero se agradece. Envía un resumen anónimo que solo sirve para que yo sepa si funciona y cuánto espacio libera la gente. La pantalla siguiente te muestra lo que se enviará antes de confirmar.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Tú decides, pero se agradece. Envía un resumen anónimo que solo sirve para que yo sepa si funciona. La pantalla siguiente te muestra lo que se enviará antes de confirmar.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Tú decides, pero se agradece. Envía un informe anónimo que solo sirve para que yo sepa si funciona y cuánto espacio libera la gente. La pantalla siguiente te muestra lo que se enviará antes de confirmar.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Tú decides, pero se agradece. Envía un informe anónimo que solo sirve para que yo sepa si funciona. La pantalla siguiente te muestra lo que se enviará antes de confirmar.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Mueve los archivos innecesarios a la ubicación de destino.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Mueve los archivos innecesarios a la ubicación de destino. Elige una primero.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Envía los archivos innecesarios a la Papelera de reciclaje.</value></data>
@@ -516,9 +516,9 @@ Detalles en {1}.</value></data>
 
   <!-- Result log (post-cleanup diagnostic send) -->
   <data name="ResultLog.Sending" xml:space="preserve"><value>Enviando...</value></data>
-  <data name="ResultLog.Sent" xml:space="preserve"><value>¡Gracias! Resumen enviado.</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>¡Gracias! Informe enviado.</value></data>
   <data name="ResultLog.Failed" xml:space="preserve"><value>Envío fallido. Inténtalo de nuevo más tarde.</value></data>
-  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>No hay ningún resumen que enviar.</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>No hay ningún informe que enviar.</value></data>
   <!-- Body header shown in the confirmation modal. Names the
        recipient and the full URL so the user sees the destination
        without having to scroll the JSON. -->
