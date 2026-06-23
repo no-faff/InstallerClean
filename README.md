@@ -376,17 +376,22 @@ Run the tests:
 dotnet test src/InstallerClean.Tests/
 ```
 
-## Can you help translate the GUI?
+<a name="can-you-help-translate-the-gui"></a>
+<details>
+<summary><strong>Can you help translate the GUI?</strong></summary>
 
-InstallerClean's interface, every button, message and label, is in English or Italian. I've also had it machine-translated into other languages and gone to great lengths to get each as good as I can, but I'm not going to ship a machine translation unchecked: each one needs someone who really knows the language to go through the translated file, keep what's already correct and put right what isn't.
+InstallerClean's interface - every button, message and label - is in English or Italian. I've also had it machine-translated into other languages and gone to great lengths to get each as good as I can, but I'm not going to ship a machine translation unchecked: each one needs someone who really knows the language to go through the translated file, keep what's already correct and put right what isn't.
 
 If you've got a good ear for what reads well in one of these languages, you're exactly the person I'm hoping to reach, and so are plenty of other speakers of it. Each one is here as a plain table, the English beside the translation, with the complete resx file alongside:
 
 - Simplified Chinese: [table](docs/translations/zh-Hans.md) · [resx](src/InstallerClean.Core/Resources/Strings.zh-Hans.resx)
+- Russian: [table](docs/translations/ru.md) · [resx](src/InstallerClean.Core/Resources/Strings.ru.resx)
 
 More languages are on the way and will appear here as they're ready.
 
-You don't have to take it all on: if a term reads wrong, open an [issue](../../issues/new?template=translation_review.md) saying what you'd put instead, as few or as many as you like. A pull request's just as welcome. Do that and InstallerClean will speak that language too, and you'd be credited as the person who got it there.
+You don't have to take it all on: if a term reads wrong, open an [issue](../../issues/new?template=translation_review.md) saying what you'd put instead, as few or as many as you like. A [pull request](../../pulls)'s just as welcome. Do that and InstallerClean will speak that language too, and you'd be credited as the person who got it there.
+
+</details>
 
 ## Contributing
 

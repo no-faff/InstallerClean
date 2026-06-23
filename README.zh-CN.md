@@ -55,9 +55,11 @@
 
 ---
 
-## Can you help translate the GUI?
+<a name="can-you-help-translate-the-gui"></a>
+<details>
+<summary><strong>Can you help translate the GUI?</strong></summary>
 
-You're reading a machine-translated version of this README (I put a lot of work into it), but InstallerClean's interface itself, every button, message and label, is still only in English or Italian.
+You're reading a machine-translated version of this README (I did put a lot of work into it), but InstallerClean's interface itself - every button, message and label - is still only in English or Italian.
 
 The interface has also been machine-translated into Simplified Chinese (again, I've gone to great lengths to get it as good as I can), but I'm not going to ship a machine translation unchecked; it needs someone who speaks both Chinese and English to go through the translated file, keep what's already correct and put right what isn't.
 
@@ -65,9 +67,11 @@ If you can read this English comfortably and you've got a good ear for what read
 
 You can see the whole thing [here](docs/translations/zh-Hans.md), the English beside the translation, as a plain table. And the complete resx file is [here](src/InstallerClean.Core/Resources/Strings.zh-Hans.resx).
 
-You don't have to take it all on: if a term reads wrong, open an [issue](../../issues/new?template=translation_review.md) saying what you'd put instead, as few or as many as you like. A pull request's just as welcome, whichever is easier for you.
+You don't have to take it all on: if a term reads wrong, open an [issue](../../issues/new?template=translation_review.md) saying what you'd put instead, as few or as many as you like. A [pull request](../../edit/main/src/InstallerClean.Core/Resources/Strings.zh-Hans.resx)'s just as welcome, whichever is easier for you.
 
 Do that and InstallerClean will speak Simplified Chinese too, alongside English and Italian, and you'd be credited as the person who got it there.
+
+</details>
 
 ## 没有人告诉您的文件夹
 
