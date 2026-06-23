@@ -379,6 +379,8 @@ dotnet test src/InstallerClean.Tests/
 
 Hai trovato un bug o hai un suggerimento? [Apri un issue](../../issues) o avvia una [discussione](../../discussions). Le pull request sono benvenute. Esegui `dotnet test` prima di inviare.
 
+La traduzione italiana è nata come traduzione automatica (come questo README). [bovirus](https://github.com/bovirus) l'ha rivista, corretta e approvata, ed è per questo che è disponibile. Se parli inglese, eventuali miglioramenti restano benvenuti tramite un issue o una pull request.
+
 ## Sostieni il progetto
 
 Se InstallerClean ti è stato utile, valuta di [sostenere No Faff](https://nofaff.netlify.app/support) o di lasciare una stella su GitHub.

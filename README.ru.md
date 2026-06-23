@@ -62,7 +62,7 @@
 
 I'd like to make the app available in more languages. I've got a machine-translated file for eight more languages, containing a list of all 281 strings, ready to go, but I don't want to ship them without the approval of a native speaker. [bovirus](https://github.com/bovirus) has already kindly corrected and approved the Italian, so InstallerClean is now bilingual. With your help, I can add Russian to the list.
 
-I'd be very grateful to anyone with a good grasp of both English and Russian who can look over the translation as it stands and either approve what's there or suggest improvements where necessary. You can see it all [here](docs/translations/ru.md), the English beside the Russian, and the file itself is [here](src/InstallerClean.Core/Resources/Strings.ru.resx). Tell me in an [issue](../../issues/new?template=translation_review.md) or a [pull request](../../edit/main/src/InstallerClean.Core/Resources/Strings.ru.resx), whichever's easier, and Russian joins English and Italian, with the credit going to you.
+I'd be very grateful to anyone with a good grasp of both English and Russian who can look over the translation as it stands and either approve what's there or suggest improvements where necessary. You can see it all [here](docs/translations/ru.md), the English beside the Russian, and the file itself is [here](src/InstallerClean.Core/Resources/Strings.ru.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking. Tell me in an [issue](../../issues/new?template=translation_review.md) or a [pull request](../../edit/main/src/InstallerClean.Core/Resources/Strings.ru.resx), whichever's easier, and Russian joins English and Italian, with the credit going to you.
 
 </details>
 
