@@ -234,7 +234,7 @@
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Se ti è stato utile, offrimi una tazzina di caffè.</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Ci vuole un caffè!</value></data>
-  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Annullamento richiesto. L'app sta aspettando che il passaggio in corso arrivi a un punto in cui fermarsi. Può richiedere qualche secondo durante operazioni di I/O intense o una chiamata al database MSI.</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Annullamento richiesto. InstallerClean sta aspettando che il passaggio in corso arrivi a un punto in cui fermarsi. Può richiedere qualche secondo durante operazioni di I/O intense o una chiamata al database MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Chiudi</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Lascia una stella su GitHub, segnala un problema (issue) o scrivi nelle discussioni. Ogni feedback è il benvenuto.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>o segnala un problema (issue) o scrivi nelle discussioni. Ogni feedback è il benvenuto.</value></data>
@@ -434,7 +434,7 @@
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Sono richiesti i diritti di amministratore</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Questa app richiede privilegi di amministratore.
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean richiede privilegi di amministratore.
 
 Fai clic con il pulsante destro e scegli 'Esegui come amministratore'.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Database installazioni non disponibile</value></data>
@@ -526,7 +526,7 @@ Dettagli in {1}.</value></data>
   <!-- Reassurance line under the JSON. Names the URL once, calls
        out the no-PII property, and explains the purpose so the
        user has the context the modal title implies. -->
-  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Niente ti identifica, né identifica il computer; mi fa solo sapere che l'app funziona e quanto spazio le persone stanno liberando. Viene inviato a nofaff.netlify.app/api/result-log.</value></data>
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Niente ti identifica, né identifica il computer; mi fa solo sapere che InstallerClean funziona e quanto spazio le persone stanno liberando. Viene inviato a nofaff.netlify.app/api/result-log.</value></data>
   <!-- AutomationProperties.Name on the JSON preview TextBox so screen
        readers announce its content rather than "edit, read-only". -->
   <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Anteprima registro risultati</value></data>
@@ -611,8 +611,8 @@ Non è stato possibile scrivere il file crash.log.</value></data>
 # questo file a una segnalazione di bug pubblica.
 </value></data>
 
-  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Cambia lingua. InstallerClean verrà riavviato.</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Cambia lingua. Il programma verrà riavviato.</value></data>
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Cambia lingua</value></data>
-  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>InstallerClean verrà riavviato.</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Il programma verrà riavviato.</value></data>
 
 </root>

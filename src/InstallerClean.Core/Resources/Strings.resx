@@ -234,7 +234,7 @@
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>If it helped, buy me a cup of tea.</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>It's thirsty work!</value></data>
-  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Cancellation requested. The app is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call.</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Close</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>or report an Issue or post in Discussions. Any feedback welcome.</value></data>
@@ -434,7 +434,7 @@
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Administrator rights required</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>This app requires administrator privileges.
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean requires administrator privileges.
 
 Please right-click and choose 'Run as administrator'.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Installer database unavailable</value></data>
@@ -526,7 +526,7 @@ Details in {1}.</value></data>
   <!-- Reassurance line under the JSON. Names the URL once, calls
        out the no-PII property, and explains the purpose so the
        user has the context the modal title implies. -->
-  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Nothing identifies you or your machine; it just lets me know the app is working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log.</value></data>
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log.</value></data>
   <!-- AutomationProperties.Name on the JSON preview TextBox so screen
        readers announce its content rather than "edit, read-only". -->
   <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Result log preview</value></data>
@@ -746,8 +746,8 @@ The crash log could not be written.</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some files processed, some failed</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transient: a temporary condition blocked the run (see the message)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 cancelled (Ctrl+C)</value></data>
-  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Change language. InstallerClean will restart.</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Change language. The program will restart.</value></data>
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Change language</value></data>
-  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>InstallerClean will restart.</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>The program will restart.</value></data>
 
 </root>
