@@ -308,7 +308,7 @@
   <data name="Status.ScanComplete" xml:space="preserve"><value>Scansione completata ({0})</value></data>
   <data name="Status.FoundProducts" xml:space="preserve"><value>Scansione pacchetti locali...</value></data>
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
-  <data name="Status.FoundUnused" xml:space="preserve"><value>{0} {1} da eliminare.</value></data>
+  <data name="Status.FoundUnused" xml:space="preserve"><value>{0} {1} che è possibile eliminare.</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>Preparazione cartella destinazione...</value></data>
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>Spostamento di {0} {1}...</value></data>
@@ -361,9 +361,9 @@
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
   <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>Spostati {0} {1} in {2}. {3} {4}</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
-  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} nel Cestino</value></data>
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} spostati nel Cestino</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
-  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>Spostati {0} {1} nel Cestino. {2} {3}</value></data>
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} spostati nel Cestino. {2} {3}</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files

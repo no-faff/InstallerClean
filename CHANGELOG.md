@@ -2,6 +2,12 @@
 
 Every change to InstallerClean, logged in full (not just the user-facing highlights). Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Two small refinements to the Italian interface text: the post-scan count line now describes the unneeded files as ones you can delete rather than ones to delete, and the delete summary now names the move into the Recycle Bin (matching its with-errors counterpart). Suggested by bovirus (#39).
+
 ## [1.9.2] - 2026-06-21
 
 ### Changed
