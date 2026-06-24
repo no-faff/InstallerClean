@@ -196,7 +196,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | English | Русский |
 | --- | --- |
 | Administrator rights required | Требуются права администратора |
-| This app requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | Этому приложению нужны права администратора.<br><br>Щёлкните правой кнопкой мыши и выберите «Запуск от имени администратора». |
+| InstallerClean requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | InstallerClean требует прав администратора.<br><br>Щёлкните правой кнопкой мыши и выберите «Запуск от имени администратора». |
 | Installer database unavailable | База данных установщика недоступна |
 | Scan failed | Сбой сканирования |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | База данных Windows Installer оказалась пустой или недоступной. Это необычно даже для только что установленной Windows и обычно означает, что база данных повреждена или её очистил сторонний инструмент. Обычно её восстанавливает команда «sfc /scannow», запущенная из командной строки с повышенными правами. |
@@ -264,7 +264,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Sending failed. Try again later. | Не удалось отправить. Повторите попытку позже. |
 | No report to send. | Нет отчёта для отправки. |
 | Send this to No Faff? | Отправить это в No Faff? |
-| Nothing identifies you or your machine; it just lets me know the app is working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | Ничто не идентифицирует вас или ваш компьютер; это просто даёт мне знать, что приложение работает и сколько места люди освобождают. Отправляется на nofaff.netlify.app/api/result-log. |
+| Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | Ничто не идентифицирует вас или ваш компьютер; это просто даёт мне знать, что InstallerClean работает и сколько места люди освобождают. Отправляется на nofaff.netlify.app/api/result-log. |
 
 ## Startup and crashes
 
@@ -286,18 +286,18 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | --- | --- |
 | If it helped, buy me a cup of tea. | Если пригодилось, угостите меня чашкой чая. |
 | It's thirsty work! | В горле пересохло! |
-| Cancellation requested. The app is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Запрошена отмена. Приложение ждёт, когда текущий шаг дойдёт до точки остановки. Это может занять несколько секунд при интенсивном вводе-выводе или обращении к базе данных MSI. |
+| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Запрошена отмена. InstallerClean ждёт, когда текущий шаг дойдёт до точки остановки. Это может занять несколько секунд при интенсивном вводе-выводе или обращении к базе данных MSI. |
 | Close | Закрыть |
 | Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Поставьте звезду на GitHub, сообщите о проблеме (Issue) или напишите в обсуждениях (Discussions). Любые отзывы приветствуются. |
 | or report an Issue or post in Discussions. Any feedback welcome. | или сообщите о проблеме (Issue), или напишите в обсуждениях (Discussions). Любые отзывы приветствуются. |
 | Minimise | Свернуть |
-| Up to you but appreciated. Sends an anonymous report that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимный отчёт, который просто даёт мне знать, работает ли приложение и сколько места люди освобождают. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
-| Up to you but appreciated. Sends an anonymous report that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимный отчёт, который просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
+| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение и сколько места люди освобождают. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
+| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
 | Move the unneeded files to the Move location. | Переместить ненужные файлы в папку для перемещения. |
 | Move the unneeded files to the Move location. Choose one first. | Переместить ненужные файлы в папку для перемещения. Сначала выберите её. |
 | Send the unneeded files to the Recycle Bin. | Отправить ненужные файлы в Корзину. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Имя субъекта из встроенного сертификата Authenticode. Цепочка не проверялась. |
-| Change the display language. InstallerClean restarts to apply it. | Изменить язык интерфейса. Для применения InstallerClean перезапустится. |
+| Change language. The program will restart. | Изменить язык. Программа перезапустится. |
 
 ## Screen reader labels
 
@@ -352,8 +352,8 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Files that could not be processed | Файлы, которые не удалось обработать |
 | Explains this folder, and how to recover a file, in the README | Объясняет эту папку и то, как восстановить файл, в README |
 | Result log preview | Предпросмотр журнала результатов |
-| Change the display language | Изменить язык интерфейса |
-| InstallerClean restarts to apply it. | Для применения InstallerClean перезапустится. |
+| Change language | Изменить язык |
+| The program will restart. | Программа перезапустится. |
 
 ## File picker
 

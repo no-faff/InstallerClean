@@ -234,13 +234,13 @@
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Если пригодилось, угостите меня чашкой чая.</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>В горле пересохло!</value></data>
-  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Запрошена отмена. Приложение ждёт, когда текущий шаг дойдёт до точки остановки. Это может занять несколько секунд при интенсивном вводе-выводе или обращении к базе данных MSI.</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Запрошена отмена. InstallerClean ждёт, когда текущий шаг дойдёт до точки остановки. Это может занять несколько секунд при интенсивном вводе-выводе или обращении к базе данных MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Закрыть</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Поставьте звезду на GitHub, сообщите о проблеме (Issue) или напишите в обсуждениях (Discussions). Любые отзывы приветствуются.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>или сообщите о проблеме (Issue), или напишите в обсуждениях (Discussions). Любые отзывы приветствуются.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Свернуть</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>На ваше усмотрение, но будет приятно. Отправляет анонимный отчёт, который просто даёт мне знать, работает ли приложение и сколько места люди освобождают. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>На ваше усмотрение, но будет приятно. Отправляет анонимный отчёт, который просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение и сколько места люди освобождают. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Переместить ненужные файлы в папку для перемещения.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Переместить ненужные файлы в папку для перемещения. Сначала выберите её.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Отправить ненужные файлы в Корзину.</value></data>
@@ -434,7 +434,7 @@
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Требуются права администратора</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Этому приложению нужны права администратора.
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean требует прав администратора.
 
 Щёлкните правой кнопкой мыши и выберите «Запуск от имени администратора».</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>База данных установщика недоступна</value></data>
@@ -526,7 +526,7 @@
   <!-- Reassurance line under the JSON. Names the URL once, calls
        out the no-PII property, and explains the purpose so the
        user has the context the modal title implies. -->
-  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Ничто не идентифицирует вас или ваш компьютер; это просто даёт мне знать, что приложение работает и сколько места люди освобождают. Отправляется на nofaff.netlify.app/api/result-log.</value></data>
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Ничто не идентифицирует вас или ваш компьютер; это просто даёт мне знать, что InstallerClean работает и сколько места люди освобождают. Отправляется на nofaff.netlify.app/api/result-log.</value></data>
   <!-- AutomationProperties.Name on the JSON preview TextBox so screen
        readers announce its content rather than "edit, read-only". -->
   <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Предпросмотр журнала результатов</value></data>
@@ -686,12 +686,12 @@
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
-  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Изменить язык интерфейса. Для применения InstallerClean перезапустится.</value></data>
-  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Изменить язык интерфейса</value></data>
-  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Для применения InstallerClean перезапустится.</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Изменить язык. Программа перезапустится.</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Изменить язык</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Программа перезапустится.</value></data>
 
 
-  <!-- Russian CLDR few (2-4) plural forms; satellite-only, read by name via ResourceManager -->
+  <!-- Russian CLDR-category overrides (.One/.Few); satellite-only, read by name via ResourceManager -->
   <data name="Plural.File.Few" xml:space="preserve"><value>файла</value></data>
   <data name="Plural.Package.Few" xml:space="preserve"><value>пакета</value></data>
   <data name="Plural.Product.Few" xml:space="preserve"><value>продукта</value></data>
@@ -703,4 +703,5 @@
   <data name="Summary.StaleMsiEntries.Few" xml:space="preserve"><value>Обнаружено {0} устаревшие записи MSI (файлы уже исчезли с диска; InstallerClean их не удаляет из реестра).</value></data>
   <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину.</value></data>
   <data name="Completion.PermanentDeleteSummaryWithErrors.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину. {2} {3}</value></data>
+  <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Найдено {0} зарегистрированный {1}.</value></data>
 </root>
