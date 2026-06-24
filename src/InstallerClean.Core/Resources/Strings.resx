@@ -239,8 +239,8 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>or report an Issue or post in Discussions. Any feedback welcome.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimise</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Up to you but appreciated. Sends an anonymous report that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Up to you but appreciated. Sends an anonymous report that just lets me know if it's working. The next screen lets you see what will be sent before you confirm.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the unneeded files to the Move location.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files to the Move location. Choose one first.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Send the unneeded files to the Recycle Bin.</value></data>
