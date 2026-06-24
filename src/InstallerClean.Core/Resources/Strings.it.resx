@@ -308,7 +308,7 @@
   <data name="Status.ScanComplete" xml:space="preserve"><value>Scansione completata ({0})</value></data>
   <data name="Status.FoundProducts" xml:space="preserve"><value>Scansione pacchetti locali...</value></data>
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
-  <data name="Status.FoundUnused" xml:space="preserve"><value>{0} {1} che è possibile eliminare.</value></data>
+  <data name="Status.FoundUnused" xml:space="preserve"><value>{0} {1} che è possibile eliminare in sicurezza.</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>Preparazione cartella destinazione...</value></data>
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>Spostamento di {0} {1}...</value></data>
@@ -327,7 +327,7 @@
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Accesso negato. Esegui come amministratore.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scansione non riuscita: database installazioni non disponibile.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scansione annullata.</value></data>
-  <data name="Status.Done" xml:space="preserve"><value>Completato</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>Pronto</value></data>
   <!-- 0 = exception type name. Full message + stack trace go only to
        the crash log because exception messages from elevated framework
        calls can contain paths from another user's profile. 1 = crash
@@ -421,8 +421,9 @@
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} di {1} {2}</value></data>
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} {1} da eliminare ({2})</value></data>
-  <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} {1} registrati ({2})</value></data>
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} orfani, {1} sostituiti, {2} obsoleti ({3})</value></data>
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} file registrato ancora necessario ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} file registrati ancora necessari ({1})</value></data>
 
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
@@ -616,5 +617,4 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Il programma verrà riavviato.</value></data>
 
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Trovato {0} {1} registrato.</value></data>
-  <data name="Summary.RegisteredWindow.One" xml:space="preserve"><value>{0} {1} registrato ({2})</value></data>
 </root>
