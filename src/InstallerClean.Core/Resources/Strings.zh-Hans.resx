@@ -234,7 +234,7 @@
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>如果它帮到了您，请我喝杯茶。</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>该来杯茶了！</value></data>
-  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>已请求取消。应用正在等待当前步骤到达一个可以停下来的位置。在大量 I/O 操作或 MSI 数据库调用期间，这可能需要几秒钟。</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>已请求取消。InstallerClean 正在等待当前步骤到达一个可以停下来的位置。在大量 I/O 操作或 MSI 数据库调用期间，这可能需要几秒钟。</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>关闭</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>在 GitHub 上点个星、提交 Issue 或在 Discussions 中发帖。欢迎任何反馈。</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>或提交 Issue，或在 Discussions 中发帖。欢迎任何反馈。</value></data>
@@ -434,7 +434,7 @@
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>需要管理员权限</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>此应用需要管理员权限。
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean 需要管理员权限。
 
 请右键单击并选择“以管理员身份运行”。</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>安装程序数据库不可用</value></data>
@@ -526,7 +526,7 @@
   <!-- Reassurance line under the JSON. Names the URL once, calls
        out the no-PII property, and explains the purpose so the
        user has the context the modal title implies. -->
-  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>没有任何内容能识别您或您的机器；它只是让我知道应用是否正常工作，以及大家释放了多少空间。它会发送到 nofaff.netlify.app/api/result-log。</value></data>
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>没有任何内容能识别您或您的机器；它只是让我知道 InstallerClean 是否正常工作，以及大家释放了多少空间。它会发送到 nofaff.netlify.app/api/result-log。</value></data>
   <!-- AutomationProperties.Name on the JSON preview TextBox so screen
        readers announce its content rather than "edit, read-only". -->
   <data name="Automation.ResultLogPreview" xml:space="preserve"><value>结果日志预览</value></data>
@@ -685,8 +685,8 @@
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
-  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>更改显示语言。InstallerClean 会重启以应用更改。</value></data>
-  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>更改显示语言</value></data>
-  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>InstallerClean 会重启以应用更改。</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>更改语言。程序会重启。</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>更改语言</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>程序会重启。</value></data>
 
 </root>

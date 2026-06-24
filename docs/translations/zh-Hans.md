@@ -196,7 +196,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | English | 简体中文 |
 | --- | --- |
 | Administrator rights required | 需要管理员权限 |
-| InstallerClean requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | 此应用需要管理员权限。<br><br>请右键单击并选择“以管理员身份运行”。 |
+| InstallerClean requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | InstallerClean 需要管理员权限。<br><br>请右键单击并选择“以管理员身份运行”。 |
 | Installer database unavailable | 安装程序数据库不可用 |
 | Scan failed | 扫描失败 |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Windows Installer 数据库似乎为空或无法访问。即便在全新安装的 Windows 上这也很不寻常，通常意味着数据库已损坏，或被某个第三方工具清空了。在提权的命令提示符中运行“sfc /scannow”通常可以修复它。 |
@@ -264,7 +264,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Sending failed. Try again later. | 发送失败。请稍后重试。 |
 | No report to send. | 没有可发送的报告。 |
 | Send this to No Faff? | 把这个发送给 No Faff 吗？ |
-| Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | 没有任何内容能识别您或您的机器；它只是让我知道应用是否正常工作，以及大家释放了多少空间。它会发送到 nofaff.netlify.app/api/result-log。 |
+| Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | 没有任何内容能识别您或您的机器；它只是让我知道 InstallerClean 是否正常工作，以及大家释放了多少空间。它会发送到 nofaff.netlify.app/api/result-log。 |
 
 ## Startup and crashes
 
@@ -286,7 +286,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | --- | --- |
 | If it helped, buy me a cup of tea. | 如果它帮到了您，请我喝杯茶。 |
 | It's thirsty work! | 该来杯茶了！ |
-| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | 已请求取消。应用正在等待当前步骤到达一个可以停下来的位置。在大量 I/O 操作或 MSI 数据库调用期间，这可能需要几秒钟。 |
+| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | 已请求取消。InstallerClean 正在等待当前步骤到达一个可以停下来的位置。在大量 I/O 操作或 MSI 数据库调用期间，这可能需要几秒钟。 |
 | Close | 关闭 |
 | Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | 在 GitHub 上点个星、提交 Issue 或在 Discussions 中发帖。欢迎任何反馈。 |
 | or report an Issue or post in Discussions. Any feedback welcome. | 或提交 Issue，或在 Discussions 中发帖。欢迎任何反馈。 |
@@ -297,7 +297,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Move the unneeded files to the Move location. Choose one first. | 将不需要的文件移动到移动位置。请先选择一个位置。 |
 | Send the unneeded files to the Recycle Bin. | 将不需要的文件送入回收站。 |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | 来自内嵌 Authenticode 证书的主题名称。未验证证书链。 |
-| Change language. The program will restart. | 更改显示语言。InstallerClean 会重启以应用更改。 |
+| Change language. The program will restart. | 更改语言。程序会重启。 |
 
 ## Screen reader labels
 
@@ -352,8 +352,8 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Files that could not be processed | 无法处理的文件 |
 | Explains this folder, and how to recover a file, in the README | 在 README 中解释了这个文件夹，以及如何恢复文件 |
 | Result log preview | 结果日志预览 |
-| Change language | 更改显示语言 |
-| The program will restart. | InstallerClean 会重启以应用更改。 |
+| Change language | 更改语言 |
+| The program will restart. | 程序会重启。 |
 
 ## File picker
 

@@ -234,7 +234,7 @@
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Si te ha servido, invítame a un café.</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>¡Esto da sed!</value></data>
-  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Cancelación solicitada. La aplicación está esperando a que el paso en curso llegue a un punto en el que pueda detenerse. Puede tardar unos segundos durante operaciones intensas de entrada/salida o una llamada a la base de datos MSI.</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Cancelación solicitada. InstallerClean está esperando a que el paso en curso llegue a un punto en el que pueda detenerse. Puede tardar unos segundos durante operaciones intensas de entrada/salida o una llamada a la base de datos MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Cerrar</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Deja una estrella en GitHub, informa de un problema (Issue) o escribe en Discussions. Cualquier comentario es bienvenido.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>o informa de un problema (Issue) o escribe en Discussions. Cualquier comentario es bienvenido.</value></data>
@@ -434,7 +434,7 @@
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Se requieren permisos de administrador</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Esta aplicación requiere privilegios de administrador.
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean requiere privilegios de administrador.
 
 Haz clic con el botón derecho y elige 'Ejecutar como administrador'.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Base de datos del instalador no disponible</value></data>
@@ -526,7 +526,7 @@ Detalles en {1}.</value></data>
   <!-- Reassurance line under the JSON. Names the URL once, calls
        out the no-PII property, and explains the purpose so the
        user has the context the modal title implies. -->
-  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Nada te identifica a ti ni a tu equipo; solo sirve para que yo sepa que la aplicación funciona y cuánto espacio libera la gente. Se envía a nofaff.netlify.app/api/result-log.</value></data>
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Nada te identifica a ti ni a tu equipo; solo sirve para que yo sepa que InstallerClean funciona y cuánto espacio libera la gente. Se envía a nofaff.netlify.app/api/result-log.</value></data>
   <!-- AutomationProperties.Name on the JSON preview TextBox so screen
        readers announce its content rather than "edit, read-only". -->
   <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Vista previa del registro de resultados</value></data>
@@ -687,9 +687,9 @@ No se pudo escribir el archivo crash.log.</value></data>
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
-  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Cambia el idioma de visualización. InstallerClean se reiniciará para aplicarlo.</value></data>
-  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Cambiar el idioma de visualización</value></data>
-  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>InstallerClean se reiniciará para aplicarlo.</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Cambia el idioma. El programa se reiniciará.</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Cambiar el idioma</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>El programa se reiniciará.</value></data>
 
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Se encontró {0} {1} registrado.</value></data>
   <data name="Summary.RegisteredWindow.One" xml:space="preserve"><value>{0} {1} registrado ({2})</value></data>
