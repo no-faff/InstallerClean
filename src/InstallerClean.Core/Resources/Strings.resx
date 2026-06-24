@@ -308,7 +308,7 @@
   <data name="Status.ScanComplete" xml:space="preserve"><value>Scan complete ({0})</value></data>
   <data name="Status.FoundProducts" xml:space="preserve"><value>Scanning local packages...</value></data>
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
-  <data name="Status.FoundUnused" xml:space="preserve"><value>Found {0} {1} to clean up.</value></data>
+  <data name="Status.FoundUnused" xml:space="preserve"><value>Found {0} {1} you can safely delete.</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>Preparing destination folder...</value></data>
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>Moving {0} {1}...</value></data>
@@ -327,7 +327,7 @@
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Run as administrator.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scan failed: installer database unavailable.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scan cancelled.</value></data>
-  <data name="Status.Done" xml:space="preserve"><value>Done</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>Ready</value></data>
   <!-- 0 = exception type name. Full message + stack trace go only to
        the crash log because exception messages from elevated framework
        calls can contain paths from another user's profile. 1 = crash
@@ -420,9 +420,18 @@
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>{0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them).</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} {2}</value></data>
-  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} unneeded {1} ({2})</value></data>
-  <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} registered {1} ({2})</value></data>
+  <!-- Orphaned-window footer summary. Unneeded files split into the three
+       removable causes shown in the Reason column: true orphans (the API
+       never claimed them), superseded patches and obsoleted patches.
+       0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
+       3 = size display. No trailing noun, so it agrees at any count. -->
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} orphaned, {1} superseded, {2} obsoleted ({3})</value></data>
+  <!-- Registered-window footer summary, reinforcing the "still needed" framing
+       (the flip side of the main window's "unneeded"). Split singular/plural so
+       the noun and verb agree at one file ("file ... is" vs "files ... are").
+       0 = count, 1 = size display. -->
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} registered file that is still needed ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} registered files that are still needed ({1})</value></data>
 
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
