@@ -388,6 +388,7 @@ I'd be very grateful to anyone with a good grasp of English and one of the langu
 - Simplified Chinese: [table](docs/translations/zh-Hans.md) · [resx](src/InstallerClean.Core/Resources/Strings.zh-Hans.resx)
 - Russian: [table](docs/translations/ru.md) · [resx](src/InstallerClean.Core/Resources/Strings.ru.resx)
 - Spanish: [table](docs/translations/es.md) · [resx](src/InstallerClean.Core/Resources/Strings.es.resx)
+- Brazilian Portuguese: [table](docs/translations/pt-BR.md) · [resx](src/InstallerClean.Core/Resources/Strings.pt-BR.resx)
 
 More languages are on the way and will appear here as they're ready.
 
