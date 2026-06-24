@@ -87,6 +87,6 @@ public class RegisteredFilesViewModelTests
 
         var vm = new RegisteredFilesViewModel(packages, 1_048_576, NullInfoService());
 
-        Assert.Equal("2 registered files (1.0 MB)", vm.Summary);
+        Assert.Equal("2 registered files that are still needed (1.0 MB)", vm.Summary);
     }
 }
