@@ -239,8 +239,8 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>在 GitHub 上点个星、提交 Issue 或在 Discussions 中发帖。欢迎任何反馈。</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>或提交 Issue，或在 Discussions 中发帖。欢迎任何反馈。</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>最小化</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名报告，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名报告，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>将不需要的文件移动到移动位置。</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>将不需要的文件移动到移动位置。请先选择一个位置。</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>将不需要的文件送入回收站。</value></data>

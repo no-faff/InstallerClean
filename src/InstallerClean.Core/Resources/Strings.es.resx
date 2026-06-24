@@ -239,8 +239,8 @@
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Deja una estrella en GitHub, informa de un problema (Issue) o escribe en Discussions. Cualquier comentario es bienvenido.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>o informa de un problema (Issue) o escribe en Discussions. Cualquier comentario es bienvenido.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimizar</value></data>
-  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Tú decides, pero se agradece. Envía un informe anónimo que solo sirve para que yo sepa si funciona y cuánto espacio libera la gente. La pantalla siguiente te muestra lo que se enviará antes de confirmar.</value></data>
-  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Tú decides, pero se agradece. Envía un informe anónimo que solo sirve para que yo sepa si funciona. La pantalla siguiente te muestra lo que se enviará antes de confirmar.</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Tú decides, pero se agradece. Envía un resumen anónimo que solo sirve para que yo sepa si funciona y cuánto espacio libera la gente. La pantalla siguiente te muestra lo que se enviará antes de confirmar.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Tú decides, pero se agradece. Envía un resumen anónimo que solo sirve para que yo sepa si funciona. La pantalla siguiente te muestra lo que se enviará antes de confirmar.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Mueve los archivos innecesarios a la ubicación de destino.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Mueve los archivos innecesarios a la ubicación de destino. Elige una primero.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Envía los archivos innecesarios a la Papelera de reciclaje.</value></data>

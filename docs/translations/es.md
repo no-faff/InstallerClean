@@ -196,7 +196,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | English | Español |
 | --- | --- |
 | Administrator rights required | Se requieren permisos de administrador |
-| This app requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | Esta aplicación requiere privilegios de administrador.<br><br>Haz clic con el botón derecho y elige 'Ejecutar como administrador'. |
+| InstallerClean requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | Esta aplicación requiere privilegios de administrador.<br><br>Haz clic con el botón derecho y elige 'Ejecutar como administrador'. |
 | Installer database unavailable | Base de datos del instalador no disponible |
 | Scan failed | Análisis fallido |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | La base de datos de Windows Installer parece estar vacía o inaccesible. Es algo inusual incluso en una instalación de Windows recién hecha y normalmente significa que la base de datos está dañada o que una herramienta de terceros la ha vaciado. Ejecutar 'sfc /scannow' desde un símbolo del sistema con privilegios elevados suele repararla. |
@@ -264,7 +264,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Sending failed. Try again later. | Envío fallido. Inténtalo de nuevo más tarde. |
 | No report to send. | No hay ningún informe que enviar. |
 | Send this to No Faff? | ¿Enviar esto a No Faff? |
-| Nothing identifies you or your machine; it just lets me know the app is working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | Nada te identifica a ti ni a tu equipo; solo sirve para que yo sepa que la aplicación funciona y cuánto espacio libera la gente. Se envía a nofaff.netlify.app/api/result-log. |
+| Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | Nada te identifica a ti ni a tu equipo; solo sirve para que yo sepa que la aplicación funciona y cuánto espacio libera la gente. Se envía a nofaff.netlify.app/api/result-log. |
 
 ## Startup and crashes
 
@@ -286,18 +286,18 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | --- | --- |
 | If it helped, buy me a cup of tea. | Si te ha servido, invítame a un café. |
 | It's thirsty work! | ¡Esto da sed! |
-| Cancellation requested. The app is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Cancelación solicitada. La aplicación está esperando a que el paso en curso llegue a un punto en el que pueda detenerse. Puede tardar unos segundos durante operaciones intensas de entrada/salida o una llamada a la base de datos MSI. |
+| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Cancelación solicitada. La aplicación está esperando a que el paso en curso llegue a un punto en el que pueda detenerse. Puede tardar unos segundos durante operaciones intensas de entrada/salida o una llamada a la base de datos MSI. |
 | Close | Cerrar |
 | Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Deja una estrella en GitHub, informa de un problema (Issue) o escribe en Discussions. Cualquier comentario es bienvenido. |
 | or report an Issue or post in Discussions. Any feedback welcome. | o informa de un problema (Issue) o escribe en Discussions. Cualquier comentario es bienvenido. |
 | Minimise | Minimizar |
-| Up to you but appreciated. Sends an anonymous report that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Tú decides, pero se agradece. Envía un informe anónimo que solo sirve para que yo sepa si funciona y cuánto espacio libera la gente. La pantalla siguiente te muestra lo que se enviará antes de confirmar. |
-| Up to you but appreciated. Sends an anonymous report that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Tú decides, pero se agradece. Envía un informe anónimo que solo sirve para que yo sepa si funciona. La pantalla siguiente te muestra lo que se enviará antes de confirmar. |
+| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Tú decides, pero se agradece. Envía un resumen anónimo que solo sirve para que yo sepa si funciona y cuánto espacio libera la gente. La pantalla siguiente te muestra lo que se enviará antes de confirmar. |
+| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Tú decides, pero se agradece. Envía un resumen anónimo que solo sirve para que yo sepa si funciona. La pantalla siguiente te muestra lo que se enviará antes de confirmar. |
 | Move the unneeded files to the Move location. | Mueve los archivos innecesarios a la ubicación de destino. |
 | Move the unneeded files to the Move location. Choose one first. | Mueve los archivos innecesarios a la ubicación de destino. Elige una primero. |
 | Send the unneeded files to the Recycle Bin. | Envía los archivos innecesarios a la Papelera de reciclaje. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Nombre del firmante del certificado Authenticode incorporado. La cadena no está verificada. |
-| Change the display language. InstallerClean restarts to apply it. | Cambia el idioma de visualización. InstallerClean se reiniciará para aplicarlo. |
+| Change language. The program will restart. | Cambia el idioma de visualización. InstallerClean se reiniciará para aplicarlo. |
 
 ## Screen reader labels
 
@@ -352,8 +352,8 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Files that could not be processed | Archivos que no se pudieron procesar |
 | Explains this folder, and how to recover a file, in the README | Explica esta carpeta, y cómo recuperar un archivo, en el README |
 | Result log preview | Vista previa del registro de resultados |
-| Change the display language | Cambiar el idioma de visualización |
-| InstallerClean restarts to apply it. | InstallerClean se reiniciará para aplicarlo. |
+| Change language | Cambiar el idioma de visualización |
+| The program will restart. | InstallerClean se reiniciará para aplicarlo. |
 
 ## File picker
 
