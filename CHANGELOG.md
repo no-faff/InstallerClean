@@ -9,6 +9,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - A Simplified Chinese (zh-Hans) interface translation: all 281 interface strings, ready for a native speaker to review and refine via the README before it goes live in the app. The satellite is script-neutral, reaching every Simplified-Chinese Windows; the command line stays English by design.
 - A Russian (ru) interface translation on the same basis.
 - A Spanish (es) interface translation on the same basis, in neutral international Spanish, with terms following Microsoft's Spanish Windows.
+- A Brazilian Portuguese (pt-BR) interface translation on the same basis, with terms following the existing pt-BR README and Brazilian Windows.
 
 ### Changed
 
