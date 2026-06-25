@@ -427,6 +427,7 @@ public partial class MainWindow : Window
     {
         ("en-GB", "English"),
         ("it", "Italiano"),
+        ("ja", "日本語"),
     };
 
     // Tracks whether the globe's menu is open, so a second click on the globe

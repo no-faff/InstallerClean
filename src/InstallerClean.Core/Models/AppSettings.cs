@@ -47,7 +47,7 @@ public sealed class AppSettings
     /// <summary>
     /// UI-language preference. <c>null</c> or absent means Automatic:
     /// follow the Windows display language. A non-null value is a culture
-    /// name the app ships a translation for (<c>"en-GB"</c> or <c>"it"</c>),
+    /// name the app ships a translation for (<c>"en-GB"</c>, <c>"it"</c> or <c>"ja"</c>),
     /// validated against the supported-language list at startup and
     /// otherwise ignored. Applied by <c>App.OnStartup</c> before any window
     /// loads; changing it in the bottom-bar language menu takes effect on the next launch.
