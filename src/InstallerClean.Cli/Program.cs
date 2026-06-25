@@ -203,7 +203,8 @@ internal static class Program
             var count = scanResult.RemovableFiles.Count;
             var totalBytes = scanResult.RemovableFiles.Sum(f => f.SizeBytes);
             var size = DisplayHelpers.FormatSize(totalBytes);
-            Console.WriteLine(string.Format(Strings.Cli_FoundOrphans,
+            Console.WriteLine(string.Format(
+                DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
                 count, DisplayHelpers.PluraliseFile(count), size));
 
             if (count == 0)
@@ -322,7 +323,8 @@ internal static class Program
                     return ExitTransient;
                 }
 
-                Console.WriteLine(string.Format(Strings.Cli_DeletedFiles,
+                Console.WriteLine(string.Format(
+                    DisplayHelpers.Pluralise(result.DeletedCount, Strings.Cli_DeletedFiles, Strings.Cli_DeletedFiles, "Cli.DeletedFiles"),
                     result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
                 if (result.Errors.Count > 0)
                 {
@@ -365,7 +367,8 @@ internal static class Program
             Console.WriteLine(string.Format(Strings.Cli_MovingFiles,
                 count, DisplayHelpers.PluraliseFile(count), moveDest));
             var moveResult = await moveService.MoveFilesAsync(filePaths, moveDest, progress, token);
-            Console.WriteLine(string.Format(Strings.Cli_MovedFiles,
+            Console.WriteLine(string.Format(
+                DisplayHelpers.Pluralise(moveResult.MovedCount, Strings.Cli_MovedFiles, Strings.Cli_MovedFiles, "Cli.MovedFiles"),
                 moveResult.MovedCount, DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
             if (moveResult.Errors.Count > 0)
             {
