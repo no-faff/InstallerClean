@@ -642,7 +642,7 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Cli.MovingFiles" xml:space="preserve"><value>Spostamento di {0} {1} in {2}...</value></data>
   <data name="Cli.MovedFiles" xml:space="preserve"><value>Spostati {0} {1}.</value></data>
   <data name="Cli.MutexBlocked" xml:space="preserve"><value>Un altro processo InstallerClean mantiene il blocco a istanza singola (la GUI o un'altra esecuzione della CLI). Codice di uscita 75 (transitorio); è sicuro riprovare più tardi.</value></data>
-  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Nota: scrittura nel registro eventi non riuscita. Controlla i permessi del canale Applicazione o i Criteri di gruppo.</value></data>
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Nota: scrittura nel registro eventi non riuscita. Controlla i permessi del registro Applicazione o i Criteri di gruppo.</value></data>
 
   <!-- CLI help screen. Column alignment is hand-tuned for a monospace
        terminal; eye-verify on Windows. -->
