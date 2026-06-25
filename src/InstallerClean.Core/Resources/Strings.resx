@@ -719,7 +719,7 @@ The crash log could not be written.</value></data>
        Event Log write failed (Group Policy or service unavailable).
        Tells an RMM consumer expecting an Application entry that the
        channel was unwritable, not just empty. -->
-  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Note: Event Log writing failed. Check Application channel permissions or Group Policy.</value></data>
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Note: Event Log writing failed. Check Application log permissions or Group Policy.</value></data>
 
   <!-- crash.log privacy header. Prepended to a fresh crash.log so a
        user attaching the file to a public bug report has the
