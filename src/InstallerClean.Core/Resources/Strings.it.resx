@@ -617,4 +617,57 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Il programma verrà riavviato.</value></data>
 
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Trovato {0} {1} registrato.</value></data>
+
+  <!-- CLI: human-facing stdout (localised). The Cli.EventLog* machine-
+       contract keys are held English and live in the neutral resx only;
+       an RMM tool greps them for fixed English phrases. -->
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Argomento sconosciuto: '{0}'</value></data>
+  <data name="Cli.Cancelling" xml:space="preserve"><value>Annullamento...</value></data>
+  <data name="Cli.Cancelled" xml:space="preserve"><value>Operazione annullata.</value></data>
+  <data name="Cli.GenericError" xml:space="preserve"><value>Errore: {0}. Dettagli salvati in {1}.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Errore: {0}. Non è stato possibile scrivere il file crash.log.</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Scansione di C:\Windows\Installer...</value></data>
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Trovati {0} {1} da eliminare ({2}).</value></data>
+  <data name="Cli.NothingToDo" xml:space="preserve"><value>Nessuna operazione necessaria.</value></data>
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Eliminazione di {0} {1}...</value></data>
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Eliminati {0} {1}.</value></data>
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Errore: per questa unità il Cestino non è disponibile, quindi non è stato eliminato nulla. Usa /m per spostare i file oppure riattiva il Cestino e riprova.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Errore: nessuna destinazione spostamento specificata. Usa /m PERCORSO o imposta un valore predefinito nella GUI.</value></data>
+  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Errore: la destinazione non può trovarsi all'interno della cartella di Windows Installer.</value></data>
+  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Errore: la destinazione deve essere un percorso completo. Ricevuto: {0}</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Errore: la destinazione {0} si trova in una cartella di sistema di Windows. Scegli un percorso al di fuori di %SystemRoot%, %ProgramFiles% e %ProgramData%.</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Errore: in questo momento qualcosa sta usando Windows Installer, di solito un aggiornamento di Windows o un programma che si sta installando in background. Lo spostamento e l'eliminazione sono bloccati mentre questo avviene. Riprova una volta terminato.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Errore: in questo computer è in sospeso una precedente transazione di Windows Installer. Prima di pulire la cache riprendi o annulla quell'installazione (o riavvia Windows).</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Errore: un'operazione su file in coda per il prossimo riavvio riguarda la cache di installazione ({0}). Per completare l'operazione prima della pulizia riavvia Windows.</value></data>
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Spostamento di {0} {1} in {2}...</value></data>
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>Spostati {0} {1}.</value></data>
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Un altro processo InstallerClean mantiene il blocco a istanza singola (la GUI o un'altra esecuzione della CLI). Codice di uscita 75 (transitorio); è sicuro riprovare più tardi.</value></data>
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Nota: scrittura nel registro eventi non riuscita. Controlla i permessi del canale Applicazione o i Criteri di gruppo.</value></data>
+
+  <!-- CLI help screen. Column alignment is hand-tuned for a monospace
+       terminal; eye-verify on Windows. -->
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - pulizia di C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Usage" xml:space="preserve"><value>Utilizzo:</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help       Mostra questa guida (accetta anche /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version    Mostra la versione (accetta anche -v)</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s           Solo scansione - elenca i file non necessari</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d           Elimina i file non necessari (Cestino)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m           Sposta nella destinazione predefinita salvata</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PERCORSO  Sposta nel percorso specificato</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli è un vero processo console e blocca il prompt</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>finché non termina; reindirizza o usa una pipe sul suo output come</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>per qualsiasi altro eseguibile console. La GUI è in InstallerClean.exe.</value></data>
+  <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Codici di uscita:</value></data>
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   successo: ogni file segnalato è stato elaborato</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   errore: nessuna elaborazione (argomenti errati, scansione non riuscita, tutti i file non riusciti)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   parziale: alcuni file elaborati, altri non riusciti</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transitorio: una condizione temporanea ha bloccato l'esecuzione (vedi il messaggio)</value></data>
+  <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 annullato (Ctrl+C)</value></data>
+
+  <!-- n==1 participle overrides for the three count lines: Italian inflects
+       the past participle at one (Trovato/Eliminato/Spostato) versus the
+       plural base. Satellite-only, read by DisplayHelpers.Pluralise via -->
+  <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Trovato {0} {1} da eliminare ({2}).</value></data>
+  <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Eliminato {0} {1}.</value></data>
+  <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Spostato {0} {1}.</value></data>
 </root>
