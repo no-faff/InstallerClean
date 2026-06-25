@@ -360,7 +360,7 @@
   <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました。ごみ箱には送られていません。</value></data>
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました。ごみ箱には送られていません。</value></data>
   <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました。ごみ箱には送られていません。{2} 個の {3}</value></data>
-  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました。ごみ箱には送られていません。{2} 個の{3}</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました。ごみ箱には送られていません。{2} 個の {3}</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>問題ありません。削除しても安全でした。InstallerCleanはWindowsが不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただしMicrosoftは保証していません)。</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>問題ありません。削除しても安全でした。InstallerClean は Windows が不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただし Microsoft は保証していません)。</value></data>
   <!-- 削除時にファイルのボリュームでごみ箱が利用できない場合に提供される選択肢：
@@ -383,9 +383,9 @@
        日本語の助詞配置など)では翻訳が成り立たないためです。翻訳者は各言語のルールに従って単数形と複数形の
        キーの両方を書き換えます。 -->
   <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>まだ必要なファイルが {0} 個</value></data>
-  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>まだ必要なファイルが  {0} 個</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>まだ必要なファイルが {0} 個</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>クリーンアップ対象の不要ファイルが {0} 個</value></data>
-  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>クリーンアップ対象の不要ファイルが {0}  個</value></data>
+  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>クリーンアップ対象の不要ファイルが {0} 個</value></data>
   <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} 個の登録済みファイルが見つかりません (InstallerClean によって削除されたものではありません)。現時点では問題ありませんが、そのプログラムの将来の修復、更新、またはアンインストールが失敗する可能性があります。対処方法は詳細を開いてください。</value></data>
   <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} 個の登録済みファイルが見つかりません (InstallerClean によって削除されたものではありません)。現時点では問題ありませんが、それらのプログラムの将来の修復、更新、またはアンインストールが失敗する可能性があります。対処方法は詳細を開いてください。</value></data>
   <!-- MSIデータベースに置換済みパッチの登録が残っているが、そのファイルが既にディスクから
@@ -506,7 +506,7 @@
   <!-- JSONの下の安心感を示す行。URLを一度明示し、PIIなしのプロパティを
        強調し、モーダルタイトルが示すコンテキストをユーザーが理解できるように
        目的を説明します。 -->
-  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>あなたやあなたのマシンを特定するものは何もありません。InstallerClean が動作していることと、どれだけの容量が解放されているかを知るためのものです。送信先は nofaff.netlify.app/api/result-log  です。</value></data>
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>あなたやあなたのマシンを特定するものは何もありません。InstallerClean が動作していることと、どれだけの容量が解放されているかを知るためのものです。送信先は nofaff.netlify.app/api/result-log です。</value></data>
   <!-- JSONプレビューTextBoxのAutomationProperties.Name。スクリーンリーダーが
        "編集、読み取り専用"ではなくコンテンツをアナウンスするようにします。 -->
   <data name="Automation.ResultLogPreview" xml:space="preserve"><value>結果ログのプレビュー</value></data>
