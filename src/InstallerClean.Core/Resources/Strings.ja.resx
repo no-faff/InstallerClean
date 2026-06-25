@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <!--
+    InstallerClean string resources. Source-of-truth language: en-GB.
+
+    Naming convention: every key starts with a dot-delimited category
+    prefix and is generated as an underscore-delimited C# property name
+    (Window.Main.Title becomes Strings.Window_Main_Title). The visible
+    categories are:
+      Action.*               button labels and verbs
+      Automation.*           AutomationProperties.Name / HelpText values
+      Body.*                 multi-sentence body copy
+      BrowserLaunch.*        copy for the URL-launch failure dialog
+      Cli.*                  console output for the CLI launcher
+      Completion.*           completion overlay copy
+      Confirm.*              confirmation dialog body text
+      ConfirmSendResultLog.* result-log Send confirmation modal
+      CrashLog.*             crash.log header copy
+      Display.*              size/duration formatting fragments
+      Error.*                user-facing error messages
+      Field.*                labels for metadata fields
+      FilePicker.*           folder-browser dialog labels
+      Plural.*               singular/plural fragments used by DisplayHelpers
+      Reason.*               Reason column values in the unneeded files list
+      RecycleUnavailable.*   recycle-bin-unavailable choice dialog
+      ResultLog.*            send-report states (Sending / Sent / Failed)
+      Section.*              heading text inside windows
+      Startup.*              splash + already-running messages
+      Status.*               transient status / progress text
+      Summary.*              status-line counts (registered / orphaned / missing)
+      Tooltip.*              hover tooltips
+      UpdateCheck.*          update-check status / failure detail
+      Version.*              version display string
+      Window.*               window titles and chrome strings
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- ウィンドウのタイトル -->
+  <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Window.About.Title" xml:space="preserve"><value>InstallerClean について</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>削除すべきでない登録済みファイル</value></data>
+  <data name="Window.Orphaned.Title" xml:space="preserve"><value>削除しても安全な不要ファイル</value></data>
+  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>移動の確認</value></data>
+  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>削除の確認</value></data>
+  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>ごみ箱が利用できません</value></data>
+
+  <!-- セクション見出し -->
+  <data name="Section.Registered.Products" xml:space="preserve"><value>プロダクト</value></data>
+  <data name="Section.Registered.Patches" xml:space="preserve"><value>パッチ</value></data>
+  <data name="Section.Registered.Details" xml:space="preserve"><value>プロダクト詳細</value></data>
+  <data name="Section.Move.Location" xml:space="preserve"><value>移動先</value></data>
+  <data name="Section.SayThanks" xml:space="preserve"><value>謝意を伝える</value></data>
+
+  <!-- フィールドラベル (詳細パネルで使用) -->
+  <data name="Field.Reason" xml:space="preserve"><value>理由</value></data>
+  <data name="Field.Author" xml:space="preserve"><value>作成者</value></data>
+  <data name="Field.Application" xml:space="preserve"><value>アプリケーション</value></data>
+  <data name="Field.Title" xml:space="preserve"><value>タイトル</value></data>
+  <data name="Field.Subject" xml:space="preserve"><value>サブジェクト</value></data>
+  <data name="Field.Keywords" xml:space="preserve"><value>キーワード</value></data>
+  <data name="Field.SigningCertificate" xml:space="preserve"><value>署名証明書</value></data>
+  <data name="Field.FileSize" xml:space="preserve"><value>ファイルサイズ</value></data>
+  <data name="Field.Comment" xml:space="preserve"><value>コメント</value></data>
+  <data name="Field.ProductName" xml:space="preserve"><value>プロダクト名</value></data>
+  <data name="Field.File" xml:space="preserve"><value>ファイル</value></data>
+  <data name="Field.Size" xml:space="preserve"><value>サイズ</value></data>
+  <data name="Field.Patches" xml:space="preserve"><value>パッチ</value></data>
+  <!-- 登録済みパッケージのAPIのProductNameが空の場合に表示されるプレースホルダー -->
+  <data name="Field.UnknownProductName" xml:space="preserve"><value>(不明)</value></data>
+  <data name="Field.PatchesOnly" xml:space="preserve"><value>(パッチのみ)</value></data>
+  <data name="Field.Missing" xml:space="preserve"><value>見つかりません</value></data>
+
+  <!-- アクション (ボタンラベル；アンダースコアの接頭辞はWPFのニーモニック) -->
+  <data name="Action.About" xml:space="preserve"><value>InstallerClean について(_A)</value></data>
+  <data name="Action.Copy" xml:space="preserve"><value>コピー</value></data>
+  <data name="Action.Cut" xml:space="preserve"><value>切り取り</value></data>
+  <data name="Action.Paste" xml:space="preserve"><value>貼り付け</value></data>
+  <data name="Action.SelectAll" xml:space="preserve"><value>すべて選択</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>参照(_B)...</value></data>
+  <data name="Action.Cancel" xml:space="preserve"><value>キャンセル(_C)</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>更新の確認(_U)</value></data>
+  <data name="Action.Close" xml:space="preserve"><value>閉じる(_C)</value></data>
+  <data name="Action.Delete" xml:space="preserve"><value>削除(_D)</value></data>
+  <data name="Action.DeletePermanently" xml:space="preserve"><value>完全に削除(_D)</value></data>
+  <!-- Alt+Dはここでは安全です。オーバーレイの下の削除ボタンは
+       Completion.IsCompleteがtrueの間は無効になっており (IsMainContentInteractiveが
+       本体領域をfalseにバインド)、ニーモニックはこのDoneボタンにのみ解決されます。
+       IsDefault=TrueによりEnterが主要なキーボードショートカットとして維持されます。 -->
+  <data name="Action.Done" xml:space="preserve"><value>完了(_D)</value></data>
+  <data name="Action.Details" xml:space="preserve"><value>詳細</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>コーヒーをおごる(_B)</value></data>
+  <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>GitHubでスターを付ける(_S)</value></data>
+  <data name="Action.MITLicence" xml:space="preserve"><value>MITライセンス</value></data>
+  <data name="Action.Move" xml:space="preserve"><value>移動(_M)</value></data>
+  <data name="Action.MoveInstead" xml:space="preserve"><value>代わりに移動(_M)</value></data>
+  <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>削除せずに移動する場合のフォルダーパス</value></data>
+  <data name="Action.OpenReleasePage" xml:space="preserve"><value>リリースページを開く(_R)</value></data>
+  <data name="Action.Rescan" xml:space="preserve"><value>再スキャン(_R)</value></data>
+  <data name="Action.ScanAgain" xml:space="preserve"><value>再スキャン(_S)</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>レポートを送信</value></data>
+  <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>送信(_S)</value></data>
+
+  <!-- オートメーション名 (スクリーンリーダー / アクセシビリティ) -->
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>コーヒーを一杯おごる</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>一杯おごる (バージョン情報ウィンドウ)</value></data>
+  <data name="Automation.CancelOperation" xml:space="preserve"><value>操作をキャンセル</value></data>
+  <data name="Automation.CancelScan" xml:space="preserve"><value>スキャンをキャンセル</value></data>
+  <data name="Automation.CancelStartupScan" xml:space="preserve"><value>起動時スキャンをキャンセル</value></data>
+  <data name="Automation.Close" xml:space="preserve"><value>閉じる</value></data>
+  <data name="Automation.CloseWindow" xml:space="preserve"><value>ウィンドウを閉じる</value></data>
+  <data name="Automation.CloseResult" xml:space="preserve"><value>結果を閉じてメインウィンドウに戻る</value></data>
+  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>GitHub でスターを付ける</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>GitHub でスターを付ける (バージョン情報ウィンドウ)</value></data>
+  <data name="Automation.Minimise" xml:space="preserve"><value>最小化</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>不要なインストーラーファイルをすべて選択した移動先フォルダーに移動</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>不要なインストーラーファイルをすべてごみ箱に送る</value></data>
+  <!-- 確認ダイアログのフォーカスされたキャンセルボタンに表示されるヘルプテキスト。
+       ダイアログの選択肢を説明します。"キャンセル、ボタン"の直後に正しく読めるように
+       文言を調整しています。ウィンドウレベルの代替手段は読み上げられません。なぜなら
+       ヘルプテキストはフォーカスがある要素に対してのみ読み上げられ、ウィンドウ自体が
+       フォーカスを持つことはないからです。 -->
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>削除を実行すると不要ファイルがごみ箱に送られます。キャンセルは削除せずに閉じます。</value></data>
+  <data name="Automation.ConfirmMove" xml:space="preserve"><value>移動を実行すると不要ファイルが選択した移動先フォルダーに移動されます。キャンセルはそのままの場所に残します。</value></data>
+  <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>不要ファイルの処理方法を選択：安全な場所に移動するか、完全に削除するか、キャンセルするか。</value></data>
+  <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>不要ファイルを選択したフォルダーに移動</value></data>
+  <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>このドライブではごみ箱が利用できないため、不要ファイルを完全に削除</value></data>
+  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>nofaff.netlify.app に投稿します。カウントとラベルのみです。送信前に正確なペイロードを確認できます。</value></data>
+  <data name="Automation.SayThanks" xml:space="preserve"><value>謝意を伝える</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>送信を実行すると表示されたレポートが No Faff に投稿されます。キャンセルは何も送信しません。</value></data>
+  <data name="Automation.CheckForUpdates" xml:space="preserve"><value>更新の確認</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>HTTPS 経由で GitHub リリース API をチェックし、新しいバージョンがないか確認します。</value></data>
+  <!-- 更新可用モーダルのウィンドウレベルの説明。スクリーンリーダーが開いたときに読み上げ、
+     RecycleUnavailable および ConfirmSendResultLog ウィンドウと同様です。
+     バージョン番号は本文テキストにあり、ここでは選択肢を記載します。 -->
+  <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>リリースページを開いて新しいバージョンをダウンロードするか、キャンセルして現在のバージョンを維持します。</value></data>
+  <data name="Automation.MITLicence" xml:space="preserve"><value>MIT ライセンス</value></data>
+  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>ブラウザで github.com のライセンスファイルを開きます。</value></data>
+  <!-- 大文字の Section.* ラベル (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT DETAILS)に対する
+       大文字小文字混在の AutomationProperties.Name オーバーライド。
+       Narrator はデフォルトの冗長度で短い大文字トークンを一文字ずつ読み上げます。
+       このオーバーライドにより、表示テキストはSmallCaps用に大文字のまま、読み上げ用のフレーズが提供されます。 -->
+  <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>移動先</value></data>
+  <data name="Automation.Section.Products" xml:space="preserve"><value>プロダクト</value></data>
+  <data name="Automation.Section.Patches" xml:space="preserve"><value>パッチ</value></data>
+  <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>プロダクト詳細</value></data>
+  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>移動先フォルダー</value></data>
+  <data name="Automation.OperationProgress" xml:space="preserve"><value>操作の進捗</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>C:\Windows\Installer を再スキャン</value></data>
+  <data name="Automation.ScanningProgress" xml:space="preserve"><value>スキャンの進捗</value></data>
+  <data name="Automation.StartupScanProgress" xml:space="preserve"><value>起動時スキャンの進捗</value></data>
+  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>詳細、不要ファイル</value></data>
+  <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>クリーンアップ可能です。</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>詳細、登録済みファイル</value></data>
+  <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>読み取り専用のインベントリです。</value></data>
+  <!-- 詳細ウィンドウリストのスクリーンリーダー用ソート状態。
+       UpdateSortIndicators でソートされた列ヘッダーのアクセシブル名として設定され
+       (フォーカスされたヘッダーの名前変更がアナウンスされ、名前のオーバーライドにより
+       ▲/▼グリフが音声から除外されます)、照会可能なサーフェスとしてリストの
+       ItemStatusにミラーリングされます。0 = ソートされた列の名前 (Field.*ラベル)。 -->
+  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>{0} で昇順にソート</value></data>
+  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>{0} で降順にソート</value></data>
+  <!-- スクロール可能なテキスト領域の名前。領域が実際にスクロールでき、
+     タブ順序に加わった時 (BodyScrollRegion スタイル)に一度だけ読み上げられます。 -->
+  <data name="Automation.Scroll.ScanResults" xml:space="preserve"><value>スキャン結果</value></data>
+  <data name="Automation.Scroll.ResultDetails" xml:space="preserve"><value>結果の詳細</value></data>
+  <data name="Automation.Scroll.FileDetails" xml:space="preserve"><value>ファイルの詳細</value></data>
+  <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>ダイアログテキスト</value></data>
+  <!-- ファイルが見つかったスキャン結果のアナウンスを構成：
+       0 = "クリーンアップ対象のN個の不要ファイル"行、1 = 合計サイズ。 -->
+  <data name="Automation.ScanResultAnnouncement" xml:space="preserve"><value>{0} ({1})</value></data>
+  <data name="Automation.CompletionErrors" xml:space="preserve"><value>処理できなかったファイル</value></data>
+  <!-- 欠落ファイル通知のクローズハイパーリンクの読み上げ名。表示リンクテキストは
+       文中のフレーズ (Body.RegisteredMissingFromDisk.SeeAlso の[]で囲まれたスパン、
+       翻訳者が移動可能)、スクリーンリーダーがリンクにタブ移動した際に自己完結した目的が
+       必要です。音声コントロールが画面上の単語でクリックできるよう、表示フレーズを
+       含んでいる必要があります。 -->
+  <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>このフォルダーとファイルの回復方法を README で説明しています</value></data>
+
+  <!-- ツールチップ -->
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>役に立ったら、コーヒーを一杯ご馳走してください。</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>喉が渇く仕事です！</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>キャンセルが要求されました。InstallerClean は現在のステップが停止可能なポイントに達するのを待っています。大量の I/O または MSI データベース呼び出し中は数秒かかることがあります。</value></data>
+  <data name="Tooltip.Close" xml:space="preserve"><value>閉じる</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>GitHub でスターを付けたり、問題を報告したり、ディスカッションに投稿したりしてください。あらゆるフィードバックを歓迎します。</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>または問題を報告するか、ディスカッションに投稿してください。あらゆるフィードバックを歓迎します。</value></data>
+  <data name="Tooltip.Minimise" xml:space="preserve"><value>最小化</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているか、どれだけの容量が解放されているかを知るためのものです。次の画面で送信前に送信内容を確認できます。</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているかを知るためのものです。次の画面で送信前に送信内容を確認できます。</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>不要ファイルを移動先に移動します。</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>不要ファイルを移動先に移動します。先に移動先を選択してください。</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>不要ファイルをごみ箱に送ります。</value></data>
+  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>埋め込まれた Authenticode 証明書のサブジェクト名です。チェーン検証はされていません。</value></data>
+
+  <!-- 本文 -->
+  <data name="Body.MainExplanation.Lead" xml:space="preserve">
+    <value>以下の不要ファイルは削除しても安全です。</value>
+    <comment>メインウィンドウの導入、キー1/3 (リード)。強調表示 (見出しレベル)：ウィンドウが開いたときの安心感を与えます。短い節にしてください。</comment>
+</data>
+  <data name="Body.MainExplanation.Why" xml:space="preserve">
+    <value>これらのファイルはC:\Windows\Installerにあり、プログラムがアンインストールされたとき ({0})、新しいパッチが置き換えたとき ({1})、または公開元が撤回したとき ({2})に取り残されます。InstallerClean は、Windows 自身が不要と報告したファイルのみをリストアップします。</value>
+    <comment>メインウィンドウの導入、キー2/3 (理由、控えめに表示)。{0}=Reason.Orphaned、{1}=Reason.Superseded、{2}=Reason.Obsoleted。翻訳後も本文から3つの列のReasonラベルすべてにアクセスできるように、括弧で囲んだ構造を維持してください。</comment>
+</data>
+  <data name="Body.MainExplanation.Action" xml:space="preserve">
+    <value>ごみ箱に削除するか、コピーを保持したい場合は先に別の場所に移動してください。</value>
+    <comment>メインウィンドウの導入、キー3/3 (アクション、本文レベルで表示)。削除ボタンと移動ボタンを反映しています。</comment>
+</data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>現在 Windows Installer を使用しているものがあります。通常は Windows Update またはバックグラウンドでインストール中のプログラムです。その実行中は移動と削除が一時停止され、InstallerClean は変更中のインストーラーキャッシュに触れません。完了したら、再スキャンすると復元されます。</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>このマシンで以前の Windows Installer トランザクションが中断されています。キャッシュをクリーンアップする前に、そのインストールを再開またはロールバックするか (または Windows を再起動してください)。</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows はインストーラーキャッシュに影響するファイル名の変更を次の再起動のためにキューに入れています。クリーンアップする前に Windows を再起動してください。</value></data>
+  <data name="Body.NoFileSelected" xml:space="preserve"><value>ファイルを選択して詳細を表示します。</value></data>
+  <data name="Body.NoProductSelected" xml:space="preserve"><value>プロダクトを選択して詳細を表示します。</value></data>
+  <data name="Body.NoMetadata" xml:space="preserve"><value>メタデータはありません。</value></data>
+  <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
+    <value>このインストーラーファイルは削除されています。InstallerClean が削除したのではありません。プログラムがまだ必要とするファイルを削除することは決してありません。何か別のものが、InstallerClean を実行する前にこのファイルを削除しました。&#10;&#10;今は問題を引き起こしませんが、それが属するプログラムの修復、更新、またはアンインストールを試みるまでは問題になりません。その時、Windowsがこのファイルを探して見つからないため、そのステップは失敗する可能性があります。&#10;&#10;修正を試みるには、そのプログラムのインストーラーをメーカーからダウンロードし、既存のコピーに上書き実行してください (最初にアンインストールしないでください。アンインストール自体がこのファイルを必要とするステップです)。可能であればインストールされているバージョンを使用してください。Windows は異なるバージョンを拒否する可能性があります。これにより通常ファイルは復元され、設定は通常影響を受けませんが、Microsoft はそれを保証しておらず、最終手段はプログラム自体または Windows の再インストールです。</value>
+    <comment>登録済みファイルの詳細ペインで、選択されたプロダクトのインストーラーファイルがディスクからなくなっている場合に表示されます。プロダクト名が挿入されない汎用的なものです。回復のアドバイスはすべてのプログラムで同一であり、名前の末尾がsで終わるものに所有格をつけると誤って読まれるためです。</comment>
+</data>
+  <!-- 欠落ファイル通知のクローズ文。読み込み時に構築されるインラインハイパーリンクを持つ TextBlock として
+       レンダリングされます (RegisteredFilesWindow.BuildSeeAlsoLine)。リンクフレーズは[]で区切られているため、
+       翻訳者は文の任意の場所に配置できます。コードは最初の[と]で接頭辞Run、ハイパーリンク (READMEの
+       回復セクションへ)、接尾辞Runに分割します。[]ペアのない文字列はそのまま1つのRunとしてレンダリングされます。 -->
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso" xml:space="preserve"><value>README には、このフォルダーについて、[Microsoft自身の言葉で]説明されており、ファイルの回復方法も記載されています。</value></data>
+  <data name="Body.NoPatches" xml:space="preserve"><value>(なし)</value></data>
+
+  <!-- 理由 (不要ファイルリストの理由列) -->
+  <data name="Reason.Orphaned" xml:space="preserve"><value>孤立</value></data>
+  <data name="Reason.Superseded" xml:space="preserve"><value>置換済み</value></data>
+  <!-- MSIパッチ状態4 (廃止)は状態2 (置換済み)とは異なる状態です。
+       置換済みは新しいパッチがこれを置き換えたことを意味し、廃止は置換とは無関係に
+       公開元によってパッチが撤回/非推奨になったことを意味します。
+       ユーザーが見る結果 (パッチが削除可能)は同じです。理由列は MSI 状態の精度を
+       求めるユーザー向けに区別します。 -->
+  <data name="Reason.Obsoleted" xml:space="preserve"><value>廃止</value></data>
+
+  <!-- ステータス / 進捗テキスト -->
+  <data name="Status.Scanning" xml:space="preserve"><value>スキャン中...</value></data>
+  <data name="Status.Cancelling" xml:space="preserve"><value>キャンセル中...</value></data>
+  <data name="Status.StartingScan" xml:space="preserve"><value>スキャンを開始しています...</value></data>
+  <data name="Status.QueryingApi" xml:space="preserve"><value>Windowsにインストール済みソフトウェアについて問い合わせ中...</value></data>
+  <data name="Status.ScanningCache" xml:space="preserve"><value>インストーラーキャッシュフォルダーをスキャン中...</value></data>
+  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>インストール済みプロダクトを列挙中...</value></data>
+  <data name="Status.CheckingRegistry" xml:space="preserve"><value>追加パッケージがないかレジストリをチェック中...</value></data>
+  <!-- 0 = 登録済みパッケージ数、1 = 複数形の"package"/"packages" -->
+  <!-- スキャン中にレジストリフォールバックパス後のステップ進捗更新として発火。
+       スキャン終了時のピルではない (それはStatus.ScanComplete)。
+       0 = 登録済みパッケージ数、1 = 複数形の"package"/"packages"。 -->
+  <data name="Status.RegisteredPackagesFound" xml:space="preserve"><value>{0} 個の登録済み {1} が見つかりました。</value></data>
+  <!-- 0 = 経過時間テキスト (例："1.2s") -->
+  <data name="Status.ScanComplete" xml:space="preserve"><value>スキャン完了 ({0})</value></data>
+  <data name="Status.FoundProducts" xml:space="preserve"><value>ローカルパッケージをスキャン中...</value></data>
+  <!-- 0 = ファイル数、1 = 複数形の名詞 ("file"/"files") -->
+  <data name="Status.FoundUnused" xml:space="preserve"><value>安全に削除できる {0} 個の {1} が見つかりました。</value></data>
+  <data name="Status.PreparingDestination" xml:space="preserve"><value>移動先フォルダーを準備中...</value></data>
+  <!-- 0 = ファイル数、1 = 複数形の名詞 -->
+  <data name="Status.Moving" xml:space="preserve"><value>{0} 個の {1} を移動中...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>{0} 個の {1} を削除中...</value></data>
+  <!-- 0 = キャンセル前に処理されたファイル数、1 = バッチ内の総ファイル数、
+       2 = 総数に一致する複数形の"file"/"files"。 -->
+  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>移動がキャンセルされました。{1} 個中 {0} 個の {2} を処理しました。</value></data>
+  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>削除がキャンセルされました。{1} 個中 {0} 個の {2} を処理しました。</value></data>
+  <!-- 0 = 例外タイプ名、1 = クラッシュログのパス。両方ともステータスピルに表示され、
+       ユーザーがログを見つけられるようにします。完全なメッセージとスタックトレースは
+       ログ自体に出力されます。 -->
+  <data name="Status.MoveFailed" xml:space="preserve"><value>移動に失敗しました ({0})。詳細は{1}をご覧ください。</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>移動に失敗しました ({0})。クラッシュログを書き込めませんでした。</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>削除に失敗しました ({0})。詳細は{1}をご覧ください。</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>削除に失敗しました ({0})。クラッシュログを書き込めませんでした。</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>アクセスが拒否されました。管理者として実行してください。</value></data>
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>スキャンに失敗しました：インストーラーデータベースが利用できません。</value></data>
+  <data name="Status.ScanCancelled" xml:space="preserve"><value>スキャンがキャンセルされました。</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>待機中</value></data>
+  <!-- 0 = 例外タイプ名。完全なメッセージとスタックトレースは、昇格されたフレームワーク
+       呼び出しからの例外メッセージに別のユーザープロファイルのパスが含まれる可能性があるため、
+       クラッシュログにのみ出力されます。1 = クラッシュログのパス。 -->
+  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>スキャンに失敗しました ({0})。詳細は {1} をご覧ください。</value></data>
+  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>スキャンに失敗しました ({0})。クラッシュログを書き込めませんでした。</value></data>
+
+  <!-- 完了画面 -->
+  <data name="Completion.AllClean" xml:space="preserve"><value>すべてクリーン</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>C:\Windows\Installer にクリーンアップするものはありません</value></data>
+  <!-- 0 = インストール済みプロダクト数、1 = 複数形の"product"/"products"、
+       2 = 自然な表現の所要時間 ("1.4 seconds" / "850 ms" / "less than a second")。
+       カウントは実際のスキャンが実行された証明です。高速なマシンでは所要時間だけだと
+       "何もしなかった"と読めます。完了オーバーレイの復元スロットにレンダリングされ、
+       すべてクリーンな状態でも移動後や削除後と同じ見出し + 要約 + 小さなレシートの
+       形状になります。 -->
+  <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>{0} 個の {1} を {2} でスキャンしました</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>何かが動作しなくなった場合はコピーを戻してください</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>何かが動作しなくなった場合はごみ箱から復元してください</value></data>
+  <!-- 0 = 解放されたサイズ (例："120.5 MB") -->
+  <data name="Completion.Freed" xml:space="preserve"><value>{0} 解放</value></data>
+  <data name="Completion.Moved" xml:space="preserve"><value>{0} 移動</value></data>
+  <data name="Completion.PartlyMoved" xml:space="preserve"><value>{0} 移動、一部のファイルは処理できませんでした</value></data>
+  <!-- 一部のファイルでは成功したが、他のファイルでエラーが発生した場合に表示される見出し。
+     0 = 解放された合計サイズ (例："120.5 MB")。 -->
+  <data name="Completion.PartlyFreed" xml:space="preserve"><value>{0} 解放、一部のファイルは処理できませんでした</value></data>
+  <!-- 0 = 移動数、1 = 複数形の名詞、2 = 移動先パス -->
+  <data name="Completion.MoveSummary" xml:space="preserve"><value>{0} 個の {1} を {2} に移動しました</value></data>
+  <!-- 0 = 移動数、1 = 複数形の名詞、2 = 移動先、3 = エラー数、4 = 複数形の"error"/"errors" -->
+  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>{0} 個の {1} を {2} に移動しました。{3} 個の {4}</value></data>
+  <!-- 0 = 削除数、1 = 複数形の名詞 -->
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} 個の {1} をごみ箱に送りました</value></data>
+  <!-- 0 = 削除数、1 = 複数形の名詞、2 = エラー数、3 = 複数形の"error"/"errors" -->
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} 個の {1} をごみ箱に送りました。{2} 個の {3}</value></data>
+  <!-- 承諾済みの完全削除 (ボリュームでごみ箱が利用できず、ユーザーが削除を選択した場合)の完了コピー。
+       DeleteSummaryと区別して、ごみ箱に送られたと主張しないようにします。これらのファイルは
+       ごみ箱に到達しておらず、そこから復元できません。0 = 削除数、1 = 複数形の名詞；
+       WithErrorsバリアントは2 = エラー数、3 = 複数形の"error"/"errors"を追加します。
+       クリーン版とWithErrors版の両方が単数/複数を分割するため、"It"/"They did not go to the
+       Recycle Bin"の節がカウントに一致し、WithErrors版でも部分的な失敗があった場合に
+       ファイルがごみ箱に到達したかのように読まれることはありません。 -->
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました。ごみ箱には送られていません。</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました。ごみ箱には送られていません。</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました。ごみ箱には送られていません。{2} 個の {3}</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました。ごみ箱には送られていません。{2} 個の{3}</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>問題ありません。削除しても安全でした。InstallerCleanはWindowsが不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただしMicrosoftは保証していません)。</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>問題ありません。削除しても安全でした。InstallerClean は Windows が不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただし Microsoft は保証していません)。</value></data>
+  <!-- 削除時にファイルのボリュームでごみ箱が利用できない場合に提供される選択肢：
+       移動 (安全なデフォルト)、同意の上での完全削除、またはキャンセル。
+       文言は確認された事実 (調査によりドライブでごみ箱が利用できないことが判明)のみを
+       示し、未確認の原因 (無効 vs 破損 vs フル)を主張しません。0 = ファイル数、
+       1 = 複数形の名詞、2 = サイズ表示。単数形のテキストは{0}を省略します：
+       "this file"は"this 1 file"よりも読みやすいためです。呼び出し側では
+       いずれの場合も3つの引数すべてを渡すため、単数形の{1}と{2}は引き続き解決されます。 -->
+  <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>このドライブではごみ箱が利用できません</value></data>
+  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>そのため、この {1} ({2})は削除されていません。安全な場所に移動するか、完全に削除することができます。</value></data>
+  <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>そのため、これらの {0} 個の {1} ({2}) は削除されていません。安全な場所に移動するか、完全に削除することができます。</value></data>
+  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>削除は安全です。InstallerClean は Windows が不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。ごみ箱は単なる追加の安全対策です。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただし Microsoft は保証していません)。</value></data>
+  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>削除は安全です。InstallerClean は Windows が不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。ごみ箱は単なる追加の安全対策です。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただし Microsoft は保証していません)。</value></data>
+
+  <!-- 要約 -->
+  <!-- 0 = ファイル数。単数/複数ペアは呼び出し側でPluralise(count, Singular, Plural)によって選択されます。
+       これにより、カウントと"file is"/"files are"フラグメントをプレースホルダー境界を越えて連結することを避けられます。
+       これは、名詞-動詞-カウントの一致がプレースホルダーを越える言語 (スラブ語の格選択、アラビア語の双数、
+       日本語の助詞配置など)では翻訳が成り立たないためです。翻訳者は各言語のルールに従って単数形と複数形の
+       キーの両方を書き換えます。 -->
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>まだ必要なファイルが {0} 個</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>まだ必要なファイルが  {0} 個</value></data>
+  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>クリーンアップ対象の不要ファイルが {0} 個</value></data>
+  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>クリーンアップ対象の不要ファイルが {0}  個</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} 個の登録済みファイルが見つかりません (InstallerClean によって削除されたものではありません)。現時点では問題ありませんが、そのプログラムの将来の修復、更新、またはアンインストールが失敗する可能性があります。対処方法は詳細を開いてください。</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} 個の登録済みファイルが見つかりません (InstallerClean によって削除されたものではありません)。現時点では問題ありませんが、それらのプログラムの将来の修復、更新、またはアンインストールが失敗する可能性があります。対処方法は詳細を開いてください。</value></data>
+  <!-- MSIデータベースに置換済みパッチの登録が残っているが、そのファイルが既にディスクから
+       なくなっている場合に表示される情報行。欠落ファイルの警告とは区別されます。
+       なぜなら、ファイルは既に削除可能だからです。MSI登録のみが古い状態です。
+       InstallerCleanは何も登録解除しないため、これは純粋に診断用です。 -->
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>{0} 個の古いMSIエントリを検出しました (ファイルは既にディスクからなくなっています。InstallerClean は登録解除しません)。</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>{0} 個の古いMSIエントリを検出しました (ファイルは既にディスクからなくなっています。InstallerClean は登録解除しません)。</value></data>
+  <!-- 0 = 現在のファイル数、1 = 合計数、2 = 複数形の名詞。 -->
+  <data name="Summary.OperationFiles" xml:space="preserve"><value>{2} {1} 個中 {0} 個</value></data>
+  <!-- 孤立ファイルウィンドウのフッター要約。不要ファイルは理由列に示された3つの削除可能な原因に分類されます：
+     真の孤立（APIが一切主張していないもの）、置換済みパッチ、廃止済みパッチ。
+     0 = 孤立数、1 = 置換済み数、2 = 廃止数、3 = サイズ表示。末尾に名詞がないため、どの数でも一致します。 -->
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>孤立 {0}、置換済み {1}、廃止 {2}（{3}）</value></data>
+  <!-- 登録ファイルウィンドウのフッター要約。「まだ必要」という枠組みを強調します（メインウィンドウの「不要」の反対側）。
+       単数/複数に分割することで、名詞と動詞が1ファイル（"file ... is" vs "files ... are"）で一致します。
+       0 = 数、1 = サイズ表示。 -->
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>まだ必要な登録ファイルが {0} 個（{1}）</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>まだ必要な登録ファイルが {0} 個（{1}）</value></data>
+
+  <!-- 確認ダイアログ -->
+  <!-- 0 = ファイル数、1 = 複数形の"file"/"files"、2 = サイズ表示 -->
+  <data name="Confirm.MoveTitle" xml:space="preserve"><value>{0} 個の {1} ({2})を移動しますか？</value></data>
+  <!-- 0 = 移動先パス -->
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>ファイルは {0} に移動されます。</value></data>
+  <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{0} 個の {1} ({2})を削除しますか？</value></data>
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>ファイルはごみ箱に送られます。バックアップコピーが必要な場合は、代わりに移動を使用してください。</value></data>
+
+  <!-- エラーメッセージ -->
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>管理者権限が必要です</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerCleanには管理者権限が必要です。
+
+右クリックして「管理者として実行」を選択してください。</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>インストーラーデータベースが利用できません</value></data>
+  <data name="Error.ScanFailedTitle" xml:space="preserve"><value>スキャンに失敗しました</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer データベースが空であるか、アクセスできないようです。これは新しい Windows インストールでも異常であり、通常はデータベースが破損しているか、サードパーティツールが消去したことを意味します。昇格したプロンプトで'sfc /scannow'を実行すると、通常は修復されます。</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>インストール済みプロダクトの列挙中にアクセスが拒否されました。管理者として実行してください。</value></data>
+  <!-- 0 = 連続失敗回数、1 = 最後のWin32エラーコード (メッセージに含まれています。
+     ダイアログを読んでいるシステム管理者が調べたい場合があるため)。 -->
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installerは、{0} 回の連続失敗の後もプロダクトの一覧表示を拒否しました (最後のエラーコード{1})。Windows を再起動するか、昇格したプロンプトで'sfc /scannow'を実行してみてください。</value></data>
+  <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>無効な移動先</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>移動先に書き込めませんでした</value></data>
+  <data name="Error.MoveFailedTitle" xml:space="preserve"><value>移動に失敗しました</value></data>
+  <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>削除に失敗しました</value></data>
+  <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>移動先を Windows Installer フォルダー内にすることはできません。</value></data>
+  <!-- 0 = ユーザーが入力した移動先パス -->
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>移動先 {0} は Windows システムフォルダー下に解決されます。%SystemRoot%、%ProgramFiles%、%ProgramData% 以外のパスを選択してください。</value></data>
+  <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>空き容量が不足しています</value></data>
+  <!-- 0 = 移動先、1 = 必要サイズ、2 = 利用可能サイズ -->
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>{0} の空き容量が不足しています
+
+必要：{1}
+利用可能：{2}</value></data>
+  <!-- 0 = 移動先 -->
+  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>{0} に書き込む権限がありません。
+ユーザープロファイル内または自分が所有するドライブ上のフォルダーを試してください。</value></data>
+  <data name="Error.PathTooLong" xml:space="preserve"><value>パス{0} は Windows にとって長すぎます。より短いパスを選択してください。</value></data>
+  <data name="Error.DestinationMissing" xml:space="preserve"><value>フォルダー {0} が存在せず、作成できませんでした。ドライブ文字またはネットワークパスを確認してください。</value></data>
+  <!-- 0 = 移動先、1 = クラッシュログのパス。例外の.Messageは意図的に
+       どちらの文字列にも表示されません。昇格時にはフレームワークメッセージが
+       別のユーザープロファイルのパスを運ぶ可能性があるためです。
+       詳細はクラッシュログに出力され、ユーザーはそこを参照するよう指示されます。 -->
+  <data name="Error.IOWriteDestination" xml:space="preserve"><value>Windows は {0} に書き込めません。
+詳細は{1}をご覧ください。</value></data>
+  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows は {0} に書き込めません。クラッシュログを書き込めませんでした。</value></data>
+  <data name="Error.WriteDestination" xml:space="preserve"><value>{0} に書き込めません。
+詳細は{1}をご覧ください。</value></data>
+  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>{0} に書き込めません。クラッシュログを書き込めませんでした。</value></data>
+  <data name="Error.MissingSourceFile" xml:space="preserve"><value>ファイルはもう存在しません。</value></data>
+  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>ソースファイルはシンボリックリンクまたはジャンクションです。安全のために拒否されました。</value></data>
+  <!-- FileOperationError.LocalisedMessage用のカテゴリのみの文。
+       これらには意図的にパスやフレームワークメッセージの断片を含めていません。
+       アプリが昇格して実行されている場合、ファイルごとの
+       UnauthorizedAccessException / IOExceptionメッセージに他のユーザープロファイルの
+       パスが表示されるエラーリストに含まれる可能性があるためです。 -->
+  <data name="Error.AccessDenied" xml:space="preserve"><value>アクセスが拒否されました。</value></data>
+  <data name="Error.IOFailure" xml:space="preserve"><value>操作に失敗しました。もう一度試すか、Windows を再起動してください。</value></data>
+  <data name="Error.UnknownError" xml:space="preserve"><value>不明なエラー。</value></data>
+  <!-- 0 = シェルエラーコード -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>このファイルをごみ箱に送れませんでした (エラー{0})。ロックされているか、使用中か、Windows によってブロックされている可能性があります。代わりに移動してください。</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows は管理者権限でもこのファイルへのアクセスをブロックしました (エラー{0})。通常は所有権またはアクセス許可のロックです。代わりに移動してください。</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>このファイルは別のプログラムによって開かれているかロックされています (エラー{0})。そのプログラムまたはスキャンしているものを閉じてから再試行するか、代わりに移動してください。</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>ごみ箱に送れなかったため、ファイルは完全に削除されました。</value></data>
+  <!-- 0 = 移動先 -->
+  <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Windows Installerフォルダー内へのファイル移動を拒否します (移動先：{0})。</value></data>
+  <!-- 0 = 呼び出し元が渡した相対パス -->
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>移動先は完全修飾パスである必要があります (相対パスはプロセスのカレントディレクトリに対して解決され、昇格時には安全ではありません)：{0}</value></data>
+  <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>ブラウザを開けませんでした</value></data>
+  <data name="UpdateCheck.Title" xml:space="preserve"><value>更新の確認</value></data>
+  <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>確認中...</value></data>
+  <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>最新です。</value></data>
+  <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>更新があります</value></data>
+  <!-- 0 = インストール済みバージョン、1 = GitHub上の最新バージョン -->
+  <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>バージョン {0} を実行しています。&#10;バージョン {1} が利用可能です。</value></data>
+  <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>GitHub に到達できませんでした。インターネット接続を確認して再試行してください。</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub がエラーレスポンスを返しました。リリース API がレート制限されている可能性があります。数分待ってから再試行してください。</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub のレスポンスに認識可能なリリースが含まれていませんでした。後でもう一度試すか、リリースページを直接開いてください。</value></data>
+  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>確認がタイムアウトしました。GitHub への接続が遅い可能性があります。再試行してください。</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>不明な理由で確認に失敗しました。報告が必要な場合は詳細が crash.log にあります。</value></data>
+  <!-- 0 = ユーザーがアクセスしようとしたURL -->
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>リンクを通常ユーザーのブラウザで開けませんでした。URL はクリップボードにコピーされたので、手動で開くことができます：&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>リンクを通常ユーザーのブラウザで開けず、クリップボードへのコピーも失敗しました。URL は次のとおりです：&#10;&#10;{0}</value></data>
+  <!-- 0 = バッチ処理中に正規パスが変更された移動先フォルダー -->
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>バッチ処理中に移動先フォルダーの正規パスが変更されました：{0}</value></data>
+  <!-- 0 = フォルダー、1 = 内部例外メッセージ -->
+  <data name="Error.CannotWriteFolder" xml:space="preserve"><value>{0} に書き込めません。</value></data>
+  <!-- 0 = ファイル名 -->
+  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>10,000回の試行後も'{0}'の一意のファイル名が見つかりませんでした。</value></data>
+
+  <!-- 結果ログ (クリーンアップ後の診断送信) -->
+  <data name="ResultLog.Sending" xml:space="preserve"><value>送信中...</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>ありがとうございます！レポートを送信しました。</value></data>
+  <data name="ResultLog.Failed" xml:space="preserve"><value>送信に失敗しました。後でもう一度試してください。</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>送信するレポートがありません。</value></data>
+  <!-- 確認モーダルに表示される本文ヘッダー。受信者と完全なURLを名前で示し、
+     ユーザーがJSONをスクロールしなくても送信先を確認できるようにします。 -->
+  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>これを No Faff に送信しますか？</value></data>
+  <!-- JSONの下の安心感を示す行。URLを一度明示し、PIIなしのプロパティを
+       強調し、モーダルタイトルが示すコンテキストをユーザーが理解できるように
+       目的を説明します。 -->
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>あなたやあなたのマシンを特定するものは何もありません。InstallerClean が動作していることと、どれだけの容量が解放されているかを知るためのものです。送信先は nofaff.netlify.app/api/result-log  です。</value></data>
+  <!-- JSONプレビューTextBoxのAutomationProperties.Name。スクリーンリーダーが
+       "編集、読み取り専用"ではなくコンテンツをアナウンスするようにします。 -->
+  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>結果ログのプレビュー</value></data>
+
+  <!-- 単一インスタンス / 起動 / クラッシュ -->
+  <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean は既に実行中です。</value></data>
+  <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <!-- 0 = 例外タイプ名 (例："IOException")、1 = クラッシュログのパス。
+       完全な例外メッセージはここには意図的にフォーマットされていません。
+       フレームワークが提供するメッセージには、現在のユーザーが読むダイアログに
+       他のユーザープロファイルからの絶対パスが含まれる可能性があるためです。
+       完全な詳細は代わりにクラッシュログに書き込まれます。 -->
+  <data name="Startup.UnhandledBody" xml:space="preserve"><value>予期しないエラーが発生し、InstallerClean を終了する必要があります。
+
+{0}
+
+詳細は以下に書き込まれました：
+{1}</value></data>
+  <data name="Startup.UnhandledBody.NoLog" xml:space="preserve"><value>予期しないエラーが発生し、InstallerClean を終了する必要があります。
+
+{0}
+
+クラッシュログを書き込めませんでした。</value></data>
+  <data name="Startup.ErrorTitle" xml:space="preserve"><value>起動エラー</value></data>
+  <!-- 0 = 例外タイプ名 (これがメッセージではなくタイプ名である理由はStartup.UnhandledBodyを参照)、
+       1 = クラッシュログのパス。 -->
+  <data name="Startup.FailedToStart" xml:space="preserve"><value>起動に失敗しました ({0})。詳細は以下に書き込まれました：
+{1}</value></data>
+  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>起動に失敗しました ({0})。クラッシュログを書き込めませんでした。</value></data>
+
+  <!-- ファイルピッカー -->
+  <data name="FilePicker.ChooseDestinationTitle" xml:space="preserve"><value>移動ファイルの移動先フォルダーを選択</value></data>
+
+  <!-- バージョン表示 -->
+  <!-- 0 = major.minor.patch (例："1.5.4") -->
+  <data name="Version.Display" xml:space="preserve"><value>バージョン {0}</value></data>
+
+  <!-- 複数形の断片。DisplayHelpers.Pluraliseで使用されます。
+       単数/複数ペアは英語スタイル (n != 1 -> 複数形)です。
+       スラブ語 / アラビア語などのホストはこのレイヤーを置き換えます。コンシューマーは変更しません。 -->
+  <data name="Plural.File.Singular" xml:space="preserve"><value>ファイル</value></data>
+  <data name="Plural.File.Plural" xml:space="preserve"><value>ファイル</value></data>
+  <data name="Plural.Error.Singular" xml:space="preserve"><value>エラー</value></data>
+  <data name="Plural.Error.Plural" xml:space="preserve"><value>エラー</value></data>
+  <data name="Plural.Package.Singular" xml:space="preserve"><value>パッケージ</value></data>
+  <data name="Plural.Package.Plural" xml:space="preserve"><value>パッケージ</value></data>
+  <data name="Plural.Product.Singular" xml:space="preserve"><value>プロダクト</value></data>
+  <data name="Plural.Product.Plural" xml:space="preserve"><value>プロダクト</value></data>
+  <data name="Plural.Patch.Singular" xml:space="preserve"><value>パッチ</value></data>
+  <data name="Plural.Patch.Plural" xml:space="preserve"><value>パッチ</value></data>
+
+  <!-- DisplayHelpers.FormatSize / FormatElapsed / FormatElapsedLongで使用される
+       表示フォーマット断片。数値部分はコンシューマーのCurrentCultureでstring.Formatに
+       残ります (そのため1.5 GBはde-DEでは1,5 GBになりますなど)。ローカライズ可能なのは
+       単位接尾辞と秒未満の長形式の文のみです。 -->
+  <data name="Display.Size.GB" xml:space="preserve"><value>{0:F2} GB</value></data>
+  <data name="Display.Size.MB" xml:space="preserve"><value>{0:F1} MB</value></data>
+  <data name="Display.Size.KB" xml:space="preserve"><value>{0:F1} KB</value></data>
+  <data name="Display.Size.B" xml:space="preserve"><value>{0} B</value></data>
+  <data name="Display.Elapsed.Ms" xml:space="preserve"><value>{0:F0}ms</value></data>
+  <data name="Display.Elapsed.S" xml:space="preserve"><value>{0:F1}s</value></data>
+  <data name="Display.ElapsedLong.LessThanASecond" xml:space="preserve"><value>1秒未満</value></data>
+  <data name="Display.ElapsedLong.Seconds" xml:space="preserve"><value>{0:F1}秒</value></data>
+
+  <!-- CLI出力。異なるローカライゼーションルールを持つ2つの送信先。
+       Stdout (ユーザーがコンソールで読むすべて)はローカライズされ、非英語の
+       システム管理者がUIカルチャーに一致するテキストを取得します。
+       Windowsアプリケーションイベントログに書き込まれるエントリは英語のみです
+       (翻訳禁止)：RMMツールはマシンのOS UIカルチャーに関係なく、既知の英語文字列を
+       そのチャネルでgrepします。そのため、サテライトresxはそれらを翻訳してはいけません。
+       それらはCli.EventLog*キーですが、1つの例外があります：
+       Cli.EventLogUnavailableはstdout警告です (イベントログの書き込みが失敗したことを
+       オペレーターに伝えます)。そのため、EventLogプレフィックスにもかかわらず、
+       他のstdoutと同様にローカライズされます。 -->
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>不明な引数：'{0}'</value></data>
+  <data name="Cli.Cancelling" xml:space="preserve"><value>キャンセル中...</value></data>
+  <data name="Cli.Cancelled" xml:space="preserve"><value>キャンセルされました。</value></data>
+  <!-- 0 = 例外タイプ名 (完全なメッセージとスタックトレースはクラッシュログに出力されます。
+       CLIは昇格して実行されるため、.Messageには共有ファイルにログ出力される場合、
+       別のユーザープロファイルのパスが含まれる可能性があります)。
+       1 = クラッシュログのパス。 -->
+  <data name="Cli.GenericError" xml:space="preserve"><value>エラー：{0}。詳細は {1} に書き込まれました。</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>エラー：{0}。クラッシュログを書き込めませんでした。</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>C:\Windows\Installer をスキャン中...</value></data>
+  <!-- 0 = ファイル数、1 = 複数形の名詞、2 = サイズ表示 -->
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>クリーンアップ対象の {0} 個の {1} が見つかりました ({2})。</value></data>
+  <data name="Cli.NothingToDo" xml:space="preserve"><value>実行するものはありません。</value></data>
+  <!-- 0 = モード引数 ("/s")、1 = 登録済みパッケージ数、2 = 複数形の"package"/"packages" -->
+  <data name="Cli.EventLogScanNoOrphans" xml:space="preserve"><value>スキャンモード ({0})：不要ファイルなし。インストーラーデータベースには {1} 個の登録済み {2} があります。</value></data>
+  <!-- 0 = モード引数 ("/s")、1 = ファイル数、2 = 複数形の名詞、3 = サイズ表示 -->
+  <data name="Cli.EventLogScanFound" xml:space="preserve"><value>スキャンモード ({0})：{1} 個の不要な {2} が見つかりました ({3})。アクションは実行されていません。</value></data>
+  <!-- 0 = ファイル数、1 = 複数形の名詞"file"/"files" -->
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>{0} 個の {1} を削除中...</value></data>
+  <!-- 0 = 削除数、1 = 複数形の名詞 -->
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>{0} 個の {1} を削除しました。</value></data>
+  <!-- 0 = モード引数 ("/d")、1 = 削除数、2 = 合計数、3 = 複数形の名詞、
+     4 = サイズ表示、5 = エラー数、6 = 複数形の"error"/"errors" -->
+  <data name="Cli.EventLogDeleteSummary" xml:space="preserve"><value>{0}モード：{2} 個中 {1} 個の {3} をごみ箱に送信、{4}を解放、{5}個の{6}。</value></data>
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>エラー：このボリュームではごみ箱が利用できないため、何も削除されませんでした。代わりに/mを使用してファイルを移動するか、ごみ箱を再度有効にして再実行してください。</value></data>
+  <!-- 0 = モード引数 ("/d") -->
+  <data name="Cli.EventLogRecycleUnavailable" xml:space="preserve"><value>{0}モードは中止されました：Windows ボリュームでごみ箱が利用できません。ファイルは削除されませんでした。</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>エラー：移動先が指定されていません。/m PATH を使用するか、GUI でデフォルトを設定してください。</value></data>
+  <data name="Cli.EventLogMoveNoDestination" xml:space="preserve"><value>{0}モードは中止されました：移動先が指定されていません。</value></data>
+  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>エラー：移動先を Windows Installer フォルダー内にすることはできません。</value></data>
+  <!-- 0 = 相対パスまたはその他の安全でないパス -->
+  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>エラー：移動先は完全修飾パスである必要があります。指定されたもの：{0}</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>エラー：移動先 {0} は Windows システムフォルダー下に解決されます。%SystemRoot%、%ProgramFiles%、%ProgramData%以外のパスを選択してください。</value></data>
+  <!-- 0 = モード、1 = 移動先 -->
+  <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve"><value>{0}モードは中止されました：移動先 {1} はC:\Windows\Installer 内にあります。</value></data>
+  <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>{0}モードは中止されました：移動先 {1} は完全修飾パスではありません。</value></data>
+  <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0}モードは中止されました：移動先 {1} は Windows システムフォルダー内に解決されます。</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>エラー：現在 Windows Installer を使用しているものがあります。通常 はWindows Update  またはバックグラウンドでインストール中のプログラムです。その実行中は移動と削除がブロックされます。完了したら再試行してください。</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>エラー：このマシンで以前の Windows Installer トランザクションが中断されています。キャッシュをクリーンアップする前に、そのインストールを再開またはロールバックするか (または Windows を再起動してください)。</value></data>
+  <!-- 0 = ゲートをトリガーした%SystemRoot%\Installer下の一致パス -->
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>エラー：キューに入れられた再起動後のファイル操作がインストーラーキャッシュ ({0})を対象としています。クリーンアップ前にその操作を完了するために Windows を再起動してください。</value></data>
+  <!-- EventLogの短い人間向けラベル (Cli.EventLogPendingRebootBlockedの{1}スロット)。
+       Cli.PendingRebootBlocked.*のstdout文は完全なローカライズテキストです。これらの短い
+       ラベルは英語のみです (Applicationチャネルに書き込まれるすべてのCli.EventLog*エントリと同様に翻訳禁止)。
+       これにより、ApplicationチャネルのgrepがOS UIカルチャーに関係なく既知の文字列に一致できます。 -->
+  <data name="Cli.EventLogReason.MsiExecuteMutex" xml:space="preserve"><value>Windows Installer ミューテックスが保持されています</value></data>
+  <data name="Cli.EventLogReason.InstallerInProgress" xml:space="preserve"><value>インストーラートランザクションが進行中</value></data>
+  <data name="Cli.EventLogReason.PendingRenameInCache" xml:space="preserve"><value>キューに入れられた再起動後のファイル名変更がインストーラーキャッシュを対象としています</value></data>
+  <!-- 0 = 引数 ("/d"または"/m")、1 = Cli.EventLogReason.*の短い理由ラベル、
+       2 = 詳細 (PendingRenameInCacheの場合は一致パス、それ以外は空) -->
+  <data name="Cli.EventLogPendingRebootBlocked" xml:space="preserve"><value>{0}モードは中止されました：保留中の再起動が検出されました。理由：{1}。{2}</value></data>
+  <!-- 0 = ファイル数、1 = 複数形の名詞"file"/"files"、2 = 移動先 -->
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>{0} 個の {1} を {2} に移動中...</value></data>
+  <!-- 0 = 移動数、1 = 複数形の名詞 -->
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>{0} 個の {1} を移動しました。</value></data>
+  <!-- 0 = モード引数 ("/m")、1 = 移動数、2 = 合計数、3 = 複数形の名詞、
+       4 = 移動先、5 = サイズ表示、6 = エラー数、7 = 複数形の"error"/"errors" -->
+  <data name="Cli.EventLogMoveSummary" xml:space="preserve"><value>{0}モード：{2} 個中 {1} 個の {3} を {4} に移動、{5} を移動、{6} 個の {7}。</value></data>
+  <data name="Cli.EventLogCancelledPartial" xml:space="preserve"><value>{0}モードが Ctrl+C で中断されました：キャンセル前に {2} 個中 {1} 個の {3} を処理しました。ファイルごとの詳細は進捗出力を参照してください。</value></data>
+  <!-- 0 = モード引数。ファイルが処理される前にCtrl+Cが到達した場合の監査エントリ
+       (スキャン中、または最初の削除や移動前のキャンセル)。これにより、
+       "各/s、/d、/m実行が1つの要約エントリを書き込む"というルールが、
+       作業をコミットした実行だけでなくすべての実行で維持されます。 -->
+  <data name="Cli.EventLogCancelledNoWork" xml:space="preserve"><value>{0}モードが作業実行前に Ctrl+C で中断されました。アクションは実行されていません。</value></data>
+  <!-- CLIが単一インスタンスミューテックスを取得できない場合のStdout。
+       GUIバリアント (Strings.Startup_AlreadyRunningBody)は2番目のウィンドウを
+       起動しようとしたユーザー向けに書かれています。CLIバリアントは競合する
+       当事者 (GUIまたは別のCLI実行)を名前で示し、終了コード75を指すことで、
+       stdoutを解析するRMMオペレーターがそれが一時的であり再試行しても安全であることを
+       知ることができます。 -->
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>別の InstallerClean プロセスが単一インスタンスロックを保持しています (GUIまたは別のCLI実行)。終了コード75 (一時的)。後で再試行しても安全です。</value></data>
+  <!-- 0 = モード引数 ("/d"または"/m")。CLIが単一インスタンスミューテックスを
+       取得できない場合に書き込まれる監査エントリ。これにより、Applicationチャネルの
+       コンシューマーは、実行できたかどうかに関係なく、すべてのスケジュールジョブの
+       発火の記録を確認できます。 -->
+  <data name="Cli.EventLogMutexBlocked" xml:space="preserve"><value>{0}モードはスキップされました：GUI または別の CLI 実行が既に単一インスタンスミューテックスを保持しています。</value></data>
+  <!-- 0 = 問題のトークン (元の大文字小文字)。CLIが認識できない引数または
+       不正な引数で呼び出された場合に書き込まれる監査エントリ。これにより、
+       タイプミスしたフラグを持つスケジュールタスクが、サイレントに終了する代わりに
+       Applicationチャネルのトレースを残します。すべてのCli EventLog文字列と同様に
+       英語のみです。stdoutメッセージはローカライズされたテキストを伝達します。 -->
+  <data name="Cli.EventLogBadArguments" xml:space="preserve"><value>実行が中止されました：認識できない、または不正な引数'{0}'。アクションは実行されていません。</value></data>
+  <!-- 引数なしでCLIが呼び出された場合に書き込まれる監査エントリ。
+       これにより、引数なしのスケジュールタスクが可視的に失敗し (非ゼロ終了)、
+       何もせずにサイレント成功するのではなく記録を残します。 -->
+  <data name="Cli.EventLogNoArguments" xml:space="preserve"><value>実行が中止されました：引数が指定されていません。アクションは実行されていません。</value></data>
+  <!-- LocalisedAccessExceptionおよびLocalisedInvalidOperationExceptionキャッチの監査エントリ：
+       メッセージはresxテンプレートからユーザー制御の引数のみで構築されているため、
+       全文を記録しても安全です。0 = モード引数、1 = ローカライズされたメッセージ
+       (既にフォーマット済み)。Applicationチャネルを解析するRMMコンシューマーは、
+       個別のクラッシュログ検索なしで実行可能な理由を確認できます。 -->
+  <data name="Cli.EventLogValidationFailed" xml:space="preserve"><value>{0}モードが失敗しました：{1}</value></data>
+  <!-- 汎用Exceptionキャッチの監査エントリ：ex.Messageは抑制されます
+       (昇格時のパス漏洩リスク)、タイプ名とクラッシュログパスのみが
+       EventLogに送信されます。0 = モード引数、1 = タイプ名、2 = クラッシュログのパス。 -->
+  <data name="Cli.EventLogHardError" xml:space="preserve"><value>{0}モードが失敗しました：{1}。詳細は {2} をご覧ください。</value></data>
+  <data name="Cli.EventLogHardError.NoLog" xml:space="preserve"><value>{0}モードが失敗しました：{1}。クラッシュログを書き込めませんでした。</value></data>
+  <!-- CLI実行の終了時に一度だけ出力されるStdout警告 (イベントログの
+       書き込みに失敗した場合 (グループポリシーまたはサービスが利用できない))。
+       Applicationエントリを期待するRMMコンシューマーに、チャネルが空ではなく
+       書き込み不可能であったことを伝えます。 -->
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>注意：イベントログの書き込みに失敗しました。Application チャネルのアクセス許可またはグループポリシーを確認してください。</value></data>
+
+  <!-- crash.logプライバシーヘッダー。新しいcrash.logの先頭に追加され、
+       ファイルを公開バグレポートに添付するユーザーが共有前に開示内容を
+       確認できるようにします。"# "プレフィックスにより、コメント行をスキップする
+       ログリーダー (less、grep -v、jqパイプライン)がヘッダーをスキップできます。
+       複数行ブロックとして保存され、C#側でそのまま読み取られ、行末が
+       ホストプラットフォームに正規化されます。 -->
+  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log は InstallerClean からの未処理例外をキャプチャします。
+# 昇格時には、フレームワークの例外メッセージに実行中のセッションの
+# ファイルパス (Windows Installerクエリによって列挙された他のユーザーの
+# プロファイルを含む)が含まれる場合があります。
+# 更新チェックまたは結果ログPOSTからのネットワーク障害メッセージには、
+# 宛先URLおよび解決されたIP/プロキシアドレスが含まれる場合があります。
+# このファイルを公開バグレポートに添付する前に、両方のクラスの詳細を
+# 編集してください。
+</value></data>
+
+  <!-- CLIヘルプテキスト (/?、-hおよび長いヘルプフラグで表示) -->
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - C:\Windows\Installer をクリーンアップ</value></data>
+  <data name="Cli.Help.Usage" xml:space="preserve"><value>使用方法：</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   このヘルプを表示 (/?、-hも受け付けます)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  バージョンを表示 (-vも受け付けます)</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       スキャンのみ - 削除可能なファイルを一覧表示</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       削除可能なファイルを削除 (ごみ箱)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       保存されたデフォルトの場所に移動</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PATH  指定されたパスに移動</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cliは実際のコンソールプロセスであり、完了するまで</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>プロンプトをブロックします。他のコンソール exe と同様に、出力をリダイレクト</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>またはパイプできます。GUI は同じ場所にある InstallerClean.exe にあります。</value></data>
+  <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>終了コード：</value></data>
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   成功：フラグが立てられたすべてのファイルが処理されました</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   失敗：何も処理されませんでした (不正な引数、スキャン失敗、すべてのファイルが失敗)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   部分完了：一部のファイルは処理され、一部は失敗しました</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  一時的：一時的な状態が実行をブロックしました (メッセージを参照)</value></data>
+  <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 キャンセル (Ctrl+C)</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>言語を変更します。プログラムが再起動します。</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>言語を変更</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>プログラムが再起動します。</value></data>
+
+</root>
