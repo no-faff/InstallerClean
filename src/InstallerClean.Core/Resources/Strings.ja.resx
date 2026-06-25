@@ -94,9 +94,9 @@
   <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>ごみ箱が利用できません</value></data>
 
   <!-- セクション見出し -->
-  <data name="Section.Registered.Products" xml:space="preserve"><value>プロダクト</value></data>
+  <data name="Section.Registered.Products" xml:space="preserve"><value>製品</value></data>
   <data name="Section.Registered.Patches" xml:space="preserve"><value>パッチ</value></data>
-  <data name="Section.Registered.Details" xml:space="preserve"><value>プロダクト詳細</value></data>
+  <data name="Section.Registered.Details" xml:space="preserve"><value>製品詳細</value></data>
   <data name="Section.Move.Location" xml:space="preserve"><value>移動先</value></data>
   <data name="Section.SayThanks" xml:space="preserve"><value>謝意を伝える</value></data>
 
@@ -105,12 +105,12 @@
   <data name="Field.Author" xml:space="preserve"><value>作成者</value></data>
   <data name="Field.Application" xml:space="preserve"><value>アプリケーション</value></data>
   <data name="Field.Title" xml:space="preserve"><value>タイトル</value></data>
-  <data name="Field.Subject" xml:space="preserve"><value>サブジェクト</value></data>
+  <data name="Field.Subject" xml:space="preserve"><value>件名</value></data>
   <data name="Field.Keywords" xml:space="preserve"><value>キーワード</value></data>
   <data name="Field.SigningCertificate" xml:space="preserve"><value>署名証明書</value></data>
   <data name="Field.FileSize" xml:space="preserve"><value>ファイルサイズ</value></data>
   <data name="Field.Comment" xml:space="preserve"><value>コメント</value></data>
-  <data name="Field.ProductName" xml:space="preserve"><value>プロダクト名</value></data>
+  <data name="Field.ProductName" xml:space="preserve"><value>製品名</value></data>
   <data name="Field.File" xml:space="preserve"><value>ファイル</value></data>
   <data name="Field.Size" xml:space="preserve"><value>サイズ</value></data>
   <data name="Field.Patches" xml:space="preserve"><value>パッチ</value></data>
@@ -161,7 +161,7 @@
   <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>GitHub でスターを付ける</value></data>
   <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>GitHub でスターを付ける (バージョン情報ウィンドウ)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>最小化</value></data>
-  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>不要なインストーラーファイルをすべて選択した移動先フォルダーに移動</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>不要なインストーラーファイルをすべて、選択した移動先フォルダーに移動</value></data>
   <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>不要なインストーラーファイルをすべてごみ箱に送る</value></data>
   <!-- 確認ダイアログのフォーカスされたキャンセルボタンに表示されるヘルプテキスト。
        ダイアログの選択肢を説明します。"キャンセル、ボタン"の直後に正しく読めるように
@@ -189,9 +189,9 @@
        Narrator はデフォルトの冗長度で短い大文字トークンを一文字ずつ読み上げます。
        このオーバーライドにより、表示テキストはSmallCaps用に大文字のまま、読み上げ用のフレーズが提供されます。 -->
   <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>移動先</value></data>
-  <data name="Automation.Section.Products" xml:space="preserve"><value>プロダクト</value></data>
+  <data name="Automation.Section.Products" xml:space="preserve"><value>製品</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>パッチ</value></data>
-  <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>プロダクト詳細</value></data>
+  <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>製品詳細</value></data>
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>移動先フォルダー</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>操作の進捗</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>C:\Windows\Installer を再スキャン</value></data>
@@ -257,11 +257,11 @@
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>このマシンで以前の Windows Installer トランザクションが中断されています。キャッシュをクリーンアップする前に、そのインストールを再開またはロールバックするか (または Windows を再起動してください)。</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows はインストーラーキャッシュに影響するファイル名の変更を次の再起動のためにキューに入れています。クリーンアップする前に Windows を再起動してください。</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>ファイルを選択して詳細を表示します。</value></data>
-  <data name="Body.NoProductSelected" xml:space="preserve"><value>プロダクトを選択して詳細を表示します。</value></data>
+  <data name="Body.NoProductSelected" xml:space="preserve"><value>製品を選択して詳細を表示します。</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>メタデータはありません。</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
     <value>このインストーラーファイルは削除されています。InstallerClean が削除したのではありません。プログラムがまだ必要とするファイルを削除することは決してありません。何か別のものが、InstallerClean を実行する前にこのファイルを削除しました。&#10;&#10;今は問題を引き起こしませんが、それが属するプログラムの修復、更新、またはアンインストールを試みるまでは問題になりません。その時、Windowsがこのファイルを探して見つからないため、そのステップは失敗する可能性があります。&#10;&#10;修正を試みるには、そのプログラムのインストーラーをメーカーからダウンロードし、既存のコピーに上書き実行してください (最初にアンインストールしないでください。アンインストール自体がこのファイルを必要とするステップです)。可能であればインストールされているバージョンを使用してください。Windows は異なるバージョンを拒否する可能性があります。これにより通常ファイルは復元され、設定は通常影響を受けませんが、Microsoft はそれを保証しておらず、最終手段はプログラム自体または Windows の再インストールです。</value>
-    <comment>登録済みファイルの詳細ペインで、選択されたプロダクトのインストーラーファイルがディスクからなくなっている場合に表示されます。プロダクト名が挿入されない汎用的なものです。回復のアドバイスはすべてのプログラムで同一であり、名前の末尾がsで終わるものに所有格をつけると誤って読まれるためです。</comment>
+    <comment>登録済みファイルの詳細ペインで、選択された製品のインストーラーファイルがディスクからなくなっている場合に表示されます。製品名が挿入されない汎用的なものです。回復のアドバイスはすべてのプログラムで同一であり、名前の末尾がsで終わるものに所有格をつけると誤って読まれるためです。</comment>
 </data>
   <!-- 欠落ファイル通知のクローズ文。読み込み時に構築されるインラインハイパーリンクを持つ TextBlock として
        レンダリングされます (RegisteredFilesWindow.BuildSeeAlsoLine)。リンクフレーズは[]で区切られているため、
@@ -286,7 +286,7 @@
   <data name="Status.StartingScan" xml:space="preserve"><value>スキャンを開始しています...</value></data>
   <data name="Status.QueryingApi" xml:space="preserve"><value>Windowsにインストール済みソフトウェアについて問い合わせ中...</value></data>
   <data name="Status.ScanningCache" xml:space="preserve"><value>インストーラーキャッシュフォルダーをスキャン中...</value></data>
-  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>インストール済みプロダクトを列挙中...</value></data>
+  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>インストール済み製品を列挙中...</value></data>
   <data name="Status.CheckingRegistry" xml:space="preserve"><value>追加パッケージがないかレジストリをチェック中...</value></data>
   <!-- 0 = 登録済みパッケージ数、1 = 複数形の"package"/"packages" -->
   <!-- スキャン中にレジストリフォールバックパス後のステップ進捗更新として発火。
@@ -316,7 +316,7 @@
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>アクセスが拒否されました。管理者として実行してください。</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>スキャンに失敗しました：インストーラーデータベースが利用できません。</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>スキャンがキャンセルされました。</value></data>
-  <data name="Status.Done" xml:space="preserve"><value>待機中</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>準備完了</value></data>
   <!-- 0 = 例外タイプ名。完全なメッセージとスタックトレースは、昇格されたフレームワーク
        呼び出しからの例外メッセージに別のユーザープロファイルのパスが含まれる可能性があるため、
        クラッシュログにのみ出力されます。1 = クラッシュログのパス。 -->
@@ -326,7 +326,7 @@
   <!-- 完了画面 -->
   <data name="Completion.AllClean" xml:space="preserve"><value>すべてクリーン</value></data>
   <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>C:\Windows\Installer にクリーンアップするものはありません</value></data>
-  <!-- 0 = インストール済みプロダクト数、1 = 複数形の"product"/"products"、
+  <!-- 0 = インストール済み製品数、1 = 複数形の"product"/"products"、
        2 = 自然な表現の所要時間 ("1.4 seconds" / "850 ms" / "less than a second")。
        カウントは実際のスキャンが実行された証明です。高速なマシンでは所要時間だけだと
        "何もしなかった"と読めます。完了オーバーレイの復元スロットにレンダリングされ、
@@ -422,10 +422,10 @@
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>インストーラーデータベースが利用できません</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>スキャンに失敗しました</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer データベースが空であるか、アクセスできないようです。これは新しい Windows インストールでも異常であり、通常はデータベースが破損しているか、サードパーティツールが消去したことを意味します。昇格したプロンプトで'sfc /scannow'を実行すると、通常は修復されます。</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>インストール済みプロダクトの列挙中にアクセスが拒否されました。管理者として実行してください。</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>インストール済み製品の列挙中にアクセスが拒否されました。管理者として実行してください。</value></data>
   <!-- 0 = 連続失敗回数、1 = 最後のWin32エラーコード (メッセージに含まれています。
      ダイアログを読んでいるシステム管理者が調べたい場合があるため)。 -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installerは、{0} 回の連続失敗の後もプロダクトの一覧表示を拒否しました (最後のエラーコード{1})。Windows を再起動するか、昇格したプロンプトで'sfc /scannow'を実行してみてください。</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installerは、{0} 回の連続失敗の後も製品の一覧表示を拒否しました (最後のエラーコード{1})。Windows を再起動するか、昇格したプロンプトで'sfc /scannow'を実行してみてください。</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>無効な移動先</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>移動先に書き込めませんでした</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>移動に失敗しました</value></data>
@@ -554,8 +554,8 @@
   <data name="Plural.Error.Plural" xml:space="preserve"><value>エラー</value></data>
   <data name="Plural.Package.Singular" xml:space="preserve"><value>パッケージ</value></data>
   <data name="Plural.Package.Plural" xml:space="preserve"><value>パッケージ</value></data>
-  <data name="Plural.Product.Singular" xml:space="preserve"><value>プロダクト</value></data>
-  <data name="Plural.Product.Plural" xml:space="preserve"><value>プロダクト</value></data>
+  <data name="Plural.Product.Singular" xml:space="preserve"><value>製品</value></data>
+  <data name="Plural.Product.Plural" xml:space="preserve"><value>製品</value></data>
   <data name="Plural.Patch.Singular" xml:space="preserve"><value>パッチ</value></data>
   <data name="Plural.Patch.Plural" xml:space="preserve"><value>パッチ</value></data>
 
