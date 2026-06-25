@@ -6,6 +6,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 ### Added
 
+- coolvitto contributed, entirely unprompted, a complete Japanese translation of the interface, written from scratch (#41): every window, dialog, tooltip, button and screen-reader label. InstallerClean can now be displayed in Japanese, applied automatically on a Japanese-language Windows or picked from the main-window language menu. The command line stays English by design.
 - A Simplified Chinese (zh-Hans) interface translation: all 281 interface strings, ready for a native speaker to review and refine via the README before it goes live in the app. The satellite is script-neutral, reaching every Simplified-Chinese Windows; the command line stays English by design.
 - A Russian (ru) interface translation on the same basis.
 - A Spanish (es) interface translation on the same basis, in neutral international Spanish, with terms following Microsoft's Spanish Windows.
