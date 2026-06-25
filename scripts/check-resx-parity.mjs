@@ -1,12 +1,21 @@
 #!/usr/bin/env node
 // Checks every Strings.<code>.resx satellite against the neutral Strings.resx.
 //
-// For each satellite, fails (exit 1) if a non-Cli. key is missing a translation,
-// if a key is stray (present in the satellite but not the neutral), if a Cli. key
-// is translated (the CLI ships English, so those keys are skipped in the
-// satellite), or if a translated key's {N} placeholder index set differs from the
-// neutral's. Cli. keys are the command-line surface, kept English by a culture
-// pin, so the translator omits them; this script enforces that.
+// For each satellite, fails (exit 1) if a required key is missing a translation,
+// if a key is stray (present in the satellite but not the neutral), or if a
+// translated key's {N} placeholder index set differs from the neutral's.
+//
+// CLI keys (Cli.*) follow a two-tier rule. A satellite either ships the CLI
+// surface or it does not: until it carries its first Cli. key it is skipped for
+// CLI (the CLI falls back to neutral English), and once it carries any Cli. key
+// it must carry every HUMAN-facing one (a half-translated CLI would render some
+// lines in the OS language and some in English). The MACHINE-read keys, the
+// Application-channel event-log lines an RMM tool greps for fixed English
+// phrases, stay English at runtime via a culture scope at the emit site, so a
+// satellite may carry them (ja does, from coolvitto's contribution) or omit them
+// (it.resx does); either is correct. The machine set is exactly the Cli.EventLog*
+// keys minus Cli.EventLogUnavailable, which despite its prefix is an operator-
+// facing stdout warning and so is human.
 //
 // Exception: a satellite may carry Plural.<Noun>.Few / Plural.<Noun>.Many keys
 // that the neutral lacks. These are the extra CLDR plural categories some
@@ -32,6 +41,16 @@ const parse = (file) => {
 
 const neutral = parse('Strings.resx');
 
+const isCliKey = (key) => key.startsWith('Cli.');
+// Machine-read CLI lines are forced English at the emit site, so a satellite may
+// carry or omit them: exactly the Cli.EventLog* keys bar Cli.EventLogUnavailable.
+const isMachineCliKey = (key) =>
+  isCliKey(key) && key.includes('EventLog') && key !== 'Cli.EventLogUnavailable';
+const isHumanCliKey = (key) => isCliKey(key) && !isMachineCliKey(key);
+
+const arityMismatch = (neutralPh, satPh) =>
+  neutralPh.size !== satPh.size || [...neutralPh].some((i) => !satPh.has(i));
+
 // Optional per-language CLDR-category overrides. A language whose plural rules need
 // more than the neutral's one/other pair, or a correct n==1 form for a flat count
 // string, adds these as satellite-only keys: a noun fragment (Plural.File.Few), a
@@ -55,36 +74,40 @@ if (satellites.length === 0) {
 }
 
 let failed = false;
-const nonCli = [...neutral.keys()].filter((k) => !k.startsWith('Cli.')).length;
+const nonCli = [...neutral.keys()].filter((k) => !isCliKey(k)).length;
+const humanCli = [...neutral.keys()].filter(isHumanCliKey).length;
 
 for (const file of satellites) {
   const sat = parse(file);
   const errors = [];
+  const shipsCli = [...sat.keys()].some(isCliKey);
 
   for (const [key, ph] of neutral) {
-    if (key.startsWith('Cli.')) continue; // CLI is English-only; not expected in a satellite
+    // A satellite that has not started the CLI surface omits every Cli. key.
+    if (isCliKey(key) && !shipsCli) continue;
+    // Machine CLI keys are optional even in a Cli-shipping satellite.
+    const required = !isMachineCliKey(key);
     if (!sat.has(key)) {
-      errors.push(`MISSING: ${key}`);
+      if (required) errors.push(`MISSING: ${key}`);
       continue;
     }
-    const sPh = sat.get(key);
-    if (ph.size !== sPh.size || [...ph].some((i) => !sPh.has(i)))
-      errors.push(`PLACEHOLDER mismatch ${key}: neutral {${[...ph].sort()}} vs satellite {${[...sPh].sort()}}`);
+    if (arityMismatch(ph, sat.get(key)))
+      errors.push(`PLACEHOLDER mismatch ${key}: neutral {${[...ph].sort()}} vs satellite {${[...sat.get(key)].sort()}}`);
   }
 
   for (const key of sat.keys()) {
-    if (neutral.has(key)) {
-      if (key.startsWith('Cli.')) errors.push(`Cli. key should not be translated: ${key}`);
-    } else if (!isOptionalPlural(key)) {
+    if (!neutral.has(key) && !isOptionalPlural(key))
       errors.push(`STRAY (not in neutral): ${key}`);
-    }
   }
 
   if (errors.length) {
     failed = true;
     console.error(`resx parity FAILED for ${file}:\n  ${errors.join('\n  ')}`);
   } else {
-    console.log(`${file}: OK (${nonCli} non-Cli keys translated, placeholder arity matches)`);
+    const detail = shipsCli
+      ? `${nonCli} non-Cli + ${humanCli} human Cli keys translated`
+      : `${nonCli} non-Cli keys translated, CLI not shipped here`;
+    console.log(`${file}: OK (${detail}, placeholder arity matches)`);
   }
 }
 

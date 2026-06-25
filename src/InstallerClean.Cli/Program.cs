@@ -37,16 +37,17 @@ internal static class Program
         // default code page.
         Console.OutputEncoding = Encoding.UTF8;
 
-        // Render English regardless of the OS display language. The CLI's
-        // stdout carries machine contracts (the "\d+ errors:" scrape, ordered
-        // progress lines) and its Application-channel Event Log is English by
-        // convention for RMM greps; a satellite resx would otherwise pull
-        // shared keys (the plural words, size units) into the CLI on a
-        // localised machine and break both. CurrentCulture is left on the OS
-        // region, so file sizes still format natively ("3,2 GB"). Removing this
-        // pin is how a future release opts the CLI into localisation.
-        System.Globalization.CultureInfo.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-GB");
-        System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-GB");
+        // Human-facing stdout follows the OS UI culture: Italian on an Italian
+        // machine, Japanese on a Japanese one; a locale with no satellite falls
+        // back through the resx hierarchy to neutral English. CurrentCulture is
+        // left untouched, so sizes format in the OS region ("3,2 GB"). The lines
+        // other software reads stay English regardless: the Application-channel
+        // Event Log (RMM greps it for known English phrases) and the
+        // "\d+ errors:" stdout header (a documented script scrape) are built
+        // through MachineContract, which forces en-GB at the emit site. The
+        // count in that header and the "[i/total]" progress lines are plain
+        // integers that group in no culture, so only the "errors" noun needs
+        // forcing, not the numbers.
 
         var invocation = CliContract.ParseArguments(args);
         switch (invocation.Command)
@@ -63,7 +64,7 @@ internal static class Program
                 // non-zero and leave an audit record, so the failure is visible
                 // instead of a silent "success" that did nothing.
                 PrintUsage();
-                EventLogWriter.Write(CliEventClass.HardError, Strings.Cli_EventLogNoArguments);
+                MachineContract.WriteEventLog(CliEventClass.HardError, () => Strings.Cli_EventLogNoArguments);
                 if (EventLogWriter.EventLogUnavailable)
                     Console.WriteLine(Strings.Cli_EventLogUnavailable);
                 return ExitError;
@@ -77,8 +78,8 @@ internal static class Program
                 // trace, the exact ambiguity the EventLog summary exists to
                 // remove. This switch returns before the try/finally that emits
                 // the unavailable note, so emit it inline as the mutex path does.
-                EventLogWriter.Write(CliEventClass.HardError,
-                    string.Format(Strings.Cli_EventLogBadArguments, invocation.OffendingArgument));
+                MachineContract.WriteEventLog(CliEventClass.HardError,
+                    () => string.Format(Strings.Cli_EventLogBadArguments, invocation.OffendingArgument));
                 if (EventLogWriter.EventLogUnavailable)
                     Console.WriteLine(Strings.Cli_EventLogUnavailable);
                 return ExitError;
@@ -131,8 +132,8 @@ internal static class Program
                 // InstallerClean entries needs an audit record on the
                 // skipped path to distinguish it from "the task never
                 // fired".
-                EventLogWriter.Write(CliEventClass.TransientSkip,
-                    string.Format(Strings.Cli_EventLogMutexBlocked, arg));
+                MachineContract.WriteEventLog(CliEventClass.TransientSkip,
+                    () => string.Format(Strings.Cli_EventLogMutexBlocked, arg));
                 if (EventLogWriter.EventLogUnavailable)
                     Console.WriteLine(Strings.Cli_EventLogUnavailable);
                 mutex.Dispose();
@@ -208,8 +209,8 @@ internal static class Program
             if (count == 0)
             {
                 Console.WriteLine(Strings.Cli_NothingToDo);
-                EventLogWriter.Write(CliEventClass.Ok,
-                    string.Format(Strings.Cli_EventLogScanNoOrphans,
+                MachineContract.WriteEventLog(CliEventClass.Ok,
+                    () => string.Format(Strings.Cli_EventLogScanNoOrphans,
                         arg, scanResult.RegisteredPackages.Count,
                         DisplayHelpers.PluralisePackage(scanResult.RegisteredPackages.Count)));
                 return ExitOk;
@@ -220,9 +221,13 @@ internal static class Program
                 Console.WriteLine(string.Join(Environment.NewLine,
                     scanResult.RemovableFiles.Select(f =>
                         $"  {f.FileName}  ({f.SizeDisplay}, {f.Reason})")));
-                EventLogWriter.Write(CliEventClass.Ok,
-                    string.Format(Strings.Cli_EventLogScanFound,
-                        arg, count, DisplayHelpers.PluraliseFile(count), size));
+                // The noun and size are recomputed inside the en-GB scope rather
+                // than reusing the human-facing `size` (which is in the OS
+                // region), so this audit line reads fully English.
+                MachineContract.WriteEventLog(CliEventClass.Ok,
+                    () => string.Format(Strings.Cli_EventLogScanFound,
+                        arg, count, DisplayHelpers.PluraliseFile(count),
+                        DisplayHelpers.FormatSize(totalBytes)));
                 return ExitOk;
             }
 
@@ -251,26 +256,28 @@ internal static class Program
                             "A new enum value was added without updating the CLI message switch."),
                     };
                     Console.WriteLine(stdoutMessage);
-                    // Short English label for the EventLog: the channel
-                    // is sysadmin-facing and stays English by convention
-                    // even when the stdout sentence is translated. An
-                    // Application-channel grep on a known phrase needs a
-                    // stable target.
-                    var reasonLabel = reason switch
+                    // The reason label and template are built English: the
+                    // Cli.EventLogReason.* labels ARE translated in the
+                    // satellites, but the Application channel is sysadmin-facing
+                    // and an RMM grep on a known phrase needs a stable English
+                    // target. The localised stdout sentence above is what the
+                    // operator reads; the label switch lives inside the scope so
+                    // it resolves en-GB, not the OS language.
+                    MachineContract.WriteEventLog(CliEventClass.TransientSkip, () =>
                     {
-                        PendingRebootReason.MsiExecuteMutexHeld =>
-                            Strings.Cli_EventLogReason_MsiExecuteMutex,
-                        PendingRebootReason.InstallerInProgress =>
-                            Strings.Cli_EventLogReason_InstallerInProgress,
-                        PendingRebootReason.PendingRenameInCache =>
-                            Strings.Cli_EventLogReason_PendingRenameInCache,
-                        _ => reason.ToString(),
-                    };
-                    EventLogWriter.Write(CliEventClass.TransientSkip,
-                        string.Format(Strings.Cli_EventLogPendingRebootBlocked,
-                            arg,
-                            reasonLabel,
-                            rebootCheck.Detail ?? string.Empty));
+                        var reasonLabel = reason switch
+                        {
+                            PendingRebootReason.MsiExecuteMutexHeld =>
+                                Strings.Cli_EventLogReason_MsiExecuteMutex,
+                            PendingRebootReason.InstallerInProgress =>
+                                Strings.Cli_EventLogReason_InstallerInProgress,
+                            PendingRebootReason.PendingRenameInCache =>
+                                Strings.Cli_EventLogReason_PendingRenameInCache,
+                            _ => reason.ToString(),
+                        };
+                        return string.Format(Strings.Cli_EventLogPendingRebootBlocked,
+                            arg, reasonLabel, rebootCheck.Detail ?? string.Empty);
+                    });
                     // Transient: a reboot clears the gate. Hard scan and
                     // move/delete failures stay on ExitError.
                     return ExitTransient;
@@ -310,8 +317,8 @@ internal static class Program
                 if (result.RecycleUnavailable)
                 {
                     Console.WriteLine(Strings.Cli_RecycleUnavailable);
-                    EventLogWriter.Write(CliEventClass.TransientSkip,
-                        string.Format(Strings.Cli_EventLogRecycleUnavailable, arg));
+                    MachineContract.WriteEventLog(CliEventClass.TransientSkip,
+                        () => string.Format(Strings.Cli_EventLogRecycleUnavailable, arg));
                     return ExitTransient;
                 }
 
@@ -324,8 +331,11 @@ internal static class Program
                     // stdout; the one-error case must keep the same
                     // shape so a `grep -E '[0-9]+ errors:'` matches.
                     // English-grammar oddity ("1 errors:") is the cost
-                    // of a stable machine-parseable surface.
-                    Console.WriteLine($"{result.Errors.Count} {Strings.Plural_Error_Plural}:");
+                    // of a stable machine-parseable surface. The noun is forced
+                    // English (MachineContract) so it stays "errors", not the
+                    // localised plural, on a non-English machine.
+                    Console.WriteLine(MachineContract.English(
+                        () => $"{result.Errors.Count} {Strings.Plural_Error_Plural}:"));
                     foreach (var err in result.Errors)
                         Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
                 }
@@ -336,12 +346,15 @@ internal static class Program
                 long actualBytes = result.Errors.Count == 0
                     ? totalBytes
                     : SumBytesExcludingErrors(scanResult.RemovableFiles, result.Errors);
-                var actualSize = DisplayHelpers.FormatSize(actualBytes);
                 var outcome = CliContract.ClassifyFileOperation(result.DeletedCount, result.Errors.Count);
-                EventLogWriter.Write(outcome.EventClass,
-                    string.Format(Strings.Cli_EventLogDeleteSummary,
+                // Size and nouns are recomputed inside the en-GB scope, not
+                // reused from the stdout copies, so the audit line reads fully
+                // English ("3.2 GB", "files") on a localised machine.
+                MachineContract.WriteEventLog(outcome.EventClass,
+                    () => string.Format(Strings.Cli_EventLogDeleteSummary,
                         arg, result.DeletedCount, count, DisplayHelpers.PluraliseFile(count),
-                        actualSize, result.Errors.Count, DisplayHelpers.PluraliseError(result.Errors.Count)));
+                        DisplayHelpers.FormatSize(actualBytes), result.Errors.Count,
+                        DisplayHelpers.PluraliseError(result.Errors.Count)));
                 return outcome.ExitCode;
             }
 
@@ -357,9 +370,10 @@ internal static class Program
             if (moveResult.Errors.Count > 0)
             {
                 // See the matching block in the /d branch for the
-                // always-plural rationale: the RMM-scrape contract on
-                // stdout requires "\d+ errors:".
-                Console.WriteLine($"{moveResult.Errors.Count} {Strings.Plural_Error_Plural}:");
+                // always-plural rationale and the English-forced noun: the
+                // RMM-scrape contract on stdout requires "\d+ errors:".
+                Console.WriteLine(MachineContract.English(
+                    () => $"{moveResult.Errors.Count} {Strings.Plural_Error_Plural}:"));
                 foreach (var err in moveResult.Errors)
                     Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
             }
@@ -367,12 +381,14 @@ internal static class Program
             long actualMovedBytes = moveResult.Errors.Count == 0
                 ? totalBytes
                 : SumBytesExcludingErrors(scanResult.RemovableFiles, moveResult.Errors);
-            var actualMovedSize = DisplayHelpers.FormatSize(actualMovedBytes);
             var moveOutcome = CliContract.ClassifyFileOperation(moveResult.MovedCount, moveResult.Errors.Count);
-            EventLogWriter.Write(moveOutcome.EventClass,
-                string.Format(Strings.Cli_EventLogMoveSummary,
+            // Size and nouns recomputed inside the en-GB scope; see the /d
+            // summary above for why the stdout copies are not reused.
+            MachineContract.WriteEventLog(moveOutcome.EventClass,
+                () => string.Format(Strings.Cli_EventLogMoveSummary,
                     arg, moveResult.MovedCount, count, DisplayHelpers.PluraliseFile(count),
-                    moveDest, actualMovedSize, moveResult.Errors.Count, DisplayHelpers.PluraliseError(moveResult.Errors.Count)));
+                    moveDest, DisplayHelpers.FormatSize(actualMovedBytes), moveResult.Errors.Count,
+                    DisplayHelpers.PluraliseError(moveResult.Errors.Count)));
             return moveOutcome.ExitCode;
         }
         catch (OperationCanceledException)
@@ -383,8 +399,8 @@ internal static class Program
             // committed before the Ctrl+C arrived.
             if (processedCount > 0)
             {
-                EventLogWriter.Write(CliEventClass.Partial,
-                    string.Format(Strings.Cli_EventLogCancelledPartial,
+                MachineContract.WriteEventLog(CliEventClass.Partial,
+                    () => string.Format(Strings.Cli_EventLogCancelledPartial,
                         arg, processedCount, totalToProcess,
                         DisplayHelpers.PluraliseFile(totalToProcess)));
                 return ExitPartial;
@@ -394,8 +410,8 @@ internal static class Program
             // so "each /s, /d or /m run writes one summary" holds for every
             // run. TransientSkip, not Partial: nothing committed and a re-run
             // can succeed.
-            EventLogWriter.Write(CliEventClass.TransientSkip,
-                string.Format(Strings.Cli_EventLogCancelledNoWork, arg));
+            MachineContract.WriteEventLog(CliEventClass.TransientSkip,
+                () => string.Format(Strings.Cli_EventLogCancelledNoWork, arg));
             return ExitCancelled;
         }
         catch (LocalisedAccessException ex)
@@ -409,16 +425,26 @@ internal static class Program
             // deep in the framework can carry cross-profile paths and
             // falls through to the generic catch below.
             Console.WriteLine(ex.Message);
-            EventLogWriter.Write(CliEventClass.HardError,
-                string.Format(Strings.Cli_EventLogValidationFailed, arg, ex.Message));
+            // The template is forced English (the RMM grep anchor "{0} mode
+            // failed:"); ex.Message is a LocalisedAccessException/
+            // LocalisedInvalidOperationException message, already built in the
+            // OS language and safe to echo, so the reason rides into the audit
+            // line localised (the same sentence printed to stdout above).
+            MachineContract.WriteEventLog(CliEventClass.HardError,
+                () => string.Format(Strings.Cli_EventLogValidationFailed, arg, ex.Message));
             return ExitError;
         }
         catch (LocalisedInvalidOperationException ex)
         {
             // Same safe-to-echo contract as LocalisedAccessException.
             Console.WriteLine(ex.Message);
-            EventLogWriter.Write(CliEventClass.HardError,
-                string.Format(Strings.Cli_EventLogValidationFailed, arg, ex.Message));
+            // The template is forced English (the RMM grep anchor "{0} mode
+            // failed:"); ex.Message is a LocalisedAccessException/
+            // LocalisedInvalidOperationException message, already built in the
+            // OS language and safe to echo, so the reason rides into the audit
+            // line localised (the same sentence printed to stdout above).
+            MachineContract.WriteEventLog(CliEventClass.HardError,
+                () => string.Format(Strings.Cli_EventLogValidationFailed, arg, ex.Message));
             return ExitError;
         }
         catch (Exception ex)
@@ -432,7 +458,7 @@ internal static class Program
             Console.WriteLine(crash.Written
                 ? string.Format(Strings.Cli_GenericError, typeName, crash.Path)
                 : string.Format(Strings.Cli_GenericError_NoLog, typeName));
-            EventLogWriter.Write(CliEventClass.HardError, crash.Written
+            MachineContract.WriteEventLog(CliEventClass.HardError, () => crash.Written
                 ? string.Format(Strings.Cli_EventLogHardError, arg, typeName, crash.Path)
                 : string.Format(Strings.Cli_EventLogHardError_NoLog, arg, typeName));
             return ExitError;
@@ -477,10 +503,15 @@ internal static class Program
         if (string.IsNullOrWhiteSpace(dest))
         {
             Console.WriteLine(Strings.Cli_NoMoveDestination);
-            EventLogWriter.Write(CliEventClass.HardError,
-                string.Format(Strings.Cli_EventLogMoveNoDestination, arg));
+            MachineContract.WriteEventLog(CliEventClass.HardError,
+                () => string.Format(Strings.Cli_EventLogMoveNoDestination, arg));
             return ExitError;
         }
+
+        // The event-log lambdas below capture the destination, but an out
+        // parameter cannot be captured (CS1628), so copy it into a local. dest
+        // is assigned once above and only read after, so the two stay equal.
+        var resolved = dest;
 
         // Reject relative destinations: Path.GetFullPath would otherwise
         // resolve them against the process CWD, and the CLI host's CWD is
@@ -488,24 +519,24 @@ internal static class Program
         if (!Path.IsPathFullyQualified(dest))
         {
             Console.WriteLine(string.Format(Strings.Cli_MoveDestinationRelative, dest));
-            EventLogWriter.Write(CliEventClass.HardError,
-                string.Format(Strings.Cli_EventLogMoveDestinationRelative, arg, dest));
+            MachineContract.WriteEventLog(CliEventClass.HardError,
+                () => string.Format(Strings.Cli_EventLogMoveDestinationRelative, arg, resolved));
             return ExitError;
         }
 
         if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
         {
             Console.WriteLine(Strings.Cli_MoveDestinationInsideInstaller);
-            EventLogWriter.Write(CliEventClass.HardError,
-                string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, arg, dest));
+            MachineContract.WriteEventLog(CliEventClass.HardError,
+                () => string.Format(Strings.Cli_EventLogMoveDestinationInsideInstaller, arg, resolved));
             return ExitError;
         }
 
         if (InstallerCacheHelpers.IsSystemFolderOrChild(dest))
         {
             Console.WriteLine(string.Format(Strings.Cli_MoveDestinationInSystemFolder, dest));
-            EventLogWriter.Write(CliEventClass.HardError,
-                string.Format(Strings.Cli_EventLogMoveDestinationInSystemFolder, arg, dest));
+            MachineContract.WriteEventLog(CliEventClass.HardError,
+                () => string.Format(Strings.Cli_EventLogMoveDestinationInSystemFolder, arg, resolved));
             return ExitError;
         }
 
