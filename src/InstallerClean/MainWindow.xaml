@@ -167,7 +167,37 @@
                      count. -->
                 <chrome:DecorativeBorder BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="0,1,0,0" Margin="{StaticResource GapBottom.Lg}"/>
 
+                <!-- Unneeded (orphaned) count: the loud heading-tier row leads
+                     the scan results, sitting above the quiet still-needed row
+                     so position agrees with the existing emphasis. -->
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- Wraps for the same width-clamp reason as the
+                         still-needed line below. -->
+                    <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                               Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
+                               TextWrapping="Wrap"
+                               Text="{Binding Scan.OrphanedSummaryText}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Scan.OrphanedSizeDisplay}"
+                               Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
+                               VerticalAlignment="Center" MinWidth="{a11y:TextScaled 72}" TextAlignment="Right"
+                               Margin="{StaticResource GapX.Md}"/>
+                    <Button Grid.Column="2" Style="{StaticResource GhostPill}"
+                            Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenOrphanedDetailsCommand}"
+                            MinHeight="28" Padding="12,0" FontSize="{DynamicResource Type.Heading.Sm}"
+                            VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
+                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
+                            AutomationProperties.Name="{loc:Translate Automation.ViewOrphanedFiles}"
+                            AutomationProperties.HelpText="{loc:Translate Automation.ViewOrphanedFiles.HelpText}"/>
+                </Grid>
+
+                <!-- The quiet still-needed row sits a small gap (GapTop.Sm)
+                     below the loud unneeded row above. -->
+                <Grid Margin="{StaticResource GapTop.Sm}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -238,11 +268,9 @@
             <!-- Separator -->
             <chrome:DecorativeBorder Grid.Row="2" BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="0,1,0,0"/>
 
-            <!-- Action zone: orphaned + move/delete -->
+            <!-- Action zone: move/delete -->
             <Grid Grid.Row="4">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="16"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="8"/>
                     <RowDefinition Height="Auto"/>
@@ -250,39 +278,13 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Orphaned -->
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <!-- Wraps for the same width-clamp reason as the
-                         still-needed line above. -->
-                    <TextBlock Grid.Column="0" VerticalAlignment="Center"
-                               Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
-                               TextWrapping="Wrap"
-                               Text="{Binding Scan.OrphanedSummaryText}"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Scan.OrphanedSizeDisplay}"
-                               Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
-                               VerticalAlignment="Center" MinWidth="{a11y:TextScaled 72}" TextAlignment="Right"
-                               Margin="{StaticResource GapX.Md}"/>
-                    <Button Grid.Column="2" Style="{StaticResource GhostPill}"
-                            Content="{loc:Translate Action.Details}" Command="{Binding Chrome.OpenOrphanedDetailsCommand}"
-                            MinHeight="28" Padding="12,0" FontSize="{DynamicResource Type.Heading.Sm}"
-                            VerticalAlignment="Center" Margin="{StaticResource GapLeft.Md}"
-                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
-                            AutomationProperties.Name="{loc:Translate Automation.ViewOrphanedFiles}"
-                            AutomationProperties.HelpText="{loc:Translate Automation.ViewOrphanedFiles.HelpText}"/>
-                </Grid>
-
                 <!-- Move location label -->
-                <TextBlock Grid.Row="2" Text="{loc:Translate Section.Move.Location}"
+                <TextBlock Grid.Row="0" Text="{loc:Translate Section.Move.Location}"
                            Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                            AutomationProperties.Name="{loc:Translate Automation.Section.MoveLocation}"/>
 
                 <!-- Move destination -->
-                <Grid Grid.Row="4">
+                <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="8"/>
@@ -310,7 +312,7 @@
                      Dock="Right" places Move at the far right and
                      Delete to its left, but XAML order alone would
                      visit Move first under Tab. -->
-                <DockPanel Grid.Row="6" KeyboardNavigation.TabNavigation="Local">
+                <DockPanel Grid.Row="4" KeyboardNavigation.TabNavigation="Local">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
                             KeyboardNavigation.TabIndex="1"
                             Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
