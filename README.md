@@ -240,7 +240,7 @@ Across the 98 reports people have sent in (thanks 🙏) since v1.8.0 added the o
 <details>
 <summary>Those reports come from the optional "Send report" button. Here's what you'll see before anything's sent.</summary>
 
-![Confirmation dialogue titled "Send this to No Faff?" showing the full report that would be sent: app version, Windows version, scan counts, files processed and bytes freed, with no file paths, names or machine IDs, and a note that nothing identifies you or your machine, just whether the app worked and how much space was freed, with Cancel and Send buttons.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
+![Confirmation dialogue titled "Send this to No Faff?" showing the full report that would be sent: app version, Windows version, scan counts, files processed and bytes freed, with no file paths, names or machine IDs, and a note that nothing identifies you or your machine, just whether the app worked and how much space was freed, with Cancel and Send buttons.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 
