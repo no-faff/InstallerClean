@@ -420,9 +420,18 @@
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Обнаружено {0} устаревших записей MSI (файлы уже исчезли с диска; InstallerClean их не удаляет из реестра).</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
-  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} {1} для очистки ({2})</value></data>
-  <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} {1} ещё нужно ({2})</value></data>
+  <!-- Orphaned-window footer summary. Unneeded files split into the three
+       removable causes shown in the Reason column: true orphans (the API
+       never claimed them), superseded patches and obsoleted patches.
+       0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
+       3 = size display. No trailing noun, so it agrees at any count. -->
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} бесхозных, {1} замещённых, {2} устаревших ({3})</value></data>
+  <!-- Registered-window footer summary, reinforcing the "still needed" framing
+       (the flip side of the main window's "unneeded"). Split singular/plural so
+       the noun and verb agree at one file ("file ... is" vs "files ... are").
+       0 = count, 1 = size display. -->
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} зарегистрированный файл ещё нужен ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} зарегистрированных файлов ещё нужно ({1})</value></data>
 
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
@@ -701,7 +710,49 @@
   <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} ненужных файла для очистки</value></data>
   <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>Отсутствует {0} зарегистрированных файла (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
   <data name="Summary.StaleMsiEntries.Few" xml:space="preserve"><value>Обнаружено {0} устаревшие записи MSI (файлы уже исчезли с диска; InstallerClean их не удаляет из реестра).</value></data>
+  <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} зарегистрированных файла ещё нужны ({1})</value></data>
   <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину.</value></data>
   <data name="Completion.PermanentDeleteSummaryWithErrors.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину. {2} {3}</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Найдено {0} зарегистрированный {1}.</value></data>
+
+  <!-- Human-facing CLI keys (the 39 non-machine Cli.* keys); the machine Cli.EventLog* keys are forced English at the emit site and omitted -->
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Неизвестный аргумент: «{0}»</value></data>
+  <data name="Cli.Cancelling" xml:space="preserve"><value>Отмена...</value></data>
+  <data name="Cli.Cancelled" xml:space="preserve"><value>Отменено.</value></data>
+  <data name="Cli.GenericError" xml:space="preserve"><value>Ошибка: {0}. Подробности записаны в {1}.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Ошибка: {0}. Не удалось записать журнал сбоев.</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Сканирование C:\Windows\Installer...</value></data>
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Найдено {0} {1} для очистки ({2}).</value></data>
+  <data name="Cli.NothingToDo" xml:space="preserve"><value>Делать нечего.</value></data>
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Удаление: {0} {1}...</value></data>
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Удалено {0} {1}.</value></data>
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Ошибка: Корзина недоступна для этого диска, поэтому ничего не удалено. Воспользуйтесь /m, чтобы переместить файлы, либо снова включите Корзину и запустите ещё раз.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Ошибка: не указана папка назначения для перемещения. Воспользуйтесь /m ПУТЬ или задайте значение по умолчанию в GUI.</value></data>
+  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Ошибка: папка назначения не может находиться внутри папки Windows Installer.</value></data>
+  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Ошибка: папка назначения должна быть полным путём. Получено: {0}</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Ошибка: папка назначения {0} ведёт в системную папку Windows. Выберите путь за пределами %SystemRoot%, %ProgramFiles% и %ProgramData%.</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Ошибка: прямо сейчас что-то использует Windows Installer, обычно это обновление Windows или программа, устанавливающаяся в фоне. Перемещение и удаление заблокированы, пока это происходит. Повторите попытку, когда всё завершится.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Ошибка: на этом компьютере приостановлена предыдущая транзакция Windows Installer. Прежде чем очищать кэш, продолжите или откатите ту установку (либо перезагрузите Windows).</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Ошибка: операция с файлом, поставленная в очередь на время после перезагрузки, затрагивает кэш установки ({0}). Прежде чем очищать, перезагрузите Windows, чтобы завершить эту операцию.</value></data>
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Перемещение: {0} {1} в {2}...</value></data>
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>Перемещено {0} {1}.</value></data>
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Другой процесс InstallerClean удерживает блокировку единственного экземпляра (GUI или другой запуск CLI). Код выхода 75 (временное состояние); можно повторить попытку позже.</value></data>
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Примечание: не удалось выполнить запись в журнал событий. Проверьте разрешения журнала «Приложение» или групповую политику.</value></data>
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - очистка C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Usage" xml:space="preserve"><value>Использование:</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help       Показать эту справку (также принимает /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version    Показать версию (также принимает -v)</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s           Только сканирование - список ненужных файлов</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d           Удалить ненужные файлы (Корзина)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m           Переместить в сохранённую папку по умолчанию</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m ПУТЬ      Переместить в указанный путь</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli это настоящий консольный процесс, он блокирует</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>командную строку до завершения; перенаправляйте или передавайте его вывод</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>по конвейеру, как у любого консольного exe. GUI рядом, в InstallerClean.exe.</value></data>
+  <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Коды выхода:</value></data>
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   успех: обработаны все отмеченные файлы</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   ошибка: ничего не обработано (неверные аргументы, сбой сканирования, все файлы с ошибкой)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   частично: часть файлов обработана, часть с ошибкой</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  временно: запуск заблокирован временным состоянием (см. сообщение)</value></data>
+  <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 отменено (Ctrl+C)</value></data>
 </root>
