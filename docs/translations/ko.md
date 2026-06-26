@@ -1,0 +1,441 @@
+# InstallerClean in 한국어 (Korean)
+
+The text of InstallerClean's interface and command-line tool in English on the left, with the Korean translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Korean can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.ko.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+
+A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.ko.resx`](../../src/InstallerClean.Core/Resources/Strings.ko.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
+
+## Window titles
+
+| English | 한국어 |
+| --- | --- |
+| InstallerClean | InstallerClean |
+| About | 정보 |
+| Registered files that should not be deleted | 삭제하지 말아야 할 등록된 파일 |
+| Unneeded files that are safe to delete | 안전하게 삭제할 수 있는 불필요한 파일 |
+| Confirm move | 이동 확인 |
+| Confirm delete | 삭제 확인 |
+| Recycle Bin unavailable | 휴지통을 사용할 수 없음 |
+
+## Section headings
+
+| English | 한국어 |
+| --- | --- |
+| PRODUCTS | 제품 |
+| PATCHES | 패치 |
+| PRODUCT DETAILS | 제품 세부 정보 |
+| MOVE LOCATION | 이동 위치 |
+| SAY THANKS | 감사 인사 |
+
+## Buttons and actions
+
+| English | 한국어 |
+| --- | --- |
+| _About | 정보(_A) |
+| Copy | 복사 |
+| Cut | 잘라내기 |
+| Paste | 붙여넣기 |
+| Select all | 모두 선택 |
+| _Browse... | 찾아보기(_B)... |
+| _Cancel | 취소(_C) |
+| Check for _updates | 업데이트 확인(_U) |
+| _Close | 닫기(_C) |
+| _Delete | 삭제(_D) |
+| _Delete permanently | 영구 삭제(_D) |
+| _Done | 완료(_D) |
+| Details | 세부 정보 |
+| _Buy me a cuppa | 커피 한 잔 사주기(_B) |
+| Leave a _star on GitHub | GitHub에 별 남기기(_S) |
+| MIT licence | MIT 라이선스 |
+| _Move | 이동(_M) |
+| _Move instead | 대신 이동(_M) |
+| Path to folder if you Move instead of Delete | 삭제 대신 이동할 경우의 폴더 경로 |
+| Open _release page | 릴리스 페이지 열기(_R) |
+| _Re-scan | 다시 검사(_R) |
+| _Scan again | 다시 검사(_S) |
+| Send report | 보고서 보내기 |
+| _Send | 보내기(_S) |
+
+## Field labels
+
+| English | 한국어 |
+| --- | --- |
+| Reason | 이유 |
+| Author | 작성자 |
+| Application | 애플리케이션 |
+| Title | 제목 |
+| Subject | 주제 |
+| Keywords | 키워드 |
+| Signing certificate | 서명 인증서 |
+| File size | 파일 크기 |
+| Comment | 설명 |
+| Product name | 제품 이름 |
+| File | 파일 |
+| Size | 크기 |
+| Patches | 패치 |
+| (unknown) | (알 수 없음) |
+| (patches only) | (패치 전용) |
+| missing | 누락 |
+
+## Status and progress
+
+| English | 한국어 |
+| --- | --- |
+| Scanning... | 검사 중... |
+| Cancelling... | 취소 중... |
+| Starting scan... | 검사를 시작하는 중... |
+| Asking Windows about installed software... | 설치된 소프트웨어 정보를 Windows에 조회하는 중... |
+| Scanning installer cache folder... | 설치 관리자 캐시 폴더를 검사하는 중... |
+| Enumerating installed products... | 설치된 제품을 열거하는 중... |
+| Checking registry for additional packages... | 레지스트리에서 추가 패키지를 확인하는 중... |
+| Found {0} registered {1}. | 등록된 {1} {0}개를 찾았습니다. |
+| Scan complete ({0}) | 검사 완료 ({0}) |
+| Scanning local packages... | 로컬 패키지를 검사하는 중... |
+| Found {0} {1} you can safely delete. | 안전하게 삭제할 수 있는 {1} {0}개를 찾았습니다. |
+| Preparing destination folder... | 대상 폴더를 준비하는 중... |
+| Moving {0} {1}... | {1} {0}개를 이동하는 중... |
+| Deleting {0} {1}... | {1} {0}개를 삭제하는 중... |
+| Move cancelled. {0} of {1} {2} processed. | 이동이 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다. |
+| Delete cancelled. {0} of {1} {2} processed. | 삭제가 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다. |
+| Move failed ({0}). Details in {1}. | 이동 실패 ({0}). 자세한 내용은 {1}에 있습니다. |
+| Move failed ({0}). The crash log could not be written. | 이동 실패 ({0}). 크래시 로그를 기록할 수 없었습니다. |
+| Delete failed ({0}). Details in {1}. | 삭제 실패 ({0}). 자세한 내용은 {1}에 있습니다. |
+| Delete failed ({0}). The crash log could not be written. | 삭제 실패 ({0}). 크래시 로그를 기록할 수 없었습니다. |
+| Access denied. Run as administrator. | 액세스가 거부되었습니다. 관리자 권한으로 실행하세요. |
+| Scan failed: installer database unavailable. | 검사 실패: 설치 관리자 데이터베이스를 사용할 수 없습니다. |
+| Scan cancelled. | 검사가 취소되었습니다. |
+| Ready | 준비됨 |
+| Scan failed ({0}). Details in {1}. | 검사 실패 ({0}). 자세한 내용은 {1}에 있습니다. |
+| Scan failed ({0}). The crash log could not be written. | 검사 실패 ({0}). 크래시 로그를 기록할 수 없었습니다. |
+
+## Main screen text
+
+| English | 한국어 |
+| --- | --- |
+| The unneeded files below are safe to delete. | 아래의 불필요한 파일은 안전하게 삭제할 수 있습니다. |
+| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 이 파일들은 C:\Windows\Installer에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다. |
+| Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy. | 휴지통으로 삭제하거나, 사본을 남겨 두고 싶다면 먼저 다른 곳으로 옮기세요. |
+| Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | 지금 무언가가 Windows Installer를 사용하고 있습니다. 대개 Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램입니다. 그 작업이 실행되는 동안에는 이동과 삭제가 일시 중지되어, InstallerClean이 변경 중인 설치 관리자 캐시를 건드리지 않습니다. 작업이 끝난 뒤 다시 검사하면 두 기능이 돌아옵니다. |
+| A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | 이 컴퓨터에 이전 Windows Installer 트랜잭션이 일시 중단되어 있습니다. 캐시를 정리하기 전에 그 설치를 다시 진행하거나 롤백하세요(또는 Windows를 다시 시작하세요). |
+| Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows가 다음 다시 시작 때 실행할 파일 이름 바꾸기 작업을 예약해 두었고, 이는 설치 관리자 캐시에 영향을 줍니다. 정리하기 전에 Windows를 다시 시작하세요. |
+| Select a file to view details. | 세부 정보를 보려면 파일을 선택하세요. |
+| Select a product to view details. | 세부 정보를 보려면 제품을 선택하세요. |
+| No metadata available. | 사용할 수 있는 메타데이터가 없습니다. |
+| This installer file has been deleted. InstallerClean didn't do it, it never removes a file a program still needs; something else deleted this one before you ran InstallerClean.<br><br>It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself. | 이 설치 관리자 파일은 삭제되었습니다. InstallerClean이 한 일이 아닙니다. InstallerClean은 프로그램이 아직 필요로 하는 파일을 절대 제거하지 않습니다. 이 파일은 InstallerClean을 실행하기 전에 다른 무언가가 삭제한 것입니다.<br><br>지금은 아무 문제도 일으키지 않으며, 이 파일이 속한 프로그램을 복구, 업데이트 또는 제거하려는 날이 오기 전까지는 문제가 없습니다. 그 단계에서 Windows가 이 파일을 찾지만 파일이 없으므로 실패할 수 있습니다.<br><br>복구를 시도하려면, 해당 프로그램의 설치 관리자를 제조사에서 내려받아 기존 설치본 위에 실행하세요(먼저 제거하지 마세요. 제거 역시 이 파일이 필요한 단계입니다). 가능하다면 현재 설치된 버전을 사용하세요. Windows가 다른 버전을 거부할 수 있기 때문입니다. 이렇게 하면 대개 파일이 복구되고 설정도 보통 그대로 유지되지만, Microsoft가 이를 보장하지는 않습니다. Microsoft의 마지막 수단은 그 프로그램을, 또는 Windows 자체를 다시 설치하는 것입니다. |
+| The README [explains this folder], and how to recover a file, in Microsoft's own words. | README에는 Microsoft의 표현 그대로 [이 폴더에 대한 설명]과 파일을 복구하는 방법이 담겨 있습니다. |
+| (none) | (없음) |
+
+## Reasons a file is unneeded
+
+| English | 한국어 |
+| --- | --- |
+| Orphaned | 고아 |
+| Superseded | 대체됨 |
+| Obsoleted | 폐기됨 |
+
+## Completion screen
+
+| English | 한국어 |
+| --- | --- |
+| All clean | 모두 깨끗합니다 |
+| Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer에 정리할 것이 없습니다 |
+| Scanned {0} {1} in {2} | {1} {0}개 검사, {2} 소요 |
+| Copy them back if anything stops working | 무언가 작동을 멈추면 다시 복사해 오면 됩니다 |
+| Restore them from the Recycle Bin if anything stops working | 무언가 작동을 멈추면 휴지통에서 복원하면 됩니다 |
+| {0} freed | {0} 확보 |
+| {0} moved | {0} 이동 |
+| {0} moved, some files could not be processed | {0} 이동, 일부 파일은 처리하지 못함 |
+| {0} freed, some files could not be processed | {0} 확보, 일부 파일은 처리하지 못함 |
+| {0} {1} moved to {2} | {1} {0}개를 {2}(으)로 이동함 |
+| {0} {1} moved to {2}. {3} {4} | {1} {0}개를 {2}(으)로 이동함. {4} {3}개 |
+| {0} {1} sent to the Recycle Bin | {1} {0}개를 휴지통으로 보냄 |
+| {0} {1} sent to the Recycle Bin. {2} {3} | {1} {0}개를 휴지통으로 보냄. {3} {2}개 |
+| {0} {1} permanently deleted. It did not go to the Recycle Bin. | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. |
+| {0} {1} permanently deleted. They did not go to the Recycle Bin. | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. |
+| {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. {3} {2}개 |
+| {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. {3} {2}개 |
+| That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
+| That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
+
+## Recycle Bin unavailable
+
+| English | 한국어 |
+| --- | --- |
+| The Recycle Bin isn't available for this drive | 이 드라이브에서는 휴지통을 사용할 수 없습니다 |
+| So this {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently. | 그래서 이 {1}({2})은 아직 삭제되지 않았습니다. 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다. |
+| So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently. | 그래서 이 {1} {0}개는 아직 삭제되지 않았습니다 ({2}). 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다. |
+| Deleting it is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 삭제해도 안전합니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 휴지통은 추가 안전장치일 뿐입니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
+| Deleting them is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 삭제해도 안전합니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 휴지통은 추가 안전장치일 뿐입니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
+
+## Summaries and counts
+
+| English | 한국어 |
+| --- | --- |
+| {0} file still needed | 아직 필요한 파일 {0}개 |
+| {0} files still needed | 아직 필요한 파일 {0}개 |
+| {0} unneeded file to clean up | 정리할 불필요한 파일 {0}개 |
+| {0} unneeded files to clean up | 정리할 불필요한 파일 {0}개 |
+| {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | 등록된 파일 {0}개가 누락되었습니다(InstallerClean이 삭제한 것은 아닙니다). 지금은 문제가 없지만, 나중에 해당 프로그램을 복구, 업데이트 또는 제거할 때 실패할 수 있습니다. 어떻게 해야 할지는 세부 정보를 여세요. |
+| {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | 등록된 파일 {0}개가 누락되었습니다(InstallerClean이 삭제한 것은 아닙니다). 지금은 문제가 없지만, 나중에 해당 프로그램들을 복구, 업데이트 또는 제거할 때 실패할 수 있습니다. 어떻게 해야 할지는 세부 정보를 여세요. |
+| {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | 오래된 MSI 항목 {0}개가 감지되었습니다(파일이 이미 디스크에서 사라졌습니다. InstallerClean은 그 등록을 해제하지 않습니다). |
+| {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | 오래된 MSI 항목 {0}개가 감지되었습니다(파일이 이미 디스크에서 사라졌습니다. InstallerClean은 그 등록을 해제하지 않습니다). |
+| {0} of {1} {2} | {2} {1}개 중 {0}개 |
+| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | 고아 {0}개, 대체됨 {1}개, 폐기됨 {2}개 ({3}) |
+| {0} registered file that is still needed ({1}) | 아직 필요한 등록된 파일 {0}개 ({1}) |
+| {0} registered files that are still needed ({1}) | 아직 필요한 등록된 파일 {0}개 ({1}) |
+
+## Confirmation dialogs
+
+| English | 한국어 |
+| --- | --- |
+| Move {0} {1} ({2})? | {1} {0}개를 이동하시겠습니까? ({2}) |
+| Files will be moved to {0}. | 파일이 {0}(으)로 이동됩니다. |
+| Delete {0} {1} ({2})? | {1} {0}개를 삭제하시겠습니까? ({2}) |
+| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | 파일이 휴지통으로 보내집니다. 백업 사본을 원하시면 대신 이동을 사용하세요. |
+
+## Error messages
+
+| English | 한국어 |
+| --- | --- |
+| Administrator rights required | 관리자 권한 필요 |
+| InstallerClean requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | InstallerClean에는 관리자 권한이 필요합니다.<br><br>마우스 오른쪽 버튼을 클릭한 다음 '관리자 권한으로 실행'을 선택하세요. |
+| Installer database unavailable | 설치 관리자 데이터베이스를 사용할 수 없음 |
+| Scan failed | 검사 실패 |
+| The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Windows Installer 데이터베이스가 비어 있거나 접근할 수 없는 것으로 보입니다. 이는 새로 설치한 Windows에서도 드문 일이며, 보통 데이터베이스가 손상되었거나 타사 도구가 이를 비웠다는 뜻입니다. 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행하면 대개 복구됩니다. |
+| Access denied enumerating installed products. Run as administrator. | 설치된 제품을 열거하는 중 액세스가 거부되었습니다. 관리자 권한으로 실행하세요. |
+| Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | {0}번 연속 실패한 끝에 Windows Installer가 제품 목록 표시를 거부했습니다(마지막 오류 코드 {1}). Windows를 다시 시작하거나, 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행해 보세요. |
+| Invalid destination | 잘못된 대상 |
+| Could not write to destination | 대상에 쓸 수 없음 |
+| Move failed | 이동 실패 |
+| Delete failed | 삭제 실패 |
+| The destination cannot be inside the Windows Installer folder. | 대상은 Windows Installer 폴더 안에 있을 수 없습니다. |
+| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | 지정한 대상이 Windows 시스템 폴더 아래로 해석됩니다 ({0}). %SystemRoot%, %ProgramFiles%, %ProgramData% 밖의 경로를 선택하세요. |
+| Not enough space | 공간 부족 |
+| Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | {0}에 공간이 부족합니다<br><br>필요: {1}<br>사용 가능: {2} |
+| You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | {0}에 쓸 권한이 없습니다.<br>사용자 프로필 안의 폴더나 본인 소유의 드라이브를 사용해 보세요. |
+| The path {0} is too long for Windows. Pick a shorter path. | Windows가 처리하기에는 경로가 너무 깁니다 ({0}). 더 짧은 경로를 선택하세요. |
+| The folder {0} does not exist and could not be created. Check the drive letter or network path. | 폴더가 존재하지 않으며 만들 수도 없습니다 ({0}). 드라이브 문자나 네트워크 경로를 확인하세요. |
+| Windows cannot write to {0}.<br>Details in {1}. | Windows가 {0}에 쓸 수 없습니다.<br>자세한 내용은 {1}에 있습니다. |
+| Windows cannot write to {0}. The crash log could not be written. | Windows가 {0}에 쓸 수 없습니다. 크래시 로그를 기록할 수 없었습니다. |
+| Cannot write to {0}.<br>Details in {1}. | {0}에 쓸 수 없습니다.<br>자세한 내용은 {1}에 있습니다. |
+| Cannot write to {0}. The crash log could not be written. | {0}에 쓸 수 없습니다. 크래시 로그를 기록할 수 없었습니다. |
+| File no longer exists. | 파일이 더 이상 존재하지 않습니다. |
+| Source file is a symlink or junction; refused for safety. | 원본 파일이 심볼릭 링크 또는 정션입니다. 안전을 위해 거부했습니다. |
+| Access denied. | 액세스가 거부되었습니다. |
+| The operation failed. Try again or restart Windows. | 작업에 실패했습니다. 다시 시도하거나 Windows를 다시 시작하세요. |
+| Unknown error. | 알 수 없는 오류입니다. |
+| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | 이 파일을 휴지통으로 보낼 수 없습니다(오류 {0}). 파일이 잠겨 있거나, 사용 중이거나, Windows에 의해 차단되었을 수 있습니다. 대신 이동하세요. |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | 관리자 권한으로도 Windows가 이 파일에 대한 액세스를 차단했습니다(오류 {0}). 보통 소유권이나 권한 잠금 때문입니다. 대신 이동하세요. |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | 이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다(오류 {0}). 그 프로그램이나, 이 파일을 검사 중인 무언가를 닫은 다음 다시 시도하거나, 대신 이동하세요. |
+| The file was permanently deleted because it could not be sent to the Recycle Bin. | 이 파일을 휴지통으로 보낼 수 없어 영구 삭제되었습니다. |
+| Refusing to move files into the Windows Installer folder (destination: {0}). | 파일을 Windows Installer 폴더로 이동하는 것을 거부합니다(대상: {0}). |
+| Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | 대상은 정규화된 전체 경로여야 합니다(상대 경로는 프로세스의 현재 디렉터리를 기준으로 해석되어 권한 상승 상태에서 안전하지 않습니다): {0} |
+| Destination folder canonical path changed mid-batch: {0} | 일괄 처리 도중 대상 폴더의 정규 경로가 변경되었습니다: {0} |
+| Cannot write to {0}. | {0}에 쓸 수 없습니다. |
+| Could not find a unique filename for '{0}' after 10,000 attempts. | 10,000번 시도한 후에도 '{0}'에 대한 고유한 파일 이름을 찾을 수 없었습니다. |
+
+## Update check
+
+| English | 한국어 |
+| --- | --- |
+| Check for updates | 업데이트 확인 |
+| Checking... | 확인 중... |
+| Up to date. | 최신 버전입니다. |
+| Update available | 업데이트 사용 가능 |
+| You're running version {0}.<br>Version {1} is available. | 현재 {0} 버전을 사용하고 있습니다.<br>{1} 버전을 사용할 수 있습니다. |
+| Couldn't reach GitHub. Check your internet connection and try again. | GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요. |
+| GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes. | GitHub가 오류 응답을 반환했습니다. 릴리스 API가 속도 제한에 걸렸을 수 있으니, 몇 분 후에 다시 시도하세요. |
+| GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub의 응답에 인식할 수 있는 릴리스가 없습니다. 나중에 다시 시도하거나, 릴리스 페이지를 직접 여세요. |
+| The check timed out. Your connection to GitHub may be slow; try again. | 확인 시간이 초과되었습니다. GitHub와의 연결이 느릴 수 있으니 다시 시도하세요. |
+| The check failed for an unknown reason. Details are in crash.log if you need to report it. | 알 수 없는 이유로 확인에 실패했습니다. 신고가 필요하면 자세한 내용이 crash.log에 있습니다. |
+
+## Opening links in your browser
+
+| English | 한국어 |
+| --- | --- |
+| Couldn't open your browser | 브라우저를 열 수 없음 |
+| The link couldn't be opened in your normal-user browser. The URL has been copied to your clipboard so you can open it manually:<br><br>{0} | 일반 사용자 브라우저에서 링크를 열 수 없었습니다. URL을 클립보드에 복사했으니 직접 여실 수 있습니다:<br><br>{0} |
+| The link couldn't be opened in your normal-user browser, and copying it to the clipboard also failed. The URL is:<br><br>{0} | 일반 사용자 브라우저에서 링크를 열 수 없었고, 클립보드에 복사하는 것도 실패했습니다. URL은 다음과 같습니다:<br><br>{0} |
+
+## Sending the summary
+
+| English | 한국어 |
+| --- | --- |
+| Sending... | 보내는 중... |
+| Thanks! Report sent. | 감사합니다! 보고서를 보냈습니다. |
+| Sending failed. Try again later. | 보내기에 실패했습니다. 나중에 다시 시도하세요. |
+| No report to send. | 보낼 보고서가 없습니다. |
+| Send this to No Faff? | 이 내용을 No Faff에 보내시겠습니까? |
+| Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | 사용자나 사용자의 컴퓨터를 식별할 수 있는 내용은 전혀 없습니다. 그저 InstallerClean이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 알 수 있게 해 줄 뿐입니다. nofaff.netlify.app/api/result-log으로 전송됩니다. |
+
+## Startup and crashes
+
+| English | 한국어 |
+| --- | --- |
+| InstallerClean | InstallerClean |
+| InstallerClean is already running. | InstallerClean이 이미 실행 중입니다. |
+| InstallerClean | InstallerClean |
+| An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | 예기치 않은 오류가 발생하여 InstallerClean을 닫아야 합니다.<br><br>{0}<br><br>자세한 내용을 기록한 위치:<br>{1} |
+| An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | 예기치 않은 오류가 발생하여 InstallerClean을 닫아야 합니다.<br><br>{0}<br><br>크래시 로그를 기록할 수 없었습니다. |
+| Startup error | 시작 오류 |
+| Failed to start ({0}). Details written to:<br>{1} | 시작하지 못했습니다 ({0}). 자세한 내용을 기록한 위치:<br>{1} |
+| Failed to start ({0}). The crash log could not be written. | 시작하지 못했습니다 ({0}). 크래시 로그를 기록할 수 없었습니다. |
+| # crash.log captures unhandled exceptions from InstallerClean.<br># Under elevation the framework's exception messages can include<br># file paths from the running session (including other users'<br># profiles enumerated by Windows Installer queries). Network-<br># failure messages from the update check or result-log POST can<br># include the destination URL and the resolved IP / proxy address.<br># Redact both classes of detail before attaching this file to a<br># public bug report.<br> | # crash.log는 InstallerClean의 처리되지 않은 예외를 기록합니다.<br># 권한 상승 상태에서는 프레임워크의 예외 메시지에 현재<br># 세션의 파일 경로(Windows Installer 쿼리로 열거된 다른<br># 사용자의 프로필 포함)가 들어갈 수 있습니다. 업데이트 확인<br># 이나 결과 로그 POST의 네트워크 실패 메시지에는 대상 URL과<br># 확인된 IP / 프록시 주소가 포함될 수 있습니다. 이 파일을<br># 공개 버그 신고에 첨부하기 전에 두 종류의 정보를 모두<br># 삭제하세요.<br> |
+
+## Tooltips (hover text)
+
+| English | 한국어 |
+| --- | --- |
+| If it helped, buy me a cup of tea. | 도움이 되었다면 커피 한 잔 사주세요. |
+| It's thirsty work! | 이게 생각보다 목마른 일입니다! |
+| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | 취소가 요청되었습니다. InstallerClean이 현재 단계가 멈출 수 있는 지점에 이를 때까지 기다리고 있습니다. I/O가 많거나 MSI 데이터베이스를 호출하는 동안에는 몇 초 걸릴 수 있습니다. |
+| Close | 닫기 |
+| Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | GitHub에 별을 남기거나, Issue를 등록하거나, Discussions에 글을 남겨 주세요. 어떤 피드백이든 환영합니다. |
+| or report an Issue or post in Discussions. Any feedback welcome. | 또는 Issue를 등록하거나 Discussions에 글을 남겨 주세요. 어떤 피드백이든 환영합니다. |
+| Minimise | 최소화 |
+| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다. |
+| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다. |
+| Move the unneeded files to the Move location. | 불필요한 파일을 이동 위치로 옮깁니다. |
+| Move the unneeded files to the Move location. Choose one first. | 불필요한 파일을 이동 위치로 옮깁니다. 먼저 위치를 선택하세요. |
+| Send the unneeded files to the Recycle Bin. | 불필요한 파일을 휴지통으로 보냅니다. |
+| Subject name from the embedded Authenticode certificate. Not chain-verified. | 내장된 Authenticode 인증서의 주체 이름입니다. 인증서 체인은 검증하지 않았습니다. |
+| Change language. The program will restart. | 언어를 변경합니다. 프로그램이 다시 시작됩니다. |
+
+## Screen reader labels
+
+| English | 한국어 |
+| --- | --- |
+| Buy me a cup of tea | 커피 한 잔 사주기 |
+| Buy me a cuppa (About window) | 커피 한 잔 사주기 (정보 창) |
+| Cancel operation | 작업 취소 |
+| Cancel scan | 검사 취소 |
+| Cancel startup scan | 시작 검사 취소 |
+| Close | 닫기 |
+| Close window | 창 닫기 |
+| Close result and return to main window | 결과를 닫고 메인 창으로 돌아가기 |
+| Leave a star on GitHub | GitHub에 별 남기기 |
+| Leave a star on GitHub (About window) | GitHub에 별 남기기 (정보 창) |
+| Minimise | 최소화 |
+| Move all unneeded installer files to the chosen destination folder | 불필요한 설치 관리자 파일을 모두 선택한 대상 폴더로 이동 |
+| Send all unneeded installer files to the Recycle Bin | 불필요한 설치 관리자 파일을 모두 휴지통으로 보내기 |
+| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | 삭제하면 불필요한 파일이 휴지통으로 보내집니다. 취소하면 삭제하지 않고 닫습니다. |
+| Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 이동하면 불필요한 파일이 선택한 대상 폴더에 들어갑니다. 취소하면 파일은 있던 자리에 그대로 남습니다. |
+| Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | 불필요한 파일을 어떻게 처리할지 선택하세요. 안전한 곳으로 이동하거나, 영구 삭제하거나, 취소합니다. |
+| Move the unneeded files to a folder you choose | 불필요한 파일을 직접 고른 폴더로 이동 |
+| Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | 이 드라이브에서 휴지통을 사용할 수 없으므로 불필요한 파일을 영구 삭제 |
+| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | nofaff.netlify.app으로 전송됩니다. 개수와 라벨만 포함됩니다. 보내기 전에 보낼 내용을 정확히 확인할 수 있습니다. |
+| Say thanks | 감사 인사 |
+| Send posts the report shown to No Faff. Cancel sends nothing. | 보내기를 누르면 표시된 보고서가 No Faff에 전송됩니다. 취소하면 아무것도 보내지 않습니다. |
+| Check for updates | 업데이트 확인 |
+| Checks the GitHub releases API over HTTPS for a newer version. | GitHub 릴리스 API를 HTTPS로 조회해 새 버전이 있는지 확인합니다. |
+| Open the release page to download the newer version, or cancel to keep the current version. | 새 버전을 내려받으려면 릴리스 페이지를 열고, 현재 버전을 유지하려면 취소하세요. |
+| MIT licence | MIT 라이선스 |
+| Opens the licence file on github.com in your browser. | 브라우저에서 github.com의 라이선스 파일을 엽니다. |
+| Move location | 이동 위치 |
+| Products | 제품 |
+| Patches | 패치 |
+| Product details | 제품 세부 정보 |
+| Move destination folder | 이동 대상 폴더 |
+| Operation progress | 작업 진행 상황 |
+| Scan C:\Windows\Installer again | C:\Windows\Installer 다시 검사 |
+| Scanning progress | 검사 진행 상황 |
+| Startup scan progress | 시작 검사 진행 상황 |
+| Details, unneeded files | 세부 정보, 불필요한 파일 |
+| Available for cleanup. | 정리할 수 있습니다. |
+| Details, registered files | 세부 정보, 등록된 파일 |
+| Read-only inventory. | 읽기 전용 목록입니다. |
+| Sorted by {0}, ascending | {0} 기준 오름차순 정렬됨 |
+| Sorted by {0}, descending | {0} 기준 내림차순 정렬됨 |
+| Scan results | 검사 결과 |
+| Result details | 결과 세부 정보 |
+| File details | 파일 세부 정보 |
+| Dialog text | 대화 상자 텍스트 |
+| {0} ({1}) | {0} ({1}) |
+| Files that could not be processed | 처리할 수 없는 파일 |
+| Explains this folder, and how to recover a file, in the README | 이 폴더에 대한 설명과 파일 복구 방법을 README에서 안내 |
+| Result log preview | 결과 로그 미리 보기 |
+| Change language | 언어 변경 |
+| The program will restart. | 프로그램이 다시 시작됩니다. |
+
+## File picker
+
+| English | 한국어 |
+| --- | --- |
+| Choose destination folder for moved files | 이동할 파일의 대상 폴더 선택 |
+
+## Version
+
+| English | 한국어 |
+| --- | --- |
+| Version {0} | 버전 {0} |
+
+## Word forms (singular and plural)
+
+| English | 한국어 |
+| --- | --- |
+| file | 파일 |
+| files | 파일 |
+| error | 오류 |
+| errors | 오류 |
+| package | 패키지 |
+| packages | 패키지 |
+| product | 제품 |
+| products | 제품 |
+| patch | 패치 |
+| patches | 패치 |
+
+## Sizes and times
+
+| English | 한국어 |
+| --- | --- |
+| {0:F2} GB | {0:F2} GB |
+| {0:F1} MB | {0:F1} MB |
+| {0:F1} KB | {0:F1} KB |
+| {0} B | {0} B |
+| {0:F0}ms | {0:F0}ms |
+| {0:F1}s | {0:F1}s |
+| less than a second | 1초 미만 |
+| {0:F1} seconds | {0:F1}초 |
+
+## Command-line tool (installerclean-cli)
+
+| English | 한국어 |
+| --- | --- |
+| Unknown argument: '{0}' | 알 수 없는 인수: '{0}' |
+| Cancelling... | 취소 중... |
+| Cancelled. | 취소되었습니다. |
+| Error: {0}. Details written to {1}. | 오류: {0}. 자세한 내용을 {1}에 기록했습니다. |
+| Error: {0}. The crash log could not be written. | 오류: {0}. 크래시 로그를 기록할 수 없었습니다. |
+| Scanning C:\Windows\Installer... | C:\Windows\Installer 검사 중... |
+| Found {0} {1} to clean up ({2}). | 정리할 {1} {0}개를 찾았습니다 ({2}). |
+| Nothing to do. | 수행할 작업이 없습니다. |
+| Deleting {0} {1}... | {1} {0}개를 삭제하는 중... |
+| Deleted {0} {1}. | {1} {0}개를 삭제했습니다. |
+| Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | 오류: 이 볼륨에서 휴지통을 사용할 수 없어 아무것도 삭제하지 않았습니다. /m으로 파일을 대신 이동하거나, 휴지통을 다시 활성화한 후 다시 실행하세요. |
+| Error: no move destination specified. Use /m PATH or set a default in the GUI. | 오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하거나 GUI에서 기본값을 설정하세요. |
+| Error: destination cannot be inside the Windows Installer folder. | 오류: 대상은 Windows Installer 폴더 안에 있을 수 없습니다. |
+| Error: destination must be a fully qualified path. Got: {0} | 오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0} |
+| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | 오류: 지정한 대상이 Windows 시스템 폴더 아래로 해석됩니다 ({0}). %SystemRoot%, %ProgramFiles%, %ProgramData% 밖의 경로를 선택하세요. |
+| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | 오류: 지금 무언가가 Windows Installer를 사용하고 있습니다. 대개 Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램입니다. 그 작업이 실행되는 동안에는 이동과 삭제가 차단됩니다. 작업이 끝나면 다시 시도하세요. |
+| Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | 오류: 이 컴퓨터에 이전 Windows Installer 트랜잭션이 일시 중단되어 있습니다. 캐시를 정리하기 전에 그 설치를 다시 진행하거나 롤백하세요(또는 Windows를 다시 시작하세요). |
+| Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | 오류: 다시 시작 후 실행되도록 예약된 파일 작업이 설치 관리자 캐시를 대상으로 합니다 ({0}). 정리하기 전에 Windows를 다시 시작하여 그 작업을 완료하세요. |
+| Moving {0} {1} to {2}... | {1} {0}개를 {2}(으)로 이동하는 중... |
+| Moved {0} {1}. | {1} {0}개를 이동했습니다. |
+| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | 다른 InstallerClean 프로세스가 단일 인스턴스 잠금을 보유하고 있습니다(GUI 또는 다른 CLI 실행). 종료 코드 75(일시적); 나중에 다시 시도해도 안전합니다. |
+| Note: Event Log writing failed. Check Application log permissions or Group Policy. | 참고: 이벤트 로그 쓰기에 실패했습니다. 응용 프로그램 로그 권한 또는 그룹 정책을 확인하세요. |
+| InstallerClean - clean up C:\Windows\Installer | InstallerClean - C:\Windows\Installer 정리 |
+| Usage: | 사용법: |
+|   installerclean-cli --help   Show this help (also accepts /?, -h) |   installerclean-cli --help   이 도움말 표시 (/?, -h도 사용 가능) |
+|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  버전 출력 (-v도 사용 가능) |
+|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s       검사만 - 불필요한 파일 나열 |
+|   installerclean-cli /d       Delete removable files (Recycle Bin) |   installerclean-cli /d       불필요한 파일 삭제 (휴지통) |
+|   installerclean-cli /m       Move to saved default location |   installerclean-cli /m       저장된 기본 위치로 이동 |
+|   installerclean-cli /m PATH  Move to specified path |   installerclean-cli /m 경로   지정한 경로로 이동 |
+| installerclean-cli is a real console process and blocks the prompt | installerclean-cli는 실제 콘솔 프로세스로, 명령 프롬프트를 점유하며, |
+| until it finishes; redirect or pipe its output as you would any | 실행이 끝날 때까지 기다립니다. 다른 콘솔 실행 파일처럼 출력을 리디렉션하거나 |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | 파이프로 넘길 수 있습니다. GUI는 바로 옆 InstallerClean.exe에 들어 있습니다. |
+| Exit codes: | 종료 코드: |
+|   0   success: every flagged file was processed |   0   성공: 표시된 모든 파일을 처리함 |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   실패: 아무것도 처리하지 못함 (잘못된 인수, 검사 실패, 모든 파일 실패) |
+|   2   partial: some files processed, some failed |   2   부분 처리: 일부 파일은 처리됨, 일부는 실패 |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  일시적: 일시적인 상황으로 실행이 차단됨 (메시지 참고) |
+|   130 cancelled (Ctrl+C) |   130 취소됨 (Ctrl+C) |

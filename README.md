@@ -12,7 +12,7 @@
 
 <p align="center"><strong>An open-source tool to safely clean up <code>C:\Windows\Installer</code>, the hidden Windows folder that quietly eats your disk space.</strong></p>
 
-<p align="center"><em>Use it once. Maybe save some space. Chuck it away.</em></p>
+<p align="center"><em>Use it once in a blue moon. Maybe save some space. Move on, feeling clean.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licence: MIT"></a>
@@ -389,6 +389,7 @@ I'd be very grateful to anyone with a good grasp of English and one of the langu
 - Russian: [table](docs/translations/ru.md) · [resx](src/InstallerClean.Core/Resources/Strings.ru.resx)
 - Spanish: [table](docs/translations/es.md) · [resx](src/InstallerClean.Core/Resources/Strings.es.resx)
 - Brazilian Portuguese: [table](docs/translations/pt-BR.md) · [resx](src/InstallerClean.Core/Resources/Strings.pt-BR.resx)
+- Korean: [table](docs/translations/ko.md) · [resx](src/InstallerClean.Core/Resources/Strings.ko.resx)
 
 bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
 
