@@ -59,12 +59,27 @@ internal static class DisplayHelpers
                 if (mod10 == 1 && mod100 != 11) return PluralCategory.One;
                 if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return PluralCategory.Few;
                 return PluralCategory.Many;
+            case "pl": // Polish one / few / many. "one" is strictly n==1, NOT the
+                       // East Slavic rule (where 21, 31, ... are also "one"); few =
+                       // n%10 in 2..4 and n%100 not in 12..14; many = the rest
+                       // (including 0 and the 11..14 band).
+            {
+                int m10 = n % 10, m100 = n % 100;
+                if (n == 1) return PluralCategory.One;
+                if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return PluralCategory.Few;
+                return PluralCategory.Many;
+            }
             case "fr":
             case "pt": // 0 and 1 are singular
                 return n is 0 or 1 ? PluralCategory.One : PluralCategory.Other;
+            case "tr": // Turkish: a noun stays singular after a numeral ("5 dosya",
+                       // never "dosyalar"), so the count sentence does not inflect.
+                return PluralCategory.Other;
             case "ja":
             case "ko":
-            case "zh": // no count inflection
+            case "zh":
+            case "id":
+            case "vi": // no count inflection
                 return PluralCategory.Other;
             default: // en, de, es, it, ...: singular only at exactly 1
                 return n == 1 ? PluralCategory.One : PluralCategory.Other;
