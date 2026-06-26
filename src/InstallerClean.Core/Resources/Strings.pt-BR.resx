@@ -420,9 +420,15 @@
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>{0} entradas MSI obsoletas detectadas (os arquivos já sumiram do disco; o InstallerClean não as remove do registro).</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} de {1} {2}</value></data>
-  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} {1} para limpar ({2})</value></data>
-  <data name="Summary.RegisteredWindow" xml:space="preserve"><value>{0} {1} registrados ({2})</value></data>
+  <!-- 0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
+       3 = size display. No trailing noun, so it agrees at any count. -->
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} órfãos, {1} substituídos, {2} obsoletos ({3})</value></data>
+  <!-- Registered-window footer summary, reinforcing the "still needed" framing
+       (the flip side of the main window's "unneeded"). Split singular/plural so
+       the noun and verb agree at one file ("file ... is" vs "files ... are").
+       0 = count, 1 = size display. -->
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} arquivo registrado que ainda é necessário ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} arquivos registrados que ainda são necessários ({1})</value></data>
 
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
@@ -685,11 +691,63 @@ Não foi possível gravar o crash.log.</value></data>
 # de anexar este arquivo a um relatório de bug público.
 </value></data>
 
-  <!-- CLI help text (printed by /?, -h and the long help flag) -->
   <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Alterar idioma. O programa será reiniciado.</value></data>
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Alterar idioma</value></data>
   <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>O programa será reiniciado.</value></data>
 
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Foi encontrado {0} {1} registrado.</value></data>
-  <data name="Summary.RegisteredWindow.One" xml:space="preserve"><value>{0} {1} registrado ({2})</value></data>
+
+  <!-- CLI: human-facing stdout (localised). The Cli.EventLog* machine-
+       contract keys are held English and live in the neutral resx only;
+       an RMM tool greps them for fixed English phrases. -->
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Argumento desconhecido: '{0}'</value></data>
+  <data name="Cli.Cancelling" xml:space="preserve"><value>Cancelando...</value></data>
+  <data name="Cli.Cancelled" xml:space="preserve"><value>Cancelado.</value></data>
+  <data name="Cli.GenericError" xml:space="preserve"><value>Erro: {0}. Detalhes gravados em {1}.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Erro: {0}. Não foi possível gravar o crash.log.</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Analisando C:\Windows\Installer...</value></data>
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Encontrados {0} {1} para limpar ({2}).</value></data>
+  <data name="Cli.NothingToDo" xml:space="preserve"><value>Nada a fazer.</value></data>
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Excluindo {0} {1}...</value></data>
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Excluídos {0} {1}.</value></data>
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Erro: a Lixeira está indisponível para este volume, então nada foi excluído. Use /m para mover os arquivos, ou reative a Lixeira e execute novamente.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Erro: nenhum destino de movimentação especificado. Use /m CAMINHO ou defina um padrão na GUI.</value></data>
+  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Erro: o destino não pode estar dentro da pasta do Windows Installer.</value></data>
+  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Erro: o destino deve ser um caminho completo. Recebido: {0}</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Erro: o destino {0} fica dentro de uma pasta de sistema do Windows. Escolha um caminho fora de %SystemRoot%, %ProgramFiles% e %ProgramData%.</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Erro: algo está usando o Windows Installer agora, normalmente uma atualização do Windows ou um programa se instalando em segundo plano. Mover e Excluir ficam bloqueados enquanto isso acontece. Tente novamente quando terminar.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Erro: uma transação anterior do Windows Installer está suspensa nesta máquina. Retome ou reverta essa instalação (ou reinicie o Windows) antes de limpar o cache.</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Erro: uma operação de arquivo em fila para a próxima reinicialização afeta o cache do Installer ({0}). Reinicie o Windows para concluir essa operação antes de limpar.</value></data>
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Movendo {0} {1} para {2}...</value></data>
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>Movidos {0} {1}.</value></data>
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Outro processo do InstallerClean mantém o bloqueio de instância única (a GUI ou outra execução da CLI). Código de saída 75 (transitório); seguro tentar novamente mais tarde.</value></data>
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Observação: falha ao gravar no Log de Eventos. Verifique as permissões do log de Aplicativo ou a Diretiva de Grupo.</value></data>
+
+  <!-- CLI help screen. Column alignment is hand-tuned for a monospace
+       terminal; eye-verify on Windows. -->
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - limpeza de C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Usage" xml:space="preserve"><value>Uso:</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help      Mostra esta ajuda (aceita também /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version   Mostra a versão (aceita também -v)</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s          Apenas análise - lista os arquivos desnecessários</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d          Exclui os arquivos desnecessários (Lixeira)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m          Move para o local padrão salvo</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m CAMINHO  Move para o caminho especificado</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli é um processo de console real e bloqueia o prompt</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>até terminar; redirecione ou encaminhe a saída por pipe como faria</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>com qualquer outro executável de console. A GUI fica no InstallerClean.exe.</value></data>
+  <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Códigos de saída:</value></data>
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   sucesso: todos os arquivos sinalizados foram processados</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   falha: nada processado (argumentos inválidos, falha na análise, todos os arquivos falharam)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   parcial: alguns arquivos processados, outros falharam</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transitório: uma condição temporária bloqueou a execução (veja a mensagem)</value></data>
+  <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 cancelado (Ctrl+C)</value></data>
+
+  <!-- n==1 participle overrides for the three count lines: Portuguese inflects
+       the past participle at one (Encontrado/Excluído/Movido) versus the plural
+       base, and counts 0 and 1 as "one". Satellite-only, read by name via
+       DisplayHelpers.Pluralise. -->
+  <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Encontrado {0} {1} para limpar ({2}).</value></data>
+  <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Excluído {0} {1}.</value></data>
+  <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Movido {0} {1}.</value></data>
 </root>
