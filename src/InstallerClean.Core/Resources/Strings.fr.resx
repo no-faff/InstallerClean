@@ -1,0 +1,750 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    InstallerClean string resources. Source-of-truth language: en-GB.
+
+    Naming convention: every key starts with a dot-delimited category
+    prefix and is generated as an underscore-delimited C# property name
+    (Window.Main.Title becomes Strings.Window_Main_Title). The visible
+    categories are:
+      Action.*               button labels and verbs
+      Automation.*           AutomationProperties.Name / HelpText values
+      Body.*                 multi-sentence body copy
+      BrowserLaunch.*        copy for the URL-launch failure dialog
+      Cli.*                  console output for the CLI launcher
+      Completion.*           completion overlay copy
+      Confirm.*              confirmation dialog body text
+      ConfirmSendResultLog.* result-log Send confirmation modal
+      CrashLog.*             crash.log header copy
+      Display.*              size/duration formatting fragments
+      Error.*                user-facing error messages
+      Field.*                labels for metadata fields
+      FilePicker.*           folder-browser dialog labels
+      Plural.*               singular/plural fragments used by DisplayHelpers
+      Reason.*               Reason column values in the unneeded files list
+      RecycleUnavailable.*   recycle-bin-unavailable choice dialog
+      ResultLog.*            send-report states (Sending / Sent / Failed)
+      Section.*              heading text inside windows
+      Startup.*              splash + already-running messages
+      Status.*               transient status / progress text
+      Summary.*              status-line counts (registered / orphaned / missing)
+      Tooltip.*              hover tooltips
+      UpdateCheck.*          update-check status / failure detail
+      Version.*              version display string
+      Window.*               window titles and chrome strings
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Window titles -->
+  <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Window.About.Title" xml:space="preserve"><value>À propos</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>Fichiers enregistrés qui ne devraient pas être supprimés</value></data>
+  <data name="Window.Orphaned.Title" xml:space="preserve"><value>Fichiers inutiles que vous pouvez supprimer sans risque</value></data>
+  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Confirmer le déplacement</value></data>
+  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Confirmer la suppression</value></data>
+  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>Corbeille indisponible</value></data>
+
+  <!-- Section headings -->
+  <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUITS</value></data>
+  <data name="Section.Registered.Patches" xml:space="preserve"><value>CORRECTIFS</value></data>
+  <data name="Section.Registered.Details" xml:space="preserve"><value>DÉTAILS DU PRODUIT</value></data>
+  <data name="Section.Move.Location" xml:space="preserve"><value>EMPLACEMENT DE DESTINATION</value></data>
+  <data name="Section.SayThanks" xml:space="preserve"><value>DIRE MERCI</value></data>
+
+  <!-- Field labels (used in detail panels) -->
+  <data name="Field.Reason" xml:space="preserve"><value>Motif</value></data>
+  <data name="Field.Author" xml:space="preserve"><value>Auteur</value></data>
+  <data name="Field.Application" xml:space="preserve"><value>Application</value></data>
+  <data name="Field.Title" xml:space="preserve"><value>Titre</value></data>
+  <data name="Field.Subject" xml:space="preserve"><value>Objet</value></data>
+  <data name="Field.Keywords" xml:space="preserve"><value>Mots-clés</value></data>
+  <data name="Field.SigningCertificate" xml:space="preserve"><value>Certificat de signature</value></data>
+  <data name="Field.FileSize" xml:space="preserve"><value>Taille du fichier</value></data>
+  <data name="Field.Comment" xml:space="preserve"><value>Commentaire</value></data>
+  <data name="Field.ProductName" xml:space="preserve"><value>Nom du produit</value></data>
+  <data name="Field.File" xml:space="preserve"><value>Fichier</value></data>
+  <data name="Field.Size" xml:space="preserve"><value>Taille</value></data>
+  <data name="Field.Patches" xml:space="preserve"><value>Correctifs</value></data>
+  <!-- Placeholder shown for a registered package whose API ProductName is empty. -->
+  <data name="Field.UnknownProductName" xml:space="preserve"><value>(inconnu)</value></data>
+  <data name="Field.PatchesOnly" xml:space="preserve"><value>(correctifs uniquement)</value></data>
+  <data name="Field.Missing" xml:space="preserve"><value>manquant</value></data>
+
+  <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
+  <data name="Action.About" xml:space="preserve"><value>À _propos</value></data>
+  <data name="Action.Copy" xml:space="preserve"><value>Copier</value></data>
+  <data name="Action.Cut" xml:space="preserve"><value>Couper</value></data>
+  <data name="Action.Paste" xml:space="preserve"><value>Coller</value></data>
+  <data name="Action.SelectAll" xml:space="preserve"><value>Tout sélectionner</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>_Parcourir...</value></data>
+  <data name="Action.Cancel" xml:space="preserve"><value>_Annuler</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Rechercher des _mises à jour</value></data>
+  <data name="Action.Close" xml:space="preserve"><value>_Fermer</value></data>
+  <data name="Action.Delete" xml:space="preserve"><value>_Supprimer</value></data>
+  <data name="Action.DeletePermanently" xml:space="preserve"><value>_Supprimer définitivement</value></data>
+  <!-- Alt+D safe here because the Delete button under the overlay is
+       disabled while Completion.IsComplete is true (IsMainContentInteractive
+       binds the body region to false); the mnemonic only resolves to
+       this Done button. IsDefault=True keeps Enter as the primary
+       keyboard shortcut. -->
+  <data name="Action.Done" xml:space="preserve"><value>_Terminé</value></data>
+  <data name="Action.Details" xml:space="preserve"><value>Détails</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Offrez-moi un _café</value></data>
+  <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>_Laisser une étoile sur GitHub</value></data>
+  <data name="Action.MITLicence" xml:space="preserve"><value>Licence MIT</value></data>
+  <data name="Action.Move" xml:space="preserve"><value>_Déplacer</value></data>
+  <data name="Action.MoveInstead" xml:space="preserve"><value>_Déplacer plutôt</value></data>
+  <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Chemin du dossier si vous déplacez au lieu de supprimer</value></data>
+  <data name="Action.OpenReleasePage" xml:space="preserve"><value>Ouvrir la page de la _version</value></data>
+  <data name="Action.Rescan" xml:space="preserve"><value>_Réanalyser</value></data>
+  <data name="Action.ScanAgain" xml:space="preserve"><value>Analyser à _nouveau</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>Envoyer le rapport</value></data>
+  <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Envoyer</value></data>
+
+  <!-- Automation names (screen reader / accessibility) -->
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Offrez-moi une tasse de café</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Offrez-moi un café (fenêtre À propos)</value></data>
+  <data name="Automation.CancelOperation" xml:space="preserve"><value>Annuler l'opération</value></data>
+  <data name="Automation.CancelScan" xml:space="preserve"><value>Annuler l'analyse</value></data>
+  <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Annuler l'analyse de démarrage</value></data>
+  <data name="Automation.Close" xml:space="preserve"><value>Fermer</value></data>
+  <data name="Automation.CloseWindow" xml:space="preserve"><value>Fermer la fenêtre</value></data>
+  <data name="Automation.CloseResult" xml:space="preserve"><value>Fermer le résultat et revenir à la fenêtre principale</value></data>
+  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Laisser une étoile sur GitHub</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Laisser une étoile sur GitHub (fenêtre À propos)</value></data>
+  <data name="Automation.Minimise" xml:space="preserve"><value>Réduire</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Déplacer tous les fichiers d'installation inutiles vers le dossier de destination choisi</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Envoyer à la Corbeille tous les fichiers d'installation inutiles</value></data>
+  <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
+       They describe the dialog's choice, worded to read correctly
+       straight after "Cancel, button": the window-level alternative is
+       never read, because help text is only spoken for the element with
+       focus and the window itself never has it. -->
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Supprimer envoie les fichiers inutiles à la Corbeille. Annuler ferme sans rien supprimer.</value></data>
+  <data name="Automation.ConfirmMove" xml:space="preserve"><value>Déplacer place les fichiers inutiles dans le dossier de destination choisi. Annuler les laisse où ils sont.</value></data>
+  <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Choisissez quoi faire des fichiers inutiles : les déplacer en lieu sûr, les supprimer définitivement ou annuler.</value></data>
+  <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Déplacer les fichiers inutiles vers un dossier que vous choisissez</value></data>
+  <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Supprimer définitivement les fichiers inutiles parce que la Corbeille est indisponible pour ce lecteur</value></data>
+  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Envoie à nofaff.netlify.app. Uniquement des décomptes et des étiquettes. Vous verrez exactement ce qui sera envoyé avant l'envoi.</value></data>
+  <data name="Automation.SayThanks" xml:space="preserve"><value>Dire merci</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Envoyer transmet à No Faff le rapport affiché. Annuler n'envoie rien.</value></data>
+  <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Rechercher des mises à jour</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Interroge l'API des versions de GitHub en HTTPS pour une version plus récente.</value></data>
+  <!-- Window-level description for the update-available modal, read by a
+       screen reader on open, mirroring the RecycleUnavailable and
+       ConfirmSendResultLog windows. The version numbers are in the body
+       text; this states the choice. -->
+  <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Ouvrez la page de la version pour télécharger la version plus récente, ou annulez pour conserver la version actuelle.</value></data>
+  <data name="Automation.MITLicence" xml:space="preserve"><value>Licence MIT</value></data>
+  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Ouvre le fichier de licence sur github.com dans votre navigateur.</value></data>
+  <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
+       Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
+       DETAILS). Narrator at default verbosity spells short uppercase
+       tokens letter-by-letter; the override gives it a phrase to read
+       while the visible text stays uppercased for SmallCaps. -->
+  <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>Emplacement de destination</value></data>
+  <data name="Automation.Section.Products" xml:space="preserve"><value>Produits</value></data>
+  <data name="Automation.Section.Patches" xml:space="preserve"><value>Correctifs</value></data>
+  <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Détails du produit</value></data>
+  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Dossier de destination</value></data>
+  <data name="Automation.OperationProgress" xml:space="preserve"><value>Progression de l'opération</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Analyser à nouveau C:\Windows\Installer</value></data>
+  <data name="Automation.ScanningProgress" xml:space="preserve"><value>Progression de l'analyse</value></data>
+  <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Progression de l'analyse de démarrage</value></data>
+  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Détails, fichiers inutiles</value></data>
+  <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Disponibles pour le nettoyage.</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Détails, fichiers enregistrés</value></data>
+  <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Inventaire en lecture seule.</value></data>
+  <!-- Screen-reader sort state for the detail-window lists, set in
+       UpdateSortIndicators as the sorted column header's accessible
+       name (a focused header's name change is announced, and the name
+       override keeps the ▲/▼ glyph out of speech) and mirrored into the
+       list's ItemStatus as a queryable surface. 0 = the sorted column's
+       name (a Field.* label). -->
+  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>Trié par {0}, ordre croissant</value></data>
+  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>Trié par {0}, ordre décroissant</value></data>
+  <!-- Names for the scrollable text regions, spoken only once a region
+       can actually scroll and so joins the tab order (the
+       BodyScrollRegion style). -->
+  <data name="Automation.Scroll.ScanResults" xml:space="preserve"><value>Résultats de l'analyse</value></data>
+  <data name="Automation.Scroll.ResultDetails" xml:space="preserve"><value>Détails du résultat</value></data>
+  <data name="Automation.Scroll.FileDetails" xml:space="preserve"><value>Détails du fichier</value></data>
+  <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>Texte de la boîte de dialogue</value></data>
+  <!-- Composes the announced outcome of a scan that found files:
+       0 = the "N unneeded files to clean up" line, 1 = the total size. -->
+  <data name="Automation.ScanResultAnnouncement" xml:space="preserve"><value>{0} ({1})</value></data>
+  <data name="Automation.CompletionErrors" xml:space="preserve"><value>Fichiers qui n'ont pas pu être traités</value></data>
+  <!-- Spoken name for the missing-file note's closing hyperlink. The visible
+       link text is a phrase mid-sentence (the [ ]-delimited span of
+       Body.RegisteredMissingFromDisk.SeeAlso, movable by a translator), so a
+       screen reader tabbing onto the link needs a self-contained purpose;
+       it must still contain the visible phrase so voice control can click
+       it by its on-screen words. -->
+  <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Explique ce dossier, et comment récupérer un fichier, dans le README</value></data>
+
+  <!-- Tooltips -->
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Si ça vous a aidé, offrez-moi un café.</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Ça donne soif !</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Annulation demandée. InstallerClean attend que l'étape en cours atteigne un point d'arrêt. Cela peut prendre quelques secondes lors d'opérations d'E/S intensives ou d'un appel à la base de données MSI.</value></data>
+  <data name="Tooltip.Close" xml:space="preserve"><value>Fermer</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Laissez une étoile sur GitHub, ouvrez une Issue ou écrivez dans les Discussions. Tout retour est le bienvenu.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>ou ouvrez une Issue ou écrivez dans les Discussions. Tout retour est le bienvenu.</value></data>
+  <data name="Tooltip.Minimise" xml:space="preserve"><value>Réduire</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Comme vous voulez, mais c'est apprécié. Envoie un résumé anonyme qui me dit juste si l'outil fonctionne et combien d'espace les gens libèrent. L'écran suivant vous montre ce qui sera envoyé avant que vous confirmiez.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Comme vous voulez, mais c'est apprécié. Envoie un résumé anonyme qui me dit juste si l'outil fonctionne. L'écran suivant vous montre ce qui sera envoyé avant que vous confirmiez.</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>Déplacer les fichiers inutiles vers l'emplacement de destination.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Déplacer les fichiers inutiles vers l'emplacement de destination. Choisissez-en un d'abord.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Envoyer les fichiers inutiles à la Corbeille.</value></data>
+  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Nom du titulaire du certificat Authenticode incorporé. Chaîne non vérifiée.</value></data>
+
+  <!-- Body copy -->
+  <data name="Body.MainExplanation.Lead" xml:space="preserve">
+    <value>Les fichiers inutiles ci-dessous peuvent être supprimés sans risque.</value>
+    <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. Keep it one short clause.</comment>
+  </data>
+  <data name="Body.MainExplanation.Why" xml:space="preserve">
+    <value>Ils se trouvent dans C:\Windows\Installer, laissés là quand un programme a été désinstallé ({0}), qu'un correctif plus récent en a remplacé un ({1}) ou que l'éditeur l'a retiré ({2}). InstallerClean ne liste jamais que les fichiers dont Windows lui-même déclare avoir fini de se servir.</value>
+    <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
+  </data>
+  <data name="Body.MainExplanation.Action" xml:space="preserve">
+    <value>Supprimez-les vers la Corbeille, ou Déplacez-les ailleurs d'abord si vous préférez en garder une copie.</value>
+    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
+  </data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Quelque chose utilise Windows Installer en ce moment, généralement une mise à jour Windows ou un programme en cours d'installation en arrière-plan. Déplacer et Supprimer sont en pause pendant ce temps, pour qu'InstallerClean ne touche pas au cache d'installation tant qu'il change. Une fois terminé, réanalysez et ils réapparaissent.</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Une transaction Windows Installer précédente est suspendue sur cette machine. Reprenez ou annulez cette installation (ou redémarrez Windows) avant de nettoyer le cache.</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows a un renommage de fichier en file d'attente pour le prochain redémarrage qui affecte le cache d'installation. Redémarrez Windows avant de nettoyer.</value></data>
+  <data name="Body.NoFileSelected" xml:space="preserve"><value>Sélectionnez un fichier pour voir les détails.</value></data>
+  <data name="Body.NoProductSelected" xml:space="preserve"><value>Sélectionnez un produit pour voir les détails.</value></data>
+  <data name="Body.NoMetadata" xml:space="preserve"><value>Aucune métadonnée disponible.</value></data>
+  <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
+    <value>Ce fichier d'installation a été supprimé. Ce n'est pas InstallerClean qui l'a fait : il ne retire jamais un fichier dont un programme a encore besoin ; autre chose a supprimé celui-ci avant que vous ne lanciez InstallerClean.&#10;&#10;Pour l'instant, cela ne pose aucun problème, et n'en posera pas avant le jour où vous tenterez de réparer, mettre à jour ou désinstaller le programme auquel il appartient. Cette étape pourra alors échouer, parce que Windows cherche ce fichier et qu'il n'est pas là.&#10;&#10;Pour tenter d'y remédier, téléchargez le programme d'installation de ce logiciel chez son éditeur et lancez-le par-dessus votre copie actuelle (ne désinstallez pas d'abord : désinstaller est en soi une étape qui a besoin de ce fichier). Utilisez si possible la version que vous avez installée, car Windows pourrait en refuser une autre. Cela rétablit en général le fichier, et vos réglages restent normalement intacts, mais Microsoft ne le garantit pas : son propre dernier recours est de réinstaller le programme, ou Windows lui-même.</value>
+    <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
+  </data>
+  <!-- The missing-file note's closing sentence, rendered as a TextBlock
+       with one inline Hyperlink built at load time (RegisteredFilesWindow
+       .BuildSeeAlsoLine). The linked phrase is delimited by [ ] so a
+       translator can place it anywhere in the sentence; the code splits on
+       the first [ and ] into a prefix Run, the Hyperlink (to the README's
+       recovery section), and a suffix Run. A string with no [ ] pair
+       renders verbatim as one Run. -->
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso" xml:space="preserve"><value>Le README [explique ce dossier], et comment récupérer un fichier, avec les propres mots de Microsoft.</value></data>
+  <data name="Body.NoPatches" xml:space="preserve"><value>(aucun)</value></data>
+
+  <!-- Reasons (Reason column in the orphaned-files list) -->
+  <data name="Reason.Orphaned" xml:space="preserve"><value>Orphelin</value></data>
+  <data name="Reason.Superseded" xml:space="preserve"><value>Remplacé</value></data>
+  <!-- MSI PatchState 4 (obsoleted) is a distinct state from 2
+       (superseded): superseded means a newer patch has replaced
+       this one, obsoleted means the patch has been withdrawn /
+       deprecated by the publisher independent of a replacement.
+       The user-visible outcome (the patch is removable) is the
+       same; the Reason column distinguishes them for users who
+       want the MSI-state precision. -->
+  <data name="Reason.Obsoleted" xml:space="preserve"><value>Obsolète</value></data>
+
+  <!-- Status / progress text -->
+  <data name="Status.Scanning" xml:space="preserve"><value>Analyse...</value></data>
+  <data name="Status.Cancelling" xml:space="preserve"><value>Annulation...</value></data>
+  <data name="Status.StartingScan" xml:space="preserve"><value>Démarrage de l'analyse...</value></data>
+  <data name="Status.QueryingApi" xml:space="preserve"><value>Interrogation de Windows sur les logiciels installés...</value></data>
+  <data name="Status.ScanningCache" xml:space="preserve"><value>Analyse du dossier de cache d'installation...</value></data>
+  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Énumération des produits installés...</value></data>
+  <data name="Status.CheckingRegistry" xml:space="preserve"><value>Vérification du registre pour des paquets supplémentaires...</value></data>
+  <!-- 0 = registered package count, 1 = pluralised "package"/"packages" -->
+  <!-- Fires mid-scan as a step-progress update after the registry-
+       fallback pass; not the end-of-scan pill (that's Status.ScanComplete).
+       0 = registered package count, 1 = pluralised "package"/"packages". -->
+  <data name="Status.RegisteredPackagesFound" xml:space="preserve"><value>Trouvé {0} {1} enregistrés.</value></data>
+  <!-- 0 = elapsed time text (e.g. "1.2s") -->
+  <data name="Status.ScanComplete" xml:space="preserve"><value>Analyse terminée ({0})</value></data>
+  <data name="Status.FoundProducts" xml:space="preserve"><value>Analyse des paquets locaux...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
+  <data name="Status.FoundUnused" xml:space="preserve"><value>{0} {1} à supprimer sans risque.</value></data>
+  <data name="Status.PreparingDestination" xml:space="preserve"><value>Préparation du dossier de destination...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun -->
+  <data name="Status.Moving" xml:space="preserve"><value>Déplacement de {0} {1}...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Suppression de {0} {1}...</value></data>
+  <!-- 0 = files processed before cancel, 1 = total files in the batch,
+       2 = pluralised "file"/"files" agreeing with the total. -->
+  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Déplacement annulé après avoir traité {0} sur {1} {2}.</value></data>
+  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>Suppression annulée après avoir traité {0} sur {1} {2}.</value></data>
+  <!-- 0 = exception type name, 1 = crash log path. Both surface in
+       the status pill so the user can find the log; full message +
+       stack trace go to the log itself. -->
+  <data name="Status.MoveFailed" xml:space="preserve"><value>Échec du déplacement ({0}). Détails dans {1}.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Échec du déplacement ({0}). Le crash.log n'a pas pu être écrit.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>Échec de la suppression ({0}). Détails dans {1}.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Échec de la suppression ({0}). Le crash.log n'a pas pu être écrit.</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Accès refusé. Exécutez en tant qu'administrateur.</value></data>
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Échec de l'analyse : base de données Windows Installer indisponible.</value></data>
+  <data name="Status.ScanCancelled" xml:space="preserve"><value>Analyse annulée.</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>Prêt</value></data>
+  <!-- 0 = exception type name. Full message + stack trace go only to
+       the crash log because exception messages from elevated framework
+       calls can contain paths from another user's profile. 1 = crash
+       log path. -->
+  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Échec de l'analyse ({0}). Détails dans {1}.</value></data>
+  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Échec de l'analyse ({0}). Le crash.log n'a pas pu être écrit.</value></data>
+
+  <!-- Completion screen -->
+  <data name="Completion.AllClean" xml:space="preserve"><value>Tout est propre</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Rien à nettoyer dans C:\Windows\Installer</value></data>
+  <!-- 0 = installed product count, 1 = pluralised "product"/"products",
+       2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
+       "less than a second"). The count is the receipt that a real
+       scan ran; on fast machines a duration alone reads as "did
+       nothing". Rendered in the Restore slot of the completion
+       overlay so the all-clean state has the same heading + summary
+       + smaller-receipt shape as the post-Move and post-Delete
+       states. -->
+  <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Analyse de {0} {1} en {2}</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Recopiez-les si quelque chose cesse de fonctionner</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restaurez-les depuis la Corbeille si quelque chose cesse de fonctionner</value></data>
+  <!-- 0 = size freed (e.g. "120.5 MB") -->
+  <data name="Completion.Freed" xml:space="preserve"><value>{0} libérés</value></data>
+  <data name="Completion.Moved" xml:space="preserve"><value>{0} déplacés</value></data>
+  <data name="Completion.PartlyMoved" xml:space="preserve"><value>{0} déplacés, certains fichiers n'ont pas pu être traités</value></data>
+  <!-- Heading shown when an operation succeeded for SOME files but
+       errored for others. 0 = total size freed (e.g. "120.5 MB"). -->
+  <data name="Completion.PartlyFreed" xml:space="preserve"><value>{0} libérés, certains fichiers n'ont pas pu être traités</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
+  <data name="Completion.MoveSummary" xml:space="preserve"><value>Déplacé {0} {1} vers {2}</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
+  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>Déplacé {0} {1} vers {2}. {3} {4}</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>Envoyé {0} {1} à la Corbeille</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>Envoyé {0} {1} à la Corbeille. {2} {3}</value></data>
+  <!-- Completion copy for a consented permanent delete (the Recycle Bin
+       was unavailable for the volume and the user chose to delete anyway).
+       Distinct from DeleteSummary so it never claims the bin: these files
+       did not reach it and cannot be restored from it. 0 = deleted count,
+       1 = pluralised noun; the WithErrors variants add 2 = error count,
+       3 = pluralised "error"/"errors". Both the clean and the WithErrors
+       copy split singular/plural so the "It"/"They did not go to the
+       Recycle Bin" clause agrees with the count, and the WithErrors copy
+       carries that same clause so a partial failure still never reads as
+       though the files reached the bin. -->
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} supprimé définitivement. Il n'est pas allé à la Corbeille.</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} supprimés définitivement. Ils ne sont pas allés à la Corbeille.</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>{0} {1} supprimé définitivement. Il n'est pas allé à la Corbeille. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{0} {1} supprimés définitivement. Ils ne sont pas allés à la Corbeille. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>C'est normal, il n'y avait aucun risque à le retirer. InstallerClean n'efface que les fichiers dont Windows déclare avoir fini de se servir, jamais un dont un programme a encore besoin. Dans le cas improbable où une suppression empêcherait un jour un programme de se réparer, se mettre à jour ou se désinstaller, le réinstaller depuis son éditeur rétablit en général le fichier, même si Microsoft ne le garantit pas.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>C'est normal, il n'y avait aucun risque à les retirer. InstallerClean n'efface que les fichiers dont Windows déclare avoir fini de se servir, jamais un dont un programme a encore besoin. Dans le cas improbable où une suppression empêcherait un jour un programme de se réparer, se mettre à jour ou se désinstaller, le réinstaller depuis son éditeur rétablit en général le fichier, même si Microsoft ne le garantit pas.</value></data>
+  <!-- The choice offered when Delete finds the Recycle Bin unavailable for
+       the files' volume: Move (the safe default), delete permanently with
+       consent, or cancel. Wording states only the confirmed fact (the probe
+       found the bin unavailable for the drive); it never asserts an
+       unconfirmed cause (off vs corrupt vs full). 0 = file count,
+       1 = pluralised noun, 2 = size display. The singular text omits
+       {0}: "this file" reads better than "this 1 file". The call site
+       passes all three args either way, so the singular's {1} and {2}
+       still resolve. -->
+  <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>La Corbeille n'est pas disponible pour ce lecteur</value></data>
+  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>Donc ce {1} ({2}) n'a pas été supprimé. Vous pouvez le déplacer en lieu sûr, ou le supprimer définitivement.</value></data>
+  <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>Donc ces {0} {1} ({2}) n'ont pas été supprimés. Vous pouvez les déplacer en lieu sûr, ou les supprimer définitivement.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Le supprimer ne présente aucun risque. InstallerClean n'efface que les fichiers dont Windows déclare avoir fini de se servir, jamais un dont un programme a encore besoin, et la Corbeille n'est qu'une protection supplémentaire. Dans le cas improbable où une suppression empêcherait un jour un programme de se réparer, se mettre à jour ou se désinstaller, le réinstaller depuis son éditeur rétablit en général le fichier, même si Microsoft ne le garantit pas.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Les supprimer ne présente aucun risque. InstallerClean n'efface que les fichiers dont Windows déclare avoir fini de se servir, jamais un dont un programme a encore besoin, et la Corbeille n'est qu'une protection supplémentaire. Dans le cas improbable où une suppression empêcherait un jour un programme de se réparer, se mettre à jour ou se désinstaller, le réinstaller depuis son éditeur rétablit en général le fichier, même si Microsoft ne le garantit pas.</value></data>
+
+  <!-- Summaries -->
+  <!-- 0 = file count. Singular / plural pairs picked at the call
+       site by Pluralise(count, Singular, Plural); this avoids
+       concatenating a count and a "file is"/"files are" fragment
+       across a placeholder boundary, which does not survive
+       translation into languages where the noun-verb-count agreement
+       crosses the placeholder (Slavic case selection, Arabic dual,
+       Japanese particle placement, etc). A translator rewrites both
+       singular and plural keys per their language's rule. -->
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} fichier encore nécessaire</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} fichiers encore nécessaires</value></data>
+  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} fichier inutile à nettoyer</value></data>
+  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} fichiers inutiles à nettoyer</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} fichier enregistré est manquant (non supprimé par InstallerClean). Aucun problème pour l'instant, mais une future réparation, mise à jour ou désinstallation de ce programme pourrait échouer. Ouvrez les Détails pour savoir quoi faire.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} fichiers enregistrés sont manquants (non supprimés par InstallerClean). Aucun problème pour l'instant, mais une future réparation, mise à jour ou désinstallation de ces programmes pourrait échouer. Ouvrez les Détails pour savoir quoi faire.</value></data>
+  <!-- Informational line shown when the MSI database carries
+       superseded-patch registrations whose files are already gone
+       from disk. Distinct from the missing-from-disk warning
+       because the files are removable already; only the MSI
+       registration is stale. InstallerClean doesn't unregister
+       anything, so this is purely diagnostic. -->
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>{0} entrée MSI obsolète détectée (le fichier a déjà disparu du disque ; InstallerClean ne la retire pas du registre).</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>{0} entrées MSI obsolètes détectées (les fichiers ont déjà disparu du disque ; InstallerClean ne les retire pas du registre).</value></data>
+  <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
+  <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} sur {1} {2}</value></data>
+  <!-- Orphaned-window footer summary. Unneeded files split into the three
+       removable causes shown in the Reason column: true orphans (the API
+       never claimed them), superseded patches and obsoleted patches.
+       0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
+       3 = size display. No trailing noun, so it agrees at any count. -->
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} orphelins, {1} remplacés, {2} obsolètes ({3})</value></data>
+  <!-- Registered-window footer summary, reinforcing the "still needed" framing
+       (the flip side of the main window's "unneeded"). Split singular/plural so
+       the noun and verb agree at one file ("file ... is" vs "files ... are").
+       0 = count, 1 = size display. -->
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} fichier enregistré encore nécessaire ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} fichiers enregistrés encore nécessaires ({1})</value></data>
+
+  <!-- Confirmation dialogs -->
+  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
+  <data name="Confirm.MoveTitle" xml:space="preserve"><value>Déplacer {0} {1} ({2}) ?</value></data>
+  <!-- 0 = destination path -->
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Les fichiers seront déplacés vers {0}.</value></data>
+  <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Supprimer {0} {1} ({2}) ?</value></data>
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Les fichiers seront envoyés à la Corbeille. Si vous voulez des copies de sauvegarde, utilisez plutôt Déplacer.</value></data>
+
+  <!-- Error messages -->
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Droits d'administrateur requis</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean nécessite des privilèges d'administrateur.
+
+Faites un clic droit et choisissez « Exécuter en tant qu'administrateur ».</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Base de données Windows Installer indisponible</value></data>
+  <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Échec de l'analyse</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>La base de données Windows Installer semble vide ou inaccessible. C'est inhabituel même sur une installation neuve de Windows et signifie généralement que la base de données est corrompue ou qu'un outil tiers l'a vidée. Exécuter « sfc /scannow » depuis une invite élevée la répare en général.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Accès refusé lors de l'énumération des produits installés. Exécutez en tant qu'administrateur.</value></data>
+  <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
+       in the message because a sysadmin reading the dialog may want
+       to look it up). -->
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer a refusé de lister les produits après {0} échecs consécutifs (dernier code d'erreur {1}). Essayez de redémarrer Windows, ou exécutez « sfc /scannow » depuis une invite élevée.</value></data>
+  <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Destination invalide</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Impossible d'écrire dans la destination</value></data>
+  <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Échec du déplacement</value></data>
+  <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Échec de la suppression</value></data>
+  <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>La destination ne peut pas se trouver dans le dossier Windows Installer.</value></data>
+  <!-- 0 = the destination path the user typed -->
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>La destination {0} se trouve dans un dossier système de Windows. Choisissez un chemin en dehors de %SystemRoot%, %ProgramFiles% et %ProgramData%.</value></data>
+  <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Espace insuffisant</value></data>
+  <!-- 0 = destination, 1 = required size, 2 = available size -->
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Espace insuffisant dans {0}
+
+Nécessaire : {1}
+Disponible : {2}</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>Vous n'avez pas la permission d'écrire dans {0}.
+Essayez un dossier dans votre profil utilisateur ou sur un lecteur qui vous appartient.</value></data>
+  <data name="Error.PathTooLong" xml:space="preserve"><value>Le chemin {0} est trop long pour Windows. Choisissez un chemin plus court.</value></data>
+  <data name="Error.DestinationMissing" xml:space="preserve"><value>Le dossier {0} n'existe pas et n'a pas pu être créé. Vérifiez la lettre de lecteur ou le chemin réseau.</value></data>
+  <!-- 0 = destination, 1 = crash log path. The exception's .Message
+       intentionally does NOT appear in either string: under elevation
+       framework messages can carry paths from another user's profile.
+       Detail goes to the crash log; the user is pointed at it. -->
+  <data name="Error.IOWriteDestination" xml:space="preserve"><value>Windows ne peut pas écrire dans {0}.
+Détails dans {1}.</value></data>
+  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows ne peut pas écrire dans {0}. Le crash.log n'a pas pu être écrit.</value></data>
+  <data name="Error.WriteDestination" xml:space="preserve"><value>Impossible d'écrire dans {0}.
+Détails dans {1}.</value></data>
+  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Impossible d'écrire dans {0}. Le crash.log n'a pas pu être écrit.</value></data>
+  <data name="Error.MissingSourceFile" xml:space="preserve"><value>Le fichier n'existe plus.</value></data>
+  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Le fichier source est un lien symbolique ou une jonction ; refusé par sécurité.</value></data>
+  <!-- Category-only sentences for FileOperationError.LocalisedMessage.
+       These intentionally do NOT include a path or framework message
+       fragment: with the app running elevated, the per-file
+       UnauthorizedAccessException / IOException messages can carry
+       paths from other users' profiles into the displayed error list. -->
+  <data name="Error.AccessDenied" xml:space="preserve"><value>Accès refusé.</value></data>
+  <data name="Error.IOFailure" xml:space="preserve"><value>L'opération a échoué. Réessayez ou redémarrez Windows.</value></data>
+  <data name="Error.UnknownError" xml:space="preserve"><value>Erreur inconnue.</value></data>
+  <!-- 0 = shell error code -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Impossible d'envoyer ce fichier à la Corbeille (erreur {0}). Il est peut-être verrouillé, en cours d'utilisation ou bloqué par Windows. Déplacez-le plutôt.</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows a bloqué l'accès à ce fichier, même avec des droits d'administrateur (erreur {0}). C'est généralement un verrou de propriété ou de permissions. Déplacez-le plutôt.</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>Ce fichier est ouvert ou verrouillé par un autre programme (erreur {0}). Fermez ce programme, ou ce qui l'analyse, puis réessayez, ou déplacez-le plutôt.</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Le fichier a été supprimé définitivement parce qu'il n'a pas pu être envoyé à la Corbeille.</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Refus de déplacer des fichiers dans le dossier Windows Installer (destination : {0}).</value></data>
+  <!-- 0 = the relative path the caller passed -->
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>La destination doit être un chemin entièrement qualifié (les chemins relatifs sont résolus par rapport au répertoire courant du processus et ne sont pas sûrs sous élévation) : {0}</value></data>
+  <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Impossible d'ouvrir votre navigateur</value></data>
+  <data name="UpdateCheck.Title" xml:space="preserve"><value>Rechercher des mises à jour</value></data>
+  <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Vérification...</value></data>
+  <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>À jour.</value></data>
+  <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Mise à jour disponible</value></data>
+  <!-- 0 = installed version, 1 = latest version on GitHub -->
+  <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Vous utilisez la version {0}.&#10;La version {1} est disponible.</value></data>
+  <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Impossible de joindre GitHub. Vérifiez votre connexion internet et réessayez.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub a renvoyé une réponse d'erreur. L'API des versions est peut-être limitée ; réessayez dans quelques minutes.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>La réponse de GitHub ne contenait pas de version reconnaissable. Réessayez plus tard, ou ouvrez directement la page des versions.</value></data>
+  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>La vérification a expiré. Votre connexion à GitHub est peut-être lente ; réessayez.</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>La vérification a échoué pour une raison inconnue. Les détails sont dans le crash.log si vous devez le signaler.</value></data>
+  <!-- 0 = the URL the user was trying to reach -->
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>Le lien n'a pas pu être ouvert dans le navigateur de votre utilisateur normal. L'URL a été copiée dans le presse-papiers pour que vous puissiez l'ouvrir manuellement :&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>Le lien n'a pas pu être ouvert dans le navigateur de votre utilisateur normal, et sa copie dans le presse-papiers a également échoué. L'URL est :&#10;&#10;{0}</value></data>
+  <!-- 0 = the destination folder whose canonical path changed mid-batch -->
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Le chemin canonique du dossier de destination a changé pendant l'opération : {0}</value></data>
+  <!-- 0 = folder, 1 = inner exception message -->
+  <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Impossible d'écrire dans {0}.</value></data>
+  <!-- 0 = file name -->
+  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Impossible de trouver un nom de fichier unique pour « {0} » après 10 000 tentatives.</value></data>
+
+  <!-- Result log (post-cleanup diagnostic send) -->
+  <data name="ResultLog.Sending" xml:space="preserve"><value>Envoi...</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>Merci ! Rapport envoyé.</value></data>
+  <data name="ResultLog.Failed" xml:space="preserve"><value>Échec de l'envoi. Réessayez plus tard.</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>Aucun rapport à envoyer.</value></data>
+  <!-- Body header shown in the confirmation modal. Names the
+       recipient and the full URL so the user sees the destination
+       without having to scroll the JSON. -->
+  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>Envoyer ceci à No Faff ?</value></data>
+  <!-- Reassurance line under the JSON. Names the URL once, calls
+       out the no-PII property, and explains the purpose so the
+       user has the context the modal title implies. -->
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Rien ne vous identifie, ni votre machine ; ça me dit juste qu'InstallerClean fonctionne et combien d'espace les gens libèrent. Ça va vers nofaff.netlify.app/api/result-log.</value></data>
+  <!-- AutomationProperties.Name on the JSON preview TextBox so screen
+       readers announce its content rather than "edit, read-only". -->
+  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Aperçu du rapport de résultats</value></data>
+
+  <!-- Single instance / startup / crash -->
+  <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean est déjà en cours d'exécution.</value></data>
+  <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <!-- 0 = exception type name (e.g. "IOException"), 1 = crash log path.
+       The full exception message is intentionally NOT formatted in here:
+       framework-provided messages can carry absolute paths from other
+       users' profiles into a dialog the current user reads. The full
+       detail is written to the crash log instead. -->
+  <data name="Startup.UnhandledBody" xml:space="preserve"><value>Une erreur inattendue s'est produite et InstallerClean doit se fermer.
+
+{0}
+
+Détails écrits dans :
+{1}</value></data>
+  <data name="Startup.UnhandledBody.NoLog" xml:space="preserve"><value>Une erreur inattendue s'est produite et InstallerClean doit se fermer.
+
+{0}
+
+Le crash.log n'a pas pu être écrit.</value></data>
+  <data name="Startup.ErrorTitle" xml:space="preserve"><value>Erreur de démarrage</value></data>
+  <!-- 0 = exception type name (see Startup.UnhandledBody for why this
+       is the type name and not the message), 1 = crash log path. -->
+  <data name="Startup.FailedToStart" xml:space="preserve"><value>Échec du démarrage ({0}). Détails écrits dans :
+{1}</value></data>
+  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>Échec du démarrage ({0}). Le crash.log n'a pas pu être écrit.</value></data>
+
+  <!-- File picker -->
+  <data name="FilePicker.ChooseDestinationTitle" xml:space="preserve"><value>Choisissez le dossier de destination des fichiers déplacés</value></data>
+
+  <!-- Version display -->
+  <!-- 0 = major.minor.patch (e.g. "1.5.4") -->
+  <data name="Version.Display" xml:space="preserve"><value>Version {0}</value></data>
+
+  <!-- Plural fragments. Consumed by DisplayHelpers.Pluralise. The
+       singular/plural pair is English-style (n != 1 -> plural). A
+       Slavic / Arabic / etc. host replaces this layer; consumers do
+       not change. -->
+  <data name="Plural.File.Singular" xml:space="preserve"><value>fichier</value></data>
+  <data name="Plural.File.Plural" xml:space="preserve"><value>fichiers</value></data>
+  <data name="Plural.Error.Singular" xml:space="preserve"><value>erreur</value></data>
+  <data name="Plural.Error.Plural" xml:space="preserve"><value>erreurs</value></data>
+  <data name="Plural.Package.Singular" xml:space="preserve"><value>paquet</value></data>
+  <data name="Plural.Package.Plural" xml:space="preserve"><value>paquets</value></data>
+  <data name="Plural.Product.Singular" xml:space="preserve"><value>produit</value></data>
+  <data name="Plural.Product.Plural" xml:space="preserve"><value>produits</value></data>
+  <data name="Plural.Patch.Singular" xml:space="preserve"><value>correctif</value></data>
+  <data name="Plural.Patch.Plural" xml:space="preserve"><value>correctifs</value></data>
+
+  <!-- Display-format fragments used by DisplayHelpers.FormatSize /
+       FormatElapsed / FormatElapsedLong. Number portion stays in
+       string.Format with the consumer's CurrentCulture (so 1.5 GB
+       becomes 1,5 GB on de-DE etc.); only the unit suffix and the
+       sub-second long-form sentence are localisable. -->
+  <data name="Display.Size.GB" xml:space="preserve"><value>{0:F2} GB</value></data>
+  <data name="Display.Size.MB" xml:space="preserve"><value>{0:F1} MB</value></data>
+  <data name="Display.Size.KB" xml:space="preserve"><value>{0:F1} KB</value></data>
+  <data name="Display.Size.B" xml:space="preserve"><value>{0} B</value></data>
+  <data name="Display.Elapsed.Ms" xml:space="preserve"><value>{0:F0}ms</value></data>
+  <data name="Display.Elapsed.S" xml:space="preserve"><value>{0:F1}s</value></data>
+  <data name="Display.ElapsedLong.LessThanASecond" xml:space="preserve"><value>moins d'une seconde</value></data>
+  <data name="Display.ElapsedLong.Seconds" xml:space="preserve"><value>{0:F1} secondes</value></data>
+
+  <!-- CLI output. Two destinations with different localisation rules.
+       Stdout (everything the user reads at the console) is localised so a
+       non-English sysadmin gets text matching their UI culture. The entries
+       written INTO the Windows Application event log are English-only
+       (no-translate): an RMM tool greps that channel for a known English
+       string regardless of the machine's OS UI culture, so a satellite resx
+       must NOT translate them. Those are the Cli.EventLog* keys, with one
+       exception: Cli.EventLogUnavailable is a stdout warning (it tells the
+       operator that an event-log write failed), so it is localised like the
+       rest of stdout despite the EventLog prefix. -->
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Argument inconnu : « {0} »</value></data>
+  <data name="Cli.Cancelling" xml:space="preserve"><value>Annulation...</value></data>
+  <data name="Cli.Cancelled" xml:space="preserve"><value>Annulé.</value></data>
+  <!-- 0 = exception type name (full message + stack trace go to the
+       crash log; the CLI runs elevated so .Message could include paths
+       from another user's profile if logged to a shared file).
+       1 = crash log path. -->
+  <data name="Cli.GenericError" xml:space="preserve"><value>Erreur : {0}. Détails écrits dans {1}.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Erreur : {0}. Le crash.log n'a pas pu être écrit.</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Analyse de C:\Windows\Installer...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Trouvé {0} {1} à nettoyer ({2}).</value></data>
+  <data name="Cli.NothingToDo" xml:space="preserve"><value>Rien à faire.</value></data>
+  <!-- 0 = mode arg ("/s"), 1 = registered package count, 2 = pluralised "package"/"packages" -->
+  <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Suppression de {0} {1}...</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Supprimé {0} {1}.</value></data>
+  <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
+       4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Erreur : la Corbeille est indisponible pour ce volume, donc rien n'a été supprimé. Utilisez /m pour déplacer les fichiers, ou réactivez la Corbeille et relancez.</value></data>
+  <!-- 0 = mode arg ("/d") -->
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Erreur : aucune destination de déplacement spécifiée. Utilisez /m CHEMIN ou définissez une valeur par défaut dans l'interface.</value></data>
+  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Erreur : la destination ne peut pas se trouver dans le dossier Windows Installer.</value></data>
+  <!-- 0 = the relative or otherwise unsafe path -->
+  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Erreur : la destination doit être un chemin entièrement qualifié. Reçu : {0}</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Erreur : la destination {0} se trouve dans un dossier système de Windows. Choisissez un chemin en dehors de %SystemRoot%, %ProgramFiles% et %ProgramData%.</value></data>
+  <!-- 0 = mode, 1 = destination -->
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Erreur : quelque chose utilise Windows Installer en ce moment, généralement une mise à jour Windows ou un programme en cours d'installation en arrière-plan. Déplacer et Supprimer sont bloqués pendant ce temps. Réessayez une fois que c'est terminé.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Erreur : une transaction Windows Installer précédente est suspendue sur cette machine. Reprenez ou annulez cette installation (ou redémarrez Windows) avant de nettoyer le cache.</value></data>
+  <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Erreur : une opération de fichier en file d'attente pour le prochain redémarrage vise le cache d'installation ({0}). Redémarrez Windows pour terminer cette opération avant de nettoyer.</value></data>
+  <!-- Short human labels for the EventLog ({1} slot in
+       Cli.EventLogPendingRebootBlocked). The stdout sentences in
+       Cli.PendingRebootBlocked.* are full localised text; these short
+       labels are English-only (no-translate, like every Cli.EventLog*
+       entry written to the Application channel) so an Application-channel
+       grep can match a known string regardless of OS UI culture. -->
+  <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
+       2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination -->
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Déplacement de {0} {1} vers {2}...</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun -->
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>Déplacé {0} {1}.</value></data>
+  <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
+       4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
+  <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
+       processed (a cancel during the scan, or before the first delete or
+       move), so "each /s, /d or /m run writes one summary entry" holds for
+       every run, not only the ones that committed work. -->
+  <!-- Stdout when the CLI cannot acquire the single-instance mutex.
+       The GUI variant (Strings.Startup_AlreadyRunningBody) is written
+       for a user who tried to launch a second window; the CLI variant
+       names the contending parties (GUI or another CLI run) and
+       points at exit code 75 so an RMM operator parsing stdout
+       knows it is transient and safe to retry. -->
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Un autre processus InstallerClean détient le verrou d'instance unique (l'interface ou une autre exécution de la CLI). Code de sortie 75 (transitoire) ; sans risque à réessayer plus tard.</value></data>
+  <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
+       can't acquire the single-instance mutex, so an RMM consumer of
+       the Application channel sees a record of every scheduled-job
+       firing whether or not it was able to run. -->
+  <!-- 0 = the offending token (original case). Audit entry written when
+       the CLI is invoked with an unrecognised or malformed argument, so a
+       scheduled task with a fat-fingered flag leaves an Application-channel
+       trace instead of exiting silently. English only, like every Cli
+       EventLog string; the stdout message carries the localised text. -->
+  <!-- Audit entry written when the CLI is invoked with no argument at all,
+       so an argless scheduled task fails visibly (non-zero exit) and leaves
+       a record rather than silently succeeding while doing nothing. -->
+  <!-- Audit entry for the LocalisedAccessException and
+       LocalisedInvalidOperationException catches: the message has been
+       built from a resx template with user-controlled args only, so the
+       full text is safe to record. 0 = mode arg, 1 = the localised
+       message (already-formatted). RMM consumers parsing the
+       Application channel see the actionable reason without a separate
+       crash-log lookup. -->
+  <!-- Audit entry for the generic Exception catch: ex.Message is held
+       back (path-leak risk under elevation), only the type name and
+       crash log path travel to the EventLog. 0 = mode arg, 1 = type
+       name, 2 = crash log path. -->
+  <!-- Stdout warning printed once at the end of a CLI run if any
+       Event Log write failed (Group Policy or service unavailable).
+       Tells an RMM consumer expecting an Application entry that the
+       channel was unwritable, not just empty. -->
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Remarque : l'écriture dans le journal des événements a échoué. Vérifiez les autorisations du journal Application ou la stratégie de groupe.</value></data>
+
+  <!-- crash.log privacy header. Prepended to a fresh crash.log so a
+       user attaching the file to a public bug report has the
+       disclosure before sharing. The "# " prefix lets log readers
+       that skip comment lines (less, grep -v, jq pipelines) skip
+       the header. Stored as one multi-line block; the C# side reads
+       it verbatim and normalises line endings to the host platform. -->
+  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log capture les exceptions non gérées d'InstallerClean.
+# Sous élévation, les messages d'exception du framework peuvent
+# inclure des chemins de fichiers de la session en cours (y compris
+# les profils d'autres utilisateurs énumérés par les requêtes Windows
+# Installer). Les messages d'échec réseau de la vérification de mises
+# à jour ou de l'envoi du rapport de résultats peuvent inclure l'URL
+# de destination et l'adresse IP / proxy résolue. Expurgez ces deux
+# types de détail avant de joindre ce fichier à un rapport de bug
+# public.
+</value></data>
+
+  <!-- CLI help text (printed by /?, -h and the long help flag) -->
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - nettoyage de C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Usage" xml:space="preserve"><value>Utilisation :</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help      Affiche cette aide (accepte aussi /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version   Affiche la version (accepte aussi -v)</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s          Analyse seule - liste les fichiers inutiles</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d          Supprime les fichiers inutiles (Corbeille)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m          Déplace vers l'emplacement par défaut enregistré</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m CHEMIN   Déplace vers le chemin spécifié</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli est un vrai processus de console et bloque l'invite</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>jusqu'à la fin ; redirigez ou acheminez sa sortie comme vous le feriez</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>pour tout autre exécutable de console. L'interface se trouve dans InstallerClean.exe.</value></data>
+  <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Codes de sortie :</value></data>
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   succès : tous les fichiers signalés ont été traités</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   échec : rien de traité (arguments incorrects, échec de l'analyse, tous les fichiers ont échoué)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partiel : certains fichiers traités, d'autres ont échoué</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transitoire : une condition temporaire a bloqué l'exécution (voir le message)</value></data>
+  <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 annulé (Ctrl+C)</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Changer la langue. Le programme redémarrera.</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Changer la langue</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Le programme redémarrera.</value></data>
+
+  <!-- n==1 (and 0) agreement override for the registered-packages count line:
+       French counts 0 and 1 as "one", and the adjective "enregistré" agrees
+       with the count, so the singular drops the plural -s. Satellite-only, read
+       by name via DisplayHelpers.Pluralise. The CLI count lines need no such
+       override: their participle (Trouvé/Supprimé/Déplacé) precedes its object
+       and so stays invariable. -->
+  <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Trouvé {0} {1} enregistré.</value></data>
+
+</root>
