@@ -22,7 +22,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.2-blue" alt="Version GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-25k-brightgreen" alt="Total des téléchargements"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-26k-brightgreen" alt="Total des téléchargements"></a>
 </p>
 
 ![Capture d'écran d'InstallerClean après un nettoyage réussi : 1,28 Go libérés, 69 fichiers envoyés à la Corbeille](docs/screenshots/06-freed-success-done.webp)
@@ -168,7 +168,7 @@ Les services d'analyse, de requête, de déplacement, de suppression, de réglag
 - Les empreintes SHA-256 de chaque version sont listées sur la [page des versions](../../releases/latest).
 - VirusTotal : propre sur tous les moteurs. Des liens à jour dans les notes de chaque version pour que vous puissiez revérifier.
 - Le code source est sur [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) et la CI compile et teste chaque commit (voir le badge CI vert plus haut).
-- <!-- downloads-start -->25k<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
+- <!-- downloads-start -->26k<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) teste chaque soumission dans une machine virtuelle et ne la référence que si elle passe son contrôle.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analyse chaque version à la recherche de virus, logiciels espions et publiciels.
 

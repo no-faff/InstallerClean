@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.2-blue" alt="Релиз на GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-25k-brightgreen" alt="Всего загрузок"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-26k-brightgreen" alt="Всего загрузок"></a>
 </p>
 
 ![Скриншот InstallerClean после успешной очистки: освобождено 1,28 ГБ, 69 файлов отправлено в Корзину](docs/screenshots/06-freed-success-done.webp)
@@ -178,7 +178,7 @@ InstallerClean различает три вида ненужных файлов.
 - Хеши SHA-256 для каждого выпуска указаны на [странице выпусков](../../releases/latest).
 - VirusTotal: чисто по всем антивирусным движкам. В примечаниях к каждому выпуску есть актуальные ссылки, чтобы вы могли перепроверить сами.
 - Исходный код лежит на [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), и CI собирает и тестирует каждый коммит (см. зелёный значок CI выше).
-- <!-- downloads-start -->25k<!-- downloads-end --> загрузок на GitHub, MajorGeeks и Softpedia.
+- <!-- downloads-start -->26k<!-- downloads-end --> загрузок на GitHub, MajorGeeks и Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) тестирует каждую присланную сборку в виртуальной машине и публикует её, только если она прошла их проверку.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) проверяет каждый выпуск на вирусы, шпионское и рекламное ПО.
 
