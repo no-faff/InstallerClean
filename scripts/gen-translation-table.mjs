@@ -10,8 +10,9 @@
 // USAGE  node scripts/gen-translation-table.mjs <code>
 //   <code> is a shipped satellite code: zh-Hans, de, ko, es, ja, pt-BR, ru, fr.
 // It reads the English neutral Strings.resx and Strings.<code>.resx, pairs them by
-// key, and writes docs/translations/<code>.md (LF). The 60 Cli.* keys are CLI-only
-// and English by contract (the CLI's stdout is a machine-readable interface), so they
+// key, and writes docs/translations/<code>.md (LF). The 39 human-facing Cli.* keys
+// are now translated and shown in their own group; the 21 machine-contract
+// Cli.EventLog* keys (bar Cli.EventLogUnavailable) stay English by contract, so they
 // are skipped here exactly as the satellite omits them.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
@@ -80,6 +81,7 @@ const GROUPS = [
   ['Version',                          ['Version.']],
   ['Word forms (singular and plural)', ['Plural.']],
   ['Sizes and times',                  ['Display.']],
+  ['Command-line tool (installerclean-cli)', ['Cli.']],
   ['Other',                            ['']],
 ];
 const groupOf = (key) => GROUPS.findIndex(([, prefixes]) => prefixes.some((p) => key.startsWith(p)));
@@ -94,14 +96,18 @@ const cell = (raw) => raw
   .replace(/\r\n|\r|\n/g, '<br>')    // a literal newline in a multi-line value
   .replace(/\|/g, '\\|');
 
-const keys = [...neutral.keys()].filter((k) => !k.startsWith('Cli.'));
+// Drop only the 21 machine-contract CLI keys (the Cli.EventLog* set bar
+// Cli.EventLogUnavailable, the one operator-facing warning); the 39 human-facing
+// Cli.* keys are translated and belong in the table.
+const isMachineCliKey = (k) => k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
+const keys = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
 const buckets = GROUPS.map(() => []);
 for (const k of keys) buckets[groupOf(k)].push(k);
 
 let missing = 0;
-let md = `# InstallerClean UI in ${lang.endo} (${lang.en})\n\n`;
-md += `The text of InstallerClean's interface in English on the left, with the ${lang.en} translation beside it, grouped by where each line appears in the app. It is here so someone who really knows ${lang.en} can read through the translation and flag anything that doesn't read well. See [Can you help translate the GUI?](../../${lang.readme}#can-you-help-translate-the-gui) for how to suggest a change, whether an issue or a pull request.\n\n`;
-md += `A few lines (the app name, version and file-size formats) are meant to stay the same in every language, so leave those as they are. The translation file itself is [\`Strings.${code}.resx\`](../../${dir}/Strings.${code}.resx). This page is generated from it by \`scripts/gen-translation-table.mjs\`, so do not edit it by hand.\n`;
+let md = `# InstallerClean in ${lang.endo} (${lang.en})\n\n`;
+md += `The text of InstallerClean's interface and command-line tool in English on the left, with the ${lang.en} translation beside it, grouped by where each line appears in the app. It is here so someone who really knows ${lang.en} can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../${lang.readme}#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.\n\n`;
+md += `A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [\`Strings.${code}.resx\`](../../${dir}/Strings.${code}.resx). This page is generated from it by \`scripts/gen-translation-table.mjs\`, so do not edit it by hand.\n`;
 
 for (let i = 0; i < GROUPS.length; i++) {
   const list = buckets[i];

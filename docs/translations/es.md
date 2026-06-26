@@ -1,8 +1,8 @@
-# InstallerClean UI in Español (Spanish)
+# InstallerClean in Español (Spanish)
 
-The text of InstallerClean's interface in English on the left, with the Spanish translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Spanish can read through the translation and flag anything that doesn't read well. See [Can you help translate the GUI?](../../README.es.md#can-you-help-translate-the-gui) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Spanish translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Spanish can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.es.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
 
-A few lines (the app name, version and file-size formats) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.es.resx`](../../src/InstallerClean.Core/Resources/Strings.es.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
+A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.es.resx`](../../src/InstallerClean.Core/Resources/Strings.es.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
 ## Window titles
 
@@ -90,7 +90,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Found {0} registered {1}. | Se encontraron {0} {1} registrados. |
 | Scan complete ({0}) | Análisis completado ({0}) |
 | Scanning local packages... | Analizando los paquetes locales... |
-| Found {0} {1} to clean up. | {0} {1} para limpiar. |
+| Found {0} {1} you can safely delete. | {0} {1} para limpiar. |
 | Preparing destination folder... | Preparando la carpeta de destino... |
 | Moving {0} {1}... | Moviendo {0} {1}... |
 | Deleting {0} {1}... | Eliminando {0} {1}... |
@@ -103,7 +103,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Access denied. Run as administrator. | Acceso denegado. Ejecuta como administrador. |
 | Scan failed: installer database unavailable. | Análisis fallido: base de datos del instalador no disponible. |
 | Scan cancelled. | Análisis cancelado. |
-| Done | Listo |
+| Ready | Listo |
 | Scan failed ({0}). Details in {1}. | Análisis fallido ({0}). Detalles en {1}. |
 | Scan failed ({0}). The crash log could not be written. | Análisis fallido ({0}). No se pudo escribir el archivo crash.log. |
 
@@ -179,8 +179,9 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | Detectada {0} entrada MSI obsoleta (el archivo ya no está en el disco; InstallerClean no la quita del registro). |
 | {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | Detectadas {0} entradas MSI obsoletas (los archivos ya no están en el disco; InstallerClean no las quita del registro). |
 | {0} of {1} {2} | {0} de {1} {2} |
-| {0} unneeded {1} ({2}) | {0} {1} para limpiar ({2}) |
-| {0} registered {1} ({2}) | {0} {1} registrados ({2}) |
+| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} huérfanos, {1} sustituidos, {2} obsoletos ({3}) |
+| {0} registered file that is still needed ({1}) | {0} archivo registrado aún necesario ({1}) |
+| {0} registered files that are still needed ({1}) | {0} archivos registrados aún necesarios ({1}) |
 
 ## Confirmation dialogs
 
@@ -394,3 +395,47 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | {0:F1}s | {0:F1}s |
 | less than a second | menos de un segundo |
 | {0:F1} seconds | {0:F1} segundos |
+
+## Command-line tool (installerclean-cli)
+
+| English | Español |
+| --- | --- |
+| Unknown argument: '{0}' | Argumento desconocido: '{0}' |
+| Cancelling... | Cancelando... |
+| Cancelled. | Operación cancelada. |
+| Error: {0}. Details written to {1}. | Error: {0}. Detalles guardados en {1}. |
+| Error: {0}. The crash log could not be written. | Error: {0}. No se pudo escribir el archivo crash.log. |
+| Scanning C:\Windows\Installer... | Analizando C:\Windows\Installer... |
+| Found {0} {1} to clean up ({2}). | Encontrados {0} {1} para limpiar ({2}). |
+| Nothing to do. | No hay nada que hacer. |
+| Deleting {0} {1}... | Eliminando {0} {1}... |
+| Deleted {0} {1}. | Eliminados {0} {1}. |
+| Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Error: la Papelera de reciclaje no está disponible para este volumen, así que no se eliminó nada. Usa /m para mover los archivos en su lugar, o vuelve a activar la Papelera de reciclaje y ejecuta de nuevo. |
+| Error: no move destination specified. Use /m PATH or set a default in the GUI. | Error: no se especificó ningún destino de movimiento. Usa /m RUTA o establece un valor predeterminado en la GUI. |
+| Error: destination cannot be inside the Windows Installer folder. | Error: el destino no puede estar dentro de la carpeta de Windows Installer. |
+| Error: destination must be a fully qualified path. Got: {0} | Error: el destino debe ser una ruta completa. Recibido: {0} |
+| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Error: el destino {0} se encuentra dentro de una carpeta del sistema de Windows. Elige una ruta fuera de %SystemRoot%, %ProgramFiles% y %ProgramData%. |
+| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | Error: ahora mismo algo está usando Windows Installer, normalmente una actualización de Windows o un programa instalándose en segundo plano. Mover y Eliminar están bloqueados mientras eso ocurre. Vuelve a intentarlo cuando termine. |
+| Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Error: hay una transacción anterior de Windows Installer suspendida en este equipo. Reanuda o revierte esa instalación (o reinicia Windows) antes de limpiar la caché. |
+| Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | Error: una operación de archivo en cola para después del reinicio afecta a la caché de instalación ({0}). Reinicia Windows para completar esa operación antes de limpiar. |
+| Moving {0} {1} to {2}... | Moviendo {0} {1} a {2}... |
+| Moved {0} {1}. | Movidos {0} {1}. |
+| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Otro proceso de InstallerClean mantiene el bloqueo de instancia única (la GUI u otra ejecución de la CLI). Código de salida 75 (transitorio); es seguro reintentar más tarde. |
+| Note: Event Log writing failed. Check Application log permissions or Group Policy. | Nota: error al escribir en el registro de eventos. Comprueba los permisos del registro Aplicación o las directivas de grupo. |
+| InstallerClean - clean up C:\Windows\Installer | InstallerClean - limpiar C:\Windows\Installer |
+| Usage: | Uso: |
+|   installerclean-cli --help   Show this help (also accepts /?, -h) |   installerclean-cli --help     Muestra esta ayuda (acepta también /?, -h) |
+|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Muestra la versión (acepta también -v) |
+|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s         Solo análisis - enumera los archivos innecesarios |
+|   installerclean-cli /d       Delete removable files (Recycle Bin) |   installerclean-cli /d         Elimina los archivos innecesarios (Papelera de reciclaje) |
+|   installerclean-cli /m       Move to saved default location |   installerclean-cli /m         Mueve a la ubicación predeterminada guardada |
+|   installerclean-cli /m PATH  Move to specified path |   installerclean-cli /m RUTA    Mueve a la ruta especificada |
+| installerclean-cli is a real console process and blocks the prompt | installerclean-cli es un verdadero proceso de consola y bloquea el |
+| until it finishes; redirect or pipe its output as you would any | símbolo del sistema hasta que termina; redirige o canaliza su salida como |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | con cualquier otro ejecutable de consola. La GUI está en InstallerClean.exe. |
+| Exit codes: | Códigos de salida: |
+|   0   success: every flagged file was processed |   0   correcto: se procesó cada archivo señalado |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   error: no se procesó nada (argumentos incorrectos, análisis fallido, todos los archivos fallaron) |
+|   2   partial: some files processed, some failed |   2   parcial: algunos archivos procesados, otros fallaron |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  transitorio: una condición temporal bloqueó la ejecución (consulta el mensaje) |
+|   130 cancelled (Ctrl+C) |   130 cancelado (Ctrl+C) |
