@@ -68,7 +68,7 @@ bovirus has already kindly corrected and approved the Italian, which is now live
 
 I did put *a lot* of effort into the draft, so it should be pretty good, but it's only there to help you out; up to you - use all, some or none of it.
 
-You can see it all [here](docs/translations/es.md), the English next to the Spanish, and the file itself is [here](src/InstallerClean.Core/Resources/Strings.es.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking (although even more effort has gone into the resx). Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and Spanish will join English, Italian and Japanese, with the credit going to you.
+You can see it all [here](docs/translations/es.md), the English next to the Spanish, and the `.resx` file itself is [here](src/InstallerClean.Core/Resources/Strings.es.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking (although even more effort has gone into the `.resx`). Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and Spanish will join English, Japanese and Italian, with the credit going to you.
 
 </details>
 
