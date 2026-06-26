@@ -32,7 +32,7 @@
 
 ## Содержание
 
-- [Can you help translate the GUI?](#can-you-help-translate-the-gui)
+- [Can you help translate InstallerClean?](#can-you-help-translate-installerclean)
 - [Папка, о которой вам никто не рассказывает](#папка-о-которой-вам-никто-не-рассказывает)
 - [В поисках помощи](#в-поисках-помощи)
 - [Что он делает](#что-он-делает)
@@ -55,14 +55,20 @@
 
 ---
 
-## Can you help translate the GUI?
+## Can you help translate InstallerClean?
 
 <details>
-<summary>Interface is English or Italian only; click to help check a machine translation</summary>
+<summary>I'm looking for a native Russian speaker to check my machine translation; click if you might be willing to help 🙏</summary>
 
-I'd like to make the app available in more languages. I've got a machine-translated file for eight more languages, containing a list of all 281 strings, ready to go, but I don't want to ship them without the approval of a native speaker. [bovirus](https://github.com/bovirus) has already kindly corrected and approved the Italian, so InstallerClean is now bilingual. With your help, I can add Russian to the list.
+I'd like to make InstallerClean available in more languages. I've got a complete machine-translated Russian version ready to go - every string in the app, the interface and the command-line tool, but I don't want to ship it without the approval of a native speaker.
 
-I'd be very grateful to anyone with a good grasp of both English and Russian who can look over the translation as it stands and either approve what's there or suggest improvements where necessary. You can see it all [here](docs/translations/ru.md), the English beside the Russian, and the file itself is [here](src/InstallerClean.Core/Resources/Strings.ru.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking. Tell me in an [issue](../../issues/new?template=translation_review.md) or a [pull request](../../edit/main/src/InstallerClean.Core/Resources/Strings.ru.resx), whichever's easier, and Russian joins English and Italian, with the credit going to you.
+I'd be very grateful to anyone with a good grasp of both English and Russian who can look over the translation as it stands and either approve what's there or suggest improvements where necessary.
+
+bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
+
+I did put *a lot* of effort into the draft, so it should be pretty good, but it's only there to help you out; up to you - use all, some or none of it.
+
+You can see it all [here](docs/translations/ru.md), the English next to the Russian, and the file itself is [here](src/InstallerClean.Core/Resources/Strings.ru.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking (although even more effort has gone into the resx). Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and Russian will join English, Italian and Japanese, with the credit going to you.
 
 </details>
 
