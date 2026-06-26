@@ -305,7 +305,8 @@ internal static class Program
             if (arg == "/d")
             {
                 var deleteService = services.GetRequiredService<IDeleteFilesService>();
-                Console.WriteLine(string.Format(Strings.Cli_DeletingFiles,
+                Console.WriteLine(string.Format(
+                    DisplayHelpers.Pluralise(count, Strings.Cli_DeletingFiles, Strings.Cli_DeletingFiles, "Cli.DeletingFiles"),
                     count, DisplayHelpers.PluraliseFile(count)));
                 var result = await deleteService.DeleteFilesAsync(
                     filePaths, permitPermanentDelete: false, progress: progress, cancellationToken: token);
@@ -364,7 +365,8 @@ internal static class Program
             // (see ResolveAndValidateMoveDestination); moveDest is non-empty,
             // fully qualified and outside the Installer and system folders.
             var moveService = services.GetRequiredService<IMoveFilesService>();
-            Console.WriteLine(string.Format(Strings.Cli_MovingFiles,
+            Console.WriteLine(string.Format(
+                DisplayHelpers.Pluralise(count, Strings.Cli_MovingFiles, Strings.Cli_MovingFiles, "Cli.MovingFiles"),
                 count, DisplayHelpers.PluraliseFile(count), moveDest));
             var moveResult = await moveService.MoveFilesAsync(filePaths, moveDest, progress, token);
             Console.WriteLine(string.Format(
