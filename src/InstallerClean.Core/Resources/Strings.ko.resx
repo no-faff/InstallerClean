@@ -1,0 +1,741 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    InstallerClean string resources. Source-of-truth language: en-GB.
+
+    Naming convention: every key starts with a dot-delimited category
+    prefix and is generated as an underscore-delimited C# property name
+    (Window.Main.Title becomes Strings.Window_Main_Title). The visible
+    categories are:
+      Action.*               button labels and verbs
+      Automation.*           AutomationProperties.Name / HelpText values
+      Body.*                 multi-sentence body copy
+      BrowserLaunch.*        copy for the URL-launch failure dialog
+      Cli.*                  console output for the CLI launcher
+      Completion.*           completion overlay copy
+      Confirm.*              confirmation dialog body text
+      ConfirmSendResultLog.* result-log Send confirmation modal
+      CrashLog.*             crash.log header copy
+      Display.*              size/duration formatting fragments
+      Error.*                user-facing error messages
+      Field.*                labels for metadata fields
+      FilePicker.*           folder-browser dialog labels
+      Plural.*               singular/plural fragments used by DisplayHelpers
+      Reason.*               Reason column values in the unneeded files list
+      RecycleUnavailable.*   recycle-bin-unavailable choice dialog
+      ResultLog.*            send-report states (Sending / Sent / Failed)
+      Section.*              heading text inside windows
+      Startup.*              splash + already-running messages
+      Status.*               transient status / progress text
+      Summary.*              status-line counts (registered / orphaned / missing)
+      Tooltip.*              hover tooltips
+      UpdateCheck.*          update-check status / failure detail
+      Version.*              version display string
+      Window.*               window titles and chrome strings
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Window titles -->
+  <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Window.About.Title" xml:space="preserve"><value>정보</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>삭제하지 말아야 할 등록된 파일</value></data>
+  <data name="Window.Orphaned.Title" xml:space="preserve"><value>안전하게 삭제할 수 있는 불필요한 파일</value></data>
+  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>이동 확인</value></data>
+  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>삭제 확인</value></data>
+  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>휴지통을 사용할 수 없음</value></data>
+
+  <!-- Section headings -->
+  <data name="Section.Registered.Products" xml:space="preserve"><value>제품</value></data>
+  <data name="Section.Registered.Patches" xml:space="preserve"><value>패치</value></data>
+  <data name="Section.Registered.Details" xml:space="preserve"><value>제품 세부 정보</value></data>
+  <data name="Section.Move.Location" xml:space="preserve"><value>이동 위치</value></data>
+  <data name="Section.SayThanks" xml:space="preserve"><value>감사 인사</value></data>
+
+  <!-- Field labels (used in detail panels) -->
+  <data name="Field.Reason" xml:space="preserve"><value>이유</value></data>
+  <data name="Field.Author" xml:space="preserve"><value>작성자</value></data>
+  <data name="Field.Application" xml:space="preserve"><value>애플리케이션</value></data>
+  <data name="Field.Title" xml:space="preserve"><value>제목</value></data>
+  <data name="Field.Subject" xml:space="preserve"><value>주제</value></data>
+  <data name="Field.Keywords" xml:space="preserve"><value>키워드</value></data>
+  <data name="Field.SigningCertificate" xml:space="preserve"><value>서명 인증서</value></data>
+  <data name="Field.FileSize" xml:space="preserve"><value>파일 크기</value></data>
+  <data name="Field.Comment" xml:space="preserve"><value>설명</value></data>
+  <data name="Field.ProductName" xml:space="preserve"><value>제품 이름</value></data>
+  <data name="Field.File" xml:space="preserve"><value>파일</value></data>
+  <data name="Field.Size" xml:space="preserve"><value>크기</value></data>
+  <data name="Field.Patches" xml:space="preserve"><value>패치</value></data>
+  <!-- Placeholder shown for a registered package whose API ProductName is empty. -->
+  <data name="Field.UnknownProductName" xml:space="preserve"><value>(알 수 없음)</value></data>
+  <data name="Field.PatchesOnly" xml:space="preserve"><value>(패치 전용)</value></data>
+  <data name="Field.Missing" xml:space="preserve"><value>누락</value></data>
+
+  <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
+  <data name="Action.About" xml:space="preserve"><value>정보(_A)</value></data>
+  <data name="Action.Copy" xml:space="preserve"><value>복사</value></data>
+  <data name="Action.Cut" xml:space="preserve"><value>잘라내기</value></data>
+  <data name="Action.Paste" xml:space="preserve"><value>붙여넣기</value></data>
+  <data name="Action.SelectAll" xml:space="preserve"><value>모두 선택</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>찾아보기(_B)...</value></data>
+  <data name="Action.Cancel" xml:space="preserve"><value>취소(_C)</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>업데이트 확인(_U)</value></data>
+  <data name="Action.Close" xml:space="preserve"><value>닫기(_C)</value></data>
+  <data name="Action.Delete" xml:space="preserve"><value>삭제(_D)</value></data>
+  <data name="Action.DeletePermanently" xml:space="preserve"><value>영구 삭제(_D)</value></data>
+  <!-- Alt+D safe here because the Delete button under the overlay is
+       disabled while Completion.IsComplete is true (IsMainContentInteractive
+       binds the body region to false); the mnemonic only resolves to
+       this Done button. IsDefault=True keeps Enter as the primary
+       keyboard shortcut. -->
+  <data name="Action.Done" xml:space="preserve"><value>완료(_D)</value></data>
+  <data name="Action.Details" xml:space="preserve"><value>세부 정보</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>커피 한 잔 사주기(_B)</value></data>
+  <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>GitHub에 별 남기기(_S)</value></data>
+  <data name="Action.MITLicence" xml:space="preserve"><value>MIT 라이선스</value></data>
+  <data name="Action.Move" xml:space="preserve"><value>이동(_M)</value></data>
+  <data name="Action.MoveInstead" xml:space="preserve"><value>대신 이동(_M)</value></data>
+  <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>삭제 대신 이동할 경우의 폴더 경로</value></data>
+  <data name="Action.OpenReleasePage" xml:space="preserve"><value>릴리스 페이지 열기(_R)</value></data>
+  <data name="Action.Rescan" xml:space="preserve"><value>다시 검사(_R)</value></data>
+  <data name="Action.ScanAgain" xml:space="preserve"><value>다시 검사(_S)</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>보고서 보내기</value></data>
+  <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>보내기(_S)</value></data>
+
+  <!-- Automation names (screen reader / accessibility) -->
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>커피 한 잔 사주기</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>커피 한 잔 사주기 (정보 창)</value></data>
+  <data name="Automation.CancelOperation" xml:space="preserve"><value>작업 취소</value></data>
+  <data name="Automation.CancelScan" xml:space="preserve"><value>검사 취소</value></data>
+  <data name="Automation.CancelStartupScan" xml:space="preserve"><value>시작 검사 취소</value></data>
+  <data name="Automation.Close" xml:space="preserve"><value>닫기</value></data>
+  <data name="Automation.CloseWindow" xml:space="preserve"><value>창 닫기</value></data>
+  <data name="Automation.CloseResult" xml:space="preserve"><value>결과를 닫고 메인 창으로 돌아가기</value></data>
+  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>GitHub에 별 남기기</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>GitHub에 별 남기기 (정보 창)</value></data>
+  <data name="Automation.Minimise" xml:space="preserve"><value>최소화</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>불필요한 설치 관리자 파일을 모두 선택한 대상 폴더로 이동</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>불필요한 설치 관리자 파일을 모두 휴지통으로 보내기</value></data>
+  <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
+       They describe the dialog's choice, worded to read correctly
+       straight after "Cancel, button": the window-level alternative is
+       never read, because help text is only spoken for the element with
+       focus and the window itself never has it. -->
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>삭제하면 불필요한 파일이 휴지통으로 보내집니다. 취소하면 삭제하지 않고 닫습니다.</value></data>
+  <data name="Automation.ConfirmMove" xml:space="preserve"><value>이동하면 불필요한 파일이 선택한 대상 폴더에 들어갑니다. 취소하면 파일은 있던 자리에 그대로 남습니다.</value></data>
+  <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>불필요한 파일을 어떻게 처리할지 선택하세요. 안전한 곳으로 이동하거나, 영구 삭제하거나, 취소합니다.</value></data>
+  <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>불필요한 파일을 직접 고른 폴더로 이동</value></data>
+  <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>이 드라이브에서 휴지통을 사용할 수 없으므로 불필요한 파일을 영구 삭제</value></data>
+  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>nofaff.netlify.app으로 전송됩니다. 개수와 라벨만 포함됩니다. 보내기 전에 보낼 내용을 정확히 확인할 수 있습니다.</value></data>
+  <data name="Automation.SayThanks" xml:space="preserve"><value>감사 인사</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>보내기를 누르면 표시된 보고서가 No Faff에 전송됩니다. 취소하면 아무것도 보내지 않습니다.</value></data>
+  <data name="Automation.CheckForUpdates" xml:space="preserve"><value>업데이트 확인</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>GitHub 릴리스 API를 HTTPS로 조회해 새 버전이 있는지 확인합니다.</value></data>
+  <!-- Window-level description for the update-available modal, read by a
+       screen reader on open, mirroring the RecycleUnavailable and
+       ConfirmSendResultLog windows. The version numbers are in the body
+       text; this states the choice. -->
+  <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>새 버전을 내려받으려면 릴리스 페이지를 열고, 현재 버전을 유지하려면 취소하세요.</value></data>
+  <data name="Automation.MITLicence" xml:space="preserve"><value>MIT 라이선스</value></data>
+  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>브라우저에서 github.com의 라이선스 파일을 엽니다.</value></data>
+  <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
+       Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
+       DETAILS). Narrator at default verbosity spells short uppercase
+       tokens letter-by-letter; the override gives it a phrase to read
+       while the visible text stays uppercased for SmallCaps. -->
+  <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>이동 위치</value></data>
+  <data name="Automation.Section.Products" xml:space="preserve"><value>제품</value></data>
+  <data name="Automation.Section.Patches" xml:space="preserve"><value>패치</value></data>
+  <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>제품 세부 정보</value></data>
+  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>이동 대상 폴더</value></data>
+  <data name="Automation.OperationProgress" xml:space="preserve"><value>작업 진행 상황</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>C:\Windows\Installer 다시 검사</value></data>
+  <data name="Automation.ScanningProgress" xml:space="preserve"><value>검사 진행 상황</value></data>
+  <data name="Automation.StartupScanProgress" xml:space="preserve"><value>시작 검사 진행 상황</value></data>
+  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>세부 정보, 불필요한 파일</value></data>
+  <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>정리할 수 있습니다.</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>세부 정보, 등록된 파일</value></data>
+  <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>읽기 전용 목록입니다.</value></data>
+  <!-- Screen-reader sort state for the detail-window lists, set in
+       UpdateSortIndicators as the sorted column header's accessible
+       name (a focused header's name change is announced, and the name
+       override keeps the ▲/▼ glyph out of speech) and mirrored into the
+       list's ItemStatus as a queryable surface. 0 = the sorted column's
+       name (a Field.* label). -->
+  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>{0} 기준 오름차순 정렬됨</value></data>
+  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>{0} 기준 내림차순 정렬됨</value></data>
+  <!-- Names for the scrollable text regions, spoken only once a region
+       can actually scroll and so joins the tab order (the
+       BodyScrollRegion style). -->
+  <data name="Automation.Scroll.ScanResults" xml:space="preserve"><value>검사 결과</value></data>
+  <data name="Automation.Scroll.ResultDetails" xml:space="preserve"><value>결과 세부 정보</value></data>
+  <data name="Automation.Scroll.FileDetails" xml:space="preserve"><value>파일 세부 정보</value></data>
+  <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>대화 상자 텍스트</value></data>
+  <!-- Composes the announced outcome of a scan that found files:
+       0 = the "N unneeded files to clean up" line, 1 = the total size. -->
+  <data name="Automation.ScanResultAnnouncement" xml:space="preserve"><value>{0} ({1})</value></data>
+  <data name="Automation.CompletionErrors" xml:space="preserve"><value>처리할 수 없는 파일</value></data>
+  <!-- Spoken name for the missing-file note's closing hyperlink. The visible
+       link text is a phrase mid-sentence (the [ ]-delimited span of
+       Body.RegisteredMissingFromDisk.SeeAlso, movable by a translator), so a
+       screen reader tabbing onto the link needs a self-contained purpose;
+       it must still contain the visible phrase so voice control can click
+       it by its on-screen words. -->
+  <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>이 폴더에 대한 설명과 파일 복구 방법을 README에서 안내</value></data>
+
+  <!-- Tooltips -->
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>도움이 되었다면 커피 한 잔 사주세요.</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>이게 생각보다 목마른 일입니다!</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>취소가 요청되었습니다. InstallerClean이 현재 단계가 멈출 수 있는 지점에 이를 때까지 기다리고 있습니다. I/O가 많거나 MSI 데이터베이스를 호출하는 동안에는 몇 초 걸릴 수 있습니다.</value></data>
+  <data name="Tooltip.Close" xml:space="preserve"><value>닫기</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>GitHub에 별을 남기거나, Issue를 등록하거나, Discussions에 글을 남겨 주세요. 어떤 피드백이든 환영합니다.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>또는 Issue를 등록하거나 Discussions에 글을 남겨 주세요. 어떤 피드백이든 환영합니다.</value></data>
+  <data name="Tooltip.Minimise" xml:space="preserve"><value>최소화</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>불필요한 파일을 이동 위치로 옮깁니다.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>불필요한 파일을 이동 위치로 옮깁니다. 먼저 위치를 선택하세요.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>불필요한 파일을 휴지통으로 보냅니다.</value></data>
+  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>내장된 Authenticode 인증서의 주체 이름입니다. 인증서 체인은 검증하지 않았습니다.</value></data>
+
+  <!-- Body copy -->
+  <data name="Body.MainExplanation.Lead" xml:space="preserve">
+    <value>아래의 불필요한 파일은 안전하게 삭제할 수 있습니다.</value>
+    <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. Keep it one short clause.</comment>
+  </data>
+  <data name="Body.MainExplanation.Why" xml:space="preserve">
+    <value>이 파일들은 C:\Windows\Installer에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다.</value>
+    <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
+  </data>
+  <data name="Body.MainExplanation.Action" xml:space="preserve">
+    <value>휴지통으로 삭제하거나, 사본을 남겨 두고 싶다면 먼저 다른 곳으로 옮기세요.</value>
+    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
+  </data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>지금 무언가가 Windows Installer를 사용하고 있습니다. 대개 Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램입니다. 그 작업이 실행되는 동안에는 이동과 삭제가 일시 중지되어, InstallerClean이 변경 중인 설치 관리자 캐시를 건드리지 않습니다. 작업이 끝난 뒤 다시 검사하면 두 기능이 돌아옵니다.</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>이 컴퓨터에 이전 Windows Installer 트랜잭션이 일시 중단되어 있습니다. 캐시를 정리하기 전에 그 설치를 다시 진행하거나 롤백하세요(또는 Windows를 다시 시작하세요).</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows가 다음 다시 시작 때 실행할 파일 이름 바꾸기 작업을 예약해 두었고, 이는 설치 관리자 캐시에 영향을 줍니다. 정리하기 전에 Windows를 다시 시작하세요.</value></data>
+  <data name="Body.NoFileSelected" xml:space="preserve"><value>세부 정보를 보려면 파일을 선택하세요.</value></data>
+  <data name="Body.NoProductSelected" xml:space="preserve"><value>세부 정보를 보려면 제품을 선택하세요.</value></data>
+  <data name="Body.NoMetadata" xml:space="preserve"><value>사용할 수 있는 메타데이터가 없습니다.</value></data>
+  <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
+    <value>이 설치 관리자 파일은 삭제되었습니다. InstallerClean이 한 일이 아닙니다. InstallerClean은 프로그램이 아직 필요로 하는 파일을 절대 제거하지 않습니다. 이 파일은 InstallerClean을 실행하기 전에 다른 무언가가 삭제한 것입니다.&#10;&#10;지금은 아무 문제도 일으키지 않으며, 이 파일이 속한 프로그램을 복구, 업데이트 또는 제거하려는 날이 오기 전까지는 문제가 없습니다. 그 단계에서 Windows가 이 파일을 찾지만 파일이 없으므로 실패할 수 있습니다.&#10;&#10;복구를 시도하려면, 해당 프로그램의 설치 관리자를 제조사에서 내려받아 기존 설치본 위에 실행하세요(먼저 제거하지 마세요. 제거 역시 이 파일이 필요한 단계입니다). 가능하다면 현재 설치된 버전을 사용하세요. Windows가 다른 버전을 거부할 수 있기 때문입니다. 이렇게 하면 대개 파일이 복구되고 설정도 보통 그대로 유지되지만, Microsoft가 이를 보장하지는 않습니다. Microsoft의 마지막 수단은 그 프로그램을, 또는 Windows 자체를 다시 설치하는 것입니다.</value>
+    <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
+  </data>
+  <!-- The missing-file note's closing sentence, rendered as a TextBlock
+       with one inline Hyperlink built at load time (RegisteredFilesWindow
+       .BuildSeeAlsoLine). The linked phrase is delimited by [ ] so a
+       translator can place it anywhere in the sentence; the code splits on
+       the first [ and ] into a prefix Run, the Hyperlink (to the README's
+       recovery section), and a suffix Run. A string with no [ ] pair
+       renders verbatim as one Run. -->
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso" xml:space="preserve"><value>README에는 Microsoft의 표현 그대로 [이 폴더에 대한 설명]과 파일을 복구하는 방법이 담겨 있습니다.</value></data>
+  <data name="Body.NoPatches" xml:space="preserve"><value>(없음)</value></data>
+
+  <!-- Reasons (Reason column in the orphaned-files list) -->
+  <data name="Reason.Orphaned" xml:space="preserve"><value>고아</value></data>
+  <data name="Reason.Superseded" xml:space="preserve"><value>대체됨</value></data>
+  <!-- MSI PatchState 4 (obsoleted) is a distinct state from 2
+       (superseded): superseded means a newer patch has replaced
+       this one, obsoleted means the patch has been withdrawn /
+       deprecated by the publisher independent of a replacement.
+       The user-visible outcome (the patch is removable) is the
+       same; the Reason column distinguishes them for users who
+       want the MSI-state precision. -->
+  <data name="Reason.Obsoleted" xml:space="preserve"><value>폐기됨</value></data>
+
+  <!-- Status / progress text -->
+  <data name="Status.Scanning" xml:space="preserve"><value>검사 중...</value></data>
+  <data name="Status.Cancelling" xml:space="preserve"><value>취소 중...</value></data>
+  <data name="Status.StartingScan" xml:space="preserve"><value>검사를 시작하는 중...</value></data>
+  <data name="Status.QueryingApi" xml:space="preserve"><value>설치된 소프트웨어 정보를 Windows에 조회하는 중...</value></data>
+  <data name="Status.ScanningCache" xml:space="preserve"><value>설치 관리자 캐시 폴더를 검사하는 중...</value></data>
+  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>설치된 제품을 열거하는 중...</value></data>
+  <data name="Status.CheckingRegistry" xml:space="preserve"><value>레지스트리에서 추가 패키지를 확인하는 중...</value></data>
+  <!-- 0 = registered package count, 1 = pluralised "package"/"packages" -->
+  <!-- Fires mid-scan as a step-progress update after the registry-
+       fallback pass; not the end-of-scan pill (that's Status.ScanComplete).
+       0 = registered package count, 1 = pluralised "package"/"packages". -->
+  <data name="Status.RegisteredPackagesFound" xml:space="preserve"><value>등록된 {1} {0}개를 찾았습니다.</value></data>
+  <!-- 0 = elapsed time text (e.g. "1.2s") -->
+  <data name="Status.ScanComplete" xml:space="preserve"><value>검사 완료 ({0})</value></data>
+  <data name="Status.FoundProducts" xml:space="preserve"><value>로컬 패키지를 검사하는 중...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
+  <data name="Status.FoundUnused" xml:space="preserve"><value>안전하게 삭제할 수 있는 {1} {0}개를 찾았습니다.</value></data>
+  <data name="Status.PreparingDestination" xml:space="preserve"><value>대상 폴더를 준비하는 중...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun -->
+  <data name="Status.Moving" xml:space="preserve"><value>{1} {0}개를 이동하는 중...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>{1} {0}개를 삭제하는 중...</value></data>
+  <!-- 0 = files processed before cancel, 1 = total files in the batch,
+       2 = pluralised "file"/"files" agreeing with the total. -->
+  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>이동이 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다.</value></data>
+  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>삭제가 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다.</value></data>
+  <!-- 0 = exception type name, 1 = crash log path. Both surface in
+       the status pill so the user can find the log; full message +
+       stack trace go to the log itself. -->
+  <data name="Status.MoveFailed" xml:space="preserve"><value>이동 실패 ({0}). 자세한 내용은 {1}에 있습니다.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>이동 실패 ({0}). 크래시 로그를 기록할 수 없었습니다.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>삭제 실패 ({0}). 자세한 내용은 {1}에 있습니다.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>삭제 실패 ({0}). 크래시 로그를 기록할 수 없었습니다.</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>액세스가 거부되었습니다. 관리자 권한으로 실행하세요.</value></data>
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>검사 실패: 설치 관리자 데이터베이스를 사용할 수 없습니다.</value></data>
+  <data name="Status.ScanCancelled" xml:space="preserve"><value>검사가 취소되었습니다.</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>준비됨</value></data>
+  <!-- 0 = exception type name. Full message + stack trace go only to
+       the crash log because exception messages from elevated framework
+       calls can contain paths from another user's profile. 1 = crash
+       log path. -->
+  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>검사 실패 ({0}). 자세한 내용은 {1}에 있습니다.</value></data>
+  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>검사 실패 ({0}). 크래시 로그를 기록할 수 없었습니다.</value></data>
+
+  <!-- Completion screen -->
+  <data name="Completion.AllClean" xml:space="preserve"><value>모두 깨끗합니다</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>C:\Windows\Installer에 정리할 것이 없습니다</value></data>
+  <!-- 0 = installed product count, 1 = pluralised "product"/"products",
+       2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
+       "less than a second"). The count is the receipt that a real
+       scan ran; on fast machines a duration alone reads as "did
+       nothing". Rendered in the Restore slot of the completion
+       overlay so the all-clean state has the same heading + summary
+       + smaller-receipt shape as the post-Move and post-Delete
+       states. -->
+  <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>{1} {0}개 검사, {2} 소요</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>무언가 작동을 멈추면 다시 복사해 오면 됩니다</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>무언가 작동을 멈추면 휴지통에서 복원하면 됩니다</value></data>
+  <!-- 0 = size freed (e.g. "120.5 MB") -->
+  <data name="Completion.Freed" xml:space="preserve"><value>{0} 확보</value></data>
+  <data name="Completion.Moved" xml:space="preserve"><value>{0} 이동</value></data>
+  <data name="Completion.PartlyMoved" xml:space="preserve"><value>{0} 이동, 일부 파일은 처리하지 못함</value></data>
+  <!-- Heading shown when an operation succeeded for SOME files but
+       errored for others. 0 = total size freed (e.g. "120.5 MB"). -->
+  <data name="Completion.PartlyFreed" xml:space="preserve"><value>{0} 확보, 일부 파일은 처리하지 못함</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
+  <data name="Completion.MoveSummary" xml:space="preserve"><value>{1} {0}개를 {2}(으)로 이동함</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
+  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>{1} {0}개를 {2}(으)로 이동함. {4} {3}개</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{1} {0}개를 휴지통으로 보냄</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{1} {0}개를 휴지통으로 보냄. {3} {2}개</value></data>
+  <!-- Completion copy for a consented permanent delete (the Recycle Bin
+       was unavailable for the volume and the user chose to delete anyway).
+       Distinct from DeleteSummary so it never claims the bin: these files
+       did not reach it and cannot be restored from it. 0 = deleted count,
+       1 = pluralised noun; the WithErrors variants add 2 = error count,
+       3 = pluralised "error"/"errors". Both the clean and the WithErrors
+       copy split singular/plural so the "It"/"They did not go to the
+       Recycle Bin" clause agrees with the count, and the WithErrors copy
+       carries that same clause so a partial failure still never reads as
+       though the files reached the bin. -->
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다.</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다.</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>{1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. {3} {2}개</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. {3} {2}개</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다.</value></data>
+  <!-- The choice offered when Delete finds the Recycle Bin unavailable for
+       the files' volume: Move (the safe default), delete permanently with
+       consent, or cancel. Wording states only the confirmed fact (the probe
+       found the bin unavailable for the drive); it never asserts an
+       unconfirmed cause (off vs corrupt vs full). 0 = file count,
+       1 = pluralised noun, 2 = size display. The singular text omits
+       {0}: "this file" reads better than "this 1 file". The call site
+       passes all three args either way, so the singular's {1} and {2}
+       still resolve. -->
+  <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>이 드라이브에서는 휴지통을 사용할 수 없습니다</value></data>
+  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>그래서 이 {1}({2})은 아직 삭제되지 않았습니다. 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다.</value></data>
+  <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>그래서 이 {1} {0}개는 아직 삭제되지 않았습니다 ({2}). 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>삭제해도 안전합니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 휴지통은 추가 안전장치일 뿐입니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>삭제해도 안전합니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 휴지통은 추가 안전장치일 뿐입니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다.</value></data>
+
+  <!-- Summaries -->
+  <!-- 0 = file count. Singular / plural pairs picked at the call
+       site by Pluralise(count, Singular, Plural); this avoids
+       concatenating a count and a "file is"/"files are" fragment
+       across a placeholder boundary, which does not survive
+       translation into languages where the noun-verb-count agreement
+       crosses the placeholder (Slavic case selection, Arabic dual,
+       Japanese particle placement, etc). A translator rewrites both
+       singular and plural keys per their language's rule. -->
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>아직 필요한 파일 {0}개</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>아직 필요한 파일 {0}개</value></data>
+  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>정리할 불필요한 파일 {0}개</value></data>
+  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>정리할 불필요한 파일 {0}개</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>등록된 파일 {0}개가 누락되었습니다(InstallerClean이 삭제한 것은 아닙니다). 지금은 문제가 없지만, 나중에 해당 프로그램을 복구, 업데이트 또는 제거할 때 실패할 수 있습니다. 어떻게 해야 할지는 세부 정보를 여세요.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>등록된 파일 {0}개가 누락되었습니다(InstallerClean이 삭제한 것은 아닙니다). 지금은 문제가 없지만, 나중에 해당 프로그램들을 복구, 업데이트 또는 제거할 때 실패할 수 있습니다. 어떻게 해야 할지는 세부 정보를 여세요.</value></data>
+  <!-- Informational line shown when the MSI database carries
+       superseded-patch registrations whose files are already gone
+       from disk. Distinct from the missing-from-disk warning
+       because the files are removable already; only the MSI
+       registration is stale. InstallerClean doesn't unregister
+       anything, so this is purely diagnostic. -->
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>오래된 MSI 항목 {0}개가 감지되었습니다(파일이 이미 디스크에서 사라졌습니다. InstallerClean은 그 등록을 해제하지 않습니다).</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>오래된 MSI 항목 {0}개가 감지되었습니다(파일이 이미 디스크에서 사라졌습니다. InstallerClean은 그 등록을 해제하지 않습니다).</value></data>
+  <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
+  <data name="Summary.OperationFiles" xml:space="preserve"><value>{2} {1}개 중 {0}개</value></data>
+  <!-- Orphaned-window footer summary. Unneeded files split into the three
+       removable causes shown in the Reason column: true orphans (the API
+       never claimed them), superseded patches and obsoleted patches.
+       0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
+       3 = size display. No trailing noun, so it agrees at any count. -->
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>고아 {0}개, 대체됨 {1}개, 폐기됨 {2}개 ({3})</value></data>
+  <!-- Registered-window footer summary, reinforcing the "still needed" framing
+       (the flip side of the main window's "unneeded"). Split singular/plural so
+       the noun and verb agree at one file ("file ... is" vs "files ... are").
+       0 = count, 1 = size display. -->
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>아직 필요한 등록된 파일 {0}개 ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>아직 필요한 등록된 파일 {0}개 ({1})</value></data>
+
+  <!-- Confirmation dialogs -->
+  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
+  <data name="Confirm.MoveTitle" xml:space="preserve"><value>{1} {0}개를 이동하시겠습니까? ({2})</value></data>
+  <!-- 0 = destination path -->
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>파일이 {0}(으)로 이동됩니다.</value></data>
+  <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{1} {0}개를 삭제하시겠습니까? ({2})</value></data>
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>파일이 휴지통으로 보내집니다. 백업 사본을 원하시면 대신 이동을 사용하세요.</value></data>
+
+  <!-- Error messages -->
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>관리자 권한 필요</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean에는 관리자 권한이 필요합니다.
+
+마우스 오른쪽 버튼을 클릭한 다음 '관리자 권한으로 실행'을 선택하세요.</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>설치 관리자 데이터베이스를 사용할 수 없음</value></data>
+  <data name="Error.ScanFailedTitle" xml:space="preserve"><value>검사 실패</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer 데이터베이스가 비어 있거나 접근할 수 없는 것으로 보입니다. 이는 새로 설치한 Windows에서도 드문 일이며, 보통 데이터베이스가 손상되었거나 타사 도구가 이를 비웠다는 뜻입니다. 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행하면 대개 복구됩니다.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>설치된 제품을 열거하는 중 액세스가 거부되었습니다. 관리자 권한으로 실행하세요.</value></data>
+  <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
+       in the message because a sysadmin reading the dialog may want
+       to look it up). -->
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>{0}번 연속 실패한 끝에 Windows Installer가 제품 목록 표시를 거부했습니다(마지막 오류 코드 {1}). Windows를 다시 시작하거나, 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행해 보세요.</value></data>
+  <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>잘못된 대상</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>대상에 쓸 수 없음</value></data>
+  <data name="Error.MoveFailedTitle" xml:space="preserve"><value>이동 실패</value></data>
+  <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>삭제 실패</value></data>
+  <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>대상은 Windows Installer 폴더 안에 있을 수 없습니다.</value></data>
+  <!-- 0 = the destination path the user typed -->
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>지정한 대상이 Windows 시스템 폴더 아래로 해석됩니다 ({0}). %SystemRoot%, %ProgramFiles%, %ProgramData% 밖의 경로를 선택하세요.</value></data>
+  <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>공간 부족</value></data>
+  <!-- 0 = destination, 1 = required size, 2 = available size -->
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>{0}에 공간이 부족합니다
+
+필요: {1}
+사용 가능: {2}</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>{0}에 쓸 권한이 없습니다.
+사용자 프로필 안의 폴더나 본인 소유의 드라이브를 사용해 보세요.</value></data>
+  <data name="Error.PathTooLong" xml:space="preserve"><value>Windows가 처리하기에는 경로가 너무 깁니다 ({0}). 더 짧은 경로를 선택하세요.</value></data>
+  <data name="Error.DestinationMissing" xml:space="preserve"><value>폴더가 존재하지 않으며 만들 수도 없습니다 ({0}). 드라이브 문자나 네트워크 경로를 확인하세요.</value></data>
+  <!-- 0 = destination, 1 = crash log path. The exception's .Message
+       intentionally does NOT appear in either string: under elevation
+       framework messages can carry paths from another user's profile.
+       Detail goes to the crash log; the user is pointed at it. -->
+  <data name="Error.IOWriteDestination" xml:space="preserve"><value>Windows가 {0}에 쓸 수 없습니다.
+자세한 내용은 {1}에 있습니다.</value></data>
+  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows가 {0}에 쓸 수 없습니다. 크래시 로그를 기록할 수 없었습니다.</value></data>
+  <data name="Error.WriteDestination" xml:space="preserve"><value>{0}에 쓸 수 없습니다.
+자세한 내용은 {1}에 있습니다.</value></data>
+  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>{0}에 쓸 수 없습니다. 크래시 로그를 기록할 수 없었습니다.</value></data>
+  <data name="Error.MissingSourceFile" xml:space="preserve"><value>파일이 더 이상 존재하지 않습니다.</value></data>
+  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>원본 파일이 심볼릭 링크 또는 정션입니다. 안전을 위해 거부했습니다.</value></data>
+  <!-- Category-only sentences for FileOperationError.LocalisedMessage.
+       These intentionally do NOT include a path or framework message
+       fragment: with the app running elevated, the per-file
+       UnauthorizedAccessException / IOException messages can carry
+       paths from other users' profiles into the displayed error list. -->
+  <data name="Error.AccessDenied" xml:space="preserve"><value>액세스가 거부되었습니다.</value></data>
+  <data name="Error.IOFailure" xml:space="preserve"><value>작업에 실패했습니다. 다시 시도하거나 Windows를 다시 시작하세요.</value></data>
+  <data name="Error.UnknownError" xml:space="preserve"><value>알 수 없는 오류입니다.</value></data>
+  <!-- 0 = shell error code -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>이 파일을 휴지통으로 보낼 수 없습니다(오류 {0}). 파일이 잠겨 있거나, 사용 중이거나, Windows에 의해 차단되었을 수 있습니다. 대신 이동하세요.</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>관리자 권한으로도 Windows가 이 파일에 대한 액세스를 차단했습니다(오류 {0}). 보통 소유권이나 권한 잠금 때문입니다. 대신 이동하세요.</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다(오류 {0}). 그 프로그램이나, 이 파일을 검사 중인 무언가를 닫은 다음 다시 시도하거나, 대신 이동하세요.</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>이 파일을 휴지통으로 보낼 수 없어 영구 삭제되었습니다.</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>파일을 Windows Installer 폴더로 이동하는 것을 거부합니다(대상: {0}).</value></data>
+  <!-- 0 = the relative path the caller passed -->
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>대상은 정규화된 전체 경로여야 합니다(상대 경로는 프로세스의 현재 디렉터리를 기준으로 해석되어 권한 상승 상태에서 안전하지 않습니다): {0}</value></data>
+  <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>브라우저를 열 수 없음</value></data>
+  <data name="UpdateCheck.Title" xml:space="preserve"><value>업데이트 확인</value></data>
+  <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>확인 중...</value></data>
+  <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>최신 버전입니다.</value></data>
+  <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>업데이트 사용 가능</value></data>
+  <!-- 0 = installed version, 1 = latest version on GitHub -->
+  <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>현재 {0} 버전을 사용하고 있습니다.&#10;{1} 버전을 사용할 수 있습니다.</value></data>
+  <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub가 오류 응답을 반환했습니다. 릴리스 API가 속도 제한에 걸렸을 수 있으니, 몇 분 후에 다시 시도하세요.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub의 응답에 인식할 수 있는 릴리스가 없습니다. 나중에 다시 시도하거나, 릴리스 페이지를 직접 여세요.</value></data>
+  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>확인 시간이 초과되었습니다. GitHub와의 연결이 느릴 수 있으니 다시 시도하세요.</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>알 수 없는 이유로 확인에 실패했습니다. 신고가 필요하면 자세한 내용이 crash.log에 있습니다.</value></data>
+  <!-- 0 = the URL the user was trying to reach -->
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>일반 사용자 브라우저에서 링크를 열 수 없었습니다. URL을 클립보드에 복사했으니 직접 여실 수 있습니다:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>일반 사용자 브라우저에서 링크를 열 수 없었고, 클립보드에 복사하는 것도 실패했습니다. URL은 다음과 같습니다:&#10;&#10;{0}</value></data>
+  <!-- 0 = the destination folder whose canonical path changed mid-batch -->
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>일괄 처리 도중 대상 폴더의 정규 경로가 변경되었습니다: {0}</value></data>
+  <!-- 0 = folder, 1 = inner exception message -->
+  <data name="Error.CannotWriteFolder" xml:space="preserve"><value>{0}에 쓸 수 없습니다.</value></data>
+  <!-- 0 = file name -->
+  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>10,000번 시도한 후에도 '{0}'에 대한 고유한 파일 이름을 찾을 수 없었습니다.</value></data>
+
+  <!-- Result log (post-cleanup diagnostic send) -->
+  <data name="ResultLog.Sending" xml:space="preserve"><value>보내는 중...</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>감사합니다! 보고서를 보냈습니다.</value></data>
+  <data name="ResultLog.Failed" xml:space="preserve"><value>보내기에 실패했습니다. 나중에 다시 시도하세요.</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>보낼 보고서가 없습니다.</value></data>
+  <!-- Body header shown in the confirmation modal. Names the
+       recipient and the full URL so the user sees the destination
+       without having to scroll the JSON. -->
+  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>이 내용을 No Faff에 보내시겠습니까?</value></data>
+  <!-- Reassurance line under the JSON. Names the URL once, calls
+       out the no-PII property, and explains the purpose so the
+       user has the context the modal title implies. -->
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>사용자나 사용자의 컴퓨터를 식별할 수 있는 내용은 전혀 없습니다. 그저 InstallerClean이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 알 수 있게 해 줄 뿐입니다. nofaff.netlify.app/api/result-log으로 전송됩니다.</value></data>
+  <!-- AutomationProperties.Name on the JSON preview TextBox so screen
+       readers announce its content rather than "edit, read-only". -->
+  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>결과 로그 미리 보기</value></data>
+
+  <!-- Single instance / startup / crash -->
+  <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean이 이미 실행 중입니다.</value></data>
+  <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <!-- 0 = exception type name (e.g. "IOException"), 1 = crash log path.
+       The full exception message is intentionally NOT formatted in here:
+       framework-provided messages can carry absolute paths from other
+       users' profiles into a dialog the current user reads. The full
+       detail is written to the crash log instead. -->
+  <data name="Startup.UnhandledBody" xml:space="preserve"><value>예기치 않은 오류가 발생하여 InstallerClean을 닫아야 합니다.
+
+{0}
+
+자세한 내용을 기록한 위치:
+{1}</value></data>
+  <data name="Startup.UnhandledBody.NoLog" xml:space="preserve"><value>예기치 않은 오류가 발생하여 InstallerClean을 닫아야 합니다.
+
+{0}
+
+크래시 로그를 기록할 수 없었습니다.</value></data>
+  <data name="Startup.ErrorTitle" xml:space="preserve"><value>시작 오류</value></data>
+  <!-- 0 = exception type name (see Startup.UnhandledBody for why this
+       is the type name and not the message), 1 = crash log path. -->
+  <data name="Startup.FailedToStart" xml:space="preserve"><value>시작하지 못했습니다 ({0}). 자세한 내용을 기록한 위치:
+{1}</value></data>
+  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>시작하지 못했습니다 ({0}). 크래시 로그를 기록할 수 없었습니다.</value></data>
+
+  <!-- File picker -->
+  <data name="FilePicker.ChooseDestinationTitle" xml:space="preserve"><value>이동할 파일의 대상 폴더 선택</value></data>
+
+  <!-- Version display -->
+  <!-- 0 = major.minor.patch (e.g. "1.5.4") -->
+  <data name="Version.Display" xml:space="preserve"><value>버전 {0}</value></data>
+
+  <!-- Plural fragments. Consumed by DisplayHelpers.Pluralise. The
+       singular/plural pair is English-style (n != 1 -> plural). A
+       Slavic / Arabic / etc. host replaces this layer; consumers do
+       not change. -->
+  <data name="Plural.File.Singular" xml:space="preserve"><value>파일</value></data>
+  <data name="Plural.File.Plural" xml:space="preserve"><value>파일</value></data>
+  <data name="Plural.Error.Singular" xml:space="preserve"><value>오류</value></data>
+  <data name="Plural.Error.Plural" xml:space="preserve"><value>오류</value></data>
+  <data name="Plural.Package.Singular" xml:space="preserve"><value>패키지</value></data>
+  <data name="Plural.Package.Plural" xml:space="preserve"><value>패키지</value></data>
+  <data name="Plural.Product.Singular" xml:space="preserve"><value>제품</value></data>
+  <data name="Plural.Product.Plural" xml:space="preserve"><value>제품</value></data>
+  <data name="Plural.Patch.Singular" xml:space="preserve"><value>패치</value></data>
+  <data name="Plural.Patch.Plural" xml:space="preserve"><value>패치</value></data>
+
+  <!-- Display-format fragments used by DisplayHelpers.FormatSize /
+       FormatElapsed / FormatElapsedLong. Number portion stays in
+       string.Format with the consumer's CurrentCulture (so 1.5 GB
+       becomes 1,5 GB on de-DE etc.); only the unit suffix and the
+       sub-second long-form sentence are localisable. -->
+  <data name="Display.Size.GB" xml:space="preserve"><value>{0:F2} GB</value></data>
+  <data name="Display.Size.MB" xml:space="preserve"><value>{0:F1} MB</value></data>
+  <data name="Display.Size.KB" xml:space="preserve"><value>{0:F1} KB</value></data>
+  <data name="Display.Size.B" xml:space="preserve"><value>{0} B</value></data>
+  <data name="Display.Elapsed.Ms" xml:space="preserve"><value>{0:F0}ms</value></data>
+  <data name="Display.Elapsed.S" xml:space="preserve"><value>{0:F1}s</value></data>
+  <data name="Display.ElapsedLong.LessThanASecond" xml:space="preserve"><value>1초 미만</value></data>
+  <data name="Display.ElapsedLong.Seconds" xml:space="preserve"><value>{0:F1}초</value></data>
+
+  <!-- CLI output. Two destinations with different localisation rules.
+       Stdout (everything the user reads at the console) is localised so a
+       non-English sysadmin gets text matching their UI culture. The entries
+       written INTO the Windows Application event log are English-only
+       (no-translate): an RMM tool greps that channel for a known English
+       string regardless of the machine's OS UI culture, so a satellite resx
+       must NOT translate them. Those are the Cli.EventLog* keys, with one
+       exception: Cli.EventLogUnavailable is a stdout warning (it tells the
+       operator that an event-log write failed), so it is localised like the
+       rest of stdout despite the EventLog prefix. -->
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>알 수 없는 인수: '{0}'</value></data>
+  <data name="Cli.Cancelling" xml:space="preserve"><value>취소 중...</value></data>
+  <data name="Cli.Cancelled" xml:space="preserve"><value>취소되었습니다.</value></data>
+  <!-- 0 = exception type name (full message + stack trace go to the
+       crash log; the CLI runs elevated so .Message could include paths
+       from another user's profile if logged to a shared file).
+       1 = crash log path. -->
+  <data name="Cli.GenericError" xml:space="preserve"><value>오류: {0}. 자세한 내용을 {1}에 기록했습니다.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>오류: {0}. 크래시 로그를 기록할 수 없었습니다.</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>C:\Windows\Installer 검사 중...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>정리할 {1} {0}개를 찾았습니다 ({2}).</value></data>
+  <data name="Cli.NothingToDo" xml:space="preserve"><value>수행할 작업이 없습니다.</value></data>
+  <!-- 0 = mode arg ("/s"), 1 = registered package count, 2 = pluralised "package"/"packages" -->
+  <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>{1} {0}개를 삭제하는 중...</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>{1} {0}개를 삭제했습니다.</value></data>
+  <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
+       4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>오류: 이 볼륨에서 휴지통을 사용할 수 없어 아무것도 삭제하지 않았습니다. /m으로 파일을 대신 이동하거나, 휴지통을 다시 활성화한 후 다시 실행하세요.</value></data>
+  <!-- 0 = mode arg ("/d") -->
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하거나 GUI에서 기본값을 설정하세요.</value></data>
+  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>오류: 대상은 Windows Installer 폴더 안에 있을 수 없습니다.</value></data>
+  <!-- 0 = the relative or otherwise unsafe path -->
+  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0}</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>오류: 지정한 대상이 Windows 시스템 폴더 아래로 해석됩니다 ({0}). %SystemRoot%, %ProgramFiles%, %ProgramData% 밖의 경로를 선택하세요.</value></data>
+  <!-- 0 = mode, 1 = destination -->
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>오류: 지금 무언가가 Windows Installer를 사용하고 있습니다. 대개 Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램입니다. 그 작업이 실행되는 동안에는 이동과 삭제가 차단됩니다. 작업이 끝나면 다시 시도하세요.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>오류: 이 컴퓨터에 이전 Windows Installer 트랜잭션이 일시 중단되어 있습니다. 캐시를 정리하기 전에 그 설치를 다시 진행하거나 롤백하세요(또는 Windows를 다시 시작하세요).</value></data>
+  <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>오류: 다시 시작 후 실행되도록 예약된 파일 작업이 설치 관리자 캐시를 대상으로 합니다 ({0}). 정리하기 전에 Windows를 다시 시작하여 그 작업을 완료하세요.</value></data>
+  <!-- Short human labels for the EventLog ({1} slot in
+       Cli.EventLogPendingRebootBlocked). The stdout sentences in
+       Cli.PendingRebootBlocked.* are full localised text; these short
+       labels are English-only (no-translate, like every Cli.EventLog*
+       entry written to the Application channel) so an Application-channel
+       grep can match a known string regardless of OS UI culture. -->
+  <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
+       2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination -->
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>{1} {0}개를 {2}(으)로 이동하는 중...</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun -->
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>{1} {0}개를 이동했습니다.</value></data>
+  <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
+       4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
+  <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
+       processed (a cancel during the scan, or before the first delete or
+       move), so "each /s, /d or /m run writes one summary entry" holds for
+       every run, not only the ones that committed work. -->
+  <!-- Stdout when the CLI cannot acquire the single-instance mutex.
+       The GUI variant (Strings.Startup_AlreadyRunningBody) is written
+       for a user who tried to launch a second window; the CLI variant
+       names the contending parties (GUI or another CLI run) and
+       points at exit code 75 so an RMM operator parsing stdout
+       knows it is transient and safe to retry. -->
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>다른 InstallerClean 프로세스가 단일 인스턴스 잠금을 보유하고 있습니다(GUI 또는 다른 CLI 실행). 종료 코드 75(일시적); 나중에 다시 시도해도 안전합니다.</value></data>
+  <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
+       can't acquire the single-instance mutex, so an RMM consumer of
+       the Application channel sees a record of every scheduled-job
+       firing whether or not it was able to run. -->
+  <!-- 0 = the offending token (original case). Audit entry written when
+       the CLI is invoked with an unrecognised or malformed argument, so a
+       scheduled task with a fat-fingered flag leaves an Application-channel
+       trace instead of exiting silently. English only, like every Cli
+       EventLog string; the stdout message carries the localised text. -->
+  <!-- Audit entry written when the CLI is invoked with no argument at all,
+       so an argless scheduled task fails visibly (non-zero exit) and leaves
+       a record rather than silently succeeding while doing nothing. -->
+  <!-- Audit entry for the LocalisedAccessException and
+       LocalisedInvalidOperationException catches: the message has been
+       built from a resx template with user-controlled args only, so the
+       full text is safe to record. 0 = mode arg, 1 = the localised
+       message (already-formatted). RMM consumers parsing the
+       Application channel see the actionable reason without a separate
+       crash-log lookup. -->
+  <!-- Audit entry for the generic Exception catch: ex.Message is held
+       back (path-leak risk under elevation), only the type name and
+       crash log path travel to the EventLog. 0 = mode arg, 1 = type
+       name, 2 = crash log path. -->
+  <!-- Stdout warning printed once at the end of a CLI run if any
+       Event Log write failed (Group Policy or service unavailable).
+       Tells an RMM consumer expecting an Application entry that the
+       channel was unwritable, not just empty. -->
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>참고: 이벤트 로그 쓰기에 실패했습니다. 응용 프로그램 로그 권한 또는 그룹 정책을 확인하세요.</value></data>
+
+  <!-- crash.log privacy header. Prepended to a fresh crash.log so a
+       user attaching the file to a public bug report has the
+       disclosure before sharing. The "# " prefix lets log readers
+       that skip comment lines (less, grep -v, jq pipelines) skip
+       the header. Stored as one multi-line block; the C# side reads
+       it verbatim and normalises line endings to the host platform. -->
+  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log는 InstallerClean의 처리되지 않은 예외를 기록합니다.
+# 권한 상승 상태에서는 프레임워크의 예외 메시지에 현재
+# 세션의 파일 경로(Windows Installer 쿼리로 열거된 다른
+# 사용자의 프로필 포함)가 들어갈 수 있습니다. 업데이트 확인
+# 이나 결과 로그 POST의 네트워크 실패 메시지에는 대상 URL과
+# 확인된 IP / 프록시 주소가 포함될 수 있습니다. 이 파일을
+# 공개 버그 신고에 첨부하기 전에 두 종류의 정보를 모두
+# 삭제하세요.
+</value></data>
+
+  <!-- CLI help text (printed by /?, -h and the long help flag) -->
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - C:\Windows\Installer 정리</value></data>
+  <data name="Cli.Help.Usage" xml:space="preserve"><value>사용법:</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   이 도움말 표시 (/?, -h도 사용 가능)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  버전 출력 (-v도 사용 가능)</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       검사만 - 불필요한 파일 나열</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       불필요한 파일 삭제 (휴지통)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       저장된 기본 위치로 이동</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 경로   지정한 경로로 이동</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli는 실제 콘솔 프로세스로, 명령 프롬프트를 점유하며,</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>실행이 끝날 때까지 기다립니다. 다른 콘솔 실행 파일처럼 출력을 리디렉션하거나</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>파이프로 넘길 수 있습니다. GUI는 바로 옆 InstallerClean.exe에 들어 있습니다.</value></data>
+  <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>종료 코드:</value></data>
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   성공: 표시된 모든 파일을 처리함</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   실패: 아무것도 처리하지 못함 (잘못된 인수, 검사 실패, 모든 파일 실패)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   부분 처리: 일부 파일은 처리됨, 일부는 실패</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  일시적: 일시적인 상황으로 실행이 차단됨 (메시지 참고)</value></data>
+  <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 취소됨 (Ctrl+C)</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>언어를 변경합니다. 프로그램이 다시 시작됩니다.</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>언어 변경</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>프로그램이 다시 시작됩니다.</value></data>
+
+</root>
