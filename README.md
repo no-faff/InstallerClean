@@ -390,6 +390,7 @@ I'd be very grateful to anyone with a good grasp of English and one of the langu
 - Spanish: [table](docs/translations/es.md) · [resx](src/InstallerClean.Core/Resources/Strings.es.resx)
 - Brazilian Portuguese: [table](docs/translations/pt-BR.md) · [resx](src/InstallerClean.Core/Resources/Strings.pt-BR.resx)
 - Korean: [table](docs/translations/ko.md) · [resx](src/InstallerClean.Core/Resources/Strings.ko.resx)
+- French: [table](docs/translations/fr.md) · [resx](src/InstallerClean.Core/Resources/Strings.fr.resx)
 
 bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
 
