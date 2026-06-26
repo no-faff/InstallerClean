@@ -1,8 +1,8 @@
-# InstallerClean UI in 简体中文 (Simplified Chinese)
+# InstallerClean in 简体中文 (Simplified Chinese)
 
-The text of InstallerClean's interface in English on the left, with the Simplified Chinese translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Simplified Chinese can read through the translation and flag anything that doesn't read well. See [Can you help translate the GUI?](../../README.zh-CN.md#can-you-help-translate-the-gui) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Simplified Chinese translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Simplified Chinese can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.zh-CN.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
 
-A few lines (the app name, version and file-size formats) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.zh-Hans.resx`](../../src/InstallerClean.Core/Resources/Strings.zh-Hans.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
+A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.zh-Hans.resx`](../../src/InstallerClean.Core/Resources/Strings.zh-Hans.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
 ## Window titles
 
@@ -90,7 +90,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Found {0} registered {1}. | 找到 {0} 个已注册的{1}。 |
 | Scan complete ({0}) | 扫描完成（{0}） |
 | Scanning local packages... | 正在扫描本地程序包… |
-| Found {0} {1} to clean up. | 找到 {0} 个{1}，可清理。 |
+| Found {0} {1} you can safely delete. | 找到 {0} 个{1}，可清理。 |
 | Preparing destination folder... | 正在准备目标文件夹… |
 | Moving {0} {1}... | 正在移动 {0} 个{1}… |
 | Deleting {0} {1}... | 正在删除 {0} 个{1}… |
@@ -103,7 +103,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Access denied. Run as administrator. | 访问被拒绝。请以管理员身份运行。 |
 | Scan failed: installer database unavailable. | 扫描失败：安装程序数据库不可用。 |
 | Scan cancelled. | 扫描已取消。 |
-| Done | 完成 |
+| Ready | 完成 |
 | Scan failed ({0}). Details in {1}. | 扫描失败（{0}）。详情见 {1}。 |
 | Scan failed ({0}). The crash log could not be written. | 扫描失败（{0}）。无法写入崩溃日志。 |
 
@@ -179,8 +179,9 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | 检测到 {0} 个过时的 MSI 条目（文件已从磁盘上消失；InstallerClean 不会取消它的注册）。 |
 | {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | 检测到 {0} 个过时的 MSI 条目（文件已从磁盘上消失；InstallerClean 不会取消它们的注册）。 |
 | {0} of {1} {2} | {1} 个{2}中的 {0} 个 |
-| {0} unneeded {1} ({2}) | {0} 个不需要的{1}（{2}） |
-| {0} registered {1} ({2}) | {0} 个已注册的{1}（{2}） |
+| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | 孤立 {0} 个，被取代 {1} 个，已废弃 {2} 个（{3}） |
+| {0} registered file that is still needed ({1}) | {0} 个仍需要的已注册文件（{1}） |
+| {0} registered files that are still needed ({1}) | {0} 个仍需要的已注册文件（{1}） |
 
 ## Confirmation dialogs
 
@@ -394,3 +395,47 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | {0:F1}s | {0:F1}s |
 | less than a second | 不到一秒 |
 | {0:F1} seconds | {0:F1} 秒 |
+
+## Command-line tool (installerclean-cli)
+
+| English | 简体中文 |
+| --- | --- |
+| Unknown argument: '{0}' | 未知参数：'{0}' |
+| Cancelling... | 正在取消… |
+| Cancelled. | 已取消。 |
+| Error: {0}. Details written to {1}. | 错误：{0}。详情已写入 {1}。 |
+| Error: {0}. The crash log could not be written. | 错误：{0}。无法写入崩溃日志。 |
+| Scanning C:\Windows\Installer... | 正在扫描 C:\Windows\Installer… |
+| Found {0} {1} to clean up ({2}). | 找到 {0} 个{1}，可清理（{2}）。 |
+| Nothing to do. | 无需任何操作。 |
+| Deleting {0} {1}... | 正在删除 {0} 个{1}… |
+| Deleted {0} {1}. | 已删除 {0} 个{1}。 |
+| Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | 错误：此驱动器的回收站不可用，因此未删除任何内容。请改用 /m 移动这些文件，或重新启用回收站后再次运行。 |
+| Error: no move destination specified. Use /m PATH or set a default in the GUI. | 错误：未指定移动位置。请使用 /m 路径，或在 GUI 中设置默认位置。 |
+| Error: destination cannot be inside the Windows Installer folder. | 错误：目标位置不能位于 Windows Installer 文件夹内。 |
+| Error: destination must be a fully qualified path. Got: {0} | 错误：目标位置必须是完整路径。收到：{0} |
+| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | 错误：目标位置 {0} 解析到 Windows 系统文件夹下。请选择 %SystemRoot%、%ProgramFiles% 和 %ProgramData% 之外的路径。 |
+| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | 错误：当前有程序正在使用 Windows Installer，通常是 Windows 更新或正在后台安装的程序。在其运行期间，移动和删除均被阻止。请在它完成后重试。 |
+| Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | 错误：本机有一个先前的 Windows Installer 事务处于挂起状态。请在清理缓存前，恢复或回滚该安装（或重启 Windows）。 |
+| Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | 错误：有一个排队等待重启后执行的文件操作指向安装程序缓存（{0}）。请先重启 Windows 完成该操作，然后再清理。 |
+| Moving {0} {1} to {2}... | 正在将 {0} 个{1}移动到 {2}… |
+| Moved {0} {1}. | 已移动 {0} 个{1}。 |
+| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | 另一个 InstallerClean 进程正持有单实例锁（GUI 或另一次 CLI 运行）。退出码 75（暂时性）；稍后可安全重试。 |
+| Note: Event Log writing failed. Check Application log permissions or Group Policy. | 注意：事件日志写入失败。请检查应用程序日志的权限或组策略。 |
+| InstallerClean - clean up C:\Windows\Installer | InstallerClean - 清理 C:\Windows\Installer |
+| Usage: | 用法： |
+|   installerclean-cli --help   Show this help (also accepts /?, -h) |   installerclean-cli --help     显示此帮助（也接受 /?、-h） |
+|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  显示版本号（也接受 -v） |
+|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s         仅扫描 - 列出不需要的文件 |
+|   installerclean-cli /d       Delete removable files (Recycle Bin) |   installerclean-cli /d         删除不需要的文件（回收站） |
+|   installerclean-cli /m       Move to saved default location |   installerclean-cli /m         移动到已保存的默认位置 |
+|   installerclean-cli /m PATH  Move to specified path |   installerclean-cli /m 路径    移动到指定路径 |
+| installerclean-cli is a real console process and blocks the prompt | installerclean-cli 是一个真正的控制台进程，在运行结束前会一直 |
+| until it finishes; redirect or pipe its output as you would any | 占用命令提示符；可像对待其他控制台程序那样重定向或通过管道处理其输出。 |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | GUI 就位于同目录下的 InstallerClean.exe 中。 |
+| Exit codes: | 退出码： |
+|   0   success: every flagged file was processed |   0   成功：已处理每个被标记的文件 |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   失败：未处理任何文件（参数错误、扫描失败或所有文件均失败） |
+|   2   partial: some files processed, some failed |   2   部分完成：部分文件已处理，部分失败 |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  暂时性：临时状况阻止了本次运行（见相关消息） |
+|   130 cancelled (Ctrl+C) |   130 已取消（Ctrl+C） |

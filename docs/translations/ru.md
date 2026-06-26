@@ -1,8 +1,8 @@
-# InstallerClean UI in Русский (Russian)
+# InstallerClean in Русский (Russian)
 
-The text of InstallerClean's interface in English on the left, with the Russian translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Russian can read through the translation and flag anything that doesn't read well. See [Can you help translate the GUI?](../../README.ru.md#can-you-help-translate-the-gui) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Russian translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Russian can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.ru.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
 
-A few lines (the app name, version and file-size formats) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.ru.resx`](../../src/InstallerClean.Core/Resources/Strings.ru.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
+A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.ru.resx`](../../src/InstallerClean.Core/Resources/Strings.ru.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
 ## Window titles
 
@@ -90,7 +90,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Found {0} registered {1}. | Найдено зарегистрированных {1}: {0}. |
 | Scan complete ({0}) | Сканирование завершено ({0}) |
 | Scanning local packages... | Сканирование локальных пакетов... |
-| Found {0} {1} to clean up. | Найдено {0} {1} для очистки. |
+| Found {0} {1} you can safely delete. | Найдено {0} {1} для очистки. |
 | Preparing destination folder... | Подготовка папки назначения... |
 | Moving {0} {1}... | Перемещение: {0} {1}... |
 | Deleting {0} {1}... | Удаление: {0} {1}... |
@@ -103,7 +103,7 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | Access denied. Run as administrator. | Доступ запрещён. Запустите от имени администратора. |
 | Scan failed: installer database unavailable. | Сбой сканирования: база данных установщика недоступна. |
 | Scan cancelled. | Сканирование отменено. |
-| Done | Готово |
+| Ready | Готово |
 | Scan failed ({0}). Details in {1}. | Сбой сканирования ({0}). Подробности в {1}. |
 | Scan failed ({0}). The crash log could not be written. | Сбой сканирования ({0}). Не удалось записать журнал сбоев. |
 
@@ -179,8 +179,9 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | Обнаружена {0} устаревшая запись MSI (файл уже исчез с диска; InstallerClean её не удаляет из реестра). |
 | {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | Обнаружено {0} устаревших записей MSI (файлы уже исчезли с диска; InstallerClean их не удаляет из реестра). |
 | {0} of {1} {2} | {0}/{1} {2} |
-| {0} unneeded {1} ({2}) | {0} {1} для очистки ({2}) |
-| {0} registered {1} ({2}) | {0} {1} ещё нужно ({2}) |
+| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} бесхозных, {1} замещённых, {2} устаревших ({3}) |
+| {0} registered file that is still needed ({1}) | {0} зарегистрированный файл ещё нужен ({1}) |
+| {0} registered files that are still needed ({1}) | {0} зарегистрированных файлов ещё нужно ({1}) |
 
 ## Confirmation dialogs
 
@@ -394,3 +395,47 @@ A few lines (the app name, version and file-size formats) are meant to stay the 
 | {0:F1}s | {0:F1}s |
 | less than a second | меньше секунды |
 | {0:F1} seconds | {0:F1} секунды |
+
+## Command-line tool (installerclean-cli)
+
+| English | Русский |
+| --- | --- |
+| Unknown argument: '{0}' | Неизвестный аргумент: «{0}» |
+| Cancelling... | Отмена... |
+| Cancelled. | Отменено. |
+| Error: {0}. Details written to {1}. | Ошибка: {0}. Подробности записаны в {1}. |
+| Error: {0}. The crash log could not be written. | Ошибка: {0}. Не удалось записать журнал сбоев. |
+| Scanning C:\Windows\Installer... | Сканирование C:\Windows\Installer... |
+| Found {0} {1} to clean up ({2}). | Найдено {0} {1} для очистки ({2}). |
+| Nothing to do. | Делать нечего. |
+| Deleting {0} {1}... | Удаление: {0} {1}... |
+| Deleted {0} {1}. | Удалено {0} {1}. |
+| Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Ошибка: Корзина недоступна для этого диска, поэтому ничего не удалено. Воспользуйтесь /m, чтобы переместить файлы, либо снова включите Корзину и запустите ещё раз. |
+| Error: no move destination specified. Use /m PATH or set a default in the GUI. | Ошибка: не указана папка назначения для перемещения. Воспользуйтесь /m ПУТЬ или задайте значение по умолчанию в GUI. |
+| Error: destination cannot be inside the Windows Installer folder. | Ошибка: папка назначения не может находиться внутри папки Windows Installer. |
+| Error: destination must be a fully qualified path. Got: {0} | Ошибка: папка назначения должна быть полным путём. Получено: {0} |
+| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Ошибка: папка назначения {0} ведёт в системную папку Windows. Выберите путь за пределами %SystemRoot%, %ProgramFiles% и %ProgramData%. |
+| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | Ошибка: прямо сейчас что-то использует Windows Installer, обычно это обновление Windows или программа, устанавливающаяся в фоне. Перемещение и удаление заблокированы, пока это происходит. Повторите попытку, когда всё завершится. |
+| Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Ошибка: на этом компьютере приостановлена предыдущая транзакция Windows Installer. Прежде чем очищать кэш, продолжите или откатите ту установку (либо перезагрузите Windows). |
+| Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | Ошибка: операция с файлом, поставленная в очередь на время после перезагрузки, затрагивает кэш установки ({0}). Прежде чем очищать, перезагрузите Windows, чтобы завершить эту операцию. |
+| Moving {0} {1} to {2}... | Перемещение: {0} {1} в {2}... |
+| Moved {0} {1}. | Перемещено {0} {1}. |
+| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Другой процесс InstallerClean удерживает блокировку единственного экземпляра (GUI или другой запуск CLI). Код выхода 75 (временное состояние); можно повторить попытку позже. |
+| Note: Event Log writing failed. Check Application log permissions or Group Policy. | Примечание: не удалось выполнить запись в журнал событий. Проверьте разрешения журнала «Приложение» или групповую политику. |
+| InstallerClean - clean up C:\Windows\Installer | InstallerClean - очистка C:\Windows\Installer |
+| Usage: | Использование: |
+|   installerclean-cli --help   Show this help (also accepts /?, -h) |   installerclean-cli --help       Показать эту справку (также принимает /?, -h) |
+|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version    Показать версию (также принимает -v) |
+|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s           Только сканирование - список ненужных файлов |
+|   installerclean-cli /d       Delete removable files (Recycle Bin) |   installerclean-cli /d           Удалить ненужные файлы (Корзина) |
+|   installerclean-cli /m       Move to saved default location |   installerclean-cli /m           Переместить в сохранённую папку по умолчанию |
+|   installerclean-cli /m PATH  Move to specified path |   installerclean-cli /m ПУТЬ      Переместить в указанный путь |
+| installerclean-cli is a real console process and blocks the prompt | installerclean-cli это настоящий консольный процесс, он блокирует |
+| until it finishes; redirect or pipe its output as you would any | командную строку до завершения; перенаправляйте или передавайте его вывод |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | по конвейеру, как у любого консольного exe. GUI рядом, в InstallerClean.exe. |
+| Exit codes: | Коды выхода: |
+|   0   success: every flagged file was processed |   0   успех: обработаны все отмеченные файлы |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   ошибка: ничего не обработано (неверные аргументы, сбой сканирования, все файлы с ошибкой) |
+|   2   partial: some files processed, some failed |   2   частично: часть файлов обработана, часть с ошибкой |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  временно: запуск заблокирован временным состоянием (см. сообщение) |
+|   130 cancelled (Ctrl+C) |   130 отменено (Ctrl+C) |
