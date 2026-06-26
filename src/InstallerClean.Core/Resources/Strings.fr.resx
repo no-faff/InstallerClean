@@ -739,12 +739,5 @@ Le crash.log n'a pas pu être écrit.</value></data>
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Changer la langue</value></data>
   <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Le programme redémarrera.</value></data>
 
-  <!-- n==1 (and 0) agreement override for the registered-packages count line:
-       French counts 0 and 1 as "one", and the adjective "enregistré" agrees
-       with the count, so the singular drops the plural -s. Satellite-only, read
-       by name via DisplayHelpers.Pluralise. The CLI count lines need no such
-       override: their participle (Trouvé/Supprimé/Déplacé) precedes its object
-       and so stays invariable. -->
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Trouvé {0} {1} enregistré.</value></data>
-
 </root>
