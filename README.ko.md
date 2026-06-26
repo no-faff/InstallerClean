@@ -243,7 +243,7 @@ v1.8.0에서 이 옵션이 추가된 이후 보내 주신 98건의 보고서(감
 <details>
 <summary>이 보고서는 선택 사항인 ‘보고서 보내기’ 버튼을 통해 전송됩니다. 무언가 전송되기 전에 보게 될 내용은 다음과 같습니다.</summary>
 
-![제목이 "Send this to No Faff?"인 확인 대화상자. 전송될 보고서 전체가 표시됨: 앱 버전, Windows 버전, 검사 횟수, 처리된 파일 수, 확보된 바이트 수. 파일 경로나 이름, 컴퓨터 ID는 포함되지 않으며, 사용자나 컴퓨터를 식별하는 것은 전혀 없고 앱이 동작했는지와 공간이 얼마나 확보됐는지만 담긴다는 안내, 그리고 취소와 보내기 버튼이 있음.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
+![제목이 "Send this to No Faff?"인 확인 대화상자. 전송될 보고서 전체가 표시됨: 앱 버전, Windows 버전, 검사 횟수, 처리된 파일 수, 확보된 바이트 수. 파일 경로나 이름, 컴퓨터 ID는 포함되지 않으며, 사용자나 컴퓨터를 식별하는 것은 전혀 없고 앱이 동작했는지와 공간이 얼마나 확보됐는지만 담긴다는 안내, 그리고 취소와 보내기 버튼이 있음.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

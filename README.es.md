@@ -253,7 +253,7 @@ De los 98 informes que me han enviado amablemente (gracias 🙏) desde que la v1
 <details>
 <summary>Esos informes provienen del botón opcional «Enviar informe». Esto es lo que verás antes de que se envíe nada.</summary>
 
-![Diálogo de confirmación titulado «¿Enviar esto a No Faff?» que muestra el informe completo que se enviaría: la versión de la aplicación, la versión de Windows, los recuentos del análisis, los archivos procesados y los bytes liberados, sin rutas de archivo, sin nombres ni identificadores de equipo, y con una nota de que nada te identifica a ti ni a tu equipo, solo si la aplicación funcionó y cuánto espacio se liberó, con los botones Cancelar y Enviar.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
+![Diálogo de confirmación titulado «¿Enviar esto a No Faff?» que muestra el informe completo que se enviaría: la versión de la aplicación, la versión de Windows, los recuentos del análisis, los archivos procesados y los bytes liberados, sin rutas de archivo, sin nombres ni identificadores de equipo, y con una nota de que nada te identifica a ti ni a tu equipo, solo si la aplicación funcionó y cuánto espacio se liberó, con los botones Cancelar y Enviar.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

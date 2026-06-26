@@ -243,7 +243,7 @@ Von den 98 Berichten, die seit der Einführung der Option in v1.8.0 freundlicher
 <details>
 <summary>Diese Berichte stammen von der optionalen Schaltfläche „Bericht senden“. Das siehst du, bevor etwas gesendet wird.</summary>
 
-![Bestätigungsdialog mit dem Titel „Send this to No Faff?“, der den vollständigen Bericht zeigt, der gesendet würde: App-Version, Windows-Version, Scan-Zähler, verarbeitete Dateien und freigegebene Bytes, ohne Dateipfade, Namen oder Geräte-IDs, mit dem Hinweis, dass nichts dich oder deinen Rechner identifiziert, nur ob die App funktioniert hat und wie viel Platz freigegeben wurde, mit den Schaltflächen Abbrechen und Senden.](docs/screenshots/optional-send-summary-confirmation-dialogue.webp)
+![Bestätigungsdialog mit dem Titel „Send this to No Faff?“, der den vollständigen Bericht zeigt, der gesendet würde: App-Version, Windows-Version, Scan-Zähler, verarbeitete Dateien und freigegebene Bytes, ohne Dateipfade, Namen oder Geräte-IDs, mit dem Hinweis, dass nichts dich oder deinen Rechner identifiziert, nur ob die App funktioniert hat und wie viel Platz freigegeben wurde, mit den Schaltflächen Abbrechen und Senden.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 
