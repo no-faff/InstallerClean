@@ -8,7 +8,8 @@
 // resx; re-run it whenever a satellite changes.
 //
 // USAGE  node scripts/gen-translation-table.mjs <code>
-//   <code> is a shipped satellite code: zh-Hans, de, ko, es, ja, pt-BR, ru, fr.
+//   <code> is a satellite code: zh-Hans, de, ko, es, ja, pt-BR, ru, fr, pl, tr,
+//   id, vi, uk (the draft-only ones are run once their Strings.<code>.resx exists).
 // It reads the English neutral Strings.resx and Strings.<code>.resx, pairs them by
 // key, and writes docs/translations/<code>.md (LF). The 39 human-facing Cli.* keys
 // are now translated and shown in their own group; the 21 machine-contract
@@ -25,6 +26,11 @@ const LANGS = {
   'pt-BR':   { en: 'Brazilian Portuguese',  endo: 'Português (Brasil)', readme: 'README.pt-BR.md' },
   'ru':      { en: 'Russian',               endo: 'Русский',           readme: 'README.ru.md' },
   'fr':      { en: 'French',                endo: 'Français',          readme: 'README.fr.md' },
+  'pl':      { en: 'Polish',                endo: 'Polski',            readme: 'README.pl.md' },
+  'tr':      { en: 'Turkish',               endo: 'Türkçe',            readme: 'README.tr.md' },
+  'id':      { en: 'Indonesian',            endo: 'Bahasa Indonesia',  readme: 'README.id.md' },
+  'vi':      { en: 'Vietnamese',            endo: 'Tiếng Việt',        readme: 'README.vi.md' },
+  'uk':      { en: 'Ukrainian',             endo: 'Українська',        readme: 'README.uk.md' },
 };
 
 const code = process.argv[2];
