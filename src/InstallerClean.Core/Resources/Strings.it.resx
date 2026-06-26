@@ -136,7 +136,7 @@
        binds the body region to false); the mnemonic only resolves to
        this Done button. IsDefault=True keeps Enter as the primary
        keyboard shortcut. -->
-  <data name="Action.Done" xml:space="preserve"><value>_Completato</value></data>
+  <data name="Action.Done" xml:space="preserve"><value>_Fatto</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Dettagli</value></data>
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Offrimi un caffè</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Lascia una _stella su GitHub</value></data>
@@ -308,7 +308,7 @@
   <data name="Status.ScanComplete" xml:space="preserve"><value>Scansione completata ({0})</value></data>
   <data name="Status.FoundProducts" xml:space="preserve"><value>Scansione pacchetti locali...</value></data>
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
-  <data name="Status.FoundUnused" xml:space="preserve"><value>{0} {1} che è possibile eliminare in sicurezza.</value></data>
+  <data name="Status.FoundUnused" xml:space="preserve"><value>{0} {1} che puoi eliminare in sicurezza.</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>Preparazione cartella destinazione...</value></data>
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>Spostamento di {0} {1}...</value></data>

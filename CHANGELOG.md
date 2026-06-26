@@ -25,6 +25,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The orphaned-files window's footer now breaks its count down by cause, "69 orphaned, 0 superseded, 0 obsoleted (1.28 GB)" in place of "69 unneeded files (1.28 GB)", naming the three removable categories from the window's Reason column so the line reinforces what each unneeded file is.
 - The registered-files window's footer now reads "N registered files that are still needed (size)" rather than "N registered files (size)", reinforcing that "registered" means still needed (the flip side of the main window's "unneeded"); it reads "1 registered file that is still needed" at a count of one.
 - The startup splash's final step now reads "Ready" rather than "Done", so the app-is-loaded state no longer shares the one word "Done" with the button that dismisses the post-clean completion screen.
+- The post-clean completion screen's dismiss button reads "Fatto" in Italian rather than "Completato", naming the action you take rather than restating that the operation finished. Suggested by bovirus (#39).
 
 ## [1.9.2] - 2026-06-21
 
