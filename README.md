@@ -395,6 +395,7 @@ I'd be very grateful to anyone with a good grasp of English and one of the langu
 - French: [table](docs/translations/fr.md) · [resx](src/InstallerClean.Core/Resources/Strings.fr.resx)
 - German: [table](docs/translations/de.md) · [resx](src/InstallerClean.Core/Resources/Strings.de.resx)
 - Indonesian: [table](docs/translations/id.md) · [resx](src/InstallerClean.Core/Resources/Strings.id.resx)
+- Vietnamese: [table](docs/translations/vi.md) · [resx](src/InstallerClean.Core/Resources/Strings.vi.resx)
 - Ukrainian: [table](docs/translations/uk.md) · [resx](src/InstallerClean.Core/Resources/Strings.uk.resx)
 
 bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
