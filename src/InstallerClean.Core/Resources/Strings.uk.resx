@@ -1,0 +1,753 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    InstallerClean string resources. Source-of-truth language: en-GB.
+
+    Naming convention: every key starts with a dot-delimited category
+    prefix and is generated as an underscore-delimited C# property name
+    (Window.Main.Title becomes Strings.Window_Main_Title). The visible
+    categories are:
+      Action.*               button labels and verbs
+      Automation.*           AutomationProperties.Name / HelpText values
+      Body.*                 multi-sentence body copy
+      BrowserLaunch.*        copy for the URL-launch failure dialog
+      Cli.*                  console output for the CLI launcher
+      Completion.*           completion overlay copy
+      Confirm.*              confirmation dialog body text
+      ConfirmSendResultLog.* result-log Send confirmation modal
+      CrashLog.*             crash.log header copy
+      Display.*              size/duration formatting fragments
+      Error.*                user-facing error messages
+      Field.*                labels for metadata fields
+      FilePicker.*           folder-browser dialog labels
+      Plural.*               singular/plural fragments used by DisplayHelpers
+      Reason.*               Reason column values in the unneeded files list
+      RecycleUnavailable.*   recycle-bin-unavailable choice dialog
+      ResultLog.*            send-report states (Sending / Sent / Failed)
+      Section.*              heading text inside windows
+      Startup.*              splash + already-running messages
+      Status.*               transient status / progress text
+      Summary.*              status-line counts (registered / orphaned / missing)
+      Tooltip.*              hover tooltips
+      UpdateCheck.*          update-check status / failure detail
+      Version.*              version display string
+      Window.*               window titles and chrome strings
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Window titles -->
+  <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Window.About.Title" xml:space="preserve"><value>Про програму</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>Зареєстровані файли, які не варто видаляти</value></data>
+  <data name="Window.Orphaned.Title" xml:space="preserve"><value>Непотрібні файли, які можна безпечно видалити</value></data>
+  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Підтвердження переміщення</value></data>
+  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Підтвердження видалення</value></data>
+  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>Кошик недоступний</value></data>
+
+  <!-- Section headings -->
+  <data name="Section.Registered.Products" xml:space="preserve"><value>ПРОДУКТИ</value></data>
+  <data name="Section.Registered.Patches" xml:space="preserve"><value>ПАТЧІ</value></data>
+  <data name="Section.Registered.Details" xml:space="preserve"><value>ДЕТАЛІ ПРОДУКТУ</value></data>
+  <data name="Section.Move.Location" xml:space="preserve"><value>КУДИ ПЕРЕМІСТИТИ</value></data>
+  <data name="Section.SayThanks" xml:space="preserve"><value>ПОДЯКУВАТИ</value></data>
+
+  <!-- Field labels (used in detail panels) -->
+  <data name="Field.Reason" xml:space="preserve"><value>Причина</value></data>
+  <data name="Field.Author" xml:space="preserve"><value>Автор</value></data>
+  <data name="Field.Application" xml:space="preserve"><value>Застосунок</value></data>
+  <data name="Field.Title" xml:space="preserve"><value>Назва</value></data>
+  <data name="Field.Subject" xml:space="preserve"><value>Тема</value></data>
+  <data name="Field.Keywords" xml:space="preserve"><value>Ключові слова</value></data>
+  <data name="Field.SigningCertificate" xml:space="preserve"><value>Сертифікат підпису</value></data>
+  <data name="Field.FileSize" xml:space="preserve"><value>Розмір файлу</value></data>
+  <data name="Field.Comment" xml:space="preserve"><value>Коментар</value></data>
+  <data name="Field.ProductName" xml:space="preserve"><value>Назва продукту</value></data>
+  <data name="Field.File" xml:space="preserve"><value>Файл</value></data>
+  <data name="Field.Size" xml:space="preserve"><value>Розмір</value></data>
+  <data name="Field.Patches" xml:space="preserve"><value>Патчі</value></data>
+  <!-- Placeholder shown for a registered package whose API ProductName is empty. -->
+  <data name="Field.UnknownProductName" xml:space="preserve"><value>(невідомо)</value></data>
+  <data name="Field.PatchesOnly" xml:space="preserve"><value>(лише патчі)</value></data>
+  <data name="Field.Missing" xml:space="preserve"><value>відсутній</value></data>
+
+  <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
+  <data name="Action.About" xml:space="preserve"><value>_Про програму</value></data>
+  <data name="Action.Copy" xml:space="preserve"><value>Копіювати</value></data>
+  <data name="Action.Cut" xml:space="preserve"><value>Вирізати</value></data>
+  <data name="Action.Paste" xml:space="preserve"><value>Вставити</value></data>
+  <data name="Action.SelectAll" xml:space="preserve"><value>Виділити все</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>_Огляд...</value></data>
+  <data name="Action.Cancel" xml:space="preserve"><value>_Скасувати</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Перевірити _оновлення</value></data>
+  <data name="Action.Close" xml:space="preserve"><value>_Закрити</value></data>
+  <data name="Action.Delete" xml:space="preserve"><value>_Видалити</value></data>
+  <data name="Action.DeletePermanently" xml:space="preserve"><value>Видалити _назавжди</value></data>
+  <!-- Alt+D safe here because the Delete button under the overlay is
+       disabled while Completion.IsComplete is true (IsMainContentInteractive
+       binds the body region to false); the mnemonic only resolves to
+       this Done button. IsDefault=True keeps Enter as the primary
+       keyboard shortcut. -->
+  <data name="Action.Done" xml:space="preserve"><value>_Готово</value></data>
+  <data name="Action.Details" xml:space="preserve"><value>Деталі</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Пригостіть мене _кавою</value></data>
+  <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Лишити зірку на _GitHub</value></data>
+  <data name="Action.MITLicence" xml:space="preserve"><value>Ліцензія MIT</value></data>
+  <data name="Action.Move" xml:space="preserve"><value>Пере_містити</value></data>
+  <data name="Action.MoveInstead" xml:space="preserve"><value>_Перемістити натомість</value></data>
+  <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Шлях до папки, якщо ви переміщуєте замість видалення</value></data>
+  <data name="Action.OpenReleasePage" xml:space="preserve"><value>_Відкрити сторінку випуску</value></data>
+  <data name="Action.Rescan" xml:space="preserve"><value>_Повторити сканування</value></data>
+  <data name="Action.ScanAgain" xml:space="preserve"><value>_Сканувати знову</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>Надіслати звіт</value></data>
+  <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Надіслати</value></data>
+
+  <!-- Automation names (screen reader / accessibility) -->
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Пригостіть мене кавою</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Пригостіть мене кавою (вікно «Про програму»)</value></data>
+  <data name="Automation.CancelOperation" xml:space="preserve"><value>Скасувати операцію</value></data>
+  <data name="Automation.CancelScan" xml:space="preserve"><value>Скасувати сканування</value></data>
+  <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Скасувати сканування під час запуску</value></data>
+  <data name="Automation.Close" xml:space="preserve"><value>Закрити</value></data>
+  <data name="Automation.CloseWindow" xml:space="preserve"><value>Закрити вікно</value></data>
+  <data name="Automation.CloseResult" xml:space="preserve"><value>Закрити результат і повернутися до головного вікна</value></data>
+  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Лишити зірку на GitHub</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Лишити зірку на GitHub (вікно «Про програму»)</value></data>
+  <data name="Automation.Minimise" xml:space="preserve"><value>Згорнути</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Перемістити всі непотрібні файли інсталятора до обраної папки призначення</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Надіслати всі непотрібні файли інсталятора до Кошика</value></data>
+  <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
+       They describe the dialog's choice, worded to read correctly
+       straight after "Cancel, button": the window-level alternative is
+       never read, because help text is only spoken for the element with
+       focus and the window itself never has it. -->
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>«Видалити» надсилає непотрібні файли до Кошика. «Скасувати» закриває вікно, нічого не видаляючи.</value></data>
+  <data name="Automation.ConfirmMove" xml:space="preserve"><value>«Перемістити» кладе непотрібні файли до обраної папки призначення. «Скасувати» лишає їх там, де вони є.</value></data>
+  <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Виберіть, що робити з непотрібними файлами: перемістити їх у безпечне місце, видалити назавжди або скасувати.</value></data>
+  <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Перемістити непотрібні файли до обраної вами папки</value></data>
+  <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Видалити непотрібні файли назавжди, бо Кошик недоступний для цього диска</value></data>
+  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Надсилається на nofaff.netlify.app. Лише лічильники та позначки. Ви побачите точний вміст перед надсиланням.</value></data>
+  <data name="Automation.SayThanks" xml:space="preserve"><value>Подякувати</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>«Надіслати» надсилає показаний звіт до No Faff. «Скасувати» не надсилає нічого.</value></data>
+  <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Перевірити оновлення</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Перевіряє API випусків GitHub через HTTPS на наявність новішої версії.</value></data>
+  <!-- Window-level description for the update-available modal, read by a
+       screen reader on open, mirroring the RecycleUnavailable and
+       ConfirmSendResultLog windows. The version numbers are in the body
+       text; this states the choice. -->
+  <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Відкрийте сторінку випуску, щоб завантажити новішу версію, або скасуйте, щоб лишити поточну версію.</value></data>
+  <data name="Automation.MITLicence" xml:space="preserve"><value>Ліцензія MIT</value></data>
+  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Відкриває файл ліцензії на github.com у вашому браузері.</value></data>
+  <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
+       Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
+       DETAILS). Narrator at default verbosity spells short uppercase
+       tokens letter-by-letter; the override gives it a phrase to read
+       while the visible text stays uppercased for SmallCaps. -->
+  <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>Куди перемістити</value></data>
+  <data name="Automation.Section.Products" xml:space="preserve"><value>Продукти</value></data>
+  <data name="Automation.Section.Patches" xml:space="preserve"><value>Патчі</value></data>
+  <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Деталі продукту</value></data>
+  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Папка призначення для переміщення</value></data>
+  <data name="Automation.OperationProgress" xml:space="preserve"><value>Перебіг операції</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Просканувати C:\Windows\Installer ще раз</value></data>
+  <data name="Automation.ScanningProgress" xml:space="preserve"><value>Перебіг сканування</value></data>
+  <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Перебіг сканування під час запуску</value></data>
+  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Деталі, непотрібні файли</value></data>
+  <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Доступні для очищення.</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Деталі, зареєстровані файли</value></data>
+  <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Лише для перегляду.</value></data>
+  <!-- Screen-reader sort state for the detail-window lists, set in
+       UpdateSortIndicators as the sorted column header's accessible
+       name (a focused header's name change is announced, and the name
+       override keeps the ▲/▼ glyph out of speech) and mirrored into the
+       list's ItemStatus as a queryable surface. 0 = the sorted column's
+       name (a Field.* label). -->
+  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>Відсортовано за {0}, за зростанням</value></data>
+  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>Відсортовано за {0}, за спаданням</value></data>
+  <!-- Names for the scrollable text regions, spoken only once a region
+       can actually scroll and so joins the tab order (the
+       BodyScrollRegion style). -->
+  <data name="Automation.Scroll.ScanResults" xml:space="preserve"><value>Результати сканування</value></data>
+  <data name="Automation.Scroll.ResultDetails" xml:space="preserve"><value>Деталі результату</value></data>
+  <data name="Automation.Scroll.FileDetails" xml:space="preserve"><value>Деталі файлу</value></data>
+  <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>Текст діалогу</value></data>
+  <!-- Composes the announced outcome of a scan that found files:
+       0 = the "N unneeded files to clean up" line, 1 = the total size. -->
+  <data name="Automation.ScanResultAnnouncement" xml:space="preserve"><value>{0} ({1})</value></data>
+  <data name="Automation.CompletionErrors" xml:space="preserve"><value>Файли, які не вдалося обробити</value></data>
+  <!-- Spoken name for the missing-file note's closing hyperlink. The visible
+       link text is a phrase mid-sentence (the [ ]-delimited span of
+       Body.RegisteredMissingFromDisk.SeeAlso, movable by a translator), so a
+       screen reader tabbing onto the link needs a self-contained purpose;
+       it must still contain the visible phrase so voice control can click
+       it by its on-screen words. -->
+  <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Пояснює цю папку і як відновити файл, у README</value></data>
+
+  <!-- Tooltips -->
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Якщо стало в пригоді, пригостіть мене кавою.</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Робота не з легких, аж у горлі пересохло!</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Скасування запитано. InstallerClean чекає, доки поточний крок дійде до точки зупинки. Це може зайняти кілька секунд під час інтенсивного вводу-виводу чи звернення до бази даних MSI.</value></data>
+  <data name="Tooltip.Close" xml:space="preserve"><value>Закрити</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Лишіть зірку на GitHub, повідомте про проблему (Issue) чи напишіть в обговореннях (Discussions). Будь-який відгук вітається.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>або повідомте про проблему (Issue) чи напишіть в обговореннях (Discussions). Будь-який відгук вітається.</value></data>
+  <data name="Tooltip.Minimise" xml:space="preserve"><value>Згорнути</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма і скільки місця люди звільняють. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити.</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>Перемістити непотрібні файли до вказаного розташування.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Перемістити непотрібні файли до вказаного розташування. Спершу виберіть його.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Надіслати непотрібні файли до Кошика.</value></data>
+  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Назва суб'єкта з вбудованого сертифіката Authenticode. Ланцюжок не перевірено.</value></data>
+
+  <!-- Body copy -->
+  <data name="Body.MainExplanation.Lead" xml:space="preserve">
+    <value>Наведені нижче непотрібні файли можна безпечно видалити.</value>
+    <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. Keep it one short clause.</comment>
+  </data>
+  <data name="Body.MainExplanation.Why" xml:space="preserve">
+    <value>Вони лежать у C:\Windows\Installer, лишившись після видалення програми ({0}), заміни старого патча новішим ({1}) чи відкликання видавцем ({2}). InstallerClean перелічує лише ті файли, які сама Windows позначає як завершені.</value>
+    <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
+  </data>
+  <data name="Body.MainExplanation.Action" xml:space="preserve">
+    <value>Видаліть їх до Кошика або спершу перемістіть в інше місце, якщо хочете зберегти копію.</value>
+    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
+  </data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Щось саме зараз використовує Windows Installer, зазвичай це Windows Update або програма, що встановлюється у фоні. Переміщення та видалення призупинено, доки це триває, тож InstallerClean не чіпатиме кеш інсталятора, поки той змінюється. Коли це завершиться, виконайте повторне сканування, і вони повернуться.</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>На цій машині призупинено попередню транзакцію Windows Installer. Поновіть або відкотіть те встановлення (чи перезавантажте Windows), перш ніж очищати кеш.</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows має перейменування файлу, поставлене в чергу на наступне перезавантаження, яке стосується кешу інсталятора. Перезавантажте Windows, перш ніж очищати.</value></data>
+  <data name="Body.NoFileSelected" xml:space="preserve"><value>Виберіть файл, щоб переглянути деталі.</value></data>
+  <data name="Body.NoProductSelected" xml:space="preserve"><value>Виберіть продукт, щоб переглянути деталі.</value></data>
+  <data name="Body.NoMetadata" xml:space="preserve"><value>Метадані недоступні.</value></data>
+  <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
+    <value>Цей файл інсталятора видалено. InstallerClean цього не робив, він ніколи не видаляє файл, який ще потрібен програмі; цей видалило щось інше, перш ніж ви запустили InstallerClean.&#10;&#10;Зараз це не завдає клопоту і не завдаватиме аж до дня, коли ви спробуєте відновити, оновити чи видалити програму, якій він належить. Тоді цей крок може не вдатися, бо Windows шукатиме цей файл, а його там немає.&#10;&#10;Щоб спробувати це виправити, завантажте інсталятор тієї програми в її виробника та запустіть його поверх наявної копії (не видаляйте програму спершу, бо видалення саме по собі є кроком, який потребує цього файлу). Якщо можете дістати ту версію, яку ви встановили, використайте її, бо Windows може відхилити іншу. Зазвичай це відновлює файл, і ваші налаштування звичайно лишаються недоторканими, але Microsoft цього не гарантує, її власний останній засіб, це перевстановлення програми або самої Windows.</value>
+    <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
+  </data>
+  <!-- The missing-file note's closing sentence, rendered as a TextBlock
+       with one inline Hyperlink built at load time (RegisteredFilesWindow
+       .BuildSeeAlsoLine). The linked phrase is delimited by [ ] so a
+       translator can place it anywhere in the sentence; the code splits on
+       the first [ and ] into a prefix Run, the Hyperlink (to the README's
+       recovery section), and a suffix Run. A string with no [ ] pair
+       renders verbatim as one Run. -->
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso" xml:space="preserve"><value>README [пояснює цю папку] і як відновити файл, словами самої Microsoft.</value></data>
+  <data name="Body.NoPatches" xml:space="preserve"><value>(немає)</value></data>
+
+  <!-- Reasons (Reason column in the orphaned-files list) -->
+  <data name="Reason.Orphaned" xml:space="preserve"><value>Осиротілий</value></data>
+  <data name="Reason.Superseded" xml:space="preserve"><value>Заміщений</value></data>
+  <!-- MSI PatchState 4 (obsoleted) is a distinct state from 2
+       (superseded): superseded means a newer patch has replaced
+       this one, obsoleted means the patch has been withdrawn /
+       deprecated by the publisher independent of a replacement.
+       The user-visible outcome (the patch is removable) is the
+       same; the Reason column distinguishes them for users who
+       want the MSI-state precision. -->
+  <data name="Reason.Obsoleted" xml:space="preserve"><value>Застарілий</value></data>
+
+  <!-- Status / progress text -->
+  <data name="Status.Scanning" xml:space="preserve"><value>Сканування...</value></data>
+  <data name="Status.Cancelling" xml:space="preserve"><value>Скасування...</value></data>
+  <data name="Status.StartingScan" xml:space="preserve"><value>Початок сканування...</value></data>
+  <data name="Status.QueryingApi" xml:space="preserve"><value>Запит до Windows про встановлені програми...</value></data>
+  <data name="Status.ScanningCache" xml:space="preserve"><value>Сканування папки кешу інсталятора...</value></data>
+  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Перелічення встановлених продуктів...</value></data>
+  <data name="Status.CheckingRegistry" xml:space="preserve"><value>Перевірка реєстру на додаткові пакети...</value></data>
+  <!-- 0 = registered package count, 1 = pluralised "package"/"packages" -->
+  <!-- Fires mid-scan as a step-progress update after the registry-
+       fallback pass; not the end-of-scan pill (that's Status.ScanComplete).
+       0 = registered package count, 1 = pluralised "package"/"packages". -->
+  <data name="Status.RegisteredPackagesFound" xml:space="preserve"><value>Знайдено {0} зареєстрованих {1}.</value></data>
+  <!-- 0 = elapsed time text (e.g. "1.2s") -->
+  <data name="Status.ScanComplete" xml:space="preserve"><value>Сканування завершено ({0})</value></data>
+  <data name="Status.FoundProducts" xml:space="preserve"><value>Сканування локальних пакетів...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
+  <data name="Status.FoundUnused" xml:space="preserve"><value>Знайдено {0} {1} для безпечного видалення.</value></data>
+  <data name="Status.PreparingDestination" xml:space="preserve"><value>Підготовка папки призначення...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun -->
+  <data name="Status.Moving" xml:space="preserve"><value>Переміщення: {0} {1}...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Видалення: {0} {1}...</value></data>
+  <!-- 0 = files processed before cancel, 1 = total files in the batch,
+       2 = pluralised "file"/"files" agreeing with the total. -->
+  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Переміщення скасовано. Опрацьовано {0} з {1} {2}.</value></data>
+  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>Видалення скасовано. Опрацьовано {0} з {1} {2}.</value></data>
+  <!-- 0 = exception type name, 1 = crash log path. Both surface in
+       the status pill so the user can find the log; full message +
+       stack trace go to the log itself. -->
+  <data name="Status.MoveFailed" xml:space="preserve"><value>Не вдалося перемістити ({0}). Деталі у {1}.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Не вдалося перемістити ({0}). Не вдалося записати журнал збоїв.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>Не вдалося видалити ({0}). Деталі у {1}.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Не вдалося видалити ({0}). Не вдалося записати журнал збоїв.</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Відмовлено в доступі. Запустіть від імені адміністратора.</value></data>
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Збій сканування: база даних інсталятора недоступна.</value></data>
+  <data name="Status.ScanCancelled" xml:space="preserve"><value>Сканування скасовано.</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>Готово</value></data>
+  <!-- 0 = exception type name. Full message + stack trace go only to
+       the crash log because exception messages from elevated framework
+       calls can contain paths from another user's profile. 1 = crash
+       log path. -->
+  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Збій сканування ({0}). Деталі у {1}.</value></data>
+  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Збій сканування ({0}). Не вдалося записати журнал збоїв.</value></data>
+
+  <!-- Completion screen -->
+  <data name="Completion.AllClean" xml:space="preserve"><value>Усе чисто</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>У C:\Windows\Installer немає чого прибирати</value></data>
+  <!-- 0 = installed product count, 1 = pluralised "product"/"products",
+       2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
+       "less than a second"). The count is the receipt that a real
+       scan ran; on fast machines a duration alone reads as "did
+       nothing". Rendered in the Restore slot of the completion
+       overlay so the all-clean state has the same heading + summary
+       + smaller-receipt shape as the post-Move and post-Delete
+       states. -->
+  <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Проскановано {0} {1} за {2}</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Скопіюйте їх назад, якщо щось перестане працювати</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Відновіть їх із Кошика, якщо щось перестане працювати</value></data>
+  <!-- 0 = size freed (e.g. "120.5 MB") -->
+  <data name="Completion.Freed" xml:space="preserve"><value>Звільнено {0}</value></data>
+  <data name="Completion.Moved" xml:space="preserve"><value>Переміщено {0}</value></data>
+  <data name="Completion.PartlyMoved" xml:space="preserve"><value>Переміщено {0}, деякі файли не вдалося обробити</value></data>
+  <!-- Heading shown when an operation succeeded for SOME files but
+       errored for others. 0 = total size freed (e.g. "120.5 MB"). -->
+  <data name="Completion.PartlyFreed" xml:space="preserve"><value>Звільнено {0}, деякі файли не вдалося обробити</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
+  <data name="Completion.MoveSummary" xml:space="preserve"><value>{0} {1} переміщено до {2}</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
+  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>{0} {1} переміщено до {2}. {3} {4}</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} надіслано до Кошика</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} надіслано до Кошика. {2} {3}</value></data>
+  <!-- Completion copy for a consented permanent delete (the Recycle Bin
+       was unavailable for the volume and the user chose to delete anyway).
+       Distinct from DeleteSummary so it never claims the bin: these files
+       did not reach it and cannot be restored from it. 0 = deleted count,
+       1 = pluralised noun; the WithErrors variants add 2 = error count,
+       3 = pluralised "error"/"errors". Both the clean and the WithErrors
+       copy split singular/plural so the "It"/"They did not go to the
+       Recycle Bin" clause agrees with the count, and the WithErrors copy
+       carries that same clause so a partial failure still never reads as
+       though the files reached the bin. -->
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} безповоротно видалено. Він не потрапив до Кошика.</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} безповоротно видалено. Вони не потрапили до Кошика.</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>{0} {1} безповоротно видалено. Він не потрапив до Кошика. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{0} {1} безповоротно видалено. Вони не потрапили до Кошика. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Це нормально, його можна було безпечно прибрати. InstallerClean прибирає лише ті файли, які Windows позначає як завершені, ніколи той, що ще потрібен програмі. У малоймовірному разі, якщо видалення колись лишило програму нездатною відновитися, оновитися чи видалитися, перевстановлення її від виробника зазвичай повертає файл, хоча Microsoft цього не гарантує.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Це нормально, їх можна було безпечно прибрати. InstallerClean прибирає лише ті файли, які Windows позначає як завершені, ніколи той, що ще потрібен програмі. У малоймовірному разі, якщо видалення колись лишило програму нездатною відновитися, оновитися чи видалитися, перевстановлення її від виробника зазвичай повертає файл, хоча Microsoft цього не гарантує.</value></data>
+  <!-- The choice offered when Delete finds the Recycle Bin unavailable for
+       the files' volume: Move (the safe default), delete permanently with
+       consent, or cancel. Wording states only the confirmed fact (the probe
+       found the bin unavailable for the drive); it never asserts an
+       unconfirmed cause (off vs corrupt vs full). 0 = file count,
+       1 = pluralised noun, 2 = size display. The singular text omits
+       {0}: "this file" reads better than "this 1 file". The call site
+       passes all three args either way, so the singular's {1} and {2}
+       still resolve. -->
+  <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>Кошик недоступний для цього диска</value></data>
+  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>Тож цей {1} ({2}) не видалено. Ви можете перемістити його в безпечне місце або видалити назавжди.</value></data>
+  <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>Тож ці {0} {1} ({2}) не видалено. Ви можете перемістити їх у безпечне місце або видалити назавжди.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Видаляти його безпечно. InstallerClean прибирає лише ті файли, які Windows позначає як завершені, ніколи той, що ще потрібен програмі, а Кошик, це лише додатковий запобіжник. У малоймовірному разі, якщо видалення колись лишило програму нездатною відновитися, оновитися чи видалитися, перевстановлення її від виробника зазвичай повертає файл, хоча Microsoft цього не гарантує.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Видаляти їх безпечно. InstallerClean прибирає лише ті файли, які Windows позначає як завершені, ніколи той, що ще потрібен програмі, а Кошик, це лише додатковий запобіжник. У малоймовірному разі, якщо видалення колись лишило програму нездатною відновитися, оновитися чи видалитися, перевстановлення її від виробника зазвичай повертає файл, хоча Microsoft цього не гарантує.</value></data>
+
+  <!-- Summaries -->
+  <!-- 0 = file count. Singular / plural pairs picked at the call
+       site by Pluralise(count, Singular, Plural); this avoids
+       concatenating a count and a "file is"/"files are" fragment
+       across a placeholder boundary, which does not survive
+       translation into languages where the noun-verb-count agreement
+       crosses the placeholder (Slavic case selection, Arabic dual,
+       Japanese particle placement, etc). A translator rewrites both
+       singular and plural keys per their language's rule. -->
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} файл ще потрібен</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} файлів ще потрібно</value></data>
+  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} непотрібний файл для очищення</value></data>
+  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} непотрібних файлів для очищення</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} зареєстрований файл відсутній (його не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тієї програми може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} зареєстрованих файлів відсутні (їх не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тих програм може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.</value></data>
+  <!-- Informational line shown when the MSI database carries
+       superseded-patch registrations whose files are already gone
+       from disk. Distinct from the missing-from-disk warning
+       because the files are removable already; only the MSI
+       registration is stale. InstallerClean doesn't unregister
+       anything, so this is purely diagnostic. -->
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Виявлено {0} застарілий запис MSI (файл уже зник з диска; InstallerClean не скасовує його реєстрації).</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Виявлено {0} застарілих записів MSI (файли вже зникли з диска; InstallerClean не скасовує їхньої реєстрації).</value></data>
+  <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
+  <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} з {1} {2}</value></data>
+  <!-- Orphaned-window footer summary. Unneeded files split into the three
+       removable causes shown in the Reason column: true orphans (the API
+       never claimed them), superseded patches and obsoleted patches.
+       0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
+       3 = size display. No trailing noun, so it agrees at any count. -->
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} осиротілих, {1} заміщених, {2} застарілих ({3})</value></data>
+  <!-- Registered-window footer summary, reinforcing the "still needed" framing
+       (the flip side of the main window's "unneeded"). Split singular/plural so
+       the noun and verb agree at one file ("file ... is" vs "files ... are").
+       0 = count, 1 = size display. -->
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} зареєстрований файл, який ще потрібен ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} зареєстрованих файлів, які ще потрібні ({1})</value></data>
+
+  <!-- Confirmation dialogs -->
+  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
+  <data name="Confirm.MoveTitle" xml:space="preserve"><value>Перемістити {0} {1} ({2})?</value></data>
+  <!-- 0 = destination path -->
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Файли буде переміщено до {0}.</value></data>
+  <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Видалити {0} {1} ({2})?</value></data>
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Файли буде надіслано до Кошика. Якщо хочете мати резервні копії, скористайтеся переміщенням.</value></data>
+
+  <!-- Error messages -->
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Потрібні права адміністратора</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean потребує прав адміністратора.
+
+Клацніть правою кнопкою миші та виберіть «Запуск від імені адміністратора».</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>База даних інсталятора недоступна</value></data>
+  <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Збій сканування</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>База даних Windows Installer видається порожньою чи недоступною. Це незвично навіть на щойно встановленій Windows і зазвичай означає, що база даних пошкоджена або її очистив сторонній інструмент. Запуск «sfc /scannow» з командного рядка з підвищеними правами зазвичай її відновлює.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Відмовлено в доступі під час перелічення встановлених продуктів. Запустіть від імені адміністратора.</value></data>
+  <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
+       in the message because a sysadmin reading the dialog may want
+       to look it up). -->
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer відмовився перелічувати продукти після {0} послідовних збоїв (останній код помилки {1}). Спробуйте перезавантажити Windows або запустіть «sfc /scannow» з командного рядка з підвищеними правами.</value></data>
+  <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Недійсне призначення</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не вдалося записати в призначення</value></data>
+  <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Не вдалося перемістити</value></data>
+  <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Не вдалося видалити</value></data>
+  <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Призначення не може бути всередині папки Windows Installer.</value></data>
+  <!-- 0 = the destination path the user typed -->
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Призначення {0} вказує всередину системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles% та %ProgramData%.</value></data>
+  <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Недостатньо місця</value></data>
+  <!-- 0 = destination, 1 = required size, 2 = available size -->
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Недостатньо місця в {0}
+
+Потрібно: {1}
+Доступно: {2}</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>У вас немає дозволу на запис у {0}.
+Спробуйте папку у вашому профілі користувача або на диску, який вам належить.</value></data>
+  <data name="Error.PathTooLong" xml:space="preserve"><value>Шлях {0} задовгий для Windows. Виберіть коротший шлях.</value></data>
+  <data name="Error.DestinationMissing" xml:space="preserve"><value>Папки {0} не існує, і її не вдалося створити. Перевірте літеру диска або мережевий шлях.</value></data>
+  <!-- 0 = destination, 1 = crash log path. The exception's .Message
+       intentionally does NOT appear in either string: under elevation
+       framework messages can carry paths from another user's profile.
+       Detail goes to the crash log; the user is pointed at it. -->
+  <data name="Error.IOWriteDestination" xml:space="preserve"><value>Windows не може записати в {0}.
+Деталі у {1}.</value></data>
+  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows не може записати в {0}. Не вдалося записати журнал збоїв.</value></data>
+  <data name="Error.WriteDestination" xml:space="preserve"><value>Не вдається записати в {0}.
+Деталі у {1}.</value></data>
+  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Не вдається записати в {0}. Не вдалося записати журнал збоїв.</value></data>
+  <data name="Error.MissingSourceFile" xml:space="preserve"><value>Файл більше не існує.</value></data>
+  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Вихідний файл, це символьне посилання чи junction; відмовлено з міркувань безпеки.</value></data>
+  <!-- Category-only sentences for FileOperationError.LocalisedMessage.
+       These intentionally do NOT include a path or framework message
+       fragment: with the app running elevated, the per-file
+       UnauthorizedAccessException / IOException messages can carry
+       paths from other users' profiles into the displayed error list. -->
+  <data name="Error.AccessDenied" xml:space="preserve"><value>Відмовлено в доступі.</value></data>
+  <data name="Error.IOFailure" xml:space="preserve"><value>Операція не вдалася. Спробуйте ще раз або перезавантажте Windows.</value></data>
+  <data name="Error.UnknownError" xml:space="preserve"><value>Невідома помилка.</value></data>
+  <!-- 0 = shell error code -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Не вдалося надіслати цей файл до Кошика (помилка {0}). Можливо, він заблокований, використовується чи заблокований Windows. Перемістіть його натомість.</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows заблокувала доступ до цього файлу навіть із правами адміністратора (помилка {0}). Зазвичай це блокування через власника чи дозволи. Перемістіть його натомість.</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>Цей файл відкрито чи заблоковано іншою програмою (помилка {0}). Закрийте ту програму або те, що його сканує, а потім спробуйте ще раз, або перемістіть його натомість.</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Файл видалено назавжди, бо його не вдалося надіслати до Кошика.</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Відмова перемістити файли до папки Windows Installer (призначення: {0}).</value></data>
+  <!-- 0 = the relative path the caller passed -->
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Призначення має бути повним шляхом (відносні шляхи розв'язуються відносно поточного каталогу процесу і небезпечні під час підвищення прав): {0}</value></data>
+  <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Не вдалося відкрити ваш браузер</value></data>
+  <data name="UpdateCheck.Title" xml:space="preserve"><value>Перевірити оновлення</value></data>
+  <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Перевірка...</value></data>
+  <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>Актуальна версія.</value></data>
+  <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Доступне оновлення</value></data>
+  <!-- 0 = installed version, 1 = latest version on GitHub -->
+  <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Ви використовуєте версію {0}.&#10;Доступна версія {1}.</value></data>
+  <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Не вдалося зв'язатися з GitHub. Перевірте інтернет-з'єднання та спробуйте ще раз.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub повернув повідомлення про помилку. Можливо, API випусків обмежує частоту запитів; спробуйте за кілька хвилин.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Відповідь GitHub не містила розпізнаного випуску. Спробуйте пізніше або відкрийте сторінку випусків напряму.</value></data>
+  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Час перевірки вичерпано. Можливо, ваше з'єднання з GitHub повільне; спробуйте ще раз.</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Перевірка не вдалася з невідомої причини. Деталі у crash.log, якщо вам потрібно про це повідомити.</value></data>
+  <!-- 0 = the URL the user was trying to reach -->
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>Не вдалося відкрити посилання у вашому звичайному (неадміністраторському) браузері. URL скопійовано до буфера обміну, щоб ви могли відкрити його вручну:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>Не вдалося відкрити посилання у вашому звичайному (неадміністраторському) браузері, а скопіювати його до буфера обміну теж не вдалося. URL:&#10;&#10;{0}</value></data>
+  <!-- 0 = the destination folder whose canonical path changed mid-batch -->
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Канонічний шлях папки призначення змінився посеред пакета: {0}</value></data>
+  <!-- 0 = folder, 1 = inner exception message -->
+  <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Не вдається записати в {0}.</value></data>
+  <!-- 0 = file name -->
+  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Не вдалося знайти унікальне ім'я файлу для «{0}» після 10 000 спроб.</value></data>
+
+  <!-- Result log (post-cleanup diagnostic send) -->
+  <data name="ResultLog.Sending" xml:space="preserve"><value>Надсилання...</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>Дякую! Звіт надіслано.</value></data>
+  <data name="ResultLog.Failed" xml:space="preserve"><value>Не вдалося надіслати. Спробуйте пізніше.</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>Немає звіту для надсилання.</value></data>
+  <!-- Body header shown in the confirmation modal. Names the
+       recipient and the full URL so the user sees the destination
+       without having to scroll the JSON. -->
+  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>Надіслати це до No Faff?</value></data>
+  <!-- Reassurance line under the JSON. Names the URL once, calls
+       out the no-PII property, and explains the purpose so the
+       user has the context the modal title implies. -->
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Ніщо не ідентифікує вас чи вашу машину; це лише дає мені знати, що InstallerClean працює і скільки місця люди звільняють. Надсилається на nofaff.netlify.app/api/result-log.</value></data>
+  <!-- AutomationProperties.Name on the JSON preview TextBox so screen
+       readers announce its content rather than "edit, read-only". -->
+  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Попередній перегляд журналу результатів</value></data>
+
+  <!-- Single instance / startup / crash -->
+  <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean уже працює.</value></data>
+  <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <!-- 0 = exception type name (e.g. "IOException"), 1 = crash log path.
+       The full exception message is intentionally NOT formatted in here:
+       framework-provided messages can carry absolute paths from other
+       users' profiles into a dialog the current user reads. The full
+       detail is written to the crash log instead. -->
+  <data name="Startup.UnhandledBody" xml:space="preserve"><value>Сталася неочікувана помилка, і InstallerClean потрібно закрити.
+
+{0}
+
+Деталі записано до:
+{1}</value></data>
+  <data name="Startup.UnhandledBody.NoLog" xml:space="preserve"><value>Сталася неочікувана помилка, і InstallerClean потрібно закрити.
+
+{0}
+
+Не вдалося записати журнал збоїв.</value></data>
+  <data name="Startup.ErrorTitle" xml:space="preserve"><value>Помилка запуску</value></data>
+  <!-- 0 = exception type name (see Startup.UnhandledBody for why this
+       is the type name and not the message), 1 = crash log path. -->
+  <data name="Startup.FailedToStart" xml:space="preserve"><value>Не вдалося запустити ({0}). Деталі записано до:
+{1}</value></data>
+  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>Не вдалося запустити ({0}). Не вдалося записати журнал збоїв.</value></data>
+
+  <!-- File picker -->
+  <data name="FilePicker.ChooseDestinationTitle" xml:space="preserve"><value>Виберіть папку призначення для переміщених файлів</value></data>
+
+  <!-- Version display -->
+  <!-- 0 = major.minor.patch (e.g. "1.5.4") -->
+  <data name="Version.Display" xml:space="preserve"><value>Версія {0}</value></data>
+
+  <!-- Plural fragments. Consumed by DisplayHelpers.Pluralise. The
+       singular/plural pair is English-style (n != 1 -> plural). A
+       Slavic / Arabic / etc. host replaces this layer; consumers do
+       not change. -->
+  <data name="Plural.File.Singular" xml:space="preserve"><value>файл</value></data>
+  <data name="Plural.File.Plural" xml:space="preserve"><value>файлів</value></data>
+  <data name="Plural.Error.Singular" xml:space="preserve"><value>помилка</value></data>
+  <data name="Plural.Error.Plural" xml:space="preserve"><value>помилок</value></data>
+  <data name="Plural.Package.Singular" xml:space="preserve"><value>пакет</value></data>
+  <data name="Plural.Package.Plural" xml:space="preserve"><value>пакетів</value></data>
+  <data name="Plural.Product.Singular" xml:space="preserve"><value>продукт</value></data>
+  <data name="Plural.Product.Plural" xml:space="preserve"><value>продуктів</value></data>
+  <data name="Plural.Patch.Singular" xml:space="preserve"><value>патч</value></data>
+  <data name="Plural.Patch.Plural" xml:space="preserve"><value>патчів</value></data>
+
+  <!-- Display-format fragments used by DisplayHelpers.FormatSize /
+       FormatElapsed / FormatElapsedLong. Number portion stays in
+       string.Format with the consumer's CurrentCulture (so 1.5 GB
+       becomes 1,5 GB on de-DE etc.); only the unit suffix and the
+       sub-second long-form sentence are localisable. -->
+  <data name="Display.Size.GB" xml:space="preserve"><value>{0:F2} GB</value></data>
+  <data name="Display.Size.MB" xml:space="preserve"><value>{0:F1} MB</value></data>
+  <data name="Display.Size.KB" xml:space="preserve"><value>{0:F1} KB</value></data>
+  <data name="Display.Size.B" xml:space="preserve"><value>{0} B</value></data>
+  <data name="Display.Elapsed.Ms" xml:space="preserve"><value>{0:F0}ms</value></data>
+  <data name="Display.Elapsed.S" xml:space="preserve"><value>{0:F1}s</value></data>
+  <data name="Display.ElapsedLong.LessThanASecond" xml:space="preserve"><value>менш ніж секунду</value></data>
+  <data name="Display.ElapsedLong.Seconds" xml:space="preserve"><value>{0:F1} секунди</value></data>
+
+  <!-- CLI output. Two destinations with different localisation rules.
+       Stdout (everything the user reads at the console) is localised so a
+       non-English sysadmin gets text matching their UI culture. The entries
+       written INTO the Windows Application event log are English-only
+       (no-translate): an RMM tool greps that channel for a known English
+       string regardless of the machine's OS UI culture, so a satellite resx
+       must NOT translate them. Those are the Cli.EventLog* keys, with one
+       exception: Cli.EventLogUnavailable is a stdout warning (it tells the
+       operator that an event-log write failed), so it is localised like the
+       rest of stdout despite the EventLog prefix. -->
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Невідомий аргумент: «{0}»</value></data>
+  <data name="Cli.Cancelling" xml:space="preserve"><value>Скасування...</value></data>
+  <data name="Cli.Cancelled" xml:space="preserve"><value>Скасовано.</value></data>
+  <!-- 0 = exception type name (full message + stack trace go to the
+       crash log; the CLI runs elevated so .Message could include paths
+       from another user's profile if logged to a shared file).
+       1 = crash log path. -->
+  <data name="Cli.GenericError" xml:space="preserve"><value>Помилка: {0}. Деталі записано до {1}.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Помилка: {0}. Не вдалося записати журнал збоїв.</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Сканування C:\Windows\Installer...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Знайдено {0} {1} для очищення ({2}).</value></data>
+  <data name="Cli.NothingToDo" xml:space="preserve"><value>Нічого робити.</value></data>
+  <!-- 0 = mode arg ("/s"), 1 = registered package count, 2 = pluralised "package"/"packages" -->
+  <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Видалення: {0} {1}...</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Видалено {0} {1}.</value></data>
+  <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
+       4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Помилка: Кошик недоступний для цього тому, тож нічого не видалено. Скористайтеся /m, щоб перемістити файли натомість, або знову ввімкніть Кошик і запустіть ще раз.</value></data>
+  <!-- 0 = mode arg ("/d") -->
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Помилка: не вказано призначення для переміщення. Скористайтеся /m ШЛЯХ або задайте типове в графічному інтерфейсі.</value></data>
+  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Помилка: призначення не може бути всередині папки Windows Installer.</value></data>
+  <!-- 0 = the relative or otherwise unsafe path -->
+  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Помилка: призначення має бути повним шляхом. Отримано: {0}</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Помилка: призначення {0} вказує всередину системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles% та %ProgramData%.</value></data>
+  <!-- 0 = mode, 1 = destination -->
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Помилка: щось саме зараз використовує Windows Installer, зазвичай це Windows Update або програма, що встановлюється у фоні. Переміщення та видалення заблоковано, доки це триває. Спробуйте ще раз, коли воно завершиться.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Помилка: на цій машині призупинено попередню транзакцію Windows Installer. Поновіть або відкотіть те встановлення (чи перезавантажте Windows), перш ніж очищати кеш.</value></data>
+  <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Помилка: поставлена в чергу після перезавантаження файлова операція націлена на кеш інсталятора ({0}). Перезавантажте Windows, щоб завершити ту операцію, перш ніж очищати.</value></data>
+  <!-- Short human labels for the EventLog ({1} slot in
+       Cli.EventLogPendingRebootBlocked). The stdout sentences in
+       Cli.PendingRebootBlocked.* are full localised text; these short
+       labels are English-only (no-translate, like every Cli.EventLog*
+       entry written to the Application channel) so an Application-channel
+       grep can match a known string regardless of OS UI culture. -->
+  <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
+       2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination -->
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Переміщення: {0} {1} до {2}...</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun -->
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>Переміщено {0} {1}.</value></data>
+  <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
+       4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
+  <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
+       processed (a cancel during the scan, or before the first delete or
+       move), so "each /s, /d or /m run writes one summary entry" holds for
+       every run, not only the ones that committed work. -->
+  <!-- Stdout when the CLI cannot acquire the single-instance mutex.
+       The GUI variant (Strings.Startup_AlreadyRunningBody) is written
+       for a user who tried to launch a second window; the CLI variant
+       names the contending parties (GUI or another CLI run) and
+       points at exit code 75 so an RMM operator parsing stdout
+       knows it is transient and safe to retry. -->
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Інший процес InstallerClean утримує блокування єдиного екземпляра (графічний інтерфейс чи інший запуск CLI). Вихід 75 (тимчасовий); можна безпечно повторити пізніше.</value></data>
+  <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
+       can't acquire the single-instance mutex, so an RMM consumer of
+       the Application channel sees a record of every scheduled-job
+       firing whether or not it was able to run. -->
+  <!-- 0 = the offending token (original case). Audit entry written when
+       the CLI is invoked with an unrecognised or malformed argument, so a
+       scheduled task with a fat-fingered flag leaves an Application-channel
+       trace instead of exiting silently. English only, like every Cli
+       EventLog string; the stdout message carries the localised text. -->
+  <!-- Audit entry written when the CLI is invoked with no argument at all,
+       so an argless scheduled task fails visibly (non-zero exit) and leaves
+       a record rather than silently succeeding while doing nothing. -->
+  <!-- Audit entry for the LocalisedAccessException and
+       LocalisedInvalidOperationException catches: the message has been
+       built from a resx template with user-controlled args only, so the
+       full text is safe to record. 0 = mode arg, 1 = the localised
+       message (already-formatted). RMM consumers parsing the
+       Application channel see the actionable reason without a separate
+       crash-log lookup. -->
+  <!-- Audit entry for the generic Exception catch: ex.Message is held
+       back (path-leak risk under elevation), only the type name and
+       crash log path travel to the EventLog. 0 = mode arg, 1 = type
+       name, 2 = crash log path. -->
+  <!-- Stdout warning printed once at the end of a CLI run if any
+       Event Log write failed (Group Policy or service unavailable).
+       Tells an RMM consumer expecting an Application entry that the
+       channel was unwritable, not just empty. -->
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Примітка: не вдалося записати до журналу подій. Перевірте дозволи журналу «Програма» чи групову політику.</value></data>
+
+  <!-- crash.log privacy header. Prepended to a fresh crash.log so a
+       user attaching the file to a public bug report has the
+       disclosure before sharing. The "# " prefix lets log readers
+       that skip comment lines (less, grep -v, jq pipelines) skip
+       the header. Stored as one multi-line block; the C# side reads
+       it verbatim and normalises line endings to the host platform. -->
+  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log фіксує необроблені винятки InstallerClean.
+# Під час підвищення прав повідомлення про винятки фреймворку
+# можуть містити шляхи до файлів із поточного сеансу (зокрема
+# профілі інших користувачів, перелічені запитами Windows
+# Installer). Повідомлення про збій мережі від перевірки оновлень
+# чи надсилання звіту можуть містити URL призначення та
+# розв'язану IP-адресу / адресу проксі. Відредагуйте обидва види
+# даних, перш ніж додавати цей файл до публічного звіту про ваду.
+</value></data>
+
+  <!-- CLI help text (printed by /?, -h and the long help flag) -->
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - очищення C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Usage" xml:space="preserve"><value>Використання:</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   Показати цю довідку (також приймає /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Вивести версію (також приймає -v)</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       Лише сканування, перелік непотрібних файлів</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       Видалити непотрібні файли (Кошик)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       Перемістити в збережене типове розташування</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m ШЛЯХ  Перемістити за вказаним шляхом</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli, це консольний процес, що блокує командний рядок до</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>завершення; перенаправляйте чи передавайте його вивід, як у будь-якого</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>іншого консольного exe. Графічний інтерфейс, у InstallerClean.exe поруч.</value></data>
+  <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Коди виходу:</value></data>
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   успіх: оброблено кожен позначений файл</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   невдача: нічого не оброблено (хибні аргументи, збій сканування, усі файли)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   частково: частину файлів оброблено, частину ні</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  тимчасова: запуск заблокувала тимчасова умова (див. повідомлення)</value></data>
+  <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 скасовано (Ctrl+C)</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Змінити мову. Програму буде перезапущено.</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Змінити мову</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Програму буде перезапущено.</value></data>
+
+  <data name="Plural.File.Few" xml:space="preserve"><value>файли</value></data>
+  <data name="Plural.Error.Few" xml:space="preserve"><value>помилки</value></data>
+  <data name="Plural.Package.Few" xml:space="preserve"><value>пакети</value></data>
+  <data name="Plural.Product.Few" xml:space="preserve"><value>продукти</value></data>
+  <data name="Plural.Patch.Few" xml:space="preserve"><value>патчі</value></data>
+  <data name="Summary.RegisteredStillUsed.Few" xml:space="preserve"><value>{0} файли ще потрібні</value></data>
+  <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} непотрібні файли для очищення</value></data>
+  <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>{0} зареєстровані файли відсутні (їх не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тих програм може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.</value></data>
+  <data name="Summary.StaleMsiEntries.Few" xml:space="preserve"><value>Виявлено {0} застарілі записи MSI (файли вже зникли з диска; InstallerClean не скасовує їхньої реєстрації).</value></data>
+  <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} зареєстровані файли, які ще потрібні ({1})</value></data>
+  <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Знайдено {0} зареєстрований {1}.</value></data>
+  <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Знайдено {0} зареєстровані {1}.</value></data>
+</root>
