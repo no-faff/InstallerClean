@@ -17,7 +17,11 @@ public static class SupportedLanguages
     /// <summary>The neutral resx culture, displayed for any culture without a satellite.</summary>
     public const string Neutral = "en-GB";
 
-    public static readonly IReadOnlyList<string> CultureNames = new[] { Neutral, "it", "ja" };
+    public static readonly IReadOnlyList<string> CultureNames = new[]
+    {
+        Neutral, "zh-Hans", "ru", "es", "ja", "pt-BR", "pl", "tr",
+        "ko", "fr", "it", "de", "id", "vi", "uk",
+    };
 
     /// <summary>
     /// The supported-language name the app is actually displaying for
