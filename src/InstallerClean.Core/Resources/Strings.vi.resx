@@ -1,0 +1,741 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    InstallerClean string resources. Source-of-truth language: en-GB.
+
+    Naming convention: every key starts with a dot-delimited category
+    prefix and is generated as an underscore-delimited C# property name
+    (Window.Main.Title becomes Strings.Window_Main_Title). The visible
+    categories are:
+      Action.*               button labels and verbs
+      Automation.*           AutomationProperties.Name / HelpText values
+      Body.*                 multi-sentence body copy
+      BrowserLaunch.*        copy for the URL-launch failure dialog
+      Cli.*                  console output for the CLI launcher
+      Completion.*           completion overlay copy
+      Confirm.*              confirmation dialog body text
+      ConfirmSendResultLog.* result-log Send confirmation modal
+      CrashLog.*             crash.log header copy
+      Display.*              size/duration formatting fragments
+      Error.*                user-facing error messages
+      Field.*                labels for metadata fields
+      FilePicker.*           folder-browser dialog labels
+      Plural.*               singular/plural fragments used by DisplayHelpers
+      Reason.*               Reason column values in the unneeded files list
+      RecycleUnavailable.*   recycle-bin-unavailable choice dialog
+      ResultLog.*            send-report states (Sending / Sent / Failed)
+      Section.*              heading text inside windows
+      Startup.*              splash + already-running messages
+      Status.*               transient status / progress text
+      Summary.*              status-line counts (registered / orphaned / missing)
+      Tooltip.*              hover tooltips
+      UpdateCheck.*          update-check status / failure detail
+      Version.*              version display string
+      Window.*               window titles and chrome strings
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Window titles -->
+  <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Window.About.Title" xml:space="preserve"><value>Giới thiệu</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>Tệp đã đăng ký, không nên xóa</value></data>
+  <data name="Window.Orphaned.Title" xml:space="preserve"><value>Tệp không cần thiết, có thể xóa an toàn</value></data>
+  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Xác nhận chuyển</value></data>
+  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Xác nhận xóa</value></data>
+  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>Thùng rác không khả dụng</value></data>
+
+  <!-- Section headings -->
+  <data name="Section.Registered.Products" xml:space="preserve"><value>SẢN PHẨM</value></data>
+  <data name="Section.Registered.Patches" xml:space="preserve"><value>BẢN VÁ</value></data>
+  <data name="Section.Registered.Details" xml:space="preserve"><value>CHI TIẾT SẢN PHẨM</value></data>
+  <data name="Section.Move.Location" xml:space="preserve"><value>NƠI CHUYỂN ĐẾN</value></data>
+  <data name="Section.SayThanks" xml:space="preserve"><value>LỜI CẢM ƠN</value></data>
+
+  <!-- Field labels (used in detail panels) -->
+  <data name="Field.Reason" xml:space="preserve"><value>Lý do</value></data>
+  <data name="Field.Author" xml:space="preserve"><value>Tác giả</value></data>
+  <data name="Field.Application" xml:space="preserve"><value>Ứng dụng</value></data>
+  <data name="Field.Title" xml:space="preserve"><value>Tiêu đề</value></data>
+  <data name="Field.Subject" xml:space="preserve"><value>Chủ đề</value></data>
+  <data name="Field.Keywords" xml:space="preserve"><value>Từ khóa</value></data>
+  <data name="Field.SigningCertificate" xml:space="preserve"><value>Chứng chỉ ký</value></data>
+  <data name="Field.FileSize" xml:space="preserve"><value>Kích thước tệp</value></data>
+  <data name="Field.Comment" xml:space="preserve"><value>Chú thích</value></data>
+  <data name="Field.ProductName" xml:space="preserve"><value>Tên sản phẩm</value></data>
+  <data name="Field.File" xml:space="preserve"><value>Tệp</value></data>
+  <data name="Field.Size" xml:space="preserve"><value>Kích thước</value></data>
+  <data name="Field.Patches" xml:space="preserve"><value>Bản vá</value></data>
+  <!-- Placeholder shown for a registered package whose API ProductName is empty. -->
+  <data name="Field.UnknownProductName" xml:space="preserve"><value>(không rõ)</value></data>
+  <data name="Field.PatchesOnly" xml:space="preserve"><value>(chỉ bản vá)</value></data>
+  <data name="Field.Missing" xml:space="preserve"><value>thiếu</value></data>
+
+  <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
+  <data name="Action.About" xml:space="preserve"><value>_Giới thiệu</value></data>
+  <data name="Action.Copy" xml:space="preserve"><value>Sao chép</value></data>
+  <data name="Action.Cut" xml:space="preserve"><value>Cắt</value></data>
+  <data name="Action.Paste" xml:space="preserve"><value>Dán</value></data>
+  <data name="Action.SelectAll" xml:space="preserve"><value>Chọn tất cả</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>_Duyệt...</value></data>
+  <data name="Action.Cancel" xml:space="preserve"><value>_Hủy</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Kiểm tra _cập nhật</value></data>
+  <data name="Action.Close" xml:space="preserve"><value>Đón_g</value></data>
+  <data name="Action.Delete" xml:space="preserve"><value>_Xóa</value></data>
+  <data name="Action.DeletePermanently" xml:space="preserve"><value>_Xóa vĩnh viễn</value></data>
+  <!-- Alt+D safe here because the Delete button under the overlay is
+       disabled while Completion.IsComplete is true (IsMainContentInteractive
+       binds the body region to false); the mnemonic only resolves to
+       this Done button. IsDefault=True keeps Enter as the primary
+       keyboard shortcut. -->
+  <data name="Action.Done" xml:space="preserve"><value>_Xong</value></data>
+  <data name="Action.Details" xml:space="preserve"><value>Chi tiết</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Mời tôi một ly cà phê</value></data>
+  <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Gắn _sao trên GitHub</value></data>
+  <data name="Action.MITLicence" xml:space="preserve"><value>Giấy phép MIT</value></data>
+  <data name="Action.Move" xml:space="preserve"><value>_Chuyển</value></data>
+  <data name="Action.MoveInstead" xml:space="preserve"><value>_Chuyển thay vào đó</value></data>
+  <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Đường dẫn thư mục nếu bạn Chuyển thay vì Xóa</value></data>
+  <data name="Action.OpenReleasePage" xml:space="preserve"><value>_Mở trang phát hành</value></data>
+  <data name="Action.Rescan" xml:space="preserve"><value>_Quét lại</value></data>
+  <data name="Action.ScanAgain" xml:space="preserve"><value>_Quét lại</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>Gửi báo cáo</value></data>
+  <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Gửi</value></data>
+
+  <!-- Automation names (screen reader / accessibility) -->
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Mời tôi một ly cà phê</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Mời tôi một ly cà phê (cửa sổ Giới thiệu)</value></data>
+  <data name="Automation.CancelOperation" xml:space="preserve"><value>Hủy thao tác</value></data>
+  <data name="Automation.CancelScan" xml:space="preserve"><value>Hủy quét</value></data>
+  <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Hủy quét khi khởi động</value></data>
+  <data name="Automation.Close" xml:space="preserve"><value>Đóng</value></data>
+  <data name="Automation.CloseWindow" xml:space="preserve"><value>Đóng cửa sổ</value></data>
+  <data name="Automation.CloseResult" xml:space="preserve"><value>Đóng kết quả và quay lại cửa sổ chính</value></data>
+  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Gắn sao trên GitHub</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Gắn sao trên GitHub (cửa sổ Giới thiệu)</value></data>
+  <data name="Automation.Minimise" xml:space="preserve"><value>Thu nhỏ</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Chuyển tất cả các tệp cài đặt không cần thiết tới thư mục đích đã chọn</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Gửi tất cả các tệp cài đặt không cần thiết vào Thùng rác</value></data>
+  <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
+       They describe the dialog's choice, worded to read correctly
+       straight after "Cancel, button": the window-level alternative is
+       never read, because help text is only spoken for the element with
+       focus and the window itself never has it. -->
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Xóa sẽ gửi các tệp không cần thiết vào Thùng rác. Hủy sẽ đóng lại mà không xóa.</value></data>
+  <data name="Automation.ConfirmMove" xml:space="preserve"><value>Chuyển sẽ đặt các tệp không cần thiết vào thư mục đích đã chọn. Hủy sẽ để chúng nguyên chỗ cũ.</value></data>
+  <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Chọn cách xử lý các tệp không cần thiết: chuyển chúng tới nơi an toàn, xóa vĩnh viễn hoặc hủy.</value></data>
+  <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Chuyển các tệp không cần thiết tới một thư mục bạn chọn</value></data>
+  <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Xóa vĩnh viễn các tệp không cần thiết vì Thùng rác không khả dụng cho ổ đĩa này</value></data>
+  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Gửi tới nofaff.netlify.app. Chỉ gồm số liệu và nhãn. Bạn sẽ thấy nội dung chính xác trước khi gửi.</value></data>
+  <data name="Automation.SayThanks" xml:space="preserve"><value>Gửi lời cảm ơn</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì.</value></data>
+  <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Kiểm tra cập nhật</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Kiểm tra API phát hành của GitHub qua HTTPS để tìm phiên bản mới hơn.</value></data>
+  <!-- Window-level description for the update-available modal, read by a
+       screen reader on open, mirroring the RecycleUnavailable and
+       ConfirmSendResultLog windows. The version numbers are in the body
+       text; this states the choice. -->
+  <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Mở trang phát hành để tải phiên bản mới hơn, hoặc hủy để giữ phiên bản hiện tại.</value></data>
+  <data name="Automation.MITLicence" xml:space="preserve"><value>Giấy phép MIT</value></data>
+  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Mở tệp giấy phép trên github.com trong trình duyệt của bạn.</value></data>
+  <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
+       Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
+       DETAILS). Narrator at default verbosity spells short uppercase
+       tokens letter-by-letter; the override gives it a phrase to read
+       while the visible text stays uppercased for SmallCaps. -->
+  <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>Nơi chuyển đến</value></data>
+  <data name="Automation.Section.Products" xml:space="preserve"><value>Sản phẩm</value></data>
+  <data name="Automation.Section.Patches" xml:space="preserve"><value>Bản vá</value></data>
+  <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Chi tiết sản phẩm</value></data>
+  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Thư mục đích để chuyển đến</value></data>
+  <data name="Automation.OperationProgress" xml:space="preserve"><value>Tiến trình thao tác</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Quét lại C:\Windows\Installer</value></data>
+  <data name="Automation.ScanningProgress" xml:space="preserve"><value>Tiến trình quét</value></data>
+  <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Tiến trình quét khi khởi động</value></data>
+  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Chi tiết, tệp không cần thiết</value></data>
+  <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Có thể dọn dẹp.</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Chi tiết, tệp đã đăng ký</value></data>
+  <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Danh sách chỉ đọc.</value></data>
+  <!-- Screen-reader sort state for the detail-window lists, set in
+       UpdateSortIndicators as the sorted column header's accessible
+       name (a focused header's name change is announced, and the name
+       override keeps the ▲/▼ glyph out of speech) and mirrored into the
+       list's ItemStatus as a queryable surface. 0 = the sorted column's
+       name (a Field.* label). -->
+  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>Đã sắp xếp theo {0}, tăng dần</value></data>
+  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>Đã sắp xếp theo {0}, giảm dần</value></data>
+  <!-- Names for the scrollable text regions, spoken only once a region
+       can actually scroll and so joins the tab order (the
+       BodyScrollRegion style). -->
+  <data name="Automation.Scroll.ScanResults" xml:space="preserve"><value>Kết quả quét</value></data>
+  <data name="Automation.Scroll.ResultDetails" xml:space="preserve"><value>Chi tiết kết quả</value></data>
+  <data name="Automation.Scroll.FileDetails" xml:space="preserve"><value>Chi tiết tệp</value></data>
+  <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>Nội dung hộp thoại</value></data>
+  <!-- Composes the announced outcome of a scan that found files:
+       0 = the "N unneeded files to clean up" line, 1 = the total size. -->
+  <data name="Automation.ScanResultAnnouncement" xml:space="preserve"><value>{0} ({1})</value></data>
+  <data name="Automation.CompletionErrors" xml:space="preserve"><value>Các tệp không thể xử lý</value></data>
+  <!-- Spoken name for the missing-file note's closing hyperlink. The visible
+       link text is a phrase mid-sentence (the [ ]-delimited span of
+       Body.RegisteredMissingFromDisk.SeeAlso, movable by a translator), so a
+       screen reader tabbing onto the link needs a self-contained purpose;
+       it must still contain the visible phrase so voice control can click
+       it by its on-screen words. -->
+  <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Giải thích thư mục này, và cách khôi phục một tệp, trong README</value></data>
+
+  <!-- Tooltips -->
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Nếu thấy hữu ích, hãy mời tôi một ly cà phê.</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Việc này khát nước lắm!</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Đã yêu cầu hủy. InstallerClean đang chờ bước hiện tại tới điểm dừng. Việc này có thể mất vài giây khi I/O nặng hoặc khi đang gọi cơ sở dữ liệu MSI.</value></data>
+  <data name="Tooltip.Close" xml:space="preserve"><value>Đóng</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Gắn sao trên GitHub, báo một Issue hoặc đăng trong Discussions. Mọi phản hồi đều được hoan nghênh.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>hoặc báo một Issue hay đăng trong Discussions. Mọi phản hồi đều được hoan nghênh.</value></data>
+  <data name="Tooltip.Minimise" xml:space="preserve"><value>Thu nhỏ</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không và mọi người đang giải phóng được bao nhiêu dung lượng. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>Chuyển các tệp không cần thiết tới Nơi chuyển đến.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Chuyển các tệp không cần thiết tới Nơi chuyển đến. Hãy chọn một nơi trước.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Gửi các tệp không cần thiết vào Thùng rác.</value></data>
+  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Tên chủ thể từ chứng chỉ Authenticode được nhúng. Chưa xác minh chuỗi.</value></data>
+
+  <!-- Body copy -->
+  <data name="Body.MainExplanation.Lead" xml:space="preserve">
+    <value>Các tệp không cần thiết bên dưới có thể xóa an toàn.</value>
+    <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. Keep it one short clause.</comment>
+  </data>
+  <data name="Body.MainExplanation.Why" xml:space="preserve">
+    <value>Chúng nằm trong C:\Windows\Installer, còn sót lại khi một chương trình bị gỡ cài đặt ({0}), khi một bản vá mới hơn thay thế một bản ({1}) hoặc khi nhà phát hành thu hồi nó ({2}). InstallerClean chỉ liệt kê những tệp mà chính Windows báo là đã dùng xong.</value>
+    <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
+  </data>
+  <data name="Body.MainExplanation.Action" xml:space="preserve">
+    <value>Xóa chúng vào Thùng rác, hoặc Chuyển chúng đi nơi khác trước nếu bạn muốn giữ một bản sao.</value>
+    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
+  </data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Có thứ gì đó đang dùng Windows Installer ngay lúc này, thường là Windows Update hoặc một chương trình đang cài đặt ở chế độ nền. Chuyển và Xóa được tạm dừng trong khi việc đó chạy, nên InstallerClean sẽ không đụng tới bộ nhớ đệm trình cài đặt khi nó đang thay đổi. Khi việc đó xong, hãy Quét lại và chúng sẽ quay lại.</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Một giao dịch Windows Installer trước đó đang bị tạm dừng trên máy này. Hãy tiếp tục hoặc hoàn tác lần cài đặt đó (hoặc khởi động lại Windows) trước khi dọn bộ nhớ đệm.</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows có một thao tác đổi tên tệp được xếp hàng cho lần khởi động lại tới, ảnh hưởng tới bộ nhớ đệm Installer. Hãy khởi động lại Windows trước khi dọn.</value></data>
+  <data name="Body.NoFileSelected" xml:space="preserve"><value>Chọn một tệp để xem chi tiết.</value></data>
+  <data name="Body.NoProductSelected" xml:space="preserve"><value>Chọn một sản phẩm để xem chi tiết.</value></data>
+  <data name="Body.NoMetadata" xml:space="preserve"><value>Không có siêu dữ liệu.</value></data>
+  <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
+    <value>Tệp cài đặt này đã bị xóa. InstallerClean không làm việc đó, nó không bao giờ xóa một tệp mà chương trình vẫn cần; thứ gì đó khác đã xóa tệp này trước khi bạn chạy InstallerClean.&#10;&#10;Bây giờ nó không gây rắc rối gì, và sẽ không gây rắc rối cho tới ngày bạn cố sửa chữa, cập nhật hoặc gỡ cài đặt chương trình mà nó thuộc về. Khi đó bước này có thể thất bại, vì Windows tìm tệp này mà không thấy.&#10;&#10;Để thử khắc phục, hãy tải trình cài đặt của chương trình đó từ nhà sản xuất và chạy nó đè lên bản hiện có của bạn (đừng gỡ cài đặt trước, gỡ cài đặt bản thân nó là một bước cần tới tệp này). Hãy dùng đúng phiên bản bạn đã cài nếu có thể, vì Windows có thể từ chối một phiên bản khác. Cách này thường khôi phục được tệp, và cài đặt của bạn thường không bị động đến, nhưng Microsoft không bảo đảm điều đó, phương án cuối cùng của họ là cài đặt lại chương trình, hoặc chính Windows.</value>
+    <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
+  </data>
+  <!-- The missing-file note's closing sentence, rendered as a TextBlock
+       with one inline Hyperlink built at load time (RegisteredFilesWindow
+       .BuildSeeAlsoLine). The linked phrase is delimited by [ ] so a
+       translator can place it anywhere in the sentence; the code splits on
+       the first [ and ] into a prefix Run, the Hyperlink (to the README's
+       recovery section), and a suffix Run. A string with no [ ] pair
+       renders verbatim as one Run. -->
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso" xml:space="preserve"><value>README [giải thích thư mục này], và cách khôi phục một tệp, bằng chính lời của Microsoft.</value></data>
+  <data name="Body.NoPatches" xml:space="preserve"><value>(không có)</value></data>
+
+  <!-- Reasons (Reason column in the orphaned-files list) -->
+  <data name="Reason.Orphaned" xml:space="preserve"><value>Mồ côi</value></data>
+  <data name="Reason.Superseded" xml:space="preserve"><value>Bị thay thế</value></data>
+  <!-- MSI PatchState 4 (obsoleted) is a distinct state from 2
+       (superseded): superseded means a newer patch has replaced
+       this one, obsoleted means the patch has been withdrawn /
+       deprecated by the publisher independent of a replacement.
+       The user-visible outcome (the patch is removable) is the
+       same; the Reason column distinguishes them for users who
+       want the MSI-state precision. -->
+  <data name="Reason.Obsoleted" xml:space="preserve"><value>Đã lỗi thời</value></data>
+
+  <!-- Status / progress text -->
+  <data name="Status.Scanning" xml:space="preserve"><value>Đang quét...</value></data>
+  <data name="Status.Cancelling" xml:space="preserve"><value>Đang hủy...</value></data>
+  <data name="Status.StartingScan" xml:space="preserve"><value>Đang bắt đầu quét...</value></data>
+  <data name="Status.QueryingApi" xml:space="preserve"><value>Đang hỏi Windows về phần mềm đã cài...</value></data>
+  <data name="Status.ScanningCache" xml:space="preserve"><value>Đang quét thư mục bộ nhớ đệm trình cài đặt...</value></data>
+  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Đang liệt kê các sản phẩm đã cài...</value></data>
+  <data name="Status.CheckingRegistry" xml:space="preserve"><value>Đang kiểm tra registry để tìm các gói bổ sung...</value></data>
+  <!-- 0 = registered package count, 1 = pluralised "package"/"packages" -->
+  <!-- Fires mid-scan as a step-progress update after the registry-
+       fallback pass; not the end-of-scan pill (that's Status.ScanComplete).
+       0 = registered package count, 1 = pluralised "package"/"packages". -->
+  <data name="Status.RegisteredPackagesFound" xml:space="preserve"><value>Đã tìm thấy {0} {1} đã đăng ký.</value></data>
+  <!-- 0 = elapsed time text (e.g. "1.2s") -->
+  <data name="Status.ScanComplete" xml:space="preserve"><value>Quét xong ({0})</value></data>
+  <data name="Status.FoundProducts" xml:space="preserve"><value>Đang quét các gói cục bộ...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
+  <data name="Status.FoundUnused" xml:space="preserve"><value>Đã tìm thấy {0} {1} bạn có thể xóa an toàn.</value></data>
+  <data name="Status.PreparingDestination" xml:space="preserve"><value>Đang chuẩn bị thư mục đích...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun -->
+  <data name="Status.Moving" xml:space="preserve"><value>Đang chuyển {0} {1}...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Đang xóa {0} {1}...</value></data>
+  <!-- 0 = files processed before cancel, 1 = total files in the batch,
+       2 = pluralised "file"/"files" agreeing with the total. -->
+  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Đã hủy chuyển. Đã xử lý {0}/{1} {2}.</value></data>
+  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>Đã hủy xóa. Đã xử lý {0}/{1} {2}.</value></data>
+  <!-- 0 = exception type name, 1 = crash log path. Both surface in
+       the status pill so the user can find the log; full message +
+       stack trace go to the log itself. -->
+  <data name="Status.MoveFailed" xml:space="preserve"><value>Chuyển thất bại ({0}). Chi tiết trong {1}.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Chuyển thất bại ({0}). Không thể ghi nhật ký sự cố.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>Xóa thất bại ({0}). Chi tiết trong {1}.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Xóa thất bại ({0}). Không thể ghi nhật ký sự cố.</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Truy cập bị từ chối. Hãy chạy với quyền quản trị viên.</value></data>
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Quét thất bại: cơ sở dữ liệu trình cài đặt không khả dụng.</value></data>
+  <data name="Status.ScanCancelled" xml:space="preserve"><value>Đã hủy quét.</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>Sẵn sàng</value></data>
+  <!-- 0 = exception type name. Full message + stack trace go only to
+       the crash log because exception messages from elevated framework
+       calls can contain paths from another user's profile. 1 = crash
+       log path. -->
+  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Quét thất bại ({0}). Chi tiết trong {1}.</value></data>
+  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Quét thất bại ({0}). Không thể ghi nhật ký sự cố.</value></data>
+
+  <!-- Completion screen -->
+  <data name="Completion.AllClean" xml:space="preserve"><value>Đã sạch</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Không còn gì để dọn trong C:\Windows\Installer</value></data>
+  <!-- 0 = installed product count, 1 = pluralised "product"/"products",
+       2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
+       "less than a second"). The count is the receipt that a real
+       scan ran; on fast machines a duration alone reads as "did
+       nothing". Rendered in the Restore slot of the completion
+       overlay so the all-clean state has the same heading + summary
+       + smaller-receipt shape as the post-Move and post-Delete
+       states. -->
+  <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Đã quét {0} {1} trong {2}</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Chép chúng trở lại nếu có gì ngừng hoạt động</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Khôi phục chúng từ Thùng rác nếu có gì ngừng hoạt động</value></data>
+  <!-- 0 = size freed (e.g. "120.5 MB") -->
+  <data name="Completion.Freed" xml:space="preserve"><value>Đã giải phóng {0}</value></data>
+  <data name="Completion.Moved" xml:space="preserve"><value>Đã chuyển {0}</value></data>
+  <data name="Completion.PartlyMoved" xml:space="preserve"><value>Đã chuyển {0}, một số tệp không thể xử lý</value></data>
+  <!-- Heading shown when an operation succeeded for SOME files but
+       errored for others. 0 = total size freed (e.g. "120.5 MB"). -->
+  <data name="Completion.PartlyFreed" xml:space="preserve"><value>Đã giải phóng {0}, một số tệp không thể xử lý</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
+  <data name="Completion.MoveSummary" xml:space="preserve"><value>Đã chuyển {0} {1} tới {2}</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
+  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>Đã chuyển {0} {1} tới {2}. {3} {4}</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>Đã gửi {0} {1} vào Thùng rác</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>Đã gửi {0} {1} vào Thùng rác. {2} {3}</value></data>
+  <!-- Completion copy for a consented permanent delete (the Recycle Bin
+       was unavailable for the volume and the user chose to delete anyway).
+       Distinct from DeleteSummary so it never claims the bin: these files
+       did not reach it and cannot be restored from it. 0 = deleted count,
+       1 = pluralised noun; the WithErrors variants add 2 = error count,
+       3 = pluralised "error"/"errors". Both the clean and the WithErrors
+       copy split singular/plural so the "It"/"They did not go to the
+       Recycle Bin" clause agrees with the count, and the WithErrors copy
+       carries that same clause so a partial failure still never reads as
+       though the files reached the bin. -->
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác.</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác.</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Không sao, những tệp đó đều an toàn để loại bỏ. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Không sao, những tệp đó đều an toàn để loại bỏ. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó.</value></data>
+  <!-- The choice offered when Delete finds the Recycle Bin unavailable for
+       the files' volume: Move (the safe default), delete permanently with
+       consent, or cancel. Wording states only the confirmed fact (the probe
+       found the bin unavailable for the drive); it never asserts an
+       unconfirmed cause (off vs corrupt vs full). 0 = file count,
+       1 = pluralised noun, 2 = size display. The singular text omits
+       {0}: "this file" reads better than "this 1 file". The call site
+       passes all three args either way, so the singular's {1} and {2}
+       still resolve. -->
+  <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>Thùng rác không khả dụng cho ổ đĩa này</value></data>
+  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>Vậy nên {1} này ({2}) chưa bị xóa. Bạn có thể chuyển nó tới nơi an toàn, hoặc xóa vĩnh viễn.</value></data>
+  <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>Vậy nên {0} {1} này ({2}) chưa bị xóa. Bạn có thể chuyển chúng tới nơi an toàn, hoặc xóa vĩnh viễn.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Việc xóa là an toàn. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần, và Thùng rác chỉ là một lớp bảo vệ thêm. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Việc xóa là an toàn. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần, và Thùng rác chỉ là một lớp bảo vệ thêm. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó.</value></data>
+
+  <!-- Summaries -->
+  <!-- 0 = file count. Singular / plural pairs picked at the call
+       site by Pluralise(count, Singular, Plural); this avoids
+       concatenating a count and a "file is"/"files are" fragment
+       across a placeholder boundary, which does not survive
+       translation into languages where the noun-verb-count agreement
+       crosses the placeholder (Slavic case selection, Arabic dual,
+       Japanese particle placement, etc). A translator rewrites both
+       singular and plural keys per their language's rule. -->
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} tệp vẫn cần thiết</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} tệp vẫn cần thiết</value></data>
+  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} tệp không cần thiết để dọn</value></data>
+  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} tệp không cần thiết để dọn</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} tệp đã đăng ký bị thiếu (không phải do InstallerClean xóa). Hiện chưa có vấn đề, nhưng một lần sửa chữa, cập nhật hoặc gỡ cài đặt chương trình liên quan trong tương lai có thể thất bại. Mở Chi tiết để biết cần làm gì.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} tệp đã đăng ký bị thiếu (không phải do InstallerClean xóa). Hiện chưa có vấn đề, nhưng một lần sửa chữa, cập nhật hoặc gỡ cài đặt chương trình liên quan trong tương lai có thể thất bại. Mở Chi tiết để biết cần làm gì.</value></data>
+  <!-- Informational line shown when the MSI database carries
+       superseded-patch registrations whose files are already gone
+       from disk. Distinct from the missing-from-disk warning
+       because the files are removable already; only the MSI
+       registration is stale. InstallerClean doesn't unregister
+       anything, so this is purely diagnostic. -->
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Phát hiện {0} mục MSI cũ (tệp đã biến mất khỏi đĩa; InstallerClean không hủy đăng ký các mục này).</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Phát hiện {0} mục MSI cũ (tệp đã biến mất khỏi đĩa; InstallerClean không hủy đăng ký các mục này).</value></data>
+  <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
+  <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
+  <!-- Orphaned-window footer summary. Unneeded files split into the three
+       removable causes shown in the Reason column: true orphans (the API
+       never claimed them), superseded patches and obsoleted patches.
+       0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
+       3 = size display. No trailing noun, so it agrees at any count. -->
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} mồ côi, {1} bị thay thế, {2} đã lỗi thời ({3})</value></data>
+  <!-- Registered-window footer summary, reinforcing the "still needed" framing
+       (the flip side of the main window's "unneeded"). Split singular/plural so
+       the noun and verb agree at one file ("file ... is" vs "files ... are").
+       0 = count, 1 = size display. -->
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} tệp đã đăng ký vẫn cần thiết ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} tệp đã đăng ký vẫn cần thiết ({1})</value></data>
+
+  <!-- Confirmation dialogs -->
+  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
+  <data name="Confirm.MoveTitle" xml:space="preserve"><value>Chuyển {0} {1} ({2})?</value></data>
+  <!-- 0 = destination path -->
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Các tệp sẽ được chuyển tới {0}.</value></data>
+  <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Xóa {0} {1} ({2})?</value></data>
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Các tệp sẽ được gửi vào Thùng rác. Nếu bạn muốn có bản sao lưu, hãy dùng Chuyển thay vào đó.</value></data>
+
+  <!-- Error messages -->
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Cần quyền quản trị viên</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean cần quyền quản trị viên.
+
+Hãy nhấp chuột phải và chọn 'Chạy với tư cách quản trị viên'.</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Cơ sở dữ liệu trình cài đặt không khả dụng</value></data>
+  <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Quét thất bại</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Cơ sở dữ liệu Windows Installer có vẻ trống hoặc không truy cập được. Điều này bất thường ngay cả trên một bản Windows mới cài và thường có nghĩa là cơ sở dữ liệu bị hỏng hoặc một công cụ của bên thứ ba đã xóa nó. Chạy 'sfc /scannow' từ một dấu nhắc có quyền nâng cao thường sửa được.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Truy cập bị từ chối khi liệt kê các sản phẩm đã cài. Hãy chạy với quyền quản trị viên.</value></data>
+  <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
+       in the message because a sysadmin reading the dialog may want
+       to look it up). -->
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer từ chối liệt kê sản phẩm sau {0} lần thất bại liên tiếp (mã lỗi cuối {1}). Hãy thử khởi động lại Windows, hoặc chạy 'sfc /scannow' từ một dấu nhắc có quyền nâng cao.</value></data>
+  <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Đích không hợp lệ</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Không thể ghi vào đích</value></data>
+  <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Chuyển thất bại</value></data>
+  <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Xóa thất bại</value></data>
+  <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Đích không thể nằm bên trong thư mục Windows Installer.</value></data>
+  <!-- 0 = the destination path the user typed -->
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Đích {0} nằm dưới một thư mục hệ thống của Windows. Hãy chọn một đường dẫn ngoài %SystemRoot%, %ProgramFiles% và %ProgramData%.</value></data>
+  <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Không đủ dung lượng</value></data>
+  <!-- 0 = destination, 1 = required size, 2 = available size -->
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Không đủ dung lượng tại {0}
+
+Cần: {1}
+Còn trống: {2}</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>Bạn không có quyền ghi vào {0}.
+Hãy thử một thư mục trong hồ sơ người dùng của bạn hoặc trên một ổ đĩa bạn sở hữu.</value></data>
+  <data name="Error.PathTooLong" xml:space="preserve"><value>Đường dẫn {0} quá dài đối với Windows. Hãy chọn một đường dẫn ngắn hơn.</value></data>
+  <data name="Error.DestinationMissing" xml:space="preserve"><value>Thư mục {0} không tồn tại và không thể tạo được. Hãy kiểm tra ký tự ổ đĩa hoặc đường dẫn mạng.</value></data>
+  <!-- 0 = destination, 1 = crash log path. The exception's .Message
+       intentionally does NOT appear in either string: under elevation
+       framework messages can carry paths from another user's profile.
+       Detail goes to the crash log; the user is pointed at it. -->
+  <data name="Error.IOWriteDestination" xml:space="preserve"><value>Windows không thể ghi vào {0}.
+Chi tiết trong {1}.</value></data>
+  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows không thể ghi vào {0}. Không thể ghi nhật ký sự cố.</value></data>
+  <data name="Error.WriteDestination" xml:space="preserve"><value>Không thể ghi vào {0}.
+Chi tiết trong {1}.</value></data>
+  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Không thể ghi vào {0}. Không thể ghi nhật ký sự cố.</value></data>
+  <data name="Error.MissingSourceFile" xml:space="preserve"><value>Tệp không còn tồn tại.</value></data>
+  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Tệp nguồn là một symlink hoặc junction; bị từ chối vì lý do an toàn.</value></data>
+  <!-- Category-only sentences for FileOperationError.LocalisedMessage.
+       These intentionally do NOT include a path or framework message
+       fragment: with the app running elevated, the per-file
+       UnauthorizedAccessException / IOException messages can carry
+       paths from other users' profiles into the displayed error list. -->
+  <data name="Error.AccessDenied" xml:space="preserve"><value>Truy cập bị từ chối.</value></data>
+  <data name="Error.IOFailure" xml:space="preserve"><value>Thao tác thất bại. Hãy thử lại hoặc khởi động lại Windows.</value></data>
+  <data name="Error.UnknownError" xml:space="preserve"><value>Lỗi không xác định.</value></data>
+  <!-- 0 = shell error code -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Không thể gửi tệp này vào Thùng rác (lỗi {0}). Nó có thể đang bị khóa, đang được dùng hoặc bị Windows chặn. Hãy Chuyển nó thay vào đó.</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows đã chặn truy cập tệp này, ngay cả với quyền quản trị viên (lỗi {0}). Đây thường là khóa quyền sở hữu hoặc quyền truy cập. Hãy Chuyển nó thay vào đó.</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>Tệp này đang được mở hoặc bị khóa bởi một chương trình khác (lỗi {0}). Hãy đóng chương trình đó, hoặc thứ gì đang quét nó, rồi thử lại, hoặc Chuyển nó thay vào đó.</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Tệp đã bị xóa vĩnh viễn vì không thể gửi vào Thùng rác.</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Từ chối chuyển tệp vào thư mục Windows Installer (đích: {0}).</value></data>
+  <!-- 0 = the relative path the caller passed -->
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Đích phải là một đường dẫn đầy đủ (đường dẫn tương đối được phân giải theo thư mục hiện tại của tiến trình và không an toàn khi chạy nâng quyền): {0}</value></data>
+  <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Không thể mở trình duyệt của bạn</value></data>
+  <data name="UpdateCheck.Title" xml:space="preserve"><value>Kiểm tra cập nhật</value></data>
+  <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Đang kiểm tra...</value></data>
+  <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>Đã cập nhật.</value></data>
+  <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Có bản cập nhật</value></data>
+  <!-- 0 = installed version, 1 = latest version on GitHub -->
+  <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Bạn đang dùng phiên bản {0}.&#10;Phiên bản {1} đã có.</value></data>
+  <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Không thể kết nối tới GitHub. Hãy kiểm tra kết nối internet và thử lại.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub trả về phản hồi lỗi. API phát hành có thể đang bị giới hạn tần suất; hãy thử lại sau vài phút.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Phản hồi của GitHub không chứa bản phát hành nào nhận ra được. Hãy thử lại sau, hoặc mở thẳng trang phát hành.</value></data>
+  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Quá thời gian kiểm tra. Kết nối của bạn tới GitHub có thể chậm; hãy thử lại.</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Việc kiểm tra thất bại vì một lý do không xác định. Chi tiết nằm trong crash.log nếu bạn cần báo cáo.</value></data>
+  <!-- 0 = the URL the user was trying to reach -->
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>Không thể mở liên kết trong trình duyệt người dùng thường của bạn. URL đã được chép vào bộ nhớ tạm để bạn mở thủ công:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>Không thể mở liên kết trong trình duyệt người dùng thường của bạn, và việc chép nó vào bộ nhớ tạm cũng thất bại. URL là:&#10;&#10;{0}</value></data>
+  <!-- 0 = the destination folder whose canonical path changed mid-batch -->
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Đường dẫn chuẩn của thư mục đích đã thay đổi giữa chừng: {0}</value></data>
+  <!-- 0 = folder, 1 = inner exception message -->
+  <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Không thể ghi vào {0}.</value></data>
+  <!-- 0 = file name -->
+  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Không tìm được tên tệp duy nhất cho '{0}' sau 10.000 lần thử.</value></data>
+
+  <!-- Result log (post-cleanup diagnostic send) -->
+  <data name="ResultLog.Sending" xml:space="preserve"><value>Đang gửi...</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>Cảm ơn! Đã gửi báo cáo.</value></data>
+  <data name="ResultLog.Failed" xml:space="preserve"><value>Gửi thất bại. Hãy thử lại sau.</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>Không có báo cáo để gửi.</value></data>
+  <!-- Body header shown in the confirmation modal. Names the
+       recipient and the full URL so the user sees the destination
+       without having to scroll the JSON. -->
+  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>Gửi cái này tới No Faff?</value></data>
+  <!-- Reassurance line under the JSON. Names the URL once, calls
+       out the no-PII property, and explains the purpose so the
+       user has the context the modal title implies. -->
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Không có gì nhận dạng bạn hay máy của bạn; nó chỉ cho tôi biết InstallerClean có hoạt động không và mọi người đang giải phóng được bao nhiêu dung lượng. Nó được gửi tới nofaff.netlify.app/api/result-log.</value></data>
+  <!-- AutomationProperties.Name on the JSON preview TextBox so screen
+       readers announce its content rather than "edit, read-only". -->
+  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Xem trước nhật ký kết quả</value></data>
+
+  <!-- Single instance / startup / crash -->
+  <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean đang chạy rồi.</value></data>
+  <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <!-- 0 = exception type name (e.g. "IOException"), 1 = crash log path.
+       The full exception message is intentionally NOT formatted in here:
+       framework-provided messages can carry absolute paths from other
+       users' profiles into a dialog the current user reads. The full
+       detail is written to the crash log instead. -->
+  <data name="Startup.UnhandledBody" xml:space="preserve"><value>Đã xảy ra lỗi không mong muốn và InstallerClean cần đóng lại.
+
+{0}
+
+Chi tiết đã được ghi vào:
+{1}</value></data>
+  <data name="Startup.UnhandledBody.NoLog" xml:space="preserve"><value>Đã xảy ra lỗi không mong muốn và InstallerClean cần đóng lại.
+
+{0}
+
+Không thể ghi nhật ký sự cố.</value></data>
+  <data name="Startup.ErrorTitle" xml:space="preserve"><value>Lỗi khởi động</value></data>
+  <!-- 0 = exception type name (see Startup.UnhandledBody for why this
+       is the type name and not the message), 1 = crash log path. -->
+  <data name="Startup.FailedToStart" xml:space="preserve"><value>Khởi động thất bại ({0}). Chi tiết đã được ghi vào:
+{1}</value></data>
+  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>Khởi động thất bại ({0}). Không thể ghi nhật ký sự cố.</value></data>
+
+  <!-- File picker -->
+  <data name="FilePicker.ChooseDestinationTitle" xml:space="preserve"><value>Chọn thư mục đích cho các tệp đã chuyển</value></data>
+
+  <!-- Version display -->
+  <!-- 0 = major.minor.patch (e.g. "1.5.4") -->
+  <data name="Version.Display" xml:space="preserve"><value>Phiên bản {0}</value></data>
+
+  <!-- Plural fragments. Consumed by DisplayHelpers.Pluralise. The
+       singular/plural pair is English-style (n != 1 -> plural). A
+       Slavic / Arabic / etc. host replaces this layer; consumers do
+       not change. -->
+  <data name="Plural.File.Singular" xml:space="preserve"><value>tệp</value></data>
+  <data name="Plural.File.Plural" xml:space="preserve"><value>tệp</value></data>
+  <data name="Plural.Error.Singular" xml:space="preserve"><value>lỗi</value></data>
+  <data name="Plural.Error.Plural" xml:space="preserve"><value>lỗi</value></data>
+  <data name="Plural.Package.Singular" xml:space="preserve"><value>gói</value></data>
+  <data name="Plural.Package.Plural" xml:space="preserve"><value>gói</value></data>
+  <data name="Plural.Product.Singular" xml:space="preserve"><value>sản phẩm</value></data>
+  <data name="Plural.Product.Plural" xml:space="preserve"><value>sản phẩm</value></data>
+  <data name="Plural.Patch.Singular" xml:space="preserve"><value>bản vá</value></data>
+  <data name="Plural.Patch.Plural" xml:space="preserve"><value>bản vá</value></data>
+
+  <!-- Display-format fragments used by DisplayHelpers.FormatSize /
+       FormatElapsed / FormatElapsedLong. Number portion stays in
+       string.Format with the consumer's CurrentCulture (so 1.5 GB
+       becomes 1,5 GB on de-DE etc.); only the unit suffix and the
+       sub-second long-form sentence are localisable. -->
+  <data name="Display.Size.GB" xml:space="preserve"><value>{0:F2} GB</value></data>
+  <data name="Display.Size.MB" xml:space="preserve"><value>{0:F1} MB</value></data>
+  <data name="Display.Size.KB" xml:space="preserve"><value>{0:F1} KB</value></data>
+  <data name="Display.Size.B" xml:space="preserve"><value>{0} B</value></data>
+  <data name="Display.Elapsed.Ms" xml:space="preserve"><value>{0:F0}ms</value></data>
+  <data name="Display.Elapsed.S" xml:space="preserve"><value>{0:F1}s</value></data>
+  <data name="Display.ElapsedLong.LessThanASecond" xml:space="preserve"><value>chưa đến một giây</value></data>
+  <data name="Display.ElapsedLong.Seconds" xml:space="preserve"><value>{0:F1} giây</value></data>
+
+  <!-- CLI output. Two destinations with different localisation rules.
+       Stdout (everything the user reads at the console) is localised so a
+       non-English sysadmin gets text matching their UI culture. The entries
+       written INTO the Windows Application event log are English-only
+       (no-translate): an RMM tool greps that channel for a known English
+       string regardless of the machine's OS UI culture, so a satellite resx
+       must NOT translate them. Those are the Cli.EventLog* keys, with one
+       exception: Cli.EventLogUnavailable is a stdout warning (it tells the
+       operator that an event-log write failed), so it is localised like the
+       rest of stdout despite the EventLog prefix. -->
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Đối số không xác định: '{0}'</value></data>
+  <data name="Cli.Cancelling" xml:space="preserve"><value>Đang hủy...</value></data>
+  <data name="Cli.Cancelled" xml:space="preserve"><value>Đã hủy.</value></data>
+  <!-- 0 = exception type name (full message + stack trace go to the
+       crash log; the CLI runs elevated so .Message could include paths
+       from another user's profile if logged to a shared file).
+       1 = crash log path. -->
+  <data name="Cli.GenericError" xml:space="preserve"><value>Lỗi: {0}. Chi tiết đã ghi vào {1}.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Lỗi: {0}. Không thể ghi nhật ký sự cố.</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Đang quét C:\Windows\Installer...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Đã tìm thấy {0} {1} để dọn ({2}).</value></data>
+  <data name="Cli.NothingToDo" xml:space="preserve"><value>Không có gì để làm.</value></data>
+  <!-- 0 = mode arg ("/s"), 1 = registered package count, 2 = pluralised "package"/"packages" -->
+  <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Đang xóa {0} {1}...</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Đã xóa {0} {1}.</value></data>
+  <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
+       4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Lỗi: Thùng rác không khả dụng cho ổ đĩa này, nên không có gì bị xóa. Hãy dùng /m để chuyển các tệp thay vào đó, hoặc bật lại Thùng rác rồi chạy lại.</value></data>
+  <!-- 0 = mode arg ("/d") -->
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Lỗi: chưa chỉ định đích để chuyển. Hãy dùng /m ĐƯỜNG_DẪN hoặc đặt một mặc định trong GUI.</value></data>
+  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Lỗi: đích không thể nằm bên trong thư mục Windows Installer.</value></data>
+  <!-- 0 = the relative or otherwise unsafe path -->
+  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Lỗi: đích phải là một đường dẫn đầy đủ. Nhận được: {0}</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Lỗi: đích {0} nằm dưới một thư mục hệ thống của Windows. Hãy chọn một đường dẫn ngoài %SystemRoot%, %ProgramFiles% và %ProgramData%.</value></data>
+  <!-- 0 = mode, 1 = destination -->
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Lỗi: có thứ gì đó đang dùng Windows Installer ngay lúc này, thường là Windows Update hoặc một chương trình đang cài đặt ở chế độ nền. Chuyển và Xóa bị chặn trong khi việc đó chạy. Hãy thử lại khi nó xong.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Lỗi: một giao dịch Windows Installer trước đó đang bị tạm dừng trên máy này. Hãy tiếp tục hoặc hoàn tác lần cài đặt đó (hoặc khởi động lại Windows) trước khi dọn bộ nhớ đệm.</value></data>
+  <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Lỗi: một thao tác trên tệp được xếp hàng cho lần khởi động lại tới nhắm vào bộ nhớ đệm Installer ({0}). Hãy khởi động lại Windows để hoàn tất thao tác đó trước khi dọn.</value></data>
+  <!-- Short human labels for the EventLog ({1} slot in
+       Cli.EventLogPendingRebootBlocked). The stdout sentences in
+       Cli.PendingRebootBlocked.* are full localised text; these short
+       labels are English-only (no-translate, like every Cli.EventLog*
+       entry written to the Application channel) so an Application-channel
+       grep can match a known string regardless of OS UI culture. -->
+  <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
+       2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination -->
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Đang chuyển {0} {1} tới {2}...</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun -->
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>Đã chuyển {0} {1}.</value></data>
+  <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
+       4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
+  <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
+       processed (a cancel during the scan, or before the first delete or
+       move), so "each /s, /d or /m run writes one summary entry" holds for
+       every run, not only the ones that committed work. -->
+  <!-- Stdout when the CLI cannot acquire the single-instance mutex.
+       The GUI variant (Strings.Startup_AlreadyRunningBody) is written
+       for a user who tried to launch a second window; the CLI variant
+       names the contending parties (GUI or another CLI run) and
+       points at exit code 75 so an RMM operator parsing stdout
+       knows it is transient and safe to retry. -->
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Một tiến trình InstallerClean khác đang giữ khóa một-thực-thể (GUI hoặc một lần chạy CLI khác). Mã thoát 75 (tạm thời); có thể thử lại sau.</value></data>
+  <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
+       can't acquire the single-instance mutex, so an RMM consumer of
+       the Application channel sees a record of every scheduled-job
+       firing whether or not it was able to run. -->
+  <!-- 0 = the offending token (original case). Audit entry written when
+       the CLI is invoked with an unrecognised or malformed argument, so a
+       scheduled task with a fat-fingered flag leaves an Application-channel
+       trace instead of exiting silently. English only, like every Cli
+       EventLog string; the stdout message carries the localised text. -->
+  <!-- Audit entry written when the CLI is invoked with no argument at all,
+       so an argless scheduled task fails visibly (non-zero exit) and leaves
+       a record rather than silently succeeding while doing nothing. -->
+  <!-- Audit entry for the LocalisedAccessException and
+       LocalisedInvalidOperationException catches: the message has been
+       built from a resx template with user-controlled args only, so the
+       full text is safe to record. 0 = mode arg, 1 = the localised
+       message (already-formatted). RMM consumers parsing the
+       Application channel see the actionable reason without a separate
+       crash-log lookup. -->
+  <!-- Audit entry for the generic Exception catch: ex.Message is held
+       back (path-leak risk under elevation), only the type name and
+       crash log path travel to the EventLog. 0 = mode arg, 1 = type
+       name, 2 = crash log path. -->
+  <!-- Stdout warning printed once at the end of a CLI run if any
+       Event Log write failed (Group Policy or service unavailable).
+       Tells an RMM consumer expecting an Application entry that the
+       channel was unwritable, not just empty. -->
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Lưu ý: ghi vào Nhật ký sự kiện thất bại. Hãy kiểm tra quyền của nhật ký Ứng dụng hoặc Chính sách nhóm.</value></data>
+
+  <!-- crash.log privacy header. Prepended to a fresh crash.log so a
+       user attaching the file to a public bug report has the
+       disclosure before sharing. The "# " prefix lets log readers
+       that skip comment lines (less, grep -v, jq pipelines) skip
+       the header. Stored as one multi-line block; the C# side reads
+       it verbatim and normalises line endings to the host platform. -->
+  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log ghi lại các ngoại lệ chưa được xử lý từ InstallerClean.
+# Khi chạy nâng quyền, thông báo ngoại lệ của framework có thể chứa
+# đường dẫn tệp từ phiên đang chạy (bao gồm hồ sơ của những người
+# dùng khác do truy vấn Windows Installer liệt kê). Thông báo lỗi
+# mạng từ lần kiểm tra cập nhật hoặc POST nhật ký kết quả có thể
+# chứa URL đích và địa chỉ IP / proxy đã phân giải. Hãy che cả hai
+# loại chi tiết này trước khi đính kèm tệp này vào một báo cáo lỗi
+# công khai.
+</value></data>
+
+  <!-- CLI help text (printed by /?, -h and the long help flag) -->
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - dọn dẹp C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Usage" xml:space="preserve"><value>Cách dùng:</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help        Hiển thị trợ giúp này (cũng nhận /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version     In ra phiên bản (cũng nhận -v)</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s            Chỉ quét - liệt kê các tệp không cần thiết</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d            Xóa các tệp không cần thiết (Thùng rác)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m            Chuyển tới vị trí mặc định đã lưu</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m ĐƯỜNG_DẪN  Chuyển tới đường dẫn được chỉ định</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli là một tiến trình console thật và chặn dấu nhắc</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>cho đến khi xong; hãy chuyển hướng hoặc nối ống đầu ra của nó như</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>với mọi tệp console khác. GUI nằm trong InstallerClean.exe cùng chỗ.</value></data>
+  <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Mã thoát:</value></data>
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   thành công: mọi tệp được đánh dấu đều đã được xử lý</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   thất bại: không xử lý được gì (sai đối số, quét thất bại, mọi tệp đều thất bại)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   một phần: một số tệp được xử lý, một số thất bại</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  tạm thời: một điều kiện tạm thời đã chặn lần chạy (xem thông báo)</value></data>
+  <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 đã hủy (Ctrl+C)</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Thay đổi ngôn ngữ. Chương trình sẽ khởi động lại.</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Thay đổi ngôn ngữ</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Chương trình sẽ khởi động lại.</value></data>
+
+</root>
