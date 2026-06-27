@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    InstallerClean string resources. Source-of-truth language: en-GB.
+
+    Naming convention: every key starts with a dot-delimited category
+    prefix and is generated as an underscore-delimited C# property name
+    (Window.Main.Title becomes Strings.Window_Main_Title). The visible
+    categories are:
+      Action.*               button labels and verbs
+      Automation.*           AutomationProperties.Name / HelpText values
+      Body.*                 multi-sentence body copy
+      BrowserLaunch.*        copy for the URL-launch failure dialog
+      Cli.*                  console output for the CLI launcher
+      Completion.*           completion overlay copy
+      Confirm.*              confirmation dialog body text
+      ConfirmSendResultLog.* result-log Send confirmation modal
+      CrashLog.*             crash.log header copy
+      Display.*              size/duration formatting fragments
+      Error.*                user-facing error messages
+      Field.*                labels for metadata fields
+      FilePicker.*           folder-browser dialog labels
+      Plural.*               singular/plural fragments used by DisplayHelpers
+      Reason.*               Reason column values in the unneeded files list
+      RecycleUnavailable.*   recycle-bin-unavailable choice dialog
+      ResultLog.*            send-report states (Sending / Sent / Failed)
+      Section.*              heading text inside windows
+      Startup.*              splash + already-running messages
+      Status.*               transient status / progress text
+      Summary.*              status-line counts (registered / orphaned / missing)
+      Tooltip.*              hover tooltips
+      UpdateCheck.*          update-check status / failure detail
+      Version.*              version display string
+      Window.*               window titles and chrome strings
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Window titles -->
+  <data name="Window.Main.Title" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Window.About.Title" xml:space="preserve"><value>Tentang</value></data>
+  <data name="Window.Registered.Title" xml:space="preserve"><value>File terdaftar yang sebaiknya tidak dihapus</value></data>
+  <data name="Window.Orphaned.Title" xml:space="preserve"><value>File tidak diperlukan yang aman dihapus</value></data>
+  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Konfirmasi pemindahan</value></data>
+  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Konfirmasi penghapusan</value></data>
+  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>Keranjang Sampah tidak tersedia</value></data>
+
+  <!-- Section headings -->
+  <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUK</value></data>
+  <data name="Section.Registered.Patches" xml:space="preserve"><value>PATCH</value></data>
+  <data name="Section.Registered.Details" xml:space="preserve"><value>DETAIL PRODUK</value></data>
+  <data name="Section.Move.Location" xml:space="preserve"><value>LOKASI PEMINDAHAN</value></data>
+  <data name="Section.SayThanks" xml:space="preserve"><value>UCAPKAN TERIMA KASIH</value></data>
+
+  <!-- Field labels (used in detail panels) -->
+  <data name="Field.Reason" xml:space="preserve"><value>Alasan</value></data>
+  <data name="Field.Author" xml:space="preserve"><value>Pembuat</value></data>
+  <data name="Field.Application" xml:space="preserve"><value>Aplikasi</value></data>
+  <data name="Field.Title" xml:space="preserve"><value>Judul</value></data>
+  <data name="Field.Subject" xml:space="preserve"><value>Subjek</value></data>
+  <data name="Field.Keywords" xml:space="preserve"><value>Kata kunci</value></data>
+  <data name="Field.SigningCertificate" xml:space="preserve"><value>Sertifikat penandatanganan</value></data>
+  <data name="Field.FileSize" xml:space="preserve"><value>Ukuran file</value></data>
+  <data name="Field.Comment" xml:space="preserve"><value>Komentar</value></data>
+  <data name="Field.ProductName" xml:space="preserve"><value>Nama produk</value></data>
+  <data name="Field.File" xml:space="preserve"><value>File</value></data>
+  <data name="Field.Size" xml:space="preserve"><value>Ukuran</value></data>
+  <data name="Field.Patches" xml:space="preserve"><value>Patch</value></data>
+  <!-- Placeholder shown for a registered package whose API ProductName is empty. -->
+  <data name="Field.UnknownProductName" xml:space="preserve"><value>(tidak diketahui)</value></data>
+  <data name="Field.PatchesOnly" xml:space="preserve"><value>(patch saja)</value></data>
+  <data name="Field.Missing" xml:space="preserve"><value>hilang</value></data>
+
+  <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
+  <data name="Action.About" xml:space="preserve"><value>_Tentang</value></data>
+  <data name="Action.Copy" xml:space="preserve"><value>Salin</value></data>
+  <data name="Action.Cut" xml:space="preserve"><value>Potong</value></data>
+  <data name="Action.Paste" xml:space="preserve"><value>Tempel</value></data>
+  <data name="Action.SelectAll" xml:space="preserve"><value>Pilih semua</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>_Telusuri...</value></data>
+  <data name="Action.Cancel" xml:space="preserve"><value>_Batal</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Periksa _pembaruan</value></data>
+  <data name="Action.Close" xml:space="preserve"><value>_Tutup</value></data>
+  <data name="Action.Delete" xml:space="preserve"><value>_Hapus</value></data>
+  <data name="Action.DeletePermanently" xml:space="preserve"><value>Hapus _permanen</value></data>
+  <!-- Alt+D safe here because the Delete button under the overlay is
+       disabled while Completion.IsComplete is true (IsMainContentInteractive
+       binds the body region to false); the mnemonic only resolves to
+       this Done button. IsDefault=True keeps Enter as the primary
+       keyboard shortcut. -->
+  <data name="Action.Done" xml:space="preserve"><value>_Selesai</value></data>
+  <data name="Action.Details" xml:space="preserve"><value>Detail</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Traktir kopi</value></data>
+  <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Beri _bintang di GitHub</value></data>
+  <data name="Action.MITLicence" xml:space="preserve"><value>Lisensi MIT</value></data>
+  <data name="Action.Move" xml:space="preserve"><value>_Pindahkan</value></data>
+  <data name="Action.MoveInstead" xml:space="preserve"><value>_Pindahkan saja</value></data>
+  <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Jalur folder jika Anda memilih Pindahkan, bukan Hapus</value></data>
+  <data name="Action.OpenReleasePage" xml:space="preserve"><value>Buka halaman _rilis</value></data>
+  <data name="Action.Rescan" xml:space="preserve"><value>_Pindai ulang</value></data>
+  <data name="Action.ScanAgain" xml:space="preserve"><value>Pindai _lagi</value></data>
+  <data name="Action.SendResultLog" xml:space="preserve"><value>Kirim laporan</value></data>
+  <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Kirim</value></data>
+
+  <!-- Automation names (screen reader / accessibility) -->
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Traktir saya secangkir kopi</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Traktir saya secangkir kopi (jendela Tentang)</value></data>
+  <data name="Automation.CancelOperation" xml:space="preserve"><value>Batalkan operasi</value></data>
+  <data name="Automation.CancelScan" xml:space="preserve"><value>Batalkan pemindaian</value></data>
+  <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Batalkan pemindaian awal</value></data>
+  <data name="Automation.Close" xml:space="preserve"><value>Tutup</value></data>
+  <data name="Automation.CloseWindow" xml:space="preserve"><value>Tutup jendela</value></data>
+  <data name="Automation.CloseResult" xml:space="preserve"><value>Tutup hasil dan kembali ke jendela utama</value></data>
+  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Beri bintang di GitHub</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Beri bintang di GitHub (jendela Tentang)</value></data>
+  <data name="Automation.Minimise" xml:space="preserve"><value>Kecilkan</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Pindahkan semua file penginstal yang tidak diperlukan ke folder tujuan yang dipilih</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Kirim semua file penginstal yang tidak diperlukan ke Keranjang Sampah</value></data>
+  <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
+       They describe the dialog's choice, worded to read correctly
+       straight after "Cancel, button": the window-level alternative is
+       never read, because help text is only spoken for the element with
+       focus and the window itself never has it. -->
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Hapus mengirim file yang tidak diperlukan ke Keranjang Sampah. Batal menutup tanpa menghapus.</value></data>
+  <data name="Automation.ConfirmMove" xml:space="preserve"><value>Pindahkan menaruh file yang tidak diperlukan di folder tujuan yang dipilih. Batal membiarkannya di tempatnya.</value></data>
+  <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Pilih cara menangani file yang tidak diperlukan: pindahkan ke tempat aman, hapus permanen, atau batalkan.</value></data>
+  <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Pindahkan file yang tidak diperlukan ke folder pilihan Anda</value></data>
+  <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Hapus permanen file yang tidak diperlukan karena Keranjang Sampah tidak tersedia untuk drive ini</value></data>
+  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Dikirim ke nofaff.netlify.app. Hanya jumlah dan label. Anda akan melihat data persis yang akan dikirim sebelum mengirim.</value></data>
+  <data name="Automation.SayThanks" xml:space="preserve"><value>Ucapkan terima kasih</value></data>
+  <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Kirim mengirimkan laporan yang ditampilkan ke No Faff. Batal tidak mengirim apa pun.</value></data>
+  <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Periksa pembaruan</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Memeriksa API rilis GitHub melalui HTTPS untuk versi yang lebih baru.</value></data>
+  <!-- Window-level description for the update-available modal, read by a
+       screen reader on open, mirroring the RecycleUnavailable and
+       ConfirmSendResultLog windows. The version numbers are in the body
+       text; this states the choice. -->
+  <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini.</value></data>
+  <data name="Automation.MITLicence" xml:space="preserve"><value>Lisensi MIT</value></data>
+  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Membuka file lisensi di github.com melalui peramban Anda.</value></data>
+  <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
+       Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
+       DETAILS). Narrator at default verbosity spells short uppercase
+       tokens letter-by-letter; the override gives it a phrase to read
+       while the visible text stays uppercased for SmallCaps. -->
+  <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>Lokasi pemindahan</value></data>
+  <data name="Automation.Section.Products" xml:space="preserve"><value>Produk</value></data>
+  <data name="Automation.Section.Patches" xml:space="preserve"><value>Patch</value></data>
+  <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Detail produk</value></data>
+  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Folder tujuan pemindahan</value></data>
+  <data name="Automation.OperationProgress" xml:space="preserve"><value>Kemajuan operasi</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Pindai ulang C:\Windows\Installer</value></data>
+  <data name="Automation.ScanningProgress" xml:space="preserve"><value>Kemajuan pemindaian</value></data>
+  <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Kemajuan pemindaian awal</value></data>
+  <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Detail, file yang tidak diperlukan</value></data>
+  <data name="Automation.ViewOrphanedFiles.HelpText" xml:space="preserve"><value>Tersedia untuk dibersihkan.</value></data>
+  <data name="Automation.ViewRegisteredFiles" xml:space="preserve"><value>Detail, file terdaftar</value></data>
+  <data name="Automation.ViewRegisteredFiles.HelpText" xml:space="preserve"><value>Daftar baca-saja.</value></data>
+  <!-- Screen-reader sort state for the detail-window lists, set in
+       UpdateSortIndicators as the sorted column header's accessible
+       name (a focused header's name change is announced, and the name
+       override keeps the ▲/▼ glyph out of speech) and mirrored into the
+       list's ItemStatus as a queryable surface. 0 = the sorted column's
+       name (a Field.* label). -->
+  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>Diurutkan berdasarkan {0}, menaik</value></data>
+  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>Diurutkan berdasarkan {0}, menurun</value></data>
+  <!-- Names for the scrollable text regions, spoken only once a region
+       can actually scroll and so joins the tab order (the
+       BodyScrollRegion style). -->
+  <data name="Automation.Scroll.ScanResults" xml:space="preserve"><value>Hasil pemindaian</value></data>
+  <data name="Automation.Scroll.ResultDetails" xml:space="preserve"><value>Detail hasil</value></data>
+  <data name="Automation.Scroll.FileDetails" xml:space="preserve"><value>Detail file</value></data>
+  <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>Teks dialog</value></data>
+  <!-- Composes the announced outcome of a scan that found files:
+       0 = the "N unneeded files to clean up" line, 1 = the total size. -->
+  <data name="Automation.ScanResultAnnouncement" xml:space="preserve"><value>{0} ({1})</value></data>
+  <data name="Automation.CompletionErrors" xml:space="preserve"><value>File yang tidak dapat diproses</value></data>
+  <!-- Spoken name for the missing-file note's closing hyperlink. The visible
+       link text is a phrase mid-sentence (the [ ]-delimited span of
+       Body.RegisteredMissingFromDisk.SeeAlso, movable by a translator), so a
+       screen reader tabbing onto the link needs a self-contained purpose;
+       it must still contain the visible phrase so voice control can click
+       it by its on-screen words. -->
+  <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Menjelaskan folder ini, dan cara memulihkan file, di README</value></data>
+
+  <!-- Tooltips -->
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Kalau membantu, traktir saya secangkir kopi.</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Bikin haus, lho!</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa makan beberapa detik saat I/O berat atau panggilan basis data MSI.</value></data>
+  <data name="Tooltip.Close" xml:space="preserve"><value>Tutup</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Beri bintang di GitHub, laporkan Issue, atau tulis di Discussions. Masukan apa pun diterima.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>atau laporkan Issue, atau tulis di Discussions. Masukan apa pun diterima.</value></data>
+  <data name="Tooltip.Minimise" xml:space="preserve"><value>Kecilkan</value></data>
+  <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi dan berapa banyak ruang yang dikosongkan orang-orang. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi.</value></data>
+  <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi.</value></data>
+  <data name="Tooltip.Move" xml:space="preserve"><value>Pindahkan file yang tidak diperlukan ke lokasi pemindahan.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Pindahkan file yang tidak diperlukan ke lokasi pemindahan. Pilih lokasinya dulu.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Kirim file yang tidak diperlukan ke Keranjang Sampah.</value></data>
+  <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Nama subjek dari sertifikat Authenticode yang disematkan. Rantai sertifikat tidak diverifikasi.</value></data>
+
+  <!-- Body copy -->
+  <data name="Body.MainExplanation.Lead" xml:space="preserve">
+    <value>File yang tidak diperlukan di bawah ini aman dihapus.</value>
+    <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. Keep it one short clause.</comment>
+  </data>
+  <data name="Body.MainExplanation.Why" xml:space="preserve">
+    <value>File-file ini berada di C:\Windows\Installer, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mendaftar file yang Windows sendiri laporkan sudah tidak terpakai.</value>
+    <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
+  </data>
+  <data name="Body.MainExplanation.Action" xml:space="preserve">
+    <value>Hapus ke Keranjang Sampah, atau Pindahkan dulu ke tempat lain jika Anda lebih suka menyimpan salinan.</value>
+    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
+  </data>
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Ada sesuatu yang sedang menggunakan Windows Installer saat ini, biasanya Windows Update atau program yang memasang di latar belakang. Pindahkan dan Hapus dijeda selama itu berjalan, sehingga InstallerClean tidak menyentuh cache penginstal saat sedang berubah. Setelah selesai, Pindai ulang dan keduanya kembali.</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Ada transaksi Windows Installer sebelumnya yang tertunda di mesin ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache.</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows memiliki antrean penggantian nama file untuk mulai ulang berikutnya yang memengaruhi cache Installer. Mulai ulang Windows sebelum membersihkan.</value></data>
+  <data name="Body.NoFileSelected" xml:space="preserve"><value>Pilih file untuk melihat detail.</value></data>
+  <data name="Body.NoProductSelected" xml:space="preserve"><value>Pilih produk untuk melihat detail.</value></data>
+  <data name="Body.NoMetadata" xml:space="preserve"><value>Tidak ada metadata yang tersedia.</value></data>
+  <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
+    <value>File penginstal ini telah dihapus. InstallerClean tidak melakukannya, aplikasi ini tidak pernah menghapus file yang masih diperlukan sebuah program; sesuatu yang lain menghapus file ini sebelum Anda menjalankan InstallerClean.&#10;&#10;File ini tidak menimbulkan masalah sekarang, dan tidak akan menimbulkannya sampai suatu hari Anda mencoba memperbaiki, memperbarui, atau menghapus instalasi program pemiliknya. Langkah itu kemudian bisa gagal, karena Windows mencari file ini dan file-nya tidak ada.&#10;&#10;Untuk mencoba memperbaikinya, unduh penginstal program tersebut dari pembuatnya dan jalankan di atas salinan yang sudah ada (jangan menghapus instalasi terlebih dahulu, penghapusan instalasi sendiri adalah langkah yang memerlukan file ini). Gunakan versi yang Anda pasang jika bisa mendapatkannya, karena Windows mungkin menolak versi yang berbeda. Cara ini biasanya memulihkan file, dan pengaturan Anda umumnya tetap utuh, tetapi Microsoft tidak menjaminnya, langkah terakhir Microsoft sendiri adalah memasang ulang program itu, atau Windows itu sendiri.</value>
+    <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
+  </data>
+  <!-- The missing-file note's closing sentence, rendered as a TextBlock
+       with one inline Hyperlink built at load time (RegisteredFilesWindow
+       .BuildSeeAlsoLine). The linked phrase is delimited by [ ] so a
+       translator can place it anywhere in the sentence; the code splits on
+       the first [ and ] into a prefix Run, the Hyperlink (to the README's
+       recovery section), and a suffix Run. A string with no [ ] pair
+       renders verbatim as one Run. -->
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso" xml:space="preserve"><value>README [menjelaskan folder ini], dan cara memulihkan file, dengan kata-kata Microsoft sendiri.</value></data>
+  <data name="Body.NoPatches" xml:space="preserve"><value>(tidak ada)</value></data>
+
+  <!-- Reasons (Reason column in the orphaned-files list) -->
+  <data name="Reason.Orphaned" xml:space="preserve"><value>Yatim</value></data>
+  <data name="Reason.Superseded" xml:space="preserve"><value>Digantikan</value></data>
+  <!-- MSI PatchState 4 (obsoleted) is a distinct state from 2
+       (superseded): superseded means a newer patch has replaced
+       this one, obsoleted means the patch has been withdrawn /
+       deprecated by the publisher independent of a replacement.
+       The user-visible outcome (the patch is removable) is the
+       same; the Reason column distinguishes them for users who
+       want the MSI-state precision. -->
+  <data name="Reason.Obsoleted" xml:space="preserve"><value>Usang</value></data>
+
+  <!-- Status / progress text -->
+  <data name="Status.Scanning" xml:space="preserve"><value>Memindai...</value></data>
+  <data name="Status.Cancelling" xml:space="preserve"><value>Membatalkan...</value></data>
+  <data name="Status.StartingScan" xml:space="preserve"><value>Memulai pemindaian...</value></data>
+  <data name="Status.QueryingApi" xml:space="preserve"><value>Menanyakan ke Windows tentang perangkat lunak yang terpasang...</value></data>
+  <data name="Status.ScanningCache" xml:space="preserve"><value>Memindai folder cache penginstal...</value></data>
+  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Mendata produk yang terpasang...</value></data>
+  <data name="Status.CheckingRegistry" xml:space="preserve"><value>Memeriksa registri untuk paket tambahan...</value></data>
+  <!-- 0 = registered package count, 1 = pluralised "package"/"packages" -->
+  <!-- Fires mid-scan as a step-progress update after the registry-
+       fallback pass; not the end-of-scan pill (that's Status.ScanComplete).
+       0 = registered package count, 1 = pluralised "package"/"packages". -->
+  <data name="Status.RegisteredPackagesFound" xml:space="preserve"><value>Ditemukan {0} {1} terdaftar.</value></data>
+  <!-- 0 = elapsed time text (e.g. "1.2s") -->
+  <data name="Status.ScanComplete" xml:space="preserve"><value>Pemindaian selesai ({0})</value></data>
+  <data name="Status.FoundProducts" xml:space="preserve"><value>Memindai paket lokal...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
+  <data name="Status.FoundUnused" xml:space="preserve"><value>Ditemukan {0} {1} yang aman Anda hapus.</value></data>
+  <data name="Status.PreparingDestination" xml:space="preserve"><value>Menyiapkan folder tujuan...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun -->
+  <data name="Status.Moving" xml:space="preserve"><value>Memindahkan {0} {1}...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Menghapus {0} {1}...</value></data>
+  <!-- 0 = files processed before cancel, 1 = total files in the batch,
+       2 = pluralised "file"/"files" agreeing with the total. -->
+  <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Pemindahan dibatalkan. {0} dari {1} {2} diproses.</value></data>
+  <data name="Status.DeleteCancelled.Partial" xml:space="preserve"><value>Penghapusan dibatalkan. {0} dari {1} {2} diproses.</value></data>
+  <!-- 0 = exception type name, 1 = crash log path. Both surface in
+       the status pill so the user can find the log; full message +
+       stack trace go to the log itself. -->
+  <data name="Status.MoveFailed" xml:space="preserve"><value>Pemindahan gagal ({0}). Detail di {1}.</value></data>
+  <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Pemindahan gagal ({0}). Log kerusakan tidak bisa ditulis.</value></data>
+  <data name="Status.DeleteFailed" xml:space="preserve"><value>Penghapusan gagal ({0}). Detail di {1}.</value></data>
+  <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Penghapusan gagal ({0}). Log kerusakan tidak bisa ditulis.</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Akses ditolak. Jalankan sebagai administrator.</value></data>
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Pemindaian gagal: basis data penginstal tidak tersedia.</value></data>
+  <data name="Status.ScanCancelled" xml:space="preserve"><value>Pemindaian dibatalkan.</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>Siap</value></data>
+  <!-- 0 = exception type name. Full message + stack trace go only to
+       the crash log because exception messages from elevated framework
+       calls can contain paths from another user's profile. 1 = crash
+       log path. -->
+  <data name="Status.ScanFailedDetails" xml:space="preserve"><value>Pemindaian gagal ({0}). Detail di {1}.</value></data>
+  <data name="Status.ScanFailedDetails.NoLog" xml:space="preserve"><value>Pemindaian gagal ({0}). Log kerusakan tidak bisa ditulis.</value></data>
+
+  <!-- Completion screen -->
+  <data name="Completion.AllClean" xml:space="preserve"><value>Semua bersih</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Tidak ada yang perlu dibersihkan di C:\Windows\Installer</value></data>
+  <!-- 0 = installed product count, 1 = pluralised "product"/"products",
+       2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
+       "less than a second"). The count is the receipt that a real
+       scan ran; on fast machines a duration alone reads as "did
+       nothing". Rendered in the Restore slot of the completion
+       overlay so the all-clean state has the same heading + summary
+       + smaller-receipt shape as the post-Move and post-Delete
+       states. -->
+  <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>{0} {1} dipindai dalam {2}</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Salin kembali jika ada yang berhenti berfungsi</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Pulihkan dari Keranjang Sampah jika ada yang berhenti berfungsi</value></data>
+  <!-- 0 = size freed (e.g. "120.5 MB") -->
+  <data name="Completion.Freed" xml:space="preserve"><value>{0} dikosongkan</value></data>
+  <data name="Completion.Moved" xml:space="preserve"><value>{0} dipindahkan</value></data>
+  <data name="Completion.PartlyMoved" xml:space="preserve"><value>{0} dipindahkan, sebagian file tidak dapat diproses</value></data>
+  <!-- Heading shown when an operation succeeded for SOME files but
+       errored for others. 0 = total size freed (e.g. "120.5 MB"). -->
+  <data name="Completion.PartlyFreed" xml:space="preserve"><value>{0} dikosongkan, sebagian file tidak dapat diproses</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
+  <data name="Completion.MoveSummary" xml:space="preserve"><value>{0} {1} dipindahkan ke {2}</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
+  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>{0} {1} dipindahkan ke {2}. {3} {4}</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} dikirim ke Keranjang Sampah</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} dikirim ke Keranjang Sampah. {2} {3}</value></data>
+  <!-- Completion copy for a consented permanent delete (the Recycle Bin
+       was unavailable for the volume and the user chose to delete anyway).
+       Distinct from DeleteSummary so it never claims the bin: these files
+       did not reach it and cannot be restored from it. 0 = deleted count,
+       1 = pluralised noun; the WithErrors variants add 2 = error count,
+       3 = pluralised "error"/"errors". Both the clean and the WithErrors
+       copy split singular/plural so the "It"/"They did not go to the
+       Recycle Bin" clause agrees with the count, and the WithErrors copy
+       carries that same clause so a partial failure still never reads as
+       though the files reached the bin. -->
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah.</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah.</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>{0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. {2} {3}</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Tidak masalah, file itu memang aman dihapus. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Tidak masalah, file itu memang aman dihapus. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya.</value></data>
+  <!-- The choice offered when Delete finds the Recycle Bin unavailable for
+       the files' volume: Move (the safe default), delete permanently with
+       consent, or cancel. Wording states only the confirmed fact (the probe
+       found the bin unavailable for the drive); it never asserts an
+       unconfirmed cause (off vs corrupt vs full). 0 = file count,
+       1 = pluralised noun, 2 = size display. The singular text omits
+       {0}: "this file" reads better than "this 1 file". The call site
+       passes all three args either way, so the singular's {1} and {2}
+       still resolve. -->
+  <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>Keranjang Sampah tidak tersedia untuk drive ini</value></data>
+  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>Jadi {1} ini ({2}) belum dihapus. Anda bisa memindahkannya ke tempat aman, atau menghapusnya permanen.</value></data>
+  <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>Jadi {0} {1} ini ({2}) belum dihapus. Anda bisa memindahkannya ke tempat aman, atau menghapusnya permanen.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Menghapusnya aman. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program, dan Keranjang Sampah hanyalah pengaman tambahan. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Menghapusnya aman. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program, dan Keranjang Sampah hanyalah pengaman tambahan. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya.</value></data>
+
+  <!-- Summaries -->
+  <!-- 0 = file count. Singular / plural pairs picked at the call
+       site by Pluralise(count, Singular, Plural); this avoids
+       concatenating a count and a "file is"/"files are" fragment
+       across a placeholder boundary, which does not survive
+       translation into languages where the noun-verb-count agreement
+       crosses the placeholder (Slavic case selection, Arabic dual,
+       Japanese particle placement, etc). A translator rewrites both
+       singular and plural keys per their language's rule. -->
+  <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} file masih diperlukan</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} file masih diperlukan</value></data>
+  <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} file tidak diperlukan untuk dibersihkan</value></data>
+  <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} file tidak diperlukan untuk dibersihkan</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} file terdaftar hilang (bukan dihapus oleh InstallerClean). Tidak masalah sekarang, tetapi perbaikan, pembaruan, atau penghapusan instalasi program itu di kemudian hari bisa gagal. Buka Detail untuk tahu apa yang harus dilakukan.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} file terdaftar hilang (bukan dihapus oleh InstallerClean). Tidak masalah sekarang, tetapi perbaikan, pembaruan, atau penghapusan instalasi program-program itu di kemudian hari bisa gagal. Buka Detail untuk tahu apa yang harus dilakukan.</value></data>
+  <!-- Informational line shown when the MSI database carries
+       superseded-patch registrations whose files are already gone
+       from disk. Distinct from the missing-from-disk warning
+       because the files are removable already; only the MSI
+       registration is stale. InstallerClean doesn't unregister
+       anything, so this is purely diagnostic. -->
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>{0} entri MSI usang terdeteksi (file sudah hilang dari disk; InstallerClean tidak membatalkan pendaftarannya).</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>{0} entri MSI usang terdeteksi (file sudah hilang dari disk; InstallerClean tidak membatalkan pendaftarannya).</value></data>
+  <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
+  <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} dari {1} {2}</value></data>
+  <!-- Orphaned-window footer summary. Unneeded files split into the three
+       removable causes shown in the Reason column: true orphans (the API
+       never claimed them), superseded patches and obsoleted patches.
+       0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
+       3 = size display. No trailing noun, so it agrees at any count. -->
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} yatim, {1} digantikan, {2} usang ({3})</value></data>
+  <!-- Registered-window footer summary, reinforcing the "still needed" framing
+       (the flip side of the main window's "unneeded"). Split singular/plural so
+       the noun and verb agree at one file ("file ... is" vs "files ... are").
+       0 = count, 1 = size display. -->
+  <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} file terdaftar yang masih diperlukan ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} file terdaftar yang masih diperlukan ({1})</value></data>
+
+  <!-- Confirmation dialogs -->
+  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
+  <data name="Confirm.MoveTitle" xml:space="preserve"><value>Pindahkan {0} {1} ({2})?</value></data>
+  <!-- 0 = destination path -->
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>File akan dipindahkan ke {0}.</value></data>
+  <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Hapus {0} {1} ({2})?</value></data>
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>File akan dikirim ke Keranjang Sampah. Jika Anda ingin salinan cadangan, gunakan Pindahkan.</value></data>
+
+  <!-- Error messages -->
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Perlu hak administrator</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean memerlukan hak istimewa administrator.
+
+Klik kanan dan pilih 'Jalankan sebagai administrator'.</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Basis data penginstal tidak tersedia</value></data>
+  <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Pemindaian gagal</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Basis data Windows Installer tampak kosong atau tidak bisa diakses. Ini tidak biasa bahkan pada Windows yang baru dipasang dan biasanya berarti basis data rusak atau alat pihak ketiga telah mengosongkannya. Menjalankan 'sfc /scannow' dari prompt dengan hak administrator biasanya memperbaikinya.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Akses ditolak saat mendata produk yang terpasang. Jalankan sebagai administrator.</value></data>
+  <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
+       in the message because a sysadmin reading the dialog may want
+       to look it up). -->
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer menolak menampilkan daftar produk setelah {0} kali gagal berturut-turut (kode kesalahan terakhir {1}). Coba mulai ulang Windows, atau jalankan 'sfc /scannow' dari prompt dengan hak administrator.</value></data>
+  <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Tujuan tidak valid</value></data>
+  <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Tidak bisa menulis ke tujuan</value></data>
+  <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Pemindahan gagal</value></data>
+  <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Penghapusan gagal</value></data>
+  <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Tujuan tidak boleh berada di dalam folder Windows Installer.</value></data>
+  <!-- 0 = the destination path the user typed -->
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, dan %ProgramData%.</value></data>
+  <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Ruang tidak cukup</value></data>
+  <!-- 0 = destination, 1 = required size, 2 = available size -->
+  <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>Ruang tidak cukup di {0}
+
+Diperlukan: {1}
+Tersedia: {2}</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>Anda tidak punya izin untuk menulis ke {0}.
+Coba folder di profil pengguna Anda atau di drive milik Anda sendiri.</value></data>
+  <data name="Error.PathTooLong" xml:space="preserve"><value>Jalur {0} terlalu panjang untuk Windows. Pilih jalur yang lebih pendek.</value></data>
+  <data name="Error.DestinationMissing" xml:space="preserve"><value>Folder {0} tidak ada dan tidak bisa dibuat. Periksa huruf drive atau jalur jaringan.</value></data>
+  <!-- 0 = destination, 1 = crash log path. The exception's .Message
+       intentionally does NOT appear in either string: under elevation
+       framework messages can carry paths from another user's profile.
+       Detail goes to the crash log; the user is pointed at it. -->
+  <data name="Error.IOWriteDestination" xml:space="preserve"><value>Windows tidak bisa menulis ke {0}.
+Detail di {1}.</value></data>
+  <data name="Error.IOWriteDestination.NoLog" xml:space="preserve"><value>Windows tidak bisa menulis ke {0}. Log kerusakan tidak bisa ditulis.</value></data>
+  <data name="Error.WriteDestination" xml:space="preserve"><value>Tidak bisa menulis ke {0}.
+Detail di {1}.</value></data>
+  <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Tidak bisa menulis ke {0}. Log kerusakan tidak bisa ditulis.</value></data>
+  <data name="Error.MissingSourceFile" xml:space="preserve"><value>File sudah tidak ada lagi.</value></data>
+  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>File sumber adalah symlink atau junction; ditolak demi keamanan.</value></data>
+  <!-- Category-only sentences for FileOperationError.LocalisedMessage.
+       These intentionally do NOT include a path or framework message
+       fragment: with the app running elevated, the per-file
+       UnauthorizedAccessException / IOException messages can carry
+       paths from other users' profiles into the displayed error list. -->
+  <data name="Error.AccessDenied" xml:space="preserve"><value>Akses ditolak.</value></data>
+  <data name="Error.IOFailure" xml:space="preserve"><value>Operasi gagal. Coba lagi atau mulai ulang Windows.</value></data>
+  <data name="Error.UnknownError" xml:space="preserve"><value>Kesalahan tidak diketahui.</value></data>
+  <!-- 0 = shell error code -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Tidak bisa mengirim file ini ke Keranjang Sampah (kesalahan {0}). File mungkin terkunci, sedang dipakai, atau diblokir Windows. Pindahkan saja.</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows memblokir akses ke file ini, bahkan dengan hak administrator (kesalahan {0}). Biasanya karena kunci kepemilikan atau izin. Pindahkan saja.</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>File ini sedang terbuka atau terkunci oleh program lain (kesalahan {0}). Tutup program itu, atau apa pun yang sedang memindainya, lalu coba lagi, atau Pindahkan saja.</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>File dihapus permanen karena tidak bisa dikirim ke Keranjang Sampah.</value></data>
+  <!-- 0 = destination -->
+  <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Menolak memindahkan file ke dalam folder Windows Installer (tujuan: {0}).</value></data>
+  <!-- 0 = the relative path the caller passed -->
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Tujuan harus berupa jalur absolut lengkap (jalur relatif diselesaikan terhadap direktori kerja proses saat ini dan tidak aman saat berjalan dengan hak admin): {0}</value></data>
+  <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Tidak bisa membuka peramban Anda</value></data>
+  <data name="UpdateCheck.Title" xml:space="preserve"><value>Periksa pembaruan</value></data>
+  <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Memeriksa...</value></data>
+  <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>Sudah versi terbaru.</value></data>
+  <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Pembaruan tersedia</value></data>
+  <!-- 0 = installed version, 1 = latest version on GitHub -->
+  <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Anda menjalankan versi {0}.&#10;Versi {1} tersedia.</value></data>
+  <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Tidak bisa menjangkau GitHub. Periksa koneksi internet Anda dan coba lagi.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub mengembalikan respons kesalahan. API rilis mungkin terkena batas laju; coba lagi beberapa menit lagi.</value></data>
+  <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Respons GitHub tidak memuat rilis yang dikenali. Coba lagi nanti, atau buka halaman rilis langsung.</value></data>
+  <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Pemeriksaan kehabisan waktu. Koneksi Anda ke GitHub mungkin lambat; coba lagi.</value></data>
+  <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Pemeriksaan gagal karena alasan yang tidak diketahui. Detailnya ada di crash.log jika Anda perlu melaporkannya.</value></data>
+  <!-- 0 = the URL the user was trying to reach -->
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>Tautan tidak bisa dibuka di peramban pengguna biasa Anda. URL telah disalin ke papan klip agar Anda bisa membukanya secara manual:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>Tautan tidak bisa dibuka di peramban pengguna biasa Anda, dan menyalinnya ke papan klip juga gagal. URL-nya:&#10;&#10;{0}</value></data>
+  <!-- 0 = the destination folder whose canonical path changed mid-batch -->
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Jalur kanonis folder tujuan berubah di tengah proses batch: {0}</value></data>
+  <!-- 0 = folder, 1 = inner exception message -->
+  <data name="Error.CannotWriteFolder" xml:space="preserve"><value>Tidak bisa menulis ke {0}.</value></data>
+  <!-- 0 = file name -->
+  <data name="Error.NoUniqueFilename" xml:space="preserve"><value>Tidak bisa menemukan nama file yang unik untuk '{0}' setelah 10.000 percobaan.</value></data>
+
+  <!-- Result log (post-cleanup diagnostic send) -->
+  <data name="ResultLog.Sending" xml:space="preserve"><value>Mengirim...</value></data>
+  <data name="ResultLog.Sent" xml:space="preserve"><value>Terima kasih! Laporan terkirim.</value></data>
+  <data name="ResultLog.Failed" xml:space="preserve"><value>Pengiriman gagal. Coba lagi nanti.</value></data>
+  <data name="ResultLog.NothingToSend" xml:space="preserve"><value>Tidak ada laporan untuk dikirim.</value></data>
+  <!-- Body header shown in the confirmation modal. Names the
+       recipient and the full URL so the user sees the destination
+       without having to scroll the JSON. -->
+  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>Kirim ini ke No Faff?</value></data>
+  <!-- Reassurance line under the JSON. Names the URL once, calls
+       out the no-PII property, and explains the purpose so the
+       user has the context the modal title implies. -->
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Tidak ada yang mengidentifikasi Anda atau mesin Anda; ini hanya memberi tahu saya bahwa InstallerClean berfungsi dan berapa banyak ruang yang dikosongkan orang-orang. Dikirim ke nofaff.netlify.app/api/result-log.</value></data>
+  <!-- AutomationProperties.Name on the JSON preview TextBox so screen
+       readers announce its content rather than "edit, read-only". -->
+  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Pratinjau log hasil</value></data>
+
+  <!-- Single instance / startup / crash -->
+  <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <data name="Startup.AlreadyRunningBody" xml:space="preserve"><value>InstallerClean sudah berjalan.</value></data>
+  <data name="Startup.UnhandledTitle" xml:space="preserve"><value>InstallerClean</value></data>
+  <!-- 0 = exception type name (e.g. "IOException"), 1 = crash log path.
+       The full exception message is intentionally NOT formatted in here:
+       framework-provided messages can carry absolute paths from other
+       users' profiles into a dialog the current user reads. The full
+       detail is written to the crash log instead. -->
+  <data name="Startup.UnhandledBody" xml:space="preserve"><value>Terjadi kesalahan tak terduga dan InstallerClean perlu ditutup.
+
+{0}
+
+Detail ditulis ke:
+{1}</value></data>
+  <data name="Startup.UnhandledBody.NoLog" xml:space="preserve"><value>Terjadi kesalahan tak terduga dan InstallerClean perlu ditutup.
+
+{0}
+
+Log kerusakan tidak bisa ditulis.</value></data>
+  <data name="Startup.ErrorTitle" xml:space="preserve"><value>Kesalahan saat memulai</value></data>
+  <!-- 0 = exception type name (see Startup.UnhandledBody for why this
+       is the type name and not the message), 1 = crash log path. -->
+  <data name="Startup.FailedToStart" xml:space="preserve"><value>Gagal memulai ({0}). Detail ditulis ke:
+{1}</value></data>
+  <data name="Startup.FailedToStart.NoLog" xml:space="preserve"><value>Gagal memulai ({0}). Log kerusakan tidak bisa ditulis.</value></data>
+
+  <!-- File picker -->
+  <data name="FilePicker.ChooseDestinationTitle" xml:space="preserve"><value>Pilih folder tujuan untuk file yang dipindahkan</value></data>
+
+  <!-- Version display -->
+  <!-- 0 = major.minor.patch (e.g. "1.5.4") -->
+  <data name="Version.Display" xml:space="preserve"><value>Versi {0}</value></data>
+
+  <!-- Plural fragments. Consumed by DisplayHelpers.Pluralise. The
+       singular/plural pair is English-style (n != 1 -> plural). A
+       Slavic / Arabic / etc. host replaces this layer; consumers do
+       not change. -->
+  <data name="Plural.File.Singular" xml:space="preserve"><value>file</value></data>
+  <data name="Plural.File.Plural" xml:space="preserve"><value>file</value></data>
+  <data name="Plural.Error.Singular" xml:space="preserve"><value>kesalahan</value></data>
+  <data name="Plural.Error.Plural" xml:space="preserve"><value>kesalahan</value></data>
+  <data name="Plural.Package.Singular" xml:space="preserve"><value>paket</value></data>
+  <data name="Plural.Package.Plural" xml:space="preserve"><value>paket</value></data>
+  <data name="Plural.Product.Singular" xml:space="preserve"><value>produk</value></data>
+  <data name="Plural.Product.Plural" xml:space="preserve"><value>produk</value></data>
+  <data name="Plural.Patch.Singular" xml:space="preserve"><value>patch</value></data>
+  <data name="Plural.Patch.Plural" xml:space="preserve"><value>patch</value></data>
+
+  <!-- Display-format fragments used by DisplayHelpers.FormatSize /
+       FormatElapsed / FormatElapsedLong. Number portion stays in
+       string.Format with the consumer's CurrentCulture (so 1.5 GB
+       becomes 1,5 GB on de-DE etc.); only the unit suffix and the
+       sub-second long-form sentence are localisable. -->
+  <data name="Display.Size.GB" xml:space="preserve"><value>{0:F2} GB</value></data>
+  <data name="Display.Size.MB" xml:space="preserve"><value>{0:F1} MB</value></data>
+  <data name="Display.Size.KB" xml:space="preserve"><value>{0:F1} KB</value></data>
+  <data name="Display.Size.B" xml:space="preserve"><value>{0} B</value></data>
+  <data name="Display.Elapsed.Ms" xml:space="preserve"><value>{0:F0}ms</value></data>
+  <data name="Display.Elapsed.S" xml:space="preserve"><value>{0:F1}s</value></data>
+  <data name="Display.ElapsedLong.LessThanASecond" xml:space="preserve"><value>kurang dari satu detik</value></data>
+  <data name="Display.ElapsedLong.Seconds" xml:space="preserve"><value>{0:F1} detik</value></data>
+
+  <!-- CLI output. Two destinations with different localisation rules.
+       Stdout (everything the user reads at the console) is localised so a
+       non-English sysadmin gets text matching their UI culture. The entries
+       written INTO the Windows Application event log are English-only
+       (no-translate): an RMM tool greps that channel for a known English
+       string regardless of the machine's OS UI culture, so a satellite resx
+       must NOT translate them. Those are the Cli.EventLog* keys, with one
+       exception: Cli.EventLogUnavailable is a stdout warning (it tells the
+       operator that an event-log write failed), so it is localised like the
+       rest of stdout despite the EventLog prefix. -->
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Argumen tidak dikenal: '{0}'</value></data>
+  <data name="Cli.Cancelling" xml:space="preserve"><value>Membatalkan...</value></data>
+  <data name="Cli.Cancelled" xml:space="preserve"><value>Dibatalkan.</value></data>
+  <!-- 0 = exception type name (full message + stack trace go to the
+       crash log; the CLI runs elevated so .Message could include paths
+       from another user's profile if logged to a shared file).
+       1 = crash log path. -->
+  <data name="Cli.GenericError" xml:space="preserve"><value>Kesalahan: {0}. Detail ditulis ke {1}.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Kesalahan: {0}. Log kerusakan tidak bisa ditulis.</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Memindai C:\Windows\Installer...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Ditemukan {0} {1} untuk dibersihkan ({2}).</value></data>
+  <data name="Cli.NothingToDo" xml:space="preserve"><value>Tidak ada yang perlu dilakukan.</value></data>
+  <!-- 0 = mode arg ("/s"), 1 = registered package count, 2 = pluralised "package"/"packages" -->
+  <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Menghapus {0} {1}...</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun -->
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>{0} {1} dihapus.</value></data>
+  <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
+       4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Kesalahan: Keranjang Sampah tidak tersedia untuk volume ini, jadi tidak ada yang dihapus. Gunakan /m untuk memindahkan file, atau aktifkan kembali Keranjang Sampah dan jalankan lagi.</value></data>
+  <!-- 0 = mode arg ("/d") -->
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Kesalahan: tujuan pemindahan tidak ditentukan. Gunakan /m JALUR atau atur default di GUI.</value></data>
+  <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Kesalahan: tujuan tidak boleh berada di dalam folder Windows Installer.</value></data>
+  <!-- 0 = the relative or otherwise unsafe path -->
+  <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Kesalahan: tujuan harus berupa jalur absolut lengkap. Diterima: {0}</value></data>
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Kesalahan: tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, dan %ProgramData%.</value></data>
+  <!-- 0 = mode, 1 = destination -->
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Kesalahan: ada sesuatu yang sedang menggunakan Windows Installer saat ini, biasanya Windows Update atau program yang memasang di latar belakang. Pindahkan dan Hapus diblokir selama itu berjalan. Coba lagi setelah selesai.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Kesalahan: ada transaksi Windows Installer sebelumnya yang tertunda di mesin ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache.</value></data>
+  <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Kesalahan: operasi file yang diantrekan setelah mulai ulang menyasar cache Installer ({0}). Mulai ulang Windows untuk menyelesaikan operasi itu sebelum membersihkan.</value></data>
+  <!-- Short human labels for the EventLog ({1} slot in
+       Cli.EventLogPendingRebootBlocked). The stdout sentences in
+       Cli.PendingRebootBlocked.* are full localised text; these short
+       labels are English-only (no-translate, like every Cli.EventLog*
+       entry written to the Application channel) so an Application-channel
+       grep can match a known string regardless of OS UI culture. -->
+  <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
+       2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination -->
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Memindahkan {0} {1} ke {2}...</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun -->
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>{0} {1} dipindahkan.</value></data>
+  <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
+       4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
+  <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
+       processed (a cancel during the scan, or before the first delete or
+       move), so "each /s, /d or /m run writes one summary entry" holds for
+       every run, not only the ones that committed work. -->
+  <!-- Stdout when the CLI cannot acquire the single-instance mutex.
+       The GUI variant (Strings.Startup_AlreadyRunningBody) is written
+       for a user who tried to launch a second window; the CLI variant
+       names the contending parties (GUI or another CLI run) and
+       points at exit code 75 so an RMM operator parsing stdout
+       knows it is transient and safe to retry. -->
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Proses InstallerClean lain memegang kunci instans-tunggal (GUI atau proses CLI lain). Keluar 75 (sementara); aman untuk dicoba lagi nanti.</value></data>
+  <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
+       can't acquire the single-instance mutex, so an RMM consumer of
+       the Application channel sees a record of every scheduled-job
+       firing whether or not it was able to run. -->
+  <!-- 0 = the offending token (original case). Audit entry written when
+       the CLI is invoked with an unrecognised or malformed argument, so a
+       scheduled task with a fat-fingered flag leaves an Application-channel
+       trace instead of exiting silently. English only, like every Cli
+       EventLog string; the stdout message carries the localised text. -->
+  <!-- Audit entry written when the CLI is invoked with no argument at all,
+       so an argless scheduled task fails visibly (non-zero exit) and leaves
+       a record rather than silently succeeding while doing nothing. -->
+  <!-- Audit entry for the LocalisedAccessException and
+       LocalisedInvalidOperationException catches: the message has been
+       built from a resx template with user-controlled args only, so the
+       full text is safe to record. 0 = mode arg, 1 = the localised
+       message (already-formatted). RMM consumers parsing the
+       Application channel see the actionable reason without a separate
+       crash-log lookup. -->
+  <!-- Audit entry for the generic Exception catch: ex.Message is held
+       back (path-leak risk under elevation), only the type name and
+       crash log path travel to the EventLog. 0 = mode arg, 1 = type
+       name, 2 = crash log path. -->
+  <!-- Stdout warning printed once at the end of a CLI run if any
+       Event Log write failed (Group Policy or service unavailable).
+       Tells an RMM consumer expecting an Application entry that the
+       channel was unwritable, not just empty. -->
+  <data name="Cli.EventLogUnavailable" xml:space="preserve"><value>Catatan: penulisan ke Log Peristiwa gagal. Periksa izin log Aplikasi atau Kebijakan Grup.</value></data>
+
+  <!-- crash.log privacy header. Prepended to a fresh crash.log so a
+       user attaching the file to a public bug report has the
+       disclosure before sharing. The "# " prefix lets log readers
+       that skip comment lines (less, grep -v, jq pipelines) skip
+       the header. Stored as one multi-line block; the C# side reads
+       it verbatim and normalises line endings to the host platform. -->
+  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log menangkap pengecualian tak tertangani dari InstallerClean.
+# Dalam mode dengan hak akses tinggi, pesan pengecualian framework bisa
+# memuat jalur file dari sesi yang berjalan (termasuk profil pengguna
+# lain yang didata oleh kueri Windows Installer). Pesan kegagalan
+# jaringan dari pemeriksaan pembaruan atau POST log hasil bisa memuat
+# URL tujuan dan alamat IP / proksi yang teresolusi. Hapus kedua jenis
+# detail ini sebelum melampirkan file ini ke laporan bug publik.
+</value></data>
+
+  <!-- CLI help text (printed by /?, -h and the long help flag) -->
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - pembersihan C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Usage" xml:space="preserve"><value>Penggunaan:</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   Tampilkan bantuan ini (juga menerima /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Cetak versi (juga menerima -v)</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       Pindai saja - daftar file tidak diperlukan</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       Hapus file tidak diperlukan (Keranjang Sampah)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       Pindahkan ke lokasi default tersimpan</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m JALUR Pindahkan ke jalur yang ditentukan</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli adalah proses konsol sungguhan dan memblokir prompt</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>sampai selesai; alihkan atau salurkan keluarannya seperti</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>executable konsol lainnya. GUI ada di InstallerClean.exe di sebelahnya.</value></data>
+  <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Kode keluar:</value></data>
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   berhasil: setiap file yang ditandai telah diproses</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   gagal: tidak ada yang diproses (argumen salah, pemindaian gagal, semua file gagal)</value></data>
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   sebagian: sebagian file diproses, sebagian gagal</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  sementara: kondisi sementara memblokir proses (lihat pesannya)</value></data>
+  <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 dibatalkan (Ctrl+C)</value></data>
+  <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Ganti bahasa. Program akan dimulai ulang.</value></data>
+  <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Ganti bahasa</value></data>
+  <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Program akan dimulai ulang.</value></data>
+
+</root>
