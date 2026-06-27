@@ -8,13 +8,13 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 - coolvitto contributed, entirely unprompted, a complete Japanese translation of the interface, written from scratch (#41): every window, dialog, tooltip, button and screen-reader label. InstallerClean can now be displayed in Japanese, applied automatically on a Japanese-language Windows or picked from the main-window language menu.
 - The command-line tool (`installerclean-cli`) now follows the Windows display language for its human-facing output: on a Japanese Windows its help, progress and error text appear in Japanese (coolvitto, #41), and on an Italian Windows in Italian (bovirus, #34). The machine-readable parts stay English on every machine, by design: the Application event-log entries that monitoring (RMM) tools match on, and the scriptable "N errors:" line. On a Windows language with no command-line translation it falls back to English.
-- InstallerClean's interface and command-line tool have been translated into seven more languages, each a complete translation awaiting a native speaker's review (through the README) before it goes live in the app. Korean, French and German were done in this cycle, French with full French typography (the narrow no-break space before `:` `;` `?` `!` and `%`, and guillemets) and German with the finite-verb and adjective agreement it needs at a count of one. Where the languages stand:
+- InstallerClean's interface and command-line tool have been translated into twelve more languages, each a complete translation awaiting a native speaker's review (through the README) before it goes live in the app: Simplified Chinese, Russian, Spanish, Brazilian Portuguese, Korean, French, German, Polish, Turkish, Indonesian, Vietnamese and Ukrainian. Each was done from the English with its own grammar handled rather than calqued: French carries full French typography (the narrow no-break space before `:` `;` `?` `!` and `%`, and guillemets); German, Russian, Polish and Ukrainian agree their counts, Polish and Ukrainian each on their own one/few/many rule and Ukrainian's "few" in the nominative plural rather than Russian's genitive singular; Turkish, Indonesian and Vietnamese leave the count uninflected; and each takes the register and the Windows terms (the Recycle Bin, the Event Log and the rest) its own platform uses. Where the languages stand:
 
   | In the app | Ready for review | README only \* |
   | --- | --- | --- |
-  | English · Italian · Japanese | Simplified Chinese · Russian · Spanish · Brazilian Portuguese · Polish · Turkish · Korean · French · German · Indonesian · Ukrainian | Arabic |
+  | English · Italian · Japanese | Simplified Chinese · Russian · Spanish · Brazilian Portuguese · Polish · Turkish · Korean · French · German · Indonesian · Vietnamese · Ukrainian | Arabic |
 
-  \* README only means the README is translated while the interface stays English. Arabic is here on that basis, because a right-to-left interface is a separate piece of work. Vietnamese is being translated and will join the middle column.
+  \* README only means the README is translated while the interface stays English. Arabic is here on that basis, because a right-to-left interface is a separate piece of work.
 
 ### Changed
 
