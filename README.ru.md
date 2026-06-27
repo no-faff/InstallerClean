@@ -12,7 +12,7 @@
 
 <p align="center"><strong>Инструмент с открытым исходным кодом для безопасной очистки <code>C:\Windows\Installer</code> — скрытой папки Windows, которая незаметно съедает место на диске.</strong></p>
 
-<p align="center"><em>Запустите один раз. Может, освободите немного места. И выкиньте.</em></p>
+<p align="center"><em>Запускайте раз в кои-то веки. Может, освободите немного места. Идите дальше, налегке.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Лицензия: MIT"></a>

@@ -12,7 +12,7 @@
 
 <p align="center"><strong>Uma ferramenta de código aberto para limpar com segurança o <code>C:\Windows\Installer</code>, a pasta oculta do Windows que consome silenciosamente o seu espaço em disco.</strong></p>
 
-<p align="center"><em>Use uma vez. Talvez libere um espaço. Pode jogar fora.</em></p>
+<p align="center"><em>Use uma vez na vida e outra na morte. Talvez libere um espaço. Siga em frente, leve e limpo.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licença: MIT"></a>
