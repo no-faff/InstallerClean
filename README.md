@@ -390,6 +390,7 @@ I'd be very grateful to anyone with a good grasp of English and one of the langu
 - Spanish: [table](docs/translations/es.md) · [resx](src/InstallerClean.Core/Resources/Strings.es.resx)
 - Brazilian Portuguese: [table](docs/translations/pt-BR.md) · [resx](src/InstallerClean.Core/Resources/Strings.pt-BR.resx)
 - Polish: [table](docs/translations/pl.md) · [resx](src/InstallerClean.Core/Resources/Strings.pl.resx)
+- Turkish: [table](docs/translations/tr.md) · [resx](src/InstallerClean.Core/Resources/Strings.tr.resx)
 - Korean: [table](docs/translations/ko.md) · [resx](src/InstallerClean.Core/Resources/Strings.ko.resx)
 - French: [table](docs/translations/fr.md) · [resx](src/InstallerClean.Core/Resources/Strings.fr.resx)
 - German: [table](docs/translations/de.md) · [resx](src/InstallerClean.Core/Resources/Strings.de.resx)
