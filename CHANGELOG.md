@@ -12,9 +12,9 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
   | In the app | Ready for review | README only \* |
   | --- | --- | --- |
-  | English · Italian · Japanese | Simplified Chinese · Russian · Spanish · Brazilian Portuguese · Korean · French · German | Arabic |
+  | English · Italian · Japanese | Simplified Chinese · Russian · Spanish · Brazilian Portuguese · Korean · French · German · Ukrainian | Arabic |
 
-  \* README only means the README is translated while the interface stays English. Arabic is here on that basis, because a right-to-left interface is a separate piece of work. Polish, Turkish, Indonesian, Vietnamese and Ukrainian are being translated and will join the middle column.
+  \* README only means the README is translated while the interface stays English. Arabic is here on that basis, because a right-to-left interface is a separate piece of work. Polish, Turkish, Indonesian and Vietnamese are being translated and will join the middle column.
 
 ### Changed
 
