@@ -14,7 +14,7 @@
 
 <p align="center"><strong>Ein quelloffenes Tool, um <code>C:\Windows\Installer</code> sicher aufzuräumen, den versteckten Windows-Ordner, der still und leise deinen Speicherplatz auffrisst.</strong></p>
 
-<p align="center"><em>Einmal benutzen. Vielleicht etwas Platz schaffen. Weg damit.</em></p>
+<p align="center"><em>Alle Jubeljahre mal benutzen. Vielleicht etwas Platz schaffen. Aufgeräumt weiterziehen.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Lizenz: MIT"></a>

@@ -12,7 +12,7 @@
 
 <p align="center"><strong>一款开源工具，安全清理 <code>C:\Windows\Installer</code>，这个悄悄蚕食您磁盘空间的隐藏 Windows 文件夹。</strong></p>
 
-<p align="center"><em>用上一次。说不定能省点空间。然后随手扔掉。</em></p>
+<p align="center"><em>难得用上一回。说不定能省点空间。清清爽爽，继续前行。</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="许可证：MIT"></a>

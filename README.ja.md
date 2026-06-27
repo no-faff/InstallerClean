@@ -14,7 +14,7 @@
 
 <p align="center"><strong><code>C:\Windows\Installer</code>、つまり気づかないうちにディスク容量を食いつぶしていく Windows の隠しフォルダーを、安全にクリーンアップするためのオープンソースツールです。</strong></p>
 
-<p align="center"><em>一度使う。少し容量が空くかも。あとは捨てる。</em></p>
+<p align="center"><em>思い出した頃に使う。少し容量が空くかも。すっきりして、また日常へ。</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="ライセンス: MIT"></a>

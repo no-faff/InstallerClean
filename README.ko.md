@@ -14,7 +14,7 @@
 
 <p align="center"><strong>디스크 공간을 소리 없이 갉아먹는 숨겨진 Windows 폴더 <code>C:\Windows\Installer</code>를 안전하게 정리하는 오픈 소스 도구입니다.</strong></p>
 
-<p align="center"><em>한 번 쓰세요. 어쩌면 공간이 좀 생길지도. 그리고 버리세요.</em></p>
+<p align="center"><em>쓸 일은 가뭄에 콩 나듯. 어쩌면 공간이 좀 생길지도. 개운하게 떠나세요.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="라이선스: MIT"></a>

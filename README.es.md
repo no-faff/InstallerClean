@@ -12,7 +12,7 @@
 
 <p align="center"><strong>Una herramienta de código abierto para limpiar con seguridad <code>C:\Windows\Installer</code>, la carpeta oculta de Windows que se va comiendo tu espacio en disco sin que te des cuenta.</strong></p>
 
-<p align="center"><em>Úsala una vez. Quizá liberes algo de espacio. Tírala.</em></p>
+<p align="center"><em>Úsala de Pascuas a Ramos. Quizá liberes algo de espacio. Sigue adelante, todo limpio.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licencia: MIT"></a>

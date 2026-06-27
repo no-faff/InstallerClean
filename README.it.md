@@ -14,7 +14,7 @@
 
 <p align="center"><strong>Uno strumento open source per pulire in sicurezza <code>C:\Windows\Installer</code>, la cartella nascosta di Windows che si mangia in silenzio il tuo spazio su disco.</strong></p>
 
-<p align="center"><em>Usala una volta. Magari liberi un po' di spazio. Buttala via.</em></p>
+<p align="center"><em>Usala ogni morte di papa. Magari liberi un po' di spazio. Passa oltre, con la coscienza pulita.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licenza: MIT"></a>

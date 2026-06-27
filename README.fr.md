@@ -14,7 +14,7 @@
 
 <p align="center"><strong>Un outil open source pour nettoyer en toute sécurité <code>C:\Windows\Installer</code>, le dossier caché de Windows qui grignote silencieusement votre espace disque.</strong></p>
 
-<p align="center"><em>Utilisez-le une fois. Gagnez peut-être un peu d'espace. Puis jetez-le.</em></p>
+<p align="center"><em>Servez-vous-en tous les trente-six du mois. Gagnez peut-être un peu d'espace. Repartez, tout propre.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licence : MIT"></a>
