@@ -1,0 +1,441 @@
+# InstallerClean in Polski (Polish)
+
+The text of InstallerClean's interface and command-line tool in English on the left, with the Polish translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Polish can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.pl.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+
+A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.pl.resx`](../../src/InstallerClean.Core/Resources/Strings.pl.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
+
+## Window titles
+
+| English | Polski |
+| --- | --- |
+| InstallerClean | InstallerClean |
+| About | O programie |
+| Registered files that should not be deleted | Zarejestrowane pliki, których nie należy usuwać |
+| Unneeded files that are safe to delete | Niepotrzebne pliki, które można bezpiecznie usunąć |
+| Confirm move | Potwierdzenie przeniesienia |
+| Confirm delete | Potwierdzenie usunięcia |
+| Recycle Bin unavailable | Kosz niedostępny |
+
+## Section headings
+
+| English | Polski |
+| --- | --- |
+| PRODUCTS | PRODUKTY |
+| PATCHES | POPRAWKI |
+| PRODUCT DETAILS | SZCZEGÓŁY PRODUKTU |
+| MOVE LOCATION | LOKALIZACJA PRZENOSZENIA |
+| SAY THANKS | PODZIĘKUJ |
+
+## Buttons and actions
+
+| English | Polski |
+| --- | --- |
+| _About | _O programie |
+| Copy | Kopiuj |
+| Cut | Wytnij |
+| Paste | Wklej |
+| Select all | Zaznacz wszystko |
+| _Browse... | Prze_glądaj... |
+| _Cancel | _Anuluj |
+| Check for _updates | Sprawdź _aktualizacje |
+| _Close | _Zamknij |
+| _Delete | _Usuń |
+| _Delete permanently | Usuń _trwale |
+| _Done | _Gotowe |
+| Details | Szczegóły |
+| _Buy me a cuppa | Postaw mi _kawę |
+| Leave a _star on GitHub | Zostaw _gwiazdkę na GitHubie |
+| MIT licence | Licencja MIT |
+| _Move | _Przenieś |
+| _Move instead | _Przenieś |
+| Path to folder if you Move instead of Delete | Ścieżka do folderu, jeśli zamiast usuwać wybierzesz Przenieś |
+| Open _release page | Otwórz stronę _wydania |
+| _Re-scan | _Skanuj ponownie |
+| _Scan again | _Skanuj ponownie |
+| Send report | Wyślij raport |
+| _Send | _Wyślij |
+
+## Field labels
+
+| English | Polski |
+| --- | --- |
+| Reason | Powód |
+| Author | Autor |
+| Application | Aplikacja |
+| Title | Tytuł |
+| Subject | Temat |
+| Keywords | Słowa kluczowe |
+| Signing certificate | Certyfikat podpisujący |
+| File size | Rozmiar pliku |
+| Comment | Komentarz |
+| Product name | Nazwa produktu |
+| File | Plik |
+| Size | Rozmiar |
+| Patches | Poprawki |
+| (unknown) | (nieznana) |
+| (patches only) | (tylko poprawki) |
+| missing | brak |
+
+## Status and progress
+
+| English | Polski |
+| --- | --- |
+| Scanning... | Skanowanie... |
+| Cancelling... | Anulowanie... |
+| Starting scan... | Rozpoczynanie skanowania... |
+| Asking Windows about installed software... | Pytanie Windows o zainstalowane oprogramowanie... |
+| Scanning installer cache folder... | Skanowanie folderu pamięci podręcznej instalatora... |
+| Enumerating installed products... | Wyliczanie zainstalowanych produktów... |
+| Checking registry for additional packages... | Sprawdzanie rejestru w poszukiwaniu dodatkowych pakietów... |
+| Found {0} registered {1}. | Znaleziono {0} zarejestrowanych {1}. |
+| Scan complete ({0}) | Skanowanie zakończone ({0}) |
+| Scanning local packages... | Skanowanie pakietów lokalnych... |
+| Found {0} {1} you can safely delete. | Znaleziono {0} {1} do bezpiecznego usunięcia. |
+| Preparing destination folder... | Przygotowywanie folderu docelowego... |
+| Moving {0} {1}... | Przenoszenie: {0} {1}... |
+| Deleting {0} {1}... | Usuwanie: {0} {1}... |
+| Move cancelled. {0} of {1} {2} processed. | Przenoszenie anulowane. Przetworzono {0}/{1} {2}. |
+| Delete cancelled. {0} of {1} {2} processed. | Usuwanie anulowane. Przetworzono {0}/{1} {2}. |
+| Move failed ({0}). Details in {1}. | Przenoszenie nie powiodło się ({0}). Szczegóły w {1}. |
+| Move failed ({0}). The crash log could not be written. | Przenoszenie nie powiodło się ({0}). Nie udało się zapisać dziennika awarii. |
+| Delete failed ({0}). Details in {1}. | Usuwanie nie powiodło się ({0}). Szczegóły w {1}. |
+| Delete failed ({0}). The crash log could not be written. | Usuwanie nie powiodło się ({0}). Nie udało się zapisać dziennika awarii. |
+| Access denied. Run as administrator. | Odmowa dostępu. Uruchom jako administrator. |
+| Scan failed: installer database unavailable. | Skanowanie nie powiodło się: baza danych instalatora niedostępna. |
+| Scan cancelled. | Skanowanie anulowane. |
+| Ready | Gotowe |
+| Scan failed ({0}). Details in {1}. | Skanowanie nie powiodło się ({0}). Szczegóły w {1}. |
+| Scan failed ({0}). The crash log could not be written. | Skanowanie nie powiodło się ({0}). Nie udało się zapisać dziennika awarii. |
+
+## Main screen text
+
+| English | Polski |
+| --- | --- |
+| The unneeded files below are safe to delete. | Niepotrzebne pliki poniżej można bezpiecznie usunąć. |
+| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Leżą w C:\Windows\Installer, pozostawione po odinstalowaniu programu ({0}), gdy nowsza poprawka zastąpiła jedną z nich ({1}) lub gdy wydawca ją wycofał ({2}). InstallerClean wymienia wyłącznie pliki, które sam Windows zgłasza jako już niepotrzebne. |
+| Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy. | Usuń je do Kosza albo najpierw przenieś w inne miejsce, jeśli wolisz zachować kopię. |
+| Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Coś właśnie korzysta z Windows Installer, zwykle aktualizacja Windows albo program instalujący się w tle. Na ten czas Przenieś i Usuń są wstrzymane, aby InstallerClean nie ruszał pamięci podręcznej instalatora, gdy ta się zmienia. Gdy to się zakończy, skanuj ponownie, a wrócą. |
+| A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Na tym komputerze zawieszona jest wcześniejsza transakcja Windows Installer. Przed wyczyszczeniem pamięci podręcznej dokończ lub wycofaj tamtą instalację (albo uruchom ponownie Windows). |
+| Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows ma w kolejce na następne uruchomienie zmianę nazwy pliku, która dotyczy pamięci podręcznej instalatora. Przed czyszczeniem uruchom ponownie Windows. |
+| Select a file to view details. | Wybierz plik, aby zobaczyć szczegóły. |
+| Select a product to view details. | Wybierz produkt, aby zobaczyć szczegóły. |
+| No metadata available. | Brak dostępnych metadanych. |
+| This installer file has been deleted. InstallerClean didn't do it, it never removes a file a program still needs; something else deleted this one before you ran InstallerClean.<br><br>It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself. | Ten plik instalatora został usunięty. InstallerClean tego nie zrobił, nigdy nie usuwa pliku, którego program wciąż potrzebuje; ten usunęło coś innego, zanim uruchomiono InstallerClean.<br><br>Na razie nie sprawia to żadnych kłopotów i nie sprawi, dopóki pewnego dnia nie spróbujesz naprawić, zaktualizować lub odinstalować programu, do którego należy. Ten krok może się wtedy nie powieść, bo Windows szuka tego pliku, a jego nie ma.<br><br>Aby spróbować to naprawić, pobierz instalator tego programu od jego producenta i uruchom go na istniejącej kopii (nie odinstalowuj wcześniej, odinstalowanie samo w sobie jest krokiem, który potrzebuje tego pliku). Jeśli możesz, użyj wersji, którą masz zainstalowaną, bo Windows może odrzucić inną. Zwykle przywraca to plik, a twoje ustawienia zazwyczaj pozostają nietknięte, ale Microsoft tego nie gwarantuje, jego własną ostatecznością jest ponowna instalacja programu lub samego Windows. |
+| The README [explains this folder], and how to recover a file, in Microsoft's own words. | README [wyjaśnia ten folder] i sposób odzyskania pliku, słowami samego Microsoftu. |
+| (none) | (brak) |
+
+## Reasons a file is unneeded
+
+| English | Polski |
+| --- | --- |
+| Orphaned | Osierocony |
+| Superseded | Zastąpiony |
+| Obsoleted | Przestarzały |
+
+## Completion screen
+
+| English | Polski |
+| --- | --- |
+| All clean | Wszystko czyste |
+| Nothing to clean up in C:\Windows\Installer | Nie ma czego czyścić w C:\Windows\Installer |
+| Scanned {0} {1} in {2} | Przeskanowano {0} {1} w {2} |
+| Copy them back if anything stops working | Skopiuj je z powrotem, jeśli coś przestanie działać |
+| Restore them from the Recycle Bin if anything stops working | Przywróć je z Kosza, jeśli coś przestanie działać |
+| {0} freed | Zwolniono {0} |
+| {0} moved | Przeniesiono {0} |
+| {0} moved, some files could not be processed | Przeniesiono {0}, niektórych plików nie udało się przetworzyć |
+| {0} freed, some files could not be processed | Zwolniono {0}, niektórych plików nie udało się przetworzyć |
+| {0} {1} moved to {2} | Przeniesiono {0} {1} do {2} |
+| {0} {1} moved to {2}. {3} {4} | Przeniesiono {0} {1} do {2}. {3} {4} |
+| {0} {1} sent to the Recycle Bin | Wysłano {0} {1} do Kosza |
+| {0} {1} sent to the Recycle Bin. {2} {3} | Wysłano {0} {1} do Kosza. {2} {3} |
+| {0} {1} permanently deleted. It did not go to the Recycle Bin. | Usunięto trwale {0} {1}. Nie trafił do Kosza. |
+| {0} {1} permanently deleted. They did not go to the Recycle Bin. | Usunięto trwale {0} {1}. Nie trafiło do Kosza. |
+| {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | Usunięto trwale {0} {1}. Nie trafił do Kosza. {2} {3} |
+| {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | Usunięto trwale {0} {1}. Nie trafiło do Kosza. {2} {3} |
+| That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | W porządku, można go było bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje. |
+| That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | W porządku, można je było bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje. |
+
+## Recycle Bin unavailable
+
+| English | Polski |
+| --- | --- |
+| The Recycle Bin isn't available for this drive | Kosz nie jest dostępny dla tego dysku |
+| So this {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently. | Dlatego ten {1} ({2}) nie został usunięty. Możesz przenieść go w bezpieczne miejsce lub usunąć trwale. |
+| So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently. | Dlatego te {0} {1} ({2}) nie zostało usuniętych. Możesz przenieść je w bezpieczne miejsce lub usunąć trwale. |
+| Deleting it is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Można go bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje, a Kosz to tylko dodatkowe zabezpieczenie. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje. |
+| Deleting them is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Można je bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje, a Kosz to tylko dodatkowe zabezpieczenie. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje. |
+
+## Summaries and counts
+
+| English | Polski |
+| --- | --- |
+| {0} file still needed | {0} plik nadal potrzebny |
+| {0} files still needed | {0} plików nadal potrzebnych |
+| {0} unneeded file to clean up | {0} niepotrzebny plik do wyczyszczenia |
+| {0} unneeded files to clean up | {0} niepotrzebnych plików do wyczyszczenia |
+| {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | Brakuje {0} zarejestrowanego pliku (nie usunął go InstallerClean). Na razie to nie problem, ale w przyszłości naprawa, aktualizacja lub odinstalowanie tego programu mogą się nie powieść. Otwórz Szczegóły, aby dowiedzieć się, co zrobić. |
+| {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | Brakuje {0} zarejestrowanych plików (nie usunął ich InstallerClean). Na razie to nie problem, ale w przyszłości naprawa, aktualizacja lub odinstalowanie tych programów mogą się nie powieść. Otwórz Szczegóły, aby dowiedzieć się, co zrobić. |
+| {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | Wykryto {0} przestarzały wpis MSI (plik już zniknął z dysku; InstallerClean nie wyrejestrowuje go). |
+| {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | Wykryto {0} przestarzałych wpisów MSI (pliki już zniknęły z dysku; InstallerClean ich nie wyrejestrowuje). |
+| {0} of {1} {2} | {0}/{1} {2} |
+| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} osieroconych, {1} zastąpionych, {2} przestarzałych ({3}) |
+| {0} registered file that is still needed ({1}) | {0} zarejestrowany plik nadal potrzebny ({1}) |
+| {0} registered files that are still needed ({1}) | {0} zarejestrowanych plików nadal potrzebnych ({1}) |
+
+## Confirmation dialogs
+
+| English | Polski |
+| --- | --- |
+| Move {0} {1} ({2})? | Przenieść {0} {1} ({2})? |
+| Files will be moved to {0}. | Pliki zostaną przeniesione do {0}. |
+| Delete {0} {1} ({2})? | Usunąć {0} {1} ({2})? |
+| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | Pliki zostaną wysłane do Kosza. Jeśli chcesz mieć kopie zapasowe, użyj zamiast tego Przenieś. |
+
+## Error messages
+
+| English | Polski |
+| --- | --- |
+| Administrator rights required | Wymagane uprawnienia administratora |
+| InstallerClean requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | InstallerClean wymaga uprawnień administratora.<br><br>Kliknij prawym przyciskiem myszy i wybierz „Uruchom jako administrator”. |
+| Installer database unavailable | Baza danych instalatora niedostępna |
+| Scan failed | Skanowanie nie powiodło się |
+| The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Baza danych Windows Installer wygląda na pustą lub niedostępną. To nietypowe nawet na świeżo zainstalowanym Windows i zwykle oznacza, że baza jest uszkodzona albo wyczyściło ją narzędzie innej firmy. Zwykle naprawia to polecenie „sfc /scannow” uruchomione z wiersza poleceń z podwyższonymi uprawnieniami. |
+| Access denied enumerating installed products. Run as administrator. | Odmowa dostępu podczas wyliczania zainstalowanych produktów. Uruchom jako administrator. |
+| Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer odmówił wypisania produktów po {0} kolejnych niepowodzeniach (ostatni kod błędu {1}). Spróbuj uruchomić ponownie Windows lub uruchom „sfc /scannow” z wiersza poleceń z podwyższonymi uprawnieniami. |
+| Invalid destination | Nieprawidłowy folder docelowy |
+| Could not write to destination | Nie udało się zapisać w folderze docelowym |
+| Move failed | Przenoszenie nie powiodło się |
+| Delete failed | Usuwanie nie powiodło się |
+| The destination cannot be inside the Windows Installer folder. | Folder docelowy nie może znajdować się wewnątrz folderu Windows Installer. |
+| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Folder docelowy {0} prowadzi do folderu systemowego Windows. Wybierz ścieżkę poza %SystemRoot%, %ProgramFiles% i %ProgramData%. |
+| Not enough space | Za mało miejsca |
+| Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | Za mało miejsca w {0}<br><br>Wymagane: {1}<br>Dostępne: {2} |
+| You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | Nie masz uprawnień do zapisu w {0}.<br>Wypróbuj folder w swoim profilu użytkownika lub na dysku, którego jesteś właścicielem. |
+| The path {0} is too long for Windows. Pick a shorter path. | Ścieżka {0} jest za długa dla Windows. Wybierz krótszą ścieżkę. |
+| The folder {0} does not exist and could not be created. Check the drive letter or network path. | Folder {0} nie istnieje i nie udało się go utworzyć. Sprawdź literę dysku lub ścieżkę sieciową. |
+| Windows cannot write to {0}.<br>Details in {1}. | Windows nie może zapisać w {0}.<br>Szczegóły w {1}. |
+| Windows cannot write to {0}. The crash log could not be written. | Windows nie może zapisać w {0}. Nie udało się zapisać dziennika awarii. |
+| Cannot write to {0}.<br>Details in {1}. | Nie można zapisać w {0}.<br>Szczegóły w {1}. |
+| Cannot write to {0}. The crash log could not be written. | Nie można zapisać w {0}. Nie udało się zapisać dziennika awarii. |
+| File no longer exists. | Plik już nie istnieje. |
+| Source file is a symlink or junction; refused for safety. | Plik źródłowy jest dowiązaniem symbolicznym lub złączem (junction); odrzucono ze względów bezpieczeństwa. |
+| Access denied. | Odmowa dostępu. |
+| The operation failed. Try again or restart Windows. | Operacja nie powiodła się. Spróbuj ponownie lub uruchom ponownie Windows. |
+| Unknown error. | Nieznany błąd. |
+| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | Nie udało się wysłać tego pliku do Kosza (błąd {0}). Może być zablokowany, używany lub blokowany przez Windows. Zamiast tego przenieś go. |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | Windows zablokował dostęp do tego pliku, nawet z uprawnieniami administratora (błąd {0}). Zwykle to blokada wynikająca z własności lub uprawnień. Zamiast tego przenieś go. |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | Ten plik jest otwarty lub zablokowany przez inny program (błąd {0}). Zamknij ten program albo cokolwiek go skanuje, a następnie spróbuj ponownie lub przenieś go. |
+| The file was permanently deleted because it could not be sent to the Recycle Bin. | Plik został usunięty trwale, ponieważ nie udało się wysłać go do Kosza. |
+| Refusing to move files into the Windows Installer folder (destination: {0}). | Odmowa przeniesienia plików do folderu Windows Installer (cel: {0}). |
+| Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | Folder docelowy musi być pełną ścieżką (ścieżki względne są rozwiązywane względem bieżącego katalogu procesu i są niebezpieczne przy podwyższonych uprawnieniach): {0} |
+| Destination folder canonical path changed mid-batch: {0} | Kanoniczna ścieżka folderu docelowego zmieniła się w trakcie operacji: {0} |
+| Cannot write to {0}. | Nie można zapisać w {0}. |
+| Could not find a unique filename for '{0}' after 10,000 attempts. | Nie udało się znaleźć unikalnej nazwy pliku dla „{0}” po 10 000 prób. |
+
+## Update check
+
+| English | Polski |
+| --- | --- |
+| Check for updates | Sprawdź aktualizacje |
+| Checking... | Sprawdzanie... |
+| Up to date. | Wszystko aktualne. |
+| Update available | Dostępna aktualizacja |
+| You're running version {0}.<br>Version {1} is available. | Masz zainstalowaną wersję {0}.<br>Dostępna jest wersja {1}. |
+| Couldn't reach GitHub. Check your internet connection and try again. | Nie udało się połączyć z GitHub. Sprawdź połączenie internetowe i spróbuj ponownie. |
+| GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes. | GitHub zwrócił odpowiedź z błędem. API wydań może mieć ograniczoną liczbę żądań; spróbuj ponownie za kilka minut. |
+| GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | Odpowiedź GitHub nie zawierała rozpoznawalnego wydania. Spróbuj ponownie później lub otwórz stronę wydań bezpośrednio. |
+| The check timed out. Your connection to GitHub may be slow; try again. | Upłynął limit czasu sprawdzania. Połączenie z GitHub może być wolne; spróbuj ponownie. |
+| The check failed for an unknown reason. Details are in crash.log if you need to report it. | Sprawdzanie nie powiodło się z nieznanej przyczyny. Szczegóły są w crash.log, jeśli chcesz to zgłosić. |
+
+## Opening links in your browser
+
+| English | Polski |
+| --- | --- |
+| Couldn't open your browser | Nie udało się otworzyć przeglądarki |
+| The link couldn't be opened in your normal-user browser. The URL has been copied to your clipboard so you can open it manually:<br><br>{0} | Nie udało się otworzyć linku w przeglądarce zwykłego użytkownika. Adres URL został skopiowany do schowka, abyś mógł otworzyć go ręcznie:<br><br>{0} |
+| The link couldn't be opened in your normal-user browser, and copying it to the clipboard also failed. The URL is:<br><br>{0} | Nie udało się otworzyć linku w przeglądarce zwykłego użytkownika, a skopiowanie go do schowka również się nie powiodło. Adres URL to:<br><br>{0} |
+
+## Sending the summary
+
+| English | Polski |
+| --- | --- |
+| Sending... | Wysyłanie... |
+| Thanks! Report sent. | Dzięki! Raport wysłany. |
+| Sending failed. Try again later. | Wysyłanie nie powiodło się. Spróbuj ponownie później. |
+| No report to send. | Brak raportu do wysłania. |
+| Send this to No Faff? | Wysłać to do No Faff? |
+| Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | Nic nie identyfikuje ciebie ani twojego komputera; to po prostu daje mi znać, że InstallerClean działa i ile miejsca ludzie zwalniają. Trafia do nofaff.netlify.app/api/result-log. |
+
+## Startup and crashes
+
+| English | Polski |
+| --- | --- |
+| InstallerClean | InstallerClean |
+| InstallerClean is already running. | InstallerClean jest już uruchomiony. |
+| InstallerClean | InstallerClean |
+| An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>Details written to:<br>{1} | Wystąpił nieoczekiwany błąd i InstallerClean musi się zamknąć.<br><br>{0}<br><br>Szczegóły zapisano w:<br>{1} |
+| An unexpected error occurred and InstallerClean needs to close.<br><br>{0}<br><br>The crash log could not be written. | Wystąpił nieoczekiwany błąd i InstallerClean musi się zamknąć.<br><br>{0}<br><br>Nie udało się zapisać dziennika awarii. |
+| Startup error | Błąd uruchamiania |
+| Failed to start ({0}). Details written to:<br>{1} | Nie udało się uruchomić ({0}). Szczegóły zapisano w:<br>{1} |
+| Failed to start ({0}). The crash log could not be written. | Nie udało się uruchomić ({0}). Nie udało się zapisać dziennika awarii. |
+| # crash.log captures unhandled exceptions from InstallerClean.<br># Under elevation the framework's exception messages can include<br># file paths from the running session (including other users'<br># profiles enumerated by Windows Installer queries). Network-<br># failure messages from the update check or result-log POST can<br># include the destination URL and the resolved IP / proxy address.<br># Redact both classes of detail before attaching this file to a<br># public bug report.<br> | # crash.log rejestruje nieobsłużone wyjątki InstallerClean.<br># Przy podwyższonych uprawnieniach komunikaty wyjątków platformy<br># mogą zawierać ścieżki plików z bieżącej sesji (w tym profile<br># innych użytkowników wyliczone przez zapytania Windows Installer).<br># Komunikaty o błędach sieci ze sprawdzania aktualizacji lub<br># wysyłania dziennika wyników mogą zawierać docelowy adres URL<br># oraz rozwiązany adres IP / proxy. Usuń oba rodzaje danych przed<br># dołączeniem tego pliku do publicznego zgłoszenia błędu.<br> |
+
+## Tooltips (hover text)
+
+| English | Polski |
+| --- | --- |
+| If it helped, buy me a cup of tea. | Jeśli się przydało, postaw mi kawę. |
+| It's thirsty work! | Aż zaschło w gardle! |
+| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Zażądano anulowania. InstallerClean czeka, aż bieżący krok dojdzie do punktu, w którym może się zatrzymać. Przy intensywnym wejściu/wyjściu lub zapytaniu do bazy danych MSI może to potrwać kilka sekund. |
+| Close | Zamknij |
+| Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Zostaw gwiazdkę na GitHubie, zgłoś problem (Issue) lub napisz w Dyskusjach (Discussions). Każda opinia mile widziana. |
+| or report an Issue or post in Discussions. Any feedback welcome. | lub zgłoś problem (Issue), albo napisz w Dyskusjach (Discussions). Każda opinia mile widziana. |
+| Minimise | Minimalizuj |
+| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Twoja decyzja, ale będzie miło. Wysyła anonimowe podsumowanie, które po prostu daje mi znać, czy działa i ile miejsca ludzie zwalniają. Na następnym ekranie zobaczysz, co zostanie wysłane, zanim potwierdzisz. |
+| Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Twoja decyzja, ale będzie miło. Wysyła anonimowe podsumowanie, które po prostu daje mi znać, czy działa. Na następnym ekranie zobaczysz, co zostanie wysłane, zanim potwierdzisz. |
+| Move the unneeded files to the Move location. | Przenieś niepotrzebne pliki do lokalizacji przenoszenia. |
+| Move the unneeded files to the Move location. Choose one first. | Przenieś niepotrzebne pliki do lokalizacji przenoszenia. Najpierw ją wybierz. |
+| Send the unneeded files to the Recycle Bin. | Wyślij niepotrzebne pliki do Kosza. |
+| Subject name from the embedded Authenticode certificate. Not chain-verified. | Nazwa podmiotu z osadzonego certyfikatu Authenticode. Łańcuch nie został zweryfikowany. |
+| Change language. The program will restart. | Zmień język. Program zostanie ponownie uruchomiony. |
+
+## Screen reader labels
+
+| English | Polski |
+| --- | --- |
+| Buy me a cup of tea | Postaw mi filiżankę kawy |
+| Buy me a cuppa (About window) | Postaw mi kawę (okno O programie) |
+| Cancel operation | Anuluj operację |
+| Cancel scan | Anuluj skanowanie |
+| Cancel startup scan | Anuluj skanowanie startowe |
+| Close | Zamknij |
+| Close window | Zamknij okno |
+| Close result and return to main window | Zamknij wynik i wróć do okna głównego |
+| Leave a star on GitHub | Zostaw gwiazdkę na GitHubie |
+| Leave a star on GitHub (About window) | Zostaw gwiazdkę na GitHubie (okno O programie) |
+| Minimise | Minimalizuj |
+| Move all unneeded installer files to the chosen destination folder | Przenieś wszystkie niepotrzebne pliki instalatora do wybranego folderu docelowego |
+| Send all unneeded installer files to the Recycle Bin | Wyślij wszystkie niepotrzebne pliki instalatora do Kosza |
+| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | Usuń wysyła niepotrzebne pliki do Kosza. Anuluj zamyka okno bez usuwania. |
+| Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Przenieś umieszcza niepotrzebne pliki w wybranym folderze docelowym. Anuluj zostawia je na miejscu. |
+| Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Wybierz, co zrobić z niepotrzebnymi plikami: przenieść je w bezpieczne miejsce, usunąć trwale lub anulować. |
+| Move the unneeded files to a folder you choose | Przenieś niepotrzebne pliki do wybranego folderu |
+| Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Usuń niepotrzebne pliki trwale, ponieważ Kosz jest niedostępny dla tego dysku |
+| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | Wysyłane do nofaff.netlify.app. Tylko liczniki i etykiety. Przed wysłaniem zobaczysz dokładną treść. |
+| Say thanks | Podziękuj |
+| Send posts the report shown to No Faff. Cancel sends nothing. | Wyślij przekazuje pokazany raport do No Faff. Anuluj nie wysyła niczego. |
+| Check for updates | Sprawdź aktualizacje |
+| Checks the GitHub releases API over HTTPS for a newer version. | Sprawdza w API wydań GitHub przez HTTPS, czy jest nowsza wersja. |
+| Open the release page to download the newer version, or cancel to keep the current version. | Otwórz stronę wydania, aby pobrać nowszą wersję, lub anuluj, aby zachować bieżącą. |
+| MIT licence | Licencja MIT |
+| Opens the licence file on github.com in your browser. | Otwiera plik licencji na github.com w twojej przeglądarce. |
+| Move location | Lokalizacja przenoszenia |
+| Products | Produkty |
+| Patches | Poprawki |
+| Product details | Szczegóły produktu |
+| Move destination folder | Folder docelowy przenoszenia |
+| Operation progress | Postęp operacji |
+| Scan C:\Windows\Installer again | Skanuj ponownie C:\Windows\Installer |
+| Scanning progress | Postęp skanowania |
+| Startup scan progress | Postęp skanowania startowego |
+| Details, unneeded files | Szczegóły, niepotrzebne pliki |
+| Available for cleanup. | Dostępne do wyczyszczenia. |
+| Details, registered files | Szczegóły, zarejestrowane pliki |
+| Read-only inventory. | Lista tylko do odczytu. |
+| Sorted by {0}, ascending | Posortowano według {0}, rosnąco |
+| Sorted by {0}, descending | Posortowano według {0}, malejąco |
+| Scan results | Wyniki skanowania |
+| Result details | Szczegóły wyniku |
+| File details | Szczegóły pliku |
+| Dialog text | Tekst okna dialogowego |
+| {0} ({1}) | {0} ({1}) |
+| Files that could not be processed | Pliki, których nie udało się przetworzyć |
+| Explains this folder, and how to recover a file, in the README | Wyjaśnia ten folder i sposób odzyskania pliku w README |
+| Result log preview | Podgląd dziennika wyników |
+| Change language | Zmień język |
+| The program will restart. | Program zostanie ponownie uruchomiony. |
+
+## File picker
+
+| English | Polski |
+| --- | --- |
+| Choose destination folder for moved files | Wybierz folder docelowy dla przeniesionych plików |
+
+## Version
+
+| English | Polski |
+| --- | --- |
+| Version {0} | Wersja {0} |
+
+## Word forms (singular and plural)
+
+| English | Polski |
+| --- | --- |
+| file | plik |
+| files | plików |
+| error | błąd |
+| errors | błędów |
+| package | pakiet |
+| packages | pakietów |
+| product | produkt |
+| products | produktów |
+| patch | poprawka |
+| patches | poprawek |
+
+## Sizes and times
+
+| English | Polski |
+| --- | --- |
+| {0:F2} GB | {0:F2} GB |
+| {0:F1} MB | {0:F1} MB |
+| {0:F1} KB | {0:F1} KB |
+| {0} B | {0} B |
+| {0:F0}ms | {0:F0}ms |
+| {0:F1}s | {0:F1}s |
+| less than a second | mniej niż sekunda |
+| {0:F1} seconds | {0:F1} sekundy |
+
+## Command-line tool (installerclean-cli)
+
+| English | Polski |
+| --- | --- |
+| Unknown argument: '{0}' | Nieznany argument: „{0}” |
+| Cancelling... | Anulowanie... |
+| Cancelled. | Anulowano. |
+| Error: {0}. Details written to {1}. | Błąd: {0}. Szczegóły zapisano w {1}. |
+| Error: {0}. The crash log could not be written. | Błąd: {0}. Nie udało się zapisać dziennika awarii. |
+| Scanning C:\Windows\Installer... | Skanowanie C:\Windows\Installer... |
+| Found {0} {1} to clean up ({2}). | Znaleziono {0} {1} do wyczyszczenia ({2}). |
+| Nothing to do. | Nie ma nic do zrobienia. |
+| Deleting {0} {1}... | Usuwanie: {0} {1}... |
+| Deleted {0} {1}. | Usunięto {0} {1}. |
+| Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Błąd: Kosz jest niedostępny dla tego woluminu, więc nic nie usunięto. Użyj /m, aby zamiast tego przenieść pliki, albo ponownie włącz Kosz i uruchom jeszcze raz. |
+| Error: no move destination specified. Use /m PATH or set a default in the GUI. | Błąd: nie podano folderu docelowego przenoszenia. Użyj /m ŚCIEŻKA lub ustaw domyślny w GUI. |
+| Error: destination cannot be inside the Windows Installer folder. | Błąd: folder docelowy nie może znajdować się wewnątrz folderu Windows Installer. |
+| Error: destination must be a fully qualified path. Got: {0} | Błąd: folder docelowy musi być pełną ścieżką. Otrzymano: {0} |
+| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Błąd: folder docelowy {0} prowadzi do folderu systemowego Windows. Wybierz ścieżkę poza %SystemRoot%, %ProgramFiles% i %ProgramData%. |
+| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | Błąd: coś właśnie korzysta z Windows Installer, zwykle aktualizacja Windows albo program instalujący się w tle. Przenoszenie i usuwanie są zablokowane, dopóki to trwa. Spróbuj ponownie, gdy się zakończy. |
+| Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Błąd: na tym komputerze zawieszona jest wcześniejsza transakcja Windows Installer. Przed wyczyszczeniem pamięci podręcznej dokończ lub wycofaj tamtą instalację (albo uruchom ponownie Windows). |
+| Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | Błąd: zakolejkowana po ponownym uruchomieniu operacja na pliku dotyczy pamięci podręcznej instalatora ({0}). Przed czyszczeniem uruchom ponownie Windows, aby dokończyć tę operację. |
+| Moving {0} {1} to {2}... | Przenoszenie: {0} {1} do {2}... |
+| Moved {0} {1}. | Przeniesiono {0} {1}. |
+| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Inny proces InstallerClean trzyma blokadę pojedynczej instancji (GUI lub inne uruchomienie CLI). Kod wyjścia 75 (stan przejściowy); można bezpiecznie spróbować ponownie później. |
+| Note: Event Log writing failed. Check Application log permissions or Group Policy. | Uwaga: zapis do dziennika zdarzeń nie powiódł się. Sprawdź uprawnienia dziennika „Aplikacja” lub zasady grupy. |
+| InstallerClean - clean up C:\Windows\Installer | InstallerClean - oczyszczanie C:\Windows\Installer |
+| Usage: | Sposób użycia: |
+|   installerclean-cli --help   Show this help (also accepts /?, -h) |   installerclean-cli --help   Pokaż tę pomoc (akceptuje też /?, -h) |
+|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Wypisz wersję (akceptuje też -v) |
+|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s       Tylko skanowanie - lista niepotrzebnych plików |
+|   installerclean-cli /d       Delete removable files (Recycle Bin) |   installerclean-cli /d       Usuń niepotrzebne pliki (Kosz) |
+|   installerclean-cli /m       Move to saved default location |   installerclean-cli /m       Przenieś do zapisanej lokalizacji domyślnej |
+|   installerclean-cli /m PATH  Move to specified path |   installerclean-cli /m ŚCIEŻKA  Przenieś do wskazanej ścieżki |
+| installerclean-cli is a real console process and blocks the prompt | installerclean-cli to prawdziwy proces konsolowy i blokuje wiersz poleceń, |
+| until it finishes; redirect or pipe its output as you would any | dopóki się nie zakończy; przekieruj lub przekaż potokiem jego wyjście |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | jak każdy inny program konsolowy exe. GUI jest obok, w InstallerClean.exe. |
+| Exit codes: | Kody wyjścia: |
+|   0   success: every flagged file was processed |   0   sukces: przetworzono każdy oznaczony plik |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   błąd: nic nie przetworzono (złe argumenty, skanowanie nie powiodło się, wszystkie pliki zawiodły) |
+|   2   partial: some files processed, some failed |   2   częściowo: część plików przetworzono, część zawiodła |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  stan przejściowy: tymczasowy warunek zablokował uruchomienie (zob. komunikat) |
+|   130 cancelled (Ctrl+C) |   130 anulowano (Ctrl+C) |
