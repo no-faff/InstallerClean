@@ -25,7 +25,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-26k-brightgreen" alt="Total unduhan"></a>
 </p>
 
-![Tangkapan layar InstallerClean setelah pembersihan berhasil: 1,28 GB dikosongkan, 69 file dikirim ke Recycle Bin](docs/screenshots/06-freed-success-done.webp)
+![Tangkapan layar InstallerClean setelah pembersihan berhasil: 1,28 GB dikosongkan, 69 file dikirim ke Keranjang Sampah](docs/screenshots/06-freed-success-done.webp)
 
 - **Apa:** InstallerClean melakukan satu hal: menghapus file yang tidak diperlukan dari `C:\Windows\Installer`, folder tersembunyi yang tidak pernah dibersihkan Windows. Setelah pemindaian yang hampir seketika, aplikasi memberi tahu Anda apakah ada file seperti itu, menampilkan detail lebih lanjut bagi yang penasaran, dan memungkinkan Anda menghapusnya untuk mengosongkan ruang di drive C: Anda. Anda cukup memakainya sekali lalu lanjut.
 - **Berapa banyak ruang:** Laporan (opsional) yang masuk sejauh ini menunjukkan bahwa <!-- reports-freedpct-start -->42%<!-- reports-freedpct-end --> mesin memiliki file tidak diperlukan untuk dibersihkan. Dari mesin-mesin itu, median yang dikosongkan adalah <!-- reports-median-start -->23 GB<!-- reports-median-end -->. Beberapa membersihkan ratusan GB. Bagi saya jumlahnya 1,28 GB. Sisanya, <!-- reports-nothingpct-start -->58%<!-- reports-nothingpct-end -->, tidak menemukan apa pun untuk dihapus, yang berarti folder Installer mereka memang sudah bersih. Detail lebih lanjut ada di [FAQ](#faq) di bawah.
@@ -83,7 +83,7 @@ Nasihat standar mencampuradukkan penghapusan file secara sembarangan (yang meman
 1. **Memindai** `C:\Windows\Installer` untuk file `.msi` dan `.msp`
 2. **Menanyakan** ke Windows Installer API untuk mengetahui file mana yang masih terdaftar
 3. **Menampilkan** berapa banyak yang bisa Anda kosongkan dan berapa banyak yang masih diperlukan, dengan jendela detail opsional yang mendaftar setiap file
-4. **Menghapus** file yang tidak diperlukan: hapus ke Recycle Bin, atau pindahkan ke folder pilihan Anda
+4. **Menghapus** file yang tidak diperlukan: hapus ke Keranjang Sampah, atau pindahkan ke folder pilihan Anda
 
 ## Tangkapan layar
 
@@ -112,13 +112,13 @@ Nasihat standar mencampuradukkan penghapusan file secara sembarangan (yang meman
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Konfirmasi penghapusan yang menanyakan apakah akan menghapus 69 file (1,28 GB), dengan catatan bahwa file akan dikirim ke Recycle Bin" width="900"><br>
-  <em>Konfirmasi sebelum kedua tindakan. Hapus mengirim ke Recycle Bin; Pindahkan menaruh file di tempat pilihan Anda.</em>
+  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Konfirmasi penghapusan yang menanyakan apakah akan menghapus 69 file (1,28 GB), dengan catatan bahwa file akan dikirim ke Keranjang Sampah" width="900"><br>
+  <em>Konfirmasi sebelum kedua tindakan. Hapus mengirim ke Keranjang Sampah; Pindahkan menaruh file di tempat pilihan Anda.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="Overlay keberhasilan yang menampilkan 1,28 GB dikosongkan, dengan 69 file dikirim ke Recycle Bin" width="900"><br>
+  <img src="docs/screenshots/06-freed-success-done.webp" alt="Overlay keberhasilan yang menampilkan 1,28 GB dikosongkan, dengan 69 file dikirim ke Keranjang Sampah" width="900"><br>
   <em>Setelah Hapus yang berhasil.</em>
   <br><br>
 </p>
@@ -155,9 +155,9 @@ Setelah Pindahkan atau Hapus selesai, subfolder kosong di dalam `C:\Windows\Inst
 
 Ya. InstallerClean menanyakan ke basis data Windows Installer API yang sama dengan yang dipakai Windows sendiri untuk melacak apa yang terpasang. Jika Windows menyatakan suatu file sudah tidak diperlukan, aplikasi memercayainya; aplikasi tidak menebak berdasarkan nama file atau tanggal.
 
-**Tentang Hapus dan Pindahkan.** File yang dihapus InstallerClean aman untuk dihapus permanen. **Hapus** mengirimnya ke Recycle Bin (Anda akan diperingatkan jika Recycle Bin tidak tersedia); Anda mendapatkan kembali ruang di drive C: saat mengosongkan Recycle Bin.
+**Tentang Hapus dan Pindahkan.** File yang dihapus InstallerClean aman untuk dihapus permanen. **Hapus** mengirimnya ke Keranjang Sampah (Anda akan diperingatkan jika Keranjang Sampah tidak tersedia); Anda mendapatkan kembali ruang di drive C: saat mengosongkan Keranjang Sampah.
 
-Namun, Anda tidak harus percaya begitu saja pada saya bahwa file-file itu aman dihapus. Selama berada di Recycle Bin, Anda berkesempatan memeriksa apakah aplikasi yang memakai folder ini, Office, Acrobat, Visual Studio dan sejenisnya, masih bisa diperbarui dan dihapus instalasinya tanpa masalah. Jika ada yang rusak (tidak akan!), pulihkan file dari Recycle Bin untuk memperbaikinya. Agar benar-benar aman, Anda bisa menggunakan **Pindahkan** sebagai gantinya, untuk menaruh file di folder pilihan Anda (tentu pilih folder di partisi/drive lain jika Anda ingin mengosongkan ruang di C:). Cukup salin kembali file ke `C:\Windows\Installer` untuk mengembalikan semuanya seperti semula (tapi Anda tidak akan memerlukannya!).
+Namun, Anda tidak harus percaya begitu saja pada saya bahwa file-file itu aman dihapus. Selama berada di Keranjang Sampah, Anda berkesempatan memeriksa apakah aplikasi yang memakai folder ini, Office, Acrobat, Visual Studio dan sejenisnya, masih bisa diperbarui dan dihapus instalasinya tanpa masalah. Jika ada yang rusak (tidak akan!), pulihkan file dari Keranjang Sampah untuk memperbaikinya. Agar benar-benar aman, Anda bisa menggunakan **Pindahkan** sebagai gantinya, untuk menaruh file di folder pilihan Anda (tentu pilih folder di partisi/drive lain jika Anda ingin mengosongkan ruang di C:). Cukup salin kembali file ke `C:\Windows\Installer` untuk mengembalikan semuanya seperti semula (tapi Anda tidak akan memerlukannya!).
 
 Jika Windows Installer sedang menulis ke cache, memiliki transaksi sebelumnya yang ditangguhkan, atau memiliki antrean penggantian nama setelah mulai ulang yang menyasar cache, Pindahkan dan Hapus dinonaktifkan dan alasan spesifiknya ditampilkan.
 
@@ -255,7 +255,7 @@ Dari 98 laporan yang dikirimkan orang-orang (terima kasih 🙏) sejak opsi ini d
 
 **Mengapa Windows mengatakan "Unknown publisher"?** Karena InstallerClean tidak ditandatangani secara digital. Sertifikat penandatanganan membutuhkan biaya setiap tahun, dan saya lebih memilih membuat aplikasi tetap gratis daripada membayarnya. Jadi ketika Anda menjalankannya, Windows SmartScreen menampilkan "Windows protected your PC". Klik **More info**, lalu **Run anyway**. Aman untuk dilakukan: kode sumbernya publik, dan tiap rilis memiliki tautan VirusTotal serta hash SHA-256 yang bisa Anda periksa lebih dulu.
 
-**Bisakah saya membatalkan Hapus?** Biasanya, ya. Ketika Recycle Bin tersedia untuk drive tersebut, Hapus mengirim file ke sana dan Anda bisa memulihkannya dari Recycle Bin. Jika Recycle Bin tidak tersedia, aplikasi tidak akan pernah menghapus secara permanen dengan sendirinya (lihat [Apakah aman?](#apakah-aman)). Dan jika Anda lebih suka punya jalan kembali yang Anda kendalikan, Pindahkan menaruh file di folder pilihan Anda; hapus dari sana kapan pun Anda sudah yakin.
+**Bisakah saya membatalkan Hapus?** Biasanya, ya. Ketika Keranjang Sampah tersedia untuk drive tersebut, Hapus mengirim file ke sana dan Anda bisa memulihkannya dari Keranjang Sampah. Jika Keranjang Sampah tidak tersedia, aplikasi tidak akan pernah menghapus secara permanen dengan sendirinya (lihat [Apakah aman?](#apakah-aman)). Dan jika Anda lebih suka punya jalan kembali yang Anda kendalikan, Pindahkan menaruh file di folder pilihan Anda; hapus dari sana kapan pun Anda sudah yakin.
 
 **Akankah Windows mengeluh jika saya menghapus file-file ini?** Tidak. InstallerClean hanya pernah menghapus file yang dilaporkan Windows sendiri sudah tidak terpakai, jadi tidak ada yang dihapusnya yang diperlukan untuk memperbaiki, memperbarui, atau menghapus instalasi suatu program. Jika suatu file yang diperlukan memang hilang dari `C:\Windows\Installer` lewat cara lain, lihat [Jika Anda memang punya file yang hilang dari C:\Windows\Installer](#recovery).
 
@@ -318,7 +318,7 @@ InstallerClean membaca catatan patch milik Windows Installer sendiri, jadi bisa 
 | Penanganan Adobe | Mendeteksi patch yang digantikan | Mengecualikan secara default |
 | Antarmuka | Tema gelap (WPF) | Windows Forms |
 | Pengumpulan data | Tidak ada | Tidak ada |
-| Keamanan penghapusan | Recycle Bin. Jika tidak tersedia, aplikasi bertanya: pindahkan saja atau hapus permanen | Permanen, tanpa Recycle Bin |
+| Keamanan penghapusan | Keranjang Sampah. Jika tidak tersedia, aplikasi bertanya: pindahkan saja atau hapus permanen | Permanen, tanpa Keranjang Sampah |
 
 > **Catatan tentang `Win32_Product`:** Pendekatan yang umum tetapi cacat untuk mendaftar produk yang terpasang adalah `Win32_Product` (WMI), yang [memicu operasi perbaikan MSI](https://gregramsey.net/2012/02/20/win32_product-is-evil/) pada setiap produk selama enumerasi. Baik InstallerClean maupun PatchCleaner menghindarinya. Keduanya menggunakan antarmuka COM Windows Installer. Nama file `WMIProducts.vbs` dalam skrip PatchCleaner menyesatkan; skrip itu menggunakan MSI COM, bukan WMI.
 
@@ -335,7 +335,7 @@ Penggunaan:
   installerclean-cli --help   Tampilkan bantuan ini (juga menerima /?, -h)
   installerclean-cli --version  Cetak versi (juga menerima -v)
   installerclean-cli /s       Pindai saja, daftar file yang bisa dihapus
-  installerclean-cli /d       Hapus file yang bisa dihapus (Recycle Bin)
+  installerclean-cli /d       Hapus file yang bisa dihapus (Keranjang Sampah)
   installerclean-cli /m       Pindahkan ke lokasi default tersimpan
   installerclean-cli /m PATH  Pindahkan ke jalur yang ditentukan
 ```
@@ -346,7 +346,7 @@ Jalankan tanpa argumen, atau dengan flag yang tidak dikenali, maka `installercle
 
 `/s` hanya menjalankan simulasi: ia memindai, mendaftar apa yang akan dihapus beserta nama file dan ukurannya, lalu keluar. Berguna untuk audit sebelum pembersihan. Kode keluarnya `0` pada pemindaian yang berhasil, `1` jika pemindaian gagal, dan `130` pada Ctrl+C. Semua file ada di `C:\Windows\Installer`.
 
-`/d` dan `/m` memindai lalu bertindak. `/d` mengirim file yang bisa dihapus ke Recycle Bin. `/m` memindahkannya ke folder (entah yang Anda tentukan di baris perintah, atau default yang tersimpan dari GUI). Kode keluar: `0` untuk berhasil penuh, `2` untuk sebagian (sebagian file berhasil, sebagian gagal), `1` untuk kegagalan total (pemindaian gagal, argumen salah, atau semua file dalam batch gagal), `75` untuk kondisi sementara yang memblokir proses (pesan yang dicetak menjelaskan kondisi mana dan apakah mencoba ulang akan membantu), `130` untuk Ctrl+C sebelum ada file yang diproses (Ctrl+C yang terjadi di tengah batch keluar dengan `2`, sebagian, karena pekerjaan sudah dijalankan).
+`/d` dan `/m` memindai lalu bertindak. `/d` mengirim file yang bisa dihapus ke Keranjang Sampah. `/m` memindahkannya ke folder (entah yang Anda tentukan di baris perintah, atau default yang tersimpan dari GUI). Kode keluar: `0` untuk berhasil penuh, `2` untuk sebagian (sebagian file berhasil, sebagian gagal), `1` untuk kegagalan total (pemindaian gagal, argumen salah, atau semua file dalam batch gagal), `75` untuk kondisi sementara yang memblokir proses (pesan yang dicetak menjelaskan kondisi mana dan apakah mencoba ulang akan membantu), `130` untuk Ctrl+C sebelum ada file yang diproses (Ctrl+C yang terjadi di tengah batch keluar dengan `2`, sebagian, karena pekerjaan sudah dijalankan).
 
 Semua keluaran CLI, termasuk pesan kesalahan dan diagnostik, masuk ke stdout; tidak ada aliran stderr terpisah. Kode keluar adalah sinyal yang terbaca mesin (dan entri log peristiwa Application per proses mencerminkannya), jadi skrip sebaiknya berpatokan pada kode keluar alih-alih mengurai teksnya, dan `installerclean-cli /s > audit.txt` menangkap seluruh proses termasuk baris kesalahan apa pun.
 
