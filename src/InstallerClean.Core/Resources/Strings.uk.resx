@@ -483,7 +483,7 @@
 Деталі у {1}.</value></data>
   <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Не вдається записати в {0}. Не вдалося записати журнал збоїв.</value></data>
   <data name="Error.MissingSourceFile" xml:space="preserve"><value>Файл більше не існує.</value></data>
-  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Вихідний файл, це символьне посилання чи junction; відмовлено з міркувань безпеки.</value></data>
+  <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Вихідний файл є символьним посиланням або junction; відмовлено з міркувань безпеки.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file
@@ -721,7 +721,7 @@
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Використання:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   Показати цю довідку (також приймає /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Вивести версію (також приймає -v)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       Лише сканування, перелік непотрібних файлів</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       Лише сканувати, перелічити непотрібні файли</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       Видалити непотрібні файли (Кошик)</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       Перемістити в збережене типове розташування</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m ШЛЯХ  Перемістити за вказаним шляхом</value></data>
