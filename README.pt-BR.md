@@ -269,7 +269,7 @@ Entre os 99 relatórios que as pessoas tiveram a gentileza de enviar (obrigado �
 
 <a id="unknown-publisher"></a>
 
-**Por que o Windows diz "Editor desconhecido"?** Porque o InstallerClean não tem assinatura de código. Um certificado de assinatura custa dinheiro todo ano, e eu prefiro manter o aplicativo gratuito a pagar por um. Então, quando você o executa, o Windows SmartScreen mostra "O Windows protegeu o seu PC". Clique em **Mais informações** e depois em **Executar assim mesmo**. Pode fazer sem medo: o código-fonte é público, e cada versão tem links do VirusTotal e hashes SHA-256 que você pode conferir antes.
+**Por que o Windows diz "Editor desconhecido"?** Porque o InstallerClean não tem assinatura de código. Um certificado de assinatura custa dinheiro todo ano, e eu prefiro manter o aplicativo gratuito a pagar por um. Então, quando você o executa, o Windows SmartScreen mostra "O Windows protegeu o computador". Clique em **Mais informações** e depois em **Executar assim mesmo**. Pode fazer sem medo: o código-fonte é público, e cada versão tem links do VirusTotal e hashes SHA-256 que você pode conferir antes.
 
 **Posso desfazer uma exclusão?** Em geral, sim. Quando a Lixeira está disponível para a unidade, Excluir manda os arquivos para lá e você pode restaurá-los pela Lixeira. Se a Lixeira não estiver disponível, o aplicativo nunca exclui de vez por conta própria (veja [É seguro?](#é-seguro)). E se você preferir ter uma volta sob o seu controle, Mover coloca os arquivos em uma pasta que você escolher; exclua de lá quando estiver satisfeito.
 
@@ -348,12 +348,12 @@ O InstallerClean oferece operação sem interface gráfica para uso em scripts e
 
 ```
 Uso:
-  installerclean-cli --help   Mostra esta ajuda (também aceita /?, -h)
-  installerclean-cli --version  Mostra a versão (também aceita -v)
-  installerclean-cli /s       Apenas análise, lista os arquivos removíveis
-  installerclean-cli /d       Exclui os arquivos removíveis (Lixeira)
-  installerclean-cli /m       Move para o local padrão salvo
-  installerclean-cli /m PATH  Move para o caminho especificado
+  installerclean-cli --help      Mostra esta ajuda (aceita também /?, -h)
+  installerclean-cli --version   Mostra a versão (aceita também -v)
+  installerclean-cli /s          Apenas análise - lista os arquivos desnecessários
+  installerclean-cli /d          Exclui os arquivos desnecessários (Lixeira)
+  installerclean-cli /m          Move para o local padrão salvo
+  installerclean-cli /m CAMINHO  Move para o caminho especificado
 ```
 
 Para abrir a interface gráfica, execute `InstallerClean.exe` (ou use o atalho do menu Iniciar, se você instalou pelo setup).
@@ -367,8 +367,6 @@ Executado sem argumento, ou com uma opção não reconhecida, o `installerclean-
 Toda a saída da CLI, incluindo as mensagens de erro e de diagnóstico, vai para o stdout; não há um fluxo stderr separado. O código de saída é o sinal legível por máquina (e a entrada no log de eventos do Aplicativo de cada execução o reflete), então um script deve se basear no código de saída em vez de analisar o texto, e `installerclean-cli /s > audit.txt` captura a execução inteira, incluindo qualquer linha de erro.
 
 Os três exigem um prompt de comando elevado (administrador). Se a Diretiva de Grupo bloquear o prompt de elevação do UAC, o processo se recusa a iniciar e o Windows retorna o erro 740 para o shell pai (`$LASTEXITCODE = 740` no PowerShell). `taskkill /pid <pid>` não dispara um cancelamento gracioso; o mutex de instância única é recuperado na próxima execução pelo caminho do AbandonedMutexException.
-
-Observação: a saída da própria CLI está em inglês. As descrições acima correspondem às opções disponíveis.
 
 ### Por que `installerclean-cli` e não `installerclean.exe`?
 
