@@ -350,12 +350,12 @@ InstallerClean unterstützt den Betrieb ohne Oberfläche, für Skripting und die
 
 ```
 Verwendung:
-  installerclean-cli --help   Diese Hilfe anzeigen (akzeptiert auch /?, -h)
+  installerclean-cli --help     Diese Hilfe anzeigen (akzeptiert auch /?, -h)
   installerclean-cli --version  Die Version ausgeben (akzeptiert auch -v)
-  installerclean-cli /s       Nur scannen, entfernbare Dateien auflisten
-  installerclean-cli /d       Entfernbare Dateien löschen (Papierkorb)
-  installerclean-cli /m       In den gespeicherten Standardort verschieben
-  installerclean-cli /m PATH  In den angegebenen Pfad verschieben
+  installerclean-cli /s         Nur scannen - nicht benötigte Dateien auflisten
+  installerclean-cli /d         Nicht benötigte Dateien löschen (Papierkorb)
+  installerclean-cli /m         An den gespeicherten Standardort verschieben
+  installerclean-cli /m PFAD    An den angegebenen Pfad verschieben
 ```
 
 Um die GUI zu starten, führe `InstallerClean.exe` aus (oder nutze die Startmenü-Verknüpfung aus der Setup-Installation).
@@ -369,8 +369,6 @@ Wird `installerclean-cli` ohne Argument oder mit einer nicht erkannten Option au
 Die gesamte Ausgabe der CLI, einschließlich Fehler- und Diagnosemeldungen, geht an stdout; es gibt keinen separaten stderr-Stream. Der Exit-Code ist das maschinenlesbare Signal (und der Eintrag pro Lauf im Anwendungs-Ereignisprotokoll spiegelt ihn wider), ein Skript sollte sich also am Exit-Code orientieren statt den Text zu parsen, und `installerclean-cli /s > audit.txt` erfasst den gesamten Lauf einschließlich etwaiger Fehlerzeile.
 
 Alle drei erfordern eine Eingabeaufforderung mit erhöhten Rechten (Administrator). Wenn eine Gruppenrichtlinie die UAC-Eingabeaufforderung blockiert, verweigert der Prozess den Start und Windows gibt den Fehler 740 an die übergeordnete Shell zurück (`$LASTEXITCODE = 740` in PowerShell). `taskkill /pid <pid>` löst keinen kontrollierten Abbruch aus; der Einzelinstanz-Mutex wird vom nächsten Lauf über den AbandonedMutexException-Pfad wiederhergestellt.
-
-Hinweis: Die Ausgabe der CLI selbst ist auf Englisch. Die obigen Beschreibungen entsprechen den verfügbaren Optionen.
 
 ### Warum `installerclean-cli` und nicht `installerclean.exe`?
 
