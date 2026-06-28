@@ -350,12 +350,12 @@ InstallerClean은 스크립트와 시스템 관리 용도를 위한 무인(헤�
 
 ```
 사용법:
-  installerclean-cli --help   이 도움말을 표시(/?, -h도 사용 가능)
-  installerclean-cli --version  버전을 출력(-v도 사용 가능)
-  installerclean-cli /s       검사만 수행. 제거 가능한 파일을 나열
-  installerclean-cli /d       제거 가능한 파일을 삭제(휴지통)
+  installerclean-cli --help   이 도움말 표시 (/?, -h도 사용 가능)
+  installerclean-cli --version  버전 출력 (-v도 사용 가능)
+  installerclean-cli /s       검사만 - 불필요한 파일 나열
+  installerclean-cli /d       불필요한 파일 삭제 (휴지통)
   installerclean-cli /m       저장된 기본 위치로 이동
-  installerclean-cli /m PATH  지정한 경로로 이동
+  installerclean-cli /m 경로   지정한 경로로 이동
 ```
 
 GUI를 실행하려면 `InstallerClean.exe`를 실행하세요(또는 Setup으로 설치한 경우 시작 메뉴 바로 가기를 쓰세요).
@@ -369,8 +369,6 @@ GUI를 실행하려면 `InstallerClean.exe`를 실행하세요(또는 Setup으�
 오류와 진단 메시지를 포함한 CLI의 모든 출력은 stdout으로 나갑니다. 별도의 stderr 스트림은 없습니다. 종료 코드가 기계가 읽을 수 있는 신호이며(실행별 응용 프로그램 이벤트 로그 항목도 이를 그대로 반영합니다), 따라서 스크립트는 텍스트를 분석하기보다 종료 코드를 기준으로 삼아야 합니다. 그리고 `installerclean-cli /s > audit.txt`로 하면 오류 줄을 포함한 실행 전체를 담을 수 있습니다.
 
 셋 다 권한이 상승된(관리자) 명령 프롬프트가 필요합니다. 그룹 정책이 UAC 권한 상승 프롬프트를 차단하면 프로세스는 시작을 거부하고, Windows는 상위 셸에 오류 740을 반환합니다(PowerShell에서는 `$LASTEXITCODE = 740`). `taskkill /pid <pid>`는 정상적인 취소를 일으키지 않습니다. 단일 인스턴스 뮤텍스는 다음 실행 때 AbandonedMutexException 경로를 통해 복구됩니다.
-
-참고로 CLI 자체의 출력은 영어입니다. 위 설명은 사용할 수 있는 옵션에 대응합니다.
 
 ### 왜 `installerclean.exe`가 아니라 `installerclean-cli`인가요?
 
