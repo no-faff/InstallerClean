@@ -120,7 +120,7 @@
   <data name="Field.Missing" xml:space="preserve"><value>manquant</value></data>
 
   <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
-  <data name="Action.About" xml:space="preserve"><value>À _propos</value></data>
+  <data name="Action.About" xml:space="preserve"><value>À pr_opos</value></data>
   <data name="Action.Copy" xml:space="preserve"><value>Copier</value></data>
   <data name="Action.Cut" xml:space="preserve"><value>Couper</value></data>
   <data name="Action.Paste" xml:space="preserve"><value>Coller</value></data>
@@ -670,7 +670,7 @@ Le crash.log n'a pas pu être écrit.</value></data>
        names the contending parties (GUI or another CLI run) and
        points at exit code 75 so an RMM operator parsing stdout
        knows it is transient and safe to retry. -->
-  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Un autre processus InstallerClean détient le verrou d'instance unique (l'interface ou une autre exécution de la CLI). Code de sortie 75 (transitoire) ; sans risque à réessayer plus tard.</value></data>
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Un autre processus InstallerClean détient le verrou d'instance unique (l'interface ou une autre exécution de la CLI). Code de sortie 75 (transitoire) ; vous pouvez réessayer plus tard sans risque.</value></data>
   <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
        can't acquire the single-instance mutex, so an RMM consumer of
        the Application channel sees a record of every scheduled-job
