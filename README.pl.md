@@ -352,10 +352,10 @@ InstallerClean obsługuje pracę bez interfejsu, na potrzeby skryptowania i admi
 Sposób użycia:
   installerclean-cli --help   Pokaż tę pomoc (akceptuje też /?, -h)
   installerclean-cli --version  Wypisz wersję (akceptuje też -v)
-  installerclean-cli /s       Tylko skanuj, wypisz pliki do usunięcia
-  installerclean-cli /d       Usuń pliki do usunięcia (Kosz)
+  installerclean-cli /s       Tylko skanowanie - lista niepotrzebnych plików
+  installerclean-cli /d       Usuń niepotrzebne pliki (Kosz)
   installerclean-cli /m       Przenieś do zapisanej lokalizacji domyślnej
-  installerclean-cli /m PATH  Przenieś do wskazanej ścieżki
+  installerclean-cli /m ŚCIEŻKA  Przenieś do wskazanej ścieżki
 ```
 
 Aby uruchomić GUI, uruchom `InstallerClean.exe` (lub użyj skrótu w menu Start z instalacji Setup).
@@ -369,8 +369,6 @@ Uruchomione bez argumentu lub z nierozpoznaną flagą, `installerclean-cli` wypi
 Cała komunikacja CLI, w tym komunikaty o błędach i diagnostyczne, trafia do stdout; nie ma osobnego strumienia stderr. Kod wyjścia jest sygnałem czytelnym maszynowo (a wpis w dzienniku zdarzeń aplikacji dla każdego uruchomienia go odzwierciedla), więc skrypt powinien opierać się na kodzie wyjścia, a nie analizować tekst, a `installerclean-cli /s > audit.txt` przechwytuje cały przebieg, łącznie z ewentualnym wierszem błędu.
 
 Wszystkie trzy wymagają wiersza poleceń z podwyższonymi uprawnieniami (administratora). Jeśli zasady grupy blokują monit podniesienia uprawnień UAC, proces odmawia uruchomienia, a Windows zwraca błąd 740 do nadrzędnej powłoki (`$LASTEXITCODE = 740` w PowerShell). `taskkill /pid <pid>` nie wywołuje łagodnego anulowania; muteks pojedynczej instancji jest odzyskiwany przy następnym uruchomieniu przez ścieżkę AbandonedMutexException.
-
-Uwaga: komunikaty samego CLI są w języku angielskim. Powyższe opisy odpowiadają dostępnym opcjom.
 
 ### Dlaczego `installerclean-cli`, a nie `installerclean.exe`?
 
