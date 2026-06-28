@@ -14,7 +14,7 @@
 
 <p align="center"><strong>Một công cụ mã nguồn mở giúp dọn dẹp an toàn <code>C:\Windows\Installer</code>, thư mục ẩn của Windows đang âm thầm ngốn dung lượng đĩa của bạn.</strong></p>
 
-<p align="center"><em>Năm thì mười họa mới dùng đến. Biết đâu dọn ra được chút dung lượng. Rồi thảnh thơi bước tiếp.</em></p>
+<p align="center"><em>Năm thì mười họa mới dùng đến. Biết đâu dọn ra được chút dung lượng. Rồi nhẹ nhõm bước tiếp.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Giấy phép: MIT"></a>
@@ -350,12 +350,12 @@ InstallerClean hỗ trợ vận hành không giao diện cho việc viết scrip
 
 ```
 Cách dùng:
-  installerclean-cli --help   Hiển thị trợ giúp này (cũng nhận /?, -h)
-  installerclean-cli --version  In ra phiên bản (cũng nhận -v)
-  installerclean-cli /s       Chỉ quét, liệt kê các tệp có thể loại bỏ
-  installerclean-cli /d       Xóa các tệp có thể loại bỏ (Thùng rác)
-  installerclean-cli /m       Chuyển tới nơi mặc định đã lưu
-  installerclean-cli /m PATH  Chuyển tới đường dẫn được chỉ định
+  installerclean-cli --help        Hiển thị trợ giúp này (cũng nhận /?, -h)
+  installerclean-cli --version     In ra phiên bản (cũng nhận -v)
+  installerclean-cli /s            Chỉ quét - liệt kê các tệp không cần thiết
+  installerclean-cli /d            Xóa các tệp không cần thiết (Thùng rác)
+  installerclean-cli /m            Chuyển tới vị trí mặc định đã lưu
+  installerclean-cli /m ĐƯỜNG_DẪN  Chuyển tới đường dẫn được chỉ định
 ```
 
 Để khởi chạy GUI, hãy chạy `InstallerClean.exe` (hoặc dùng lối tắt trong Start Menu từ bản cài đặt).
@@ -369,8 +369,6 @@ Chạy mà không có tham số, hoặc với một cờ không được nhận,
 Toàn bộ đầu ra của CLI, bao gồm các thông báo lỗi và chẩn đoán, đều đi tới stdout; không có luồng stderr riêng. Mã thoát là tín hiệu mà máy đọc được (và mục nhật ký sự kiện Application cho mỗi lần chạy phản ánh đúng mã đó), nên một script nên dựa vào mã thoát thay vì phân tích văn bản, và `installerclean-cli /s > audit.txt` ghi lại toàn bộ lần chạy kể cả dòng lỗi nếu có.
 
 Cả ba đều cần một dấu nhắc lệnh có quyền nâng cao (quản trị viên). Nếu Group Policy chặn lời nhắc nâng quyền UAC thì tiến trình từ chối khởi động và Windows trả về lỗi 740 cho shell cha (`$LASTEXITCODE = 740` trong PowerShell). `taskkill /pid <pid>` không kích hoạt việc hủy êm; mutex một-thực-thể được lần chạy kế tiếp khôi phục qua đường AbandonedMutexException.
-
-Lưu ý: Bản thân đầu ra của CLI là tiếng Anh. Các mô tả ở trên tương ứng với những tùy chọn hiện có.
 
 ### Vì sao là `installerclean-cli` chứ không phải `installerclean.exe`?
 
