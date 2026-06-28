@@ -331,13 +331,13 @@ I pulitori di sistema generici come [CCleaner](https://www.ccleaner.com/) e [Ble
 InstallerClean supporta il funzionamento senza interfaccia, per scripting e uso da amministratore di sistema:
 
 ```
-Uso:
+Utilizzo:
   installerclean-cli --help   Mostra questa guida (accetta anche /?, -h)
-  installerclean-cli --version  Stampa la versione (accetta anche -v)
-  installerclean-cli /s       Solo scansione, elenca i file rimovibili
-  installerclean-cli /d       Elimina i file rimovibili (Cestino)
-  installerclean-cli /m       Sposta nella posizione predefinita salvata
-  installerclean-cli /m PATH  Sposta nel percorso indicato
+  installerclean-cli --version  Mostra la versione (accetta anche -v)
+  installerclean-cli /s       Solo scansione - elenca i file non necessari
+  installerclean-cli /d       Elimina i file non necessari (Cestino)
+  installerclean-cli /m       Sposta nella destinazione predefinita salvata
+  installerclean-cli /m PERCORSO  Sposta nel percorso specificato
 ```
 
 Per avviare la GUI, esegui `InstallerClean.exe` (o usa il collegamento nel menu Start dell'installazione con Setup).
@@ -351,8 +351,6 @@ Eseguito senza argomenti, o con un'opzione non riconosciuta, `installerclean-cli
 Tutto l'output della CLI, compresi i messaggi di errore e di diagnostica, va su stdout; non c'è un flusso stderr separato. Il codice di uscita è il segnale leggibile dalla macchina (e la voce per ogni esecuzione nel registro eventi Applicazione lo rispecchia), quindi uno script dovrebbe basarsi sul codice di uscita anziché analizzare il testo, e `installerclean-cli /s > audit.txt` cattura l'intera esecuzione, compresa qualunque riga di errore.
 
 Tutte e tre richiedono un prompt dei comandi con privilegi elevati (amministratore). Se Criteri di gruppo blocca la richiesta di elevazione UAC, il processo si rifiuta di avviarsi e Windows restituisce l'errore 740 alla shell chiamante (`$LASTEXITCODE = 740` in PowerShell). `taskkill /pid <pid>` non provoca un annullamento controllato; il mutex di istanza singola viene recuperato dall'esecuzione successiva tramite il percorso AbandonedMutexException.
-
-Nota: l'output della CLI stessa è in inglese. Le descrizioni qui sopra corrispondono alle opzioni disponibili.
 
 ### Perché `installerclean-cli` e non `installerclean.exe`?
 
