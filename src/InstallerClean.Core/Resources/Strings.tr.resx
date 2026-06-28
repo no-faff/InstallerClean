@@ -146,7 +146,7 @@
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Silmek yerine taşıyacaksanız klasör yolu</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>_Sürüm sayfasını aç</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Yeniden tara</value></data>
-  <data name="Action.ScanAgain" xml:space="preserve"><value>_Yeniden tara</value></data>
+  <data name="Action.ScanAgain" xml:space="preserve"><value>Te_krar tara</value></data>
   <data name="Action.SendResultLog" xml:space="preserve"><value>Rapor gönder</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Gönder</value></data>
 
@@ -297,7 +297,7 @@
   <data name="Status.StartingScan" xml:space="preserve"><value>Tarama başlatılıyor...</value></data>
   <data name="Status.QueryingApi" xml:space="preserve"><value>Yüklü yazılımlar için Windows sorgulanıyor...</value></data>
   <data name="Status.ScanningCache" xml:space="preserve"><value>Yükleyici önbellek klasörü taranıyor...</value></data>
-  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Yüklü ürünler sıralanıyor...</value></data>
+  <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Yüklü ürünler listeleniyor...</value></data>
   <data name="Status.CheckingRegistry" xml:space="preserve"><value>Ek paketler için kayıt defteri denetleniyor...</value></data>
   <!-- 0 = registered package count, 1 = pluralised "package"/"packages" -->
   <!-- Fires mid-scan as a step-progress update after the registry-
