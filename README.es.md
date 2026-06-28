@@ -348,12 +348,12 @@ InstallerClean admite el funcionamiento sin interfaz, para scripting y administr
 
 ```
 Uso:
-  installerclean-cli --help   Muestra esta ayuda (también acepta /?, -h)
-  installerclean-cli --version  Muestra la versión (también acepta -v)
-  installerclean-cli /s       Solo análisis, lista los archivos eliminables
-  installerclean-cli /d       Elimina los archivos (Papelera de reciclaje)
-  installerclean-cli /m       Mueve a la ubicación por defecto guardada
-  installerclean-cli /m PATH  Mueve a la ruta indicada
+  installerclean-cli --help     Muestra esta ayuda (acepta también /?, -h)
+  installerclean-cli --version  Muestra la versión (acepta también -v)
+  installerclean-cli /s         Solo análisis - enumera los archivos innecesarios
+  installerclean-cli /d         Elimina los archivos innecesarios (Papelera de reciclaje)
+  installerclean-cli /m         Mueve a la ubicación predeterminada guardada
+  installerclean-cli /m RUTA    Mueve a la ruta especificada
 ```
 
 Para abrir la interfaz gráfica, ejecuta `InstallerClean.exe` (o usa el acceso directo del menú Inicio si lo instalaste con Setup).
@@ -362,13 +362,11 @@ Ejecutado sin argumentos, o con una opción no reconocida, `installerclean-cli` 
 
 `/s` es una ejecución en seco: analiza, enumera lo que eliminaría con nombres y tamaños, y sale. Útil para auditar antes de limpiar. El código de salida es `0` si el análisis tiene éxito, `1` si falla y `130` con Ctrl+C. Todos los archivos están en `C:\Windows\Installer`.
 
-`/d` y `/m` analizan y luego actúan. `/d` envía los archivos eliminables a la Papelera de reciclaje. `/m` los mueve a una carpeta (la que indiques en la línea de comandos, o la guardada por defecto desde la interfaz gráfica). Códigos de salida: `0` éxito completo, `2` parcial (algunos archivos correctos, otros fallidos), `1` fallo total (análisis fallido, argumentos incorrectos o todos los archivos del lote han fallado), `75` una condición transitoria bloqueó la ejecución (el mensaje mostrado indica cuál y si reintentar servirá de algo), `130` para un Ctrl+C antes de procesar ningún archivo (un Ctrl+C que cae a mitad del lote sale con `2`, parcial, porque ya se había hecho trabajo).
+`/d` y `/m` analizan y luego actúan. `/d` envía los archivos innecesarios a la Papelera de reciclaje. `/m` los mueve a una carpeta (la que indiques en la línea de comandos, o la guardada por defecto desde la interfaz gráfica). Códigos de salida: `0` éxito completo, `2` parcial (algunos archivos correctos, otros fallidos), `1` fallo total (análisis fallido, argumentos incorrectos o todos los archivos del lote han fallado), `75` una condición transitoria bloqueó la ejecución (el mensaje mostrado indica cuál y si reintentar servirá de algo), `130` para un Ctrl+C antes de procesar ningún archivo (un Ctrl+C que cae a mitad del lote sale con `2`, parcial, porque ya se había hecho trabajo).
 
 Toda la salida de la CLI, incluidos los mensajes de error y de diagnóstico, va a stdout; no hay un flujo stderr aparte. El código de salida es la señal legible por máquina (y la entrada por ejecución en el registro de eventos de Aplicación lo refleja), así que un script debería basarse en el código de salida en lugar de analizar el texto, y `installerclean-cli /s > audit.txt` captura toda la ejecución, incluida cualquier línea de error.
 
 Las tres requieren un símbolo del sistema elevado (administrador). Si una directiva de grupo bloquea el aviso de elevación de UAC, el proceso se niega a iniciarse y Windows devuelve el error 740 al shell que lo invocó (`$LASTEXITCODE = 740` en PowerShell). `taskkill /pid <pid>` no provoca una cancelación controlada; el mutex de instancia única se recupera en la siguiente ejecución mediante la vía AbandonedMutexException.
-
-Nota: la salida de la propia CLI está en inglés. Las descripciones anteriores corresponden a las opciones disponibles.
 
 ### ¿Por qué `installerclean-cli` y no `installerclean.exe`?
 
