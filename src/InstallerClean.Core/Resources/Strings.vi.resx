@@ -146,7 +146,7 @@
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Đường dẫn thư mục nếu bạn Chuyển thay vì Xóa</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>_Mở trang phát hành</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Quét lại</value></data>
-  <data name="Action.ScanAgain" xml:space="preserve"><value>_Quét lại</value></data>
+  <data name="Action.ScanAgain" xml:space="preserve"><value>Quét _lại</value></data>
   <data name="Action.SendResultLog" xml:space="preserve"><value>Gửi báo cáo</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Gửi</value></data>
 
@@ -233,7 +233,7 @@
 
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Nếu thấy hữu ích, hãy mời tôi một ly cà phê.</value></data>
-  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Việc này khát nước lắm!</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Làm việc này khát nước lắm!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Đã yêu cầu hủy. InstallerClean đang chờ bước hiện tại tới điểm dừng. Việc này có thể mất vài giây khi I/O nặng hoặc khi đang gọi cơ sở dữ liệu MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Đóng</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Gắn sao trên GitHub, báo một Issue hoặc đăng trong Discussions. Mọi phản hồi đều được hoan nghênh.</value></data>
