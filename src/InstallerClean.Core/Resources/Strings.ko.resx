@@ -390,7 +390,7 @@
        passes all three args either way, so the singular's {1} and {2}
        still resolve. -->
   <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>이 드라이브에서는 휴지통을 사용할 수 없습니다</value></data>
-  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>그래서 이 {1}({2})은 아직 삭제되지 않았습니다. 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다.</value></data>
+  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>그래서 이 {1}은 아직 삭제되지 않았습니다 ({2}). 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다.</value></data>
   <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>그래서 이 {1} {0}개는 아직 삭제되지 않았습니다 ({2}). 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다.</value></data>
   <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>삭제해도 안전합니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 휴지통은 추가 안전장치일 뿐입니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다.</value></data>
   <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>삭제해도 안전합니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 휴지통은 추가 안전장치일 뿐입니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다.</value></data>
