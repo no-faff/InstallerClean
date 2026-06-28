@@ -146,7 +146,7 @@
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Ścieżka do folderu, jeśli zamiast usuwać wybierzesz Przenieś</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>Otwórz stronę _wydania</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Skanuj ponownie</value></data>
-  <data name="Action.ScanAgain" xml:space="preserve"><value>_Skanuj ponownie</value></data>
+  <data name="Action.ScanAgain" xml:space="preserve"><value>Skanuj _ponownie</value></data>
   <data name="Action.SendResultLog" xml:space="preserve"><value>Wyślij raport</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Wyślij</value></data>
 
@@ -234,7 +234,7 @@
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Jeśli się przydało, postaw mi kawę.</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Aż zaschło w gardle!</value></data>
-  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Zażądano anulowania. InstallerClean czeka, aż bieżący krok dojdzie do punktu, w którym może się zatrzymać. Przy intensywnym wejściu/wyjściu lub zapytaniu do bazy danych MSI może to potrwać kilka sekund.</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Zażądano anulowania. InstallerClean czeka, aż bieżący krok dojdzie do punktu, w którym może się zatrzymać. Przy intensywnych operacjach wejścia/wyjścia lub zapytaniu do bazy danych MSI może to potrwać kilka sekund.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Zamknij</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Zostaw gwiazdkę na GitHubie, zgłoś problem (Issue) lub napisz w Dyskusjach (Discussions). Każda opinia mile widziana.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>lub zgłoś problem (Issue), albo napisz w Dyskusjach (Discussions). Każda opinia mile widziana.</value></data>
@@ -469,7 +469,7 @@ Wymagane: {1}
 Dostępne: {2}</value></data>
   <!-- 0 = destination -->
   <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>Nie masz uprawnień do zapisu w {0}.
-Wypróbuj folder w swoim profilu użytkownika lub na dysku, którego jesteś właścicielem.</value></data>
+Wypróbuj folder w swoim profilu użytkownika lub na własnym dysku.</value></data>
   <data name="Error.PathTooLong" xml:space="preserve"><value>Ścieżka {0} jest za długa dla Windows. Wybierz krótszą ścieżkę.</value></data>
   <data name="Error.DestinationMissing" xml:space="preserve"><value>Folder {0} nie istnieje i nie udało się go utworzyć. Sprawdź literę dysku lub ścieżkę sieciową.</value></data>
   <!-- 0 = destination, 1 = crash log path. The exception's .Message
@@ -514,7 +514,7 @@ Szczegóły w {1}.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Upłynął limit czasu sprawdzania. Połączenie z GitHub może być wolne; spróbuj ponownie.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Sprawdzanie nie powiodło się z nieznanej przyczyny. Szczegóły są w crash.log, jeśli chcesz to zgłosić.</value></data>
   <!-- 0 = the URL the user was trying to reach -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>Nie udało się otworzyć linku w przeglądarce zwykłego użytkownika. Adres URL został skopiowany do schowka, abyś mógł otworzyć go ręcznie:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>Nie udało się otworzyć linku w przeglądarce zwykłego użytkownika. Adres URL został skopiowany do schowka, więc możesz otworzyć go ręcznie:&#10;&#10;{0}</value></data>
   <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>Nie udało się otworzyć linku w przeglądarce zwykłego użytkownika, a skopiowanie go do schowka również się nie powiodło. Adres URL to:&#10;&#10;{0}</value></data>
   <!-- 0 = the destination folder whose canonical path changed mid-batch -->
   <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Kanoniczna ścieżka folderu docelowego zmieniła się w trakcie operacji: {0}</value></data>
