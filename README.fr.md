@@ -349,13 +349,13 @@ Les nettoyeurs système généralistes comme [CCleaner](https://www.ccleaner.com
 InstallerClean prend en charge un fonctionnement sans interface, pour le scripting et l'administration système :
 
 ```
-Utilisation :
-  installerclean-cli --help   Affiche cette aide (accepte aussi /?, -h)
-  installerclean-cli --version  Affiche la version (accepte aussi -v)
-  installerclean-cli /s       Analyse seule, liste les fichiers supprimables
-  installerclean-cli /d       Supprime les fichiers (Corbeille)
-  installerclean-cli /m       Déplace vers l'emplacement par défaut enregistré
-  installerclean-cli /m PATH  Déplace vers le chemin indiqué
+Utilisation :
+  installerclean-cli --help      Affiche cette aide (accepte aussi /?, -h)
+  installerclean-cli --version   Affiche la version (accepte aussi -v)
+  installerclean-cli /s          Analyse seule - liste les fichiers inutiles
+  installerclean-cli /d          Supprime les fichiers inutiles (Corbeille)
+  installerclean-cli /m          Déplace vers l'emplacement par défaut enregistré
+  installerclean-cli /m CHEMIN   Déplace vers le chemin spécifié
 ```
 
 Pour lancer l'interface graphique, exécutez `InstallerClean.exe` (ou utilisez le raccourci du menu Démarrer si vous avez utilisé le programme d'installation Setup).
@@ -370,7 +370,6 @@ Toute la sortie de la CLI, y compris les messages d'erreur et de diagnostic, va 
 
 Les trois nécessitent une invite de commandes élevée (administrateur). Si une stratégie de groupe bloque l'invite d'élévation UAC, le processus refuse de démarrer et Windows renvoie l'erreur 740 à l'invite parente (`$LASTEXITCODE = 740` sous PowerShell). `taskkill /pid <pid>` ne déclenche pas d'annulation propre ; le mutex d'instance unique est récupéré au lancement suivant, par le chemin AbandonedMutexException.
 
-À noter : la sortie de la CLI elle-même est en anglais. Les descriptions ci-dessus correspondent aux options disponibles.
 
 ### Pourquoi `installerclean-cli` et pas `installerclean.exe` ?
 
