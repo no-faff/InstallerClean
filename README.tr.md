@@ -351,12 +351,12 @@ InstallerClean, betik yazma ve sistem yöneticisi kullanımı için arayüzsüz 
 
 ```
 Kullanım:
-  installerclean-cli --help   Bu yardımı göster (/?, -h de kabul edilir)
+  installerclean-cli --help     Bu yardımı göster (/?, -h de kabul edilir)
   installerclean-cli --version  Sürümü yazdır (-v de kabul edilir)
-  installerclean-cli /s       Yalnızca tara - kaldırılabilir dosyaları listele
-  installerclean-cli /d       Kaldırılabilir dosyaları sil (Geri Dönüşüm Kutusu)
-  installerclean-cli /m       Kayıtlı varsayılan konuma taşı
-  installerclean-cli /m PATH  Belirtilen yola taşı
+  installerclean-cli /s         Yalnızca tara - gereksiz dosyaları listele
+  installerclean-cli /d         Gereksiz dosyaları sil (Geri Dönüşüm Kutusu)
+  installerclean-cli /m         Kayıtlı varsayılan konuma taşı
+  installerclean-cli /m YOL     Belirtilen yola taşı
 ```
 
 GUI'yi başlatmak için `InstallerClean.exe` çalıştırın (ya da kurulumdan gelen Başlat menüsü kısayolunu kullanın).
@@ -370,8 +370,6 @@ GUI'yi başlatmak için `InstallerClean.exe` çalıştırın (ya da kurulumdan g
 CLI'nin tüm çıktısı, hata ve tanılama iletileri dahil, stdout'a gider; ayrı bir stderr akışı yoktur. Çıkış kodu makinece okunabilen sinyaldir (ve çalıştırma başına Uygulama olay günlüğü girişi onu yansıtır), dolayısıyla bir betik metni ayrıştırmak yerine çıkış koduna göre hareket etmelidir ve `installerclean-cli /s > audit.txt` varsa herhangi bir hata satırı dahil çalıştırmanın tamamını yakalar.
 
 Üçü de yükseltilmiş (yönetici) bir komut istemi gerektirir. Bir Grup İlkesi UAC yükseltme istemini engellerse, süreç başlamayı reddeder ve Windows üst kabuğa 740 hatası döndürür (PowerShell'de `$LASTEXITCODE = 740`). `taskkill /pid <pid>` düzgün bir iptal tetiklemez; tek örnek muteksi, AbandonedMutexException yolu üzerinden bir sonraki çalıştırma tarafından kurtarılır.
-
-Not: CLI'nin kendi çıktısı İngilizcedir. Yukarıdaki açıklamalar mevcut seçeneklere karşılık gelir.
 
 ### Neden `installerclean-cli`, `installerclean.exe` değil?
 
