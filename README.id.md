@@ -352,10 +352,10 @@ InstallerClean mendukung operasi tanpa antarmuka untuk pembuatan skrip dan pengg
 Penggunaan:
   installerclean-cli --help   Tampilkan bantuan ini (juga menerima /?, -h)
   installerclean-cli --version  Cetak versi (juga menerima -v)
-  installerclean-cli /s       Pindai saja, daftar file yang bisa dihapus
-  installerclean-cli /d       Hapus file yang bisa dihapus (Keranjang Sampah)
+  installerclean-cli /s       Pindai saja - daftar file tidak diperlukan
+  installerclean-cli /d       Hapus file tidak diperlukan (Keranjang Sampah)
   installerclean-cli /m       Pindahkan ke lokasi default tersimpan
-  installerclean-cli /m PATH  Pindahkan ke jalur yang ditentukan
+  installerclean-cli /m JALUR Pindahkan ke jalur yang ditentukan
 ```
 
 Untuk meluncurkan GUI, jalankan `InstallerClean.exe` (atau gunakan pintasan menu Mulai dari instalasi setup).
@@ -369,8 +369,6 @@ Jalankan tanpa argumen, atau dengan flag yang tidak dikenali, maka `installercle
 Semua keluaran CLI, termasuk pesan kesalahan dan diagnostik, masuk ke stdout; tidak ada aliran stderr terpisah. Kode keluar adalah sinyal yang terbaca mesin (dan entri log peristiwa Application per proses mencerminkannya), jadi skrip sebaiknya berpatokan pada kode keluar alih-alih mengurai teksnya, dan `installerclean-cli /s > audit.txt` menangkap seluruh proses termasuk baris kesalahan apa pun.
 
 Ketiganya memerlukan prompt perintah yang ditinggikan (administrator). Jika Group Policy memblokir permintaan elevasi UAC, proses menolak untuk dijalankan dan Windows mengembalikan kesalahan 740 ke shell induk (`$LASTEXITCODE = 740` di PowerShell). `taskkill /pid <pid>` tidak memicu pembatalan yang mulus; mutex instans-tunggal dipulihkan oleh proses berikutnya melalui jalur AbandonedMutexException.
-
-Catatan: Keluaran CLI itu sendiri berbahasa Inggris. Deskripsi di atas sesuai dengan opsi yang tersedia.
 
 ### Mengapa `installerclean-cli` dan bukan `installerclean.exe`?
 

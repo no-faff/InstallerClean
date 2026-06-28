@@ -125,12 +125,12 @@
   <data name="Action.Cut" xml:space="preserve"><value>Potong</value></data>
   <data name="Action.Paste" xml:space="preserve"><value>Tempel</value></data>
   <data name="Action.SelectAll" xml:space="preserve"><value>Pilih semua</value></data>
-  <data name="Action.Browse" xml:space="preserve"><value>_Telusuri...</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>Te_lusuri...</value></data>
   <data name="Action.Cancel" xml:space="preserve"><value>_Batal</value></data>
   <data name="Action.CheckForUpdates" xml:space="preserve"><value>Periksa _pembaruan</value></data>
   <data name="Action.Close" xml:space="preserve"><value>_Tutup</value></data>
   <data name="Action.Delete" xml:space="preserve"><value>_Hapus</value></data>
-  <data name="Action.DeletePermanently" xml:space="preserve"><value>Hapus _permanen</value></data>
+  <data name="Action.DeletePermanently" xml:space="preserve"><value>_Hapus permanen</value></data>
   <!-- Alt+D safe here because the Delete button under the overlay is
        disabled while Completion.IsComplete is true (IsMainContentInteractive
        binds the body region to false); the mnemonic only resolves to
@@ -138,14 +138,14 @@
        keyboard shortcut. -->
   <data name="Action.Done" xml:space="preserve"><value>_Selesai</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Detail</value></data>
-  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Traktir kopi</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Traktir _kopi</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Beri _bintang di GitHub</value></data>
   <data name="Action.MITLicence" xml:space="preserve"><value>Lisensi MIT</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Pindahkan</value></data>
   <data name="Action.MoveInstead" xml:space="preserve"><value>_Pindahkan saja</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Jalur folder jika Anda memilih Pindahkan, bukan Hapus</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>Buka halaman _rilis</value></data>
-  <data name="Action.Rescan" xml:space="preserve"><value>_Pindai ulang</value></data>
+  <data name="Action.Rescan" xml:space="preserve"><value>Pindai _ulang</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>Pindai _lagi</value></data>
   <data name="Action.SendResultLog" xml:space="preserve"><value>Kirim laporan</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Kirim</value></data>
@@ -234,7 +234,7 @@
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Kalau membantu, traktir saya secangkir kopi.</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Bikin haus, lho!</value></data>
-  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa makan beberapa detik saat I/O berat atau panggilan basis data MSI.</value></data>
+  <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa memakan waktu beberapa detik saat I/O berat atau panggilan basis data MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Tutup</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Beri bintang di GitHub, laporkan Issue, atau tulis di Discussions. Masukan apa pun diterima.</value></data>
   <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>atau laporkan Issue, atau tulis di Discussions. Masukan apa pun diterima.</value></data>
@@ -295,7 +295,7 @@
   <data name="Status.Scanning" xml:space="preserve"><value>Memindai...</value></data>
   <data name="Status.Cancelling" xml:space="preserve"><value>Membatalkan...</value></data>
   <data name="Status.StartingScan" xml:space="preserve"><value>Memulai pemindaian...</value></data>
-  <data name="Status.QueryingApi" xml:space="preserve"><value>Menanyakan ke Windows tentang perangkat lunak yang terpasang...</value></data>
+  <data name="Status.QueryingApi" xml:space="preserve"><value>Menanyai Windows tentang perangkat lunak yang terpasang...</value></data>
   <data name="Status.ScanningCache" xml:space="preserve"><value>Memindai folder cache penginstal...</value></data>
   <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Mendata produk yang terpasang...</value></data>
   <data name="Status.CheckingRegistry" xml:space="preserve"><value>Memeriksa registri untuk paket tambahan...</value></data>
@@ -670,7 +670,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
        names the contending parties (GUI or another CLI run) and
        points at exit code 75 so an RMM operator parsing stdout
        knows it is transient and safe to retry. -->
-  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Proses InstallerClean lain memegang kunci instans-tunggal (GUI atau proses CLI lain). Keluar 75 (sementara); aman untuk dicoba lagi nanti.</value></data>
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Proses InstallerClean lain memegang kunci instans-tunggal (GUI atau proses CLI lain). Kode keluar 75 (sementara); aman untuk dicoba lagi nanti.</value></data>
   <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
        can't acquire the single-instance mutex, so an RMM consumer of
        the Application channel sees a record of every scheduled-job
