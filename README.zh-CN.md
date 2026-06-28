@@ -348,12 +348,12 @@ InstallerClean 支持无界面运行，方便编写脚本和系统管理使用�
 
 ```
 用法：
-  installerclean-cli --help   显示帮助（也接受 /?、-h）
-  installerclean-cli --version  显示版本（也接受 -v）
-  installerclean-cli /s       仅扫描，列出可删除的文件
-  installerclean-cli /d       删除可删除的文件（送回收站）
+  installerclean-cli --help   显示此帮助（也接受 /?、-h）
+  installerclean-cli --version  显示版本号（也接受 -v）
+  installerclean-cli /s       仅扫描 - 列出不需要的文件
+  installerclean-cli /d       删除不需要的文件（回收站）
   installerclean-cli /m       移动到已保存的默认位置
-  installerclean-cli /m PATH  移动到指定路径
+  installerclean-cli /m 路径  移动到指定路径
 ```
 
 要启动图形界面，请运行 `InstallerClean.exe`（或使用 setup 安装后在开始菜单里的快捷方式）。
@@ -367,8 +367,6 @@ InstallerClean 支持无界面运行，方便编写脚本和系统管理使用�
 CLI 的所有输出，包括错误和诊断信息，都写到 stdout；没有单独的 stderr 流。退出码才是供机器读取的信号（每次运行写入应用程序事件日志的条目也与它一致），所以脚本应当依据退出码来判断，而不是去解析文本；`installerclean-cli /s > audit.txt` 会把整次运行都捕获下来，包括任何错误行。
 
 这三个命令都需要一个已提权的（管理员）命令提示符。如果组策略拦截了 UAC 提权提示，进程会拒绝启动，Windows 会向父 Shell 返回错误码 740（在 PowerShell 中即 `$LASTEXITCODE = 740`）。`taskkill /pid <pid>` 不会触发优雅取消；单实例互斥锁会由下一次运行通过 AbandonedMutexException 路径恢复。
-
-说明：CLI 自身的输出是英文的，上面的描述对应的是各个可用选项。
 
 ### 为什么是 `installerclean-cli` 而不是 `installerclean.exe`？
 

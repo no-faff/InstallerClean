@@ -308,7 +308,7 @@
   <data name="Status.ScanComplete" xml:space="preserve"><value>扫描完成（{0}）</value></data>
   <data name="Status.FoundProducts" xml:space="preserve"><value>正在扫描本地程序包…</value></data>
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
-  <data name="Status.FoundUnused" xml:space="preserve"><value>找到 {0} 个{1}，可清理。</value></data>
+  <data name="Status.FoundUnused" xml:space="preserve"><value>找到 {0} 个{1}，可安全删除。</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>正在准备目标文件夹…</value></data>
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>正在移动 {0} 个{1}…</value></data>
@@ -327,7 +327,7 @@
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>访问被拒绝。请以管理员身份运行。</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>扫描失败：安装程序数据库不可用。</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>扫描已取消。</value></data>
-  <data name="Status.Done" xml:space="preserve"><value>完成</value></data>
+  <data name="Status.Done" xml:space="preserve"><value>就绪</value></data>
   <!-- 0 = exception type name. Full message + stack trace go only to
        the crash log because exception messages from elevated framework
        calls can contain paths from another user's profile. 1 = crash
@@ -420,8 +420,16 @@
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>检测到 {0} 个过时的 MSI 条目（文件已从磁盘上消失；InstallerClean 不会取消它们的注册）。</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{1} 个{2}中的 {0} 个</value></data>
-  <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
+  <!-- Orphaned-window footer summary. Unneeded files split into the three
+       removable causes shown in the Reason column: true orphans (the API
+       never claimed them), superseded patches and obsoleted patches.
+       0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
+       3 = size display. No trailing noun, so it agrees at any count. -->
   <data name="Summary.OrphanedWindow" xml:space="preserve"><value>孤立 {0} 个，被取代 {1} 个，已废弃 {2} 个（{3}）</value></data>
+  <!-- Registered-window footer summary, reinforcing the "still needed" framing
+       (the flip side of the main window's "unneeded"). Split singular/plural so
+       the noun and verb agree at one file ("file ... is" vs "files ... are").
+       0 = count, 1 = size display. -->
   <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} 个仍需要的已注册文件（{1}）</value></data>
   <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} 个仍需要的已注册文件（{1}）</value></data>
 
@@ -604,8 +612,7 @@
        must NOT translate them. Those are the Cli.EventLog* keys, with one
        exception: Cli.EventLogUnavailable is a stdout warning (it tells the
        operator that an event-log write failed), so it is localised like the
-       rest of stdout despite the EventLog prefix. The Cli.EventLog* keys are
-       therefore omitted from this satellite entirely. -->
+       rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>未知参数：'{0}'</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>正在取消…</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>已取消。</value></data>
@@ -619,24 +626,44 @@
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>找到 {0} 个{1}，可清理（{2}）。</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>无需任何操作。</value></data>
+  <!-- 0 = mode arg ("/s"), 1 = registered package count, 2 = pluralised "package"/"packages" -->
+  <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
   <data name="Cli.DeletingFiles" xml:space="preserve"><value>正在删除 {0} 个{1}…</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
   <data name="Cli.DeletedFiles" xml:space="preserve"><value>已删除 {0} 个{1}。</value></data>
+  <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
+       4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>错误：此驱动器的回收站不可用，因此未删除任何内容。请改用 /m 移动这些文件，或重新启用回收站后再次运行。</value></data>
+  <!-- 0 = mode arg ("/d") -->
   <data name="Cli.NoMoveDestination" xml:space="preserve"><value>错误：未指定移动位置。请使用 /m 路径，或在 GUI 中设置默认位置。</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>错误：目标位置不能位于 Windows Installer 文件夹内。</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>错误：目标位置必须是完整路径。收到：{0}</value></data>
   <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>错误：目标位置 {0} 解析到 Windows 系统文件夹下。请选择 %SystemRoot%、%ProgramFiles% 和 %ProgramData% 之外的路径。</value></data>
+  <!-- 0 = mode, 1 = destination -->
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>错误：当前有程序正在使用 Windows Installer，通常是 Windows 更新或正在后台安装的程序。在其运行期间，移动和删除均被阻止。请在它完成后重试。</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>错误：本机有一个先前的 Windows Installer 事务处于挂起状态。请在清理缓存前，恢复或回滚该安装（或重启 Windows）。</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>错误：有一个排队等待重启后执行的文件操作指向安装程序缓存（{0}）。请先重启 Windows 完成该操作，然后再清理。</value></data>
+  <!-- Short human labels for the EventLog ({1} slot in
+       Cli.EventLogPendingRebootBlocked). The stdout sentences in
+       Cli.PendingRebootBlocked.* are full localised text; these short
+       labels are English-only (no-translate, like every Cli.EventLog*
+       entry written to the Application channel) so an Application-channel
+       grep can match a known string regardless of OS UI culture. -->
+  <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
+       2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination -->
   <data name="Cli.MovingFiles" xml:space="preserve"><value>正在将 {0} 个{1}移动到 {2}…</value></data>
   <!-- 0 = moved count, 1 = pluralised noun -->
   <data name="Cli.MovedFiles" xml:space="preserve"><value>已移动 {0} 个{1}。</value></data>
+  <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
+       4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
+  <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
+       processed (a cancel during the scan, or before the first delete or
+       move), so "each /s, /d or /m run writes one summary entry" holds for
+       every run, not only the ones that committed work. -->
   <!-- Stdout when the CLI cannot acquire the single-instance mutex.
        The GUI variant (Strings.Startup_AlreadyRunningBody) is written
        for a user who tried to launch a second window; the CLI variant
@@ -644,6 +671,29 @@
        points at exit code 75 so an RMM operator parsing stdout
        knows it is transient and safe to retry. -->
   <data name="Cli.MutexBlocked" xml:space="preserve"><value>另一个 InstallerClean 进程正持有单实例锁（GUI 或另一次 CLI 运行）。退出码 75（暂时性）；稍后可安全重试。</value></data>
+  <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
+       can't acquire the single-instance mutex, so an RMM consumer of
+       the Application channel sees a record of every scheduled-job
+       firing whether or not it was able to run. -->
+  <!-- 0 = the offending token (original case). Audit entry written when
+       the CLI is invoked with an unrecognised or malformed argument, so a
+       scheduled task with a fat-fingered flag leaves an Application-channel
+       trace instead of exiting silently. English only, like every Cli
+       EventLog string; the stdout message carries the localised text. -->
+  <!-- Audit entry written when the CLI is invoked with no argument at all,
+       so an argless scheduled task fails visibly (non-zero exit) and leaves
+       a record rather than silently succeeding while doing nothing. -->
+  <!-- Audit entry for the LocalisedAccessException and
+       LocalisedInvalidOperationException catches: the message has been
+       built from a resx template with user-controlled args only, so the
+       full text is safe to record. 0 = mode arg, 1 = the localised
+       message (already-formatted). RMM consumers parsing the
+       Application channel see the actionable reason without a separate
+       crash-log lookup. -->
+  <!-- Audit entry for the generic Exception catch: ex.Message is held
+       back (path-leak risk under elevation), only the type name and
+       crash log path travel to the EventLog. 0 = mode arg, 1 = type
+       name, 2 = crash log path. -->
   <!-- Stdout warning printed once at the end of a CLI run if any
        Event Log write failed (Group Policy or service unavailable).
        Tells an RMM consumer expecting an Application entry that the
