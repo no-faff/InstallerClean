@@ -10,3 +10,7 @@
 *.bmp binary
 *.ico binary
 *.ttf binary
+# Bundled Inno Setup language files: keep each file's exact bytes (CRLF and its
+# own encoding, e.g. Vietnamese.isl is cp1258) so an eol/charset normalisation
+# pass cannot corrupt them on checkout.
+*.isl binary
