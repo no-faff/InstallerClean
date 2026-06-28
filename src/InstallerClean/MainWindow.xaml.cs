@@ -423,25 +423,27 @@ public partial class MainWindow : Window
     // always reflects the displayed language.
     private static readonly System.Windows.Media.FontFamily SegoeMdl2 = new("Segoe MDL2 Assets");
 
-    // Order follows the README language-switcher / priority ranking. Arabic is
-    // README-only (no satellite resx), so it is not offered here.
+    // Listed alphabetically by name, the conventional picker order, with English
+    // (the source and fallback) pinned first. The README language-switcher uses a
+    // different, priority order. Arabic is README-only (no satellite resx), so it
+    // is not offered here.
     private static readonly (string Culture, string Endonym)[] LanguageChoices =
     {
         ("en-GB", "English"),
-        ("zh-Hans", "简体中文"),
-        ("ru", "Русский"),
+        ("id", "Bahasa Indonesia"),
+        ("de", "Deutsch"),
         ("es", "Español"),
-        ("ja", "日本語"),
-        ("pt-BR", "Português (BR)"),
-        ("pl", "Polski"),
-        ("tr", "Türkçe"),
-        ("ko", "한국어"),
         ("fr", "Français"),
         ("it", "Italiano"),
-        ("de", "Deutsch"),
-        ("id", "Bahasa Indonesia"),
+        ("pl", "Polski"),
+        ("pt-BR", "Português (BR)"),
         ("vi", "Tiếng Việt"),
+        ("tr", "Türkçe"),
+        ("ru", "Русский"),
         ("uk", "Українська"),
+        ("ja", "日本語"),
+        ("zh-Hans", "简体中文"),
+        ("ko", "한국어"),
     };
 
     // Tracks whether the globe's menu is open, so a second click on the globe
