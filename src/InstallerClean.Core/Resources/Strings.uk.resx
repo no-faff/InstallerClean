@@ -145,7 +145,7 @@
   <data name="Action.MoveInstead" xml:space="preserve"><value>_Перемістити натомість</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Шлях до папки, якщо ви переміщуєте замість видалення</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>_Відкрити сторінку випуску</value></data>
-  <data name="Action.Rescan" xml:space="preserve"><value>_Повторити сканування</value></data>
+  <data name="Action.Rescan" xml:space="preserve"><value>Пов_торити сканування</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Сканувати знову</value></data>
   <data name="Action.SendResultLog" xml:space="preserve"><value>Надіслати звіт</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Надіслати</value></data>
