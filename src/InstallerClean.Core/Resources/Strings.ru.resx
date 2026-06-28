@@ -120,7 +120,7 @@
   <data name="Field.Missing" xml:space="preserve"><value>отсутствует</value></data>
 
   <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
-  <data name="Action.About" xml:space="preserve"><value>_О программе</value></data>
+  <data name="Action.About" xml:space="preserve"><value>О п_рограмме</value></data>
   <data name="Action.Copy" xml:space="preserve"><value>Копировать</value></data>
   <data name="Action.Cut" xml:space="preserve"><value>Вырезать</value></data>
   <data name="Action.Paste" xml:space="preserve"><value>Вставить</value></data>
@@ -145,7 +145,7 @@
   <data name="Action.MoveInstead" xml:space="preserve"><value>_Переместить</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Путь к папке, если вы выберете «Переместить» вместо «Удалить»</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>Открыть страницу _выпуска</value></data>
-  <data name="Action.Rescan" xml:space="preserve"><value>_Повторить сканирование</value></data>
+  <data name="Action.Rescan" xml:space="preserve"><value>По_вторить сканирование</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Сканировать снова</value></data>
   <data name="Action.SendResultLog" xml:space="preserve"><value>Отправить отчёт</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>От_править</value></data>
@@ -308,7 +308,7 @@
   <data name="Status.ScanComplete" xml:space="preserve"><value>Сканирование завершено ({0})</value></data>
   <data name="Status.FoundProducts" xml:space="preserve"><value>Сканирование локальных пакетов...</value></data>
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
-  <data name="Status.FoundUnused" xml:space="preserve"><value>Найдено {0} {1} для очистки.</value></data>
+  <data name="Status.FoundUnused" xml:space="preserve"><value>Найдено {0} {1} для безопасного удаления.</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>Подготовка папки назначения...</value></data>
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>Перемещение: {0} {1}...</value></data>
