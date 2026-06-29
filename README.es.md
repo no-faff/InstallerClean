@@ -99,7 +99,7 @@ El consejo habitual confunde borrar archivos al azar (lo cual sí es peligroso) 
 1. **Analiza** `C:\Windows\Installer` en busca de archivos `.msi` y `.msp`
 2. **Consulta** la API de Windows Installer para identificar qué archivos siguen registrados
 3. **Muestra** cuánto puedes liberar y cuánto sigue haciendo falta, con ventanas de detalle opcionales que enumeran cada archivo
-4. **Elimina** los archivos innecesarios: los envía a la Papelera de reciclaje, o los mueve a una carpeta que tú elijas
+4. **Elimina** los archivos innecesarios: los mueve a la Papelera de reciclaje, o a una carpeta que tú elijas
 
 ## Capturas de pantalla
 
@@ -129,7 +129,7 @@ El consejo habitual confunde borrar archivos al azar (lo cual sí es peligroso) 
 
 <p>
   <img src="docs/screenshots/05-delete-dialogue.webp" alt="Confirmación de eliminación que pregunta si eliminar 69 archivos (1,28 GB) e indica que los archivos se enviarán a la Papelera de reciclaje" width="900"><br>
-  <em>Confirmación antes de cada acción. Eliminar envía a la Papelera de reciclaje; Mover coloca los archivos donde tú elijas.</em>
+  <em>Confirmación antes de cada acción. Eliminar mueve a la Papelera de reciclaje; Mover coloca los archivos donde tú elijas.</em>
   <br><br>
 </p>
 
@@ -171,7 +171,7 @@ Tras completar un Mover o un Eliminar, las subcarpetas vacías que haya dentro d
 
 Sí. InstallerClean consulta la misma base de datos de la API de Windows Installer que el propio Windows usa para llevar el control de lo que está instalado. Si Windows dice que un archivo ya no hace falta, la aplicación se fía; no adivina a partir de nombres de archivo ni fechas.
 
-**Sobre Eliminar y Mover.** Los archivos que InstallerClean elimina se pueden borrar de forma permanente sin riesgo. **Eliminar** los envía a la Papelera de reciclaje (se te avisará si no está disponible); recuperas el espacio en tu unidad C: cuando vacías la Papelera de reciclaje.
+**Sobre Eliminar y Mover.** Los archivos que InstallerClean elimina se pueden borrar de forma permanente sin riesgo. **Eliminar** los mueve a la Papelera de reciclaje (se te avisará si no está disponible); recuperas el espacio en tu unidad C: cuando vacías la Papelera de reciclaje.
 
 Aun así, no tienes que fiarte de mi palabra de que se pueden borrar sin riesgo. Mientras están en la Papelera de reciclaje, tienes ocasión de comprobar que las aplicaciones que usan esta carpeta (Office, Acrobat, Visual Studio y similares) siguen actualizándose y desinstalándose sin problemas. Si algo falla (¡no fallará!), restaura los archivos desde la Papelera de reciclaje para arreglarlo. Para mayor seguridad todavía, puedes usar **Mover** en su lugar, para dejar los archivos en una carpeta que tú elijas (obviamente, elige una carpeta en otra partición o unidad si lo que buscas es liberar espacio en C:). Solo tienes que volver a copiar los archivos a `C:\Windows\Installer` para dejar las cosas como estaban (¡pero no te hará falta!).
 
@@ -271,7 +271,7 @@ De los 100 informes que me han enviado amablemente (gracias 🙏) desde que la v
 
 **¿Por qué dice Windows «Editor desconocido»?** Porque InstallerClean no está firmado digitalmente. Un certificado de firma cuesta dinero todos los años, y prefiero mantener la aplicación gratuita antes que pagar por uno. Así que, al ejecutarla, Windows SmartScreen muestra «Windows protegió su PC». Pulsa **Más información** y luego **Ejecutar de todas formas**. Hacerlo es seguro: el código fuente es público, y cada versión incluye enlaces a VirusTotal y hashes SHA-256 que puedes comprobar antes.
 
-**¿Puedo deshacer una eliminación?** Normalmente, sí. Cuando la Papelera está disponible para la unidad, Eliminar envía los archivos ahí y puedes restaurarlos desde la Papelera. Si no está disponible, la aplicación nunca borra para siempre por su cuenta (consulta [¿Es seguro?](#es-seguro)). Y si prefieres tener una vía de vuelta que tú controlas, Mover coloca los archivos en una carpeta que tú elijas; bórralos de ahí cuando te quedes tranquilo.
+**¿Puedo deshacer una eliminación?** Normalmente, sí. Cuando la Papelera está disponible para la unidad, Eliminar mueve los archivos ahí y puedes restaurarlos desde la Papelera. Si no está disponible, la aplicación nunca borra para siempre por su cuenta (consulta [¿Es seguro?](#es-seguro)). Y si prefieres tener una vía de vuelta que tú controlas, Mover coloca los archivos en una carpeta que tú elijas; bórralos de ahí cuando te quedes tranquilo.
 
 **¿Va a quejarse Windows si quito estos archivos?** No. InstallerClean solo elimina los archivos que el propio Windows da por terminados, así que nada de lo que elimina hace falta para reparar, actualizar o desinstalar un programa. Si un archivo necesario llega a desaparecer de `C:\Windows\Installer` por algún otro medio, consulta [Si te llega a faltar un archivo de C:\Windows\Installer](#recovery).
 
@@ -362,7 +362,7 @@ Ejecutado sin argumentos, o con una opción no reconocida, `installerclean-cli` 
 
 `/s` es una ejecución en seco: analiza, enumera lo que eliminaría con nombres y tamaños, y sale. Útil para auditar antes de limpiar. El código de salida es `0` si el análisis tiene éxito, `1` si falla y `130` con Ctrl+C. Todos los archivos están en `C:\Windows\Installer`.
 
-`/d` y `/m` analizan y luego actúan. `/d` envía los archivos innecesarios a la Papelera de reciclaje. `/m` los mueve a una carpeta (la que indiques en la línea de comandos, o la guardada por defecto desde la interfaz gráfica). Códigos de salida: `0` éxito completo, `2` parcial (algunos archivos correctos, otros fallidos), `1` fallo total (análisis fallido, argumentos incorrectos o todos los archivos del lote han fallado), `75` una condición transitoria bloqueó la ejecución (el mensaje mostrado indica cuál y si reintentar servirá de algo), `130` para un Ctrl+C antes de procesar ningún archivo (un Ctrl+C que cae a mitad del lote sale con `2`, parcial, porque ya se había hecho trabajo).
+`/d` y `/m` analizan y luego actúan. `/d` mueve los archivos innecesarios a la Papelera de reciclaje. `/m` los mueve a una carpeta (la que indiques en la línea de comandos, o la guardada por defecto desde la interfaz gráfica). Códigos de salida: `0` éxito completo, `2` parcial (algunos archivos correctos, otros fallidos), `1` fallo total (análisis fallido, argumentos incorrectos o todos los archivos del lote han fallado), `75` una condición transitoria bloqueó la ejecución (el mensaje mostrado indica cuál y si reintentar servirá de algo), `130` para un Ctrl+C antes de procesar ningún archivo (un Ctrl+C que cae a mitad del lote sale con `2`, parcial, porque ya se había hecho trabajo).
 
 Toda la salida de la CLI, incluidos los mensajes de error y de diagnóstico, va a stdout; no hay un flujo stderr aparte. El código de salida es la señal legible por máquina (y la entrada por ejecución en el registro de eventos de Aplicación lo refleja), así que un script debería basarse en el código de salida en lugar de analizar el texto, y `installerclean-cli /s > audit.txt` captura toda la ejecución, incluida cualquier línea de error.
 
