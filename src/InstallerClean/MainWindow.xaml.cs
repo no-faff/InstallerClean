@@ -1,13 +1,16 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
+using InstallerClean.Services;
 using InstallerClean.ViewModels;
 
 namespace InstallerClean;
@@ -42,6 +45,12 @@ public partial class MainWindow : Window
         // overlay.
         if (_vm.Completion.IsComplete)
         {
+            // The restore line has no Text binding (it hosts an inline
+            // Hyperlink composed in code), so build it now for the overlay
+            // already up at construction; the PropertyChanged path that
+            // normally builds it never fired for this pre-construction
+            // completion (the startup all-clear set during the splash).
+            BuildCompletionRestoreLine();
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
             // The overlay was never revealed inside this window's lifetime
             // (the startup all-clear is set during the splash, before
@@ -70,7 +79,7 @@ public partial class MainWindow : Window
         StarToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
         HeartToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
 
-        // Width is explicit, the designed 720 (the content column's 672
+        // Width is explicit, the designed 828 (the content column's 780
         // MaxWidth plus the content margins) multiplied by the
         // text-scale factor; height sizes to content with the root
         // grid's work-area MaxHeight as its ceiling, so at large OS
@@ -115,7 +124,7 @@ public partial class MainWindow : Window
         // acceptable.
         RootLayout.MaxHeight = DetailWindowSizing.WorkAreaHeightLimit(this);
         Width = DetailWindowSizing.ClampWidthToWorkArea(
-            this, 720 * AccessibilitySettings.Current.TextScaleFactor, 0);
+            this, 828 * AccessibilitySettings.Current.TextScaleFactor, 0);
     }
 
     private void OnAccessibilitySettingsChanged(object? sender, PropertyChangedEventArgs e)
@@ -196,6 +205,12 @@ public partial class MainWindow : Window
 
     private void OnCompletionPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        // Restore is set on every Show* path before IsComplete flips, so
+        // rebuilding its inlines here means they are in place by the time the
+        // IsComplete branch below announces the outcome.
+        if (e.PropertyName == nameof(CompletionViewModel.Restore))
+            BuildCompletionRestoreLine();
+
         if (e.PropertyName == nameof(CompletionViewModel.IsComplete) && _vm.Completion.IsComplete)
         {
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
@@ -373,11 +388,68 @@ public partial class MainWindow : Window
 
     // The error list stays unraised: the summary already speaks the
     // error count, and the per-file breakdown is scan-mode reading. The
-    // restore line carries the second half of the outcome (where the
-    // files went after a Move or Delete; the scan receipt on an
-    // all-clear).
+    // space hint (delete only) and the restore line carry the second half
+    // of the outcome (how to reclaim the space and undo it after a Delete,
+    // where the files went after a Move, the scan receipt on an all-clear).
+    // A collapsed space hint (every non-delete path) announces nothing.
     private void AnnounceCompletionOutcome() =>
-        AnnounceLiveRegions(CompletionHeadingText, CompletionSummaryText, CompletionRestoreText);
+        AnnounceLiveRegions(CompletionHeadingText, CompletionSummaryText,
+            CompletionSpaceHintText, CompletionRestoreText);
+
+    // Stable README anchor: the "Is it safe?" heading slugifies to
+    // "is-it-safe". The post-Move / post-Delete restore hints carry an
+    // "[it won't!]" phrase that links here, the reassurance that a cleaned
+    // file was safe to remove.
+    private const string SafetyUrl = "https://github.com/no-faff/InstallerClean#is-it-safe";
+
+    /// <summary>
+    /// Composes the completion restore line from <see cref="CompletionViewModel.Restore"/>,
+    /// rendering a phrase delimited by <c>[ ]</c> as a hyperlink into the
+    /// README's "Is it safe?" section: a prefix Run, the Hyperlink, then a
+    /// suffix Run. A value with no <c>[ ]</c> pair (the all-clear receipt, the
+    /// permanent-delete reassurance) renders verbatim as a single Run. Mirrors
+    /// <see cref="RegisteredFilesWindow"/>'s BuildSeeAlsoLine; the URL opens
+    /// through <see cref="UrlLauncher"/> so this elevated process does not
+    /// launch the browser as Administrator.
+    /// </summary>
+    private void BuildCompletionRestoreLine()
+    {
+        var raw = _vm.Completion.Restore;
+        CompletionRestoreText.Inlines.Clear();
+
+        int open = raw.IndexOf('[');
+        int close = open >= 0 ? raw.IndexOf(']', open + 1) : -1;
+        if (open < 0 || close < 0)
+        {
+            CompletionRestoreText.Inlines.Add(new Run(raw));
+            return;
+        }
+
+        var prefix = raw[..open];
+        var linkText = raw[(open + 1)..close];
+        var suffix = raw[(close + 1)..];
+
+        var link = new Hyperlink(new Run(linkText))
+        {
+            NavigateUri = new Uri(SafetyUrl),
+            Style = (Style)FindResource("SubtleLink"),
+        };
+        link.Click += Hyperlink_Click;
+        // "it won't!" is meaningless to a screen reader focused on the link
+        // alone; the whole restore sentence (brackets removed) is the
+        // self-contained accessible name, already in the user's language.
+        AutomationProperties.SetName(link, prefix + linkText + suffix);
+
+        if (prefix.Length > 0) CompletionRestoreText.Inlines.Add(new Run(prefix));
+        CompletionRestoreText.Inlines.Add(link);
+        if (suffix.Length > 0) CompletionRestoreText.Inlines.Add(new Run(suffix));
+    }
+
+    private void Hyperlink_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Hyperlink link && link.NavigateUri is not null)
+            UrlLauncher.OpenUrl(link.NavigateUri.AbsoluteUri);
+    }
 
     private static void RaiseLiveRegionChanged(FrameworkElement element)
     {
