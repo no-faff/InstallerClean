@@ -76,13 +76,13 @@
              SizeToContent="Height", so it grows to fit this content
              exactly and normally never needs a scrollbar; a tall warning
              banner makes the window taller rather than clipping the
-             action buttons. The MaxWidth is the content width a 720
+             action buttons. The MaxWidth is the content width an 828
              window gives at 100% text scale and grows with the OS
              text-size factor in step with the explicit scaled window
              width set in code-behind, so the window widens with its
              text instead of starving the counts row. -->
         <Grid Grid.Row="1" Margin="{StaticResource MainContentMargin}"
-              MaxWidth="{a11y:TextScaled 672}" HorizontalAlignment="Center"
+              MaxWidth="{a11y:TextScaled 780}" HorizontalAlignment="Center"
               IsEnabled="{Binding IsMainContentInteractive}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -640,7 +640,7 @@
                  its line length instead of wrapping into a tall sliver. -->
             <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Pill}"
                     BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}"
-                    Padding="36,32" MinWidth="{a11y:TextScaled 340}" MaxWidth="{a11y:TextScaled 420}"
+                    Padding="36,32" MinWidth="{a11y:TextScaled 340}" MaxWidth="{a11y:TextScaled 520}"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
                 <!-- Grid, not a StackPanel: the icon, heading and buttons
                      sit in Auto rows and the variable-length copy in a
@@ -688,6 +688,30 @@
                                TextWrapping="Wrap" Margin="0,0,0,6"
                                AutomationProperties.LiveSetting="Polite"/>
 
+                    <!-- Delete-only space hint ("Empty it to actually reclaim
+                         the space."), bound to Completion.SpaceHint and shown
+                         above the restore line. Collapses when empty (every
+                         path but a recycle-delete) so move / all-clear /
+                         permanent-delete carry no phantom gap. 4px bottom
+                         pairs it with the restore line: the two are one
+                         delete message. -->
+                    <TextBlock x:Name="CompletionSpaceHintText" Text="{Binding Completion.SpaceHint}"
+                               AutomationProperties.LiveSetting="Polite"
+                               Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
+                               HorizontalAlignment="Center" TextAlignment="Center"
+                               TextWrapping="Wrap" Margin="0,0,0,4">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Completion.SpaceHint}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
                     <!-- Restore guidance. Collapses when empty so the
                          all-clear overlay (which has no restore hint)
                          doesn't carry a phantom 30+ pixel gap from the
@@ -696,8 +720,15 @@
                          below. LiveSetting + the code-behind raise on
                          reveal: this line is the second half of the
                          outcome (where the files went after a Move or
-                         Delete; the scan receipt on an all-clear). -->
-                    <TextBlock x:Name="CompletionRestoreText" Text="{Binding Completion.Restore}"
+                         Delete; the scan receipt on an all-clear).
+                         Inlines are composed in code-behind
+                         (BuildCompletionRestoreLine) so the "[it won't!]"
+                         phrase renders as a hyperlink to the README's "Is it
+                         safe?" section; a TextBlock cannot bind Text and host
+                         an inline Hyperlink at once, so there is no Text
+                         binding here. The collapse trigger still reads
+                         Completion.Restore. -->
+                    <TextBlock x:Name="CompletionRestoreText"
                                AutomationProperties.LiveSetting="Polite"
                                Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
                                HorizontalAlignment="Center" TextAlignment="Center"

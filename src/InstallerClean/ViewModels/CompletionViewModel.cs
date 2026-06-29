@@ -41,6 +41,17 @@ public partial class CompletionViewModel : ObservableObject
     [ObservableProperty] private string _heading = string.Empty;
     [ObservableProperty] private string _summary = string.Empty;
     [ObservableProperty] private string _restore = string.Empty;
+
+    /// <summary>
+    /// Delete-only line shown above <see cref="Restore"/> ("Empty it to
+    /// actually reclaim the space."). Empty on every other completion path
+    /// (move, all-clear, permanent delete) so the bound TextBlock collapses
+    /// and only the recycle-delete summary carries it. Set in
+    /// <see cref="ShowDeleteSummary"/> and cleared everywhere else, because the
+    /// view-model instance is reused across operations.
+    /// </summary>
+    [ObservableProperty] private string _spaceHint = string.Empty;
+
     [ObservableProperty] private string _errors = string.Empty;
 
     [ObservableProperty]
@@ -152,6 +163,7 @@ public partial class CompletionViewModel : ObservableObject
             installedProductCount,
             DisplayHelpers.PluraliseProduct(installedProductCount),
             DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
+        SpaceHint = string.Empty;
         Errors = string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = true;
@@ -183,6 +195,7 @@ public partial class CompletionViewModel : ObservableObject
             : string.Format(Strings.Completion_MoveSummaryWithErrors,
                 movedCount, movedLabel, destination, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = Strings.Completion_MoveRestoreHint;
+        SpaceHint = string.Empty;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = movedBytes <= 0;
@@ -194,7 +207,7 @@ public partial class CompletionViewModel : ObservableObject
         IReadOnlyList<FileOperationError> errors)
     {
         Heading = string.Format(
-            errors.Count == 0 ? Strings.Completion_Freed : Strings.Completion_PartlyFreed,
+            errors.Count == 0 ? Strings.Completion_CleanedUp : Strings.Completion_PartlyCleanedUp,
             DisplayHelpers.FormatSize(deletedBytes));
         var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
         Summary = errors.Count == 0
@@ -202,6 +215,7 @@ public partial class CompletionViewModel : ObservableObject
             : string.Format(Strings.Completion_DeleteSummaryWithErrors,
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = Strings.Completion_DeleteRestoreHint;
+        SpaceHint = Strings.Completion_DeleteSpaceHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
@@ -220,7 +234,7 @@ public partial class CompletionViewModel : ObservableObject
         IReadOnlyList<FileOperationError> errors)
     {
         Heading = string.Format(
-            errors.Count == 0 ? Strings.Completion_Freed : Strings.Completion_PartlyFreed,
+            errors.Count == 0 ? Strings.Completion_CleanedUp : Strings.Completion_PartlyCleanedUp,
             DisplayHelpers.FormatSize(deletedBytes));
         var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
         Summary = errors.Count == 0
@@ -238,6 +252,10 @@ public partial class CompletionViewModel : ObservableObject
             Strings.Completion_PermanentDeleteRestoreHint_Singular,
             Strings.Completion_PermanentDeleteRestoreHint_Plural,
             "Completion.PermanentDeleteRestoreHint");
+        // No space hint: a permanent delete reclaims the disk at that instant
+        // (there is no bin to empty). The headline still reads "cleaned up"
+        // rather than "freed" to keep both delete paths consistent.
+        SpaceHint = string.Empty;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;

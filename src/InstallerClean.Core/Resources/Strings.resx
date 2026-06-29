@@ -347,15 +347,36 @@
        + smaller-receipt shape as the post-Move and post-Delete
        states. -->
   <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>Scanned {0} {1} in {2}</value></data>
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything stops working</value></data>
-  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Restore them from the Recycle Bin if anything stops working</value></data>
-  <!-- 0 = size freed (e.g. "120.5 MB") -->
+  <!-- Restore hints under the post-Move / post-Delete summary. The
+       "[it won't!]" phrase becomes a hyperlink to the README's "Is it safe?"
+       section (rendered in MainWindow.xaml.cs BuildCompletionRestoreLine); the
+       square brackets are the link delimiter and are NOT shown, only the
+       phrase between them becomes the link, and the round brackets around it
+       are shown. Keep the brackets in place and translate the phrase. -->
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything breaks ([it won't!])</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Until then you can restore them if anything breaks ([it won't!])</value></data>
+  <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
+       the Recycle Bin, which does not reclaim disk space until the bin is
+       emptied; this line names that step. "actually" carries "this is what
+       genuinely frees the disk" (cf. French "vraiment"); translate for that
+       sense, not a rote calque. -->
+  <data name="Completion.DeleteSpaceHint" xml:space="preserve"><value>Empty it to actually reclaim the space.</value></data>
+  <!-- Headline size figures. "freed" is used only where space is genuinely
+       reclaimed at that instant: a cross-volume Move (frees the system drive)
+       and a consented permanent delete. A Delete to the Recycle Bin reclaims
+       nothing until the bin is emptied, so the delete paths read "cleaned up"
+       (true at that instant: the junk is out of the cache). A same-volume Move
+       reads "moved" (a rename frees nothing yet). 0 = size (e.g. "120.5 MB"). -->
   <data name="Completion.Freed" xml:space="preserve"><value>{0} freed</value></data>
+  <data name="Completion.CleanedUp" xml:space="preserve"><value>{0} cleaned up</value></data>
   <data name="Completion.Moved" xml:space="preserve"><value>{0} moved</value></data>
   <data name="Completion.PartlyMoved" xml:space="preserve"><value>{0} moved, some files could not be processed</value></data>
-  <!-- Heading shown when an operation succeeded for SOME files but
-       errored for others. 0 = total size freed (e.g. "120.5 MB"). -->
+  <!-- Heading shown when an operation succeeded for SOME files but errored for
+       others. PartlyCleanedUp is the delete-path counterpart of PartlyFreed
+       (see Completion.CleanedUp for why delete reads "cleaned up").
+       0 = total size (e.g. "120.5 MB"). -->
   <data name="Completion.PartlyFreed" xml:space="preserve"><value>{0} freed, some files could not be processed</value></data>
+  <data name="Completion.PartlyCleanedUp" xml:space="preserve"><value>{0} cleaned up, some files could not be processed</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
   <data name="Completion.MoveSummary" xml:space="preserve"><value>{0} {1} moved to {2}</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->

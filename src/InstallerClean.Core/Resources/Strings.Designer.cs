@@ -186,7 +186,9 @@ public static class Strings
     public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_UnknownArgument => Get("Cli.UnknownArgument");
     public static string Completion_AllClean => Get("Completion.AllClean");
+    public static string Completion_CleanedUp => Get("Completion.CleanedUp");
     public static string Completion_DeleteRestoreHint => Get("Completion.DeleteRestoreHint");
+    public static string Completion_DeleteSpaceHint => Get("Completion.DeleteSpaceHint");
     public static string Completion_DeleteSummary => Get("Completion.DeleteSummary");
     public static string Completion_DeleteSummaryWithErrors => Get("Completion.DeleteSummaryWithErrors");
     public static string Completion_Freed => Get("Completion.Freed");
@@ -196,6 +198,7 @@ public static class Strings
     public static string Completion_MoveSummaryWithErrors => Get("Completion.MoveSummaryWithErrors");
     public static string Completion_NothingToCleanUp => Get("Completion.NothingToCleanUp");
     public static string Completion_NothingToCleanUpReceipt => Get("Completion.NothingToCleanUpReceipt");
+    public static string Completion_PartlyCleanedUp => Get("Completion.PartlyCleanedUp");
     public static string Completion_PartlyFreed => Get("Completion.PartlyFreed");
     public static string Completion_PartlyMoved => Get("Completion.PartlyMoved");
     public static string Completion_PermanentDeleteRestoreHint_Plural => Get("Completion.PermanentDeleteRestoreHint.Plural");
