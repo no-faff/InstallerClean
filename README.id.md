@@ -14,7 +14,7 @@
 
 <p align="center"><strong>Alat sumber terbuka untuk membersihkan <code>C:\Windows\Installer</code> dengan aman, folder Windows tersembunyi yang diam-diam menggerogoti ruang disk Anda.</strong></p>
 
-<p align="center"><em>Pakai sesekali saja. Mungkin sedikit ruang jadi lega. Lalu lanjutkan harimu, terasa lebih ringan.</em></p>
+<p align="center"><em>Pakai sesekali saja. Mungkin sedikit ruang jadi lega. Lalu lanjutkan harimu, terasa bersih.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Lisensi: MIT"></a>

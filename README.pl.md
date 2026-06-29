@@ -14,7 +14,7 @@
 
 <p align="center"><strong>Otwartoźródłowe narzędzie do bezpiecznego oczyszczania <code>C:\Windows\Installer</code>, ukrytego folderu systemu Windows, który po cichu pożera miejsce na dysku.</strong></p>
 
-<p align="center"><em>Uruchamiaj go od wielkiego dzwonu. Może zwolnisz trochę miejsca. Ruszaj dalej z czystym sumieniem.</em></p>
+<p align="center"><em>Uruchamiaj go od wielkiego dzwonu. Może zwolnisz trochę miejsca. Ruszaj dalej, wszystko czyste.</em></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licencja: MIT"></a>
