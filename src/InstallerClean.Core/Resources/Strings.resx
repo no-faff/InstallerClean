@@ -163,13 +163,13 @@
   <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Leave a star on GitHub (About window)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Move all unneeded installer files to the chosen destination folder</value></data>
-  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Send all unneeded installer files to the Recycle Bin</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Move all unneeded installer files to the Recycle Bin</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
        straight after "Cancel, button": the window-level alternative is
        never read, because help text is only spoken for the element with
        focus and the window itself never has it. -->
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting.</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting.</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are.</value></data>
   <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel.</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Move the unneeded files to a folder you choose</value></data>
@@ -243,7 +243,7 @@
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Move the unneeded files to the Move location.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files to the Move location. Choose one first.</value></data>
-  <data name="Tooltip.Delete" xml:space="preserve"><value>Send the unneeded files to the Recycle Bin.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Move the unneeded files to the Recycle Bin.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Subject name from the embedded Authenticode certificate. Not chain-verified.</value></data>
 
   <!-- Body copy -->
@@ -382,9 +382,9 @@
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
   <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>{0} {1} moved to {2}. {3} {4}</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
-  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} sent to the Recycle Bin</value></data>
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} moved to the Recycle Bin</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
-  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} sent to the Recycle Bin. {2} {3}</value></data>
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} moved to the Recycle Bin. {2} {3}</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
@@ -460,6 +460,10 @@
   <!-- 0 = destination path -->
   <data name="Confirm.MoveDestination" xml:space="preserve"><value>Files will be moved to {0}.</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Delete {0} {1} ({2})?</value></data>
+  <!-- Keeps "sent" while the delete summaries and the Delete tooltip say
+       "moved": this line recommends the Move feature in the same breath ("use
+       Move instead"), so a distinct verb avoids a "moved ... use Move" garden
+       path. Not an oversight; do not align it to "moved". -->
   <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead.</value></data>
 
   <!-- Error messages -->
@@ -514,10 +518,13 @@ Details in {1}.</value></data>
   <data name="Error.IOFailure" xml:space="preserve"><value>The operation failed. Try again or restart Windows.</value></data>
   <data name="Error.UnknownError" xml:space="preserve"><value>Unknown error.</value></data>
   <!-- 0 = shell error code -->
+  <!-- Keeps "sent" for the same reason as Confirm.DeleteToRecycleBin: it ends
+       with "Move it instead", so "couldn't move ... Move it instead" would
+       confuse. The delete summaries and tooltip use "moved". -->
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>The file was permanently deleted because it could not be sent to the Recycle Bin.</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>The file was permanently deleted because it could not be moved to the Recycle Bin.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Refusing to move files into the Windows Installer folder (destination: {0}).</value></data>
   <!-- 0 = the relative path the caller passed -->

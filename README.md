@@ -112,7 +112,7 @@ The standard advice confuses deleting files at random (which genuinely is danger
 
 <p>
   <img src="docs/screenshots/05-delete-dialogue.webp" alt="Delete confirmation asking to delete 69 files (1.28 GB), noting the files will be sent to the Recycle Bin" width="900"><br>
-  <em>Confirmation before either action. Delete sends to the Recycle Bin; Move puts the files somewhere of your choice.</em>
+  <em>Confirmation before either action. Delete moves to the Recycle Bin; Move puts the files somewhere of your choice.</em>
   <br><br>
 </p>
 
@@ -154,7 +154,7 @@ After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer`
 
 Yes. InstallerClean queries the same Windows Installer API database that Windows itself uses to track what's installed. If Windows says a file is no longer needed, the app trusts it; it doesn't guess based on filenames or dates.
 
-**About Delete and Move.** The files InstallerClean deletes are safe to delete permanently. **Delete** sends them to the Recycle Bin (you'll be warned if it's not available); you gain the space back on your C: drive when you empty your Recycle Bin.
+**About Delete and Move.** The files InstallerClean deletes are safe to delete permanently. **Delete** moves them to the Recycle Bin (you'll be warned if it's not available); you gain the space back on your C: drive when you empty your Recycle Bin.
 
 You don't have to trust me that the files are safe to delete, though. While they're in your Recycle Bin, you have a chance to check that the apps that use this folder, Office, Acrobat, Visual Studio and the like, still update and uninstall without trouble. If anything's broken (it won't be!), restore the files from the Recycle Bin to fix it. To be super safe, you can instead use **Move** - to park the files in a folder of your choice (obviously choose a folder on another partition/drive if you're looking to free space on C:). Just copy the files back to `C:\Windows\Installer` to restore things back to how they were (but you won't need to!).
 
@@ -252,7 +252,7 @@ Across the 100 reports people have sent in (thanks 🙏) since v1.8.0 added the 
 
 **Why does Windows say "Unknown publisher"?** Because InstallerClean isn't code-signed. A signing certificate costs money every year, and I'd rather keep the app free than pay for one. So when you run it, Windows SmartScreen shows "Windows protected your PC". Click **More info**, then **Run anyway**. It's safe to do: the source code is public, and every release has VirusTotal links and SHA-256 hashes you can check first.
 
-**Can I undo a Delete?** Usually, yes. When the Recycle Bin is available for the drive, Delete sends files there and you can restore them from the bin. If the bin isn't available, the app never deletes for good on its own (see [Is it safe?](#is-it-safe)). And if you'd rather have a way back you control, Move puts the files in a folder you choose; delete them from there whenever you're satisfied.
+**Can I undo a Delete?** Usually, yes. When the Recycle Bin is available for the drive, Delete moves files there and you can restore them from the bin. If the bin isn't available, the app never deletes for good on its own (see [Is it safe?](#is-it-safe)). And if you'd rather have a way back you control, Move puts the files in a folder you choose; delete them from there whenever you're satisfied.
 
 **Will Windows complain if I remove these files?** No. InstallerClean only ever removes the files Windows itself reports as finished with, so nothing it removes is needed to repair, update or uninstall a program. If a needed file does go missing from `C:\Windows\Installer` by some other means, see [If you do have a file missing from C:\Windows\Installer](#recovery).
 
@@ -343,7 +343,7 @@ Run with no argument, or an unrecognised flag, and `installerclean-cli` prints t
 
 `/s` is a dry run: it scans, lists what it would remove with filenames and sizes, then exits. Useful for auditing before cleanup. Exit code is `0` on a successful scan, `1` if the scan fails and `130` on Ctrl+C. All files are in `C:\Windows\Installer`.
 
-`/d` and `/m` scan and then act. `/d` sends removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments or every file in the batch failed), `75` for a transient condition that blocked the run (the printed message explains which and whether a retry will help), `130` for a Ctrl+C before any file was processed (a Ctrl+C that lands mid-batch exits `2`, partial, since work was committed).
+`/d` and `/m` scan and then act. `/d` moves removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments or every file in the batch failed), `75` for a transient condition that blocked the run (the printed message explains which and whether a retry will help), `130` for a Ctrl+C before any file was processed (a Ctrl+C that lands mid-batch exits `2`, partial, since work was committed).
 
 All of the CLI's output, including error and diagnostic messages, goes to stdout; there is no separate stderr stream. The exit code is the machine-readable signal (and the per-run Application event log entry mirrors it), so a script should key off the exit code rather than parse the text, and `installerclean-cli /s > audit.txt` captures the whole run including any error line.
 
