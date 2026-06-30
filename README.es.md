@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.2-blue" alt="Versión de GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-26k-brightgreen" alt="Descargas totales"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Descargas totales"></a>
 </p>
 
 ![Captura de pantalla de InstallerClean tras limpiar con éxito: 1,28 GB liberados, 69 archivos enviados a la Papelera de reciclaje](docs/screenshots/06-freed-success-done.webp)
@@ -184,7 +184,7 @@ Los servicios de análisis, consulta, movimiento, eliminación, configuración y
 - Los hashes SHA-256 de cada versión están listados en la [página de versiones](../../releases/latest).
 - VirusTotal: limpio en todos los motores. Hay enlaces en vivo en las notas de cada versión para que puedas volver a comprobarlo.
 - El código fuente está en [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) y la CI compila y prueba cada commit (consulta la insignia verde de CI más arriba).
-- <!-- downloads-start -->26k<!-- downloads-end --> descargas entre GitHub, MajorGeeks y Softpedia.
+- <!-- downloads-start -->27k<!-- downloads-end --> descargas entre GitHub, MajorGeeks y Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) prueba cada envío en una máquina virtual y solo lo publica si pasa su revisión.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analiza cada versión en busca de virus, spyware y adware.
 

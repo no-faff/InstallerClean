@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.2-blue" alt="GitHub Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-26k-brightgreen" alt="Total downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Total downloads"></a>
 </p>
 
 ![Screenshot of InstallerClean after a successful clean-up: 1.28 GB freed, 69 files sent to the Recycle Bin](docs/screenshots/06-freed-success-done.webp)
@@ -167,7 +167,7 @@ The scan, query, move, delete, settings and pending-reboot services are covered 
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
 - VirusTotal: clean across every engine. Live links in each release's notes so you can re-check.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
-- <!-- downloads-start -->26k<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
+- <!-- downloads-start -->27k<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) tests each submission in a virtual machine and lists it only if it passes their review.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) tests each release for viruses, spyware and adware.
 

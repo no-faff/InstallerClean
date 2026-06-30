@@ -22,7 +22,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.2-blue" alt="GitHub リリース"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-26k-brightgreen" alt="総ダウンロード数"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="総ダウンロード数"></a>
 </p>
 
 ![クリーンアップ成功後の InstallerClean の画面：1.28 GB を解放し、69 個のファイルをごみ箱へ送ったところ](docs/screenshots/06-freed-success-done.webp)
@@ -168,7 +168,7 @@ Windows インストーラーが今まさにキャッシュへ書き込んでい
 - 各リリースの SHA-256 ハッシュは[リリースページ](../../releases/latest)に掲載しています。
 - VirusTotal：すべてのエンジンでクリーンです。各リリースのノートにライブリンクを掲載しているので、ご自身で再確認できます。
 - ソースコードは [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) にあり、CI が毎回のコミットをビルド・テストしています（上の緑色の CI バッジを参照）。
-- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->26k<!-- downloads-end --> 回ダウンロードされています。
+- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->27k<!-- downloads-end --> 回ダウンロードされています。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) は各提出物を仮想マシンでテストし、審査を通過したものだけを掲載します。
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) は各リリースをウイルス・スパイウェア・アドウェアについて検査しています。
 
