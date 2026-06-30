@@ -131,7 +131,7 @@ Standardowa porada myli usuwanie plików na chybił trafił (co naprawdę jest n
 
 <p>
   <img src="docs/screenshots/05-delete-dialogue.webp" alt="Potwierdzenie usunięcia z pytaniem o usunięcie 69 plików (1,28 GB), z informacją, że pliki trafią do Kosza" width="900"><br>
-  <em>Potwierdzenie przed każdą z akcji. Usuń wysyła do Kosza; Przenieś umieszcza pliki w wybranym przez ciebie miejscu.</em>
+  <em>Potwierdzenie przed każdą z akcji. Usuń przenosi do Kosza; Przenieś umieszcza pliki w wybranym przez ciebie miejscu.</em>
   <br><br>
 </p>
 
@@ -173,7 +173,7 @@ Po zakończeniu przenoszenia lub usuwania puste podfoldery wewnątrz `C:\Windows
 
 Tak. InstallerClean odpytuje tę samą bazę danych API Windows Installer, której Windows używa do śledzenia tego, co jest zainstalowane. Jeśli Windows mówi, że plik nie jest już potrzebny, aplikacja mu ufa; nie zgaduje na podstawie nazw plików ani dat.
 
-**O usuwaniu i przenoszeniu.** Pliki, które InstallerClean usuwa, można bezpiecznie usunąć na stałe. **Usuń** wysyła je do Kosza (dostaniesz ostrzeżenie, jeśli jest niedostępny); miejsce na dysku C: odzyskujesz po opróżnieniu Kosza.
+**O usuwaniu i przenoszeniu.** Pliki, które InstallerClean usuwa, można bezpiecznie usunąć na stałe. **Usuń** przenosi je do Kosza (dostaniesz ostrzeżenie, jeśli jest niedostępny); miejsce na dysku C: odzyskujesz po opróżnieniu Kosza.
 
 Nie musisz mi jednak wierzyć na słowo, że pliki można bezpiecznie usunąć. Dopóki są w Koszu, masz okazję sprawdzić, czy programy korzystające z tego folderu, Office, Acrobat, Visual Studio i podobne, nadal bez problemu się aktualizują i odinstalowują. Jeśli coś przestanie działać (nie przestanie!), przywróć pliki z Kosza, aby to naprawić. Dla pełnej pewności możesz zamiast tego użyć przycisku **Przenieś**, aby odłożyć pliki do wybranego przez siebie folderu (rzecz jasna wybierz folder na innej partycji lub dysku, jeśli zależy ci na zwolnieniu miejsca na C:). Wystarczy skopiować pliki z powrotem do `C:\Windows\Installer`, aby przywrócić wszystko do poprzedniego stanu (ale nie będziesz musiał!).
 
@@ -273,7 +273,7 @@ Spośród 98 raportów, które nadesłano (dziękuję 🙏) od czasu, gdy opcję
 
 **Dlaczego Windows pisze „Nieznany wydawca”?** Ponieważ InstallerClean nie jest podpisany cyfrowo. Certyfikat do podpisywania kosztuje co roku, a wolę, żeby aplikacja pozostała darmowa, niż płacić za certyfikat. Gdy więc go uruchomisz, Windows SmartScreen pokaże „System Windows ochronił ten komputer”. Kliknij **Więcej informacji**, a następnie **Uruchom mimo to**. Można to zrobić bez obaw: kod źródłowy jest publiczny, a każde wydanie ma linki do VirusTotal i skróty SHA-256, które możesz wcześniej sprawdzić.
 
-**Czy mogę cofnąć usunięcie?** Zwykle tak. Gdy Kosz jest dostępny dla danego dysku, Usuń wysyła pliki do niego i możesz je z Kosza przywrócić. Jeśli Kosz jest niedostępny, aplikacja nigdy sama nie usuwa trwale (zob. [Czy to bezpieczne?](#czy-to-bezpieczne)). A jeśli wolisz mieć drogę powrotną pod własną kontrolą, Przenieś umieszcza pliki w wybranym przez ciebie folderze; usuń je stamtąd, kiedy tylko nabierzesz pewności.
+**Czy mogę cofnąć usunięcie?** Zwykle tak. Gdy Kosz jest dostępny dla danego dysku, Usuń przenosi do niego pliki i możesz je z Kosza przywrócić. Jeśli Kosz jest niedostępny, aplikacja nigdy sama nie usuwa trwale (zob. [Czy to bezpieczne?](#czy-to-bezpieczne)). A jeśli wolisz mieć drogę powrotną pod własną kontrolą, Przenieś umieszcza pliki w wybranym przez ciebie folderze; usuń je stamtąd, kiedy tylko nabierzesz pewności.
 
 **Czy Windows będzie narzekał, jeśli usunę te pliki?** Nie. InstallerClean usuwa wyłącznie pliki, które sam Windows zgłasza jako już niepotrzebne, więc nic z usuwanego nie jest potrzebne do naprawy, aktualizacji ani odinstalowania programu. Jeśli potrzebny plik mimo wszystko zniknie z `C:\Windows\Installer` w jakiś inny sposób, zob. [Jeśli jednak brakuje ci pliku w C:\Windows\Installer](#recovery).
 
@@ -364,7 +364,7 @@ Uruchomione bez argumentu lub z nierozpoznaną flagą, `installerclean-cli` wypi
 
 `/s` to przebieg próbny: skanuje, wypisuje to, co usunąłby, z nazwami plików i rozmiarami, a następnie kończy działanie. Przydatne do audytu przed czyszczeniem. Kod wyjścia to `0` przy udanym skanowaniu, `1`, jeśli skanowanie zawiedzie, i `130` przy Ctrl+C. Wszystkie pliki znajdują się w `C:\Windows\Installer`.
 
-`/d` i `/m` skanują, a następnie działają. `/d` wysyła pliki do usunięcia do Kosza. `/m` przenosi je do folderu (albo wskazanego w wierszu poleceń, albo domyślnego zapisanego z GUI). Kody wyjścia: `0` dla pełnego sukcesu, `2` dla częściowego (część plików się powiodła, część zawiodła), `1` dla całkowitej porażki (skanowanie zawiodło, błędne argumenty albo każdy plik w partii zawiódł), `75` dla stanu przejściowego, który zablokował przebieg (wypisany komunikat wyjaśnia jaki i czy ponowna próba pomoże), `130` dla Ctrl+C przed przetworzeniem jakiegokolwiek pliku (Ctrl+C w trakcie partii kończy się kodem `2`, częściowym, ponieważ praca została wykonana).
+`/d` i `/m` skanują, a następnie działają. `/d` przenosi pliki do usunięcia do Kosza. `/m` przenosi je do folderu (albo wskazanego w wierszu poleceń, albo domyślnego zapisanego z GUI). Kody wyjścia: `0` dla pełnego sukcesu, `2` dla częściowego (część plików się powiodła, część zawiodła), `1` dla całkowitej porażki (skanowanie zawiodło, błędne argumenty albo każdy plik w partii zawiódł), `75` dla stanu przejściowego, który zablokował przebieg (wypisany komunikat wyjaśnia jaki i czy ponowna próba pomoże), `130` dla Ctrl+C przed przetworzeniem jakiegokolwiek pliku (Ctrl+C w trakcie partii kończy się kodem `2`, częściowym, ponieważ praca została wykonana).
 
 Cała komunikacja CLI, w tym komunikaty o błędach i diagnostyczne, trafia do stdout; nie ma osobnego strumienia stderr. Kod wyjścia jest sygnałem czytelnym maszynowo (a wpis w dzienniku zdarzeń aplikacji dla każdego uruchomienia go odzwierciedla), więc skrypt powinien opierać się na kodzie wyjścia, a nie analizować tekst, a `installerclean-cli /s > audit.txt` przechwytuje cały przebieg, łącznie z ewentualnym wierszem błędu.
 
