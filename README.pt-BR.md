@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.2-blue" alt="Versão do GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-26k-brightgreen" alt="Total de downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Total de downloads"></a>
 </p>
 
 ![Captura de tela do InstallerClean após uma limpeza bem-sucedida: 1,28 GB liberados, 69 arquivos enviados para a Lixeira](docs/screenshots/06-freed-success-done.webp)
@@ -184,7 +184,7 @@ Os serviços de análise, consulta, movimentação, exclusão, configurações e
 - Os hashes SHA-256 de cada versão estão listados na [página de versões](../../releases/latest).
 - VirusTotal: limpo em todos os mecanismos. Há links ativos nas notas de cada versão para você verificar de novo.
 - O código-fonte está em [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), e a CI compila e testa cada commit (veja o selo verde de CI acima).
-- <!-- downloads-start -->26k<!-- downloads-end --> downloads entre o GitHub, o MajorGeeks e a Softpedia.
+- <!-- downloads-start -->27k<!-- downloads-end --> downloads entre o GitHub, o MajorGeeks e a Softpedia.
 - O [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testa cada envio em uma máquina virtual e só publica se passar na avaliação deles.
 - A [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testa cada versão em busca de vírus, spyware e adware.
 

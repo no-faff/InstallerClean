@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.2-blue" alt="GitHub 版本"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-26k-brightgreen" alt="总下载量"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="总下载量"></a>
 </p>
 
 ![InstallerClean 成功清理后的截图：已释放 1.28 GB，69 个文件已送进回收站](docs/screenshots/06-freed-success-done.webp)
@@ -184,7 +184,7 @@ InstallerClean 会识别三类不需要的文件。
 - 每个版本的 SHA-256 哈希值都列在[发布页面](../../releases/latest)上。
 - VirusTotal：所有引擎检测均为干净。每个版本的发布说明里都有实时链接，方便您自行复查。
 - 源代码在 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)，CI 会对每次提交进行构建和测试（见上方绿色的 CI 徽章）。
-- 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->26k<!-- downloads-end --> 次下载。
+- 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->27k<!-- downloads-end --> 次下载。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 会在虚拟机中测试每一个提交上来的版本，只有通过审核才会收录。
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) 会对每个版本做病毒、间谍软件和广告软件检测。
 

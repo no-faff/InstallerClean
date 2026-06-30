@@ -22,7 +22,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v1.9.2-blue" alt="GitHub-Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-26k-brightgreen" alt="Downloads insgesamt"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Downloads insgesamt"></a>
 </p>
 
 ![Screenshot von InstallerClean nach einem erfolgreichen Aufräumen: 1,28 GB freigegeben, 69 Dateien in den Papierkorb verschoben](docs/screenshots/06-freed-success-done.webp)
@@ -186,7 +186,7 @@ Die Dienste für Scan, Abfrage, Verschieben, Löschen, Einstellungen und aussteh
 - SHA-256-Hashes für jede Version sind auf der [Releases-Seite](../../releases/latest) aufgeführt.
 - VirusTotal: sauber bei allen Engines. Live-Links in den Hinweisen zu jeder Version, damit du es erneut prüfen kannst.
 - Der Quellcode liegt auf [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), und die CI baut und testet jeden Commit (siehe das grüne CI-Badge oben).
-- <!-- downloads-start -->26k<!-- downloads-end --> Downloads über GitHub, MajorGeeks und Softpedia.
+- <!-- downloads-start -->27k<!-- downloads-end --> Downloads über GitHub, MajorGeeks und Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testet jede Einreichung in einer virtuellen Maschine und listet sie nur, wenn sie die Prüfung besteht.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) prüft jede Version auf Viren, Spyware und Adware.
 
