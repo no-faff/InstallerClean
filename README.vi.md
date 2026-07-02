@@ -2,8 +2,6 @@
   <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.es.md">Español</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.pl.md">Polski</a> · <a href="README.tr.md">Türkçe</a> · <a href="README.ko.md">한국어</a> · <a href="README.fr.md">Français</a> · <a href="README.it.md">Italiano</a> · <a href="README.de.md">Deutsch</a> · <a href="README.id.md">Bahasa Indonesia</a> · <strong>Tiếng Việt</strong> · <a href="README.uk.md">Українська</a>
 </p>
 
-<p align="center"><em>Trang này đã được dịch, nhưng giao diện chương trình hiện chỉ có bằng tiếng Anh.</em></p>
-
 <p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
@@ -34,7 +32,6 @@
 
 ## Nội dung
 
-- [Can you help translate InstallerClean?](#can-you-help-translate-installerclean)
 - [Thư mục không ai nói cho bạn biết](#thư-mục-không-ai-nói-cho-bạn-biết)
 - [Đi tìm trợ giúp](#đi-tìm-trợ-giúp)
 - [Nó làm gì](#nó-làm-gì)
@@ -56,23 +53,6 @@
 - [Giấy phép](#giấy-phép)
 
 ---
-
-## Can you help translate InstallerClean?
-
-<details>
-<summary>I'm looking for a native Vietnamese speaker to check my machine translation; click if you might be willing to help 🙏</summary>
-
-I'd like to make InstallerClean available in more languages. I've got a complete machine-translated Vietnamese version ready to go - every string in the app, the interface and the command-line tool, but I don't want to ship it without the approval of a native speaker.
-
-I'd be very grateful to anyone with a good grasp of both English and Vietnamese who can look over the translation as it stands and either approve what's there or suggest improvements where necessary.
-
-bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
-
-I did put *a lot* of effort into the draft, so it should be pretty good, but it's only there to help you out; up to you - use all, some or none of it.
-
-You can see it all [here](docs/translations/vi.md), the English next to the Vietnamese, and the `.resx` file itself is [here](src/InstallerClean.Core/Resources/Strings.vi.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking (although even more effort has gone into the `.resx`). Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and Vietnamese will join English, Japanese and Italian, with the credit going to you.
-
-</details>
 
 ## Thư mục không ai nói cho bạn biết
 
@@ -131,7 +111,7 @@ Lời khuyên thường gặp nhầm lẫn giữa việc xóa tệp một cách 
 
 <p>
   <img src="docs/screenshots/05-delete-dialogue.webp" alt="Hộp thoại xác nhận xóa hỏi có xóa 69 tệp (1,28 GB) không, lưu ý rằng các tệp sẽ được chuyển vào Thùng rác" width="900"><br>
-  <em>Xác nhận trước cả hai thao tác. Xóa sẽ chuyển vào Thùng rác; Chuyển đặt các tệp ở nơi bạn chọn.</em>
+  <em>Xác nhận trước cả hai thao tác. Xóa sẽ di chuyển vào Thùng rác; Chuyển đặt các tệp ở nơi bạn chọn.</em>
   <br><br>
 </p>
 
@@ -173,7 +153,7 @@ Sau khi một thao tác Chuyển hoặc Xóa hoàn tất, các thư mục con r�
 
 Có. InstallerClean truy vấn chính cơ sở dữ liệu API Windows Installer mà Windows dùng để theo dõi những gì đã được cài. Nếu Windows nói một tệp không còn cần nữa, ứng dụng tin vào điều đó; nó không phỏng đoán dựa trên tên tệp hay ngày tháng.
 
-**Về Xóa và Chuyển.** Những tệp InstallerClean xóa có thể xóa vĩnh viễn một cách an toàn. **Xóa** sẽ chuyển chúng vào Thùng rác (bạn sẽ được cảnh báo nếu Thùng rác không khả dụng); bạn lấy lại dung lượng trên ổ C: khi dọn sạch Thùng rác.
+**Về Xóa và Chuyển.** Những tệp InstallerClean xóa có thể xóa vĩnh viễn một cách an toàn. **Xóa** sẽ di chuyển chúng vào Thùng rác (bạn sẽ được cảnh báo nếu Thùng rác không khả dụng); bạn lấy lại dung lượng trên ổ C: khi dọn sạch Thùng rác.
 
 Tuy nhiên, bạn không cần phải tin lời tôi rằng các tệp đó an toàn để xóa. Khi chúng còn trong Thùng rác, bạn có cơ hội kiểm tra xem những ứng dụng dùng thư mục này, như Office, Acrobat, Visual Studio và tương tự, vẫn cập nhật và gỡ cài đặt bình thường hay không. Nếu có gì đó hỏng (sẽ không đâu!), hãy khôi phục các tệp từ Thùng rác để khắc phục. Để cho thật chắc, bạn có thể dùng **Chuyển** thay vào đó, để gửi các tệp vào một thư mục bạn chọn (tất nhiên hãy chọn thư mục trên một phân vùng/ổ đĩa khác nếu bạn muốn giải phóng dung lượng trên C:). Chỉ cần chép các tệp trở lại `C:\Windows\Installer` là mọi thứ về như cũ (nhưng bạn sẽ không cần đến điều đó đâu!).
 
@@ -273,7 +253,7 @@ Trong số 98 báo cáo mọi người đã gửi về (cảm ơn 🙏) kể t�
 
 **Vì sao Windows báo “Nhà phát hành không xác định”?** Vì InstallerClean không được ký số. Một chứng chỉ ký số tốn tiền mỗi năm, và tôi thà giữ ứng dụng miễn phí còn hơn phải trả tiền cho nó. Vậy nên khi bạn chạy nó, Windows SmartScreen hiện “Windows đã bảo vệ PC của bạn”. Hãy bấm **Thông tin khác**, rồi **Vẫn chạy**. Làm vậy là an toàn: mã nguồn là công khai, và mỗi bản phát hành đều có liên kết VirusTotal và mã băm SHA-256 mà bạn có thể kiểm tra trước.
 
-**Tôi có thể hoàn tác một lần Xóa không?** Thường là có. Khi Thùng rác khả dụng cho ổ đĩa đó, Xóa sẽ gửi tệp vào đó và bạn có thể khôi phục chúng từ Thùng rác. Nếu Thùng rác không khả dụng, ứng dụng không bao giờ tự ý xóa vĩnh viễn (xem [Có an toàn không?](#có-an-toàn-không)). Và nếu bạn muốn có một lối quay lại do chính mình kiểm soát, Chuyển sẽ đặt các tệp vào một thư mục bạn chọn; hãy xóa chúng khỏi đó bất cứ khi nào bạn thấy yên tâm.
+**Tôi có thể hoàn tác một lần Xóa không?** Thường là có. Khi Thùng rác khả dụng cho ổ đĩa đó, Xóa sẽ di chuyển tệp vào đó và bạn có thể khôi phục chúng từ Thùng rác. Nếu Thùng rác không khả dụng, ứng dụng không bao giờ tự ý xóa vĩnh viễn (xem [Có an toàn không?](#có-an-toàn-không)). Và nếu bạn muốn có một lối quay lại do chính mình kiểm soát, Chuyển sẽ đặt các tệp vào một thư mục bạn chọn; hãy xóa chúng khỏi đó bất cứ khi nào bạn thấy yên tâm.
 
 **Windows có phàn nàn nếu tôi loại bỏ những tệp này không?** Không. InstallerClean chỉ loại bỏ những tệp mà chính Windows báo là đã dùng xong, nên không có gì nó loại bỏ lại cần cho việc sửa chữa, cập nhật hay gỡ cài đặt một chương trình. Nếu một tệp cần thiết bị thiếu khỏi `C:\Windows\Installer` vì một lý do nào khác, hãy xem [Nếu bạn thật sự thiếu một tệp trong C:\Windows\Installer](#recovery).
 
@@ -364,7 +344,7 @@ Chạy mà không có tham số, hoặc với một cờ không được nhận,
 
 `/s` là một lần chạy thử: nó quét, liệt kê những gì nó sẽ loại bỏ kèm tên tệp và kích thước, rồi thoát. Hữu ích để rà soát trước khi dọn. Mã thoát là `0` khi quét thành công, `1` nếu quét thất bại và `130` khi Ctrl+C. Tất cả các tệp đều nằm trong `C:\Windows\Installer`.
 
-`/d` và `/m` quét rồi mới hành động. `/d` gửi các tệp có thể loại bỏ vào Thùng rác. `/m` chuyển chúng vào một thư mục (hoặc thư mục bạn chỉ định trên dòng lệnh, hoặc thư mục mặc định đã lưu từ GUI). Mã thoát: `0` cho thành công hoàn toàn, `2` cho một phần (một số tệp thành công, một số thất bại), `1` cho thất bại toàn bộ (quét thất bại, tham số sai hoặc mọi tệp trong lô đều thất bại), `75` cho một tình huống tạm thời đã chặn lần chạy (thông báo in ra giải thích đó là gì và liệu thử lại có ích không), `130` cho một lần Ctrl+C trước khi xử lý bất kỳ tệp nào (một lần Ctrl+C rơi vào giữa lô sẽ thoát `2`, tức một phần, vì đã có việc được thực hiện).
+`/d` và `/m` quét rồi mới hành động. `/d` di chuyển các tệp có thể loại bỏ vào Thùng rác. `/m` chuyển chúng vào một thư mục (hoặc thư mục bạn chỉ định trên dòng lệnh, hoặc thư mục mặc định đã lưu từ GUI). Mã thoát: `0` cho thành công hoàn toàn, `2` cho một phần (một số tệp thành công, một số thất bại), `1` cho thất bại toàn bộ (quét thất bại, tham số sai hoặc mọi tệp trong lô đều thất bại), `75` cho một tình huống tạm thời đã chặn lần chạy (thông báo in ra giải thích đó là gì và liệu thử lại có ích không), `130` cho một lần Ctrl+C trước khi xử lý bất kỳ tệp nào (một lần Ctrl+C rơi vào giữa lô sẽ thoát `2`, tức một phần, vì đã có việc được thực hiện).
 
 Toàn bộ đầu ra của CLI, bao gồm các thông báo lỗi và chẩn đoán, đều đi tới stdout; không có luồng stderr riêng. Mã thoát là tín hiệu mà máy đọc được (và mục nhật ký sự kiện Application cho mỗi lần chạy phản ánh đúng mã đó), nên một script nên dựa vào mã thoát thay vì phân tích văn bản, và `installerclean-cli /s > audit.txt` ghi lại toàn bộ lần chạy kể cả dòng lỗi nếu có.
 
@@ -400,6 +380,8 @@ dotnet test src/InstallerClean.Tests/
 ## Đóng góp
 
 Tìm thấy lỗi hay có đề xuất? Hãy [mở một issue](../../issues) hoặc bắt đầu một [thảo luận](../../discussions). Pull request luôn được hoan nghênh. Vui lòng chạy `dotnet test` trước khi gửi.
+
+Giờ đây InstallerClean đã có đầy đủ bằng tiếng Việt: ứng dụng, trình cài đặt, dòng lệnh và cả README này. Tất cả đều là bản dịch máy mà tôi đã cố gắng hết sức; chúng sẽ không hoàn hảo, nên tôi phát hành nguyên trạng thay vì chờ người bản ngữ kiểm tra. Nếu bạn thấy có chỗ nào có thể cải thiện, tôi rất vui nếu bạn cho tôi biết, qua một issue, một pull request hoặc một thảo luận. Ứng dụng mặc định mở bằng ngôn ngữ Windows của bạn; bạn có thể chuyển sang tiếng Anh bất cứ lúc nào bằng biểu tượng quả địa cầu.
 
 ## Ủng hộ dự án
 

@@ -2,8 +2,6 @@
   <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.es.md">Español</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.pl.md">Polski</a> · <a href="README.tr.md">Türkçe</a> · <strong>한국어</strong> · <a href="README.fr.md">Français</a> · <a href="README.it.md">Italiano</a> · <a href="README.de.md">Deutsch</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.uk.md">Українська</a>
 </p>
 
-<p align="center"><em>이 페이지는 번역본이지만, 앱 화면은 현재 영어로만 표시됩니다.</em></p>
-
 <p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
@@ -34,7 +32,6 @@
 
 ## 목차
 
-- [Can you help translate InstallerClean?](#can-you-help-translate-installerclean)
 - [아무도 알려주지 않는 폴더](#아무도-알려주지-않는-폴더)
 - [도움을 찾아서](#도움을-찾아서)
 - [하는 일](#하는-일)
@@ -56,23 +53,6 @@
 - [라이선스](#라이선스)
 
 ---
-
-## Can you help translate InstallerClean?
-
-<details>
-<summary>I'm looking for a native Korean speaker to check my machine translation; click if you might be willing to help 🙏</summary>
-
-I'd like to make InstallerClean available in more languages. I've got a complete machine-translated Korean version ready to go - every string in the app, the interface and the command-line tool, but I don't want to ship it without the approval of a native speaker.
-
-I'd be very grateful to anyone with a good grasp of both English and Korean who can look over the translation as it stands and either approve what's there or suggest improvements where necessary.
-
-bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
-
-I did put *a lot* of effort into the draft, so it should be pretty good, but it's only there to help you out; up to you - use all, some or none of it.
-
-You can see it all [here](docs/translations/ko.md), the English next to the Korean, and the `.resx` file itself is [here](src/InstallerClean.Core/Resources/Strings.ko.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking (although even more effort has gone into the `.resx`). Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and Korean will join English, Japanese and Italian, with the credit going to you.
-
-</details>
 
 ## 아무도 알려주지 않는 폴더
 
@@ -131,7 +111,7 @@ You can see it all [here](docs/translations/ko.md), the English next to the Kore
 
 <p>
   <img src="docs/screenshots/05-delete-dialogue.webp" alt="69개 파일(1.28 GB) 삭제를 확인하며, 파일이 휴지통으로 보내진다는 점을 알리는 삭제 확인 대화상자" width="900"><br>
-  <em>어느 작업이든 실행 전에 확인을 거칩니다. 삭제는 휴지통으로 보내고, 이동은 직접 고른 위치에 파일을 둡니다.</em>
+  <em>어느 작업이든 실행 전에 확인을 거칩니다. 삭제는 휴지통으로 이동하고, 이동은 직접 고른 위치에 파일을 둡니다.</em>
   <br><br>
 </p>
 
@@ -173,7 +153,7 @@ API가 불완전한 데이터를 반환하면(드물지만 설치 관리자 상�
 
 네. InstallerClean은 Windows가 무엇이 설치되어 있는지 추적할 때 쓰는 바로 그 Windows Installer API 데이터베이스에 질의합니다. Windows가 어떤 파일이 더 이상 필요 없다고 하면 앱은 그 말을 믿습니다. 파일 이름이나 날짜로 추측하지 않습니다.
 
-**삭제와 이동에 관하여.** InstallerClean이 삭제하는 파일은 영구히 지워도 안전합니다. **삭제**는 파일을 휴지통으로 보냅니다(휴지통을 쓸 수 없으면 알려 드립니다). 휴지통을 비우면 그만큼의 공간이 C: 드라이브로 돌아옵니다.
+**삭제와 이동에 관하여.** InstallerClean이 삭제하는 파일은 영구히 지워도 안전합니다. **삭제**는 파일을 휴지통으로 이동합니다(휴지통을 쓸 수 없으면 알려 드립니다). 휴지통을 비우면 그만큼의 공간이 C: 드라이브로 돌아옵니다.
 
 그렇지만 파일이 삭제해도 안전하다는 걸 제 말만 믿으실 필요는 없습니다. 파일이 휴지통에 있는 동안, 이 폴더를 쓰는 앱들, 즉 Office, Acrobat, Visual Studio 같은 프로그램이 여전히 문제없이 업데이트되고 제거되는지 확인할 기회가 있습니다. 혹시 뭔가 망가졌다면(그럴 일 없습니다!) 휴지통에서 파일을 복원해 되돌리면 됩니다. 더 확실히 하고 싶다면 대신 **이동**을 써서 파일을 직접 고른 폴더에 보관해 둘 수 있습니다(C: 공간을 비우는 것이 목적이라면 당연히 다른 파티션이나 드라이브에 있는 폴더를 고르세요). 원래대로 되돌리려면 파일을 `C:\Windows\Installer`로 다시 복사하기만 하면 됩니다(하지만 그럴 필요는 없을 겁니다!).
 
@@ -273,7 +253,7 @@ v1.8.0에서 이 옵션이 추가된 이후 보내 주신 100건의 보고서(�
 
 **왜 Windows가 “알 수 없는 게시자”라고 하나요?** InstallerClean이 코드 서명되어 있지 않기 때문입니다. 서명 인증서는 해마다 비용이 들고, 저는 그 돈을 내느니 앱을 무료로 유지하고 싶습니다. 그래서 실행하면 Windows SmartScreen이 “Windows의 PC를 보호했습니다”라고 표시합니다. **추가 정보**를 클릭한 다음 **실행**을 클릭하세요. 그렇게 해도 안전합니다. 소스 코드가 공개되어 있고, 모든 릴리스에 미리 확인할 수 있는 VirusTotal 링크와 SHA-256 해시가 있습니다.
 
-**삭제를 되돌릴 수 있나요?** 보통은 가능합니다. 드라이브에서 휴지통을 쓸 수 있으면 삭제는 파일을 휴지통으로 보내고, 거기서 복원할 수 있습니다. 휴지통을 쓸 수 없으면, 앱은 스스로 파일을 영구히 지우는 일이 결코 없습니다([안전한가요?](#안전한가요) 참고). 그리고 직접 통제할 수 있는 되돌림 수단을 원한다면, 이동이 직접 고른 폴더에 파일을 넣어 주니, 마음이 놓일 때 거기서 지우면 됩니다.
+**삭제를 되돌릴 수 있나요?** 보통은 가능합니다. 드라이브에서 휴지통을 쓸 수 있으면 삭제는 파일을 휴지통으로 이동하고, 거기서 복원할 수 있습니다. 휴지통을 쓸 수 없으면, 앱은 스스로 파일을 영구히 지우는 일이 결코 없습니다([안전한가요?](#안전한가요) 참고). 그리고 직접 통제할 수 있는 되돌림 수단을 원한다면, 이동이 직접 고른 폴더에 파일을 넣어 주니, 마음이 놓일 때 거기서 지우면 됩니다.
 
 **이 파일을 제거하면 Windows가 불평하나요?** 아니요. InstallerClean은 Windows 스스로 다 썼다고 보고한 파일만 제거하므로, 제거하는 것 중에 프로그램을 복구하거나 업데이트하거나 제거하는 데 필요한 것은 없습니다. 혹시 다른 경로로 필요한 파일이 `C:\Windows\Installer`에서 사라졌다면 [`C:\Windows\Installer`에서 파일이 사라졌다면](#recovery)을 참고하세요.
 
@@ -364,7 +344,7 @@ GUI를 실행하려면 `InstallerClean.exe`를 실행하세요(또는 Setup으�
 
 `/s`는 시험 실행입니다. 검사한 뒤 제거할 파일을 이름과 크기와 함께 나열하고 종료합니다. 정리 전에 점검할 때 유용합니다. 종료 코드는 검사 성공 시 `0`, 검사 실패 시 `1`, Ctrl+C 시 `130`입니다. 모든 파일은 `C:\Windows\Installer`에 있습니다.
 
-`/d`와 `/m`은 검사한 다음 실행합니다. `/d`는 제거 가능한 파일을 휴지통으로 보냅니다. `/m`은 파일을 폴더로 이동합니다(명령줄에서 지정한 폴더, 또는 GUI에서 저장한 기본 위치). 종료 코드: `0` 완전 성공, `2` 부분 성공(일부 파일은 성공, 일부는 실패), `1` 전체 실패(검사 실패, 잘못된 인수, 또는 배치의 모든 파일 실패), `75` 실행을 막은 일시적 상태(출력된 메시지가 어떤 상태인지와 재시도가 도움이 될지 설명합니다), `130` 파일을 하나도 처리하기 전의 Ctrl+C(배치 도중에 들어온 Ctrl+C는 이미 작업이 이뤄졌으므로 `2`, 즉 부분 성공으로 종료합니다).
+`/d`와 `/m`은 검사한 다음 실행합니다. `/d`는 제거 가능한 파일을 휴지통으로 이동합니다. `/m`은 파일을 폴더로 이동합니다(명령줄에서 지정한 폴더, 또는 GUI에서 저장한 기본 위치). 종료 코드: `0` 완전 성공, `2` 부분 성공(일부 파일은 성공, 일부는 실패), `1` 전체 실패(검사 실패, 잘못된 인수, 또는 배치의 모든 파일 실패), `75` 실행을 막은 일시적 상태(출력된 메시지가 어떤 상태인지와 재시도가 도움이 될지 설명합니다), `130` 파일을 하나도 처리하기 전의 Ctrl+C(배치 도중에 들어온 Ctrl+C는 이미 작업이 이뤄졌으므로 `2`, 즉 부분 성공으로 종료합니다).
 
 오류와 진단 메시지를 포함한 CLI의 모든 출력은 stdout으로 나갑니다. 별도의 stderr 스트림은 없습니다. 종료 코드가 기계가 읽을 수 있는 신호이며(실행별 응용 프로그램 이벤트 로그 항목도 이를 그대로 반영합니다), 따라서 스크립트는 텍스트를 분석하기보다 종료 코드를 기준으로 삼아야 합니다. 그리고 `installerclean-cli /s > audit.txt`로 하면 오류 줄을 포함한 실행 전체를 담을 수 있습니다.
 
@@ -400,6 +380,8 @@ dotnet test src/InstallerClean.Tests/
 ## 기여
 
 버그를 찾았거나 제안할 것이 있나요? [이슈를 열](../../issues)거나 [토론](../../discussions)을 시작하세요. 풀 리퀘스트는 환영합니다. 제출하기 전에 `dotnet test`를 실행해 주세요.
+
+이제 InstallerClean은 앱, 설치 관리자, 명령줄, 그리고 이 README까지 모두 한국어로 제공됩니다. 모두 제가 최선을 다한 기계 번역이라 완벽하지는 않겠지만, 원어민의 확인을 기다리기보다 있는 그대로 내보냈습니다. 더 나아질 만한 부분을 발견하시면 이슈나 풀 리퀘스트, 또는 토론으로 알려 주시면 정말 감사하겠습니다. 앱은 기본적으로 Windows 언어로 열리며, 지구본 아이콘으로 언제든 영어로 바꿀 수 있습니다.
 
 ## 프로젝트 후원
 

@@ -2,8 +2,6 @@
   <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.es.md">Español</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.pl.md">Polski</a> · <a href="README.tr.md">Türkçe</a> · <a href="README.ko.md">한국어</a> · <strong>Français</strong> · <a href="README.it.md">Italiano</a> · <a href="README.de.md">Deutsch</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.uk.md">Українська</a>
 </p>
 
-<p align="center"><em>Cette page est traduite, mais l'interface de l'application est actuellement en anglais uniquement.</em></p>
-
 <p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
@@ -34,7 +32,6 @@
 
 ## Sommaire
 
-- [Can you help translate InstallerClean?](#can-you-help-translate-installerclean)
 - [Le dossier dont personne ne vous parle](#le-dossier-dont-personne-ne-vous-parle)
 - [La recherche d'aide](#la-recherche-daide)
 - [Ce qu'il fait](#ce-quil-fait)
@@ -56,23 +53,6 @@
 - [Licence](#licence)
 
 ---
-
-## Can you help translate InstallerClean?
-
-<details>
-<summary>I'm looking for a native French speaker to check my machine translation; click if you might be willing to help 🙏</summary>
-
-I'd like to make InstallerClean available in more languages. I've got a complete machine-translated French version ready to go - every string in the app, the interface and the command-line tool, but I don't want to ship it without the approval of a native speaker.
-
-I'd be very grateful to anyone with a good grasp of both English and French who can look over the translation as it stands and either approve what's there or suggest improvements where necessary.
-
-bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
-
-I did put *a lot* of effort into the draft, so it should be pretty good, but it's only there to help you out; up to you - use all, some or none of it.
-
-You can see it all [here](docs/translations/fr.md), the English next to the French, and the `.resx` file itself is [here](src/InstallerClean.Core/Resources/Strings.fr.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking (although even more effort has gone into the `.resx`). Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and French will join English, Japanese and Italian, with the credit going to you.
-
-</details>
 
 ## Le dossier dont personne ne vous parle
 
@@ -131,7 +111,7 @@ Le conseil habituel confond la suppression de fichiers au hasard (ce qui est ré
 
 <p>
   <img src="docs/screenshots/05-delete-dialogue.webp" alt="Confirmation de suppression demandant de supprimer 69 fichiers (1,28 Go), précisant que les fichiers seront envoyés à la Corbeille" width="900"><br>
-  <em>Une confirmation avant chaque action. La suppression envoie à la Corbeille ; le déplacement place les fichiers à l'endroit de votre choix.</em>
+  <em>Une confirmation avant chaque action. La suppression déplace vers la Corbeille ; le déplacement place les fichiers à l'endroit de votre choix.</em>
   <br><br>
 </p>
 
@@ -173,7 +153,7 @@ Une fois un déplacement ou une suppression terminé, les sous-dossiers vides de
 
 Oui. InstallerClean interroge la même base de données de l'API Windows Installer que Windows utilise lui-même pour suivre ce qui est installé. Si Windows indique qu'un fichier n'est plus nécessaire, l'application le croit ; elle ne devine pas à partir des noms de fichiers ou des dates.
 
-**À propos de Supprimer et Déplacer.** Les fichiers qu'InstallerClean supprime peuvent être supprimés définitivement sans risque. **Supprimer** les envoie à la Corbeille (vous serez prévenu si elle n'est pas disponible) ; vous récupérez l'espace sur votre disque C: une fois la Corbeille vidée.
+**À propos de Supprimer et Déplacer.** Les fichiers qu'InstallerClean supprime peuvent être supprimés définitivement sans risque. **Supprimer** les déplace vers la Corbeille (vous serez prévenu si elle n'est pas disponible) ; vous récupérez l'espace sur votre disque C: une fois la Corbeille vidée.
 
 Cela dit, vous n'avez pas à me croire sur parole quand je vous dis que ces fichiers peuvent être supprimés sans risque. Tant qu'ils sont dans votre Corbeille, vous avez la possibilité de vérifier que les applications qui utilisent ce dossier, Office, Acrobat, Visual Studio et compagnie, continuent de se mettre à jour et de se désinstaller sans problème. Si quelque chose ne fonctionne plus (ce ne sera pas le cas !), restaurez les fichiers depuis la Corbeille pour régler le problème. Pour être encore plus tranquille, vous pouvez plutôt utiliser **Déplacer**, qui met les fichiers de côté dans un dossier de votre choix (choisissez évidemment un dossier sur une autre partition ou un autre disque si vous cherchez à libérer de l'espace sur C:). Il suffit ensuite de recopier les fichiers dans `C:\Windows\Installer` pour tout remettre comme avant (mais vous n'en aurez pas besoin !).
 
@@ -273,7 +253,7 @@ Sur les 100 rapports que des utilisateurs nous ont gentiment envoyés (merci �
 
 **Pourquoi Windows affiche-t-il « Éditeur inconnu » ?** Parce qu'InstallerClean n'est pas signé numériquement. Un certificat de signature coûte de l'argent chaque année, et je préfère garder l'application gratuite plutôt que d'en payer un. Du coup, quand vous la lancez, Windows SmartScreen affiche « Windows a protégé votre ordinateur ». Cliquez sur **Informations complémentaires**, puis sur **Exécuter quand même**. C'est sans danger : le code source est public, et chaque version est accompagnée de liens VirusTotal et d'empreintes SHA-256 que vous pouvez vérifier au préalable.
 
-**Puis-je annuler une suppression ?** En général, oui. Quand la Corbeille est disponible pour le lecteur, la suppression y envoie les fichiers et vous pouvez les restaurer depuis la Corbeille. Si elle n'est pas disponible, l'application ne supprime jamais définitivement d'elle-même (voir [Est-ce sûr ?](#est-ce-sûr-)). Et si vous préférez disposer d'un retour en arrière que vous maîtrisez, le déplacement place les fichiers dans un dossier de votre choix ; supprimez-les de là quand vous êtes satisfait.
+**Puis-je annuler une suppression ?** En général, oui. Quand la Corbeille est disponible pour le lecteur, la suppression y déplace les fichiers et vous pouvez les restaurer depuis la Corbeille. Si elle n'est pas disponible, l'application ne supprime jamais définitivement d'elle-même (voir [Est-ce sûr ?](#est-ce-sûr-)). Et si vous préférez disposer d'un retour en arrière que vous maîtrisez, le déplacement place les fichiers dans un dossier de votre choix ; supprimez-les de là quand vous êtes satisfait.
 
 **Windows va-t-il se plaindre si je supprime ces fichiers ?** Non. InstallerClean ne supprime jamais que les fichiers dont Windows lui-même déclare avoir fini de se servir, donc rien de ce qu'il supprime n'est requis pour réparer, mettre à jour ou désinstaller un programme. Si un fichier nécessaire venait malgré tout à disparaître de `C:\Windows\Installer` par un autre moyen, voir [Si un fichier manque bel et bien dans C:\Windows\Installer](#recovery).
 
@@ -364,7 +344,7 @@ Lancé sans argument, ou avec une option non reconnue, `installerclean-cli` affi
 
 `/s` est un essai à blanc : il analyse, liste ce qui serait supprimé avec les noms de fichiers et les tailles, puis se termine. Utile pour auditer avant de nettoyer. Le code de sortie est `0` si l'analyse réussit, `1` si elle échoue et `130` en cas de Ctrl+C. Tous les fichiers se trouvent dans `C:\Windows\Installer`.
 
-`/d` et `/m` analysent, puis agissent. `/d` envoie les fichiers supprimables à la Corbeille. `/m` les déplace vers un dossier (soit celui indiqué sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Codes de sortie : `0` succès complet, `2` partiel (certains fichiers réussis, d'autres échoués), `1` échec total (analyse échouée, arguments incorrects ou tous les fichiers du lot en échec), `75` une condition transitoire a bloqué l'exécution (le message affiché précise laquelle et si un nouvel essai aidera), `130` pour un Ctrl+C avant qu'aucun fichier n'ait été traité (un Ctrl+C qui survient en cours de lot se termine par `2`, partiel, car du travail a été effectué).
+`/d` et `/m` analysent, puis agissent. `/d` déplace les fichiers supprimables vers la Corbeille. `/m` les déplace vers un dossier (soit celui indiqué sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Codes de sortie : `0` succès complet, `2` partiel (certains fichiers réussis, d'autres échoués), `1` échec total (analyse échouée, arguments incorrects ou tous les fichiers du lot en échec), `75` une condition transitoire a bloqué l'exécution (le message affiché précise laquelle et si un nouvel essai aidera), `130` pour un Ctrl+C avant qu'aucun fichier n'ait été traité (un Ctrl+C qui survient en cours de lot se termine par `2`, partiel, car du travail a été effectué).
 
 Toute la sortie de la CLI, y compris les messages d'erreur et de diagnostic, va vers stdout ; il n'existe pas de flux stderr distinct. Le code de sortie est le signal lisible par la machine (et l'entrée du journal d'événements Application, écrite à chaque exécution, le reflète), donc un script devrait se fonder sur le code de sortie plutôt que d'analyser le texte, et `installerclean-cli /s > audit.txt` capture toute l'exécution, y compris une éventuelle ligne d'erreur.
 
@@ -401,6 +381,8 @@ dotnet test src/InstallerClean.Tests/
 ## Contribuer
 
 Vous avez trouvé un bug ou vous avez une suggestion ? [Ouvrez un ticket](../../issues) ou démarrez une [discussion](../../discussions). Les pull requests sont les bienvenues. Lancez `dotnet test` avant de soumettre.
+
+InstallerClean est désormais entièrement disponible en français : l'application, le programme d'installation, la ligne de commande et ce README. Ce sont toutes des traductions automatiques, faites du mieux que j'ai pu ; elles ne seront pas parfaites, alors je les ai publiées telles quelles plutôt que d'attendre qu'un locuteur natif les vérifie. Si vous repérez quoi que ce soit qui pourrait être amélioré, je serais ravi de le savoir, dans un [ticket](../../issues/new?template=translation_review.md), une pull request ou une [discussion](../../discussions). L'application s'ouvre par défaut dans la langue de votre Windows ; vous pouvez passer en anglais à tout moment grâce à l'icône en forme de globe.
 
 ## Soutenir le projet
 

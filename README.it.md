@@ -2,8 +2,6 @@
   <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.es.md">Español</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.pl.md">Polski</a> · <a href="README.tr.md">Türkçe</a> · <a href="README.ko.md">한국어</a> · <a href="README.fr.md">Français</a> · <strong>Italiano</strong> · <a href="README.de.md">Deutsch</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.uk.md">Українська</a>
 </p>
 
-<p align="center"><em>Anche l'interfaccia dell'app è disponibile in italiano: segue la lingua di Windows e si può cambiare dal menu della lingua nell'app.</em></p>
-
 <p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
@@ -113,7 +111,7 @@ Il consiglio abituale confonde l'eliminare file a caso (cosa che è davvero peri
 
 <p>
   <img src="docs/screenshots/05-delete-dialogue.webp" alt="Conferma di eliminazione che chiede di eliminare 69 file (1,28 GB), segnalando che i file verranno inviati al Cestino" width="900"><br>
-  <em>Conferma prima di ogni azione. Elimina invia al Cestino; Sposta colloca i file dove scegli tu.</em>
+  <em>Conferma prima di ogni azione. Elimina sposta nel Cestino; Sposta colloca i file dove scegli tu.</em>
   <br><br>
 </p>
 
@@ -155,7 +153,7 @@ Una volta completato uno spostamento o un'eliminazione, le sottocartelle vuote d
 
 Sì. InstallerClean interroga lo stesso database dell'API di Windows Installer che Windows stesso usa per tenere traccia di ciò che è installato. Se Windows dice che un file non serve più, l'app si fida; non tira a indovinare in base a nomi di file o date.
 
-**Su Elimina e Sposta.** I file che InstallerClean elimina si possono eliminare definitivamente senza rischi. **Elimina** li invia al Cestino (verrai avvisato se non è disponibile); recuperi lo spazio sull'unità C: quando svuoti il Cestino.
+**Su Elimina e Sposta.** I file che InstallerClean elimina si possono eliminare definitivamente senza rischi. **Elimina** li sposta nel Cestino (verrai avvisato se non è disponibile); recuperi lo spazio sull'unità C: quando svuoti il Cestino.
 
 Non sei comunque costretto a fidarti di me sul fatto che i file si possano eliminare senza rischi. Finché sono nel Cestino, hai modo di verificare che le app che usano questa cartella, Office, Acrobat, Visual Studio e simili, continuino ad aggiornarsi e a disinstallarsi senza problemi. Se qualcosa non funziona (non succederà!), ripristina i file dal Cestino per sistemare le cose. Per andare ancora più sul sicuro, puoi invece usare **Sposta**, per parcheggiare i file in una cartella che scegli tu (ovviamente scegli una cartella su un'altra partizione o unità se quello che vuoi è liberare spazio su C:). Per tornare com'era basta ricopiare i file in `C:\Windows\Installer` (ma non ti servirà!).
 
@@ -255,7 +253,7 @@ Su 100 report che mi sono stati inviati (grazie 🙏) da quando la v1.8.0 ha agg
 
 **Perché Windows dice «Autore sconosciuto»?** Perché InstallerClean non è firmato digitalmente. Un certificato di firma ha un costo annuale, e preferisco tenere l'app gratuita piuttosto che pagarne uno. Così, quando la esegui, Windows SmartScreen mostra «PC protetto da Windows». Clicca su **Ulteriori informazioni**, poi su **Esegui comunque**. Farlo è sicuro: il codice sorgente è pubblico, e ogni versione ha link a VirusTotal e hash SHA-256 che puoi controllare prima.
 
-**Posso annullare un'eliminazione?** Di solito sì. Quando il Cestino è disponibile per l'unità, Elimina ci invia i file e puoi ripristinarli dal Cestino. Se il Cestino non è disponibile, l'app non elimina mai definitivamente di sua iniziativa (vedi [È sicuro?](#è-sicuro)). E se preferisci avere una via di ritorno che controlli tu, Sposta mette i file in una cartella che scegli tu; eliminali da lì quando sei tranquillo.
+**Posso annullare un'eliminazione?** Di solito sì. Quando il Cestino è disponibile per l'unità, Elimina ci sposta i file e puoi ripristinarli dal Cestino. Se il Cestino non è disponibile, l'app non elimina mai definitivamente di sua iniziativa (vedi [È sicuro?](#è-sicuro)). E se preferisci avere una via di ritorno che controlli tu, Sposta mette i file in una cartella che scegli tu; eliminali da lì quando sei tranquillo.
 
 **Windows si lamenterà se rimuovo questi file?** No. InstallerClean rimuove sempre e solo i file che Windows stesso segnala come non più necessari, quindi niente di ciò che rimuove serve a riparare, aggiornare o disinstallare un programma. Se un file necessario sparisce da `C:\Windows\Installer` per qualche altra via, vedi [Se ti manca un file da C:\Windows\Installer](#recovery).
 
@@ -346,7 +344,7 @@ Eseguito senza argomenti, o con un'opzione non riconosciuta, `installerclean-cli
 
 `/s` è un'esecuzione di prova: scansiona, elenca ciò che rimuoverebbe con nomi di file e dimensioni, poi esce. Utile per controllare prima di pulire. Il codice di uscita è `0` se la scansione riesce, `1` se fallisce e `130` con Ctrl+C. Tutti i file sono in `C:\Windows\Installer`.
 
-`/d` e `/m` scansionano e poi agiscono. `/d` invia i file rimovibili al Cestino. `/m` li sposta in una cartella (quella che indichi sulla riga di comando, oppure quella predefinita salvata dalla GUI). Codici di uscita: `0` per successo completo, `2` per parziale (alcuni file riusciti, altri falliti), `1` per fallimento totale (scansione fallita, argomenti errati o tutti i file del lotto falliti), `75` per una condizione transitoria che ha bloccato l'esecuzione (il messaggio stampato spiega quale e se riprovare servirà), `130` per un Ctrl+C prima che venga elaborato qualunque file (un Ctrl+C che cade a metà del lotto esce con `2`, parziale, perché il lavoro era già stato eseguito).
+`/d` e `/m` scansionano e poi agiscono. `/d` sposta i file rimovibili nel Cestino. `/m` li sposta in una cartella (quella che indichi sulla riga di comando, oppure quella predefinita salvata dalla GUI). Codici di uscita: `0` per successo completo, `2` per parziale (alcuni file riusciti, altri falliti), `1` per fallimento totale (scansione fallita, argomenti errati o tutti i file del lotto falliti), `75` per una condizione transitoria che ha bloccato l'esecuzione (il messaggio stampato spiega quale e se riprovare servirà), `130` per un Ctrl+C prima che venga elaborato qualunque file (un Ctrl+C che cade a metà del lotto esce con `2`, parziale, perché il lavoro era già stato eseguito).
 
 Tutto l'output della CLI, compresi i messaggi di errore e di diagnostica, va su stdout; non c'è un flusso stderr separato. Il codice di uscita è il segnale leggibile dalla macchina (e la voce per ogni esecuzione nel registro eventi Applicazione lo rispecchia), quindi uno script dovrebbe basarsi sul codice di uscita anziché analizzare il testo, e `installerclean-cli /s > audit.txt` cattura l'intera esecuzione, compresa qualunque riga di errore.
 
@@ -383,7 +381,7 @@ dotnet test src/InstallerClean.Tests/
 
 Hai trovato un bug o hai un suggerimento? [Apri un issue](../../issues) o avvia una [discussione](../../discussions). Le pull request sono benvenute. Esegui `dotnet test` prima di inviare.
 
-La traduzione italiana è nata come traduzione automatica (come questo README). [bovirus](https://github.com/bovirus) l'ha rivista, corretta e approvata, ed è per questo che è disponibile. Se parli inglese, eventuali miglioramenti restano benvenuti tramite un issue o una pull request.
+InstallerClean è ora interamente disponibile in italiano: l'app, il programma di installazione e la riga di comando. [bovirus](https://github.com/bovirus), madrelingua, ha gentilmente corretto e approvato l'app e il programma di installazione, e la riga di comando si basa anch'essa sul suo lavoro. Se noti qualcosa che si può migliorare, sarò felice di saperlo, in un issue, una pull request o una discussione. L'app si apre per impostazione predefinita nella lingua di Windows, e puoi passare all'inglese in qualsiasi momento con l'icona del globo. Questo README è il mio miglior tentativo di traduzione automatica: anche in questo caso, ogni suggerimento per migliorarlo è benvenuto.
 
 ## Sostieni il progetto
 
