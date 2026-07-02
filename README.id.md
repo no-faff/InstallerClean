@@ -2,8 +2,6 @@
   <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.es.md">Español</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.pl.md">Polski</a> · <a href="README.tr.md">Türkçe</a> · <a href="README.ko.md">한국어</a> · <a href="README.fr.md">Français</a> · <a href="README.it.md">Italiano</a> · <a href="README.de.md">Deutsch</a> · <strong>Bahasa Indonesia</strong> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.uk.md">Українська</a>
 </p>
 
-<p align="center"><em>Halaman ini telah diterjemahkan, tetapi antarmuka aplikasi saat ini hanya tersedia dalam bahasa Inggris.</em></p>
-
 <p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
@@ -34,7 +32,6 @@
 
 ## Daftar Isi
 
-- [Can you help translate InstallerClean?](#can-you-help-translate-installerclean)
 - [Folder yang tak pernah diberitahukan kepada Anda](#folder-yang-tak-pernah-diberitahukan-kepada-anda)
 - [Mencari bantuan](#mencari-bantuan)
 - [Apa yang dilakukannya](#apa-yang-dilakukannya)
@@ -56,23 +53,6 @@
 - [Lisensi](#lisensi)
 
 ---
-
-## Can you help translate InstallerClean?
-
-<details>
-<summary>I'm looking for a native Indonesian speaker to check my machine translation; click if you might be willing to help 🙏</summary>
-
-I'd like to make InstallerClean available in more languages. I've got a complete machine-translated Indonesian version ready to go - every string in the app, the interface and the command-line tool, but I don't want to ship it without the approval of a native speaker.
-
-I'd be very grateful to anyone with a good grasp of both English and Indonesian who can look over the translation as it stands and either approve what's there or suggest improvements where necessary.
-
-bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
-
-I did put *a lot* of effort into the draft, so it should be pretty good, but it's only there to help you out; up to you - use all, some or none of it.
-
-You can see it all [here](docs/translations/id.md), the English next to the Indonesian, and the `.resx` file itself is [here](src/InstallerClean.Core/Resources/Strings.id.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking (although even more effort has gone into the `.resx`). Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and Indonesian will join English, Japanese and Italian, with the credit going to you.
-
-</details>
 
 ## Folder yang tak pernah diberitahukan kepada Anda
 
@@ -131,7 +111,7 @@ Nasihat standar mencampuradukkan penghapusan file secara sembarangan (yang meman
 
 <p>
   <img src="docs/screenshots/05-delete-dialogue.webp" alt="Konfirmasi penghapusan yang menanyakan apakah akan menghapus 69 file (1,28 GB), dengan catatan bahwa file akan dikirim ke Keranjang Sampah" width="900"><br>
-  <em>Konfirmasi sebelum kedua tindakan. Hapus mengirim ke Keranjang Sampah; Pindahkan menaruh file di tempat pilihan Anda.</em>
+  <em>Konfirmasi sebelum kedua tindakan. Hapus memindahkan ke Keranjang Sampah; Pindahkan menaruh file di tempat pilihan Anda.</em>
   <br><br>
 </p>
 
@@ -173,7 +153,7 @@ Setelah Pindahkan atau Hapus selesai, subfolder kosong di dalam `C:\Windows\Inst
 
 Ya. InstallerClean menanyakan ke basis data Windows Installer API yang sama dengan yang dipakai Windows sendiri untuk melacak apa yang terpasang. Jika Windows menyatakan suatu file sudah tidak diperlukan, aplikasi memercayainya; aplikasi tidak menebak berdasarkan nama file atau tanggal.
 
-**Tentang Hapus dan Pindahkan.** File yang dihapus InstallerClean aman untuk dihapus permanen. **Hapus** mengirimnya ke Keranjang Sampah (Anda akan diperingatkan jika Keranjang Sampah tidak tersedia); Anda mendapatkan kembali ruang di drive C: saat mengosongkan Keranjang Sampah.
+**Tentang Hapus dan Pindahkan.** File yang dihapus InstallerClean aman untuk dihapus permanen. **Hapus** memindahkannya ke Keranjang Sampah (Anda akan diperingatkan jika Keranjang Sampah tidak tersedia); Anda mendapatkan kembali ruang di drive C: saat mengosongkan Keranjang Sampah.
 
 Namun, Anda tidak harus percaya begitu saja pada saya bahwa file-file itu aman dihapus. Selama berada di Keranjang Sampah, Anda berkesempatan memeriksa apakah aplikasi yang memakai folder ini, Office, Acrobat, Visual Studio dan sejenisnya, masih bisa diperbarui dan dihapus instalasinya tanpa masalah. Jika ada yang rusak (tidak akan!), pulihkan file dari Keranjang Sampah untuk memperbaikinya. Agar benar-benar aman, Anda bisa menggunakan **Pindahkan** sebagai gantinya, untuk menaruh file di folder pilihan Anda (tentu pilih folder di partisi/drive lain jika Anda ingin mengosongkan ruang di C:). Cukup salin kembali file ke `C:\Windows\Installer` untuk mengembalikan semuanya seperti semula (tapi Anda tidak akan memerlukannya!).
 
@@ -273,7 +253,7 @@ Dari 98 laporan yang dikirimkan orang-orang (terima kasih 🙏) sejak opsi ini d
 
 **Mengapa Windows mengatakan "Unknown publisher"?** Karena InstallerClean tidak ditandatangani secara digital. Sertifikat penandatanganan membutuhkan biaya setiap tahun, dan saya lebih memilih membuat aplikasi tetap gratis daripada membayarnya. Jadi ketika Anda menjalankannya, Windows SmartScreen menampilkan "Windows protected your PC". Klik **More info**, lalu **Run anyway**. Aman untuk dilakukan: kode sumbernya publik, dan tiap rilis memiliki tautan VirusTotal serta hash SHA-256 yang bisa Anda periksa lebih dulu.
 
-**Bisakah saya membatalkan Hapus?** Biasanya, ya. Ketika Keranjang Sampah tersedia untuk drive tersebut, Hapus mengirim file ke sana dan Anda bisa memulihkannya dari Keranjang Sampah. Jika Keranjang Sampah tidak tersedia, aplikasi tidak akan pernah menghapus secara permanen dengan sendirinya (lihat [Apakah aman?](#apakah-aman)). Dan jika Anda lebih suka punya jalan kembali yang Anda kendalikan, Pindahkan menaruh file di folder pilihan Anda; hapus dari sana kapan pun Anda sudah yakin.
+**Bisakah saya membatalkan Hapus?** Biasanya, ya. Ketika Keranjang Sampah tersedia untuk drive tersebut, Hapus memindahkan file ke sana dan Anda bisa memulihkannya dari Keranjang Sampah. Jika Keranjang Sampah tidak tersedia, aplikasi tidak akan pernah menghapus secara permanen dengan sendirinya (lihat [Apakah aman?](#apakah-aman)). Dan jika Anda lebih suka punya jalan kembali yang Anda kendalikan, Pindahkan menaruh file di folder pilihan Anda; hapus dari sana kapan pun Anda sudah yakin.
 
 **Akankah Windows mengeluh jika saya menghapus file-file ini?** Tidak. InstallerClean hanya pernah menghapus file yang dilaporkan Windows sendiri sudah tidak terpakai, jadi tidak ada yang dihapusnya yang diperlukan untuk memperbaiki, memperbarui, atau menghapus instalasi suatu program. Jika suatu file yang diperlukan memang hilang dari `C:\Windows\Installer` lewat cara lain, lihat [Jika Anda memang punya file yang hilang dari C:\Windows\Installer](#recovery).
 
@@ -364,7 +344,7 @@ Jalankan tanpa argumen, atau dengan flag yang tidak dikenali, maka `installercle
 
 `/s` hanya menjalankan simulasi: ia memindai, mendaftar apa yang akan dihapus beserta nama file dan ukurannya, lalu keluar. Berguna untuk audit sebelum pembersihan. Kode keluarnya `0` pada pemindaian yang berhasil, `1` jika pemindaian gagal, dan `130` pada Ctrl+C. Semua file ada di `C:\Windows\Installer`.
 
-`/d` dan `/m` memindai lalu bertindak. `/d` mengirim file yang bisa dihapus ke Keranjang Sampah. `/m` memindahkannya ke folder (entah yang Anda tentukan di baris perintah, atau default yang tersimpan dari GUI). Kode keluar: `0` untuk berhasil penuh, `2` untuk sebagian (sebagian file berhasil, sebagian gagal), `1` untuk kegagalan total (pemindaian gagal, argumen salah, atau semua file dalam batch gagal), `75` untuk kondisi sementara yang memblokir proses (pesan yang dicetak menjelaskan kondisi mana dan apakah mencoba ulang akan membantu), `130` untuk Ctrl+C sebelum ada file yang diproses (Ctrl+C yang terjadi di tengah batch keluar dengan `2`, sebagian, karena pekerjaan sudah dijalankan).
+`/d` dan `/m` memindai lalu bertindak. `/d` memindahkan file yang bisa dihapus ke Keranjang Sampah. `/m` memindahkannya ke folder (entah yang Anda tentukan di baris perintah, atau default yang tersimpan dari GUI). Kode keluar: `0` untuk berhasil penuh, `2` untuk sebagian (sebagian file berhasil, sebagian gagal), `1` untuk kegagalan total (pemindaian gagal, argumen salah, atau semua file dalam batch gagal), `75` untuk kondisi sementara yang memblokir proses (pesan yang dicetak menjelaskan kondisi mana dan apakah mencoba ulang akan membantu), `130` untuk Ctrl+C sebelum ada file yang diproses (Ctrl+C yang terjadi di tengah batch keluar dengan `2`, sebagian, karena pekerjaan sudah dijalankan).
 
 Semua keluaran CLI, termasuk pesan kesalahan dan diagnostik, masuk ke stdout; tidak ada aliran stderr terpisah. Kode keluar adalah sinyal yang terbaca mesin (dan entri log peristiwa Application per proses mencerminkannya), jadi skrip sebaiknya berpatokan pada kode keluar alih-alih mengurai teksnya, dan `installerclean-cli /s > audit.txt` menangkap seluruh proses termasuk baris kesalahan apa pun.
 
@@ -400,6 +380,8 @@ dotnet test src/InstallerClean.Tests/
 ## Berkontribusi
 
 Menemukan bug atau punya saran? [Buka sebuah issue](../../issues) atau mulai [diskusi](../../discussions). Pull request dipersilakan. Mohon jalankan `dotnet test` sebelum mengirim.
+
+InstallerClean kini tersedia sepenuhnya dalam bahasa Indonesia: aplikasi, pemasang, baris perintah, dan README ini. Semuanya terjemahan mesin yang sudah saya upayakan sebaik mungkin. Terjemahan ini tentu tidak akan sempurna, jadi saya merilisnya apa adanya daripada menunggu penutur asli memeriksanya. Jika Anda menemukan sesuatu yang bisa diperbaiki, saya akan dengan senang hati mendengarnya, lewat issue, pull request, atau diskusi. Aplikasi terbuka dalam bahasa Windows Anda secara bawaan, dan Anda bisa beralih ke bahasa Inggris kapan saja lewat ikon globe.
 
 ## Dukung proyek ini
 

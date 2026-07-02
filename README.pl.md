@@ -2,8 +2,6 @@
   <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.es.md">Español</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <strong>Polski</strong> · <a href="README.tr.md">Türkçe</a> · <a href="README.ko.md">한국어</a> · <a href="README.fr.md">Français</a> · <a href="README.it.md">Italiano</a> · <a href="README.de.md">Deutsch</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.uk.md">Українська</a>
 </p>
 
-<p align="center"><em>Ta strona została przetłumaczona, ale interfejs programu jest obecnie dostępny wyłącznie w języku angielskim.</em></p>
-
 <p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
@@ -34,7 +32,6 @@
 
 ## Spis treści
 
-- [Can you help translate InstallerClean?](#can-you-help-translate-installerclean)
 - [Folder, o którym nikt ci nie mówi](#folder-o-którym-nikt-ci-nie-mówi)
 - [W poszukiwaniu pomocy](#w-poszukiwaniu-pomocy)
 - [Co robi](#co-robi)
@@ -56,23 +53,6 @@
 - [Licencja](#licencja)
 
 ---
-
-## Can you help translate InstallerClean?
-
-<details>
-<summary>I'm looking for a native Polish speaker to check my machine translation; click if you might be willing to help 🙏</summary>
-
-I'd like to make InstallerClean available in more languages. I've got a complete machine-translated Polish version ready to go - every string in the app, the interface and the command-line tool, but I don't want to ship it without the approval of a native speaker.
-
-I'd be very grateful to anyone with a good grasp of both English and Polish who can look over the translation as it stands and either approve what's there or suggest improvements where necessary.
-
-bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
-
-I did put *a lot* of effort into the draft, so it should be pretty good, but it's only there to help you out; up to you - use all, some or none of it.
-
-You can see it all [here](docs/translations/pl.md), the English next to the Polish, and the `.resx` file itself is [here](src/InstallerClean.Core/Resources/Strings.pl.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking (although even more effort has gone into the `.resx`). Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and Polish will join English, Japanese and Italian, with the credit going to you.
-
-</details>
 
 ## Folder, o którym nikt ci nie mówi
 
@@ -400,6 +380,8 @@ dotnet test src/InstallerClean.Tests/
 ## Współtworzenie
 
 Znalazłeś błąd albo masz sugestię? [Zgłoś problem](../../issues) lub rozpocznij [dyskusję](../../discussions). Pull requesty mile widziane. Przed zgłoszeniem uruchom `dotnet test`.
+
+InstallerClean jest teraz w całości dostępny po polsku: aplikacja, instalator, wiersz poleceń i ten plik README. Wszystko to moje najlepsze starania w postaci tłumaczeń maszynowych; nie są idealne, więc udostępniam je w obecnej formie, zamiast czekać, aż sprawdzi je ktoś, dla kogo polski jest językiem ojczystym. Jeśli zauważysz coś, co dałoby się poprawić, chętnie o tym usłyszę, przez zgłoszenie (issue), pull request lub dyskusję. Aplikacja domyślnie otwiera się w języku twojego systemu Windows; w każdej chwili możesz przełączyć ją na angielski za pomocą ikony globusa.
 
 ## Wesprzyj projekt
 

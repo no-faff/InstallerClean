@@ -2,8 +2,6 @@
   <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.es.md">Español</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.pl.md">Polski</a> · <strong>Türkçe</strong> · <a href="README.ko.md">한국어</a> · <a href="README.fr.md">Français</a> · <a href="README.it.md">Italiano</a> · <a href="README.de.md">Deutsch</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.uk.md">Українська</a>
 </p>
 
-<p align="center"><em>Bu sayfa çevrilmiştir, ancak uygulama arayüzü şu anda yalnızca İngilizcedir.</em></p>
-
 <p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
 </p>
@@ -34,7 +32,6 @@
 
 ## İçindekiler
 
-- [Can you help translate InstallerClean?](#can-you-help-translate-installerclean)
 - [Kimsenin size bahsetmediği klasör](#kimsenin-size-bahsetmediği-klasör)
 - [Yardım arayışı](#yardım-arayışı)
 - [Ne yapar](#ne-yapar)
@@ -56,23 +53,6 @@
 - [Lisans](#lisans)
 
 ---
-
-## Can you help translate InstallerClean?
-
-<details>
-<summary>I'm looking for a native Turkish speaker to check my machine translation; click if you might be willing to help 🙏</summary>
-
-I'd like to make InstallerClean available in more languages. I've got a complete machine-translated Turkish version ready to go - every string in the app, the interface and the command-line tool, but I don't want to ship it without the approval of a native speaker.
-
-I'd be very grateful to anyone with a good grasp of both English and Turkish who can look over the translation as it stands and either approve what's there or suggest improvements where necessary.
-
-bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
-
-I did put *a lot* of effort into the draft, so it should be pretty good, but it's only there to help you out; up to you - use all, some or none of it.
-
-You can see it all [here](docs/translations/tr.md), the English next to the Turkish, and the `.resx` file itself is [here](src/InstallerClean.Core/Resources/Strings.tr.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking (although even more effort has gone into the `.resx`). Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and Turkish will join English, Japanese and Italian, with the credit going to you.
-
-</details>
 
 ## Kimsenin size bahsetmediği klasör
 
@@ -131,7 +111,7 @@ Sıradan tavsiyeler, dosyaları gelişigüzel silmeyi (ki bu gerçekten tehlikel
 
 <p>
   <img src="docs/screenshots/05-delete-dialogue.webp" alt="69 dosyayı (1,28 GB) silmeyi soran, dosyaların Geri Dönüşüm Kutusu'na gönderileceğini belirten silme onayı" width="900"><br>
-  <em>Her iki işlemden önce onay. Sil, Geri Dönüşüm Kutusu'na gönderir; Taşı, dosyaları seçtiğiniz bir yere koyar.</em>
+  <em>Her iki işlemden önce onay. Sil, Geri Dönüşüm Kutusu'na taşır; Taşı, dosyaları seçtiğiniz bir yere koyar.</em>
   <br><br>
 </p>
 
@@ -173,7 +153,7 @@ Bir Taşı veya Sil işlemi tamamlandıktan sonra, `C:\Windows\Installer` içind
 
 Evet. InstallerClean, Windows'un kurulu olanı izlemek için kendi kullandığı Windows Installer API veritabanını sorgular. Windows bir dosyanın artık gerekli olmadığını söylüyorsa, uygulama buna güvenir; dosya adlarına ya da tarihlere bakarak tahmin yürütmez.
 
-**Sil ve Taşı hakkında.** InstallerClean'in sildiği dosyalar kalıcı olarak silinmesinde sakınca olmayan dosyalardır. **Sil** onları Geri Dönüşüm Kutusu'na gönderir (kutu kullanılamıyorsa uyarılırsınız); Geri Dönüşüm Kutusu'nu boşalttığınızda C: sürücünüzdeki alanı geri kazanırsınız.
+**Sil ve Taşı hakkında.** InstallerClean'in sildiği dosyalar kalıcı olarak silinmesinde sakınca olmayan dosyalardır. **Sil** onları Geri Dönüşüm Kutusu'na taşır (kutu kullanılamıyorsa uyarılırsınız); Geri Dönüşüm Kutusu'nu boşalttığınızda C: sürücünüzdeki alanı geri kazanırsınız.
 
 Yine de dosyaların silinmesinde sakınca olmadığına benim sözüme güvenmek zorunda değilsiniz. Dosyalar Geri Dönüşüm Kutusu'ndayken, bu klasörü kullanan uygulamaların (Office, Acrobat, Visual Studio ve benzerlerinin) hâlâ sorunsuz güncellenip kaldırıldığını kontrol etme fırsatınız olur. Bir şey bozulursa (bozulmaz!), düzeltmek için dosyaları Geri Dönüşüm Kutusu'ndan geri yükleyin. Daha da güvende olmak için bunun yerine **Taşı**'yı kullanabilirsiniz; bu, dosyaları seçtiğiniz bir klasöre park eder (C: sürücüsünde yer açmak istiyorsanız elbette başka bir bölümde/sürücüde bir klasör seçin). Her şeyi eskisi gibi geri almak için dosyaları `C:\Windows\Installer` klasörüne geri kopyalamanız yeterli (ama buna ihtiyacınız olmayacak!).
 
@@ -273,7 +253,7 @@ v1.8.0'da seçenek eklendiğinden bu yana gönderilen 98 rapora göre (teşekkü
 
 **Windows neden “Bilinmeyen yayımcı” diyor?** Çünkü InstallerClean kod imzalı değildir. Bir imzalama sertifikası her yıl para tutar ve ben bunun için ödeme yapmaktansa uygulamayı ücretsiz tutmayı yeğliyorum. Bu yüzden onu çalıştırdığınızda Windows SmartScreen “Windows kişisel bilgisayarınızı korudu” gösterir. **Ek bilgi**'ye, ardından **Yine de çalıştır**'a tıklayın. Bunu yapmak güvenlidir: kaynak kod herkese açık ve her sürümde önceden kontrol edebileceğiniz VirusTotal bağlantıları ve SHA-256 karmaları var.
 
-**Bir Sil işlemini geri alabilir miyim?** Genellikle, evet. Sürücü için Geri Dönüşüm Kutusu kullanılabilir olduğunda Sil dosyaları oraya gönderir ve onları kutudan geri yükleyebilirsiniz. Kutu kullanılamıyorsa, uygulama kendi başına asla kalıcı olarak silmez (bkz. [Güvenli mi?](#güvenli-mi)). Ve denetimi sizde olan bir geri dönüş yolu isterseniz, Taşı dosyaları seçtiğiniz bir klasöre koyar; içiniz rahat ettiğinde onları oradan silersiniz.
+**Bir Sil işlemini geri alabilir miyim?** Genellikle, evet. Sürücü için Geri Dönüşüm Kutusu kullanılabilir olduğunda Sil dosyaları oraya taşır ve onları kutudan geri yükleyebilirsiniz. Kutu kullanılamıyorsa, uygulama kendi başına asla kalıcı olarak silmez (bkz. [Güvenli mi?](#güvenli-mi)). Ve denetimi sizde olan bir geri dönüş yolu isterseniz, Taşı dosyaları seçtiğiniz bir klasöre koyar; içiniz rahat ettiğinde onları oradan silersiniz.
 
 **Bu dosyaları kaldırırsam Windows şikâyet eder mi?** Hayır. InstallerClean her zaman yalnızca Windows'un kendisinin işi bittiğini bildirdiği dosyaları kaldırır, dolayısıyla kaldırdığı hiçbir şey bir programı onarmak, güncellemek ya da kaldırmak için gerekli değildir. Başka bir yolla `C:\Windows\Installer` klasöründen gerekli bir dosya gerçekten eksilirse, [C:\Windows\Installer'da eksik bir dosyanız varsa](#recovery) bölümüne bakın.
 
@@ -365,7 +345,7 @@ GUI'yi başlatmak için `InstallerClean.exe` çalıştırın (ya da kurulumdan g
 
 `/s` bir deneme çalıştırmasıdır: tarar, kaldıracağı şeyleri dosya adları ve boyutlarıyla listeler, sonra çıkar. Temizlikten önce denetlemek için kullanışlıdır. Çıkış kodu başarılı bir taramada `0`, tarama başarısız olursa `1` ve Ctrl+C'de `130`'dur. Tüm dosyalar `C:\Windows\Installer` içindedir.
 
-`/d` ve `/m` tarar ve ardından harekete geçer. `/d` kaldırılabilir dosyaları Geri Dönüşüm Kutusu'na gönderir. `/m` onları bir klasöre taşır (ya komut satırında belirttiğiniz birine, ya da GUI'den kaydedilmiş varsayılana). Çıkış kodları: tam başarı için `0`, kısmi için `2` (bazı dosyalar başarılı, bazıları başarısız), tam başarısızlık için `1` (tarama başarısız, hatalı argümanlar ya da toplu işteki her dosya başarısız), çalıştırmayı engelleyen geçici bir durum için `75` (yazdırılan ileti hangisi olduğunu ve yeniden denemenin yardımcı olup olmayacağını açıklar), herhangi bir dosya işlenmeden önce bir Ctrl+C için `130` (toplu işin ortasına denk gelen bir Ctrl+C, iş yapıldığından `2` ile, yani kısmi olarak çıkar).
+`/d` ve `/m` tarar ve ardından harekete geçer. `/d` kaldırılabilir dosyaları Geri Dönüşüm Kutusu'na taşır. `/m` onları bir klasöre taşır (ya komut satırında belirttiğiniz birine, ya da GUI'den kaydedilmiş varsayılana). Çıkış kodları: tam başarı için `0`, kısmi için `2` (bazı dosyalar başarılı, bazıları başarısız), tam başarısızlık için `1` (tarama başarısız, hatalı argümanlar ya da toplu işteki her dosya başarısız), çalıştırmayı engelleyen geçici bir durum için `75` (yazdırılan ileti hangisi olduğunu ve yeniden denemenin yardımcı olup olmayacağını açıklar), herhangi bir dosya işlenmeden önce bir Ctrl+C için `130` (toplu işin ortasına denk gelen bir Ctrl+C, iş yapıldığından `2` ile, yani kısmi olarak çıkar).
 
 CLI'nin tüm çıktısı, hata ve tanılama iletileri dahil, stdout'a gider; ayrı bir stderr akışı yoktur. Çıkış kodu makinece okunabilen sinyaldir (ve çalıştırma başına Uygulama olay günlüğü girişi onu yansıtır), dolayısıyla bir betik metni ayrıştırmak yerine çıkış koduna göre hareket etmelidir ve `installerclean-cli /s > audit.txt` varsa herhangi bir hata satırı dahil çalıştırmanın tamamını yakalar.
 
@@ -401,6 +381,8 @@ dotnet test src/InstallerClean.Tests/
 ## Katkıda bulunma
 
 Bir hata mı buldunuz ya da bir öneriniz mi var? [Bir konu açın](../../issues) ya da bir [tartışma](../../discussions) başlatın. Çekme istekleri memnuniyetle karşılanır. Lütfen göndermeden önce `dotnet test` çalıştırın.
+
+InstallerClean artık baştan sona Türkçe: uygulama, kurulum, komut satırı ve bu README. Bunların hepsi elimden gelenin en iyisi olan makine çevirileri; kusursuz olmayacaklar, bu yüzden anadili Türkçe olan birinin gözden geçirmesini beklemek yerine oldukları gibi yayımladım. Geliştirilebilecek bir şey fark ederseniz, bir konu, bir çekme isteği ya da bir tartışma yoluyla bana iletmenizden memnuniyet duyarım. Uygulama varsayılan olarak Windows dilinizde açılır; küre simgesiyle istediğiniz zaman İngilizceye geçebilirsiniz.
 
 ## Projeyi destekleyin
 
