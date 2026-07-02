@@ -32,7 +32,6 @@
 
 ## Conteúdo
 
-- [Can you help translate InstallerClean?](#can-you-help-translate-installerclean)
 - [A pasta que ninguém te conta](#a-pasta-que-ninguém-te-conta)
 - [A busca por ajuda](#a-busca-por-ajuda)
 - [O que ele faz](#o-que-ele-faz)
@@ -54,23 +53,6 @@
 - [Licença](#licença)
 
 ---
-
-## Can you help translate InstallerClean?
-
-<details>
-<summary>I'm looking for a native Brazilian Portuguese speaker to check my machine translation; click if you might be willing to help 🙏</summary>
-
-I'd like to make InstallerClean available in more languages. I've got a complete machine-translated Brazilian Portuguese version ready to go - every string in the app, the interface and the command-line tool, but I don't want to ship it without the approval of a native speaker.
-
-I'd be very grateful to anyone with a good grasp of both English and Brazilian Portuguese who can look over the translation as it stands and either approve what's there or suggest improvements where necessary.
-
-bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
-
-I did put *a lot* of effort into the draft, so it should be pretty good, but it's only there to help you out; up to you - use all, some or none of it.
-
-You can see it all [here](docs/translations/pt-BR.md), the English next to the Brazilian Portuguese, and the `.resx` file itself is [here](src/InstallerClean.Core/Resources/Strings.pt-BR.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking (although even more effort has gone into the `.resx`). Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and Brazilian Portuguese will join English, Japanese and Italian, with the credit going to you.
-
-</details>
 
 ## A pasta que ninguém te conta
 
@@ -398,6 +380,8 @@ dotnet test src/InstallerClean.Tests/
 ## Contribuir
 
 Encontrou um bug ou tem uma sugestão? [Abra uma issue](../../issues) ou comece uma [discussão](../../discussions). Pull requests são bem-vindas. Por favor, rode `dotnet test` antes de enviar.
+
+O InstallerClean agora está todo em português: o aplicativo, o instalador, a linha de comando e este README. Tudo isso é o meu melhor esforço em tradução automática, então não vai ser perfeito; preferi publicar como está em vez de esperar um falante nativo revisar. Se você notar algo que dê para melhorar, vou adorar saber, seja em uma [issue](../../issues/new?template=translation_review.md), um pull request ou uma [discussão](../../discussions). O aplicativo abre no idioma do seu Windows por padrão, e você pode mudar para o inglês quando quiser pelo ícone de globo.
 
 ## Apoie o projeto
 
