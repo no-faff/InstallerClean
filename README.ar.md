@@ -2,7 +2,7 @@
   <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.es.md">Español</a> · <strong>العربية</strong> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.pl.md">Polski</a> · <a href="README.tr.md">Türkçe</a> · <a href="README.ko.md">한국어</a> · <a href="README.fr.md">Français</a> · <a href="README.it.md">Italiano</a> · <a href="README.de.md">Deutsch</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.uk.md">Українська</a>
 </p>
 
-<p align="center"><em>هذه الصفحة مترجمة، لكن واجهة البرنامج متاحة حالياً باللغة الإنجليزية فقط.</em></p>
+<p align="center"><em>البرنامج نفسه بالإنجليزية؛ ولم يُترجَم إلى العربية سوى هذا الملف التعريفي، لأن جعل الواجهة تعمل من اليمين إلى اليسار مهمة مستقلة ليوم آخر.</em></p>
 
 <p align="center">
   <img src="docs/icon.png" width="280" alt="InstallerClean">
@@ -384,6 +384,8 @@ dotnet test src/InstallerClean.Tests/
 ## المساهمة
 
 وجدت عيباً أو لديك اقتراح؟ [افتح مشكلة (issue)](../../issues) أو ابدأ [نقاشاً](../../discussions). طلبات السحب مرحَّب بها. ويُرجى تشغيل `dotnet test` قبل الإرسال.
+
+هذا الملف التعريفي هو أفضل ما استطعته من ترجمة آلية، لذا لن يكون مثالياً. وإن كنت تتحدث الإنجليزية ولاحظت ما يمكن تحسينه، فيسعدني أن تخبرني، في مشكلة (issue) أو طلب سحب أو نقاش.
 
 ## ادعم المشروع
 
