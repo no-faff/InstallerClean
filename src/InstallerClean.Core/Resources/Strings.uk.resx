@@ -163,13 +163,13 @@
   <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Лишити зірку на GitHub (вікно «Про програму»)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Згорнути</value></data>
   <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Перемістити всі непотрібні файли інсталятора до обраної папки призначення</value></data>
-  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Move all unneeded installer files to the Recycle Bin</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Перемістити всі непотрібні файли інсталятора до Кошика</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
        straight after "Cancel, button": the window-level alternative is
        never read, because help text is only spoken for the element with
        focus and the window itself never has it. -->
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting.</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>«Видалити» переміщує непотрібні файли до Кошика. «Скасувати» закриває вікно без видалення.</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>«Перемістити» кладе непотрібні файли до обраної папки призначення. «Скасувати» лишає їх там, де вони є.</value></data>
   <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Виберіть, що робити з непотрібними файлами: перемістити їх у безпечне місце, видалити назавжди або скасувати.</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Перемістити непотрібні файли до обраної вами папки</value></data>
@@ -243,7 +243,7 @@
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Перемістити непотрібні файли до вказаного розташування.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Перемістити непотрібні файли до вказаного розташування. Спершу виберіть його.</value></data>
-  <data name="Tooltip.Delete" xml:space="preserve"><value>Move the unneeded files to the Recycle Bin.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Перемістити непотрібні файли до Кошика.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Назва суб'єкта з вбудованого сертифіката Authenticode. Ланцюжок не перевірено.</value></data>
 
   <!-- Body copy -->
@@ -353,14 +353,14 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything breaks ([it won't!])</value></data>
-  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Until then, you can restore them if anything breaks ([it won't!])</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Скопіюйте їх назад, якщо щось зламається ([а воно не зламається!])</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>А поки що ви можете відновити їх, якщо щось зламається ([а воно не зламається!])</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
        emptied; this line names that step. "actually" carries "this is what
        genuinely frees the disk" (cf. French "vraiment"); translate for that
        sense, not a rote calque. -->
-  <data name="Completion.DeleteSpaceHint" xml:space="preserve"><value>Empty it to actually reclaim the space.</value></data>
+  <data name="Completion.DeleteSpaceHint" xml:space="preserve"><value>Очистіть Кошик, щоб справді звільнити місце.</value></data>
   <!-- Headline size figures. "freed" is used only where space is genuinely
        reclaimed at that instant: a cross-volume Move (frees the system drive)
        and a consented permanent delete. A Delete to the Recycle Bin reclaims
@@ -368,7 +368,7 @@
        (true at that instant: the junk is out of the cache). A same-volume Move
        reads "moved" (a rename frees nothing yet). 0 = size (e.g. "120.5 MB"). -->
   <data name="Completion.Freed" xml:space="preserve"><value>Звільнено {0}</value></data>
-  <data name="Completion.CleanedUp" xml:space="preserve"><value>{0} cleaned up</value></data>
+  <data name="Completion.CleanedUp" xml:space="preserve"><value>Очищено {0}</value></data>
   <data name="Completion.Moved" xml:space="preserve"><value>Переміщено {0}</value></data>
   <data name="Completion.PartlyMoved" xml:space="preserve"><value>Переміщено {0}, деякі файли не вдалося обробити</value></data>
   <!-- Heading shown when an operation succeeded for SOME files but errored for
@@ -376,15 +376,19 @@
        (see Completion.CleanedUp for why delete reads "cleaned up").
        0 = total size (e.g. "120.5 MB"). -->
   <data name="Completion.PartlyFreed" xml:space="preserve"><value>Звільнено {0}, деякі файли не вдалося обробити</value></data>
-  <data name="Completion.PartlyCleanedUp" xml:space="preserve"><value>{0} cleaned up, some files could not be processed</value></data>
+  <data name="Completion.PartlyCleanedUp" xml:space="preserve"><value>Очищено {0}, деякі файли не вдалося обробити</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
-  <data name="Completion.MoveSummary" xml:space="preserve"><value>{0} {1} переміщено до {2}</value></data>
+  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} {1} переміщено до {2}</value></data>
+  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} {1} переміщено до {2}</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
-  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>{0} {1} переміщено до {2}. {3} {4}</value></data>
+  <data name="Completion.MoveSummaryWithErrors.Singular" xml:space="preserve"><value>{0} {1} переміщено до {2}. {3} {4}</value></data>
+  <data name="Completion.MoveSummaryWithErrors.Plural" xml:space="preserve"><value>{0} {1} переміщено до {2}. {3} {4}</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
-  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} moved to the Recycle Bin</value></data>
+  <data name="Completion.DeleteSummary.Singular" xml:space="preserve"><value>{0} {1} переміщено до Кошика</value></data>
+  <data name="Completion.DeleteSummary.Plural" xml:space="preserve"><value>{0} {1} переміщено до Кошика</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
-  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} moved to the Recycle Bin. {2} {3}</value></data>
+  <data name="Completion.DeleteSummaryWithErrors.Singular" xml:space="preserve"><value>{0} {1} переміщено до Кошика. {2} {3}</value></data>
+  <data name="Completion.DeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{0} {1} переміщено до Кошика. {2} {3}</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
@@ -460,11 +464,11 @@
   <!-- 0 = destination path -->
   <data name="Confirm.MoveDestination" xml:space="preserve"><value>Файли буде переміщено до {0}.</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Видалити {0} {1} ({2})?</value></data>
-  <!-- Keeps "sent" while the delete summaries and the Delete tooltip say
-       "moved": this line recommends the Move feature in the same breath ("use
-       Move instead"), so a distinct verb avoids a "moved ... use Move" garden
-       path. Not an oversight; do not align it to "moved". -->
-  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Файли буде надіслано до Кошика. Якщо хочете мати резервні копії, скористайтеся переміщенням.</value></data>
+  <!-- "the Move button", not bare "Move": this line says "moved to the Recycle
+       Bin" like the rest of the delete copy, and also points at the separate
+       Move feature, so naming the button stops "moved ... use Move" reading as
+       one action. -->
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Файли буде переміщено до Кошика. Якщо ви хочете зберегти резервні копії, скористайтеся кнопкою «Перемістити».</value></data>
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Потрібні права адміністратора</value></data>
@@ -518,13 +522,13 @@
   <data name="Error.IOFailure" xml:space="preserve"><value>Операція не вдалася. Спробуйте ще раз або перезавантажте Windows.</value></data>
   <data name="Error.UnknownError" xml:space="preserve"><value>Невідома помилка.</value></data>
   <!-- 0 = shell error code -->
-  <!-- Keeps "sent" for the same reason as Confirm.DeleteToRecycleBin: it ends
-       with "Move it instead", so "couldn't move ... Move it instead" would
-       confuse. The delete summaries and tooltip use "moved". -->
-  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Не вдалося надіслати цей файл до Кошика (помилка {0}). Можливо, він заблокований, використовується чи заблокований Windows. Перемістіть його натомість.</value></data>
-  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows заблокувала доступ до цього файлу навіть із правами адміністратора (помилка {0}). Зазвичай це блокування через власника чи дозволи. Перемістіть його натомість.</value></data>
-  <data name="Error.RecycleInUse" xml:space="preserve"><value>Цей файл відкрито чи заблоковано іншою програмою (помилка {0}). Закрийте ту програму або те, що його сканує, а потім спробуйте ще раз, або перемістіть його натомість.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>The file was permanently deleted because it could not be moved to the Recycle Bin.</value></data>
+  <!-- These recovery errors point at the Move feature by its button name ("the
+       Move button") so the suggestion isn't taken as the delete verb, which now
+       also says "moved to the Recycle Bin". -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Не вдалося перемістити цей файл до Кошика (помилка {0}). Можливо, він заблокований, використовується або його блокує Windows. Скористайтеся кнопкою «Перемістити».</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows блокує доступ до цього файлу навіть із правами адміністратора (помилка {0}). Зазвичай це блокування через власника або дозволи. Скористайтеся кнопкою «Перемістити».</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>Цей файл відкритий або заблокований іншою програмою (помилка {0}). Закрийте цю програму чи те, що його сканує, а потім спробуйте ще раз або скористайтеся кнопкою «Перемістити».</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Файл видалено безповоротно, бо його не вдалося перемістити до Кошика.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Відмова перемістити файли до папки Windows Installer (призначення: {0}).</value></data>
   <!-- 0 = the relative path the caller passed -->

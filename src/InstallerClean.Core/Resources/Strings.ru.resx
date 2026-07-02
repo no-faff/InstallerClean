@@ -378,13 +378,17 @@
   <data name="Completion.PartlyFreed" xml:space="preserve"><value>Освобождено {0}, некоторые файлы не удалось обработать</value></data>
   <data name="Completion.PartlyCleanedUp" xml:space="preserve"><value>Очищено {0}, некоторые файлы не удалось обработать</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
-  <data name="Completion.MoveSummary" xml:space="preserve"><value>Перемещено {0} {1} в {2}</value></data>
+  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>Перемещено {0} {1} в {2}</value></data>
+  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>Перемещено {0} {1} в {2}</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
-  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>Перемещено {0} {1} в {2}. {3} {4}</value></data>
+  <data name="Completion.MoveSummaryWithErrors.Singular" xml:space="preserve"><value>Перемещено {0} {1} в {2}. {3} {4}</value></data>
+  <data name="Completion.MoveSummaryWithErrors.Plural" xml:space="preserve"><value>Перемещено {0} {1} в {2}. {3} {4}</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
-  <data name="Completion.DeleteSummary" xml:space="preserve"><value>Перемещено {0} {1} в Корзину</value></data>
+  <data name="Completion.DeleteSummary.Singular" xml:space="preserve"><value>Перемещено {0} {1} в Корзину</value></data>
+  <data name="Completion.DeleteSummary.Plural" xml:space="preserve"><value>Перемещено {0} {1} в Корзину</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
-  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>Перемещено {0} {1} в Корзину. {2} {3}</value></data>
+  <data name="Completion.DeleteSummaryWithErrors.Singular" xml:space="preserve"><value>Перемещено {0} {1} в Корзину. {2} {3}</value></data>
+  <data name="Completion.DeleteSummaryWithErrors.Plural" xml:space="preserve"><value>Перемещено {0} {1} в Корзину. {2} {3}</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
