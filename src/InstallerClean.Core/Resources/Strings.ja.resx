@@ -163,13 +163,13 @@
   <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>GitHub でスターを付ける (バージョン情報ウィンドウ)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>最小化</value></data>
   <data name="Automation.MoveAllFiles" xml:space="preserve"><value>不要なインストーラーファイルをすべて、選択した移動先フォルダーに移動</value></data>
-  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Move all unneeded installer files to the Recycle Bin</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>不要なインストーラーファイルをすべてごみ箱に移動</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
        straight after "Cancel, button": the window-level alternative is
        never read, because help text is only spoken for the element with
        focus and the window itself never has it. -->
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting.</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>削除を実行すると不要ファイルがごみ箱に移動されます。キャンセルは削除せずに閉じます。</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>移動を実行すると不要ファイルが選択した移動先フォルダーに移動されます。キャンセルはそのままの場所に残します。</value></data>
   <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>不要ファイルの処理方法を選択：安全な場所に移動するか、完全に削除するか、キャンセルするか。</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>不要ファイルを選択したフォルダーに移動</value></data>
@@ -243,7 +243,7 @@
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているかを知るためのものです。次の画面で送信前に送信内容を確認できます。</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>不要ファイルを移動先に移動します。</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>不要ファイルを移動先に移動します。先に移動先を選択してください。</value></data>
-  <data name="Tooltip.Delete" xml:space="preserve"><value>Move the unneeded files to the Recycle Bin.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>不要ファイルをごみ箱に移動します。</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>埋め込まれた Authenticode 証明書のサブジェクト名です。チェーン検証はされていません。</value></data>
 
   <!-- Body copy -->
@@ -353,14 +353,14 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything breaks ([it won't!])</value></data>
-  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Until then, you can restore them if anything breaks ([it won't!])</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>何かが動作しなくなったらコピーを戻してください ([そんなことはありませんが！])</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>それまでは、何かが動作しなくなったら復元できます ([そんなことはありませんが！])</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
        emptied; this line names that step. "actually" carries "this is what
        genuinely frees the disk" (cf. French "vraiment"); translate for that
        sense, not a rote calque. -->
-  <data name="Completion.DeleteSpaceHint" xml:space="preserve"><value>Empty it to actually reclaim the space.</value></data>
+  <data name="Completion.DeleteSpaceHint" xml:space="preserve"><value>ごみ箱を空にすると、実際に空き容量が増えます。</value></data>
   <!-- Headline size figures. "freed" is used only where space is genuinely
        reclaimed at that instant: a cross-volume Move (frees the system drive)
        and a consented permanent delete. A Delete to the Recycle Bin reclaims
@@ -368,7 +368,7 @@
        (true at that instant: the junk is out of the cache). A same-volume Move
        reads "moved" (a rename frees nothing yet). 0 = size (e.g. "120.5 MB"). -->
   <data name="Completion.Freed" xml:space="preserve"><value>{0} 解放</value></data>
-  <data name="Completion.CleanedUp" xml:space="preserve"><value>{0} cleaned up</value></data>
+  <data name="Completion.CleanedUp" xml:space="preserve"><value>{0} クリーンアップ</value></data>
   <data name="Completion.Moved" xml:space="preserve"><value>{0} 移動</value></data>
   <data name="Completion.PartlyMoved" xml:space="preserve"><value>{0} 移動、一部のファイルは処理できませんでした</value></data>
   <!-- Heading shown when an operation succeeded for SOME files but errored for
@@ -376,15 +376,15 @@
        (see Completion.CleanedUp for why delete reads "cleaned up").
        0 = total size (e.g. "120.5 MB"). -->
   <data name="Completion.PartlyFreed" xml:space="preserve"><value>{0} 解放、一部のファイルは処理できませんでした</value></data>
-  <data name="Completion.PartlyCleanedUp" xml:space="preserve"><value>{0} cleaned up, some files could not be processed</value></data>
+  <data name="Completion.PartlyCleanedUp" xml:space="preserve"><value>{0} クリーンアップ、一部のファイルは処理できませんでした</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
   <data name="Completion.MoveSummary" xml:space="preserve"><value>{0} 個の {1} を {2} に移動しました</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
   <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>{0} 個の {1} を {2} に移動しました。{3} 個の {4}</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
-  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} moved to the Recycle Bin</value></data>
+  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} 個の {1} をごみ箱に移動しました</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
-  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} moved to the Recycle Bin. {2} {3}</value></data>
+  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} 個の {1} をごみ箱に移動しました。{2} 個の {3}</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
@@ -460,11 +460,11 @@
   <!-- 0 = destination path -->
   <data name="Confirm.MoveDestination" xml:space="preserve"><value>ファイルは {0} に移動されます。</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{0} 個の {1} ({2})を削除しますか？</value></data>
-  <!-- Keeps "sent" while the delete summaries and the Delete tooltip say
-       "moved": this line recommends the Move feature in the same breath ("use
-       Move instead"), so a distinct verb avoids a "moved ... use Move" garden
-       path. Not an oversight; do not align it to "moved". -->
-  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>ファイルはごみ箱に送られます。バックアップコピーが必要な場合は、代わりに移動を使用してください。</value></data>
+  <!-- "the Move button", not bare "Move": this line says "moved to the Recycle
+       Bin" like the rest of the delete copy, and also points at the separate
+       Move feature, so naming the button stops "moved ... use Move" reading as
+       one action. -->
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>ファイルはごみ箱に移動されます。バックアップコピーが必要な場合は、代わりに「移動」ボタンを使用してください。</value></data>
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>管理者権限が必要です</value></data>
@@ -518,13 +518,13 @@
   <data name="Error.IOFailure" xml:space="preserve"><value>操作に失敗しました。もう一度試すか、Windows を再起動してください。</value></data>
   <data name="Error.UnknownError" xml:space="preserve"><value>不明なエラー。</value></data>
   <!-- 0 = shell error code -->
-  <!-- Keeps "sent" for the same reason as Confirm.DeleteToRecycleBin: it ends
-       with "Move it instead", so "couldn't move ... Move it instead" would
-       confuse. The delete summaries and tooltip use "moved". -->
-  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>このファイルをごみ箱に送れませんでした (エラー{0})。ロックされているか、使用中か、Windows によってブロックされている可能性があります。代わりに移動してください。</value></data>
-  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows は管理者権限でもこのファイルへのアクセスをブロックしました (エラー{0})。通常は所有権またはアクセス許可のロックです。代わりに移動してください。</value></data>
-  <data name="Error.RecycleInUse" xml:space="preserve"><value>このファイルは別のプログラムによって開かれているかロックされています (エラー{0})。そのプログラムまたはスキャンしているものを閉じてから再試行するか、代わりに移動してください。</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>The file was permanently deleted because it could not be moved to the Recycle Bin.</value></data>
+  <!-- These recovery errors point at the Move feature by its button name ("the
+       Move button") so the suggestion isn't taken as the delete verb, which now
+       also says "moved to the Recycle Bin". -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>このファイルをごみ箱に移動できませんでした (エラー{0})。ロックされているか、使用中か、Windows によってブロックされている可能性があります。代わりに「移動」ボタンを使用してください。</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows は管理者権限でもこのファイルへのアクセスをブロックしました (エラー{0})。通常は所有権またはアクセス許可のロックです。代わりに「移動」ボタンを使用してください。</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>このファイルは別のプログラムによって開かれているかロックされています (エラー{0})。そのプログラムまたはスキャンしているものを閉じてから再試行するか、代わりに「移動」ボタンを使用してください。</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>ごみ箱に移動できなかったため、ファイルは完全に削除されました。</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Windows Installerフォルダー内へのファイル移動を拒否します (移動先：{0})。</value></data>
   <!-- 0 = the relative path the caller passed -->
