@@ -32,7 +32,6 @@
 
 ## 目录
 
-- [Can you help translate InstallerClean?](#can-you-help-translate-installerclean)
 - [没有人告诉您的文件夹](#没有人告诉您的文件夹)
 - [寻求帮助](#寻求帮助)
 - [它做什么](#它做什么)
@@ -54,23 +53,6 @@
 - [许可证](#许可证)
 
 ---
-
-## Can you help translate InstallerClean?
-
-<details>
-<summary>I'm looking for a native Simplified Chinese speaker to check my machine translation; click if you might be willing to help 🙏</summary>
-
-I'd like to make InstallerClean available in more languages. I've got a complete machine-translated Simplified Chinese version ready to go - every string in the app, the interface and the command-line tool, but I don't want to ship it without the approval of a native speaker.
-
-I'd be very grateful to anyone with a good grasp of both English and Simplified Chinese who can look over the translation as it stands and either approve what's there or suggest improvements where necessary.
-
-bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
-
-I did put *a lot* of effort into the draft, so it should be pretty good, but it's only there to help you out; up to you - use all, some or none of it.
-
-You can see it all [here](docs/translations/zh-Hans.md), the English next to the Simplified Chinese, and the `.resx` file itself is [here](src/InstallerClean.Core/Resources/Strings.zh-Hans.resx). This README is machine-translated too, so it should give you an idea of the quality of the translation you'd be checking (although even more effort has gone into the `.resx`). Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and Simplified Chinese will join English, Japanese and Italian, with the credit going to you.
-
-</details>
 
 ## 没有人告诉您的文件夹
 
@@ -129,7 +111,7 @@ You can see it all [here](docs/translations/zh-Hans.md), the English next to the
 
 <p>
   <img src="docs/screenshots/05-delete-dialogue.webp" alt="删除确认对话框，询问是否删除 69 个文件（1.28 GB），并说明这些文件将被送进回收站" width="900"><br>
-  <em>每次操作前都会确认。删除会送进回收站；移动则把文件放到您选择的位置。</em>
+  <em>每次操作前都会确认。删除会移到回收站；移动则把文件放到您选择的位置。</em>
   <br><br>
 </p>
 
@@ -171,7 +153,7 @@ InstallerClean 会识别三类不需要的文件。
 
 是的。InstallerClean 查询的，正是 Windows 自己用来记录已安装内容的那个 Windows Installer API 数据库。如果 Windows 说某个文件不再需要，应用就信它；它不会根据文件名或日期来猜测。
 
-**关于删除和移动。** InstallerClean 删除的这些文件，永久删掉也是安全的。**删除**会把它们送进回收站（回收站不可用时会有提示）；等您清空回收站，C: 盘上的空间就回来了。
+**关于删除和移动。** InstallerClean 删除的这些文件，永久删掉也是安全的。**删除**会把它们移到回收站（回收站不可用时会有提示）；等您清空回收站，C: 盘上的空间就回来了。
 
 不过，这些文件能否放心删除，您不必只听我说。趁它们还在回收站里，您有机会确认一下：用到这个文件夹的那些应用（Office、Acrobat、Visual Studio 之类）是否还能照常更新和卸载。万一有什么坏了（不会的！），从回收站把文件还原回去就能修好。想格外稳妥，也可以改用**移动**，把文件停放到您选定的文件夹里（当然，如果您是想给 C: 盘腾空间，就该选另一个分区或驱动器上的文件夹）。想恢复原状，把文件复制回 `C:\Windows\Installer` 就行（不过您用不着这么做！）。
 
@@ -271,7 +253,7 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 
 **为什么 Windows 说“未知发布者”？** 因为 InstallerClean 没有代码签名。签名证书每年都要花钱，我宁愿让应用保持免费，也不想为它掏钱。所以您运行它时，Windows SmartScreen 会显示“Windows 已保护你的电脑”。点击**更多信息**，再点**仍要运行**。这么做是安全的：源代码是公开的，每个版本都有 VirusTotal 链接和 SHA-256 哈希值供您事先核对。
 
-**删除能撤销吗？** 通常可以。当该驱动器的回收站可用时，删除会把文件送进回收站，您可以从那里还原。如果回收站不可用，应用绝不会自行把文件彻底删除（见[是否安全？](#是否安全)）。如果您更想要一条自己掌控的退路，移动会把文件放进您选择的文件夹；等您满意了，再从那里删除。
+**删除能撤销吗？** 通常可以。当该驱动器的回收站可用时，删除会把文件移到回收站，您可以从那里还原。如果回收站不可用，应用绝不会自行把文件彻底删除（见[是否安全？](#是否安全)）。如果您更想要一条自己掌控的退路，移动会把文件放进您选择的文件夹；等您满意了，再从那里删除。
 
 **删除这些文件，Windows 会不会有意见？** 不会。InstallerClean 只会删除 Windows 自己报告为已经用完的文件，所以它删掉的东西，没有一样是修复、更新或卸载某个程序所需要的。如果某个需要的文件确实因为别的原因从 `C:\Windows\Installer` 里消失了，请见[万一您真的丢了 C:\Windows\Installer 里的文件](#recovery)。
 
@@ -362,7 +344,7 @@ InstallerClean 支持无界面运行，方便编写脚本和系统管理使用�
 
 `/s` 是一次试运行：它会扫描、列出将要删除的文件名和大小，然后退出。便于在清理前做一次审查。退出码：扫描成功为 `0`，扫描失败为 `1`，按下 Ctrl+C 为 `130`。所有文件都在 `C:\Windows\Installer` 中。
 
-`/d` 和 `/m` 先扫描再执行。`/d` 把可删除的文件送进回收站。`/m` 把它们移动到一个文件夹（要么是您在命令行上指定的，要么是图形界面里保存的默认位置）。退出码：`0` 表示完全成功，`2` 表示部分成功（部分文件成功，部分失败），`1` 表示彻底失败（扫描失败、参数有误，或本批文件全部失败），`75` 表示有临时性状况挡住了这次运行（打印出来的消息会说明是哪种状况，以及重试是否有用），`130` 表示在处理任何文件之前按下了 Ctrl+C（若 Ctrl+C 发生在批处理中途，则返回 `2` 部分成功，因为已经有改动落地）。
+`/d` 和 `/m` 先扫描再执行。`/d` 把可删除的文件移到回收站。`/m` 把它们移动到一个文件夹（要么是您在命令行上指定的，要么是图形界面里保存的默认位置）。退出码：`0` 表示完全成功，`2` 表示部分成功（部分文件成功，部分失败），`1` 表示彻底失败（扫描失败、参数有误，或本批文件全部失败），`75` 表示有临时性状况挡住了这次运行（打印出来的消息会说明是哪种状况，以及重试是否有用），`130` 表示在处理任何文件之前按下了 Ctrl+C（若 Ctrl+C 发生在批处理中途，则返回 `2` 部分成功，因为已经有改动落地）。
 
 CLI 的所有输出，包括错误和诊断信息，都写到 stdout；没有单独的 stderr 流。退出码才是供机器读取的信号（每次运行写入应用程序事件日志的条目也与它一致），所以脚本应当依据退出码来判断，而不是去解析文本；`installerclean-cli /s > audit.txt` 会把整次运行都捕获下来，包括任何错误行。
 
@@ -398,6 +380,8 @@ dotnet test src/InstallerClean.Tests/
 ## 参与贡献
 
 发现了 bug，或有什么建议？[提交 issue](../../issues) 或发起[讨论](../../discussions)。欢迎 pull request。提交前请先运行 `dotnet test`。
+
+InstallerClean 现已全面提供简体中文：应用、安装程序、命令行以及这份 README。这些都是我尽力而为的机器翻译，难免有不完美之处，所以我没有等母语者校对，而是先按现状发布了。如果您发现任何可以改进的地方，欢迎通过 issue、pull request 或讨论告诉我。应用默认以您的 Windows 语言打开，您随时可以点击地球图标切换到英文。
 
 ## 支持本项目
 
