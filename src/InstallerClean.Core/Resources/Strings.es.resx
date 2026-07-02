@@ -460,11 +460,11 @@
   <!-- 0 = destination path -->
   <data name="Confirm.MoveDestination" xml:space="preserve"><value>Los archivos se moverán a {0}.</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>¿Eliminar {0} {1} ({2})?</value></data>
-  <!-- Keeps "sent" while the delete summaries and the Delete tooltip say
-       "moved": this line recommends the Move feature in the same breath ("use
-       Move instead"), so a distinct verb avoids a "moved ... use Move" garden
-       path. Not an oversight; do not align it to "moved". -->
-  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Los archivos se enviarán a la Papelera de reciclaje. Si quieres copias de seguridad, usa Mover en su lugar.</value></data>
+  <!-- "the Move button", not bare "Move": this line says "moved to the Recycle
+       Bin" like the rest of the delete copy, and also points at the separate
+       Move feature, so naming the button stops "moved ... use Move" reading as
+       one action. -->
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Los archivos se moverán a la Papelera de reciclaje. Si quieres copias de seguridad, usa el botón Mover en su lugar.</value></data>
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Se requieren permisos de administrador</value></data>
@@ -518,12 +518,12 @@ Detalles en {1}.</value></data>
   <data name="Error.IOFailure" xml:space="preserve"><value>La operación falló. Inténtalo de nuevo o reinicia Windows.</value></data>
   <data name="Error.UnknownError" xml:space="preserve"><value>Error desconocido.</value></data>
   <!-- 0 = shell error code -->
-  <!-- Keeps "sent" for the same reason as Confirm.DeleteToRecycleBin: it ends
-       with "Move it instead", so "couldn't move ... Move it instead" would
-       confuse. The delete summaries and tooltip use "moved". -->
-  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>No se pudo enviar este archivo a la Papelera de reciclaje (error {0}). Puede estar bloqueado, en uso o impedido por Windows. Muévelo en su lugar.</value></data>
-  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows bloqueó el acceso a este archivo, incluso con permisos de administrador (error {0}). Suele ser un bloqueo de propiedad o de permisos. Muévelo en su lugar.</value></data>
-  <data name="Error.RecycleInUse" xml:space="preserve"><value>Este archivo está abierto o bloqueado por otro programa (error {0}). Cierra ese programa, o lo que sea que lo esté analizando, y vuelve a intentarlo, o muévelo en su lugar.</value></data>
+  <!-- These recovery errors point at the Move feature by its button name ("the
+       Move button") so the suggestion isn't taken as the delete verb, which now
+       also says "moved to the Recycle Bin". -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>No se pudo mover este archivo a la Papelera de reciclaje (error {0}). Puede estar bloqueado, en uso o impedido por Windows. Usa el botón Mover en su lugar.</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows bloqueó el acceso a este archivo, incluso con permisos de administrador (error {0}). Suele ser un bloqueo de propiedad o de permisos. Usa el botón Mover en su lugar.</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>Este archivo está abierto o bloqueado por otro programa (error {0}). Cierra ese programa, o lo que sea que lo esté analizando, y vuelve a intentarlo, o usa el botón Mover en su lugar.</value></data>
   <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>El archivo se eliminó definitivamente porque no se pudo mover a la Papelera de reciclaje.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Se rechaza mover archivos a la carpeta de Windows Installer (destino: {0}).</value></data>
