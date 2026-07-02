@@ -163,13 +163,13 @@
   <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Einen Stern auf GitHub hinterlassen (Fenster Über)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimieren</value></data>
   <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Alle nicht benötigten Installer-Dateien in den gewählten Zielordner verschieben</value></data>
-  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Move all unneeded installer files to the Recycle Bin</value></data>
+  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Alle nicht benötigten Installer-Dateien in den Papierkorb verschieben</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
        straight after "Cancel, button": the window-level alternative is
        never read, because help text is only spoken for the element with
        focus and the window itself never has it. -->
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting.</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Löschen verschiebt die nicht benötigten Dateien in den Papierkorb. Abbrechen schließt, ohne zu löschen.</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>Verschieben legt die nicht benötigten Dateien in den gewählten Zielordner. Abbrechen lässt sie, wo sie sind.</value></data>
   <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Wähle, wie mit den nicht benötigten Dateien verfahren werden soll: an einen sicheren Ort verschieben, endgültig löschen oder abbrechen.</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Die nicht benötigten Dateien in einen von dir gewählten Ordner verschieben</value></data>
@@ -243,7 +243,7 @@
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Ganz wie du magst, aber ich freue mich darüber. Sendet eine anonyme Zusammenfassung, die mir nur zeigt, ob es funktioniert. Auf dem nächsten Bildschirm siehst du vor dem Bestätigen, was gesendet wird.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Verschiebt die nicht benötigten Dateien an den Zielort.</value></data>
   <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Verschiebt die nicht benötigten Dateien an den Zielort. Wähle zuerst einen aus.</value></data>
-  <data name="Tooltip.Delete" xml:space="preserve"><value>Move the unneeded files to the Recycle Bin.</value></data>
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Verschiebt die nicht benötigten Dateien in den Papierkorb.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Antragstellername aus dem eingebetteten Authenticode-Zertifikat. Die Zertifikatskette wurde nicht geprüft.</value></data>
 
   <!-- Body copy -->
@@ -353,14 +353,14 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything breaks ([it won't!])</value></data>
-  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Until then, you can restore them if anything breaks ([it won't!])</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Kopier sie zurück, falls etwas kaputtgeht ([wird es nicht!])</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Bis dahin kannst du sie wiederherstellen, falls etwas kaputtgeht ([wird es nicht!])</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
        emptied; this line names that step. "actually" carries "this is what
        genuinely frees the disk" (cf. French "vraiment"); translate for that
        sense, not a rote calque. -->
-  <data name="Completion.DeleteSpaceHint" xml:space="preserve"><value>Empty it to actually reclaim the space.</value></data>
+  <data name="Completion.DeleteSpaceHint" xml:space="preserve"><value>Leere den Papierkorb, um den Speicherplatz wirklich freizugeben.</value></data>
   <!-- Headline size figures. "freed" is used only where space is genuinely
        reclaimed at that instant: a cross-volume Move (frees the system drive)
        and a consented permanent delete. A Delete to the Recycle Bin reclaims
@@ -368,7 +368,7 @@
        (true at that instant: the junk is out of the cache). A same-volume Move
        reads "moved" (a rename frees nothing yet). 0 = size (e.g. "120.5 MB"). -->
   <data name="Completion.Freed" xml:space="preserve"><value>{0} freigegeben</value></data>
-  <data name="Completion.CleanedUp" xml:space="preserve"><value>{0} cleaned up</value></data>
+  <data name="Completion.CleanedUp" xml:space="preserve"><value>{0} aufgeräumt</value></data>
   <data name="Completion.Moved" xml:space="preserve"><value>{0} verschoben</value></data>
   <data name="Completion.PartlyMoved" xml:space="preserve"><value>{0} verschoben, einige Dateien konnten nicht verarbeitet werden</value></data>
   <!-- Heading shown when an operation succeeded for SOME files but errored for
@@ -376,15 +376,19 @@
        (see Completion.CleanedUp for why delete reads "cleaned up").
        0 = total size (e.g. "120.5 MB"). -->
   <data name="Completion.PartlyFreed" xml:space="preserve"><value>{0} freigegeben, einige Dateien konnten nicht verarbeitet werden</value></data>
-  <data name="Completion.PartlyCleanedUp" xml:space="preserve"><value>{0} cleaned up, some files could not be processed</value></data>
+  <data name="Completion.PartlyCleanedUp" xml:space="preserve"><value>{0} aufgeräumt, einige Dateien konnten nicht verarbeitet werden</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
-  <data name="Completion.MoveSummary" xml:space="preserve"><value>{0} {1} nach {2} verschoben</value></data>
+  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} {1} nach {2} verschoben</value></data>
+  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} {1} nach {2} verschoben</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
-  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>{0} {1} nach {2} verschoben. {3} {4}</value></data>
+  <data name="Completion.MoveSummaryWithErrors.Singular" xml:space="preserve"><value>{0} {1} nach {2} verschoben. {3} {4}</value></data>
+  <data name="Completion.MoveSummaryWithErrors.Plural" xml:space="preserve"><value>{0} {1} nach {2} verschoben. {3} {4}</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
-  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} {1} moved to the Recycle Bin</value></data>
+  <data name="Completion.DeleteSummary.Singular" xml:space="preserve"><value>{0} {1} in den Papierkorb verschoben</value></data>
+  <data name="Completion.DeleteSummary.Plural" xml:space="preserve"><value>{0} {1} in den Papierkorb verschoben</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
-  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} {1} moved to the Recycle Bin. {2} {3}</value></data>
+  <data name="Completion.DeleteSummaryWithErrors.Singular" xml:space="preserve"><value>{0} {1} in den Papierkorb verschoben. {2} {3}</value></data>
+  <data name="Completion.DeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{0} {1} in den Papierkorb verschoben. {2} {3}</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
@@ -460,11 +464,11 @@
   <!-- 0 = destination path -->
   <data name="Confirm.MoveDestination" xml:space="preserve"><value>Die Dateien werden nach {0} verschoben.</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{0} {1} löschen ({2})?</value></data>
-  <!-- Keeps "sent" while the delete summaries and the Delete tooltip say
-       "moved": this line recommends the Move feature in the same breath ("use
-       Move instead"), so a distinct verb avoids a "moved ... use Move" garden
-       path. Not an oversight; do not align it to "moved". -->
-  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Die Dateien werden in den Papierkorb verschoben. Wenn du Sicherungskopien möchtest, nutze stattdessen Verschieben.</value></data>
+  <!-- "the Move button", not bare "Move": this line says "moved to the Recycle
+       Bin" like the rest of the delete copy, and also points at the separate
+       Move feature, so naming the button stops "moved ... use Move" reading as
+       one action. -->
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Die Dateien werden in den Papierkorb verschoben. Wenn du Sicherungskopien möchtest, nutze stattdessen die Schaltfläche „Verschieben“.</value></data>
 
   <!-- Error messages -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Administratorrechte erforderlich</value></data>
@@ -518,13 +522,13 @@ Details in {1}.</value></data>
   <data name="Error.IOFailure" xml:space="preserve"><value>Der Vorgang ist fehlgeschlagen. Versuch es erneut oder starte Windows neu.</value></data>
   <data name="Error.UnknownError" xml:space="preserve"><value>Unbekannter Fehler.</value></data>
   <!-- 0 = shell error code -->
-  <!-- Keeps "sent" for the same reason as Confirm.DeleteToRecycleBin: it ends
-       with "Move it instead", so "couldn't move ... Move it instead" would
-       confuse. The delete summaries and tooltip use "moved". -->
-  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Diese Datei konnte nicht in den Papierkorb verschoben werden (Fehler {0}). Sie ist möglicherweise gesperrt, in Benutzung oder von Windows blockiert. Verschieb sie stattdessen.</value></data>
-  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows hat den Zugriff auf diese Datei blockiert, selbst mit Administratorrechten (Fehler {0}). Meist ist es eine Sperre durch Besitzrechte oder Berechtigungen. Verschieb sie stattdessen.</value></data>
-  <data name="Error.RecycleInUse" xml:space="preserve"><value>Diese Datei ist von einem anderen Programm geöffnet oder gesperrt (Fehler {0}). Schließe dieses Programm, oder was auch immer sie gerade prüft, und versuch es erneut, oder verschieb sie stattdessen.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>The file was permanently deleted because it could not be moved to the Recycle Bin.</value></data>
+  <!-- These recovery errors point at the Move feature by its button name ("the
+       Move button") so the suggestion isn't taken as the delete verb, which now
+       also says "moved to the Recycle Bin". -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Diese Datei konnte nicht in den Papierkorb verschoben werden (Fehler {0}). Sie ist möglicherweise gesperrt, in Benutzung oder von Windows blockiert. Nutze stattdessen die Schaltfläche „Verschieben“.</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows hat den Zugriff auf diese Datei blockiert, selbst mit Administratorrechten (Fehler {0}). Meist ist es eine Sperre durch Besitzrechte oder Berechtigungen. Nutze stattdessen die Schaltfläche „Verschieben“.</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>Diese Datei ist von einem anderen Programm geöffnet oder gesperrt (Fehler {0}). Schließe dieses Programm, oder was auch immer sie gerade prüft, und versuch es erneut, oder nutze stattdessen die Schaltfläche „Verschieben“.</value></data>
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Die Datei wurde endgültig gelöscht, weil sie nicht in den Papierkorb verschoben werden konnte.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Das Verschieben von Dateien in den Windows-Installer-Ordner wird abgelehnt (Ziel: {0}).</value></data>
   <!-- 0 = the relative path the caller passed -->

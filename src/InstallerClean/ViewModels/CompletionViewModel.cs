@@ -191,8 +191,15 @@ public partial class CompletionViewModel : ObservableObject
             DisplayHelpers.FormatSize(movedBytes));
         var movedLabel = DisplayHelpers.PluraliseFile(movedCount);
         Summary = errors.Count == 0
-            ? string.Format(Strings.Completion_MoveSummary, movedCount, movedLabel, destination)
-            : string.Format(Strings.Completion_MoveSummaryWithErrors,
+            ? string.Format(DisplayHelpers.Pluralise(movedCount,
+                    Strings.Completion_MoveSummary_Singular,
+                    Strings.Completion_MoveSummary_Plural,
+                    "Completion.MoveSummary"),
+                movedCount, movedLabel, destination)
+            : string.Format(DisplayHelpers.Pluralise(movedCount,
+                    Strings.Completion_MoveSummaryWithErrors_Singular,
+                    Strings.Completion_MoveSummaryWithErrors_Plural,
+                    "Completion.MoveSummaryWithErrors"),
                 movedCount, movedLabel, destination, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = Strings.Completion_MoveRestoreHint;
         SpaceHint = string.Empty;
@@ -211,8 +218,15 @@ public partial class CompletionViewModel : ObservableObject
             DisplayHelpers.FormatSize(deletedBytes));
         var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
         Summary = errors.Count == 0
-            ? string.Format(Strings.Completion_DeleteSummary, deletedCount, deletedLabel)
-            : string.Format(Strings.Completion_DeleteSummaryWithErrors,
+            ? string.Format(DisplayHelpers.Pluralise(deletedCount,
+                    Strings.Completion_DeleteSummary_Singular,
+                    Strings.Completion_DeleteSummary_Plural,
+                    "Completion.DeleteSummary"),
+                deletedCount, deletedLabel)
+            : string.Format(DisplayHelpers.Pluralise(deletedCount,
+                    Strings.Completion_DeleteSummaryWithErrors_Singular,
+                    Strings.Completion_DeleteSummaryWithErrors_Plural,
+                    "Completion.DeleteSummaryWithErrors"),
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
         Restore = Strings.Completion_DeleteRestoreHint;
         SpaceHint = Strings.Completion_DeleteSpaceHint;

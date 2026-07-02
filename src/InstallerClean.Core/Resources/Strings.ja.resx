@@ -378,13 +378,17 @@
   <data name="Completion.PartlyFreed" xml:space="preserve"><value>{0} 解放、一部のファイルは処理できませんでした</value></data>
   <data name="Completion.PartlyCleanedUp" xml:space="preserve"><value>{0} クリーンアップ、一部のファイルは処理できませんでした</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
-  <data name="Completion.MoveSummary" xml:space="preserve"><value>{0} 個の {1} を {2} に移動しました</value></data>
+  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} 個の {1} を {2} に移動しました</value></data>
+  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} 個の {1} を {2} に移動しました</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
-  <data name="Completion.MoveSummaryWithErrors" xml:space="preserve"><value>{0} 個の {1} を {2} に移動しました。{3} 個の {4}</value></data>
+  <data name="Completion.MoveSummaryWithErrors.Singular" xml:space="preserve"><value>{0} 個の {1} を {2} に移動しました。{3} 個の {4}</value></data>
+  <data name="Completion.MoveSummaryWithErrors.Plural" xml:space="preserve"><value>{0} 個の {1} を {2} に移動しました。{3} 個の {4}</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
-  <data name="Completion.DeleteSummary" xml:space="preserve"><value>{0} 個の {1} をごみ箱に移動しました</value></data>
+  <data name="Completion.DeleteSummary.Singular" xml:space="preserve"><value>{0} 個の {1} をごみ箱に移動しました</value></data>
+  <data name="Completion.DeleteSummary.Plural" xml:space="preserve"><value>{0} 個の {1} をごみ箱に移動しました</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
-  <data name="Completion.DeleteSummaryWithErrors" xml:space="preserve"><value>{0} 個の {1} をごみ箱に移動しました。{2} 個の {3}</value></data>
+  <data name="Completion.DeleteSummaryWithErrors.Singular" xml:space="preserve"><value>{0} 個の {1} をごみ箱に移動しました。{2} 個の {3}</value></data>
+  <data name="Completion.DeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{0} 個の {1} をごみ箱に移動しました。{2} 個の {3}</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
