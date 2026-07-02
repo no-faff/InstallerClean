@@ -47,7 +47,6 @@
 - [Command line](#command-line)
 - [Requirements](#requirements)
 - [Building from source](#building-from-source)
-- [Can you help translate InstallerClean?](#can-you-help-translate-installerclean)
 - [Contributing](#contributing)
 - [Support the project](#support-the-project)
 - [Star history](#star-history)
@@ -376,39 +375,11 @@ Run the tests:
 dotnet test src/InstallerClean.Tests/
 ```
 
-## Can you help translate InstallerClean?
-
-<details>
-<summary>I'm looking for native speakers to check my machine translations; click if you might be willing to help 🙏</summary>
-
-I'd like to make InstallerClean available in more languages. I've got complete machine-translated versions ready to go - every string in the app, the interface and the command-line tool, but I don't want to ship any of them without the approval of a native speaker.
-
-I'd be very grateful to anyone with a good grasp of English and one of the languages below who can look over its translation as it stands and either approve what's there or suggest improvements where necessary. Each is here as a plain table, the English beside the translation, with the `.resx` file itself alongside:
-
-- Simplified Chinese: [table](docs/translations/zh-Hans.md) · [resx](src/InstallerClean.Core/Resources/Strings.zh-Hans.resx)
-- Russian: [table](docs/translations/ru.md) · [resx](src/InstallerClean.Core/Resources/Strings.ru.resx)
-- Spanish: [table](docs/translations/es.md) · [resx](src/InstallerClean.Core/Resources/Strings.es.resx)
-- Brazilian Portuguese: [table](docs/translations/pt-BR.md) · [resx](src/InstallerClean.Core/Resources/Strings.pt-BR.resx)
-- Polish: [table](docs/translations/pl.md) · [resx](src/InstallerClean.Core/Resources/Strings.pl.resx)
-- Turkish: [table](docs/translations/tr.md) · [resx](src/InstallerClean.Core/Resources/Strings.tr.resx)
-- Korean: [table](docs/translations/ko.md) · [resx](src/InstallerClean.Core/Resources/Strings.ko.resx)
-- French: [table](docs/translations/fr.md) · [resx](src/InstallerClean.Core/Resources/Strings.fr.resx)
-- German: [table](docs/translations/de.md) · [resx](src/InstallerClean.Core/Resources/Strings.de.resx)
-- Indonesian: [table](docs/translations/id.md) · [resx](src/InstallerClean.Core/Resources/Strings.id.resx)
-- Vietnamese: [table](docs/translations/vi.md) · [resx](src/InstallerClean.Core/Resources/Strings.vi.resx)
-- Ukrainian: [table](docs/translations/uk.md) · [resx](src/InstallerClean.Core/Resources/Strings.uk.resx)
-
-bovirus has already kindly corrected and approved the Italian, which is now live. Then coolvitto came along and presented me with a complete Japanese translation, saving me even having to make a machine-translated draft. Japanese is now live too.
-
-I did put *a lot* of effort into the drafts, so they should be pretty good, but they're only there to help you out; up to you - use all, some or none. The non-English READMEs are machine-translated too, so you'll get an idea of the quality you'd be checking (although even more effort has gone into the `.resx`).
-
-Tell me in an [issue](../../issues/new?template=translation_review.md) or a pull request, whichever's easier, and that language will join English, Japanese and Italian, with the credit going to you.
-
-</details>
-
 ## Contributing
 
 Found a bug or have a suggestion? [Open an issue](../../issues) or start a [discussion](../../discussions). Pull requests welcome. Please run `dotnet test` before submitting.
+
+InstallerClean comes in 15 languages, each covering the whole of it: the app, the installer, the command line and this README. The Japanese was written from scratch by coolvitto, and the Italian was corrected and approved by bovirus, both native speakers; the rest are my own machine translations. I put a lot of effort into them, but they won't be perfect, and I decided to ship them as they are rather than hold them back until a native speaker could check each one. If you speak English and one of these languages and spot anything that could be improved, I'd be glad to hear it, in an [issue](../../issues/new?template=translation_review.md), a pull request or a [discussion](../../discussions).
 
 ## Support the project
 
