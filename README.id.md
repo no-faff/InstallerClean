@@ -149,6 +149,7 @@ Jika API mengembalikan data yang tidak lengkap (jarang, tetapi bisa terjadi pada
 
 Setelah Pindahkan atau Hapus selesai, subfolder kosong di dalam `C:\Windows\Installer` (direktori yang ditinggalkan cache setelah isinya hilang) dipangkas dalam satu proses yang sama.
 
+<a id="is-it-safe"></a>
 ## Apakah aman?
 
 Ya. InstallerClean menanyakan ke basis data Windows Installer API yang sama dengan yang dipakai Windows sendiri untuk melacak apa yang terpasang. Jika Windows menyatakan suatu file sudah tidak diperlukan, aplikasi memercayainya; aplikasi tidak menebak berdasarkan nama file atau tanggal.

@@ -149,6 +149,7 @@ Se l'API restituisce dati incompleti (cosa rara, ma che può capitare con uno st
 
 Una volta completato uno spostamento o un'eliminazione, le sottocartelle vuote dentro `C:\Windows\Installer` (le directory che la cache lascia indietro quando il loro contenuto sparisce) vengono eliminate nella stessa passata.
 
+<a id="is-it-safe"></a>
 ## È sicuro?
 
 Sì. InstallerClean interroga lo stesso database dell'API di Windows Installer che Windows stesso usa per tenere traccia di ciò che è installato. Se Windows dice che un file non serve più, l'app si fida; non tira a indovinare in base a nomi di file o date.

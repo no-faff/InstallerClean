@@ -149,6 +149,7 @@ Se a API retornar dados incompletos (raro, mas pode acontecer com um estado do i
 
 Depois que um Mover ou Excluir é concluído, as subpastas vazias dentro de `C:\Windows\Installer` (os diretórios que o cache deixa para trás quando o conteúdo some) são removidas na mesma passagem.
 
+<a id="is-it-safe"></a>
 ## É seguro?
 
 Sim. O InstallerClean consulta o mesmo banco de dados da API do Windows Installer que o próprio Windows usa para controlar o que está instalado. Se o Windows diz que um arquivo não é mais necessário, o aplicativo acredita; ele não fica adivinhando a partir de nomes de arquivo ou datas.

@@ -149,6 +149,7 @@ InstallerClean 会识别三类不需要的文件。
 
 一次移动或删除完成后，`C:\Windows\Installer` 内的空子文件夹（缓存内容清空后残留下来的目录）会在同一轮里一并清理。
 
+<a id="is-it-safe"></a>
 ## 是否安全？
 
 是的。InstallerClean 查询的，正是 Windows 自己用来记录已安装内容的那个 Windows Installer API 数据库。如果 Windows 说某个文件不再需要，应用就信它；它不会根据文件名或日期来猜测。

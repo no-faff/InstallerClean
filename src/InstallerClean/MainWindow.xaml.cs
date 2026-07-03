@@ -396,11 +396,13 @@ public partial class MainWindow : Window
         AnnounceLiveRegions(CompletionHeadingText, CompletionSummaryText,
             CompletionSpaceHintText, CompletionRestoreText);
 
-    // Stable README anchor: the "Is it safe?" heading slugifies to
-    // "is-it-safe". The post-Move / post-Delete restore hints carry an
+    // Stable README anchor (an explicit <a id="is-it-safe"> before the
+    // "Is it safe?" section of every README, so rewording a heading never
+    // breaks the link). The post-Move / post-Delete restore hints carry an
     // "[it won't!]" phrase that links here, the reassurance that a cleaned
-    // file was safe to remove.
-    private const string SafetyUrl = "https://github.com/no-faff/InstallerClean#is-it-safe";
+    // file was safe to remove; the URL targets the README in the displayed
+    // language.
+    private static string SafetyUrl => ReadmeLinks.For("is-it-safe", Localisation.UiCulture);
 
     /// <summary>
     /// Composes the completion restore line from <see cref="CompletionViewModel.Restore"/>,
