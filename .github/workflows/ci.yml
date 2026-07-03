@@ -18,6 +18,12 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
+      # Source-level satellite contract: key presence, stray keys and {N}
+      # placeholder arity across every Strings.<code>.resx. The compiled-
+      # resource side is covered by SatelliteResxParityTests in the test run.
+      - name: Check resx satellite parity
+        run: node scripts/check-resx-parity.mjs
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
@@ -40,6 +46,11 @@ jobs:
 
       - name: Smoke-publish CLI framework-dependent
         run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained false -p:RestoreLockedMode=true -p:PublishSingleFile=true -o publish/cli
+
+      # The released installerclean-cli.exe is this self-contained single-file
+      # shape; the framework-dependent publish above exercises the lighter one.
+      - name: Smoke-publish CLI self-contained
+        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/cli-self-contained
 
       - name: Audit vulnerable packages (GUI)
         run: dotnet list src/InstallerClean/InstallerClean.csproj package --vulnerable --include-transitive
