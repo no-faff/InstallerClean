@@ -166,7 +166,7 @@ Windows インストーラーが今まさにキャッシュへ書き込んでい
 - 各リリースの SHA-256 ハッシュは[リリースページ](../../releases/latest)に掲載しています。
 - VirusTotal：すべてのエンジンでクリーンです。各リリースのノートにライブリンクを掲載しているので、ご自身で再確認できます。
 - ソースコードは [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) にあり、CI が毎回のコミットをビルド・テストしています（上の緑色の CI バッジを参照）。
-- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->27k<!-- downloads-end --> 回ダウンロードされています。
+- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->27,000<!-- downloads-end --> 回ダウンロードされています。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) は各提出物を仮想マシンでテストし、審査を通過したものだけを掲載します。
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) は各リリースをウイルス・スパイウェア・アドウェアについて検査しています。
 
