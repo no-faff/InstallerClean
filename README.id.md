@@ -99,14 +99,14 @@ Nasihat standar mencampuradukkan penghapusan file secara sembarangan (yang meman
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="Jendela file terdaftar yang mendaftar produk yang terpasang, dengan detail basis data penginstal untuk produk yang dipilih" width="900"><br>
-  <em>Detail file yang masih diperlukan, dengan metadata yang dibaca dari basis data penginstal.</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Jendela file tidak diperlukan yang mendaftar file .msi yang bisa dihapus, diurutkan berdasarkan ukuran, dengan alasan tiap file bisa dihapus dan detail untuk file yang dipilih" width="900"><br>
+  <em>Detail file yang sudah tidak diperlukan lagi.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Jendela file tidak diperlukan yang mendaftar file .msi yang bisa dihapus, diurutkan berdasarkan ukuran, dengan alasan tiap file bisa dihapus dan detail untuk file yang dipilih" width="900"><br>
-  <em>Detail file yang sudah tidak diperlukan lagi.</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="Jendela file terdaftar yang mendaftar produk yang terpasang, dengan detail basis data penginstal untuk produk yang dipilih" width="900"><br>
+  <em>Detail file yang masih diperlukan, dengan metadata yang dibaca dari basis data penginstal.</em>
   <br><br>
 </p>
 

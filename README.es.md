@@ -99,14 +99,14 @@ El consejo habitual confunde borrar archivos al azar (lo cual sí es peligroso) 
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="Ventana de archivos registrados con los productos instalados y los detalles de la base de datos del instalador para el producto seleccionado" width="900"><br>
-  <em>Detalle de los archivos que siguen haciendo falta, con los metadatos leídos de la base de datos del instalador.</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Ventana de archivos innecesarios con los archivos .msi eliminables ordenados por tamaño, el motivo por el que cada uno es eliminable y los detalles del archivo seleccionado" width="900"><br>
+  <em>Detalle de los archivos que ya no hacen falta.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Ventana de archivos innecesarios con los archivos .msi eliminables ordenados por tamaño, el motivo por el que cada uno es eliminable y los detalles del archivo seleccionado" width="900"><br>
-  <em>Detalle de los archivos que ya no hacen falta.</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="Ventana de archivos registrados con los productos instalados y los detalles de la base de datos del instalador para el producto seleccionado" width="900"><br>
+  <em>Detalle de los archivos que siguen haciendo falta, con los metadatos leídos de la base de datos del instalador.</em>
   <br><br>
 </p>
 

@@ -99,14 +99,14 @@ Sıradan tavsiyeler, dosyaları gelişigüzel silmeyi (ki bu gerçekten tehlikel
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="Kurulu ürünleri listeleyen, seçili ürün için yükleyici veritabanı ayrıntılarını gösteren kayıtlı dosyalar penceresi" width="900"><br>
-  <em>Hâlâ gerekli dosyaların, yükleyici veritabanından okunan meta verilerle birlikte ayrıntıları.</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Boyuta göre sıralanmış kaldırılabilir .msi dosyalarını, her birinin neden kaldırılabilir olduğunu ve seçili dosyanın ayrıntılarını listeleyen gereksiz dosyalar penceresi" width="900"><br>
+  <em>Artık gerekli olmayan dosyaların ayrıntıları.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Boyuta göre sıralanmış kaldırılabilir .msi dosyalarını, her birinin neden kaldırılabilir olduğunu ve seçili dosyanın ayrıntılarını listeleyen gereksiz dosyalar penceresi" width="900"><br>
-  <em>Artık gerekli olmayan dosyaların ayrıntıları.</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="Kurulu ürünleri listeleyen, seçili ürün için yükleyici veritabanı ayrıntılarını gösteren kayıtlı dosyalar penceresi" width="900"><br>
+  <em>Hâlâ gerekli dosyaların, yükleyici veritabanından okunan meta verilerle birlikte ayrıntıları.</em>
   <br><br>
 </p>
 

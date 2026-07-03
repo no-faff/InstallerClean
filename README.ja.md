@@ -99,14 +99,14 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="インストール済み製品を一覧表示し、選択した製品のインストーラーデータベースの詳細を示す登録済みファイルのウィンドウ" width="900"><br>
-  <em>まだ必要なファイルの詳細。インストーラーデータベースから読み取ったメタデータ付きです。</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="削除可能な .msi ファイルをサイズ順に並べ、それぞれが削除可能な理由と、選択したファイルの詳細を示す不要なファイルのウィンドウ" width="900"><br>
+  <em>もう必要のないファイルの詳細。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="削除可能な .msi ファイルをサイズ順に並べ、それぞれが削除可能な理由と、選択したファイルの詳細を示す不要なファイルのウィンドウ" width="900"><br>
-  <em>もう必要のないファイルの詳細。</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="インストール済み製品を一覧表示し、選択した製品のインストーラーデータベースの詳細を示す登録済みファイルのウィンドウ" width="900"><br>
+  <em>まだ必要なファイルの詳細。インストーラーデータベースから読み取ったメタデータ付きです。</em>
   <br><br>
 </p>
 

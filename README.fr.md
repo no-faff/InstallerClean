@@ -99,14 +99,14 @@ Le conseil habituel confond la suppression de fichiers au hasard (ce qui est ré
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="Fenêtre des fichiers enregistrés listant les produits installés, avec les détails de la base de données de Windows Installer pour le produit sélectionné" width="900"><br>
-  <em>Détails des fichiers encore nécessaires, avec les métadonnées lues dans la base de données de Windows Installer.</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Fenêtre des fichiers inutiles listant les fichiers .msi supprimables triés par taille, avec la raison pour laquelle chacun est supprimable et les détails du fichier sélectionné" width="900"><br>
+  <em>Détails des fichiers devenus inutiles.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Fenêtre des fichiers inutiles listant les fichiers .msi supprimables triés par taille, avec la raison pour laquelle chacun est supprimable et les détails du fichier sélectionné" width="900"><br>
-  <em>Détails des fichiers devenus inutiles.</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="Fenêtre des fichiers enregistrés listant les produits installés, avec les détails de la base de données de Windows Installer pour le produit sélectionné" width="900"><br>
+  <em>Détails des fichiers encore nécessaires, avec les métadonnées lues dans la base de données de Windows Installer.</em>
   <br><br>
 </p>
 
