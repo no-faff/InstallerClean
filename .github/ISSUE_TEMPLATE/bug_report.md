@@ -12,7 +12,7 @@ labels: bug
 
 - InstallerClean version: <!-- About window shows this -->
 - Windows version: <!-- e.g. Windows 11 24H2 -->
-- Build variant: <!-- setup / portable / slim -->
+- Build variant: <!-- setup / portable / CLI / slim (older releases) -->
 - Elevated: <!-- yes / no -->
 
 ## Steps to reproduce
