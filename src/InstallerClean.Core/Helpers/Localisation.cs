@@ -15,9 +15,9 @@ namespace InstallerClean.Helpers;
 /// thread culture set, the main window (built during startup) rendered in the
 /// chosen language while every window opened later from a click fell back to the
 /// OS language. An explicit override here is honoured by every thread and window.
-/// When no override is set, both fall back to the ambient thread culture, so the
-/// Automatic case (follow the OS language) and the CLI's English UICulture pin
-/// keep working unchanged.
+/// When no override is set, both fall back to the ambient thread culture: the
+/// Automatic case (follow the OS language), and the whole of the CLI, which
+/// never sets an override and localises through exactly this fallback.
 /// </remarks>
 public static class Localisation
 {
