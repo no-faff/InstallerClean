@@ -123,7 +123,11 @@
                                         HeaderContainerStyle="{StaticResource NumericColumnHeader}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Grid>
+                                    <!-- HorizontalAlignment=Right on the cell root, not just
+                                         TextAlignment on the text: a GridViewRowPresenter arranges cell
+                                         content at its desired width, so TextAlignment inside has no slack
+                                         and the figure sits left of the right-aligned Size header. -->
+                                    <Grid HorizontalAlignment="Right">
                                         <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Text.Body}"
                                                    FontSize="{DynamicResource Type.Body}" TextAlignment="Right">
                                             <TextBlock.Style>
@@ -152,7 +156,7 @@
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding PatchCount}" Foreground="{StaticResource Text.Body}"
-                                               FontSize="{DynamicResource Type.Body}" TextAlignment="Right"/>
+                                               FontSize="{DynamicResource Type.Body}" TextAlignment="Right" HorizontalAlignment="Right"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
