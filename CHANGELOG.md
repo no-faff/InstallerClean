@@ -40,6 +40,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The post-clean completion screen's dismiss button reads "Fatto" in Italian rather than "Completato", naming the action you take rather than restating that the operation finished. bovirus flagged the old label (#39).
 - The command-line tool's warning shown when it cannot write its Event Log entry now refers to the Application "log" rather than the Application "channel", matching the name Windows and the Event Viewer give that log.
 - The Ukrainian main window's Alt access keys were reassigned so that no two controls share a letter.
+- The Ukrainian texts now write their "X — це Y" constructions with the dash Ukrainian orthography requires, in the app strings and the README; an English style rule against dashes had been over-applied to a language where the dash is grammar, not style (Russian's were always kept).
 - Every satellite translation is now guarded on every push: the resx parity check (key presence, stray keys and placeholder arity) runs in CI, and the compiled-resource parity tests cover all fourteen satellites rather than only Italian and Japanese. CI also smoke-publishes the command-line tool in the self-contained single-file shape that actually ships.
 - Code comments that still described the command-line tool as pinned to English were brought in line with the CLI localisation.
 
