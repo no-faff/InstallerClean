@@ -25,17 +25,31 @@ public static class SupportedLanguages
 
     /// <summary>
     /// The supported-language name the app is actually displaying for
-    /// <paramref name="uiCulture"/>: an exact or language-level match (so
-    /// it-IT and it-CH both map to <c>"it"</c>), else <see cref="Neutral"/>,
-    /// which every culture without a satellite resolves to. The active
-    /// language must be read from the displayed culture, not from an explicit
-    /// override alone: a default install carries no override and follows the
-    /// OS, yet still displays one of these languages, so the globe menu's
-    /// tick and its re-pick-is-a-no-op both depend on this.
+    /// <paramref name="uiCulture"/>: the first entry on the culture's parent
+    /// chain, the same chain satellite resolution probes (it-CH falls back to
+    /// <c>"it"</c>; zh-CN to zh-Hans, so it maps to <c>"zh-Hans"</c>), else
+    /// <see cref="Neutral"/>, which every culture without a satellite
+    /// resolves to. A two-letter comparison is not enough: zh-CN's ISO
+    /// language name is "zh", which matches no entry, yet its resources
+    /// resolve through zh-Hans, so the app renders Chinese while a two-letter
+    /// check reports English. The active language must be read from the
+    /// displayed culture, not from an explicit override alone: a default
+    /// install carries no override and follows the OS, yet still displays one
+    /// of these languages, so the globe menu's tick and its re-pick-is-a-no-op
+    /// both depend on this.
     /// </summary>
     public static string Active(CultureInfo uiCulture)
-        => CultureNames.FirstOrDefault(name =>
-               string.Equals(name, uiCulture.Name, StringComparison.OrdinalIgnoreCase)
-               || string.Equals(name, uiCulture.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase))
-           ?? Neutral;
+    {
+        for (var culture = uiCulture;
+             !string.IsNullOrEmpty(culture.Name);
+             culture = culture.Parent)
+        {
+            var match = CultureNames.FirstOrDefault(name =>
+                string.Equals(name, culture.Name, StringComparison.OrdinalIgnoreCase));
+            if (match is not null)
+                return match;
+        }
+
+        return Neutral;
+    }
 }
