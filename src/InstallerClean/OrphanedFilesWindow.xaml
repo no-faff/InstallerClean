@@ -5,8 +5,8 @@
         xmlns:a11y="clr-namespace:InstallerClean.Helpers"
         xmlns:chrome="clr-namespace:InstallerClean.Controls"
         Title="{loc:Translate Window.Orphaned.Title}"
-        Width="920" Height="540"
-        MinWidth="600" MinHeight="380"
+        Width="1000" Height="540"
+        MinWidth="680" MinHeight="380"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource Surface.Sidebar}"
         Loaded="Window_Loaded">
@@ -83,8 +83,8 @@
                     <ListView.View>
                         <GridView>
                             <!-- The three column widths total under the list
-                                 pane's ~466 units at the 920 default (872
-                                 content minus the 12 gap, the 380 details
+                                 pane's ~466 units at the 1000 default (952
+                                 content minus the 12 gap, the 460 details
                                  pane, the card border and the scrollbar),
                                  and they scale with the OS text size so the
                                  names and sizes stay whole as they grow.
@@ -134,7 +134,8 @@
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                             <GridViewColumn Header="{loc:Translate Field.Size}" Width="{a11y:TextScaled 90}"
-                                            x:Name="ColSize">
+                                            x:Name="ColSize"
+                                            HeaderContainerStyle="{StaticResource NumericColumnHeader}">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Text.Body}"
@@ -147,7 +148,7 @@
                 </ListView>
             </Border>
 
-            <Border Grid.Column="2" Style="{StaticResource Card}" Width="{a11y:TextScaled 380}">
+            <Border Grid.Column="2" Style="{StaticResource Card}" Width="{a11y:TextScaled 460}">
                 <Grid>
                     <TextBlock Text="{loc:Translate Body.NoFileSelected}"
                                Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Body}" FontStyle="Italic"
@@ -193,7 +194,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Translate Field.Reason}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
-                            <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SelectedFile.Reason, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}"
+                            <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SelectedFile.Reason, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
                                      AutomationProperties.Name="{loc:Translate Field.Reason}"/>
                             <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Translate Field.Author}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
                             <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding SelectedDetails.Author, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
@@ -215,7 +216,7 @@
                             <TextBox Grid.Row="12" Grid.Column="2" Text="{Binding SelectedDetails.DigitalSignature, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
                                      AutomationProperties.Name="{loc:Translate Field.SigningCertificate}"/>
                             <TextBlock Grid.Row="14" Grid.Column="0" Text="{loc:Translate Field.FileSize}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
-                            <TextBox Grid.Row="14" Grid.Column="2" Text="{Binding SelectedFile.SizeDisplay, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}"
+                            <TextBox Grid.Row="14" Grid.Column="2" Text="{Binding SelectedFile.SizeDisplay, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
                                      AutomationProperties.Name="{loc:Translate Field.FileSize}"/>
                             <TextBlock Grid.Row="16" Grid.Column="0" Text="{loc:Translate Field.Comment}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
                             <TextBox Grid.Row="16" Grid.Column="2" Text="{Binding SelectedDetails.Comments, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
