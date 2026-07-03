@@ -166,7 +166,7 @@ Các dịch vụ quét, truy vấn, chuyển, xóa, cài đặt và kiểm tra k
 - Mã băm SHA-256 của mỗi bản phát hành được liệt kê trên [trang phát hành](../../releases/latest).
 - VirusTotal: sạch ở mọi công cụ quét. Có liên kết trực tiếp trong ghi chú của mỗi bản phát hành để bạn kiểm tra lại.
 - Mã nguồn nằm tại [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) và CI biên dịch và kiểm thử mọi lần commit (xem huy hiệu CI màu xanh ở trên).
-- <!-- downloads-start -->27.000<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
+- <!-- downloads-start -->27.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) kiểm tra mỗi lần gửi trong một máy ảo và chỉ đăng nếu nó vượt qua được phần đánh giá của họ.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) kiểm tra mỗi bản phát hành để phát hiện virus, phần mềm gián điệp và phần mềm quảng cáo.
 

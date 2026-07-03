@@ -166,7 +166,7 @@ Les services d'analyse, de requête, de déplacement, de suppression, de réglag
 - Les empreintes SHA-256 de chaque version sont listées sur la [page des versions](../../releases/latest).
 - VirusTotal : propre sur tous les moteurs. Des liens à jour dans les notes de chaque version pour que vous puissiez revérifier.
 - Le code source est sur [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) et la CI compile et teste chaque commit (voir le badge CI vert plus haut).
-- <!-- downloads-start -->27 000<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
+- <!-- downloads-start -->27 000+<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) teste chaque soumission dans une machine virtuelle et ne la référence que si elle passe son contrôle.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analyse chaque version à la recherche de virus, logiciels espions et publiciels.
 

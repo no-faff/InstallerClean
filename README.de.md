@@ -166,7 +166,7 @@ Die Dienste für Scan, Abfrage, Verschieben, Löschen, Einstellungen und aussteh
 - SHA-256-Hashes für jede Version sind auf der [Releases-Seite](../../releases/latest) aufgeführt.
 - VirusTotal: sauber bei allen Engines. Live-Links in den Hinweisen zu jeder Version, damit du es erneut prüfen kannst.
 - Der Quellcode liegt auf [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), und die CI baut und testet jeden Commit (siehe das grüne CI-Badge oben).
-- <!-- downloads-start -->27.000<!-- downloads-end --> Downloads über GitHub, MajorGeeks und Softpedia.
+- <!-- downloads-start -->27.000+<!-- downloads-end --> Downloads über GitHub, MajorGeeks und Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testet jede Einreichung in einer virtuellen Maschine und listet sie nur, wenn sie die Prüfung besteht.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) prüft jede Version auf Viren, Spyware und Adware.
 

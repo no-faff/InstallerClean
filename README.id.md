@@ -166,7 +166,7 @@ Layanan pemindaian, kueri, pemindahan, penghapusan, pengaturan, dan mulai-ulang-
 - Hash SHA-256 untuk tiap rilis tercantum di [halaman rilis](../../releases/latest).
 - VirusTotal: bersih di semua mesin pemindai. Tautan langsung ada di catatan tiap rilis agar Anda bisa memeriksa ulang.
 - Kode sumber ada di [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) dan CI membangun serta menguji setiap commit (lihat lencana CI hijau di atas).
-- <!-- downloads-start -->27.000<!-- downloads-end --> unduhan di GitHub, MajorGeeks, dan Softpedia.
+- <!-- downloads-start -->27.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks, dan Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) menguji tiap kiriman di mesin virtual dan hanya mendaftarkannya jika lolos tinjauan mereka.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) menguji tiap rilis dari virus, spyware, dan adware.
 

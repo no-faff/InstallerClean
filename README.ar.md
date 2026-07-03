@@ -168,7 +168,7 @@
 - بصمات SHA-256 لكل إصدار مدرجة في [صفحة الإصدارات](../../releases/latest).
 - VirusTotal: نظيف لدى كل محرك. روابط مباشرة في ملاحظات كل إصدار لتعيد التحقق.
 - الشيفرة المصدرية على [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)، وتقوم CI ببناء واختبار كل commit (انظر شارة CI الخضراء أعلاه).
-- <!-- downloads-start -->27,000<!-- downloads-end --> عملية تنزيل عبر GitHub وMajorGeeks وSoftpedia.
+- <!-- downloads-start -->27,000+<!-- downloads-end --> عملية تنزيل عبر GitHub وMajorGeeks وSoftpedia.
 - يختبر [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) كل إصدار مُرسَل في جهاز افتراضي ولا يدرجه إلا إذا اجتاز مراجعتهم.
 - يفحص [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) كل إصدار بحثاً عن الفيروسات وبرامج التجسس والإعلانات.
 

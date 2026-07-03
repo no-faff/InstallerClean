@@ -166,7 +166,7 @@ InstallerClean различает три вида ненужных файлов.
 - Хеши SHA-256 для каждого выпуска указаны на [странице выпусков](../../releases/latest).
 - VirusTotal: чисто по всем антивирусным движкам. В примечаниях к каждому выпуску есть актуальные ссылки, чтобы вы могли перепроверить сами.
 - Исходный код лежит на [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), и CI собирает и тестирует каждый коммит (см. зелёный значок CI выше).
-- <!-- downloads-start -->27 000<!-- downloads-end --> загрузок на GitHub, MajorGeeks и Softpedia.
+- <!-- downloads-start -->27 000+<!-- downloads-end --> загрузок на GitHub, MajorGeeks и Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) тестирует каждую присланную сборку в виртуальной машине и публикует её, только если она прошла их проверку.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) проверяет каждый выпуск на вирусы, шпионское и рекламное ПО.
 

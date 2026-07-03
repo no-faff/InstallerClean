@@ -166,7 +166,7 @@ Tarama, sorgulama, taşıma, silme, ayarlar ve bekleyen yeniden başlatma hizmet
 - Her sürümün SHA-256 karmaları [sürümler sayfasında](../../releases/latest) listelenir.
 - VirusTotal: her motorda temiz. Yeniden kontrol edebilmeniz için her sürümün notlarında canlı bağlantılar var.
 - Kaynak kod [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) adresinde ve CI her commit'i derleyip test ediyor (yukarıdaki yeşil CI rozetine bakın).
-- GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->27.000<!-- downloads-end --> indirme.
+- GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->27.000+<!-- downloads-end --> indirme.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) her gönderimi bir sanal makinede test eder ve yalnızca incelemelerinden geçerse listeler.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) her sürümü virüs, casus yazılım ve reklam yazılımı için test eder.
 

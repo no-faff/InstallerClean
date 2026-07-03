@@ -166,7 +166,7 @@ Usługi skanowania, odpytywania, przenoszenia, usuwania, ustawień i oczekujące
 - Skróty SHA-256 dla każdej wersji są wymienione na [stronie wydań](../../releases/latest).
 - VirusTotal: czysty we wszystkich silnikach. Aktualne linki w informacjach o każdym wydaniu, abyś mógł sprawdzić ponownie.
 - Kod źródłowy jest pod adresem [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), a CI buduje i testuje każdy commit (zob. zieloną plakietkę CI powyżej).
-- <!-- downloads-start -->27 000<!-- downloads-end --> pobrań w GitHub, MajorGeeks i Softpedia.
+- <!-- downloads-start -->27 000+<!-- downloads-end --> pobrań w GitHub, MajorGeeks i Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testuje każde zgłoszenie w maszynie wirtualnej i umieszcza je na liście tylko wtedy, gdy przejdzie ich kontrolę.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testuje każde wydanie pod kątem wirusów, programów szpiegujących i adware.
 
