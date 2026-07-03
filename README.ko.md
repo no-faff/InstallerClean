@@ -99,14 +99,14 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="설치된 제품을 나열하고, 선택한 제품의 설치 관리자 데이터베이스 정보를 보여 주는 등록된 파일 창" width="900"><br>
-  <em>아직 필요한 파일의 세부 정보. 설치 관리자 데이터베이스에서 읽은 메타데이터가 함께 표시됩니다.</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="제거 가능한 .msi 파일을 크기순으로 나열하고, 각 파일을 제거할 수 있는 이유와 선택한 파일의 세부 정보를 보여 주는 불필요한 파일 창" width="900"><br>
+  <em>더 이상 필요 없는 파일의 세부 정보.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="제거 가능한 .msi 파일을 크기순으로 나열하고, 각 파일을 제거할 수 있는 이유와 선택한 파일의 세부 정보를 보여 주는 불필요한 파일 창" width="900"><br>
-  <em>더 이상 필요 없는 파일의 세부 정보.</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="설치된 제품을 나열하고, 선택한 제품의 설치 관리자 데이터베이스 정보를 보여 주는 등록된 파일 창" width="900"><br>
+  <em>아직 필요한 파일의 세부 정보. 설치 관리자 데이터베이스에서 읽은 메타데이터가 함께 표시됩니다.</em>
   <br><br>
 </p>
 

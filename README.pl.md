@@ -99,14 +99,14 @@ Standardowa porada myli usuwanie plików na chybił trafił (co naprawdę jest n
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="Okno zarejestrowanych plików z listą zainstalowanych produktów oraz szczegółami z bazy danych instalatora dla wybranego produktu" width="900"><br>
-  <em>Szczegóły plików nadal potrzebnych, z metadanymi odczytanymi z bazy danych instalatora.</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Okno niepotrzebnych plików z listą plików .msi do usunięcia, posortowanych według rozmiaru, z powodem, dla którego każdy można usunąć, oraz szczegółami wybranego pliku" width="900"><br>
+  <em>Szczegóły plików, które nie są już potrzebne.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Okno niepotrzebnych plików z listą plików .msi do usunięcia, posortowanych według rozmiaru, z powodem, dla którego każdy można usunąć, oraz szczegółami wybranego pliku" width="900"><br>
-  <em>Szczegóły plików, które nie są już potrzebne.</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="Okno zarejestrowanych plików z listą zainstalowanych produktów oraz szczegółami z bazy danych instalatora dla wybranego produktu" width="900"><br>
+  <em>Szczegóły plików nadal potrzebnych, z metadanymi odczytanymi z bazy danych instalatora.</em>
   <br><br>
 </p>
 

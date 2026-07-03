@@ -99,14 +99,14 @@ Il consiglio abituale confonde l'eliminare file a caso (cosa che è davvero peri
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="Finestra dei file registrati con l'elenco dei prodotti installati e i dettagli del database del programma di installazione per il prodotto selezionato" width="900"><br>
-  <em>Dettagli dei file ancora necessari, con i metadati letti dal database del programma di installazione.</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Finestra dei file non necessari con i file .msi rimovibili ordinati per dimensione, il motivo per cui ciascuno è rimovibile e i dettagli del file selezionato" width="900"><br>
+  <em>Dettagli dei file non più necessari.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Finestra dei file non necessari con i file .msi rimovibili ordinati per dimensione, il motivo per cui ciascuno è rimovibile e i dettagli del file selezionato" width="900"><br>
-  <em>Dettagli dei file non più necessari.</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="Finestra dei file registrati con l'elenco dei prodotti installati e i dettagli del database del programma di installazione per il prodotto selezionato" width="900"><br>
+  <em>Dettagli dei file ancora necessari, con i metadati letti dal database del programma di installazione.</em>
   <br><br>
 </p>
 

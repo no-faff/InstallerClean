@@ -99,14 +99,14 @@ Lời khuyên thường gặp nhầm lẫn giữa việc xóa tệp một cách 
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="Cửa sổ các tệp đã đăng ký liệt kê những sản phẩm đã cài, kèm chi tiết từ cơ sở dữ liệu trình cài đặt cho sản phẩm được chọn" width="900"><br>
-  <em>Chi tiết những tệp vẫn cần giữ, với siêu dữ liệu đọc từ cơ sở dữ liệu trình cài đặt.</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Cửa sổ các tệp không cần thiết liệt kê những tệp .msi có thể loại bỏ, sắp xếp theo kích thước, kèm lý do mỗi tệp có thể loại bỏ và chi tiết cho tệp được chọn" width="900"><br>
+  <em>Chi tiết những tệp không còn cần nữa.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Cửa sổ các tệp không cần thiết liệt kê những tệp .msi có thể loại bỏ, sắp xếp theo kích thước, kèm lý do mỗi tệp có thể loại bỏ và chi tiết cho tệp được chọn" width="900"><br>
-  <em>Chi tiết những tệp không còn cần nữa.</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="Cửa sổ các tệp đã đăng ký liệt kê những sản phẩm đã cài, kèm chi tiết từ cơ sở dữ liệu trình cài đặt cho sản phẩm được chọn" width="900"><br>
+  <em>Chi tiết những tệp vẫn cần giữ, với siêu dữ liệu đọc từ cơ sở dữ liệu trình cài đặt.</em>
   <br><br>
 </p>
 

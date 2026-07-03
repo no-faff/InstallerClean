@@ -99,14 +99,14 @@ The standard advice confuses deleting files at random (which genuinely is danger
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="Registered files window listing installed products, with installer-database details for the selected product" width="900"><br>
-  <em>Details of the files still needed, with metadata read from the installer database.</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Unneeded files window listing removable .msi files sorted by size, with the reason each is removable and details for the selected file" width="900"><br>
+  <em>Details of the files no longer needed.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Unneeded files window listing removable .msi files sorted by size, with the reason each is removable and details for the selected file" width="900"><br>
-  <em>Details of the files no longer needed.</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="Registered files window listing installed products, with installer-database details for the selected product" width="900"><br>
+  <em>Details of the files still needed, with metadata read from the installer database.</em>
   <br><br>
 </p>
 

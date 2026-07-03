@@ -99,14 +99,14 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="已注册文件窗口，列出已安装的产品，并显示所选产品的安装数据库详情" width="900"><br>
-  <em>仍需保留的文件的详情，附带从安装数据库读取的元数据。</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="不需要的文件窗口，按大小排序列出可删除的 .msi 文件，给出每个文件可删除的原因，并显示所选文件的详情" width="900"><br>
+  <em>不再需要的文件的详情。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="不需要的文件窗口，按大小排序列出可删除的 .msi 文件，给出每个文件可删除的原因，并显示所选文件的详情" width="900"><br>
-  <em>不再需要的文件的详情。</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="已注册文件窗口，列出已安装的产品，并显示所选产品的安装数据库详情" width="900"><br>
+  <em>仍需保留的文件的详情，附带从安装数据库读取的元数据。</em>
   <br><br>
 </p>
 

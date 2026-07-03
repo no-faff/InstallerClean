@@ -99,14 +99,14 @@ Der übliche Rat verwechselt das wahllose Löschen von Dateien (was tatsächlich
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-registered.webp" alt="Fenster der registrierten Dateien mit den installierten Produkten und Installer-Datenbankdetails zum ausgewählten Produkt" width="900"><br>
-  <em>Details zu den noch benötigten Dateien, mit aus der Installer-Datenbank gelesenen Metadaten.</em>
+  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Fenster der nicht benötigten Dateien mit den entfernbaren .msi-Dateien nach Größe sortiert, mit dem Grund, warum jede entfernbar ist, und Details zur ausgewählten Datei" width="900"><br>
+  <em>Details zu den nicht mehr benötigten Dateien.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-safe-to-delete.webp" alt="Fenster der nicht benötigten Dateien mit den entfernbaren .msi-Dateien nach Größe sortiert, mit dem Grund, warum jede entfernbar ist, und Details zur ausgewählten Datei" width="900"><br>
-  <em>Details zu den nicht mehr benötigten Dateien.</em>
+  <img src="docs/screenshots/04-details-registered.webp" alt="Fenster der registrierten Dateien mit den installierten Produkten und Installer-Datenbankdetails zum ausgewählten Produkt" width="900"><br>
+  <em>Details zu den noch benötigten Dateien, mit aus der Installer-Datenbank gelesenen Metadaten.</em>
   <br><br>
 </p>
 
