@@ -331,29 +331,29 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Translate Field.Author}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
-                                <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SelectedDetails.Author, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
+                                <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SelectedDetails.Author, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                          AutomationProperties.Name="{loc:Translate Field.Author}"/>
                                 <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Translate Field.Application}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
-                                <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding SelectedDetails.AppName, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
+                                <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding SelectedDetails.AppName, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                          AutomationProperties.Name="{loc:Translate Field.Application}"/>
                                 <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Translate Field.Title}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
-                                <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding SelectedDetails.Title, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
+                                <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding SelectedDetails.Title, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                          AutomationProperties.Name="{loc:Translate Field.Title}"/>
                                 <TextBlock Grid.Row="6" Grid.Column="0" Text="{loc:Translate Field.Subject}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
-                                <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding SelectedDetails.Subject, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
+                                <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding SelectedDetails.Subject, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                          AutomationProperties.Name="{loc:Translate Field.Subject}"/>
                                 <TextBlock Grid.Row="8" Grid.Column="0" Text="{loc:Translate Field.Keywords}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
-                                <TextBox Grid.Row="8" Grid.Column="2" Text="{Binding SelectedDetails.Keywords, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
+                                <TextBox Grid.Row="8" Grid.Column="2" Text="{Binding SelectedDetails.Keywords, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                          AutomationProperties.Name="{loc:Translate Field.Keywords}"/>
                                 <TextBlock Grid.Row="10" Grid.Column="0" Text="{loc:Translate Field.SigningCertificate}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"
                                            ToolTip="{loc:Translate Tooltip.SigningCertificate}"/>
-                                <TextBox Grid.Row="10" Grid.Column="2" Text="{Binding SelectedDetails.DigitalSignature, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
+                                <TextBox Grid.Row="10" Grid.Column="2" Text="{Binding SelectedDetails.DigitalSignature, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                          AutomationProperties.Name="{loc:Translate Field.SigningCertificate}"/>
                                 <TextBlock Grid.Row="12" Grid.Column="0" Text="{loc:Translate Field.FileSize}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
-                                <TextBox Grid.Row="12" Grid.Column="2" Text="{Binding SelectedProduct.SizeDisplay, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
+                                <TextBox Grid.Row="12" Grid.Column="2" Text="{Binding SelectedProduct.SizeDisplay, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                          AutomationProperties.Name="{loc:Translate Field.FileSize}"/>
                                 <TextBlock Grid.Row="14" Grid.Column="0" Text="{loc:Translate Field.Comment}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
-                                <TextBox Grid.Row="14" Grid.Column="2" Text="{Binding SelectedDetails.Comments, Mode=OneWay}" Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
+                                <TextBox Grid.Row="14" Grid.Column="2" Text="{Binding SelectedDetails.Comments, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                          AutomationProperties.Name="{loc:Translate Field.Comment}"/>
                             </Grid>
                         </ScrollViewer>

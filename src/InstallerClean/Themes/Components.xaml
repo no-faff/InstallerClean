@@ -49,6 +49,18 @@
         </Setter>
     </Style>
 
+    <!-- A value row in the detail panels' metadata grids (Orphaned and
+         Registered): SelectableText's copyable, borderless look, in the
+         heading colour at body size, and wrapping so a long value (a signing
+         certificate, a long product field) breaks onto the next line rather
+         than clipping. The wrap lives here, not on each of the value boxes, so
+         a metadata row cannot be added without it. -->
+    <Style x:Key="MetadataValueText" TargetType="TextBox" BasedOn="{StaticResource SelectableText}">
+        <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
     <!-- Cards. Rounded surface containers. Card has standard inner
          padding; CardNoPad lets the consumer control its own padding
          (used for lists that paint their own row spacing). -->
