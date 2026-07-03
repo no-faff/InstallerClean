@@ -166,7 +166,7 @@ Windows Installer가 지금 캐시에 쓰고 있거나, 이전 트랜잭션이 �
 - 각 릴리스의 SHA-256 해시는 [릴리스 페이지](../../releases/latest)에 올려 두었습니다.
 - VirusTotal: 모든 엔진에서 깨끗합니다. 각 릴리스 노트에 직접 다시 확인할 수 있는 링크가 있습니다.
 - 소스는 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)에 있고, CI가 모든 커밋을 빌드하고 테스트합니다(위의 초록색 CI 배지를 참고하세요).
-- GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->27,000<!-- downloads-end --> 회 다운로드되었습니다.
+- GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->27,000+<!-- downloads-end --> 회 다운로드되었습니다.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html)는 제출된 각 파일을 가상 머신에서 테스트하고, 자체 검토를 통과한 경우에만 목록에 올립니다.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml)는 각 릴리스를 바이러스, 스파이웨어, 애드웨어에 대해 검사합니다.
 
