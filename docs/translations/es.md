@@ -1,6 +1,6 @@
 # InstallerClean in Español (Spanish)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the Spanish translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Spanish can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.es.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Spanish translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Spanish can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.es.resx`](../../src/InstallerClean.Core/Resources/Strings.es.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -90,7 +90,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Found {0} registered {1}. | Se encontraron {0} {1} registrados. |
 | Scan complete ({0}) | Análisis completado ({0}) |
 | Scanning local packages... | Analizando los paquetes locales... |
-| Found {0} {1} you can safely delete. | {0} {1} para limpiar. |
+| Found {0} {1} you can safely delete. | {0} {1} que puedes eliminar sin riesgo. |
 | Preparing destination folder... | Preparando la carpeta de destino... |
 | Moving {0} {1}... | Moviendo {0} {1}... |
 | Deleting {0} {1}... | Eliminando {0} {1}... |
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Todo limpio |
 | Nothing to clean up in C:\Windows\Installer | Nada que limpiar en C:\Windows\Installer |
 | Scanned {0} {1} in {2} | Análisis de {0} {1} en {2} |
-| Copy them back if anything stops working | Vuelve a copiarlos a su sitio si algo deja de funcionar |
-| Restore them from the Recycle Bin if anything stops working | Restáuralos desde la Papelera de reciclaje si algo deja de funcionar |
+| Copy them back if anything breaks ([it won't!]) | Vuelve a copiarlos a su sitio si algo falla ([¡no fallará!]) |
+| Until then, you can restore them if anything breaks ([it won't!]) | Hasta entonces, puedes restaurarlos si algo falla ([¡no fallará!]) |
+| Empty it to actually reclaim the space. | Vacíala para liberar el espacio de verdad. |
 | {0} freed | {0} liberados |
+| {0} cleaned up | {0} limpiados |
 | {0} moved | {0} movidos |
 | {0} moved, some files could not be processed | {0} movidos, no se pudieron procesar algunos archivos |
 | {0} freed, some files could not be processed | {0} liberados, no se pudieron procesar algunos archivos |
+| {0} cleaned up, some files could not be processed | {0} limpiados, no se pudieron procesar algunos archivos |
+| {0} {1} moved to {2} | {0} {1} en {2} |
 | {0} {1} moved to {2} | {0} {1} en {2} |
 | {0} {1} moved to {2}. {3} {4} | {0} {1} en {2}. {3} {4} |
-| {0} {1} sent to the Recycle Bin | {0} {1} en la Papelera de reciclaje |
-| {0} {1} sent to the Recycle Bin. {2} {3} | {0} {1} en la Papelera de reciclaje. {2} {3} |
+| {0} {1} moved to {2}. {3} {4} | {0} {1} en {2}. {3} {4} |
+| {0} {1} moved to the Recycle Bin | {0} {1} en la Papelera de reciclaje |
+| {0} {1} moved to the Recycle Bin | {0} {1} en la Papelera de reciclaje |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} en la Papelera de reciclaje. {2} {3} |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} en la Papelera de reciclaje. {2} {3} |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} eliminado definitivamente. No fue a la Papelera de reciclaje. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} eliminados definitivamente. No fueron a la Papelera de reciclaje. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} eliminado definitivamente. No fue a la Papelera de reciclaje. {2} {3} |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | ¿Mover {0} {1} ({2})? |
 | Files will be moved to {0}. | Los archivos se moverán a {0}. |
 | Delete {0} {1} ({2})? | ¿Eliminar {0} {1} ({2})? |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | Los archivos se enviarán a la Papelera de reciclaje. Si quieres copias de seguridad, usa Mover en su lugar. |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Los archivos se moverán a la Papelera de reciclaje. Si quieres copias de seguridad, usa el botón Mover en su lugar. |
 
 ## Error messages
 
@@ -208,7 +215,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed | Movimiento fallido |
 | Delete failed | Eliminación fallida |
 | The destination cannot be inside the Windows Installer folder. | El destino no puede estar dentro de la carpeta de Windows Installer. |
-| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | El destino {0} se encuentra dentro de una carpeta de sistema de Windows. Elige una ruta fuera de %SystemRoot%, %ProgramFiles% y %ProgramData%. |
+| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | El destino {0} se encuentra dentro de una carpeta del sistema de Windows. Elige una ruta fuera de %SystemRoot%, %ProgramFiles% y %ProgramData%. |
 | Not enough space | Espacio insuficiente |
 | Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | Espacio insuficiente en {0}<br><br>Necesario: {1}<br>Disponible: {2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | No tienes permiso para escribir en {0}.<br>Prueba con una carpeta de tu perfil de usuario o en una unidad de tu propiedad. |
@@ -223,10 +230,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. | Acceso denegado. |
 | The operation failed. Try again or restart Windows. | La operación falló. Inténtalo de nuevo o reinicia Windows. |
 | Unknown error. | Error desconocido. |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | No se pudo enviar este archivo a la Papelera de reciclaje (error {0}). Puede estar bloqueado, en uso o impedido por Windows. Muévelo en su lugar. |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | Windows bloqueó el acceso a este archivo, incluso con permisos de administrador (error {0}). Suele ser un bloqueo de propiedad o de permisos. Muévelo en su lugar. |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | Este archivo está abierto o bloqueado por otro programa (error {0}). Cierra ese programa, o lo que sea que lo esté analizando, y vuelve a intentarlo, o muévelo en su lugar. |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | El archivo se eliminó definitivamente porque no se pudo enviar a la Papelera de reciclaje. |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | No se pudo mover este archivo a la Papelera de reciclaje (error {0}). Puede estar bloqueado, en uso o impedido por Windows. Usa el botón Mover en su lugar. |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | Windows bloqueó el acceso a este archivo, incluso con permisos de administrador (error {0}). Suele ser un bloqueo de propiedad o de permisos. Usa el botón Mover en su lugar. |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Este archivo está abierto o bloqueado por otro programa (error {0}). Cierra ese programa, o lo que sea que lo esté analizando, y vuelve a intentarlo, o usa el botón Mover en su lugar. |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | El archivo se eliminó definitivamente porque no se pudo mover a la Papelera de reciclaje. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Se rechaza mover archivos a la carpeta de Windows Installer (destino: {0}). |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | El destino debe ser una ruta completa (las rutas relativas se resuelven respecto al directorio actual del proceso y no son seguras con privilegios elevados): {0} |
 | Destination folder canonical path changed mid-batch: {0} | La ruta canónica de la carpeta de destino cambió durante la operación: {0} |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Tú decides, pero se agradece. Envía un resumen anónimo que solo sirve para que yo sepa si funciona. La pantalla siguiente te muestra lo que se enviará antes de confirmar. |
 | Move the unneeded files to the Move location. | Mueve los archivos innecesarios a la ubicación de destino. |
 | Move the unneeded files to the Move location. Choose one first. | Mueve los archivos innecesarios a la ubicación de destino. Elige una primero. |
-| Send the unneeded files to the Recycle Bin. | Envía los archivos innecesarios a la Papelera de reciclaje. |
+| Move the unneeded files to the Recycle Bin. | Mueve los archivos innecesarios a la Papelera de reciclaje. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Nombre del firmante del certificado Authenticode incorporado. La cadena no está verificada. |
 | Change language. The program will restart. | Cambia el idioma. El programa se reiniciará. |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | Deja una estrella en GitHub (ventana Acerca de) |
 | Minimise | Minimizar |
 | Move all unneeded installer files to the chosen destination folder | Mover todos los archivos de instalación innecesarios a la carpeta de destino elegida |
-| Send all unneeded installer files to the Recycle Bin | Enviar a la Papelera de reciclaje todos los archivos de instalación innecesarios |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | Eliminar envía los archivos innecesarios a la Papelera de reciclaje. Cancelar cierra sin eliminar. |
+| Move all unneeded installer files to the Recycle Bin | Mover todos los archivos de instalación innecesarios a la Papelera de reciclaje |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Eliminar mueve los archivos innecesarios a la Papelera de reciclaje. Cancelar cierra sin eliminar. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Mover coloca los archivos innecesarios en la carpeta de destino elegida. Cancelar los deja donde están. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Elige qué hacer con los archivos innecesarios: moverlos a un lugar seguro, eliminarlos definitivamente o cancelar. |
 | Move the unneeded files to a folder you choose | Mover los archivos innecesarios a una carpeta que tú elijas |

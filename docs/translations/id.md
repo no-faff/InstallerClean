@@ -1,6 +1,6 @@
 # InstallerClean in Bahasa Indonesia (Indonesian)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the Indonesian translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Indonesian can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.id.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Indonesian translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Indonesian can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.id.resx`](../../src/InstallerClean.Core/Resources/Strings.id.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -35,22 +35,22 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cut | Potong |
 | Paste | Tempel |
 | Select all | Pilih semua |
-| _Browse... | _Telusuri... |
+| _Browse... | Te_lusuri... |
 | _Cancel | _Batal |
 | Check for _updates | Periksa _pembaruan |
 | _Close | _Tutup |
 | _Delete | _Hapus |
-| _Delete permanently | Hapus _permanen |
+| _Delete permanently | _Hapus permanen |
 | _Done | _Selesai |
 | Details | Detail |
-| _Buy me a cuppa | _Traktir kopi |
+| _Buy me a cuppa | Traktir _kopi |
 | Leave a _star on GitHub | Beri _bintang di GitHub |
 | MIT licence | Lisensi MIT |
 | _Move | _Pindahkan |
 | _Move instead | _Pindahkan saja |
 | Path to folder if you Move instead of Delete | Jalur folder jika Anda memilih Pindahkan, bukan Hapus |
 | Open _release page | Buka halaman _rilis |
-| _Re-scan | _Pindai ulang |
+| _Re-scan | Pindai _ulang |
 | _Scan again | Pindai _lagi |
 | Send report | Kirim laporan |
 | _Send | _Kirim |
@@ -83,7 +83,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning... | Memindai... |
 | Cancelling... | Membatalkan... |
 | Starting scan... | Memulai pemindaian... |
-| Asking Windows about installed software... | Menanyakan ke Windows tentang perangkat lunak yang terpasang... |
+| Asking Windows about installed software... | Menanyai Windows tentang perangkat lunak yang terpasang... |
 | Scanning installer cache folder... | Memindai folder cache penginstal... |
 | Enumerating installed products... | Mendata produk yang terpasang... |
 | Checking registry for additional packages... | Memeriksa registri untuk paket tambahan... |
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Semua bersih |
 | Nothing to clean up in C:\Windows\Installer | Tidak ada yang perlu dibersihkan di C:\Windows\Installer |
 | Scanned {0} {1} in {2} | {0} {1} dipindai dalam {2} |
-| Copy them back if anything stops working | Salin kembali jika ada yang berhenti berfungsi |
-| Restore them from the Recycle Bin if anything stops working | Pulihkan dari Keranjang Sampah jika ada yang berhenti berfungsi |
+| Copy them back if anything breaks ([it won't!]) | Salin kembali jika ada yang rusak ([tidak akan!]) |
+| Until then, you can restore them if anything breaks ([it won't!]) | Sampai saat itu, Anda bisa memulihkannya jika ada yang rusak ([tidak akan!]) |
+| Empty it to actually reclaim the space. | Kosongkan Keranjang Sampah untuk benar-benar membebaskan ruang. |
 | {0} freed | {0} dikosongkan |
+| {0} cleaned up | {0} dibersihkan |
 | {0} moved | {0} dipindahkan |
 | {0} moved, some files could not be processed | {0} dipindahkan, sebagian file tidak dapat diproses |
 | {0} freed, some files could not be processed | {0} dikosongkan, sebagian file tidak dapat diproses |
+| {0} cleaned up, some files could not be processed | {0} dibersihkan, sebagian file tidak dapat diproses |
+| {0} {1} moved to {2} | {0} {1} dipindahkan ke {2} |
 | {0} {1} moved to {2} | {0} {1} dipindahkan ke {2} |
 | {0} {1} moved to {2}. {3} {4} | {0} {1} dipindahkan ke {2}. {3} {4} |
-| {0} {1} sent to the Recycle Bin | {0} {1} dikirim ke Keranjang Sampah |
-| {0} {1} sent to the Recycle Bin. {2} {3} | {0} {1} dikirim ke Keranjang Sampah. {2} {3} |
+| {0} {1} moved to {2}. {3} {4} | {0} {1} dipindahkan ke {2}. {3} {4} |
+| {0} {1} moved to the Recycle Bin | {0} {1} dipindahkan ke Keranjang Sampah |
+| {0} {1} moved to the Recycle Bin | {0} {1} dipindahkan ke Keranjang Sampah |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} dipindahkan ke Keranjang Sampah. {2} {3} |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} dipindahkan ke Keranjang Sampah. {2} {3} |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. {2} {3} |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | Pindahkan {0} {1} ({2})? |
 | Files will be moved to {0}. | File akan dipindahkan ke {0}. |
 | Delete {0} {1} ({2})? | Hapus {0} {1} ({2})? |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | File akan dikirim ke Keranjang Sampah. Jika Anda ingin salinan cadangan, gunakan Pindahkan. |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | File akan dipindahkan ke Keranjang Sampah. Jika Anda ingin salinan cadangan, gunakan tombol Pindahkan sebagai gantinya. |
 
 ## Error messages
 
@@ -223,10 +230,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. | Akses ditolak. |
 | The operation failed. Try again or restart Windows. | Operasi gagal. Coba lagi atau mulai ulang Windows. |
 | Unknown error. | Kesalahan tidak diketahui. |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | Tidak bisa mengirim file ini ke Keranjang Sampah (kesalahan {0}). File mungkin terkunci, sedang dipakai, atau diblokir Windows. Pindahkan saja. |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | Windows memblokir akses ke file ini, bahkan dengan hak administrator (kesalahan {0}). Biasanya karena kunci kepemilikan atau izin. Pindahkan saja. |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | File ini sedang terbuka atau terkunci oleh program lain (kesalahan {0}). Tutup program itu, atau apa pun yang sedang memindainya, lalu coba lagi, atau Pindahkan saja. |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | File dihapus permanen karena tidak bisa dikirim ke Keranjang Sampah. |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | Tidak bisa memindahkan file ini ke Keranjang Sampah (kesalahan {0}). File mungkin terkunci, sedang digunakan, atau diblokir Windows. Gunakan tombol Pindahkan sebagai gantinya. |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | Windows memblokir akses ke file ini, bahkan dengan hak administrator (kesalahan {0}). Biasanya ini karena masalah kepemilikan atau izin. Gunakan tombol Pindahkan sebagai gantinya. |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | File ini sedang dibuka atau dikunci oleh program lain (kesalahan {0}). Tutup program itu, atau apa pun yang sedang memindainya, lalu coba lagi, atau gunakan tombol Pindahkan sebagai gantinya. |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | File dihapus permanen karena tidak bisa dipindahkan ke Keranjang Sampah. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Menolak memindahkan file ke dalam folder Windows Installer (tujuan: {0}). |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | Tujuan harus berupa jalur absolut lengkap (jalur relatif diselesaikan terhadap direktori kerja proses saat ini dan tidak aman saat berjalan dengan hak admin): {0} |
 | Destination folder canonical path changed mid-batch: {0} | Jalur kanonis folder tujuan berubah di tengah proses batch: {0} |
@@ -287,7 +294,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | If it helped, buy me a cup of tea. | Kalau membantu, traktir saya secangkir kopi. |
 | It's thirsty work! | Bikin haus, lho! |
-| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa makan beberapa detik saat I/O berat atau panggilan basis data MSI. |
+| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa memakan waktu beberapa detik saat I/O berat atau panggilan basis data MSI. |
 | Close | Tutup |
 | Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Beri bintang di GitHub, laporkan Issue, atau tulis di Discussions. Masukan apa pun diterima. |
 | or report an Issue or post in Discussions. Any feedback welcome. | atau laporkan Issue, atau tulis di Discussions. Masukan apa pun diterima. |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi. |
 | Move the unneeded files to the Move location. | Pindahkan file yang tidak diperlukan ke lokasi pemindahan. |
 | Move the unneeded files to the Move location. Choose one first. | Pindahkan file yang tidak diperlukan ke lokasi pemindahan. Pilih lokasinya dulu. |
-| Send the unneeded files to the Recycle Bin. | Kirim file yang tidak diperlukan ke Keranjang Sampah. |
+| Move the unneeded files to the Recycle Bin. | Pindahkan file yang tidak diperlukan ke Keranjang Sampah. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Nama subjek dari sertifikat Authenticode yang disematkan. Rantai sertifikat tidak diverifikasi. |
 | Change language. The program will restart. | Ganti bahasa. Program akan dimulai ulang. |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | Beri bintang di GitHub (jendela Tentang) |
 | Minimise | Kecilkan |
 | Move all unneeded installer files to the chosen destination folder | Pindahkan semua file penginstal yang tidak diperlukan ke folder tujuan yang dipilih |
-| Send all unneeded installer files to the Recycle Bin | Kirim semua file penginstal yang tidak diperlukan ke Keranjang Sampah |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | Hapus mengirim file yang tidak diperlukan ke Keranjang Sampah. Batal menutup tanpa menghapus. |
+| Move all unneeded installer files to the Recycle Bin | Pindahkan semua file penginstal yang tidak diperlukan ke Keranjang Sampah |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Hapus memindahkan file yang tidak diperlukan ke Keranjang Sampah. Batal menutup tanpa menghapus. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Pindahkan menaruh file yang tidak diperlukan di folder tujuan yang dipilih. Batal membiarkannya di tempatnya. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Pilih cara menangani file yang tidak diperlukan: pindahkan ke tempat aman, hapus permanen, atau batalkan. |
 | Move the unneeded files to a folder you choose | Pindahkan file yang tidak diperlukan ke folder pilihan Anda |
@@ -420,7 +427,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | Kesalahan: operasi file yang diantrekan setelah mulai ulang menyasar cache Installer ({0}). Mulai ulang Windows untuk menyelesaikan operasi itu sebelum membersihkan. |
 | Moving {0} {1} to {2}... | Memindahkan {0} {1} ke {2}... |
 | Moved {0} {1}. | {0} {1} dipindahkan. |
-| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Proses InstallerClean lain memegang kunci instans-tunggal (GUI atau proses CLI lain). Keluar 75 (sementara); aman untuk dicoba lagi nanti. |
+| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Proses InstallerClean lain memegang kunci instans-tunggal (GUI atau proses CLI lain). Kode keluar 75 (sementara); aman untuk dicoba lagi nanti. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Catatan: penulisan ke Log Peristiwa gagal. Periksa izin log Aplikasi atau Kebijakan Grup. |
 | InstallerClean - clean up C:\Windows\Installer | InstallerClean - pembersihan C:\Windows\Installer |
 | Usage: | Penggunaan: |

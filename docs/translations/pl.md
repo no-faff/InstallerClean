@@ -1,6 +1,6 @@
 # InstallerClean in Polski (Polish)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the Polish translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Polish can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.pl.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Polish translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Polish can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.pl.resx`](../../src/InstallerClean.Core/Resources/Strings.pl.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -51,7 +51,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you Move instead of Delete | Ścieżka do folderu, jeśli zamiast usuwać wybierzesz Przenieś |
 | Open _release page | Otwórz stronę _wydania |
 | _Re-scan | _Skanuj ponownie |
-| _Scan again | _Skanuj ponownie |
+| _Scan again | Skanuj _ponownie |
 | Send report | Wyślij raport |
 | _Send | _Wyślij |
 
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Wszystko czyste |
 | Nothing to clean up in C:\Windows\Installer | Nie ma czego czyścić w C:\Windows\Installer |
 | Scanned {0} {1} in {2} | Przeskanowano {0} {1} w {2} |
-| Copy them back if anything stops working | Skopiuj je z powrotem, jeśli coś przestanie działać |
-| Restore them from the Recycle Bin if anything stops working | Przywróć je z Kosza, jeśli coś przestanie działać |
+| Copy them back if anything breaks ([it won't!]) | Skopiuj je z powrotem, jeśli coś się zepsuje ([a nie zepsuje się!]) |
+| Until then, you can restore them if anything breaks ([it won't!]) | Do tego czasu możesz je przywrócić, jeśli coś się zepsuje ([a nie zepsuje się!]) |
+| Empty it to actually reclaim the space. | Opróżnij go, aby naprawdę odzyskać miejsce. |
 | {0} freed | Zwolniono {0} |
+| {0} cleaned up | Wyczyszczono {0} |
 | {0} moved | Przeniesiono {0} |
 | {0} moved, some files could not be processed | Przeniesiono {0}, niektórych plików nie udało się przetworzyć |
 | {0} freed, some files could not be processed | Zwolniono {0}, niektórych plików nie udało się przetworzyć |
+| {0} cleaned up, some files could not be processed | Wyczyszczono {0}, niektórych plików nie udało się przetworzyć |
+| {0} {1} moved to {2} | Przeniesiono {0} {1} do {2} |
 | {0} {1} moved to {2} | Przeniesiono {0} {1} do {2} |
 | {0} {1} moved to {2}. {3} {4} | Przeniesiono {0} {1} do {2}. {3} {4} |
-| {0} {1} sent to the Recycle Bin | Wysłano {0} {1} do Kosza |
-| {0} {1} sent to the Recycle Bin. {2} {3} | Wysłano {0} {1} do Kosza. {2} {3} |
+| {0} {1} moved to {2}. {3} {4} | Przeniesiono {0} {1} do {2}. {3} {4} |
+| {0} {1} moved to the Recycle Bin | Przeniesiono {0} {1} do Kosza |
+| {0} {1} moved to the Recycle Bin | Przeniesiono {0} {1} do Kosza |
+| {0} {1} moved to the Recycle Bin. {2} {3} | Przeniesiono {0} {1} do Kosza. {2} {3} |
+| {0} {1} moved to the Recycle Bin. {2} {3} | Przeniesiono {0} {1} do Kosza. {2} {3} |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | Usunięto trwale {0} {1}. Nie trafił do Kosza. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | Usunięto trwale {0} {1}. Nie trafiło do Kosza. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | Usunięto trwale {0} {1}. Nie trafił do Kosza. {2} {3} |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | Przenieść {0} {1} ({2})? |
 | Files will be moved to {0}. | Pliki zostaną przeniesione do {0}. |
 | Delete {0} {1} ({2})? | Usunąć {0} {1} ({2})? |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | Pliki zostaną wysłane do Kosza. Jeśli chcesz mieć kopie zapasowe, użyj zamiast tego Przenieś. |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Pliki zostaną przeniesione do Kosza. Jeśli chcesz mieć kopie zapasowe, użyj zamiast tego przycisku Przenieś. |
 
 ## Error messages
 
@@ -211,7 +218,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Folder docelowy {0} prowadzi do folderu systemowego Windows. Wybierz ścieżkę poza %SystemRoot%, %ProgramFiles% i %ProgramData%. |
 | Not enough space | Za mało miejsca |
 | Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | Za mało miejsca w {0}<br><br>Wymagane: {1}<br>Dostępne: {2} |
-| You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | Nie masz uprawnień do zapisu w {0}.<br>Wypróbuj folder w swoim profilu użytkownika lub na dysku, którego jesteś właścicielem. |
+| You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | Nie masz uprawnień do zapisu w {0}.<br>Wypróbuj folder w swoim profilu użytkownika lub na własnym dysku. |
 | The path {0} is too long for Windows. Pick a shorter path. | Ścieżka {0} jest za długa dla Windows. Wybierz krótszą ścieżkę. |
 | The folder {0} does not exist and could not be created. Check the drive letter or network path. | Folder {0} nie istnieje i nie udało się go utworzyć. Sprawdź literę dysku lub ścieżkę sieciową. |
 | Windows cannot write to {0}.<br>Details in {1}. | Windows nie może zapisać w {0}.<br>Szczegóły w {1}. |
@@ -223,10 +230,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. | Odmowa dostępu. |
 | The operation failed. Try again or restart Windows. | Operacja nie powiodła się. Spróbuj ponownie lub uruchom ponownie Windows. |
 | Unknown error. | Nieznany błąd. |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | Nie udało się wysłać tego pliku do Kosza (błąd {0}). Może być zablokowany, używany lub blokowany przez Windows. Zamiast tego przenieś go. |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | Windows zablokował dostęp do tego pliku, nawet z uprawnieniami administratora (błąd {0}). Zwykle to blokada wynikająca z własności lub uprawnień. Zamiast tego przenieś go. |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | Ten plik jest otwarty lub zablokowany przez inny program (błąd {0}). Zamknij ten program albo cokolwiek go skanuje, a następnie spróbuj ponownie lub przenieś go. |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | Plik został usunięty trwale, ponieważ nie udało się wysłać go do Kosza. |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | Nie udało się przenieść tego pliku do Kosza (błąd {0}). Może być zablokowany, używany lub blokowany przez Windows. Użyj zamiast tego przycisku Przenieś. |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | Windows zablokował dostęp do tego pliku, nawet z uprawnieniami administratora (błąd {0}). Zwykle to blokada wynikająca z własności lub uprawnień. Użyj zamiast tego przycisku Przenieś. |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Ten plik jest otwarty lub zablokowany przez inny program (błąd {0}). Zamknij ten program albo cokolwiek go skanuje, a następnie spróbuj ponownie lub użyj zamiast tego przycisku Przenieś. |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | Plik został usunięty trwale, ponieważ nie udało się przenieść go do Kosza. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Odmowa przeniesienia plików do folderu Windows Installer (cel: {0}). |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | Folder docelowy musi być pełną ścieżką (ścieżki względne są rozwiązywane względem bieżącego katalogu procesu i są niebezpieczne przy podwyższonych uprawnieniach): {0} |
 | Destination folder canonical path changed mid-batch: {0} | Kanoniczna ścieżka folderu docelowego zmieniła się w trakcie operacji: {0} |
@@ -253,7 +260,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Polski |
 | --- | --- |
 | Couldn't open your browser | Nie udało się otworzyć przeglądarki |
-| The link couldn't be opened in your normal-user browser. The URL has been copied to your clipboard so you can open it manually:<br><br>{0} | Nie udało się otworzyć linku w przeglądarce zwykłego użytkownika. Adres URL został skopiowany do schowka, abyś mógł otworzyć go ręcznie:<br><br>{0} |
+| The link couldn't be opened in your normal-user browser. The URL has been copied to your clipboard so you can open it manually:<br><br>{0} | Nie udało się otworzyć linku w przeglądarce zwykłego użytkownika. Adres URL został skopiowany do schowka, więc możesz otworzyć go ręcznie:<br><br>{0} |
 | The link couldn't be opened in your normal-user browser, and copying it to the clipboard also failed. The URL is:<br><br>{0} | Nie udało się otworzyć linku w przeglądarce zwykłego użytkownika, a skopiowanie go do schowka również się nie powiodło. Adres URL to:<br><br>{0} |
 
 ## Sending the summary
@@ -287,7 +294,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | If it helped, buy me a cup of tea. | Jeśli się przydało, postaw mi kawę. |
 | It's thirsty work! | Aż zaschło w gardle! |
-| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Zażądano anulowania. InstallerClean czeka, aż bieżący krok dojdzie do punktu, w którym może się zatrzymać. Przy intensywnym wejściu/wyjściu lub zapytaniu do bazy danych MSI może to potrwać kilka sekund. |
+| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Zażądano anulowania. InstallerClean czeka, aż bieżący krok dojdzie do punktu, w którym może się zatrzymać. Przy intensywnych operacjach wejścia/wyjścia lub zapytaniu do bazy danych MSI może to potrwać kilka sekund. |
 | Close | Zamknij |
 | Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Zostaw gwiazdkę na GitHubie, zgłoś problem (Issue) lub napisz w Dyskusjach (Discussions). Każda opinia mile widziana. |
 | or report an Issue or post in Discussions. Any feedback welcome. | lub zgłoś problem (Issue), albo napisz w Dyskusjach (Discussions). Każda opinia mile widziana. |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Twoja decyzja, ale będzie miło. Wysyła anonimowe podsumowanie, które po prostu daje mi znać, czy działa. Na następnym ekranie zobaczysz, co zostanie wysłane, zanim potwierdzisz. |
 | Move the unneeded files to the Move location. | Przenieś niepotrzebne pliki do lokalizacji przenoszenia. |
 | Move the unneeded files to the Move location. Choose one first. | Przenieś niepotrzebne pliki do lokalizacji przenoszenia. Najpierw ją wybierz. |
-| Send the unneeded files to the Recycle Bin. | Wyślij niepotrzebne pliki do Kosza. |
+| Move the unneeded files to the Recycle Bin. | Przenieś niepotrzebne pliki do Kosza. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Nazwa podmiotu z osadzonego certyfikatu Authenticode. Łańcuch nie został zweryfikowany. |
 | Change language. The program will restart. | Zmień język. Program zostanie ponownie uruchomiony. |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | Zostaw gwiazdkę na GitHubie (okno O programie) |
 | Minimise | Minimalizuj |
 | Move all unneeded installer files to the chosen destination folder | Przenieś wszystkie niepotrzebne pliki instalatora do wybranego folderu docelowego |
-| Send all unneeded installer files to the Recycle Bin | Wyślij wszystkie niepotrzebne pliki instalatora do Kosza |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | Usuń wysyła niepotrzebne pliki do Kosza. Anuluj zamyka okno bez usuwania. |
+| Move all unneeded installer files to the Recycle Bin | Przenieś wszystkie niepotrzebne pliki instalatora do Kosza |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Usuń przenosi niepotrzebne pliki do Kosza. Anuluj zamyka okno bez usuwania. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Przenieś umieszcza niepotrzebne pliki w wybranym folderze docelowym. Anuluj zostawia je na miejscu. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Wybierz, co zrobić z niepotrzebnymi plikami: przenieść je w bezpieczne miejsce, usunąć trwale lub anulować. |
 | Move the unneeded files to a folder you choose | Przenieś niepotrzebne pliki do wybranego folderu |

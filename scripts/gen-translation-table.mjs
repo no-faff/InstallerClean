@@ -1,36 +1,38 @@
 #!/usr/bin/env node
-// Generate the readable English-beside-translation review table for one language's
+// Generate the readable English-beside-translation table for one language's
 // satellite resx, written to docs/translations/<code>.md. That table is the friendly
-// surface a native-speaker reviewer reads: the invitation in each translated README
-// links to it, so a helper sees the English UI string beside its translation, grouped
-// by where each line shows up in the app, and never has to read raw resx XML or the
-// internal key-names. It is generated, never hand-edited, so it cannot drift from the
+// surface for anyone suggesting improvements to a shipped translation: the
+// translation-feedback issue template and CONTRIBUTING.md point here, so a helper
+// sees the English UI string beside its translation, grouped by where each line
+// shows up in the app, and never has to read raw resx XML or the internal
+// key-names. It is generated, never hand-edited, so it cannot drift from the
 // resx; re-run it whenever a satellite changes.
 //
 // USAGE  node scripts/gen-translation-table.mjs <code>
-//   <code> is a satellite code: zh-Hans, de, ko, es, ja, pt-BR, ru, fr, pl, tr,
-//   id, vi, uk (the draft-only ones are run once their Strings.<code>.resx exists).
+//   <code> is a satellite code: zh-Hans, de, ko, es, it, ja, pt-BR, ru, fr, pl,
+//   tr, id, vi, uk.
 // It reads the English neutral Strings.resx and Strings.<code>.resx, pairs them by
 // key, and writes docs/translations/<code>.md (LF). The 39 human-facing Cli.* keys
-// are now translated and shown in their own group; the 21 machine-contract
+// are translated and shown in their own group; the 21 machine-contract
 // Cli.EventLog* keys (bar Cli.EventLogUnavailable) stay English by contract, so they
-// are skipped here exactly as the satellite omits them.
+// are skipped here whether or not the satellite carries them (ja does).
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
 const LANGS = {
-  'zh-Hans': { en: 'Simplified Chinese',    endo: '简体中文',          readme: 'README.zh-CN.md' },
-  'de':      { en: 'German',                endo: 'Deutsch',           readme: 'README.de.md' },
-  'ko':      { en: 'Korean',                endo: '한국어',             readme: 'README.ko.md' },
-  'es':      { en: 'Spanish',               endo: 'Español',           readme: 'README.es.md' },
-  'ja':      { en: 'Japanese',              endo: '日本語',             readme: 'README.ja.md' },
-  'pt-BR':   { en: 'Brazilian Portuguese',  endo: 'Português (Brasil)', readme: 'README.pt-BR.md' },
-  'ru':      { en: 'Russian',               endo: 'Русский',           readme: 'README.ru.md' },
-  'fr':      { en: 'French',                endo: 'Français',          readme: 'README.fr.md' },
-  'pl':      { en: 'Polish',                endo: 'Polski',            readme: 'README.pl.md' },
-  'tr':      { en: 'Turkish',               endo: 'Türkçe',            readme: 'README.tr.md' },
-  'id':      { en: 'Indonesian',            endo: 'Bahasa Indonesia',  readme: 'README.id.md' },
-  'vi':      { en: 'Vietnamese',            endo: 'Tiếng Việt',        readme: 'README.vi.md' },
-  'uk':      { en: 'Ukrainian',             endo: 'Українська',        readme: 'README.uk.md' },
+  'zh-Hans': { en: 'Simplified Chinese',    endo: '简体中文' },
+  'de':      { en: 'German',                endo: 'Deutsch' },
+  'ko':      { en: 'Korean',                endo: '한국어' },
+  'es':      { en: 'Spanish',               endo: 'Español' },
+  'it':      { en: 'Italian',               endo: 'Italiano' },
+  'ja':      { en: 'Japanese',              endo: '日本語' },
+  'pt-BR':   { en: 'Brazilian Portuguese',  endo: 'Português (Brasil)' },
+  'ru':      { en: 'Russian',               endo: 'Русский' },
+  'fr':      { en: 'French',                endo: 'Français' },
+  'pl':      { en: 'Polish',                endo: 'Polski' },
+  'tr':      { en: 'Turkish',               endo: 'Türkçe' },
+  'id':      { en: 'Indonesian',            endo: 'Bahasa Indonesia' },
+  'vi':      { en: 'Vietnamese',            endo: 'Tiếng Việt' },
+  'uk':      { en: 'Ukrainian',             endo: 'Українська' },
 };
 
 const code = process.argv[2];
@@ -112,7 +114,7 @@ for (const k of keys) buckets[groupOf(k)].push(k);
 
 let missing = 0;
 let md = `# InstallerClean in ${lang.endo} (${lang.en})\n\n`;
-md += `The text of InstallerClean's interface and command-line tool in English on the left, with the ${lang.en} translation beside it, grouped by where each line appears in the app. It is here so someone who really knows ${lang.en} can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../${lang.readme}#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.\n\n`;
+md += `The text of InstallerClean's interface and command-line tool in English on the left, with the ${lang.en} translation beside it, grouped by where each line appears in the app. It is here so someone who really knows ${lang.en} can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.\n\n`;
 md += `A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [\`Strings.${code}.resx\`](../../${dir}/Strings.${code}.resx). This page is generated from it by \`scripts/gen-translation-table.mjs\`, so do not edit it by hand.\n`;
 
 for (let i = 0; i < GROUPS.length; i++) {

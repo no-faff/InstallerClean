@@ -1,6 +1,6 @@
 # InstallerClean in Українська (Ukrainian)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the Ukrainian translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Ukrainian can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.uk.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Ukrainian translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Ukrainian can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.uk.resx`](../../src/InstallerClean.Core/Resources/Strings.uk.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -50,7 +50,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Move instead | _Перемістити натомість |
 | Path to folder if you Move instead of Delete | Шлях до папки, якщо ви переміщуєте замість видалення |
 | Open _release page | _Відкрити сторінку випуску |
-| _Re-scan | _Повторити сканування |
+| _Re-scan | Пов_торити сканування |
 | _Scan again | _Сканувати знову |
 | Send report | Надіслати звіт |
 | _Send | _Надіслати |
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Усе чисто |
 | Nothing to clean up in C:\Windows\Installer | У C:\Windows\Installer немає чого прибирати |
 | Scanned {0} {1} in {2} | Проскановано {0} {1} за {2} |
-| Copy them back if anything stops working | Скопіюйте їх назад, якщо щось перестане працювати |
-| Restore them from the Recycle Bin if anything stops working | Відновіть їх із Кошика, якщо щось перестане працювати |
+| Copy them back if anything breaks ([it won't!]) | Скопіюйте їх назад, якщо щось зламається ([а воно не зламається!]) |
+| Until then, you can restore them if anything breaks ([it won't!]) | А поки що ви можете відновити їх, якщо щось зламається ([а воно не зламається!]) |
+| Empty it to actually reclaim the space. | Очистіть Кошик, щоб справді звільнити місце. |
 | {0} freed | Звільнено {0} |
+| {0} cleaned up | Очищено {0} |
 | {0} moved | Переміщено {0} |
 | {0} moved, some files could not be processed | Переміщено {0}, деякі файли не вдалося обробити |
 | {0} freed, some files could not be processed | Звільнено {0}, деякі файли не вдалося обробити |
+| {0} cleaned up, some files could not be processed | Очищено {0}, деякі файли не вдалося обробити |
+| {0} {1} moved to {2} | {0} {1} переміщено до {2} |
 | {0} {1} moved to {2} | {0} {1} переміщено до {2} |
 | {0} {1} moved to {2}. {3} {4} | {0} {1} переміщено до {2}. {3} {4} |
-| {0} {1} sent to the Recycle Bin | {0} {1} надіслано до Кошика |
-| {0} {1} sent to the Recycle Bin. {2} {3} | {0} {1} надіслано до Кошика. {2} {3} |
+| {0} {1} moved to {2}. {3} {4} | {0} {1} переміщено до {2}. {3} {4} |
+| {0} {1} moved to the Recycle Bin | {0} {1} переміщено до Кошика |
+| {0} {1} moved to the Recycle Bin | {0} {1} переміщено до Кошика |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} переміщено до Кошика. {2} {3} |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} переміщено до Кошика. {2} {3} |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} безповоротно видалено. Він не потрапив до Кошика. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} безповоротно видалено. Вони не потрапили до Кошика. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} безповоротно видалено. Він не потрапив до Кошика. {2} {3} |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | Перемістити {0} {1} ({2})? |
 | Files will be moved to {0}. | Файли буде переміщено до {0}. |
 | Delete {0} {1} ({2})? | Видалити {0} {1} ({2})? |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | Файли буде надіслано до Кошика. Якщо хочете мати резервні копії, скористайтеся переміщенням. |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Файли буде переміщено до Кошика. Якщо ви хочете зберегти резервні копії, скористайтеся кнопкою «Перемістити». |
 
 ## Error messages
 
@@ -219,14 +226,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}.<br>Details in {1}. | Не вдається записати в {0}.<br>Деталі у {1}. |
 | Cannot write to {0}. The crash log could not be written. | Не вдається записати в {0}. Не вдалося записати журнал збоїв. |
 | File no longer exists. | Файл більше не існує. |
-| Source file is a symlink or junction; refused for safety. | Вихідний файл, це символьне посилання чи junction; відмовлено з міркувань безпеки. |
+| Source file is a symlink or junction; refused for safety. | Вихідний файл є символьним посиланням або junction; відмовлено з міркувань безпеки. |
 | Access denied. | Відмовлено в доступі. |
 | The operation failed. Try again or restart Windows. | Операція не вдалася. Спробуйте ще раз або перезавантажте Windows. |
 | Unknown error. | Невідома помилка. |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | Не вдалося надіслати цей файл до Кошика (помилка {0}). Можливо, він заблокований, використовується чи заблокований Windows. Перемістіть його натомість. |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | Windows заблокувала доступ до цього файлу навіть із правами адміністратора (помилка {0}). Зазвичай це блокування через власника чи дозволи. Перемістіть його натомість. |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | Цей файл відкрито чи заблоковано іншою програмою (помилка {0}). Закрийте ту програму або те, що його сканує, а потім спробуйте ще раз, або перемістіть його натомість. |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | Файл видалено назавжди, бо його не вдалося надіслати до Кошика. |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | Не вдалося перемістити цей файл до Кошика (помилка {0}). Можливо, він заблокований, використовується або його блокує Windows. Скористайтеся кнопкою «Перемістити». |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | Windows блокує доступ до цього файлу навіть із правами адміністратора (помилка {0}). Зазвичай це блокування через власника або дозволи. Скористайтеся кнопкою «Перемістити». |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Цей файл відкритий або заблокований іншою програмою (помилка {0}). Закрийте цю програму чи те, що його сканує, а потім спробуйте ще раз або скористайтеся кнопкою «Перемістити». |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | Файл видалено безповоротно, бо його не вдалося перемістити до Кошика. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Відмова перемістити файли до папки Windows Installer (призначення: {0}). |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | Призначення має бути повним шляхом (відносні шляхи розв'язуються відносно поточного каталогу процесу і небезпечні під час підвищення прав): {0} |
 | Destination folder canonical path changed mid-batch: {0} | Канонічний шлях папки призначення змінився посеред пакета: {0} |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити. |
 | Move the unneeded files to the Move location. | Перемістити непотрібні файли до вказаного розташування. |
 | Move the unneeded files to the Move location. Choose one first. | Перемістити непотрібні файли до вказаного розташування. Спершу виберіть його. |
-| Send the unneeded files to the Recycle Bin. | Надіслати непотрібні файли до Кошика. |
+| Move the unneeded files to the Recycle Bin. | Перемістити непотрібні файли до Кошика. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Назва суб'єкта з вбудованого сертифіката Authenticode. Ланцюжок не перевірено. |
 | Change language. The program will restart. | Змінити мову. Програму буде перезапущено. |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | Лишити зірку на GitHub (вікно «Про програму») |
 | Minimise | Згорнути |
 | Move all unneeded installer files to the chosen destination folder | Перемістити всі непотрібні файли інсталятора до обраної папки призначення |
-| Send all unneeded installer files to the Recycle Bin | Надіслати всі непотрібні файли інсталятора до Кошика |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | «Видалити» надсилає непотрібні файли до Кошика. «Скасувати» закриває вікно, нічого не видаляючи. |
+| Move all unneeded installer files to the Recycle Bin | Перемістити всі непотрібні файли інсталятора до Кошика |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | «Видалити» переміщує непотрібні файли до Кошика. «Скасувати» закриває вікно без видалення. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | «Перемістити» кладе непотрібні файли до обраної папки призначення. «Скасувати» лишає їх там, де вони є. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Виберіть, що робити з непотрібними файлами: перемістити їх у безпечне місце, видалити назавжди або скасувати. |
 | Move the unneeded files to a folder you choose | Перемістити непотрібні файли до обраної вами папки |
@@ -426,7 +433,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Використання: |
 |   installerclean-cli --help   Show this help (also accepts /?, -h) |   installerclean-cli --help   Показати цю довідку (також приймає /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Вивести версію (також приймає -v) |
-|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s       Лише сканування, перелік непотрібних файлів |
+|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s       Лише сканувати, перелічити непотрібні файли |
 |   installerclean-cli /d       Delete removable files (Recycle Bin) |   installerclean-cli /d       Видалити непотрібні файли (Кошик) |
 |   installerclean-cli /m       Move to saved default location |   installerclean-cli /m       Перемістити в збережене типове розташування |
 |   installerclean-cli /m PATH  Move to specified path |   installerclean-cli /m ШЛЯХ  Перемістити за вказаним шляхом |

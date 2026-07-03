@@ -41,6 +41,15 @@ If you find a bug or have a feature idea, open an issue. Please include:
 - What actually happened
 - Your Windows version and .NET version (`dotnet --version`)
 
+## Translations
+
+InstallerClean ships in 15 languages: the app, the installer, the command-line
+tool and the README. The string tables in
+[`docs/translations/`](docs/translations/) show every line in English beside
+each language. If something reads wrong in your language, open a
+[translation-feedback issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md)
+or a pull request, with as few or as many changes as you like.
+
 ## Pull requests
 
 - Keep PRs focused on a single change

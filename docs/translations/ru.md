@@ -1,6 +1,6 @@
 # InstallerClean in Русский (Russian)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the Russian translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Russian can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.ru.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Russian translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Russian can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.ru.resx`](../../src/InstallerClean.Core/Resources/Strings.ru.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -30,7 +30,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Русский |
 | --- | --- |
-| _About | _О программе |
+| _About | О п_рограмме |
 | Copy | Копировать |
 | Cut | Вырезать |
 | Paste | Вставить |
@@ -50,7 +50,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Move instead | _Переместить |
 | Path to folder if you Move instead of Delete | Путь к папке, если вы выберете «Переместить» вместо «Удалить» |
 | Open _release page | Открыть страницу _выпуска |
-| _Re-scan | _Повторить сканирование |
+| _Re-scan | По_вторить сканирование |
 | _Scan again | _Сканировать снова |
 | Send report | Отправить отчёт |
 | _Send | От_править |
@@ -90,7 +90,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Found {0} registered {1}. | Найдено зарегистрированных {1}: {0}. |
 | Scan complete ({0}) | Сканирование завершено ({0}) |
 | Scanning local packages... | Сканирование локальных пакетов... |
-| Found {0} {1} you can safely delete. | Найдено {0} {1} для очистки. |
+| Found {0} {1} you can safely delete. | Найдено {0} {1} для безопасного удаления. |
 | Preparing destination folder... | Подготовка папки назначения... |
 | Moving {0} {1}... | Перемещение: {0} {1}... |
 | Deleting {0} {1}... | Удаление: {0} {1}... |
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Всё чисто |
 | Nothing to clean up in C:\Windows\Installer | В C:\Windows\Installer нечего очищать |
 | Scanned {0} {1} in {2} | Просканировано {0} {1} за {2} |
-| Copy them back if anything stops working | Скопируйте их обратно, если что-то перестанет работать |
-| Restore them from the Recycle Bin if anything stops working | Восстановите их из Корзины, если что-то перестанет работать |
+| Copy them back if anything breaks ([it won't!]) | Скопируйте их обратно, если что-то сломается ([а оно не сломается!]) |
+| Until then, you can restore them if anything breaks ([it won't!]) | А пока их можно восстановить, если что-то сломается ([а оно не сломается!]) |
+| Empty it to actually reclaim the space. | Очистите Корзину, чтобы действительно освободить место. |
 | {0} freed | Освобождено {0} |
+| {0} cleaned up | Очищено {0} |
 | {0} moved | Перемещено {0} |
 | {0} moved, some files could not be processed | Перемещено {0}, некоторые файлы не удалось обработать |
 | {0} freed, some files could not be processed | Освобождено {0}, некоторые файлы не удалось обработать |
+| {0} cleaned up, some files could not be processed | Очищено {0}, некоторые файлы не удалось обработать |
+| {0} {1} moved to {2} | Перемещено {0} {1} в {2} |
 | {0} {1} moved to {2} | Перемещено {0} {1} в {2} |
 | {0} {1} moved to {2}. {3} {4} | Перемещено {0} {1} в {2}. {3} {4} |
-| {0} {1} sent to the Recycle Bin | Отправлено {0} {1} в Корзину |
-| {0} {1} sent to the Recycle Bin. {2} {3} | Отправлено {0} {1} в Корзину. {2} {3} |
+| {0} {1} moved to {2}. {3} {4} | Перемещено {0} {1} в {2}. {3} {4} |
+| {0} {1} moved to the Recycle Bin | Перемещено {0} {1} в Корзину |
+| {0} {1} moved to the Recycle Bin | Перемещено {0} {1} в Корзину |
+| {0} {1} moved to the Recycle Bin. {2} {3} | Перемещено {0} {1} в Корзину. {2} {3} |
+| {0} {1} moved to the Recycle Bin. {2} {3} | Перемещено {0} {1} в Корзину. {2} {3} |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} удалён безвозвратно. Он не попал в Корзину. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} удалено безвозвратно. Они не попали в Корзину. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} удалён безвозвратно. Он не попал в Корзину. {2} {3} |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | Переместить {0} {1} ({2})? |
 | Files will be moved to {0}. | Файлы будут перемещены в {0}. |
 | Delete {0} {1} ({2})? | Удалить {0} {1} ({2})? |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | Файлы будут отправлены в Корзину. Если хотите сделать резервные копии, воспользуйтесь «Переместить». |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Файлы будут перемещены в Корзину. Если хотите сделать резервные копии, воспользуйтесь кнопкой «Переместить». |
 
 ## Error messages
 
@@ -223,10 +230,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. | Доступ запрещён. |
 | The operation failed. Try again or restart Windows. | Операция не выполнена. Повторите попытку или перезагрузите Windows. |
 | Unknown error. | Неизвестная ошибка. |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | Не удалось отправить этот файл в Корзину (ошибка {0}). Возможно, он заблокирован, используется или его блокирует Windows. Воспользуйтесь «Переместить». |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | Windows заблокировал доступ к этому файлу даже с правами администратора (ошибка {0}). Обычно это блокировка из-за владельца или разрешений. Воспользуйтесь «Переместить». |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | Этот файл открыт или заблокирован другой программой (ошибка {0}). Закройте ту программу или то, что его сканирует, затем повторите попытку либо воспользуйтесь «Переместить». |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | Файл был удалён безвозвратно, потому что его не удалось отправить в Корзину. |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | Не удалось переместить этот файл в Корзину (ошибка {0}). Возможно, он заблокирован, используется или его блокирует Windows. Воспользуйтесь кнопкой «Переместить». |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | Windows заблокировал доступ к этому файлу даже с правами администратора (ошибка {0}). Обычно это блокировка из-за владельца или разрешений. Воспользуйтесь кнопкой «Переместить». |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Этот файл открыт или заблокирован другой программой (ошибка {0}). Закройте ту программу или то, что его сканирует, затем повторите попытку либо воспользуйтесь кнопкой «Переместить». |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | Файл был удалён безвозвратно, потому что его не удалось переместить в Корзину. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Перемещение файлов в папку Windows Installer отклонено (назначение: {0}). |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | Папка назначения должна быть полным путём (относительные пути разрешаются относительно текущего каталога процесса и небезопасны при работе с повышенными правами): {0} |
 | Destination folder canonical path changed mid-batch: {0} | Канонический путь папки назначения изменился во время операции: {0} |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
 | Move the unneeded files to the Move location. | Переместить ненужные файлы в папку для перемещения. |
 | Move the unneeded files to the Move location. Choose one first. | Переместить ненужные файлы в папку для перемещения. Сначала выберите её. |
-| Send the unneeded files to the Recycle Bin. | Отправить ненужные файлы в Корзину. |
+| Move the unneeded files to the Recycle Bin. | Переместить ненужные файлы в Корзину. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Имя субъекта из встроенного сертификата Authenticode. Цепочка не проверялась. |
 | Change language. The program will restart. | Изменить язык. Программа перезапустится. |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | Поставить звезду на GitHub (окно «О программе») |
 | Minimise | Свернуть |
 | Move all unneeded installer files to the chosen destination folder | Переместить все ненужные файлы установщика в выбранную папку назначения |
-| Send all unneeded installer files to the Recycle Bin | Отправить все ненужные файлы установщика в Корзину |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | «Удалить» отправляет ненужные файлы в Корзину. «Отмена» закрывает окно без удаления. |
+| Move all unneeded installer files to the Recycle Bin | Переместить все ненужные файлы установщика в Корзину |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | «Удалить» перемещает ненужные файлы в Корзину. «Отмена» закрывает окно без удаления. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | «Переместить» помещает ненужные файлы в выбранную папку назначения. «Отмена» оставляет их на месте. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Выберите, что сделать с ненужными файлами: переместить в надёжное место, удалить безвозвратно или отменить. |
 | Move the unneeded files to a folder you choose | Переместить ненужные файлы в выбранную вами папку |
