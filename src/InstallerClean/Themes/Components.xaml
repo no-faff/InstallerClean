@@ -478,6 +478,13 @@
         <Setter Property="FontSize" Value="{DynamicResource Type.Caption}"/>
         <Setter Property="IsTabStop" Value="True"/>
         <Setter Property="Focusable" Value="True"/>
+        <!-- Left-align the header content so each heading sits above its
+             left-aligned column text. GridViewColumnHeader's metadata defaults
+             HorizontalContentAlignment to Center, which reads as a heading
+             floating off-centre from the values under it. The numeric columns
+             opt into NumericColumnHeader below to sit over their right-aligned
+             figures instead. -->
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="GridViewColumnHeader">
@@ -500,6 +507,17 @@
                 <Setter Property="Focusable" Value="False"/>
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <!-- Header style for the detail-window numeric columns (Size, Patches),
+         whose cells right-align their figures. Right-aligning the header sits
+         the heading directly over the digits rather than to their left. Based
+         on the header style above so the focus, keyboard-sort and
+         sort-indicator behaviour carry over unchanged; only the content
+         alignment differs. -->
+    <Style x:Key="NumericColumnHeader" TargetType="GridViewColumnHeader"
+           BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
+        <Setter Property="HorizontalContentAlignment" Value="Right"/>
     </Style>
 
     <!-- Body scroll regions. A bare ScrollViewer is focusable and a tab

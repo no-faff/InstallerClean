@@ -43,6 +43,8 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The Ukrainian texts now write their "X — це Y" constructions with the dash Ukrainian orthography requires, in the app strings and the README.
 - Every satellite translation is now guarded on every push: the resx parity check (key presence, stray keys and placeholder arity) runs in CI, and the compiled-resource parity tests cover all fourteen satellites rather than only Italian and Japanese. CI also smoke-publishes the command-line tool in the self-contained single-file shape that actually ships.
 - Code comments that still described the command-line tool as pinned to English were brought in line with the CLI localisation.
+- The two file-details windows now left-align their column headers, so each heading sits above the values in its column instead of centred over them; the numeric size and patch columns right-align their headers to sit over the figures. The keyboard column-sort and its sort-arrow indicator are unchanged.
+- The orphaned-files details window is a little wider (its right-hand metadata panel gains the extra width while the file list keeps its size), so a long value such as a signing certificate has more room to wrap cleanly where a language's field labels run long and leave the value column cramped. Every value field in both details windows now wraps a long value rather than clipping it, closing a gap on the reason and file-size fields.
 
 ## [1.9.2] - 2026-06-21
 
