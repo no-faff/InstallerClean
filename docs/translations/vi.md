@@ -1,6 +1,6 @@
 # InstallerClean in Tiếng Việt (Vietnamese)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the Vietnamese translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Vietnamese can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.vi.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Vietnamese translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Vietnamese can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.vi.resx`](../../src/InstallerClean.Core/Resources/Strings.vi.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -51,7 +51,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you Move instead of Delete | Đường dẫn thư mục nếu bạn Chuyển thay vì Xóa |
 | Open _release page | _Mở trang phát hành |
 | _Re-scan | _Quét lại |
-| _Scan again | _Quét lại |
+| _Scan again | Quét _lại |
 | Send report | Gửi báo cáo |
 | _Send | _Gửi |
 
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Đã sạch |
 | Nothing to clean up in C:\Windows\Installer | Không còn gì để dọn trong C:\Windows\Installer |
 | Scanned {0} {1} in {2} | Đã quét {0} {1} trong {2} |
-| Copy them back if anything stops working | Chép chúng trở lại nếu có gì ngừng hoạt động |
-| Restore them from the Recycle Bin if anything stops working | Khôi phục chúng từ Thùng rác nếu có gì ngừng hoạt động |
+| Copy them back if anything breaks ([it won't!]) | Sao chép chúng trở lại nếu có gì trục trặc ([sẽ không đâu!]) |
+| Until then, you can restore them if anything breaks ([it won't!]) | Cho đến lúc đó, bạn có thể khôi phục chúng nếu có gì trục trặc ([sẽ không đâu!]) |
+| Empty it to actually reclaim the space. | Dọn sạch Thùng rác để thực sự lấy lại dung lượng. |
 | {0} freed | Đã giải phóng {0} |
+| {0} cleaned up | Đã dọn {0} |
 | {0} moved | Đã chuyển {0} |
 | {0} moved, some files could not be processed | Đã chuyển {0}, một số tệp không thể xử lý |
 | {0} freed, some files could not be processed | Đã giải phóng {0}, một số tệp không thể xử lý |
+| {0} cleaned up, some files could not be processed | Đã dọn {0}, một số tệp không thể xử lý |
+| {0} {1} moved to {2} | Đã chuyển {0} {1} tới {2} |
 | {0} {1} moved to {2} | Đã chuyển {0} {1} tới {2} |
 | {0} {1} moved to {2}. {3} {4} | Đã chuyển {0} {1} tới {2}. {3} {4} |
-| {0} {1} sent to the Recycle Bin | Đã gửi {0} {1} vào Thùng rác |
-| {0} {1} sent to the Recycle Bin. {2} {3} | Đã gửi {0} {1} vào Thùng rác. {2} {3} |
+| {0} {1} moved to {2}. {3} {4} | Đã chuyển {0} {1} tới {2}. {3} {4} |
+| {0} {1} moved to the Recycle Bin | Đã di chuyển {0} {1} vào Thùng rác |
+| {0} {1} moved to the Recycle Bin | Đã di chuyển {0} {1} vào Thùng rác |
+| {0} {1} moved to the Recycle Bin. {2} {3} | Đã di chuyển {0} {1} vào Thùng rác. {2} {3} |
+| {0} {1} moved to the Recycle Bin. {2} {3} | Đã di chuyển {0} {1} vào Thùng rác. {2} {3} |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác. {2} {3} |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | Chuyển {0} {1} ({2})? |
 | Files will be moved to {0}. | Các tệp sẽ được chuyển tới {0}. |
 | Delete {0} {1} ({2})? | Xóa {0} {1} ({2})? |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | Các tệp sẽ được gửi vào Thùng rác. Nếu bạn muốn có bản sao lưu, hãy dùng Chuyển thay vào đó. |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Các tệp sẽ được di chuyển vào Thùng rác. Nếu bạn muốn có bản sao lưu, hãy dùng nút Chuyển thay vào đó. |
 
 ## Error messages
 
@@ -223,10 +230,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. | Truy cập bị từ chối. |
 | The operation failed. Try again or restart Windows. | Thao tác thất bại. Hãy thử lại hoặc khởi động lại Windows. |
 | Unknown error. | Lỗi không xác định. |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | Không thể gửi tệp này vào Thùng rác (lỗi {0}). Nó có thể đang bị khóa, đang được dùng hoặc bị Windows chặn. Hãy Chuyển nó thay vào đó. |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | Windows đã chặn truy cập tệp này, ngay cả với quyền quản trị viên (lỗi {0}). Đây thường là khóa quyền sở hữu hoặc quyền truy cập. Hãy Chuyển nó thay vào đó. |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | Tệp này đang được mở hoặc bị khóa bởi một chương trình khác (lỗi {0}). Hãy đóng chương trình đó, hoặc thứ gì đang quét nó, rồi thử lại, hoặc Chuyển nó thay vào đó. |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | Tệp đã bị xóa vĩnh viễn vì không thể gửi vào Thùng rác. |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | Không thể di chuyển tệp này vào Thùng rác (lỗi {0}). Nó có thể đang bị khóa, đang được dùng hoặc bị Windows chặn. Hãy dùng nút Chuyển thay vào đó. |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | Windows đã chặn truy cập tệp này, ngay cả với quyền quản trị viên (lỗi {0}). Đây thường là khóa quyền sở hữu hoặc quyền truy cập. Hãy dùng nút Chuyển thay vào đó. |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Tệp này đang được mở hoặc bị khóa bởi một chương trình khác (lỗi {0}). Hãy đóng chương trình đó, hoặc thứ gì đang quét nó, rồi thử lại, hoặc dùng nút Chuyển thay vào đó. |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | Tệp đã bị xóa vĩnh viễn vì không thể di chuyển vào Thùng rác. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Từ chối chuyển tệp vào thư mục Windows Installer (đích: {0}). |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | Đích phải là một đường dẫn đầy đủ (đường dẫn tương đối được phân giải theo thư mục hiện tại của tiến trình và không an toàn khi chạy nâng quyền): {0} |
 | Destination folder canonical path changed mid-batch: {0} | Đường dẫn chuẩn của thư mục đích đã thay đổi giữa chừng: {0} |
@@ -286,7 +293,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Tiếng Việt |
 | --- | --- |
 | If it helped, buy me a cup of tea. | Nếu thấy hữu ích, hãy mời tôi một ly cà phê. |
-| It's thirsty work! | Việc này khát nước lắm! |
+| It's thirsty work! | Làm việc này khát nước lắm! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Đã yêu cầu hủy. InstallerClean đang chờ bước hiện tại tới điểm dừng. Việc này có thể mất vài giây khi I/O nặng hoặc khi đang gọi cơ sở dữ liệu MSI. |
 | Close | Đóng |
 | Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Gắn sao trên GitHub, báo một Issue hoặc đăng trong Discussions. Mọi phản hồi đều được hoan nghênh. |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận. |
 | Move the unneeded files to the Move location. | Chuyển các tệp không cần thiết tới Nơi chuyển đến. |
 | Move the unneeded files to the Move location. Choose one first. | Chuyển các tệp không cần thiết tới Nơi chuyển đến. Hãy chọn một nơi trước. |
-| Send the unneeded files to the Recycle Bin. | Gửi các tệp không cần thiết vào Thùng rác. |
+| Move the unneeded files to the Recycle Bin. | Di chuyển các tệp không cần thiết vào Thùng rác. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Tên chủ thể từ chứng chỉ Authenticode được nhúng. Chưa xác minh chuỗi. |
 | Change language. The program will restart. | Thay đổi ngôn ngữ. Chương trình sẽ khởi động lại. |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | Gắn sao trên GitHub (cửa sổ Giới thiệu) |
 | Minimise | Thu nhỏ |
 | Move all unneeded installer files to the chosen destination folder | Chuyển tất cả các tệp cài đặt không cần thiết tới thư mục đích đã chọn |
-| Send all unneeded installer files to the Recycle Bin | Gửi tất cả các tệp cài đặt không cần thiết vào Thùng rác |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | Xóa sẽ gửi các tệp không cần thiết vào Thùng rác. Hủy sẽ đóng lại mà không xóa. |
+| Move all unneeded installer files to the Recycle Bin | Di chuyển tất cả các tệp cài đặt không cần thiết vào Thùng rác |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Xóa sẽ di chuyển các tệp không cần thiết vào Thùng rác. Hủy sẽ đóng lại mà không xóa. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Chuyển sẽ đặt các tệp không cần thiết vào thư mục đích đã chọn. Hủy sẽ để chúng nguyên chỗ cũ. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Chọn cách xử lý các tệp không cần thiết: chuyển chúng tới nơi an toàn, xóa vĩnh viễn hoặc hủy. |
 | Move the unneeded files to a folder you choose | Chuyển các tệp không cần thiết tới một thư mục bạn chọn |

@@ -1,6 +1,6 @@
 # InstallerClean in 简体中文 (Simplified Chinese)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the Simplified Chinese translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Simplified Chinese can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.zh-CN.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Simplified Chinese translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Simplified Chinese can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.zh-Hans.resx`](../../src/InstallerClean.Core/Resources/Strings.zh-Hans.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -90,7 +90,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Found {0} registered {1}. | 找到 {0} 个已注册的{1}。 |
 | Scan complete ({0}) | 扫描完成（{0}） |
 | Scanning local packages... | 正在扫描本地程序包… |
-| Found {0} {1} you can safely delete. | 找到 {0} 个{1}，可清理。 |
+| Found {0} {1} you can safely delete. | 找到 {0} 个{1}，可安全删除。 |
 | Preparing destination folder... | 正在准备目标文件夹… |
 | Moving {0} {1}... | 正在移动 {0} 个{1}… |
 | Deleting {0} {1}... | 正在删除 {0} 个{1}… |
@@ -103,7 +103,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. Run as administrator. | 访问被拒绝。请以管理员身份运行。 |
 | Scan failed: installer database unavailable. | 扫描失败：安装程序数据库不可用。 |
 | Scan cancelled. | 扫描已取消。 |
-| Ready | 完成 |
+| Ready | 就绪 |
 | Scan failed ({0}). Details in {1}. | 扫描失败（{0}）。详情见 {1}。 |
 | Scan failed ({0}). The crash log could not be written. | 扫描失败（{0}）。无法写入崩溃日志。 |
 
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | 全部干净 |
 | Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer 中没有需要清理的内容 |
 | Scanned {0} {1} in {2} | 扫描了 {0} 个{1}，用时 {2} |
-| Copy them back if anything stops working | 如果有什么不能正常工作，把它们复制回原处即可 |
-| Restore them from the Recycle Bin if anything stops working | 如果有什么不能正常工作，从回收站把它们还原即可 |
+| Copy them back if anything breaks ([it won't!]) | 万一出了什么问题，把它们复制回原处（[不会的！]） |
+| Until then, you can restore them if anything breaks ([it won't!]) | 在那之前，万一出了什么问题，您可以把它们还原（[不会的！]） |
+| Empty it to actually reclaim the space. | 清空回收站才能真正释放空间。 |
 | {0} freed | 已释放 {0} |
+| {0} cleaned up | 已清理 {0} |
 | {0} moved | 已移动 {0} |
 | {0} moved, some files could not be processed | 已移动 {0}，部分文件无法处理 |
 | {0} freed, some files could not be processed | 已释放 {0}，部分文件无法处理 |
+| {0} cleaned up, some files could not be processed | 已清理 {0}，部分文件无法处理 |
+| {0} {1} moved to {2} | 已将 {0} 个{1}移动到 {2} |
 | {0} {1} moved to {2} | 已将 {0} 个{1}移动到 {2} |
 | {0} {1} moved to {2}. {3} {4} | 已将 {0} 个{1}移动到 {2}。{3} 个{4} |
-| {0} {1} sent to the Recycle Bin | 已将 {0} 个{1}送入回收站 |
-| {0} {1} sent to the Recycle Bin. {2} {3} | 已将 {0} 个{1}送入回收站。{2} 个{3} |
+| {0} {1} moved to {2}. {3} {4} | 已将 {0} 个{1}移动到 {2}。{3} 个{4} |
+| {0} {1} moved to the Recycle Bin | 已将 {0} 个{1}移到回收站 |
+| {0} {1} moved to the Recycle Bin | 已将 {0} 个{1}移到回收站 |
+| {0} {1} moved to the Recycle Bin. {2} {3} | 已将 {0} 个{1}移到回收站。{2} 个{3} |
+| {0} {1} moved to the Recycle Bin. {2} {3} | 已将 {0} 个{1}移到回收站。{2} 个{3} |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | 已永久删除 {0} 个{1}。它没有进入回收站。 |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | 已永久删除 {0} 个{1}。它们没有进入回收站。 |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | 已永久删除 {0} 个{1}。它没有进入回收站。{2} 个{3} |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | 移动 {0} 个{1}（{2}）？ |
 | Files will be moved to {0}. | 文件将被移动到 {0}。 |
 | Delete {0} {1} ({2})? | 删除 {0} 个{1}（{2}）？ |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | 文件将被送入回收站。如果您想要备份副本，请改用移动。 |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | 文件将被移到回收站。如果您想要备份副本，请改用“移动”按钮。 |
 
 ## Error messages
 
@@ -223,10 +230,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. | 访问被拒绝。 |
 | The operation failed. Try again or restart Windows. | 操作失败。请重试或重启 Windows。 |
 | Unknown error. | 未知错误。 |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | 无法将此文件送入回收站（错误 {0}）。它可能被锁定、正在使用，或被 Windows 阻止。请改为移动它。 |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | 即使拥有管理员权限，Windows 仍阻止了对此文件的访问（错误 {0}）。这通常是所有权或权限锁定。请改为移动它。 |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | 此文件正被另一个程序打开或锁定（错误 {0}）。请关闭那个程序，或任何正在扫描它的程序，然后重试，或改为移动它。 |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | 由于无法将该文件送入回收站，它已被永久删除。 |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | 无法将此文件移到回收站（错误 {0}）。它可能被锁定、正在使用，或被 Windows 阻止。请改用“移动”按钮。 |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | 即使拥有管理员权限，Windows 仍阻止了对此文件的访问（错误 {0}）。这通常是所有权或权限锁定。请改用“移动”按钮。 |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | 此文件正被另一个程序打开或锁定（错误 {0}）。请关闭那个程序，或任何正在扫描它的程序，然后重试，或改用“移动”按钮。 |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | 由于无法将该文件移到回收站，它已被永久删除。 |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | 拒绝将文件移动到 Windows Installer 文件夹（目标：{0}）。 |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | 目标必须是完全限定的路径（相对路径会相对于进程的当前目录解析，在提权运行时不安全）：{0} |
 | Destination folder canonical path changed mid-batch: {0} | 目标文件夹的规范路径在批处理过程中发生了变化：{0} |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。 |
 | Move the unneeded files to the Move location. | 将不需要的文件移动到移动位置。 |
 | Move the unneeded files to the Move location. Choose one first. | 将不需要的文件移动到移动位置。请先选择一个位置。 |
-| Send the unneeded files to the Recycle Bin. | 将不需要的文件送入回收站。 |
+| Move the unneeded files to the Recycle Bin. | 将不需要的文件移到回收站。 |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | 来自内嵌 Authenticode 证书的主题名称。未验证证书链。 |
 | Change language. The program will restart. | 更改语言。程序会重启。 |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | 在 GitHub 上点个星（关于窗口） |
 | Minimise | 最小化 |
 | Move all unneeded installer files to the chosen destination folder | 将所有不需要的安装程序文件移动到所选的目标文件夹 |
-| Send all unneeded installer files to the Recycle Bin | 将所有不需要的安装程序文件送入回收站 |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | 删除会将不需要的文件送入回收站。取消则关闭且不删除。 |
+| Move all unneeded installer files to the Recycle Bin | 将所有不需要的安装程序文件移到回收站 |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | 删除会将不需要的文件移到回收站。取消则关闭且不删除。 |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 移动会将不需要的文件放入所选的目标文件夹。取消则让它们留在原处。 |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | 选择如何处理这些不需要的文件：移动到安全的位置、永久删除或取消。 |
 | Move the unneeded files to a folder you choose | 将不需要的文件移动到您选择的文件夹 |

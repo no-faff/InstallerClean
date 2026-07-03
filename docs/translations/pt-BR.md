@@ -1,6 +1,6 @@
 # InstallerClean in Português (Brasil) (Brazilian Portuguese)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the Brazilian Portuguese translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Brazilian Portuguese can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.pt-BR.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Brazilian Portuguese translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Brazilian Portuguese can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.pt-BR.resx`](../../src/InstallerClean.Core/Resources/Strings.pt-BR.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -90,7 +90,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Found {0} registered {1}. | Foram encontrados {0} {1} registrados. |
 | Scan complete ({0}) | Análise concluída ({0}) |
 | Scanning local packages... | Analisando os pacotes locais... |
-| Found {0} {1} you can safely delete. | {0} {1} para limpar. |
+| Found {0} {1} you can safely delete. | {0} {1} que você pode excluir com segurança. |
 | Preparing destination folder... | Preparando a pasta de destino... |
 | Moving {0} {1}... | Movendo {0} {1}... |
 | Deleting {0} {1}... | Excluindo {0} {1}... |
@@ -103,7 +103,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. Run as administrator. | Acesso negado. Execute como administrador. |
 | Scan failed: installer database unavailable. | Falha na análise: banco de dados do instalador indisponível. |
 | Scan cancelled. | Análise cancelada. |
-| Ready | Concluído |
+| Ready | Pronto |
 | Scan failed ({0}). Details in {1}. | Falha na análise ({0}). Detalhes em {1}. |
 | Scan failed ({0}). The crash log could not be written. | Falha na análise ({0}). Não foi possível gravar o crash.log. |
 
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Tudo limpo |
 | Nothing to clean up in C:\Windows\Installer | Nada para limpar em C:\Windows\Installer |
 | Scanned {0} {1} in {2} | Análise de {0} {1} em {2} |
-| Copy them back if anything stops working | Copie-os de volta se algo parar de funcionar |
-| Restore them from the Recycle Bin if anything stops working | Restaure-os pela Lixeira se algo parar de funcionar |
+| Copy them back if anything breaks ([it won't!]) | Copie-os de volta se algo quebrar ([não vai!]) |
+| Until then, you can restore them if anything breaks ([it won't!]) | Até lá, você pode restaurá-los se algo quebrar ([não vai!]) |
+| Empty it to actually reclaim the space. | Esvazie a Lixeira para realmente recuperar o espaço. |
 | {0} freed | {0} liberados |
+| {0} cleaned up | {0} limpos |
 | {0} moved | {0} movidos |
 | {0} moved, some files could not be processed | {0} movidos, alguns arquivos não puderam ser processados |
 | {0} freed, some files could not be processed | {0} liberados, alguns arquivos não puderam ser processados |
+| {0} cleaned up, some files could not be processed | {0} limpos, alguns arquivos não puderam ser processados |
+| {0} {1} moved to {2} | {0} {1} em {2} |
 | {0} {1} moved to {2} | {0} {1} em {2} |
 | {0} {1} moved to {2}. {3} {4} | {0} {1} em {2}. {3} {4} |
-| {0} {1} sent to the Recycle Bin | {0} {1} na Lixeira |
-| {0} {1} sent to the Recycle Bin. {2} {3} | {0} {1} na Lixeira. {2} {3} |
+| {0} {1} moved to {2}. {3} {4} | {0} {1} em {2}. {3} {4} |
+| {0} {1} moved to the Recycle Bin | {0} {1} movido para a Lixeira |
+| {0} {1} moved to the Recycle Bin | {0} {1} movidos para a Lixeira |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} movido para a Lixeira. {2} {3} |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} movidos para a Lixeira. {2} {3} |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} excluído permanentemente. Não foi para a Lixeira. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} excluídos permanentemente. Não foram para a Lixeira. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} excluído permanentemente. Não foi para a Lixeira. {2} {3} |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | Mover {0} {1} ({2})? |
 | Files will be moved to {0}. | Os arquivos serão movidos para {0}. |
 | Delete {0} {1} ({2})? | Excluir {0} {1} ({2})? |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | Os arquivos serão enviados para a Lixeira. Se quiser cópias de backup, use Mover em vez disso. |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Os arquivos serão movidos para a Lixeira. Se quiser cópias de backup, use o botão Mover em vez disso. |
 
 ## Error messages
 
@@ -223,10 +230,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. | Acesso negado. |
 | The operation failed. Try again or restart Windows. | A operação falhou. Tente de novo ou reinicie o Windows. |
 | Unknown error. | Erro desconhecido. |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | Não foi possível enviar este arquivo para a Lixeira (erro {0}). Ele pode estar bloqueado, em uso ou impedido pelo Windows. Mova-o em vez disso. |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | O Windows bloqueou o acesso a este arquivo, mesmo com direitos de administrador (erro {0}). Normalmente é um bloqueio de propriedade ou de permissões. Mova-o em vez disso. |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | Este arquivo está aberto ou bloqueado por outro programa (erro {0}). Feche esse programa, ou o que estiver analisando o arquivo, e tente de novo, ou mova-o em vez disso. |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | O arquivo foi excluído permanentemente porque não foi possível enviá-lo para a Lixeira. |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | Não foi possível mover este arquivo para a Lixeira (erro {0}). Ele pode estar bloqueado, em uso ou impedido pelo Windows. Use o botão Mover em vez disso. |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | O Windows bloqueou o acesso a este arquivo, mesmo com direitos de administrador (erro {0}). Normalmente é um bloqueio de propriedade ou de permissões. Use o botão Mover em vez disso. |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Este arquivo está aberto ou bloqueado por outro programa (erro {0}). Feche esse programa, ou o que estiver analisando o arquivo, e tente de novo, ou use o botão Mover. |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | O arquivo foi excluído permanentemente porque não foi possível movê-lo para a Lixeira. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Recusando mover arquivos para a pasta do Windows Installer (destino: {0}). |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | O destino deve ser um caminho totalmente qualificado (caminhos relativos são resolvidos com base no diretório atual do processo e não são seguros sob elevação): {0} |
 | Destination folder canonical path changed mid-batch: {0} | O caminho canônico da pasta de destino mudou durante a operação: {0} |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Você decide, mas eu agradeço. Envia um resumo anônimo que só me diz se está funcionando. A próxima tela mostra o que será enviado antes de você confirmar. |
 | Move the unneeded files to the Move location. | Mover os arquivos desnecessários para o local de destino. |
 | Move the unneeded files to the Move location. Choose one first. | Mover os arquivos desnecessários para o local de destino. Escolha um primeiro. |
-| Send the unneeded files to the Recycle Bin. | Enviar os arquivos desnecessários para a Lixeira. |
+| Move the unneeded files to the Recycle Bin. | Mover os arquivos desnecessários para a Lixeira. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Nome do titular do certificado Authenticode incorporado. Cadeia não verificada. |
 | Change language. The program will restart. | Alterar idioma. O programa será reiniciado. |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | Deixe uma estrela no GitHub (janela Sobre) |
 | Minimise | Minimizar |
 | Move all unneeded installer files to the chosen destination folder | Mover todos os arquivos de instalação desnecessários para a pasta de destino escolhida |
-| Send all unneeded installer files to the Recycle Bin | Enviar para a Lixeira todos os arquivos de instalação desnecessários |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | Excluir envia os arquivos desnecessários para a Lixeira. Cancelar fecha sem excluir. |
+| Move all unneeded installer files to the Recycle Bin | Mover todos os arquivos de instalação desnecessários para a Lixeira |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Excluir move os arquivos desnecessários para a Lixeira. Cancelar fecha sem excluir. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Mover coloca os arquivos desnecessários na pasta de destino escolhida. Cancelar os deixa onde estão. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Escolha o que fazer com os arquivos desnecessários: movê-los para um lugar seguro, excluí-los permanentemente ou cancelar. |
 | Move the unneeded files to a folder you choose | Mover os arquivos desnecessários para uma pasta que você escolher |
@@ -413,7 +420,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Erro: a Lixeira está indisponível para este volume, então nada foi excluído. Use /m para mover os arquivos, ou reative a Lixeira e execute novamente. |
 | Error: no move destination specified. Use /m PATH or set a default in the GUI. | Erro: nenhum destino de movimentação especificado. Use /m CAMINHO ou defina um padrão na GUI. |
 | Error: destination cannot be inside the Windows Installer folder. | Erro: o destino não pode estar dentro da pasta do Windows Installer. |
-| Error: destination must be a fully qualified path. Got: {0} | Erro: o destino deve ser um caminho completo. Recebido: {0} |
+| Error: destination must be a fully qualified path. Got: {0} | Erro: o destino deve ser um caminho totalmente qualificado. Recebido: {0} |
 | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Erro: o destino {0} fica dentro de uma pasta de sistema do Windows. Escolha um caminho fora de %SystemRoot%, %ProgramFiles% e %ProgramData%. |
 | Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | Erro: algo está usando o Windows Installer agora, normalmente uma atualização do Windows ou um programa se instalando em segundo plano. Mover e Excluir ficam bloqueados enquanto isso acontece. Tente novamente quando terminar. |
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Erro: uma transação anterior do Windows Installer está suspensa nesta máquina. Retome ou reverta essa instalação (ou reinicie o Windows) antes de limpar o cache. |

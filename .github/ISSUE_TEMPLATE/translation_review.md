@@ -1,6 +1,6 @@
 ---
-name: Translation review
-about: Approve a language's GUI translation, or say what needs changing
+name: Translation feedback
+about: Suggest improvements to a shipped translation
 labels: translation
 ---
 
@@ -8,14 +8,12 @@ labels: translation
 
 <!-- e.g. Simplified Chinese, German, Russian. -->
 
-## Your verdict
+## What could read better
 
-<!-- Good to ship as it stands? Or good once the changes below are made? Your call as a native speaker. -->
-
-## Changes, if any
-
-<!-- Quote the current wording (from the translation table or the resx) and what you'd put instead.
-     As few or as many as you like; you don't have to do the whole file. -->
+<!-- Quote the current wording and what you'd put instead. The string tables in
+     docs/translations/ show every line in English beside your language, so you
+     don't have to read the resx. As few or as many as you like; you don't have
+     to do the whole file. -->
 
 ## Anything else
 

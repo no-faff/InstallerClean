@@ -1,6 +1,6 @@
 # InstallerClean in Deutsch (German)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the German translation beside it, grouped by where each line appears in the app. It is here so someone who really knows German can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.de.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the German translation beside it, grouped by where each line appears in the app. It is here so someone who really knows German can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.de.resx`](../../src/InstallerClean.Core/Resources/Strings.de.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -114,7 +114,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The unneeded files below are safe to delete. | Die nicht benötigten Dateien unten können bedenkenlos gelöscht werden. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Sie liegen in C:\Windows\Installer und blieben zurück, als ein Programm deinstalliert wurde ({0}), ein neuerer Patch einen älteren ersetzt hat ({1}) oder der Herausgeber ihn zurückgezogen hat ({2}). InstallerClean listet nur Dateien auf, die Windows selbst als erledigt meldet. |
 | Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy. | Lösche sie in den Papierkorb, oder verschiebe sie zuerst woandershin, wenn du lieber eine Kopie behalten möchtest. |
-| Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Gerade benutzt etwas Windows Installer, normalerweise ein Windows-Update oder ein Programm, das im Hintergrund installiert. Verschieben und Löschen pausieren, solange das läuft, damit InstallerClean den Installer-Cache nicht anrührt, während er sich ändert. Wenn es fertig ist, scanne erneut, und sie sind wieder verfügbar. |
+| Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Gerade benutzt etwas Windows Installer, normalerweise ein Windows-Update oder ein Programm, das im Hintergrund installiert wird. Verschieben und Löschen pausieren, solange das läuft, damit InstallerClean den Installer-Cache nicht anrührt, während er sich ändert. Wenn es fertig ist, scanne erneut, und sie sind wieder verfügbar. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Eine frühere Windows-Installer-Transaktion ist auf diesem Rechner ausgesetzt. Setze diese Installation fort oder mach sie rückgängig (oder starte Windows neu), bevor du den Cache aufräumst. |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows hat für den nächsten Neustart eine Dateiumbenennung in der Warteschlange, die den Installer-Cache betrifft. Starte Windows neu, bevor du aufräumst. |
 | Select a file to view details. | Wähle eine Datei, um Details anzuzeigen. |
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Alles sauber |
 | Nothing to clean up in C:\Windows\Installer | Nichts aufzuräumen in C:\Windows\Installer |
 | Scanned {0} {1} in {2} | {0} {1} in {2} gescannt |
-| Copy them back if anything stops working | Kopier sie zurück, falls etwas nicht mehr funktioniert |
-| Restore them from the Recycle Bin if anything stops working | Stell sie aus dem Papierkorb wieder her, falls etwas nicht mehr funktioniert |
+| Copy them back if anything breaks ([it won't!]) | Kopier sie zurück, falls etwas kaputtgeht ([wird es nicht!]) |
+| Until then, you can restore them if anything breaks ([it won't!]) | Bis dahin kannst du sie wiederherstellen, falls etwas kaputtgeht ([wird es nicht!]) |
+| Empty it to actually reclaim the space. | Leere den Papierkorb, um den Speicherplatz wirklich freizugeben. |
 | {0} freed | {0} freigegeben |
+| {0} cleaned up | {0} aufgeräumt |
 | {0} moved | {0} verschoben |
 | {0} moved, some files could not be processed | {0} verschoben, einige Dateien konnten nicht verarbeitet werden |
 | {0} freed, some files could not be processed | {0} freigegeben, einige Dateien konnten nicht verarbeitet werden |
+| {0} cleaned up, some files could not be processed | {0} aufgeräumt, einige Dateien konnten nicht verarbeitet werden |
+| {0} {1} moved to {2} | {0} {1} nach {2} verschoben |
 | {0} {1} moved to {2} | {0} {1} nach {2} verschoben |
 | {0} {1} moved to {2}. {3} {4} | {0} {1} nach {2} verschoben. {3} {4} |
-| {0} {1} sent to the Recycle Bin | {0} {1} in den Papierkorb verschoben |
-| {0} {1} sent to the Recycle Bin. {2} {3} | {0} {1} in den Papierkorb verschoben. {2} {3} |
+| {0} {1} moved to {2}. {3} {4} | {0} {1} nach {2} verschoben. {3} {4} |
+| {0} {1} moved to the Recycle Bin | {0} {1} in den Papierkorb verschoben |
+| {0} {1} moved to the Recycle Bin | {0} {1} in den Papierkorb verschoben |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} in den Papierkorb verschoben. {2} {3} |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} in den Papierkorb verschoben. {2} {3} |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} endgültig gelöscht. Sie ist nicht in den Papierkorb gewandert. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} endgültig gelöscht. Sie sind nicht in den Papierkorb gewandert. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} endgültig gelöscht. Sie ist nicht in den Papierkorb gewandert. {2} {3} |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | {0} {1} verschieben ({2})? |
 | Files will be moved to {0}. | Die Dateien werden nach {0} verschoben. |
 | Delete {0} {1} ({2})? | {0} {1} löschen ({2})? |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | Die Dateien werden in den Papierkorb verschoben. Wenn du Sicherungskopien möchtest, nutze stattdessen Verschieben. |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Die Dateien werden in den Papierkorb verschoben. Wenn du Sicherungskopien möchtest, nutze stattdessen die Schaltfläche „Verschieben“. |
 
 ## Error messages
 
@@ -223,10 +230,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. | Zugriff verweigert. |
 | The operation failed. Try again or restart Windows. | Der Vorgang ist fehlgeschlagen. Versuch es erneut oder starte Windows neu. |
 | Unknown error. | Unbekannter Fehler. |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | Diese Datei konnte nicht in den Papierkorb verschoben werden (Fehler {0}). Sie ist möglicherweise gesperrt, in Benutzung oder von Windows blockiert. Verschieb sie stattdessen. |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | Windows hat den Zugriff auf diese Datei blockiert, selbst mit Administratorrechten (Fehler {0}). Meist ist es eine Sperre durch Besitzrechte oder Berechtigungen. Verschieb sie stattdessen. |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | Diese Datei ist von einem anderen Programm geöffnet oder gesperrt (Fehler {0}). Schließe dieses Programm, oder was auch immer sie gerade prüft, und versuch es erneut, oder verschieb sie stattdessen. |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | Die Datei wurde endgültig gelöscht, weil sie nicht in den Papierkorb verschoben werden konnte. |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | Diese Datei konnte nicht in den Papierkorb verschoben werden (Fehler {0}). Sie ist möglicherweise gesperrt, in Benutzung oder von Windows blockiert. Nutze stattdessen die Schaltfläche „Verschieben“. |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | Windows hat den Zugriff auf diese Datei blockiert, selbst mit Administratorrechten (Fehler {0}). Meist ist es eine Sperre durch Besitzrechte oder Berechtigungen. Nutze stattdessen die Schaltfläche „Verschieben“. |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Diese Datei ist von einem anderen Programm geöffnet oder gesperrt (Fehler {0}). Schließe dieses Programm, oder was auch immer sie gerade prüft, und versuch es erneut, oder nutze stattdessen die Schaltfläche „Verschieben“. |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | Die Datei wurde endgültig gelöscht, weil sie nicht in den Papierkorb verschoben werden konnte. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Das Verschieben von Dateien in den Windows-Installer-Ordner wird abgelehnt (Ziel: {0}). |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | Das Ziel muss ein vollständig qualifizierter Pfad sein (relative Pfade werden relativ zum aktuellen Verzeichnis des Prozesses aufgelöst und sind bei erhöhten Rechten unsicher): {0} |
 | Destination folder canonical path changed mid-batch: {0} | Der kanonische Pfad des Zielordners hat sich während des Vorgangs geändert: {0} |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Ganz wie du magst, aber ich freue mich darüber. Sendet eine anonyme Zusammenfassung, die mir nur zeigt, ob es funktioniert. Auf dem nächsten Bildschirm siehst du vor dem Bestätigen, was gesendet wird. |
 | Move the unneeded files to the Move location. | Verschiebt die nicht benötigten Dateien an den Zielort. |
 | Move the unneeded files to the Move location. Choose one first. | Verschiebt die nicht benötigten Dateien an den Zielort. Wähle zuerst einen aus. |
-| Send the unneeded files to the Recycle Bin. | Verschiebt die nicht benötigten Dateien in den Papierkorb. |
+| Move the unneeded files to the Recycle Bin. | Verschiebt die nicht benötigten Dateien in den Papierkorb. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Antragstellername aus dem eingebetteten Authenticode-Zertifikat. Die Zertifikatskette wurde nicht geprüft. |
 | Change language. The program will restart. | Sprache ändern. Das Programm wird neu gestartet. |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | Einen Stern auf GitHub hinterlassen (Fenster Über) |
 | Minimise | Minimieren |
 | Move all unneeded installer files to the chosen destination folder | Alle nicht benötigten Installer-Dateien in den gewählten Zielordner verschieben |
-| Send all unneeded installer files to the Recycle Bin | Alle nicht benötigten Installer-Dateien in den Papierkorb verschieben |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | Löschen verschiebt die nicht benötigten Dateien in den Papierkorb. Abbrechen schließt, ohne zu löschen. |
+| Move all unneeded installer files to the Recycle Bin | Alle nicht benötigten Installer-Dateien in den Papierkorb verschieben |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Löschen verschiebt die nicht benötigten Dateien in den Papierkorb. Abbrechen schließt, ohne zu löschen. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Verschieben legt die nicht benötigten Dateien in den gewählten Zielordner. Abbrechen lässt sie, wo sie sind. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Wähle, wie mit den nicht benötigten Dateien verfahren werden soll: an einen sicheren Ort verschieben, endgültig löschen oder abbrechen. |
 | Move the unneeded files to a folder you choose | Die nicht benötigten Dateien in einen von dir gewählten Ordner verschieben |
@@ -415,7 +422,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: destination cannot be inside the Windows Installer folder. | Fehler: Das Ziel darf nicht im Windows-Installer-Ordner liegen. |
 | Error: destination must be a fully qualified path. Got: {0} | Fehler: Das Ziel muss ein vollständig qualifizierter Pfad sein. Erhalten: {0} |
 | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Fehler: Das Ziel {0} liegt unter einem Windows-Systemordner. Wähle einen Pfad außerhalb von %SystemRoot%, %ProgramFiles% und %ProgramData%. |
-| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | Fehler: Gerade benutzt etwas Windows Installer, normalerweise ein Windows-Update oder ein Programm, das im Hintergrund installiert. Verschieben und Löschen sind blockiert, solange das läuft. Versuch es erneut, sobald es fertig ist. |
+| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | Fehler: Gerade benutzt etwas Windows Installer, normalerweise ein Windows-Update oder ein Programm, das im Hintergrund installiert wird. Verschieben und Löschen sind blockiert, solange das läuft. Versuch es erneut, sobald es fertig ist. |
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Fehler: Eine frühere Windows-Installer-Transaktion ist auf diesem Rechner ausgesetzt. Setze diese Installation fort oder mach sie rückgängig (oder starte Windows neu), bevor du den Cache aufräumst. |
 | Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | Fehler: Ein für nach dem Neustart eingeplanter Dateivorgang betrifft den Installer-Cache ({0}). Starte Windows neu, um diesen Vorgang abzuschließen, bevor du aufräumst. |
 | Moving {0} {1} to {2}... | {0} {1} werden nach {2} verschoben... |

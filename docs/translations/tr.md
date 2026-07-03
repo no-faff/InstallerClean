@@ -1,6 +1,6 @@
 # InstallerClean in Türkçe (Turkish)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the Turkish translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Turkish can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.tr.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Turkish translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Turkish can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.tr.resx`](../../src/InstallerClean.Core/Resources/Strings.tr.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -51,7 +51,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Path to folder if you Move instead of Delete | Silmek yerine taşıyacaksanız klasör yolu |
 | Open _release page | _Sürüm sayfasını aç |
 | _Re-scan | _Yeniden tara |
-| _Scan again | _Yeniden tara |
+| _Scan again | Te_krar tara |
 | Send report | Rapor gönder |
 | _Send | _Gönder |
 
@@ -85,7 +85,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Starting scan... | Tarama başlatılıyor... |
 | Asking Windows about installed software... | Yüklü yazılımlar için Windows sorgulanıyor... |
 | Scanning installer cache folder... | Yükleyici önbellek klasörü taranıyor... |
-| Enumerating installed products... | Yüklü ürünler sıralanıyor... |
+| Enumerating installed products... | Yüklü ürünler listeleniyor... |
 | Checking registry for additional packages... | Ek paketler için kayıt defteri denetleniyor... |
 | Found {0} registered {1}. | {0} kayıtlı {1} bulundu. |
 | Scan complete ({0}) | Tarama tamamlandı ({0}) |
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Her şey temiz |
 | Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer içinde temizlenecek bir şey yok |
 | Scanned {0} {1} in {2} | {2} içinde {0} {1} tarandı |
-| Copy them back if anything stops working | Bir şey çalışmamaya başlarsa onları geri kopyalayın |
-| Restore them from the Recycle Bin if anything stops working | Bir şey çalışmamaya başlarsa onları Geri Dönüşüm Kutusu'ndan geri yükleyin |
+| Copy them back if anything breaks ([it won't!]) | Bir şey bozulursa onları geri kopyalayın ([bozulmaz!]) |
+| Until then, you can restore them if anything breaks ([it won't!]) | O zamana kadar, bir şey bozulursa onları geri yükleyebilirsiniz ([bozulmaz!]) |
+| Empty it to actually reclaim the space. | Alanı gerçekten geri kazanmak için onu boşaltın. |
 | {0} freed | {0} açıldı |
+| {0} cleaned up | {0} temizlendi |
 | {0} moved | {0} taşındı |
 | {0} moved, some files could not be processed | {0} taşındı, bazı dosyalar işlenemedi |
 | {0} freed, some files could not be processed | {0} açıldı, bazı dosyalar işlenemedi |
+| {0} cleaned up, some files could not be processed | {0} temizlendi, bazı dosyalar işlenemedi |
+| {0} {1} moved to {2} | {0} {1}, {2} konumuna taşındı |
 | {0} {1} moved to {2} | {0} {1}, {2} konumuna taşındı |
 | {0} {1} moved to {2}. {3} {4} | {0} {1}, {2} konumuna taşındı. {3} {4} |
-| {0} {1} sent to the Recycle Bin | {0} {1} Geri Dönüşüm Kutusu'na gönderildi |
-| {0} {1} sent to the Recycle Bin. {2} {3} | {0} {1} Geri Dönüşüm Kutusu'na gönderildi. {2} {3} |
+| {0} {1} moved to {2}. {3} {4} | {0} {1}, {2} konumuna taşındı. {3} {4} |
+| {0} {1} moved to the Recycle Bin | {0} {1} Geri Dönüşüm Kutusu'na taşındı |
+| {0} {1} moved to the Recycle Bin | {0} {1} Geri Dönüşüm Kutusu'na taşındı |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} Geri Dönüşüm Kutusu'na taşındı. {2} {3} |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} Geri Dönüşüm Kutusu'na taşındı. {2} {3} |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. {2} {3} |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | {0} {1} ({2}) taşınsın mı? |
 | Files will be moved to {0}. | Dosyalar {0} konumuna taşınacak. |
 | Delete {0} {1} ({2})? | {0} {1} ({2}) silinsin mi? |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | Dosyalar Geri Dönüşüm Kutusu'na gönderilecek. Yedek kopya isterseniz bunun yerine Taşı'yı kullanın. |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Dosyalar Geri Dönüşüm Kutusu'na taşınacak. Yedek kopya isterseniz bunun yerine Taşı düğmesini kullanın. |
 
 ## Error messages
 
@@ -223,10 +230,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. | Erişim reddedildi. |
 | The operation failed. Try again or restart Windows. | İşlem başarısız oldu. Yeniden deneyin ya da Windows'u yeniden başlatın. |
 | Unknown error. | Bilinmeyen hata. |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | Bu dosya Geri Dönüşüm Kutusu'na gönderilemedi (hata {0}). Kilitli, kullanımda ya da Windows tarafından engellenmiş olabilir. Bunun yerine taşıyın. |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | Windows, yönetici haklarıyla bile bu dosyaya erişimi engelledi (hata {0}). Genellikle bir sahiplik ya da izin kilidi olur. Bunun yerine taşıyın. |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | Bu dosya başka bir program tarafından açık ya da kilitli (hata {0}). O programı, ya da onu tarayan her ne varsa kapatıp yeniden deneyin ya da bunun yerine taşıyın. |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | Geri Dönüşüm Kutusu'na gönderilemediği için dosya kalıcı olarak silindi. |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | Bu dosya Geri Dönüşüm Kutusu'na taşınamadı (hata {0}). Kilitli, kullanımda ya da Windows tarafından engellenmiş olabilir. Bunun yerine Taşı düğmesini kullanın. |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | Windows, yönetici haklarıyla bile bu dosyaya erişimi engelledi (hata {0}). Genellikle bir sahiplik ya da izin kilidi olur. Bunun yerine Taşı düğmesini kullanın. |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Bu dosya başka bir program tarafından açık ya da kilitli (hata {0}). O programı, ya da onu tarayan her ne varsa kapatıp yeniden deneyin ya da bunun yerine Taşı düğmesini kullanın. |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | Geri Dönüşüm Kutusu'na taşınamadığı için dosya kalıcı olarak silindi. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Dosyaların Windows Installer klasörüne taşınması reddediliyor (hedef: {0}). |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | Hedef, tam nitelenmiş bir yol olmalıdır (göreli yollar işlemin geçerli dizinine göre çözümlenir ve yükseltilmiş çalışmada güvenli değildir): {0} |
 | Destination folder canonical path changed mid-batch: {0} | Hedef klasörün kurallı yolu işlem ortasında değişti: {0} |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Size kalmış ama makbule geçer. Yalnızca uygulamanın çalışıp çalışmadığını bana bildiren anonim bir özet gönderir. Sonraki ekran, onaylamadan önce ne gönderileceğini görmenizi sağlar. |
 | Move the unneeded files to the Move location. | Gereksiz dosyaları Taşıma konumuna taşır. |
 | Move the unneeded files to the Move location. Choose one first. | Gereksiz dosyaları Taşıma konumuna taşır. Önce bir konum seçin. |
-| Send the unneeded files to the Recycle Bin. | Gereksiz dosyaları Geri Dönüşüm Kutusu'na gönderir. |
+| Move the unneeded files to the Recycle Bin. | Gereksiz dosyaları Geri Dönüşüm Kutusu'na taşır. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Gömülü Authenticode sertifikasındaki konu adı. Zincir doğrulaması yapılmadı. |
 | Change language. The program will restart. | Dili değiştir. Program yeniden başlatılacak. |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | GitHub'da yıldız bırak (Hakkında penceresi) |
 | Minimise | Simge durumuna küçült |
 | Move all unneeded installer files to the chosen destination folder | Gereksiz tüm yükleyici dosyalarını seçilen hedef klasöre taşı |
-| Send all unneeded installer files to the Recycle Bin | Gereksiz tüm yükleyici dosyalarını Geri Dönüşüm Kutusu'na gönder |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | Sil, gereksiz dosyaları Geri Dönüşüm Kutusu'na gönderir. İptal, silmeden kapatır. |
+| Move all unneeded installer files to the Recycle Bin | Gereksiz tüm yükleyici dosyalarını Geri Dönüşüm Kutusu'na taşı |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Sil, gereksiz dosyaları Geri Dönüşüm Kutusu'na taşır. İptal, silmeden kapatır. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Taşı, gereksiz dosyaları seçilen hedef klasöre koyar. İptal, onları olduğu yerde bırakır. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Gereksiz dosyaları nasıl ele alacağınızı seçin: güvenli bir yere taşıyın, kalıcı olarak silin ya da iptal edin. |
 | Move the unneeded files to a folder you choose | Gereksiz dosyaları seçtiğiniz bir klasöre taşı |

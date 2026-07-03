@@ -1,6 +1,6 @@
 # InstallerClean in Français (French)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the French translation beside it, grouped by where each line appears in the app. It is here so someone who really knows French can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.fr.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the French translation beside it, grouped by where each line appears in the app. It is here so someone who really knows French can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.fr.resx`](../../src/InstallerClean.Core/Resources/Strings.fr.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -30,7 +30,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Français |
 | --- | --- |
-| _About | À _propos |
+| _About | À pr_opos |
 | Copy | Copier |
 | Cut | Couper |
 | Paste | Coller |
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Tout est propre |
 | Nothing to clean up in C:\Windows\Installer | Rien à nettoyer dans C:\Windows\Installer |
 | Scanned {0} {1} in {2} | Analyse de {0} {1} en {2} |
-| Copy them back if anything stops working | Recopiez-les si quelque chose cesse de fonctionner |
-| Restore them from the Recycle Bin if anything stops working | Restaurez-les depuis la Corbeille si quelque chose cesse de fonctionner |
+| Copy them back if anything breaks ([it won't!]) | Recopiez-les si quelque chose ne fonctionne plus ([ce ne sera pas le cas !]) |
+| Until then, you can restore them if anything breaks ([it won't!]) | D'ici là, vous pouvez les restaurer si quelque chose ne fonctionne plus ([ce ne sera pas le cas !]) |
+| Empty it to actually reclaim the space. | Videz la Corbeille pour vraiment récupérer l'espace. |
 | {0} freed | {0} libérés |
+| {0} cleaned up | {0} nettoyés |
 | {0} moved | {0} déplacés |
 | {0} moved, some files could not be processed | {0} déplacés, certains fichiers n'ont pas pu être traités |
 | {0} freed, some files could not be processed | {0} libérés, certains fichiers n'ont pas pu être traités |
+| {0} cleaned up, some files could not be processed | {0} nettoyés, certains fichiers n'ont pas pu être traités |
+| {0} {1} moved to {2} | Déplacé {0} {1} vers {2} |
 | {0} {1} moved to {2} | Déplacé {0} {1} vers {2} |
 | {0} {1} moved to {2}. {3} {4} | Déplacé {0} {1} vers {2}. {3} {4} |
-| {0} {1} sent to the Recycle Bin | Envoyé {0} {1} à la Corbeille |
-| {0} {1} sent to the Recycle Bin. {2} {3} | Envoyé {0} {1} à la Corbeille. {2} {3} |
+| {0} {1} moved to {2}. {3} {4} | Déplacé {0} {1} vers {2}. {3} {4} |
+| {0} {1} moved to the Recycle Bin | Déplacé {0} {1} vers la Corbeille |
+| {0} {1} moved to the Recycle Bin | Déplacé {0} {1} vers la Corbeille |
+| {0} {1} moved to the Recycle Bin. {2} {3} | Déplacé {0} {1} vers la Corbeille. {2} {3} |
+| {0} {1} moved to the Recycle Bin. {2} {3} | Déplacé {0} {1} vers la Corbeille. {2} {3} |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} supprimé définitivement. Il n'est pas allé à la Corbeille. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} supprimés définitivement. Ils ne sont pas allés à la Corbeille. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} supprimé définitivement. Il n'est pas allé à la Corbeille. {2} {3} |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | Déplacer {0} {1} ({2}) ? |
 | Files will be moved to {0}. | Les fichiers seront déplacés vers {0}. |
 | Delete {0} {1} ({2})? | Supprimer {0} {1} ({2}) ? |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | Les fichiers seront envoyés à la Corbeille. Si vous voulez des copies de sauvegarde, utilisez plutôt Déplacer. |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Les fichiers seront déplacés vers la Corbeille. Si vous voulez des copies de sauvegarde, utilisez plutôt le bouton Déplacer. |
 
 ## Error messages
 
@@ -223,10 +230,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. | Accès refusé. |
 | The operation failed. Try again or restart Windows. | L'opération a échoué. Réessayez ou redémarrez Windows. |
 | Unknown error. | Erreur inconnue. |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | Impossible d'envoyer ce fichier à la Corbeille (erreur {0}). Il est peut-être verrouillé, en cours d'utilisation ou bloqué par Windows. Déplacez-le plutôt. |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | Windows a bloqué l'accès à ce fichier, même avec des droits d'administrateur (erreur {0}). C'est généralement un verrou de propriété ou de permissions. Déplacez-le plutôt. |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | Ce fichier est ouvert ou verrouillé par un autre programme (erreur {0}). Fermez ce programme, ou ce qui l'analyse, puis réessayez, ou déplacez-le plutôt. |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | Le fichier a été supprimé définitivement parce qu'il n'a pas pu être envoyé à la Corbeille. |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | Impossible de déplacer ce fichier vers la Corbeille (erreur {0}). Il est peut-être verrouillé, en cours d'utilisation ou bloqué par Windows. Utilisez plutôt le bouton Déplacer. |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | Windows a bloqué l'accès à ce fichier, même avec des droits d'administrateur (erreur {0}). C'est généralement un verrou de propriété ou de permissions. Utilisez plutôt le bouton Déplacer. |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Ce fichier est ouvert ou verrouillé par un autre programme (erreur {0}). Fermez ce programme, ou ce qui l'analyse, puis réessayez, ou utilisez plutôt le bouton Déplacer. |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | Le fichier a été supprimé définitivement parce qu'il n'a pas pu être déplacé vers la Corbeille. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Refus de déplacer des fichiers dans le dossier Windows Installer (destination : {0}). |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | La destination doit être un chemin entièrement qualifié (les chemins relatifs sont résolus par rapport au répertoire courant du processus et ne sont pas sûrs sous élévation) : {0} |
 | Destination folder canonical path changed mid-batch: {0} | Le chemin canonique du dossier de destination a changé pendant l'opération : {0} |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Comme vous voulez, mais c'est apprécié. Envoie un résumé anonyme qui me dit juste si l'outil fonctionne. L'écran suivant vous montre ce qui sera envoyé avant que vous confirmiez. |
 | Move the unneeded files to the Move location. | Déplacer les fichiers inutiles vers l'emplacement de destination. |
 | Move the unneeded files to the Move location. Choose one first. | Déplacer les fichiers inutiles vers l'emplacement de destination. Choisissez-en un d'abord. |
-| Send the unneeded files to the Recycle Bin. | Envoyer les fichiers inutiles à la Corbeille. |
+| Move the unneeded files to the Recycle Bin. | Déplacer les fichiers inutiles vers la Corbeille. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Nom du titulaire du certificat Authenticode incorporé. Chaîne non vérifiée. |
 | Change language. The program will restart. | Changer la langue. Le programme redémarrera. |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | Laisser une étoile sur GitHub (fenêtre À propos) |
 | Minimise | Réduire |
 | Move all unneeded installer files to the chosen destination folder | Déplacer tous les fichiers d'installation inutiles vers le dossier de destination choisi |
-| Send all unneeded installer files to the Recycle Bin | Envoyer à la Corbeille tous les fichiers d'installation inutiles |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | Supprimer envoie les fichiers inutiles à la Corbeille. Annuler ferme sans rien supprimer. |
+| Move all unneeded installer files to the Recycle Bin | Déplacer tous les fichiers d'installation inutiles vers la Corbeille |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Supprimer déplace les fichiers inutiles vers la Corbeille. Annuler ferme sans rien supprimer. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Déplacer place les fichiers inutiles dans le dossier de destination choisi. Annuler les laisse où ils sont. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Choisissez quoi faire des fichiers inutiles : les déplacer en lieu sûr, les supprimer définitivement ou annuler. |
 | Move the unneeded files to a folder you choose | Déplacer les fichiers inutiles vers un dossier que vous choisissez |
@@ -420,7 +427,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | Erreur : une opération de fichier en file d'attente pour le prochain redémarrage vise le cache d'installation ({0}). Redémarrez Windows pour terminer cette opération avant de nettoyer. |
 | Moving {0} {1} to {2}... | Déplacement de {0} {1} vers {2}... |
 | Moved {0} {1}. | Déplacé {0} {1}. |
-| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Un autre processus InstallerClean détient le verrou d'instance unique (l'interface ou une autre exécution de la CLI). Code de sortie 75 (transitoire) ; sans risque à réessayer plus tard. |
+| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Un autre processus InstallerClean détient le verrou d'instance unique (l'interface ou une autre exécution de la CLI). Code de sortie 75 (transitoire) ; vous pouvez réessayer plus tard sans risque. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Remarque : l'écriture dans le journal des événements a échoué. Vérifiez les autorisations du journal Application ou la stratégie de groupe. |
 | InstallerClean - clean up C:\Windows\Installer | InstallerClean - nettoyage de C:\Windows\Installer |
 | Usage: | Utilisation : |

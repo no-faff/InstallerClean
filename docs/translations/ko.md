@@ -1,6 +1,6 @@
 # InstallerClean in 한국어 (Korean)
 
-The text of InstallerClean's interface and command-line tool in English on the left, with the Korean translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Korean can read through the translation and flag anything that doesn't read well. See [Can you help translate InstallerClean?](../../README.ko.md#can-you-help-translate-installerclean) for how to suggest a change, whether an issue or a pull request.
+The text of InstallerClean's interface and command-line tool in English on the left, with the Korean translation beside it, grouped by where each line appears in the app. It is here so someone who really knows Korean can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.ko.resx`](../../src/InstallerClean.Core/Resources/Strings.ko.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
@@ -139,16 +139,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | 모두 깨끗합니다 |
 | Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer에 정리할 것이 없습니다 |
 | Scanned {0} {1} in {2} | {1} {0}개 검사, {2} 소요 |
-| Copy them back if anything stops working | 무언가 작동을 멈추면 다시 복사해 오면 됩니다 |
-| Restore them from the Recycle Bin if anything stops working | 무언가 작동을 멈추면 휴지통에서 복원하면 됩니다 |
+| Copy them back if anything breaks ([it won't!]) | 무언가 망가지면 다시 복사해 오면 됩니다 ([그럴 일 없습니다!]) |
+| Until then, you can restore them if anything breaks ([it won't!]) | 그때까지는 무언가 망가지면 복원할 수 있습니다 ([그럴 일 없습니다!]) |
+| Empty it to actually reclaim the space. | 휴지통을 비워야 공간이 실제로 확보됩니다. |
 | {0} freed | {0} 확보 |
+| {0} cleaned up | {0} 정리 |
 | {0} moved | {0} 이동 |
 | {0} moved, some files could not be processed | {0} 이동, 일부 파일은 처리하지 못함 |
 | {0} freed, some files could not be processed | {0} 확보, 일부 파일은 처리하지 못함 |
+| {0} cleaned up, some files could not be processed | {0} 정리, 일부 파일은 처리하지 못함 |
+| {0} {1} moved to {2} | {1} {0}개를 {2}(으)로 이동함 |
 | {0} {1} moved to {2} | {1} {0}개를 {2}(으)로 이동함 |
 | {0} {1} moved to {2}. {3} {4} | {1} {0}개를 {2}(으)로 이동함. {4} {3}개 |
-| {0} {1} sent to the Recycle Bin | {1} {0}개를 휴지통으로 보냄 |
-| {0} {1} sent to the Recycle Bin. {2} {3} | {1} {0}개를 휴지통으로 보냄. {3} {2}개 |
+| {0} {1} moved to {2}. {3} {4} | {1} {0}개를 {2}(으)로 이동함. {4} {3}개 |
+| {0} {1} moved to the Recycle Bin | {1} {0}개를 휴지통으로 이동함 |
+| {0} {1} moved to the Recycle Bin | {1} {0}개를 휴지통으로 이동함 |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {1} {0}개를 휴지통으로 이동함. {3} {2}개 |
+| {0} {1} moved to the Recycle Bin. {2} {3} | {1} {0}개를 휴지통으로 이동함. {3} {2}개 |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. {3} {2}개 |
@@ -161,7 +168,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 한국어 |
 | --- | --- |
 | The Recycle Bin isn't available for this drive | 이 드라이브에서는 휴지통을 사용할 수 없습니다 |
-| So this {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently. | 그래서 이 {1}({2})은 아직 삭제되지 않았습니다. 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다. |
+| So this {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently. | 그래서 이 {1}은 아직 삭제되지 않았습니다 ({2}). 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다. |
 | So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently. | 그래서 이 {1} {0}개는 아직 삭제되지 않았습니다 ({2}). 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다. |
 | Deleting it is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 삭제해도 안전합니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 휴지통은 추가 안전장치일 뿐입니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
 | Deleting them is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 삭제해도 안전합니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 휴지통은 추가 안전장치일 뿐입니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
@@ -190,7 +197,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | {1} {0}개를 이동하시겠습니까? ({2}) |
 | Files will be moved to {0}. | 파일이 {0}(으)로 이동됩니다. |
 | Delete {0} {1} ({2})? | {1} {0}개를 삭제하시겠습니까? ({2}) |
-| Files will be sent to the Recycle Bin. If you'd like backup copies, use Move instead. | 파일이 휴지통으로 보내집니다. 백업 사본을 원하시면 대신 이동을 사용하세요. |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | 파일이 휴지통으로 이동됩니다. 백업 사본을 원하시면 대신 이동 버튼을 사용하세요. |
 
 ## Error messages
 
@@ -223,10 +230,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Access denied. | 액세스가 거부되었습니다. |
 | The operation failed. Try again or restart Windows. | 작업에 실패했습니다. 다시 시도하거나 Windows를 다시 시작하세요. |
 | Unknown error. | 알 수 없는 오류입니다. |
-| Couldn't send this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Move it instead. | 이 파일을 휴지통으로 보낼 수 없습니다(오류 {0}). 파일이 잠겨 있거나, 사용 중이거나, Windows에 의해 차단되었을 수 있습니다. 대신 이동하세요. |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Move it instead. | 관리자 권한으로도 Windows가 이 파일에 대한 액세스를 차단했습니다(오류 {0}). 보통 소유권이나 권한 잠금 때문입니다. 대신 이동하세요. |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or Move it instead. | 이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다(오류 {0}). 그 프로그램이나, 이 파일을 검사 중인 무언가를 닫은 다음 다시 시도하거나, 대신 이동하세요. |
-| The file was permanently deleted because it could not be sent to the Recycle Bin. | 이 파일을 휴지통으로 보낼 수 없어 영구 삭제되었습니다. |
+| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | 이 파일을 휴지통으로 이동할 수 없습니다(오류 {0}). 파일이 잠겨 있거나, 사용 중이거나, Windows에 의해 차단되었을 수 있습니다. 대신 이동 버튼을 사용하세요. |
+| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | 관리자 권한으로도 Windows가 이 파일에 대한 액세스를 차단했습니다(오류 {0}). 보통 소유권이나 권한 잠금 때문입니다. 대신 이동 버튼을 사용하세요. |
+| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | 이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다(오류 {0}). 그 프로그램이나, 이 파일을 검사 중인 무언가를 닫은 다음 다시 시도하거나, 대신 이동 버튼을 사용하세요. |
+| The file was permanently deleted because it could not be moved to the Recycle Bin. | 이 파일을 휴지통으로 이동할 수 없어 영구 삭제되었습니다. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | 파일을 Windows Installer 폴더로 이동하는 것을 거부합니다(대상: {0}). |
 | Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | 대상은 정규화된 전체 경로여야 합니다(상대 경로는 프로세스의 현재 디렉터리를 기준으로 해석되어 권한 상승 상태에서 안전하지 않습니다): {0} |
 | Destination folder canonical path changed mid-batch: {0} | 일괄 처리 도중 대상 폴더의 정규 경로가 변경되었습니다: {0} |
@@ -296,7 +303,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다. |
 | Move the unneeded files to the Move location. | 불필요한 파일을 이동 위치로 옮깁니다. |
 | Move the unneeded files to the Move location. Choose one first. | 불필요한 파일을 이동 위치로 옮깁니다. 먼저 위치를 선택하세요. |
-| Send the unneeded files to the Recycle Bin. | 불필요한 파일을 휴지통으로 보냅니다. |
+| Move the unneeded files to the Recycle Bin. | 불필요한 파일을 휴지통으로 이동합니다. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | 내장된 Authenticode 인증서의 주체 이름입니다. 인증서 체인은 검증하지 않았습니다. |
 | Change language. The program will restart. | 언어를 변경합니다. 프로그램이 다시 시작됩니다. |
 
@@ -316,8 +323,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub (About window) | GitHub에 별 남기기 (정보 창) |
 | Minimise | 최소화 |
 | Move all unneeded installer files to the chosen destination folder | 불필요한 설치 관리자 파일을 모두 선택한 대상 폴더로 이동 |
-| Send all unneeded installer files to the Recycle Bin | 불필요한 설치 관리자 파일을 모두 휴지통으로 보내기 |
-| Delete sends the unneeded files to the Recycle Bin. Cancel closes without deleting. | 삭제하면 불필요한 파일이 휴지통으로 보내집니다. 취소하면 삭제하지 않고 닫습니다. |
+| Move all unneeded installer files to the Recycle Bin | 불필요한 설치 관리자 파일을 모두 휴지통으로 이동 |
+| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | 삭제하면 불필요한 파일이 휴지통으로 이동됩니다. 취소하면 삭제하지 않고 닫습니다. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 이동하면 불필요한 파일이 선택한 대상 폴더에 들어갑니다. 취소하면 파일은 있던 자리에 그대로 남습니다. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | 불필요한 파일을 어떻게 처리할지 선택하세요. 안전한 곳으로 이동하거나, 영구 삭제하거나, 취소합니다. |
 | Move the unneeded files to a folder you choose | 불필요한 파일을 직접 고른 폴더로 이동 |
