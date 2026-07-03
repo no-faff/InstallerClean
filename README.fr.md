@@ -149,6 +149,7 @@ Si l'API renvoie des données incomplètes (rare, mais possible avec un état d'
 
 Une fois un déplacement ou une suppression terminé, les sous-dossiers vides de `C:\Windows\Installer` (les répertoires que le cache laisse derrière lui une fois leur contenu parti) sont nettoyés dans la même passe.
 
+<a id="is-it-safe"></a>
 ## Est-ce sûr ?
 
 Oui. InstallerClean interroge la même base de données de l'API Windows Installer que Windows utilise lui-même pour suivre ce qui est installé. Si Windows indique qu'un fichier n'est plus nécessaire, l'application le croit ; elle ne devine pas à partir des noms de fichiers ou des dates.

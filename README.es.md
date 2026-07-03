@@ -149,6 +149,7 @@ Si la API devuelve datos incompletos (algo raro, pero que puede ocurrir si el es
 
 Tras completar un Mover o un Eliminar, las subcarpetas vacías que haya dentro de `C:\Windows\Installer` (los directorios que la caché deja atrás cuando su contenido desaparece) se podan en la misma pasada.
 
+<a id="is-it-safe"></a>
 ## ¿Es seguro?
 
 Sí. InstallerClean consulta la misma base de datos de la API de Windows Installer que el propio Windows usa para llevar el control de lo que está instalado. Si Windows dice que un archivo ya no hace falta, la aplicación se fía; no adivina a partir de nombres de archivo ni fechas.

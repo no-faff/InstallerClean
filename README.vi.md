@@ -149,6 +149,7 @@ Nếu API trả về dữ liệu không đầy đủ (hiếm, nhưng có thể x
 
 Sau khi một thao tác Chuyển hoặc Xóa hoàn tất, các thư mục con rỗng bên trong `C:\Windows\Installer` (những thư mục mà bộ nhớ đệm để lại khi nội dung đã biến mất) được dọn luôn trong cùng lượt đó.
 
+<a id="is-it-safe"></a>
 ## Có an toàn không?
 
 Có. InstallerClean truy vấn chính cơ sở dữ liệu API Windows Installer mà Windows dùng để theo dõi những gì đã được cài. Nếu Windows nói một tệp không còn cần nữa, ứng dụng tin vào điều đó; nó không phỏng đoán dựa trên tên tệp hay ngày tháng.

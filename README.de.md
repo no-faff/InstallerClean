@@ -149,6 +149,7 @@ Wenn die API unvollständige Daten zurückgibt (selten, aber bei beschädigtem I
 
 Nach einem abgeschlossenen Verschieben oder Löschen werden leere Unterordner in `C:\Windows\Installer` (die Verzeichnisse, die der Cache zurücklässt, sobald ihr Inhalt weg ist) im selben Durchgang entfernt.
 
+<a id="is-it-safe"></a>
 ## Ist es sicher?
 
 Ja. InstallerClean fragt dieselbe Windows-Installer-API-Datenbank ab, die Windows selbst verwendet, um nachzuhalten, was installiert ist. Wenn Windows sagt, dass eine Datei nicht mehr benötigt wird, vertraut die App darauf; sie rät nicht anhand von Dateinamen oder Datumsangaben.

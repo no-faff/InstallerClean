@@ -149,6 +149,7 @@ If the API returns incomplete data (rare, but it can happen with a corrupted ins
 
 After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer` (the directories the cache leaves behind once their contents are gone) are pruned in the same pass.
 
+<a id="is-it-safe"></a>
 ## Is it safe?
 
 Yes. InstallerClean queries the same Windows Installer API database that Windows itself uses to track what's installed. If Windows says a file is no longer needed, the app trusts it; it doesn't guess based on filenames or dates.

@@ -149,6 +149,7 @@ API eksik veri döndürürse (nadirdir, ama bozuk bir Installer durumunda olabil
 
 Bir Taşı veya Sil işlemi tamamlandıktan sonra, `C:\Windows\Installer` içindeki boş alt klasörler (önbelleğin, içeriği gittiğinde geride bıraktığı dizinler) aynı geçişte budanır.
 
+<a id="is-it-safe"></a>
 ## Güvenli mi?
 
 Evet. InstallerClean, Windows'un kurulu olanı izlemek için kendi kullandığı Windows Installer API veritabanını sorgular. Windows bir dosyanın artık gerekli olmadığını söylüyorsa, uygulama buna güvenir; dosya adlarına ya da tarihlere bakarak tahmin yürütmez.

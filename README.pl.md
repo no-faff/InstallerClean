@@ -149,6 +149,7 @@ Jeśli API zwróci niekompletne dane (rzadko, ale przy uszkodzonym stanie instal
 
 Po zakończeniu przenoszenia lub usuwania puste podfoldery wewnątrz `C:\Windows\Installer` (katalogi, które pamięć podręczna pozostawia po zniknięciu ich zawartości) są usuwane w tym samym przebiegu.
 
+<a id="is-it-safe"></a>
 ## Czy to bezpieczne?
 
 Tak. InstallerClean odpytuje tę samą bazę danych API Windows Installer, której Windows używa do śledzenia tego, co jest zainstalowane. Jeśli Windows mówi, że plik nie jest już potrzebny, aplikacja mu ufa; nie zgaduje na podstawie nazw plików ani dat.
