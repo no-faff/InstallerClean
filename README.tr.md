@@ -385,7 +385,7 @@ dotnet test src/InstallerClean.Tests/
 
 Bir hata mı buldunuz ya da bir öneriniz mi var? [Bir konu açın](../../issues) ya da bir [tartışma](../../discussions) başlatın. Çekme istekleri memnuniyetle karşılanır. Lütfen göndermeden önce `dotnet test` çalıştırın.
 
-InstallerClean artık baştan sona Türkçe: uygulama, kurulum, komut satırı ve bu README. Bunların hepsi elimden gelenin en iyisi olan makine çevirileri; kusursuz olmayacaklar, bu yüzden anadili Türkçe olan birinin gözden geçirmesini beklemek yerine oldukları gibi yayımladım. Geliştirilebilecek bir şey fark ederseniz, bir konu, bir çekme isteği ya da bir tartışma yoluyla bana iletmenizden memnuniyet duyarım. Uygulama varsayılan olarak Windows dilinizde açılır; küre simgesiyle istediğiniz zaman İngilizceye geçebilirsiniz.
+InstallerClean artık baştan sona Türkçe: uygulama, kurulum, komut satırı ve bu README. Bunların hepsi elimden gelenin en iyisi olan makine çevirileri; kusursuz olmayacaklar, bu yüzden anadili Türkçe olan birinin gözden geçirmesini beklemek yerine oldukları gibi yayımladım. Geliştirilebilecek bir şey fark ederseniz, bir [konu](../../issues/new?template=translation_review.md), bir çekme isteği ya da bir tartışma yoluyla bana iletmenizden memnuniyet duyarım. Uygulama varsayılan olarak Windows dilinizde açılır; küre simgesiyle istediğiniz zaman İngilizceye geçebilirsiniz.
 
 ## Projeyi destekleyin
 

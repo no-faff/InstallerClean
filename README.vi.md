@@ -384,7 +384,7 @@ dotnet test src/InstallerClean.Tests/
 
 Tìm thấy lỗi hay có đề xuất? Hãy [mở một issue](../../issues) hoặc bắt đầu một [thảo luận](../../discussions). Pull request luôn được hoan nghênh. Vui lòng chạy `dotnet test` trước khi gửi.
 
-Giờ đây InstallerClean đã có đầy đủ bằng tiếng Việt: ứng dụng, trình cài đặt, dòng lệnh và cả README này. Tất cả đều là bản dịch máy mà tôi đã cố gắng hết sức; chúng sẽ không hoàn hảo, nên tôi phát hành nguyên trạng thay vì chờ người bản ngữ kiểm tra. Nếu bạn thấy có chỗ nào có thể cải thiện, tôi rất vui nếu bạn cho tôi biết, qua một issue, một pull request hoặc một thảo luận. Ứng dụng mặc định mở bằng ngôn ngữ Windows của bạn; bạn có thể chuyển sang tiếng Anh bất cứ lúc nào bằng biểu tượng quả địa cầu.
+Giờ đây InstallerClean đã có đầy đủ bằng tiếng Việt: ứng dụng, trình cài đặt, dòng lệnh và cả README này. Tất cả đều là bản dịch máy mà tôi đã cố gắng hết sức; chúng sẽ không hoàn hảo, nên tôi phát hành nguyên trạng thay vì chờ người bản ngữ kiểm tra. Nếu bạn thấy có chỗ nào có thể cải thiện, tôi rất vui nếu bạn cho tôi biết, qua một [issue](../../issues/new?template=translation_review.md), một pull request hoặc một thảo luận. Ứng dụng mặc định mở bằng ngôn ngữ Windows của bạn; bạn có thể chuyển sang tiếng Anh bất cứ lúc nào bằng biểu tượng quả địa cầu.
 
 ## Ủng hộ dự án
 

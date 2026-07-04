@@ -384,7 +384,7 @@ dotnet test src/InstallerClean.Tests/
 
 ¿Has encontrado un bug o tienes una sugerencia? [Abre un issue](../../issues) o inicia una [discusión](../../discussions). Las pull requests son bienvenidas. Ejecuta `dotnet test` antes de enviar.
 
-InstallerClean ya está disponible por completo en español: la aplicación, el instalador, la línea de comandos y este README. Todas son traducciones automáticas hechas lo mejor que he podido; no serán perfectas, así que las he publicado tal cual en lugar de esperar a que un hablante nativo las revise. Si ves algo que se pueda mejorar, me encantaría saberlo, en un issue, una pull request o una discusión. La aplicación se abre de forma predeterminada en el idioma de tu Windows; puedes cambiar a inglés en cualquier momento con el icono del globo terráqueo.
+InstallerClean ya está disponible por completo en español: la aplicación, el instalador, la línea de comandos y este README. Todas son traducciones automáticas hechas lo mejor que he podido; no serán perfectas, así que las he publicado tal cual en lugar de esperar a que un hablante nativo las revise. Si ves algo que se pueda mejorar, me encantaría saberlo, en un [issue](../../issues/new?template=translation_review.md), una pull request o una discusión. La aplicación se abre de forma predeterminada en el idioma de tu Windows; puedes cambiar a inglés en cualquier momento con el icono del globo terráqueo.
 
 ## Apoyar el proyecto
 

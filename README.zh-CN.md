@@ -384,7 +384,7 @@ dotnet test src/InstallerClean.Tests/
 
 发现了 bug，或有什么建议？[提交 issue](../../issues) 或发起[讨论](../../discussions)。欢迎 pull request。提交前请先运行 `dotnet test`。
 
-InstallerClean 现已全面提供简体中文：应用、安装程序、命令行以及这份 README。这些都是我尽力而为的机器翻译，难免有不完美之处，所以我没有等母语者校对，而是先按现状发布了。如果您发现任何可以改进的地方，欢迎通过 issue、pull request 或讨论告诉我。应用默认以您的 Windows 语言打开，您随时可以点击地球图标切换到英文。
+InstallerClean 现已全面提供简体中文：应用、安装程序、命令行以及这份 README。这些都是我尽力而为的机器翻译，难免有不完美之处，所以我没有等母语者校对，而是先按现状发布了。如果您发现任何可以改进的地方，欢迎通过 [issue](../../issues/new?template=translation_review.md)、pull request 或讨论告诉我。应用默认以您的 Windows 语言打开，您随时可以点击地球图标切换到英文。
 
 ## 支持本项目
 
