@@ -497,15 +497,15 @@ public partial class MainWindow : Window
     // always reflects the displayed language.
     private static readonly System.Windows.Media.FontFamily SegoeMdl2 = new("Segoe MDL2 Assets");
 
-    // Listed alphabetically by name, the conventional picker order, with English
-    // (the source and fallback) pinned first. The README language-switcher uses a
-    // different, priority order. Arabic is README-only (no satellite resx), so it
-    // is not offered here.
+    // Listed alphabetically by each language's own name, the conventional picker
+    // order (so the non-Latin scripts group after the Latin names). The README
+    // language-switcher uses a different, priority order. Arabic is README-only
+    // (no satellite resx), so it is not offered here.
     private static readonly (string Culture, string Endonym)[] LanguageChoices =
     {
-        ("en-GB", "English"),
         ("id", "Bahasa Indonesia"),
         ("de", "Deutsch"),
+        ("en-GB", "English"),
         ("es", "Español"),
         ("fr", "Français"),
         ("it", "Italiano"),

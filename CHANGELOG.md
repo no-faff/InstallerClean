@@ -45,6 +45,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - Code comments that still described the command-line tool as pinned to English were brought in line with the CLI localisation.
 - The two file-details windows now left-align their column headers, so each heading sits above the values in its column instead of centred over them; the numeric size and patch columns right-align their headers to sit over the figures. The keyboard column-sort and its sort-arrow indicator are unchanged.
 - The orphaned-files details window is a little wider (its right-hand metadata panel gains the extra width while the file list keeps its size), so a long value such as a signing certificate has more room to wrap cleanly where a language's field labels run long and leave the value column cramped. Every value field in both details windows now wraps a long value rather than clipping it, closing a gap on the reason and file-size fields.
+- The language menu now lists English in its alphabetical place among the other languages rather than pinned to the top; the tick still marks the current language.
 
 ## [1.9.2] - 2026-06-21
 
