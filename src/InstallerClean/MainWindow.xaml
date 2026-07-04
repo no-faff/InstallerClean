@@ -681,8 +681,15 @@
                          the summary against the caption that follows
                          (the reassurance on an all-clear, the restore
                          hint after a Move or Delete); GapBottom.Sm (8)
-                         loosens the pairing visibly. -->
-                    <TextBlock x:Name="CompletionSummaryText" Text="{Binding Completion.Summary}"
+                         loosens the pairing visibly. Inlines are composed
+                         in code-behind (BuildCompletionSummaryLine) so a
+                         Move's destination path always starts its own
+                         line, at whatever point it substitutes into the
+                         formatted sentence for the current language; a
+                         plain Text binding cannot force a line break at a
+                         dynamic position, so there is no Text binding
+                         here. -->
+                    <TextBlock x:Name="CompletionSummaryText"
                                Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="0,0,0,6"

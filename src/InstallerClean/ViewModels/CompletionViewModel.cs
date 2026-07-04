@@ -43,6 +43,20 @@ public partial class CompletionViewModel : ObservableObject
     [ObservableProperty] private string _restore = string.Empty;
 
     /// <summary>
+    /// Move-only: the raw destination path embedded in <see cref="Summary"/>,
+    /// so the WPF host can locate it within the formatted sentence and force
+    /// it onto its own line (mirroring the move-confirmation dialog's
+    /// destination-on-its-own-line treatment). Empty on every other
+    /// completion path (delete, all-clear) so the host falls back to
+    /// rendering Summary verbatim. Must be set before <see cref="Summary"/>
+    /// in <see cref="ShowMoveSummary"/>: the WPF host rebuilds the summary
+    /// line's inlines from Summary's PropertyChanged, so this needs its
+    /// final value in place before that setter raises. Cleared everywhere
+    /// else because the view-model instance is reused across operations.
+    /// </summary>
+    [ObservableProperty] private string _summaryDestination = string.Empty;
+
+    /// <summary>
     /// Delete-only line shown above <see cref="Restore"/> ("Empty it to
     /// actually reclaim the space."). Empty on every other completion path
     /// (move, all-clear, permanent delete) so the bound TextBlock collapses
@@ -157,6 +171,7 @@ public partial class CompletionViewModel : ObservableObject
     public void ShowAllClear(int installedProductCount, long scanDurationMs)
     {
         Heading = Strings.Completion_AllClean;
+        SummaryDestination = string.Empty;
         Summary = Strings.Completion_NothingToCleanUp;
         Restore = string.Format(
             Strings.Completion_NothingToCleanUpReceipt,
@@ -190,6 +205,12 @@ public partial class CompletionViewModel : ObservableObject
                 : (freesSpace ? Strings.Completion_PartlyFreed : Strings.Completion_PartlyMoved),
             DisplayHelpers.FormatSize(movedBytes));
         var movedLabel = DisplayHelpers.PluraliseFile(movedCount);
+        // SummaryDestination must be set before Summary: the WPF host rebuilds
+        // the summary line's inlines (splitting the sentence at this substring
+        // to force the path onto its own line) from Summary's PropertyChanged,
+        // so SummaryDestination needs its final value in place before that
+        // setter raises.
+        SummaryDestination = destination;
         Summary = errors.Count == 0
             ? string.Format(DisplayHelpers.Pluralise(movedCount,
                     Strings.Completion_MoveSummary_Singular,
@@ -216,6 +237,7 @@ public partial class CompletionViewModel : ObservableObject
         Heading = string.Format(
             errors.Count == 0 ? Strings.Completion_CleanedUp : Strings.Completion_PartlyCleanedUp,
             DisplayHelpers.FormatSize(deletedBytes));
+        SummaryDestination = string.Empty;
         var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
         Summary = errors.Count == 0
             ? string.Format(DisplayHelpers.Pluralise(deletedCount,
@@ -254,6 +276,7 @@ public partial class CompletionViewModel : ObservableObject
         Heading = string.Format(
             errors.Count == 0 ? Strings.Completion_CleanedUp : Strings.Completion_PartlyCleanedUp,
             DisplayHelpers.FormatSize(deletedBytes));
+        SummaryDestination = string.Empty;
         var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
         Summary = errors.Count == 0
             ? string.Format(DisplayHelpers.Pluralise(deletedCount,
