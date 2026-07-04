@@ -151,7 +151,7 @@
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>От_править</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
-  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Угостить меня чашкой чая</value></data>
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Поддержать</value></data>
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Угостить чаем (окно «О программе»)</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Отменить операцию</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Отменить сканирование</value></data>
@@ -232,7 +232,7 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Объясняет эту папку и то, как восстановить файл, в README</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Если пригодилось, угостите меня чашкой чая.</value></data>
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Поддержать</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>В горле пересохло!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Запрошена отмена. InstallerClean ждёт, когда текущий шаг дойдёт до точки остановки. Это может занять несколько секунд при интенсивном вводе-выводе или обращении к базе данных MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Закрыть</value></data>
@@ -256,7 +256,7 @@
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Удалите их в Корзину или сначала переместите в другое место, если хотите сохранить копию.</value>
+    <value>Удалите их в Корзину, или используйте вместо этого функцию «Переместить», если хотите сохранить копию.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Прямо сейчас что-то использует Windows Installer, обычно это обновление Windows или программа, устанавливающаяся в фоне. Пока это происходит, «Переместить» и «Удалить» приостановлены, чтобы InstallerClean не трогал кэш установки, пока тот меняется. Когда всё завершится, выполните повторное сканирование, и они снова станут доступны.</value></data>
@@ -461,8 +461,7 @@
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>Переместить {0} {1} ({2})?</value></data>
-  <!-- 0 = destination path -->
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Файлы будут перемещены в {0}.</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Файлы будут перемещены в:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Удалить {0} {1} ({2})?</value></data>
   <!-- "the Move button", not bare "Move": this line says "moved to the Recycle
        Bin" like the rest of the delete copy, and also points at the separate

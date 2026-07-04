@@ -151,7 +151,7 @@
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>送信(_S)</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
-  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>コーヒーを一杯おごる</value></data>
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>寄付</value></data>
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>一杯おごる (バージョン情報ウィンドウ)</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>操作をキャンセル</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>スキャンをキャンセル</value></data>
@@ -232,7 +232,7 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>このフォルダーとファイルの回復方法を README で説明しています</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>役に立ったら、コーヒーを一杯ご馳走してください。</value></data>
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>寄付</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>喉が渇く仕事です！</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>キャンセルが要求されました。InstallerClean は現在のステップが停止可能なポイントに達するのを待っています。大量の I/O または MSI データベース呼び出し中は数秒かかることがあります。</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>閉じる</value></data>
@@ -256,7 +256,7 @@
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>ごみ箱に削除するか、コピーを保持したい場合は先に別の場所に移動してください。</value>
+    <value>ごみ箱に削除するか、コピーを保持したい場合は代わりに「移動」を使用してください。</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>現在 Windows Installer を使用しているものがあります。通常は Windows Update またはバックグラウンドでインストール中のプログラムです。その実行中は移動と削除が一時停止され、InstallerClean は変更中のインストーラーキャッシュに触れません。完了したら、再スキャンすると復元されます。</value></data>
@@ -461,8 +461,7 @@
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>{0} 個の {1} ({2})を移動しますか？</value></data>
-  <!-- 0 = destination path -->
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>ファイルは {0} に移動されます。</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>ファイルは次の場所に移動されます：</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{0} 個の {1} ({2})を削除しますか？</value></data>
   <!-- "the Move button", not bare "Move": this line says "moved to the Recycle
        Bin" like the rest of the delete copy, and also points at the separate
