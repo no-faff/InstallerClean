@@ -353,8 +353,8 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back if anything breaks ([it won't!]).</value></data>
-  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Until then, you can restore them if anything breaks ([it won't!]).</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Kopier sie zurück, falls etwas kaputtgeht ([wird es nicht!]).</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Bis dahin kannst du sie wiederherstellen, falls etwas kaputtgeht ([wird es nicht!]).</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
        emptied; this line names that step. "actually" carries "this is what
