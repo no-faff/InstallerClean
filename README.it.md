@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Download totali"></a>
 </p>
 
-![Schermata di InstallerClean dopo una pulizia riuscita: 1,28 GB liberati, 69 file inviati al Cestino](docs/screenshots/it/06-freed-success-done.webp)
+![Schermata di InstallerClean dopo una pulizia riuscita: 1,28 GB ripuliti, 69 file spostati al Cestino](docs/screenshots/it/06-freed-success-done.webp)
 
 - **Cosa fa:** InstallerClean fa una cosa sola: rimuove i file non necessari da `C:\Windows\Installer`, una cartella nascosta che Windows non pulisce mai. Dopo una scansione quasi istantanea ti dice se ne hai, mostra qualche dettaglio in più per i curiosi e ti lascia eliminarli per liberare spazio sull'unità C:. La usi una volta e passi oltre.
 - **Forse sei qui perché:** Hai usato [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, hai visto che `C:\Windows\Installer` occupava un sacco di spazio e non sapevi cosa ci fosse dentro. InstallerClean è proprio quello che ti serve. Sa cosa contengono quei file dai nomi all'apparenza casuali come `9f05cba.msi` e ti dice rapidamente quali puoi eliminare in sicurezza.
@@ -117,7 +117,7 @@ Il consiglio abituale confonde l'eliminare file a caso (cosa che è davvero peri
 </p>
 
 <p>
-  <img src="docs/screenshots/it/06-freed-success-done.webp" alt="Schermata di esito positivo che mostra 1,28 GB liberati, con 69 file inviati al Cestino" width="900"><br>
+  <img src="docs/screenshots/it/06-freed-success-done.webp" alt="Schermata di esito positivo che mostra 1,28 GB ripuliti, con 69 file spostati al Cestino" width="900"><br>
   <em>Dopo un'eliminazione riuscita.</em>
   <br><br>
 </p>

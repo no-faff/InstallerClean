@@ -25,7 +25,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="إجمالي التنزيلات"></a>
 </p>
 
-![لقطة شاشة لـ InstallerClean بعد تنظيف ناجح: تحرير 1.28 GB ونقل 69 ملفاً إلى سلة المحذوفات](docs/screenshots/en/06-freed-success-done.webp)
+![لقطة شاشة لـ InstallerClean بعد تنظيف ناجح: تنظيف 1.28 GB ونقل 69 ملفاً إلى سلة المحذوفات](docs/screenshots/en/06-freed-success-done.webp)
 
 - **ما هو:** يفعل InstallerClean شيئاً واحداً: يزيل الملفات غير الضرورية من `C:\Windows\Installer`، وهو مجلد مخفي لا ينظفه Windows أبداً. بعد فحص شبه فوري يخبرك إن كان لديك أي منها، ويعرض مزيداً من التفاصيل للفضوليين، ويتيح لك حذفها لتحرير مساحة على قرص C:. تستخدمه مرة واحدة ثم تمضي في طريقك.
 - **قد تكون هنا لأنك:** استخدمت [WinDirStat](https://github.com/windirstat/windirstat) أو WizTree أو TreeSize، فرأيت `C:\Windows\Installer` يشغل مساحة كبيرة ولم تعرف ما بداخله. وInstallerClean هو ما تحتاج إليه تماماً. فهو يعرف ما بداخل تلك الملفات ذات الأسماء التي تبدو عشوائية مثل `9f05cba.msi`، ويخبرك بسرعة أيّها يمكنك حذفه بأمان.
@@ -119,7 +119,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/en/06-freed-success-done.webp" alt="طبقة نجاح تُظهر تحرير 1.28 GB، مع إرسال 69 ملفاً إلى سلة المحذوفات" width="900"><br>
+  <img src="docs/screenshots/en/06-freed-success-done.webp" alt="طبقة نجاح تُظهر تنظيف 1.28 GB، مع نقل 69 ملفاً إلى سلة المحذوفات" width="900"><br>
   <em>بعد عملية حذف ناجحة.</em>
   <br><br>
 </p>

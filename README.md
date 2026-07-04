@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Total downloads"></a>
 </p>
 
-![Screenshot of InstallerClean after a successful clean-up: 1.28 GB freed, 69 files sent to the Recycle Bin](docs/screenshots/en/06-freed-success-done.webp)
+![Screenshot of InstallerClean after a successful clean-up: 1.28 GB cleaned up, 69 files moved to the Recycle Bin](docs/screenshots/en/06-freed-success-done.webp)
 
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
 - **You might be here because:** You used [WinDirStat](https://github.com/windirstat/windirstat), WizTree or TreeSize, saw `C:\Windows\Installer` taking up a lot of space and didn't know what was in there. InstallerClean is just what you need. It knows what's in those files with random-looking names like `9f05cba.msi` and quickly tells you which ones you can safely delete.
@@ -117,7 +117,7 @@ The standard advice confuses deleting files at random (which genuinely is danger
 </p>
 
 <p>
-  <img src="docs/screenshots/en/06-freed-success-done.webp" alt="Success overlay showing 1.28 GB freed, with 69 files sent to the Recycle Bin" width="900"><br>
+  <img src="docs/screenshots/en/06-freed-success-done.webp" alt="Success overlay showing 1.28 GB cleaned up, with 69 files moved to the Recycle Bin" width="900"><br>
   <em>After a successful Delete.</em>
   <br><br>
 </p>

@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Total de downloads"></a>
 </p>
 
-![Captura de tela do InstallerClean após uma limpeza bem-sucedida: 1,28 GB liberados, 69 arquivos enviados para a Lixeira](docs/screenshots/pt/06-freed-success-done.webp)
+![Captura de tela do InstallerClean após uma limpeza bem-sucedida: 1,28 GB limpos, 69 arquivos movidos para a Lixeira](docs/screenshots/pt/06-freed-success-done.webp)
 
 - **O que faz:** O InstallerClean faz uma coisa só: remove arquivos desnecessários de `C:\Windows\Installer`, uma pasta oculta que o Windows nunca limpa. Depois de uma análise quase instantânea, ele te diz se você tem algum, mostra mais detalhes para os curiosos e deixa você excluí-los para liberar espaço no disco C:. Você usa uma vez e segue em frente.
 - **Talvez você esteja aqui porque:** Você usou o [WinDirStat](https://github.com/windirstat/windirstat), o WizTree ou o TreeSize, viu que o `C:\Windows\Installer` estava ocupando muito espaço e não sabia o que tinha ali dentro. O InstallerClean é exatamente o que você precisa. Ele sabe o que há naqueles arquivos com nomes que parecem aleatórios, como `9f05cba.msi`, e te diz rapidamente quais você pode excluir com segurança.
@@ -117,7 +117,7 @@ O conselho padrão confunde apagar arquivos a esmo (o que é de fato perigoso) c
 </p>
 
 <p>
-  <img src="docs/screenshots/pt/06-freed-success-done.webp" alt="Sobreposição de sucesso mostrando 1,28 GB liberados, com 69 arquivos enviados para a Lixeira" width="900"><br>
+  <img src="docs/screenshots/pt/06-freed-success-done.webp" alt="Sobreposição de sucesso mostrando 1,28 GB limpos, com 69 arquivos movidos para a Lixeira" width="900"><br>
   <em>Depois de uma exclusão bem-sucedida.</em>
   <br><br>
 </p>
