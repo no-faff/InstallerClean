@@ -1,14 +1,25 @@
 using System.Windows;
+using System.Windows.Automation;
+using System.Windows.Documents;
 using InstallerClean.Helpers;
+using InstallerClean.Resources;
 
 namespace InstallerClean;
 
 public partial class ConfirmSendResultLogWindow : Window
 {
+    // Stable README anchor (an explicit <a id="reports-stats"> right before
+    // the "Will I actually free up GBs of space?" FAQ answer of every
+    // README, so rewording the question never breaks the link). The
+    // Reassurance line's "[how much space people are freeing]" phrase links
+    // here; the URL targets the README in the displayed language.
+    private static string ReportsStatsUrl => ReadmeLinks.For("reports-stats", Localisation.UiCulture);
+
     public ConfirmSendResultLogWindow(string jsonContent)
     {
         InitializeComponent();
         JsonText.Text = jsonContent;
+        BuildReassuranceLine();
 
         // Sized to content, so the whole report is visible with no
         // scrollbar; the clamp stops an error-heavy report or a very
@@ -24,6 +35,53 @@ public partial class ConfirmSendResultLogWindow : Window
         // Cancel still activates Cancel, so a reflexive Enter dismisses.
         // Deferred to Loaded so the visual tree exists when Focus runs.
         Loaded += (_, _) => CancelButton.Focus();
+    }
+
+    /// <summary>
+    /// Composes the Reassurance line from <see cref="Strings.ConfirmSendResultLog_Reassurance"/>,
+    /// rendering the <c>[ ]</c>-delimited phrase as a Hyperlink into the
+    /// README's reports-stats FAQ answer: a prefix Run, the Hyperlink, then a
+    /// suffix Run. Mirrors MainWindow's BuildCompletionRestoreLine; the URL
+    /// opens through <see cref="UrlLauncher"/> so this elevated process does
+    /// not launch the browser as Administrator.
+    /// </summary>
+    private void BuildReassuranceLine()
+    {
+        var raw = Strings.ConfirmSendResultLog_Reassurance;
+        ReassuranceText.Inlines.Clear();
+
+        int open = raw.IndexOf('[');
+        int close = open >= 0 ? raw.IndexOf(']', open + 1) : -1;
+        if (open < 0 || close < 0)
+        {
+            ReassuranceText.Inlines.Add(new Run(raw));
+            return;
+        }
+
+        var prefix = raw[..open];
+        var linkText = raw[(open + 1)..close];
+        var suffix = raw[(close + 1)..];
+
+        var link = new Hyperlink(new Run(linkText))
+        {
+            NavigateUri = new Uri(ReportsStatsUrl),
+            Style = (Style)FindResource("SubtleLink"),
+        };
+        link.Click += Hyperlink_Click;
+        // The link text alone ("how much space people are freeing") is not a
+        // self-contained accessible name; the whole sentence (brackets
+        // removed) is, already in the user's language.
+        AutomationProperties.SetName(link, prefix + linkText + suffix);
+
+        if (prefix.Length > 0) ReassuranceText.Inlines.Add(new Run(prefix));
+        ReassuranceText.Inlines.Add(link);
+        if (suffix.Length > 0) ReassuranceText.Inlines.Add(new Run(suffix));
+    }
+
+    private void Hyperlink_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Hyperlink link && link.NavigateUri is not null)
+            UrlLauncher.OpenUrl(link.NavigateUri.AbsoluteUri);
     }
 
     private void OnSend(object sender, RoutedEventArgs e)
