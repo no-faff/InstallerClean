@@ -688,31 +688,14 @@
                                TextWrapping="Wrap" Margin="0,0,0,6"
                                AutomationProperties.LiveSetting="Polite"/>
 
-                    <!-- Delete-only space hint ("Empty it to actually reclaim
-                         the space."), bound to Completion.SpaceHint and shown
-                         above the restore line. Collapses when empty (every
-                         path but a recycle-delete) so move / all-clear /
-                         permanent-delete carry no phantom gap. 4px bottom
-                         pairs it with the restore line: the two are one
-                         delete message. -->
-                    <TextBlock x:Name="CompletionSpaceHintText" Text="{Binding Completion.SpaceHint}"
-                               AutomationProperties.LiveSetting="Polite"
-                               Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
-                               HorizontalAlignment="Center" TextAlignment="Center"
-                               TextWrapping="Wrap" Margin="0,0,0,4">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility" Value="Visible"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Completion.SpaceHint}" Value="">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-
-                    <!-- Restore guidance. Collapses when empty so the
+                    <!-- Restore guidance. On a recycle-delete this leads with
+                         Completion.SpaceHint ("Empty it to actually reclaim the
+                         space.") folded into the same flowing text by
+                         BuildCompletionRestoreLine, rather than a separate
+                         TextBlock, so the sentence wraps naturally as one
+                         paragraph (a fixed line break there left a lone word
+                         stranded on its own line in longer languages, French's
+                         "sera pas le cas !" among them). Collapses when empty so the
                          all-clear overlay (which has no restore hint)
                          doesn't carry a phantom 30+ pixel gap from the
                          bottom margin plus line-height of an empty

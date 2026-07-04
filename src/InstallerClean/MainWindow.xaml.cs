@@ -388,13 +388,11 @@ public partial class MainWindow : Window
 
     // The error list stays unraised: the summary already speaks the
     // error count, and the per-file breakdown is scan-mode reading. The
-    // space hint (delete only) and the restore line carry the second half
-    // of the outcome (how to reclaim the space and undo it after a Delete,
-    // where the files went after a Move, the scan receipt on an all-clear).
-    // A collapsed space hint (every non-delete path) announces nothing.
+    // restore line carries the second half of the outcome (how to reclaim
+    // the space and undo it after a Delete, where the files went after a
+    // Move, the scan receipt on an all-clear).
     private void AnnounceCompletionOutcome() =>
-        AnnounceLiveRegions(CompletionHeadingText, CompletionSummaryText,
-            CompletionSpaceHintText, CompletionRestoreText);
+        AnnounceLiveRegions(CompletionHeadingText, CompletionSummaryText, CompletionRestoreText);
 
     // Stable README anchor (an explicit <a id="is-it-safe"> before the
     // "Is it safe?" section of every README, so rewording a heading never
@@ -416,7 +414,14 @@ public partial class MainWindow : Window
     /// </summary>
     private void BuildCompletionRestoreLine()
     {
-        var raw = _vm.Completion.Restore;
+        // SpaceHint (the recycle-delete-only "Empty it to actually reclaim
+        // the space.") is folded in as a leading sentence rather than its own
+        // TextBlock, so the whole thing wraps as one flowing paragraph. Two
+        // separately-wrapped TextBlocks each break independently, which could
+        // strand a short trailing phrase (French's "sera pas le cas !") alone
+        // on its own line even when the pane had room to carry it up.
+        var spaceHint = _vm.Completion.SpaceHint;
+        var raw = spaceHint.Length > 0 ? $"{spaceHint} {_vm.Completion.Restore}" : _vm.Completion.Restore;
         CompletionRestoreText.Inlines.Clear();
 
         int open = raw.IndexOf('[');
