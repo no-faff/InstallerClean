@@ -228,8 +228,12 @@ public partial class CompletionViewModel : ObservableObject
                     Strings.Completion_DeleteSummaryWithErrors_Plural,
                     "Completion.DeleteSummaryWithErrors"),
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
-        Restore = Strings.Completion_DeleteRestoreHint;
+        // SpaceHint must be set before Restore: the WPF host rebuilds the
+        // restore line's inlines (folding SpaceHint in as a leading sentence)
+        // from Restore's PropertyChanged, so SpaceHint needs its final value
+        // in place before that setter raises.
         SpaceHint = Strings.Completion_DeleteSpaceHint;
+        Restore = Strings.Completion_DeleteRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
