@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Toplam indirme"></a>
 </p>
 
-![Başarılı bir temizliğin ardından InstallerClean'in ekran görüntüsü: 1,28 GB açıldı, 69 dosya Geri Dönüşüm Kutusu'na gönderildi](docs/screenshots/tr/06-freed-success-done.webp)
+![Başarılı bir temizliğin ardından InstallerClean'in ekran görüntüsü: 1,28 GB temizlendi, 69 dosya Geri Dönüşüm Kutusu'na taşındı](docs/screenshots/tr/06-freed-success-done.webp)
 
 - **Ne yapar:** InstallerClean tek bir iş yapar: Windows'un hiç temizlemediği gizli bir klasör olan `C:\Windows\Installer` içindeki gereksiz dosyaları kaldırır. Neredeyse anında biten bir taramanın ardından böyle dosyalarınız olup olmadığını size söyler, merak edenler için daha fazla ayrıntı gösterir ve C: sürücünüzde yer açmak için bunları silmenize olanak tanır. Bir kez kullanır, yolunuza devam edersiniz.
 - **Buraya gelme nedeniniz belki de şu:** [WinDirStat](https://github.com/windirstat/windirstat), WizTree ya da TreeSize kullandınız, `C:\Windows\Installer`'ın çok yer kapladığını gördünüz ama içinde ne olduğunu bilmiyordunuz. InstallerClean tam da ihtiyacınız olan şey. `9f05cba.msi` gibi rastgele görünen adlı o dosyaların içinde ne olduğunu bilir ve hangilerini güvenle silebileceğinizi size hızlıca söyler.
@@ -117,7 +117,7 @@ Sıradan tavsiyeler, dosyaları gelişigüzel silmeyi (ki bu gerçekten tehlikel
 </p>
 
 <p>
-  <img src="docs/screenshots/tr/06-freed-success-done.webp" alt="1,28 GB açıldığını ve 69 dosyanın Geri Dönüşüm Kutusu'na gönderildiğini gösteren başarı katmanı" width="900"><br>
+  <img src="docs/screenshots/tr/06-freed-success-done.webp" alt="1,28 GB temizlendiğini ve 69 dosyanın Geri Dönüşüm Kutusu'na taşındığını gösteren başarı katmanı" width="900"><br>
   <em>Başarılı bir Sil işleminin ardından.</em>
   <br><br>
 </p>

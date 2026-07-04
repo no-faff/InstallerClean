@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Total des téléchargements"></a>
 </p>
 
-![Capture d'écran d'InstallerClean après un nettoyage réussi : 1,28 Go libérés, 69 fichiers envoyés à la Corbeille](docs/screenshots/fr/06-freed-success-done.webp)
+![Capture d'écran d'InstallerClean après un nettoyage réussi : 1,28 Go nettoyés, 69 fichiers déplacés à la Corbeille](docs/screenshots/fr/06-freed-success-done.webp)
 
 - **En bref :** InstallerClean fait une seule chose : il supprime les fichiers inutiles de `C:\Windows\Installer`, un dossier caché que Windows ne nettoie jamais. Après une analyse quasi instantanée, il vous dit si vous en avez, donne plus de détails pour les curieux, et vous permet de les supprimer pour libérer de l'espace sur votre disque C:. Vous l'utilisez une fois, puis vous passez à autre chose.
 - **Vous êtes peut-être ici parce que :** vous avez utilisé [WinDirStat](https://github.com/windirstat/windirstat), WizTree ou TreeSize, vous avez vu que `C:\Windows\Installer` occupait beaucoup de place et vous ne saviez pas ce qu'il y avait dedans. InstallerClean est exactement ce qu'il vous faut. Il sait ce que contiennent ces fichiers aux noms apparemment aléatoires comme `9f05cba.msi` et vous dit rapidement lesquels vous pouvez supprimer sans risque.
@@ -117,7 +117,7 @@ Le conseil habituel confond la suppression de fichiers au hasard (ce qui est ré
 </p>
 
 <p>
-  <img src="docs/screenshots/fr/06-freed-success-done.webp" alt="Écran de réussite indiquant 1,28 Go libérés, avec 69 fichiers envoyés à la Corbeille" width="900"><br>
+  <img src="docs/screenshots/fr/06-freed-success-done.webp" alt="Écran de réussite indiquant 1,28 Go nettoyés, avec 69 fichiers déplacés à la Corbeille" width="900"><br>
   <em>Après une suppression réussie.</em>
   <br><br>
 </p>
