@@ -562,14 +562,17 @@
   <data name="ResultLog.Sent" xml:space="preserve"><value>감사합니다! 보고서를 보냈습니다.</value></data>
   <data name="ResultLog.Failed" xml:space="preserve"><value>보내기에 실패했습니다. 나중에 다시 시도하세요.</value></data>
   <data name="ResultLog.NothingToSend" xml:space="preserve"><value>보낼 보고서가 없습니다.</value></data>
-  <!-- Body header shown in the confirmation modal. Names the
-       recipient and the full URL so the user sees the destination
-       without having to scroll the JSON. -->
-  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>이 내용을 No Faff에 보내시겠습니까?</value></data>
-  <!-- Reassurance line under the JSON. Names the URL once, calls
-       out the no-PII property, and explains the purpose so the
-       user has the context the modal title implies. -->
-  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>사용자나 사용자의 컴퓨터를 식별할 수 있는 내용은 전혀 없습니다. 그저 InstallerClean이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 알 수 있게 해 줄 뿐입니다. nofaff.netlify.app/api/result-log으로 전송됩니다.</value></data>
+  <!-- Body header shown in the confirmation modal. Kept short: the JSON
+       right below is the actual disclosure, the title just asks. -->
+  <data name="ConfirmSendResultLog.Title" xml:space="preserve"><value>이 내용을 보내시겠습니까?</value></data>
+  <!-- Reassurance line under the JSON. Leads with the destination so the URL
+       always opens its own sentence rather than trailing variable-length
+       prose (stops it wrapping unpredictably at different lengths per
+       language), then the no-PII property and purpose. The bracketed phrase
+       becomes a hyperlink into the README's reports-stats FAQ answer (built
+       in ConfirmSendResultLogWindow.xaml.cs), the same [ ]-delimited pattern
+       as MainWindow's "[it won't!]". -->
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>nofaff.netlify.app/api/result-log으로 전송됩니다. 사용자나 사용자의 컴퓨터를 식별할 수 있는 내용은 전혀 없습니다. 그저 InstallerClean이 잘 작동하는지와 [사람들이 공간을 얼마나 확보하고 있는지] 알 수 있게 해 줄 뿐입니다.</value></data>
   <!-- AutomationProperties.Name on the JSON preview TextBox so screen
        readers announce its content rather than "edit, read-only". -->
   <data name="Automation.ResultLogPreview" xml:space="preserve"><value>결과 로그 미리 보기</value></data>

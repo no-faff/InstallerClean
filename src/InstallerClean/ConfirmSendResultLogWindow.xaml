@@ -79,7 +79,11 @@
                 </ScrollViewer>
             </Border>
 
-            <TextBlock Grid.Row="2" Text="{loc:Translate ConfirmSendResultLog.Reassurance}"
+            <!-- Built up in code-behind (BuildReassuranceLine): the
+                 [ ]-delimited phrase in ConfirmSendResultLog.Reassurance
+                 becomes a Hyperlink into the README's reports-stats FAQ
+                 answer, mirroring MainWindow's "[it won't!]" restore line. -->
+            <TextBlock x:Name="ReassuranceText" Grid.Row="2"
                        Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
                        TextWrapping="Wrap"
                        Margin="{StaticResource GapBottom.Lg}"/>
