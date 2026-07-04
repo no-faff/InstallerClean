@@ -384,7 +384,7 @@ dotnet test src/InstallerClean.Tests/
 
 Menemukan bug atau punya saran? [Buka sebuah issue](../../issues) atau mulai [diskusi](../../discussions). Pull request dipersilakan. Mohon jalankan `dotnet test` sebelum mengirim.
 
-InstallerClean kini tersedia sepenuhnya dalam bahasa Indonesia: aplikasi, pemasang, baris perintah, dan README ini. Semuanya terjemahan mesin yang sudah saya upayakan sebaik mungkin. Terjemahan ini tentu tidak akan sempurna, jadi saya merilisnya apa adanya daripada menunggu penutur asli memeriksanya. Jika Anda menemukan sesuatu yang bisa diperbaiki, saya akan dengan senang hati mendengarnya, lewat issue, pull request, atau diskusi. Aplikasi terbuka dalam bahasa Windows Anda secara bawaan, dan Anda bisa beralih ke bahasa Inggris kapan saja lewat ikon globe.
+InstallerClean kini tersedia sepenuhnya dalam bahasa Indonesia: aplikasi, pemasang, baris perintah, dan README ini. Semuanya terjemahan mesin yang sudah saya upayakan sebaik mungkin. Terjemahan ini tentu tidak akan sempurna, jadi saya merilisnya apa adanya daripada menunggu penutur asli memeriksanya. Jika Anda menemukan sesuatu yang bisa diperbaiki, saya akan dengan senang hati mendengarnya, lewat [issue](../../issues/new?template=translation_review.md), pull request, atau diskusi. Aplikasi terbuka dalam bahasa Windows Anda secara bawaan, dan Anda bisa beralih ke bahasa Inggris kapan saja lewat ikon globe.
 
 ## Dukung proyek ini
 

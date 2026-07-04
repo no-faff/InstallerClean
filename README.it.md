@@ -384,7 +384,7 @@ dotnet test src/InstallerClean.Tests/
 
 Hai trovato un bug o hai un suggerimento? [Apri un issue](../../issues) o avvia una [discussione](../../discussions). Le pull request sono benvenute. Esegui `dotnet test` prima di inviare.
 
-InstallerClean è ora interamente disponibile in italiano: l'app, il programma di installazione e la riga di comando. [bovirus](https://github.com/bovirus), madrelingua, ha gentilmente corretto e approvato l'app e il programma di installazione, e la riga di comando si basa anch'essa sul suo lavoro. Se noti qualcosa che si può migliorare, sarò felice di saperlo, in un issue, una pull request o una discussione. L'app si apre per impostazione predefinita nella lingua di Windows, e puoi passare all'inglese in qualsiasi momento con l'icona del globo. Questo README è il mio miglior tentativo di traduzione automatica: anche in questo caso, ogni suggerimento per migliorarlo è benvenuto.
+InstallerClean è ora interamente disponibile in italiano: l'app, il programma di installazione e la riga di comando. [bovirus](https://github.com/bovirus), madrelingua, ha gentilmente corretto e approvato l'app e il programma di installazione, e la riga di comando si basa anch'essa sul suo lavoro. Se noti qualcosa che si può migliorare, sarò felice di saperlo, in un [issue](../../issues/new?template=translation_review.md), una pull request o una discussione. L'app si apre per impostazione predefinita nella lingua di Windows, e puoi passare all'inglese in qualsiasi momento con l'icona del globo. Questo README è il mio miglior tentativo di traduzione automatica: anche in questo caso, ogni suggerimento per migliorarlo è benvenuto.
 
 ## Sostieni il progetto
 
