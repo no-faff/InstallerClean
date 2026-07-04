@@ -151,7 +151,7 @@
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Send</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
-  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Buy me a cup of tea</value></data>
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Donate</value></data>
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Buy me a cuppa (About window)</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Cancel operation</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Cancel scan</value></data>
@@ -232,7 +232,7 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Explains this folder, and how to recover a file, in the README</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>If it helped, buy me a cup of tea.</value></data>
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Donate</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>It's thirsty work!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Close</value></data>
@@ -256,7 +256,7 @@
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy.</value>
+    <value>Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back.</value></data>
@@ -461,8 +461,7 @@
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>Move {0} {1} ({2})?</value></data>
-  <!-- 0 = destination path -->
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Files will be moved to {0}.</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Files will be moved to:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Delete {0} {1} ({2})?</value></data>
   <!-- "the Move button", not bare "Move": this line says "moved to the Recycle
        Bin" like the rest of the delete copy, and also points at the separate

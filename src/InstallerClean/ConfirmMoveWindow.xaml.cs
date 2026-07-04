@@ -11,7 +11,12 @@ public partial class ConfirmMoveWindow : Window
         InitializeComponent();
         var label = DisplayHelpers.PluraliseFile(fileCount);
         MessageText.Text = string.Format(Strings.Confirm_MoveTitle, fileCount, label, sizeDisplay);
-        DestinationText.Text = string.Format(Strings.Confirm_MoveDestination, destination);
+        DestinationLabel.Text = Strings.Confirm_MoveDestination;
+        // Insert a zero-width space after every backslash so a long path wraps at
+        // a folder boundary (after ...\Installer\, not inside a folder name). It is
+        // spelled with the C# unicode escape; do not paste a literal zero-width
+        // character into source (it is invisible and tooling mangles it).
+        DestinationText.Text = destination.Replace("\\", "\\\u200B");
         // The window title is what a screen reader announces when a
         // dialog opens; the static "Confirm move" left the question
         // itself, the count and size, unspoken. ShowInTaskbar is false,

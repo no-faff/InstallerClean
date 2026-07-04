@@ -46,6 +46,9 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The two file-details windows now left-align their column headers, so each heading sits above the values in its column instead of centred over them; the numeric size and patch columns right-align their headers to sit over the figures. The keyboard column-sort and its sort-arrow indicator are unchanged.
 - The orphaned-files details window is a little wider (its right-hand metadata panel gains the extra width while the file list keeps its size), so a long value such as a signing certificate has more room to wrap cleanly where a language's field labels run long and leave the value column cramped. Every value field in both details windows now wraps a long value rather than clipping it, closing a gap on the reason and file-size fields.
 - The language menu now lists English in its alphabetical place among the other languages rather than pinned to the top; the tick still marks the current language.
+- The move-confirmation dialog now shows the destination folder on its own line under "Files will be moved to:", and a long path wraps at its folder separators, so the path no longer breaks awkwardly mid-sentence.
+- The main-window intro's action line now reads "or use Move instead" in place of "or Move them elsewhere first", saying the same thing more plainly.
+- The main-window donate button's tooltip and screen-reader label now read "Donate" rather than "If it helped, buy me a cup of tea"; the About window keeps the cup-of-tea wording.
 
 ## [1.9.2] - 2026-06-21
 

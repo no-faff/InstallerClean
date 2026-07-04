@@ -151,7 +151,7 @@
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Gönder</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
-  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Bana bir bardak çay ısmarla</value></data>
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Bağış yap</value></data>
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Bana bir çay ısmarla (Hakkında penceresi)</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>İşlemi iptal et</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Taramayı iptal et</value></data>
@@ -232,7 +232,7 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Bu klasörü açıklar ve bir dosyanın nasıl kurtarılacağını README'de anlatır</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>İşinize yaradıysa bana bir bardak çay ısmarlayın.</value></data>
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Bağış yap</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Susatan bir iş!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>İptal istendi. InstallerClean, geçerli adımın durabileceği bir noktaya gelmesini bekliyor. Yoğun G/Ç sırasında ya da bir MSI veritabanı çağrısında bu birkaç saniye sürebilir.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Kapat</value></data>
@@ -256,7 +256,7 @@
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Geri Dönüşüm Kutusu'na göndermek için onları silin ya da bir kopyasını saklamak isterseniz önce başka bir yere taşıyın.</value>
+    <value>Onları Geri Dönüşüm Kutusu'na silin ya da bir kopyasını saklamak isterseniz bunun yerine Taşı'yı kullanın.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Şu anda bir şey Windows Installer'ı kullanıyor; genellikle bir Windows Update ya da arka planda kurulan bir program. Bu sürerken Taşı ve Sil duraklatılır, böylece InstallerClean değişmekte olan yükleyici önbelleğine dokunmaz. İşlem bittiğinde Yeniden tara'yı kullanın, geri gelirler.</value></data>
@@ -461,8 +461,7 @@
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>{0} {1} ({2}) taşınsın mı?</value></data>
-  <!-- 0 = destination path -->
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Dosyalar {0} konumuna taşınacak.</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>Dosyalar şu konuma taşınacak:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{0} {1} ({2}) silinsin mi?</value></data>
   <!-- "the Move button", not bare "Move": this line says "moved to the Recycle
        Bin" like the rest of the delete copy, and also points at the separate

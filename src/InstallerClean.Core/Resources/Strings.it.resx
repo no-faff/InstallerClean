@@ -151,7 +151,7 @@
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Invia</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
-  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Offrimi una tazzina di caffè</value></data>
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Dona</value></data>
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Offrimi un caffè (finestra Informazioni)</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Annulla operazione</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Annulla scansione</value></data>
@@ -232,7 +232,7 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Spiega questa cartella, e come recuperare un file, nel README</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Se ti è stato utile, offrimi una tazzina di caffè.</value></data>
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Dona</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Ci vuole un caffè!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Annullamento richiesto. InstallerClean sta aspettando che il passaggio in corso arrivi a un punto in cui fermarsi. Può richiedere qualche secondo durante operazioni di I/O intense o una chiamata al database MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Chiudi</value></data>
@@ -256,7 +256,7 @@
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Eliminali nel Cestino, oppure spostali prima altrove, se preferisci tenerne una copia.</value>
+    <value>Eliminali nel Cestino, oppure usa invece Sposta, se preferisci tenerne una copia.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>In questo momento qualcosa sta usando Windows Installer, di solito un aggiornamento di Windows o un programma che si sta installando in background. Mentre questo avviene 'Sposta' ed 'Elimina' sono in pausa, così InstallerClean non tocca la cache di installazione quando ci sono modifiche in corso. Ad attività completate ripeti la scansione e torneranno disponibili.</value></data>
@@ -461,8 +461,7 @@
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>Vuoi spostare {0} {1} ({2})?</value></data>
-  <!-- 0 = destination path -->
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>I file verranno spostati in {0}.</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>I file verranno spostati in:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>Vuoi eliminare {0} {1} ({2})?</value></data>
   <!-- "the Move button", not bare "Move": this line says "moved to the Recycle
        Bin" like the rest of the delete copy, and also points at the separate

@@ -151,7 +151,7 @@
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>发送(_S)</value></data>
 
   <!-- Automation names (screen reader / accessibility) -->
-  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>请我喝杯茶</value></data>
+  <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>捐赠</value></data>
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>请我喝杯茶（关于窗口）</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>取消操作</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>取消扫描</value></data>
@@ -232,7 +232,7 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>在 README 中解释了这个文件夹，以及如何恢复文件</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>如果它帮到了您，请我喝杯茶。</value></data>
+  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>捐赠</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>该来杯茶了！</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>已请求取消。InstallerClean 正在等待当前步骤到达一个可以停下来的位置。在大量 I/O 操作或 MSI 数据库调用期间，这可能需要几秒钟。</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>关闭</value></data>
@@ -256,7 +256,7 @@
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>将它们删除到回收站；如果您想保留副本，也可以先把它们移动到别处。</value>
+    <value>将它们删除到回收站，如果您想保留副本，也可以改用“移动”。</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>现在有程序正在使用 Windows Installer，通常是 Windows 更新或某个正在后台安装的程序。在此期间，移动和删除会暂停，这样 InstallerClean 就不会在安装程序缓存发生变化时去动它。等它完成后，重新扫描，这两项操作便会恢复。</value></data>
@@ -461,8 +461,7 @@
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>移动 {0} 个{1}（{2}）？</value></data>
-  <!-- 0 = destination path -->
-  <data name="Confirm.MoveDestination" xml:space="preserve"><value>文件将被移动到 {0}。</value></data>
+  <data name="Confirm.MoveDestination" xml:space="preserve"><value>文件将被移动到：</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>删除 {0} 个{1}（{2}）？</value></data>
   <!-- "the Move button", not bare "Move": this line says "moved to the Recycle
        Bin" like the rest of the delete copy, and also points at the separate
