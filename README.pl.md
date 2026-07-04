@@ -295,7 +295,6 @@ choco install installerclean
 Albo zainstaluj przez [Scoop](https://scoop.sh):
 
 ```
-scoop bucket add no-faff https://github.com/no-faff/scoop-bucket
 scoop install installerclean
 ```
 

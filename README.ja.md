@@ -295,7 +295,6 @@ choco install installerclean
 または [Scoop](https://scoop.sh) でインストールできます。
 
 ```
-scoop bucket add no-faff https://github.com/no-faff/scoop-bucket
 scoop install installerclean
 ```
 
