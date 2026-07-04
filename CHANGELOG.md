@@ -50,6 +50,8 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The move-confirmation dialog now shows the destination folder on its own line under "Files will be moved to:", and a long path wraps at its folder separators, so the path no longer breaks awkwardly mid-sentence.
 - The main-window intro's action line now reads "or use Move instead" in place of "or Move them elsewhere first", saying the same thing more plainly.
 - The main-window donate button's tooltip and screen-reader label now read "Donate" rather than "If it helped, buy me a cup of tea"; the About window keeps the cup-of-tea wording.
+- Every translated README now shows the app running in its own language, rather than the previous shared English screenshots with translated captions.
+- The send-report dialog's title is now just "Send this?" (the JSON below it is the actual disclosure), the line naming where the report goes now opens the paragraph instead of trailing it, and "how much space people are freeing" links to the FAQ answer showing what other people have actually freed.
 
 ## [1.9.2] - 2026-06-21
 
