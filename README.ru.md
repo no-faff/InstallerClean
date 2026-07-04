@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Всего загрузок"></a>
 </p>
 
-![Скриншот InstallerClean после успешной очистки: очищено 1,28 ГБ, 69 файлов перемещено в Корзину](docs/screenshots/ru/06-freed-success-done.webp)
+![Скриншот InstallerClean после успешной очистки: очищено 1,28 ГБ, 69 файлов перемещено в Корзину](docs/screenshots/ru/06-success-done.webp)
 
 - **Что это:** InstallerClean делает одно дело: убирает ненужные файлы из `C:\Windows\Installer` — скрытой папки, которую Windows никогда не очищает. После почти мгновенного сканирования он сообщает, есть ли они у вас, показывает подробности для любопытных и позволяет удалить их, чтобы освободить место на диске C:. Запускаете один раз — и идёте дальше.
 - **Возможно, вы здесь вот почему:** вы пользовались [WinDirStat](https://github.com/windirstat/windirstat), WizTree или TreeSize, увидели, что `C:\Windows\Installer` занимает много места, и не знали, что там внутри. InstallerClean — как раз то, что вам нужно. Он знает, что содержится в этих файлах со случайными на вид именами вроде `9f05cba.msi`, и быстро подскажет, какие из них можно безопасно удалить.
@@ -117,7 +117,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/ru/06-freed-success-done.webp" alt="Экран успеха: очищено 1,28 ГБ, 69 файлов перемещено в Корзину" width="900"><br>
+  <img src="docs/screenshots/ru/06-success-done.webp" alt="Экран успеха: очищено 1,28 ГБ, 69 файлов перемещено в Корзину" width="900"><br>
   <em>После успешного удаления.</em>
   <br><br>
 </p>

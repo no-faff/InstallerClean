@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Łączna liczba pobrań"></a>
 </p>
 
-![Zrzut ekranu InstallerClean po udanym oczyszczeniu: wyczyszczono 1,28 GB, 69 plików przeniesiono do Kosza](docs/screenshots/pl/06-freed-success-done.webp)
+![Zrzut ekranu InstallerClean po udanym oczyszczeniu: wyczyszczono 1,28 GB, 69 plików przeniesiono do Kosza](docs/screenshots/pl/06-success-done.webp)
 
 - **Co:** InstallerClean robi jedną rzecz: usuwa niepotrzebne pliki z `C:\Windows\Installer`, ukrytego folderu, którego Windows nigdy nie czyści. Po niemal natychmiastowym skanowaniu mówi ci, czy w ogóle jakieś masz, pokazuje więcej szczegółów ciekawskim i pozwala je usunąć, by zwolnić miejsce na dysku C:. Uruchamiasz go raz i ruszasz dalej.
 - **Może jesteś tu, bo:** Użyłeś [WinDirStat](https://github.com/windirstat/windirstat), WizTree albo TreeSize, zobaczyłeś, że `C:\Windows\Installer` zajmuje mnóstwo miejsca, i nie wiedziałeś, co w nim siedzi. InstallerClean to dokładnie to, czego potrzebujesz. Wie, co kryje się w tych plikach o pozornie przypadkowych nazwach, jak `9f05cba.msi`, i szybko mówi ci, które z nich możesz bezpiecznie usunąć.
@@ -117,7 +117,7 @@ Standardowa porada myli usuwanie plików na chybił trafił (co naprawdę jest n
 </p>
 
 <p>
-  <img src="docs/screenshots/pl/06-freed-success-done.webp" alt="Nakładka sukcesu pokazująca wyczyszczone 1,28 GB i 69 plików przeniesionych do Kosza" width="900"><br>
+  <img src="docs/screenshots/pl/06-success-done.webp" alt="Nakładka sukcesu pokazująca wyczyszczone 1,28 GB i 69 plików przeniesionych do Kosza" width="900"><br>
   <em>Po udanym usunięciu.</em>
   <br><br>
 </p>

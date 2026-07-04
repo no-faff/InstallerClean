@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Total unduhan"></a>
 </p>
 
-![Tangkapan layar InstallerClean setelah pembersihan berhasil: 1,28 GB dibersihkan, 69 file dipindahkan ke Keranjang Sampah](docs/screenshots/id/06-freed-success-done.webp)
+![Tangkapan layar InstallerClean setelah pembersihan berhasil: 1,28 GB dibersihkan, 69 file dipindahkan ke Keranjang Sampah](docs/screenshots/id/06-success-done.webp)
 
 - **Apa:** InstallerClean melakukan satu hal: menghapus file yang tidak diperlukan dari `C:\Windows\Installer`, folder tersembunyi yang tidak pernah dibersihkan Windows. Setelah pemindaian yang hampir seketika, aplikasi memberi tahu Anda apakah ada file seperti itu, menampilkan detail lebih lanjut bagi yang penasaran, dan memungkinkan Anda menghapusnya untuk mengosongkan ruang di drive C: Anda. Anda cukup memakainya sekali lalu lanjut.
 - **Mungkin Anda di sini karena:** Anda memakai [WinDirStat](https://github.com/windirstat/windirstat), WizTree, atau TreeSize, melihat `C:\Windows\Installer` memakan banyak ruang, dan tidak tahu apa isinya. InstallerClean justru yang Anda butuhkan. Aplikasi ini tahu isi file dengan nama yang tampak acak seperti `9f05cba.msi` dan dengan cepat memberi tahu Anda mana yang aman dihapus.
@@ -117,7 +117,7 @@ Nasihat standar mencampuradukkan penghapusan file secara sembarangan (yang meman
 </p>
 
 <p>
-  <img src="docs/screenshots/id/06-freed-success-done.webp" alt="Overlay keberhasilan yang menampilkan 1,28 GB dibersihkan, dengan 69 file dipindahkan ke Keranjang Sampah" width="900"><br>
+  <img src="docs/screenshots/id/06-success-done.webp" alt="Overlay keberhasilan yang menampilkan 1,28 GB dibersihkan, dengan 69 file dipindahkan ke Keranjang Sampah" width="900"><br>
   <em>Setelah Hapus yang berhasil.</em>
   <br><br>
 </p>

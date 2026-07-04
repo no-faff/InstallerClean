@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Downloads insgesamt"></a>
 </p>
 
-![Screenshot von InstallerClean nach einem erfolgreichen Aufräumen: 1,28 GB aufgeräumt, 69 Dateien in den Papierkorb verschoben](docs/screenshots/de/06-freed-success-done.webp)
+![Screenshot von InstallerClean nach einem erfolgreichen Aufräumen: 1,28 GB aufgeräumt, 69 Dateien in den Papierkorb verschoben](docs/screenshots/de/06-success-done.webp)
 
 - **Was:** InstallerClean tut eine Sache: Es entfernt nicht benötigte Dateien aus `C:\Windows\Installer`, einem versteckten Ordner, den Windows nie aufräumt. Nach einem fast augenblicklichen Scan sagt es dir, ob du welche hast, zeigt Neugierigen mehr Details und lässt dich die Dateien löschen, um Platz auf deiner C:-Festplatte freizugeben. Du benutzt es einmal und machst weiter.
 - **Warum du vielleicht hier bist:** Du hast [WinDirStat](https://github.com/windirstat/windirstat), WizTree oder TreeSize benutzt, gesehen, dass `C:\Windows\Installer` viel Platz belegt, und nicht gewusst, was darin steckt. InstallerClean ist genau das Richtige. Es weiß, was in diesen Dateien mit ihren zufällig wirkenden Namen wie `9f05cba.msi` steckt, und sagt dir schnell, welche du bedenkenlos löschen kannst.
@@ -117,7 +117,7 @@ Der übliche Rat verwechselt das wahllose Löschen von Dateien (was tatsächlich
 </p>
 
 <p>
-  <img src="docs/screenshots/de/06-freed-success-done.webp" alt="Erfolgs-Overlay mit 1,28 GB aufgeräumt und 69 in den Papierkorb verschobenen Dateien" width="900"><br>
+  <img src="docs/screenshots/de/06-success-done.webp" alt="Erfolgs-Overlay mit 1,28 GB aufgeräumt und 69 in den Papierkorb verschobenen Dateien" width="900"><br>
   <em>Nach einem erfolgreichen Löschen.</em>
   <br><br>
 </p>

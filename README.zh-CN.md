@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="总下载量"></a>
 </p>
 
-![InstallerClean 成功清理后的截图：已清理 1.28 GB，69 个文件已移到回收站](docs/screenshots/zh/06-freed-success-done.webp)
+![InstallerClean 成功清理后的截图：已清理 1.28 GB，69 个文件已移到回收站](docs/screenshots/zh/06-success-done.webp)
 
 - **简介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 里不需要的文件，这是个 Windows 从不清理的隐藏文件夹。它几乎瞬间扫描完，告诉您有没有这类文件，想细看的还能查看更多细节，并让您删掉它们，给 C: 盘腾出空间。用上一次，就可以不再惦记了。
 - **您可能正是为此而来：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 时，看到 `C:\Windows\Installer` 占了很大空间，却不知道里面都是些什么。InstallerClean 正是您需要的工具。像 `9f05cba.msi` 这样名字看起来毫无规律的文件，它清楚里面装的是什么，并很快告诉您哪些可以安全删除。
@@ -117,7 +117,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/zh/06-freed-success-done.webp" alt="删除成功后的提示界面，显示已清理 1.28 GB，69 个文件已移到回收站" width="900"><br>
+  <img src="docs/screenshots/zh/06-success-done.webp" alt="删除成功后的提示界面，显示已清理 1.28 GB，69 个文件已移到回收站" width="900"><br>
   <em>一次成功的删除之后。</em>
   <br><br>
 </p>
