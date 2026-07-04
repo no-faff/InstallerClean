@@ -79,4 +79,34 @@ public class CompletionViewModelTests
             errors: new List<FileOperationError>(), freesSpace: false);
         Assert.Equal(string.Empty, vm.SpaceHint);
     }
+
+    [Fact]
+    public void ShowMoveSummary_sets_summary_destination_to_the_raw_path()
+    {
+        // The WPF host locates this raw string inside the formatted Summary
+        // to force the destination onto its own line; it must be the
+        // literal, unformatted path handed to ShowMoveSummary.
+        var vm = new CompletionViewModel();
+        vm.ShowMoveSummary(movedCount: 1, movedBytes: 1024 * 1024, destination: @"D:\backup",
+            errors: new List<FileOperationError>(), freesSpace: true);
+
+        Assert.Equal(@"D:\backup", vm.SummaryDestination);
+        Assert.Contains(@"D:\backup", vm.Summary);
+    }
+
+    [Fact]
+    public void Summary_destination_from_a_move_is_cleared_by_a_following_delete()
+    {
+        // The view-model instance is reused across operations, so a stale
+        // destination path from a prior move must not bleed into a later
+        // delete summary (which has no destination placeholder at all).
+        var vm = new CompletionViewModel();
+        vm.ShowMoveSummary(movedCount: 1, movedBytes: 1024 * 1024, destination: @"D:\backup",
+            errors: new List<FileOperationError>(), freesSpace: true);
+        Assert.NotEqual(string.Empty, vm.SummaryDestination);
+
+        vm.ShowDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
+            errors: new List<FileOperationError>());
+        Assert.Equal(string.Empty, vm.SummaryDestination);
+    }
 }

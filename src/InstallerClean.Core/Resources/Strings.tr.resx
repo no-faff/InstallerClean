@@ -377,12 +377,15 @@
        0 = total size (e.g. "120.5 MB"). -->
   <data name="Completion.PartlyFreed" xml:space="preserve"><value>{0} açıldı, bazı dosyalar işlenemedi</value></data>
   <data name="Completion.PartlyCleanedUp" xml:space="preserve"><value>{0} temizlendi, bazı dosyalar işlenemedi</value></data>
-  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path -->
-  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} {1}, {2} konumuna taşındı</value></data>
-  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} {1}, {2} konumuna taşındı</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path. The colon
+       ends the sentence at the verb/preposition so the WPF host can force
+       the path onto its own line at the exact point {2} substitutes, the
+       same technique the move-confirmation dialog uses. -->
+  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} {1} şu konuma taşındı: {2}</value></data>
+  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} {1} şu konuma taşındı: {2}</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
-  <data name="Completion.MoveSummaryWithErrors.Singular" xml:space="preserve"><value>{0} {1}, {2} konumuna taşındı. {3} {4}</value></data>
-  <data name="Completion.MoveSummaryWithErrors.Plural" xml:space="preserve"><value>{0} {1}, {2} konumuna taşındı. {3} {4}</value></data>
+  <data name="Completion.MoveSummaryWithErrors.Singular" xml:space="preserve"><value>{0} {1} şu konuma taşındı: {2}. {3} {4}</value></data>
+  <data name="Completion.MoveSummaryWithErrors.Plural" xml:space="preserve"><value>{0} {1} şu konuma taşındı: {2}. {3} {4}</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
   <data name="Completion.DeleteSummary.Singular" xml:space="preserve"><value>{0} {1} Geri Dönüşüm Kutusu'na taşındı</value></data>
   <data name="Completion.DeleteSummary.Plural" xml:space="preserve"><value>{0} {1} Geri Dönüşüm Kutusu'na taşındı</value></data>

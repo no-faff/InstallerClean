@@ -45,11 +45,13 @@ public partial class MainWindow : Window
         // overlay.
         if (_vm.Completion.IsComplete)
         {
-            // The restore line has no Text binding (it hosts an inline
-            // Hyperlink composed in code), so build it now for the overlay
-            // already up at construction; the PropertyChanged path that
-            // normally builds it never fired for this pre-construction
-            // completion (the startup all-clear set during the splash).
+            // Neither the summary nor the restore line has a Text binding
+            // (each hosts inlines composed in code), so build both now for
+            // the overlay already up at construction; the PropertyChanged
+            // path that normally builds them never fired for this
+            // pre-construction completion (the startup all-clear set during
+            // the splash).
+            BuildCompletionSummaryLine();
             BuildCompletionRestoreLine();
             Dispatcher.BeginInvoke(DispatcherPriority.Input, () => CompletionCloseButton.Focus());
             // The overlay was never revealed inside this window's lifetime
@@ -205,9 +207,13 @@ public partial class MainWindow : Window
 
     private void OnCompletionPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        // Restore is set on every Show* path before IsComplete flips, so
-        // rebuilding its inlines here means they are in place by the time the
-        // IsComplete branch below announces the outcome.
+        // Summary and Restore are both set on every Show* path before
+        // IsComplete flips, so rebuilding their inlines here means they are
+        // in place by the time the IsComplete branch below announces the
+        // outcome.
+        if (e.PropertyName == nameof(CompletionViewModel.Summary))
+            BuildCompletionSummaryLine();
+
         if (e.PropertyName == nameof(CompletionViewModel.Restore))
             BuildCompletionRestoreLine();
 
@@ -401,6 +407,46 @@ public partial class MainWindow : Window
     // file was safe to remove; the URL targets the README in the displayed
     // language.
     private static string SafetyUrl => ReadmeLinks.For("is-it-safe", Localisation.UiCulture);
+
+    /// <summary>
+    /// Composes the completion summary line from <see cref="CompletionViewModel.Summary"/>,
+    /// forcing the destination path (<see cref="CompletionViewModel.SummaryDestination"/>)
+    /// onto its own line at the exact point it substitutes into the formatted
+    /// sentence, whatever word order the target language uses (mirrors
+    /// ConfirmMoveWindow's destination-on-its-own-line treatment). A value with
+    /// no destination (the all-clear receipt, the delete-to-Recycle-Bin
+    /// summary) renders verbatim as a single Run. Locating the raw substring
+    /// rather than a bracket-delimited marker (as <see cref="BuildCompletionRestoreLine"/>
+    /// uses for its hyperlink) is deliberate: the destination is a user-chosen
+    /// folder path that could itself contain a literal '[' or ']'.
+    /// </summary>
+    private void BuildCompletionSummaryLine()
+    {
+        var raw = _vm.Completion.Summary;
+        var destination = _vm.Completion.SummaryDestination;
+        CompletionSummaryText.Inlines.Clear();
+
+        int index = destination.Length > 0 ? raw.IndexOf(destination, StringComparison.Ordinal) : -1;
+        if (index < 0)
+        {
+            CompletionSummaryText.Inlines.Add(new Run(raw));
+            return;
+        }
+
+        var prefix = raw[..index].TrimEnd();
+        var suffix = raw[(index + destination.Length)..];
+        // Zero-width space after every backslash so a long path wraps at a
+        // folder boundary rather than mid-word, matching ConfirmMoveWindow.
+        // Spelled with the C# unicode escape; do not paste a literal
+        // zero-width character into source (it is invisible and tooling
+        // mangles it).
+        var wrappedDestination = destination.Replace("\\", "\\u200B");
+
+        if (prefix.Length > 0) CompletionSummaryText.Inlines.Add(new Run(prefix));
+        CompletionSummaryText.Inlines.Add(new LineBreak());
+        CompletionSummaryText.Inlines.Add(new Run(wrappedDestination));
+        if (suffix.Length > 0) CompletionSummaryText.Inlines.Add(new Run(suffix));
+    }
 
     /// <summary>
     /// Composes the completion restore line from <see cref="CompletionViewModel.Restore"/>,
