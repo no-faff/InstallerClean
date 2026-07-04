@@ -138,13 +138,8 @@
                                             HeaderContainerStyle="{StaticResource NumericColumnHeader}">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <!-- HorizontalAlignment=Right, not just TextAlignment: a
-                                             GridViewRowPresenter arranges cell content at its desired
-                                             width, so TextAlignment inside a content-sized block has no
-                                             slack to act on and the figure sits left. Right-aligning the
-                                             block itself sits it under the right-aligned Size header. -->
                                         <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource Text.Body}"
-                                                   FontSize="{DynamicResource Type.Body}" TextAlignment="Right" HorizontalAlignment="Right"/>
+                                                   FontSize="{DynamicResource Type.Body}" TextAlignment="Right"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

@@ -435,6 +435,12 @@
 
     <Style TargetType="ListViewItem">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
+        <!-- Stretch, not the Left default: GridViewRowPresenter arranges each
+             cell's content at its own desired width and packs it to the left
+             of the column unless the item's content is stretched to fill it,
+             so a numeric cell's TextAlignment="Right" has no slack to act on
+             without this. -->
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListViewItem">
