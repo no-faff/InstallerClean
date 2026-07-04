@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="总下载量"></a>
 </p>
 
-![InstallerClean 成功清理后的截图：已释放 1.28 GB，69 个文件已送进回收站](docs/screenshots/06-freed-success-done.webp)
+![InstallerClean 成功清理后的截图：已释放 1.28 GB，69 个文件已送进回收站](docs/screenshots/zh/06-freed-success-done.webp)
 
 - **简介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 里不需要的文件，这是个 Windows 从不清理的隐藏文件夹。它几乎瞬间扫描完，告诉您有没有这类文件，想细看的还能查看更多细节，并让您删掉它们，给 C: 盘腾出空间。用上一次，就可以不再惦记了。
 - **您可能正是为此而来：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 时，看到 `C:\Windows\Installer` 占了很大空间，却不知道里面都是些什么。InstallerClean 正是您需要的工具。像 `9f05cba.msi` 这样名字看起来毫无规律的文件，它清楚里面装的是什么，并很快告诉您哪些可以安全删除。
@@ -87,43 +87,43 @@
 ## 截图
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="启动画面，扫描运行时显示 InstallerClean 徽标" width="900"><br>
+  <img src="docs/screenshots/zh/01-initial-scan.webp" alt="启动画面，扫描运行时显示 InstallerClean 徽标" width="900"><br>
   <em>初始扫描，非常快。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="主窗口，显示 120 个文件仍需保留（2.83 GB），69 个不需要的文件可以清理（1.28 GB），还有一个移动位置输入框，以及“删除”和“移动”按钮" width="900"><br>
+  <img src="docs/screenshots/zh/02-main-window.webp" alt="主窗口，显示 120 个文件仍需保留（2.83 GB），69 个不需要的文件可以清理（1.28 GB），还有一个移动位置输入框，以及“删除”和“移动”按钮" width="900"><br>
   <em>结果：还需要多少，能清理多少。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="不需要的文件窗口，按大小排序列出可删除的 .msi 文件，给出每个文件可删除的原因，并显示所选文件的详情" width="900"><br>
+  <img src="docs/screenshots/zh/03-details-safe-to-delete.webp" alt="不需要的文件窗口，按大小排序列出可删除的 .msi 文件，给出每个文件可删除的原因，并显示所选文件的详情" width="900"><br>
   <em>不再需要的文件的详情。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="已注册文件窗口，列出已安装的产品，并显示所选产品的安装数据库详情" width="900"><br>
+  <img src="docs/screenshots/zh/04-details-registered.webp" alt="已注册文件窗口，列出已安装的产品，并显示所选产品的安装数据库详情" width="900"><br>
   <em>仍需保留的文件的详情，附带从安装数据库读取的元数据。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="删除确认对话框，询问是否删除 69 个文件（1.28 GB），并说明这些文件将被送进回收站" width="900"><br>
+  <img src="docs/screenshots/zh/05-delete-dialogue.webp" alt="删除确认对话框，询问是否删除 69 个文件（1.28 GB），并说明这些文件将被送进回收站" width="900"><br>
   <em>每次操作前都会确认。删除会移到回收站；移动则把文件放到您选择的位置。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="删除成功后的提示界面，显示已释放 1.28 GB，69 个文件已送进回收站" width="900"><br>
+  <img src="docs/screenshots/zh/06-freed-success-done.webp" alt="删除成功后的提示界面，显示已释放 1.28 GB，69 个文件已送进回收站" width="900"><br>
   <em>一次成功的删除之后。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="再次扫描后的“全部干净”提示界面：C:\Windows\Installer 中已无可清理项" width="900"><br>
+  <img src="docs/screenshots/zh/07-scanned-again-all-clean.webp" alt="再次扫描后的“全部干净”提示界面：C:\Windows\Installer 中已无可清理项" width="900"><br>
   <em>再次扫描之后。已经没有什么可清理的了。</em>
   <br><br>
 </p>
@@ -243,7 +243,7 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 <details>
 <summary>这些报告来自可选的“发送报告”按钮。下面是发送前您会看到的内容。</summary>
 
-![确认对话框，标题为“把这个发送给 No Faff 吗？”，显示将要发送的完整报告：应用版本、Windows 版本、扫描计数、处理的文件数和释放的字节数，不含任何文件路径、名称或机器标识，并附一句说明：没有任何内容能识别您或您的机器，只有应用是否正常工作以及释放了多少空间，下方是“取消”和“发送”按钮。](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![确认对话框，标题为“把这个发送给 No Faff 吗？”，显示将要发送的完整报告：应用版本、Windows 版本、扫描计数、处理的文件数和释放的字节数，不含任何文件路径、名称或机器标识，并附一句说明：没有任何内容能识别您或您的机器，只有应用是否正常工作以及释放了多少空间，下方是“取消”和“发送”按钮。](docs/screenshots/zh/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

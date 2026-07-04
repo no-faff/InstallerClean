@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Total des téléchargements"></a>
 </p>
 
-![Capture d'écran d'InstallerClean après un nettoyage réussi : 1,28 Go libérés, 69 fichiers envoyés à la Corbeille](docs/screenshots/06-freed-success-done.webp)
+![Capture d'écran d'InstallerClean après un nettoyage réussi : 1,28 Go libérés, 69 fichiers envoyés à la Corbeille](docs/screenshots/fr/06-freed-success-done.webp)
 
 - **En bref :** InstallerClean fait une seule chose : il supprime les fichiers inutiles de `C:\Windows\Installer`, un dossier caché que Windows ne nettoie jamais. Après une analyse quasi instantanée, il vous dit si vous en avez, donne plus de détails pour les curieux, et vous permet de les supprimer pour libérer de l'espace sur votre disque C:. Vous l'utilisez une fois, puis vous passez à autre chose.
 - **Vous êtes peut-être ici parce que :** vous avez utilisé [WinDirStat](https://github.com/windirstat/windirstat), WizTree ou TreeSize, vous avez vu que `C:\Windows\Installer` occupait beaucoup de place et vous ne saviez pas ce qu'il y avait dedans. InstallerClean est exactement ce qu'il vous faut. Il sait ce que contiennent ces fichiers aux noms apparemment aléatoires comme `9f05cba.msi` et vous dit rapidement lesquels vous pouvez supprimer sans risque.
@@ -87,43 +87,43 @@ Le conseil habituel confond la suppression de fichiers au hasard (ce qui est ré
 ## Captures d'écran
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="Écran de démarrage avec le logo InstallerClean pendant l'analyse" width="900"><br>
+  <img src="docs/screenshots/fr/01-initial-scan.webp" alt="Écran de démarrage avec le logo InstallerClean pendant l'analyse" width="900"><br>
   <em>Analyse initiale. Très rapide.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Fenêtre principale affichant 120 fichiers encore nécessaires (2,83 Go) et 69 fichiers inutiles à nettoyer (1,28 Go), avec un champ pour l'emplacement de déplacement et les boutons Supprimer et Déplacer" width="900"><br>
+  <img src="docs/screenshots/fr/02-main-window.webp" alt="Fenêtre principale affichant 120 fichiers encore nécessaires (2,83 Go) et 69 fichiers inutiles à nettoyer (1,28 Go), avec un champ pour l'emplacement de déplacement et les boutons Supprimer et Déplacer" width="900"><br>
   <em>Résultats : ce qui est encore nécessaire, ce qui est supprimable.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Fenêtre des fichiers inutiles listant les fichiers .msi supprimables triés par taille, avec la raison pour laquelle chacun est supprimable et les détails du fichier sélectionné" width="900"><br>
+  <img src="docs/screenshots/fr/03-details-safe-to-delete.webp" alt="Fenêtre des fichiers inutiles listant les fichiers .msi supprimables triés par taille, avec la raison pour laquelle chacun est supprimable et les détails du fichier sélectionné" width="900"><br>
   <em>Détails des fichiers devenus inutiles.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="Fenêtre des fichiers enregistrés listant les produits installés, avec les détails de la base de données de Windows Installer pour le produit sélectionné" width="900"><br>
+  <img src="docs/screenshots/fr/04-details-registered.webp" alt="Fenêtre des fichiers enregistrés listant les produits installés, avec les détails de la base de données de Windows Installer pour le produit sélectionné" width="900"><br>
   <em>Détails des fichiers encore nécessaires, avec les métadonnées lues dans la base de données de Windows Installer.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Confirmation de suppression demandant de supprimer 69 fichiers (1,28 Go), précisant que les fichiers seront envoyés à la Corbeille" width="900"><br>
+  <img src="docs/screenshots/fr/05-delete-dialogue.webp" alt="Confirmation de suppression demandant de supprimer 69 fichiers (1,28 Go), précisant que les fichiers seront envoyés à la Corbeille" width="900"><br>
   <em>Une confirmation avant chaque action. La suppression déplace vers la Corbeille ; le déplacement place les fichiers à l'endroit de votre choix.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="Écran de réussite indiquant 1,28 Go libérés, avec 69 fichiers envoyés à la Corbeille" width="900"><br>
+  <img src="docs/screenshots/fr/06-freed-success-done.webp" alt="Écran de réussite indiquant 1,28 Go libérés, avec 69 fichiers envoyés à la Corbeille" width="900"><br>
   <em>Après une suppression réussie.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="Écran « tout est propre » après une nouvelle analyse : plus rien à nettoyer dans C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/fr/07-scanned-again-all-clean.webp" alt="Écran « tout est propre » après une nouvelle analyse : plus rien à nettoyer dans C:\Windows\Installer" width="900"><br>
   <em>Après une nouvelle analyse. Plus rien à nettoyer.</em>
   <br><br>
 </p>
@@ -243,7 +243,7 @@ Sur les 101 rapports que des utilisateurs nous ont gentiment envoyés (merci �
 <details>
 <summary>Ces rapports proviennent du bouton facultatif « Envoyer le rapport ». Voici ce que vous verrez avant que quoi que ce soit ne soit envoyé.</summary>
 
-![Boîte de dialogue de confirmation intitulée « Send this to No Faff? », montrant l'intégralité du rapport qui serait envoyé : version de l'application, version de Windows, compteurs d'analyse, fichiers traités et octets libérés, sans aucun chemin de fichier, nom ou identifiant de machine, et une note précisant que rien ne vous identifie, vous ou votre machine, seulement si l'application a fonctionné et combien d'espace a été libéré, avec les boutons Annuler et Envoyer.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![Boîte de dialogue de confirmation intitulée « Send this to No Faff? », montrant l'intégralité du rapport qui serait envoyé : version de l'application, version de Windows, compteurs d'analyse, fichiers traités et octets libérés, sans aucun chemin de fichier, nom ou identifiant de machine, et une note précisant que rien ne vous identifie, vous ou votre machine, seulement si l'application a fonctionné et combien d'espace a été libéré, avec les boutons Annuler et Envoyer.](docs/screenshots/fr/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

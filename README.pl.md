@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Łączna liczba pobrań"></a>
 </p>
 
-![Zrzut ekranu InstallerClean po udanym oczyszczeniu: zwolniono 1,28 GB, 69 plików przeniesiono do Kosza](docs/screenshots/06-freed-success-done.webp)
+![Zrzut ekranu InstallerClean po udanym oczyszczeniu: zwolniono 1,28 GB, 69 plików przeniesiono do Kosza](docs/screenshots/pl/06-freed-success-done.webp)
 
 - **Co:** InstallerClean robi jedną rzecz: usuwa niepotrzebne pliki z `C:\Windows\Installer`, ukrytego folderu, którego Windows nigdy nie czyści. Po niemal natychmiastowym skanowaniu mówi ci, czy w ogóle jakieś masz, pokazuje więcej szczegółów ciekawskim i pozwala je usunąć, by zwolnić miejsce na dysku C:. Uruchamiasz go raz i ruszasz dalej.
 - **Może jesteś tu, bo:** Użyłeś [WinDirStat](https://github.com/windirstat/windirstat), WizTree albo TreeSize, zobaczyłeś, że `C:\Windows\Installer` zajmuje mnóstwo miejsca, i nie wiedziałeś, co w nim siedzi. InstallerClean to dokładnie to, czego potrzebujesz. Wie, co kryje się w tych plikach o pozornie przypadkowych nazwach, jak `9f05cba.msi`, i szybko mówi ci, które z nich możesz bezpiecznie usunąć.
@@ -87,43 +87,43 @@ Standardowa porada myli usuwanie plików na chybił trafił (co naprawdę jest n
 ## Zrzuty ekranu
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="Ekran powitalny z logo InstallerClean podczas skanowania" width="900"><br>
+  <img src="docs/screenshots/pl/01-initial-scan.webp" alt="Ekran powitalny z logo InstallerClean podczas skanowania" width="900"><br>
   <em>Pierwsze skanowanie. Idzie bardzo szybko.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Okno główne pokazujące 120 plików nadal potrzebnych (2,83 GB) i 69 niepotrzebnych plików do wyczyszczenia (1,28 GB), z polem lokalizacji przenoszenia oraz przyciskami Usuń i Przenieś" width="900"><br>
+  <img src="docs/screenshots/pl/02-main-window.webp" alt="Okno główne pokazujące 120 plików nadal potrzebnych (2,83 GB) i 69 niepotrzebnych plików do wyczyszczenia (1,28 GB), z polem lokalizacji przenoszenia oraz przyciskami Usuń i Przenieś" width="900"><br>
   <em>Wyniki: ile jest nadal potrzebne, ile można usunąć.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Okno niepotrzebnych plików z listą plików .msi do usunięcia, posortowanych według rozmiaru, z powodem, dla którego każdy można usunąć, oraz szczegółami wybranego pliku" width="900"><br>
+  <img src="docs/screenshots/pl/03-details-safe-to-delete.webp" alt="Okno niepotrzebnych plików z listą plików .msi do usunięcia, posortowanych według rozmiaru, z powodem, dla którego każdy można usunąć, oraz szczegółami wybranego pliku" width="900"><br>
   <em>Szczegóły plików, które nie są już potrzebne.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="Okno zarejestrowanych plików z listą zainstalowanych produktów oraz szczegółami z bazy danych instalatora dla wybranego produktu" width="900"><br>
+  <img src="docs/screenshots/pl/04-details-registered.webp" alt="Okno zarejestrowanych plików z listą zainstalowanych produktów oraz szczegółami z bazy danych instalatora dla wybranego produktu" width="900"><br>
   <em>Szczegóły plików nadal potrzebnych, z metadanymi odczytanymi z bazy danych instalatora.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Potwierdzenie usunięcia z pytaniem o usunięcie 69 plików (1,28 GB), z informacją, że pliki trafią do Kosza" width="900"><br>
+  <img src="docs/screenshots/pl/05-delete-dialogue.webp" alt="Potwierdzenie usunięcia z pytaniem o usunięcie 69 plików (1,28 GB), z informacją, że pliki trafią do Kosza" width="900"><br>
   <em>Potwierdzenie przed każdą z akcji. Usuń przenosi do Kosza; Przenieś umieszcza pliki w wybranym przez ciebie miejscu.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="Nakładka sukcesu pokazująca zwolnione 1,28 GB i 69 plików przeniesionych do Kosza" width="900"><br>
+  <img src="docs/screenshots/pl/06-freed-success-done.webp" alt="Nakładka sukcesu pokazująca zwolnione 1,28 GB i 69 plików przeniesionych do Kosza" width="900"><br>
   <em>Po udanym usunięciu.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="Nakładka „wszystko czyste” po ponownym skanowaniu: nic do wyczyszczenia w C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/pl/07-scanned-again-all-clean.webp" alt="Nakładka „wszystko czyste” po ponownym skanowaniu: nic do wyczyszczenia w C:\Windows\Installer" width="900"><br>
   <em>Po ponownym skanowaniu. Nic już do wyczyszczenia.</em>
   <br><br>
 </p>
@@ -243,7 +243,7 @@ Spośród 101 raportów, które nadesłano (dziękuję 🙏) od czasu, gdy opcj�
 <details>
 <summary>Te raporty pochodzą z opcjonalnego przycisku „Wyślij raport”. Oto co zobaczysz, zanim cokolwiek zostanie wysłane.</summary>
 
-![Okno potwierdzenia zatytułowane „Send this to No Faff?” pokazujące pełny raport, który zostałby wysłany: wersja aplikacji, wersja Windows, liczniki skanowania, przetworzone pliki i zwolnione bajty, bez ścieżek plików, nazw czy identyfikatorów maszyny, z informacją, że nic nie identyfikuje ciebie ani twojej maszyny, a jedynie to, czy aplikacja zadziałała i ile miejsca zwolniono, z przyciskami Anuluj i Wyślij.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![Okno potwierdzenia zatytułowane „Send this to No Faff?” pokazujące pełny raport, który zostałby wysłany: wersja aplikacji, wersja Windows, liczniki skanowania, przetworzone pliki i zwolnione bajty, bez ścieżek plików, nazw czy identyfikatorów maszyny, z informacją, że nic nie identyfikuje ciebie ani twojej maszyny, a jedynie to, czy aplikacja zadziałała i ile miejsca zwolniono, z przyciskami Anuluj i Wyślij.](docs/screenshots/pl/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

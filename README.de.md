@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Downloads insgesamt"></a>
 </p>
 
-![Screenshot von InstallerClean nach einem erfolgreichen Aufräumen: 1,28 GB freigegeben, 69 Dateien in den Papierkorb verschoben](docs/screenshots/06-freed-success-done.webp)
+![Screenshot von InstallerClean nach einem erfolgreichen Aufräumen: 1,28 GB freigegeben, 69 Dateien in den Papierkorb verschoben](docs/screenshots/de/06-freed-success-done.webp)
 
 - **Was:** InstallerClean tut eine Sache: Es entfernt nicht benötigte Dateien aus `C:\Windows\Installer`, einem versteckten Ordner, den Windows nie aufräumt. Nach einem fast augenblicklichen Scan sagt es dir, ob du welche hast, zeigt Neugierigen mehr Details und lässt dich die Dateien löschen, um Platz auf deiner C:-Festplatte freizugeben. Du benutzt es einmal und machst weiter.
 - **Warum du vielleicht hier bist:** Du hast [WinDirStat](https://github.com/windirstat/windirstat), WizTree oder TreeSize benutzt, gesehen, dass `C:\Windows\Installer` viel Platz belegt, und nicht gewusst, was darin steckt. InstallerClean ist genau das Richtige. Es weiß, was in diesen Dateien mit ihren zufällig wirkenden Namen wie `9f05cba.msi` steckt, und sagt dir schnell, welche du bedenkenlos löschen kannst.
@@ -87,43 +87,43 @@ Der übliche Rat verwechselt das wahllose Löschen von Dateien (was tatsächlich
 ## Screenshots
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="Startbildschirm mit dem InstallerClean-Logo, während der Scan läuft" width="900"><br>
+  <img src="docs/screenshots/de/01-initial-scan.webp" alt="Startbildschirm mit dem InstallerClean-Logo, während der Scan läuft" width="900"><br>
   <em>Erster Scan. Das geht sehr schnell.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Hauptfenster mit 120 noch benötigten Dateien (2,83 GB) und 69 nicht benötigten Dateien zum Aufräumen (1,28 GB), mit einem Feld für den Verschiebeort und den Schaltflächen Löschen und Verschieben" width="900"><br>
+  <img src="docs/screenshots/de/02-main-window.webp" alt="Hauptfenster mit 120 noch benötigten Dateien (2,83 GB) und 69 nicht benötigten Dateien zum Aufräumen (1,28 GB), mit einem Feld für den Verschiebeort und den Schaltflächen Löschen und Verschieben" width="900"><br>
   <em>Ergebnisse: wie viel noch benötigt wird, wie viel entfernt werden kann.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Fenster der nicht benötigten Dateien mit den entfernbaren .msi-Dateien nach Größe sortiert, mit dem Grund, warum jede entfernbar ist, und Details zur ausgewählten Datei" width="900"><br>
+  <img src="docs/screenshots/de/03-details-safe-to-delete.webp" alt="Fenster der nicht benötigten Dateien mit den entfernbaren .msi-Dateien nach Größe sortiert, mit dem Grund, warum jede entfernbar ist, und Details zur ausgewählten Datei" width="900"><br>
   <em>Details zu den nicht mehr benötigten Dateien.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="Fenster der registrierten Dateien mit den installierten Produkten und Installer-Datenbankdetails zum ausgewählten Produkt" width="900"><br>
+  <img src="docs/screenshots/de/04-details-registered.webp" alt="Fenster der registrierten Dateien mit den installierten Produkten und Installer-Datenbankdetails zum ausgewählten Produkt" width="900"><br>
   <em>Details zu den noch benötigten Dateien, mit aus der Installer-Datenbank gelesenen Metadaten.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Löschbestätigung, die fragt, ob 69 Dateien (1,28 GB) gelöscht werden sollen, mit dem Hinweis, dass die Dateien in den Papierkorb verschoben werden" width="900"><br>
+  <img src="docs/screenshots/de/05-delete-dialogue.webp" alt="Löschbestätigung, die fragt, ob 69 Dateien (1,28 GB) gelöscht werden sollen, mit dem Hinweis, dass die Dateien in den Papierkorb verschoben werden" width="900"><br>
   <em>Bestätigung vor beiden Aktionen. Löschen verschiebt in den Papierkorb; Verschieben legt die Dateien an einen Ort deiner Wahl.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="Erfolgs-Overlay mit 1,28 GB freigegeben und 69 in den Papierkorb verschobenen Dateien" width="900"><br>
+  <img src="docs/screenshots/de/06-freed-success-done.webp" alt="Erfolgs-Overlay mit 1,28 GB freigegeben und 69 in den Papierkorb verschobenen Dateien" width="900"><br>
   <em>Nach einem erfolgreichen Löschen.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="Overlay „Alles sauber“ nach erneutem Scan: nichts aufzuräumen in C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/de/07-scanned-again-all-clean.webp" alt="Overlay „Alles sauber“ nach erneutem Scan: nichts aufzuräumen in C:\Windows\Installer" width="900"><br>
   <em>Nach erneutem Scan. Nichts mehr aufzuräumen.</em>
   <br><br>
 </p>
@@ -243,7 +243,7 @@ Von den 101 Berichten, die seit der Einführung der Option in v1.8.0 freundliche
 <details>
 <summary>Diese Berichte stammen von der optionalen Schaltfläche „Bericht senden“. Das siehst du, bevor etwas gesendet wird.</summary>
 
-![Bestätigungsdialog mit dem Titel „Send this to No Faff?“, der den vollständigen Bericht zeigt, der gesendet würde: App-Version, Windows-Version, Scan-Zähler, verarbeitete Dateien und freigegebene Bytes, ohne Dateipfade, Namen oder Geräte-IDs, mit dem Hinweis, dass nichts dich oder deinen Rechner identifiziert, nur ob die App funktioniert hat und wie viel Platz freigegeben wurde, mit den Schaltflächen Abbrechen und Senden.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![Bestätigungsdialog mit dem Titel „Send this to No Faff?“, der den vollständigen Bericht zeigt, der gesendet würde: App-Version, Windows-Version, Scan-Zähler, verarbeitete Dateien und freigegebene Bytes, ohne Dateipfade, Namen oder Geräte-IDs, mit dem Hinweis, dass nichts dich oder deinen Rechner identifiziert, nur ob die App funktioniert hat und wie viel Platz freigegeben wurde, mit den Schaltflächen Abbrechen und Senden.](docs/screenshots/de/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 
