@@ -687,7 +687,7 @@
   <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve"><value>{0}モードは中止されました：移動先 {1} はC:\Windows\Installer 内にあります。</value></data>
   <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>{0}モードは中止されました：移動先 {1} は完全修飾パスではありません。</value></data>
   <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0}モードは中止されました：移動先 {1} は Windows システムフォルダー内に解決されます。</value></data>
-  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>エラー：現在 Windows Installer を使用しているものがあります。通常 はWindows Update  またはバックグラウンドでインストール中のプログラムです。その実行中は移動と削除がブロックされます。完了したら再試行してください。</value></data>
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>エラー：現在 Windows Installer を使用しているものがあります。通常は Windows Update またはバックグラウンドでインストール中のプログラムです。その実行中は移動と削除がブロックされます。完了したら再試行してください。</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>エラー：このマシンで以前の Windows Installer トランザクションが中断されています。キャッシュをクリーンアップする前に、そのインストールを再開またはロールバックするか (または Windows を再起動してください)。</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>エラー：キューに入れられた再起動後のファイル操作がインストーラーキャッシュ ({0})を対象としています。クリーンアップ前にその操作を完了するために Windows を再起動してください。</value></data>
