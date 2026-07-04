@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Download totali"></a>
 </p>
 
-![Schermata di InstallerClean dopo una pulizia riuscita: 1,28 GB liberati, 69 file inviati al Cestino](docs/screenshots/06-freed-success-done.webp)
+![Schermata di InstallerClean dopo una pulizia riuscita: 1,28 GB liberati, 69 file inviati al Cestino](docs/screenshots/it/06-freed-success-done.webp)
 
 - **Cosa fa:** InstallerClean fa una cosa sola: rimuove i file non necessari da `C:\Windows\Installer`, una cartella nascosta che Windows non pulisce mai. Dopo una scansione quasi istantanea ti dice se ne hai, mostra qualche dettaglio in più per i curiosi e ti lascia eliminarli per liberare spazio sull'unità C:. La usi una volta e passi oltre.
 - **Forse sei qui perché:** Hai usato [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, hai visto che `C:\Windows\Installer` occupava un sacco di spazio e non sapevi cosa ci fosse dentro. InstallerClean è proprio quello che ti serve. Sa cosa contengono quei file dai nomi all'apparenza casuali come `9f05cba.msi` e ti dice rapidamente quali puoi eliminare in sicurezza.
@@ -87,43 +87,43 @@ Il consiglio abituale confonde l'eliminare file a caso (cosa che è davvero peri
 ## Schermate
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="Schermata iniziale con il logo di InstallerClean mentre la scansione è in corso" width="900"><br>
+  <img src="docs/screenshots/it/01-initial-scan.webp" alt="Schermata iniziale con il logo di InstallerClean mentre la scansione è in corso" width="900"><br>
   <em>Scansione iniziale. È molto rapida.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Finestra principale con 120 file ancora necessari (2,83 GB) e 69 file non necessari da pulire (1,28 GB), con un campo per la destinazione spostamento e i pulsanti Elimina e Sposta" width="900"><br>
+  <img src="docs/screenshots/it/02-main-window.webp" alt="Finestra principale con 120 file ancora necessari (2,83 GB) e 69 file non necessari da pulire (1,28 GB), con un campo per la destinazione spostamento e i pulsanti Elimina e Sposta" width="900"><br>
   <em>Risultati: quanto serve ancora, quanto è rimovibile.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Finestra dei file non necessari con i file .msi rimovibili ordinati per dimensione, il motivo per cui ciascuno è rimovibile e i dettagli del file selezionato" width="900"><br>
+  <img src="docs/screenshots/it/03-details-safe-to-delete.webp" alt="Finestra dei file non necessari con i file .msi rimovibili ordinati per dimensione, il motivo per cui ciascuno è rimovibile e i dettagli del file selezionato" width="900"><br>
   <em>Dettagli dei file non più necessari.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="Finestra dei file registrati con l'elenco dei prodotti installati e i dettagli del database del programma di installazione per il prodotto selezionato" width="900"><br>
+  <img src="docs/screenshots/it/04-details-registered.webp" alt="Finestra dei file registrati con l'elenco dei prodotti installati e i dettagli del database del programma di installazione per il prodotto selezionato" width="900"><br>
   <em>Dettagli dei file ancora necessari, con i metadati letti dal database del programma di installazione.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Conferma di eliminazione che chiede di eliminare 69 file (1,28 GB), segnalando che i file verranno inviati al Cestino" width="900"><br>
+  <img src="docs/screenshots/it/05-delete-dialogue.webp" alt="Conferma di eliminazione che chiede di eliminare 69 file (1,28 GB), segnalando che i file verranno inviati al Cestino" width="900"><br>
   <em>Conferma prima di ogni azione. Elimina sposta nel Cestino; Sposta colloca i file dove scegli tu.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="Schermata di esito positivo che mostra 1,28 GB liberati, con 69 file inviati al Cestino" width="900"><br>
+  <img src="docs/screenshots/it/06-freed-success-done.webp" alt="Schermata di esito positivo che mostra 1,28 GB liberati, con 69 file inviati al Cestino" width="900"><br>
   <em>Dopo un'eliminazione riuscita.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="Schermata «Tutto pulito» dopo una nuova scansione: niente da pulire in C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/it/07-scanned-again-all-clean.webp" alt="Schermata «Tutto pulito» dopo una nuova scansione: niente da pulire in C:\Windows\Installer" width="900"><br>
   <em>Dopo una nuova scansione. Non resta nulla da pulire.</em>
   <br><br>
 </p>
@@ -243,7 +243,7 @@ Su 101 report che mi sono stati inviati (grazie 🙏) da quando la v1.8.0 ha agg
 <details>
 <summary>Quei report arrivano dal pulsante opzionale «Invia rapporto». Ecco cosa vedrai prima che venga inviato qualcosa.</summary>
 
-![Finestra di conferma intitolata «Vuoi inviare questo a No Faff?» che mostra il report completo che verrebbe inviato: versione dell'app, versione di Windows, conteggi della scansione, file elaborati e byte liberati, senza percorsi di file, nomi o identificatori del computer, e con una nota che niente identifica te o il tuo computer, solo se l'app ha funzionato e quanto spazio è stato liberato, con i pulsanti Annulla e Invia.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![Finestra di conferma intitolata «Vuoi inviare questo a No Faff?» che mostra il report completo che verrebbe inviato: versione dell'app, versione di Windows, conteggi della scansione, file elaborati e byte liberati, senza percorsi di file, nomi o identificatori del computer, e con una nota che niente identifica te o il tuo computer, solo se l'app ha funzionato e quanto spazio è stato liberato, con i pulsanti Annulla e Invia.](docs/screenshots/it/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Toplam indirme"></a>
 </p>
 
-![Başarılı bir temizliğin ardından InstallerClean'in ekran görüntüsü: 1,28 GB açıldı, 69 dosya Geri Dönüşüm Kutusu'na gönderildi](docs/screenshots/06-freed-success-done.webp)
+![Başarılı bir temizliğin ardından InstallerClean'in ekran görüntüsü: 1,28 GB açıldı, 69 dosya Geri Dönüşüm Kutusu'na gönderildi](docs/screenshots/tr/06-freed-success-done.webp)
 
 - **Ne yapar:** InstallerClean tek bir iş yapar: Windows'un hiç temizlemediği gizli bir klasör olan `C:\Windows\Installer` içindeki gereksiz dosyaları kaldırır. Neredeyse anında biten bir taramanın ardından böyle dosyalarınız olup olmadığını size söyler, merak edenler için daha fazla ayrıntı gösterir ve C: sürücünüzde yer açmak için bunları silmenize olanak tanır. Bir kez kullanır, yolunuza devam edersiniz.
 - **Buraya gelme nedeniniz belki de şu:** [WinDirStat](https://github.com/windirstat/windirstat), WizTree ya da TreeSize kullandınız, `C:\Windows\Installer`'ın çok yer kapladığını gördünüz ama içinde ne olduğunu bilmiyordunuz. InstallerClean tam da ihtiyacınız olan şey. `9f05cba.msi` gibi rastgele görünen adlı o dosyaların içinde ne olduğunu bilir ve hangilerini güvenle silebileceğinizi size hızlıca söyler.
@@ -87,43 +87,43 @@ Sıradan tavsiyeler, dosyaları gelişigüzel silmeyi (ki bu gerçekten tehlikel
 ## Ekran görüntüleri
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="Tarama sürerken InstallerClean logosunun yer aldığı açılış ekranı" width="900"><br>
+  <img src="docs/screenshots/tr/01-initial-scan.webp" alt="Tarama sürerken InstallerClean logosunun yer aldığı açılış ekranı" width="900"><br>
   <em>İlk tarama. Bu çok hızlıdır.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Hâlâ gerekli 120 dosya (2,83 GB) ve temizlenecek 69 gereksiz dosya (1,28 GB) gösteren, taşıma konumu kutusu ile Sil ve Taşı düğmelerinin bulunduğu ana pencere" width="900"><br>
+  <img src="docs/screenshots/tr/02-main-window.webp" alt="Hâlâ gerekli 120 dosya (2,83 GB) ve temizlenecek 69 gereksiz dosya (1,28 GB) gösteren, taşıma konumu kutusu ile Sil ve Taşı düğmelerinin bulunduğu ana pencere" width="900"><br>
   <em>Sonuçlar: ne kadarı hâlâ gerekli, ne kadarı kaldırılabilir.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Boyuta göre sıralanmış kaldırılabilir .msi dosyalarını, her birinin neden kaldırılabilir olduğunu ve seçili dosyanın ayrıntılarını listeleyen gereksiz dosyalar penceresi" width="900"><br>
+  <img src="docs/screenshots/tr/03-details-safe-to-delete.webp" alt="Boyuta göre sıralanmış kaldırılabilir .msi dosyalarını, her birinin neden kaldırılabilir olduğunu ve seçili dosyanın ayrıntılarını listeleyen gereksiz dosyalar penceresi" width="900"><br>
   <em>Artık gerekli olmayan dosyaların ayrıntıları.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="Kurulu ürünleri listeleyen, seçili ürün için yükleyici veritabanı ayrıntılarını gösteren kayıtlı dosyalar penceresi" width="900"><br>
+  <img src="docs/screenshots/tr/04-details-registered.webp" alt="Kurulu ürünleri listeleyen, seçili ürün için yükleyici veritabanı ayrıntılarını gösteren kayıtlı dosyalar penceresi" width="900"><br>
   <em>Hâlâ gerekli dosyaların, yükleyici veritabanından okunan meta verilerle birlikte ayrıntıları.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="69 dosyayı (1,28 GB) silmeyi soran, dosyaların Geri Dönüşüm Kutusu'na gönderileceğini belirten silme onayı" width="900"><br>
+  <img src="docs/screenshots/tr/05-delete-dialogue.webp" alt="69 dosyayı (1,28 GB) silmeyi soran, dosyaların Geri Dönüşüm Kutusu'na gönderileceğini belirten silme onayı" width="900"><br>
   <em>Her iki işlemden önce onay. Sil, Geri Dönüşüm Kutusu'na taşır; Taşı, dosyaları seçtiğiniz bir yere koyar.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="1,28 GB açıldığını ve 69 dosyanın Geri Dönüşüm Kutusu'na gönderildiğini gösteren başarı katmanı" width="900"><br>
+  <img src="docs/screenshots/tr/06-freed-success-done.webp" alt="1,28 GB açıldığını ve 69 dosyanın Geri Dönüşüm Kutusu'na gönderildiğini gösteren başarı katmanı" width="900"><br>
   <em>Başarılı bir Sil işleminin ardından.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="Yeniden tarandıktan sonra her şey temiz katmanı: C:\Windows\Installer klasöründe temizlenecek bir şey yok" width="900"><br>
+  <img src="docs/screenshots/tr/07-scanned-again-all-clean.webp" alt="Yeniden tarandıktan sonra her şey temiz katmanı: C:\Windows\Installer klasöründe temizlenecek bir şey yok" width="900"><br>
   <em>Yeniden tarandıktan sonra. Temizlenecek bir şey kalmadı.</em>
   <br><br>
 </p>
@@ -243,7 +243,7 @@ v1.8.0'da seçenek eklendiğinden bu yana gönderilen 101 rapora göre (teşekk�
 <details>
 <summary>Bu raporlar isteğe bağlı “Rapor gönder” düğmesinden gelir. Bir şey gönderilmeden önce göreceğiniz şey şudur.</summary>
 
-![“Send this to No Faff?” başlıklı, gönderilecek tam raporu gösteren onay penceresi: uygulama sürümü, Windows sürümü, tarama sayıları, işlenen dosyalar ve açılan baytlar; hiçbir dosya yolu, ad veya makine kimliği olmadan, sizi ya da makinenizi hiçbir şeyin tanımlamadığına, yalnızca uygulamanın çalışıp çalışmadığını ve ne kadar yer açıldığını gösterdiğine dair bir notla, İptal ve Gönder düğmeleriyle.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![“Send this to No Faff?” başlıklı, gönderilecek tam raporu gösteren onay penceresi: uygulama sürümü, Windows sürümü, tarama sayıları, işlenen dosyalar ve açılan baytlar; hiçbir dosya yolu, ad veya makine kimliği olmadan, sizi ya da makinenizi hiçbir şeyin tanımlamadığına, yalnızca uygulamanın çalışıp çalışmadığını ve ne kadar yer açıldığını gösterdiğine dair bir notla, İptal ve Gönder düğmeleriyle.](docs/screenshots/tr/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

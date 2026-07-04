@@ -25,7 +25,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="إجمالي التنزيلات"></a>
 </p>
 
-![لقطة شاشة لـ InstallerClean بعد تنظيف ناجح: تحرير 1.28 GB ونقل 69 ملفاً إلى سلة المحذوفات](docs/screenshots/06-freed-success-done.webp)
+![لقطة شاشة لـ InstallerClean بعد تنظيف ناجح: تحرير 1.28 GB ونقل 69 ملفاً إلى سلة المحذوفات](docs/screenshots/en/06-freed-success-done.webp)
 
 - **ما هو:** يفعل InstallerClean شيئاً واحداً: يزيل الملفات غير الضرورية من `C:\Windows\Installer`، وهو مجلد مخفي لا ينظفه Windows أبداً. بعد فحص شبه فوري يخبرك إن كان لديك أي منها، ويعرض مزيداً من التفاصيل للفضوليين، ويتيح لك حذفها لتحرير مساحة على قرص C:. تستخدمه مرة واحدة ثم تمضي في طريقك.
 - **قد تكون هنا لأنك:** استخدمت [WinDirStat](https://github.com/windirstat/windirstat) أو WizTree أو TreeSize، فرأيت `C:\Windows\Installer` يشغل مساحة كبيرة ولم تعرف ما بداخله. وInstallerClean هو ما تحتاج إليه تماماً. فهو يعرف ما بداخل تلك الملفات ذات الأسماء التي تبدو عشوائية مثل `9f05cba.msi`، ويخبرك بسرعة أيّها يمكنك حذفه بأمان.
@@ -89,43 +89,43 @@
 ## لقطات الشاشة
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="شاشة بداية تحمل شعار InstallerClean أثناء تشغيل الفحص" width="900"><br>
+  <img src="docs/screenshots/en/01-initial-scan.webp" alt="شاشة بداية تحمل شعار InstallerClean أثناء تشغيل الفحص" width="900"><br>
   <em>الفحص الأولي. وهو سريع جداً.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="النافذة الرئيسية تُظهر 120 ملفاً لا تزال مطلوبة (2.83 GB) و69 ملفاً غير ضروري للتنظيف (1.28 GB)، مع مربع لموقع النقل وزرّي الحذف والنقل" width="900"><br>
+  <img src="docs/screenshots/en/02-main-window.webp" alt="النافذة الرئيسية تُظهر 120 ملفاً لا تزال مطلوبة (2.83 GB) و69 ملفاً غير ضروري للتنظيف (1.28 GB)، مع مربع لموقع النقل وزرّي الحذف والنقل" width="900"><br>
   <em>النتائج: كم لا يزال مطلوباً، وكم يمكن إزالته.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="نافذة الملفات غير الضرورية تسرد ملفات .msi القابلة للإزالة مرتبة حسب الحجم، مع سبب قابلية إزالة كل منها وتفاصيل الملف المحدد" width="900"><br>
+  <img src="docs/screenshots/en/03-details-safe-to-delete.webp" alt="نافذة الملفات غير الضرورية تسرد ملفات .msi القابلة للإزالة مرتبة حسب الحجم، مع سبب قابلية إزالة كل منها وتفاصيل الملف المحدد" width="900"><br>
   <em>تفاصيل الملفات التي لم تعد مطلوبة.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="نافذة الملفات المسجّلة تسرد المنتجات المثبّتة، مع تفاصيل من قاعدة بيانات المثبّت للمنتج المحدد" width="900"><br>
+  <img src="docs/screenshots/en/04-details-registered.webp" alt="نافذة الملفات المسجّلة تسرد المنتجات المثبّتة، مع تفاصيل من قاعدة بيانات المثبّت للمنتج المحدد" width="900"><br>
   <em>تفاصيل الملفات التي لا تزال مطلوبة، مع بيانات وصفية مقروءة من قاعدة بيانات المثبّت.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="تأكيد الحذف يسأل عن حذف 69 ملفاً (1.28 GB)، مع الإشارة إلى أن الملفات ستُرسَل إلى سلة المحذوفات" width="900"><br>
+  <img src="docs/screenshots/en/05-delete-dialogue.webp" alt="تأكيد الحذف يسأل عن حذف 69 ملفاً (1.28 GB)، مع الإشارة إلى أن الملفات ستُرسَل إلى سلة المحذوفات" width="900"><br>
   <em>تأكيد قبل أي من الإجراءين. الحذف ينقل إلى سلة المحذوفات؛ والنقل يضع الملفات في مكان تختاره.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="طبقة نجاح تُظهر تحرير 1.28 GB، مع إرسال 69 ملفاً إلى سلة المحذوفات" width="900"><br>
+  <img src="docs/screenshots/en/06-freed-success-done.webp" alt="طبقة نجاح تُظهر تحرير 1.28 GB، مع إرسال 69 ملفاً إلى سلة المحذوفات" width="900"><br>
   <em>بعد عملية حذف ناجحة.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="طبقة (كل شيء نظيف) بعد إعادة الفحص: لا شيء للتنظيف في C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/en/07-scanned-again-all-clean.webp" alt="طبقة (كل شيء نظيف) بعد إعادة الفحص: لا شيء للتنظيف في C:\Windows\Installer" width="900"><br>
   <em>بعد إعادة الفحص. لم يبق شيء للتنظيف.</em>
   <br><br>
 </p>
@@ -245,7 +245,7 @@
 <details>
 <summary>تأتي هذه التقارير من زر «إرسال تقرير» الاختياري. وهذا ما ستراه قبل إرسال أي شيء.</summary>
 
-![مربع حوار تأكيد بعنوان «Send this to No Faff?» يعرض التقرير الكامل الذي سيُرسَل: إصدار التطبيق، وإصدار Windows، وأعداد الفحص، والملفات المعالَجة والبايتات المحرَّرة، دون أي مسارات ملفات أو أسماء أو معرّفات أجهزة، مع ملاحظة بأن لا شيء يعرّف هويتك أو جهازك، فقط ما إذا كان التطبيق قد عمل وكم من المساحة حُرّرت، مع زرّي الإلغاء والإرسال.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![مربع حوار تأكيد بعنوان «Send this to No Faff?» يعرض التقرير الكامل الذي سيُرسَل: إصدار التطبيق، وإصدار Windows، وأعداد الفحص، والملفات المعالَجة والبايتات المحرَّرة، دون أي مسارات ملفات أو أسماء أو معرّفات أجهزة، مع ملاحظة بأن لا شيء يعرّف هويتك أو جهازك، فقط ما إذا كان التطبيق قد عمل وكم من المساحة حُرّرت، مع زرّي الإلغاء والإرسال.](docs/screenshots/en/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

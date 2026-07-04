@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Total unduhan"></a>
 </p>
 
-![Tangkapan layar InstallerClean setelah pembersihan berhasil: 1,28 GB dikosongkan, 69 file dikirim ke Keranjang Sampah](docs/screenshots/06-freed-success-done.webp)
+![Tangkapan layar InstallerClean setelah pembersihan berhasil: 1,28 GB dikosongkan, 69 file dikirim ke Keranjang Sampah](docs/screenshots/id/06-freed-success-done.webp)
 
 - **Apa:** InstallerClean melakukan satu hal: menghapus file yang tidak diperlukan dari `C:\Windows\Installer`, folder tersembunyi yang tidak pernah dibersihkan Windows. Setelah pemindaian yang hampir seketika, aplikasi memberi tahu Anda apakah ada file seperti itu, menampilkan detail lebih lanjut bagi yang penasaran, dan memungkinkan Anda menghapusnya untuk mengosongkan ruang di drive C: Anda. Anda cukup memakainya sekali lalu lanjut.
 - **Mungkin Anda di sini karena:** Anda memakai [WinDirStat](https://github.com/windirstat/windirstat), WizTree, atau TreeSize, melihat `C:\Windows\Installer` memakan banyak ruang, dan tidak tahu apa isinya. InstallerClean justru yang Anda butuhkan. Aplikasi ini tahu isi file dengan nama yang tampak acak seperti `9f05cba.msi` dan dengan cepat memberi tahu Anda mana yang aman dihapus.
@@ -87,43 +87,43 @@ Nasihat standar mencampuradukkan penghapusan file secara sembarangan (yang meman
 ## Tangkapan layar
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="Layar splash dengan logo InstallerClean saat pemindaian berlangsung" width="900"><br>
+  <img src="docs/screenshots/id/01-initial-scan.webp" alt="Layar splash dengan logo InstallerClean saat pemindaian berlangsung" width="900"><br>
   <em>Pemindaian awal. Ini sangat cepat.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Jendela utama yang menampilkan 120 file yang masih diperlukan (2,83 GB) dan 69 file tidak diperlukan untuk dibersihkan (1,28 GB), dengan kotak lokasi pemindahan serta tombol Hapus dan Pindahkan" width="900"><br>
+  <img src="docs/screenshots/id/02-main-window.webp" alt="Jendela utama yang menampilkan 120 file yang masih diperlukan (2,83 GB) dan 69 file tidak diperlukan untuk dibersihkan (1,28 GB), dengan kotak lokasi pemindahan serta tombol Hapus dan Pindahkan" width="900"><br>
   <em>Hasil: berapa banyak yang masih diperlukan, berapa banyak yang bisa dihapus.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Jendela file tidak diperlukan yang mendaftar file .msi yang bisa dihapus, diurutkan berdasarkan ukuran, dengan alasan tiap file bisa dihapus dan detail untuk file yang dipilih" width="900"><br>
+  <img src="docs/screenshots/id/03-details-safe-to-delete.webp" alt="Jendela file tidak diperlukan yang mendaftar file .msi yang bisa dihapus, diurutkan berdasarkan ukuran, dengan alasan tiap file bisa dihapus dan detail untuk file yang dipilih" width="900"><br>
   <em>Detail file yang sudah tidak diperlukan lagi.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="Jendela file terdaftar yang mendaftar produk yang terpasang, dengan detail basis data penginstal untuk produk yang dipilih" width="900"><br>
+  <img src="docs/screenshots/id/04-details-registered.webp" alt="Jendela file terdaftar yang mendaftar produk yang terpasang, dengan detail basis data penginstal untuk produk yang dipilih" width="900"><br>
   <em>Detail file yang masih diperlukan, dengan metadata yang dibaca dari basis data penginstal.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Konfirmasi penghapusan yang menanyakan apakah akan menghapus 69 file (1,28 GB), dengan catatan bahwa file akan dikirim ke Keranjang Sampah" width="900"><br>
+  <img src="docs/screenshots/id/05-delete-dialogue.webp" alt="Konfirmasi penghapusan yang menanyakan apakah akan menghapus 69 file (1,28 GB), dengan catatan bahwa file akan dikirim ke Keranjang Sampah" width="900"><br>
   <em>Konfirmasi sebelum kedua tindakan. Hapus memindahkan ke Keranjang Sampah; Pindahkan menaruh file di tempat pilihan Anda.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="Overlay keberhasilan yang menampilkan 1,28 GB dikosongkan, dengan 69 file dikirim ke Keranjang Sampah" width="900"><br>
+  <img src="docs/screenshots/id/06-freed-success-done.webp" alt="Overlay keberhasilan yang menampilkan 1,28 GB dikosongkan, dengan 69 file dikirim ke Keranjang Sampah" width="900"><br>
   <em>Setelah Hapus yang berhasil.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="Overlay 'semua bersih' setelah pemindaian ulang: tidak ada yang perlu dibersihkan di C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/id/07-scanned-again-all-clean.webp" alt="Overlay 'semua bersih' setelah pemindaian ulang: tidak ada yang perlu dibersihkan di C:\Windows\Installer" width="900"><br>
   <em>Setelah pemindaian ulang. Tidak ada lagi yang perlu dibersihkan.</em>
   <br><br>
 </p>
@@ -243,7 +243,7 @@ Dari 101 laporan yang dikirimkan orang-orang (terima kasih 🙏) sejak opsi ini 
 <details>
 <summary>Laporan itu berasal dari tombol opsional "Kirim laporan". Inilah yang akan Anda lihat sebelum apa pun dikirim.</summary>
 
-![Dialog konfirmasi berjudul "Send this to No Faff?" yang menampilkan laporan lengkap yang akan dikirim: versi aplikasi, versi Windows, jumlah hasil pemindaian, file yang diproses dan byte yang dikosongkan, tanpa jalur file, nama, atau ID mesin, disertai catatan bahwa tidak ada yang mengidentifikasi Anda atau mesin Anda, hanya apakah aplikasi berfungsi dan berapa banyak ruang yang dikosongkan, dengan tombol Batal dan Kirim.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![Dialog konfirmasi berjudul "Send this to No Faff?" yang menampilkan laporan lengkap yang akan dikirim: versi aplikasi, versi Windows, jumlah hasil pemindaian, file yang diproses dan byte yang dikosongkan, tanpa jalur file, nama, atau ID mesin, disertai catatan bahwa tidak ada yang mengidentifikasi Anda atau mesin Anda, hanya apakah aplikasi berfungsi dan berapa banyak ruang yang dikosongkan, dengan tombol Batal dan Kirim.](docs/screenshots/id/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

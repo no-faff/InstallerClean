@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Total de downloads"></a>
 </p>
 
-![Captura de tela do InstallerClean após uma limpeza bem-sucedida: 1,28 GB liberados, 69 arquivos enviados para a Lixeira](docs/screenshots/06-freed-success-done.webp)
+![Captura de tela do InstallerClean após uma limpeza bem-sucedida: 1,28 GB liberados, 69 arquivos enviados para a Lixeira](docs/screenshots/pt/06-freed-success-done.webp)
 
 - **O que faz:** O InstallerClean faz uma coisa só: remove arquivos desnecessários de `C:\Windows\Installer`, uma pasta oculta que o Windows nunca limpa. Depois de uma análise quase instantânea, ele te diz se você tem algum, mostra mais detalhes para os curiosos e deixa você excluí-los para liberar espaço no disco C:. Você usa uma vez e segue em frente.
 - **Talvez você esteja aqui porque:** Você usou o [WinDirStat](https://github.com/windirstat/windirstat), o WizTree ou o TreeSize, viu que o `C:\Windows\Installer` estava ocupando muito espaço e não sabia o que tinha ali dentro. O InstallerClean é exatamente o que você precisa. Ele sabe o que há naqueles arquivos com nomes que parecem aleatórios, como `9f05cba.msi`, e te diz rapidamente quais você pode excluir com segurança.
@@ -87,43 +87,43 @@ O conselho padrão confunde apagar arquivos a esmo (o que é de fato perigoso) c
 ## Capturas de tela
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="Tela de abertura com o logo do InstallerClean enquanto a análise é executada" width="900"><br>
+  <img src="docs/screenshots/pt/01-initial-scan.webp" alt="Tela de abertura com o logo do InstallerClean enquanto a análise é executada" width="900"><br>
   <em>Análise inicial. Muito rápida.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Janela principal mostrando 120 arquivos ainda necessários (2,83 GB) e 69 arquivos desnecessários para limpar (1,28 GB), com uma caixa de local de destino e os botões Excluir e Mover" width="900"><br>
+  <img src="docs/screenshots/pt/02-main-window.webp" alt="Janela principal mostrando 120 arquivos ainda necessários (2,83 GB) e 69 arquivos desnecessários para limpar (1,28 GB), com uma caixa de local de destino e os botões Excluir e Mover" width="900"><br>
   <em>Resultados: quanto ainda é necessário, quanto é removível.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Janela de arquivos desnecessários listando os arquivos .msi removíveis ordenados por tamanho, com o motivo de cada um ser removível e os detalhes do arquivo selecionado" width="900"><br>
+  <img src="docs/screenshots/pt/03-details-safe-to-delete.webp" alt="Janela de arquivos desnecessários listando os arquivos .msi removíveis ordenados por tamanho, com o motivo de cada um ser removível e os detalhes do arquivo selecionado" width="900"><br>
   <em>Detalhes dos arquivos que não são mais necessários.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="Janela de arquivos registrados listando os produtos instalados, com os detalhes do banco de dados do instalador para o produto selecionado" width="900"><br>
+  <img src="docs/screenshots/pt/04-details-registered.webp" alt="Janela de arquivos registrados listando os produtos instalados, com os detalhes do banco de dados do instalador para o produto selecionado" width="900"><br>
   <em>Detalhes dos arquivos ainda necessários, com os metadados lidos do banco de dados do instalador.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Confirmação de exclusão perguntando se deve excluir 69 arquivos (1,28 GB), avisando que os arquivos serão enviados para a Lixeira" width="900"><br>
+  <img src="docs/screenshots/pt/05-delete-dialogue.webp" alt="Confirmação de exclusão perguntando se deve excluir 69 arquivos (1,28 GB), avisando que os arquivos serão enviados para a Lixeira" width="900"><br>
   <em>Confirmação antes de cada ação. Excluir move para a Lixeira; Mover coloca os arquivos onde você quiser.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="Sobreposição de sucesso mostrando 1,28 GB liberados, com 69 arquivos enviados para a Lixeira" width="900"><br>
+  <img src="docs/screenshots/pt/06-freed-success-done.webp" alt="Sobreposição de sucesso mostrando 1,28 GB liberados, com 69 arquivos enviados para a Lixeira" width="900"><br>
   <em>Depois de uma exclusão bem-sucedida.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="Sobreposição de tudo limpo após uma nova análise: nada para limpar em C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/pt/07-scanned-again-all-clean.webp" alt="Sobreposição de tudo limpo após uma nova análise: nada para limpar em C:\Windows\Installer" width="900"><br>
   <em>Depois de uma nova análise. Nada mais para limpar.</em>
   <br><br>
 </p>
@@ -243,7 +243,7 @@ Entre os 101 relatórios que as pessoas tiveram a gentileza de enviar (obrigado 
 <details>
 <summary>Esses relatórios vêm do botão opcional "Enviar relatório". Veja o que você verá antes de qualquer coisa ser enviada.</summary>
 
-![Caixa de diálogo de confirmação intitulada "Enviar isto para o No Faff?" mostrando o relatório completo que seria enviado: versão do aplicativo, versão do Windows, contagens da análise, arquivos processados e bytes liberados, sem nenhum caminho de arquivo, nome ou ID de máquina, e uma observação de que nada identifica você ou a sua máquina, apenas se o aplicativo funcionou e quanto espaço foi liberado, com os botões Cancelar e Enviar.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![Caixa de diálogo de confirmação intitulada "Enviar isto para o No Faff?" mostrando o relatório completo que seria enviado: versão do aplicativo, versão do Windows, contagens da análise, arquivos processados e bytes liberados, sem nenhum caminho de arquivo, nome ou ID de máquina, e uma observação de que nada identifica você ou a sua máquina, apenas se o aplicativo funcionou e quanto espaço foi liberado, com os botões Cancelar e Enviar.](docs/screenshots/pt/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

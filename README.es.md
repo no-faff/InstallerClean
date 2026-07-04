@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Descargas totales"></a>
 </p>
 
-![Captura de pantalla de InstallerClean tras limpiar con éxito: 1,28 GB liberados, 69 archivos enviados a la Papelera de reciclaje](docs/screenshots/06-freed-success-done.webp)
+![Captura de pantalla de InstallerClean tras limpiar con éxito: 1,28 GB liberados, 69 archivos enviados a la Papelera de reciclaje](docs/screenshots/es/06-freed-success-done.webp)
 
 - **Qué hace:** InstallerClean hace una sola cosa: elimina archivos innecesarios de `C:\Windows\Installer`, una carpeta oculta que Windows nunca limpia. Tras un análisis casi instantáneo te dice si tienes alguno, muestra más detalle para los curiosos y te deja eliminarlos para liberar espacio en tu unidad C:. Lo usas una vez y a otra cosa.
 - **Quizá estés aquí porque:** Usaste [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, viste que `C:\Windows\Installer` ocupaba mucho espacio y no sabías qué había dentro. InstallerClean es justo lo que necesitas. Sabe qué contienen esos archivos con nombres que parecen aleatorios como `9f05cba.msi` y te dice enseguida cuáles puedes eliminar sin riesgo.
@@ -87,43 +87,43 @@ El consejo habitual confunde borrar archivos al azar (lo cual sí es peligroso) 
 ## Capturas de pantalla
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="Pantalla de bienvenida con el logotipo de InstallerClean mientras se ejecuta el análisis" width="900"><br>
+  <img src="docs/screenshots/es/01-initial-scan.webp" alt="Pantalla de bienvenida con el logotipo de InstallerClean mientras se ejecuta el análisis" width="900"><br>
   <em>Análisis inicial. Es muy rápido.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Ventana principal con 120 archivos que siguen haciendo falta (2,83 GB) y 69 archivos innecesarios para limpiar (1,28 GB), con un cuadro de ubicación para mover y los botones Eliminar y Mover" width="900"><br>
+  <img src="docs/screenshots/es/02-main-window.webp" alt="Ventana principal con 120 archivos que siguen haciendo falta (2,83 GB) y 69 archivos innecesarios para limpiar (1,28 GB), con un cuadro de ubicación para mover y los botones Eliminar y Mover" width="900"><br>
   <em>Resultados: cuánto sigue haciendo falta y cuánto se puede eliminar.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Ventana de archivos innecesarios con los archivos .msi eliminables ordenados por tamaño, el motivo por el que cada uno es eliminable y los detalles del archivo seleccionado" width="900"><br>
+  <img src="docs/screenshots/es/03-details-safe-to-delete.webp" alt="Ventana de archivos innecesarios con los archivos .msi eliminables ordenados por tamaño, el motivo por el que cada uno es eliminable y los detalles del archivo seleccionado" width="900"><br>
   <em>Detalle de los archivos que ya no hacen falta.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="Ventana de archivos registrados con los productos instalados y los detalles de la base de datos del instalador para el producto seleccionado" width="900"><br>
+  <img src="docs/screenshots/es/04-details-registered.webp" alt="Ventana de archivos registrados con los productos instalados y los detalles de la base de datos del instalador para el producto seleccionado" width="900"><br>
   <em>Detalle de los archivos que siguen haciendo falta, con los metadatos leídos de la base de datos del instalador.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Confirmación de eliminación que pregunta si eliminar 69 archivos (1,28 GB) e indica que los archivos se enviarán a la Papelera de reciclaje" width="900"><br>
+  <img src="docs/screenshots/es/05-delete-dialogue.webp" alt="Confirmación de eliminación que pregunta si eliminar 69 archivos (1,28 GB) e indica que los archivos se enviarán a la Papelera de reciclaje" width="900"><br>
   <em>Confirmación antes de cada acción. Eliminar mueve a la Papelera de reciclaje; Mover coloca los archivos donde tú elijas.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="Superposición de éxito que muestra 1,28 GB liberados, con 69 archivos enviados a la Papelera de reciclaje" width="900"><br>
+  <img src="docs/screenshots/es/06-freed-success-done.webp" alt="Superposición de éxito que muestra 1,28 GB liberados, con 69 archivos enviados a la Papelera de reciclaje" width="900"><br>
   <em>Tras una eliminación correcta.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="Superposición de «todo limpio» tras un nuevo análisis: no queda nada que limpiar en C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/es/07-scanned-again-all-clean.webp" alt="Superposición de «todo limpio» tras un nuevo análisis: no queda nada que limpiar en C:\Windows\Installer" width="900"><br>
   <em>Tras un nuevo análisis. No queda nada que limpiar.</em>
   <br><br>
 </p>
@@ -243,7 +243,7 @@ De los 101 informes que me han enviado amablemente (gracias 🙏) desde que la v
 <details>
 <summary>Esos informes provienen del botón opcional «Enviar informe». Esto es lo que verás antes de que se envíe nada.</summary>
 
-![Diálogo de confirmación titulado «¿Enviar esto a No Faff?» que muestra el informe completo que se enviaría: la versión de la aplicación, la versión de Windows, los recuentos del análisis, los archivos procesados y los bytes liberados, sin rutas de archivo, sin nombres ni identificadores de equipo, y con una nota de que nada te identifica a ti ni a tu equipo, solo si la aplicación funcionó y cuánto espacio se liberó, con los botones Cancelar y Enviar.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![Diálogo de confirmación titulado «¿Enviar esto a No Faff?» que muestra el informe completo que se enviaría: la versión de la aplicación, la versión de Windows, los recuentos del análisis, los archivos procesados y los bytes liberados, sin rutas de archivo, sin nombres ni identificadores de equipo, y con una nota de que nada te identifica a ti ni a tu equipo, solo si la aplicación funcionó y cuánto espacio se liberó, con los botones Cancelar y Enviar.](docs/screenshots/es/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

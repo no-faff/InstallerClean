@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="Tổng lượt tải"></a>
 </p>
 
-![Ảnh chụp màn hình InstallerClean sau khi dọn dẹp thành công: giải phóng 1,28 GB, 69 tệp đã được chuyển vào Thùng rác](docs/screenshots/06-freed-success-done.webp)
+![Ảnh chụp màn hình InstallerClean sau khi dọn dẹp thành công: giải phóng 1,28 GB, 69 tệp đã được chuyển vào Thùng rác](docs/screenshots/vi/06-freed-success-done.webp)
 
 - **Là gì:** InstallerClean chỉ làm một việc: nó loại bỏ những tệp không cần thiết khỏi `C:\Windows\Installer`, một thư mục ẩn mà Windows không bao giờ dọn dẹp. Sau một lần quét gần như tức thì, nó cho bạn biết bạn có tệp như vậy hay không, hiển thị thêm chi tiết cho ai tò mò, và cho phép bạn xóa chúng để giải phóng dung lượng trên ổ C:. Bạn dùng một lần rồi thôi.
 - **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. InstallerClean chính là thứ bạn cần. Nó biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và nhanh chóng cho bạn biết tệp nào có thể xóa an toàn.
@@ -87,43 +87,43 @@ Lời khuyên thường gặp nhầm lẫn giữa việc xóa tệp một cách 
 ## Ảnh chụp màn hình
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="Màn hình chờ với logo InstallerClean trong khi quá trình quét chạy" width="900"><br>
+  <img src="docs/screenshots/vi/01-initial-scan.webp" alt="Màn hình chờ với logo InstallerClean trong khi quá trình quét chạy" width="900"><br>
   <em>Lần quét đầu. Việc này rất nhanh.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="Cửa sổ chính hiển thị 120 tệp vẫn cần giữ (2,83 GB) và 69 tệp không cần thiết để dọn (1,28 GB), với ô chọn nơi chuyển đến và các nút Xóa và Chuyển" width="900"><br>
+  <img src="docs/screenshots/vi/02-main-window.webp" alt="Cửa sổ chính hiển thị 120 tệp vẫn cần giữ (2,83 GB) và 69 tệp không cần thiết để dọn (1,28 GB), với ô chọn nơi chuyển đến và các nút Xóa và Chuyển" width="900"><br>
   <em>Kết quả: còn cần giữ bao nhiêu, có thể loại bỏ bao nhiêu.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="Cửa sổ các tệp không cần thiết liệt kê những tệp .msi có thể loại bỏ, sắp xếp theo kích thước, kèm lý do mỗi tệp có thể loại bỏ và chi tiết cho tệp được chọn" width="900"><br>
+  <img src="docs/screenshots/vi/03-details-safe-to-delete.webp" alt="Cửa sổ các tệp không cần thiết liệt kê những tệp .msi có thể loại bỏ, sắp xếp theo kích thước, kèm lý do mỗi tệp có thể loại bỏ và chi tiết cho tệp được chọn" width="900"><br>
   <em>Chi tiết những tệp không còn cần nữa.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="Cửa sổ các tệp đã đăng ký liệt kê những sản phẩm đã cài, kèm chi tiết từ cơ sở dữ liệu trình cài đặt cho sản phẩm được chọn" width="900"><br>
+  <img src="docs/screenshots/vi/04-details-registered.webp" alt="Cửa sổ các tệp đã đăng ký liệt kê những sản phẩm đã cài, kèm chi tiết từ cơ sở dữ liệu trình cài đặt cho sản phẩm được chọn" width="900"><br>
   <em>Chi tiết những tệp vẫn cần giữ, với siêu dữ liệu đọc từ cơ sở dữ liệu trình cài đặt.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="Hộp thoại xác nhận xóa hỏi có xóa 69 tệp (1,28 GB) không, lưu ý rằng các tệp sẽ được chuyển vào Thùng rác" width="900"><br>
+  <img src="docs/screenshots/vi/05-delete-dialogue.webp" alt="Hộp thoại xác nhận xóa hỏi có xóa 69 tệp (1,28 GB) không, lưu ý rằng các tệp sẽ được chuyển vào Thùng rác" width="900"><br>
   <em>Xác nhận trước cả hai thao tác. Xóa sẽ di chuyển vào Thùng rác; Chuyển đặt các tệp ở nơi bạn chọn.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="Lớp phủ thành công hiển thị đã giải phóng 1,28 GB, với 69 tệp đã được chuyển vào Thùng rác" width="900"><br>
+  <img src="docs/screenshots/vi/06-freed-success-done.webp" alt="Lớp phủ thành công hiển thị đã giải phóng 1,28 GB, với 69 tệp đã được chuyển vào Thùng rác" width="900"><br>
   <em>Sau khi Xóa thành công.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="Lớp phủ “đã sạch” sau khi quét lại: không còn gì để dọn trong C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/vi/07-scanned-again-all-clean.webp" alt="Lớp phủ “đã sạch” sau khi quét lại: không còn gì để dọn trong C:\Windows\Installer" width="900"><br>
   <em>Sau khi quét lại. Không còn gì để dọn.</em>
   <br><br>
 </p>
@@ -243,7 +243,7 @@ Trong số 101 báo cáo mọi người đã gửi về (cảm ơn 🙏) kể t�
 <details>
 <summary>Những báo cáo đó đến từ nút “Gửi báo cáo” tùy chọn. Đây là những gì bạn thấy trước khi có bất cứ thứ gì được gửi đi.</summary>
 
-![Hộp thoại xác nhận với tiêu đề “Send this to No Faff?” hiển thị toàn bộ báo cáo sẽ được gửi: phiên bản ứng dụng, phiên bản Windows, số liệu quét, số tệp đã xử lý và số byte đã giải phóng, không có đường dẫn tệp, tên tệp hay mã định danh máy, kèm ghi chú rằng không có gì nhận dạng bạn hay máy của bạn, chỉ cho biết ứng dụng có hoạt động hay không và đã giải phóng được bao nhiêu dung lượng, với các nút Hủy và Gửi.](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![Hộp thoại xác nhận với tiêu đề “Send this to No Faff?” hiển thị toàn bộ báo cáo sẽ được gửi: phiên bản ứng dụng, phiên bản Windows, số liệu quét, số tệp đã xử lý và số byte đã giải phóng, không có đường dẫn tệp, tên tệp hay mã định danh máy, kèm ghi chú rằng không có gì nhận dạng bạn hay máy của bạn, chỉ cho biết ứng dụng có hoạt động hay không và đã giải phóng được bao nhiêu dung lượng, với các nút Hủy và Gửi.](docs/screenshots/vi/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

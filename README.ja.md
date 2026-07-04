@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-27k-brightgreen" alt="総ダウンロード数"></a>
 </p>
 
-![クリーンアップ成功後の InstallerClean の画面：1.28 GB を解放し、69 個のファイルをごみ箱へ送ったところ](docs/screenshots/06-freed-success-done.webp)
+![クリーンアップ成功後の InstallerClean の画面：1.28 GB を解放し、69 個のファイルをごみ箱へ送ったところ](docs/screenshots/ja/06-freed-success-done.webp)
 
 - **概要：** InstallerClean がすることは 1 つだけです。Windows が一切クリーンアップしない隠しフォルダー `C:\Windows\Installer` から、不要なファイルを取り除きます。ほぼ一瞬で終わるスキャンのあと、不要なファイルがあるかどうかを知らせ、詳しく見たい人にはさらに詳細を示し、それらを削除して C: ドライブの空き容量を増やせるようにします。一度使ったら、それで終わりです。
 - **こんな覚えはありませんか：** [WinDirStat](https://github.com/windirstat/windirstat)、WizTree、TreeSize などでディスクを調べていて、`C:\Windows\Installer` が大量の容量を占めているのに気づいたものの、中に何が入っているのか分からなかった。InstallerClean は、まさにそんなあなたのためのツールです。`9f05cba.msi` のような一見ランダムな名前のファイルの中身を把握していて、どれなら安全に削除できるのかをすぐに教えてくれます。
@@ -87,43 +87,43 @@
 ## スクリーンショット
 
 <p>
-  <img src="docs/screenshots/01-initial-scan.webp" alt="スキャン実行中、InstallerClean のロゴが表示されたスプラッシュ画面" width="900"><br>
+  <img src="docs/screenshots/ja/01-initial-scan.webp" alt="スキャン実行中、InstallerClean のロゴが表示されたスプラッシュ画面" width="900"><br>
   <em>最初のスキャン。とても高速です。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/02-main-window.webp" alt="まだ必要な 120 個のファイル（2.83 GB）と、クリーンアップ対象の不要な 69 個のファイル（1.28 GB）を示すメイン画面。移動先の入力欄と、「削除」「移動」ボタンがある" width="900"><br>
+  <img src="docs/screenshots/ja/02-main-window.webp" alt="まだ必要な 120 個のファイル（2.83 GB）と、クリーンアップ対象の不要な 69 個のファイル（1.28 GB）を示すメイン画面。移動先の入力欄と、「削除」「移動」ボタンがある" width="900"><br>
   <em>結果の画面。どれだけがまだ必要で、どれだけが削除できるかがわかります。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/03-details-safe-to-delete.webp" alt="削除可能な .msi ファイルをサイズ順に並べ、それぞれが削除可能な理由と、選択したファイルの詳細を示す不要なファイルのウィンドウ" width="900"><br>
+  <img src="docs/screenshots/ja/03-details-safe-to-delete.webp" alt="削除可能な .msi ファイルをサイズ順に並べ、それぞれが削除可能な理由と、選択したファイルの詳細を示す不要なファイルのウィンドウ" width="900"><br>
   <em>もう必要のないファイルの詳細。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/04-details-registered.webp" alt="インストール済み製品を一覧表示し、選択した製品のインストーラーデータベースの詳細を示す登録済みファイルのウィンドウ" width="900"><br>
+  <img src="docs/screenshots/ja/04-details-registered.webp" alt="インストール済み製品を一覧表示し、選択した製品のインストーラーデータベースの詳細を示す登録済みファイルのウィンドウ" width="900"><br>
   <em>まだ必要なファイルの詳細。インストーラーデータベースから読み取ったメタデータ付きです。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/05-delete-dialogue.webp" alt="69 個のファイル（1.28 GB）の削除を確認し、ファイルがごみ箱へ送られることを伝える削除確認ダイアログ" width="900"><br>
+  <img src="docs/screenshots/ja/05-delete-dialogue.webp" alt="69 個のファイル（1.28 GB）の削除を確認し、ファイルがごみ箱へ送られることを伝える削除確認ダイアログ" width="900"><br>
   <em>どちらの操作の前にも確認があります。「削除」はごみ箱へ移動し、「移動」はファイルをお好みの場所に置きます。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/06-freed-success-done.webp" alt="1.28 GB を解放し、69 個のファイルをごみ箱へ送ったことを示す成功画面" width="900"><br>
+  <img src="docs/screenshots/ja/06-freed-success-done.webp" alt="1.28 GB を解放し、69 個のファイルをごみ箱へ送ったことを示す成功画面" width="900"><br>
   <em>削除が成功した後の画面。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/07-scanned-again-all-clean.webp" alt="再スキャン後の「すべてクリーン」画面。C:\Windows\Installer にクリーンアップするものはありません" width="900"><br>
+  <img src="docs/screenshots/ja/07-scanned-again-all-clean.webp" alt="再スキャン後の「すべてクリーン」画面。C:\Windows\Installer にクリーンアップするものはありません" width="900"><br>
   <em>再スキャン後。もうクリーンアップするものはありません。</em>
   <br><br>
 </p>
@@ -243,7 +243,7 @@ v1.8.0 でこのオプションが追加されて以来、ご厚意で送って�
 <details>
 <summary>こうしたレポートは、任意で押せる「レポートを送信」ボタンから送られます。送信前に表示される内容は次のとおりです。</summary>
 
-![「No Faff に送信しますか？」と題された確認ダイアログ。送信される内容の全体が表示されている。アプリのバージョン、Windows のバージョン、スキャンの各件数、処理したファイル数、解放したバイト数。ファイルパスや名前、マシン ID は含まれず、あなたやマシンを特定するものは一切なく、アプリが動作したかどうかと解放した容量だけだという注記、そして「キャンセル」と「送信」のボタンがある。](docs/screenshots/optional-send-report-confirmation-dialogue.webp)
+![「No Faff に送信しますか？」と題された確認ダイアログ。送信される内容の全体が表示されている。アプリのバージョン、Windows のバージョン、スキャンの各件数、処理したファイル数、解放したバイト数。ファイルパスや名前、マシン ID は含まれず、あなたやマシンを特定するものは一切なく、アプリが動作したかどうかと解放した容量だけだという注記、そして「キャンセル」と「送信」のボタンがある。](docs/screenshots/ja/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 
