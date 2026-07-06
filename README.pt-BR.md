@@ -163,10 +163,10 @@ Se o Windows Installer estiver gravando no cache naquele momento, tiver uma tran
 
 Os serviços de análise, consulta, movimentação, exclusão, configurações e reinicialização pendente são cobertos por uma suíte de testes automatizados que roda a cada commit (veja o selo de CI acima).
 
-**Verificando o binário.** O InstallerClean não é assinado, então você não precisa confiar de olhos fechados:
+**Verificando o binário.** O InstallerClean não é assinado, mas você não precisa confiar de olhos fechados:
 
 - Os hashes SHA-256 de cada versão estão listados na [página de versões](../../releases/latest).
-- VirusTotal: limpo em todos os mecanismos. Há links ativos nas notas de cada versão para você verificar de novo.
+- VirusTotal: cada build é escaneado, com os resultados completos por mecanismo vinculados na página da versão, para que você possa ver como cada arquivo pontuou e escaneá-lo de novo você mesmo. Qualquer falso positivo é apontado e explicado nas notas da versão, nunca escondido.
 - O código-fonte está em [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), e a CI compila e testa cada commit (veja o selo verde de CI acima).
 - <!-- downloads-start -->27.000+<!-- downloads-end --> downloads entre o GitHub, o MajorGeeks e a Softpedia.
 - O [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testa cada envio em uma máquina virtual e só publica se passar na avaliação deles.

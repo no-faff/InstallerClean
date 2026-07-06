@@ -166,7 +166,7 @@ Windows インストーラーが今まさにキャッシュへ書き込んでい
 **バイナリの検証について。** InstallerClean には署名がありませんが、鵜呑みにする必要はありません。
 
 - 各リリースの SHA-256 ハッシュは[リリースページ](../../releases/latest)に掲載しています。
-- VirusTotal：すべてのエンジンでクリーンです。各リリースのノートにライブリンクを掲載しているので、ご自身で再確認できます。
+- VirusTotal：ビルドごとにスキャンしており、エンジンごとの詳細な結果はそのリリースページにリンクされているので、各ファイルのスコアを確認したり、ご自身で再スキャンしたりできます。誤検知があれば隠さず、リリースノートで告知して説明しています。
 - ソースコードは [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) にあり、CI が毎回のコミットをビルド・テストしています（上の緑色の CI バッジを参照）。
 - GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->27,000+<!-- downloads-end --> 回ダウンロードされています。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) は各提出物を仮想マシンでテストし、審査を通過したものだけを掲載します。

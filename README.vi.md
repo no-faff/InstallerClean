@@ -163,10 +163,10 @@ Nếu Windows Installer đang ghi vào bộ nhớ đệm, có một giao dịch 
 
 Các dịch vụ quét, truy vấn, chuyển, xóa, cài đặt và kiểm tra khởi động lại đang chờ đều được bao phủ bởi một bộ kiểm thử tự động chạy ở mỗi lần commit (xem huy hiệu CI ở trên).
 
-**Kiểm chứng tệp nhị phân.** InstallerClean không được ký số, nên bạn không phải tin tưởng một cách mù quáng:
+**Kiểm chứng tệp nhị phân.** InstallerClean không được ký số, nhưng bạn không phải tin tưởng một cách mù quáng:
 
 - Mã băm SHA-256 của mỗi bản phát hành được liệt kê trên [trang phát hành](../../releases/latest).
-- VirusTotal: sạch ở mọi công cụ quét. Có liên kết trực tiếp trong ghi chú của mỗi bản phát hành để bạn kiểm tra lại.
+- VirusTotal: mỗi bản dựng đều được quét, với kết quả đầy đủ theo từng công cụ được liên kết trên trang phát hành của bản đó, để bạn có thể xem từng tệp được chấm điểm ra sao và tự quét lại. Bất kỳ báo động giả nào cũng được nêu ra và giải thích trong ghi chú phát hành, không giấu giếm.
 - Mã nguồn nằm tại [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) và CI biên dịch và kiểm thử mọi lần commit (xem huy hiệu CI màu xanh ở trên).
 - <!-- downloads-start -->27.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) kiểm tra mỗi lần gửi trong một máy ảo và chỉ đăng nếu nó vượt qua được phần đánh giá của họ.
