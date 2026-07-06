@@ -163,10 +163,10 @@ InstallerClean 会识别三类不需要的文件。
 
 扫描、查询、移动、删除、设置和待重启检查这些服务，都有一套自动化测试覆盖，每次提交都会运行（见上方的 CI 徽章）。
 
-**验证二进制文件。** InstallerClean 没有数字签名，所以您不必只凭信任：
+**验证二进制文件。** InstallerClean 没有数字签名，但您不必只凭信任：
 
 - 每个版本的 SHA-256 哈希值都列在[发布页面](../../releases/latest)上。
-- VirusTotal：所有引擎检测均为干净。每个版本的发布说明里都有实时链接，方便您自行复查。
+- VirusTotal：每个构建都会扫描，各引擎的完整结果链接在对应版本的发布页面上，方便您查看每个文件的检测结果并自行重新扫描。任何误报都会在发布说明中指出并解释，绝不隐瞒。
 - 源代码在 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)，CI 会对每次提交进行构建和测试（见上方绿色的 CI 徽章）。
 - 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->27,000+<!-- downloads-end --> 次下载。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 会在虚拟机中测试每一个提交上来的版本，只有通过审核才会收录。

@@ -163,10 +163,10 @@ Windows Installer가 지금 캐시에 쓰고 있거나, 이전 트랜잭션이 �
 
 검사, 질의, 이동, 삭제, 설정, 재부팅 대기 확인 서비스는 커밋할 때마다 실행되는 자동화된 테스트 모음으로 검증됩니다(위의 CI 배지를 참고하세요).
 
-**바이너리 검증.** InstallerClean은 서명되어 있지 않으므로, 그냥 믿고 쓰실 필요가 없습니다.
+**바이너리 검증.** InstallerClean은 서명되어 있지 않지만, 그냥 믿고 쓰실 필요는 없습니다.
 
 - 각 릴리스의 SHA-256 해시는 [릴리스 페이지](../../releases/latest)에 올려 두었습니다.
-- VirusTotal: 모든 엔진에서 깨끗합니다. 각 릴리스 노트에 직접 다시 확인할 수 있는 링크가 있습니다.
+- VirusTotal: 모든 빌드를 스캔하며, 엔진별 전체 결과를 해당 릴리스 페이지에 링크해 두어 각 파일이 어떤 점수를 받았는지 확인하고 직접 다시 스캔해 볼 수 있습니다. 오탐이 있으면 숨기지 않고 릴리스 노트에서 알리고 설명합니다.
 - 소스는 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)에 있고, CI가 모든 커밋을 빌드하고 테스트합니다(위의 초록색 CI 배지를 참고하세요).
 - GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->27,000+<!-- downloads-end --> 회 다운로드되었습니다.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html)는 제출된 각 파일을 가상 머신에서 테스트하고, 자체 검토를 통과한 경우에만 목록에 올립니다.

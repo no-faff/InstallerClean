@@ -163,10 +163,10 @@ Jeśli Windows Installer akurat zapisuje do pamięci podręcznej, ma zawieszoną
 
 Usługi skanowania, odpytywania, przenoszenia, usuwania, ustawień i oczekującego ponownego uruchomienia są objęte automatycznym zestawem testów uruchamianym przy każdym commicie (zob. plakietkę CI powyżej).
 
-**Weryfikacja pliku binarnego.** InstallerClean jest niepodpisany, więc nie musisz brać go na wiarę:
+**Weryfikacja pliku binarnego.** InstallerClean jest niepodpisany, ale nie musisz brać go na wiarę:
 
 - Skróty SHA-256 dla każdej wersji są wymienione na [stronie wydań](../../releases/latest).
-- VirusTotal: czysty we wszystkich silnikach. Aktualne linki w informacjach o każdym wydaniu, abyś mógł sprawdzić ponownie.
+- VirusTotal: każdy build jest skanowany, a pełne wyniki dla każdego silnika są linkowane na stronie danego wydania, dzięki czemu możesz zobaczyć, jak oceniono każdy plik, i przeskanować go ponownie samodzielnie. Każdy fałszywy alarm jest wskazany i wyjaśniony w informacjach o wydaniu, nigdy ukrywany.
 - Kod źródłowy jest pod adresem [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), a CI buduje i testuje każdy commit (zob. zieloną plakietkę CI powyżej).
 - <!-- downloads-start -->27 000+<!-- downloads-end --> pobrań w GitHub, MajorGeeks i Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testuje każde zgłoszenie w maszynie wirtualnej i umieszcza je na liście tylko wtedy, gdy przejdzie ich kontrolę.

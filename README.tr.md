@@ -163,10 +163,10 @@ Windows Installer şu anda önbelleğe yazıyorsa, önceki bir işlemi askıya a
 
 Tarama, sorgulama, taşıma, silme, ayarlar ve bekleyen yeniden başlatma hizmetleri, her commit'te çalışan otomatik bir test paketiyle kapsanır (yukarıdaki CI rozetine bakın).
 
-**İkili dosyayı doğrulama.** InstallerClean imzasızdır, dolayısıyla körü körüne güvenmeniz gerekmez:
+**İkili dosyayı doğrulama.** InstallerClean imzasızdır, ama körü körüne güvenmeniz gerekmez:
 
 - Her sürümün SHA-256 karmaları [sürümler sayfasında](../../releases/latest) listelenir.
-- VirusTotal: her motorda temiz. Yeniden kontrol edebilmeniz için her sürümün notlarında canlı bağlantılar var.
+- VirusTotal: her yapı taranır; her motordaki tam sonuçlar ilgili sürümün sayfasında bağlantılanır, böylece her dosyanın nasıl puanlandığını görebilir ve kendiniz yeniden tarayabilirsiniz. Herhangi bir yanlış pozitif gizlenmez, sürüm notlarında belirtilir ve açıklanır.
 - Kaynak kod [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) adresinde ve CI her commit'i derleyip test ediyor (yukarıdaki yeşil CI rozetine bakın).
 - GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->27.000+<!-- downloads-end --> indirme.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) her gönderimi bir sanal makinede test eder ve yalnızca incelemelerinden geçerse listeler.

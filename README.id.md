@@ -163,10 +163,10 @@ Jika Windows Installer sedang menulis ke cache, memiliki transaksi sebelumnya ya
 
 Layanan pemindaian, kueri, pemindahan, penghapusan, pengaturan, dan mulai-ulang-tertunda dicakup oleh rangkaian pengujian otomatis yang berjalan pada setiap commit (lihat lencana CI di atas).
 
-**Memverifikasi biner.** InstallerClean tidak ditandatangani, jadi Anda tidak perlu menerimanya begitu saja:
+**Memverifikasi biner.** InstallerClean tidak ditandatangani, tetapi Anda tidak perlu menerimanya begitu saja:
 
 - Hash SHA-256 untuk tiap rilis tercantum di [halaman rilis](../../releases/latest).
-- VirusTotal: bersih di semua mesin pemindai. Tautan langsung ada di catatan tiap rilis agar Anda bisa memeriksa ulang.
+- VirusTotal: setiap build dipindai, dengan hasil lengkap per mesin pemindai ditautkan di halaman rilisnya sehingga Anda bisa melihat skor tiap file dan memindai ulang sendiri. Setiap positif palsu disebutkan dan dijelaskan di catatan rilis, tidak disembunyikan.
 - Kode sumber ada di [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) dan CI membangun serta menguji setiap commit (lihat lencana CI hijau di atas).
 - <!-- downloads-start -->27.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks, dan Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) menguji tiap kiriman di mesin virtual dan hanya mendaftarkannya jika lolos tinjauan mereka.

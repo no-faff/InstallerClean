@@ -163,10 +163,10 @@ Wenn Windows Installer gerade in den Cache schreibt, eine frühere Transaktion a
 
 Die Dienste für Scan, Abfrage, Verschieben, Löschen, Einstellungen und ausstehenden Neustart sind durch eine automatisierte Testsuite abgedeckt, die bei jedem Commit läuft (siehe das CI-Badge oben).
 
-**Die Binärdatei überprüfen.** InstallerClean ist unsigniert, du musst es also nicht auf Treu und Glauben hinnehmen:
+**Die Binärdatei überprüfen.** InstallerClean ist unsigniert, du musst es trotzdem nicht auf Treu und Glauben hinnehmen:
 
 - SHA-256-Hashes für jede Version sind auf der [Releases-Seite](../../releases/latest) aufgeführt.
-- VirusTotal: sauber bei allen Engines. Live-Links in den Hinweisen zu jeder Version, damit du es erneut prüfen kannst.
+- VirusTotal: Jeder Build wird gescannt; die vollständigen Ergebnisse pro Engine sind auf der jeweiligen Release-Seite verlinkt, damit du sehen kannst, wie jede Datei abgeschnitten hat, und sie selbst erneut scannen kannst. Jeder Fehlalarm wird in den Versionshinweisen benannt und erklärt, nicht verschwiegen.
 - Der Quellcode liegt auf [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), und die CI baut und testet jeden Commit (siehe das grüne CI-Badge oben).
 - <!-- downloads-start -->27.000+<!-- downloads-end --> Downloads über GitHub, MajorGeeks und Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testet jede Einreichung in einer virtuellen Maschine und listet sie nur, wenn sie die Prüfung besteht.
