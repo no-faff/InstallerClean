@@ -109,4 +109,74 @@ public class CompletionViewModelTests
             errors: new List<FileOperationError>());
         Assert.Equal(string.Empty, vm.SummaryDestination);
     }
+
+    // The WPF host's BuildCompletionRestoreLine rebuilds the restore line's
+    // inlines synchronously off Restore's PropertyChanged, reading SpaceHint
+    // at that instant and baking the result into TextBlock inlines. A Show*
+    // method that sets SpaceHint AFTER Restore lets a SpaceHint left over
+    // from an earlier Delete this session leak into the rebuild, even though
+    // the property's final value (asserted by the tests above) is correct.
+    // These three regressions shipped in 2.0.0 (all clear, a following move,
+    // a following permanent delete) and were invisible to final-state
+    // assertions; only capturing SpaceHint at the moment Restore's
+    // PropertyChanged fires catches them.
+
+    [Fact]
+    public void ShowAllClear_has_cleared_the_space_hint_by_the_time_Restore_changes()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
+            errors: new List<FileOperationError>());
+
+        string? spaceHintDuringRestoreChange = "unset";
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(CompletionViewModel.Restore))
+                spaceHintDuringRestoreChange = vm.SpaceHint;
+        };
+
+        vm.ShowAllClear(installedProductCount: 5, scanDurationMs: 10);
+
+        Assert.Equal(string.Empty, spaceHintDuringRestoreChange);
+    }
+
+    [Fact]
+    public void ShowMoveSummary_has_cleared_the_space_hint_by_the_time_Restore_changes()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
+            errors: new List<FileOperationError>());
+
+        string? spaceHintDuringRestoreChange = "unset";
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(CompletionViewModel.Restore))
+                spaceHintDuringRestoreChange = vm.SpaceHint;
+        };
+
+        vm.ShowMoveSummary(movedCount: 1, movedBytes: 1024 * 1024, destination: @"D:\backup",
+            errors: new List<FileOperationError>(), freesSpace: true);
+
+        Assert.Equal(string.Empty, spaceHintDuringRestoreChange);
+    }
+
+    [Fact]
+    public void ShowPermanentDeleteSummary_has_cleared_the_space_hint_by_the_time_Restore_changes()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
+            errors: new List<FileOperationError>());
+
+        string? spaceHintDuringRestoreChange = "unset";
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(CompletionViewModel.Restore))
+                spaceHintDuringRestoreChange = vm.SpaceHint;
+        };
+
+        vm.ShowPermanentDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
+            errors: new List<FileOperationError>());
+
+        Assert.Equal(string.Empty, spaceHintDuringRestoreChange);
+    }
 }

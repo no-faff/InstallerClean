@@ -173,12 +173,18 @@ public partial class CompletionViewModel : ObservableObject
         Heading = Strings.Completion_AllClean;
         SummaryDestination = string.Empty;
         Summary = Strings.Completion_NothingToCleanUp;
+        // SpaceHint must be set before Restore: the WPF host rebuilds the
+        // restore line's inlines (folding SpaceHint in as a leading sentence)
+        // from Restore's PropertyChanged, so SpaceHint needs its final value
+        // in place before that setter raises. Without this order a SpaceHint
+        // left over from an earlier Delete in the same session bleeds into
+        // the all-clear receipt.
+        SpaceHint = string.Empty;
         Restore = string.Format(
             Strings.Completion_NothingToCleanUpReceipt,
             installedProductCount,
             DisplayHelpers.PluraliseProduct(installedProductCount),
             DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
-        SpaceHint = string.Empty;
         Errors = string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = true;
@@ -222,8 +228,14 @@ public partial class CompletionViewModel : ObservableObject
                     Strings.Completion_MoveSummaryWithErrors_Plural,
                     "Completion.MoveSummaryWithErrors"),
                 movedCount, movedLabel, destination, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
-        Restore = Strings.Completion_MoveRestoreHint;
+        // SpaceHint must be set before Restore: the WPF host rebuilds the
+        // restore line's inlines (folding SpaceHint in as a leading sentence)
+        // from Restore's PropertyChanged, so SpaceHint needs its final value
+        // in place before that setter raises. Without this order a SpaceHint
+        // left over from an earlier Delete in the same session bleeds into
+        // this move's restore hint.
         SpaceHint = string.Empty;
+        Restore = Strings.Completion_MoveRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = movedBytes <= 0;
@@ -289,14 +301,18 @@ public partial class CompletionViewModel : ObservableObject
                     Strings.Completion_PermanentDeleteSummaryWithErrors_Plural,
                     "Completion.PermanentDeleteSummaryWithErrors"),
                 deletedCount, deletedLabel, errors.Count, DisplayHelpers.PluraliseError(errors.Count));
+        // No space hint: a permanent delete reclaims the disk at that instant
+        // (there is no bin to empty). The headline still reads "cleaned up"
+        // rather than "freed" to keep both delete paths consistent. Cleared
+        // before Restore: the WPF host rebuilds the restore line's inlines
+        // (folding SpaceHint in as a leading sentence) from Restore's
+        // PropertyChanged, so a SpaceHint left over from an earlier Delete in
+        // the same session would otherwise bleed into this reassurance.
+        SpaceHint = string.Empty;
         Restore = DisplayHelpers.Pluralise(deletedCount,
             Strings.Completion_PermanentDeleteRestoreHint_Singular,
             Strings.Completion_PermanentDeleteRestoreHint_Plural,
             "Completion.PermanentDeleteRestoreHint");
-        // No space hint: a permanent delete reclaims the disk at that instant
-        // (there is no bin to empty). The headline still reads "cleaned up"
-        // rather than "freed" to keep both delete paths consistent.
-        SpaceHint = string.Empty;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
