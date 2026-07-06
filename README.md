@@ -163,10 +163,10 @@ If Windows Installer is currently writing to the cache, has a previous transacti
 
 The scan, query, move, delete, settings and pending-reboot services are covered by an automated test suite that runs on every commit (see the CI badge above).
 
-**Verifying the binary.** InstallerClean is unsigned, so you don't have to take it on trust:
+**Verifying the binary.** InstallerClean is unsigned, but you don't have to take it on trust:
 
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
-- VirusTotal: clean across every engine. Live links in each release's notes so you can re-check.
+- VirusTotal: every build is scanned, with the full per-engine results linked on its release page so you can see how each file scored and re-scan it yourself. Any false positive is called out and explained in the release notes, not hidden.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
 - <!-- downloads-start -->27,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) tests each submission in a virtual machine and lists it only if it passes their review.
