@@ -13,7 +13,7 @@
 ; Programs entry.
 [Setup]
 #ifndef AppVersion
-  #define AppVersion "2.0.0"
+  #define AppVersion "2.0.1"
 #endif
 ; Copyright year comes from the build clock (compile-time) so the
 ; notice never goes stale.

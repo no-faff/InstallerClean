@@ -2,6 +2,12 @@
 
 Every change to InstallerClean, logged in full (not just the user-facing highlights). Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-07-07
+
+### Fixed
+
+- The completion screen no longer shows the Recycle-Bin-only "Empty it to actually reclaim the space." line after an all-clear rescan, a Move, or a permanent delete that followed a Recycle-Bin delete earlier in the same session. The 2.0.0 reword that added that line cleared it after setting the restore line's text rather than before, on three of the four completion paths; the on-screen text is rebuilt at the moment the restore line changes, so it picked up the previous operation's leftover hint instead of a blank one. All four paths now clear it first, matching the one that already did.
+
 ## [2.0.0] - 2026-07-06
 
 ### Added
