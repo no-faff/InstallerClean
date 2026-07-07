@@ -169,10 +169,8 @@ Windows Installer가 지금 캐시에 쓰고 있거나, 이전 트랜잭션이 �
 - VirusTotal: 모든 빌드를 스캔하며, 엔진별 전체 결과를 해당 릴리스 페이지에 링크해 두어 각 파일이 어떤 점수를 받았는지 확인하고 직접 다시 스캔해 볼 수 있습니다. 오탐이 있으면 숨기지 않고 릴리스 노트에서 알리고 설명합니다.
 - 소스는 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)에 있고, CI가 모든 커밋을 빌드하고 테스트합니다(위의 초록색 CI 배지를 참고하세요).
 - GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->29,000+<!-- downloads-end --> 회 다운로드되었습니다.
-- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html)는 제출된 각 파일을 가상 머신에서 테스트하고, 자체 검토를 통과한 경우에만 목록에 올립니다.
-- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml)는 각 릴리스를 바이러스, 스파이웨어, 애드웨어에 대해 검사합니다.
-
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 인증 100% 클린" width="190"></a>
+- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html)는 제출된 각 파일을 가상 머신에서 테스트하고, 자체 검토를 통과한 경우에만 목록에 올립니다.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 인증 100% 클린" width="263"></a>
+- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml)는 각 릴리스를 바이러스, 스파이웨어, 애드웨어에 대해 검사합니다.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 인증 100% 클린" width="190"></a>
 
 <a id="recovery"></a>
 ## `C:\Windows\Installer`에서 파일이 사라졌다면

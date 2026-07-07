@@ -169,10 +169,8 @@ Các dịch vụ quét, truy vấn, chuyển, xóa, cài đặt và kiểm tra k
 - VirusTotal: mỗi bản dựng đều được quét, với kết quả đầy đủ theo từng công cụ được liên kết trên trang phát hành của bản đó, để bạn có thể xem từng tệp được chấm điểm ra sao và tự quét lại. Bất kỳ báo động giả nào cũng được nêu ra và giải thích trong ghi chú phát hành, không giấu giếm.
 - Mã nguồn nằm tại [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) và CI biên dịch và kiểm thử mọi lần commit (xem huy hiệu CI màu xanh ở trên).
 - <!-- downloads-start -->29.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
-- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) kiểm tra mỗi lần gửi trong một máy ảo và chỉ đăng nếu nó vượt qua được phần đánh giá của họ.
-- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) kiểm tra mỗi bản phát hành để phát hiện virus, phần mềm gián điệp và phần mềm quảng cáo.
-
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Được Softpedia chứng nhận 100% sạch" width="190"></a>
+- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) kiểm tra mỗi lần gửi trong một máy ảo và chỉ đăng nếu nó vượt qua được phần đánh giá của họ.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Được MajorGeeks chứng nhận 100% sạch" width="263"></a>
+- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) kiểm tra mỗi bản phát hành để phát hiện virus, phần mềm gián điệp và phần mềm quảng cáo.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Được Softpedia chứng nhận 100% sạch" width="190"></a>
 
 <a id="recovery"></a>
 ## Nếu bạn thật sự thiếu một tệp trong `C:\Windows\Installer`

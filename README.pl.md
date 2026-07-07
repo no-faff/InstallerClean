@@ -169,10 +169,8 @@ Usługi skanowania, odpytywania, przenoszenia, usuwania, ustawień i oczekujące
 - VirusTotal: każdy build jest skanowany, a pełne wyniki dla każdego silnika są linkowane na stronie danego wydania, dzięki czemu możesz zobaczyć, jak oceniono każdy plik, i przeskanować go ponownie samodzielnie. Każdy fałszywy alarm jest wskazany i wyjaśniony w informacjach o wydaniu, nigdy ukrywany.
 - Kod źródłowy jest pod adresem [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), a CI buduje i testuje każdy commit (zob. zieloną plakietkę CI powyżej).
 - <!-- downloads-start -->29 000+<!-- downloads-end --> pobrań w GitHub, MajorGeeks i Softpedia.
-- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testuje każde zgłoszenie w maszynie wirtualnej i umieszcza je na liście tylko wtedy, gdy przejdzie ich kontrolę.
-- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testuje każde wydanie pod kątem wirusów, programów szpiegujących i adware.
-
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia: certyfikat 100% czystości" width="190"></a>
+- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testuje każde zgłoszenie w maszynie wirtualnej i umieszcza je na liście tylko wtedy, gdy przejdzie ich kontrolę.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks: certyfikat 100% czystości" width="263"></a>
+- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testuje każde wydanie pod kątem wirusów, programów szpiegujących i adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia: certyfikat 100% czystości" width="190"></a>
 
 <a id="recovery"></a>
 ## Jeśli jednak brakuje ci pliku w `C:\Windows\Installer`
