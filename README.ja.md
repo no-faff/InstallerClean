@@ -169,10 +169,8 @@ Windows インストーラーが今まさにキャッシュへ書き込んでい
 - VirusTotal：ビルドごとにスキャンしており、エンジンごとの詳細な結果はそのリリースページにリンクされているので、各ファイルのスコアを確認したり、ご自身で再スキャンしたりできます。誤検知があれば隠さず、リリースノートで告知して説明しています。
 - ソースコードは [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) にあり、CI が毎回のコミットをビルド・テストしています（上の緑色の CI バッジを参照）。
 - GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->29,000+<!-- downloads-end --> 回ダウンロードされています。
-- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) は各提出物を仮想マシンでテストし、審査を通過したものだけを掲載します。
-- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) は各リリースをウイルス・スパイウェア・アドウェアについて検査しています。
-
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 認証済み 100% クリーン" width="190"></a>
+- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) は各提出物を仮想マシンでテストし、審査を通過したものだけを掲載します。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 認証済み 100% クリーン" width="263"></a>
+- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) は各リリースをウイルス・スパイウェア・アドウェアについて検査しています。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 認証済み 100% クリーン" width="190"></a>
 
 <a id="recovery"></a>
 ## 万一 `C:\Windows\Installer` のファイルが失われてしまったら

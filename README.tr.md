@@ -169,10 +169,8 @@ Tarama, sorgulama, taşıma, silme, ayarlar ve bekleyen yeniden başlatma hizmet
 - VirusTotal: her yapı taranır; her motordaki tam sonuçlar ilgili sürümün sayfasında bağlantılanır, böylece her dosyanın nasıl puanlandığını görebilir ve kendiniz yeniden tarayabilirsiniz. Herhangi bir yanlış pozitif gizlenmez, sürüm notlarında belirtilir ve açıklanır.
 - Kaynak kod [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) adresinde ve CI her commit'i derleyip test ediyor (yukarıdaki yeşil CI rozetine bakın).
 - GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->29.000+<!-- downloads-end --> indirme.
-- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) her gönderimi bir sanal makinede test eder ve yalnızca incelemelerinden geçerse listeler.
-- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) her sürümü virüs, casus yazılım ve reklam yazılımı için test eder.
-
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia tarafından %100 temiz olarak onaylandı" width="190"></a>
+- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) her gönderimi bir sanal makinede test eder ve yalnızca incelemelerinden geçerse listeler.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks tarafından %100 temiz olarak onaylandı" width="263"></a>
+- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) her sürümü virüs, casus yazılım ve reklam yazılımı için test eder.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia tarafından %100 temiz olarak onaylandı" width="190"></a>
 
 <a id="recovery"></a>
 ## C:\Windows\Installer'da eksik bir dosyanız varsa

@@ -169,10 +169,8 @@ InstallerClean 会识别三类不需要的文件。
 - VirusTotal：每个构建都会扫描，各引擎的完整结果链接在对应版本的发布页面上，方便您查看每个文件的检测结果并自行重新扫描。任何误报都会在发布说明中指出并解释，绝不隐瞒。
 - 源代码在 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)，CI 会对每次提交进行构建和测试（见上方绿色的 CI 徽章）。
 - 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->29,000+<!-- downloads-end --> 次下载。
-- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 会在虚拟机中测试每一个提交上来的版本，只有通过审核才会收录。
-- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) 会对每个版本做病毒、间谍软件和广告软件检测。
-
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 认证 100% 干净" width="190"></a>
+- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 会在虚拟机中测试每一个提交上来的版本，只有通过审核才会收录。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 认证 100% 干净" width="263"></a>
+- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) 会对每个版本做病毒、间谍软件和广告软件检测。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 认证 100% 干净" width="190"></a>
 
 <a id="recovery"></a>
 ## 万一您真的丢了 `C:\Windows\Installer` 里的文件

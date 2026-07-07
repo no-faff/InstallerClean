@@ -169,10 +169,8 @@ Os serviços de análise, consulta, movimentação, exclusão, configurações e
 - VirusTotal: cada build é escaneado, com os resultados completos por mecanismo vinculados na página da versão, para que você possa ver como cada arquivo pontuou e escaneá-lo de novo você mesmo. Qualquer falso positivo é apontado e explicado nas notas da versão, nunca escondido.
 - O código-fonte está em [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), e a CI compila e testa cada commit (veja o selo verde de CI acima).
 - <!-- downloads-start -->29.000+<!-- downloads-end --> downloads entre o GitHub, o MajorGeeks e a Softpedia.
-- O [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testa cada envio em uma máquina virtual e só publica se passar na avaliação deles.
-- A [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testa cada versão em busca de vírus, spyware e adware.
-
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificado 100% limpo pela Softpedia" width="190"></a>
+- O [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testa cada envio em uma máquina virtual e só publica se passar na avaliação deles.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certificado 100% limpo pelo MajorGeeks" width="263"></a>
+- A [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testa cada versão em busca de vírus, spyware e adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificado 100% limpo pela Softpedia" width="190"></a>
 
 <a id="recovery"></a>
 ## Se você estiver mesmo com um arquivo faltando em `C:\Windows\Installer`

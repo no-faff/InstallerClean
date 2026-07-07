@@ -169,10 +169,8 @@ InstallerClean различает три вида ненужных файлов.
 - VirusTotal: каждая сборка сканируется, и полные результаты по каждому антивирусному движку связаны на странице соответствующего выпуска, чтобы вы могли увидеть, как оценён каждый файл, и перепроверить его самостоятельно. Любое ложное срабатывание указывается и объясняется в примечаниях к выпуску, а не скрывается.
 - Исходный код лежит на [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), и CI собирает и тестирует каждый коммит (см. зелёный значок CI выше).
 - <!-- downloads-start -->29 000+<!-- downloads-end --> загрузок на GitHub, MajorGeeks и Softpedia.
-- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) тестирует каждую присланную сборку в виртуальной машине и публикует её, только если она прошла их проверку.
-- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) проверяет каждый выпуск на вирусы, шпионское и рекламное ПО.
-
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia: сертифицировано как 100 % чистое" width="190"></a>
+- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) тестирует каждую присланную сборку в виртуальной машине и публикует её, только если она прошла их проверку.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks: сертифицировано как 100 % чистое" width="263"></a>
+- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) проверяет каждый выпуск на вирусы, шпионское и рекламное ПО.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia: сертифицировано как 100 % чистое" width="190"></a>
 
 <a id="recovery"></a>
 ## Если у вас всё-таки пропал файл из `C:\Windows\Installer`

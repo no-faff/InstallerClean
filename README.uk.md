@@ -169,10 +169,8 @@ InstallerClean розрізняє три види непотрібних фай�
 - VirusTotal: кожну збірку скановано, а повні результати за кожним рушієм пов'язано зі сторінкою відповідного релізу, тож ви можете побачити, як оцінено кожен файл, і повторно перевірити його самостійно. Будь-яке хибне спрацювання зазначається і пояснюється в нотатках релізу, а не приховується.
 - Вихідний код на [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), а CI збирає й тестує кожен коміт (див. зелений значок CI вище).
 - <!-- downloads-start -->29 000+<!-- downloads-end --> завантажень через GitHub, MajorGeeks і Softpedia.
-- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) перевіряє кожну подачу у віртуальній машині й додає її до каталогу лише після проходження перевірки.
-- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) перевіряє кожен реліз на віруси, шпигунське та рекламне ПЗ.
-
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Сертифіковано Softpedia як 100% чисте" width="190"></a>
+- [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) перевіряє кожну подачу у віртуальній машині й додає її до каталогу лише після проходження перевірки.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Сертифіковано MajorGeeks як 100% чисте" width="263"></a>
+- [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) перевіряє кожен реліз на віруси, шпигунське та рекламне ПЗ.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Сертифіковано Softpedia як 100% чисте" width="190"></a>
 
 <a id="recovery"></a>
 ## Якщо у вас усе ж бракує файлу в `C:\Windows\Installer`

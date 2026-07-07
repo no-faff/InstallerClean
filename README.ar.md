@@ -171,10 +171,8 @@
 - VirusTotal: تُفحص كل نسخة، مع روابط للنتائج الكاملة لكل محرك على صفحة إصدارها لتتمكن من رؤية كيف صُنِّف كل ملف وإعادة فحصه بنفسك. أي إنذار كاذب يُذكر ويُشرح في ملاحظات الإصدار، لا يُخفى.
 - الشيفرة المصدرية على [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)، وتقوم CI ببناء واختبار كل commit (انظر شارة CI الخضراء أعلاه).
 - <!-- downloads-start -->29,000+<!-- downloads-end --> عملية تنزيل عبر GitHub وMajorGeeks وSoftpedia.
-- يختبر [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) كل إصدار مُرسَل في جهاز افتراضي ولا يدرجه إلا إذا اجتاز مراجعتهم.
-- يفحص [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) كل إصدار بحثاً عن الفيروسات وبرامج التجسس والإعلانات.
-
-<a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="شهادة Softpedia بنظافة 100%" width="190"></a>
+- يختبر [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) كل إصدار مُرسَل في جهاز افتراضي ولا يدرجه إلا إذا اجتاز مراجعتهم.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="شهادة MajorGeeks بنظافة 100%" width="263"></a>
+- يفحص [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) كل إصدار بحثاً عن الفيروسات وبرامج التجسس والإعلانات.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="شهادة Softpedia بنظافة 100%" width="190"></a>
 
 <a id="recovery"></a>
 ## إذا فقدت بالفعل ملفاً من `C:\Windows\Installer`
