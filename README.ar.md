@@ -22,7 +22,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.0.1-blue" alt="إصدار GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-29k-brightgreen" alt="إجمالي التنزيلات"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-30k-brightgreen" alt="إجمالي التنزيلات"></a>
 </p>
 
 ![لقطة شاشة لـ InstallerClean بعد تنظيف ناجح: تنظيف 1.28 GB ونقل 69 ملفاً إلى سلة المحذوفات](docs/screenshots/en/06-success-done.webp)
@@ -170,7 +170,7 @@
 - بصمات SHA-256 لكل إصدار مدرجة في [صفحة الإصدارات](../../releases/latest).
 - VirusTotal: تُفحص كل نسخة، مع روابط للنتائج الكاملة لكل محرك على صفحة إصدارها لتتمكن من رؤية كيف صُنِّف كل ملف وإعادة فحصه بنفسك. أي إنذار كاذب يُذكر ويُشرح في ملاحظات الإصدار، لا يُخفى.
 - الشيفرة المصدرية على [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)، وتقوم CI ببناء واختبار كل commit (انظر شارة CI الخضراء أعلاه).
-- <!-- downloads-start -->29,000+<!-- downloads-end --> عملية تنزيل عبر GitHub وMajorGeeks وSoftpedia.
+- <!-- downloads-start -->30,000+<!-- downloads-end --> عملية تنزيل عبر GitHub وMajorGeeks وSoftpedia.
 - يختبر [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) كل إصدار مُرسَل في جهاز افتراضي ولا يدرجه إلا إذا اجتاز مراجعتهم.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="شهادة MajorGeeks بنظافة 100%" width="263"></a>
 - يفحص [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) كل إصدار بحثاً عن الفيروسات وبرامج التجسس والإعلانات.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="شهادة Softpedia بنظافة 100%" width="190"></a>
 
