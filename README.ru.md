@@ -20,14 +20,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.0.1-blue" alt="Релиз на GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-28k-brightgreen" alt="Всего загрузок"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-29k-brightgreen" alt="Всего загрузок"></a>
 </p>
 
 ![Скриншот InstallerClean после успешной очистки: очищено 1,28 ГБ, 69 файлов перемещено в Корзину](docs/screenshots/ru/06-success-done.webp)
 
 - **Что это:** InstallerClean делает одно дело: убирает ненужные файлы из `C:\Windows\Installer` — скрытой папки, которую Windows никогда не очищает. После почти мгновенного сканирования он сообщает, есть ли они у вас, показывает подробности для любопытных и позволяет удалить их, чтобы освободить место на диске C:. Запускаете один раз — и идёте дальше.
 - **Возможно, вы здесь вот почему:** вы пользовались [WinDirStat](https://github.com/windirstat/windirstat), WizTree или TreeSize, увидели, что `C:\Windows\Installer` занимает много места, и не знали, что там внутри. InstallerClean — как раз то, что вам нужно. Он знает, что содержится в этих файлах со случайными на вид именами вроде `9f05cba.msi`, и быстро подскажет, какие из них можно безопасно удалить.
-- **Сколько места:** По присланным (необязательным) отчётам на данный момент у <!-- reports-freedpct-start -->45 %<!-- reports-freedpct-end --> машин нашлись ненужные файлы для очистки. У них медиана освобождённого — <!-- reports-median-start -->21 ГБ<!-- reports-median-end -->. У некоторых очистилось по нескольку сотен гигабайт. У меня — 1,28 ГБ. Остальные <!-- reports-nothingpct-start -->55 %<!-- reports-nothingpct-end --> не нашли ничего лишнего, а это просто значит, что их папка Installer уже была чистой. Подробнее в разделе [Частые вопросы](#частые-вопросы) ниже.
+- **Сколько места:** По присланным (необязательным) отчётам на данный момент у <!-- reports-freedpct-start -->46 %<!-- reports-freedpct-end --> машин нашлись ненужные файлы для очистки. У них медиана освобождённого — <!-- reports-median-start -->20 ГБ<!-- reports-median-end -->. У некоторых очистилось по нескольку сотен гигабайт. У меня — 1,28 ГБ. Остальные <!-- reports-nothingpct-start -->54 %<!-- reports-nothingpct-end --> не нашли ничего лишнего, а это просто значит, что их папка Installer уже была чистой. Подробнее в разделе [Частые вопросы](#частые-вопросы) ниже.
 - **Это безопасно:** Да. Он спрашивает у самого API Windows Installer, какие файлы ещё нужны, и показывает только те, что Windows объявляет отработавшими. Это проект с открытым исходным кодом (MIT), и он ничего о вас не спрашивает: ни учётной записи, ни рекламы, ни слежки, ни телеметрии, ничего работающего в фоне. Сам он в сеть никогда не выходит.
 - **Как получить:** [Скачайте последнюю версию](../../releases/latest). Запустите, пройдите через [предупреждение Windows](#unknown-publisher) и [запрос прав администратора](#admin). Удалите ненужные файлы. Готово.
 
@@ -168,7 +168,7 @@ InstallerClean различает три вида ненужных файлов.
 - Хеши SHA-256 для каждого выпуска указаны на [странице выпусков](../../releases/latest).
 - VirusTotal: каждая сборка сканируется, и полные результаты по каждому антивирусному движку связаны на странице соответствующего выпуска, чтобы вы могли увидеть, как оценён каждый файл, и перепроверить его самостоятельно. Любое ложное срабатывание указывается и объясняется в примечаниях к выпуску, а не скрывается.
 - Исходный код лежит на [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), и CI собирает и тестирует каждый коммит (см. зелёный значок CI выше).
-- <!-- downloads-start -->28 000+<!-- downloads-end --> загрузок на GitHub, MajorGeeks и Softpedia.
+- <!-- downloads-start -->29 000+<!-- downloads-end --> загрузок на GitHub, MajorGeeks и Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) тестирует каждую присланную сборку в виртуальной машине и публикует её, только если она прошла их проверку.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) проверяет каждый выпуск на вирусы, шпионское и рекламное ПО.
 
@@ -233,12 +233,12 @@ InstallerClean создан так, чтобы им можно было полн
 **Я действительно освобожу гигабайты места?** Зависит от вашего компьютера. На чистой установке Windows 11 без лишних программ удалять нечего. На давно используемой рабочей станции разработчика или на любой машине с обилием программ на основе MSI (Acrobat, Office, LibreOffice, крупные средства разработки) могут набраться десятки гигабайт. В любом случае вы увидите точную цифру, как только запустите программу.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-По 108 отчётам, которые люди любезно прислали (спасибо 🙏) с тех пор, как в v1.8.0 появилась эта возможность:
+По 111 отчётам, которые люди любезно прислали (спасибо 🙏) с тех пор, как в v1.8.0 появилась эта возможность:
 
 | Результат | Доля | Минимум | Медиана | Максимум |
 |---|---|---|---|---|
-| Удалять нечего | 55 % | - | - | - |
-| Освобождено место | 45 % | 0,1 ГБ | 21 ГБ | 327 ГБ |
+| Удалять нечего | 54 % | - | - | - |
+| Освобождено место | 46 % | 0,1 ГБ | 20 ГБ | 327 ГБ |
 <!-- reports-stats-end -->
 
 <details>

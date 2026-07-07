@@ -20,14 +20,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.0.1-blue" alt="Rilis GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-28k-brightgreen" alt="Total unduhan"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-29k-brightgreen" alt="Total unduhan"></a>
 </p>
 
 ![Tangkapan layar InstallerClean setelah pembersihan berhasil: 1,28 GB dibersihkan, 69 file dipindahkan ke Keranjang Sampah](docs/screenshots/id/06-success-done.webp)
 
 - **Apa:** InstallerClean melakukan satu hal: menghapus file yang tidak diperlukan dari `C:\Windows\Installer`, folder tersembunyi yang tidak pernah dibersihkan Windows. Setelah pemindaian yang hampir seketika, aplikasi memberi tahu Anda apakah ada file seperti itu, menampilkan detail lebih lanjut bagi yang penasaran, dan memungkinkan Anda menghapusnya untuk mengosongkan ruang di drive C: Anda. Anda cukup memakainya sekali lalu lanjut.
 - **Mungkin Anda di sini karena:** Anda memakai [WinDirStat](https://github.com/windirstat/windirstat), WizTree, atau TreeSize, melihat `C:\Windows\Installer` memakan banyak ruang, dan tidak tahu apa isinya. InstallerClean justru yang Anda butuhkan. Aplikasi ini tahu isi file dengan nama yang tampak acak seperti `9f05cba.msi` dan dengan cepat memberi tahu Anda mana yang aman dihapus.
-- **Berapa banyak ruang:** Laporan (opsional) yang masuk sejauh ini menunjukkan bahwa <!-- reports-freedpct-start -->45%<!-- reports-freedpct-end --> mesin memiliki file tidak diperlukan untuk dibersihkan. Dari mesin-mesin itu, median yang dikosongkan adalah <!-- reports-median-start -->21 GB<!-- reports-median-end -->. Beberapa membersihkan ratusan GB. Bagi saya jumlahnya 1,28 GB. Sisanya, <!-- reports-nothingpct-start -->55%<!-- reports-nothingpct-end -->, tidak menemukan apa pun untuk dihapus, yang berarti folder Installer mereka memang sudah bersih. Detail lebih lanjut ada di [FAQ](#faq) di bawah.
+- **Berapa banyak ruang:** Laporan (opsional) yang masuk sejauh ini menunjukkan bahwa <!-- reports-freedpct-start -->46%<!-- reports-freedpct-end --> mesin memiliki file tidak diperlukan untuk dibersihkan. Dari mesin-mesin itu, median yang dikosongkan adalah <!-- reports-median-start -->20 GB<!-- reports-median-end -->. Beberapa membersihkan ratusan GB. Bagi saya jumlahnya 1,28 GB. Sisanya, <!-- reports-nothingpct-start -->54%<!-- reports-nothingpct-end -->, tidak menemukan apa pun untuk dihapus, yang berarti folder Installer mereka memang sudah bersih. Detail lebih lanjut ada di [FAQ](#faq) di bawah.
 - **Apakah aman:** Ya. Aplikasi menanyakan langsung ke Windows Installer API sendiri file mana yang masih diperlukan dan hanya pernah mendaftar file yang dilaporkan Windows sudah tidak terpakai. Aplikasi ini sumber terbuka (MIT) dan tidak menanyakan apa pun tentang Anda: tanpa akun, tanpa iklan, tanpa pelacakan, tanpa telemetri, tidak ada yang berjalan di latar belakang. Aplikasi tidak pernah terhubung ke internet dengan sendirinya.
 - **Dapatkan:** [Unduh rilis terbaru](../../releases/latest). Jalankan; lewati [peringatan Windows](#unknown-publisher) dan [permintaan administrator](#admin). Hapus file yang tidak diperlukan. Selesai.
 
@@ -168,7 +168,7 @@ Layanan pemindaian, kueri, pemindahan, penghapusan, pengaturan, dan mulai-ulang-
 - Hash SHA-256 untuk tiap rilis tercantum di [halaman rilis](../../releases/latest).
 - VirusTotal: setiap build dipindai, dengan hasil lengkap per mesin pemindai ditautkan di halaman rilisnya sehingga Anda bisa melihat skor tiap file dan memindai ulang sendiri. Setiap positif palsu disebutkan dan dijelaskan di catatan rilis, tidak disembunyikan.
 - Kode sumber ada di [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) dan CI membangun serta menguji setiap commit (lihat lencana CI hijau di atas).
-- <!-- downloads-start -->28.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks, dan Softpedia.
+- <!-- downloads-start -->29.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks, dan Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) menguji tiap kiriman di mesin virtual dan hanya mendaftarkannya jika lolos tinjauan mereka.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) menguji tiap rilis dari virus, spyware, dan adware.
 
@@ -233,12 +233,12 @@ Jika ada sesuatu di sini yang menghalangi Anda, [buka sebuah issue](../../issues
 **Apakah saya benar-benar akan mengosongkan ruang sebesar GB?** Tergantung mesin Anda. Instalasi Windows 11 yang bersih tanpa perangkat lunak tambahan tidak punya apa pun untuk dihapus. Workstation pengembang yang sudah lama berjalan, atau mesin mana pun dengan banyak perangkat lunak berbasis MSI (Acrobat, Office, LibreOffice, alat pengembangan besar), bisa menyimpan puluhan GB. Apa pun keadaannya, Anda akan melihat persis berapa banyak begitu menjalankannya.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-Dari 108 laporan yang dikirimkan orang-orang (terima kasih 🙏) sejak opsi ini ditambahkan di v1.8.0:
+Dari 111 laporan yang dikirimkan orang-orang (terima kasih 🙏) sejak opsi ini ditambahkan di v1.8.0:
 
 | Hasil | Persentase | Terkecil | Median | Terbesar |
 |---|---|---|---|---|
-| Tidak ada yang dihapus | 55% | - | - | - |
-| Ruang yang dikosongkan | 45% | 0,1 GB | 21 GB | 327 GB |
+| Tidak ada yang dihapus | 54% | - | - | - |
+| Ruang yang dikosongkan | 46% | 0,1 GB | 20 GB | 327 GB |
 <!-- reports-stats-end -->
 
 <details>
