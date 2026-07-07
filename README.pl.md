@@ -20,14 +20,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.0.1-blue" alt="Wydanie GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-28k-brightgreen" alt="Łączna liczba pobrań"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-29k-brightgreen" alt="Łączna liczba pobrań"></a>
 </p>
 
 ![Zrzut ekranu InstallerClean po udanym oczyszczeniu: wyczyszczono 1,28 GB, 69 plików przeniesiono do Kosza](docs/screenshots/pl/06-success-done.webp)
 
 - **Co:** InstallerClean robi jedną rzecz: usuwa niepotrzebne pliki z `C:\Windows\Installer`, ukrytego folderu, którego Windows nigdy nie czyści. Po niemal natychmiastowym skanowaniu mówi ci, czy w ogóle jakieś masz, pokazuje więcej szczegółów ciekawskim i pozwala je usunąć, by zwolnić miejsce na dysku C:. Uruchamiasz go raz i ruszasz dalej.
 - **Może jesteś tu, bo:** Użyłeś [WinDirStat](https://github.com/windirstat/windirstat), WizTree albo TreeSize, zobaczyłeś, że `C:\Windows\Installer` zajmuje mnóstwo miejsca, i nie wiedziałeś, co w nim siedzi. InstallerClean to dokładnie to, czego potrzebujesz. Wie, co kryje się w tych plikach o pozornie przypadkowych nazwach, jak `9f05cba.msi`, i szybko mówi ci, które z nich możesz bezpiecznie usunąć.
-- **Ile miejsca:** Nadesłane jak dotąd (opcjonalne) raporty pokazują, że <!-- reports-freedpct-start -->45%<!-- reports-freedpct-end --> maszyn miało niepotrzebne pliki do wyczyszczenia. Na tych maszynach mediana zwolnionego miejsca to <!-- reports-median-start -->21 GB<!-- reports-median-end -->. Kilka osób odzyskało setki GB. U mnie było to 1,28 GB. Pozostałe <!-- reports-nothingpct-start -->55%<!-- reports-nothingpct-end --> nie znalazły nic do usunięcia, co po prostu oznacza, że ich folder Installer był już czysty. Więcej szczegółów w [FAQ](#faq) poniżej.
+- **Ile miejsca:** Nadesłane jak dotąd (opcjonalne) raporty pokazują, że <!-- reports-freedpct-start -->46%<!-- reports-freedpct-end --> maszyn miało niepotrzebne pliki do wyczyszczenia. Na tych maszynach mediana zwolnionego miejsca to <!-- reports-median-start -->20 GB<!-- reports-median-end -->. Kilka osób odzyskało setki GB. U mnie było to 1,28 GB. Pozostałe <!-- reports-nothingpct-start -->54%<!-- reports-nothingpct-end --> nie znalazły nic do usunięcia, co po prostu oznacza, że ich folder Installer był już czysty. Więcej szczegółów w [FAQ](#faq) poniżej.
 - **Czy to bezpieczne:** Tak. Pyta samo API Windows Installer, które pliki są nadal potrzebne, i wymienia wyłącznie te, które Windows zgłasza jako już niepotrzebne. Jest otwartoźródłowy (MIT) i o nic cię nie pyta: bez konta, bez reklam, bez śledzenia, bez telemetrii, bez niczego działającego w tle. Nigdy sam nie łączy się z siecią.
 - **Pobierz:** [Pobierz najnowszą wersję](../../releases/latest). Uruchom; przeklikaj się przez [ostrzeżenie Windows](#unknown-publisher) i [monit administratora](#admin). Usuń wszelkie niepotrzebne pliki. Gotowe.
 
@@ -168,7 +168,7 @@ Usługi skanowania, odpytywania, przenoszenia, usuwania, ustawień i oczekujące
 - Skróty SHA-256 dla każdej wersji są wymienione na [stronie wydań](../../releases/latest).
 - VirusTotal: każdy build jest skanowany, a pełne wyniki dla każdego silnika są linkowane na stronie danego wydania, dzięki czemu możesz zobaczyć, jak oceniono każdy plik, i przeskanować go ponownie samodzielnie. Każdy fałszywy alarm jest wskazany i wyjaśniony w informacjach o wydaniu, nigdy ukrywany.
 - Kod źródłowy jest pod adresem [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), a CI buduje i testuje każdy commit (zob. zieloną plakietkę CI powyżej).
-- <!-- downloads-start -->28 000+<!-- downloads-end --> pobrań w GitHub, MajorGeeks i Softpedia.
+- <!-- downloads-start -->29 000+<!-- downloads-end --> pobrań w GitHub, MajorGeeks i Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testuje każde zgłoszenie w maszynie wirtualnej i umieszcza je na liście tylko wtedy, gdy przejdzie ich kontrolę.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testuje każde wydanie pod kątem wirusów, programów szpiegujących i adware.
 
@@ -233,12 +233,12 @@ Jeśli cokolwiek tutaj ci przeszkadza, [zgłoś problem](../../issues). Problemy
 **Czy naprawdę zwolnię GB miejsca?** To zależy od twojej maszyny. Czysta instalacja Windows 11 bez dodatkowego oprogramowania nie ma nic do usunięcia. Długo używana stacja robocza dewelopera albo dowolna maszyna z dużą ilością oprogramowania opartego na MSI (Acrobat, Office, LibreOffice, duże narzędzia deweloperskie) może mieć dziesiątki GB. Tak czy inaczej, dokładnie zobaczysz ile, w chwili gdy ją uruchomisz.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-Spośród 108 raportów, które nadesłano (dziękuję 🙏) od czasu, gdy opcję tę dodano w v1.8.0:
+Spośród 111 raportów, które nadesłano (dziękuję 🙏) od czasu, gdy opcję tę dodano w v1.8.0:
 
 | Wynik | Udział | Najmniej | Mediana | Najwięcej |
 |---|---|---|---|---|
-| Nic do usunięcia | 55% | - | - | - |
-| Zwolnione miejsce | 45% | 0,1 GB | 21 GB | 327 GB |
+| Nic do usunięcia | 54% | - | - | - |
+| Zwolnione miejsce | 46% | 0,1 GB | 20 GB | 327 GB |
 <!-- reports-stats-end -->
 
 <details>

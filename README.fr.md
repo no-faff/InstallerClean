@@ -20,14 +20,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.0.1-blue" alt="Version GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-28k-brightgreen" alt="Total des téléchargements"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-29k-brightgreen" alt="Total des téléchargements"></a>
 </p>
 
 ![Capture d'écran d'InstallerClean après un nettoyage réussi : 1,28 Go nettoyés, 69 fichiers déplacés à la Corbeille](docs/screenshots/fr/06-success-done.webp)
 
 - **En bref :** InstallerClean fait une seule chose : il supprime les fichiers inutiles de `C:\Windows\Installer`, un dossier caché que Windows ne nettoie jamais. Après une analyse quasi instantanée, il vous dit si vous en avez, donne plus de détails pour les curieux, et vous permet de les supprimer pour libérer de l'espace sur votre disque C:. Vous l'utilisez une fois, puis vous passez à autre chose.
 - **Vous êtes peut-être ici parce que :** vous avez utilisé [WinDirStat](https://github.com/windirstat/windirstat), WizTree ou TreeSize, vous avez vu que `C:\Windows\Installer` occupait beaucoup de place et vous ne saviez pas ce qu'il y avait dedans. InstallerClean est exactement ce qu'il vous faut. Il sait ce que contiennent ces fichiers aux noms apparemment aléatoires comme `9f05cba.msi` et vous dit rapidement lesquels vous pouvez supprimer sans risque.
-- **Combien d'espace :** Les rapports (facultatifs) reçus jusqu'ici montrent que <!-- reports-freedpct-start -->45 %<!-- reports-freedpct-end --> des machines avaient des fichiers inutiles à nettoyer. Pour celles-ci, la médiane libérée est de <!-- reports-median-start -->21 Go<!-- reports-median-end -->. Quelques-unes ont récupéré des centaines de Go. Pour moi, c'était 1,28 Go. Les <!-- reports-nothingpct-start -->55 %<!-- reports-nothingpct-end --> restants n'avaient rien à supprimer, ce qui veut simplement dire que leur dossier Installer était déjà propre. Plus de détails dans la [FAQ](#faq) ci-dessous.
+- **Combien d'espace :** Les rapports (facultatifs) reçus jusqu'ici montrent que <!-- reports-freedpct-start -->46 %<!-- reports-freedpct-end --> des machines avaient des fichiers inutiles à nettoyer. Pour celles-ci, la médiane libérée est de <!-- reports-median-start -->20 Go<!-- reports-median-end -->. Quelques-unes ont récupéré des centaines de Go. Pour moi, c'était 1,28 Go. Les <!-- reports-nothingpct-start -->54 %<!-- reports-nothingpct-end --> restants n'avaient rien à supprimer, ce qui veut simplement dire que leur dossier Installer était déjà propre. Plus de détails dans la [FAQ](#faq) ci-dessous.
 - **Est-ce sûr :** Oui. Il demande à l'API Windows Installer elle-même quels fichiers sont encore nécessaires et ne liste jamais que ceux dont Windows déclare avoir fini de se servir. C'est un logiciel open source (MIT) qui ne demande rien sur vous : pas de compte, pas de publicité, pas de pistage, pas de télémétrie, rien qui tourne en arrière-plan. Il ne se connecte jamais de lui-même.
 - **Comment l'obtenir :** [Téléchargez la dernière version](../../releases/latest). Lancez-la ; cliquez pour passer [l'avertissement de Windows](#unknown-publisher) et [l'invite d'administrateur](#admin). Supprimez les fichiers inutiles. C'est tout.
 
@@ -168,7 +168,7 @@ Les services d'analyse, de requête, de déplacement, de suppression, de réglag
 - Les empreintes SHA-256 de chaque version sont listées sur la [page des versions](../../releases/latest).
 - VirusTotal : chaque build est analysé, avec les résultats complets par moteur liés sur la page de la version afin que vous puissiez voir comment chaque fichier a été noté et le réanalyser vous-même. Tout faux positif est signalé et expliqué dans les notes de version, jamais caché.
 - Le code source est sur [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) et la CI compile et teste chaque commit (voir le badge CI vert plus haut).
-- <!-- downloads-start -->28 000+<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
+- <!-- downloads-start -->29 000+<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) teste chaque soumission dans une machine virtuelle et ne la référence que si elle passe son contrôle.
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analyse chaque version à la recherche de virus, logiciels espions et publiciels.
 
@@ -233,12 +233,12 @@ Si quelque chose ici vous gêne, [ouvrez un ticket](../../issues). Les problème
 **Vais-je vraiment libérer des Go d'espace ?** Ça dépend de votre machine. Une installation neuve de Windows 11 sans logiciel supplémentaire n'a rien à supprimer. Une station de développement utilisée de longue date, ou toute machine chargée de logiciels basés sur MSI (Acrobat, Office, LibreOffice, gros outils de développement), peut en contenir des dizaines de Go. Dans tous les cas, vous verrez exactement combien dès que vous la lancez.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-Sur les 108 rapports que des utilisateurs nous ont gentiment envoyés (merci 🙏) depuis que la v1.8.0 a ajouté l'option :
+Sur les 111 rapports que des utilisateurs nous ont gentiment envoyés (merci 🙏) depuis que la v1.8.0 a ajouté l'option :
 
 | Résultat | Proportion | Minimum | Médiane | Maximum |
 |---|---|---|---|---|
-| Rien à supprimer | 55 % | - | - | - |
-| Espace libéré | 45 % | 0,1 Go | 21 Go | 327 Go |
+| Rien à supprimer | 54 % | - | - | - |
+| Espace libéré | 46 % | 0,1 Go | 20 Go | 327 Go |
 <!-- reports-stats-end -->
 
 <details>
