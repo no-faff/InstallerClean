@@ -20,14 +20,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.0.1-blue" alt="GitHub-Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-30k-brightgreen" alt="Downloads insgesamt"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-31k-brightgreen" alt="Downloads insgesamt"></a>
 </p>
 
 ![Screenshot von InstallerClean nach einem erfolgreichen Aufräumen: 1,28 GB aufgeräumt, 69 Dateien in den Papierkorb verschoben](docs/screenshots/de/06-success-done.webp)
 
 - **Was:** InstallerClean tut eine Sache: Es entfernt nicht benötigte Dateien aus `C:\Windows\Installer`, einem versteckten Ordner, den Windows nie aufräumt. Nach einem fast augenblicklichen Scan sagt es dir, ob du welche hast, zeigt Neugierigen mehr Details und lässt dich die Dateien löschen, um Platz auf deiner C:-Festplatte freizugeben. Du benutzt es einmal und machst weiter.
 - **Warum du vielleicht hier bist:** Du hast [WinDirStat](https://github.com/windirstat/windirstat), WizTree oder TreeSize benutzt, gesehen, dass `C:\Windows\Installer` viel Platz belegt, und nicht gewusst, was darin steckt. InstallerClean ist genau das Richtige. Es weiß, was in diesen Dateien mit ihren zufällig wirkenden Namen wie `9f05cba.msi` steckt, und sagt dir schnell, welche du bedenkenlos löschen kannst.
-- **Wie viel Platz:** Die (optionalen) bisher eingesandten Berichte zeigen, dass bei <!-- reports-freedpct-start -->46 %<!-- reports-freedpct-end --> der Rechner nicht benötigte Dateien zum Aufräumen vorhanden waren. Bei diesen wurden im Median <!-- reports-median-start -->20 GB<!-- reports-median-end --> freigegeben. Einige haben Hunderte GB freigeräumt. Bei mir waren es 1,28 GB. Die übrigen <!-- reports-nothingpct-start -->54 %<!-- reports-nothingpct-end --> fanden nichts zu entfernen, was einfach heißt, dass ihr Installer-Ordner bereits sauber war. Mehr Details in den [FAQ](#faq) weiter unten.
+- **Wie viel Platz:** Die (optionalen) bisher eingesandten Berichte zeigen, dass bei <!-- reports-freedpct-start -->47 %<!-- reports-freedpct-end --> der Rechner nicht benötigte Dateien zum Aufräumen vorhanden waren. Bei diesen wurden im Median <!-- reports-median-start -->20 GB<!-- reports-median-end --> freigegeben. Einige haben Hunderte GB freigeräumt. Bei mir waren es 1,28 GB. Die übrigen <!-- reports-nothingpct-start -->53 %<!-- reports-nothingpct-end --> fanden nichts zu entfernen, was einfach heißt, dass ihr Installer-Ordner bereits sauber war. Mehr Details in den [FAQ](#faq) weiter unten.
 - **Ist es sicher:** Ja. Es fragt die Windows-Installer-API selbst, welche Dateien noch benötigt werden, und listet nur die auf, die Windows als erledigt meldet. Es ist quelloffen (MIT) und fragt nichts über dich ab: kein Konto, keine Werbung, kein Tracking, keine Telemetrie, nichts, was im Hintergrund läuft. Es geht nie von selbst online.
 - **Holen:** [Lade die neueste Version herunter](../../releases/latest). Führe sie aus; klicke dich durch [die Windows-Warnung](#unknown-publisher) und [die Administrator-Abfrage](#admin). Lösche alle nicht benötigten Dateien. Fertig.
 
@@ -168,7 +168,7 @@ Die Dienste für Scan, Abfrage, Verschieben, Löschen, Einstellungen und aussteh
 - SHA-256-Hashes für jede Version sind auf der [Releases-Seite](../../releases/latest) aufgeführt.
 - VirusTotal: Jeder Build wird gescannt; die vollständigen Ergebnisse pro Engine sind auf der jeweiligen Release-Seite verlinkt, damit du sehen kannst, wie jede Datei abgeschnitten hat, und sie selbst erneut scannen kannst. Jeder Fehlalarm wird in den Versionshinweisen benannt und erklärt, nicht verschwiegen.
 - Der Quellcode liegt auf [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), und die CI baut und testet jeden Commit (siehe das grüne CI-Badge oben).
-- <!-- downloads-start -->30.000+<!-- downloads-end --> Downloads über GitHub, MajorGeeks und Softpedia.
+- <!-- downloads-start -->31.000+<!-- downloads-end --> Downloads über GitHub, MajorGeeks und Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testet jede Einreichung in einer virtuellen Maschine und listet sie nur, wenn sie die Prüfung besteht.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Von MajorGeeks als 100 % sauber zertifiziert" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) prüft jede Version auf Viren, Spyware und Adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Von Softpedia als 100 % sauber zertifiziert" width="190"></a>
 
@@ -231,12 +231,12 @@ Wenn dir hier etwas im Weg ist, [erstelle ein Issue](../../issues). Barrierefrei
 **Werde ich wirklich GB an Speicher freigeben?** Das hängt von deinem Rechner ab. Eine saubere Windows-11-Installation ohne zusätzliche Software hat nichts zu entfernen. Eine lange genutzte Entwickler-Workstation oder jeder Rechner mit viel MSI-basierter Software (Acrobat, Office, LibreOffice, große Entwicklungswerkzeuge) kann zig GB haben. So oder so siehst du genau wie viel, sobald du es ausführst.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-Von den 111 Berichten, die seit der Einführung der Option in v1.8.0 freundlicherweise eingesandt wurden (danke 🙏):
+Von den 113 Berichten, die seit der Einführung der Option in v1.8.0 freundlicherweise eingesandt wurden (danke 🙏):
 
 | Ergebnis | Anteil | Minimum | Median | Maximum |
 |---|---|---|---|---|
-| Nichts zu entfernen | 54 % | - | - | - |
-| Freigegebener Speicher | 46 % | 0,1 GB | 20 GB | 327 GB |
+| Nichts zu entfernen | 53 % | - | - | - |
+| Freigegebener Speicher | 47 % | 0,1 GB | 20 GB | 327 GB |
 <!-- reports-stats-end -->
 
 <details>

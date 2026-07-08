@@ -20,14 +20,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.0.1-blue" alt="GitHub Sürümü"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-30k-brightgreen" alt="Toplam indirme"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-31k-brightgreen" alt="Toplam indirme"></a>
 </p>
 
 ![Başarılı bir temizliğin ardından InstallerClean'in ekran görüntüsü: 1,28 GB temizlendi, 69 dosya Geri Dönüşüm Kutusu'na taşındı](docs/screenshots/tr/06-success-done.webp)
 
 - **Ne yapar:** InstallerClean tek bir iş yapar: Windows'un hiç temizlemediği gizli bir klasör olan `C:\Windows\Installer` içindeki gereksiz dosyaları kaldırır. Neredeyse anında biten bir taramanın ardından böyle dosyalarınız olup olmadığını size söyler, merak edenler için daha fazla ayrıntı gösterir ve C: sürücünüzde yer açmak için bunları silmenize olanak tanır. Bir kez kullanır, yolunuza devam edersiniz.
 - **Buraya gelme nedeniniz belki de şu:** [WinDirStat](https://github.com/windirstat/windirstat), WizTree ya da TreeSize kullandınız, `C:\Windows\Installer`'ın çok yer kapladığını gördünüz ama içinde ne olduğunu bilmiyordunuz. InstallerClean tam da ihtiyacınız olan şey. `9f05cba.msi` gibi rastgele görünen adlı o dosyaların içinde ne olduğunu bilir ve hangilerini güvenle silebileceğinizi size hızlıca söyler.
-- **Ne kadar yer:** Şimdiye dek gönderilen (isteğe bağlı) raporlar, makinelerin <!-- reports-freedpct-start -->%46<!-- reports-freedpct-end -->'sinde temizlenecek gereksiz dosyalar bulunduğunu gösteriyor. Bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->20 GB<!-- reports-median-end -->. Birkaçı yüzlerce GB temizledi. Bende 1,28 GB çıktı. Geri kalan <!-- reports-nothingpct-start -->%54<!-- reports-nothingpct-end -->'i kaldıracak bir şey bulamadı; bu da yalnızca Installer klasörlerinin zaten temiz olduğu anlamına geliyor. Daha fazla ayrıntı aşağıdaki [SSS](#sss) bölümünde.
+- **Ne kadar yer:** Şimdiye dek gönderilen (isteğe bağlı) raporlar, makinelerin <!-- reports-freedpct-start -->%47<!-- reports-freedpct-end -->'sinde temizlenecek gereksiz dosyalar bulunduğunu gösteriyor. Bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->20 GB<!-- reports-median-end -->. Birkaçı yüzlerce GB temizledi. Bende 1,28 GB çıktı. Geri kalan <!-- reports-nothingpct-start -->%53<!-- reports-nothingpct-end -->'i kaldıracak bir şey bulamadı; bu da yalnızca Installer klasörlerinin zaten temiz olduğu anlamına geliyor. Daha fazla ayrıntı aşağıdaki [SSS](#sss) bölümünde.
 - **Güvenli mi:** Evet. Hangi dosyaların hâlâ gerekli olduğunu doğrudan Windows Installer API'sine sorar ve yalnızca Windows'un işi bittiğini bildirdiği dosyaları listeler. Açık kaynaklıdır (MIT) ve sizinle ilgili hiçbir şey sormaz: hesap yok, reklam yok, takip yok, telemetri yok, arka planda çalışan hiçbir şey yok. Kendi başına asla internete bağlanmaz.
 - **Edinme:** [En son sürümü indirin](../../releases/latest). Çalıştırın; [Windows'un uyarısına](#unknown-publisher) ve [yönetici istemine](#admin) tıklayıp geçin. Gereksiz dosyaları silin. Tamam.
 
@@ -168,7 +168,7 @@ Tarama, sorgulama, taşıma, silme, ayarlar ve bekleyen yeniden başlatma hizmet
 - Her sürümün SHA-256 karmaları [sürümler sayfasında](../../releases/latest) listelenir.
 - VirusTotal: her yapı taranır; her motordaki tam sonuçlar ilgili sürümün sayfasında bağlantılanır, böylece her dosyanın nasıl puanlandığını görebilir ve kendiniz yeniden tarayabilirsiniz. Herhangi bir yanlış pozitif gizlenmez, sürüm notlarında belirtilir ve açıklanır.
 - Kaynak kod [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) adresinde ve CI her commit'i derleyip test ediyor (yukarıdaki yeşil CI rozetine bakın).
-- GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->30.000+<!-- downloads-end --> indirme.
+- GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->31.000+<!-- downloads-end --> indirme.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) her gönderimi bir sanal makinede test eder ve yalnızca incelemelerinden geçerse listeler.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks tarafından %100 temiz olarak onaylandı" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) her sürümü virüs, casus yazılım ve reklam yazılımı için test eder.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia tarafından %100 temiz olarak onaylandı" width="190"></a>
 
@@ -231,12 +231,12 @@ Burada bir şey size engel oluyorsa, [bir konu açın](../../issues). Erişilebi
 **Gerçekten GB'larca yer açar mıyım?** Bu makinenize bağlı. Ek yazılımı olmayan temiz bir Windows 11 kurulumunda kaldırılacak bir şey yoktur. Uzun süredir kullanılan bir geliştirici iş istasyonu ya da çok sayıda MSI tabanlı yazılımı (Acrobat, Office, LibreOffice, büyük geliştirme araçları) olan herhangi bir makine, onlarca GB barındırabilir. Her hâlükârda, çalıştırdığınız anda tam olarak ne kadar olduğunu görürsünüz.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-v1.8.0'da seçenek eklendiğinden bu yana gönderilen 111 rapora göre (teşekkürler 🙏):
+v1.8.0'da seçenek eklendiğinden bu yana gönderilen 113 rapora göre (teşekkürler 🙏):
 
 | Sonuç | Pay | En küçük | Ortanca | En büyük |
 |---|---|---|---|---|
-| Kaldırılacak bir şey yok | %54 | - | - | - |
-| Açılan alan | %46 | 0,1 GB | 20 GB | 327 GB |
+| Kaldırılacak bir şey yok | %53 | - | - | - |
+| Açılan alan | %47 | 0,1 GB | 20 GB | 327 GB |
 <!-- reports-stats-end -->
 
 <details>
