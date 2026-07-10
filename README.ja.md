@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.0.1-blue" alt="GitHub リリース"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-31k-brightgreen" alt="総ダウンロード数"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-32k-brightgreen" alt="総ダウンロード数"></a>
 </p>
 
 ![クリーンアップ成功後の InstallerClean の画面：1.28 GB をクリーンアップし、69 個のファイルをごみ箱へ移動したところ](docs/screenshots/ja/06-success-done.webp)
@@ -168,7 +168,7 @@ Windows インストーラーが今まさにキャッシュへ書き込んでい
 - 各リリースの SHA-256 ハッシュは[リリースページ](../../releases/latest)に掲載しています。
 - VirusTotal：ビルドごとにスキャンしており、エンジンごとの詳細な結果はそのリリースページにリンクされているので、各ファイルのスコアを確認したり、ご自身で再スキャンしたりできます。誤検知があれば隠さず、リリースノートで告知して説明しています。
 - ソースコードは [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) にあり、CI が毎回のコミットをビルド・テストしています（上の緑色の CI バッジを参照）。
-- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->31,000+<!-- downloads-end --> 回ダウンロードされています。
+- GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->32,000+<!-- downloads-end --> 回ダウンロードされています。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) は各提出物を仮想マシンでテストし、審査を通過したものだけを掲載します。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 認証済み 100% クリーン" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) は各リリースをウイルス・スパイウェア・アドウェアについて検査しています。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 認証済み 100% クリーン" width="190"></a>
 

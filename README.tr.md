@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.0.1-blue" alt="GitHub Sürümü"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-31k-brightgreen" alt="Toplam indirme"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-32k-brightgreen" alt="Toplam indirme"></a>
 </p>
 
 ![Başarılı bir temizliğin ardından InstallerClean'in ekran görüntüsü: 1,28 GB temizlendi, 69 dosya Geri Dönüşüm Kutusu'na taşındı](docs/screenshots/tr/06-success-done.webp)
@@ -168,7 +168,7 @@ Tarama, sorgulama, taşıma, silme, ayarlar ve bekleyen yeniden başlatma hizmet
 - Her sürümün SHA-256 karmaları [sürümler sayfasında](../../releases/latest) listelenir.
 - VirusTotal: her yapı taranır; her motordaki tam sonuçlar ilgili sürümün sayfasında bağlantılanır, böylece her dosyanın nasıl puanlandığını görebilir ve kendiniz yeniden tarayabilirsiniz. Herhangi bir yanlış pozitif gizlenmez, sürüm notlarında belirtilir ve açıklanır.
 - Kaynak kod [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) adresinde ve CI her commit'i derleyip test ediyor (yukarıdaki yeşil CI rozetine bakın).
-- GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->31.000+<!-- downloads-end --> indirme.
+- GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->32.000+<!-- downloads-end --> indirme.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) her gönderimi bir sanal makinede test eder ve yalnızca incelemelerinden geçerse listeler.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks tarafından %100 temiz olarak onaylandı" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) her sürümü virüs, casus yazılım ve reklam yazılımı için test eder.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia tarafından %100 temiz olarak onaylandı" width="190"></a>
 
