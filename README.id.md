@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.0.1-blue" alt="Rilis GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-31k-brightgreen" alt="Total unduhan"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-32k-brightgreen" alt="Total unduhan"></a>
 </p>
 
 ![Tangkapan layar InstallerClean setelah pembersihan berhasil: 1,28 GB dibersihkan, 69 file dipindahkan ke Keranjang Sampah](docs/screenshots/id/06-success-done.webp)
@@ -168,7 +168,7 @@ Layanan pemindaian, kueri, pemindahan, penghapusan, pengaturan, dan mulai-ulang-
 - Hash SHA-256 untuk tiap rilis tercantum di [halaman rilis](../../releases/latest).
 - VirusTotal: setiap build dipindai, dengan hasil lengkap per mesin pemindai ditautkan di halaman rilisnya sehingga Anda bisa melihat skor tiap file dan memindai ulang sendiri. Setiap positif palsu disebutkan dan dijelaskan di catatan rilis, tidak disembunyikan.
 - Kode sumber ada di [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) dan CI membangun serta menguji setiap commit (lihat lencana CI hijau di atas).
-- <!-- downloads-start -->31.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks, dan Softpedia.
+- <!-- downloads-start -->32.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks, dan Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) menguji tiap kiriman di mesin virtual dan hanya mendaftarkannya jika lolos tinjauan mereka.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Disertifikasi MajorGeeks 100% bersih" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) menguji tiap rilis dari virus, spyware, dan adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Disertifikasi Softpedia 100% bersih" width="190"></a>
 

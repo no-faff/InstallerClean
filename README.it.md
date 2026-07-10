@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.0.1-blue" alt="Versione di GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-31k-brightgreen" alt="Download totali"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-32k-brightgreen" alt="Download totali"></a>
 </p>
 
 ![Schermata di InstallerClean dopo una pulizia riuscita: 1,28 GB ripuliti, 69 file spostati al Cestino](docs/screenshots/it/06-success-done.webp)
@@ -168,7 +168,7 @@ I servizi di scansione, interrogazione, spostamento, eliminazione, impostazioni 
 - Gli hash SHA-256 di ogni versione sono elencati nella [pagina delle release](../../releases/latest).
 - VirusTotal: ogni build viene analizzata, con i risultati completi per ciascun motore collegati alla pagina della relativa versione, così puoi vedere come ha ottenuto ogni file e riscansionarlo tu stesso. Ogni falso positivo viene segnalato e spiegato nelle note di versione, mai nascosto.
 - Il codice sorgente è su [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) e la CI compila e testa ogni commit (vedi il badge verde della CI qui sopra).
-- <!-- downloads-start -->31.000+<!-- downloads-end --> download tra GitHub, MajorGeeks e Softpedia.
+- <!-- downloads-start -->32.000+<!-- downloads-end --> download tra GitHub, MajorGeeks e Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) prova ogni invio in una macchina virtuale e lo pubblica solo se supera la loro revisione.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certificato 100% pulito da MajorGeeks" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analizza ogni versione alla ricerca di virus, spyware e adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificato 100% pulito da Softpedia" width="190"></a>
 
