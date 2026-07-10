@@ -2,6 +2,12 @@
 
 Every change to InstallerClean, logged in full (not just the user-facing highlights). Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] - Unreleased
+
+### Changed
+
+- The installer's "InstallerClean is still running" prompt, shown by Setup and by the uninstaller when the app is open, now names the two processes that can hold the lock (`InstallerClean.exe` and `installerclean-cli.exe`) and points the user at Task Manager, in all fifteen languages. The single-instance mutex is shared by the app and the command-line tool, so Setup or an uninstall can correctly find InstallerClean "running" with nothing on screen (a command-line or scheduled-task run holds the same mutex); Inno Setup's default text only says to close all instances, which leaves the user no way to find an invisible one.
+
 ## [2.0.1] - 2026-07-07
 
 ### Fixed
