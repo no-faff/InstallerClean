@@ -40,16 +40,20 @@ public interface IResultLogService
     /// last-run.json twice would open a TOCTOU window between user
     /// review and POST. Returns one of <see cref="ResultLogSendOutcome"/>;
     /// the caller picks a localised message per case rather than the
-    /// service echoing a framework exception. Never throws.
+    /// service echoing a framework exception. Never throws for a network,
+    /// server or IO failure; a token cancelled by the caller surfaces as
+    /// OperationCanceledException, so a caller that passes one must catch it.
     /// </summary>
     Task<ResultLogSendOutcome> SendAsync(string body, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Reads <see cref="LastLogPath"/> as UTF-8 text and returns the
-    /// raw content for display in the confirmation window. Never
-    /// throws; returns null when the file doesn't exist, exceeds the
-    /// <see cref="MaxLogBytes"/> cap, or fails to read. Oversize and
-    /// read-failure cases write a breadcrumb to crash.log.
+    /// raw content for display in the confirmation window. Returns null
+    /// when the file doesn't exist, exceeds the <see cref="MaxLogBytes"/>
+    /// cap, or fails to read; oversize and read-failure cases write a
+    /// breadcrumb to crash.log. Never throws for an IO failure; a token
+    /// cancelled by the caller surfaces as OperationCanceledException, so
+    /// a caller that passes one must catch it.
     /// </summary>
     Task<string?> ReadLastLogAsync(CancellationToken cancellationToken = default);
 }
