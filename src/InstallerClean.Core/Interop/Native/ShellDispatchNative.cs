@@ -44,15 +44,19 @@ internal static partial class ShellDispatchNative
     /// </summary>
     internal const uint SVGIO_BACKGROUND = 0x00000000;
 
+    // Only the GUIDs the chain passes as a riid argument are declared. The rest
+    // of the interfaces it walks (IServiceProvider, IShellView,
+    // IShellFolderViewDual, IShellDispatch2) are reached by casting a wrapped
+    // pointer, and ComWrappers takes their GUID from each interface's own [Guid]
+    // attribute, so a constant for them would be dead weight. This is not the
+    // vtable-slot rule next door in ShellDispatchInterfaces: an unused method
+    // there is load-bearing because slots are positional, and an unused GUID here
+    // is not.
     internal static readonly Guid CLSID_ShellWindows       = new("9ba05972-f6a8-11cf-a442-00a0c90a8f39");
     internal static readonly Guid IID_IShellWindows        = new("85cb6900-4d95-11cf-960c-0080c7f4ee85");
-    internal static readonly Guid IID_IServiceProvider     = new("6d5140c1-7436-11ce-8034-00aa006009fa");
     internal static readonly Guid SID_STopLevelBrowser     = new("4c96be40-915c-11cf-99d3-00aa004ae837");
     internal static readonly Guid IID_IShellBrowser        = new("000214e2-0000-0000-c000-000000000046");
-    internal static readonly Guid IID_IShellView           = new("000214e3-0000-0000-c000-000000000046");
     internal static readonly Guid IID_IDispatch            = new("00020400-0000-0000-c000-000000000046");
-    internal static readonly Guid IID_IShellFolderViewDual = new("e7a1af80-4d96-11cf-960c-0080c7f4ee85");
-    internal static readonly Guid IID_IShellDispatch2      = new("a4c6892c-3ba9-11d2-9dea-00c04fb16162");
 
     /// <summary>
     /// Initialises the calling thread's COM apartment. Returns S_OK
