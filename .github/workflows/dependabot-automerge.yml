@@ -7,6 +7,66 @@ permissions:
   pull-requests: write
 
 jobs:
+  # Dependabot's NuGet updater does not rewrite every packages.lock.json when it
+  # moves a package that lives in InstallerClean.Core. Core is referenced by the
+  # GUI, the CLI and the tests, and each of those projects' locks carries its own
+  # copy of Core's dependency ranges, so a version inside Core forces all four
+  # locks to move together. On the System.IO.Abstractions 22.1.1 -> 22.2.0 bump
+  # (July 2026) it left the CLI's lock asserting Core still wanted [22.1.1, ) and
+  # dropped a live System.Diagnostics.EventLog transitive entry from the GUI's;
+  # CI restores with RestoreLockedMode, so the CLI build failed with NU1004.
+  # Regenerating all four from the csproj files Dependabot edited is the fix, and
+  # is a no-op on the bumps it already gets right (a package used by one project
+  # only).
+  #
+  # Two consequences worth knowing before touching this job. GitHub will not run
+  # workflows recursively off a GITHUB_TOKEN push, so the CI run for the commit
+  # pushed here arrives in an approval-required state: someone with write access
+  # clicks "Approve and run" on the PR before the checks complete and auto-merge
+  # can act. And Dependabot stops rebasing a PR once a commit it did not write
+  # lands on the branch, so if such a PR later goes stale against main, close it
+  # and let Dependabot raise a fresh one rather than waiting for a rebase.
+  relock:
+    if: |
+      github.actor == 'dependabot[bot]' &&
+      startsWith(github.head_ref, 'dependabot/nuget/') &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    # The same image the CI restore runs on, so the locks pushed from here are
+    # byte-for-byte the ones CI then validates in locked mode.
+    runs-on: windows-2025
+    concurrency:
+      group: relock-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          # The PR's branch, not the merge commit: the regenerated locks are
+          # committed back to it. Dependabot's branches live in this repository,
+          # so the checkout's default GITHUB_TOKEN credentials can push to them.
+          ref: ${{ github.head_ref }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          global-json-file: global.json
+
+      - name: Regenerate the lock files
+        run: dotnet restore src/InstallerClean.sln --force-evaluate
+
+      - name: Commit any lock files Dependabot missed
+        shell: bash
+        run: |
+          if git diff --quiet -- '*packages.lock.json'; then
+            echo "All four lock files already agree with the bumped projects."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- '*packages.lock.json'
+          git commit -m 'chore(deps): regenerate the lock files for the bumped packages'
+          git push
+          echo "::notice::Lock files regenerated and pushed. Approve the queued CI run on the PR ('Approve and run') to let the checks finish."
+
   automerge:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
