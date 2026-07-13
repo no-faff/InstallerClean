@@ -217,7 +217,7 @@ public class MainViewModelTests
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
         _dialogService.Received(1).ShowWarning(
-            Arg.Is<string>(s => s.Contains("administrator privileges")),
+            Arg.Is<string>(s => s != null && s.Contains("administrator privileges")),
             Arg.Any<string>());
     }
 
@@ -232,7 +232,7 @@ public class MainViewModelTests
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
         _dialogService.Received(1).ShowError(
-            Arg.Is<string>(s => s.Contains("installer database", StringComparison.OrdinalIgnoreCase)),
+            Arg.Is<string>(s => s != null && s.Contains("installer database", StringComparison.OrdinalIgnoreCase)),
             Arg.Any<string>());
     }
 
@@ -301,7 +301,7 @@ public class MainViewModelTests
         await Task.Delay(DebounceWait);
 
         _settingsService.Received().Update(Arg.Is<Action<AppSettings>>(
-            a => Applied(a).MoveDestination == @"D:\Backup\Installer-cache"));
+            a => a != null && Applied(a).MoveDestination == @"D:\Backup\Installer-cache"));
     }
 
     [Fact]
@@ -649,7 +649,7 @@ public class MainViewModelTests
         vm.Chrome.OpenOrphanedDetailsCommand.Execute(null);
 
         _windowService.Received(1).ShowOrphanedDetails(
-            Arg.Is<OrphanedFilesViewModel>(v => v.Files.Count == 2));
+            Arg.Is<OrphanedFilesViewModel>(v => v != null && v.Files.Count == 2));
     }
 
     [Fact]
@@ -698,7 +698,7 @@ public class MainViewModelTests
         vm.Chrome.OpenRegisteredDetailsCommand.Execute(null);
 
         _windowService.Received(1).ShowRegisteredDetails(
-            Arg.Is<RegisteredFilesViewModel>(v => v.Products.Count == 2));
+            Arg.Is<RegisteredFilesViewModel>(v => v != null && v.Products.Count == 2));
     }
 
     [Fact]
@@ -766,7 +766,7 @@ public class MainViewModelTests
 
         await vm.Completion.SendResultLogCommand.ExecuteAsync(null);
 
-        _settingsService.Received().Update(Arg.Is<Action<AppSettings>>(a => Applied(a).HasSentResultLog));
+        _settingsService.Received().Update(Arg.Is<Action<AppSettings>>(a => a != null && Applied(a).HasSentResultLog));
     }
 
     [Fact]
@@ -781,7 +781,7 @@ public class MainViewModelTests
 
         await vm.Completion.SendResultLogCommand.ExecuteAsync(null);
 
-        _settingsService.DidNotReceive().Update(Arg.Is<Action<AppSettings>>(a => Applied(a).HasSentResultLog));
+        _settingsService.DidNotReceive().Update(Arg.Is<Action<AppSettings>>(a => a != null && Applied(a).HasSentResultLog));
     }
 
     [Fact]
@@ -795,7 +795,7 @@ public class MainViewModelTests
 
         _confirmationService.DidNotReceive().ConfirmSendResultLog(Arg.Any<string>());
         await _resultLogService.DidNotReceive().SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
-        _settingsService.DidNotReceive().Update(Arg.Is<Action<AppSettings>>(a => Applied(a).HasSentResultLog));
+        _settingsService.DidNotReceive().Update(Arg.Is<Action<AppSettings>>(a => a != null && Applied(a).HasSentResultLog));
     }
 
     [Fact]
