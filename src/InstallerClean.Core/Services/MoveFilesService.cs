@@ -145,7 +145,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // token would throw OperationCanceledException out of a
             // batch that actually succeeded - the caller would re-label
             // the run as "Move cancelled" even though every file moved.
-            InstallerCacheHelpers.PruneEmptySubdirectories(CancellationToken.None);
+            InstallerCacheHelpers.PruneEmptySubdirectories(_fs, CancellationToken.None);
             return new MoveResult(moved, errors.AsReadOnly());
         }, cancellationToken);
     }

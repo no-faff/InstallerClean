@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using System.Security;
 using InstallerClean.Interop.Native;
 
@@ -162,9 +163,22 @@ internal static class InstallerCacheHelpers
     /// pass. Cancellable because a deeply nested Installer tree can
     /// take several seconds to walk.
     /// </summary>
-    internal static void PruneEmptySubdirectories(CancellationToken cancellationToken = default)
+    /// <remarks>
+    /// Goes through the caller's <paramref name="fileSystem"/> rather than
+    /// System.IO, unlike <see cref="IsInstallerFolderOrChild"/> and
+    /// StorageHelpers.IsReparsePoint next door: those two are gates a
+    /// MockFileSystem must not be able to defeat, while this is cleanup that
+    /// runs after the gates have already passed. Injected, a test's
+    /// MockFileSystem has no C:\Windows\Installer, so the prune returns at the
+    /// Exists check instead of walking the host's real cache folder.
+    /// The folder is NOT a parameter, so no caller can aim the prune anywhere
+    /// else.
+    /// </remarks>
+    internal static void PruneEmptySubdirectories(
+        IFileSystem fileSystem,
+        CancellationToken cancellationToken = default)
     {
-        if (!Directory.Exists(InstallerFolder)) return;
+        if (!fileSystem.Directory.Exists(InstallerFolder)) return;
 
         // Match FileSystemScanService: skip reparse points so a junction
         // planted inside the Installer folder cannot redirect the prune
@@ -180,14 +194,14 @@ internal static class InstallerCacheHelpers
         // committed, so a failure here must not undo that success.
         try
         {
-            foreach (var dir in Directory.EnumerateDirectories(InstallerFolder, "*", options)
+            foreach (var dir in fileSystem.Directory.EnumerateDirectories(InstallerFolder, "*", options)
                 .OrderByDescending(d => d.Length))
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 try
                 {
-                    if (!Directory.EnumerateFileSystemEntries(dir).Any())
-                        Directory.Delete(dir);
+                    if (!fileSystem.Directory.EnumerateFileSystemEntries(dir).Any())
+                        fileSystem.Directory.Delete(dir);
                 }
                 catch (IOException) { /* directory not empty by the time Delete fires, or filesystem busy */ }
                 catch (UnauthorizedAccessException) { /* DACL refuses the elevated process; rare but possible */ }
