@@ -33,4 +33,19 @@ public static class Localisation
         UiCultureOverride = uiCulture;
         FormatCultureOverride = formatCulture;
     }
+
+    /// <summary>
+    /// Drops both overrides, so the cultures fall back to the ambient thread
+    /// culture again. The app never needs this: it pins the language once at
+    /// startup and lives with it. Tests do, and without a way back nothing
+    /// could call <see cref="Set"/> at all, because the override is process-
+    /// global and every <c>Strings</c> lookup reads it, so one test pinning
+    /// French would rewrite the expected strings of every test that ran after
+    /// it. That is why the explicit-language path went untested until now.
+    /// </summary>
+    internal static void Reset()
+    {
+        UiCultureOverride = null;
+        FormatCultureOverride = null;
+    }
 }
