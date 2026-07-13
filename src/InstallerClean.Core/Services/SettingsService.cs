@@ -35,8 +35,8 @@ public sealed class SettingsService : ISettingsService
 
     // Serialises Update's read-modify-write. SettingsService is a DI singleton
     // (CoreComposition), so one gate covers every settings writer in the
-    // process: the debounced MoveDestination save on a thread-pool thread and
-    // the window-size / lifetime-lock persists on the dispatcher.
+    // process: the debounced MoveDestination save on a thread-pool thread, and
+    // the result-log lifetime lock and the language pick on the dispatcher.
     private readonly object _ioGate = new();
 
     public SettingsService() : this(DefaultSettingsFile) { }

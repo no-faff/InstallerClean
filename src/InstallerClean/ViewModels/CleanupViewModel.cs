@@ -208,8 +208,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // the orphan instance between the worker's snapshot read and the field
         // swap. SettingsService.Update reloads, applies the captured destination
         // and saves atomically under its own lock, so this thread-pool debounce
-        // cannot lose the window-size or lifetime-lock persists that run on the
-        // dispatcher to a last-writer-wins rename.
+        // cannot lose the result-log lifetime lock or the language pick that run
+        // on the dispatcher to a last-writer-wins rename.
         var destinationSnapshot = _settings.MoveDestination;
         await Task.Run(() =>
         {
