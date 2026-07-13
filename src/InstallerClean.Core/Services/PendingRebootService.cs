@@ -2,9 +2,14 @@ namespace InstallerClean.Services;
 
 /// <summary>
 /// Returns Block when any of three signals indicates the MSI cache is currently at risk:
-/// the _MSIExecute mutex, the Installer\InProgress key, or a PendingFileRenameOperations
-/// entry whose source path is under %SystemRoot%\Installer.
+/// the _MSIExecute mutex, the Installer\InProgress key, or any PendingFileRenameOperations
+/// entry, source or destination, resolving under %SystemRoot%\Installer.
 /// </summary>
+/// <remarks>
+/// Every entry is checked, not just the sources: a queued rename INTO the cache is as
+/// much a reason to keep out as one moving a file within it, and the destination form
+/// is why <see cref="StripNtPathPrefix"/> has to take the leading '!' off first.
+/// </remarks>
 public sealed class PendingRebootService : IPendingRebootService
 {
     /// <summary>The Windows Installer execute mutex. Global\_ namespace makes it visible across sessions.</summary>
