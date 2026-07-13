@@ -398,11 +398,16 @@ public partial class ScanViewModel : ObservableObject
             await RunScanCoreAsync(null);
             ScanCompleted?.Invoke(this, EventArgs.Empty);
         }
-        catch
+        catch (Exception ex)
         {
             // Best-effort refresh. The completion screen still renders
             // from the cached pre-operation result; the next scan
-            // command will retry with full error reporting.
+            // command will retry with full error reporting. The failure
+            // is logged rather than swallowed silently: this is the one
+            // path that leaves stale registered and orphaned counts on
+            // the completion screen, so "the counts were wrong after
+            // cleaning up" needs a trail in crash.log to be diagnosable.
+            CrashLog.Write(ex);
         }
     }
 }
