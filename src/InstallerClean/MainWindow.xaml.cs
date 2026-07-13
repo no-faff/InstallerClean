@@ -440,7 +440,7 @@ public partial class MainWindow : Window
         // Spelled with the C# unicode escape; do not paste a literal
         // zero-width character into source (it is invisible and tooling
         // mangles it).
-        var wrappedDestination = destination.Replace("\\", "\\u200B");
+        var wrappedDestination = destination.Replace("\\", "\\\u200B");
 
         if (prefix.Length > 0) CompletionSummaryText.Inlines.Add(new Run(prefix));
         CompletionSummaryText.Inlines.Add(new LineBreak());
