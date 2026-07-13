@@ -134,10 +134,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             // Best effort. The crash log preserves a diagnostic trail
-            // for reports of missing registered products.
+            // for reports of missing registered products. Cancellation is
+            // excluded: ThrowIfCancellationRequested fires inside this try,
+            // so a plain catch would log the user's own Cancel as a fault
+            // and swallow the stop the caller is waiting on.
             Helpers.CrashLog.Write(ex);
         }
 
