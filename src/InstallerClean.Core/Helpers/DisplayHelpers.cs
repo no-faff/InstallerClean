@@ -38,7 +38,7 @@ internal static class DisplayHelpers
     internal static string FormatElapsedLong(TimeSpan elapsed) =>
         elapsed.TotalSeconds < 1
             ? Strings.Display_ElapsedLong_LessThanASecond
-            : string.Format(Strings.Display_ElapsedLong_Seconds, elapsed.TotalSeconds);
+            : string.Format(Localisation.FormatCulture, Strings.Display_ElapsedLong_Seconds, elapsed.TotalSeconds);
 
     internal enum PluralCategory { One, Few, Many, Other }
 
