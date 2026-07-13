@@ -26,20 +26,20 @@
       },
       "NSubstitute": {
         "type": "Direct",
-        "requested": "[5.3.0, )",
-        "resolved": "5.3.0",
-        "contentHash": "lJ47Cps5Qzr86N99lcwd+OUvQma7+fBgr8+Mn+aOC0WrlqMNkdivaYD9IvnZ5Mqo6Ky3LS7ZI+tUq1/s9ERd0Q==",
+        "requested": "[6.0.0, )",
+        "resolved": "6.0.0",
+        "contentHash": "0gvKMbiJ+/WrfbcfBfqRZZrvfLJcd3rqkqVMjjlY5dtmLRVzMY+o/K/rJUStofQ2haSr9Vd04YDfvZtVVGS3/A==",
         "dependencies": {
           "Castle.Core": "5.1.1"
         }
       },
       "System.IO.Abstractions.TestingHelpers": {
         "type": "Direct",
-        "requested": "[22.1.1, )",
-        "resolved": "22.1.1",
-        "contentHash": "/fJ2F9N8Q7ZL7l7TQRcFtgaBdLBOj4+XL8ipc9sZC8tLMjoNBJtuyxMise5utraozm3KDAzPls5iWIcDCwpawQ==",
+        "requested": "[22.2.0, )",
+        "resolved": "22.2.0",
+        "contentHash": "yVy8HIx57CFwf9Z5UMYbrokQtLdwf7f004UiR8XhA70Q3BWlIAYDaOUk7ZhDp3BtIgh739dgJkqGmSN0LUA50Q==",
         "dependencies": {
-          "TestableIO.System.IO.Abstractions.TestingHelpers": "22.1.1"
+          "TestableIO.System.IO.Abstractions.TestingHelpers": "22.2.0"
         }
       },
       "xunit": {
@@ -116,42 +116,42 @@
       },
       "System.IO.Abstractions": {
         "type": "Transitive",
-        "resolved": "22.1.1",
-        "contentHash": "nm4sNhAoN1NyiIVT6MS3EEzNjnir3PC1HE0mKGGUFg6RBW1HmRvWKuRDPkij1etOoQkpyIFmjVGcM6TpBGF3qQ==",
+        "resolved": "22.2.0",
+        "contentHash": "fwnNXyIPb7ABPLae6K9YZz0FAkRjb2s/nElRWrg73usMveY/qdOHjKaNvAF7iAfmzTl1W4wa7S/SnmIc4LDvTg==",
         "dependencies": {
-          "TestableIO.System.IO.Abstractions": "22.1.1",
-          "TestableIO.System.IO.Abstractions.Wrappers": "22.1.1"
+          "TestableIO.System.IO.Abstractions": "22.2.0",
+          "TestableIO.System.IO.Abstractions.Wrappers": "22.2.0"
         }
       },
       "TestableIO.System.IO.Abstractions": {
         "type": "Transitive",
-        "resolved": "22.1.1",
-        "contentHash": "EJmXIKfwvJHvSHWP+NjA213avUdofV4SmBx2aWxc3SzPkrHHVKxUMC3fSa/epzk/SVITwuU2EAntgQTvobAqwQ==",
+        "resolved": "22.2.0",
+        "contentHash": "BQPyr0A1s2HvpVTZIyolrZ3ZdPn8DU2tqciaK1oco3pjm76fiKIk75eup4R9reZjNS75M+WJIICOlNX5OFt50g==",
         "dependencies": {
-          "Testably.Abstractions.FileSystem.Interface": "10.1.0"
+          "Testably.Abstractions.FileSystem.Interface": "10.3.0"
         }
       },
       "TestableIO.System.IO.Abstractions.TestingHelpers": {
         "type": "Transitive",
-        "resolved": "22.1.1",
-        "contentHash": "To7oYx68nrl0tu8duRSO9SyRHrNOVYSYIUlvfqNnoX9X2X9thIdJGmM3W3ZINtT4xqKuSy1Tb4hJK35Umhtfqg==",
+        "resolved": "22.2.0",
+        "contentHash": "mmsYxNRoxsimceoqImCPVf+LuqJJSd8esDQVP5uONDUZ8envfrKen8I+fRtwsoyt+GVrKvf+XiZJgKWns+t9eg==",
         "dependencies": {
-          "TestableIO.System.IO.Abstractions.Wrappers": "22.1.1",
-          "Testably.Abstractions.FileSystem.Interface": "10.1.0"
+          "TestableIO.System.IO.Abstractions.Wrappers": "22.2.0",
+          "Testably.Abstractions.FileSystem.Interface": "10.3.0"
         }
       },
       "TestableIO.System.IO.Abstractions.Wrappers": {
         "type": "Transitive",
-        "resolved": "22.1.1",
-        "contentHash": "J91zmSwuMY75ybtkqAFMC3vDNMkLJ/kiDDLhORITEwTKNhEwEYfxAQGv+f0jGYZg/H0YbnGcx5Ky0FgFJwrrWQ==",
+        "resolved": "22.2.0",
+        "contentHash": "0GW9i46ozm687WGAWsBHWMhLR7l1HmKwhiSU2hQrbFnI5m2YRfqXwqTQNjnOwT8BdbvcGqwMr97/zlnPWa1u1Q==",
         "dependencies": {
-          "Testably.Abstractions.FileSystem.Interface": "10.1.0"
+          "Testably.Abstractions.FileSystem.Interface": "10.3.0"
         }
       },
       "Testably.Abstractions.FileSystem.Interface": {
         "type": "Transitive",
-        "resolved": "10.1.0",
-        "contentHash": "0R+m7DvS2QuDcFOfDGtyGErRrgXOl4/z2tbNLX2RfvlYJjlVcKG+wMIBfZO8vxGtTNwNxffTG4ibFRwd0jkM7w=="
+        "resolved": "10.3.0",
+        "contentHash": "5ebMaoADkzjfW7GnZYKaUebV8XmUn++C/4sKk1PTzCiddEgbSKBq3pW4EWEi70rYJAK0gA1yDWrYFeHq18FvHQ=="
       },
       "xunit.abstractions": {
         "type": "Transitive",
@@ -197,7 +197,7 @@
         "type": "Project",
         "dependencies": {
           "CommunityToolkit.Mvvm": "[8.4.2, )",
-          "InstallerClean.Core": "[1.9.2, )",
+          "InstallerClean.Core": "[2.0.1, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.7, )"
         }
       },
@@ -206,7 +206,7 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.7, )",
           "System.Diagnostics.EventLog": "[10.0.7, )",
-          "System.IO.Abstractions": "[22.1.1, )"
+          "System.IO.Abstractions": "[22.2.0, )"
         }
       }
     },
