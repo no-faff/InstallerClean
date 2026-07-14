@@ -29,7 +29,14 @@ public enum RecycleUnavailableChoice
 /// </summary>
 public interface IConfirmationService
 {
-    bool ConfirmMove(int fileCount, string sizeDisplay, string destination);
+    /// <summary>
+    /// Shows the Move confirmation. <paramref name="sameDrive"/> is the caller's
+    /// pre-flight verdict on the destination volume: a same-drive move is a
+    /// rename, so it frees no space until the user deletes the parked copies,
+    /// and the dialog says so. The caller classifies it (off the dispatcher,
+    /// once) rather than the dialog re-deriving it.
+    /// </summary>
+    bool ConfirmMove(int fileCount, string sizeDisplay, string destination, bool sameDrive);
 
     bool ConfirmDelete(int fileCount, string sizeDisplay);
 

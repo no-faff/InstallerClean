@@ -499,7 +499,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // is in the textbox at that instant; if the user managed to
         // change it between the IsInstallerFolderOrChild validation and
         // here, the validated path and the moved-to path would diverge.
-        if (!_confirmationService.ConfirmMove(count, sizeDisplay, dest))
+        // The pre-flight already classified the volume, so the confirmation can
+        // tell the user the one thing this app exists to be right about: a move
+        // to the drive the files are already on frees nothing until the copies
+        // parked there are deleted.
+        if (!_confirmationService.ConfirmMove(count, sizeDisplay, dest,
+                destinationKind == MoveDestinationKinds.SameDrive))
         {
             // User cancelled at the confirmation dialog. The pre-flight
             // CTS is no longer needed; dispose it before returning.

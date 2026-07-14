@@ -216,6 +216,7 @@ public static class Strings
     public static string Confirm_DeleteTitle => Get("Confirm.DeleteTitle");
     public static string Confirm_DeleteToRecycleBin => Get("Confirm.DeleteToRecycleBin");
     public static string Confirm_MoveDestination => Get("Confirm.MoveDestination");
+    public static string Confirm_MoveSameDrive => Get("Confirm.MoveSameDrive");
     public static string Confirm_MoveTitle => Get("Confirm.MoveTitle");
     public static string ConfirmSendResultLog_Reassurance => Get("ConfirmSendResultLog.Reassurance");
     public static string ConfirmSendResultLog_Title => Get("ConfirmSendResultLog.Title");

@@ -4,10 +4,10 @@ namespace InstallerClean.Services;
 
 public sealed class ConfirmationService : IConfirmationService
 {
-    public bool ConfirmMove(int fileCount, string sizeDisplay, string destination)
+    public bool ConfirmMove(int fileCount, string sizeDisplay, string destination, bool sameDrive)
     {
         if (Application.Current is null) return false;
-        var dialog = new ConfirmMoveWindow(fileCount, sizeDisplay, destination)
+        var dialog = new ConfirmMoveWindow(fileCount, sizeDisplay, destination, sameDrive)
         {
             Owner = Application.Current.MainWindow,
         };

@@ -479,6 +479,13 @@
        Move feature, so naming the button stops "moved ... use Move" reading as
        one action. -->
   <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Die Dateien werden in den Papierkorb verschoben. Wenn du Sicherungskopien möchtest, nutze stattdessen die Schaltfläche „Verschieben“.</value></data>
+  <!-- Shown on the Move confirmation only when the destination sits on the
+       same drive as the installer cache. That move is a rename: it frees
+       nothing until the user deletes the parked copies themselves, and the only
+       signal they get otherwise is the absence of the word "freed" on the
+       completion screen, which nobody reads as a warning. This is a free-space
+       tool, so the one moment it knows the answer is the moment to say it. -->
+  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead.</value></data>
 
   <!-- Error messages -->
   <!-- Both manifests declare requireAdministrator, so the process is

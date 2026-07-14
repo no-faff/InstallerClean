@@ -6,7 +6,13 @@ namespace InstallerClean;
 
 public partial class ConfirmMoveWindow : Window
 {
-    public ConfirmMoveWindow(int fileCount, string sizeDisplay, string destination)
+    /// <param name="sameDrive">
+    /// True when the destination sits on the drive the files are already on. The
+    /// caller has classified it in its pre-flight, so the dialog is told rather
+    /// than working it out: resolving a drive is a Win32 hop, and this runs on
+    /// the dispatcher.
+    /// </param>
+    public ConfirmMoveWindow(int fileCount, string sizeDisplay, string destination, bool sameDrive)
     {
         InitializeComponent();
         var label = DisplayHelpers.PluraliseFile(fileCount);
@@ -17,11 +23,23 @@ public partial class ConfirmMoveWindow : Window
         // spelled with the C# unicode escape; do not paste a literal zero-width
         // character into source (it is invisible and tooling mangles it).
         DestinationText.Text = destination.Replace("\\", "\\\u200B");
+
+        // A same-drive move is a rename: it frees nothing until the user deletes
+        // the parked copies themselves. This is the only moment the app knows
+        // that and the user is still deciding.
+        if (sameDrive)
+            SameDriveNote.Visibility = Visibility.Visible;
+
         // The window title is what a screen reader announces when a
         // dialog opens; the static "Confirm move" left the question
         // itself, the count and size, unspoken. ShowInTaskbar is false,
-        // so the title serves announcements only.
-        Title = MessageText.Text;
+        // so the title serves announcements only. The same-drive note rides
+        // along with it: on open, only the title and the focused button are
+        // spoken, so a note left in the body alone would never be heard by the
+        // user deciding whether to press Move.
+        Title = sameDrive
+            ? MessageText.Text + " " + Strings.Confirm_MoveSameDrive
+            : MessageText.Text;
 
         // Sized to content; the clamp stops a very large text scale
         // pushing the card past the work area, at which point the

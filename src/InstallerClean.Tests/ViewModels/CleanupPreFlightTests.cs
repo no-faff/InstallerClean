@@ -114,7 +114,7 @@ public class CleanupPreFlightTests
         Assert.False(vm.Cleanup.IsCancellationRequested);
 
         var releaseMove = new ManualResetEventSlim();
-        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>())
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(true);
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
@@ -162,7 +162,7 @@ public class CleanupPreFlightTests
         // cancelled still got the "move 1 file?" dialog, and only the move
         // behind it failed on the already-cancelled token.
         _confirmationService.DidNotReceive().ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>());
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
@@ -185,7 +185,7 @@ public class CleanupPreFlightTests
         _dialogService.Received(1).ShowWarning(
             Arg.Any<string>(), InstallerClean.Resources.Strings.Error_DestinationWriteFailedTitle);
         _confirmationService.DidNotReceive().ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>());
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
@@ -210,7 +210,7 @@ public class CleanupPreFlightTests
         // collapses if the files end up back inside the cache folder.
         _directory.DidNotReceive().CreateDirectory(Arg.Any<string>());
         _confirmationService.DidNotReceive().ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>());
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
@@ -283,7 +283,7 @@ public class CleanupPreFlightTests
     [Fact]
     public async Task The_pre_flight_creates_and_probes_the_destination_before_the_confirmation()
     {
-        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>())
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(false);
 
         var vm = CreateViewModel();
@@ -298,7 +298,32 @@ public class CleanupPreFlightTests
         // per file inside the move.
         _file.Received(1).WriteAllBytes(Arg.Any<string>(), Arg.Any<byte[]>());
         _file.Received(1).Delete(Arg.Any<string>());
-        _confirmationService.Received(1).ConfirmMove(1, Arg.Any<string>(), _destination);
+        _confirmationService.Received(1).ConfirmMove(1, Arg.Any<string>(), _destination, Arg.Any<bool>());
+    }
+
+    [Fact]
+    public async Task A_move_to_the_same_drive_tells_the_confirmation_it_frees_no_space()
+    {
+        // Built from the actual system drive rather than %TEMP%, which is what
+        // ClassifyMoveDestination compares the destination against: a move to the
+        // drive the cache is already on is a rename, and frees nothing until the
+        // user deletes the copies parked there. The dialog is the last moment
+        // anyone can tell them that, and it is the whole point of the app.
+        var systemDrive = Path.GetPathRoot(
+            Environment.GetFolderPath(Environment.SpecialFolder.System))!;
+        var sameDriveDestination = Path.Combine(systemDrive, "ic-test-samedrive");
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(false);
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = sameDriveDestination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _confirmationService.Received(1).ConfirmMove(
+            1, Arg.Any<string>(), sameDriveDestination, sameDrive: true);
     }
 
     [Fact]
@@ -320,7 +345,7 @@ public class CleanupPreFlightTests
         _directory.DidNotReceive().CreateDirectory(Arg.Any<string>());
         _file.DidNotReceive().WriteAllBytes(Arg.Any<string>(), Arg.Any<byte[]>());
         _confirmationService.DidNotReceive().ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>());
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());

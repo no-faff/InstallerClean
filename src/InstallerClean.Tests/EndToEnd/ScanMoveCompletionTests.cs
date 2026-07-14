@@ -58,7 +58,7 @@ public class ScanMoveCompletionTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
@@ -186,7 +186,7 @@ public class ScanMoveCompletionTests
         var dialogService = Substitute.For<IDialogService>();
         var confirmationService = Substitute.For<IConfirmationService>();
         confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         var windowService = Substitute.For<IWindowService>();
         var resultLogService = Substitute.For<IResultLogService>();
 
@@ -238,7 +238,7 @@ public class ScanMoveCompletionTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
         // One success, two MissingSourceFile errors.
         var errors = new FileOperationError[]

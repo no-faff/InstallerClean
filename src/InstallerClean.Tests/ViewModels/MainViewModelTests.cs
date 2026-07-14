@@ -447,14 +447,14 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move");
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
-        _confirmationService.Received(1).ConfirmMove(2, Arg.Any<string>(), vm.Cleanup.MoveDestination);
+        _confirmationService.Received(1).ConfirmMove(2, Arg.Any<string>(), vm.Cleanup.MoveDestination, Arg.Any<bool>());
         await _moveService.Received(1).MoveFilesAsync(
             Arg.Any<IEnumerable<string>>(), vm.Cleanup.MoveDestination,
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
@@ -471,7 +471,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(3));
         _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(false);
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(false);
 
         await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move");
@@ -527,7 +527,7 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new IOException("boom"));
         _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move-crash");
@@ -713,7 +713,7 @@ public class MainViewModelTests
         _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
             .Returns(RecycleUnavailableChoice.MoveInstead);
         _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
@@ -923,7 +923,7 @@ public class MainViewModelTests
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
         vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-locked-move");
