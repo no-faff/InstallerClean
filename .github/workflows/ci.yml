@@ -77,18 +77,13 @@ jobs:
           if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
           & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
 
-      - name: Audit vulnerable packages (GUI)
-        run: dotnet list src/InstallerClean/InstallerClean.csproj package --vulnerable --include-transitive
-        continue-on-error: true
-
-      - name: Audit vulnerable packages (Core)
-        run: dotnet list src/InstallerClean.Core/InstallerClean.Core.csproj package --vulnerable --include-transitive
-        continue-on-error: true
-
-      - name: Audit vulnerable packages (CLI)
-        run: dotnet list src/InstallerClean.Cli/InstallerClean.Cli.csproj package --vulnerable --include-transitive
-        continue-on-error: true
-
-      - name: Audit vulnerable packages (Tests)
-        run: dotnet list src/InstallerClean.Tests/InstallerClean.Tests.csproj package --vulnerable --include-transitive
-        continue-on-error: true
+      # NuGet Audit runs during restore and reports a vulnerable package as a
+      # warning; -warnaserror is what turns that into a failed build. This
+      # replaced four `dotnet list package --vulnerable` steps that could not
+      # fail one: the command exits 0 even while printing a high-severity
+      # advisory (verified), and every step carried continue-on-error on top, so
+      # a known-vulnerable package shipped green unless somebody opened the log.
+      # NuGetAuditMode=all is explicit rather than relied on: transitive
+      # packages are where an advisory actually arrives.
+      - name: Fail on a vulnerable package
+        run: dotnet restore src/InstallerClean.sln -p:RestoreLockedMode=true -p:NuGetAuditMode=all -warnaserror:NU1901,NU1902,NU1903,NU1904
