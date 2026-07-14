@@ -324,7 +324,7 @@
   <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>移动失败（{0}）。无法写入崩溃日志。</value></data>
   <data name="Status.DeleteFailed" xml:space="preserve"><value>删除失败（{0}）。详情见 {1}。</value></data>
   <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>删除失败（{0}）。无法写入崩溃日志。</value></data>
-  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>访问被拒绝。请以管理员身份运行。</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Windows refused the scan.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>扫描失败：安装程序数据库不可用。</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>扫描已取消。</value></data>
   <data name="Status.Done" xml:space="preserve"><value>就绪</value></data>
@@ -473,14 +473,20 @@
   <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>文件将被移到回收站。如果您想要备份副本，请改用“移动”按钮。</value></data>
 
   <!-- Error messages -->
-  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>需要管理员权限</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean 需要管理员权限。
+  <!-- Both manifests declare requireAdministrator, so the process is
+       always elevated: it is never started at all if the user declines the
+       UAC prompt. An access-denied therefore never means "you are not an
+       administrator", and telling the user to run as administrator hands
+       them the one instruction they have already followed. The key names
+       predate that correction; what they say is what matters. -->
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Access denied</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.
 
-请右键单击并选择“以管理员身份运行”。</value></data>
+That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>安装程序数据库不可用</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>扫描失败</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer 数据库似乎为空或无法访问。即便在全新安装的 Windows 上这也很不寻常，通常意味着数据库已损坏，或被某个第三方工具清空了。在提权的命令提示符中运行“sfc /scannow”通常可以修复它。</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>枚举已安装产品时访问被拒绝。请以管理员身份运行。</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
@@ -536,8 +542,13 @@
   <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>由于无法将该文件移到回收站，它已被永久删除。</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>拒绝将文件移动到 Windows Installer 文件夹（目标：{0}）。</value></data>
-  <!-- 0 = the relative path the caller passed -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>目标必须是完全限定的路径（相对路径会相对于进程的当前目录解析，在提权运行时不安全）：{0}</value></data>
+  <!-- 0 = the relative path the caller passed. Shown to a user who typed a
+       bare folder name into the Move location box, so it says what to type
+       instead. The reason a relative path is refused (it would resolve
+       against the process working directory, which nothing constrains, and
+       this process is elevated) is a fact about the app, not about anything
+       the user did, and belongs in the code, not in the dialog. -->
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>无法打开您的浏览器</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>检查更新</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>正在检查…</value></data>
@@ -550,11 +561,18 @@
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub 的响应中没有可识别的发布版本。请稍后重试，或直接打开发布页面。</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>检查超时。您与 GitHub 的连接可能较慢；请重试。</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>检查因未知原因失败。如果您需要报告此问题，详情在 crash.log 中。</value></data>
-  <!-- 0 = the URL the user was trying to reach -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>无法在您的普通用户浏览器中打开该链接。网址已复制到您的剪贴板，您可以手动打开：&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>无法在您的普通用户浏览器中打开该链接，复制到剪贴板也失败了。网址为：&#10;&#10;{0}</value></data>
-  <!-- 0 = the destination folder whose canonical path changed mid-batch -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>目标文件夹的规范路径在批处理过程中发生了变化：{0}</value></data>
+  <!-- 0 = the URL the user was trying to reach. The reason the launch failed
+       (this process is elevated, so the browser has to be started from the
+       user's own medium-integrity shell, and that chain was unavailable) is
+       an internal distinction with no name outside this codebase; the user
+       gets what happened and what they can do about it. -->
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:&#10;&#10;{0}</value></data>
+  <!-- 0 = the destination folder whose canonical path changed mid-batch.
+       Raised when the folder is replaced or redirected between two files of
+       the same Move, so the copy must not claim where the files moved before
+       that point ended up: they went wherever the folder pointed then. -->
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path

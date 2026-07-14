@@ -324,7 +324,7 @@
   <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Spostamento non riuscito ({0}). Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Status.DeleteFailed" xml:space="preserve"><value>Eliminazione non riuscita ({0}). Dettagli in {1}.</value></data>
   <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Eliminazione non riuscita ({0}). Non è stato possibile scrivere il file crash.log.</value></data>
-  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Accesso negato. Esegui come amministratore.</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Windows refused the scan.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scansione non riuscita: database installazioni non disponibile.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scansione annullata.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Pronto</value></data>
@@ -473,14 +473,20 @@
   <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>I file verranno spostati nel Cestino. Se vuoi fare delle copie di backup, usa invece il pulsante Sposta.</value></data>
 
   <!-- Error messages -->
-  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Sono richiesti i diritti di amministratore</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerClean richiede privilegi di amministratore.
+  <!-- Both manifests declare requireAdministrator, so the process is
+       always elevated: it is never started at all if the user declines the
+       UAC prompt. An access-denied therefore never means "you are not an
+       administrator", and telling the user to run as administrator hands
+       them the one instruction they have already followed. The key names
+       predate that correction; what they say is what matters. -->
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Access denied</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.
 
-Fai clic con il pulsante destro e scegli 'Esegui come amministratore'.</value></data>
+That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Database installazioni non disponibile</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scansione non riuscita</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Il database di Windows Installer risulta vuoto o non accessibile. È una cosa insolita anche in un'installazione di Windows appena fatta e di solito significa che il database è danneggiato o che uno strumento di terze parti lo ha svuotato. L'esecuzione di 'sfc /scannow' da un prompt con privilegi elevati di solito lo ripara.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Accesso negato durante l'enumerazione dei prodotti installati. Esegui come amministratore.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
@@ -536,8 +542,13 @@ Dettagli in {1}.</value></data>
   <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Il file è stato eliminato definitivamente perché non è stato possibile spostarlo nel Cestino.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Spostamento dei file nella cartella di Windows Installer rifiutato (destinazione: {0}).</value></data>
-  <!-- 0 = the relative path the caller passed -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>La destinazione deve essere un percorso completo (i percorsi relativi vengono risolti rispetto alla cartella attuale del processo e non sono sicuri in esecuzione con privilegi elevati): {0}</value></data>
+  <!-- 0 = the relative path the caller passed. Shown to a user who typed a
+       bare folder name into the Move location box, so it says what to type
+       instead. The reason a relative path is refused (it would resolve
+       against the process working directory, which nothing constrains, and
+       this process is elevated) is a fact about the app, not about anything
+       the user did, and belongs in the code, not in the dialog. -->
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Impossibile aprire il browser</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Controlla aggiornamenti</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Controllo aggiornamenti...</value></data>
@@ -550,11 +561,18 @@ Dettagli in {1}.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>La risposta di GitHub non conteneva una release riconoscibile. Riprova più tardi, o apri direttamente la pagina delle release.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Il controllo è scaduto. La connessione a GitHub potrebbe essere lenta; riprova.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Il controllo non è riuscito per un motivo sconosciuto. I dettagli sono nel file crash.log, se devi segnalarlo.</value></data>
-  <!-- 0 = the URL the user was trying to reach -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>Impossibile aprire il collegamento nel browser. L'URL è stato copiato negli appunti, così puoi aprirlo manualmente:&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>Impossibile aprire il collegamento nel browser, e anche la copia negli appunti non è riuscita. L'URL è:&#10;&#10;{0}</value></data>
-  <!-- 0 = the destination folder whose canonical path changed mid-batch -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Il percorso canonico della cartella destinazione è stato modificato durante l'operazione: {0}</value></data>
+  <!-- 0 = the URL the user was trying to reach. The reason the launch failed
+       (this process is elevated, so the browser has to be started from the
+       user's own medium-integrity shell, and that chain was unavailable) is
+       an internal distinction with no name outside this codebase; the user
+       gets what happened and what they can do about it. -->
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:&#10;&#10;{0}</value></data>
+  <!-- 0 = the destination folder whose canonical path changed mid-batch.
+       Raised when the folder is replaced or redirected between two files of
+       the same Move, so the copy must not claim where the files moved before
+       that point ended up: they went wherever the folder pointed then. -->
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path

@@ -324,7 +324,7 @@
   <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>移動に失敗しました ({0})。クラッシュログを書き込めませんでした。</value></data>
   <data name="Status.DeleteFailed" xml:space="preserve"><value>削除に失敗しました ({0})。詳細は{1}をご覧ください。</value></data>
   <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>削除に失敗しました ({0})。クラッシュログを書き込めませんでした。</value></data>
-  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>アクセスが拒否されました。管理者として実行してください。</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Windows refused the scan.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>スキャンに失敗しました：インストーラーデータベースが利用できません。</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>スキャンがキャンセルされました。</value></data>
   <data name="Status.Done" xml:space="preserve"><value>準備完了</value></data>
@@ -473,14 +473,20 @@
   <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>ファイルはごみ箱に移動されます。バックアップコピーが必要な場合は、代わりに「移動」ボタンを使用してください。</value></data>
 
   <!-- Error messages -->
-  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>管理者権限が必要です</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>InstallerCleanには管理者権限が必要です。
+  <!-- Both manifests declare requireAdministrator, so the process is
+       always elevated: it is never started at all if the user declines the
+       UAC prompt. An access-denied therefore never means "you are not an
+       administrator", and telling the user to run as administrator hands
+       them the one instruction they have already followed. The key names
+       predate that correction; what they say is what matters. -->
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Access denied</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.
 
-右クリックして「管理者として実行」を選択してください。</value></data>
+That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>インストーラーデータベースが利用できません</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>スキャンに失敗しました</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer データベースが空であるか、アクセスできないようです。これは新しい Windows インストールでも異常であり、通常はデータベースが破損しているか、サードパーティツールが消去したことを意味します。昇格したプロンプトで'sfc /scannow'を実行すると、通常は修復されます。</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>インストール済み製品の列挙中にアクセスが拒否されました。管理者として実行してください。</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
@@ -536,8 +542,13 @@
   <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>ごみ箱に移動できなかったため、ファイルは完全に削除されました。</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Windows Installerフォルダー内へのファイル移動を拒否します (移動先：{0})。</value></data>
-  <!-- 0 = the relative path the caller passed -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>移動先は完全修飾パスである必要があります (相対パスはプロセスのカレントディレクトリに対して解決され、昇格時には安全ではありません)：{0}</value></data>
+  <!-- 0 = the relative path the caller passed. Shown to a user who typed a
+       bare folder name into the Move location box, so it says what to type
+       instead. The reason a relative path is refused (it would resolve
+       against the process working directory, which nothing constrains, and
+       this process is elevated) is a fact about the app, not about anything
+       the user did, and belongs in the code, not in the dialog. -->
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>ブラウザを開けませんでした</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>更新の確認</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>確認中...</value></data>
@@ -550,11 +561,18 @@
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub のレスポンスに認識可能なリリースが含まれていませんでした。後でもう一度試すか、リリースページを直接開いてください。</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>確認がタイムアウトしました。GitHub への接続が遅い可能性があります。再試行してください。</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>不明な理由で確認に失敗しました。報告が必要な場合は詳細が crash.log にあります。</value></data>
-  <!-- 0 = the URL the user was trying to reach -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>リンクを通常ユーザーのブラウザで開けませんでした。URL はクリップボードにコピーされたので、手動で開くことができます：&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>リンクを通常ユーザーのブラウザで開けず、クリップボードへのコピーも失敗しました。URL は次のとおりです：&#10;&#10;{0}</value></data>
-  <!-- 0 = the destination folder whose canonical path changed mid-batch -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>バッチ処理中に移動先フォルダーの正規パスが変更されました：{0}</value></data>
+  <!-- 0 = the URL the user was trying to reach. The reason the launch failed
+       (this process is elevated, so the browser has to be started from the
+       user's own medium-integrity shell, and that chain was unavailable) is
+       an internal distinction with no name outside this codebase; the user
+       gets what happened and what they can do about it. -->
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:&#10;&#10;{0}</value></data>
+  <!-- 0 = the destination folder whose canonical path changed mid-batch.
+       Raised when the folder is replaced or redirected between two files of
+       the same Move, so the copy must not claim where the files moved before
+       that point ended up: they went wherever the folder pointed then. -->
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
