@@ -48,6 +48,28 @@ public class DeleteFilesServiceTests : IDisposable
     }
 
     [Fact]
+    public void A_disposed_engine_refuses_work_with_ObjectDisposedException()
+    {
+        // Both states matter: the engine that never started its worker (the
+        // app was closed before any delete) and the one that did. The second
+        // is the one that can bite: its queue is still there, just marked
+        // complete, and adding to a completed BlockingCollection throws
+        // InvalidOperationException. Callers, and DeleteFilesService's
+        // unwrapped CanRecycleToVolume in particular, are promised
+        // ObjectDisposedException.
+        var neverStarted = new RecycleEngine();
+        neverStarted.Dispose();
+        Assert.Throws<ObjectDisposedException>(
+            () => neverStarted.CanRecycleToVolume(_tempDir));
+
+        var started = new RecycleEngine();
+        started.CanRecycleToVolume(_tempDir);
+        started.Dispose();
+        Assert.Throws<ObjectDisposedException>(
+            () => started.RecycleFile(Path.Combine(_tempDir, "anything.msi")));
+    }
+
+    [Fact]
     public async Task DeleteFilesAsync_reports_error_for_missing_source()
     {
         var file = Path.Combine(_tempDir, "nonexistent.msi");

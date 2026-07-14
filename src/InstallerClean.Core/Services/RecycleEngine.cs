@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using InstallerClean.Helpers;
 using InstallerClean.Interop.Native;
 
 namespace InstallerClean.Services;
@@ -18,7 +19,8 @@ namespace InstallerClean.Services;
 /// <c>PerformOperations</c> needs no message pump (verified on
 /// Windows), so the worker just drains the queue. Registered as a DI
 /// singleton; the container disposes it at shutdown, which drains the
-/// queue and joins the thread.
+/// queue and joins the thread, under a bound so that a shell call which
+/// never returns cannot hold the process open with no window on screen.
 /// </summary>
 internal sealed class RecycleEngine : IRecycleEngine, IDisposable
 {
@@ -85,19 +87,27 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
 
     private T Run<T>(Func<T> func)
     {
-        // Dispose does not null _work, so EnsureStarted's fast path would return
-        // on a disposed engine and the Add below would throw
-        // InvalidOperationException ("marked as complete"). Fail with the expected
-        // ObjectDisposedException instead; DeleteFilesService already degrades a
-        // recycle fault to the RecycleUnavailable / per-file-error path.
-        ObjectDisposedException.ThrowIf(_disposed, this);
         EnsureStarted();
         var tcs = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _work!.Add(() =>
+
+        // The disposed check and the Add are one atomic step, paired with
+        // Dispose's CompleteAdding under the same gate. Checked and then added
+        // outside it, a Dispose landing in between leaves the queue already
+        // marked complete, and Add throws InvalidOperationException where the
+        // caller is promised ObjectDisposedException. The window is only open
+        // during shutdown, which is precisely when a delete can still be in
+        // flight, and DeleteFilesService.CanRecycleToVolume does not wrap this
+        // call: an InvalidOperationException there faults the whole delete
+        // task instead of degrading to the RecycleUnavailable path.
+        lock (_gate)
         {
-            try { tcs.SetResult(func()); }
-            catch (Exception ex) { tcs.SetException(ex); }
-        });
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            _work!.Add(() =>
+            {
+                try { tcs.SetResult(func()); }
+                catch (Exception ex) { tcs.SetException(ex); }
+            });
+        }
         // Blocking cannot deadlock the queue: the STA worker is the only thread
         // that runs jobs and it never calls back in here, so no caller can ever
         // be waiting on itself. What blocking does cost is the calling thread,
@@ -324,9 +334,27 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
         {
             if (_disposed) return;
             _disposed = true;
+            // Inside the gate, so it cannot land between Run's disposed check
+            // and its Add.
+            _work?.CompleteAdding();
         }
-        _work?.CompleteAdding();
-        _sta?.Join();
+
+        // Bounded join. A shell IFileOperation that never returns (a hung shell
+        // extension, a volume that has stopped answering) would otherwise hang
+        // the process on exit with no window on screen and nothing to do but
+        // reach for Task Manager. The worker is a background thread, so
+        // abandoning it still lets the process exit. Same bound, and the same
+        // reasoning, as UnelevatedLauncher's join on its own STA thread.
+        if (_sta is { } sta && !sta.Join(TimeSpan.FromSeconds(10)))
+        {
+            CrashLog.Write(new TimeoutException(
+                "RecycleEngine's shell worker did not return within 10 seconds of disposal"));
+            // The worker is still inside the queue's consuming enumerator, so
+            // the collection is left undisposed rather than pulled out from
+            // under it: disposing it here would throw on that thread, and an
+            // unhandled throw on a background thread takes the process with it.
+            return;
+        }
         _work?.Dispose();
     }
 }
