@@ -780,12 +780,12 @@
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - C:\Windows\Installer をクリーンアップ</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>使用方法：</value></data>
-  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   このヘルプを表示 (/?、-hも受け付けます)</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     このヘルプを表示 (/?、-hも受け付けます)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  バージョンを表示 (-vも受け付けます)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       スキャンのみ - 削除可能なファイルを一覧表示</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       削除可能なファイルを削除 (ごみ箱)</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       保存されたデフォルトの場所に移動</value></data>
-  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PATH  指定されたパスに移動</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         スキャンのみ - 削除可能なファイルを一覧表示</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         削除可能なファイルを削除 (ごみ箱)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         保存されたデフォルトの場所に移動</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PATH    指定されたパスに移動</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cliは実際のコンソールプロセスであり、完了するまで</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>プロンプトをブロックします。他のコンソール exe と同様に、出力をリダイレクト</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>またはパイプできます。GUI は同じ場所にある InstallerClean.exe にあります。</value></data>

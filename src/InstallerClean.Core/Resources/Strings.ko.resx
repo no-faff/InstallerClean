@@ -759,12 +759,12 @@
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - C:\Windows\Installer 정리</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>사용법:</value></data>
-  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   이 도움말 표시 (/?, -h도 사용 가능)</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     이 도움말 표시 (/?, -h도 사용 가능)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  버전 출력 (-v도 사용 가능)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       검사만 - 불필요한 파일 나열</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       불필요한 파일 삭제 (휴지통)</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       저장된 기본 위치로 이동</value></data>
-  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 경로   지정한 경로로 이동</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         검사만 - 불필요한 파일 나열</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         불필요한 파일 삭제 (휴지통)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         저장된 기본 위치로 이동</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 경로      지정한 경로로 이동</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli는 실제 콘솔 프로세스로, 명령 프롬프트를 점유하며,</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>실행이 끝날 때까지 기다립니다. 다른 콘솔 실행 파일처럼 출력을 리디렉션하거나</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>파이프로 넘길 수 있습니다. GUI는 바로 옆 InstallerClean.exe에 들어 있습니다.</value></data>

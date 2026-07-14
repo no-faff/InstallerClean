@@ -763,7 +763,7 @@
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         仅扫描 - 列出不需要的文件</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         删除不需要的文件（回收站）</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         移动到已保存的默认位置</value></data>
-  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 路径    移动到指定路径</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 路径      移动到指定路径</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli 是一个真正的控制台进程，在运行结束前会一直</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>占用命令提示符；可像对待其他控制台程序那样重定向或通过管道处理其输出。</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>GUI 就位于同目录下的 InstallerClean.exe 中。</value></data>

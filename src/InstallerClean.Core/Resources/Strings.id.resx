@@ -758,12 +758,12 @@ Log kerusakan tidak bisa ditulis.</value></data>
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - pembersihan C:\Windows\Installer</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Penggunaan:</value></data>
-  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   Tampilkan bantuan ini (juga menerima /?, -h)</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Tampilkan bantuan ini (juga menerima /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Cetak versi (juga menerima -v)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       Pindai saja - daftar file tidak diperlukan</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       Hapus file tidak diperlukan (Keranjang Sampah)</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       Pindahkan ke lokasi default tersimpan</value></data>
-  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m JALUR Pindahkan ke jalur yang ditentukan</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Pindai saja - daftar file tidak diperlukan</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Hapus file tidak diperlukan (Keranjang Sampah)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Pindahkan ke lokasi default tersimpan</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m JALUR   Pindahkan ke jalur yang ditentukan</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli adalah proses konsol sungguhan dan memblokir prompt</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>sampai selesai; alihkan atau salurkan keluarannya seperti</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>executable konsol lainnya. GUI ada di InstallerClean.exe di sebelahnya.</value></data>

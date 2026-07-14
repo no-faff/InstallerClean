@@ -759,11 +759,11 @@ Nie udało się zapisać dziennika awarii.</value></data>
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - oczyszczanie C:\Windows\Installer</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Sposób użycia:</value></data>
-  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help   Pokaż tę pomoc (akceptuje też /?, -h)</value></data>
-  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Wypisz wersję (akceptuje też -v)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s       Tylko skanowanie - lista niepotrzebnych plików</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d       Usuń niepotrzebne pliki (Kosz)</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m       Przenieś do zapisanej lokalizacji domyślnej</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help      Pokaż tę pomoc (akceptuje też /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version   Wypisz wersję (akceptuje też -v)</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s          Tylko skanowanie - lista niepotrzebnych plików</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d          Usuń niepotrzebne pliki (Kosz)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m          Przenieś do zapisanej lokalizacji domyślnej</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m ŚCIEŻKA  Przenieś do wskazanej ścieżki</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli to prawdziwy proces konsolowy i blokuje wiersz poleceń,</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>dopóki się nie zakończy; przekieruj lub przekaż potokiem jego wyjście</value></data>
