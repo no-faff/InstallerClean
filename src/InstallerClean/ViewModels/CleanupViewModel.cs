@@ -355,6 +355,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 IsOperating = true;
             }
             await probeTask;
+            // A Cancel clicked while the probe was in flight can lose the race
+            // with a probe that completes anyway (the token is only checked
+            // between the probe's three filesystem calls). Without this the
+            // click is honoured too late: the confirmation dialog opens, and
+            // only the move that follows fails on the already-cancelled token.
+            probeToken.ThrowIfCancellationRequested();
         }
         catch (OperationCanceledException)
         {
@@ -524,9 +530,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         finally
         {
+            // DisposeOperationCts also clears IsCancellationRequested.
             DisposeOperationCts();
             IsOperating = false;
-            IsCancellationRequested = false;
             OperationProgressPercent = 0;
             // Stale-state reset: a cancel-then-rerun cycle would otherwise
             // briefly show the previous run's last filename and "X of Y"
@@ -710,9 +716,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         finally
         {
+            // DisposeOperationCts also clears IsCancellationRequested.
             DisposeOperationCts();
             IsOperating = false;
-            IsCancellationRequested = false;
             OperationProgressPercent = 0;
             // Stale-state reset: a cancel-then-rerun cycle would otherwise
             // briefly show the previous run's last filename and "X of Y"
@@ -787,8 +793,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(OperationProgressDetail));
 
     /// <summary>
-    /// Cancel-then-null-then-dispose <see cref="_operationCts"/>. Order
-    /// matters on two fronts: the null happens before Dispose so a
+    /// Ends the current operation's cancellation scope:
+    /// cancel-then-null-then-dispose <see cref="_operationCts"/>, then clear
+    /// <see cref="IsCancellationRequested"/>, which is that CTS's UI mirror.
+    ///
+    /// Order matters on two fronts: the null happens before Dispose so a
     /// concurrent CancelOperationCommand reading the field sees no CTS
     /// and no-ops instead of racing the dispose; the Cancel happens
     /// first so a still-running worker on the Dispose-during-shutdown
@@ -796,6 +805,14 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// ThrowIfCancellationRequested rather than ObjectDisposedException.
     /// Cancel on a completed CTS (the success-path callers below) is a
     /// no-op.
+    ///
+    /// The flag is cleared here rather than in each operation's finally
+    /// because the Move pre-flight has four early returns that never reach
+    /// one (cancelled probe, failed probe, not enough space, declined
+    /// confirmation). A Cancel clicked during the probe left the flag set
+    /// on those paths, and CanCancelOperation reads !IsCancellationRequested,
+    /// so the Cancel button and Esc stayed dead for the whole of the next
+    /// operation.
     /// </summary>
     private void DisposeOperationCts()
     {
@@ -803,6 +820,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         _operationCts = null;
         cts?.Cancel();
         cts?.Dispose();
+        IsCancellationRequested = false;
     }
 
     private void OnOperationProgressUpdate(OperationProgress p)
