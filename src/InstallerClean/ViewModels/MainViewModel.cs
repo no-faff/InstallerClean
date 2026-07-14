@@ -36,6 +36,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly ISettingsService _settingsService;
     private readonly bool _hasSentResultLogBefore;
 
+    /// <summary>
+    /// The off-dispatcher write of the result-log lifetime lock, held so
+    /// <see cref="Dispose"/> can wait for it. Clicking Send can be the last
+    /// thing a user does before closing the window, and a write lost to the
+    /// process exiting would re-prompt them next session on a machine that has
+    /// already sent.
+    /// </summary>
+    private Task _lifetimeLockSave = Task.CompletedTask;
+
     public MainViewModel(
         IFileSystemScanService scanService,
         IMoveFilesService moveService,
@@ -103,6 +112,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Scan.ScanCompleted -= _scanCompletedHandler;
         Chrome.Dispose();
         Cleanup.Dispose();
+
+        // Let the lifetime-lock write finish before the process goes. Bounded,
+        // because a settings.json on a wedged network profile must not be able
+        // to hold the app open on exit; the write is a few hundred bytes, so
+        // the bound is only ever reached by a disk that has stopped answering,
+        // and losing the lock then costs one extra prompt next session.
+        try { _lifetimeLockSave.Wait(TimeSpan.FromSeconds(5)); }
+        catch (Exception ex) { CrashLog.TryWrite(ex); }
     }
 
     /// <summary>
@@ -144,12 +161,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
         else if (e.PropertyName == nameof(CompletionViewModel.HasSentResultLog) &&
                  Completion.HasSentResultLog)
         {
-            // Persist the lifetime lock after a successful send. Update serialises
-            // against the debounced MoveDestination save (on a thread-pool thread)
-            // so neither write clobbers the other. Best-effort: a failed save just
-            // shows the prompt one extra time next session, self-correcting on the
-            // next successful send.
-            _settingsService.Update(s => s.HasSentResultLog = true);
+            // Persist the lifetime lock after a successful send. Off the
+            // dispatcher, like the debounced destination save and for the same
+            // reason: Update is a load-then-save round trip to settings.json,
+            // which is a disk hop (OneDrive-redirected and network-roaming
+            // profiles bite hardest), and it can additionally block on the
+            // service's own gate behind that very save. This fires on a user
+            // click, so the stall would land on a visible interaction.
+            //
+            // Update serialises against the debounced save under that gate, so
+            // neither write clobbers the other, and it never throws (TrySave
+            // returns false instead), so the task cannot fault unobserved.
+            // Best-effort: a failed save just shows the prompt one extra time
+            // next session, self-correcting on the next successful send.
+            _lifetimeLockSave = Task.Run(() => _settingsService.Update(s => s.HasSentResultLog = true));
         }
     }
 

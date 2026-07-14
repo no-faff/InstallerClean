@@ -150,11 +150,26 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         DisposeOperationCts();
         var saveCts = _moveDestinationSaveCts;
         _moveDestinationSaveCts = null;
-        // Cancel before Dispose so an in-flight SaveAfterDelayAsync
-        // observes the token and stops; otherwise a final keystroke
-        // could land a settings write after the VM is gone.
         saveCts?.Cancel();
         saveCts?.Dispose();
+
+        // A non-null CTS means an edit is still waiting out its debounce: the
+        // field is nulled once a save lands. Cancelling it, which is all this
+        // did, threw the edit away, so a destination typed or picked within
+        // 400 ms of the window closing was never persisted and the box came
+        // back empty (or holding the old path) next session. The language
+        // switch, which relaunches the app, went through the same Dispose and
+        // lost the same edit.
+        //
+        // Flushing it here is safe: the debounced save's own continuation is
+        // posted to a dispatcher that is about to stop pumping, so it would not
+        // run anyway, and SettingsService.Update takes its own lock, reloads,
+        // applies and saves atomically, so it cannot race the write it just
+        // cancelled. (The old comment justified the cancel by saying a late
+        // write could land "after the VM is gone". Update touches no view-model
+        // state, so that was never a hazard.)
+        if (saveCts is not null)
+            _settingsService.Update(s => s.MoveDestination = _settings.MoveDestination);
     }
 
     // Move and Delete gate on IsOperationInFlight, which is already set when

@@ -305,6 +305,39 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public void Closing_flushes_a_destination_edit_still_inside_its_debounce()
+    {
+        var vm = CreateViewModel();
+
+        vm.Cleanup.MoveDestination = @"D:\Backup\picked-then-closed";
+        // No wait: the debounce has not elapsed, so nothing has been saved yet.
+        _settingsService.DidNotReceive().Update(Arg.Any<Action<AppSettings>>());
+
+        vm.Dispose();
+
+        // Browse to a folder, change your mind about cleaning up, close the
+        // window: the destination used to be thrown away with the pending save,
+        // and the box came back empty next session.
+        _settingsService.Received(1).Update(Arg.Is<Action<AppSettings>>(
+            a => a != null && Applied(a).MoveDestination == @"D:\Backup\picked-then-closed"));
+    }
+
+    [Fact]
+    public async Task Closing_with_no_pending_destination_edit_writes_nothing()
+    {
+        var vm = CreateViewModel(new AppSettings { MoveDestination = @"D:\Backup" });
+        vm.Cleanup.MoveDestination = @"D:\Backup\changed";
+        await Task.Delay(DebounceWait);
+        _settingsService.ClearReceivedCalls();
+
+        vm.Dispose();
+
+        // The debounced save already landed and nulled the pending marker, so
+        // the flush must not fire a second, redundant write.
+        _settingsService.DidNotReceive().Update(Arg.Any<Action<AppSettings>>());
+    }
+
+    [Fact]
     public async Task MoveDestination_setting_same_value_does_not_resave()
     {
         var vm = CreateViewModel(new AppSettings { MoveDestination = @"D:\Backup" });
@@ -831,6 +864,10 @@ public class MainViewModelTests
             .Returns(ResultLogSendOutcome.Sent);
 
         await vm.Completion.SendResultLogCommand.ExecuteAsync(null);
+        // The write runs off the dispatcher, so it is Dispose that guarantees
+        // it landed. That is the barrier the app relies on too: the Send click
+        // is often the last thing a user does before closing the window.
+        vm.Dispose();
 
         _settingsService.Received().Update(Arg.Is<Action<AppSettings>>(a => a != null && Applied(a).HasSentResultLog));
     }
@@ -846,6 +883,7 @@ public class MainViewModelTests
             .Returns(ResultLogSendOutcome.NetworkUnavailable);
 
         await vm.Completion.SendResultLogCommand.ExecuteAsync(null);
+        vm.Dispose();
 
         _settingsService.DidNotReceive().Update(Arg.Is<Action<AppSettings>>(a => a != null && Applied(a).HasSentResultLog));
     }
@@ -858,6 +896,7 @@ public class MainViewModelTests
         _resultLogService.ReadLastLogAsync().Returns(Task.FromResult<string?>(null));
 
         await vm.Completion.SendResultLogCommand.ExecuteAsync(null);
+        vm.Dispose();
 
         _confirmationService.DidNotReceive().ConfirmSendResultLog(Arg.Any<string>());
         await _resultLogService.DidNotReceive().SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
