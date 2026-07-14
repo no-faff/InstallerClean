@@ -485,6 +485,9 @@ Klik kanan dan pilih 'Jalankan sebagai administrator'.</value></data>
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer menolak menampilkan daftar produk setelah {0} kali gagal berturut-turut (kode kesalahan terakhir {1}). Coba mulai ulang Windows, atau jalankan 'sfc /scannow' dari prompt dengan hak administrator.</value></data>
+  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
+       runs per product and fails on its own. Same two placeholders. -->
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer menolak menampilkan daftar patch untuk sebuah produk setelah {0} kali gagal berturut-turut (kode kesalahan terakhir {1}). Coba mulai ulang Windows, atau jalankan 'sfc /scannow' dari prompt dengan hak administrator.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Tujuan tidak valid</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Tidak bisa menulis ke tujuan</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Pemindahan gagal</value></data>

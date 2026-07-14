@@ -485,6 +485,9 @@
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer отказался перечислять продукты после {0} последовательных сбоев (последний код ошибки {1}). Попробуйте перезагрузить Windows или запустите «sfc /scannow» из командной строки с повышенными правами.</value></data>
+  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
+       runs per product and fails on its own. Same two placeholders. -->
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer отказался перечислять патчи продукта после {0} последовательных сбоев (последний код ошибки {1}). Попробуйте перезагрузить Windows или запустите «sfc /scannow» из командной строки с повышенными правами.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Недопустимая папка назначения</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не удалось записать в папку назначения</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Сбой перемещения</value></data>

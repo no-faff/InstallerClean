@@ -324,7 +324,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // to a dialog and to crash.log).
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                     throw new LocalisedInvalidOperationException(
-                        string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));
+                        string.Format(Strings.Error_MsiPatchNonSuccess, consecutiveNonSuccess, error));
             }
         }
 

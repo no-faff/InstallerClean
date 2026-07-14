@@ -485,6 +485,9 @@ Hãy nhấp chuột phải và chọn 'Chạy với tư cách quản trị viên
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer từ chối liệt kê sản phẩm sau {0} lần thất bại liên tiếp (mã lỗi cuối {1}). Hãy thử khởi động lại Windows, hoặc chạy 'sfc /scannow' từ một dấu nhắc có quyền nâng cao.</value></data>
+  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
+       runs per product and fails on its own. Same two placeholders. -->
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer từ chối liệt kê các bản vá của một sản phẩm sau {0} lần thất bại liên tiếp (mã lỗi cuối {1}). Hãy thử khởi động lại Windows, hoặc chạy 'sfc /scannow' từ một dấu nhắc có quyền nâng cao.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Đích không hợp lệ</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Không thể ghi vào đích</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Chuyển thất bại</value></data>

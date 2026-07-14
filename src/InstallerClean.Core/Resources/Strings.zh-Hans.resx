@@ -485,6 +485,9 @@
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>在连续 {0} 次失败后，Windows Installer 拒绝列出产品（最后的错误代码为 {1}）。请尝试重启 Windows，或在提权的命令提示符中运行“sfc /scannow”。</value></data>
+  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
+       runs per product and fails on its own. Same two placeholders. -->
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>在连续 {0} 次失败后，Windows Installer 拒绝列出某个产品的补丁（最后的错误代码为 {1}）。请尝试重启 Windows，或在提权的命令提示符中运行“sfc /scannow”。</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>目标无效</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>无法写入目标</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>移动失败</value></data>

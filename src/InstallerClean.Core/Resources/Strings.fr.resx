@@ -485,6 +485,9 @@ Faites un clic droit et choisissez « Exécuter en tant qu'administrateur »
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer a refusé de lister les produits après {0} échecs consécutifs (dernier code d'erreur {1}). Essayez de redémarrer Windows, ou exécutez « sfc /scannow » depuis une invite élevée.</value></data>
+  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
+       runs per product and fails on its own. Same two placeholders. -->
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer a refusé de lister les correctifs d'un produit après {0} échecs consécutifs (dernier code d'erreur {1}). Essayez de redémarrer Windows, ou exécutez « sfc /scannow » depuis une invite élevée.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Destination invalide</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Impossible d'écrire dans la destination</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Échec du déplacement</value></data>

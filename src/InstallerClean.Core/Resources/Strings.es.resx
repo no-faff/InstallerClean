@@ -485,6 +485,9 @@ Haz clic con el botón derecho y elige 'Ejecutar como administrador'.</value></d
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer se negó a enumerar los productos tras {0} errores consecutivos (último código de error {1}). Prueba a reiniciar Windows, o ejecuta 'sfc /scannow' desde un símbolo del sistema con privilegios elevados.</value></data>
+  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
+       runs per product and fails on its own. Same two placeholders. -->
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer se negó a enumerar los parches de un producto tras {0} errores consecutivos (último código de error {1}). Prueba a reiniciar Windows, o ejecuta 'sfc /scannow' desde un símbolo del sistema con privilegios elevados.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Destino no válido</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>No se pudo escribir en el destino</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Movimiento fallido</value></data>

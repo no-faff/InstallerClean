@@ -485,6 +485,9 @@
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>{0}번 연속 실패한 끝에 Windows Installer가 제품 목록 표시를 거부했습니다(마지막 오류 코드 {1}). Windows를 다시 시작하거나, 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행해 보세요.</value></data>
+  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
+       runs per product and fails on its own. Same two placeholders. -->
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>{0}번 연속 실패한 끝에 Windows Installer가 제품의 패치 목록 표시를 거부했습니다(마지막 오류 코드 {1}). Windows를 다시 시작하거나, 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행해 보세요.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>잘못된 대상</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>대상에 쓸 수 없음</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>이동 실패</value></data>

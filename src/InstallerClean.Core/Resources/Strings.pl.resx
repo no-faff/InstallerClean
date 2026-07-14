@@ -485,6 +485,9 @@ Kliknij prawym przyciskiem myszy i wybierz „Uruchom jako administrator”.</va
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer odmówił wypisania produktów po {0} kolejnych niepowodzeniach (ostatni kod błędu {1}). Spróbuj uruchomić ponownie Windows lub uruchom „sfc /scannow” z wiersza poleceń z podwyższonymi uprawnieniami.</value></data>
+  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
+       runs per product and fails on its own. Same two placeholders. -->
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer odmówił wypisania poprawek produktu po {0} kolejnych niepowodzeniach (ostatni kod błędu {1}). Spróbuj uruchomić ponownie Windows lub uruchom „sfc /scannow” z wiersza poleceń z podwyższonymi uprawnieniami.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Nieprawidłowy folder docelowy</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Nie udało się zapisać w folderze docelowym</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Przenoszenie nie powiodło się</value></data>

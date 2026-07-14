@@ -485,6 +485,9 @@ Sağ tıklayıp 'Yönetici olarak çalıştır'ı seçin.</value></data>
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer, {0} ardışık hatadan sonra ürünleri listelemeyi reddetti (son hata kodu {1}). Windows'u yeniden başlatmayı deneyin ya da yükseltilmiş bir komut isteminden 'sfc /scannow' çalıştırın.</value></data>
+  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
+       runs per product and fails on its own. Same two placeholders. -->
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer, {0} ardışık hatadan sonra bir ürünün yamalarını listelemeyi reddetti (son hata kodu {1}). Windows'u yeniden başlatmayı deneyin ya da yükseltilmiş bir komut isteminden 'sfc /scannow' çalıştırın.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Geçersiz hedef</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Hedefe yazılamadı</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Taşıma başarısız</value></data>

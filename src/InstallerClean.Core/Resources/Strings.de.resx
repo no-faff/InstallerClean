@@ -485,6 +485,9 @@ Klick mit der rechten Maustaste und wähle 'Als Administrator ausführen'.</valu
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer hat das Auflisten der Produkte nach {0} aufeinanderfolgenden Fehlern verweigert (letzter Fehlercode {1}). Starte Windows neu oder führe 'sfc /scannow' an einer Eingabeaufforderung mit erhöhten Rechten aus.</value></data>
+  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
+       runs per product and fails on its own. Same two placeholders. -->
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer hat das Auflisten der Patches eines Produkts nach {0} aufeinanderfolgenden Fehlern verweigert (letzter Fehlercode {1}). Starte Windows neu oder führe 'sfc /scannow' an einer Eingabeaufforderung mit erhöhten Rechten aus.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Ungültiges Ziel</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Schreiben am Ziel nicht möglich</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Verschieben fehlgeschlagen</value></data>
