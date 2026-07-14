@@ -92,6 +92,16 @@ internal static partial class Kernel32
     public const uint GENERIC_READ           = 0x80000000;
     public const uint GENERIC_WRITE          = 0x40000000;
 
+    // Granted on its own, and specifically WITHOUT FILE_WRITE_DATA (which
+    // GENERIC_WRITE carries), FILE_APPEND_DATA is what makes every write on the
+    // handle land at the end of the file as one atomic step, whatever offset the
+    // caller asks for. CreateFile documents it as "the right to append data to
+    // the file... for local files, write operations will not overwrite existing
+    // data if this flag is specified without FILE_WRITE_DATA". FILE_READ_ATTRIBUTES
+    // is what lets the length still be queried on such a handle.
+    public const uint FILE_APPEND_DATA       = 0x00000004;
+    public const uint FILE_READ_ATTRIBUTES   = 0x00000080;
+
     public const uint CREATE_ALWAYS          = 2;
     public const uint OPEN_EXISTING          = 3;
     public const uint OPEN_ALWAYS            = 4;

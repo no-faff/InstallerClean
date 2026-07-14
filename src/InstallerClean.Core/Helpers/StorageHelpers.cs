@@ -23,8 +23,6 @@ internal static class StorageHelpers
     internal static SafeFileHandle? OpenAtomic(
         string path, FileAccess access, AtomicOpenMode mode)
     {
-        if (string.IsNullOrEmpty(path)) return null;
-
         uint desired = access switch
         {
             FileAccess.Read => Kernel32.GENERIC_READ,
@@ -39,10 +37,36 @@ internal static class StorageHelpers
             AtomicOpenMode.CreateAlways => Kernel32.CREATE_ALWAYS,
             _ => Kernel32.OPEN_EXISTING,
         };
+        return Open(path, desired, disposition);
+    }
+
+    /// <summary>
+    /// Opens <paramref name="path"/> for appending only, creating it if it does
+    /// not exist, with the same reparse-point refusal as
+    /// <see cref="OpenAtomic"/>. Returns null on any failure.
+    ///
+    /// The handle carries FILE_APPEND_DATA and not FILE_WRITE_DATA, so Win32
+    /// resolves the end of the file and writes there as one atomic step and no
+    /// concurrent writer can be handed the same offset. Opening for
+    /// GENERIC_WRITE and seeking to the end does not have that property: the
+    /// seek and the write are two steps, and two writers who seek between each
+    /// other's calls both write at the same offset, so the second silently
+    /// overwrites the first. The length can still be read (FILE_READ_ATTRIBUTES),
+    /// which is what an append-only log needs to know whether it is fresh.
+    /// </summary>
+    internal static SafeFileHandle? OpenAtomicAppend(string path) =>
+        Open(path,
+            Kernel32.FILE_APPEND_DATA | Kernel32.FILE_READ_ATTRIBUTES,
+            Kernel32.OPEN_ALWAYS);
+
+    private static SafeFileHandle? Open(string path, uint desiredAccess, uint disposition)
+    {
+        if (string.IsNullOrEmpty(path)) return null;
+
         uint flags = Kernel32.FILE_FLAG_OPEN_REPARSE_POINT;
 
         var handle = Kernel32.CreateFile(
-            path, desired, Kernel32.FILE_SHARE_ALL, IntPtr.Zero,
+            path, desiredAccess, Kernel32.FILE_SHARE_ALL, IntPtr.Zero,
             disposition, flags, IntPtr.Zero);
         if (handle.IsInvalid) return null;
 
