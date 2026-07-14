@@ -27,9 +27,28 @@ public partial class ScanViewModel : ObservableObject
 
     private CancellationTokenSource? _scanCts;
 
+    /// <summary>
+    /// Reveals the scanning overlay. Deliberately not the gate on any command:
+    /// see <see cref="IsScanInFlight"/>.
+    /// </summary>
+    [ObservableProperty] private bool _isScanning;
+
+    /// <summary>
+    /// True from the first line of every scan (the Scan command, the splash
+    /// startup scan and the silent post-operation refresh) until it ends.
+    ///
+    /// <see cref="IsScanning"/> cannot serve as this gate: it is an
+    /// overlay-reveal flag, set only once a scan outlives the 200 ms delay,
+    /// and never at all by the silent refresh. It left the Move and Delete
+    /// buttons live through the first 200 ms of a scan, which is long enough
+    /// to start a destructive batch against the previous scan's result while
+    /// a fresh scan walks the same folder, and to leave two scans writing
+    /// <see cref="LastScanResult"/> with no ordering between them.
+    /// </summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ScanCommand))]
-    private bool _isScanning;
+    private bool _isScanInFlight;
+
     [ObservableProperty] private string _scanProgress = string.Empty;
 
     /// <summary>
@@ -208,29 +227,40 @@ public partial class ScanViewModel : ObservableObject
     /// </summary>
     private async Task RunScanCoreAsync(IProgress<ScanProgressUpdate>? progress, CancellationToken cancellationToken = default)
     {
-        // Compute everything off the call results before touching any
-        // observable property; on throw or cancel the VM stays at its
-        // prior consistent state.
-        var result = await _scanService.ScanAsync(progress, cancellationToken);
-        // Sample reboot after the scan; ordering matters. An MSI install
-        // starting mid-scan could flip the _MSIExecute mutex, and
-        // probing first would miss it.
-        var pendingRebootResult = await Task.Run(() => _rebootService.Check(), cancellationToken);
+        // Set before the first await, so it is already true when the caller's
+        // command returns to the dispatcher: every scan entry point routes
+        // through here, so this is the one place the gate can be complete.
+        IsScanInFlight = true;
+        try
+        {
+            // Compute everything off the call results before touching any
+            // observable property; on throw or cancel the VM stays at its
+            // prior consistent state.
+            var result = await _scanService.ScanAsync(progress, cancellationToken);
+            // Sample reboot after the scan; ordering matters. An MSI install
+            // starting mid-scan could flip the _MSIExecute mutex, and
+            // probing first would miss it.
+            var pendingRebootResult = await Task.Run(() => _rebootService.Check(), cancellationToken);
 
-        var registeredCount = result.RegisteredPackages.Count;
-        var registeredSize = DisplayHelpers.FormatSize(result.RegisteredTotalBytes);
-        var orphanedCount = result.RemovableFiles.Count;
-        var orphanedSize = DisplayHelpers.FormatSize(result.RemovableFiles.Sum(f => f.SizeBytes));
+            var registeredCount = result.RegisteredPackages.Count;
+            var registeredSize = DisplayHelpers.FormatSize(result.RegisteredTotalBytes);
+            var orphanedCount = result.RemovableFiles.Count;
+            var orphanedSize = DisplayHelpers.FormatSize(result.RemovableFiles.Sum(f => f.SizeBytes));
 
-        PendingRebootResult = pendingRebootResult;
-        LastScanResult = result;
-        RegisteredFileCount = registeredCount;
-        RegisteredSizeDisplay = registeredSize;
-        OrphanedFileCount = orphanedCount;
-        OrphanedSizeDisplay = orphanedSize;
-        MissingNonRemovableCount = result.MissingNonRemovableCount;
-        MissingRemovableCount = result.MissingRemovableCount;
-        HasScanned = true;
+            PendingRebootResult = pendingRebootResult;
+            LastScanResult = result;
+            RegisteredFileCount = registeredCount;
+            RegisteredSizeDisplay = registeredSize;
+            OrphanedFileCount = orphanedCount;
+            OrphanedSizeDisplay = orphanedSize;
+            MissingNonRemovableCount = result.MissingNonRemovableCount;
+            MissingRemovableCount = result.MissingRemovableCount;
+            HasScanned = true;
+        }
+        finally
+        {
+            IsScanInFlight = false;
+        }
     }
 
     /// <summary>
@@ -239,7 +269,7 @@ public partial class ScanViewModel : ObservableObject
     /// to the dialog service, and updates <see cref="ScanProgress"/>
     /// throughout.
     /// </summary>
-    private bool CanScan() => !IsScanning && !_isExternallyBlocked();
+    private bool CanScan() => !IsScanInFlight && !_isExternallyBlocked();
 
     /// <summary>
     /// True when the most recent scan ended because the user cancelled it

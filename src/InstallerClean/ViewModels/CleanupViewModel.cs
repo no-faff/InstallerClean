@@ -117,7 +117,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
     private void OnScanPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||
+        if (e.PropertyName == nameof(ScanViewModel.IsScanInFlight) ||
             e.PropertyName == nameof(ScanViewModel.OrphanedFileCount) ||
             e.PropertyName == nameof(ScanViewModel.HasPendingReboot))
         {
@@ -240,14 +240,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // post-reboot rename targets the cache (see IPendingRebootService).
     // The banner is informational only; the CanExecute predicate is what
     // stops a click from reaching the service.
+    // IsScanInFlight, not IsScanning: the latter reveals the scanning overlay
+    // and is only set once a scan passes 200 ms, which left both buttons live
+    // over the start of every scan.
     private bool CanMove() =>
-        !_scan.IsScanning && !IsOperating
+        !_scan.IsScanInFlight && !IsOperating
         && !_scan.HasPendingReboot
         && _scan.OrphanedFileCount > 0
         && !string.IsNullOrWhiteSpace(MoveDestination);
 
     private bool CanDelete() =>
-        !_scan.IsScanning && !IsOperating
+        !_scan.IsScanInFlight && !IsOperating
         && !_scan.HasPendingReboot
         && _scan.OrphanedFileCount > 0;
 

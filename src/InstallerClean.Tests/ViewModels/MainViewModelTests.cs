@@ -317,6 +317,72 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task Move_and_Delete_are_blocked_from_the_first_instant_of_a_scan()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-scan-gate");
+        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
+        Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+
+        var release = new ManualResetEventSlim();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Task.Run(() =>
+            {
+                release.Wait();
+                return ScanResultWithOrphans(2);
+            }));
+
+        var scan = vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        // Asserted synchronously after the command's first await, so the scan
+        // is provably still inside its 200 ms overlay-reveal delay: IsScanning
+        // is false, and gating the buttons on it used to leave a window in
+        // which a Delete could start against the previous scan's result while
+        // this one walked the same folder.
+        Assert.False(vm.Scan.IsScanning);
+        Assert.True(vm.Scan.IsScanInFlight);
+        Assert.False(vm.Cleanup.MoveAllCommand.CanExecute(null));
+        Assert.False(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+
+        release.Set();
+        await scan;
+
+        Assert.False(vm.Scan.IsScanInFlight);
+        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
+        Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task The_post_operation_refresh_blocks_a_parallel_scan()
+    {
+        var vm = CreateViewModel();
+        var release = new ManualResetEventSlim();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Task.Run(() =>
+            {
+                release.Wait();
+                return ScanResultWithOrphans(2);
+            }));
+
+        // The refresh a Move or Delete runs on completion never sets IsScanning
+        // (it must not: the operating overlay owns the screen at that point), so
+        // it was invisible to the Scan command's CanExecute.
+        var refresh = vm.Scan.RefreshAsync();
+
+        Assert.True(vm.Scan.IsScanInFlight);
+        Assert.False(vm.Scan.IsScanning);
+        Assert.False(vm.Scan.ScanCommand.CanExecute(null));
+
+        release.Set();
+        await refresh;
+
+        Assert.True(vm.Scan.ScanCommand.CanExecute(null));
+    }
+
+    [Fact]
     public async Task RescanAfterCompletion_dismisses_and_triggers_scan()
     {
         var vm = CreateViewModel();
