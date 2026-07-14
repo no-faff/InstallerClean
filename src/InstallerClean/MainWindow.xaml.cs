@@ -31,6 +31,7 @@ public partial class MainWindow : Window
         _vm.Scan.PropertyChanged += OnScanPropertyChanged;
         _vm.Scan.ScanCompleted += OnScanCompleted;
         PreviewKeyDown += OnPreviewKeyDown;
+        Closing += OnClosing;
         Closed += OnClosed;
 
         // The splash-driven startup scan can complete (and Completion
@@ -155,6 +156,39 @@ public partial class MainWindow : Window
         new CustomPopupPlacement(new Point(targetSize.Width - popupSize.Width, targetSize.Height), PopupPrimaryAxis.Horizontal)
     ];
 
+    /// <summary>
+    /// True once a close has been requested during a Move or a Delete: the
+    /// close is held, the operation cancelled, and the window closed for real
+    /// when the operation lets go.
+    /// </summary>
+    private bool _closeHeldForOperation;
+
+    private void OnClosing(object? sender, CancelEventArgs e)
+    {
+        if (!_vm.Cleanup.IsOperating) return;
+
+        // A Move or a Delete is running. Letting this close through kills the
+        // worker where it stands: OnExit disposes the container, which cancels
+        // the token but waits for nothing, and the batch is on a background
+        // thread, so the process exits from under it. A cross-volume move is a
+        // copy performed in this process (File.Move passes
+        // MOVEFILE_COPY_ALLOWED, and Win32 documents that flag as a CopyFile
+        // plus a DeleteFile), so dying mid-file leaves a truncated .msi in the
+        // destination folder with the source still in place: a file that looks
+        // like a recovery copy and is not one, in an app whose whole promise is
+        // that it never leaves you worse off.
+        //
+        // So: hold the close, cancel the batch, and take the close when the
+        // operation lets go. Cancelling stops it at the next file boundary, so
+        // the file being moved right now is finished rather than truncated. The
+        // wait is visible: the operating overlay stays up and says so.
+        e.Cancel = true;
+        if (_closeHeldForOperation) return;
+        _closeHeldForOperation = true;
+        if (_vm.Cleanup.CancelOperationCommand.CanExecute(null))
+            _vm.Cleanup.CancelOperationCommand.Execute(null);
+    }
+
     private void OnClosed(object? sender, EventArgs e)
     {
         _vm.Completion.PropertyChanged -= OnCompletionPropertyChanged;
@@ -164,6 +198,7 @@ public partial class MainWindow : Window
         PreviewKeyDown -= OnPreviewKeyDown;
         AccessibilitySettings.Current.PropertyChanged -= OnAccessibilitySettingsChanged;
         SizeChanged -= OnWindowSizeChanged;
+        Closing -= OnClosing;
         Closed -= OnClosed;
     }
 
@@ -278,6 +313,19 @@ public partial class MainWindow : Window
 
     private void OnCleanupPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(CleanupViewModel.IsOperating) && !_vm.Cleanup.IsOperating
+            && _closeHeldForOperation)
+        {
+            // The close the user asked for during the operation. Deferred to a
+            // later dispatcher pass rather than closed from here: this fires
+            // inside the operation's finally, and tearing the window (and with
+            // it the DI container, and with it these view-models) down while
+            // that frame is still on the stack is a re-entrancy nobody should
+            // have to reason about.
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, Close);
+            return;
+        }
+
         if (e.PropertyName == nameof(CleanupViewModel.IsOperating) && !_vm.Cleanup.IsOperating)
         {
             // The overlay's focused Cancel button collapses with the
