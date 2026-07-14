@@ -555,7 +555,10 @@ Detalles en {1}.</value></data>
   <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>No se pudo abrir el enlace en el navegador de tu usuario normal, y tampoco se pudo copiar al portapapeles. La URL es:&#10;&#10;{0}</value></data>
   <!-- 0 = the destination folder whose canonical path changed mid-batch -->
   <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>La ruta canónica de la carpeta de destino cambió durante la operación: {0}</value></data>
-  <!-- 0 = folder, 1 = inner exception message -->
+  <!-- 0 = folder, and nothing else. The framework's own message rides the
+       thrown exception's InnerException to the crash log; formatting it in
+       here would put an elevated framework message, which can carry a path
+       out of another user's profile, in front of the user. -->
   <data name="Error.CannotWriteFolder" xml:space="preserve"><value>No se puede escribir en {0}.</value></data>
   <!-- 0 = file name -->
   <data name="Error.NoUniqueFilename" xml:space="preserve"><value>No se pudo encontrar un nombre de archivo único para '{0}' tras 10.000 intentos.</value></data>

@@ -555,7 +555,10 @@
   <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>リンクを通常ユーザーのブラウザで開けず、クリップボードへのコピーも失敗しました。URL は次のとおりです：&#10;&#10;{0}</value></data>
   <!-- 0 = the destination folder whose canonical path changed mid-batch -->
   <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>バッチ処理中に移動先フォルダーの正規パスが変更されました：{0}</value></data>
-  <!-- 0 = folder, 1 = inner exception message -->
+  <!-- 0 = folder, and nothing else. The framework's own message rides the
+       thrown exception's InnerException to the crash log; formatting it in
+       here would put an elevated framework message, which can carry a path
+       out of another user's profile, in front of the user. -->
   <data name="Error.CannotWriteFolder" xml:space="preserve"><value>{0} に書き込めません。</value></data>
   <!-- 0 = file name -->
   <data name="Error.NoUniqueFilename" xml:space="preserve"><value>10,000回の試行後も'{0}'の一意のファイル名が見つかりませんでした。</value></data>
