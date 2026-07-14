@@ -15,22 +15,30 @@ public static class MsiError
 
 /// <summary>
 /// Installation context flags for MsiEnumProductsEx / MsiEnumPatchesEx /
-/// MsiEnumComponentsEx.
+/// MsiEnumComponentsEx. The values are msi.h's MSIINSTALLCONTEXT, declared
+/// here in the header's own order: managed is 1 and unmanaged is 2, which is
+/// the opposite of the order the names suggest. A context returned by the API
+/// is handed straight back to the next call as an opaque number, so a
+/// mislabelled member costs nothing until the first branch on one, and that
+/// branch would then decide whether a file is registered.
 /// </summary>
 [Flags]
 public enum MsiInstallContext : uint
 {
-    /// <summary>Per-machine installation context.</summary>
+    /// <summary>Per-user managed installation context (MSIINSTALLCONTEXT_USERMANAGED).</summary>
+    UserManaged = 0x00000001,
+
+    /// <summary>Per-user unmanaged installation context (MSIINSTALLCONTEXT_USERUNMANAGED).</summary>
+    UserUnmanaged = 0x00000002,
+
+    /// <summary>Per-machine installation context (MSIINSTALLCONTEXT_MACHINE).</summary>
     Machine = 0x00000004,
 
-    /// <summary>Per-user unmanaged installation context.</summary>
-    UserUnmanaged = 0x00000001,
-
-    /// <summary>Per-user managed installation context.</summary>
-    UserManaged = 0x00000002,
-
-    /// <summary>All installation contexts.</summary>
-    All = Machine | UserUnmanaged | UserManaged
+    /// <summary>
+    /// All installation contexts (MSIINSTALLCONTEXT_ALL). Excludes
+    /// ALLUSERMANAGED (8), which msi.h also leaves out of its own ALL.
+    /// </summary>
+    All = UserManaged | UserUnmanaged | Machine
 }
 
 /// <summary>
