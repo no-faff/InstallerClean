@@ -44,6 +44,12 @@ AppMutex=Global\InstallerClean_SingleInstance
 ; last-run.json, settings.json.bad on a corrupt-and-recovered run,
 ; crash.log) survives uninstall by design: the saved move destination
 ; and the lifetime result-log lock carry across upgrades.
+; The CLI's Application event-log source, registered on its first run at
+; HKLM\SYSTEM\CurrentControlSet\Services\EventLog\Application\InstallerClean,
+; survives too, and no [Registry] or [UninstallDelete] entry should be added
+; to remove it: Event Viewer resolves an entry's description through its
+; source, so deleting the source turns every audit entry the CLI has already
+; written into "the description for Event ID ... cannot be found".
 AppPublisher={#MyCompany}
 AppPublisherURL={#MyRepoUrl}
 AppSupportURL={#MyRepoUrl}/discussions
