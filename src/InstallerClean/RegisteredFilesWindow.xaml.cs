@@ -64,10 +64,21 @@ public partial class RegisteredFilesWindow : Window
     {
         if (ProductsList.Items.Count > 0)
         {
-            ProductsList.SelectedIndex = 0;
-            ProductsList.ScrollIntoView(ProductsList.Items[0]);
+            // The row to open on is the view-model's: the first product missing
+            // from disk if there is one, else the first row. Hardcoding index 0
+            // here overrode that selection, which is how the missing-from-disk
+            // banner came to send the user to a window that opened somewhere
+            // else. SelectedIndex is already the bound selection by Loaded; the
+            // Max guards a selection the list has not resolved.
+            var index = Math.Max(ProductsList.SelectedIndex, 0);
+            ProductsList.SelectedIndex = index;
+            ProductsList.ScrollIntoView(ProductsList.Items[index]);
+            // The list virtualises, so a row below the fold has no container
+            // until the scroll above realises it, and the layout pass that does
+            // so has not run yet.
+            ProductsList.UpdateLayout();
             var container = (ListViewItem?)ProductsList.ItemContainerGenerator
-                .ContainerFromIndex(0);
+                .ContainerFromIndex(index);
             container?.Focus();
         }
 

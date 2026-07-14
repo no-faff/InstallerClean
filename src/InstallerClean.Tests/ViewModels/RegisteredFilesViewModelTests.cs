@@ -89,4 +89,40 @@ public class RegisteredFilesViewModelTests
 
         Assert.Equal("2 registered files that are still needed (1.0 MB)", vm.Summary);
     }
+
+    [Fact]
+    public void Opens_on_the_first_product_missing_from_disk()
+    {
+        // The main window's missing-from-disk banner tells the user to open
+        // Details for what to do, and the recovery note lives on the missing
+        // row's details pane. Sorted by product name, the missing one is third.
+        var packages = new List<RegisteredPackage>
+        {
+            Pkg(@"C:\Windows\Installer\aaa.msi", "Product A", "{AAA}"),
+            Pkg(@"C:\Windows\Installer\bbb.msi", "Product B", "{BBB}"),
+            new(@"C:\Windows\Installer\ccc.msi", "Product C", "{CCC}", FileExists: false),
+            new(@"C:\Windows\Installer\ddd.msi", "Product D", "{DDD}", FileExists: false),
+        };
+
+        var vm = new RegisteredFilesViewModel(packages, 0, NullInfoService());
+
+        Assert.Equal("Product C", vm.SelectedProduct?.ProductName);
+        Assert.True(vm.SelectedProduct?.IsMissing);
+        Assert.True(vm.ShowMissing);
+    }
+
+    [Fact]
+    public void Opens_on_the_first_product_when_none_is_missing()
+    {
+        var packages = new List<RegisteredPackage>
+        {
+            Pkg(@"C:\Windows\Installer\aaa.msi", "Product A", "{AAA}"),
+            Pkg(@"C:\Windows\Installer\bbb.msi", "Product B", "{BBB}"),
+        };
+
+        var vm = new RegisteredFilesViewModel(packages, 0, NullInfoService());
+
+        Assert.Equal("Product A", vm.SelectedProduct?.ProductName);
+        Assert.False(vm.ShowMissing);
+    }
 }

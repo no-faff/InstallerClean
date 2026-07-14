@@ -148,8 +148,15 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
             packages.Count,
             DisplayHelpers.FormatSize(totalBytes));
 
-        if (Products.Count > 0)
-            SelectedProduct = Products[0];
+        // Open on the first product whose installer file is missing from disk,
+        // when there is one. The main window's missing-from-disk banner ends
+        // "Open Details for what to do", and what to do is the note that only
+        // that row's details pane carries. Selecting the top row instead left
+        // the user hunting for a small amber triangle somewhere in an
+        // alphabetical list of every installed product, which is an instruction
+        // they cannot follow. Products is sorted by product name, so the missing
+        // rows are wherever the alphabet puts them.
+        SelectedProduct = products.FirstOrDefault(p => p.IsMissing) ?? products.FirstOrDefault();
     }
 
     async partial void OnSelectedProductChanged(ProductRow? value)
