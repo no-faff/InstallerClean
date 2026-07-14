@@ -117,6 +117,8 @@ public static class Strings
     public static string Body_NoMetadata => Get("Body.NoMetadata");
     public static string Body_NoPatches => Get("Body.NoPatches");
     public static string Body_NoProductSelected => Get("Body.NoProductSelected");
+    public static string Body_NotScanned_Lead => Get("Body.NotScanned.Lead");
+    public static string Body_NotScanned_Why => Get("Body.NotScanned.Why");
     public static string Body_PendingReboot_InstallerInProgress => Get("Body.PendingReboot.InstallerInProgress");
     public static string Body_PendingReboot_MsiExecuteMutex => Get("Body.PendingReboot.MsiExecuteMutex");
     public static string Body_PendingReboot_PendingRenameInCache => Get("Body.PendingReboot.PendingRenameInCache");

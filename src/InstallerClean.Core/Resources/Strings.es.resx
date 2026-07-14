@@ -259,6 +259,14 @@
     <value>Elimínalos y se enviarán a la Papelera de reciclaje, o usa Mover en su lugar si prefieres conservar una copia.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
+  <data name="Body.NotScanned.Lead" xml:space="preserve">
+    <value>Nothing scanned yet.</value>
+    <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
+  </data>
+  <data name="Body.NotScanned.Why" xml:space="preserve">
+    <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
+    <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
+  </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Ahora mismo algo está usando Windows Installer, normalmente una actualización de Windows o un programa instalándose en segundo plano. Mover y Eliminar quedan en pausa mientras eso ocurre, de modo que InstallerClean no toca la caché de instalación mientras está cambiando. Cuando termine, vuelve a analizar y volverán a estar disponibles.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Hay una transacción anterior de Windows Installer suspendida en este equipo. Reanuda o revierte esa instalación (o reinicia Windows) antes de limpiar la caché.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows tiene en cola, para el próximo reinicio, el cambio de nombre de un archivo que afecta a la caché de instalación. Reinicia Windows antes de limpiar.</value></data>

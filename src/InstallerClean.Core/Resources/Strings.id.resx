@@ -259,6 +259,14 @@
     <value>Hapus ke Keranjang Sampah, atau gunakan Pindahkan sebagai gantinya jika Anda lebih suka menyimpan salinan.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
+  <data name="Body.NotScanned.Lead" xml:space="preserve">
+    <value>Nothing scanned yet.</value>
+    <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
+  </data>
+  <data name="Body.NotScanned.Why" xml:space="preserve">
+    <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
+    <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
+  </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Ada sesuatu yang sedang menggunakan Windows Installer saat ini, biasanya Windows Update atau program yang memasang di latar belakang. Pindahkan dan Hapus dijeda selama itu berjalan, sehingga InstallerClean tidak menyentuh cache penginstal saat sedang berubah. Setelah selesai, Pindai ulang dan keduanya kembali.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Ada transaksi Windows Installer sebelumnya yang tertunda di mesin ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows memiliki antrean penggantian nama file untuk mulai ulang berikutnya yang memengaruhi cache Installer. Mulai ulang Windows sebelum membersihkan.</value></data>

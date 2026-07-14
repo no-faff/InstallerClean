@@ -259,6 +259,14 @@
     <value>Удалите их в Корзину, или используйте вместо этого функцию «Переместить», если хотите сохранить копию.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
+  <data name="Body.NotScanned.Lead" xml:space="preserve">
+    <value>Nothing scanned yet.</value>
+    <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
+  </data>
+  <data name="Body.NotScanned.Why" xml:space="preserve">
+    <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
+    <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
+  </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Прямо сейчас что-то использует Windows Installer, обычно это обновление Windows или программа, устанавливающаяся в фоне. Пока это происходит, «Переместить» и «Удалить» приостановлены, чтобы InstallerClean не трогал кэш установки, пока тот меняется. Когда всё завершится, выполните повторное сканирование, и они снова станут доступны.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>На этом компьютере приостановлена предыдущая транзакция Windows Installer. Прежде чем очищать кэш, продолжите или откатите ту установку (либо перезагрузите Windows).</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows поставил в очередь на следующую перезагрузку переименование файла, затрагивающее кэш установки. Прежде чем очищать, перезагрузите Windows.</value></data>

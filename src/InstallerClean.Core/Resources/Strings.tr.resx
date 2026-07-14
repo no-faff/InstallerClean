@@ -259,6 +259,14 @@
     <value>Onları Geri Dönüşüm Kutusu'na silin ya da bir kopyasını saklamak isterseniz bunun yerine Taşı'yı kullanın.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
+  <data name="Body.NotScanned.Lead" xml:space="preserve">
+    <value>Nothing scanned yet.</value>
+    <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
+  </data>
+  <data name="Body.NotScanned.Why" xml:space="preserve">
+    <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
+    <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
+  </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Şu anda bir şey Windows Installer'ı kullanıyor; genellikle bir Windows Update ya da arka planda kurulan bir program. Bu sürerken Taşı ve Sil duraklatılır, böylece InstallerClean değişmekte olan yükleyici önbelleğine dokunmaz. İşlem bittiğinde Yeniden tara'yı kullanın, geri gelirler.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Bu makinede önceki bir Windows Installer işlemi askıya alınmış durumda. Önbelleği temizlemeden önce o kurulumu sürdürün ya da geri alın (veya Windows'u yeniden başlatın).</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows, bir sonraki yeniden başlatmada yükleyici önbelleğini etkileyen bir dosya yeniden adlandırması sıraya almış. Temizlemeden önce Windows'u yeniden başlatın.</value></data>

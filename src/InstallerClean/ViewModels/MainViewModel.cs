@@ -132,6 +132,43 @@ public partial class MainViewModel : ObservableObject, IDisposable
         !Scan.IsScanning && !Cleanup.IsOperating && !Completion.IsComplete;
 
     /// <summary>
+    /// The main window's opening line. The window has three states and the
+    /// intro is the only thing that tells them apart:
+    ///
+    ///   - nothing scanned yet (the startup scan was cancelled),
+    ///   - a scan found files (the state the window was designed for),
+    ///   - a scan found nothing (an all-clear, and the end state of every
+    ///     successful clean-up).
+    ///
+    /// The last of those used to read "The unneeded files below are safe to
+    /// delete" directly above "0 unneeded files to clean up", which is the app
+    /// telling the user to act on files it has just told them do not exist.
+    /// </summary>
+    public string IntroLead =>
+        !Scan.HasScanned ? Strings.Body_NotScanned_Lead
+        : Scan.HasOrphans ? Strings.Body_MainExplanation_Lead
+        : Strings.Completion_NothingToCleanUp;
+
+    /// <summary>
+    /// The muted second line under <see cref="IntroLead"/>. Empty on an
+    /// all-clear (the lead says it all, and the count rows below carry the
+    /// receipt), which collapses the TextBlock.
+    /// </summary>
+    public string IntroDetail =>
+        !Scan.HasScanned ? Strings.Body_NotScanned_Why
+        : Scan.HasOrphans ? MainExplanationWhyText
+        : string.Empty;
+
+    /// <summary>
+    /// "Scan cancelled." under the not-yet-scanned intro, so a user who
+    /// cancelled the startup scan is told why the window is empty rather than
+    /// being shown what looks like a clean machine. Empty (and collapsed) in
+    /// every other state: once a scan has completed, its result is the answer.
+    /// </summary>
+    public string IntroNotice =>
+        !Scan.HasScanned && Scan.LastScanWasCancelled ? Strings.Status_ScanCancelled : string.Empty;
+
+    /// <summary>
     /// The middle ("why") sentence of the main-window intro, with the three
     /// Reason values formatted in. The intro is three resx keys
     /// (<c>Body.MainExplanation.Lead</c> / <c>.Why</c> / <c>.Action</c>) so each
@@ -148,6 +185,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void OnChildPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        // The three intro lines are computed from the scan's state, so they
+        // re-read whenever any of the three inputs moves. HasOrphans covers
+        // OrphanedFileCount, which raises it.
+        if (e.PropertyName is nameof(ScanViewModel.HasScanned)
+            or nameof(ScanViewModel.HasOrphans)
+            or nameof(ScanViewModel.LastScanWasCancelled))
+        {
+            OnPropertyChanged(nameof(IntroLead));
+            OnPropertyChanged(nameof(IntroDetail));
+            OnPropertyChanged(nameof(IntroNotice));
+        }
+
         if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||
             e.PropertyName == nameof(CleanupViewModel.IsOperating) ||
             e.PropertyName == nameof(CleanupViewModel.IsOperationInFlight) ||

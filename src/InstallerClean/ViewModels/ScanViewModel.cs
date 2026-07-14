@@ -60,7 +60,14 @@ public partial class ScanViewModel : ObservableObject
     /// </summary>
     [ObservableProperty] private string _scanTicker = string.Empty;
 
-    [ObservableProperty] private bool _hasScanned;
+    /// <summary>
+    /// True once a scan has completed. False before the first one, which is a
+    /// state the user reaches by cancelling the startup scan, and the main
+    /// window has to say so rather than paint a zeroed scan result.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasOrphans))]
+    private bool _hasScanned;
 
     [ObservableProperty] private int _registeredFileCount;
     [ObservableProperty] private string _registeredSizeDisplay = string.Empty;
@@ -182,6 +189,15 @@ public partial class ScanViewModel : ObservableObject
                 "Summary.OrphanedToCleanUp"),
             OrphanedFileCount);
 
+    /// <summary>
+    /// True when the last scan found files to clean up. The main window's
+    /// action zone (the Move location, Move and Delete) hangs off this: with
+    /// nothing found there is nothing for it to act on, and a greyed-out pair
+    /// of buttons under copy that tells the user to press them reads as a
+    /// broken app rather than a clean machine.
+    /// </summary>
+    public bool HasOrphans => HasScanned && OrphanedFileCount > 0;
+
     public bool HasMissingFromDisk => MissingNonRemovableCount > 0;
 
     public string MissingFromDiskSummaryText =>
@@ -214,8 +230,11 @@ public partial class ScanViewModel : ObservableObject
     partial void OnRegisteredFileCountChanged(int value) =>
         OnPropertyChanged(nameof(RegisteredSummaryText));
 
-    partial void OnOrphanedFileCountChanged(int value) =>
+    partial void OnOrphanedFileCountChanged(int value)
+    {
         OnPropertyChanged(nameof(OrphanedSummaryText));
+        OnPropertyChanged(nameof(HasOrphans));
+    }
 
     /// <summary>
     /// Runs the scan service and updates this VM's display fields.
@@ -275,10 +294,22 @@ public partial class ScanViewModel : ObservableObject
     /// True when the most recent scan ended because the user cancelled it
     /// (rather than completing or failing). The view reads this when the
     /// scanning overlay collapses to re-announce "Scan cancelled." past the
-    /// focus move that would otherwise swallow it. Reset at the start of
-    /// every scan.
+    /// focus move that would otherwise swallow it, and the main window's
+    /// not-yet-scanned state reads it to say why there is nothing on screen.
+    /// Reset at the start of every scan.
+    ///
+    /// Observable, not a plain property: the startup scan is the one that gets
+    /// cancelled in practice, and it sets this without ever setting
+    /// <see cref="HasScanned"/>, so nothing else raises for the window to
+    /// re-read it.
     /// </summary>
-    public bool LastScanWasCancelled { get; private set; }
+    public bool LastScanWasCancelled
+    {
+        get => _lastScanWasCancelled;
+        private set => SetProperty(ref _lastScanWasCancelled, value);
+    }
+
+    private bool _lastScanWasCancelled;
 
     [RelayCommand(CanExecute = nameof(CanScan))]
     private async Task ScanAsync()
@@ -408,8 +439,22 @@ public partial class ScanViewModel : ObservableObject
     /// </summary>
     public async Task ScanWithProgressAsync(IProgress<ScanProgressUpdate>? progress, CancellationToken cancellationToken = default)
     {
+        LastScanWasCancelled = false;
         var sw = Stopwatch.StartNew();
-        await RunScanCoreAsync(progress, cancellationToken);
+        try
+        {
+            await RunScanCoreAsync(progress, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancelling the splash leaves the app with no scan at all, and the
+            // main window says so. Recording it here (the caller lets the
+            // cancellation through to close the splash) is what lets that window
+            // say why, rather than showing a bare "nothing scanned yet" to a user
+            // who knows perfectly well they pressed Cancel.
+            LastScanWasCancelled = true;
+            throw;
+        }
         sw.Stop();
         LastScanDurationMs = sw.ElapsedMilliseconds;
         ScanProgress = string.Format(Strings.Status_ScanComplete, DisplayHelpers.FormatElapsed(sw.Elapsed));

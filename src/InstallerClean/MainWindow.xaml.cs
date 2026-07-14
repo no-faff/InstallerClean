@@ -77,6 +77,16 @@ public partial class MainWindow : Window
             // replay the result announcement the same way the all-clear
             // branch replays its raises.
             OnScanCompleted(this, EventArgs.Empty);
+
+            // Cancelled at the splash: there is no scan to announce, and the
+            // scanning overlay this window normally re-announces the cancel from
+            // was never up inside its lifetime. Say why the window is empty.
+            // Background, below the focus move queued above, so the focus
+            // announcement does not cancel this polite one (see
+            // AnnounceLiveRegions for the priority contract).
+            if (!_vm.Scan.HasScanned && _vm.Scan.LastScanWasCancelled)
+                Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+                    ScanResultAnnouncer.Text = Strings.Status_ScanCancelled);
         }
 
         StarToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
@@ -413,9 +423,20 @@ public partial class MainWindow : Window
     // Routes focus to the move-destination field, the entry point of the Move
     // workflow, for the results-shown state that appears with no overlay (the
     // startup scan or a manual re-scan that found orphans). Never the
-    // destructive Delete. A no-op when an overlay has disabled the main content,
-    // because Focus() cannot land on a disabled control.
-    private void FocusResultsDefault() => MoveDestinationInput.Focus();
+    // destructive Delete.
+    //
+    // The field is only on screen when the scan found something to move, and
+    // Focus() cannot land on a collapsed control, so the two states without an
+    // action zone (nothing found, nothing scanned yet) fall back to Re-scan,
+    // which is what those states offer. Both calls returning false is the
+    // overlay case: Focus() also fails on a disabled control, and the bottom nav
+    // is disabled with the rest of the body while an overlay is up, so this
+    // stays the no-op it has always been there.
+    private void FocusResultsDefault()
+    {
+        if (!MoveDestinationInput.Focus())
+            RescanButton.Focus();
+    }
 
     /// <summary>
     /// Queues LiveRegionChanged raises for <paramref name="elements"/> at

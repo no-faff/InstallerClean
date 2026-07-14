@@ -84,11 +84,16 @@
         <Grid Grid.Row="1" Margin="{StaticResource MainContentMargin}"
               MaxWidth="{a11y:TextScaled 780}" HorizontalAlignment="Center"
               IsEnabled="{Binding IsMainContentInteractive}">
+            <!-- Three rows, not five with fixed 16 and 12 spacer rows between
+                 them: the separator and the action zone collapse together when
+                 there is nothing to move or delete, and a fixed spacer row
+                 holds its height whatever sits in it, so the collapsed pair
+                 would leave 28 pixels of dead space above the bottom nav. The
+                 separator carries that spacing in its own margin instead, which
+                 goes with it. -->
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="16"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="12"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
@@ -119,20 +124,66 @@
                           AutomationProperties.Name="{loc:Translate Automation.Scroll.ScanResults}">
             <StackPanel Margin="0,0,4,4">
 
-                <!-- Explanatory text in three tiers: the lead reassurance reads
-                     prominent (heading tier), the "why" detail recedes (muted),
-                     the action line sits at body tier. Three resx keys so each
-                     styles independently; only the "why" interpolates the Reason
-                     labels, so only it binds to the view-model. -->
-                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Heading}"
-                           FontSize="{DynamicResource Type.Heading.Sm}" Margin="{StaticResource GapBottom.Sm}"
-                           Text="{loc:Translate Body.MainExplanation.Lead}"/>
-                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Muted}"
-                           FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Sm}"
-                           Text="{Binding MainExplanationWhyText}"/>
-                <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Body}"
-                           FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Lg}"
-                           Text="{loc:Translate Body.MainExplanation.Action}"/>
+                <!-- Explanatory text in three tiers: the lead reads prominent
+                     (heading tier), the detail recedes (muted), the action line
+                     sits at body tier. The lead and the detail are computed by
+                     the view-model, because what they say depends on what the
+                     scan found: an intro written for "a scan found files" is
+                     wrong in the two states where it did not (nothing scanned
+                     yet, and nothing to clean up), and those are the states most
+                     users end in. The action line belongs to the found-files
+                     case alone, so it collapses with the buttons it mirrors.
+
+                     The block carries the gap below the intro, not its last
+                     child: which child IS last changes with the state, so a
+                     bottom margin on any one of them would vanish in the states
+                     where it collapses. Its 8 plus the 8 on the last visible
+                     line is the 16 the intro has always had under it. -->
+                <StackPanel Margin="{StaticResource GapBottom.Sm}">
+                    <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Heading}"
+                               FontSize="{DynamicResource Type.Heading.Sm}" Margin="{StaticResource GapBottom.Sm}"
+                               Text="{Binding IntroLead}"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Muted}"
+                               FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Sm}"
+                               Text="{Binding IntroDetail}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <!-- Collapses on an all-clear, where the lead
+                                         says it all; an empty TextBlock would
+                                         still carry its line height and margin. -->
+                                    <DataTrigger Binding="{Binding IntroDetail}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <!-- "Scan cancelled.", shown only in the not-yet-scanned
+                         state. No LiveSetting: this window is built after the
+                         startup scan has already ended, so there is no text
+                         change for the UIA bridge to announce; the code-behind
+                         speaks it through ScanResultAnnouncer instead. -->
+                    <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Body}"
+                               FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Sm}"
+                               Text="{Binding IntroNotice}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IntroNotice}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Body}"
+                               FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Sm}"
+                               Visibility="{Binding Scan.HasOrphans, Converter={StaticResource BoolToVis}}"
+                               Text="{loc:Translate Body.MainExplanation.Action}"/>
+                </StackPanel>
 
                 <!-- Pending reboot warning (Phosphor fill, tweaked !). DockPanel
                      (not a horizontal StackPanel) so the message wraps: a
@@ -164,13 +215,20 @@
                 <!-- Rule under the intro (and the pending-reboot warning when
                      shown): marks the explanation as its own section above the
                      scan counts. Matches the separator below the still-needed
-                     count. -->
-                <chrome:DecorativeBorder BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="0,1,0,0" Margin="{StaticResource GapBottom.Lg}"/>
+                     count. Collapses with the counts it introduces: before the
+                     first scan there are no counts, and a rule with nothing
+                     under it is a stray line. -->
+                <chrome:DecorativeBorder BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="0,1,0,0" Margin="{StaticResource GapBottom.Lg}"
+                                         Visibility="{Binding Scan.HasScanned, Converter={StaticResource BoolToVis}}"/>
 
                 <!-- Unneeded (orphaned) count: the loud heading-tier row leads
                      the scan results, sitting above the quiet still-needed row
-                     so position agrees with the existing emphasis. -->
-                <Grid>
+                     so position agrees with the existing emphasis. Both count
+                     rows hang off HasScanned: "0 unneeded files" and "0 files
+                     still needed" are a scan result, and printing them before
+                     any scan has run tells a user who cancelled the startup scan
+                     that their machine is clean. -->
+                <Grid Visibility="{Binding Scan.HasScanned, Converter={StaticResource BoolToVis}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -197,7 +255,8 @@
 
                 <!-- The quiet still-needed row sits a small gap (GapTop.Sm)
                      below the loud unneeded row above. -->
-                <Grid Margin="{StaticResource GapTop.Sm}">
+                <Grid Margin="{StaticResource GapTop.Sm}"
+                      Visibility="{Binding Scan.HasScanned, Converter={StaticResource BoolToVis}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -265,11 +324,19 @@
             </StackPanel>
             </ScrollViewer>
 
-            <!-- Separator -->
-            <chrome:DecorativeBorder Grid.Row="2" BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="0,1,0,0"/>
+            <!-- Separator. The 16 above and 12 below were the two spacer rows it
+                 used to sit between. -->
+            <chrome:DecorativeBorder Grid.Row="1" BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="0,1,0,0"
+                                     Margin="0,16,0,12"
+                                     Visibility="{Binding Scan.HasOrphans, Converter={StaticResource BoolToVis}}"/>
 
-            <!-- Action zone: move/delete -->
-            <Grid Grid.Row="4">
+            <!-- Action zone: move/delete. Collapses when the scan found nothing
+                 to act on (and before it has run at all): a disabled Move and
+                 Delete under copy telling the user to press them reads as a
+                 broken app, and it is the state every successful clean-up ends
+                 in. -->
+            <Grid Grid.Row="2"
+                  Visibility="{Binding Scan.HasOrphans, Converter={StaticResource BoolToVis}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="8"/>

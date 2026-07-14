@@ -54,13 +54,27 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
             OpenOrphanedDetailsCommand.NotifyCanExecuteChanged();
             OpenRegisteredDetailsCommand.NotifyCanExecuteChanged();
         }
+        // A clean-up empties the orphan list without a fresh HasScanned raise
+        // (the post-operation refresh only moves the counts), so the orphaned
+        // Details button needs this one to grey out behind the completion
+        // overlay rather than sit live over an empty list.
+        else if (e.PropertyName == nameof(ScanViewModel.HasOrphans))
+        {
+            OpenOrphanedDetailsCommand.NotifyCanExecuteChanged();
+        }
     }
 
     public void Dispose() => _scan.PropertyChanged -= _scanHandler;
 
     private bool HasScanResult => _scan.LastScanResult is not null;
 
-    [RelayCommand(CanExecute = nameof(HasScanResult))]
+    // The orphaned-files window lists what the scan found. With nothing found
+    // there is nothing to list, and a live button onto an empty list is a dead
+    // end; the registered window, which always has content after a scan, keeps
+    // the plain has-a-result gate.
+    private bool HasOrphansToShow => HasScanResult && _scan.HasOrphans;
+
+    [RelayCommand(CanExecute = nameof(HasOrphansToShow))]
     private void OpenOrphanedDetails()
     {
         if (_scan.LastScanResult is null) return;

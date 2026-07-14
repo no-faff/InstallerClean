@@ -1081,6 +1081,76 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public void Before_any_scan_the_intro_says_so_and_offers_nothing_to_act_on()
+    {
+        var vm = CreateViewModel();
+
+        Assert.Equal(Strings.Body_NotScanned_Lead, vm.IntroLead);
+        Assert.Equal(Strings.Body_NotScanned_Why, vm.IntroDetail);
+        Assert.Equal(string.Empty, vm.IntroNotice);
+        Assert.False(vm.Scan.HasOrphans);
+        // The action zone and both count rows hang off these two: nothing has
+        // been scanned, so there are no counts to show and nothing to move.
+        Assert.False(vm.Scan.HasScanned);
+        Assert.False(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task A_cancelled_startup_scan_leaves_the_window_saying_it_was_cancelled()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Throws(new OperationCanceledException());
+
+        await Assert.ThrowsAsync<OperationCanceledException>(
+            () => vm.Scan.ScanWithProgressAsync(null));
+
+        // The cancellation reaches App.OnStartup, which opens the main window
+        // anyway. Before this, that window painted "0 unneeded files to clean
+        // up" and "0 files still needed": a clean bill of health for a scan that
+        // never ran.
+        Assert.False(vm.Scan.HasScanned);
+        Assert.True(vm.Scan.LastScanWasCancelled);
+        Assert.Equal(Strings.Body_NotScanned_Lead, vm.IntroLead);
+        Assert.Equal(Strings.Status_ScanCancelled, vm.IntroNotice);
+    }
+
+    [Fact]
+    public async Task A_scan_that_finds_nothing_stops_telling_the_user_to_delete_files()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(EmptyScanResult());
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        // The lead used to read "The unneeded files below are safe to delete"
+        // above a zero count, with Move and Delete greyed out beneath it.
+        Assert.Equal(Strings.Completion_NothingToCleanUp, vm.IntroLead);
+        Assert.Equal(string.Empty, vm.IntroDetail);
+        Assert.True(vm.Scan.HasScanned);
+        Assert.False(vm.Scan.HasOrphans);
+        // A live Details button here opened an empty list.
+        Assert.False(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task A_scan_that_finds_files_keeps_the_full_intro_and_the_action_zone()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(3));
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        Assert.Equal(Strings.Body_MainExplanation_Lead, vm.IntroLead);
+        Assert.Equal(vm.MainExplanationWhyText, vm.IntroDetail);
+        Assert.Equal(string.Empty, vm.IntroNotice);
+        Assert.True(vm.Scan.HasOrphans);
+        Assert.True(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+    }
+
+    [Fact]
     public void MainExplanationWhyText_carries_all_three_reason_labels()
     {
         // The "why" sentence of the intro carries the three Reason format
