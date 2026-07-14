@@ -100,12 +100,26 @@ public partial class App : Application
         }
         if (!_holdsSingleInstanceMutex)
         {
-            MessageDialog.Show(
-                Strings.Startup_AlreadyRunningBody,
-                Strings.Startup_AlreadyRunningTitle, MessageKind.Information);
+            // Another instance holds the mutex. If it is the GUI, bring its
+            // window to the front, which is what clicking the icon of a running
+            // app is supposed to do, and say nothing: telling the user it is
+            // already running and then leaving them to find a window that may be
+            // minimised or behind the browser is worse than useless.
+            //
+            // The dialog stays for the case that has no window to raise: the CLI
+            // holds the same mutex (deliberately, so the two binaries never race
+            // on C:\Windows\Installer) and never creates the activation event, so
+            // an unattended /d or /m run reports itself here rather than
+            // swallowing the click in silence.
+            if (!TryRaiseRunningInstance())
+                MessageDialog.Show(
+                    Strings.Startup_AlreadyRunningBody,
+                    Strings.Startup_AlreadyRunningTitle, MessageKind.Information);
             Shutdown();
             return;
         }
+
+        StartActivationListener();
 
         DispatcherUnhandledException += (_, args) =>
         {
@@ -270,6 +284,125 @@ public partial class App : Application
             MessageDialog.Show(body, Strings.Startup_ErrorTitle, MessageKind.Error);
             Shutdown();
         }
+    }
+
+    /// <summary>
+    /// The event a second launch signals to say "you are the one with the
+    /// window, come to the front". Only the GUI creates it, so its absence is
+    /// how the second launch knows the mutex holder is the CLI.
+    /// </summary>
+    private const string ActivationEventName = @"Global\InstallerClean_Activate";
+
+    private static EventWaitHandle? _activationSignal;
+
+    /// <summary>
+    /// Signals the running GUI instance to raise its window. Returns false when
+    /// there is no GUI to raise (the CLI holds the mutex, or the GUI is between
+    /// taking it and creating the event), in which case the caller shows the
+    /// already-running message instead.
+    /// </summary>
+    private static bool TryRaiseRunningInstance()
+    {
+        try
+        {
+            if (!EventWaitHandle.TryOpenExisting(ActivationEventName, out var signal))
+                return false;
+
+            using (signal)
+            {
+                // Foreground rights belong to the process the user last acted on,
+                // which is this one: it exists because they double-clicked the
+                // icon. Handing them over is what lets the other process's
+                // Activate() actually raise the window rather than flash its
+                // taskbar button. Failure is not fatal, so the return is ignored:
+                // the flash is the honest degradation.
+                User32.AllowSetForegroundWindow(User32.ASFW_ANY);
+                signal.Set();
+            }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            // A denied open (a squatted name, an event created by a process whose
+            // DACL keeps this one out) is the same outcome as no event at all: fall
+            // back to the message. Nothing here can raise a window, so nothing here
+            // is worth failing the launch over.
+            CrashLog.TryWrite(ex);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Creates the activation event and waits on it for the life of the process,
+    /// raising the main window whenever a second launch signals.
+    ///
+    /// The signal carries no data and grants no capability: any process on the
+    /// machine can open this event and set it, and the most it can achieve is
+    /// bringing InstallerClean's window to the foreground, which is what its own
+    /// icon does anyway. The event handle is deliberately never disposed: the
+    /// listener is parked inside WaitOne, and disposing the handle under it throws
+    /// on a background thread, which takes the process down (the same trap
+    /// RecycleEngine's bounded join has to avoid). A background thread and its
+    /// handle both die with the process.
+    /// </summary>
+    private static void StartActivationListener()
+    {
+        try
+        {
+            _activationSignal = new EventWaitHandle(
+                initialState: false, EventResetMode.AutoReset, ActivationEventName);
+        }
+        catch (Exception ex)
+        {
+            // Without the event, a second launch falls back to the message box,
+            // which is where this app was before. Not worth failing a start-up over.
+            CrashLog.TryWrite(ex);
+            return;
+        }
+
+        var listener = new Thread(ActivationListenerLoop)
+        {
+            IsBackground = true,
+            Name = "InstallerClean activation listener",
+        };
+        listener.Start();
+    }
+
+    private static void ActivationListenerLoop()
+    {
+        var signal = _activationSignal;
+        if (signal is null) return;
+
+        while (true)
+        {
+            try
+            {
+                signal.WaitOne();
+            }
+            catch (Exception ex)
+            {
+                // Nothing disposes the handle, so this should not happen; if it
+                // ever does, stop waiting rather than spin, and leave a trail.
+                CrashLog.TryWrite(ex);
+                return;
+            }
+
+            var dispatcher = Current?.Dispatcher;
+            if (dispatcher is null || dispatcher.HasShutdownStarted) return;
+            dispatcher.BeginInvoke(RaiseMainWindow);
+        }
+    }
+
+    private static void RaiseMainWindow()
+    {
+        // Null while the splash still owns the screen: the startup scan is running
+        // and the window is seconds away, so it will show itself. The second
+        // instance has already exited, and nothing is owed to it.
+        if (Current?.MainWindow is not { } window) return;
+
+        if (window.WindowState == WindowState.Minimized)
+            window.WindowState = WindowState.Normal;
+        window.Activate();
     }
 
     /// <summary>

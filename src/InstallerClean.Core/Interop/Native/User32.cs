@@ -4,12 +4,32 @@ namespace InstallerClean.Interop.Native;
 
 /// <summary>
 /// P/Invoke surface for user32.dll. Consumed by the WPF host's
-/// WindowChromeExtensions (focus-visual suppression gate) and
-/// DetailWindowSizing (work-area measurement).
+/// WindowChromeExtensions (focus-visual suppression gate),
+/// DetailWindowSizing (work-area measurement) and App's single-instance
+/// hand-off (foreground rights).
 /// </summary>
 internal static partial class User32
 {
     private const string Library = "user32.dll";
+
+    /// <summary>
+    /// Grants another process the right to take the foreground. Win32 gives that
+    /// right only to the process the user last interacted with, so a running
+    /// instance asked (by a second launch) to bring its window forward does not
+    /// have it and its Activate() would only flash the taskbar button. The
+    /// second instance, which the user has just launched, does have it, and hands
+    /// it over with this before it signals and exits.
+    ///
+    /// ASFW_ANY rather than the first instance's PID: the second instance knows
+    /// the first only through a named event, and the grant is consumed by the
+    /// next foreground change either way.
+    /// </summary>
+    [LibraryImport(Library, EntryPoint = "AllowSetForegroundWindow", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool AllowSetForegroundWindow(uint dwProcessId);
+
+    /// <summary>ASFW_ANY: any process may take the foreground.</summary>
+    public const uint ASFW_ANY = 0xFFFFFFFF;
 
     /// <summary>
     /// HWND of the foreground window across the desktop, or zero if no
