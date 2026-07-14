@@ -27,11 +27,9 @@ internal static class UrlLauncher
         var body = clipboardOk
             ? string.Format(Strings.BrowserLaunch_ClipboardOk, url)
             : string.Format(Strings.BrowserLaunch_ClipboardFailed, url);
-        MessageBox.Show(
-            body,
-            Strings.BrowserLaunch_FailedTitle,
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
+        // Warning, not information: the user asked for a page and did not get
+        // it, and the body carries the URL for them to paste.
+        MessageDialog.Show(body, Strings.BrowserLaunch_FailedTitle, MessageKind.Warning);
     }
 
     private static bool TryCopyToClipboard(string text)

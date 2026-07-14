@@ -1,25 +1,15 @@
-using System.Windows;
+using InstallerClean.Helpers;
 
 namespace InstallerClean.Services;
 
 public sealed class DialogService : IDialogService
 {
+    // MessageDialog owns the UI-thread marshalling (these are called from
+    // view-model paths that can be on a worker) and the fallback for a themed
+    // window it cannot build.
     public void ShowWarning(string message, string caption) =>
-        Show(message, caption, MessageBoxImage.Warning);
+        MessageDialog.Show(message, caption, MessageKind.Warning);
 
     public void ShowError(string message, string caption) =>
-        Show(message, caption, MessageBoxImage.Error);
-
-    private static void Show(string message, string caption, MessageBoxImage icon)
-    {
-        // MessageBox requires the UI thread; marshal there if invoked from a background thread.
-        var app = Application.Current;
-        if (app is null || app.Dispatcher.CheckAccess())
-        {
-            MessageBox.Show(message, caption, MessageBoxButton.OK, icon);
-            return;
-        }
-        app.Dispatcher.Invoke(() =>
-            MessageBox.Show(message, caption, MessageBoxButton.OK, icon));
-    }
+        MessageDialog.Show(message, caption, MessageKind.Error);
 }

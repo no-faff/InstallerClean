@@ -15,7 +15,7 @@ namespace InstallerClean;
 /// pending-reboot) is registered via
 /// <see cref="CoreComposition.AddInstallerCleanCore(IServiceCollection)"/>
 /// from <c>InstallerClean.Core</c> so the CLI host (which has no
-/// MainWindow, no MessageBox, no DataContext bindings) shares the
+/// MainWindow, no dialogs, no DataContext bindings) shares the
 /// same registrations. The WPF host then layers in the surfaces it
 /// uniquely needs.
 ///
@@ -40,8 +40,8 @@ internal static class Composition
         // in InstallerClean.Core and is registered via the extension.
         services.AddInstallerCleanCore();
 
-        // WPF-only surfaces. These wrap MessageBox / Window types and
-        // therefore cannot run without a WPF dispatcher.
+        // WPF-only surfaces. These wrap Window types and therefore cannot
+        // run without a WPF dispatcher.
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<IConfirmationService, ConfirmationService>();
         services.AddSingleton<IWindowService, WindowService>();

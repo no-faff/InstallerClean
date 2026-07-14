@@ -149,11 +149,10 @@ public partial class AboutWindow : Window
                     break;
 
                 case CheckFailed failed:
-                    MessageBox.Show(
+                    MessageDialog.Show(
                         FailureReasonText(failed.ReasonCode),
                         Strings.UpdateCheck_Title,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                        MessageKind.Warning);
                     CheckStatusText.Text = string.Empty;
                     break;
             }

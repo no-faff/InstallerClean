@@ -30,7 +30,7 @@ public partial class App : Application
     private static Mutex? _singleInstanceMutex;
     private static bool _holdsSingleInstanceMutex;
     private static ServiceProvider? _services;
-    // Reentry guard: MessageBox.Show pumps messages, so a queued
+    // Reentry guard: a modal dialog pumps messages, so a queued
     // exception could fire DispatcherUnhandledException recursively.
     private static bool _handlingUnhandledException;
 
@@ -100,9 +100,9 @@ public partial class App : Application
         }
         if (!_holdsSingleInstanceMutex)
         {
-            MessageBox.Show(
+            MessageDialog.Show(
                 Strings.Startup_AlreadyRunningBody,
-                Strings.Startup_AlreadyRunningTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+                Strings.Startup_AlreadyRunningTitle, MessageKind.Information);
             Shutdown();
             return;
         }
@@ -110,7 +110,7 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             // Recursive entry: log silently and bail. A nested handler
-            // call would stack a second MessageBox over the first.
+            // call would stack a second dialog over the first.
             if (_handlingUnhandledException)
             {
                 CrashLog.Write(args.Exception);
@@ -127,8 +127,12 @@ public partial class App : Application
                 var body = crash.Written
                     ? string.Format(Strings.Startup_UnhandledBody, typeName, crash.Path)
                     : string.Format(Strings.Startup_UnhandledBody_NoLog, typeName);
-                MessageBox.Show(body,
-                    Strings.Startup_UnhandledTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                // The crash log is written first, so a themed window that cannot
+                // itself be built (a broken theme resource is one of the things
+                // that reaches this handler) costs the user only the dialog's
+                // paint: MessageDialog falls back to the stock box, which needs
+                // none of the app's own resources.
+                MessageDialog.Show(body, Strings.Startup_UnhandledTitle, MessageKind.Error);
                 args.Handled = true;
                 Shutdown(1);
             }
@@ -249,11 +253,10 @@ public partial class App : Application
         catch (UnauthorizedAccessException)
         {
             splash?.Close();
-            MessageBox.Show(
+            MessageDialog.Show(
                 Strings.Error_AdminRequiredBody,
                 Strings.Error_AdminRequiredTitle,
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+                MessageKind.Warning);
             Shutdown();
         }
         catch (Exception ex)
@@ -264,10 +267,7 @@ public partial class App : Application
             var body = crash.Written
                 ? string.Format(Strings.Startup_FailedToStart, typeName, crash.Path)
                 : string.Format(Strings.Startup_FailedToStart_NoLog, typeName);
-            MessageBox.Show(body,
-                Strings.Startup_ErrorTitle,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+            MessageDialog.Show(body, Strings.Startup_ErrorTitle, MessageKind.Error);
             Shutdown();
         }
     }

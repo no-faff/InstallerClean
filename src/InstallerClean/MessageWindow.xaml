@@ -1,0 +1,77 @@
+<Window x:Class="InstallerClean.MessageWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:InstallerClean.Resources"
+        xmlns:a11y="clr-namespace:InstallerClean.Helpers"
+        WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <WindowChrome.WindowChrome>
+        <!-- CaptionHeight=0: this is a centred-on-owner modal with no
+             title-bar buttons, so no drag region is needed and the
+             Border below claims the full window. -->
+        <WindowChrome CaptionHeight="0" GlassFrameThickness="0"
+                      ResizeBorderThickness="0"/>
+    </WindowChrome.WindowChrome>
+
+    <!-- Card width scales with the OS text size so the copy keeps its
+         line length instead of wrapping into a tall sliver. Wider than the
+         confirm dialogs (they ask a one-line question; this one can carry a
+         crash-log path or a URL). -->
+    <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
+            MaxWidth="{a11y:TextScaled 520}" MinWidth="{a11y:TextScaled 360}"
+            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
+        <!-- Grid, not a StackPanel: the message sits in a star row so it
+             scrolls once the window's work-area MaxHeight binds (very large
+             text scales), keeping the heading and the Close button visible; a
+             vertical StackPanel measures children at infinite height, so the
+             button would clip instead. -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- DockPanel, not a horizontal StackPanel: a StackPanel hands the
+                 TextBlock unbounded width, so TextWrapping never engages and a
+                 long heading clips off the card edge. The icon is collapsed for
+                 an informational message and shown for a warning or a failure;
+                 it is the same amber triangle the pending-reboot, missing-file
+                 and bin-unavailable notices use, because the tokens carry one
+                 attention colour and inventing a second (a red icon brush) for
+                 an error would put a colour on screen that means nothing
+                 anywhere else in the app. -->
+            <DockPanel Grid.Row="0" Margin="{StaticResource GapBottom.Md}">
+                <Path x:Name="WarningIcon" Visibility="Collapsed"
+                      Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
+                      Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
+                      DockPanel.Dock="Left" VerticalAlignment="Center" Margin="{StaticResource GapRight.Sm}"/>
+                <TextBlock x:Name="CaptionText" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
+                           TextWrapping="Wrap" VerticalAlignment="Center"/>
+            </DockPanel>
+
+            <!-- Read-only TextBox, not a TextBlock: these messages carry the
+                 crash-log path and, on a failed browser launch, the URL itself,
+                 and the stock message box this replaced let the user select and
+                 copy them. It scrolls itself, so there is no nested ScrollViewer
+                 to swallow the wheel. Named so a screen reader announces what
+                 the text is rather than a bare "edit, read-only". -->
+            <TextBox x:Name="MessageText" Grid.Row="1"
+                     Style="{StaticResource SelectableText}"
+                     Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
+                     TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                     Margin="{StaticResource GapBottom.Lg}"
+                     AutomationProperties.Name="{loc:Translate Automation.Scroll.DialogBody}"/>
+
+            <Button x:Name="CloseButton" Grid.Row="2" Style="{StaticResource PrimaryPill}"
+                    Content="{loc:Translate Action.Close}" Click="OnClose"
+                    IsDefault="True" IsCancel="True"
+                    HorizontalAlignment="Right"/>
+        </Grid>
+    </Border>
+</Window>
