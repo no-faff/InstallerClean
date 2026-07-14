@@ -50,13 +50,31 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [NotifyPropertyChangedFor(nameof(MoveButtonTooltip))]
     private string _moveDestination = string.Empty;
 
-    // IsOperating goes false during the confirm-dialog window between
-    // pre-flight and the move call (so the modal owns the foreground
-    // state). Re-entry is gated by the [RelayCommand]-generated
-    // AsyncRelayCommand's internal IsRunning flag, not by IsOperating
-    // alone; a refactor that splits MoveAllAsync into two commands
-    // must re-introduce a VM-level guard or accept double-execution.
+    // Reveals the operating overlay. It is not the "work is underway" flag:
+    // it goes false during the confirm-dialog window between the pre-flight
+    // and the move call (so the modal owns the foreground state), it is set
+    // only after 200 ms during the Move pre-flight, and the recycle probe
+    // deliberately never sets it. IsOperationInFlight is the execution gate.
     [ObservableProperty] private bool _isOperating;
+
+    /// <summary>
+    /// True from the first line of a Move or a Delete until it has finished,
+    /// pre-flight included, whether or not <see cref="IsOperating"/> ever
+    /// raised the overlay. This is what the commands gate on.
+    ///
+    /// The pre-flights are the reason it exists. Both hop off the dispatcher
+    /// (a Win32 path resolve or a shell recycle probe against a mapped drive
+    /// can stall for the SMB timeout, and on the dispatcher that freezes the
+    /// window), and while one is awaited the message loop pumps with no
+    /// overlay up. Without this flag the other destructive command is still
+    /// clickable in that window, and a Delete started during a Move pre-flight
+    /// would overwrite <see cref="_operationCts"/> while the Move was still
+    /// using it, leaving the Move's Cancel button wired to the Delete's token.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(MoveAllCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DeleteAllCommand))]
+    private bool _isOperationInFlight;
     [ObservableProperty] private string _operationProgress = string.Empty;
     [ObservableProperty] private int _operationCurrentFile;
     [ObservableProperty] private int _operationTotalFiles;
@@ -139,12 +157,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         saveCts?.Dispose();
     }
 
-    partial void OnIsOperatingChanged(bool value)
-    {
-        MoveAllCommand.NotifyCanExecuteChanged();
-        DeleteAllCommand.NotifyCanExecuteChanged();
+    // Move and Delete gate on IsOperationInFlight, which is already set when
+    // IsOperating flips; only the overlay's Cancel button reads IsOperating.
+    partial void OnIsOperatingChanged(bool value) =>
         CancelOperationCommand.NotifyCanExecuteChanged();
-    }
 
     // Surfaced on the disabled Move button (ToolTipService.ShowOnDisabled
     // in the view): with no destination set, point the user at the one
@@ -240,17 +256,18 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // post-reboot rename targets the cache (see IPendingRebootService).
     // The banner is informational only; the CanExecute predicate is what
     // stops a click from reaching the service.
-    // IsScanInFlight, not IsScanning: the latter reveals the scanning overlay
-    // and is only set once a scan passes 200 ms, which left both buttons live
-    // over the start of every scan.
+    // Both gates are execution flags, not the overlay flags that used to stand
+    // in for them: IsScanning is only set once a scan passes 200 ms, and
+    // IsOperating is unset through both pre-flights. Reading either here left
+    // a window in which the other destructive command was still clickable.
     private bool CanMove() =>
-        !_scan.IsScanInFlight && !IsOperating
+        !_scan.IsScanInFlight && !IsOperationInFlight
         && !_scan.HasPendingReboot
         && _scan.OrphanedFileCount > 0
         && !string.IsNullOrWhiteSpace(MoveDestination);
 
     private bool CanDelete() =>
-        !_scan.IsScanInFlight && !IsOperating
+        !_scan.IsScanInFlight && !IsOperationInFlight
         && !_scan.HasPendingReboot
         && _scan.OrphanedFileCount > 0;
 
@@ -301,47 +318,59 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         var dest = MoveDestination.Trim();
 
-        // Never let files move back inside C:\Windows\Installer.
-        // ResolveFinalPath inside IsInstallerFolderOrChild expands
-        // junctions so a reparse-point destination cannot smuggle the
-        // batch into the cache folder.
-        if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
-        {
-            _dialogService.ShowWarning(
-                Strings.Error_DestinationInsideInstaller,
-                Strings.Error_InvalidDestinationTitle);
-            return;
-        }
-
-        // %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and
-        // %ProgramData% sit on the Win32 DLL search path and the SxS
-        // resolution path: a process searching those paths trusts a
-        // planted file at load time.
-        if (InstallerCacheHelpers.IsSystemFolderOrChild(dest))
-        {
-            _dialogService.ShowWarning(
-                string.Format(Strings.Error_DestinationInSystemFolder, dest),
-                Strings.Error_InvalidDestinationTitle);
-            return;
-        }
-
-        // Pre-flight: CreateDirectory + write probe. Runs on a
-        // worker thread so a slow UNC share doesn't freeze the UI for
-        // the SMB timeout. The CTS is created BEFORE the probe so
-        // the operating overlay's Cancel button can interrupt it.
-        // Goes through IFileSystem so MockFileSystem-backed tests
-        // don't hit real disk.
+        // Every touch of the destination happens here, on a worker thread and
+        // under one cancellable task: the two path gates, the CreateDirectory
+        // and write probe, the drive classification and the free-space query.
+        // Each of them resolves or queries a path through Win32, so each can
+        // stall for the SMB timeout on a mapped drive or a UNC share that has
+        // gone away, and any of them on the dispatcher freezes the window.
+        // The CTS is created first so the overlay's Cancel button can
+        // interrupt the wait. The probe goes through IFileSystem so
+        // MockFileSystem-backed tests don't hit real disk; the gates and the
+        // free-space query deliberately do not (a mock must not be able to
+        // talk its way past a safety check).
+        //
+        // Nothing here touches view-model state: the verdict comes back as a
+        // record and is applied below, on the dispatcher.
         _operationCts = new CancellationTokenSource();
         var probeToken = _operationCts.Token;
+        IsOperationInFlight = true;
         var probeTask = Task.Run(() =>
         {
+            // Never let files move back inside C:\Windows\Installer.
+            // ResolveFinalPath inside IsInstallerFolderOrChild expands
+            // junctions so a reparse-point destination cannot smuggle the
+            // batch into the cache folder. Both gates run before the probe
+            // creates anything.
+            if (InstallerCacheHelpers.IsInstallerFolderOrChild(dest))
+                return DestinationPreFlight.Rejected(insideInstallerCache: true);
+
+            // %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and
+            // %ProgramData% sit on the Win32 DLL search path and the SxS
+            // resolution path: a process searching those paths trusts a
+            // planted file at load time.
+            if (InstallerCacheHelpers.IsSystemFolderOrChild(dest))
+                return DestinationPreFlight.Rejected(insideSystemFolder: true);
+
             _fs.Directory.CreateDirectory(dest);
             probeToken.ThrowIfCancellationRequested();
             var probe = _fs.Path.Combine(dest, _fs.Path.GetRandomFileName());
             _fs.File.WriteAllBytes(probe, Array.Empty<byte>());
             probeToken.ThrowIfCancellationRequested();
             _fs.File.Delete(probe);
+            probeToken.ThrowIfCancellationRequested();
+
+            // A same-volume move is a rename and consumes no space, so the
+            // free-space check would otherwise refuse exactly the nearly-full
+            // system drive this app exists for; the caller applies the check
+            // only when the move really copies.
+            return new DestinationPreFlight(
+                false, false,
+                ClassifyMoveDestination(dest),
+                StorageHelpers.GetAvailableFreeSpace(dest));
         }, probeToken);
+
+        DestinationPreFlight preFlight;
         try
         {
             // Reveal the operating overlay only if the probe is slow, the way
@@ -357,12 +386,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 OperationProgress = Strings.Status_PreparingDestination;
                 IsOperating = true;
             }
-            await probeTask;
+            preFlight = await probeTask;
             // A Cancel clicked while the probe was in flight can lose the race
             // with a probe that completes anyway (the token is only checked
-            // between the probe's three filesystem calls). Without this the
-            // click is honoured too late: the confirmation dialog opens, and
-            // only the move that follows fails on the already-cancelled token.
+            // between the probe's filesystem calls). Without this the click is
+            // honoured too late: the confirmation dialog opens, and only the
+            // move that follows fails on the already-cancelled token.
             probeToken.ThrowIfCancellationRequested();
         }
         catch (OperationCanceledException)
@@ -387,24 +416,37 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         IsOperating = false;
         OperationProgress = string.Empty;
 
+        if (preFlight.InsideInstallerCache)
+        {
+            DisposeOperationCts();
+            _dialogService.ShowWarning(
+                Strings.Error_DestinationInsideInstaller,
+                Strings.Error_InvalidDestinationTitle);
+            return;
+        }
+
+        if (preFlight.InsideSystemFolder)
+        {
+            DisposeOperationCts();
+            _dialogService.ShowWarning(
+                string.Format(Strings.Error_DestinationInSystemFolder, dest),
+                Strings.Error_InvalidDestinationTitle);
+            return;
+        }
+
         var removableFiles = _scan.LastScanResult.RemovableFiles;
         var filePaths = removableFiles.Select(f => f.FullPath).ToList();
         var count = filePaths.Count;
         var totalBytes = removableFiles.Sum(f => f.SizeBytes);
         var sizeDisplay = _scan.OrphanedSizeDisplay;
 
-        // A same-volume move is a rename and consumes no space, so the
-        // free-space check below would refuse exactly the nearly-full
-        // system drive this app exists for; the check applies only when
-        // the move really copies, i.e. the destination is on another
-        // volume.
-        var destinationKind = ClassifyMoveDestination(dest);
+        var destinationKind = preFlight.Kind;
 
-        // Free-space check. Skip silently for paths the API can't
+        // Free-space check. Skipped for a same-drive move (a rename frees
+        // nothing and needs nothing) and silently for paths the API can't
         // measure (UNC shares where the caller lacks query rights, etc).
-        var availableFreeSpace = StorageHelpers.GetAvailableFreeSpace(dest);
         if (destinationKind != MoveDestinationKinds.SameDrive
-            && availableFreeSpace is long free && free < totalBytes)
+            && preFlight.AvailableFreeSpace is long free && free < totalBytes)
         {
             // Pre-flight CTS no longer needed; dispose before returning.
             DisposeOperationCts();
@@ -613,6 +655,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// </returns>
     private async Task<bool> RunDeleteAsync(DeleteContext ctx, bool permitPermanentDelete)
     {
+        _operationCts = new CancellationTokenSource();
+        IsOperationInFlight = true;
+
         // Probe the volume before showing any overlay on the recycle-first
         // pass: when the bin is unavailable the service deletes nothing, so a
         // "Deleting N files..." overlay (and its screen-reader announcement)
@@ -621,11 +666,22 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // choice. The permanent-retry pass (permitPermanentDelete) skips this
         // and always runs. DeleteFilesAsync re-checks the same volume and
         // still fails closed, so this only governs whether the overlay shows.
+        //
+        // Task.Run because the probe is a full shell IFileOperation round trip
+        // (write a file, recycle it, then permanently delete the bin entry it
+        // created), plus the recycle thread's creation and CoInitializeEx on
+        // the session's first Delete. It is slowest exactly when the bin is
+        // sick, which is the only case it exists to detect, and it used to run
+        // on the dispatcher: the window sat frozen, with no overlay and no
+        // Cancel, between the confirmation dialog closing and the delete
+        // starting.
         if (!permitPermanentDelete && ctx.FilePaths.Count > 0
-            && !_deleteService.CanRecycleToVolume(ctx.FilePaths[0]))
+            && !await Task.Run(() => _deleteService.CanRecycleToVolume(ctx.FilePaths[0])))
+        {
+            DisposeOperationCts();
             return true;
+        }
 
-        _operationCts = new CancellationTokenSource();
         // Heading before IsOperating: a heading assigned after the reveal
         // can be spoken twice (see OperationHeadingText in MainWindow.xaml).
         OperationProgress = string.Format(
@@ -762,6 +818,25 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>
+    /// What one off-thread pass over a Move destination found: whether it is
+    /// out of bounds, and, when it is not, what kind of volume it sits on and
+    /// how much room is left there. <see cref="Kind"/> and
+    /// <see cref="AvailableFreeSpace"/> are only meaningful when neither
+    /// rejection flag is set, because the pass returns at the first gate that
+    /// refuses and never touches the destination after that.
+    /// </summary>
+    private sealed record DestinationPreFlight(
+        bool InsideInstallerCache,
+        bool InsideSystemFolder,
+        string Kind,
+        long? AvailableFreeSpace)
+    {
+        public static DestinationPreFlight Rejected(
+            bool insideInstallerCache = false, bool insideSystemFolder = false) =>
+            new(insideInstallerCache, insideSystemFolder, MoveDestinationKinds.Unknown, null);
+    }
+
+    /// <summary>
     /// Snapshot of the scan state and file list a delete pass needs, captured
     /// before the first delete so the permanent-delete retry and the
     /// result-log entry both read the pre-operation values (RefreshAsync
@@ -796,9 +871,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(OperationProgressDetail));
 
     /// <summary>
-    /// Ends the current operation's cancellation scope:
-    /// cancel-then-null-then-dispose <see cref="_operationCts"/>, then clear
-    /// <see cref="IsCancellationRequested"/>, which is that CTS's UI mirror.
+    /// Ends the current operation: cancel-then-null-then-dispose
+    /// <see cref="_operationCts"/>, then clear <see cref="IsCancellationRequested"/>
+    /// (that CTS's UI mirror) and <see cref="IsOperationInFlight"/>. Every exit
+    /// path of a Move or a Delete calls this, including the pre-flight's early
+    /// returns, so it is the one place the operation's state is torn down.
     ///
     /// Order matters on two fronts: the null happens before Dispose so a
     /// concurrent CancelOperationCommand reading the field sees no CTS
@@ -824,6 +901,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         cts?.Cancel();
         cts?.Dispose();
         IsCancellationRequested = false;
+        IsOperationInFlight = false;
     }
 
     private void OnOperationProgressUpdate(OperationProgress p)

@@ -98,9 +98,12 @@ internal sealed class RecycleEngine : IRecycleEngine, IDisposable
             try { tcs.SetResult(func()); }
             catch (Exception ex) { tcs.SetException(ex); }
         });
-        // The caller is a thread-pool thread inside DeleteFilesAsync's
-        // Task.Run, never the STA worker, so blocking here cannot
-        // deadlock the worker.
+        // Blocking cannot deadlock the queue: the STA worker is the only thread
+        // that runs jobs and it never calls back in here, so no caller can ever
+        // be waiting on itself. What blocking does cost is the calling thread,
+        // for a full shell round trip, which is why every call site reaches
+        // this from the thread pool (DeleteFilesAsync's Task.Run, and the
+        // view-model's pre-flight probe) and none from a UI thread.
         return tcs.Task.GetAwaiter().GetResult();
     }
 

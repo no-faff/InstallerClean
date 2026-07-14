@@ -60,8 +60,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         // Closures read Cleanup / Completion at invocation time, after
         // the ctor runs.
+        // IsOperationInFlight, not IsOperating: the latter is unset through
+        // both of Cleanup's pre-flights, which would leave Re-scan live while
+        // a Move or a Delete was already under way.
         Scan = new ScanViewModel(scanService, rebootService, dialogService,
-            isExternallyBlocked: () => Cleanup?.IsOperating == true || Completion?.IsComplete == true);
+            isExternallyBlocked: () => Cleanup?.IsOperationInFlight == true || Completion?.IsComplete == true);
         Completion = new CompletionViewModel(
             rescanRequested: () => Scan.ScanCommand.ExecuteAsync(null),
             resultLogService: resultLogService,
@@ -130,11 +133,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||
             e.PropertyName == nameof(CleanupViewModel.IsOperating) ||
+            e.PropertyName == nameof(CleanupViewModel.IsOperationInFlight) ||
             e.PropertyName == nameof(CompletionViewModel.IsComplete))
         {
             OnPropertyChanged(nameof(IsMainContentInteractive));
-            // Block F5 / Re-scan while a Move/Delete or completion is
-            // up so a parallel scan can't race the operation.
+            // Block F5 / Re-scan while a Move/Delete (its pre-flight included)
+            // or a completion is up so a parallel scan can't race the operation.
             Scan.NotifyExternallyBlockedChanged();
         }
         else if (e.PropertyName == nameof(CompletionViewModel.HasSentResultLog) &&

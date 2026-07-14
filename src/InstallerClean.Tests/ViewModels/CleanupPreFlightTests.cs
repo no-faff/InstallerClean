@@ -133,11 +133,11 @@ public class CleanupPreFlightTests
     }
 
     [Fact]
-    public async Task Cancelling_a_pre_flight_that_completes_anyway_still_stops_the_move()
+    public async Task Cancelling_on_the_probes_last_call_never_reaches_the_confirmation()
     {
-        // Hold the probe open on its last call, which sits after its last
-        // cancellation checkpoint: the click therefore lands too late for the
-        // probe body to observe it, and the probe completes successfully.
+        // Hold the probe open on the last filesystem call it makes, so the
+        // Cancel lands at the latest point the probe can still act on it. The
+        // move must not proceed, and the user must not be asked to confirm one.
         var probeFinishing = new ManualResetEventSlim();
         var releaseProbe = new ManualResetEventSlim();
         _file.When(f => f.Delete(Arg.Any<string>())).Do(_ =>
@@ -157,8 +157,8 @@ public class CleanupPreFlightTests
         await move;
 
         Assert.True(probeFinishing.IsSet);
-        // No confirmation dialog, no move: the cancel is honoured even though
-        // the probe won the race. Before this was checked, the user who
+        // The pre-flight used to check the token only between its filesystem
+        // calls, so a Cancel this late was honoured too late: the user who
         // cancelled still got the "move 1 file?" dialog, and only the move
         // behind it failed on the already-cancelled token.
         _confirmationService.DidNotReceive().ConfirmMove(
@@ -191,6 +191,93 @@ public class CleanupPreFlightTests
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.False(vm.Cleanup.IsOperating);
         Assert.Equal(string.Empty, vm.Cleanup.OperationProgress);
+    }
+
+    [Fact]
+    public async Task A_destination_inside_the_installer_cache_is_refused_without_creating_it()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer", "backup");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(
+            InstallerClean.Resources.Strings.Error_DestinationInsideInstaller,
+            InstallerClean.Resources.Strings.Error_InvalidDestinationTitle);
+        // The gate runs before anything is created: the whole restore story
+        // collapses if the files end up back inside the cache folder.
+        _directory.DidNotReceive().CreateDirectory(Arg.Any<string>());
+        _confirmationService.DidNotReceive().ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>());
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_destination_inside_a_system_folder_is_refused_without_creating_it()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "ic-test-backup");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(
+            Arg.Any<string>(), InstallerClean.Resources.Strings.Error_InvalidDestinationTitle);
+        _directory.DidNotReceive().CreateDirectory(Arg.Any<string>());
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_refused_pre_flight_leaves_the_commands_usable()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Installer", "backup");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // Every exit from the pre-flight, refusals included, has to end the
+        // operation: the in-flight flag is what disables both destructive
+        // commands and Re-scan, and a leaked one locks the window down.
+        Assert.False(vm.Cleanup.IsOperationInFlight);
+        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
+        Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+        Assert.True(vm.Scan.ScanCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task Move_and_Delete_are_blocked_while_a_pre_flight_runs()
+    {
+        var releaseProbe = new ManualResetEventSlim();
+        _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ => releaseProbe.Wait());
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+        Assert.True(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+
+        var move = vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // Asserted synchronously, so the probe is provably still inside the
+        // 200 ms before the overlay would appear. The dispatcher pumps input
+        // through that window: a Delete started in it would overwrite the
+        // Move's cancellation source while the Move was still using it.
+        Assert.True(vm.Cleanup.IsOperationInFlight);
+        Assert.False(vm.Cleanup.IsOperating);
+        Assert.False(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+        Assert.False(vm.Cleanup.MoveAllCommand.CanExecute(null));
+        Assert.False(vm.Scan.ScanCommand.CanExecute(null));
+
+        releaseProbe.Set();
+        await move;
     }
 
     [Fact]
