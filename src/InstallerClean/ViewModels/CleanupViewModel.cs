@@ -333,6 +333,25 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         var dest = MoveDestination.Trim();
 
+        // Relative destinations are refused before anything resolves or creates
+        // them. Every gate below goes through Path.GetFullPath, which expands a
+        // bare "backup" against the process CWD, so the pre-flight would create
+        // that folder and write its probe file somewhere the user never named,
+        // elevated, and only then would MoveFilesService refuse the batch, after
+        // the confirmation dialog. The CWD is wherever the process happened to be
+        // started from and nothing in the app constrains it, so the two
+        // out-of-bounds gates below catching such a path is luck, not a gate.
+        // Same three checks in the same order as the CLI's
+        // ResolveAndValidateMoveDestination; MoveFilesService keeps its own copy
+        // at the service boundary for callers that never come through here.
+        if (!Path.IsPathFullyQualified(dest))
+        {
+            _dialogService.ShowWarning(
+                string.Format(Strings.Error_DestinationNotFullyQualified, dest),
+                Strings.Error_InvalidDestinationTitle);
+            return;
+        }
+
         // Every touch of the destination happens here, on a worker thread and
         // under one cancellable task: the two path gates, the CreateDirectory
         // and write probe, the drive classification and the free-space query.

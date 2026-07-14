@@ -300,4 +300,30 @@ public class CleanupPreFlightTests
         _file.Received(1).Delete(Arg.Any<string>());
         _confirmationService.Received(1).ConfirmMove(1, Arg.Any<string>(), _destination);
     }
+
+    [Fact]
+    public async Task A_relative_destination_is_refused_without_creating_it()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = "backup";
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _dialogService.Received(1).ShowWarning(
+            string.Format(InstallerClean.Resources.Strings.Error_DestinationNotFullyQualified, "backup"),
+            InstallerClean.Resources.Strings.Error_InvalidDestinationTitle);
+        // The refusal comes before the probe, not after the confirmation:
+        // "backup" resolves against the process CWD, so creating and probing it
+        // first would have the elevated process write to a folder the user never
+        // named, at a path that moves with wherever the exe was started from.
+        _directory.DidNotReceive().CreateDirectory(Arg.Any<string>());
+        _file.DidNotReceive().WriteAllBytes(Arg.Any<string>(), Arg.Any<byte[]>());
+        _confirmationService.DidNotReceive().ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>());
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.False(vm.Cleanup.IsOperationInFlight);
+    }
 }
