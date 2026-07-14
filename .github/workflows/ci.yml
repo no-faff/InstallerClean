@@ -52,6 +52,31 @@ jobs:
       - name: Smoke-publish CLI self-contained
         run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/cli-self-contained
 
+      # The setup is the artefact CI could not build: ISCC is the only thing
+      # that reads installer/*.iss, so a typo there, a message missing from one
+      # of the three bundled community .isl files, or an #include that lost its
+      # UTF-8 BOM used to surface for the first time mid-release, on the one
+      # machine that compiles it. The two publishes above put the exes exactly
+      # where the [Files] section looks for them, so this compiles the real
+      # setup rather than a stub.
+      #
+      # The version is pinned for the same reason the runner is: an Inno release
+      # must not redden an unrelated push. 6.7.1 is the compiler that built the
+      # shipped 2.0.x setups, and it is the one the bundled "Inno Setup 6.5.0+"
+      # community .isl files are known to compile against. Bump it deliberately.
+      - name: Install Inno Setup
+        run: choco install innosetup --version=6.7.1 --no-progress -y
+
+      - name: Compile the installer
+        run: |
+          $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
+                  Select-Object -First 1 -ExpandProperty FullName
+          if (-not $iscc) { throw "ISCC.exe not found under ${env:ProgramFiles(x86)} after installing Inno Setup." }
+          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version |
+                     Where-Object { $_ } | Select-Object -First 1
+          if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
+          & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
+
       - name: Audit vulnerable packages (GUI)
         run: dotnet list src/InstallerClean/InstallerClean.csproj package --vulnerable --include-transitive
         continue-on-error: true
