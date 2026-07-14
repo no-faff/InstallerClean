@@ -56,12 +56,16 @@ public sealed class ResultLogService : IResultLogService
 
     public async Task<bool> WriteAsync(ResultLogEntry entry, CancellationToken cancellationToken = default)
     {
+        // Named outside the try so every failure path below can remove it,
+        // matching SettingsService.TrySave. A refused open, a cancelled token, a
+        // full disk or a failed rename all leave the temp file on disk otherwise,
+        // and it shares a folder with settings.json for the life of the install.
+        var tempFile = LogFile + "." + Path.GetRandomFileName() + ".tmp";
         try
         {
             Directory.CreateDirectory(LogFolder);
 
             var json = JsonSerializer.Serialize(entry, JsonOptions);
-            var tempFile = LogFile + "." + Path.GetRandomFileName() + ".tmp";
 
             // OpenAtomic + MoveFileEx(REPLACE_EXISTING) keeps the swap
             // race-free: the temp open refuses a symlink, and the
@@ -70,8 +74,14 @@ public sealed class ResultLogService : IResultLogService
             using (var handle = StorageHelpers.OpenAtomic(
                        tempFile, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateAlways))
             {
+                // Null means the open was refused after CREATE_ALWAYS had already
+                // made the file (a reparse point at the name, or an attribute read
+                // that failed), so there is something to clean up here too.
                 if (handle is null)
+                {
+                    StorageHelpers.TryDeleteTempFile(tempFile);
                     return false;
+                }
                 using var fs = new FileStream(handle, FileAccess.Write);
                 await fs.WriteAsync(Encoding.UTF8.GetBytes(json), cancellationToken).ConfigureAwait(false);
             }
@@ -82,6 +92,7 @@ public sealed class ResultLogService : IResultLogService
         catch (Exception ex)
         {
             CrashLog.TryWrite(ex);
+            StorageHelpers.TryDeleteTempFile(tempFile);
             return false;
         }
     }

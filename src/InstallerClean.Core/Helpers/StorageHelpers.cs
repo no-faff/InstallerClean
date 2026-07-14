@@ -96,6 +96,29 @@ internal static class StorageHelpers
     }
 
     /// <summary>
+    /// Deletes the temp file a failed write-temp-then-rename left behind, for
+    /// the two savers that pair with <see cref="OpenAtomic"/>. Each failure
+    /// names a fresh temp file, so without this one every one of them strands
+    /// another file in <c>%LOCALAPPDATA%</c> that no later run ever removes.
+    /// Swallows everything it meets: the caller is already returning "the write
+    /// did not land", and a cleanup that threw would escalate a handled failure
+    /// into an unhandled one, on a thread-pool thread in the debounced case.
+    /// </summary>
+    internal static void TryDeleteTempFile(string path)
+    {
+        try
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+        }
+        catch
+        {
+            // A temp file that cannot be removed is litter, not a fault worth
+            // failing or logging a second time for.
+        }
+    }
+
+    /// <summary>
     /// Returns the number of bytes available to the current user at
     /// <paramref name="path"/>, or null if the space cannot be
     /// determined. Handles local drives, UNC shares and mapped drives

@@ -16,6 +16,9 @@ public class SettingsServiceTests : IDisposable
     {
         if (File.Exists(_tempFile))
             File.Delete(_tempFile);
+        // A_failed_save_leaves_no_temp_file_behind puts a directory at this path.
+        if (Directory.Exists(_tempFile))
+            Directory.Delete(_tempFile, recursive: true);
         var badFile = _tempFile + ".bad";
         if (File.Exists(badFile))
             File.Delete(badFile);
@@ -44,6 +47,25 @@ public class SettingsServiceTests : IDisposable
         var loaded = svc.Load();
 
         Assert.Equal(@"D:\Backup", loaded.MoveDestination);
+    }
+
+    [Fact]
+    public void A_failed_save_leaves_no_temp_file_behind()
+    {
+        // A directory standing where settings.json belongs makes the closing
+        // rename fail with the temp file already written and serialised, which
+        // is the state a full disk or a locked profile also ends in. Every
+        // attempt names a fresh temp file, so one left behind is never reused
+        // or overwritten: it is permanent litter in the folder settings.json
+        // and last-run.json share.
+        Directory.CreateDirectory(_tempFile);
+        var svc = new SettingsService(_tempFile);
+
+        var saved = svc.TrySave(new AppSettings { MoveDestination = @"D:\Backup" });
+
+        Assert.False(saved);
+        Assert.Empty(Directory.GetFiles(
+            Path.GetTempPath(), Path.GetFileName(_tempFile) + ".*.tmp"));
     }
 
     [Fact]

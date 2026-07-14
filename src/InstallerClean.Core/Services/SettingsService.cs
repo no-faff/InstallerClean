@@ -105,7 +105,15 @@ public sealed class SettingsService : ISettingsService
             using (var handle = StorageHelpers.OpenAtomic(
                        tempFile, FileAccess.Write, StorageHelpers.AtomicOpenMode.CreateAlways))
             {
-                if (handle is null) return false;
+                // Null means the open was refused after CREATE_ALWAYS had already
+                // made the file (a reparse point at the name, or an attribute read
+                // that failed). Returning straight out skips the catch below, so
+                // this path has to clean up after itself.
+                if (handle is null)
+                {
+                    StorageHelpers.TryDeleteTempFile(tempFile);
+                    return false;
+                }
                 using var fs = new FileStream(handle, FileAccess.Write);
                 JsonSerializer.Serialize(fs, settings, JsonOptions);
             }
@@ -115,7 +123,7 @@ public sealed class SettingsService : ISettingsService
         }
         catch (Exception)
         {
-            try { if (File.Exists(tempFile)) File.Delete(tempFile); } catch { }
+            StorageHelpers.TryDeleteTempFile(tempFile);
             return false;
         }
     }
