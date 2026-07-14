@@ -242,7 +242,7 @@ v1.8.0'da seçenek eklendiğinden bu yana gönderilen 124 rapora göre (teşekk�
 <details>
 <summary>Bu raporlar isteğe bağlı “Rapor gönder” düğmesinden gelir. Bir şey gönderilmeden önce göreceğiniz şey şudur.</summary>
 
-![“Send this to No Faff?” başlıklı, gönderilecek tam raporu gösteren onay penceresi: uygulama sürümü, Windows sürümü, tarama sayıları, işlenen dosyalar ve açılan baytlar; hiçbir dosya yolu, ad veya makine kimliği olmadan, sizi ya da makinenizi hiçbir şeyin tanımlamadığına, yalnızca uygulamanın çalışıp çalışmadığını ve ne kadar yer açıldığını gösterdiğine dair bir notla, İptal ve Gönder düğmeleriyle.](docs/screenshots/tr/optional-send-report-confirmation-dialogue.webp)
+![“Bunu göndermek ister misiniz?” başlıklı, gönderilecek tam raporu gösteren onay penceresi: uygulama sürümü, Windows sürümü, tarama sayıları, işlenen dosyalar ve açılan baytlar; hiçbir dosya yolu, ad veya makine kimliği olmadan, sizi ya da makinenizi hiçbir şeyin tanımlamadığına, yalnızca uygulamanın çalışıp çalışmadığını ve ne kadar yer açıldığını gösterdiğine dair bir notla, İptal ve Gönder düğmeleriyle.](docs/screenshots/tr/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

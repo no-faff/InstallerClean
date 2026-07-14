@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed ({0}). The crash log could not be written. | Не удалось переместить ({0}). Не удалось записать журнал сбоев. |
 | Delete failed ({0}). Details in {1}. | Не удалось удалить ({0}). Подробности в {1}. |
 | Delete failed ({0}). The crash log could not be written. | Не удалось удалить ({0}). Не удалось записать журнал сбоев. |
-| Access denied. Run as administrator. | Доступ запрещён. Запустите от имени администратора. |
+| Access denied. Windows refused the scan. | Access denied. Windows refused the scan. |
 | Scan failed: installer database unavailable. | Сбой сканирования: база данных установщика недоступна. |
 | Scan cancelled. | Сканирование отменено. |
 | Ready | Готово |
@@ -113,7 +113,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | The unneeded files below are safe to delete. | Ненужные файлы ниже можно безопасно удалить. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Они лежат в C:\Windows\Installer и остаются после того, как программа была удалена ({0}), более новый патч заменил один из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими. |
-| Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy. | Удалите их в Корзину или сначала переместите в другое место, если хотите сохранить копию. |
+| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Удалите их в Корзину, или используйте вместо этого функцию «Переместить», если хотите сохранить копию. |
+| Nothing scanned yet. | Nothing scanned yet. |
+| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Прямо сейчас что-то использует Windows Installer, обычно это обновление Windows или программа, устанавливающаяся в фоне. Пока это происходит, «Переместить» и «Удалить» приостановлены, чтобы InstallerClean не трогал кэш установки, пока тот меняется. Когда всё завершится, выполните повторное сканирование, и они снова станут доступны. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | На этом компьютере приостановлена предыдущая транзакция Windows Installer. Прежде чем очищать кэш, продолжите или откатите ту установку (либо перезагрузите Windows). |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows поставил в очередь на следующую перезагрузку переименование файла, затрагивающее кэш установки. Прежде чем очищать, перезагрузите Windows. |
@@ -139,8 +141,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Всё чисто |
 | Nothing to clean up in C:\Windows\Installer | В C:\Windows\Installer нечего очищать |
 | Scanned {0} {1} in {2} | Просканировано {0} {1} за {2} |
-| Copy them back if anything breaks ([it won't!]) | Скопируйте их обратно, если что-то сломается ([а оно не сломается!]) |
-| Until then, you can restore them if anything breaks ([it won't!]) | А пока их можно восстановить, если что-то сломается ([а оно не сломается!]) |
+| Copy them back if anything breaks ([it won't!]). | Скопируйте их обратно, если что-то сломается ([а оно не сломается!]). |
+| Until then, you can restore them if anything breaks ([it won't!]). | А пока их можно восстановить, если что-то сломается ([а оно не сломается!]). |
 | Empty it to actually reclaim the space. | Очистите Корзину, чтобы действительно освободить место. |
 | {0} freed | Освобождено {0} |
 | {0} cleaned up | Очищено {0} |
@@ -148,10 +150,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved, some files could not be processed | Перемещено {0}, некоторые файлы не удалось обработать |
 | {0} freed, some files could not be processed | Освобождено {0}, некоторые файлы не удалось обработать |
 | {0} cleaned up, some files could not be processed | Очищено {0}, некоторые файлы не удалось обработать |
-| {0} {1} moved to {2} | Перемещено {0} {1} в {2} |
-| {0} {1} moved to {2} | Перемещено {0} {1} в {2} |
-| {0} {1} moved to {2}. {3} {4} | Перемещено {0} {1} в {2}. {3} {4} |
-| {0} {1} moved to {2}. {3} {4} | Перемещено {0} {1} в {2}. {3} {4} |
+| {0} {1} moved to: {2} | Перемещено {0} {1} в: {2} |
+| {0} {1} moved to: {2} | Перемещено {0} {1} в: {2} |
+| {0} {1} moved to: {2}. {3} {4} | Перемещено {0} {1} в: {2}. {3} {4} |
+| {0} {1} moved to: {2}. {3} {4} | Перемещено {0} {1} в: {2}. {3} {4} |
 | {0} {1} moved to the Recycle Bin | Перемещено {0} {1} в Корзину |
 | {0} {1} moved to the Recycle Bin | Перемещено {0} {1} в Корзину |
 | {0} {1} moved to the Recycle Bin. {2} {3} | Перемещено {0} {1} в Корзину. {2} {3} |
@@ -195,21 +197,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Русский |
 | --- | --- |
 | Move {0} {1} ({2})? | Переместить {0} {1} ({2})? |
-| Files will be moved to {0}. | Файлы будут перемещены в {0}. |
+| Files will be moved to: | Файлы будут перемещены в: |
 | Delete {0} {1} ({2})? | Удалить {0} {1} ({2})? |
 | Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Файлы будут перемещены в Корзину. Если хотите сделать резервные копии, воспользуйтесь кнопкой «Переместить». |
+| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. |
 
 ## Error messages
 
 | English | Русский |
 | --- | --- |
-| Administrator rights required | Требуются права администратора |
-| InstallerClean requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | InstallerClean требует прав администратора.<br><br>Щёлкните правой кнопкой мыши и выберите «Запуск от имени администратора». |
+| Access denied | Access denied |
+| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. |
 | Installer database unavailable | База данных установщика недоступна |
 | Scan failed | Сбой сканирования |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | База данных Windows Installer оказалась пустой или недоступной. Это необычно даже для только что установленной Windows и обычно означает, что база данных повреждена или её очистил сторонний инструмент. Обычно её восстанавливает команда «sfc /scannow», запущенная из командной строки с повышенными правами. |
-| Access denied enumerating installed products. Run as administrator. | Доступ запрещён при перечислении установленных продуктов. Запустите от имени администратора. |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer отказался перечислять продукты после {0} последовательных сбоев (последний код ошибки {1}). Попробуйте перезагрузить Windows или запустите «sfc /scannow» из командной строки с повышенными правами. |
+| Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer отказался перечислять патчи продукта после {0} последовательных сбоев (последний код ошибки {1}). Попробуйте перезагрузить Windows или запустите «sfc /scannow» из командной строки с повышенными правами. |
 | Invalid destination | Недопустимая папка назначения |
 | Could not write to destination | Не удалось записать в папку назначения |
 | Move failed | Сбой перемещения |
@@ -235,8 +239,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Этот файл открыт или заблокирован другой программой (ошибка {0}). Закройте ту программу или то, что его сканирует, затем повторите попытку либо воспользуйтесь кнопкой «Переместить». |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | Файл был удалён безвозвратно, потому что его не удалось переместить в Корзину. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Перемещение файлов в папку Windows Installer отклонено (назначение: {0}). |
-| Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | Папка назначения должна быть полным путём (относительные пути разрешаются относительно текущего каталога процесса и небезопасны при работе с повышенными правами): {0} |
-| Destination folder canonical path changed mid-batch: {0} | Канонический путь папки назначения изменился во время операции: {0} |
+| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
+| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
 | Cannot write to {0}. | Не удаётся выполнить запись в {0}. |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | Не удалось подобрать уникальное имя файла для «{0}» после 10 000 попыток. |
 
@@ -260,8 +264,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Русский |
 | --- | --- |
 | Couldn't open your browser | Не удалось открыть браузер |
-| The link couldn't be opened in your normal-user browser. The URL has been copied to your clipboard so you can open it manually:<br><br>{0} | Не удалось открыть ссылку в браузере обычного пользователя. URL-адрес скопирован в буфер обмена, чтобы вы могли открыть его вручную:<br><br>{0} |
-| The link couldn't be opened in your normal-user browser, and copying it to the clipboard also failed. The URL is:<br><br>{0} | Не удалось открыть ссылку в браузере обычного пользователя, и скопировать её в буфер обмена тоже не вышло. URL-адрес:<br><br>{0} |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} |
 
 ## Sending the summary
 
@@ -271,8 +275,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Thanks! Report sent. | Спасибо! Отчёт отправлен. |
 | Sending failed. Try again later. | Не удалось отправить. Повторите попытку позже. |
 | No report to send. | Нет отчёта для отправки. |
-| Send this to No Faff? | Отправить это в No Faff? |
-| Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | Ничто не идентифицирует вас или ваш компьютер; это просто даёт мне знать, что InstallerClean работает и сколько места люди освобождают. Отправляется на nofaff.netlify.app/api/result-log. |
+| Send this? | Отправить это? |
+| It goes to nofaff.netlify.app/api/result-log. Nothing identifies you or your machine; it just lets me know InstallerClean's working and [how much space people are freeing]. | Отправляется на nofaff.netlify.app/api/result-log. Ничто не идентифицирует вас или ваш компьютер; это просто даёт мне знать, что InstallerClean работает и [сколько места люди освобождают]. |
 
 ## Startup and crashes
 
@@ -292,7 +296,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Русский |
 | --- | --- |
-| If it helped, buy me a cup of tea. | Если пригодилось, угостите меня чашкой чая. |
+| Donate | Поддержать |
 | It's thirsty work! | В горле пересохло! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Запрошена отмена. InstallerClean ждёт, когда текущий шаг дойдёт до точки остановки. Это может занять несколько секунд при интенсивном вводе-выводе или обращении к базе данных MSI. |
 | Close | Закрыть |
@@ -311,7 +315,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Русский |
 | --- | --- |
-| Buy me a cup of tea | Угостить меня чашкой чая |
+| Donate | Поддержать |
 | Buy me a cuppa (About window) | Угостить чаем (окно «О программе») |
 | Cancel operation | Отменить операцию |
 | Cancel scan | Отменить сканирование |
@@ -431,12 +435,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Примечание: не удалось выполнить запись в журнал событий. Проверьте разрешения журнала «Приложение» или групповую политику. |
 | InstallerClean - clean up C:\Windows\Installer | InstallerClean - очистка C:\Windows\Installer |
 | Usage: | Использование: |
-|   installerclean-cli --help   Show this help (also accepts /?, -h) |   installerclean-cli --help       Показать эту справку (также принимает /?, -h) |
+|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help       Показать эту справку (также принимает /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version    Показать версию (также принимает -v) |
-|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s           Только сканирование - список ненужных файлов |
-|   installerclean-cli /d       Delete removable files (Recycle Bin) |   installerclean-cli /d           Удалить ненужные файлы (Корзина) |
-|   installerclean-cli /m       Move to saved default location |   installerclean-cli /m           Переместить в сохранённую папку по умолчанию |
-|   installerclean-cli /m PATH  Move to specified path |   installerclean-cli /m ПУТЬ      Переместить в указанный путь |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s           Только сканирование - список ненужных файлов |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d           Удалить ненужные файлы (Корзина) |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m           Переместить в сохранённую папку по умолчанию |
+|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m ПУТЬ      Переместить в указанный путь |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli это настоящий консольный процесс, он блокирует |
 | until it finishes; redirect or pipe its output as you would any | командную строку до завершения; перенаправляйте или передавайте его вывод |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | по конвейеру, как у любого консольного exe. GUI рядом, в InstallerClean.exe. |

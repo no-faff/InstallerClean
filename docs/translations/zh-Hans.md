@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed ({0}). The crash log could not be written. | 移动失败（{0}）。无法写入崩溃日志。 |
 | Delete failed ({0}). Details in {1}. | 删除失败（{0}）。详情见 {1}。 |
 | Delete failed ({0}). The crash log could not be written. | 删除失败（{0}）。无法写入崩溃日志。 |
-| Access denied. Run as administrator. | 访问被拒绝。请以管理员身份运行。 |
+| Access denied. Windows refused the scan. | Access denied. Windows refused the scan. |
 | Scan failed: installer database unavailable. | 扫描失败：安装程序数据库不可用。 |
 | Scan cancelled. | 扫描已取消。 |
 | Ready | 就绪 |
@@ -113,7 +113,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | The unneeded files below are safe to delete. | 下面这些不需要的文件可以安全删除。 |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 它们位于 C:\Windows\Installer，是在卸载程序（{0}）、新补丁取代旧补丁（{1}）或发布者撤回补丁（{2}）时遗留下来的。InstallerClean 只会列出 Windows 自己报告为已经用完的文件。 |
-| Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy. | 将它们删除到回收站；如果您想保留副本，也可以先把它们移动到别处。 |
+| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | 将它们删除到回收站，如果您想保留副本，也可以改用“移动”。 |
+| Nothing scanned yet. | Nothing scanned yet. |
+| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | 现在有程序正在使用 Windows Installer，通常是 Windows 更新或某个正在后台安装的程序。在此期间，移动和删除会暂停，这样 InstallerClean 就不会在安装程序缓存发生变化时去动它。等它完成后，重新扫描，这两项操作便会恢复。 |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | 此计算机上有一个先前的 Windows Installer 事务处于挂起状态。请先继续或回滚该安装（或重启 Windows），再清理缓存。 |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows 已排队一项将在下次重启时执行的文件重命名操作，会影响安装程序缓存。请先重启 Windows，再进行清理。 |
@@ -139,8 +141,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | 全部干净 |
 | Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer 中没有需要清理的内容 |
 | Scanned {0} {1} in {2} | 扫描了 {0} 个{1}，用时 {2} |
-| Copy them back if anything breaks ([it won't!]) | 万一出了什么问题，把它们复制回原处（[不会的！]） |
-| Until then, you can restore them if anything breaks ([it won't!]) | 在那之前，万一出了什么问题，您可以把它们还原（[不会的！]） |
+| Copy them back if anything breaks ([it won't!]). | 万一出了什么问题，把它们复制回原处（[不会的！]）。 |
+| Until then, you can restore them if anything breaks ([it won't!]). | 在那之前，万一出了什么问题，您可以把它们还原（[不会的！]）。 |
 | Empty it to actually reclaim the space. | 清空回收站才能真正释放空间。 |
 | {0} freed | 已释放 {0} |
 | {0} cleaned up | 已清理 {0} |
@@ -148,10 +150,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved, some files could not be processed | 已移动 {0}，部分文件无法处理 |
 | {0} freed, some files could not be processed | 已释放 {0}，部分文件无法处理 |
 | {0} cleaned up, some files could not be processed | 已清理 {0}，部分文件无法处理 |
-| {0} {1} moved to {2} | 已将 {0} 个{1}移动到 {2} |
-| {0} {1} moved to {2} | 已将 {0} 个{1}移动到 {2} |
-| {0} {1} moved to {2}. {3} {4} | 已将 {0} 个{1}移动到 {2}。{3} 个{4} |
-| {0} {1} moved to {2}. {3} {4} | 已将 {0} 个{1}移动到 {2}。{3} 个{4} |
+| {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
+| {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
+| {0} {1} moved to: {2}. {3} {4} | 已将 {0} 个{1}移动到：{2}。{3} 个{4} |
+| {0} {1} moved to: {2}. {3} {4} | 已将 {0} 个{1}移动到：{2}。{3} 个{4} |
 | {0} {1} moved to the Recycle Bin | 已将 {0} 个{1}移到回收站 |
 | {0} {1} moved to the Recycle Bin | 已将 {0} 个{1}移到回收站 |
 | {0} {1} moved to the Recycle Bin. {2} {3} | 已将 {0} 个{1}移到回收站。{2} 个{3} |
@@ -195,21 +197,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | Move {0} {1} ({2})? | 移动 {0} 个{1}（{2}）？ |
-| Files will be moved to {0}. | 文件将被移动到 {0}。 |
+| Files will be moved to: | 文件将被移动到： |
 | Delete {0} {1} ({2})? | 删除 {0} 个{1}（{2}）？ |
 | Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | 文件将被移到回收站。如果您想要备份副本，请改用“移动”按钮。 |
+| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. |
 
 ## Error messages
 
 | English | 简体中文 |
 | --- | --- |
-| Administrator rights required | 需要管理员权限 |
-| InstallerClean requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | InstallerClean 需要管理员权限。<br><br>请右键单击并选择“以管理员身份运行”。 |
+| Access denied | Access denied |
+| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. |
 | Installer database unavailable | 安装程序数据库不可用 |
 | Scan failed | 扫描失败 |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Windows Installer 数据库似乎为空或无法访问。即便在全新安装的 Windows 上这也很不寻常，通常意味着数据库已损坏，或被某个第三方工具清空了。在提权的命令提示符中运行“sfc /scannow”通常可以修复它。 |
-| Access denied enumerating installed products. Run as administrator. | 枚举已安装产品时访问被拒绝。请以管理员身份运行。 |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | 在连续 {0} 次失败后，Windows Installer 拒绝列出产品（最后的错误代码为 {1}）。请尝试重启 Windows，或在提权的命令提示符中运行“sfc /scannow”。 |
+| Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | 在连续 {0} 次失败后，Windows Installer 拒绝列出某个产品的补丁（最后的错误代码为 {1}）。请尝试重启 Windows，或在提权的命令提示符中运行“sfc /scannow”。 |
 | Invalid destination | 目标无效 |
 | Could not write to destination | 无法写入目标 |
 | Move failed | 移动失败 |
@@ -235,8 +239,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | 此文件正被另一个程序打开或锁定（错误 {0}）。请关闭那个程序，或任何正在扫描它的程序，然后重试，或改用“移动”按钮。 |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | 由于无法将该文件移到回收站，它已被永久删除。 |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | 拒绝将文件移动到 Windows Installer 文件夹（目标：{0}）。 |
-| Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | 目标必须是完全限定的路径（相对路径会相对于进程的当前目录解析，在提权运行时不安全）：{0} |
-| Destination folder canonical path changed mid-batch: {0} | 目标文件夹的规范路径在批处理过程中发生了变化：{0} |
+| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
+| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
 | Cannot write to {0}. | 无法写入 {0}。 |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | 尝试 10,000 次后仍无法为“{0}”找到唯一的文件名。 |
 
@@ -260,8 +264,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | Couldn't open your browser | 无法打开您的浏览器 |
-| The link couldn't be opened in your normal-user browser. The URL has been copied to your clipboard so you can open it manually:<br><br>{0} | 无法在您的普通用户浏览器中打开该链接。网址已复制到您的剪贴板，您可以手动打开：<br><br>{0} |
-| The link couldn't be opened in your normal-user browser, and copying it to the clipboard also failed. The URL is:<br><br>{0} | 无法在您的普通用户浏览器中打开该链接，复制到剪贴板也失败了。网址为：<br><br>{0} |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} |
 
 ## Sending the summary
 
@@ -271,8 +275,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Thanks! Report sent. | 谢谢！报告已发送。 |
 | Sending failed. Try again later. | 发送失败。请稍后重试。 |
 | No report to send. | 没有可发送的报告。 |
-| Send this to No Faff? | 把这个发送给 No Faff 吗？ |
-| Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | 没有任何内容能识别您或您的机器；它只是让我知道 InstallerClean 是否正常工作，以及大家释放了多少空间。它会发送到 nofaff.netlify.app/api/result-log。 |
+| Send this? | 把这个发送吗？ |
+| It goes to nofaff.netlify.app/api/result-log. Nothing identifies you or your machine; it just lets me know InstallerClean's working and [how much space people are freeing]. | 它会发送到 nofaff.netlify.app/api/result-log。没有任何内容能识别您或您的机器；它只是让我知道 InstallerClean 是否正常工作，以及[大家释放了多少空间]。 |
 
 ## Startup and crashes
 
@@ -292,7 +296,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 简体中文 |
 | --- | --- |
-| If it helped, buy me a cup of tea. | 如果它帮到了您，请我喝杯茶。 |
+| Donate | 捐赠 |
 | It's thirsty work! | 该来杯茶了！ |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | 已请求取消。InstallerClean 正在等待当前步骤到达一个可以停下来的位置。在大量 I/O 操作或 MSI 数据库调用期间，这可能需要几秒钟。 |
 | Close | 关闭 |
@@ -311,7 +315,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 简体中文 |
 | --- | --- |
-| Buy me a cup of tea | 请我喝杯茶 |
+| Donate | 捐赠 |
 | Buy me a cuppa (About window) | 请我喝杯茶（关于窗口） |
 | Cancel operation | 取消操作 |
 | Cancel scan | 取消扫描 |
@@ -431,12 +435,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | 注意：事件日志写入失败。请检查应用程序日志的权限或组策略。 |
 | InstallerClean - clean up C:\Windows\Installer | InstallerClean - 清理 C:\Windows\Installer |
 | Usage: | 用法： |
-|   installerclean-cli --help   Show this help (also accepts /?, -h) |   installerclean-cli --help     显示此帮助（也接受 /?、-h） |
+|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     显示此帮助（也接受 /?、-h） |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  显示版本号（也接受 -v） |
-|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s         仅扫描 - 列出不需要的文件 |
-|   installerclean-cli /d       Delete removable files (Recycle Bin) |   installerclean-cli /d         删除不需要的文件（回收站） |
-|   installerclean-cli /m       Move to saved default location |   installerclean-cli /m         移动到已保存的默认位置 |
-|   installerclean-cli /m PATH  Move to specified path |   installerclean-cli /m 路径    移动到指定路径 |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         仅扫描 - 列出不需要的文件 |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         删除不需要的文件（回收站） |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         移动到已保存的默认位置 |
+|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m 路径      移动到指定路径 |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli 是一个真正的控制台进程，在运行结束前会一直 |
 | until it finishes; redirect or pipe its output as you would any | 占用命令提示符；可像对待其他控制台程序那样重定向或通过管道处理其输出。 |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | GUI 就位于同目录下的 InstallerClean.exe 中。 |

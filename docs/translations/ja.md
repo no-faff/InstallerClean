@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed ({0}). The crash log could not be written. | 移動に失敗しました ({0})。クラッシュログを書き込めませんでした。 |
 | Delete failed ({0}). Details in {1}. | 削除に失敗しました ({0})。詳細は{1}をご覧ください。 |
 | Delete failed ({0}). The crash log could not be written. | 削除に失敗しました ({0})。クラッシュログを書き込めませんでした。 |
-| Access denied. Run as administrator. | アクセスが拒否されました。管理者として実行してください。 |
+| Access denied. Windows refused the scan. | Access denied. Windows refused the scan. |
 | Scan failed: installer database unavailable. | スキャンに失敗しました：インストーラーデータベースが利用できません。 |
 | Scan cancelled. | スキャンがキャンセルされました。 |
 | Ready | 準備完了 |
@@ -113,7 +113,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | The unneeded files below are safe to delete. | 以下の不要ファイルは削除しても安全です。 |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | これらのファイルはC:\Windows\Installerにあり、プログラムがアンインストールされたとき ({0})、新しいパッチが置き換えたとき ({1})、または公開元が撤回したとき ({2})に取り残されます。InstallerClean は、Windows 自身が不要と報告したファイルのみをリストアップします。 |
-| Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy. | ごみ箱に削除するか、コピーを保持したい場合は先に別の場所に移動してください。 |
+| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | ごみ箱に削除するか、コピーを保持したい場合は代わりに「移動」を使用してください。 |
+| Nothing scanned yet. | Nothing scanned yet. |
+| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | 現在 Windows Installer を使用しているものがあります。通常は Windows Update またはバックグラウンドでインストール中のプログラムです。その実行中は移動と削除が一時停止され、InstallerClean は変更中のインストーラーキャッシュに触れません。完了したら、再スキャンすると復元されます。 |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | このマシンで以前の Windows Installer トランザクションが中断されています。キャッシュをクリーンアップする前に、そのインストールを再開またはロールバックするか (または Windows を再起動してください)。 |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows はインストーラーキャッシュに影響するファイル名の変更を次の再起動のためにキューに入れています。クリーンアップする前に Windows を再起動してください。 |
@@ -139,8 +141,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | すべてクリーン |
 | Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer にクリーンアップするものはありません |
 | Scanned {0} {1} in {2} | {0} 個の {1} を {2} でスキャンしました |
-| Copy them back if anything breaks ([it won't!]) | 何かが動作しなくなったらコピーを戻してください ([そんなことはありませんが！]) |
-| Until then, you can restore them if anything breaks ([it won't!]) | それまでは、何かが動作しなくなったら復元できます ([そんなことはありませんが！]) |
+| Copy them back if anything breaks ([it won't!]). | 何かが動作しなくなったらコピーを戻してください ([そんなことはありませんが！])。 |
+| Until then, you can restore them if anything breaks ([it won't!]). | それまでは、何かが動作しなくなったら復元できます ([そんなことはありませんが！])。 |
 | Empty it to actually reclaim the space. | ごみ箱を空にすると、実際に空き容量が増えます。 |
 | {0} freed | {0} 解放 |
 | {0} cleaned up | {0} クリーンアップ |
@@ -148,10 +150,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved, some files could not be processed | {0} 移動、一部のファイルは処理できませんでした |
 | {0} freed, some files could not be processed | {0} 解放、一部のファイルは処理できませんでした |
 | {0} cleaned up, some files could not be processed | {0} クリーンアップ、一部のファイルは処理できませんでした |
-| {0} {1} moved to {2} | {0} 個の {1} を {2} に移動しました |
-| {0} {1} moved to {2} | {0} 個の {1} を {2} に移動しました |
-| {0} {1} moved to {2}. {3} {4} | {0} 個の {1} を {2} に移動しました。{3} 個の {4} |
-| {0} {1} moved to {2}. {3} {4} | {0} 個の {1} を {2} に移動しました。{3} 個の {4} |
+| {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
+| {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
+| {0} {1} moved to: {2}. {3} {4} | {0} 個の {1} を次の場所に移動しました：{2}。{3} 個の {4} |
+| {0} {1} moved to: {2}. {3} {4} | {0} 個の {1} を次の場所に移動しました：{2}。{3} 個の {4} |
 | {0} {1} moved to the Recycle Bin | {0} 個の {1} をごみ箱に移動しました |
 | {0} {1} moved to the Recycle Bin | {0} 個の {1} をごみ箱に移動しました |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {0} 個の {1} をごみ箱に移動しました。{2} 個の {3} |
@@ -195,21 +197,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | Move {0} {1} ({2})? | {0} 個の {1} ({2})を移動しますか？ |
-| Files will be moved to {0}. | ファイルは {0} に移動されます。 |
+| Files will be moved to: | ファイルは次の場所に移動されます： |
 | Delete {0} {1} ({2})? | {0} 個の {1} ({2})を削除しますか？ |
 | Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | ファイルはごみ箱に移動されます。バックアップコピーが必要な場合は、代わりに「移動」ボタンを使用してください。 |
+| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. |
 
 ## Error messages
 
 | English | 日本語 |
 | --- | --- |
-| Administrator rights required | 管理者権限が必要です |
-| InstallerClean requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | InstallerCleanには管理者権限が必要です。<br><br>右クリックして「管理者として実行」を選択してください。 |
+| Access denied | Access denied |
+| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. |
 | Installer database unavailable | インストーラーデータベースが利用できません |
 | Scan failed | スキャンに失敗しました |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Windows Installer データベースが空であるか、アクセスできないようです。これは新しい Windows インストールでも異常であり、通常はデータベースが破損しているか、サードパーティツールが消去したことを意味します。昇格したプロンプトで'sfc /scannow'を実行すると、通常は修復されます。 |
-| Access denied enumerating installed products. Run as administrator. | インストール済み製品の列挙中にアクセスが拒否されました。管理者として実行してください。 |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installerは、{0} 回の連続失敗の後も製品の一覧表示を拒否しました (最後のエラーコード{1})。Windows を再起動するか、昇格したプロンプトで'sfc /scannow'を実行してみてください。 |
+| Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installerは、{0} 回の連続失敗の後も製品のパッチの一覧表示を拒否しました (最後のエラーコード{1})。Windows を再起動するか、昇格したプロンプトで'sfc /scannow'を実行してみてください。 |
 | Invalid destination | 無効な移動先 |
 | Could not write to destination | 移動先に書き込めませんでした |
 | Move failed | 移動に失敗しました |
@@ -235,8 +239,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | このファイルは別のプログラムによって開かれているかロックされています (エラー{0})。そのプログラムまたはスキャンしているものを閉じてから再試行するか、代わりに「移動」ボタンを使用してください。 |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | ごみ箱に移動できなかったため、ファイルは完全に削除されました。 |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Windows Installerフォルダー内へのファイル移動を拒否します (移動先：{0})。 |
-| Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | 移動先は完全修飾パスである必要があります (相対パスはプロセスのカレントディレクトリに対して解決され、昇格時には安全ではありません)：{0} |
-| Destination folder canonical path changed mid-batch: {0} | バッチ処理中に移動先フォルダーの正規パスが変更されました：{0} |
+| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
+| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
 | Cannot write to {0}. | {0} に書き込めません。 |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | 10,000回の試行後も'{0}'の一意のファイル名が見つかりませんでした。 |
 
@@ -260,8 +264,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | Couldn't open your browser | ブラウザを開けませんでした |
-| The link couldn't be opened in your normal-user browser. The URL has been copied to your clipboard so you can open it manually:<br><br>{0} | リンクを通常ユーザーのブラウザで開けませんでした。URL はクリップボードにコピーされたので、手動で開くことができます：<br><br>{0} |
-| The link couldn't be opened in your normal-user browser, and copying it to the clipboard also failed. The URL is:<br><br>{0} | リンクを通常ユーザーのブラウザで開けず、クリップボードへのコピーも失敗しました。URL は次のとおりです：<br><br>{0} |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} |
 
 ## Sending the summary
 
@@ -271,8 +275,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Thanks! Report sent. | ありがとうございます！レポートを送信しました。 |
 | Sending failed. Try again later. | 送信に失敗しました。後でもう一度試してください。 |
 | No report to send. | 送信するレポートがありません。 |
-| Send this to No Faff? | これを No Faff に送信しますか？ |
-| Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | あなたやあなたのマシンを特定するものは何もありません。InstallerClean が動作していることと、どれだけの容量が解放されているかを知るためのものです。送信先は nofaff.netlify.app/api/result-log です。 |
+| Send this? | これを送信しますか？ |
+| It goes to nofaff.netlify.app/api/result-log. Nothing identifies you or your machine; it just lets me know InstallerClean's working and [how much space people are freeing]. | 送信先は nofaff.netlify.app/api/result-log です。あなたやあなたのマシンを特定するものは何もありません。InstallerClean が動作していることと、[どれだけの容量が解放されているか]を知るためのものです。 |
 
 ## Startup and crashes
 
@@ -292,7 +296,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 日本語 |
 | --- | --- |
-| If it helped, buy me a cup of tea. | 役に立ったら、コーヒーを一杯ご馳走してください。 |
+| Donate | 寄付 |
 | It's thirsty work! | 喉が渇く仕事です！ |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | キャンセルが要求されました。InstallerClean は現在のステップが停止可能なポイントに達するのを待っています。大量の I/O または MSI データベース呼び出し中は数秒かかることがあります。 |
 | Close | 閉じる |
@@ -311,7 +315,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 日本語 |
 | --- | --- |
-| Buy me a cup of tea | コーヒーを一杯おごる |
+| Donate | 寄付 |
 | Buy me a cuppa (About window) | 一杯おごる (バージョン情報ウィンドウ) |
 | Cancel operation | 操作をキャンセル |
 | Cancel scan | スキャンをキャンセル |
@@ -431,12 +435,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | 注意：イベントログの書き込みに失敗しました。Application チャネルのアクセス許可またはグループポリシーを確認してください。 |
 | InstallerClean - clean up C:\Windows\Installer | InstallerClean - C:\Windows\Installer をクリーンアップ |
 | Usage: | 使用方法： |
-|   installerclean-cli --help   Show this help (also accepts /?, -h) |   installerclean-cli --help   このヘルプを表示 (/?、-hも受け付けます) |
+|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     このヘルプを表示 (/?、-hも受け付けます) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  バージョンを表示 (-vも受け付けます) |
-|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s       スキャンのみ - 削除可能なファイルを一覧表示 |
-|   installerclean-cli /d       Delete removable files (Recycle Bin) |   installerclean-cli /d       削除可能なファイルを削除 (ごみ箱) |
-|   installerclean-cli /m       Move to saved default location |   installerclean-cli /m       保存されたデフォルトの場所に移動 |
-|   installerclean-cli /m PATH  Move to specified path |   installerclean-cli /m PATH  指定されたパスに移動 |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         スキャンのみ - 削除可能なファイルを一覧表示 |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         削除可能なファイルを削除 (ごみ箱) |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         保存されたデフォルトの場所に移動 |
+|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PATH    指定されたパスに移動 |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cliは実際のコンソールプロセスであり、完了するまで |
 | until it finishes; redirect or pipe its output as you would any | プロンプトをブロックします。他のコンソール exe と同様に、出力をリダイレクト |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | またはパイプできます。GUI は同じ場所にある InstallerClean.exe にあります。 |

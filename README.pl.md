@@ -242,7 +242,7 @@ Spośród 124 raportów, które nadesłano (dziękuję 🙏) od czasu, gdy opcj�
 <details>
 <summary>Te raporty pochodzą z opcjonalnego przycisku „Wyślij raport”. Oto co zobaczysz, zanim cokolwiek zostanie wysłane.</summary>
 
-![Okno potwierdzenia zatytułowane „Send this to No Faff?” pokazujące pełny raport, który zostałby wysłany: wersja aplikacji, wersja Windows, liczniki skanowania, przetworzone pliki i zwolnione bajty, bez ścieżek plików, nazw czy identyfikatorów maszyny, z informacją, że nic nie identyfikuje ciebie ani twojej maszyny, a jedynie to, czy aplikacja zadziałała i ile miejsca zwolniono, z przyciskami Anuluj i Wyślij.](docs/screenshots/pl/optional-send-report-confirmation-dialogue.webp)
+![Okno potwierdzenia zatytułowane „Wysłać to?” pokazujące pełny raport, który zostałby wysłany: wersja aplikacji, wersja Windows, liczniki skanowania, przetworzone pliki i zwolnione bajty, bez ścieżek plików, nazw czy identyfikatorów maszyny, z informacją, że nic nie identyfikuje ciebie ani twojej maszyny, a jedynie to, czy aplikacja zadziałała i ile miejsca zwolniono, z przyciskami Anuluj i Wyślij.](docs/screenshots/pl/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

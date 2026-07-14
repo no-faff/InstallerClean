@@ -242,7 +242,7 @@ Sur les 124 rapports que des utilisateurs nous ont gentiment envoyés (merci �
 <details>
 <summary>Ces rapports proviennent du bouton facultatif « Envoyer le rapport ». Voici ce que vous verrez avant que quoi que ce soit ne soit envoyé.</summary>
 
-![Boîte de dialogue de confirmation intitulée « Send this to No Faff? », montrant l'intégralité du rapport qui serait envoyé : version de l'application, version de Windows, compteurs d'analyse, fichiers traités et octets libérés, sans aucun chemin de fichier, nom ou identifiant de machine, et une note précisant que rien ne vous identifie, vous ou votre machine, seulement si l'application a fonctionné et combien d'espace a été libéré, avec les boutons Annuler et Envoyer.](docs/screenshots/fr/optional-send-report-confirmation-dialogue.webp)
+![Boîte de dialogue de confirmation intitulée « Envoyer ceci ? », montrant l'intégralité du rapport qui serait envoyé : version de l'application, version de Windows, compteurs d'analyse, fichiers traités et octets libérés, sans aucun chemin de fichier, nom ou identifiant de machine, et une note précisant que rien ne vous identifie, vous ou votre machine, seulement si l'application a fonctionné et combien d'espace a été libéré, avec les boutons Annuler et Envoyer.](docs/screenshots/fr/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

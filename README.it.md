@@ -242,7 +242,7 @@ Su 124 report che mi sono stati inviati (grazie 🙏) da quando la v1.8.0 ha agg
 <details>
 <summary>Quei report arrivano dal pulsante opzionale «Invia rapporto». Ecco cosa vedrai prima che venga inviato qualcosa.</summary>
 
-![Finestra di conferma intitolata «Vuoi inviare questo a No Faff?» che mostra il report completo che verrebbe inviato: versione dell'app, versione di Windows, conteggi della scansione, file elaborati e byte liberati, senza percorsi di file, nomi o identificatori del computer, e con una nota che niente identifica te o il tuo computer, solo se l'app ha funzionato e quanto spazio è stato liberato, con i pulsanti Annulla e Invia.](docs/screenshots/it/optional-send-report-confirmation-dialogue.webp)
+![Finestra di conferma intitolata «Vuoi inviare questo?» che mostra il report completo che verrebbe inviato: versione dell'app, versione di Windows, conteggi della scansione, file elaborati e byte liberati, senza percorsi di file, nomi o identificatori del computer, e con una nota che niente identifica te o il tuo computer, solo se l'app ha funzionato e quanto spazio è stato liberato, con i pulsanti Annulla e Invia.](docs/screenshots/it/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed ({0}). The crash log could not be written. | Chuyển thất bại ({0}). Không thể ghi nhật ký sự cố. |
 | Delete failed ({0}). Details in {1}. | Xóa thất bại ({0}). Chi tiết trong {1}. |
 | Delete failed ({0}). The crash log could not be written. | Xóa thất bại ({0}). Không thể ghi nhật ký sự cố. |
-| Access denied. Run as administrator. | Truy cập bị từ chối. Hãy chạy với quyền quản trị viên. |
+| Access denied. Windows refused the scan. | Access denied. Windows refused the scan. |
 | Scan failed: installer database unavailable. | Quét thất bại: cơ sở dữ liệu trình cài đặt không khả dụng. |
 | Scan cancelled. | Đã hủy quét. |
 | Ready | Sẵn sàng |
@@ -113,7 +113,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | The unneeded files below are safe to delete. | Các tệp không cần thiết bên dưới có thể xóa an toàn. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Chúng nằm trong C:\Windows\Installer, còn sót lại khi một chương trình bị gỡ cài đặt ({0}), khi một bản vá mới hơn thay thế một bản ({1}) hoặc khi nhà phát hành thu hồi nó ({2}). InstallerClean chỉ liệt kê những tệp mà chính Windows báo là đã dùng xong. |
-| Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy. | Xóa chúng vào Thùng rác, hoặc Chuyển chúng đi nơi khác trước nếu bạn muốn giữ một bản sao. |
+| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Xóa chúng vào Thùng rác, hoặc dùng Chuyển thay vào đó nếu bạn muốn giữ một bản sao. |
+| Nothing scanned yet. | Nothing scanned yet. |
+| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Có thứ gì đó đang dùng Windows Installer ngay lúc này, thường là Windows Update hoặc một chương trình đang cài đặt ở chế độ nền. Chuyển và Xóa được tạm dừng trong khi việc đó chạy, nên InstallerClean sẽ không đụng tới bộ nhớ đệm trình cài đặt khi nó đang thay đổi. Khi việc đó xong, hãy Quét lại và chúng sẽ quay lại. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Một giao dịch Windows Installer trước đó đang bị tạm dừng trên máy này. Hãy tiếp tục hoặc hoàn tác lần cài đặt đó (hoặc khởi động lại Windows) trước khi dọn bộ nhớ đệm. |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows có một thao tác đổi tên tệp được xếp hàng cho lần khởi động lại tới, ảnh hưởng tới bộ nhớ đệm Installer. Hãy khởi động lại Windows trước khi dọn. |
@@ -139,8 +141,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Đã sạch |
 | Nothing to clean up in C:\Windows\Installer | Không còn gì để dọn trong C:\Windows\Installer |
 | Scanned {0} {1} in {2} | Đã quét {0} {1} trong {2} |
-| Copy them back if anything breaks ([it won't!]) | Sao chép chúng trở lại nếu có gì trục trặc ([sẽ không đâu!]) |
-| Until then, you can restore them if anything breaks ([it won't!]) | Cho đến lúc đó, bạn có thể khôi phục chúng nếu có gì trục trặc ([sẽ không đâu!]) |
+| Copy them back if anything breaks ([it won't!]). | Sao chép chúng trở lại nếu có gì trục trặc ([sẽ không đâu!]). |
+| Until then, you can restore them if anything breaks ([it won't!]). | Cho đến lúc đó, bạn có thể khôi phục chúng nếu có gì trục trặc ([sẽ không đâu!]). |
 | Empty it to actually reclaim the space. | Dọn sạch Thùng rác để thực sự lấy lại dung lượng. |
 | {0} freed | Đã giải phóng {0} |
 | {0} cleaned up | Đã dọn {0} |
@@ -148,10 +150,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved, some files could not be processed | Đã chuyển {0}, một số tệp không thể xử lý |
 | {0} freed, some files could not be processed | Đã giải phóng {0}, một số tệp không thể xử lý |
 | {0} cleaned up, some files could not be processed | Đã dọn {0}, một số tệp không thể xử lý |
-| {0} {1} moved to {2} | Đã chuyển {0} {1} tới {2} |
-| {0} {1} moved to {2} | Đã chuyển {0} {1} tới {2} |
-| {0} {1} moved to {2}. {3} {4} | Đã chuyển {0} {1} tới {2}. {3} {4} |
-| {0} {1} moved to {2}. {3} {4} | Đã chuyển {0} {1} tới {2}. {3} {4} |
+| {0} {1} moved to: {2} | Đã chuyển {0} {1} tới: {2} |
+| {0} {1} moved to: {2} | Đã chuyển {0} {1} tới: {2} |
+| {0} {1} moved to: {2}. {3} {4} | Đã chuyển {0} {1} tới: {2}. {3} {4} |
+| {0} {1} moved to: {2}. {3} {4} | Đã chuyển {0} {1} tới: {2}. {3} {4} |
 | {0} {1} moved to the Recycle Bin | Đã di chuyển {0} {1} vào Thùng rác |
 | {0} {1} moved to the Recycle Bin | Đã di chuyển {0} {1} vào Thùng rác |
 | {0} {1} moved to the Recycle Bin. {2} {3} | Đã di chuyển {0} {1} vào Thùng rác. {2} {3} |
@@ -195,21 +197,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Tiếng Việt |
 | --- | --- |
 | Move {0} {1} ({2})? | Chuyển {0} {1} ({2})? |
-| Files will be moved to {0}. | Các tệp sẽ được chuyển tới {0}. |
+| Files will be moved to: | Các tệp sẽ được chuyển tới: |
 | Delete {0} {1} ({2})? | Xóa {0} {1} ({2})? |
 | Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Các tệp sẽ được di chuyển vào Thùng rác. Nếu bạn muốn có bản sao lưu, hãy dùng nút Chuyển thay vào đó. |
+| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. |
 
 ## Error messages
 
 | English | Tiếng Việt |
 | --- | --- |
-| Administrator rights required | Cần quyền quản trị viên |
-| InstallerClean requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | InstallerClean cần quyền quản trị viên.<br><br>Hãy nhấp chuột phải và chọn 'Chạy với tư cách quản trị viên'. |
+| Access denied | Access denied |
+| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. |
 | Installer database unavailable | Cơ sở dữ liệu trình cài đặt không khả dụng |
 | Scan failed | Quét thất bại |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Cơ sở dữ liệu Windows Installer có vẻ trống hoặc không truy cập được. Điều này bất thường ngay cả trên một bản Windows mới cài và thường có nghĩa là cơ sở dữ liệu bị hỏng hoặc một công cụ của bên thứ ba đã xóa nó. Chạy 'sfc /scannow' từ một dấu nhắc có quyền nâng cao thường sửa được. |
-| Access denied enumerating installed products. Run as administrator. | Truy cập bị từ chối khi liệt kê các sản phẩm đã cài. Hãy chạy với quyền quản trị viên. |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer từ chối liệt kê sản phẩm sau {0} lần thất bại liên tiếp (mã lỗi cuối {1}). Hãy thử khởi động lại Windows, hoặc chạy 'sfc /scannow' từ một dấu nhắc có quyền nâng cao. |
+| Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer từ chối liệt kê các bản vá của một sản phẩm sau {0} lần thất bại liên tiếp (mã lỗi cuối {1}). Hãy thử khởi động lại Windows, hoặc chạy 'sfc /scannow' từ một dấu nhắc có quyền nâng cao. |
 | Invalid destination | Đích không hợp lệ |
 | Could not write to destination | Không thể ghi vào đích |
 | Move failed | Chuyển thất bại |
@@ -235,8 +239,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Tệp này đang được mở hoặc bị khóa bởi một chương trình khác (lỗi {0}). Hãy đóng chương trình đó, hoặc thứ gì đang quét nó, rồi thử lại, hoặc dùng nút Chuyển thay vào đó. |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | Tệp đã bị xóa vĩnh viễn vì không thể di chuyển vào Thùng rác. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Từ chối chuyển tệp vào thư mục Windows Installer (đích: {0}). |
-| Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | Đích phải là một đường dẫn đầy đủ (đường dẫn tương đối được phân giải theo thư mục hiện tại của tiến trình và không an toàn khi chạy nâng quyền): {0} |
-| Destination folder canonical path changed mid-batch: {0} | Đường dẫn chuẩn của thư mục đích đã thay đổi giữa chừng: {0} |
+| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
+| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
 | Cannot write to {0}. | Không thể ghi vào {0}. |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | Không tìm được tên tệp duy nhất cho '{0}' sau 10.000 lần thử. |
 
@@ -260,8 +264,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Tiếng Việt |
 | --- | --- |
 | Couldn't open your browser | Không thể mở trình duyệt của bạn |
-| The link couldn't be opened in your normal-user browser. The URL has been copied to your clipboard so you can open it manually:<br><br>{0} | Không thể mở liên kết trong trình duyệt người dùng thường của bạn. URL đã được chép vào bộ nhớ tạm để bạn mở thủ công:<br><br>{0} |
-| The link couldn't be opened in your normal-user browser, and copying it to the clipboard also failed. The URL is:<br><br>{0} | Không thể mở liên kết trong trình duyệt người dùng thường của bạn, và việc chép nó vào bộ nhớ tạm cũng thất bại. URL là:<br><br>{0} |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} |
 
 ## Sending the summary
 
@@ -271,8 +275,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Thanks! Report sent. | Cảm ơn! Đã gửi báo cáo. |
 | Sending failed. Try again later. | Gửi thất bại. Hãy thử lại sau. |
 | No report to send. | Không có báo cáo để gửi. |
-| Send this to No Faff? | Gửi cái này tới No Faff? |
-| Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | Không có gì nhận dạng bạn hay máy của bạn; nó chỉ cho tôi biết InstallerClean có hoạt động không và mọi người đang giải phóng được bao nhiêu dung lượng. Nó được gửi tới nofaff.netlify.app/api/result-log. |
+| Send this? | Gửi cái này? |
+| It goes to nofaff.netlify.app/api/result-log. Nothing identifies you or your machine; it just lets me know InstallerClean's working and [how much space people are freeing]. | Nó được gửi tới nofaff.netlify.app/api/result-log. Không có gì nhận dạng bạn hay máy của bạn; nó chỉ cho tôi biết InstallerClean có hoạt động không và [mọi người đang giải phóng được bao nhiêu dung lượng]. |
 
 ## Startup and crashes
 
@@ -292,7 +296,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Tiếng Việt |
 | --- | --- |
-| If it helped, buy me a cup of tea. | Nếu thấy hữu ích, hãy mời tôi một ly cà phê. |
+| Donate | Ủng hộ |
 | It's thirsty work! | Làm việc này khát nước lắm! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Đã yêu cầu hủy. InstallerClean đang chờ bước hiện tại tới điểm dừng. Việc này có thể mất vài giây khi I/O nặng hoặc khi đang gọi cơ sở dữ liệu MSI. |
 | Close | Đóng |
@@ -311,7 +315,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Tiếng Việt |
 | --- | --- |
-| Buy me a cup of tea | Mời tôi một ly cà phê |
+| Donate | Ủng hộ |
 | Buy me a cuppa (About window) | Mời tôi một ly cà phê (cửa sổ Giới thiệu) |
 | Cancel operation | Hủy thao tác |
 | Cancel scan | Hủy quét |
@@ -431,12 +435,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Lưu ý: ghi vào Nhật ký sự kiện thất bại. Hãy kiểm tra quyền của nhật ký Ứng dụng hoặc Chính sách nhóm. |
 | InstallerClean - clean up C:\Windows\Installer | InstallerClean - dọn dẹp C:\Windows\Installer |
 | Usage: | Cách dùng: |
-|   installerclean-cli --help   Show this help (also accepts /?, -h) |   installerclean-cli --help        Hiển thị trợ giúp này (cũng nhận /?, -h) |
+|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help        Hiển thị trợ giúp này (cũng nhận /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version     In ra phiên bản (cũng nhận -v) |
-|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s            Chỉ quét - liệt kê các tệp không cần thiết |
-|   installerclean-cli /d       Delete removable files (Recycle Bin) |   installerclean-cli /d            Xóa các tệp không cần thiết (Thùng rác) |
-|   installerclean-cli /m       Move to saved default location |   installerclean-cli /m            Chuyển tới vị trí mặc định đã lưu |
-|   installerclean-cli /m PATH  Move to specified path |   installerclean-cli /m ĐƯỜNG_DẪN  Chuyển tới đường dẫn được chỉ định |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s            Chỉ quét - liệt kê các tệp không cần thiết |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d            Xóa các tệp không cần thiết (Thùng rác) |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m            Chuyển tới vị trí mặc định đã lưu |
+|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m ĐƯỜNG_DẪN  Chuyển tới đường dẫn được chỉ định |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli là một tiến trình console thật và chặn dấu nhắc |
 | until it finishes; redirect or pipe its output as you would any | cho đến khi xong; hãy chuyển hướng hoặc nối ống đầu ra của nó như |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | với mọi tệp console khác. GUI nằm trong InstallerClean.exe cùng chỗ. |

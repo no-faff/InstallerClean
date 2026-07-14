@@ -242,7 +242,7 @@ Dari 124 laporan yang dikirimkan orang-orang (terima kasih 🙏) sejak opsi ini 
 <details>
 <summary>Laporan itu berasal dari tombol opsional "Kirim laporan". Inilah yang akan Anda lihat sebelum apa pun dikirim.</summary>
 
-![Dialog konfirmasi berjudul "Send this to No Faff?" yang menampilkan laporan lengkap yang akan dikirim: versi aplikasi, versi Windows, jumlah hasil pemindaian, file yang diproses dan byte yang dikosongkan, tanpa jalur file, nama, atau ID mesin, disertai catatan bahwa tidak ada yang mengidentifikasi Anda atau mesin Anda, hanya apakah aplikasi berfungsi dan berapa banyak ruang yang dikosongkan, dengan tombol Batal dan Kirim.](docs/screenshots/id/optional-send-report-confirmation-dialogue.webp)
+![Dialog konfirmasi berjudul "Kirim ini?" yang menampilkan laporan lengkap yang akan dikirim: versi aplikasi, versi Windows, jumlah hasil pemindaian, file yang diproses dan byte yang dikosongkan, tanpa jalur file, nama, atau ID mesin, disertai catatan bahwa tidak ada yang mengidentifikasi Anda atau mesin Anda, hanya apakah aplikasi berfungsi dan berapa banyak ruang yang dikosongkan, dengan tombol Batal dan Kirim.](docs/screenshots/id/optional-send-report-confirmation-dialogue.webp)
 
 </details>
 

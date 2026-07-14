@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed ({0}). The crash log could not be written. | Échec du déplacement ({0}). Le crash.log n'a pas pu être écrit. |
 | Delete failed ({0}). Details in {1}. | Échec de la suppression ({0}). Détails dans {1}. |
 | Delete failed ({0}). The crash log could not be written. | Échec de la suppression ({0}). Le crash.log n'a pas pu être écrit. |
-| Access denied. Run as administrator. | Accès refusé. Exécutez en tant qu'administrateur. |
+| Access denied. Windows refused the scan. | Access denied. Windows refused the scan. |
 | Scan failed: installer database unavailable. | Échec de l'analyse : base de données Windows Installer indisponible. |
 | Scan cancelled. | Analyse annulée. |
 | Ready | Prêt |
@@ -113,7 +113,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | The unneeded files below are safe to delete. | Les fichiers inutiles ci-dessous peuvent être supprimés sans risque. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Ils se trouvent dans C:\Windows\Installer, laissés là quand un programme a été désinstallé ({0}), qu'un correctif plus récent en a remplacé un ({1}) ou que l'éditeur l'a retiré ({2}). InstallerClean ne liste jamais que les fichiers dont Windows lui-même déclare avoir fini de se servir. |
-| Delete them to the Recycle Bin, or Move them elsewhere first if you'd rather keep a copy. | Supprimez-les vers la Corbeille, ou Déplacez-les ailleurs d'abord si vous préférez en garder une copie. |
+| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Supprimez-les vers la Corbeille, ou utilisez plutôt Déplacer si vous préférez en garder une copie. |
+| Nothing scanned yet. | Nothing scanned yet. |
+| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Quelque chose utilise Windows Installer en ce moment, généralement une mise à jour Windows ou un programme en cours d'installation en arrière-plan. Déplacer et Supprimer sont en pause pendant ce temps, pour qu'InstallerClean ne touche pas au cache d'installation tant qu'il change. Une fois terminé, réanalysez et ils réapparaissent. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Une transaction Windows Installer précédente est suspendue sur cette machine. Reprenez ou annulez cette installation (ou redémarrez Windows) avant de nettoyer le cache. |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows a un renommage de fichier en file d'attente pour le prochain redémarrage qui affecte le cache d'installation. Redémarrez Windows avant de nettoyer. |
@@ -139,8 +141,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Tout est propre |
 | Nothing to clean up in C:\Windows\Installer | Rien à nettoyer dans C:\Windows\Installer |
 | Scanned {0} {1} in {2} | Analyse de {0} {1} en {2} |
-| Copy them back if anything breaks ([it won't!]) | Recopiez-les si quelque chose ne fonctionne plus ([ce ne sera pas le cas !]) |
-| Until then, you can restore them if anything breaks ([it won't!]) | D'ici là, vous pouvez les restaurer si quelque chose ne fonctionne plus ([ce ne sera pas le cas !]) |
+| Copy them back if anything breaks ([it won't!]). | Recopiez-les si quelque chose ne fonctionne plus ([ce ne sera pas le cas !]). |
+| Until then, you can restore them if anything breaks ([it won't!]). | D'ici là, vous pouvez les restaurer si quelque chose ne fonctionne plus ([ce ne sera pas le cas !]). |
 | Empty it to actually reclaim the space. | Videz la Corbeille pour vraiment récupérer l'espace. |
 | {0} freed | {0} libérés |
 | {0} cleaned up | {0} nettoyés |
@@ -148,10 +150,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved, some files could not be processed | {0} déplacés, certains fichiers n'ont pas pu être traités |
 | {0} freed, some files could not be processed | {0} libérés, certains fichiers n'ont pas pu être traités |
 | {0} cleaned up, some files could not be processed | {0} nettoyés, certains fichiers n'ont pas pu être traités |
-| {0} {1} moved to {2} | Déplacé {0} {1} vers {2} |
-| {0} {1} moved to {2} | Déplacé {0} {1} vers {2} |
-| {0} {1} moved to {2}. {3} {4} | Déplacé {0} {1} vers {2}. {3} {4} |
-| {0} {1} moved to {2}. {3} {4} | Déplacé {0} {1} vers {2}. {3} {4} |
+| {0} {1} moved to: {2} | Déplacé {0} {1} vers : {2} |
+| {0} {1} moved to: {2} | Déplacé {0} {1} vers : {2} |
+| {0} {1} moved to: {2}. {3} {4} | Déplacé {0} {1} vers : {2}. {3} {4} |
+| {0} {1} moved to: {2}. {3} {4} | Déplacé {0} {1} vers : {2}. {3} {4} |
 | {0} {1} moved to the Recycle Bin | Déplacé {0} {1} vers la Corbeille |
 | {0} {1} moved to the Recycle Bin | Déplacé {0} {1} vers la Corbeille |
 | {0} {1} moved to the Recycle Bin. {2} {3} | Déplacé {0} {1} vers la Corbeille. {2} {3} |
@@ -195,21 +197,23 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Français |
 | --- | --- |
 | Move {0} {1} ({2})? | Déplacer {0} {1} ({2}) ? |
-| Files will be moved to {0}. | Les fichiers seront déplacés vers {0}. |
+| Files will be moved to: | Les fichiers seront déplacés vers : |
 | Delete {0} {1} ({2})? | Supprimer {0} {1} ({2}) ? |
 | Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Les fichiers seront déplacés vers la Corbeille. Si vous voulez des copies de sauvegarde, utilisez plutôt le bouton Déplacer. |
+| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. |
 
 ## Error messages
 
 | English | Français |
 | --- | --- |
-| Administrator rights required | Droits d'administrateur requis |
-| InstallerClean requires administrator privileges.<br><br>Please right-click and choose 'Run as administrator'. | InstallerClean nécessite des privilèges d'administrateur.<br><br>Faites un clic droit et choisissez « Exécuter en tant qu'administrateur ». |
+| Access denied | Access denied |
+| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. |
 | Installer database unavailable | Base de données Windows Installer indisponible |
 | Scan failed | Échec de l'analyse |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | La base de données Windows Installer semble vide ou inaccessible. C'est inhabituel même sur une installation neuve de Windows et signifie généralement que la base de données est corrompue ou qu'un outil tiers l'a vidée. Exécuter « sfc /scannow » depuis une invite élevée la répare en général. |
-| Access denied enumerating installed products. Run as administrator. | Accès refusé lors de l'énumération des produits installés. Exécutez en tant qu'administrateur. |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer a refusé de lister les produits après {0} échecs consécutifs (dernier code d'erreur {1}). Essayez de redémarrer Windows, ou exécutez « sfc /scannow » depuis une invite élevée. |
+| Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer a refusé de lister les correctifs d'un produit après {0} échecs consécutifs (dernier code d'erreur {1}). Essayez de redémarrer Windows, ou exécutez « sfc /scannow » depuis une invite élevée. |
 | Invalid destination | Destination invalide |
 | Could not write to destination | Impossible d'écrire dans la destination |
 | Move failed | Échec du déplacement |
@@ -235,8 +239,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Ce fichier est ouvert ou verrouillé par un autre programme (erreur {0}). Fermez ce programme, ou ce qui l'analyse, puis réessayez, ou utilisez plutôt le bouton Déplacer. |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | Le fichier a été supprimé définitivement parce qu'il n'a pas pu être déplacé vers la Corbeille. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Refus de déplacer des fichiers dans le dossier Windows Installer (destination : {0}). |
-| Destination must be a fully qualified path (relative paths resolve against the process current directory and are unsafe under elevation): {0} | La destination doit être un chemin entièrement qualifié (les chemins relatifs sont résolus par rapport au répertoire courant du processus et ne sont pas sûrs sous élévation) : {0} |
-| Destination folder canonical path changed mid-batch: {0} | Le chemin canonique du dossier de destination a changé pendant l'opération : {0} |
+| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
+| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
 | Cannot write to {0}. | Impossible d'écrire dans {0}. |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | Impossible de trouver un nom de fichier unique pour « {0} » après 10 000 tentatives. |
 
@@ -260,8 +264,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Français |
 | --- | --- |
 | Couldn't open your browser | Impossible d'ouvrir votre navigateur |
-| The link couldn't be opened in your normal-user browser. The URL has been copied to your clipboard so you can open it manually:<br><br>{0} | Le lien n'a pas pu être ouvert dans le navigateur de votre utilisateur normal. L'URL a été copiée dans le presse-papiers pour que vous puissiez l'ouvrir manuellement :<br><br>{0} |
-| The link couldn't be opened in your normal-user browser, and copying it to the clipboard also failed. The URL is:<br><br>{0} | Le lien n'a pas pu être ouvert dans le navigateur de votre utilisateur normal, et sa copie dans le presse-papiers a également échoué. L'URL est :<br><br>{0} |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} |
 
 ## Sending the summary
 
@@ -271,8 +275,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Thanks! Report sent. | Merci ! Rapport envoyé. |
 | Sending failed. Try again later. | Échec de l'envoi. Réessayez plus tard. |
 | No report to send. | Aucun rapport à envoyer. |
-| Send this to No Faff? | Envoyer ceci à No Faff ? |
-| Nothing identifies you or your machine; it just lets me know InstallerClean's working and how much space people are freeing. It goes to nofaff.netlify.app/api/result-log. | Rien ne vous identifie, ni votre machine ; ça me dit juste qu'InstallerClean fonctionne et combien d'espace les gens libèrent. Ça va vers nofaff.netlify.app/api/result-log. |
+| Send this? | Envoyer ceci ? |
+| It goes to nofaff.netlify.app/api/result-log. Nothing identifies you or your machine; it just lets me know InstallerClean's working and [how much space people are freeing]. | Ça va vers nofaff.netlify.app/api/result-log. Rien ne vous identifie, ni votre machine ; ça me dit juste qu'InstallerClean fonctionne et [combien d'espace les gens libèrent]. |
 
 ## Startup and crashes
 
@@ -292,7 +296,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Français |
 | --- | --- |
-| If it helped, buy me a cup of tea. | Si ça vous a aidé, offrez-moi un café. |
+| Donate | Faire un don |
 | It's thirsty work! | Ça donne soif ! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Annulation demandée. InstallerClean attend que l'étape en cours atteigne un point d'arrêt. Cela peut prendre quelques secondes lors d'opérations d'E/S intensives ou d'un appel à la base de données MSI. |
 | Close | Fermer |
@@ -311,7 +315,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Français |
 | --- | --- |
-| Buy me a cup of tea | Offrez-moi une tasse de café |
+| Donate | Faire un don |
 | Buy me a cuppa (About window) | Offrez-moi un café (fenêtre À propos) |
 | Cancel operation | Annuler l'opération |
 | Cancel scan | Annuler l'analyse |
@@ -431,12 +435,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Remarque : l'écriture dans le journal des événements a échoué. Vérifiez les autorisations du journal Application ou la stratégie de groupe. |
 | InstallerClean - clean up C:\Windows\Installer | InstallerClean - nettoyage de C:\Windows\Installer |
 | Usage: | Utilisation : |
-|   installerclean-cli --help   Show this help (also accepts /?, -h) |   installerclean-cli --help      Affiche cette aide (accepte aussi /?, -h) |
+|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help      Affiche cette aide (accepte aussi /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version   Affiche la version (accepte aussi -v) |
-|   installerclean-cli /s       Scan only - list removable files |   installerclean-cli /s          Analyse seule - liste les fichiers inutiles |
-|   installerclean-cli /d       Delete removable files (Recycle Bin) |   installerclean-cli /d          Supprime les fichiers inutiles (Corbeille) |
-|   installerclean-cli /m       Move to saved default location |   installerclean-cli /m          Déplace vers l'emplacement par défaut enregistré |
-|   installerclean-cli /m PATH  Move to specified path |   installerclean-cli /m CHEMIN   Déplace vers le chemin spécifié |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s          Analyse seule - liste les fichiers inutiles |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d          Supprime les fichiers inutiles (Corbeille) |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m          Déplace vers l'emplacement par défaut enregistré |
+|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m CHEMIN   Déplace vers le chemin spécifié |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli est un vrai processus de console et bloque l'invite |
 | until it finishes; redirect or pipe its output as you would any | jusqu'à la fin ; redirigez ou acheminez sa sortie comme vous le feriez |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | pour tout autre exécutable de console. L'interface se trouve dans InstallerClean.exe. |
