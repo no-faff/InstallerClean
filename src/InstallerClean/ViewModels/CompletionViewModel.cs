@@ -403,17 +403,6 @@ public partial class CompletionViewModel : ObservableObject
                 outcome = await _resultLogService.SendAsync(jsonContent)
                     .ConfigureAwait(true);
             }
-            catch (OperationCanceledException)
-            {
-                // Caller-driven cancel: clear the "Sending..." caption
-                // and exit through the same wrap-up as a clean reject
-                // (outcome = Unknown). The AsyncRelayCommand wrapper
-                // would otherwise leave the SR-announced and visible
-                // status stuck at "Sending..." while the lifetime lock
-                // never engaged because the post-await reset block was
-                // skipped.
-                outcome = ResultLogSendOutcome.Unknown;
-            }
             catch (Exception ex)
             {
                 // SendAsync documents never-throws, but the contract
@@ -421,6 +410,14 @@ public partial class CompletionViewModel : ObservableObject
                 // any breach to the same visible failure state as a
                 // clean reject so a regression can't ride
                 // DispatcherUnhandledException to a process exit.
+                //
+                // A cancellation catch used to sit above this one, saying it
+                // handled a "caller-driven cancel". There is no caller-driven
+                // cancel: the send is passed no token, and SendAsync maps its
+                // own HttpClient timeout to the Timeout outcome and only
+                // rethrows a cancellation when the token it was given was
+                // cancelled. It could not fire, and it described a send the
+                // user could abandon, which this one is not.
                 CrashLog.TryWrite(ex);
                 outcome = ResultLogSendOutcome.Unknown;
             }
