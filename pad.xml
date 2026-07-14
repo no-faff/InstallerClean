@@ -7,7 +7,7 @@
   </MASTER_PAD_VERSION_INFO>
 
   <Company_Info>
-    <Company_Name>No faff</Company_Name>
+    <Company_Name>No Faff</Company_Name>
     <Country>United Kingdom</Country>
     <Company_WebSite_URL>https://nofaff.netlify.app/</Company_WebSite_URL>
   </Company_Info>
@@ -25,8 +25,8 @@
     <Program_Release_Status>Minor Update</Program_Release_Status>
     <Program_Install_Support>Install and Uninstall</Program_Install_Support>
     <Program_OS_Support>Win10x64,Win11</Program_OS_Support>
-    <Program_Language>English</Program_Language>
-    <Program_Change_Info>See release notes.</Program_Change_Info>
+    <Program_Language>English, Simplified Chinese, Russian, Spanish, Japanese, Brazilian Portuguese, Polish, Turkish, Korean, French, Italian, German, Indonesian, Vietnamese, Ukrainian</Program_Language>
+    <Program_Change_Info>Fixes the completion screen showing the Recycle Bin hint "Empty it to actually reclaim the space." after a Move, after a permanent delete, and after a rescan that finds nothing, where it does not apply.</Program_Change_Info>
     <Program_Specific_Category>System</Program_Specific_Category>
     <Program_Category_Class>System &amp; Desktop Utilities::File &amp; Disk Management</Program_Category_Class>
     <Program_System_Requirements>Windows 10 or 11 (64-bit). Administrator rights required to access C:\Windows\Installer.</Program_System_Requirements>
@@ -66,7 +66,7 @@ Modern replacement for PatchCleaner, which was last updated in March 2016.</Char
   <Web_Info>
     <Application_URLs>
       <Application_Info_URL>https://nofaff.netlify.app/installerclean/</Application_Info_URL>
-      <Application_Screenshot_URL>https://raw.githubusercontent.com/no-faff/InstallerClean/main/docs/screenshots/02-main-window.webp</Application_Screenshot_URL>
+      <Application_Screenshot_URL>https://raw.githubusercontent.com/no-faff/InstallerClean/main/docs/screenshots/en/02-main-window.webp</Application_Screenshot_URL>
       <Application_Icon_URL>https://raw.githubusercontent.com/no-faff/InstallerClean/main/docs/icon.png</Application_Icon_URL>
       <Application_XML_File_URL>https://raw.githubusercontent.com/no-faff/InstallerClean/main/pad.xml</Application_XML_File_URL>
     </Application_URLs>
