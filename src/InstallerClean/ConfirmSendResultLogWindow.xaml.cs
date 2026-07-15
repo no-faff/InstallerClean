@@ -50,19 +50,15 @@ public partial class ConfirmSendResultLogWindow : Window
         var raw = Strings.ConfirmSendResultLog_Reassurance;
         ReassuranceText.Inlines.Clear();
 
-        int open = raw.IndexOf('[');
-        int close = open >= 0 ? raw.IndexOf(']', open + 1) : -1;
-        if (open < 0 || close < 0)
+        // Where the sentence splits around its [ ]-delimited link is pure string
+        // work in Core (see CompositionParsing); this method only builds inlines.
+        if (CompositionParsing.SplitAtBracketedPhrase(raw) is not { } split)
         {
             ReassuranceText.Inlines.Add(new Run(raw));
             return;
         }
 
-        var prefix = raw[..open];
-        var linkText = raw[(open + 1)..close];
-        var suffix = raw[(close + 1)..];
-
-        var link = new Hyperlink(new Run(linkText))
+        var link = new Hyperlink(new Run(split.LinkText))
         {
             NavigateUri = new Uri(ReportsStatsUrl),
             Style = (Style)FindResource("SubtleLink"),
@@ -71,11 +67,11 @@ public partial class ConfirmSendResultLogWindow : Window
         // The link text alone ("how much space people are freeing") is not a
         // self-contained accessible name; the whole sentence (brackets
         // removed) is, already in the user's language.
-        AutomationProperties.SetName(link, prefix + linkText + suffix);
+        AutomationProperties.SetName(link, split.Prefix + split.LinkText + split.Suffix);
 
-        if (prefix.Length > 0) ReassuranceText.Inlines.Add(new Run(prefix));
+        if (split.Prefix.Length > 0) ReassuranceText.Inlines.Add(new Run(split.Prefix));
         ReassuranceText.Inlines.Add(link);
-        if (suffix.Length > 0) ReassuranceText.Inlines.Add(new Run(suffix));
+        if (split.Suffix.Length > 0) ReassuranceText.Inlines.Add(new Run(split.Suffix));
     }
 
     private void Hyperlink_Click(object sender, RoutedEventArgs e)

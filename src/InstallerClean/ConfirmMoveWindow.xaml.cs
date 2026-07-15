@@ -19,10 +19,9 @@ public partial class ConfirmMoveWindow : Window
         MessageText.Text = string.Format(Strings.Confirm_MoveTitle, fileCount, label, sizeDisplay);
         DestinationLabel.Text = Strings.Confirm_MoveDestination;
         // Insert a zero-width space after every backslash so a long path wraps at
-        // a folder boundary (after ...\Installer\, not inside a folder name). It is
-        // spelled with the C# unicode escape; do not paste a literal zero-width
-        // character into source (it is invisible and tooling mangles it).
-        DestinationText.Text = destination.Replace("\\", "\\\u200B");
+        // a folder boundary (after ...\Installer\, not inside a folder name). The
+        // insertion is in Core (CompositionParsing) so a test guards the escape.
+        DestinationText.Text = CompositionParsing.InsertPathWrapPoints(destination);
 
         // A same-drive move is a rename: it frees nothing until the user deletes
         // the parked copies themselves. This is the only moment the app knows

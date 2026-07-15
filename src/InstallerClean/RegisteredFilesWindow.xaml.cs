@@ -112,19 +112,15 @@ public partial class RegisteredFilesWindow : Window
         var raw = Strings.Body_RegisteredMissingFromDisk_SeeAlso;
         SeeAlsoText.Inlines.Clear();
 
-        int open = raw.IndexOf('[');
-        int close = open >= 0 ? raw.IndexOf(']', open + 1) : -1;
-        if (open < 0 || close < 0)
+        // Where the sentence splits around its [ ]-delimited link is pure string
+        // work in Core (see CompositionParsing); this method only builds inlines.
+        if (CompositionParsing.SplitAtBracketedPhrase(raw) is not { } split)
         {
             SeeAlsoText.Inlines.Add(new Run(raw));
             return;
         }
 
-        var prefix = raw[..open];
-        var linkText = raw[(open + 1)..close];
-        var suffix = raw[(close + 1)..];
-
-        var link = new Hyperlink(new Run(linkText))
+        var link = new Hyperlink(new Run(split.LinkText))
         {
             NavigateUri = new Uri(MissingFileRecoveryUrl),
             Style = (Style)FindResource("SubtleLink"),
@@ -137,9 +133,9 @@ public partial class RegisteredFilesWindow : Window
         // can click the on-screen words.
         AutomationProperties.SetName(link, Strings.Automation_RegisteredMissingSeeAlso);
 
-        if (prefix.Length > 0) SeeAlsoText.Inlines.Add(new Run(prefix));
+        if (split.Prefix.Length > 0) SeeAlsoText.Inlines.Add(new Run(split.Prefix));
         SeeAlsoText.Inlines.Add(link);
-        if (suffix.Length > 0) SeeAlsoText.Inlines.Add(new Run(suffix));
+        if (split.Suffix.Length > 0) SeeAlsoText.Inlines.Add(new Run(split.Suffix));
     }
 
     private (string Plain, GridViewColumn Col)[] SortableColumns => new[]

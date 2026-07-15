@@ -495,26 +495,22 @@ public partial class MainWindow : Window
         var destination = _vm.Completion.SummaryDestination;
         CompletionSummaryText.Inlines.Clear();
 
-        int index = destination.Length > 0 ? raw.IndexOf(destination, StringComparison.Ordinal) : -1;
-        if (index < 0)
+        // The split point and the path-wrap-point insertion are both pure string
+        // work, extracted to Core so a test can pin them (the shipped zero-width
+        // escape bug lived here and had no test); this method only turns the
+        // result into WPF inlines. See CompositionParsing.
+        if (CompositionParsing.SplitAtSubstring(raw, destination) is not { } split)
         {
             CompletionSummaryText.Inlines.Add(new Run(raw));
             return;
         }
 
-        var prefix = raw[..index].TrimEnd();
-        var suffix = raw[(index + destination.Length)..];
-        // Zero-width space after every backslash so a long path wraps at a
-        // folder boundary rather than mid-word, matching ConfirmMoveWindow.
-        // Spelled with the C# unicode escape; do not paste a literal
-        // zero-width character into source (it is invisible and tooling
-        // mangles it).
-        var wrappedDestination = destination.Replace("\\", "\\\u200B");
+        var wrappedDestination = CompositionParsing.InsertPathWrapPoints(destination);
 
-        if (prefix.Length > 0) CompletionSummaryText.Inlines.Add(new Run(prefix));
+        if (split.Prefix.Length > 0) CompletionSummaryText.Inlines.Add(new Run(split.Prefix));
         CompletionSummaryText.Inlines.Add(new LineBreak());
         CompletionSummaryText.Inlines.Add(new Run(wrappedDestination));
-        if (suffix.Length > 0) CompletionSummaryText.Inlines.Add(new Run(suffix));
+        if (split.Suffix.Length > 0) CompletionSummaryText.Inlines.Add(new Run(split.Suffix));
     }
 
     /// <summary>
@@ -539,19 +535,15 @@ public partial class MainWindow : Window
         var raw = spaceHint.Length > 0 ? $"{spaceHint} {_vm.Completion.Restore}" : _vm.Completion.Restore;
         CompletionRestoreText.Inlines.Clear();
 
-        int open = raw.IndexOf('[');
-        int close = open >= 0 ? raw.IndexOf(']', open + 1) : -1;
-        if (open < 0 || close < 0)
+        // Where the sentence splits around its [ ]-delimited link is pure string
+        // work in Core (see CompositionParsing); this method only builds inlines.
+        if (CompositionParsing.SplitAtBracketedPhrase(raw) is not { } split)
         {
             CompletionRestoreText.Inlines.Add(new Run(raw));
             return;
         }
 
-        var prefix = raw[..open];
-        var linkText = raw[(open + 1)..close];
-        var suffix = raw[(close + 1)..];
-
-        var link = new Hyperlink(new Run(linkText))
+        var link = new Hyperlink(new Run(split.LinkText))
         {
             NavigateUri = new Uri(SafetyUrl),
             Style = (Style)FindResource("SubtleLink"),
@@ -560,11 +552,11 @@ public partial class MainWindow : Window
         // "it won't!" is meaningless to a screen reader focused on the link
         // alone; the whole restore sentence (brackets removed) is the
         // self-contained accessible name, already in the user's language.
-        AutomationProperties.SetName(link, prefix + linkText + suffix);
+        AutomationProperties.SetName(link, split.Prefix + split.LinkText + split.Suffix);
 
-        if (prefix.Length > 0) CompletionRestoreText.Inlines.Add(new Run(prefix));
+        if (split.Prefix.Length > 0) CompletionRestoreText.Inlines.Add(new Run(split.Prefix));
         CompletionRestoreText.Inlines.Add(link);
-        if (suffix.Length > 0) CompletionRestoreText.Inlines.Add(new Run(suffix));
+        if (split.Suffix.Length > 0) CompletionRestoreText.Inlines.Add(new Run(split.Suffix));
     }
 
     private void Hyperlink_Click(object sender, RoutedEventArgs e)
