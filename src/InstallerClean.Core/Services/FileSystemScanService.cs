@@ -247,29 +247,27 @@ public sealed class FileSystemScanService : IFileSystemScanService
         if (!_fs.Directory.Exists(folder))
             return Enumerable.Empty<string>();
 
-        // Reparse points are skipped so a junction planted inside the
-        // Installer folder cannot redirect enumeration outside it; Hidden
-        // and System stay included because real installer-cache entries
-        // sometimes carry those attributes.
+        // Scan the folder ROOT only. A registered LocalPackage path only ever
+        // sits at the root, so for any file in a subdirectory the API
+        // correlation carries no signal at all: calling such a file orphaned
+        // would be asking Windows about a file it was never told to track.
+        // Root-only makes the candidate set "files at the root that no
+        // registered package claims", which cannot acquire a new blind spot.
+        // The old recurse-everything approach depended on a denylist
+        // ($PatchCache$, the patch engine's baseline payload copies) that could
+        // only ever exclude a subtree after it had already bitten someone; with
+        // root-only that whole subtree is out of scope, so the denylist is gone.
+        // Reparse points are skipped so a junction planted at the root cannot
+        // redirect enumeration outside it; Hidden and System stay included
+        // because real cache entries sometimes carry those attributes.
         var options = new EnumerationOptions
         {
-            RecurseSubdirectories = true,
+            RecurseSubdirectories = false,
             AttributesToSkip = FileAttributes.ReparsePoint,
             IgnoreInaccessible = true,
         };
 
-        // $PatchCache$ holds the patch engine's baseline copies of
-        // product payload files; registered LocalPackage paths only
-        // ever sit at the folder root, so a payload .msi/.msp cached
-        // under it is unknown to the API and would be reported
-        // "orphaned" without Windows ever having been asked about it,
-        // while a later delta patch may still want it. Nothing under
-        // that subtree is a removal candidate.
-        var patchCachePrefix = _fs.Path.Combine(folder, "$PatchCache$")
-            + _fs.Path.DirectorySeparatorChar;
-
         return _fs.Directory.EnumerateFiles(folder, "*.msi", options)
-            .Concat(_fs.Directory.EnumerateFiles(folder, "*.msp", options))
-            .Where(p => !p.StartsWith(patchCachePrefix, StringComparison.OrdinalIgnoreCase));
+            .Concat(_fs.Directory.EnumerateFiles(folder, "*.msp", options));
     }
 }

@@ -52,20 +52,22 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
-    public async Task ScanAsync_excludes_PatchCache_subtree_from_candidates()
+    public async Task ScanAsync_scans_the_root_only_and_ignores_subdirectory_files()
     {
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new List<RegisteredPackage>().AsReadOnly());
 
-        // A payload .msp under $PatchCache$ is the patch engine's
-        // baseline copy: unknown to the API, so correlation would call
-        // it orphaned, yet a later delta patch may still want it.
+        // Only root-level files are candidates. A registered LocalPackage path
+        // never sits in a subdirectory, so the API can say nothing about a file
+        // there. A payload .msp under $PatchCache$ (the patch engine's baseline
+        // copy) and any other subfolder file are both out of scope now.
         var fs = new MockFileSystem(new Dictionary<string, MockFileData>
         {
-            [@"C:\Windows\Installer\bbb.msi"] = new("x"),
-            [@"C:\Windows\Installer\$PatchCache$\Managed\abc\1.0.0\payload.msp"] = new("x"),
+            [@"C:\Windows\Installer\bbb.msi"] = new("x"),                                     // root: a candidate
+            [@"C:\Windows\Installer\$PatchCache$\Managed\abc\1.0.0\payload.msp"] = new("x"),  // subdir: not
+            [@"C:\Windows\Installer\SomeVendor\leftover.msi"] = new("x"),                     // subdir: not
         });
 
         var svc = new FileSystemScanService(mockQuery, fs);
