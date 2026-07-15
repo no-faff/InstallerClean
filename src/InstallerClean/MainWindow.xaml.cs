@@ -87,6 +87,13 @@ public partial class MainWindow : Window
             if (!_vm.Scan.HasScanned && _vm.Scan.LastScanWasCancelled)
                 Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
                     ScanResultAnnouncer.Text = Strings.Status_ScanCancelled);
+
+            // A failed startup scan opens the window with the tailored error in the
+            // intro instead of exiting. A newly shown window speaks only its title
+            // and the focused Re-scan button, so announce the diagnosis too.
+            if (!_vm.Scan.HasScanned && _vm.Scan.HasScanError)
+                Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+                    ScanResultAnnouncer.Text = _vm.Scan.LastScanError);
         }
 
         StarToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;

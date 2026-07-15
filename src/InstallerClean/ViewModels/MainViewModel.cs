@@ -132,30 +132,37 @@ public partial class MainViewModel : ObservableObject, IDisposable
         !Scan.IsScanning && !Cleanup.IsOperating && !Completion.IsComplete;
 
     /// <summary>
-    /// The main window's opening line. The window has three states and the
-    /// intro is the only thing that tells them apart:
+    /// The main window's opening line. The intro is the only thing that tells the
+    /// window's states apart:
     ///
+    ///   - a scan FAILED (the startup scan, or a Re-scan): the tailored error,
+    ///     with Re-scan focused, instead of exiting,
     ///   - nothing scanned yet (the startup scan was cancelled),
     ///   - a scan found files (the state the window was designed for),
     ///   - a scan found nothing (an all-clear, and the end state of every
     ///     successful clean-up).
     ///
-    /// The last of those used to read "The unneeded files below are safe to
-    /// delete" directly above "0 unneeded files to clean up", which is the app
-    /// telling the user to act on files it has just told them do not exist.
+    /// The failed state takes precedence over not-yet-scanned, because a failed
+    /// scan leaves <see cref="ScanViewModel.HasScanned"/> false too but must say
+    /// what went wrong rather than "nothing scanned yet". The all-clear line used
+    /// to read "The unneeded files below are safe to delete" directly above "0
+    /// unneeded files to clean up", the app telling the user to act on files it
+    /// has just told them do not exist.
     /// </summary>
     public string IntroLead =>
-        !Scan.HasScanned ? Strings.Body_NotScanned_Lead
+        Scan.HasScanError ? Strings.Error_ScanFailedTitle
+        : !Scan.HasScanned ? Strings.Body_NotScanned_Lead
         : Scan.HasOrphans ? Strings.Body_MainExplanation_Lead
         : Strings.Completion_NothingToCleanUp;
 
     /// <summary>
-    /// The muted second line under <see cref="IntroLead"/>. Empty on an
-    /// all-clear (the lead says it all, and the count rows below carry the
-    /// receipt), which collapses the TextBlock.
+    /// The muted second line under <see cref="IntroLead"/>. Carries the tailored
+    /// message on a failed scan; empty on an all-clear (the lead says it all, and
+    /// the count rows below carry the receipt), which collapses the TextBlock.
     /// </summary>
     public string IntroDetail =>
-        !Scan.HasScanned ? Strings.Body_NotScanned_Why
+        Scan.HasScanError ? Scan.LastScanError
+        : !Scan.HasScanned ? Strings.Body_NotScanned_Why
         : Scan.HasOrphans ? MainExplanationWhyText
         : string.Empty;
 
@@ -190,7 +197,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // OrphanedFileCount, which raises it.
         if (e.PropertyName is nameof(ScanViewModel.HasScanned)
             or nameof(ScanViewModel.HasOrphans)
-            or nameof(ScanViewModel.LastScanWasCancelled))
+            or nameof(ScanViewModel.LastScanWasCancelled)
+            or nameof(ScanViewModel.HasScanError))
         {
             OnPropertyChanged(nameof(IntroLead));
             OnPropertyChanged(nameof(IntroDetail));

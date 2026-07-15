@@ -1271,6 +1271,62 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task A_failed_startup_scan_opens_the_window_with_the_tailored_error_and_does_not_throw()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new LocalisedInvalidOperationException(
+                "The Windows Installer database appears to be empty or inaccessible."));
+
+        // Must NOT throw: App.OnStartup used to catch the propagated exception and
+        // exit. It now returns, so the window opens.
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.False(vm.Scan.HasScanned);
+        Assert.True(vm.Scan.HasScanError);
+        Assert.Contains("installer database", vm.Scan.LastScanError, StringComparison.OrdinalIgnoreCase);
+        // The window's intro shows the diagnosis, not "nothing scanned yet", and
+        // the startup path is inline: no modal fires over the splash.
+        Assert.Equal(Strings.Error_ScanFailedTitle, vm.IntroLead);
+        Assert.Equal(vm.Scan.LastScanError, vm.IntroDetail);
+        Assert.Equal(string.Empty, vm.IntroNotice);
+        _dialogService.DidNotReceive().ShowError(Arg.Any<string>(), Arg.Any<string>());
+        _dialogService.DidNotReceive().ShowWarning(Arg.Any<string>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task A_failed_rescan_shows_the_modal_and_records_the_same_inline_error()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new LocalisedInvalidOperationException(
+                "The Windows Installer database appears to be empty or inaccessible."));
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        // The explicit click still gets its modal (one error ladder, two
+        // presentations)...
+        _dialogService.Received(1).ShowError(Arg.Any<string>(), Strings.Error_InstallerDbUnavailableTitle);
+        // ...and the same message is recorded inline, so a later re-render of the
+        // window shows the diagnosis rather than a stale count.
+        Assert.True(vm.Scan.HasScanError);
+        Assert.Equal(Strings.Error_ScanFailedTitle, vm.IntroLead);
+    }
+
+    [Fact]
+    public async Task A_successful_scan_leaves_no_scan_error()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        Assert.False(vm.Scan.HasScanError);
+        Assert.Equal(string.Empty, vm.Scan.LastScanError);
+    }
+
+    [Fact]
     public async Task A_scan_that_finds_nothing_stops_telling_the_user_to_delete_files()
     {
         var vm = CreateViewModel();

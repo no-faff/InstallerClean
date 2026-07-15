@@ -311,10 +311,75 @@ public partial class ScanViewModel : ObservableObject
 
     private bool _lastScanWasCancelled;
 
+    /// <summary>
+    /// Tailored, safe-to-show message for the most recent scan that FAILED. Empty
+    /// until the first failure, cleared at the start of every scan and left empty
+    /// on a success. Both the user-driven Scan command and the startup scan set it
+    /// through the one error ladder (<see cref="DescribeScanFailure"/>); the main
+    /// window shows it in place of the not-yet-scanned copy, with Re-scan focused,
+    /// so a failed startup scan opens the window with the diagnosis rather than
+    /// exiting.
+    /// </summary>
+    public string LastScanError
+    {
+        get => _lastScanError;
+        private set
+        {
+            if (SetProperty(ref _lastScanError, value))
+                OnPropertyChanged(nameof(HasScanError));
+        }
+    }
+
+    private string _lastScanError = string.Empty;
+
+    /// <summary>True when the last scan failed and its message is on screen.</summary>
+    public bool HasScanError => LastScanError.Length > 0;
+
+    /// <summary>
+    /// The scan's one error ladder: maps a scan (or act-time re-verify) failure to
+    /// the message, dialog title and overlay status line the user should see, so
+    /// the user-driven Scan command, the startup scan and the re-verify all
+    /// diagnose a failure the same way instead of each inventing its own. The
+    /// generic branch writes the crash log (its message names the log path), so
+    /// this is called once per failure. <see cref="OperationCanceledException"/> is
+    /// handled by its own catch and never reaches here.
+    /// </summary>
+    internal ScanFailure DescribeScanFailure(Exception ex) => ex switch
+    {
+        // LocalisedAccessException before UnauthorizedAccessException: it derives
+        // from it and carries a precise, safe-to-echo resx message (e.g. "Access
+        // denied enumerating installed products"), where the BCL type only earns
+        // the generic "run as administrator" guidance.
+        LocalisedAccessException =>
+            new(ex.Message, Strings.Error_AdminRequiredTitle, IsError: false, Strings.Status_ScanAccessDenied),
+        UnauthorizedAccessException =>
+            new(Strings.Error_AdminRequiredBody, Strings.Error_AdminRequiredTitle, IsError: false, Strings.Status_ScanAccessDenied),
+        LocalisedInvalidOperationException =>
+            new(ex.Message, Strings.Error_InstallerDbUnavailableTitle, IsError: true, Strings.Status_ScanFailedDb),
+        _ => DescribeUnexpectedScanFailure(ex),
+    };
+
+    private static ScanFailure DescribeUnexpectedScanFailure(Exception ex)
+    {
+        // ex.Message never reaches UI: type name plus log path only, because a
+        // framework message from an elevated process can carry a path out of
+        // another user's profile.
+        var crash = CrashLog.TryWrite(ex);
+        var typeName = ex.GetType().Name;
+        var message = crash.Written
+            ? string.Format(Strings.Status_ScanFailedDetails, typeName, crash.Path)
+            : string.Format(Strings.Status_ScanFailedDetails_NoLog, typeName);
+        return new ScanFailure(message, Strings.Error_ScanFailedTitle, IsError: true, message);
+    }
+
+    /// <summary>One rung of the scan error ladder: what to show and how.</summary>
+    internal readonly record struct ScanFailure(string Message, string Title, bool IsError, string StatusLine);
+
     [RelayCommand(CanExecute = nameof(CanScan))]
     private async Task ScanAsync()
     {
         LastScanWasCancelled = false;
+        LastScanError = string.Empty;
         ScanProgress = Strings.Status_StartingScan;
         ScanTicker = string.Empty;
         var sw = Stopwatch.StartNew();
@@ -339,47 +404,20 @@ public partial class ScanViewModel : ObservableObject
             LastScanWasCancelled = true;
             ScanProgress = Strings.Status_ScanCancelled;
         }
-        catch (LocalisedAccessException ex)
-        {
-            // LocalisedAccessException carries a safe-to-echo resx
-            // message; surfacing it preserves the precise diagnosis
-            // (e.g., "Access denied enumerating installed products")
-            // rather than the generic "Run as administrator" guidance
-            // the BCL-UAE branch below shows. Order matters: this
-            // catch must precede catch (UnauthorizedAccessException)
-            // because LocalisedAccessException inherits from it.
-            _dialogService.ShowWarning(ex.Message, Strings.Error_AdminRequiredTitle);
-            ScanProgress = Strings.Status_ScanAccessDenied;
-        }
-        catch (UnauthorizedAccessException)
-        {
-            _dialogService.ShowWarning(
-                Strings.Error_AdminRequiredBody,
-                Strings.Error_AdminRequiredTitle);
-            ScanProgress = Strings.Status_ScanAccessDenied;
-        }
-        catch (LocalisedInvalidOperationException ex)
-        {
-            // LocalisedInvalidOperationException is the contract: sites
-            // that raise it have built Message from a resx string with
-            // only fixed-shape template args (counts, error codes), so
-            // echoing under elevation is safe. BCL-raised
-            // InvalidOperationException from deep in the framework falls
-            // through to the generic catch below with type-name + crash
-            // log only.
-            _dialogService.ShowError(ex.Message, Strings.Error_InstallerDbUnavailableTitle);
-            ScanProgress = Strings.Status_ScanFailedDb;
-        }
         catch (Exception ex)
         {
-            // ex.Message never reaches UI: type name + log path only.
-            var crash = CrashLog.TryWrite(ex);
-            var typeName = ex.GetType().Name;
-            var msg = crash.Written
-                ? string.Format(Strings.Status_ScanFailedDetails, typeName, crash.Path)
-                : string.Format(Strings.Status_ScanFailedDetails_NoLog, typeName);
-            ScanProgress = msg;
-            _dialogService.ShowError(msg, Strings.Error_ScanFailedTitle);
+            // One error ladder, shared with the startup scan (which shows the
+            // message inline in the window rather than a modal) and the act-time
+            // re-verify. LastScanError is set on every path so the main window can
+            // reflect a failed Re-scan the same way it reflects a failed startup
+            // scan; the modal is the immediate feedback for the explicit click.
+            var failure = DescribeScanFailure(ex);
+            LastScanError = failure.Message;
+            ScanProgress = failure.StatusLine;
+            if (failure.IsError)
+                _dialogService.ShowError(failure.Message, failure.Title);
+            else
+                _dialogService.ShowWarning(failure.Message, failure.Title);
         }
         finally
         {
@@ -440,6 +478,7 @@ public partial class ScanViewModel : ObservableObject
     public async Task ScanWithProgressAsync(IProgress<ScanProgressUpdate>? progress, CancellationToken cancellationToken = default)
     {
         LastScanWasCancelled = false;
+        LastScanError = string.Empty;
         var sw = Stopwatch.StartNew();
         try
         {
@@ -454,6 +493,19 @@ public partial class ScanViewModel : ObservableObject
             // who knows perfectly well they pressed Cancel.
             LastScanWasCancelled = true;
             throw;
+        }
+        catch (Exception ex)
+        {
+            // A failed startup scan opens the main window in an error state rather
+            // than exiting: record the tailored message through the one ladder,
+            // shared with the Scan command, so the window's not-yet-scanned state
+            // shows it with Re-scan focused. Do NOT rethrow: the exception used to
+            // propagate to App.OnStartup, which told an already-elevated user to
+            // run as administrator and then exited. An app that diagnoses "your
+            // installer database is empty" and then vanishes is strictly worse than
+            // one that says it and offers Re-scan.
+            LastScanError = DescribeScanFailure(ex).Message;
+            return;
         }
         sw.Stop();
         LastScanDurationMs = sw.ElapsedMilliseconds;
