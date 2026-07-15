@@ -458,8 +458,8 @@
        because the files are removable already; only the MSI
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
-  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>오래된 MSI 항목 {0}개가 감지되었습니다(파일이 이미 디스크에서 사라졌습니다. InstallerClean은 그 등록을 해제하지 않습니다).</value></data>
-  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>오래된 MSI 항목 {0}개가 감지되었습니다(파일이 이미 디스크에서 사라졌습니다. InstallerClean은 그 등록을 해제하지 않습니다).</value></data>
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{2} {1}개 중 {0}개</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three

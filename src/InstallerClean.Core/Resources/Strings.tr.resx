@@ -458,8 +458,8 @@
        because the files are removable already; only the MSI
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
-  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>{0} eski MSI kaydı algılandı (dosya diskten çoktan silinmiş; InstallerClean bu kaydı silmez).</value></data>
-  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>{0} eski MSI kaydı algılandı (dosya diskten çoktan silinmiş; InstallerClean bu kaydı silmez).</value></data>
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{1} {2} içinden {0}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
