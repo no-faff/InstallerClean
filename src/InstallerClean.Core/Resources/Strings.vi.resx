@@ -544,6 +544,10 @@ Chi tiết trong {1}.</value></data>
   <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Không thể ghi vào {0}. Không thể ghi nhật ký sự cố.</value></data>
   <data name="Error.MissingSourceFile" xml:space="preserve"><value>Tệp không còn tồn tại.</value></data>
   <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Tệp nguồn là một symlink hoặc junction; bị từ chối vì lý do an toàn.</value></data>
+  <!-- Category-only, no path (elevated path-leak rule). Shown for a candidate
+       that does not resolve inside C:\Windows\Installer, refused at the Move /
+       Delete service boundary. Should never reach a user in practice. -->
+  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>This file is not inside the Windows Installer folder; refused for safety.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file

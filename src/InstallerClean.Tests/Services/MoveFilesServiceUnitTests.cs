@@ -170,6 +170,26 @@ public class MoveFilesServiceUnitTests
     }
 
     [Fact]
+    public async Task MoveFilesAsync_refuses_a_source_outside_the_installer_cache()
+    {
+        // Cannot-rot boundary test: a source that resolves OUTSIDE
+        // C:\Windows\Installer is refused per file even though the file exists.
+        // No installer-folder override, so the real cache folder is the
+        // boundary; C:\Temp is not inside it.
+        var fs = new MockFileSystem();
+        const string outside = @"C:\Temp\evil.msi";
+        fs.AddFile(outside, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { outside }, DestDir);
+
+        Assert.Equal(0, result.MovedCount);
+        Assert.IsType<CandidateOutsideCache>(Assert.Single(result.Errors));
+        Assert.True(fs.File.Exists(outside)); // left where it was
+    }
+
+    [Fact]
     public async Task MoveFilesAsync_zero_files_returns_empty_result()
     {
         var fs = new MockFileSystem();

@@ -16,13 +16,21 @@ internal static class InstallerCacheHelpers
     /// the entire restore-after-mistakes story collapses if files end up
     /// back inside the Installer folder.
     /// </summary>
-    internal static bool IsInstallerFolderOrChild(string path)
+    /// <param name="installerFolderRoot">
+    /// Test-only real-folder override for the cache root (null in production,
+    /// which uses the real <see cref="InstallerFolder"/>). The comparison still
+    /// runs against the REAL filesystem via <see cref="ResolveFinalPath"/>, so
+    /// this only relocates the check to a real sandbox directory for the
+    /// integration tests; it does NOT let a MockFileSystem bypass the gate. It
+    /// mirrors <c>FileSystemScanService</c>'s own installer-folder override.
+    /// </param>
+    internal static bool IsInstallerFolderOrChild(string path, string? installerFolderRoot = null)
     {
         if (string.IsNullOrWhiteSpace(path)) return false;
 
         var resolvedInput = ResolveFinalPath(path)
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        var resolvedInstaller = ResolveFinalPath(InstallerFolder)
+        var resolvedInstaller = ResolveFinalPath(installerFolderRoot ?? InstallerFolder)
             .TrimEnd(Path.DirectorySeparatorChar);
 
         return resolvedInput.Equals(resolvedInstaller, StringComparison.OrdinalIgnoreCase)

@@ -188,6 +188,26 @@ public class DeleteFilesServiceUnitTests
     }
 
     [Fact]
+    public async Task Refuses_a_source_outside_the_installer_cache()
+    {
+        // The README's central promise as a test that cannot rot: a path that
+        // resolves OUTSIDE C:\Windows\Installer is refused at the service
+        // boundary even though the file exists and the engine would recycle it.
+        // No installer-folder override here, so the real C:\Windows\Installer is
+        // the boundary; C:\Temp is not inside it.
+        var (fs, engine) = Setup();
+        const string outside = @"C:\Temp\evil.msi";
+        fs.AddFile(outside, new MockFileData("payload"));
+        var svc = new DeleteFilesService(fs, engine);
+
+        var result = await svc.DeleteFilesAsync(new[] { outside }, permitPermanentDelete: true);
+
+        Assert.Equal(0, result.DeletedCount);
+        Assert.IsType<CandidateOutsideCache>(Assert.Single(result.Errors));
+        engine.DidNotReceive().RecycleFile(outside);
+    }
+
+    [Fact]
     public async Task Zero_files_returns_empty_result_without_probing()
     {
         var (fs, engine) = Setup();

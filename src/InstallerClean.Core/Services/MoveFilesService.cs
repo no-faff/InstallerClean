@@ -9,14 +9,28 @@ public sealed class MoveFilesService : IMoveFilesService
     private readonly IFileSystem _fs;
 
     /// <summary>
+    /// Test-only real-folder override for the containment guard's cache root
+    /// (null in production, which uses the real <c>C:\Windows\Installer</c>).
+    /// Lets the real-filesystem integration tests treat a %TEMP% sandbox as the
+    /// cache so a legitimately in-bounds source is not refused, without ever
+    /// touching the real cache. Mirrors <c>FileSystemScanService</c>'s own
+    /// installer-folder override.
+    /// </summary>
+    private readonly string? _installerFolderOverride;
+
+    /// <summary>
     /// Constructor. The DI container injects the registered
     /// <see cref="IFileSystem"/> singleton in production; tests pass
     /// a <see cref="MockFileSystem"/> so the move pipeline can be
     /// verified without touching <c>%TEMP%</c>.
     /// </summary>
-    public MoveFilesService(IFileSystem fileSystem)
+    public MoveFilesService(IFileSystem fileSystem) : this(fileSystem, null) { }
+
+    /// <summary>Test constructor. Points the source containment guard at a real sandbox folder.</summary>
+    internal MoveFilesService(IFileSystem fileSystem, string? installerFolderOverride)
     {
         _fs = fileSystem;
+        _installerFolderOverride = installerFolderOverride;
     }
 
     public Task<MoveResult> MoveFilesAsync(
@@ -113,6 +127,20 @@ public sealed class MoveFilesService : IMoveFilesService
                     if (Helpers.StorageHelpers.IsReparsePoint(sourcePath))
                     {
                         errors.Add(new SourceIsReparsePoint(sourcePath));
+                        continue;
+                    }
+
+                    // Containment guard at the service boundary, matching the
+                    // IsSystemFolderOrChild anchoring above: never move a source
+                    // that does not resolve inside C:\Windows\Installer. The scan
+                    // already filters candidates, but a corrupt LocalPackage
+                    // value or a future caller could reach here with an
+                    // out-of-bounds path; this is the choke point that refuses
+                    // it. Reparse is handled just above, so a failure here is an
+                    // out-of-bounds path.
+                    if (!CandidateGuard.IsSafeToRemove(sourcePath, _installerFolderOverride))
+                    {
+                        errors.Add(new CandidateOutsideCache(sourcePath));
                         continue;
                     }
 

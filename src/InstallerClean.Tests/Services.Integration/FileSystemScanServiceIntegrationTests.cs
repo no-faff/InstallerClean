@@ -16,10 +16,12 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
     }
 
     [Fact]
-    public async Task Real_directory_enumeration_finds_msi_and_msp_across_subdirs()
+    public async Task Real_directory_enumeration_finds_root_msi_and_msp_only()
     {
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "a.msi"), new byte[] { 1, 2, 3 });
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "b.msp"), new byte[] { 1, 2 });
+        // A file in a subdirectory: no longer a candidate (root-only scanning),
+        // because a registered LocalPackage path never sits in a subfolder.
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "nested", "c.msi"), new byte[] { 9 });
         File.WriteAllBytes(Path.Combine(_fakeInstallerDir, "readme.txt"), new byte[] { 7 });
 
@@ -30,11 +32,11 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         var svc = new FileSystemScanService(query, null, _fakeInstallerDir);
         var result = await svc.ScanAsync();
 
-        Assert.Equal(3, result.RemovableFiles.Count);
+        Assert.Equal(2, result.RemovableFiles.Count);
         Assert.Contains(result.RemovableFiles, f => f.FileName == "a.msi" && f.SizeBytes == 3);
         Assert.Contains(result.RemovableFiles, f => f.FileName == "b.msp" && f.SizeBytes == 2);
-        Assert.Contains(result.RemovableFiles, f => f.FileName == "c.msi" && f.SizeBytes == 1);
-        Assert.DoesNotContain(result.RemovableFiles, f => f.FileName == "readme.txt");
+        Assert.DoesNotContain(result.RemovableFiles, f => f.FileName == "c.msi");     // subdirectory
+        Assert.DoesNotContain(result.RemovableFiles, f => f.FileName == "readme.txt"); // wrong extension
     }
 
     [Fact]

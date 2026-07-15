@@ -107,6 +107,17 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 && !ext.Equals(".msp", StringComparison.OrdinalIgnoreCase))
                 continue;
 
+            // Containment guard at candidate creation. A walk file is normally
+            // in-bounds (it came out of the folder root), but assert it, so a
+            // reparse point that slipped the enumeration filter is dropped rather
+            // than offered. A refused candidate is logged and skipped.
+            if (!CandidateGuard.IsSafeToRemove(filePath, _installerFolderOverride))
+            {
+                CrashLog.Write(new InvalidOperationException(
+                    $"Removal candidate refused (outside the Installer cache or a reparse point): {filePath}"));
+                continue;
+            }
+
             long size = 0;
             // IOException covers locked / vanished files; UnauthorizedAccess
             // covers payload subfolders the elevated process still can't
@@ -165,7 +176,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // and counts separately so the banner does not fire on it.
             if (pkg.IsRemovable)
             {
-                if (exists)
+                // Containment guard at candidate creation. Unlike the orphan
+                // walk, a superseded/obsoleted candidate's path comes from an
+                // API or registry LocalPackage value, which a corrupt
+                // registration could point anywhere on disk. Drop one that does
+                // not resolve inside the cache (or is a reparse point) rather
+                // than offer it; a genuine cache patch always passes.
+                if (exists && CandidateGuard.IsSafeToRemove(pkg.LocalPackagePath, _installerFolderOverride))
                 {
                     var ext = _fs.Path.GetExtension(pkg.LocalPackagePath);
                     // PatchState 2 = superseded by a newer patch.
@@ -183,6 +200,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
                         IsRemovablePatch: true,
                         IsObsoleted: isObsoleted,
                         Reason: reason));
+                }
+                else if (exists)
+                {
+                    // In-bounds check failed on an existing removable file: drop
+                    // it (do not offer, do not count as missing) and log.
+                    CrashLog.Write(new InvalidOperationException(
+                        $"Removable-patch candidate refused (outside the Installer cache or a reparse point): {pkg.LocalPackagePath}"));
                 }
                 else
                 {

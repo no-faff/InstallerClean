@@ -118,13 +118,28 @@ public sealed record PermanentlyDeleted(string FilePath, int HResult)
 }
 
 /// <summary>
-/// Source file is a symlink or junction. Move refuses these so the
-/// move can't follow a reparse point out of C:\Windows\Installer.
+/// Source file is a symlink or junction. Move and Delete refuse these so the
+/// operation can't follow a reparse point out of C:\Windows\Installer.
 /// </summary>
 public sealed record SourceIsReparsePoint(string FilePath)
     : FileOperationError(FilePath)
 {
     public override string LocalisedMessage => Strings.Error_SourceIsReparsePoint;
+}
+
+/// <summary>
+/// The candidate does not resolve inside <c>C:\Windows\Installer</c>, so Move
+/// and Delete refuse it at the service boundary. A candidate should never reach
+/// here (both are already filtered where they are created), but a corrupt
+/// <c>LocalPackage</c> registration pointing outside the cache would otherwise
+/// make an arbitrary file a removal target; this is the choke point that makes
+/// that structurally impossible. The path is kept off the displayed sentence
+/// for the same elevated path-leak reason as <see cref="AccessDenied"/>.
+/// </summary>
+public sealed record CandidateOutsideCache(string FilePath)
+    : FileOperationError(FilePath)
+{
+    public override string LocalisedMessage => Strings.Error_CandidateOutsideCache;
 }
 
 /// <summary>

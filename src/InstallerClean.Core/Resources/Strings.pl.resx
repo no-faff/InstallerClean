@@ -544,6 +544,10 @@ Szczegóły w {1}.</value></data>
   <data name="Error.WriteDestination.NoLog" xml:space="preserve"><value>Nie można zapisać w {0}. Nie udało się zapisać dziennika awarii.</value></data>
   <data name="Error.MissingSourceFile" xml:space="preserve"><value>Plik już nie istnieje.</value></data>
   <data name="Error.SourceIsReparsePoint" xml:space="preserve"><value>Plik źródłowy jest dowiązaniem symbolicznym lub złączem (junction); odrzucono ze względów bezpieczeństwa.</value></data>
+  <!-- Category-only, no path (elevated path-leak rule). Shown for a candidate
+       that does not resolve inside C:\Windows\Installer, refused at the Move /
+       Delete service boundary. Should never reach a user in practice. -->
+  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>This file is not inside the Windows Installer folder; refused for safety.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file

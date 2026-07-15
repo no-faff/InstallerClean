@@ -9,6 +9,15 @@ public sealed class DeleteFilesService : IDeleteFilesService
     private readonly IRecycleEngine _engine;
 
     /// <summary>
+    /// Test-only real-folder override for the containment guard's cache root
+    /// (null in production). See the matching field on <c>MoveFilesService</c>:
+    /// it lets the real-filesystem integration tests treat a %TEMP% sandbox as
+    /// the cache without touching the real one, and does not let a MockFileSystem
+    /// bypass the gate.
+    /// </summary>
+    private readonly string? _installerFolderOverride;
+
+    /// <summary>
     /// Constructor. The DI container injects the registered
     /// <see cref="IFileSystem"/> and <see cref="IRecycleEngine"/>
     /// singletons in production; tests pass a <see cref="MockFileSystem"/>
@@ -17,9 +26,14 @@ public sealed class DeleteFilesService : IDeleteFilesService
     /// without touching the real Recycle Bin.
     /// </summary>
     public DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine)
+        : this(fileSystem, engine, null) { }
+
+    /// <summary>Test constructor. Points the source containment guard at a real sandbox folder.</summary>
+    internal DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine, string? installerFolderOverride)
     {
         _fs = fileSystem;
         _engine = engine;
+        _installerFolderOverride = installerFolderOverride;
     }
 
     public bool CanRecycleToVolume(string path) => _engine.CanRecycleToVolume(path);
@@ -66,6 +80,27 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     if (!_fs.File.Exists(filePath))
                     {
                         errors.Add(new MissingSourceFile(filePath));
+                        continue;
+                    }
+
+                    // Refuse a reparse-point source, matching MoveFilesService:
+                    // a shell recycle of a symlink removes the link, so following
+                    // one out of the cache is refused. Real-FS check
+                    // (MockFileSystem cannot bypass). Reparse first, then the
+                    // containment check, so a symlink is reported as one.
+                    if (Helpers.StorageHelpers.IsReparsePoint(filePath))
+                    {
+                        errors.Add(new SourceIsReparsePoint(filePath));
+                        continue;
+                    }
+
+                    // Containment guard at the service boundary: never recycle a
+                    // file that does not resolve inside C:\Windows\Installer, even
+                    // if a corrupt candidate reached here. This is the source-side
+                    // choke point the destination has always had.
+                    if (!CandidateGuard.IsSafeToRemove(filePath, _installerFolderOverride))
+                    {
+                        errors.Add(new CandidateOutsideCache(filePath));
                         continue;
                     }
 

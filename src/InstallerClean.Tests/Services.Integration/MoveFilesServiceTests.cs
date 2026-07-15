@@ -26,7 +26,11 @@ public class MoveFilesServiceTests : IDisposable
         var file = Path.Combine(_sourceDir, "test.msi");
         await File.WriteAllTextAsync(file, "content");
 
-        var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem());
+        // The source-containment guard requires sources to resolve inside the
+        // cache root; point that root at the sandbox so a legitimately in-bounds
+        // real file is not refused. The destination is a separate temp folder,
+        // outside the sandbox, so its own gates pass.
+        var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(), _sourceDir);
         var results = await svc.MoveFilesAsync(new[] { file }, _destDir);
 
         Assert.Empty(results.Errors);

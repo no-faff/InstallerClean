@@ -233,6 +233,7 @@ public static class Strings
     public static string Error_AccessDeniedDestination => Get("Error.AccessDeniedDestination");
     public static string Error_AdminRequiredBody => Get("Error.AdminRequiredBody");
     public static string Error_AdminRequiredTitle => Get("Error.AdminRequiredTitle");
+    public static string Error_CandidateOutsideCache => Get("Error.CandidateOutsideCache");
     public static string Error_CannotWriteFolder => Get("Error.CannotWriteFolder");
     public static string Error_DeletedNotRecycled => Get("Error.DeletedNotRecycled");
     public static string Error_DeleteFailedTitle => Get("Error.DeleteFailedTitle");
