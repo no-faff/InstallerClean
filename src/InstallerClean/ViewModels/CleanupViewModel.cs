@@ -513,6 +513,21 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             return;
         }
 
+        // Re-check the pending-reboot gate at the moment of action, after the
+        // confirmation and immediately before acting. The scan sampled it once; a
+        // user who left the confirmation dialog open while a Windows Installer
+        // transaction started would otherwise move files against a live install,
+        // the one condition the gate exists to block. Blocked => the banner paints
+        // via HasPendingReboot and both commands drop out; refuse without calling
+        // the service. (MoveInsteadAsync routes through MoveAllCommand, so it
+        // inherits this check.)
+        if (await _scan.RecheckPendingRebootAsync())
+        {
+            DisposeOperationCts();
+            OperationProgress = string.Empty;
+            return;
+        }
+
         // Heading before IsOperating: a heading assigned after the reveal
         // can be spoken twice (see OperationHeadingText in MainWindow.xaml).
         OperationProgress = string.Format(
@@ -527,6 +542,18 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // covers both the pre-flight and the move loop.
             var progress = new Progress<OperationProgress>(OnOperationProgressUpdate);
             var result = await _moveService.MoveFilesAsync(filePaths, dest, progress, _operationCts!.Token);
+
+            if (result.InstallerBusy)
+            {
+                // A Windows Installer transaction grabbed Global\_MSIExecute in the
+                // sub-millisecond gap between item 4's gate re-check passing and
+                // the service acquiring the mutex, so the service refused and
+                // touched nothing. Re-run the gate, which now reports the held
+                // mutex, to paint the banner, and report no completed operation.
+                await _scan.RecheckPendingRebootAsync();
+                OperationProgress = string.Empty;
+                return;
+            }
 
             if (result.Cancelled)
             {
@@ -719,6 +746,20 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         _operationCts = new CancellationTokenSource();
         IsOperationInFlight = true;
 
+        // Re-check the pending-reboot gate at the moment of action. One site here
+        // covers both passes: the recycle-first pass (after ConfirmDelete) and the
+        // consented permanent retry (after ConfirmRecycleUnavailable), each of
+        // which routes through here. Blocked => paint the banner and refuse; there
+        // is nothing to offer, so return false rather than the bin-unavailable
+        // true. A transaction that starts while the user reads a dialog is caught
+        // on whichever pass follows it.
+        if (await _scan.RecheckPendingRebootAsync())
+        {
+            DisposeOperationCts();
+            OperationProgress = string.Empty;
+            return false;
+        }
+
         // Probe the volume before showing any overlay on the recycle-first
         // pass: when the bin is unavailable the service deletes nothing, so a
         // "Deleting N files..." overlay (and its screen-reader announcement)
@@ -755,6 +796,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             var progress = new Progress<OperationProgress>(OnOperationProgressUpdate);
             var result = await _deleteService.DeleteFilesAsync(
                 ctx.FilePaths, permitPermanentDelete, progress, _operationCts.Token);
+
+            if (result.InstallerBusy)
+            {
+                // A Windows Installer transaction grabbed Global\_MSIExecute after
+                // item 4's gate re-check passed, so the service refused and touched
+                // nothing. Re-run the gate to paint the banner and report no
+                // completed operation.
+                await _scan.RecheckPendingRebootAsync();
+                OperationProgress = string.Empty;
+                return false;
+            }
 
             // Bin unavailable for the volume and no consent to permanently
             // delete: the service refused the batch and touched nothing. Hand

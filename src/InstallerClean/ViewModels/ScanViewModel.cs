@@ -462,6 +462,24 @@ public partial class ScanViewModel : ObservableObject
     }
 
     /// <summary>
+    /// Re-checks the pending-reboot gate at the moment of action, off the
+    /// dispatcher, and updates <see cref="PendingRebootResult"/> so the banner
+    /// paints and the Move/Delete commands drop out through the existing
+    /// <see cref="HasPendingReboot"/> wiring. Returns true when the gate now
+    /// blocks. The scan samples the gate once; a Windows Installer transaction
+    /// that starts after that sample, hours later if the window sits open, is
+    /// invisible until this runs immediately before a Move or Delete acts.
+    /// Mirrors the scan's own off-dispatcher Check() so a registry or mutex read
+    /// cannot stall the UI thread.
+    /// </summary>
+    public async Task<bool> RecheckPendingRebootAsync()
+    {
+        var result = await Task.Run(() => _rebootService.Check());
+        PendingRebootResult = result;
+        return result.IsBlocked;
+    }
+
+    /// <summary>
     /// Silent refresh used by Cleanup after a Move or Delete completes.
     /// Skips the scan overlay (IsScanning stays false) so the operating
     /// overlay can stay visible until its own finally block clears it.

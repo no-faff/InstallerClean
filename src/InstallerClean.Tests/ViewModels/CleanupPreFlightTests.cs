@@ -41,6 +41,9 @@ public class CleanupPreFlightTests
     public CleanupPreFlightTests()
     {
         _settingsService.Load().Returns(new AppSettings());
+        // Check() returns Clean or Block, never null (the interface contract);
+        // default it Clean so the act-time pending-reboot re-check proceeds.
+        _rebootService.Check().Returns(PendingRebootResult.Clean);
         // MockFileSystem's Path is a working implementation; a bare substitute
         // would return null from Combine and GetRandomFileName.
         _fileSystem.Path.Returns(new MockFileSystem().Path);

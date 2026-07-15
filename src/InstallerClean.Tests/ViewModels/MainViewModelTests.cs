@@ -39,6 +39,10 @@ public class MainViewModelTests
         // reaches DeleteFilesAsync; tests covering the bin-unavailable path
         // stub this false or return RecycleUnavailable from DeleteFilesAsync.
         _deleteService.CanRecycleToVolume(Arg.Any<string>()).Returns(true);
+        // Check() returns Clean or Block, never null (the interface contract);
+        // default it Clean so the scan and the act-time re-check both proceed.
+        // Tests covering the gate override with a Clean-then-Block sequence.
+        _rebootService.Check().Returns(PendingRebootResult.Clean);
 
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
@@ -648,6 +652,89 @@ public class MainViewModelTests
         // A recycle cancel names the Recycle Bin; it did reach the bin for the one
         // that completed.
         Assert.Contains("Recycle Bin", vm.Completion.Summary);
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_reboot_gate_flipping_blocked_at_action_time_refuses_and_paints_the_banner()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+        // Clean when the scan samples it, blocked by the time the user commits the
+        // move: a Windows Installer transaction started while the window sat open.
+        _rebootService.Check().Returns(
+            PendingRebootResult.Clean,
+            PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        Assert.False(vm.Scan.HasPendingReboot);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-reboot-gate");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // The act-time re-check found it blocked: the banner paints and the move
+        // service is never called.
+        Assert.True(vm.Scan.HasPendingReboot);
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.False(vm.Completion.IsComplete);
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_reboot_gate_flipping_blocked_at_action_time_refuses_and_paints_the_banner()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+        _rebootService.Check().Returns(
+            PendingRebootResult.Clean,
+            PendingRebootResult.Block(PendingRebootReason.InstallerInProgress));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Scan.HasPendingReboot);
+        await _deleteService.DidNotReceive().DeleteFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.False(vm.Completion.IsComplete);
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_installer_busy_result_paints_the_banner_and_reports_no_completion()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+        // Clean at the scan and at the act-time gate; a Windows Installer
+        // transaction then grabs the mutex in the residual race, so the service
+        // returns InstallerBusy and the re-run gate reports the held mutex.
+        _rebootService.Check().Returns(
+            PendingRebootResult.Clean,
+            PendingRebootResult.Clean,
+            PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-busy");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // The banner paints and nothing is reported as completed.
+        Assert.True(vm.Scan.HasPendingReboot);
+        Assert.False(vm.Completion.IsComplete);
         await _resultLogService.DidNotReceive().WriteAsync(
             Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
     }
