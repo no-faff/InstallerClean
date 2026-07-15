@@ -585,6 +585,74 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task MoveAllAsync_cancelled_mid_batch_reports_the_partial_on_the_completion_overlay()
+    {
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\c.msi", 3_145_728, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        // The service now returns the partial with Cancelled set rather than
+        // throwing the tally away: two moved before the stop.
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new MoveResult(2, Array.Empty<FileOperationError>(), Cancelled: true));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move-cancel");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // The overlay carries "Moved 2 of 3 files before you cancelled.", not just
+        // an empty status line as before.
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Contains("2 of 3", vm.Completion.Summary);
+        Assert.Contains("cancel", vm.Completion.Summary, StringComparison.OrdinalIgnoreCase);
+        // A cancelled run writes no result-log entry (owner's decision keeps the
+        // public reports stats meaning what they mean).
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_cancelled_mid_batch_reports_the_partial_on_the_completion_overlay()
+    {
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\x.msi", 524_288, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\y.msi", 524_288, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(), Cancelled: true));
+        _confirmationService.ConfirmDelete(
+            Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Contains("1 of 2", vm.Completion.Summary);
+        // A recycle cancel names the Recycle Bin; it did reach the bin for the one
+        // that completed.
+        Assert.Contains("Recycle Bin", vm.Completion.Summary);
+        await _resultLogService.DidNotReceive().WriteAsync(
+            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task DeleteAllAsync_recycle_unavailable_offers_choice_and_cancel_does_nothing()
     {
         // Bin unavailable for the volume: the recycle-first pass refuses

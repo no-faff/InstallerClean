@@ -189,6 +189,7 @@ public static class Strings
     public static string Cli_UnknownArgument => Get("Cli.UnknownArgument");
     public static string Completion_AllClean => Get("Completion.AllClean");
     public static string Completion_CleanedUp => Get("Completion.CleanedUp");
+    public static string Completion_DeleteCancelledSummary => Get("Completion.DeleteCancelledSummary");
     public static string Completion_DeleteRestoreHint => Get("Completion.DeleteRestoreHint");
     public static string Completion_DeleteSpaceHint => Get("Completion.DeleteSpaceHint");
     public static string Completion_DeleteSummary_Plural => Get("Completion.DeleteSummary.Plural");
@@ -196,6 +197,7 @@ public static class Strings
     public static string Completion_DeleteSummaryWithErrors_Plural => Get("Completion.DeleteSummaryWithErrors.Plural");
     public static string Completion_DeleteSummaryWithErrors_Singular => Get("Completion.DeleteSummaryWithErrors.Singular");
     public static string Completion_Freed => Get("Completion.Freed");
+    public static string Completion_MoveCancelledSummary => Get("Completion.MoveCancelledSummary");
     public static string Completion_Moved => Get("Completion.Moved");
     public static string Completion_MoveRestoreHint => Get("Completion.MoveRestoreHint");
     public static string Completion_MoveSummary_Plural => Get("Completion.MoveSummary.Plural");
@@ -207,6 +209,7 @@ public static class Strings
     public static string Completion_PartlyCleanedUp => Get("Completion.PartlyCleanedUp");
     public static string Completion_PartlyFreed => Get("Completion.PartlyFreed");
     public static string Completion_PartlyMoved => Get("Completion.PartlyMoved");
+    public static string Completion_PermanentDeleteCancelledSummary => Get("Completion.PermanentDeleteCancelledSummary");
     public static string Completion_PermanentDeleteRestoreHint_Plural => Get("Completion.PermanentDeleteRestoreHint.Plural");
     public static string Completion_PermanentDeleteRestoreHint_Singular => Get("Completion.PermanentDeleteRestoreHint.Singular");
     public static string Completion_PermanentDeleteSummary_Plural => Get("Completion.PermanentDeleteSummary.Plural");

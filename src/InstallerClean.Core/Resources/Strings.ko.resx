@@ -406,6 +406,16 @@
        a language may add a satellite-only Completion.ReverifySkipped.One/.Few/.Many
        override. DRAFT wording, owner to refine in the translation batch. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} files were left in place because an installed program has needed them again since the scan.</value></data>
+  <!-- Completion-overlay summaries for a Move or Delete the user cancelled
+       part-way through. 0 = the count that completed before the stop, 1 = the
+       total that was being processed, 2 = pluralised "file"/"files" for the
+       total. Distinct from the Status.*Cancelled.Partial keys, which are the
+       body-row status line; these are the overlay's own summary sentence. The
+       permanent variant never claims the Recycle Bin: those files did not reach
+       it. -->
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Moved {0} of {1} {2} before you cancelled.</value></data>
+  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>Sent {0} of {1} {2} to the Recycle Bin before you cancelled.</value></data>
+  <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Permanently deleted {0} of {1} {2} before you cancelled.</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files

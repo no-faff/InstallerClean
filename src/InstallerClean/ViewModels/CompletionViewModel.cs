@@ -320,6 +320,82 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
+    /// Shows the completion summary for a Move the user cancelled part-way
+    /// through. <paramref name="movedCount"/> of <paramref name="totalCount"/>
+    /// files were moved before the stop, and <paramref name="movedBytes"/> is the
+    /// size of just those. The heading states what was accomplished, not the
+    /// "some files could not be processed" of a partial FAILURE (a cancel is not
+    /// one); the summary line says it was a cancel, and the moved files still get
+    /// the restore reassurance because they are the ones that reached the
+    /// destination.
+    /// </summary>
+    public void ShowMoveCancelledSummary(int movedCount, int totalCount, long movedBytes,
+        IReadOnlyList<FileOperationError> errors, bool freesSpace)
+    {
+        Heading = string.Format(
+            freesSpace ? Strings.Completion_Freed : Strings.Completion_Moved,
+            DisplayHelpers.FormatSize(movedBytes));
+        SummaryDestination = string.Empty;
+        Summary = string.Format(
+            DisplayHelpers.Pluralise(totalCount, Strings.Completion_MoveCancelledSummary, "Completion.MoveCancelledSummary"),
+            movedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
+        SpaceHint = string.Empty;
+        Restore = Strings.Completion_MoveRestoreHint;
+        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        ResultLogStatusMessage = string.Empty;
+        LastResultFreedNothing = movedBytes <= 0;
+        IsComplete = true;
+    }
+
+    /// <summary>
+    /// Shows the completion summary for a recycle Delete the user cancelled
+    /// part-way through: <paramref name="deletedCount"/> of
+    /// <paramref name="totalCount"/> files reached the Recycle Bin before the
+    /// stop. The consented permanent-delete cancel has its own method so it never
+    /// claims the bin.
+    /// </summary>
+    public void ShowDeleteCancelledSummary(int deletedCount, int totalCount, long deletedBytes,
+        IReadOnlyList<FileOperationError> errors)
+    {
+        Heading = string.Format(Strings.Completion_CleanedUp, DisplayHelpers.FormatSize(deletedBytes));
+        SummaryDestination = string.Empty;
+        Summary = string.Format(
+            DisplayHelpers.Pluralise(totalCount, Strings.Completion_DeleteCancelledSummary, "Completion.DeleteCancelledSummary"),
+            deletedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
+        SpaceHint = Strings.Completion_DeleteSpaceHint;
+        Restore = Strings.Completion_DeleteRestoreHint;
+        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        ResultLogStatusMessage = string.Empty;
+        LastResultFreedNothing = deletedBytes <= 0;
+        IsComplete = true;
+    }
+
+    /// <summary>
+    /// Shows the completion summary for a consented permanent Delete the user
+    /// cancelled part-way through. These files did NOT reach the Recycle Bin, so
+    /// the copy never mentions it and the restore hint points at reinstalling
+    /// rather than at the (empty) bin, matching <see cref="ShowPermanentDeleteSummary"/>.
+    /// </summary>
+    public void ShowPermanentDeleteCancelledSummary(int deletedCount, int totalCount, long deletedBytes,
+        IReadOnlyList<FileOperationError> errors)
+    {
+        Heading = string.Format(Strings.Completion_CleanedUp, DisplayHelpers.FormatSize(deletedBytes));
+        SummaryDestination = string.Empty;
+        Summary = string.Format(
+            DisplayHelpers.Pluralise(totalCount, Strings.Completion_PermanentDeleteCancelledSummary, "Completion.PermanentDeleteCancelledSummary"),
+            deletedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
+        SpaceHint = string.Empty;
+        Restore = DisplayHelpers.Pluralise(deletedCount,
+            Strings.Completion_PermanentDeleteRestoreHint_Singular,
+            Strings.Completion_PermanentDeleteRestoreHint_Plural,
+            "Completion.PermanentDeleteRestoreHint");
+        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        ResultLogStatusMessage = string.Empty;
+        LastResultFreedNothing = deletedBytes <= 0;
+        IsComplete = true;
+    }
+
+    /// <summary>
     /// Marks a fresh result-log as available to send. No-op when the
     /// lifetime lock is set, when the session lock has fired (any click
     /// outcome this run), or when the prompt has already been offered

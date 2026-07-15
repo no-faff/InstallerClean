@@ -527,6 +527,31 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // covers both the pre-flight and the move loop.
             var progress = new Progress<OperationProgress>(OnOperationProgressUpdate);
             var result = await _moveService.MoveFilesAsync(filePaths, dest, progress, _operationCts!.Token);
+
+            if (result.Cancelled)
+            {
+                // Cancelled mid-batch: the service returned what completed rather
+                // than throwing the tally away. Report the partial on the
+                // completion overlay, and write no result-log entry for a
+                // cancelled run (the owner's decision keeps the public reports
+                // stats meaning what they mean). Only raise the overlay when
+                // something actually moved or errored; a cancel that reached no
+                // file just clears.
+                await _scan.RefreshAsync();
+                if (result.MovedCount > 0 || result.Errors.Count > 0)
+                {
+                    var cancelledFreesSpace = destinationKind is MoveDestinationKinds.DifferentFixedDrive
+                        or MoveDestinationKinds.RemovableDrive
+                        or MoveDestinationKinds.UncShare;
+                    _completion.ShowMoveCancelledSummary(
+                        result.MovedCount, count,
+                        CompletedBytes(removableFiles, result.MovedCount, result.Errors),
+                        result.Errors, cancelledFreesSpace);
+                }
+                OperationProgress = string.Empty;
+                return;
+            }
+
             var movedCount = result.MovedCount;
             var movedDest = dest;
             var errorCount = result.Errors.Count;
@@ -573,16 +598,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (OperationCanceledException)
         {
-            // OperationCurrentFile and OperationTotalFiles hold the last
-            // worker-reported counts when the OCE arrives; the finally
-            // resets them, so the catch reads them first.
-            OperationProgress = OperationCurrentFile > 0 && OperationTotalFiles > 0
-                ? string.Format(Strings.Status_MoveCancelled_Partial,
-                    OperationCurrentFile,
-                    OperationTotalFiles,
-                    DisplayHelpers.PluraliseFile(OperationTotalFiles))
-                : string.Empty;
+            // A cancel before the worker starts (the token was cancelled between
+            // the confirmation and Task.Run) moves nothing; a mid-batch cancel now
+            // comes back as result.Cancelled above rather than as a throw, and is
+            // reported on the overlay there. Nothing reached a file here, so just
+            // refresh the counts and clear.
             await _scan.RefreshAsync();
+            OperationProgress = string.Empty;
         }
         catch (LocalisedInvalidOperationException ex)
         {
@@ -749,6 +771,28 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 return true;
             }
 
+            if (result.Cancelled)
+            {
+                // Cancelled mid-batch: report the partial on the completion
+                // overlay (no result-log entry for a cancelled run). The permanent
+                // retry gets its own summary so it never claims the Recycle Bin;
+                // the files it deleted did not reach it. Only raise the overlay
+                // when something actually happened.
+                await _scan.RefreshAsync();
+                if (result.DeletedCount > 0 || result.Errors.Count > 0)
+                {
+                    var cancelledBytes = CompletedBytes(ctx.RemovableFiles, result.DeletedCount, result.Errors);
+                    if (permitPermanentDelete)
+                        _completion.ShowPermanentDeleteCancelledSummary(
+                            result.DeletedCount, ctx.Count, cancelledBytes, result.Errors);
+                    else
+                        _completion.ShowDeleteCancelledSummary(
+                            result.DeletedCount, ctx.Count, cancelledBytes, result.Errors);
+                }
+                OperationProgress = string.Empty;
+                return false;
+            }
+
             var deletedCount = result.DeletedCount;
             var errorCount = result.Errors.Count;
 
@@ -789,13 +833,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (OperationCanceledException)
         {
-            OperationProgress = OperationCurrentFile > 0 && OperationTotalFiles > 0
-                ? string.Format(Strings.Status_DeleteCancelled_Partial,
-                    OperationCurrentFile,
-                    OperationTotalFiles,
-                    DisplayHelpers.PluraliseFile(OperationTotalFiles))
-                : string.Empty;
+            // A cancel before the worker starts moves nothing; a mid-batch cancel
+            // now returns as result.Cancelled above and is reported on the overlay
+            // there. Refresh the counts and clear.
             await _scan.RefreshAsync();
+            OperationProgress = string.Empty;
             return false;
         }
         catch (Exception ex)
@@ -889,6 +931,27 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         ScanResult PreOpScan,
         long PreOpDurationMs,
         string PreOpRebootLabel);
+
+    /// <summary>
+    /// Bytes of the files a cancelled batch actually completed. The action
+    /// services process their input in order and stop at the cancel point, so the
+    /// files they reached are the first (<paramref name="completedCount"/> plus
+    /// the errors); of those, the ones that did not error are what moved or
+    /// deleted. The exact figure on a cancel rests on that ordered processing,
+    /// which both <see cref="IMoveFilesService"/> and <see cref="IDeleteFilesService"/>
+    /// do; the success path can lean on "no errors means every file completed"
+    /// instead, which a cancel cannot.
+    /// </summary>
+    private static long CompletedBytes(IReadOnlyList<OrphanedFile> files, int completedCount,
+        IReadOnlyList<FileOperationError> errors)
+    {
+        var reached = completedCount + errors.Count;
+        if (errors.Count == 0)
+            return files.Take(reached).Sum(f => f.SizeBytes);
+
+        var errorPaths = new HashSet<string>(errors.Select(e => e.FilePath), StringComparer.OrdinalIgnoreCase);
+        return files.Take(reached).Where(f => !errorPaths.Contains(f.FullPath)).Sum(f => f.SizeBytes);
+    }
 
     /// <summary>
     /// Localised "{current} of {total} files" line shown beneath the
