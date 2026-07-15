@@ -690,6 +690,15 @@ public partial class MainWindow : Window
                 Header = header,
                 Command = _vm.Chrome.SetLanguageCommand,
                 CommandParameter = culture,
+                // Mark the active language as checked so a screen reader is told
+                // which of the fifteen is current through the UIA Toggle pattern,
+                // rather than only by the tick glyph in the header, which is a
+                // Segoe MDL2 private-use codepoint with no accessible text. The
+                // app's MenuItem template (Components.xaml) draws no check mark of
+                // its own, so IsChecked reaches UIA without changing what the menu
+                // looks like; the glyph stays the sighted cue.
+                IsCheckable = true,
+                IsChecked = isActive,
             };
             // Close on invoke regardless of what the command does. Picking the
             // displayed language is a no-op command (no relaunch), and a
