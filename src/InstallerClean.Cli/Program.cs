@@ -31,6 +31,28 @@ internal static class Program
 
     public static int Main(string[] args)
     {
+        // A throw from the pre-flight in Run (setting the console encoding on a
+        // console-less "run whether user is logged on or not" scheduled task, a
+        // name or ACL clash constructing the single-instance mutex) would
+        // otherwise reach the runtime's default handler: ex.ToString() to stderr
+        // (a cross-profile path leak under elevation), no Application-log record,
+        // and an undocumented exit code no RMM can branch on. Route any such
+        // throw through the same crash-log + audit + ExitError path the work loop
+        // uses. Run holds the single-instance mutex on this thread (acquire and
+        // release both here, per the Win32 owner-thread rule) and RunWorkAsync
+        // owns its own catch-all, so only genuine pre-flight throws reach here.
+        try
+        {
+            return Run(args);
+        }
+        catch (Exception ex)
+        {
+            return ReportUnexpectedError(args.Length > 0 ? args[0].ToLowerInvariant() : "(none)", ex);
+        }
+    }
+
+    private static int Run(string[] args)
+    {
         // Pin to UTF-8 so a Cli.* translation into a non-ASCII language
         // doesn't mojibake under redirected output (cmd /c
         // installerclean-cli /s > out.txt) or PowerShell 5's OEM
@@ -454,20 +476,48 @@ internal static class Program
         }
         catch (Exception ex)
         {
-            // ex.Message stays out of stdout AND the EventLog: under
-            // elevation it can carry cross-profile paths, and Task
-            // Scheduler / RMM tooling routinely captures stdout to disk.
-            // Type-name + crash-log path only.
-            var crash = Helpers.CrashLog.TryWrite(ex);
-            var typeName = ex.GetType().Name;
+            // No specific catch anticipated this. Hand it to the shared
+            // last-resort handler so a work-loop crash and a pre-flight crash
+            // (Main's guard routes here too) report identically: crash.log, one
+            // HardError audit entry, ExitError, and never ex.Message.
+            return ReportUnexpectedError(arg, ex);
+        }
+    }
+
+    /// <summary>
+    /// The last-resort handler for an exception no specific catch anticipated,
+    /// shared by <see cref="RunWorkAsync"/>'s catch-all and <see cref="Main"/>'s
+    /// pre-flight guard so the two report on the same contract. Writes the full
+    /// detail to crash.log, prints only the exception type name and the
+    /// crash-log path (never <c>ex.Message</c>: under elevation it can carry a
+    /// path out of another user's profile, and Task Scheduler / RMM tooling
+    /// captures stdout to disk), records one HardError Application-log entry, and
+    /// returns <see cref="ExitError"/> so a scheduled task sees a documented exit
+    /// code rather than a runtime abort with an undocumented one. Safe to call
+    /// after the console itself has failed (the stdout write is guarded, and
+    /// <see cref="CrashLog.TryWrite"/> and <see cref="EventLogWriter"/> both
+    /// swallow their own IO), which is the state a pre-flight console failure
+    /// leaves behind.
+    /// </summary>
+    private static int ReportUnexpectedError(string mode, Exception ex)
+    {
+        var crash = Helpers.CrashLog.TryWrite(ex);
+        var typeName = ex.GetType().Name;
+        try
+        {
             Console.WriteLine(crash.Written
                 ? string.Format(Strings.Cli_GenericError, typeName, crash.Path)
                 : string.Format(Strings.Cli_GenericError_NoLog, typeName));
-            MachineContract.WriteEventLog(CliEventClass.HardError, () => crash.Written
-                ? string.Format(Strings.Cli_EventLogHardError, arg, typeName, crash.Path)
-                : string.Format(Strings.Cli_EventLogHardError_NoLog, arg, typeName));
-            return ExitError;
         }
+        catch (IOException)
+        {
+            // stdout itself is unwritable, which is one of the failures that can
+            // bring us here; crash.log and the audit entry below carry the record.
+        }
+        MachineContract.WriteEventLog(CliEventClass.HardError, () => crash.Written
+            ? string.Format(Strings.Cli_EventLogHardError, mode, typeName, crash.Path)
+            : string.Format(Strings.Cli_EventLogHardError_NoLog, mode, typeName));
+        return ExitError;
     }
 
     /// <summary>
