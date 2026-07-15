@@ -514,6 +514,11 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource Action.Primary.Background}"/>
+                            <!-- Text.Muted on Action.Primary.Background is 4.04:1 (fails AA
+                                 4.5:1 for the 12px header text); the focus fill must lift the
+                                 header foreground too, as the highlighted menu row lifts its
+                                 gesture column. Text.Body on that fill is 6.97:1. -->
+                            <Setter Property="Foreground" Value="{StaticResource Text.Body}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
