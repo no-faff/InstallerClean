@@ -84,7 +84,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             moveService, deleteService, settingsService,
             dialogService, confirmationService, fileSystem,
             Scan, Completion, resultLogService, reverifier);
-        Chrome = new ChromeViewModel(windowService, msiInfoService, settingsService, Scan);
+        Chrome = new ChromeViewModel(windowService, msiInfoService, settingsService, Scan,
+            isBusy: () => IsBusy);
 
         // Surface the all-clear overlay when a scan finishes with no
         // orphans. Cleanup sets IsOperating=false after the post-
@@ -131,6 +132,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// </summary>
     public bool IsMainContentInteractive =>
         !Scan.IsScanning && !Cleanup.IsOperating && !Completion.IsComplete;
+
+    /// <summary>
+    /// The single source of truth for "a scan or a destructive operation is in
+    /// flight", owned here rather than inferred at each call site from the two
+    /// execution flags (<see cref="ScanViewModel.IsScanInFlight"/> and
+    /// <see cref="CleanupViewModel.IsOperationInFlight"/>). The language switch
+    /// consults it to refuse a relaunch mid-operation, which the disabled bottom
+    /// nav alone misses during a Move/Delete pre-flight (that runs before the
+    /// operating overlay is shown). The command CanExecute predicates gate on the
+    /// same two flags this unifies, and the window's close-hold uses the narrower
+    /// <see cref="CleanupViewModel.IsOperating"/> deliberately: it is the
+    /// finish-the-current-file flag, and a read-only scan needs no such hold.
+    /// </summary>
+    public bool IsBusy => Scan.IsScanInFlight || Cleanup.IsOperationInFlight;
 
     /// <summary>
     /// The main window's opening line. The intro is the only thing that tells the
@@ -224,11 +239,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
 
         if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||
+            e.PropertyName == nameof(ScanViewModel.IsScanInFlight) ||
             e.PropertyName == nameof(CleanupViewModel.IsOperating) ||
             e.PropertyName == nameof(CleanupViewModel.IsOperationInFlight) ||
             e.PropertyName == nameof(CompletionViewModel.IsComplete))
         {
             OnPropertyChanged(nameof(IsMainContentInteractive));
+            OnPropertyChanged(nameof(IsBusy));
             // Block F5 / Re-scan while a Move/Delete (its pre-flight included)
             // or a completion is up so a parallel scan can't race the operation.
             Scan.NotifyExternallyBlockedChanged();

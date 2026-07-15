@@ -1534,4 +1534,22 @@ public class MainViewModelTests
         Assert.DoesNotContain("{1}", vm.MainExplanationWhyText);
         Assert.DoesNotContain("{2}", vm.MainExplanationWhyText);
     }
+
+    [Fact]
+    public void A_language_switch_relaunches_when_no_scan_or_operation_is_in_flight()
+    {
+        var vm = CreateViewModel();
+        Assert.False(vm.IsBusy);
+
+        // A culture guaranteed to differ from the active one, so the switch is a
+        // real change and not the same-language no-op.
+        var active = InstallerClean.Helpers.SupportedLanguages.Active(
+            InstallerClean.Helpers.Localisation.UiCulture);
+        var different = string.Equals(active, "fr", StringComparison.OrdinalIgnoreCase) ? "de" : "fr";
+
+        vm.Chrome.SetLanguageCommand.Execute(different);
+
+        // Idle, so the new busy check does not block: the relaunch still fires.
+        _windowService.Received(1).RelaunchForLanguageChange();
+    }
 }

@@ -288,6 +288,33 @@ public class CleanupPreFlightTests
     }
 
     [Fact]
+    public async Task A_language_switch_is_refused_while_a_move_pre_flight_is_in_flight()
+    {
+        var releaseProbe = new ManualResetEventSlim();
+        _directory.When(d => d.CreateDirectory(Arg.Any<string>())).Do(_ => releaseProbe.Wait());
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        var move = vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // Provably inside the pre-flight: IsOperationInFlight is set but the
+        // operating overlay is not yet up, so the disabled-nav mechanism that
+        // normally blocks the globe does NOT catch this window. IsBusy does.
+        Assert.True(vm.IsBusy);
+        Assert.False(vm.Cleanup.IsOperating);
+
+        // A relaunch here would tear the process down under the running operation,
+        // exactly like closing the window mid-move. It must be refused.
+        vm.Chrome.SetLanguageCommand.Execute("fr");
+        _windowService.DidNotReceive().RelaunchForLanguageChange();
+
+        releaseProbe.Set();
+        await move;
+    }
+
+    [Fact]
     public async Task The_pre_flight_creates_and_probes_the_destination_before_the_confirmation()
     {
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())

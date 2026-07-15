@@ -25,18 +25,23 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     private readonly IMsiFileInfoService _msiInfoService;
     private readonly ISettingsService _settings;
     private readonly ScanViewModel _scan;
+    private readonly Func<bool> _isBusy;
     private readonly PropertyChangedEventHandler _scanHandler;
 
     public ChromeViewModel(
         IWindowService windowService,
         IMsiFileInfoService msiInfoService,
         ISettingsService settings,
-        ScanViewModel scan)
+        ScanViewModel scan,
+        Func<bool>? isBusy = null)
     {
         _windowService = windowService;
         _msiInfoService = msiInfoService;
         _settings = settings;
         _scan = scan;
+        // MainViewModel.IsBusy: a scan or a Move/Delete in flight. Null in a bare
+        // test construction (never busy).
+        _isBusy = isBusy ?? (() => false);
 
         // Re-evaluate the Details buttons when a scan finishes.
         // HasScanned is observable; LastScanResult is a plain auto-
@@ -124,6 +129,14 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     private void SetLanguage(string? culture)
     {
         if (string.Equals(culture, SupportedLanguages.Active(Localisation.UiCulture), StringComparison.OrdinalIgnoreCase))
+            return;
+        // Refuse a relaunch while a scan or a Move/Delete is in flight: the
+        // relaunch tears the process down and the child cannot inherit the running
+        // operation, so it would end exactly like closing the window mid-move. The
+        // bottom-nav globe is already disabled while the scanning or operating
+        // overlay is up, but a Move/Delete pre-flight runs with the overlay not yet
+        // shown, so this is the belt that covers that window.
+        if (_isBusy())
             return;
         _settings.Update(s => s.Language = culture);
         _windowService.RelaunchForLanguageChange();
