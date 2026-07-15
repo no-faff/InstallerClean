@@ -4,9 +4,9 @@ namespace InstallerClean.Helpers;
 
 /// <summary>
 /// GitHub README links in the language the app is displaying. Every README
-/// carries the same explicit anchors (<c>recovery</c>, <c>is-it-safe</c>), so
-/// a link built here lands on the section in the reader's own language rather
-/// than sending every user to the English page.
+/// carries the same explicit anchors (<c>recovery</c>, <c>is-it-safe</c>,
+/// <c>reports-stats</c>), so a link built here lands on the section in the
+/// reader's own language rather than sending every user to the English page.
 /// </summary>
 public static class ReadmeLinks
 {
