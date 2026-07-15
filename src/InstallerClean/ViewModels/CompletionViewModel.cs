@@ -68,6 +68,16 @@ public partial class CompletionViewModel : ObservableObject
 
     [ObservableProperty] private string _errors = string.Empty;
 
+    /// <summary>
+    /// Line shown when the act-time re-verify left some candidates out of the
+    /// batch because a program has needed them again since the scan. Empty on
+    /// every path where the re-verify dropped nothing (the common case), which
+    /// collapses the bound TextBlock. Set through the <c>skippedByReverify</c>
+    /// argument of the Show* summary methods and cleared everywhere else, because
+    /// the view-model instance is reused across operations.
+    /// </summary>
+    [ObservableProperty] private string _skipped = string.Empty;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsSendResultLogVisible))]
     private bool _isResultLogReady;
@@ -186,10 +196,24 @@ public partial class CompletionViewModel : ObservableObject
             DisplayHelpers.PluraliseProduct(installedProductCount),
             DisplayHelpers.FormatElapsedLong(TimeSpan.FromMilliseconds(scanDurationMs)));
         Errors = string.Empty;
+        Skipped = string.Empty;
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = true;
         IsComplete = true;
     }
+
+    /// <summary>
+    /// The "N files kept in place, still needed" line for a completion overlay,
+    /// or empty when the act-time re-verify dropped nothing. Shown alongside the
+    /// Move/Delete summary so the totals still add up (acted on + kept = the
+    /// scan's candidates).
+    /// </summary>
+    private static string SkippedText(int skippedByReverify) =>
+        skippedByReverify > 0
+            ? string.Format(
+                DisplayHelpers.Pluralise(skippedByReverify, Strings.Completion_ReverifySkipped, "Completion.ReverifySkipped"),
+                skippedByReverify, DisplayHelpers.PluraliseFile(skippedByReverify))
+            : string.Empty;
 
     /// <summary>
     /// Shows the post-Move summary including any per-file errors.
@@ -200,7 +224,7 @@ public partial class CompletionViewModel : ObservableObject
     /// claim-less verb also covers an unclassifiable destination).
     /// </summary>
     public void ShowMoveSummary(int movedCount, long movedBytes, string destination,
-        IReadOnlyList<FileOperationError> errors, bool freesSpace)
+        IReadOnlyList<FileOperationError> errors, bool freesSpace, int skippedByReverify = 0)
     {
         // Distinct heading on partial-failure paths so a user whose
         // Move only half-completed doesn't see a green "120 MB freed"
@@ -237,6 +261,7 @@ public partial class CompletionViewModel : ObservableObject
         SpaceHint = string.Empty;
         Restore = Strings.Completion_MoveRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        Skipped = SkippedText(skippedByReverify);
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = movedBytes <= 0;
         IsComplete = true;
@@ -244,7 +269,7 @@ public partial class CompletionViewModel : ObservableObject
 
     /// <summary>Shows the post-Delete summary including any per-file errors.</summary>
     public void ShowDeleteSummary(int deletedCount, long deletedBytes,
-        IReadOnlyList<FileOperationError> errors)
+        IReadOnlyList<FileOperationError> errors, int skippedByReverify = 0)
     {
         Heading = string.Format(
             errors.Count == 0 ? Strings.Completion_CleanedUp : Strings.Completion_PartlyCleanedUp,
@@ -269,6 +294,7 @@ public partial class CompletionViewModel : ObservableObject
         SpaceHint = Strings.Completion_DeleteSpaceHint;
         Restore = Strings.Completion_DeleteRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        Skipped = SkippedText(skippedByReverify);
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
         IsComplete = true;
@@ -283,7 +309,7 @@ public partial class CompletionViewModel : ObservableObject
     /// (empty) Recycle Bin.
     /// </summary>
     public void ShowPermanentDeleteSummary(int deletedCount, long deletedBytes,
-        IReadOnlyList<FileOperationError> errors)
+        IReadOnlyList<FileOperationError> errors, int skippedByReverify = 0)
     {
         Heading = string.Format(
             errors.Count == 0 ? Strings.Completion_CleanedUp : Strings.Completion_PartlyCleanedUp,
@@ -314,6 +340,7 @@ public partial class CompletionViewModel : ObservableObject
             Strings.Completion_PermanentDeleteRestoreHint_Plural,
             "Completion.PermanentDeleteRestoreHint");
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        Skipped = SkippedText(skippedByReverify);
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
         IsComplete = true;
@@ -330,7 +357,7 @@ public partial class CompletionViewModel : ObservableObject
     /// destination.
     /// </summary>
     public void ShowMoveCancelledSummary(int movedCount, int totalCount, long movedBytes,
-        IReadOnlyList<FileOperationError> errors, bool freesSpace)
+        IReadOnlyList<FileOperationError> errors, bool freesSpace, int skippedByReverify = 0)
     {
         Heading = string.Format(
             freesSpace ? Strings.Completion_Freed : Strings.Completion_Moved,
@@ -342,6 +369,7 @@ public partial class CompletionViewModel : ObservableObject
         SpaceHint = string.Empty;
         Restore = Strings.Completion_MoveRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        Skipped = SkippedText(skippedByReverify);
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = movedBytes <= 0;
         IsComplete = true;
@@ -355,7 +383,7 @@ public partial class CompletionViewModel : ObservableObject
     /// claims the bin.
     /// </summary>
     public void ShowDeleteCancelledSummary(int deletedCount, int totalCount, long deletedBytes,
-        IReadOnlyList<FileOperationError> errors)
+        IReadOnlyList<FileOperationError> errors, int skippedByReverify = 0)
     {
         Heading = string.Format(Strings.Completion_CleanedUp, DisplayHelpers.FormatSize(deletedBytes));
         SummaryDestination = string.Empty;
@@ -365,6 +393,7 @@ public partial class CompletionViewModel : ObservableObject
         SpaceHint = Strings.Completion_DeleteSpaceHint;
         Restore = Strings.Completion_DeleteRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        Skipped = SkippedText(skippedByReverify);
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
         IsComplete = true;
@@ -377,7 +406,7 @@ public partial class CompletionViewModel : ObservableObject
     /// rather than at the (empty) bin, matching <see cref="ShowPermanentDeleteSummary"/>.
     /// </summary>
     public void ShowPermanentDeleteCancelledSummary(int deletedCount, int totalCount, long deletedBytes,
-        IReadOnlyList<FileOperationError> errors)
+        IReadOnlyList<FileOperationError> errors, int skippedByReverify = 0)
     {
         Heading = string.Format(Strings.Completion_CleanedUp, DisplayHelpers.FormatSize(deletedBytes));
         SummaryDestination = string.Empty;
@@ -390,8 +419,30 @@ public partial class CompletionViewModel : ObservableObject
             Strings.Completion_PermanentDeleteRestoreHint_Plural,
             "Completion.PermanentDeleteRestoreHint");
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
+        Skipped = SkippedText(skippedByReverify);
         ResultLogStatusMessage = string.Empty;
         LastResultFreedNothing = deletedBytes <= 0;
+        IsComplete = true;
+    }
+
+    /// <summary>
+    /// Shows the completion overlay when the act-time re-verify reclaimed EVERY
+    /// candidate, so nothing was moved or deleted. No freed-size heading (nothing
+    /// was freed); the summary IS the "N kept in place" message.
+    /// </summary>
+    public void ShowReverifyAllSkipped(int skippedCount)
+    {
+        Heading = Strings.Completion_AllClean;
+        SummaryDestination = string.Empty;
+        Summary = string.Format(
+            DisplayHelpers.Pluralise(skippedCount, Strings.Completion_ReverifySkipped, "Completion.ReverifySkipped"),
+            skippedCount, DisplayHelpers.PluraliseFile(skippedCount));
+        SpaceHint = string.Empty;
+        Restore = string.Empty;
+        Errors = string.Empty;
+        Skipped = string.Empty;
+        ResultLogStatusMessage = string.Empty;
+        LastResultFreedNothing = true;
         IsComplete = true;
     }
 

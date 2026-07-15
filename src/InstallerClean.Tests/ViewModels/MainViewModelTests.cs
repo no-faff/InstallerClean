@@ -22,6 +22,7 @@ public class MainViewModelTests
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
     private readonly IResultLogService _resultLogService = Substitute.For<IResultLogService>();
+    private readonly IRemovableReverifier _reverifier = Substitute.For<IRemovableReverifier>();
     private readonly MockFileSystem _fileSystem = new();
 
     private MainViewModel CreateViewModel() => CreateViewModel(new AppSettings());
@@ -43,12 +44,17 @@ public class MainViewModelTests
         // default it Clean so the scan and the act-time re-check both proceed.
         // Tests covering the gate override with a Clean-then-Block sequence.
         _rebootService.Check().Returns(PendingRebootResult.Clean);
+        // Default the act-time re-verify to a no-op: every candidate survives and
+        // nothing is dropped, so a Move/Delete acts on the full set as before.
+        // Tests covering P2 override this to drop entries or to throw.
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .Returns(ci => new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>()));
 
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService,
-            _fileSystem, _resultLogService);
+            _fileSystem, _resultLogService, _reverifier);
     }
 
     private static ScanResult EmptyScanResult() =>
@@ -737,6 +743,134 @@ public class MainViewModelTests
         Assert.False(vm.Completion.IsComplete);
         await _resultLogService.DidNotReceive().WriteAsync(
             Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_reverify_dropping_one_acts_on_the_rest_and_reports_it_skipped()
+    {
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\c.msi", 3_145_728, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        // A program needs b.msi again since the scan, so the re-verify drops it.
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .Returns(new ReverifyResult(
+                new[] { @"C:\Windows\Installer\a.msi", @"C:\Windows\Installer\c.msi" },
+                new[] { @"C:\Windows\Installer\b.msi" }));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new MoveResult(2, Array.Empty<FileOperationError>()));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-reverify-move");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // The service acts on only the two survivors, never the dropped one.
+        await _moveService.Received(1).MoveFilesAsync(
+            Arg.Is<IEnumerable<string>>(paths =>
+                paths != null && paths.Count() == 2 && !paths.Contains(@"C:\Windows\Installer\b.msi")),
+            Arg.Any<string>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.True(vm.Completion.IsComplete);
+        Assert.NotEqual(string.Empty, vm.Completion.Skipped);
+        Assert.Contains("1", vm.Completion.Skipped);
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_reverify_throwing_stops_the_batch_and_surfaces_the_failure()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(2));
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new LocalisedInvalidOperationException(
+                "The Windows Installer database appears to be empty or inaccessible."));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-reverify-throw");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // Never act on an un-verified batch: the move service is not called.
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        // The failure surfaces through the scan error ladder, not a completion.
+        _dialogService.Received(1).ShowError(Arg.Any<string>(), Strings.Error_InstallerDbUnavailableTitle);
+        Assert.False(vm.Completion.IsComplete);
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_reverify_dropping_everything_calls_no_service_and_reports_all_skipped()
+    {
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msi", 1_048_576, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\b.msi", 2_097_152, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .Returns(new ReverifyResult(
+                Array.Empty<string>(),
+                new[] { @"C:\Windows\Installer\a.msi", @"C:\Windows\Installer\b.msi" }));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-reverify-all");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Contains("2", vm.Completion.Summary);
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_reverify_dropping_one_acts_on_the_rest_and_reports_it_skipped()
+    {
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\x.msi", 524_288, false, false, false, Orphaned),
+            new(@"C:\Windows\Installer\y.msi", 524_288, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .Returns(new ReverifyResult(
+                new[] { @"C:\Windows\Installer\x.msi" },
+                new[] { @"C:\Windows\Installer\y.msi" }));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        await _deleteService.Received(1).DeleteFilesAsync(
+            Arg.Is<IEnumerable<string>>(paths =>
+                paths != null && paths.Count() == 1 && paths.Contains(@"C:\Windows\Installer\x.msi")),
+            Arg.Any<bool>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.True(vm.Completion.IsComplete);
+        Assert.Contains("1", vm.Completion.Skipped);
     }
 
     [Fact]

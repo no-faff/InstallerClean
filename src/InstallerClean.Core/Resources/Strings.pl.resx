@@ -402,10 +402,11 @@
   <data name="Completion.DeleteSummaryWithErrors.Plural" xml:space="preserve"><value>Przeniesiono {0} {1} do Kosza. {2} {3}</value></data>
   <!-- Shown when the pre-action re-check found some candidates are needed again
        (a superseded patch reverted to Applied between the scan and the click),
-       so they were left out of the batch. 0 = the count skipped. Flat string;
-       a language may add a satellite-only Completion.ReverifySkipped.One/.Few/.Many
-       override. DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} files were left in place because an installed program has needed them again since the scan.</value></data>
+       so they were left out of the batch. 0 = the count kept, 1 = pluralised
+       "file"/"files". Flat string; a language may add a satellite-only
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
+       DRAFT wording, owner to refine in the translation batch. -->
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, needed again by a program since the scan.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the

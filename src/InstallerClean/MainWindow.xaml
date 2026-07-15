@@ -808,6 +808,28 @@
                         </TextBlock.Style>
                     </TextBlock>
 
+                    <!-- Re-verify skipped note. Shown when the act-time re-check
+                         kept some candidates back because a program needs them
+                         again since the scan; empty (and collapsed) otherwise.
+                         LiveSetting so it is announced with the outcome. -->
+                    <TextBlock x:Name="CompletionSkippedText"
+                               Text="{Binding Completion.Skipped}"
+                               Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
+                               HorizontalAlignment="Center" TextAlignment="Center"
+                               TextWrapping="Wrap" Margin="{StaticResource GapBottom.Xl}"
+                               AutomationProperties.LiveSetting="Polite">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Completion.Skipped}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
                     <!-- Error details (only visible when there are errors) -->
                     <Border Margin="{StaticResource GapBottom.Xl}" MaxHeight="{a11y:TextScaled 80}">
                         <Border.Style>

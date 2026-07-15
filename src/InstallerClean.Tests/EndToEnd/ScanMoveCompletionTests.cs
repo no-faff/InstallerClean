@@ -29,6 +29,7 @@ public class ScanMoveCompletionTests
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
     private readonly IResultLogService _resultLogService = Substitute.For<IResultLogService>();
+    private readonly IRemovableReverifier _reverifier = Substitute.For<IRemovableReverifier>();
 
     private readonly MockFileSystem _fileSystem = new();
 
@@ -40,11 +41,16 @@ public class ScanMoveCompletionTests
         // returning RecycleUnavailable from DeleteFilesAsync (or stubbing this
         // false) in the specific tests that cover it.
         _deleteService.CanRecycleToVolume(Arg.Any<string>()).Returns(true);
+        // Clean gate and a no-op re-verify, so the act-time re-checks proceed and
+        // a Move/Delete acts on the full set.
+        _rebootService.Check().Returns(PendingRebootResult.Clean);
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .Returns(ci => new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>()));
         return new MainViewModel(
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService,
-            _fileSystem, _resultLogService);
+            _fileSystem, _resultLogService, _reverifier);
     }
 
     [Fact]
@@ -182,6 +188,11 @@ public class ScanMoveCompletionTests
         var settingsService = Substitute.For<ISettingsService>();
         settingsService.Load().Returns(new AppSettings());
         var rebootService = Substitute.For<IPendingRebootService>();
+        rebootService.Check().Returns(PendingRebootResult.Clean);
+        // Real re-verifier over the same query service: it re-runs the same
+        // enumeration the scan did, so the two orphans (unclaimed by the API) stay
+        // removable and nothing is dropped, exercising the P2 path end to end.
+        var reverifier = new RemovableReverifier(queryService);
         var msiInfoService = Substitute.For<IMsiFileInfoService>();
         var dialogService = Substitute.For<IDialogService>();
         var confirmationService = Substitute.For<IConfirmationService>();
@@ -200,7 +211,7 @@ public class ScanMoveCompletionTests
             scanService, moveService, deleteService,
             settingsService, rebootService, msiInfoService,
             dialogService, confirmationService, windowService,
-            fs, resultLogService);
+            fs, resultLogService, reverifier);
 
         // Stage 1: real scan finds the two orphans.
         await vm.Scan.ScanWithProgressAsync(null);

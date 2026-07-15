@@ -31,6 +31,7 @@ public class CleanupPreFlightTests
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
     private readonly IResultLogService _resultLogService = Substitute.For<IResultLogService>();
+    private readonly IRemovableReverifier _reverifier = Substitute.For<IRemovableReverifier>();
 
     private readonly IFileSystem _fileSystem = Substitute.For<IFileSystem>();
     private readonly IDirectory _directory = Substitute.For<IDirectory>();
@@ -44,6 +45,9 @@ public class CleanupPreFlightTests
         // Check() returns Clean or Block, never null (the interface contract);
         // default it Clean so the act-time pending-reboot re-check proceeds.
         _rebootService.Check().Returns(PendingRebootResult.Clean);
+        // No-op re-verify: everything survives, nothing dropped.
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .Returns(ci => new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>()));
         // MockFileSystem's Path is a working implementation; a bare substitute
         // would return null from Combine and GetRandomFileName.
         _fileSystem.Path.Returns(new MockFileSystem().Path);
@@ -64,7 +68,7 @@ public class CleanupPreFlightTests
         new(_scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService,
-            _fileSystem, _resultLogService);
+            _fileSystem, _resultLogService, _reverifier);
 
     /// <summary>
     /// Spins until <paramref name="condition"/> holds. The view-models have no

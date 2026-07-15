@@ -56,7 +56,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         IConfirmationService confirmationService,
         IWindowService windowService,
         IFileSystem fileSystem,
-        IResultLogService resultLogService)
+        IResultLogService resultLogService,
+        IRemovableReverifier reverifier)
     {
         _resultLogService = resultLogService;
         _settingsService = settingsService;
@@ -82,7 +83,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Cleanup = new CleanupViewModel(
             moveService, deleteService, settingsService,
             dialogService, confirmationService, fileSystem,
-            Scan, Completion, resultLogService);
+            Scan, Completion, resultLogService, reverifier);
         Chrome = new ChromeViewModel(windowService, msiInfoService, settingsService, Scan);
 
         // Surface the all-clear overlay when a scan finishes with no
