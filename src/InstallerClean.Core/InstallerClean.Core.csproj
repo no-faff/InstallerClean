@@ -44,11 +44,15 @@
 
   <!-- Localisation: the typed Strings accessor is hand-managed via
        scripts/regenerate-strings-designer.sh; Strings.resx is the
-       neutral resx for the assembly's NeutralLanguage (en-GB). No
-       satellite assembly is produced because no other culture has a
-       resx; .NET resource fallback returns the neutral resx for any
-       requested culture. A real translation lands as a new
-       Strings.<culture>.resx beside the neutral one. -->
+       neutral resx for the assembly's NeutralLanguage (en-GB). Fourteen
+       satellite resx sit beside it (Strings.<culture>.resx for zh-Hans,
+       ru, es, ja, pt-BR, pl, tr, ko, fr, it, de, id, vi and uk), so the
+       build emits a satellite assembly per culture and .NET resource
+       fallback serves the neutral resx only for a culture with no
+       satellite. Each satellite is generated from its
+       gen-strings-<code>.mjs MAP; only the resx is committed. A
+       fifteenth UI language lands as a new Strings.<culture>.resx
+       generated the same way (Arabic is README-only and has no resx). -->
   <ItemGroup>
     <EmbeddedResource Update="Resources\Strings.resx">
       <ManifestResourceName>InstallerClean.Resources.Strings</ManifestResourceName>

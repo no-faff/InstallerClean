@@ -8,11 +8,16 @@ namespace InstallerClean.Helpers;
 /// audit what happened without trawling stdout redirects.
 /// </summary>
 /// <remarks>
-/// Some summary lines include the user's typed destination path. The
-/// Application log is readable by every authenticated user, so under a
-/// multi-user threat model this leaks the path. Accepted: the path is
-/// the calling user's own input (not a cross-profile reference) and
-/// Task Scheduler audit needs the path for diagnosis.
+/// The entries can disclose two kinds of path to the Application log, which is
+/// readable by every authenticated user on the machine. Some summary lines carry
+/// the user's own typed destination path. The hard-error entry additionally
+/// carries the crash-log path, which is derived from <c>%LOCALAPPDATA%</c> and so
+/// embeds the elevating account's profile name, not user-typed input. Both are an
+/// accepted trade: on an unattended Task Scheduler run stdout is discarded, so
+/// this entry is the only audit trail back to what happened and to the crash log
+/// that holds the detail, and a Windows account name is a weak secret on a machine
+/// the reader can already run code on. The entry is machine-read, so dropping the
+/// path later is a safer direction to move in than adding it back.
 /// </remarks>
 internal static class EventLogWriter
 {
