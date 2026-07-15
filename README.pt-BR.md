@@ -111,7 +111,7 @@ O conselho padrão confunde apagar arquivos a esmo (o que é de fato perigoso) c
 </p>
 
 <p>
-  <img src="docs/screenshots/pt/05-delete-dialogue.webp" alt="Confirmação de exclusão perguntando se deve excluir 69 arquivos (1,28 GB), avisando que os arquivos serão enviados para a Lixeira" width="900"><br>
+  <img src="docs/screenshots/pt/05-delete-dialogue.webp" alt="Confirmação de exclusão perguntando se deve excluir 69 arquivos (1,28 GB), avisando que os arquivos serão movidos para a Lixeira" width="900"><br>
   <em>Confirmação antes de cada ação. Excluir move para a Lixeira; Mover coloca os arquivos onde você quiser.</em>
   <br><br>
 </p>

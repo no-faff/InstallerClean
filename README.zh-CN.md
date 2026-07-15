@@ -111,7 +111,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/zh/05-delete-dialogue.webp" alt="删除确认对话框，询问是否删除 69 个文件（1.28 GB），并说明这些文件将被送进回收站" width="900"><br>
+  <img src="docs/screenshots/zh/05-delete-dialogue.webp" alt="删除确认对话框，询问是否删除 69 个文件（1.28 GB），并说明这些文件将被移到回收站" width="900"><br>
   <em>每次操作前都会确认。删除会移到回收站；移动则把文件放到您选择的位置。</em>
   <br><br>
 </p>

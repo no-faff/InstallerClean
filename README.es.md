@@ -111,7 +111,7 @@ El consejo habitual confunde borrar archivos al azar (lo cual sí es peligroso) 
 </p>
 
 <p>
-  <img src="docs/screenshots/es/05-delete-dialogue.webp" alt="Confirmación de eliminación que pregunta si eliminar 69 archivos (1,28 GB) e indica que los archivos se enviarán a la Papelera de reciclaje" width="900"><br>
+  <img src="docs/screenshots/es/05-delete-dialogue.webp" alt="Confirmación de eliminación que pregunta si eliminar 69 archivos (1,28 GB) e indica que los archivos se moverán a la Papelera de reciclaje" width="900"><br>
   <em>Confirmación antes de cada acción. Eliminar mueve a la Papelera de reciclaje; Mover coloca los archivos donde tú elijas.</em>
   <br><br>
 </p>

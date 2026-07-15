@@ -111,7 +111,7 @@ Nasihat standar mencampuradukkan penghapusan file secara sembarangan (yang meman
 </p>
 
 <p>
-  <img src="docs/screenshots/id/05-delete-dialogue.webp" alt="Konfirmasi penghapusan yang menanyakan apakah akan menghapus 69 file (1,28 GB), dengan catatan bahwa file akan dikirim ke Keranjang Sampah" width="900"><br>
+  <img src="docs/screenshots/id/05-delete-dialogue.webp" alt="Konfirmasi penghapusan yang menanyakan apakah akan menghapus 69 file (1,28 GB), dengan catatan bahwa file akan dipindahkan ke Keranjang Sampah" width="900"><br>
   <em>Konfirmasi sebelum kedua tindakan. Hapus memindahkan ke Keranjang Sampah; Pindahkan menaruh file di tempat pilihan Anda.</em>
   <br><br>
 </p>

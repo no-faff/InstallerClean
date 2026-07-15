@@ -111,7 +111,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/ja/05-delete-dialogue.webp" alt="69 個のファイル（1.28 GB）の削除を確認し、ファイルがごみ箱へ送られることを伝える削除確認ダイアログ" width="900"><br>
+  <img src="docs/screenshots/ja/05-delete-dialogue.webp" alt="69 個のファイル（1.28 GB）の削除を確認し、ファイルがごみ箱へ移動されることを伝える削除確認ダイアログ" width="900"><br>
   <em>どちらの操作の前にも確認があります。「削除」はごみ箱へ移動し、「移動」はファイルをお好みの場所に置きます。</em>
   <br><br>
 </p>

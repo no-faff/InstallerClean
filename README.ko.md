@@ -111,7 +111,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/ko/05-delete-dialogue.webp" alt="69개 파일(1.28 GB) 삭제를 확인하며, 파일이 휴지통으로 보내진다는 점을 알리는 삭제 확인 대화상자" width="900"><br>
+  <img src="docs/screenshots/ko/05-delete-dialogue.webp" alt="69개 파일(1.28 GB) 삭제를 확인하며, 파일이 휴지통으로 이동된다는 점을 알리는 삭제 확인 대화상자" width="900"><br>
   <em>어느 작업이든 실행 전에 확인을 거칩니다. 삭제는 휴지통으로 이동하고, 이동은 직접 고른 위치에 파일을 둡니다.</em>
   <br><br>
 </p>

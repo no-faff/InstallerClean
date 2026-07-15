@@ -111,7 +111,7 @@ The standard advice confuses deleting files at random (which genuinely is danger
 </p>
 
 <p>
-  <img src="docs/screenshots/en/05-delete-dialogue.webp" alt="Delete confirmation asking to delete 69 files (1.28 GB), noting the files will be sent to the Recycle Bin" width="900"><br>
+  <img src="docs/screenshots/en/05-delete-dialogue.webp" alt="Delete confirmation asking to delete 69 files (1.28 GB), noting the files will be moved to the Recycle Bin" width="900"><br>
   <em>Confirmation before either action. Delete moves to the Recycle Bin; Move puts the files somewhere of your choice.</em>
   <br><br>
 </p>

@@ -111,7 +111,7 @@ Le conseil habituel confond la suppression de fichiers au hasard (ce qui est ré
 </p>
 
 <p>
-  <img src="docs/screenshots/fr/05-delete-dialogue.webp" alt="Confirmation de suppression demandant de supprimer 69 fichiers (1,28 Go), précisant que les fichiers seront envoyés à la Corbeille" width="900"><br>
+  <img src="docs/screenshots/fr/05-delete-dialogue.webp" alt="Confirmation de suppression demandant de supprimer 69 fichiers (1,28 Go), précisant que les fichiers seront déplacés vers la Corbeille" width="900"><br>
   <em>Une confirmation avant chaque action. La suppression déplace vers la Corbeille ; le déplacement place les fichiers à l'endroit de votre choix.</em>
   <br><br>
 </p>

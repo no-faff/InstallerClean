@@ -111,7 +111,7 @@ Sıradan tavsiyeler, dosyaları gelişigüzel silmeyi (ki bu gerçekten tehlikel
 </p>
 
 <p>
-  <img src="docs/screenshots/tr/05-delete-dialogue.webp" alt="69 dosyayı (1,28 GB) silmeyi soran, dosyaların Geri Dönüşüm Kutusu'na gönderileceğini belirten silme onayı" width="900"><br>
+  <img src="docs/screenshots/tr/05-delete-dialogue.webp" alt="69 dosyayı (1,28 GB) silmeyi soran, dosyaların Geri Dönüşüm Kutusu'na taşınacağını belirten silme onayı" width="900"><br>
   <em>Her iki işlemden önce onay. Sil, Geri Dönüşüm Kutusu'na taşır; Taşı, dosyaları seçtiğiniz bir yere koyar.</em>
   <br><br>
 </p>

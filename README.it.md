@@ -111,7 +111,7 @@ Il consiglio abituale confonde l'eliminare file a caso (cosa che è davvero peri
 </p>
 
 <p>
-  <img src="docs/screenshots/it/05-delete-dialogue.webp" alt="Conferma di eliminazione che chiede di eliminare 69 file (1,28 GB), segnalando che i file verranno inviati al Cestino" width="900"><br>
+  <img src="docs/screenshots/it/05-delete-dialogue.webp" alt="Conferma di eliminazione che chiede di eliminare 69 file (1,28 GB), segnalando che i file verranno spostati nel Cestino" width="900"><br>
   <em>Conferma prima di ogni azione. Elimina sposta nel Cestino; Sposta colloca i file dove scegli tu.</em>
   <br><br>
 </p>
