@@ -564,28 +564,28 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Links. SubtleLink is an in-body Hyperlink that brightens to
-         full Link colour on hover so it does not shout when sat in a
-         paragraph. -->
+    <!-- Links. SubtleLink is an in-body Hyperlink: underlined at rest so it
+         reads as a link without leaning on its hue, and brightening to the
+         full Link colour on hover or keyboard focus so it does not shout when
+         sat in a paragraph. -->
 
     <Style x:Key="SubtleLink" TargetType="Hyperlink">
         <Setter Property="Foreground" Value="{StaticResource Link.Inline}"/>
-        <Setter Property="TextDecorations" Value="None"/>
+        <!-- Underlined at rest, not only on hover/focus. An in-sentence link
+             set apart by its hue alone fails WCAG 1.4.1: the at-rest inline
+             hue is 1.16:1 and 2.01:1 against the two surrounding text tiers,
+             both under the 3:1 the guideline asks of a non-text distinction,
+             and a reader with reduced colour vision cannot tell it is a link.
+             The underline is the always-on, colour-independent cue; hover and
+             keyboard focus still brighten the hue on top of it. -->
+        <Setter Property="TextDecorations" Value="Underline"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
-            <!-- Underline AND brighten on hover so the link is
-                 discoverable. Without an underline change, hover-only
-                 reveals the link by colour shift, which fails for users
-                 with reduced colour vision. The IsKeyboardFocused arm
-                 mirrors hover for a keyboard-only user: tabbing to the
-                 link surfaces the same colour + underline cue. -->
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Foreground" Value="{StaticResource Link.Default}"/>
-                <Setter Property="TextDecorations" Value="Underline"/>
             </Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True">
                 <Setter Property="Foreground" Value="{StaticResource Link.Default}"/>
-                <Setter Property="TextDecorations" Value="Underline"/>
             </Trigger>
         </Style.Triggers>
     </Style>
