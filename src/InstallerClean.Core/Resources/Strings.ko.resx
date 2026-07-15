@@ -267,6 +267,10 @@
     <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
+  <data name="Body.PendingReboot.Lead" xml:space="preserve">
+    <value>These files can't be cleaned up right now.</value>
+    <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
+  </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>지금 무언가가 Windows Installer를 사용하고 있습니다. 대개 Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램입니다. 그 작업이 실행되는 동안에는 이동과 삭제가 일시 중지되어, InstallerClean이 변경 중인 설치 관리자 캐시를 건드리지 않습니다. 작업이 끝난 뒤 다시 검사하면 두 기능이 돌아옵니다.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>이 컴퓨터에 이전 Windows Installer 트랜잭션이 일시 중단되어 있습니다. 캐시를 정리하기 전에 그 설치를 다시 진행하거나 롤백하세요(또는 Windows를 다시 시작하세요).</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows가 다음 다시 시작 때 실행할 파일 이름 바꾸기 작업을 예약해 두었고, 이는 설치 관리자 캐시에 영향을 줍니다. 정리하기 전에 Windows를 다시 시작하세요.</value></data>

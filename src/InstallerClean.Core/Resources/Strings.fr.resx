@@ -267,6 +267,10 @@
     <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
+  <data name="Body.PendingReboot.Lead" xml:space="preserve">
+    <value>These files can't be cleaned up right now.</value>
+    <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
+  </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Quelque chose utilise Windows Installer en ce moment, généralement une mise à jour Windows ou un programme en cours d'installation en arrière-plan. Déplacer et Supprimer sont en pause pendant ce temps, pour qu'InstallerClean ne touche pas au cache d'installation tant qu'il change. Une fois terminé, réanalysez et ils réapparaissent.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Une transaction Windows Installer précédente est suspendue sur cette machine. Reprenez ou annulez cette installation (ou redémarrez Windows) avant de nettoyer le cache.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows a un renommage de fichier en file d'attente pour le prochain redémarrage qui affecte le cache d'installation. Redémarrez Windows avant de nettoyer.</value></data>

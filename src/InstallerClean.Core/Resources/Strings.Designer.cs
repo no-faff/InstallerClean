@@ -120,6 +120,7 @@ public static class Strings
     public static string Body_NotScanned_Lead => Get("Body.NotScanned.Lead");
     public static string Body_NotScanned_Why => Get("Body.NotScanned.Why");
     public static string Body_PendingReboot_InstallerInProgress => Get("Body.PendingReboot.InstallerInProgress");
+    public static string Body_PendingReboot_Lead => Get("Body.PendingReboot.Lead");
     public static string Body_PendingReboot_MsiExecuteMutex => Get("Body.PendingReboot.MsiExecuteMutex");
     public static string Body_PendingReboot_PendingRenameInCache => Get("Body.PendingReboot.PendingRenameInCache");
     public static string Body_RegisteredMissingFromDisk => Get("Body.RegisteredMissingFromDisk");

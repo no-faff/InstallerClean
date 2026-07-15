@@ -139,7 +139,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
     ///   - a scan FAILED (the startup scan, or a Re-scan): the tailored error,
     ///     with Re-scan focused, instead of exiting,
     ///   - nothing scanned yet (the startup scan was cancelled),
-    ///   - a scan found files (the state the window was designed for),
+    ///   - a scan found files but a Windows Installer operation is in progress, so
+    ///     Move and Delete are held: the copy explains the hold rather than telling
+    ///     the user to press the dead buttons,
+    ///   - a scan found files and they can be acted on (the state the window was
+    ///     designed for),
     ///   - a scan found nothing (an all-clear, and the end state of every
     ///     successful clean-up).
     ///
@@ -153,19 +157,30 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public string IntroLead =>
         Scan.HasScanError ? Strings.Error_ScanFailedTitle
         : !Scan.HasScanned ? Strings.Body_NotScanned_Lead
+        : Scan.HasOrphans && Scan.HasPendingReboot ? Strings.Body_PendingReboot_Lead
         : Scan.HasOrphans ? Strings.Body_MainExplanation_Lead
         : Strings.Completion_NothingToCleanUp;
 
     /// <summary>
     /// The muted second line under <see cref="IntroLead"/>. Carries the tailored
     /// message on a failed scan; empty on an all-clear (the lead says it all, and
-    /// the count rows below carry the receipt), which collapses the TextBlock.
+    /// the count rows below carry the receipt) and on a pending-reboot hold (the
+    /// banner below carries the specific reason), which collapses the TextBlock.
     /// </summary>
     public string IntroDetail =>
         Scan.HasScanError ? Scan.LastScanError
         : !Scan.HasScanned ? Strings.Body_NotScanned_Why
+        : Scan.HasOrphans && Scan.HasPendingReboot ? string.Empty
         : Scan.HasOrphans ? MainExplanationWhyText
         : string.Empty;
+
+    /// <summary>
+    /// Whether to show the "Move them somewhere safe, or delete them" action line.
+    /// True only when a scan found files AND they can be acted on: with a Windows
+    /// Installer operation in progress the buttons are held, so an instruction to
+    /// press them is removed (the pending-reboot banner and lead explain the hold).
+    /// </summary>
+    public bool ShowMainAction => Scan.HasOrphans && !Scan.HasPendingReboot;
 
     /// <summary>
     /// "Scan cancelled." under the not-yet-scanned intro, so a user who
@@ -199,11 +214,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (e.PropertyName is nameof(ScanViewModel.HasScanned)
             or nameof(ScanViewModel.HasOrphans)
             or nameof(ScanViewModel.LastScanWasCancelled)
-            or nameof(ScanViewModel.HasScanError))
+            or nameof(ScanViewModel.HasScanError)
+            or nameof(ScanViewModel.HasPendingReboot))
         {
             OnPropertyChanged(nameof(IntroLead));
             OnPropertyChanged(nameof(IntroDetail));
             OnPropertyChanged(nameof(IntroNotice));
+            OnPropertyChanged(nameof(ShowMainAction));
         }
 
         if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||

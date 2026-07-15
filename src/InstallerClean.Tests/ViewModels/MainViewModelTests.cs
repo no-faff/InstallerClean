@@ -1492,7 +1492,31 @@ public class MainViewModelTests
         Assert.Equal(vm.MainExplanationWhyText, vm.IntroDetail);
         Assert.Equal(string.Empty, vm.IntroNotice);
         Assert.True(vm.Scan.HasOrphans);
+        Assert.True(vm.ShowMainAction);
         Assert.True(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task A_scan_that_finds_files_while_an_install_runs_explains_the_hold_not_the_action()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(3));
+        // A Windows Installer transaction is in progress when the scan finishes.
+        _rebootService.Check().Returns(PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld));
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Scan.HasOrphans);
+        Assert.True(vm.Scan.HasPendingReboot);
+        // The intro explains the hold rather than telling the user to act, and the
+        // action line collapses; the reason-specific banner carries the why.
+        Assert.Equal(Strings.Body_PendingReboot_Lead, vm.IntroLead);
+        Assert.Equal(string.Empty, vm.IntroDetail);
+        Assert.False(vm.ShowMainAction);
+        // Move and Delete are held.
+        Assert.False(vm.Cleanup.MoveAllCommand.CanExecute(null));
+        Assert.False(vm.Cleanup.DeleteAllCommand.CanExecute(null));
     }
 
     [Fact]

@@ -267,6 +267,10 @@
     <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
+  <data name="Body.PendingReboot.Lead" xml:space="preserve">
+    <value>These files can't be cleaned up right now.</value>
+    <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
+  </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Coś właśnie korzysta z Windows Installer, zwykle aktualizacja Windows albo program instalujący się w tle. Na ten czas Przenieś i Usuń są wstrzymane, aby InstallerClean nie ruszał pamięci podręcznej instalatora, gdy ta się zmienia. Gdy to się zakończy, skanuj ponownie, a wrócą.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Na tym komputerze zawieszona jest wcześniejsza transakcja Windows Installer. Przed wyczyszczeniem pamięci podręcznej dokończ lub wycofaj tamtą instalację (albo uruchom ponownie Windows).</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows ma w kolejce na następne uruchomienie zmianę nazwy pliku, która dotyczy pamięci podręcznej instalatora. Przed czyszczeniem uruchom ponownie Windows.</value></data>

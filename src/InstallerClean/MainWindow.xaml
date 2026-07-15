@@ -179,9 +179,14 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
+                    <!-- Action line hidden when a pending reboot holds Move and
+                         Delete (bound to ShowMainAction, not Scan.HasOrphans): the
+                         buttons are dead then, so an instruction to press them
+                         reads as a broken app. The banner and the reworded lead
+                         explain the hold instead. -->
                     <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Body}"
                                FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Sm}"
-                               Visibility="{Binding Scan.HasOrphans, Converter={StaticResource BoolToVis}}"
+                               Visibility="{Binding ShowMainAction, Converter={StaticResource BoolToVis}}"
                                Text="{loc:Translate Body.MainExplanation.Action}"/>
                 </StackPanel>
 
