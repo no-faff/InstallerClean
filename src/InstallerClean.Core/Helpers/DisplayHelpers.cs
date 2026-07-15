@@ -106,6 +106,20 @@ internal static class DisplayHelpers
             _ => plural,
         };
 
+    /// <summary>
+    /// Overload for the flat-string case: ONE resx string carries the whole
+    /// sentence (with its own <c>{N}</c>) for every count, inflecting only
+    /// through the satellite-only <c>{keyPrefix}.One</c> / <c>.Few</c> /
+    /// <c>.Many</c> overrides. The three-string form above, called with the same
+    /// string twice, reads like a copy-paste slip and invites being "fixed" into
+    /// a single argument, which silently drops the inflection an inflecting
+    /// language needs. This overload states that intent and takes only one
+    /// string, so it cannot be misused that way. Use it wherever singular and
+    /// plural would be the same resx key.
+    /// </summary>
+    internal static string Pluralise(int count, string flat, string keyPrefix) =>
+        Pluralise(count, flat, flat, keyPrefix);
+
     /// <summary>"file"/"files" pair, sourced from Strings.resx.</summary>
     internal static string PluraliseFile(int count) =>
         Pluralise(count, Strings.Plural_File_Singular, Strings.Plural_File_Plural, "Plural.File");

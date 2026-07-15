@@ -35,6 +35,25 @@ public class DisplayHelpersTests
     }
 
     [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(5)]
+    public void Pluralise_flat_overload_equals_the_doubled_form(int count)
+    {
+        // The flat overload takes ONE string, so it cannot be handed two
+        // different ones the way the doubled call sites could be. It must behave
+        // exactly like the three-string form called with that string twice. A
+        // prefix with no resx overrides makes every plural category fall back to
+        // the flat string, so this holds in any UI culture.
+        const string flat = "Found {0} registered {1}.";
+        const string prefix = "Test.FlatOverload";
+        Assert.Equal(
+            DisplayHelpers.Pluralise(count, flat, flat, prefix),
+            DisplayHelpers.Pluralise(count, flat, prefix));
+        Assert.Equal(flat, DisplayHelpers.Pluralise(count, flat, prefix));
+    }
+
+    [Theory]
     [InlineData(1, "One")]
     [InlineData(21, "One")]
     [InlineData(101, "One")]

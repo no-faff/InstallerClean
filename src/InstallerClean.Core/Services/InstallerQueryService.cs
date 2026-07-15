@@ -167,7 +167,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty);
 
         progress?.Report(new ScanProgressUpdate(string.Format(
-            Helpers.DisplayHelpers.Pluralise(claimed.Count, Strings.Status_RegisteredPackagesFound, Strings.Status_RegisteredPackagesFound, "Status.RegisteredPackagesFound"),
+            Helpers.DisplayHelpers.Pluralise(claimed.Count, Strings.Status_RegisteredPackagesFound, "Status.RegisteredPackagesFound"),
             claimed.Count, Helpers.DisplayHelpers.PluralisePackage(claimed.Count))));
 
         return claimed.Values.ToList().AsReadOnly();
