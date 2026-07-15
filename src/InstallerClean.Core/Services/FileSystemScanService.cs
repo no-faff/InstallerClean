@@ -56,13 +56,36 @@ public sealed class FileSystemScanService : IFileSystemScanService
         IProgress<ScanProgressUpdate>? progress = null,
         CancellationToken cancellationToken = default)
     {
+        progress?.Report(new ScanProgressUpdate(Strings.Status_ScanningCache));
+
+        // Walk the disk BEFORE querying the API, and materialise the walk here
+        // rather than leaving it lazy. What the swap buys: a package cached
+        // after the walk finishes is simply absent from the candidate set, so a
+        // fast install that completes during the scan can no longer land its
+        // freshly cached, still-needed file in the orphan list. It is not a
+        // guarantee for every interleaving (a registration that completes in the
+        // gap between the query passing its position and the post-scan reboot
+        // probe can still slip through); the P1/P2 action-time checks close that
+        // sliver. The walk was already lazy and ran after the first await, i.e.
+        // off the dispatcher; keep it off the calling thread with Task.Run,
+        // because the GUI calls ScanAsync from the dispatcher and a synchronous
+        // directory walk here would freeze the very window the scan keeps free.
+        // ConfigureAwait(false): Core services do not bind to a caller's
+        // SynchronizationContext.
+        List<string> diskFiles;
+        if (_overrideFiles is not null)
+        {
+            diskFiles = _overrideFiles as List<string> ?? _overrideFiles.ToList();
+        }
+        else
+        {
+            var folder = _installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder;
+            diskFiles = await Task.Run(() => MaterialiseInstallerFiles(folder, cancellationToken), cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         progress?.Report(new ScanProgressUpdate(Strings.Status_QueryingApi));
 
-        // ConfigureAwait(false): Core services do not bind to a caller's
-        // SynchronizationContext. The continuation under a WPF host
-        // would otherwise run on the dispatcher and the directory walk
-        // plus per-file stat would block the UI thread for the scan
-        // duration.
         var registered = await _queryService.GetRegisteredPackagesAsync(progress, cancellationToken)
             .ConfigureAwait(false);
 
@@ -70,9 +93,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
             registered.Select(p => p.LocalPackagePath),
             StringComparer.OrdinalIgnoreCase);
 
-        progress?.Report(new ScanProgressUpdate(Strings.Status_ScanningCache));
-
-        var diskFiles = _overrideFiles ?? GetInstallerFiles(_installerFolderOverride ?? InstallerCacheHelpers.InstallerFolder);
         var removable = new List<OrphanedFile>();
 
         foreach (var filePath in diskFiles)
@@ -111,6 +131,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         long stillUsedBytes = 0;
         int missingNonRemovable = 0;
         int missingRemovable = 0;
+        int nonRemovablePresent = 0;
         var sizedPackages = new List<RegisteredPackage>(registered.Count);
         foreach (var pkg in registered)
         {
@@ -173,6 +194,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 if (exists)
                 {
                     stillUsedBytes += size;
+                    nonRemovablePresent++;
                 }
                 else
                 {
@@ -182,9 +204,42 @@ public sealed class FileSystemScanService : IFileSystemScanService
         }
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
 
+        // Correlation sanity gate. On any real machine at least some registered
+        // package's cached file is present on disk. If NOT ONE is (every
+        // non-removable registered package looks missing) yet the walk still
+        // yielded files to offer for removal, the two halves have not
+        // correlated: a path-form mismatch between the API's LocalPackage values
+        // and the walked paths, a collapsed enumeration, or the wrong folder all
+        // produce exactly this signature (Windows referencing files that are all
+        // "gone" while every file on disk is "orphaned"), and no healthy machine
+        // does. A tool that genuinely wiped the cache would leave no files to be
+        // orphans, so removable.Count > 0 rules that benign case out. Refuse the
+        // scan rather than offer the whole cache for deletion on a broken
+        // correlation. No absolute floor is used on purpose: Windows always has
+        // many machine-context products, so "every one missing" is the collapse
+        // signature at any real count, and a floor would only mask a smaller one.
+        if (nonRemovablePresent == 0 && missingNonRemovable > 0 && removable.Count > 0)
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);
+
         progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_FoundUnused,
             removable.Count, DisplayHelpers.PluraliseFile(removable.Count))));
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingNonRemovable, missingRemovable);
+    }
+
+    /// <summary>
+    /// Enumerates the walk into a list, checking the cancellation token per
+    /// file. Runs inside a <c>Task.Run</c> so the directory walk stays off the
+    /// caller's thread (the GUI's dispatcher).
+    /// </summary>
+    private List<string> MaterialiseInstallerFiles(string folder, CancellationToken cancellationToken)
+    {
+        var list = new List<string>();
+        foreach (var filePath in GetInstallerFiles(folder))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            list.Add(filePath);
+        }
+        return list;
     }
 
     private IEnumerable<string> GetInstallerFiles(string folder)

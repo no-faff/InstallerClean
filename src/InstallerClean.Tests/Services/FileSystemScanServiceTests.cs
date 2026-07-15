@@ -36,7 +36,14 @@ public class FileSystemScanServiceTests
             @"C:\Windows\Installer\bbb.msi",   // orphaned, should appear
         };
 
-        var svc = new FileSystemScanService(mockQuery, fakeFiles);
+        // The registered file is present on disk, so the correlation gate
+        // (every registered package missing while files on disk are orphaned)
+        // does not fire on this small scenario.
+        var fs = new MockFileSystem();
+        fs.AddFile(@"C:\Windows\Installer\aaa.msi", new MockFileData("x"));
+        fs.AddFile(@"C:\Windows\Installer\bbb.msi", new MockFileData("x"));
+
+        var svc = new FileSystemScanService(mockQuery, fs, fakeFiles, null);
 
         var result = await svc.ScanAsync();
 
@@ -93,11 +100,14 @@ public class FileSystemScanServiceTests
     [Fact]
     public async Task ScanAsync_registered_packages_contains_all_api_packages()
     {
-        // Registered packages pointing to paths that don't exist on disk.
+        // One registered package present on disk, one missing: the missing one
+        // must still be listed (registered packages are included regardless of
+        // disk presence), while the present one keeps the correlation gate from
+        // firing on this small scenario.
         var registered = new List<RegisteredPackage>
         {
-            Registered(@"C:\Windows\Installer\aaa.msi"),
-            Registered(@"C:\Windows\Installer\bbb.msi"),
+            Registered(@"C:\Windows\Installer\aaa.msi"),  // present
+            Registered(@"C:\Windows\Installer\bbb.msi"),  // missing on disk
         };
 
         var mockQuery = Substitute.For<IInstallerQueryService>();
@@ -105,15 +115,18 @@ public class FileSystemScanServiceTests
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(registered.AsReadOnly());
 
+        var fs = new MockFileSystem();
+        fs.AddFile(@"C:\Windows\Installer\aaa.msi", new MockFileData(new byte[100]));
         var fakeFiles = new[] { @"C:\Windows\Installer\ccc.msi" }; // orphan
 
-        var svc = new FileSystemScanService(mockQuery, fakeFiles);
+        var svc = new FileSystemScanService(mockQuery, fs, fakeFiles, null);
         var result = await svc.ScanAsync();
 
-        // All API packages are included regardless of disk presence.
+        // Both API packages are included, even the one missing from disk.
         Assert.Equal(2, result.RegisteredPackages.Count);
-        // Files don't exist on disk, so total bytes is 0.
-        Assert.Equal(0, result.RegisteredTotalBytes);
+        // Only the present package contributes bytes; the missing one is excluded.
+        Assert.Equal(100, result.RegisteredTotalBytes);
+        Assert.Equal(1, result.MissingNonRemovableCount);
         Assert.Single(result.RemovableFiles);
     }
 
@@ -297,7 +310,13 @@ public class FileSystemScanServiceTests
                 .Select(i => $@"C:\Windows\Installer\orphan{i:D5}.msi"))
             .ToArray();
 
-        var svc = new FileSystemScanService(mockQuery, fakeFiles);
+        // The 5000 registered packages are present on disk, so the correlation
+        // gate does not fire (it would if every registered package were missing).
+        var fs = new MockFileSystem();
+        for (int i = 0; i < 5_000; i++)
+            fs.AddFile($@"C:\Windows\Installer\reg{i:D5}.msi", new MockFileData("x"));
+
+        var svc = new FileSystemScanService(mockQuery, fs, fakeFiles, null);
         var result = await svc.ScanAsync();
 
         Assert.Equal(5_000, result.RemovableFiles.Count);
@@ -360,5 +379,57 @@ public class FileSystemScanServiceTests
         var svc = new FileSystemScanService(mockQuery, Array.Empty<string>());
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => svc.ScanAsync());
+    }
+
+    [Fact]
+    public async Task ScanAsync_refuses_a_collapsed_correlation()
+    {
+        // The collapse signature: every registered (non-removable) package is
+        // missing from disk while the walk still yields orphan candidates. A
+        // path-form mismatch, a collapsed enumeration or the wrong folder all
+        // produce it; no healthy machine does. The scan must refuse rather than
+        // offer the whole cache for removal.
+        var registered = Enumerable.Range(0, 30)
+            .Select(i => Registered($@"C:\Windows\Installer\reg{i:D2}.msi"))
+            .ToList();
+
+        var mockQuery = Substitute.For<IInstallerQueryService>();
+        mockQuery
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(registered.AsReadOnly());
+
+        // Empty filesystem: none of the registered files exist on disk.
+        var fs = new MockFileSystem();
+        var orphans = new[] { @"C:\Windows\Installer\o1.msi", @"C:\Windows\Installer\o2.msi" };
+
+        var svc = new FileSystemScanService(mockQuery, fs, orphans, null);
+
+        await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => svc.ScanAsync());
+    }
+
+    [Fact]
+    public async Task ScanAsync_does_not_refuse_when_some_registered_packages_are_present()
+    {
+        // The same shape as the collapse test but with a single registered
+        // package present on disk: the correlation held for at least one, so the
+        // gate must not fire and the orphans are classified normally.
+        var registered = Enumerable.Range(0, 30)
+            .Select(i => Registered($@"C:\Windows\Installer\reg{i:D2}.msi"))
+            .ToList();
+
+        var mockQuery = Substitute.For<IInstallerQueryService>();
+        mockQuery
+            .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(registered.AsReadOnly());
+
+        var fs = new MockFileSystem();
+        fs.AddFile(@"C:\Windows\Installer\reg00.msi", new MockFileData("x")); // one present
+        var orphans = new[] { @"C:\Windows\Installer\o1.msi", @"C:\Windows\Installer\o2.msi" };
+
+        var svc = new FileSystemScanService(mockQuery, fs, orphans, null);
+        var result = await svc.ScanAsync();
+
+        Assert.Equal(2, result.RemovableFiles.Count);
+        Assert.Equal(29, result.MissingNonRemovableCount);
     }
 }

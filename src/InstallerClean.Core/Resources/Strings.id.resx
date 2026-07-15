@@ -509,6 +509,11 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
        runs per product and fails on its own. Same two placeholders. -->
   <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer menolak menampilkan daftar patch untuk sebuah produk setelah {0} kali gagal berturut-turut (kode kesalahan terakhir {1}). Coba mulai ulang Windows, atau jalankan 'sfc /scannow' dari prompt dengan hak administrator.</value></data>
+  <!-- Shown when the scan's two halves (what Windows still registers, and
+       what is on disk) cannot be reconciled at all: a sign the correlation
+       broke, not a real list of removable files. Deliberately does not offer
+       anything for removal. No placeholders. -->
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Tujuan tidak valid</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Tidak bisa menulis ke tujuan</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Pemindahan gagal</value></data>
