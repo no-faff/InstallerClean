@@ -400,6 +400,12 @@
   <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
   <data name="Completion.DeleteSummaryWithErrors.Singular" xml:space="preserve"><value>Déplacé {0} {1} vers la Corbeille. {2} {3}</value></data>
   <data name="Completion.DeleteSummaryWithErrors.Plural" xml:space="preserve"><value>Déplacé {0} {1} vers la Corbeille. {2} {3}</value></data>
+  <!-- Shown when the pre-action re-check found some candidates are needed again
+       (a superseded patch reverted to Applied between the scan and the click),
+       so they were left out of the batch. 0 = the count skipped. Flat string;
+       a language may add a satellite-only Completion.ReverifySkipped.One/.Few/.Many
+       override. DRAFT wording, owner to refine in the translation batch. -->
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} files were left in place because an installed program has needed them again since the scan.</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files

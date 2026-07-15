@@ -41,6 +41,9 @@ public static class CoreComposition
         services.AddSingleton<IInstallerQueryService, InstallerQueryService>();
         services.AddSingleton<IPendingRebootService, PendingRebootService>();
         services.AddSingleton<IMsiFileInfoService, MsiFileInfoService>();
+        // Re-verifies removable candidates against the API at action time; the
+        // GUI and CLI call it just before a Move/Delete batch.
+        services.AddSingleton<IRemovableReverifier, RemovableReverifier>();
 
         // File-mutating services. The recycle engine owns the single
         // STA thread the IFileOperation delete path runs on; as a
