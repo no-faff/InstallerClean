@@ -689,7 +689,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        exception: Cli.EventLogUnavailable is a stdout warning (it tells the
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
-  <data name="Cli.UnknownArgument" xml:space="preserve"><value>未知参数：'{0}'</value></data>
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>未知参数：“{0}”</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>正在取消…</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>已取消。</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the

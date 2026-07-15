@@ -316,7 +316,7 @@
   <data name="Status.ScanComplete" xml:space="preserve"><value>Análisis completado ({0})</value></data>
   <data name="Status.FoundProducts" xml:space="preserve"><value>Analizando los paquetes locales...</value></data>
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
-  <data name="Status.FoundUnused" xml:space="preserve"><value>{0} {1} que puedes eliminar sin riesgo.</value></data>
+  <data name="Status.FoundUnused" xml:space="preserve"><value>Se encontraron {0} {1} que puedes eliminar sin riesgo.</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>Preparando la carpeta de destino...</value></data>
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>Moviendo {0} {1}...</value></data>

@@ -375,7 +375,7 @@
        nothing until the bin is emptied, so the delete paths read "cleaned up"
        (true at that instant: the junk is out of the cache). A same-volume Move
        reads "moved" (a rename frees nothing yet). 0 = size (e.g. "120.5 MB"). -->
-  <data name="Completion.Freed" xml:space="preserve"><value>{0} açıldı</value></data>
+  <data name="Completion.Freed" xml:space="preserve"><value>{0} yer açıldı</value></data>
   <data name="Completion.CleanedUp" xml:space="preserve"><value>{0} temizlendi</value></data>
   <data name="Completion.Moved" xml:space="preserve"><value>{0} taşındı</value></data>
   <data name="Completion.PartlyMoved" xml:space="preserve"><value>{0} taşındı, bazı dosyalar işlenemedi</value></data>
@@ -414,8 +414,8 @@
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi.</value></data>
   <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>{0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. {2} {3}</value></data>
   <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>{0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. {2} {3}</value></data>
-  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
-  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
        the files' volume: Move (the safe default), delete permanently with
        consent, or cancel. Wording states only the confirmed fact (the probe
@@ -428,8 +428,8 @@
   <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>Bu sürücü için Geri Dönüşüm Kutusu kullanılamıyor</value></data>
   <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>Bu yüzden bu {1} ({2}) silinmedi. Güvenli bir yere taşıyabilir ya da kalıcı olarak silebilirsiniz.</value></data>
   <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>Bu yüzden bu {0} {1} ({2}) silinmedi. Güvenli bir yere taşıyabilir ya da kalıcı olarak silebilirsiniz.</value></data>
-  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla, ve Geri Dönüşüm Kutusu yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
-  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla, ve Geri Dönüşüm Kutusu yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez; Geri Dönüşüm Kutusu ise yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez; Geri Dönüşüm Kutusu ise yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
 
   <!-- Summaries -->
   <!-- 0 = file count. Singular / plural pairs picked at the call

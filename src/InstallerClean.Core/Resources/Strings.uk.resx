@@ -803,10 +803,10 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m ШЛЯХ    Перемістити за вказаним шляхом</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli — це консольний процес, що блокує командний рядок до</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>завершення; перенаправляйте чи передавайте його вивід, як у будь-якого</value></data>
-  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>іншого консольного exe. Графічний інтерфейс, у InstallerClean.exe поруч.</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>іншого консольного exe. Графічний інтерфейс міститься поруч, у InstallerClean.exe.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Коди виходу:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   успіх: оброблено кожен позначений файл</value></data>
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   невдача: нічого не оброблено (хибні аргументи, збій сканування, усі файли)</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   невдача: нічого не оброблено (хибні аргументи, збій сканування, усі файли зазнали збою)</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   частково: частину файлів оброблено, частину ні</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  тимчасова: запуск заблокувала тимчасова умова (див. повідомлення)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 скасовано (Ctrl+C)</value></data>

@@ -822,7 +822,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d           Удалить ненужные файлы (Корзина)</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m           Переместить в сохранённую папку по умолчанию</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m ПУТЬ      Переместить в указанный путь</value></data>
-  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli это настоящий консольный процесс, он блокирует</value></data>
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli — это настоящий консольный процесс, он блокирует</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>командную строку до завершения; перенаправляйте или передавайте его вывод</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>по конвейеру, как у любого консольного exe. GUI рядом, в InstallerClean.exe.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Коды выхода:</value></data>

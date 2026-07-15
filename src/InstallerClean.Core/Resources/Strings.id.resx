@@ -233,7 +233,7 @@
 
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Donasi</value></data>
-  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Bikin haus, lho!</value></data>
+  <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Membuat haus!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa memakan waktu beberapa detik saat I/O berat atau panggilan basis data MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Tutup</value></data>
   <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Beri bintang di GitHub, laporkan Issue, atau tulis di Discussions. Masukan apa pun diterima.</value></data>
@@ -252,7 +252,7 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>File-file ini berada di C:\Windows\Installer, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mendaftar file yang Windows sendiri laporkan sudah tidak terpakai.</value>
+    <value>File-file ini berada di C:\Windows\Installer, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mencantumkan file yang Windows sendiri laporkan sudah tidak terpakai.</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
@@ -802,7 +802,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m JALUR   Pindahkan ke jalur yang ditentukan</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli adalah proses konsol sungguhan dan memblokir prompt</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>sampai selesai; alihkan atau salurkan keluarannya seperti</value></data>
-  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>executable konsol lainnya. GUI ada di InstallerClean.exe di sebelahnya.</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>file exe konsol lainnya. GUI ada di InstallerClean.exe di sebelahnya.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Kode keluar:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   berhasil: setiap file yang ditandai telah diproses</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   gagal: tidak ada yang diproses (argumen salah, pemindaian gagal, semua file gagal)</value></data>
