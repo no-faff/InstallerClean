@@ -25,6 +25,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// </summary>
     private const int SidBufferLength = 256;
 
+    private readonly IMsiApi _msi;
+
+    /// <summary>
+    /// Production constructor: talks to the real msi.dll through
+    /// <see cref="MsiApi"/>. Used by the integration tests that run against
+    /// the elevated host, and by any caller that resolves the type directly.
+    /// </summary>
+    public InstallerQueryService() : this(new MsiApi()) { }
+
+    /// <summary>
+    /// Seam constructor: DI injects the real <see cref="MsiApi"/>; unit tests
+    /// inject a fake so every error path that decides a file's fate can be
+    /// driven without an elevated Windows host. Mirrors
+    /// <see cref="PendingRebootService"/> taking <c>IRegistryReader</c> /
+    /// <c>IMutexProbe</c>.
+    /// </summary>
+    public InstallerQueryService(IMsiApi msi) => _msi = msi;
+
     /// <inheritdoc />
     public Task<IReadOnlyList<RegisteredPackage>> GetRegisteredPackagesAsync(
         IProgress<ScanProgressUpdate>? progress = null,
@@ -78,25 +96,44 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     var stateStr = GetPatchProperty(patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.State);
                     var uninstallableStr = GetPatchProperty(patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.Uninstallable);
 
+                    // Unparseable State leaves patchState at 0 (not-a-patch),
+                    // so isSuperseded is false and the row is kept: the zero
+                    // default is the safe direction on purpose, not luck. Only
+                    // a positively read Superseded (2) or Obsoleted (4) makes a
+                    // patch a removal candidate.
                     int.TryParse(stateStr, out var patchState);
                     var isSuperseded = patchState is 2 or 4;
-                    var isUninstallable = uninstallableStr == "1";
+                    // Fail safe on Uninstallable: only a positively read "0"
+                    // (the patch cannot be uninstalled, so its cached .msp is
+                    // dead weight) makes it removable. An unreadable value ("")
+                    // must NOT lean removable, because a still-uninstallable
+                    // superseded patch needs its .msp to roll back.
+                    var isUninstallable = uninstallableStr != "0";
                     var isRemovable = isSuperseded && !isUninstallable;
 
-                    claimed.TryAdd(patchPath, new RegisteredPackage(patchPath, productName, productCode, patchState, isRemovable));
+                    MergePatchVerdict(claimed, patchPath, new RegisteredPackage(
+                        patchPath, productName, productCode, patchState, isRemovable));
                 }
             }
         }
 
         progress?.Report(new ScanProgressUpdate(Strings.Status_CheckingRegistry));
+
+        // Registry64 is pinned explicitly. Registry.LocalMachine resolves to
+        // the process-bitness view, which redirects to WOW6432Node under an
+        // x86 process and silently misses installer-cache entries written by
+        // 64-bit installers. Pinning to Registry64 keeps the fallback path
+        // correct regardless of host bitness.
+        //
+        // The per-SID and per-key try/catch below is deliberate and must not
+        // be collapsed back into one outer try: this fallback is the second of
+        // the app's two independent "still needed" sources, and a single try
+        // spanning every SID once let one corrupt subkey or unreadable DACL
+        // abandon the entire remaining fallback, turning every registration
+        // only it would have contributed into an orphan candidate. Scoping the
+        // catch to each key read costs one entry per bad key, never the net.
         try
         {
-            // Registry64 is pinned explicitly. Registry.LocalMachine
-            // resolves to the process-bitness view, which redirects to
-            // WOW6432Node under an x86 process and silently misses
-            // installer-cache entries written by 64-bit installers.
-            // Pinning to Registry64 keeps the fallback path correct
-            // regardless of host bitness.
             using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
                 Microsoft.Win32.RegistryHive.LocalMachine,
                 Microsoft.Win32.RegistryView.Registry64);
@@ -107,40 +144,19 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 foreach (var sidName in udKey.GetSubKeyNames())
                 {
                     ct.ThrowIfCancellationRequested();
-
-                    using var productsKey = udKey.OpenSubKey($@"{sidName}\Products");
-                    if (productsKey is not null)
-                    {
-                        foreach (var prodGuid in productsKey.GetSubKeyNames())
-                        {
-                            using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
-                            var localPkg = ipKey?.GetValue("LocalPackage") as string;
-                            if (!string.IsNullOrEmpty(localPkg))
-                                claimed.TryAdd(localPkg, new RegisteredPackage(localPkg, "", ""));
-                        }
-                    }
-
-                    using var patchesKey = udKey.OpenSubKey($@"{sidName}\Patches");
-                    if (patchesKey is not null)
-                    {
-                        foreach (var patchGuid in patchesKey.GetSubKeyNames())
-                        {
-                            using var patchKey = patchesKey.OpenSubKey(patchGuid);
-                            var localPkg = patchKey?.GetValue("LocalPackage") as string;
-                            if (!string.IsNullOrEmpty(localPkg))
-                                claimed.TryAdd(localPkg, new RegisteredPackage(localPkg, "", ""));
-                        }
-                    }
+                    ReadFallbackSid(udKey, sidName, claimed, ct);
                 }
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            // Best effort. The crash log preserves a diagnostic trail
-            // for reports of missing registered products. Cancellation is
-            // excluded: ThrowIfCancellationRequested fires inside this try,
-            // so a plain catch would log the user's own Cancel as a fault
-            // and swallow the stop the caller is waiting on.
+            // Last resort: a failure opening UserData itself or enumerating
+            // its SID names (the per-SID reads have their own catches below).
+            // The crash log preserves a diagnostic trail for reports of
+            // missing registered products. Cancellation is excluded:
+            // ThrowIfCancellationRequested fires inside this try, so a plain
+            // catch would log the user's own Cancel as a fault and swallow the
+            // stop the caller is waiting on.
             Helpers.CrashLog.Write(ex);
         }
 
@@ -157,16 +173,112 @@ public sealed class InstallerQueryService : IInstallerQueryService
         return claimed.Values.ToList().AsReadOnly();
     }
 
+    /// <summary>
+    /// Merges one API patch row into <paramref name="claimed"/>. A patch is
+    /// cached once per code but its State is per product, so the same .msp can
+    /// be Superseded (removable) for one product and Applied (still needed) for
+    /// another. First-writer-wins would offer a still-applied patch for removal
+    /// on a coin flip of enumeration order; instead, once ANY product claims a
+    /// path non-removable the path stays non-removable, and a previously
+    /// removable row is downgraded to carry the applied product's verdict.
+    /// The verdict is never upgraded the other way. This merge applies to the
+    /// API patch loop only; the product row and the registry-fallback rows keep
+    /// TryAdd, because API-beats-fallback layering is deliberate and a fallback
+    /// row carries no state to downgrade a real verdict with.
+    /// </summary>
+    private static void MergePatchVerdict(
+        Dictionary<string, RegisteredPackage> claimed, string patchPath, RegisteredPackage candidate)
+    {
+        if (!claimed.TryGetValue(patchPath, out var existing))
+        {
+            claimed[patchPath] = candidate;
+            return;
+        }
+
+        // Downgrade only: a removable row loses to a later non-removable claim.
+        if (existing.IsRemovable && !candidate.IsRemovable)
+            claimed[patchPath] = candidate;
+    }
+
+    /// <summary>
+    /// Reads one SID subtree's Products and Patches keys into the fallback set.
+    /// Each key read is independently guarded so one corrupt entry costs only
+    /// itself; see the try/catch rationale at the call site. Cancellation is
+    /// re-thrown, never swallowed.
+    /// </summary>
+    private static void ReadFallbackSid(
+        Microsoft.Win32.RegistryKey udKey,
+        string sidName,
+        Dictionary<string, RegisteredPackage> claimed,
+        CancellationToken ct)
+    {
+        try
+        {
+            using var productsKey = udKey.OpenSubKey($@"{sidName}\Products");
+            if (productsKey is not null)
+            {
+                foreach (var prodGuid in productsKey.GetSubKeyNames())
+                {
+                    ct.ThrowIfCancellationRequested();
+                    try
+                    {
+                        using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
+                        var localPkg = ipKey?.GetValue("LocalPackage") as string;
+                        if (!string.IsNullOrEmpty(localPkg))
+                            claimed.TryAdd(localPkg, new RegisteredPackage(localPkg, "", ""));
+                    }
+                    catch (Exception ex) when (ex is not OperationCanceledException)
+                    {
+                        Helpers.CrashLog.Write(ex);
+                    }
+                }
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Helpers.CrashLog.Write(ex);
+        }
+
+        try
+        {
+            using var patchesKey = udKey.OpenSubKey($@"{sidName}\Patches");
+            if (patchesKey is not null)
+            {
+                foreach (var patchGuid in patchesKey.GetSubKeyNames())
+                {
+                    ct.ThrowIfCancellationRequested();
+                    try
+                    {
+                        using var patchKey = patchesKey.OpenSubKey(patchGuid);
+                        var localPkg = patchKey?.GetValue("LocalPackage") as string;
+                        if (!string.IsNullOrEmpty(localPkg))
+                            claimed.TryAdd(localPkg, new RegisteredPackage(localPkg, "", ""));
+                    }
+                    catch (Exception ex) when (ex is not OperationCanceledException)
+                    {
+                        Helpers.CrashLog.Write(ex);
+                    }
+                }
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Helpers.CrashLog.Write(ex);
+        }
+    }
+
     private const int MaxProductIndex = 10_000;
     private const int MaxConsecutiveNonSuccess = 20;
 
-    private static List<(string ProductCode, string? UserSid, MsiInstallContext Context)> EnumerateProducts(
+    private List<(string ProductCode, string? UserSid, MsiInstallContext Context)> EnumerateProducts(
         CancellationToken ct)
     {
         var results = new List<(string, string?, MsiInstallContext)>();
         var productCode = new char[Msi.GuidBufferLength];
         var sidBuffer = new char[SidBufferLength];
         int consecutiveNonSuccess = 0;
+        uint lastError = MsiError.Success;
+        bool reachedEnd = false;
 
         for (uint index = 0; index < MaxProductIndex; index++)
         {
@@ -187,18 +299,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // a safety net.
             uint sidLen = SidBufferLength;
 
-            var error = Msi.MsiEnumProductsEx(
-                szProductCode: null,
-                szUserSid: AllUsersSid,
-                dwContext: MsiInstallContext.All,
-                dwIndex: index,
-                szInstalledProductCode: productCode,
-                pdwInstalledContext: out var installedContext,
-                szSid: sidBuffer,
-                pcchSid: ref sidLen);
+            var error = _msi.EnumProducts(
+                productCode: null,
+                userSid: AllUsersSid,
+                context: MsiInstallContext.All,
+                index: index,
+                installedProductCode: productCode,
+                installedContext: out var installedContext,
+                sid: sidBuffer,
+                sidLength: ref sidLen);
 
             if (error == MsiError.NoMoreItems)
+            {
+                reachedEnd = true;
                 break;
+            }
 
             if (error == MsiError.AccessDenied)
                 throw new LocalisedAccessException(Strings.Error_MsiAccessDenied);
@@ -213,19 +328,37 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // passes the same value back as the new buffer size.
                 sidBuffer = new char[sidLen];
 
-                error = Msi.MsiEnumProductsEx(
-                    szProductCode: null,
-                    szUserSid: AllUsersSid,
-                    dwContext: MsiInstallContext.All,
-                    dwIndex: index,
-                    szInstalledProductCode: productCode,
-                    pdwInstalledContext: out installedContext,
-                    szSid: sidBuffer,
-                    pcchSid: ref sidLen);
+                error = _msi.EnumProducts(
+                    productCode: null,
+                    userSid: AllUsersSid,
+                    context: MsiInstallContext.All,
+                    index: index,
+                    installedProductCode: productCode,
+                    installedContext: out installedContext,
+                    sid: sidBuffer,
+                    sidLength: ref sidLen);
             }
+
+            lastError = error;
 
             if (error == MsiError.Success)
             {
+                var code = BufferToString(productCode);
+                if (code.Length == 0)
+                {
+                    // A Success return that wrote no product GUID: the
+                    // follow-up GetProductInfo reads would fail quietly and
+                    // drop the product's cached file from the registered set,
+                    // which is the unsafe direction (a needed file then looks
+                    // orphaned). Count it against the tolerance instead of
+                    // adding an empty row.
+                    consecutiveNonSuccess++;
+                    if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
+                        throw new LocalisedInvalidOperationException(
+                            string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));
+                    continue;
+                }
+
                 consecutiveNonSuccess = 0;
                 // Clamp sidLen against the buffer length defensively
                 // in case the API ever returns a value larger than the
@@ -236,16 +369,36 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 var sid = (installedContext != MsiInstallContext.Machine && safeSidLen > 0)
                     ? new string(sidBuffer, 0, safeSidLen)
                     : null;
-                results.Add((BufferToString(productCode), sid, installedContext));
+                results.Add((code, sid, installedContext));
             }
             else
             {
+                // Scattered per-product failures are tolerated on purpose:
+                // this call cannot tell "product has no cached package" from
+                // "product unreadable", and ERROR_BAD_CONFIGURATION residue is
+                // common on exactly the machines this app serves, so a
+                // per-product throw would brick the scan for the people who
+                // most need it. The protection is layered elsewhere: the
+                // registry fallback covers the paths a scattered failure loses,
+                // and FileSystemScanService's correlation gate refuses the scan
+                // if the correlation as a whole has collapsed. Only a long RUN
+                // of consecutive failures (a wholesale enumeration collapse)
+                // throws. Do not "fix" this into a per-product hard failure.
                 consecutiveNonSuccess++;
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                     throw new LocalisedInvalidOperationException(
                         string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));
             }
         }
+
+        // Hitting the index cap is not a clean end: the enumeration ran out of
+        // budget rather than reporting NoMoreItems, so everything past the cap
+        // would be unseen and classified orphaned. Cannot happen on a real
+        // machine (nobody has 10,000 products), but if it ever did it falls to
+        // the catastrophic side, so fail loudly rather than truncate silently.
+        if (!reachedEnd)
+            throw new LocalisedInvalidOperationException(
+                string.Format(Strings.Error_MsiNonSuccess, MaxProductIndex, lastError));
 
         return results;
     }
@@ -263,7 +416,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
     private const int MaxPatchIndex = 10_000;
 
-    private static List<(string PatchCode, string? UserSid, MsiInstallContext Context)> EnumeratePatches(
+    private List<(string PatchCode, string? UserSid, MsiInstallContext Context)> EnumeratePatches(
         string productCode,
         string? userSid,
         MsiInstallContext context,
@@ -273,6 +426,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var patchCode = new char[Msi.GuidBufferLength];
         var targetProductCode = new char[Msi.GuidBufferLength];
         int consecutiveNonSuccess = 0;
+        uint lastError = MsiError.Success;
+        bool reachedEnd = false;
 
         for (uint index = 0; index < MaxPatchIndex; index++)
         {
@@ -288,28 +443,52 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             uint sidLen = 0;
 
-            var error = Msi.MsiEnumPatchesEx(
-                szProductCode: productCode,
-                szUserSid: userSid,
-                dwContext: context,
-                dwFilter: MsiPatchFilter.All,
-                dwIndex: index,
-                szPatchCode: patchCode,
-                szTargetProductCode: targetProductCode,
-                pdwTargetProductContext: out var patchContext,
-                szTargetUserSid: null,
-                pcchTargetUserSid: ref sidLen);
+            var error = _msi.EnumPatches(
+                productCode: productCode,
+                userSid: userSid,
+                context: context,
+                filter: MsiPatchFilter.All,
+                index: index,
+                patchCode: patchCode,
+                targetProductCode: targetProductCode,
+                targetProductContext: out var patchContext,
+                targetUserSid: null,
+                targetUserSidLength: ref sidLen);
 
             if (error == MsiError.NoMoreItems)
+            {
+                reachedEnd = true;
                 break;
+            }
 
             if (error == MsiError.AccessDenied)
-                break; // skip patches the API refuses to enumerate
+                // Match the product loop: an API refusal must land on the scan,
+                // not on the verdict. Breaking here silently yielded zero
+                // patches for this product, and its cached .msp files were then
+                // presented as orphaned. The scan command's catch routes this
+                // to a dialog and to crash.log.
+                throw new LocalisedAccessException(Strings.Error_MsiAccessDenied);
+
+            lastError = error;
 
             if (error == MsiError.Success || error == MsiError.MoreData)
             {
+                var code = BufferToString(patchCode);
+                if (code.Length == 0)
+                {
+                    // An empty patch GUID accepted as success would fail the
+                    // follow-up GetPatchInfo reads and drop the patch from the
+                    // registered set (the unsafe direction). Count it against
+                    // the tolerance rather than adding an empty row.
+                    consecutiveNonSuccess++;
+                    if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
+                        throw new LocalisedInvalidOperationException(
+                            string.Format(Strings.Error_MsiPatchNonSuccess, consecutiveNonSuccess, error));
+                    continue;
+                }
+
                 consecutiveNonSuccess = 0;
-                results.Add((BufferToString(patchCode), userSid, patchContext));
+                results.Add((code, userSid, patchContext));
             }
             else
             {
@@ -328,6 +507,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
             }
         }
 
+        // See EnumerateProducts: hitting the cap is an unterminated
+        // enumeration, not a clean end. Fail loudly rather than truncate.
+        if (!reachedEnd)
+            throw new LocalisedInvalidOperationException(
+                string.Format(Strings.Error_MsiPatchNonSuccess, MaxPatchIndex, lastError));
+
         return results;
     }
 
@@ -336,7 +521,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// pattern. Returns an empty string if the property cannot be
     /// read.
     /// </summary>
-    private static string GetProductProperty(
+    private string GetProductProperty(
         string productCode,
         string? userSid,
         MsiInstallContext context,
@@ -344,13 +529,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         uint bufferLen = 0;
 
-        var error = Msi.MsiGetProductInfoEx(
-            szProductCode: productCode,
-            szUserSid: userSid,
-            dwContext: context,
-            szProperty: propertyName,
-            szValue: null,
-            pcchValue: ref bufferLen);
+        var error = _msi.GetProductInfo(
+            productCode: productCode,
+            userSid: userSid,
+            context: context,
+            property: propertyName,
+            value: null,
+            valueLength: ref bufferLen);
 
         if (error != MsiError.Success && error != MsiError.MoreData)
             return string.Empty;
@@ -361,13 +546,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
         bufferLen++; // space for null terminator
         var buffer = new char[bufferLen];
 
-        error = Msi.MsiGetProductInfoEx(
-            szProductCode: productCode,
-            szUserSid: userSid,
-            dwContext: context,
-            szProperty: propertyName,
-            szValue: buffer,
-            pcchValue: ref bufferLen);
+        error = _msi.GetProductInfo(
+            productCode: productCode,
+            userSid: userSid,
+            context: context,
+            property: propertyName,
+            value: buffer,
+            valueLength: ref bufferLen);
 
         // Defensive clamp: a successful Msi*GetInfoEx returns
         // bufferLen as the count excluding the terminator and never
@@ -383,7 +568,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// pattern. Returns an empty string if the property cannot be
     /// read.
     /// </summary>
-    private static string GetPatchProperty(
+    private string GetPatchProperty(
         string patchCode,
         string productCode,
         string? userSid,
@@ -392,14 +577,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         uint bufferLen = 0;
 
-        var error = Msi.MsiGetPatchInfoEx(
-            szPatchCode: patchCode,
-            szProductCode: productCode,
-            szUserSid: userSid,
-            dwContext: context,
-            szProperty: propertyName,
-            szValue: null,
-            pcchValue: ref bufferLen);
+        var error = _msi.GetPatchInfo(
+            patchCode: patchCode,
+            productCode: productCode,
+            userSid: userSid,
+            context: context,
+            property: propertyName,
+            value: null,
+            valueLength: ref bufferLen);
 
         if (error != MsiError.Success && error != MsiError.MoreData)
             return string.Empty;
@@ -410,14 +595,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
         bufferLen++; // space for null terminator
         var buffer = new char[bufferLen];
 
-        error = Msi.MsiGetPatchInfoEx(
-            szPatchCode: patchCode,
-            szProductCode: productCode,
-            szUserSid: userSid,
-            dwContext: context,
-            szProperty: propertyName,
-            szValue: buffer,
-            pcchValue: ref bufferLen);
+        error = _msi.GetPatchInfo(
+            patchCode: patchCode,
+            productCode: productCode,
+            userSid: userSid,
+            context: context,
+            property: propertyName,
+            value: buffer,
+            valueLength: ref bufferLen);
 
         // Defensive clamp: a successful Msi*GetInfoEx returns
         // bufferLen as the count excluding the terminator and never

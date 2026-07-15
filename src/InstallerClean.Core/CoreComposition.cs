@@ -35,6 +35,7 @@ public static class CoreComposition
         services.AddSingleton<IFileSystem, FileSystem>();
         services.AddSingleton<IRegistryReader, RegistryReader>();
         services.AddSingleton<IMutexProbe, MutexProbe>();
+        services.AddSingleton<Interop.IMsiApi, Interop.MsiApi>();
 
         // Win32 / registry / MSI-API wrappers.
         services.AddSingleton<IInstallerQueryService, InstallerQueryService>();
