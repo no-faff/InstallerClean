@@ -65,7 +65,10 @@ public sealed class DeleteFilesService : IDeleteFilesService
 
             int deleted = 0;
             var errors = new List<FileOperationError>();
+            bool cancelled = false;
 
+            try
+            {
             for (int i = 0; i < total; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -139,11 +142,20 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     errors.Add(new UnknownError(filePath));
                 }
             }
+            }
+            catch (OperationCanceledException)
+            {
+                // Return what was recycled before the cancel rather than
+                // throwing the tally away. The loop's ThrowIfCancellationRequested
+                // is the only cancellation source and sits outside the inner
+                // per-file catch, so only a real cancel lands here.
+                cancelled = true;
+            }
 
             // CancellationToken.None: best-effort cleanup. See the
             // matching comment in MoveFilesService for the rationale.
             InstallerCacheHelpers.PruneEmptySubdirectories(_fs, CancellationToken.None);
-            return new DeleteResult(deleted, errors.AsReadOnly());
+            return new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled);
         }, cancellationToken);
     }
 }

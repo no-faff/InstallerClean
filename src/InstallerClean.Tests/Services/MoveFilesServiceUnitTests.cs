@@ -141,7 +141,7 @@ public class MoveFilesServiceUnitTests
     }
 
     [Fact]
-    public async Task MoveFilesAsync_throws_when_cancelled_mid_batch()
+    public async Task MoveFilesAsync_returns_the_partial_result_when_cancelled_mid_batch()
     {
         var fs = new MockFileSystem();
         var sources = new[] { "a.msi", "b.msi", "c.msi" }
@@ -152,18 +152,21 @@ public class MoveFilesServiceUnitTests
         // Cancel after the first progress report so the second
         // iteration's ThrowIfCancellationRequested fires.
         var cts = new CancellationTokenSource();
-        var progress = new Helpers.SyncProgress<InstallerClean.Models.OperationProgress>(p =>
+        var progress = new Helpers.SyncProgress<OperationProgress>(p =>
         {
             if (p.CurrentFile == 1) cts.Cancel();
         });
 
         var svc = new MoveFilesService(fs);
 
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(
-            () => svc.MoveFilesAsync(sources, DestDir, progress, cts.Token));
+        // No throw on a mid-batch cancel: the accumulated result comes back with
+        // Cancelled set and the count of what completed before the stop.
+        var result = await svc.MoveFilesAsync(sources, DestDir, progress, cts.Token);
 
-        // First file should already have moved before cancellation
-        // landed; the rest stay in the source folder.
+        Assert.True(result.Cancelled);
+        Assert.Equal(1, result.MovedCount);
+        Assert.Empty(result.Errors);
+        // First file already moved before cancellation landed; the rest stay.
         Assert.True(fs.File.Exists($@"{DestDir}\a.msi"));
         Assert.True(fs.File.Exists($@"{SourceDir}\b.msi"));
         Assert.True(fs.File.Exists($@"{SourceDir}\c.msi"));

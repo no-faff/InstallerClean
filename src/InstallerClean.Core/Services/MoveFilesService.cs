@@ -94,7 +94,10 @@ public sealed class MoveFilesService : IMoveFilesService
             var errors = new List<FileOperationError>();
             var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
             var total = pathList.Count;
+            bool cancelled = false;
 
+            try
+            {
             for (int i = 0; i < total; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -166,6 +169,16 @@ public sealed class MoveFilesService : IMoveFilesService
                     errors.Add(new UnknownError(sourcePath));
                 }
             }
+            }
+            catch (OperationCanceledException)
+            {
+                // Return what moved before the cancel rather than throwing the
+                // tally away. The per-file loop's ThrowIfCancellationRequested is
+                // the only cancellation source and sits outside the inner
+                // per-file catch, so only a real cancel lands here; a genuine
+                // mid-batch error (a destination junction swap) still propagates.
+                cancelled = true;
+            }
 
             // Pass CancellationToken.None: the prune is best-effort
             // post-operation cleanup. If the user pressed Cancel during
@@ -174,7 +187,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // batch that actually succeeded - the caller would re-label
             // the run as "Move cancelled" even though every file moved.
             InstallerCacheHelpers.PruneEmptySubdirectories(_fs, CancellationToken.None);
-            return new MoveResult(moved, errors.AsReadOnly());
+            return new MoveResult(moved, errors.AsReadOnly(), cancelled);
         }, cancellationToken);
     }
 

@@ -175,7 +175,7 @@ public class DeleteFilesServiceUnitTests
     }
 
     [Fact]
-    public async Task Throws_when_cancelled_mid_batch()
+    public async Task Returns_the_partial_result_when_cancelled_mid_batch()
     {
         var (fs, engine) = Setup();
         var files = new[] { "a.msi", "b.msi", "c.msi" }.Select(n => AddFile(fs, n)).ToArray();
@@ -183,8 +183,15 @@ public class DeleteFilesServiceUnitTests
         var progress = new SyncProgress<OperationProgress>(p => { if (p.CurrentFile == 1) cts.Cancel(); });
         var svc = new DeleteFilesService(fs, engine);
 
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(
-            () => svc.DeleteFilesAsync(files, progress: progress, cancellationToken: cts.Token));
+        // No throw on a mid-batch cancel: the partial result comes back with
+        // Cancelled set and the tally of what was recycled before the stop.
+        var result = await svc.DeleteFilesAsync(files, progress: progress, cancellationToken: cts.Token);
+
+        Assert.True(result.Cancelled);
+        Assert.Equal(1, result.DeletedCount);
+        Assert.False(result.RecycleUnavailable);
+        Assert.Empty(result.Errors);
+        engine.Received(1).RecycleFile(Arg.Any<string>());
     }
 
     [Fact]

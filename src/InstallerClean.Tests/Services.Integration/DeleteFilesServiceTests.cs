@@ -139,7 +139,7 @@ public class DeleteFilesServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task DeleteFilesAsync_stops_when_cancelled()
+    public async Task DeleteFilesAsync_returns_the_partial_result_when_cancelled()
     {
         var files = new List<string>();
         for (int i = 0; i < 3; i++)
@@ -153,9 +153,11 @@ public class DeleteFilesServiceTests : IDisposable
         var progress = new SyncProgress<OperationProgress>(p => { if (p.CurrentFile == 1) cts.Cancel(); });
 
         var svc = NewService();
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(
-            () => svc.DeleteFilesAsync(files, progress: progress, cancellationToken: cts.Token));
+        // A mid-batch cancel returns the partial result with Cancelled set rather
+        // than throwing; some files remain, having been stopped before deletion.
+        var result = await svc.DeleteFilesAsync(files, progress: progress, cancellationToken: cts.Token);
 
+        Assert.True(result.Cancelled);
         var remaining = Directory.GetFiles(_tempDir).Length;
         Assert.True(remaining > 0, "Cancellation should have stopped before deleting all files");
     }

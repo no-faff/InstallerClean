@@ -19,7 +19,11 @@ public interface IMoveFilesService
     /// resolves inside the Installer folder, or
     /// <see cref="UnauthorizedAccessException"/> if the destination is
     /// not writable. Per-file failures are surfaced via the result's
-    /// <see cref="MoveResult.Errors"/>, not exceptions.
+    /// <see cref="MoveResult.Errors"/>, not exceptions. A cancellation
+    /// requested mid-operation is NOT thrown: the batch stops and the
+    /// accumulated result is returned with <see cref="MoveResult.Cancelled"/>
+    /// set (a cancellation before the worker starts still surfaces as
+    /// <see cref="OperationCanceledException"/>).
     /// </summary>
     Task<MoveResult> MoveFilesAsync(
         IEnumerable<string> filePaths,
@@ -29,10 +33,14 @@ public interface IMoveFilesService
 }
 
 /// <summary>
-/// Outcome of a Move. <see cref="MovedCount"/> + <see cref="Errors"/>.Count
-/// always sum to the input count: every file is either moved or
-/// recorded as a failure (never silently dropped).
+/// Outcome of a Move. When <see cref="Cancelled"/> is <c>false</c>,
+/// <see cref="MovedCount"/> + <see cref="Errors"/>.Count sum to the input
+/// count: every file is either moved or recorded as a failure (never silently
+/// dropped). When <see cref="Cancelled"/> is <c>true</c> the batch was stopped
+/// mid-way, so the two sum to the number of files reached before the cancel,
+/// and the rest of the input was never touched.
 /// </summary>
 public record MoveResult(
     int MovedCount,
-    IReadOnlyList<FileOperationError> Errors);
+    IReadOnlyList<FileOperationError> Errors,
+    bool Cancelled = false);
