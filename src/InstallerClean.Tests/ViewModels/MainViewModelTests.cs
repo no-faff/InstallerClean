@@ -217,7 +217,7 @@ public class MainViewModelTests
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
         _dialogService.Received(1).ShowWarning(
-            Arg.Is<string>(s => s != null && s.Contains("administrator privileges")),
+            Arg.Is<string>(s => s != null && s.Contains("already running as administrator")),
             Arg.Any<string>());
     }
 
