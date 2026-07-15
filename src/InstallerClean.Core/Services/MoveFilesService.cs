@@ -7,6 +7,7 @@ namespace InstallerClean.Services;
 public sealed class MoveFilesService : IMoveFilesService
 {
     private readonly IFileSystem _fs;
+    private readonly IMutexProbe _mutex;
 
     /// <summary>
     /// Test-only real-folder override for the containment guard's cache root
@@ -20,16 +21,24 @@ public sealed class MoveFilesService : IMoveFilesService
 
     /// <summary>
     /// Constructor. The DI container injects the registered
-    /// <see cref="IFileSystem"/> singleton in production; tests pass
-    /// a <see cref="MockFileSystem"/> so the move pipeline can be
-    /// verified without touching <c>%TEMP%</c>.
+    /// <see cref="IFileSystem"/> and <see cref="IMutexProbe"/> singletons in
+    /// production; the mutex is held for the batch so a msiexec starting
+    /// mid-move waits instead of racing the cache (P1).
     /// </summary>
-    public MoveFilesService(IFileSystem fileSystem) : this(fileSystem, null) { }
+    public MoveFilesService(IFileSystem fileSystem, IMutexProbe mutex) : this(fileSystem, mutex, null) { }
 
-    /// <summary>Test constructor. Points the source containment guard at a real sandbox folder.</summary>
+    /// <summary>Test constructor. No mutex hold (the P1 path is exercised via the seam constructor below).</summary>
+    internal MoveFilesService(IFileSystem fileSystem) : this(fileSystem, NullMutexProbe.Instance, null) { }
+
+    /// <summary>Test constructor. Points the source containment guard at a real sandbox folder; no mutex hold.</summary>
     internal MoveFilesService(IFileSystem fileSystem, string? installerFolderOverride)
+        : this(fileSystem, NullMutexProbe.Instance, installerFolderOverride) { }
+
+    /// <summary>Seam constructor: an injected <see cref="IMutexProbe"/> (real or fake) plus the sandbox override.</summary>
+    internal MoveFilesService(IFileSystem fileSystem, IMutexProbe mutex, string? installerFolderOverride)
     {
         _fs = fileSystem;
+        _mutex = mutex;
         _installerFolderOverride = installerFolderOverride;
     }
 
@@ -66,6 +75,22 @@ public sealed class MoveFilesService : IMoveFilesService
 
         return Task.Run(() =>
         {
+            // P1: hold Global\_MSIExecute for the batch on this worker thread so a
+            // msiexec starting mid-move waits on the mutex instead of racing the
+            // cache. Acquired here (not on the dispatcher) and released in the
+            // finally on the SAME thread (Win32 owner-thread rule); the body is
+            // synchronous, so no await hops threads between acquire and release.
+            // Held by a live transaction => refuse and touch nothing (the caller
+            // re-checks the pending-reboot gate and shows its banner). A
+            // DACL-refused acquire (lease null, not heldByAnother) falls back to
+            // today's behaviour: proceed without the hold. This closes only the
+            // sub-millisecond race after the host-side gate re-check has passed.
+            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
+            if (lease is null && heldByAnother)
+                return new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
+
+            try
+            {
             CreateDestinationFolder(destinationFolder);
 
             // Re-check after CreateDirectory closes the TOCTOU window
@@ -188,6 +213,13 @@ public sealed class MoveFilesService : IMoveFilesService
             // the run as "Move cancelled" even though every file moved.
             InstallerCacheHelpers.PruneEmptySubdirectories(_fs, CancellationToken.None);
             return new MoveResult(moved, errors.AsReadOnly(), cancelled);
+            }
+            finally
+            {
+                // Release on this same worker thread (Win32 owner-thread rule);
+                // no-op when the acquire fell back (lease null).
+                lease?.Dispose();
+            }
         }, cancellationToken);
     }
 

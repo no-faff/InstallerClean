@@ -7,6 +7,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
 {
     private readonly IFileSystem _fs;
     private readonly IRecycleEngine _engine;
+    private readonly IMutexProbe _mutex;
 
     /// <summary>
     /// Test-only real-folder override for the containment guard's cache root
@@ -19,20 +20,28 @@ public sealed class DeleteFilesService : IDeleteFilesService
 
     /// <summary>
     /// Constructor. The DI container injects the registered
-    /// <see cref="IFileSystem"/> and <see cref="IRecycleEngine"/>
-    /// singletons in production; tests pass a <see cref="MockFileSystem"/>
-    /// and a fake engine so the per-file outcome mapping, the
-    /// probe-and-refuse decision and the cancellation path are verified
-    /// without touching the real Recycle Bin.
+    /// <see cref="IFileSystem"/>, <see cref="IRecycleEngine"/> and
+    /// <see cref="IMutexProbe"/> singletons in production; the mutex is held for
+    /// the batch so a msiexec starting mid-delete waits instead of racing the
+    /// cache (P1).
     /// </summary>
-    public DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine)
-        : this(fileSystem, engine, null) { }
+    public DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine, IMutexProbe mutex)
+        : this(fileSystem, engine, mutex, null) { }
 
-    /// <summary>Test constructor. Points the source containment guard at a real sandbox folder.</summary>
+    /// <summary>Test constructor. No mutex hold (the P1 path is exercised via the seam constructor below).</summary>
+    internal DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine)
+        : this(fileSystem, engine, NullMutexProbe.Instance, null) { }
+
+    /// <summary>Test constructor. Points the source containment guard at a real sandbox folder; no mutex hold.</summary>
     internal DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine, string? installerFolderOverride)
+        : this(fileSystem, engine, NullMutexProbe.Instance, installerFolderOverride) { }
+
+    /// <summary>Seam constructor: an injected <see cref="IMutexProbe"/> (real or fake) plus the sandbox override.</summary>
+    internal DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine, IMutexProbe mutex, string? installerFolderOverride)
     {
         _fs = fileSystem;
         _engine = engine;
+        _mutex = mutex;
         _installerFolderOverride = installerFolderOverride;
     }
 
@@ -51,6 +60,20 @@ public sealed class DeleteFilesService : IDeleteFilesService
             if (total == 0)
                 return new DeleteResult(0, Array.Empty<FileOperationError>());
 
+            // P1: hold Global\_MSIExecute for the batch on this worker thread so a
+            // msiexec starting mid-delete waits on the mutex instead of racing the
+            // cache. Acquired here and released in the finally on the SAME thread
+            // (Win32 owner-thread rule); the body is synchronous, so no await hops
+            // threads between acquire and release. Held by a live transaction =>
+            // refuse and touch nothing (the caller re-checks the pending-reboot
+            // gate and shows its banner). A DACL-refused acquire falls back to
+            // today's behaviour: proceed without the hold.
+            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
+            if (lease is null && heldByAnother)
+                return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
+
+            try
+            {
             cancellationToken.ThrowIfCancellationRequested();
 
             // The shell recycle is recycle-or-permanently-delete: when the
@@ -156,6 +179,13 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // matching comment in MoveFilesService for the rationale.
             InstallerCacheHelpers.PruneEmptySubdirectories(_fs, CancellationToken.None);
             return new DeleteResult(deleted, errors.AsReadOnly(), Cancelled: cancelled);
+            }
+            finally
+            {
+                // Release on this same worker thread (Win32 owner-thread rule);
+                // no-op when the acquire fell back (lease null).
+                lease?.Dispose();
+            }
         }, cancellationToken);
     }
 }

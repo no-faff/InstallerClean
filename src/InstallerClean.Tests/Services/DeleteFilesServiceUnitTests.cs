@@ -215,6 +215,40 @@ public class DeleteFilesServiceUnitTests
     }
 
     [Fact]
+    public async Task Refuses_when_the_installer_mutex_is_held()
+    {
+        var (fs, engine) = Setup();
+        var a = AddFile(fs, "a.msi");
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.HeldByAnother);
+        var svc = new DeleteFilesService(fs, engine, mutex);
+
+        var result = await svc.DeleteFilesAsync(new[] { a });
+
+        Assert.True(result.InstallerBusy);
+        Assert.Equal(0, result.DeletedCount);
+        Assert.Empty(result.Errors);
+        engine.DidNotReceive().RecycleFile(Arg.Any<string>());
+        // Refused before the bin probe even runs.
+        engine.DidNotReceive().CanRecycleToVolume(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task Holds_and_releases_the_installer_mutex_when_acquired()
+    {
+        var (fs, engine) = Setup();
+        var a = AddFile(fs, "a.msi");
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.Acquire);
+        var svc = new DeleteFilesService(fs, engine, mutex);
+
+        var result = await svc.DeleteFilesAsync(new[] { a });
+
+        Assert.Equal(1, result.DeletedCount);
+        Assert.False(result.InstallerBusy);
+        Assert.Equal(1, mutex.Acquired);
+        Assert.Equal(1, mutex.Released);
+    }
+
+    [Fact]
     public async Task Zero_files_returns_empty_result_without_probing()
     {
         var (fs, engine) = Setup();

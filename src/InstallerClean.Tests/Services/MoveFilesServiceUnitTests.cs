@@ -193,6 +193,59 @@ public class MoveFilesServiceUnitTests
     }
 
     [Fact]
+    public async Task MoveFilesAsync_refuses_when_the_installer_mutex_is_held()
+    {
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.HeldByAnother);
+
+        var svc = new MoveFilesService(fs, mutex);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        Assert.True(result.InstallerBusy);
+        Assert.Equal(0, result.MovedCount);
+        Assert.Empty(result.Errors);
+        Assert.True(fs.File.Exists(source)); // nothing moved
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_holds_and_releases_the_installer_mutex_when_acquired()
+    {
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.Acquire);
+
+        var svc = new MoveFilesService(fs, mutex);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        Assert.False(result.InstallerBusy);
+        Assert.Equal(1, result.MovedCount);
+        Assert.Equal(1, mutex.Acquired);
+        Assert.Equal(1, mutex.Released); // released exactly once, on the worker thread
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_falls_back_and_proceeds_when_the_mutex_cannot_be_acquired()
+    {
+        var fs = new MockFileSystem();
+        var source = $@"{SourceDir}\a.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+        var mutex = new Helpers.FakeMutexProbe(Helpers.FakeMutexProbe.Mode.FallBack);
+
+        var svc = new MoveFilesService(fs, mutex);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        Assert.False(result.InstallerBusy);
+        Assert.Equal(1, result.MovedCount); // proceeded without the hold
+        Assert.Equal(0, mutex.Released);
+    }
+
+    [Fact]
     public async Task MoveFilesAsync_zero_files_returns_empty_result()
     {
         var fs = new MockFileSystem();

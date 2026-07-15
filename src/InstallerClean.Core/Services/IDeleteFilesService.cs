@@ -64,10 +64,14 @@ public interface IDeleteFilesService
 /// <see cref="DeletedCount"/> is 0 and <see cref="Errors"/> is empty. When
 /// <see cref="Cancelled"/> is <c>true</c> the batch was stopped mid-way, so the
 /// count and errors reflect the files reached before the cancel and the rest of
-/// the input was never touched.
+/// the input was never touched. When <see cref="InstallerBusy"/> is <c>true</c>
+/// the batch was refused before it started because a Windows Installer
+/// transaction held <c>Global\_MSIExecute</c>: nothing was touched. The caller
+/// re-checks the pending-reboot gate and shows its banner.
 /// </summary>
 public record DeleteResult(
     int DeletedCount,
     IReadOnlyList<FileOperationError> Errors,
     bool RecycleUnavailable = false,
-    bool Cancelled = false);
+    bool Cancelled = false,
+    bool InstallerBusy = false);
