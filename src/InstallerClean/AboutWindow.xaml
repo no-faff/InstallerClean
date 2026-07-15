@@ -25,6 +25,11 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="Auto"/>
+            <!-- Provenance panel (row 8). Auto, so it measures to its content and
+                 the height-sized window grows to fit; it collapses to nothing
+                 while its strings are blank, so the star spacer below still pins
+                 say-thanks to the bottom in the airy empty state. -->
+            <RowDefinition Height="Auto"/>
             <!-- Star spacer: the gap before the say-thanks block. Under
                  SizeToContent="Height" it sits at MinHeight and expands past it
                  only in the arrange pass, when the content is shorter than the
@@ -88,16 +93,43 @@
                 AutomationProperties.Name="{loc:Translate Automation.CheckForUpdates}"
                 AutomationProperties.HelpText="{loc:Translate Automation.CheckForUpdates.HelpText}"/>
 
+        <!-- Provenance panel: what InstallerClean is, who wrote it and that the
+             source is open, for the suspicious user of an unsigned, elevated app.
+             The strings are the OWNER'S copy (the "never an AI tell / reads as
+             deliberate human work" rule is a live landmine here) and are BLANK
+             until supplied. The whole panel is bound to the body being empty, so
+             a blank panel collapses and never reaches a release: it is a
+             ship-gate, reverted and held if the copy has not arrived by the final
+             build. -->
+        <StackPanel Grid.Row="8" Margin="0,10,0,0">
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Visibility" Value="Visible"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text, ElementName=ProvenanceBody}" Value="">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+            <TextBlock x:Name="ProvenanceHeading" Text="{loc:Translate About.Provenance.Heading}"
+                       Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
+                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Sm}"/>
+            <TextBlock x:Name="ProvenanceBody" Text="{loc:Translate About.Provenance.Body}"
+                       Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
+                       TextWrapping="Wrap"/>
+        </StackPanel>
+
         <!-- Section header above the Star + Buy-me-a-cuppa row. The
              resx value is already uppercased so screen readers don't
              see SmallCaps glyph mapping at all. Type.Heading.Sm +
              Text.Body matches MOVE LOCATION and the registered-
              window PRODUCTS / PATCHES / PRODUCT DETAILS labels. -->
-        <TextBlock Grid.Row="9" Text="{loc:Translate Section.SayThanks}"
+        <TextBlock Grid.Row="10" Text="{loc:Translate Section.SayThanks}"
                    Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                    AutomationProperties.Name="{loc:Translate Automation.SayThanks}"/>
 
-        <Grid Grid.Row="11">
+        <Grid Grid.Row="12">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                 <Button Style="{StaticResource CompactGhostPill}"
                         Click="StarClick" AutomationProperties.Name="{loc:Translate Automation.LeaveStarOnGitHub.About}"
