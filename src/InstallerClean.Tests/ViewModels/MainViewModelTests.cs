@@ -190,14 +190,20 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task ScanAsync_propagates_access_denied()
+    public async Task ScanWithProgressAsync_records_access_denied_without_throwing()
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new UnauthorizedAccessException("denied"));
 
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(
-            () => vm.Scan.ScanWithProgressAsync(null));
+        // The startup scan records the tailored message through the error ladder
+        // and returns, so App opens the main window in its error state instead of
+        // the exception reaching App.OnStartup and exiting. Only cancellation
+        // still propagates (it closes the splash).
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.True(vm.Scan.HasScanError);
+        Assert.Contains("already running as administrator", vm.Scan.LastScanError);
     }
 
     [Fact]
