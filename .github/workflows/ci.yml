@@ -44,6 +44,13 @@ jobs:
       - name: Lint French spacing
         run: node scripts/check-french-spacing.mjs
 
+      # Held out of CI until the 2.0.2 translation batch landed (it was red by
+      # design during that window); now every satellite is translated, so it is
+      # a required gate: a satellite shipping the English neutral for a required
+      # key fails the build.
+      - name: Check every satellite is translated
+        run: node scripts/check-still-english.mjs
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
