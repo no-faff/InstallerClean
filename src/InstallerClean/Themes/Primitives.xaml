@@ -34,9 +34,9 @@
     <Color x:Key="Primitive.Slate.800">#1e293b</Color>
     <Color x:Key="Primitive.Slate.900">#0f172a</Color>
 
-    <!-- Custom slate steps used for hover/pressed states on Primary
-         buttons. Sit between Slate.700 and Slate.800; not on the
-         Tailwind ramp. -->
+    <!-- Custom slate steps used for the hover/pressed states of the
+         standard action fill. Sit between Slate.700 and Slate.800; not
+         on the Tailwind ramp. -->
     <Color x:Key="Primitive.Slate.700.Hover">#2b3749</Color>
     <Color x:Key="Primitive.Slate.700.Pressed">#232e3d</Color>
 

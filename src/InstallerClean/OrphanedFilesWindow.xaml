@@ -115,7 +115,7 @@
                                                    FontSize="{DynamicResource Type.Caption}" VerticalAlignment="Center">
                                             <TextBlock.Style>
                                                 <!-- Text.Muted on the selected-row background
-                                                     (Action.Primary.Background) is 4.04:1 (fails AA
+                                                     (Action.Standard.Background) is 4.04:1 (fails AA
                                                      for normal text at 11pt). Lift to Text.Body on
                                                      selection so the load-bearing Orphaned-vs-Superseded
                                                      distinction stays legible on the row a low-vision
@@ -230,7 +230,7 @@
         <DockPanel Grid.Row="3" LastChildFill="False">
             <TextBlock DockPanel.Dock="Left" Text="{Binding Summary}"
                        Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}" VerticalAlignment="Center"/>
-            <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
+            <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
                     Content="{loc:Translate Action.Close}" IsCancel="True"/>
         </DockPanel>
     </Grid>

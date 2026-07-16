@@ -11,7 +11,7 @@
                                    BorderThickness.*, Gap.*, GapBottom.*,
                                    GapRight.*, GapLeft.*) consumed by
                                    both components and windows.
-          Themes/Components.xaml - control styles (PrimaryPill, Card,
+          Themes/Components.xaml - control styles (StandardPill, Card,
                                    ProgressBar, etc) consuming tokens.
 
         Tokens.xaml merges Primitives.xaml; Components.xaml merges

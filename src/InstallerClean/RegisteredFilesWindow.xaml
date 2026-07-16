@@ -223,7 +223,7 @@
                                         <TextBlock Text="{Binding SizeDisplay}" FontSize="{DynamicResource Type.Caption}">
                                             <TextBlock.Style>
                                                 <!-- Text.Dim on the selected-row background
-                                                     (Action.Primary.Background) is 3.34:1
+                                                     (Action.Standard.Background) is 3.34:1
                                                      (fails AA for normal text). Lift to
                                                      Text.Body on selection so a low-vision
                                                      user can read the size after arrow-key
@@ -365,7 +365,7 @@
         <DockPanel Grid.Row="7" LastChildFill="False">
             <TextBlock DockPanel.Dock="Left" Text="{Binding Summary}"
                        Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}" VerticalAlignment="Center"/>
-            <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
+            <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
                     Content="{loc:Translate Action.Close}" IsCancel="True"/>
         </DockPanel>
     </Grid>

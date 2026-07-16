@@ -223,7 +223,7 @@
                      count. Collapses with the counts it introduces: before the
                      first scan there are no counts, and a rule with nothing
                      under it is a stray line. -->
-                <chrome:DecorativeBorder BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="0,1,0,0" Margin="{StaticResource GapBottom.Lg}"
+                <chrome:DecorativeBorder BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="0,1,0,0" Margin="{StaticResource GapBottom.Lg}"
                                          Visibility="{Binding Scan.HasScanned, Converter={StaticResource BoolToVis}}"/>
 
                 <!-- Unneeded (orphaned) count: the loud heading-tier row leads
@@ -331,7 +331,7 @@
 
             <!-- Separator. The 16 above and 12 below were the two spacer rows it
                  used to sit between. -->
-            <chrome:DecorativeBorder Grid.Row="1" BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="0,1,0,0"
+            <chrome:DecorativeBorder Grid.Row="1" BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="0,1,0,0"
                                      Margin="0,16,0,12"
                                      Visibility="{Binding Scan.HasOrphans, Converter={StaticResource BoolToVis}}"/>
 
@@ -383,7 +383,7 @@
                      loud accent pill: InstallerClean only ever offers files that
                      are safe to remove, and only to the Recycle Bin, so removing
                      them is the main path. Move is the quieter reassurance, on
-                     the secondary pill, for anyone who would rather park a copy
+                     the standard pill, for anyone who would rather park a copy
                      somewhere first. TabIndex puts Delete before Move so Tab
                      follows left-to-right visual order; DockPanel Dock="Right"
                      places Move at the far right and Delete to its left, but XAML
@@ -391,7 +391,7 @@
                      overlay's Done pill and the confirm dialogs' own emphasis
                      line up with Delete as the default action. -->
                 <DockPanel Grid.Row="4" KeyboardNavigation.TabNavigation="Local">
-                    <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryPill}"
+                    <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
                             KeyboardNavigation.TabIndex="1"
                             Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
                             AutomationProperties.HelpText="{loc:Translate Automation.MoveAllFiles}"
@@ -717,7 +717,7 @@
             <!-- Card width scales with the OS text size so the copy keeps
                  its line length instead of wrapping into a tall sliver. -->
             <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Pill}"
-                    BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}"
+                    BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}"
                     Padding="36,32" MinWidth="{a11y:TextScaled 340}" MaxWidth="{a11y:TextScaled 520}"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
                 <!-- Grid, not a StackPanel: the icon, heading and buttons

@@ -23,7 +23,7 @@
          line length instead of wrapping into a tall sliver. -->
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
             MaxWidth="{a11y:TextScaled 520}" MinWidth="{a11y:TextScaled 320}"
-            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
+            BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <!-- Grid, not a StackPanel: the destination (the one line that
              can run long) sits in a star row so it scrolls once the
              window's work-area MaxHeight binds (very large text scales),

@@ -1,6 +1,6 @@
 <!--
     Component styles. Each Style here describes a control role
-    (PrimaryPill, GhostPill, Card, etc) and consumes only semantic
+    (StandardPill, GhostPill, Card, etc) and consumes only semantic
     tokens from Tokens.xaml.
 
     Nothing in this file references a Primitive.* key. A component
@@ -144,10 +144,15 @@
 
     <!-- Pill buttons. Four flavours share one visual language (40px
          minimum height, fully rounded, 14pt Medium label):
-           AccentPill  - secondary action colour (CTA / Move).
-           PrimaryPill - primary action colour (Browse / Add / Close).
-           DangerPill  - destructive action colour (Delete).
-           GhostPill   - text-only action with no fill (Settings / About).
+           AccentPill   - the accent fill, for the one action a screen leads with.
+           StandardPill - the default filled action.
+           DangerPill   - destructive confirm (Delete, Delete permanently).
+           GhostPill    - text-only action with no fill (Cancel / Details / About).
+
+         Which action a screen leads with is that screen's decision, taken
+         where its Button names a style. A pill is a look, not a rank, so
+         moving the emphasis between two buttons is a change at those two
+         buttons and nowhere else.
 
          The pill heights here (and on the compact pills and PillTextBox
          below) are MinHeight, never Height: the label's font size tracks
@@ -167,7 +172,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bg" Background="{StaticResource Action.Secondary.Background}"
+                    <Border x:Name="Bg" Background="{StaticResource Action.Accent.Background}"
                             CornerRadius="{StaticResource Radius.Pill}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -175,10 +180,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Secondary.Hover}"/>
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Accent.Hover}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Secondary.Pressed}"/>
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Accent.Pressed}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Bg" Property="Opacity" Value="0.5"/>
@@ -189,7 +194,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="PrimaryPill" TargetType="Button">
+    <Style x:Key="StandardPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <Setter Property="FontSize" Value="{DynamicResource Type.Heading.Sm}"/>
         <Setter Property="FontWeight" Value="Medium"/>
@@ -201,7 +206,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bg" Background="{StaticResource Action.Primary.Background}"
+                    <Border x:Name="Bg" Background="{StaticResource Action.Standard.Background}"
                             CornerRadius="{StaticResource Radius.Pill}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -209,10 +214,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Hover}"/>
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Standard.Hover}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Pressed}"/>
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Standard.Pressed}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Bg" Property="Opacity" Value="0.5"/>
@@ -304,7 +309,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bg" Background="{StaticResource Action.Primary.Background}"
+                    <Border x:Name="Bg" Background="{StaticResource Action.Standard.Background}"
                             CornerRadius="{StaticResource Radius.CompactPill}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -312,10 +317,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Hover}"/>
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Standard.Hover}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Pressed}"/>
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Standard.Pressed}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Bg" Property="Opacity" Value="0.5"/>
@@ -429,7 +434,7 @@
     </Style>
 
     <!-- List items. ListView and ListBox row styles. Selection
-         highlight uses the primary action background (not the violet
+         highlight uses the standard action background (not the violet
          selection accent) so a selected row reads as "active
          selection" rather than "brand-flavoured". -->
 
@@ -449,7 +454,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Primary.Background}"/>
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Background}"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Surface.Sidebar}"/>
@@ -470,7 +475,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Primary.Background}"/>
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Background}"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Surface.Sidebar}"/>
@@ -513,8 +518,8 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource Action.Primary.Background}"/>
-                            <!-- Text.Muted on Action.Primary.Background is 4.04:1 (fails AA
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource Action.Standard.Background}"/>
+                            <!-- Text.Muted on Action.Standard.Background is 4.04:1 (fails AA
                                  4.5:1 for the 12px header text); the focus fill must lift the
                                  header foreground too, as the highlighted menu row lifts its
                                  gesture column. Text.Body on that fill is 6.97:1. -->
@@ -689,7 +694,7 @@
     <!-- Caption buttons. Title-bar minimise / maximise / close. The
          CaptionClose style is distinct because the close button uses
          Action.CaptionClose.* on hover (red, matching the Windows
-         convention) where the others use the standard Action.Primary
+         convention) where the others use the Action.Standard
          background. -->
 
     <!-- The chrome glyphs (E921 minimise, E922 maximise, E923 restore,
@@ -729,7 +734,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Background}"/>
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Standard.Background}"/>
                             <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
@@ -786,7 +791,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToolTip">
-                    <Border Background="{StaticResource Action.Secondary.Background}"
+                    <Border Background="{StaticResource Action.Accent.Background}"
                             CornerRadius="{StaticResource Radius.Chip}"
                             Padding="10,6">
                         <TextBlock Text="{TemplateBinding Content}"
@@ -812,7 +817,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ToolTip">
                     <Border Background="{StaticResource Surface.Sidebar}"
-                            BorderBrush="{StaticResource Action.Primary.Background}"
+                            BorderBrush="{StaticResource Action.Standard.Background}"
                             BorderThickness="{StaticResource BorderThickness.Hairline}"
                             CornerRadius="{StaticResource Radius.Chip}"
                             Padding="10,6">
@@ -857,7 +862,7 @@
          so a wider indeterminate consumer needs the To value raised. -->
     <Style TargetType="ProgressBar">
         <Setter Property="Background" Value="{StaticResource Surface.Sidebar}"/>
-        <Setter Property="Foreground" Value="{StaticResource Action.Secondary.Background}"/>
+        <Setter Property="Foreground" Value="{StaticResource Action.Accent.Background}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -945,7 +950,7 @@
 
     <Style TargetType="ContextMenu">
         <Setter Property="Background" Value="{StaticResource Surface.Sidebar}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource Action.Primary.Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Action.Standard.Background}"/>
         <Setter Property="BorderThickness" Value="{StaticResource BorderThickness.Hairline}"/>
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <Setter Property="Padding" Value="2"/>
@@ -991,9 +996,9 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Primary.Background}"/>
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Standard.Background}"/>
                             <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
-                            <!-- Text.Dim on Action.Primary.Background is 3.34:1 (fails AA
+                            <!-- Text.Dim on Action.Standard.Background is 3.34:1 (fails AA
                                  4.5:1 for normal text); the highlighted row must lift the
                                  gesture column too, not just the header. -->
                             <Setter TargetName="GestureText" Property="Foreground" Value="{StaticResource Text.Body}"/>

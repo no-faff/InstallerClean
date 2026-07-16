@@ -23,7 +23,7 @@
          line length instead of wrapping into a tall sliver. -->
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
             MaxWidth="{a11y:TextScaled 480}" MinWidth="{a11y:TextScaled 380}"
-            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
+            BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <!-- Grid, not a StackPanel: the body and reassurance sit in a
              star row so they scroll once the window's work-area
              MaxHeight binds (very large text scales), keeping the
@@ -70,7 +70,7 @@
             <WrapPanel Grid.Row="2" HorizontalAlignment="Right">
                 <!-- Cancel is the default to stop a reflexive Enter from
                      deleting; the same stance as ConfirmDeleteWindow. Move
-                     is the visual primary (AccentPill, rightmost) because
+                     is the visual lead (AccentPill, rightmost) because
                      it is the recommended safe path, but it is not the
                      keyboard default: an affirmative requires an explicit
                      pointer or Tab+Space. -->

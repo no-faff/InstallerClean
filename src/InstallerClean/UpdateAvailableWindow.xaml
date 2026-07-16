@@ -23,7 +23,7 @@
          line length instead of wrapping into a tall sliver. -->
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
             MaxWidth="{a11y:TextScaled 400}" MinWidth="{a11y:TextScaled 320}"
-            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
+            BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <!-- Grid, not a StackPanel: the version copy sits in a star row
              so it scrolls once the window's work-area MaxHeight binds
              (very large text scales), keeping the heading and the action
@@ -59,7 +59,7 @@
                         Click="OnCancel" IsCancel="True"
                         AutomationProperties.HelpText="{loc:Translate Automation.UpdateAvailable.HelpText}"
                         Margin="{StaticResource GapRight.Sm}"/>
-                <Button Style="{StaticResource PrimaryPill}" Content="{loc:Translate Action.OpenReleasePage}"
+                <Button Style="{StaticResource StandardPill}" Content="{loc:Translate Action.OpenReleasePage}"
                         Click="OnOpen" IsDefault="True"/>
             </StackPanel>
         </Grid>

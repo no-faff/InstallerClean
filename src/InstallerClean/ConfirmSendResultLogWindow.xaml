@@ -21,7 +21,7 @@
          earlier as the text grows. -->
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
             MaxWidth="{a11y:TextScaled 615}" MinWidth="{a11y:TextScaled 480}"
-            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
+            BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <Grid>
             <Grid.RowDefinitions>
                 <!-- The JSON box sits in a star row rather than a
@@ -46,7 +46,7 @@
 
             <Border Grid.Row="1"
                     Background="{StaticResource Surface.Sidebar}" CornerRadius="{StaticResource Radius.Inset}"
-                    BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}"
+                    BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}"
                     Padding="12,10"
                     Margin="{StaticResource GapBottom.Md}">
                 <!-- Out of the tab order outright, not via BodyScrollRegion:
@@ -105,7 +105,7 @@
                         KeyboardNavigation.TabIndex="0"
                         AutomationProperties.HelpText="{loc:Translate Automation.ConfirmSendResultLog}"
                         Margin="{StaticResource GapRight.Sm}"/>
-                <Button Style="{StaticResource PrimaryPill}"
+                <Button Style="{StaticResource StandardPill}"
                         Content="{loc:Translate Action.SendResultLogConfirm}"
                         Click="OnSend" IsDefault="True"
                         KeyboardNavigation.TabIndex="1"/>

@@ -24,7 +24,7 @@
          crash-log path or a URL). -->
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.Card}" Padding="{StaticResource Padding.ModalCard}"
             MaxWidth="{a11y:TextScaled 520}" MinWidth="{a11y:TextScaled 360}"
-            BorderBrush="{StaticResource Action.Primary.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
+            BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <!-- Grid, not a StackPanel: the message sits in a star row so it
              scrolls once the window's work-area MaxHeight binds (very large
              text scales), keeping the heading and the Close button visible; a
@@ -68,7 +68,7 @@
                      Margin="{StaticResource GapBottom.Lg}"
                      AutomationProperties.Name="{loc:Translate Automation.Scroll.DialogBody}"/>
 
-            <Button x:Name="CloseButton" Grid.Row="2" Style="{StaticResource PrimaryPill}"
+            <Button x:Name="CloseButton" Grid.Row="2" Style="{StaticResource StandardPill}"
                     Content="{loc:Translate Action.Close}" Click="OnClose"
                     IsDefault="True" IsCancel="True"
                     HorizontalAlignment="Right"/>

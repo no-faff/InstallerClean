@@ -43,17 +43,19 @@
          states. Buttons consume these via component styles in
          Components.xaml; raw window XAML reaches for them only for
          one-offs (e.g. a selected list row fills with
-         Action.Primary.Background). -->
+         Action.Standard.Background). -->
 
-    <!-- Primary: standard button (slate). -->
-    <SolidColorBrush x:Key="Action.Primary.Background" Color="{StaticResource Primitive.Slate.700}"/>
-    <SolidColorBrush x:Key="Action.Primary.Hover"      Color="{StaticResource Primitive.Slate.700.Hover}"/>
-    <SolidColorBrush x:Key="Action.Primary.Pressed"    Color="{StaticResource Primitive.Slate.700.Pressed}"/>
+    <!-- Standard: the default button fill (slate). -->
+    <SolidColorBrush x:Key="Action.Standard.Background" Color="{StaticResource Primitive.Slate.700}"/>
+    <SolidColorBrush x:Key="Action.Standard.Hover"      Color="{StaticResource Primitive.Slate.700.Hover}"/>
+    <SolidColorBrush x:Key="Action.Standard.Pressed"    Color="{StaticResource Primitive.Slate.700.Pressed}"/>
 
-    <!-- Secondary: CTA / accent (indigo). -->
-    <SolidColorBrush x:Key="Action.Secondary.Background" Color="{StaticResource Primitive.Indigo.600}"/>
-    <SolidColorBrush x:Key="Action.Secondary.Hover"      Color="{StaticResource Primitive.Indigo.700}"/>
-    <SolidColorBrush x:Key="Action.Secondary.Pressed"    Color="{StaticResource Primitive.Indigo.800}"/>
+    <!-- Accent: the emphasis fill (indigo), for whichever action a screen
+         leads with. Which action that is belongs to the screen, not to the
+         token: the Button picks Accent or Standard at its own site. -->
+    <SolidColorBrush x:Key="Action.Accent.Background" Color="{StaticResource Primitive.Indigo.600}"/>
+    <SolidColorBrush x:Key="Action.Accent.Hover"      Color="{StaticResource Primitive.Indigo.700}"/>
+    <SolidColorBrush x:Key="Action.Accent.Pressed"    Color="{StaticResource Primitive.Indigo.800}"/>
 
     <!-- Danger: destructive (red). -->
     <SolidColorBrush x:Key="Action.Danger.Background" Color="{StaticResource Primitive.Red.900}"/>
@@ -194,7 +196,7 @@
     <!-- Padding shared by the five modal-card Borders (ConfirmDelete,
          ConfirmMove, ConfirmSendResultLog, RecycleUnavailable,
          UpdateAvailable). The modals also share Surface.Card,
-         Radius.Card and the Action.Primary.Background outline; the
+         Radius.Card and the Action.Standard.Background outline; the
          32,28 pair completes the card shape. -->
     <Thickness x:Key="Padding.ModalCard">32,28</Thickness>
 
