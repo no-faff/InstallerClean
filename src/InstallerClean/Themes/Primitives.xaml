@@ -12,7 +12,7 @@
     TypeConverter (ThicknessConverter etc), so a Double resource will
     not satisfy a Thickness setter. Numeric tokens with multiple
     consumer-property types therefore need parallel resources of each
-    type (see BorderThickness.* / Border.* in Tokens.xaml). Inline
+    type (see BorderThickness.* / StrokeThickness.* in Tokens.xaml). Inline
     attribute syntax does run TypeConverters, so BorderThickness="1"
     is fine; only StaticResource lookups have the strict-typing rule.
 

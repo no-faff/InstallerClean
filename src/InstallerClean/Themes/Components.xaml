@@ -85,7 +85,7 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Border CornerRadius="{StaticResource Radius.PillFocus}"
-                            BorderThickness="{StaticResource BorderThickness.Standard}"
+                            BorderThickness="{StaticResource BorderThickness.Focus}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
                             SnapsToDevicePixels="True"/>
@@ -99,7 +99,7 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Border CornerRadius="{StaticResource Radius.CompactPillFocus}"
-                            BorderThickness="{StaticResource BorderThickness.Standard}"
+                            BorderThickness="{StaticResource BorderThickness.Focus}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
                             SnapsToDevicePixels="True"/>
@@ -113,7 +113,7 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Border CornerRadius="{StaticResource Radius.SmallPillFocus}"
-                            BorderThickness="{StaticResource BorderThickness.Standard}"
+                            BorderThickness="{StaticResource BorderThickness.Focus}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
                             SnapsToDevicePixels="True"/>
@@ -133,7 +133,7 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Border CornerRadius="{StaticResource Radius.Tight}"
-                            BorderThickness="{StaticResource BorderThickness.Standard}"
+                            BorderThickness="{StaticResource BorderThickness.Focus}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
                             SnapsToDevicePixels="True"/>
@@ -841,7 +841,7 @@
                 <ControlTemplate>
                     <Rectangle RadiusX="2" RadiusY="2"
                                Stroke="{DynamicResource Text.Body}"
-                               StrokeThickness="{StaticResource Border.Hairline}"
+                               StrokeThickness="{StaticResource StrokeThickness.Hairline}"
                                SnapsToDevicePixels="True"
                                Margin="-1"/>
                 </ControlTemplate>
