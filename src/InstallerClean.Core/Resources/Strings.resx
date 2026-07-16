@@ -419,7 +419,7 @@
        permanent variant never claims the Recycle Bin: those files did not reach
        it. -->
   <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Moved {0} of {1} {2} before you cancelled.</value></data>
-  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>Sent {0} of {1} {2} to the Recycle Bin before you cancelled.</value></data>
+  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>Moved {0} of {1} {2} to the Recycle Bin before you cancelled.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Permanently deleted {0} of {1} {2} before you cancelled.</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
