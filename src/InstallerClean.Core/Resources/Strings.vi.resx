@@ -260,15 +260,15 @@
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
-    <value>Nothing scanned yet.</value>
+    <value>Chưa quét gì cả.</value>
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
+    <value>Nhấn Quét lại để tìm trong C:\Windows\Installer những tệp cài đặt mà không chương trình nào còn cần.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
-    <value>These files can't be cleaned up right now.</value>
+    <value>Hiện chưa thể dọn những tệp này.</value>
     <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Có thứ gì đó đang dùng Windows Installer ngay lúc này, thường là Windows Update hoặc một chương trình đang cài đặt ở chế độ nền. Chuyển và Xóa được tạm dừng trong khi việc đó chạy, nên InstallerClean sẽ không đụng tới bộ nhớ đệm trình cài đặt khi nó đang thay đổi. Khi việc đó xong, hãy Quét lại và chúng sẽ quay lại.</value></data>
@@ -292,7 +292,7 @@
   <data name="Body.NoPatches" xml:space="preserve"><value>(không có)</value></data>
 
   <!-- Reasons (Reason column in the orphaned-files list) -->
-  <data name="Reason.Orphaned" xml:space="preserve"><value>Mồ côi</value></data>
+  <data name="Reason.Orphaned" xml:space="preserve"><value>Bị bỏ lại</value></data>
   <data name="Reason.Superseded" xml:space="preserve"><value>Bị thay thế</value></data>
   <!-- MSI PatchState 4 (obsoleted) is a distinct state from 2
        (superseded): superseded means a newer patch has replaced
@@ -336,7 +336,7 @@
   <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Chuyển thất bại ({0}). Không thể ghi nhật ký sự cố.</value></data>
   <data name="Status.DeleteFailed" xml:space="preserve"><value>Xóa thất bại ({0}). Chi tiết trong {1}.</value></data>
   <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Xóa thất bại ({0}). Không thể ghi nhật ký sự cố.</value></data>
-  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Windows refused the scan.</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Truy cập bị từ chối. Windows đã từ chối lần quét.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Quét thất bại: cơ sở dữ liệu trình cài đặt không khả dụng.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Đã hủy quét.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Sẵn sàng</value></data>
@@ -410,7 +410,7 @@
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
        DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, needed again by a program since the scan.</value></data>
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Đã giữ nguyên {0} {1} vì một chương trình lại cần đến kể từ lần quét.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -418,9 +418,9 @@
        body-row status line; these are the overlay's own summary sentence. The
        permanent variant never claims the Recycle Bin: those files did not reach
        it. -->
-  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Moved {0} of {1} {2} before you cancelled.</value></data>
-  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>Sent {0} of {1} {2} to the Recycle Bin before you cancelled.</value></data>
-  <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Permanently deleted {0} of {1} {2} before you cancelled.</value></data>
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Đã chuyển {0}/{1} {2} trước khi bạn hủy.</value></data>
+  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>Đã di chuyển {0}/{1} {2} vào Thùng rác trước khi bạn hủy.</value></data>
+  <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Đã xóa vĩnh viễn {0}/{1} {2} trước khi bạn hủy.</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
@@ -473,8 +473,8 @@
        because the files are removable already; only the MSI
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
-  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
-  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows vẫn liệt kê {0} bản vá cũ có tệp đã không còn trên đĩa. Điều đó vô hại, và bạn không cần làm gì cả.</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows vẫn liệt kê {0} bản vá cũ có tệp đã không còn trên đĩa. Điều đó vô hại, và bạn không cần làm gì cả.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
@@ -482,7 +482,7 @@
        never claimed them), superseded patches and obsoleted patches.
        0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
        3 = size display. No trailing noun, so it agrees at any count. -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} mồ côi, {1} bị thay thế, {2} đã lỗi thời ({3})</value></data>
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} bị bỏ lại, {1} bị thay thế, {2} đã lỗi thời ({3})</value></data>
   <!-- Registered-window footer summary, reinforcing the "still needed" framing
        (the flip side of the main window's "unneeded"). Split singular/plural so
        the noun and verb agree at one file ("file ... is" vs "files ... are").
@@ -506,7 +506,7 @@
        signal they get otherwise is the absence of the word "freed" on the
        completion screen, which nobody reads as a warning. This is a free-space
        tool, so the one moment it knows the answer is the moment to say it. -->
-  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead.</value></data>
+  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>Thư mục này nằm trên cùng ổ đĩa, nên bản thân việc chuyển sẽ không giải phóng dung lượng nào. Bạn sẽ lấy lại dung lượng khi xóa các tệp khỏi đó, hoặc bạn có thể chọn một thư mục trên ổ đĩa khác thay vào đó.</value></data>
 
   <!-- Error messages -->
   <!-- Both manifests declare requireAdministrator, so the process is
@@ -515,14 +515,14 @@
        administrator", and telling the user to run as administrator hands
        them the one instruction they have already followed. The key names
        predate that correction; what they say is what matters. -->
-  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Access denied</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Truy cập bị từ chối</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows đã từ chối cho InstallerClean truy cập. InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi động lại theo cách đó cũng không giúp được gì.
 
-That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out.</value></data>
+Như vậy còn lại hai nguyên nhân nhiều khả năng: phần mềm bảo mật đang giữ C:\Windows\Installer, hoặc quyền của thư mục đã bị thay đổi. Tạm dừng phần mềm bảo mật rồi thử lại là cách nhanh nhất để loại trừ.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Cơ sở dữ liệu trình cài đặt không khả dụng</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Quét thất bại</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Cơ sở dữ liệu Windows Installer có vẻ trống hoặc không truy cập được. Điều này bất thường ngay cả trên một bản Windows mới cài và thường có nghĩa là cơ sở dữ liệu bị hỏng hoặc một công cụ của bên thứ ba đã xóa nó. Chạy 'sfc /scannow' từ một dấu nhắc có quyền nâng cao thường sửa được.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer đã từ chối liệt kê các sản phẩm đã cài, và InstallerClean vốn đã chạy với quyền quản trị viên, nên chạy lại cũng không giúp được gì. Quyền trên chính các bản ghi trình cài đặt của Windows có thể đã bị thay đổi, hoặc phần mềm bảo mật có thể đang chặn chúng. Chạy 'sfc /scannow' từ một dấu nhắc có quyền nâng cao là điều đáng thử.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
@@ -534,7 +534,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean không thể đối chiếu lần quét này với Windows: mọi thứ Windows vẫn liệt kê đều bị thiếu khỏi thư mục bộ nhớ đệm, trong khi các tệp trong thư mục lại không khớp với bất kỳ thứ gì Windows biết. Điều đó cho thấy có vấn đề khi đọc các bản ghi trình cài đặt chứ không phải là các tệp bạn có thể xóa an toàn, nên chưa có gì được đưa ra để dọn dẹp. Khởi động lại Windows và quét lại thường khắc phục được.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Đích không hợp lệ</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Không thể ghi vào đích</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Chuyển thất bại</value></data>
@@ -568,7 +568,7 @@ Chi tiết trong {1}.</value></data>
   <!-- Category-only, no path (elevated path-leak rule). Shown for a candidate
        that does not resolve inside C:\Windows\Installer, refused at the Move /
        Delete service boundary. Should never reach a user in practice. -->
-  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>This file is not inside the Windows Installer folder; refused for safety.</value></data>
+  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>Tệp này không nằm trong thư mục Windows Installer; bị từ chối vì lý do an toàn.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file
@@ -593,7 +593,7 @@ Chi tiết trong {1}.</value></data>
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Nơi chuyển đến cần là đường dẫn đầy đủ tới một thư mục, bắt đầu bằng ký tự ổ đĩa hoặc một thư mục mạng dùng chung (ví dụ D:\Backup, hoặc \\server\backup). InstallerClean không dùng được đường dẫn này: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Không thể mở trình duyệt của bạn</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Kiểm tra cập nhật</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Đang kiểm tra...</value></data>
@@ -611,13 +611,13 @@ Chi tiết trong {1}.</value></data>
        user's own medium-integrity shell, and that chain was unavailable) is
        an internal distinction with no name outside this codebase; the user
        gets what happened and what they can do about it. -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean không thể mở trình duyệt của bạn. Liên kết đã được sao chép vào bảng nhớ tạm, nên bạn có thể tự dán nó vào:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean không thể mở trình duyệt của bạn, và cũng không thể sao chép liên kết vào bảng nhớ tạm. Liên kết là:&#10;&#10;{0}</value></data>
   <!-- 0 = the destination folder whose canonical path changed mid-batch.
        Raised when the folder is replaced or redirected between two files of
        the same Move, so the copy must not claim where the files moved before
        that point ended up: they went wherever the folder pointed then. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Nơi chuyển đến đã thay đổi trong khi các tệp đang được chuyển (thứ gì đó đã thay thế hoặc chuyển hướng thư mục), nên InstallerClean đã dừng lại thay vì ghi vào nhầm chỗ. Hãy kiểm tra {0}, rồi Quét lại và thử lại.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -724,7 +724,7 @@ Không thể ghi nhật ký sự cố.</value></data>
        than it accepts, most often an unquoted move path with a space, so the
        message names the quoting fix. The literal " quotes and the \ in the
        example are part of the sentence the user copies. -->
-  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Lỗi: có thêm đối số không mong đợi '{0}'. Nếu thư mục đích của bạn có dấu cách, hãy đặt cả đường dẫn trong dấu ngoặc kép: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Đang hủy...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Đã hủy.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -747,7 +747,7 @@ Không thể ghi nhật ký sự cố.</value></data>
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Lỗi: Thùng rác không khả dụng cho ổ đĩa này, nên không có gì bị xóa. Hãy dùng /m để chuyển các tệp thay vào đó, hoặc bật lại Thùng rác rồi chạy lại.</value></data>
   <!-- 0 = mode arg ("/d") -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Lỗi: chưa chỉ định đích để chuyển. Dùng /m ĐƯỜNG_DẪN. (Mặc định đặt trong GUI là theo từng người dùng và không áp dụng cho các lần chạy theo lịch hoặc bằng tài khoản dịch vụ.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Lỗi: đích không thể nằm bên trong thư mục Windows Installer.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Lỗi: đích phải là một đường dẫn đầy đủ. Nhận được: {0}</value></data>
@@ -839,7 +839,7 @@ Không thể ghi nhật ký sự cố.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli là một tiến trình console thật và chặn dấu nhắc</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>cho đến khi xong; hãy chuyển hướng hoặc nối ống đầu ra của nó như</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>với mọi tệp console khác. GUI nằm trong InstallerClean.exe cùng chỗ.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Mặc định đã lưu là theo từng người dùng; các lần chạy theo lịch hoặc bằng tài khoản SYSTEM cần /m ĐƯỜNG_DẪN.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Mã thoát:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   thành công: mọi tệp được đánh dấu đều đã được xử lý</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   thất bại: không xử lý được gì (sai đối số, quét thất bại, mọi tệp đều thất bại)</value></data>
