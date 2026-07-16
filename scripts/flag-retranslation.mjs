@@ -84,14 +84,21 @@ for (const file of files) {
       text = text.replace(entryRe, (_m, p1, _body, p3) => p1 + english + p3);
       reset.push(key);
     } else {
-      // A newly added neutral key: append to the MAP. The MAP's closing brace
-      // is the first line-leading "};" after "const MAP = {" (MAP values are
-      // single-line, so no earlier "\n};" can occur inside them).
-      const mapStart = text.indexOf('const MAP = {');
-      if (mapStart < 0) { console.error(`  ${file}: no "const MAP = {" found; skipped ${key}`); continue; }
-      const rel = text.slice(mapStart).search(/\n};/);
-      if (rel < 0) { console.error(`  ${file}: MAP close not found; skipped ${key}`); continue; }
-      const at = mapStart + rel;
+      // A newly added neutral key: append to the target object's close, which is
+      // the first line-leading "};" after its "const X = {" (values are
+      // single-line, so no earlier "\n};" occurs inside them). The target is
+      // normally MAP, but a Cli.* key in a generator that keeps its human Cli.*
+      // strings in a separate CLI object (the ru generator strips every Cli.* key
+      // from the neutral base and rebuilds that set from CLI) must go into CLI, or
+      // the generator strips it by name and it never reaches the satellite resx.
+      const marker = (key.startsWith('Cli.') && text.includes('const CLI = {'))
+        ? 'const CLI = {'
+        : 'const MAP = {';
+      const objStart = text.indexOf(marker);
+      if (objStart < 0) { console.error(`  ${file}: no "${marker}" found; skipped ${key}`); continue; }
+      const rel = text.slice(objStart).search(/\n};/);
+      if (rel < 0) { console.error(`  ${file}: ${marker} close not found; skipped ${key}`); continue; }
+      const at = objStart + rel;
       text = text.slice(0, at) + `\n  '${key}': \`${english}\`,` + text.slice(at);
       added.push(key);
     }
