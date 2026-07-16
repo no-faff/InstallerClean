@@ -260,19 +260,19 @@
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
-    <value>Nothing scanned yet.</value>
+    <value>Belum ada yang dipindai.</value>
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
+    <value>Tekan Pindai ulang untuk menelusuri C:\Windows\Installer mencari file penginstal yang tidak lagi diperlukan program mana pun.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
-    <value>These files can't be cleaned up right now.</value>
+    <value>File-file ini tidak bisa dibersihkan sekarang.</value>
     <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Ada sesuatu yang sedang menggunakan Windows Installer saat ini, biasanya Windows Update atau program yang memasang di latar belakang. Pindahkan dan Hapus dijeda selama itu berjalan, sehingga InstallerClean tidak menyentuh cache penginstal saat sedang berubah. Setelah selesai, Pindai ulang dan keduanya kembali.</value></data>
-  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Ada transaksi Windows Installer sebelumnya yang tertunda di mesin ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache.</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Ada transaksi Windows Installer sebelumnya yang ditangguhkan di komputer ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows memiliki antrean penggantian nama file untuk mulai ulang berikutnya yang memengaruhi cache Installer. Mulai ulang Windows sebelum membersihkan.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Pilih file untuk melihat detail.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Pilih produk untuk melihat detail.</value></data>
@@ -292,7 +292,7 @@
   <data name="Body.NoPatches" xml:space="preserve"><value>(tidak ada)</value></data>
 
   <!-- Reasons (Reason column in the orphaned-files list) -->
-  <data name="Reason.Orphaned" xml:space="preserve"><value>Yatim</value></data>
+  <data name="Reason.Orphaned" xml:space="preserve"><value>Terisolasi</value></data>
   <data name="Reason.Superseded" xml:space="preserve"><value>Digantikan</value></data>
   <!-- MSI PatchState 4 (obsoleted) is a distinct state from 2
        (superseded): superseded means a newer patch has replaced
@@ -336,7 +336,7 @@
   <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Pemindahan gagal ({0}). Log kerusakan tidak bisa ditulis.</value></data>
   <data name="Status.DeleteFailed" xml:space="preserve"><value>Penghapusan gagal ({0}). Detail di {1}.</value></data>
   <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Penghapusan gagal ({0}). Log kerusakan tidak bisa ditulis.</value></data>
-  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Windows refused the scan.</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Akses ditolak. Windows menolak pemindaian.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Pemindaian gagal: basis data penginstal tidak tersedia.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Pemindaian dibatalkan.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Siap</value></data>
@@ -410,7 +410,7 @@
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
        DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, needed again by a program since the scan.</value></data>
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} dibiarkan di tempatnya, kembali diperlukan sebuah program sejak pemindaian.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -418,9 +418,9 @@
        body-row status line; these are the overlay's own summary sentence. The
        permanent variant never claims the Recycle Bin: those files did not reach
        it. -->
-  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Moved {0} of {1} {2} before you cancelled.</value></data>
-  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>Sent {0} of {1} {2} to the Recycle Bin before you cancelled.</value></data>
-  <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Permanently deleted {0} of {1} {2} before you cancelled.</value></data>
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>{0} dari {1} {2} dipindahkan sebelum Anda membatalkan.</value></data>
+  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>{0} dari {1} {2} dipindahkan ke Keranjang Sampah sebelum Anda membatalkan.</value></data>
+  <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>{0} dari {1} {2} dihapus permanen sebelum Anda membatalkan.</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
@@ -473,8 +473,8 @@
        because the files are removable already; only the MSI
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
-  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
-  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows masih mendaftarkan {0} patch lama yang file-nya sudah tidak ada di disk. Itu tidak berbahaya, dan tidak ada yang perlu Anda lakukan.</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows masih mendaftarkan {0} patch lama yang file-nya sudah tidak ada di disk. Itu tidak berbahaya, dan tidak ada yang perlu Anda lakukan.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} dari {1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
@@ -482,7 +482,7 @@
        never claimed them), superseded patches and obsoleted patches.
        0 = orphaned count, 1 = superseded count, 2 = obsoleted count,
        3 = size display. No trailing noun, so it agrees at any count. -->
-  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} yatim, {1} digantikan, {2} usang ({3})</value></data>
+  <data name="Summary.OrphanedWindow" xml:space="preserve"><value>{0} terisolasi, {1} digantikan, {2} usang ({3})</value></data>
   <!-- Registered-window footer summary, reinforcing the "still needed" framing
        (the flip side of the main window's "unneeded"). Split singular/plural so
        the noun and verb agree at one file ("file ... is" vs "files ... are").
@@ -506,7 +506,7 @@
        signal they get otherwise is the absence of the word "freed" on the
        completion screen, which nobody reads as a warning. This is a free-space
        tool, so the one moment it knows the answer is the moment to say it. -->
-  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead.</value></data>
+  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>Folder ini berada di drive yang sama, jadi pemindahan itu sendiri tidak akan mengosongkan ruang apa pun. Ruangnya akan kembali saat Anda menghapus file di dalamnya, atau Anda bisa memilih folder di drive lain.</value></data>
 
   <!-- Error messages -->
   <!-- Both manifests declare requireAdministrator, so the process is
@@ -515,14 +515,14 @@
        administrator", and telling the user to run as administrator hands
        them the one instruction they have already followed. The key names
        predate that correction; what they say is what matters. -->
-  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Access denied</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Akses ditolak</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows menolak akses InstallerClean. InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi dengan cara itu tidak akan membantu.
 
-That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out.</value></data>
+Tinggal dua kemungkinan penyebabnya: perangkat lunak keamanan sedang menahan C:\Windows\Installer, atau izin folder itu telah diubah. Menjeda perangkat lunak keamanan lalu mencoba lagi adalah cara tercepat untuk menyingkirkan salah satu kemungkinan itu.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Basis data penginstal tidak tersedia</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Pemindaian gagal</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Basis data Windows Installer tampak kosong atau tidak bisa diakses. Ini tidak biasa bahkan pada Windows yang baru dipasang dan biasanya berarti basis data rusak atau alat pihak ketiga telah mengosongkannya. Menjalankan 'sfc /scannow' dari prompt dengan hak administrator biasanya memperbaikinya.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer menolak menampilkan daftar produk yang terpasang, dan InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi tidak akan membantu. Izin pada catatan penginstal milik Windows sendiri mungkin telah diubah, atau perangkat lunak keamanan mungkin memblokirnya. Menjalankan 'sfc /scannow' dari prompt dengan hak administrator layak dicoba.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
@@ -534,7 +534,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean tidak bisa memeriksa silang pemindaian ini dengan Windows: semua yang masih didaftarkan Windows tidak ada di folder cache, sementara file-file di folder itu tidak cocok dengan apa pun yang Windows ketahui. Itu menunjukkan adanya masalah dalam membaca catatan penginstal, bukan file yang aman Anda hapus, jadi tidak ada yang ditawarkan untuk dibersihkan. Memulai ulang Windows lalu memindai lagi biasanya mengatasinya.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Tujuan tidak valid</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Tidak bisa menulis ke tujuan</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Pemindahan gagal</value></data>
@@ -568,7 +568,7 @@ Detail di {1}.</value></data>
   <!-- Category-only, no path (elevated path-leak rule). Shown for a candidate
        that does not resolve inside C:\Windows\Installer, refused at the Move /
        Delete service boundary. Should never reach a user in practice. -->
-  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>This file is not inside the Windows Installer folder; refused for safety.</value></data>
+  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>File ini tidak berada di dalam folder Windows Installer; ditolak demi keamanan.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file
@@ -593,7 +593,7 @@ Detail di {1}.</value></data>
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Lokasi pemindahan harus berupa jalur lengkap ke sebuah folder, yang dimulai dengan huruf drive atau jalur jaringan (misalnya D:\Backup, atau \\server\backup). InstallerClean tidak bisa memakai yang ini: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Tidak bisa membuka peramban Anda</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Periksa pembaruan</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Memeriksa...</value></data>
@@ -611,13 +611,13 @@ Detail di {1}.</value></data>
        user's own medium-integrity shell, and that chain was unavailable) is
        an internal distinction with no name outside this codebase; the user
        gets what happened and what they can do about it. -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean tidak bisa membuka peramban Anda. Tautannya sudah ada di papan klip, jadi Anda bisa menempelkannya sendiri:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean tidak bisa membuka peramban Anda, dan juga tidak bisa menyalin tautan ke papan klip. Tautannya:&#10;&#10;{0}</value></data>
   <!-- 0 = the destination folder whose canonical path changed mid-batch.
        Raised when the folder is replaced or redirected between two files of
        the same Move, so the copy must not claim where the files moved before
        that point ended up: they went wherever the folder pointed then. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Lokasi pemindahan berubah saat file sedang dipindahkan (ada sesuatu yang mengganti atau mengalihkan folder itu), jadi InstallerClean berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu Pindai ulang dan coba lagi.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -641,7 +641,7 @@ Detail di {1}.</value></data>
        becomes a hyperlink into the README's reports-stats FAQ answer (built
        in ConfirmSendResultLogWindow.xaml.cs), the same [ ]-delimited pattern
        as MainWindow's "[it won't!]". -->
-  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Dikirim ke nofaff.netlify.app/api/result-log. Tidak ada yang mengidentifikasi Anda atau mesin Anda; ini hanya memberi tahu saya bahwa InstallerClean berfungsi dan [berapa banyak ruang yang dikosongkan orang-orang].</value></data>
+  <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Dikirim ke nofaff.netlify.app/api/result-log. Tidak ada yang mengidentifikasi Anda atau komputer Anda; ini hanya memberi tahu saya bahwa InstallerClean berfungsi dan [berapa banyak ruang yang dikosongkan orang-orang].</value></data>
   <!-- AutomationProperties.Name on the JSON preview TextBox so screen
        readers announce its content rather than "edit, read-only". -->
   <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Pratinjau log hasil</value></data>
@@ -724,7 +724,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
        than it accepts, most often an unquoted move path with a space, so the
        message names the quoting fix. The literal " quotes and the \ in the
        example are part of the sentence the user copies. -->
-  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Kesalahan: argumen tambahan yang tidak terduga '{0}'. Jika folder pemindahan Anda mengandung spasi, apit seluruh jalur dengan tanda kutip: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Membatalkan...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Dibatalkan.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -747,14 +747,14 @@ Log kerusakan tidak bisa ditulis.</value></data>
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Kesalahan: Keranjang Sampah tidak tersedia untuk volume ini, jadi tidak ada yang dihapus. Gunakan /m untuk memindahkan file, atau aktifkan kembali Keranjang Sampah dan jalankan lagi.</value></data>
   <!-- 0 = mode arg ("/d") -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Kesalahan: tujuan pemindahan tidak ditentukan. Gunakan /m JALUR. (Default yang diatur di GUI bersifat per-pengguna dan tidak berlaku untuk tugas terjadwal atau proses akun layanan.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Kesalahan: tujuan tidak boleh berada di dalam folder Windows Installer.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Kesalahan: tujuan harus berupa jalur absolut lengkap. Diterima: {0}</value></data>
   <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Kesalahan: tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, dan %ProgramData%.</value></data>
   <!-- 0 = mode, 1 = destination -->
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Kesalahan: ada sesuatu yang sedang menggunakan Windows Installer saat ini, biasanya Windows Update atau program yang memasang di latar belakang. Pindahkan dan Hapus diblokir selama itu berjalan. Coba lagi setelah selesai.</value></data>
-  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Kesalahan: ada transaksi Windows Installer sebelumnya yang tertunda di mesin ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Kesalahan: ada transaksi Windows Installer sebelumnya yang ditangguhkan di komputer ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Kesalahan: operasi file yang diantrekan setelah mulai ulang menyasar cache Installer ({0}). Mulai ulang Windows untuk menyelesaikan operasi itu sebelum membersihkan.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
@@ -838,7 +838,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli adalah proses konsol sungguhan dan memblokir prompt</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>sampai selesai; alihkan atau salurkan keluarannya seperti</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>file exe konsol lainnya. GUI ada di InstallerClean.exe di sebelahnya.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Lokasi default tersimpan bersifat per-pengguna; tugas terjadwal atau proses SYSTEM memerlukan /m JALUR.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Kode keluar:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   berhasil: setiap file yang ditandai telah diproses</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   gagal: tidak ada yang diproses (argumen salah, pemindaian gagal, semua file gagal)</value></data>
