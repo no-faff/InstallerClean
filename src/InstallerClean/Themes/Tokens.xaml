@@ -136,13 +136,16 @@
     <CornerRadius x:Key="Radius.Chip">4</CornerRadius>
     <CornerRadius x:Key="Radius.Tight">2</CornerRadius>
 
-    <!-- Focus-visual radii. Derived geometry, not part of the Pill /
-         Card / Chip ramp: a 40px pill with a -2px-margin focus ring
-         needs 22 (Radius.Pill 20 + 2), and a 30px compact pill needs
-         17 (15 + 2). Defined here so a future change to Radius.Pill
-         updates the focus visual in lockstep. -->
+    <!-- Focus-visual radii. Derived geometry, not part of the radius
+         ramp above. Each ring is fully rounded, so its radius is half
+         its own height, and the -2 margin every focus visual carries
+         makes that height the pill's plus 4: a 40px pill needs 22, a
+         30px compact pill 17, a 28px small pill 16. Defined here, next
+         to each other, so a change to a pill's height or radius moves
+         its ring with it. -->
     <CornerRadius x:Key="Radius.PillFocus">22</CornerRadius>
     <CornerRadius x:Key="Radius.CompactPillFocus">17</CornerRadius>
+    <CornerRadius x:Key="Radius.SmallPillFocus">16</CornerRadius>
 
     <!-- Border thickness. Two flavours: the Double tokens are for
          properties that take a scalar (Path.StrokeThickness, etc);

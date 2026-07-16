@@ -112,7 +112,7 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border CornerRadius="{StaticResource Radius.Card}"
+                    <Border CornerRadius="{StaticResource Radius.SmallPillFocus}"
                             BorderThickness="{StaticResource BorderThickness.Standard}"
                             BorderBrush="{DynamicResource Text.Body}"
                             Margin="-2"
