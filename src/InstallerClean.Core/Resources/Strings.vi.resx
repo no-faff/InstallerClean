@@ -410,6 +410,15 @@
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Đã giữ nguyên {0} {1} vì sau lần quét, một chương trình lại cần đến chúng.</value></data>
+  <!-- The other reason the pre-action re-check keeps files back: its own read of
+       the Windows Installer records came up short, so it withheld every
+       superseded-patch verdict rather than act on one it could not confirm.
+       Distinct from Completion.ReverifySkipped, which names a specific cause (a
+       program needing the file again) that did not happen here. 0 = the count
+       kept, 1 = pluralised "file"/"files". Flat string; a language may add a
+       satellite-only Completion.ReverifyIncomplete.One/.Few/.Many override for
+       its count grammar. -->
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>Đã giữ nguyên {0} {1} vì khi kiểm tra lại, không thể đọc đầy đủ các bản ghi trình cài đặt của Windows.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -474,6 +483,14 @@
        anything, so this is purely diagnostic. -->
   <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows vẫn liệt kê {0} bản vá cũ có tệp đã không còn trên đĩa. Điều đó vô hại, và bạn không cần làm gì cả.</value></data>
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows vẫn liệt kê {0} bản vá cũ có tệp đã không còn trên đĩa. Điều đó vô hại, và bạn không cần làm gì cả.</value></data>
+  <!-- Informational line shown when the scan could not read every installed
+       program's Windows Installer records. Superseded patches are then kept
+       rather than offered, because whether one is still needed is a question
+       about every installed program and this scan could not ask them all. The
+       second sentence is load-bearing: the main job (finding orphaned files) ran
+       normally, so a shorter list is not a fault. 0 = the count of programs. -->
+  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>Không thể đọc {0} chương trình đã cài trong lần quét này, nên các bản vá bị thay thế đã được giữ lại. Các tệp bị bỏ lại không bị ảnh hưởng.</value></data>
+  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>Không thể đọc {0} chương trình đã cài trong lần quét này, nên các bản vá bị thay thế đã được giữ lại. Các tệp bị bỏ lại không bị ảnh hưởng.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three

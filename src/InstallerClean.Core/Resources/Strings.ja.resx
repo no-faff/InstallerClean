@@ -410,6 +410,15 @@
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} 個の {1} はそのまま残しました。スキャン後にプログラムが再び必要としたためです。</value></data>
+  <!-- The other reason the pre-action re-check keeps files back: its own read of
+       the Windows Installer records came up short, so it withheld every
+       superseded-patch verdict rather than act on one it could not confirm.
+       Distinct from Completion.ReverifySkipped, which names a specific cause (a
+       program needing the file again) that did not happen here. 0 = the count
+       kept, 1 = pluralised "file"/"files". Flat string; a language may add a
+       satellite-only Completion.ReverifyIncomplete.One/.Few/.Many override for
+       its count grammar. -->
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} 個の {1} はそのまま残しました。確認をやり直した際に Windows Installer の登録情報を完全に読み取れなかったためです。</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -474,6 +483,14 @@
        anything, so this is purely diagnostic. -->
   <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows の一覧には、ファイルがすでにディスクから消えている古いパッチが {0} 個、まだ残っています。害はなく、特に何もする必要はありません。</value></data>
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows の一覧には、ファイルがすでにディスクから消えている古いパッチが {0} 個、まだ残っています。害はなく、特に何もする必要はありません。</value></data>
+  <!-- Informational line shown when the scan could not read every installed
+       program's Windows Installer records. Superseded patches are then kept
+       rather than offered, because whether one is still needed is a question
+       about every installed program and this scan could not ask them all. The
+       second sentence is load-bearing: the main job (finding orphaned files) ran
+       normally, so a shorter list is not a fault. 0 = the count of programs. -->
+  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>今回のスキャンでインストール済みプログラム {0} 個を読み取れなかったため、置換済みのパッチは残してあります。孤立ファイルには影響しません。</value></data>
+  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>今回のスキャンでインストール済みプログラム {0} 個を読み取れなかったため、置換済みのパッチは残してあります。孤立ファイルには影響しません。</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{2} {1} 個中 {0} 個</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three

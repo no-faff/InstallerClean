@@ -410,6 +410,15 @@
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{1} {0}개는 검사 이후 어떤 프로그램이 다시 필요로 하게 되어 그대로 두었습니다.</value></data>
+  <!-- The other reason the pre-action re-check keeps files back: its own read of
+       the Windows Installer records came up short, so it withheld every
+       superseded-patch verdict rather than act on one it could not confirm.
+       Distinct from Completion.ReverifySkipped, which names a specific cause (a
+       program needing the file again) that did not happen here. 0 = the count
+       kept, 1 = pluralised "file"/"files". Flat string; a language may add a
+       satellite-only Completion.ReverifyIncomplete.One/.Few/.Many override for
+       its count grammar. -->
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{1} {0}개는 확인을 다시 했을 때 Windows Installer 기록을 완전히 읽을 수 없어 그대로 두었습니다.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -474,6 +483,14 @@
        anything, so this is purely diagnostic. -->
   <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows가 디스크에서 이미 사라진 오래된 패치 {0}개를 여전히 목록에 남겨 두고 있습니다. 문제 될 것은 없으며, 따로 하실 일은 없습니다.</value></data>
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows가 디스크에서 이미 사라진 오래된 패치 {0}개를 여전히 목록에 남겨 두고 있습니다. 문제 될 것은 없으며, 따로 하실 일은 없습니다.</value></data>
+  <!-- Informational line shown when the scan could not read every installed
+       program's Windows Installer records. Superseded patches are then kept
+       rather than offered, because whether one is still needed is a question
+       about every installed program and this scan could not ask them all. The
+       second sentence is load-bearing: the main job (finding orphaned files) ran
+       normally, so a shorter list is not a fault. 0 = the count of programs. -->
+  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>이번 검사에서 설치된 프로그램 {0}개를 읽을 수 없어 대체된 패치를 그대로 두었습니다. 고립된 파일은 영향을 받지 않습니다.</value></data>
+  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>이번 검사에서 설치된 프로그램 {0}개를 읽을 수 없어 대체된 패치를 그대로 두었습니다. 고립된 파일은 영향을 받지 않습니다.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{2} {1}개 중 {0}개</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three

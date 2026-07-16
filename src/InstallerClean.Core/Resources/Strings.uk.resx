@@ -410,6 +410,15 @@
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} залишено на місці: після сканування вони знову знадобилися програмі.</value></data>
+  <!-- The other reason the pre-action re-check keeps files back: its own read of
+       the Windows Installer records came up short, so it withheld every
+       superseded-patch verdict rather than act on one it could not confirm.
+       Distinct from Completion.ReverifySkipped, which names a specific cause (a
+       program needing the file again) that did not happen here. 0 = the count
+       kept, 1 = pluralised "file"/"files". Flat string; a language may add a
+       satellite-only Completion.ReverifyIncomplete.One/.Few/.Many override for
+       its count grammar. -->
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} {1} залишено на місці: під час повторної перевірки не вдалося повністю прочитати записи інсталятора Windows.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -474,6 +483,14 @@
        anything, so this is purely diagnostic. -->
   <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows досі має в списку {0} старий патч, файл якого вже зник з диска. Це нешкідливо, і вам нічого не потрібно робити.</value></data>
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows досі має в списку {0} старих патчів, файли яких уже зникли з диска. Це нешкідливо, і вам нічого не потрібно робити.</value></data>
+  <!-- Informational line shown when the scan could not read every installed
+       program's Windows Installer records. Superseded patches are then kept
+       rather than offered, because whether one is still needed is a question
+       about every installed program and this scan could not ask them all. The
+       second sentence is load-bearing: the main job (finding orphaned files) ran
+       normally, so a shorter list is not a fault. 0 = the count of programs. -->
+  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>Під час цього сканування не вдалося прочитати {0} встановлену програму, тому заміщені патчі залишено на місці. Осиротілих файлів це не стосується.</value></data>
+  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>Під час цього сканування не вдалося прочитати {0} встановлених програм, тому заміщені патчі залишено на місці. Осиротілих файлів це не стосується.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} з {1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
@@ -858,6 +875,7 @@
   <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} непотрібні файли для очищення</value></data>
   <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>{0} зареєстровані файли відсутні (їх не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тих програм може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.</value></data>
   <data name="Summary.StaleMsiEntries.Few" xml:space="preserve"><value>Windows досі має в списку {0} старі патчі, файли яких уже зникли з диска. Це нешкідливо, і вам нічого не потрібно робити.</value></data>
+  <data name="Summary.ProgramsUnreadable.Few" xml:space="preserve"><value>Під час цього сканування не вдалося прочитати {0} встановлені програми, тому заміщені патчі залишено на місці. Осиротілих файлів це не стосується.</value></data>
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} зареєстровані файли, які ще потрібні ({1})</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Знайдено {0} зареєстрований {1}.</value></data>
   <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Знайдено {0} зареєстровані {1}.</value></data>

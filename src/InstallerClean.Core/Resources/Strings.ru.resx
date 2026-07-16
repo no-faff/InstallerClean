@@ -410,6 +410,15 @@
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Оставлено {0} {1} на месте: после сканирования они снова понадобились программе.</value></data>
+  <!-- The other reason the pre-action re-check keeps files back: its own read of
+       the Windows Installer records came up short, so it withheld every
+       superseded-patch verdict rather than act on one it could not confirm.
+       Distinct from Completion.ReverifySkipped, which names a specific cause (a
+       program needing the file again) that did not happen here. 0 = the count
+       kept, 1 = pluralised "file"/"files". Flat string; a language may add a
+       satellite-only Completion.ReverifyIncomplete.One/.Few/.Many override for
+       its count grammar. -->
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>Оставлено {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи установщика Windows.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -474,6 +483,14 @@
        anything, so this is purely diagnostic. -->
   <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>В списке Windows всё ещё есть {0} старый патч, файла которого уже нет на диске. Это не страшно, и делать ничего не нужно.</value></data>
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>В списке Windows всё ещё есть {0} старых патчей, файлов которых уже нет на диске. Это не страшно, и делать ничего не нужно.</value></data>
+  <!-- Informational line shown when the scan could not read every installed
+       program's Windows Installer records. Superseded patches are then kept
+       rather than offered, because whether one is still needed is a question
+       about every installed program and this scan could not ask them all. The
+       second sentence is load-bearing: the main job (finding orphaned files) ran
+       normally, so a shorter list is not a fault. 0 = the count of programs. -->
+  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>При этом сканировании не удалось прочитать {0} установленную программу, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается.</value></data>
+  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>При этом сканировании не удалось прочитать {0} установленных программ, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
@@ -819,10 +836,12 @@
   <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} ненужных файла для очистки</value></data>
   <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>Отсутствует {0} зарегистрированных файла (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
   <data name="Summary.StaleMsiEntries.Few" xml:space="preserve"><value>В списке Windows всё ещё есть {0} старых патча, файлов которых уже нет на диске. Это не страшно, и делать ничего не нужно.</value></data>
+  <data name="Summary.ProgramsUnreadable.Few" xml:space="preserve"><value>При этом сканировании не удалось прочитать {0} установленные программы, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается.</value></data>
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} зарегистрированных файла ещё нужны ({1})</value></data>
   <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину.</value></data>
   <data name="Completion.PermanentDeleteSummaryWithErrors.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину. {2} {3}</value></data>
   <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Оставлен {0} {1} на месте: после сканирования он снова понадобился программе.</value></data>
+  <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>Оставлен {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи установщика Windows.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Найдено {0} зарегистрированный {1}.</value></data>
   <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Найдено {0} зарегистрированных {1}.</value></data>
 

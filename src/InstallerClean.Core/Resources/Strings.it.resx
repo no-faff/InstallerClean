@@ -410,6 +410,15 @@
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} lasciati al loro posto, perché un programma è tornato ad averne bisogno dopo la scansione.</value></data>
+  <!-- The other reason the pre-action re-check keeps files back: its own read of
+       the Windows Installer records came up short, so it withheld every
+       superseded-patch verdict rather than act on one it could not confirm.
+       Distinct from Completion.ReverifySkipped, which names a specific cause (a
+       program needing the file again) that did not happen here. 0 = the count
+       kept, 1 = pluralised "file"/"files". Flat string; a language may add a
+       satellite-only Completion.ReverifyIncomplete.One/.Few/.Many override for
+       its count grammar. -->
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} {1} lasciati al loro posto, perché non è stato possibile leggere completamente i record di Windows Installer quando il controllo è stato ripetuto.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -474,6 +483,14 @@
        anything, so this is purely diagnostic. -->
   <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows elenca ancora {0} vecchia patch il cui file non è più sul disco. Non è un problema e non devi fare nulla.</value></data>
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows elenca ancora {0} vecchie patch i cui file non sono più sul disco. Non è un problema e non devi fare nulla.</value></data>
+  <!-- Informational line shown when the scan could not read every installed
+       program's Windows Installer records. Superseded patches are then kept
+       rather than offered, because whether one is still needed is a question
+       about every installed program and this scan could not ask them all. The
+       second sentence is load-bearing: the main job (finding orphaned files) ran
+       normally, so a shorter list is not a fault. 0 = the count of programs. -->
+  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>Non è stato possibile leggere {0} programma installato durante questa scansione, quindi le patch sostituite sono state mantenute. I file orfani non sono interessati.</value></data>
+  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>Non è stato possibile leggere {0} programmi installati durante questa scansione, quindi le patch sostituite sono state mantenute. I file orfani non sono interessati.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} di {1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
@@ -855,4 +872,5 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Eliminato {0} {1}.</value></data>
   <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Spostato {0} {1}.</value></data>
   <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>{0} {1} lasciato al suo posto, perché un programma è tornato ad averne bisogno dopo la scansione.</value></data>
+  <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>{0} {1} lasciato al suo posto, perché non è stato possibile leggere completamente i record di Windows Installer quando il controllo è stato ripetuto.</value></data>
 </root>
