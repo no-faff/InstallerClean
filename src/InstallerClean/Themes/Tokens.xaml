@@ -107,9 +107,12 @@
     <SolidColorBrush x:Key="Scrollbar.Thumb"        Color="{StaticResource Primitive.Slate.50.Alpha20}"/>
     <SolidColorBrush x:Key="Scrollbar.Thumb.Hover"  Color="{StaticResource Primitive.Slate.50.Alpha50}"/>
 
-    <!-- Typography. Six-step hierarchy. Each role is named for the
-         job it does, not the size, so a size change edits the token
-         instead of renaming consumers. -->
+    <!-- Typography. Six scaled steps, Display down to Caption, which are
+         exactly the set App scales with the OS text-size slider, plus the
+         fixed Type.TitleBar sitting outside that set (the reason is at
+         the token). Each role is named for the job it does, not the size,
+         so a size change edits the token instead of renaming
+         consumers. -->
     <FontFamily x:Key="Type.FontFamily">pack://application:,,,/Fonts/#Poppins</FontFamily>
 
     <sys:Double x:Key="Type.Display">29</sys:Double>     <!-- splash hero -->
@@ -134,8 +137,11 @@
            ModalCard    - the modal dialog cards.
            CardSm       - smaller rounded surfaces (splash card border).
            Inset        - card-within-a-card surfaces (JSON preview, etc.).
-           Chip         - context menus, tooltips, list rows.
-           Tight        - menu-item highlight chip. -->
+           Chip         - the small rounded furniture: both tooltips, the
+                          context menu, the scrollbar thumb and track, the
+                          progress bar.
+           Tight        - the menu-item highlight, and the focus ring on
+                          flat rectangular controls. -->
     <CornerRadius x:Key="Radius.Pill">20</CornerRadius>
     <CornerRadius x:Key="Radius.CompactPill">15</CornerRadius>
     <CornerRadius x:Key="Radius.ModalCard">16</CornerRadius>
