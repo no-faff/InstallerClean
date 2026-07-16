@@ -142,7 +142,7 @@
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Поставить з_везду на GitHub</value></data>
   <data name="Action.MITLicence" xml:space="preserve"><value>Лицензия MIT</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Переместить</value></data>
-  <data name="Action.MoveInstead" xml:space="preserve"><value>_Переместить</value></data>
+  <data name="Action.MoveInstead" xml:space="preserve"><value>_Переместить вместо этого</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Путь к папке, если вы выберете «Переместить» вместо «Удалить»</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>Открыть страницу _выпуска</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>По_вторить сканирование</value></data>
@@ -260,15 +260,15 @@
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
-    <value>Nothing scanned yet.</value>
+    <value>Пока ничего не просканировано.</value>
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
+    <value>Нажмите «Повторить сканирование», чтобы просмотреть C:\Windows\Installer в поисках файлов установщика, которые больше не нужны ни одной программе.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
-    <value>These files can't be cleaned up right now.</value>
+    <value>Эти файлы сейчас нельзя очистить.</value>
     <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Прямо сейчас что-то использует Windows Installer, обычно это обновление Windows или программа, устанавливающаяся в фоне. Пока это происходит, «Переместить» и «Удалить» приостановлены, чтобы InstallerClean не трогал кэш установки, пока тот меняется. Когда всё завершится, выполните повторное сканирование, и они снова станут доступны.</value></data>
@@ -336,7 +336,7 @@
   <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Не удалось переместить ({0}). Не удалось записать журнал сбоев.</value></data>
   <data name="Status.DeleteFailed" xml:space="preserve"><value>Не удалось удалить ({0}). Подробности в {1}.</value></data>
   <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Не удалось удалить ({0}). Не удалось записать журнал сбоев.</value></data>
-  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Windows refused the scan.</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Доступ запрещён. Windows отклонил сканирование.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Сбой сканирования: база данных установщика недоступна.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Сканирование отменено.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Готово</value></data>
@@ -410,7 +410,7 @@
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
        DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, needed again by a program since the scan.</value></data>
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Оставлено {0} {1} на месте: с момента сканирования они снова понадобились программе.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -418,9 +418,9 @@
        body-row status line; these are the overlay's own summary sentence. The
        permanent variant never claims the Recycle Bin: those files did not reach
        it. -->
-  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Moved {0} of {1} {2} before you cancelled.</value></data>
-  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>Sent {0} of {1} {2} to the Recycle Bin before you cancelled.</value></data>
-  <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Permanently deleted {0} of {1} {2} before you cancelled.</value></data>
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Перемещено {0}/{1} {2} до отмены.</value></data>
+  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>Перемещено {0}/{1} {2} в Корзину до отмены.</value></data>
+  <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Удалено безвозвратно {0}/{1} {2} до отмены.</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
@@ -462,7 +462,7 @@
        Japanese particle placement, etc). A translator rewrites both
        singular and plural keys per their language's rule. -->
   <data name="Summary.RegisteredStillUsed.Singular" xml:space="preserve"><value>{0} файл ещё нужен</value></data>
-  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} файлов ещё нужно</value></data>
+  <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} файлов ещё нужны</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>{0} ненужный файл для очистки</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>{0} ненужных файлов для очистки</value></data>
   <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>Отсутствует {0} зарегистрированный файл (InstallerClean его не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление той программы может не выполниться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
@@ -473,8 +473,8 @@
        because the files are removable already; only the MSI
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
-  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
-  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>В списке Windows всё ещё есть {0} старый патч, файла которого уже нет на диске. Это не страшно, и делать ничего не нужно.</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>В списке Windows всё ещё есть {0} старых патчей, файлов которых уже нет на диске. Это не страшно, и делать ничего не нужно.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
@@ -488,7 +488,7 @@
        the noun and verb agree at one file ("file ... is" vs "files ... are").
        0 = count, 1 = size display. -->
   <data name="Summary.RegisteredWindow.Singular" xml:space="preserve"><value>{0} зарегистрированный файл ещё нужен ({1})</value></data>
-  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} зарегистрированных файлов ещё нужно ({1})</value></data>
+  <data name="Summary.RegisteredWindow.Plural" xml:space="preserve"><value>{0} зарегистрированных файлов ещё нужны ({1})</value></data>
 
   <!-- Confirmation dialogs -->
   <!-- 0 = file count, 1 = pluralised "file"/"files", 2 = size display -->
@@ -506,7 +506,7 @@
        signal they get otherwise is the absence of the word "freed" on the
        completion screen, which nobody reads as a warning. This is a free-space
        tool, so the one moment it knows the answer is the moment to say it. -->
-  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead.</value></data>
+  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>Эта папка находится на том же диске, поэтому само по себе перемещение места не освободит. Оно вернётся, когда вы удалите из неё файлы, либо вместо этого можно выбрать папку на другом диске.</value></data>
 
   <!-- Error messages -->
   <!-- Both manifests declare requireAdministrator, so the process is
@@ -515,14 +515,14 @@
        administrator", and telling the user to run as administrator hands
        them the one instruction they have already followed. The key names
        predate that correction; what they say is what matters. -->
-  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Access denied</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Доступ запрещён</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows отказал InstallerClean в доступе. InstallerClean уже запущен от имени администратора, поэтому повторный запуск таким способом не поможет.
 
-That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out.</value></data>
+Остаются две вероятные причины: защитное ПО удерживает C:\Windows\Installer, либо изменились разрешения на эту папку. Быстрее всего исключить первую: приостановите защитное ПО и повторите попытку.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>База данных установщика недоступна</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Сбой сканирования</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>База данных Windows Installer оказалась пустой или недоступной. Это необычно даже для только что установленной Windows и обычно означает, что база данных повреждена или её очистил сторонний инструмент. Обычно её восстанавливает команда «sfc /scannow», запущенная из командной строки с повышенными правами.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>База данных Windows Installer оказалась пустой или недоступной. Это необычно даже для только что установленной системы Windows и обычно означает, что база данных повреждена или её очистил сторонний инструмент. Обычно её восстанавливает команда «sfc /scannow», запущенная из командной строки с повышенными правами.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer отказался перечислять установленные продукты, а InstallerClean уже запущен от имени администратора, поэтому повторный запуск не поможет. Возможно, изменились разрешения на собственные записи установщика Windows, либо их блокирует защитное ПО. Стоит попробовать команду «sfc /scannow» из командной строки с повышенными правами.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
@@ -534,7 +534,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean не удалось сверить это сканирование с данными Windows: всё, что Windows всё ещё числит, отсутствует в папке кэша, а файлы в этой папке не соответствуют ничему из того, что известно Windows. Это указывает на проблему с чтением записей установщика, а не на файлы, которые можно безопасно удалить, поэтому для очистки ничего не предложено. Обычно это устраняется перезагрузкой Windows и повторным сканированием.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Недопустимая папка назначения</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не удалось записать в папку назначения</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Сбой перемещения</value></data>
@@ -568,7 +568,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <!-- Category-only, no path (elevated path-leak rule). Shown for a candidate
        that does not resolve inside C:\Windows\Installer, refused at the Move /
        Delete service boundary. Should never reach a user in practice. -->
-  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>This file is not inside the Windows Installer folder; refused for safety.</value></data>
+  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>Этот файл находится не в папке Windows Installer; отклонено в целях безопасности.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file
@@ -593,7 +593,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Папка для перемещения должна быть полным путём к папке, начинающимся с буквы диска или сетевой папки (например, D:\Backup или \\server\backup). InstallerClean не может использовать такой путь: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Не удалось открыть браузер</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Проверка обновлений</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Проверка...</value></data>
@@ -611,13 +611,13 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        user's own medium-integrity shell, and that chain was unavailable) is
        an internal distinction with no name outside this codebase; the user
        gets what happened and what they can do about it. -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean не удалось открыть браузер. Ссылка скопирована в буфер обмена, так что можете вставить её сами:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean не удалось открыть браузер, и скопировать ссылку в буфер обмена тоже не удалось. Вот ссылка:&#10;&#10;{0}</value></data>
   <!-- 0 = the destination folder whose canonical path changed mid-batch.
        Raised when the folder is replaced or redirected between two files of
        the same Move, so the copy must not claim where the files moved before
        that point ended up: they went wherever the folder pointed then. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Папка для перемещения изменилась, пока шло перемещение файлов (что-то заменило или перенаправило эту папку), поэтому InstallerClean остановился, чтобы не записать данные не туда. Проверьте {0}, затем выполните повторное сканирование и попробуйте снова.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -819,11 +819,13 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Summary.RegisteredStillUsed.Few" xml:space="preserve"><value>{0} файла ещё нужны</value></data>
   <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} ненужных файла для очистки</value></data>
   <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>Отсутствует {0} зарегистрированных файла (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
-  <data name="Summary.StaleMsiEntries.Few" xml:space="preserve"><value>Обнаружено {0} устаревшие записи MSI (файлы уже исчезли с диска; InstallerClean их не удаляет из реестра).</value></data>
+  <data name="Summary.StaleMsiEntries.Few" xml:space="preserve"><value>В списке Windows всё ещё есть {0} старых патча, файлов которых уже нет на диске. Это не страшно, и делать ничего не нужно.</value></data>
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} зарегистрированных файла ещё нужны ({1})</value></data>
   <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину.</value></data>
   <data name="Completion.PermanentDeleteSummaryWithErrors.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину. {2} {3}</value></data>
+  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Оставлен {0} {1} на месте: с момента сканирования он снова понадобился программе.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Найдено {0} зарегистрированный {1}.</value></data>
+  <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Найдено {0} зарегистрированных {1}.</value></data>
 
   <!-- Human-facing CLI keys (the 39 non-machine Cli.* keys); the machine Cli.EventLog* keys are forced English at the emit site and omitted -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Неизвестный аргумент: «{0}»</value></data>
@@ -837,7 +839,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Cli.DeletingFiles" xml:space="preserve"><value>Удаление: {0} {1}...</value></data>
   <data name="Cli.DeletedFiles" xml:space="preserve"><value>Удалено {0} {1}.</value></data>
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Ошибка: Корзина недоступна для этого диска, поэтому ничего не удалено. Воспользуйтесь /m, чтобы переместить файлы, либо снова включите Корзину и запустите ещё раз.</value></data>
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Ошибка: не указана папка назначения для перемещения. Используйте /m ПУТЬ. (Значение по умолчанию, заданное в графическом интерфейсе, действует только для текущего пользователя и не применяется при запуске по расписанию или от имени служебной учётной записи.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Ошибка: папка назначения не может находиться внутри папки Windows Installer.</value></data>
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Ошибка: папка назначения должна быть полным путём. Получено: {0}</value></data>
   <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Ошибка: папка назначения {0} ведёт в системную папку Windows. Выберите путь за пределами %SystemRoot%, %ProgramFiles% и %ProgramData%.</value></data>
@@ -865,6 +867,6 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   частично: часть файлов обработана, часть с ошибкой</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  временно: запуск заблокирован временным состоянием (см. сообщение)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 отменено (Ctrl+C)</value></data>
-  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Ошибка: неожиданный лишний аргумент «{0}». Если в пути к папке для перемещения есть пробел, возьмите весь путь в кавычки: /m "D:\My Backup"</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Сохранённое значение по умолчанию задаётся отдельно для каждого пользователя; для запусков по расписанию или от имени SYSTEM нужно указывать /m ПУТЬ.</value></data>
 </root>
