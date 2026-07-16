@@ -59,9 +59,9 @@
     <SolidColorBrush x:Key="Action.Accent.Pressed"    Color="{StaticResource Primitive.Indigo.800}"/>
 
     <!-- Danger: destructive (red). -->
-    <SolidColorBrush x:Key="Action.Danger.Background" Color="{StaticResource Primitive.Red.900}"/>
-    <SolidColorBrush x:Key="Action.Danger.Hover"      Color="{StaticResource Primitive.Red.950}"/>
-    <SolidColorBrush x:Key="Action.Danger.Pressed"    Color="{StaticResource Primitive.Red.950.Pressed}"/>
+    <SolidColorBrush x:Key="Action.Danger.Background" Color="{StaticResource Primitive.Red.800}"/>
+    <SolidColorBrush x:Key="Action.Danger.Hover"      Color="{StaticResource Primitive.Red.900}"/>
+    <SolidColorBrush x:Key="Action.Danger.Pressed"    Color="{StaticResource Primitive.Red.900.Pressed}"/>
 
     <!-- Caption-button: the title-bar minimise and maximise fill. Only
          the pressed state needs a step of its own; the hover state takes

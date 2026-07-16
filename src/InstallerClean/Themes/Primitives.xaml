@@ -16,10 +16,17 @@
     attribute syntax does run TypeConverters, so BorderThickness="1"
     is fine; only StaticResource lookups have the strict-typing rule.
 
-    Naming: <ramp>.<step>. Steps follow Tailwind's convention so that
+    Naming: <ramp>.<step>. Steps follow Tailwind v3's convention so that
     swapping a primitive for a different shade reads as a numeric move
     (Slate.700 darker than Slate.500). Alpha-blended variants use a
     trailing AlphaNN suffix indicating the intended opacity.
+
+    Tailwind is ancestry here, not a dependency: this is a hand-tuned
+    palette and there is nothing to upgrade. Most steps do carry Tailwind
+    v3's value for the name they wear, and every step that does not says
+    so, so an unannotated one can be trusted as v3's. v4 republished the
+    palette in OKLCH with different values; adopting those would restyle
+    the app and void every contrast ratio measured in Tokens.xaml.
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -28,6 +35,8 @@
     <Color x:Key="Primitive.Slate.50">#f8fafc</Color>
     <Color x:Key="Primitive.Slate.300">#cbd5e1</Color>
     <Color x:Key="Primitive.Slate.400">#94a3b8</Color>
+    <!-- The one slate step that is not Tailwind's: v3's slate-500 is
+         #64748b. Hand-tuned lighter; not on the Tailwind ramp. -->
     <Color x:Key="Primitive.Slate.500">#8494a7</Color>
     <Color x:Key="Primitive.Slate.600">#475569</Color>
     <Color x:Key="Primitive.Slate.700">#334155</Color>
@@ -48,16 +57,24 @@
     <Color x:Key="Primitive.Indigo.300">#a5b4fc</Color>
     <Color x:Key="Primitive.Indigo.400">#818cf8</Color>
     <Color x:Key="Primitive.Indigo.600">#4f46e5</Color>
+    <!-- Custom indigo steps used for the hover/pressed states of the
+         accent fill. Tailwind v3's indigo-700 is #4338ca and its
+         indigo-800 #3730a3; neither of these is on the Tailwind ramp. -->
     <Color x:Key="Primitive.Indigo.700">#443cc7</Color>
     <Color x:Key="Primitive.Indigo.800">#3b34af</Color>
 
     <!-- Red ramp. Destructive actions and the close-window caption. -->
     <Color x:Key="Primitive.Red.500">#ef4444</Color>
+    <!-- Custom reds used for the hover/pressed states of the title-bar X.
+         Tailwind v3's red-700 is #b91c1c, so the 700 places these on this
+         ramp, not on the Tailwind one. -->
     <Color x:Key="Primitive.Red.700.CaptionHover">#c0392b</Color>
     <Color x:Key="Primitive.Red.700.CaptionPressed">#a93226</Color>
-    <Color x:Key="Primitive.Red.900">#991b1b</Color>
-    <Color x:Key="Primitive.Red.950">#7f1d1d</Color>
-    <Color x:Key="Primitive.Red.950.Pressed">#6b1a1a</Color>
+    <Color x:Key="Primitive.Red.800">#991b1b</Color>
+    <Color x:Key="Primitive.Red.900">#7f1d1d</Color>
+    <!-- Custom step used for the pressed state of the danger fill. Sits
+         below Red.900; not on the Tailwind ramp. -->
+    <Color x:Key="Primitive.Red.900.Pressed">#6b1a1a</Color>
 
     <!-- Status colours. -->
     <Color x:Key="Primitive.Amber.400">#fbbf24</Color>
