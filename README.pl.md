@@ -163,7 +163,7 @@ Jeśli Windows Installer akurat zapisuje do pamięci podręcznej, ma zawieszoną
 
 Usługi skanowania, odpytywania, przenoszenia, usuwania, ustawień i oczekującego ponownego uruchomienia są objęte automatycznym zestawem testów uruchamianym przy każdym commicie (zob. plakietkę CI powyżej).
 
-**Weryfikacja pliku binarnego.** InstallerClean jest niepodpisany, ale nie musisz brać go na wiarę:
+**Weryfikacja pliku binarnego.** InstallerClean jest niepodpisany, ale nie musisz brać na wiarę, że jest bezpieczny:
 
 - Skróty SHA-256 dla każdej wersji są wymienione na [stronie wydań](../../releases/latest).
 - VirusTotal: każdy build jest skanowany, a pełne wyniki dla każdego silnika są linkowane na stronie danego wydania, dzięki czemu możesz zobaczyć, jak oceniono każdy plik, i przeskanować go ponownie samodzielnie. Każdy fałszywy alarm jest wskazany i wyjaśniony w informacjach o wydaniu, nigdy ukrywany.
@@ -221,7 +221,7 @@ Jeśli cokolwiek tutaj ci przeszkadza, [zgłoś problem](../../issues). Problemy
 
 - WinSxS (`C:\Windows\WinSxS`) to inny folder o innych zasadach. Do niego użyj `Dism /Online /Cleanup-Image /StartComponentCleanup` z wiersza poleceń z podwyższonymi uprawnieniami.
 - Brak usługi w tle, brak zaplanowanego zadania, brak automatycznego czyszczenia. Aplikacja działa wtedy, gdy ją uruchomisz.
-- Rejestr jest tylko do odczytu. Aplikacja odpytuje bazę danych Windows Installer; nie zmienia jej.
+- Nie zmienia ani twoich zainstalowanych programów, ani bazy danych Windows Installer, tylko je odczytuje. Jedyne, co w ogóle zapisuje do rejestru, to jednorazowy wpis w dzienniku zdarzeń Windows, którego narzędzie wiersza poleceń potrzebuje, aby można było skontrolować zaplanowane uruchomienia.
 - Łączy się z internetem tylko wtedy, gdy mu każesz: ręczne sprawdzenie aktualizacji; opcjonalny anonimowy raport (tylko po to, bym wiedział, że działa); oraz linki do dokumentacji na GitHubie i strony wsparcia, które otwierają się w twojej przeglądarce, jeśli zdecydujesz się je kliknąć.
 - Bez pasków narzędzi, bez dołączanego oprogramowania, bez adware.
 
@@ -344,7 +344,7 @@ Uruchomione bez argumentu lub z nierozpoznaną flagą, `installerclean-cli` wypi
 
 `/s` to przebieg próbny: skanuje, wypisuje to, co usunąłby, z nazwami plików i rozmiarami, a następnie kończy działanie. Przydatne do audytu przed czyszczeniem. Kod wyjścia to `0` przy udanym skanowaniu, `1`, jeśli skanowanie zawiedzie, i `130` przy Ctrl+C. Wszystkie pliki znajdują się w `C:\Windows\Installer`.
 
-`/d` i `/m` skanują, a następnie działają. `/d` przenosi pliki do usunięcia do Kosza. `/m` przenosi je do folderu (albo wskazanego w wierszu poleceń, albo domyślnego zapisanego z GUI). Kody wyjścia: `0` dla pełnego sukcesu, `2` dla częściowego (część plików się powiodła, część zawiodła), `1` dla całkowitej porażki (skanowanie zawiodło, błędne argumenty albo każdy plik w partii zawiódł), `75` dla stanu przejściowego, który zablokował przebieg (wypisany komunikat wyjaśnia jaki i czy ponowna próba pomoże), `130` dla Ctrl+C przed przetworzeniem jakiegokolwiek pliku (Ctrl+C w trakcie partii kończy się kodem `2`, częściowym, ponieważ praca została wykonana).
+`/d` i `/m` skanują, a następnie działają. `/d` przenosi pliki do usunięcia do Kosza. `/m` przenosi je do folderu (albo wskazanego w wierszu poleceń, albo domyślnego zapisanego z GUI). Ten zapisany domyślny folder jest przechowywany dla każdego użytkownika, więc zaplanowane zadanie działające jako SYSTEM lub na koncie usługi go nie zobaczy; takie uruchomienia muszą wskazać folder wprost za pomocą `/m PATH`. Kody wyjścia: `0` dla pełnego sukcesu, `2` dla częściowego (część plików się powiodła, część zawiodła), `1` dla całkowitej porażki (skanowanie zawiodło, błędne argumenty albo każdy plik w partii zawiódł), `75` dla stanu przejściowego, który zablokował przebieg (wypisany komunikat wyjaśnia jaki i czy ponowna próba pomoże), `130` dla Ctrl+C przed przetworzeniem jakiegokolwiek pliku (Ctrl+C w trakcie partii kończy się kodem `2`, częściowym, ponieważ praca została wykonana).
 
 Cała komunikacja CLI, w tym komunikaty o błędach i diagnostyczne, trafia do stdout; nie ma osobnego strumienia stderr. Kod wyjścia jest sygnałem czytelnym maszynowo (a wpis w dzienniku zdarzeń aplikacji dla każdego uruchomienia go odzwierciedla), więc skrypt powinien opierać się na kodzie wyjścia, a nie analizować tekst, a `installerclean-cli /s > audit.txt` przechwytuje cały przebieg, łącznie z ewentualnym wierszem błędu.
 

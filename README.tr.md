@@ -163,7 +163,7 @@ Windows Installer şu anda önbelleğe yazıyorsa, önceki bir işlemi askıya a
 
 Tarama, sorgulama, taşıma, silme, ayarlar ve bekleyen yeniden başlatma hizmetleri, her commit'te çalışan otomatik bir test paketiyle kapsanır (yukarıdaki CI rozetine bakın).
 
-**İkili dosyayı doğrulama.** InstallerClean imzasızdır, ama körü körüne güvenmeniz gerekmez:
+**İkili dosyayı doğrulama.** InstallerClean imzasızdır, ama güvenli olduğuna körü körüne inanmanız gerekmez:
 
 - Her sürümün SHA-256 karmaları [sürümler sayfasında](../../releases/latest) listelenir.
 - VirusTotal: her yapı taranır; her motordaki tam sonuçlar ilgili sürümün sayfasında bağlantılanır, böylece her dosyanın nasıl puanlandığını görebilir ve kendiniz yeniden tarayabilirsiniz. Herhangi bir yanlış pozitif gizlenmez, sürüm notlarında belirtilir ve açıklanır.
@@ -221,7 +221,7 @@ Burada bir şey size engel oluyorsa, [bir konu açın](../../issues). Erişilebi
 
 - WinSxS (`C:\Windows\WinSxS`) farklı kurallara sahip farklı bir klasördür. Onun için, yükseltilmiş bir komut isteminden `Dism /Online /Cleanup-Image /StartComponentCleanup` komutunu çalıştırın.
 - Arka plan hizmeti yok, zamanlanmış görev yok, otomatik temizlik yok. Uygulama yalnızca siz başlattığınızda çalışır.
-- Kayıt defteri salt okunurdur. Uygulama Windows Installer veritabanını sorgular; onu değiştirmez.
+- Yüklü programlarınızı ya da Windows Installer veritabanını değiştirmez, yalnızca okur. Kayıt defterine yazdığı tek şey, komut satırı aracının zamanlanmış çalıştırmaların denetlenebilmesi için ihtiyaç duyduğu tek seferlik bir Windows Olay Günlüğü kaydıdır.
 - İnternete yalnızca siz söylediğinizde bağlanır: elle yapılan bir güncelleme kontrolü; isteğe bağlı anonim rapor (yalnızca çalıştığını bana bildirmek için); ve GitHub belgelerine ve bir bağış sayfasına giden, tıklamayı seçerseniz tarayıcınızda açılan bağlantılar.
 - Araç çubuğu yok, paketlenmiş yazılım yok, reklam yazılımı yok.
 
@@ -345,7 +345,7 @@ GUI'yi başlatmak için `InstallerClean.exe` çalıştırın (ya da kurulumdan g
 
 `/s` bir deneme çalıştırmasıdır: tarar, kaldıracağı şeyleri dosya adları ve boyutlarıyla listeler, sonra çıkar. Temizlikten önce denetlemek için kullanışlıdır. Çıkış kodu başarılı bir taramada `0`, tarama başarısız olursa `1` ve Ctrl+C'de `130`'dur. Tüm dosyalar `C:\Windows\Installer` içindedir.
 
-`/d` ve `/m` tarar ve ardından harekete geçer. `/d` kaldırılabilir dosyaları Geri Dönüşüm Kutusu'na taşır. `/m` onları bir klasöre taşır (ya komut satırında belirttiğiniz birine, ya da GUI'den kaydedilmiş varsayılana). Çıkış kodları: tam başarı için `0`, kısmi için `2` (bazı dosyalar başarılı, bazıları başarısız), tam başarısızlık için `1` (tarama başarısız, hatalı argümanlar ya da toplu işteki her dosya başarısız), çalıştırmayı engelleyen geçici bir durum için `75` (yazdırılan ileti hangisi olduğunu ve yeniden denemenin yardımcı olup olmayacağını açıklar), herhangi bir dosya işlenmeden önce bir Ctrl+C için `130` (toplu işin ortasına denk gelen bir Ctrl+C, iş yapıldığından `2` ile, yani kısmi olarak çıkar).
+`/d` ve `/m` tarar ve ardından harekete geçer. `/d` kaldırılabilir dosyaları Geri Dönüşüm Kutusu'na taşır. `/m` onları bir klasöre taşır (ya komut satırında belirttiğiniz birine, ya da GUI'den kaydedilmiş varsayılana). Kaydedilen bu varsayılan, kullanıcı başına saklanır, dolayısıyla SYSTEM ya da bir hizmet hesabı olarak çalışan zamanlanmış bir görev onu göremez; bu tür çalıştırmaların klasörü `/m PATH` ile açıkça belirtmesi gerekir. Çıkış kodları: tam başarı için `0`, kısmi için `2` (bazı dosyalar başarılı, bazıları başarısız), tam başarısızlık için `1` (tarama başarısız, hatalı argümanlar ya da toplu işteki her dosya başarısız), çalıştırmayı engelleyen geçici bir durum için `75` (yazdırılan ileti hangisi olduğunu ve yeniden denemenin yardımcı olup olmayacağını açıklar), herhangi bir dosya işlenmeden önce bir Ctrl+C için `130` (toplu işin ortasına denk gelen bir Ctrl+C, iş yapıldığından `2` ile, yani kısmi olarak çıkar).
 
 CLI'nin tüm çıktısı, hata ve tanılama iletileri dahil, stdout'a gider; ayrı bir stderr akışı yoktur. Çıkış kodu makinece okunabilen sinyaldir (ve çalıştırma başına Uygulama olay günlüğü girişi onu yansıtır), dolayısıyla bir betik metni ayrıştırmak yerine çıkış koduna göre hareket etmelidir ve `installerclean-cli /s > audit.txt` varsa herhangi bir hata satırı dahil çalıştırmanın tamamını yakalar.
 

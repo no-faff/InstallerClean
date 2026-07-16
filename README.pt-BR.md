@@ -163,7 +163,7 @@ Se o Windows Installer estiver gravando no cache naquele momento, tiver uma tran
 
 Os serviços de análise, consulta, movimentação, exclusão, configurações e reinicialização pendente são cobertos por uma suíte de testes automatizados que roda a cada commit (veja o selo de CI acima).
 
-**Verificando o binário.** O InstallerClean não é assinado, mas você não precisa confiar de olhos fechados:
+**Verificando o binário.** O InstallerClean não é assinado, mas você não precisa confiar de olhos fechados que ele é seguro:
 
 - Os hashes SHA-256 de cada versão estão listados na [página de versões](../../releases/latest).
 - VirusTotal: cada build é escaneado, com os resultados completos por mecanismo vinculados na página da versão, para que você possa ver como cada arquivo pontuou e escaneá-lo de novo você mesmo. Qualquer falso positivo é apontado e explicado nas notas da versão, nunca escondido.
@@ -221,7 +221,7 @@ Se algo aqui atrapalhar você, [abra uma issue](../../issues). Problemas de aces
 
 - O WinSxS (`C:\Windows\WinSxS`) é uma pasta diferente, com regras diferentes. Para essa, rode `Dism /Online /Cleanup-Image /StartComponentCleanup` em um prompt elevado.
 - Sem serviço em segundo plano, sem tarefa agendada, sem limpeza automática. O aplicativo roda quando você o abre.
-- O registro é acessado apenas para leitura. O aplicativo consulta o banco de dados do Windows Installer; não o modifica.
+- Ele não altera seus programas instalados nem o banco de dados do Windows Installer, apenas os consulta. A única coisa que ele chega a escrever no registro é uma entrada única no log de eventos do Windows de que a ferramenta de linha de comando precisa para que execuções agendadas possam ser auditadas.
 - Ele só se conecta à internet quando você manda: uma verificação manual de atualizações; o relatório anônimo opcional (só para eu saber que está funcionando); e links para a documentação no GitHub e para uma página de doação, que abrem no seu navegador se você optar por clicar.
 - Sem barras de ferramentas, sem software empacotado, sem adware.
 
@@ -344,7 +344,7 @@ Executado sem argumento, ou com uma opção não reconhecida, o `installerclean-
 
 `/s` é uma simulação: analisa, lista o que seria removido com nomes e tamanhos, e sai. Útil para auditar antes de limpar. O código de saída é `0` se a análise for bem-sucedida, `1` se ela falhar e `130` em caso de Ctrl+C. Todos os arquivos estão em `C:\Windows\Installer`.
 
-`/d` e `/m` analisam e depois agem. `/d` move os arquivos removíveis para a Lixeira. `/m` os move para uma pasta (ou a que você especificar na linha de comando, ou a padrão salva pela interface gráfica). Códigos de saída: `0` sucesso total, `2` parcial (alguns arquivos deram certo, outros falharam), `1` falha total (a análise falhou, argumentos inválidos ou todos os arquivos do lote falharam), `75` uma condição transitória bloqueou a execução (a mensagem exibida explica qual e se tentar de novo vai ajudar), `130` para um Ctrl+C antes de qualquer arquivo ser processado (um Ctrl+C no meio do lote sai com `2`, parcial, já que houve trabalho concluído).
+`/d` e `/m` analisam e depois agem. `/d` move os arquivos removíveis para a Lixeira. `/m` os move para uma pasta (ou a que você especificar na linha de comando, ou a padrão salva pela interface gráfica). Esse padrão salvo fica armazenado por usuário, então uma tarefa agendada em execução como SYSTEM ou com uma conta de serviço não vai enxergá-lo; essas execuções precisam informar a pasta explicitamente com `/m PATH`. Códigos de saída: `0` sucesso total, `2` parcial (alguns arquivos deram certo, outros falharam), `1` falha total (a análise falhou, argumentos inválidos ou todos os arquivos do lote falharam), `75` uma condição transitória bloqueou a execução (a mensagem exibida explica qual e se tentar de novo vai ajudar), `130` para um Ctrl+C antes de qualquer arquivo ser processado (um Ctrl+C no meio do lote sai com `2`, parcial, já que houve trabalho concluído).
 
 Toda a saída da CLI, incluindo as mensagens de erro e de diagnóstico, vai para o stdout; não há um fluxo stderr separado. O código de saída é o sinal legível por máquina (e a entrada no log de eventos do Aplicativo de cada execução o reflete), então um script deve se basear no código de saída em vez de analisar o texto, e `installerclean-cli /s > audit.txt` captura a execução inteira, incluindo qualquer linha de erro.
 

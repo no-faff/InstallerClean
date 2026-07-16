@@ -163,7 +163,7 @@ Wenn Windows Installer gerade in den Cache schreibt, eine frühere Transaktion a
 
 Die Dienste für Scan, Abfrage, Verschieben, Löschen, Einstellungen und ausstehenden Neustart sind durch eine automatisierte Testsuite abgedeckt, die bei jedem Commit läuft (siehe das CI-Badge oben).
 
-**Die Binärdatei überprüfen.** InstallerClean ist unsigniert, du musst es trotzdem nicht auf Treu und Glauben hinnehmen:
+**Die Binärdatei überprüfen.** InstallerClean ist unsigniert, du musst trotzdem nicht einfach darauf vertrauen, dass es sicher ist:
 
 - SHA-256-Hashes für jede Version sind auf der [Releases-Seite](../../releases/latest) aufgeführt.
 - VirusTotal: Jeder Build wird gescannt; die vollständigen Ergebnisse pro Engine sind auf der jeweiligen Release-Seite verlinkt, damit du sehen kannst, wie jede Datei abgeschnitten hat, und sie selbst erneut scannen kannst. Jeder Fehlalarm wird in den Versionshinweisen benannt und erklärt, nicht verschwiegen.
@@ -221,7 +221,7 @@ Wenn dir hier etwas im Weg ist, [erstelle ein Issue](../../issues). Barrierefrei
 
 - WinSxS (`C:\Windows\WinSxS`) ist ein anderer Ordner mit anderen Regeln. Dafür führe `Dism /Online /Cleanup-Image /StartComponentCleanup` in einer Eingabeaufforderung mit erhöhten Rechten aus.
 - Kein Hintergrunddienst, keine geplante Aufgabe, kein automatisches Aufräumen. Die App läuft, wenn du sie startest.
-- Die Registrierung wird nur gelesen. Die App fragt die Windows-Installer-Datenbank ab; sie verändert sie nicht.
+- Sie verändert weder deine installierten Programme noch die Windows-Installer-Datenbank, sondern liest sie nur. Das Einzige, was sie überhaupt in die Registrierung schreibt, ist ein einmaliger Windows-Ereignisprotokoll-Eintrag, den das Befehlszeilenprogramm braucht, damit geplante Ausführungen nachvollziehbar sind.
 - Sie verbindet sich nur mit dem Internet, wenn du es ihr sagst: eine manuelle Update-Prüfung; der optionale anonyme Bericht (nur damit ich weiß, dass es funktioniert); und Links zur GitHub-Dokumentation und einer Spendenseite, die sich in deinem Browser öffnen, wenn du sie anklickst.
 - Keine Symbolleisten, keine gebündelte Software, keine Adware.
 
@@ -344,7 +344,7 @@ Wird `installerclean-cli` ohne Argument oder mit einer nicht erkannten Option au
 
 `/s` ist ein Probelauf: Es scannt, listet mit Dateinamen und Größen auf, was es entfernen würde, und beendet sich dann. Nützlich, um vor dem Aufräumen zu prüfen. Der Exit-Code ist `0` bei einem erfolgreichen Scan, `1`, wenn der Scan fehlschlägt, und `130` bei Strg+C. Alle Dateien liegen in `C:\Windows\Installer`.
 
-`/d` und `/m` scannen und handeln dann. `/d` verschiebt entfernbare Dateien in den Papierkorb. `/m` verschiebt sie in einen Ordner (entweder einen, den du auf der Befehlszeile angibst, oder den aus der GUI gespeicherten Standard). Exit-Codes: `0` für vollen Erfolg, `2` für teilweisen (einige Dateien erfolgreich, einige fehlgeschlagen), `1` für völliges Scheitern (Scan fehlgeschlagen, falsche Argumente oder jede Datei im Stapel fehlgeschlagen), `75` für eine vorübergehende Bedingung, die den Lauf blockiert hat (die ausgegebene Meldung erklärt welche und ob ein erneuter Versuch hilft), `130` für ein Strg+C, bevor eine Datei verarbeitet wurde (ein Strg+C mitten im Stapel beendet mit `2`, teilweise, da Arbeit ausgeführt wurde).
+`/d` und `/m` scannen und handeln dann. `/d` verschiebt entfernbare Dateien in den Papierkorb. `/m` verschiebt sie in einen Ordner (entweder einen, den du auf der Befehlszeile angibst, oder den aus der GUI gespeicherten Standard). Dieser gespeicherte Standard wird pro Benutzer abgelegt, eine als SYSTEM oder unter einem Dienstkonto laufende geplante Aufgabe sieht ihn also nicht; solche Ausführungen müssen den Ordner ausdrücklich mit `/m PATH` angeben. Exit-Codes: `0` für vollen Erfolg, `2` für teilweisen (einige Dateien erfolgreich, einige fehlgeschlagen), `1` für völliges Scheitern (Scan fehlgeschlagen, falsche Argumente oder jede Datei im Stapel fehlgeschlagen), `75` für eine vorübergehende Bedingung, die den Lauf blockiert hat (die ausgegebene Meldung erklärt welche und ob ein erneuter Versuch hilft), `130` für ein Strg+C, bevor eine Datei verarbeitet wurde (ein Strg+C mitten im Stapel beendet mit `2`, teilweise, da Arbeit ausgeführt wurde).
 
 Die gesamte Ausgabe der CLI, einschließlich Fehler- und Diagnosemeldungen, geht an stdout; es gibt keinen separaten stderr-Stream. Der Exit-Code ist das maschinenlesbare Signal (und der Eintrag pro Lauf im Anwendungs-Ereignisprotokoll spiegelt ihn wider), ein Skript sollte sich also am Exit-Code orientieren statt den Text zu parsen, und `installerclean-cli /s > audit.txt` erfasst den gesamten Lauf einschließlich etwaiger Fehlerzeile.
 

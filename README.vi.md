@@ -163,7 +163,7 @@ Nếu Windows Installer đang ghi vào bộ nhớ đệm, có một giao dịch 
 
 Các dịch vụ quét, truy vấn, chuyển, xóa, cài đặt và kiểm tra khởi động lại đang chờ đều được bao phủ bởi một bộ kiểm thử tự động chạy ở mỗi lần commit (xem huy hiệu CI ở trên).
 
-**Kiểm chứng tệp nhị phân.** InstallerClean không được ký số, nhưng bạn không phải tin tưởng một cách mù quáng:
+**Kiểm chứng tệp nhị phân.** InstallerClean không được ký số, nhưng bạn không phải tin một cách mù quáng rằng nó an toàn:
 
 - Mã băm SHA-256 của mỗi bản phát hành được liệt kê trên [trang phát hành](../../releases/latest).
 - VirusTotal: mỗi bản dựng đều được quét, với kết quả đầy đủ theo từng công cụ được liên kết trên trang phát hành của bản đó, để bạn có thể xem từng tệp được chấm điểm ra sao và tự quét lại. Bất kỳ báo động giả nào cũng được nêu ra và giải thích trong ghi chú phát hành, không giấu giếm.
@@ -221,7 +221,7 @@ Nếu có điều gì ở đây cản trở bạn, hãy [mở một issue](../..
 
 - WinSxS (`C:\Windows\WinSxS`) là một thư mục khác với những quy tắc khác. Với thư mục đó, hãy chạy `Dism /Online /Cleanup-Image /StartComponentCleanup` từ một dấu nhắc lệnh có quyền nâng cao.
 - Không có dịch vụ chạy ngầm, không có tác vụ theo lịch, không tự động dọn. Ứng dụng chỉ chạy khi bạn khởi động nó.
-- Registry chỉ được đọc. Ứng dụng truy vấn cơ sở dữ liệu Windows Installer; nó không thay đổi cơ sở dữ liệu đó.
+- Nó không thay đổi các chương trình đã cài đặt của bạn hay cơ sở dữ liệu Windows Installer, chỉ đọc chúng. Thứ duy nhất nó từng ghi vào Registry là một mục nhật ký sự kiện Windows chỉ tạo một lần mà công cụ dòng lệnh cần đến để các lần chạy theo lịch có thể được kiểm tra.
 - Nó chỉ kết nối internet khi bạn yêu cầu: một lần kiểm tra cập nhật thủ công; báo cáo ẩn danh tùy chọn (chỉ để cho tôi biết nó đang hoạt động); và các liên kết tới tài liệu trên GitHub cùng một trang quyên góp, sẽ mở trong trình duyệt của bạn nếu bạn chọn bấm vào.
 - Không thanh công cụ, không phần mềm đi kèm, không phần mềm quảng cáo.
 
@@ -344,7 +344,7 @@ Chạy mà không có tham số, hoặc với một cờ không được nhận,
 
 `/s` là một lần chạy thử: nó quét, liệt kê những gì nó sẽ loại bỏ kèm tên tệp và kích thước, rồi thoát. Hữu ích để rà soát trước khi dọn. Mã thoát là `0` khi quét thành công, `1` nếu quét thất bại và `130` khi Ctrl+C. Tất cả các tệp đều nằm trong `C:\Windows\Installer`.
 
-`/d` và `/m` quét rồi mới hành động. `/d` di chuyển các tệp có thể loại bỏ vào Thùng rác. `/m` chuyển chúng vào một thư mục (hoặc thư mục bạn chỉ định trên dòng lệnh, hoặc thư mục mặc định đã lưu từ GUI). Mã thoát: `0` cho thành công hoàn toàn, `2` cho một phần (một số tệp thành công, một số thất bại), `1` cho thất bại toàn bộ (quét thất bại, tham số sai hoặc mọi tệp trong lô đều thất bại), `75` cho một tình huống tạm thời đã chặn lần chạy (thông báo in ra giải thích đó là gì và liệu thử lại có ích không), `130` cho một lần Ctrl+C trước khi xử lý bất kỳ tệp nào (một lần Ctrl+C rơi vào giữa lô sẽ thoát `2`, tức một phần, vì đã có việc được thực hiện).
+`/d` và `/m` quét rồi mới hành động. `/d` di chuyển các tệp có thể loại bỏ vào Thùng rác. `/m` chuyển chúng vào một thư mục (hoặc thư mục bạn chỉ định trên dòng lệnh, hoặc thư mục mặc định đã lưu từ GUI). Giá trị mặc định đã lưu đó được lưu theo từng người dùng, nên một tác vụ theo lịch chạy dưới quyền SYSTEM hoặc một tài khoản dịch vụ sẽ không thấy nó; những lần chạy như vậy phải chỉ định thư mục một cách rõ ràng bằng `/m PATH`. Mã thoát: `0` cho thành công hoàn toàn, `2` cho một phần (một số tệp thành công, một số thất bại), `1` cho thất bại toàn bộ (quét thất bại, tham số sai hoặc mọi tệp trong lô đều thất bại), `75` cho một tình huống tạm thời đã chặn lần chạy (thông báo in ra giải thích đó là gì và liệu thử lại có ích không), `130` cho một lần Ctrl+C trước khi xử lý bất kỳ tệp nào (một lần Ctrl+C rơi vào giữa lô sẽ thoát `2`, tức một phần, vì đã có việc được thực hiện).
 
 Toàn bộ đầu ra của CLI, bao gồm các thông báo lỗi và chẩn đoán, đều đi tới stdout; không có luồng stderr riêng. Mã thoát là tín hiệu mà máy đọc được (và mục nhật ký sự kiện Application cho mỗi lần chạy phản ánh đúng mã đó), nên một script nên dựa vào mã thoát thay vì phân tích văn bản, và `installerclean-cli /s > audit.txt` ghi lại toàn bộ lần chạy kể cả dòng lỗi nếu có.
 

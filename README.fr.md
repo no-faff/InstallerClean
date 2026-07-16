@@ -163,7 +163,7 @@ Si Windows Installer est en train d'écrire dans le cache, qu'une transaction pr
 
 Les services d'analyse, de requête, de déplacement, de suppression, de réglages et de vérification du redémarrage en attente sont couverts par une suite de tests automatisés qui s'exécute à chaque commit (voir le badge CI plus haut).
 
-**Vérifier le binaire.** InstallerClean n'est pas signé numériquement, mais vous n'avez pas à lui faire confiance les yeux fermés :
+**Vérifier le binaire.** InstallerClean n'est pas signé numériquement, mais vous n'avez pas à croire les yeux fermés qu'il est sûr :
 
 - Les empreintes SHA-256 de chaque version sont listées sur la [page des versions](../../releases/latest).
 - VirusTotal : chaque build est analysé, avec les résultats complets par moteur liés sur la page de la version afin que vous puissiez voir comment chaque fichier a été noté et le réanalyser vous-même. Tout faux positif est signalé et expliqué dans les notes de version, jamais caché.
@@ -221,7 +221,7 @@ Si quelque chose ici vous gêne, [ouvrez un ticket](../../issues). Les problème
 
 - WinSxS (`C:\Windows\WinSxS`) est un dossier différent, avec des règles différentes. Pour celui-là, exécutez `Dism /Online /Cleanup-Image /StartComponentCleanup` depuis une invite élevée.
 - Aucun service en arrière-plan, aucune tâche planifiée, aucun nettoyage automatique. L'application s'exécute quand vous la lancez.
-- Le registre est lu en lecture seule. L'application interroge la base de données de Windows Installer ; elle ne la modifie pas.
+- Elle ne modifie ni vos programmes installés ni la base de données de Windows Installer, elle ne fait que les lire. La seule chose qu'elle écrit dans le registre est une entrée unique dans le journal des événements de Windows dont l'outil en ligne de commande a besoin pour que les exécutions planifiées puissent être auditées.
 - Il ne se connecte à Internet que lorsque vous le lui demandez : une vérification manuelle des mises à jour ; le rapport anonyme facultatif (juste pour me faire savoir que ça fonctionne) ; et des liens vers la documentation GitHub et une page de dons, qui s'ouvrent dans votre navigateur si vous choisissez de cliquer.
 - Pas de barres d'outils, pas de logiciels groupés, pas de publiciels.
 
@@ -344,7 +344,7 @@ Lancé sans argument, ou avec une option non reconnue, `installerclean-cli` affi
 
 `/s` est un essai à blanc : il analyse, liste ce qui serait supprimé avec les noms de fichiers et les tailles, puis se termine. Utile pour auditer avant de nettoyer. Le code de sortie est `0` si l'analyse réussit, `1` si elle échoue et `130` en cas de Ctrl+C. Tous les fichiers se trouvent dans `C:\Windows\Installer`.
 
-`/d` et `/m` analysent, puis agissent. `/d` déplace les fichiers supprimables vers la Corbeille. `/m` les déplace vers un dossier (soit celui indiqué sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Codes de sortie : `0` succès complet, `2` partiel (certains fichiers réussis, d'autres échoués), `1` échec total (analyse échouée, arguments incorrects ou tous les fichiers du lot en échec), `75` une condition transitoire a bloqué l'exécution (le message affiché précise laquelle et si un nouvel essai aidera), `130` pour un Ctrl+C avant qu'aucun fichier n'ait été traité (un Ctrl+C qui survient en cours de lot se termine par `2`, partiel, car du travail a été effectué).
+`/d` et `/m` analysent, puis agissent. `/d` déplace les fichiers supprimables vers la Corbeille. `/m` les déplace vers un dossier (soit celui indiqué sur la ligne de commande, soit celui enregistré par défaut depuis l'interface graphique). Ce dossier par défaut est enregistré par utilisateur, donc une tâche planifiée s'exécutant sous SYSTEM ou un compte de service ne le verra pas et doit indiquer le dossier explicitement avec `/m PATH`. Codes de sortie : `0` succès complet, `2` partiel (certains fichiers réussis, d'autres échoués), `1` échec total (analyse échouée, arguments incorrects ou tous les fichiers du lot en échec), `75` une condition transitoire a bloqué l'exécution (le message affiché précise laquelle et si un nouvel essai aidera), `130` pour un Ctrl+C avant qu'aucun fichier n'ait été traité (un Ctrl+C qui survient en cours de lot se termine par `2`, partiel, car du travail a été effectué).
 
 Toute la sortie de la CLI, y compris les messages d'erreur et de diagnostic, va vers stdout ; il n'existe pas de flux stderr distinct. Le code de sortie est le signal lisible par la machine (et l'entrée du journal d'événements Application, écrite à chaque exécution, le reflète), donc un script devrait se fonder sur le code de sortie plutôt que d'analyser le texte, et `installerclean-cli /s > audit.txt` capture toute l'exécution, y compris une éventuelle ligne d'erreur.
 

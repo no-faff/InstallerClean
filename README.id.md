@@ -163,7 +163,7 @@ Jika Windows Installer sedang menulis ke cache, memiliki transaksi sebelumnya ya
 
 Layanan pemindaian, kueri, pemindahan, penghapusan, pengaturan, dan mulai-ulang-tertunda dicakup oleh rangkaian pengujian otomatis yang berjalan pada setiap commit (lihat lencana CI di atas).
 
-**Memverifikasi biner.** InstallerClean tidak ditandatangani, tetapi Anda tidak perlu menerimanya begitu saja:
+**Memverifikasi biner.** InstallerClean tidak ditandatangani, tetapi Anda tidak perlu percaya begitu saja bahwa aplikasi ini aman:
 
 - Hash SHA-256 untuk tiap rilis tercantum di [halaman rilis](../../releases/latest).
 - VirusTotal: setiap build dipindai, dengan hasil lengkap per mesin pemindai ditautkan di halaman rilisnya sehingga Anda bisa melihat skor tiap file dan memindai ulang sendiri. Setiap positif palsu disebutkan dan dijelaskan di catatan rilis, tidak disembunyikan.
@@ -221,7 +221,7 @@ Jika ada sesuatu di sini yang menghalangi Anda, [buka sebuah issue](../../issues
 
 - WinSxS (`C:\Windows\WinSxS`) adalah folder berbeda dengan aturan berbeda. Untuk folder itu, jalankan `Dism /Online /Cleanup-Image /StartComponentCleanup` dari prompt perintah yang ditinggikan.
 - Tanpa layanan latar belakang, tanpa tugas terjadwal, tanpa pembersihan otomatis. Aplikasi berjalan ketika Anda menjalankannya.
-- Registri hanya dibaca. Aplikasi menanyakan basis data Windows Installer; aplikasi tidak mengubahnya.
+- Aplikasi tidak mengubah program yang terpasang atau basis data Windows Installer, hanya membacanya. Satu-satunya hal yang pernah ditulisnya ke registri adalah satu entri Log Peristiwa Windows sekali saja yang dibutuhkan alat baris perintah agar proses terjadwal dapat diaudit.
 - Aplikasi hanya terhubung ke internet ketika Anda memerintahkannya: pemeriksaan pembaruan secara manual; laporan anonim opsional (sekadar memberi tahu saya bahwa aplikasi berfungsi); serta tautan ke dokumentasi GitHub dan halaman donasi, yang terbuka di peramban Anda jika Anda memilih mengekliknya.
 - Tanpa bilah alat, tanpa perangkat lunak yang dibundel, tanpa adware.
 
@@ -344,7 +344,7 @@ Jalankan tanpa argumen, atau dengan flag yang tidak dikenali, maka `installercle
 
 `/s` hanya menjalankan simulasi: ia memindai, mendaftar apa yang akan dihapus beserta nama file dan ukurannya, lalu keluar. Berguna untuk audit sebelum pembersihan. Kode keluarnya `0` pada pemindaian yang berhasil, `1` jika pemindaian gagal, dan `130` pada Ctrl+C. Semua file ada di `C:\Windows\Installer`.
 
-`/d` dan `/m` memindai lalu bertindak. `/d` memindahkan file yang bisa dihapus ke Keranjang Sampah. `/m` memindahkannya ke folder (entah yang Anda tentukan di baris perintah, atau default yang tersimpan dari GUI). Kode keluar: `0` untuk berhasil penuh, `2` untuk sebagian (sebagian file berhasil, sebagian gagal), `1` untuk kegagalan total (pemindaian gagal, argumen salah, atau semua file dalam batch gagal), `75` untuk kondisi sementara yang memblokir proses (pesan yang dicetak menjelaskan kondisi mana dan apakah mencoba ulang akan membantu), `130` untuk Ctrl+C sebelum ada file yang diproses (Ctrl+C yang terjadi di tengah batch keluar dengan `2`, sebagian, karena pekerjaan sudah dijalankan).
+`/d` dan `/m` memindai lalu bertindak. `/d` memindahkan file yang bisa dihapus ke Keranjang Sampah. `/m` memindahkannya ke folder (entah yang Anda tentukan di baris perintah, atau default yang tersimpan dari GUI). Default tersimpan itu disimpan per-pengguna, jadi tugas terjadwal yang berjalan sebagai SYSTEM atau akun layanan tidak akan melihatnya; proses seperti itu harus menyebutkan foldernya secara eksplisit dengan `/m PATH`. Kode keluar: `0` untuk berhasil penuh, `2` untuk sebagian (sebagian file berhasil, sebagian gagal), `1` untuk kegagalan total (pemindaian gagal, argumen salah, atau semua file dalam batch gagal), `75` untuk kondisi sementara yang memblokir proses (pesan yang dicetak menjelaskan kondisi mana dan apakah mencoba ulang akan membantu), `130` untuk Ctrl+C sebelum ada file yang diproses (Ctrl+C yang terjadi di tengah batch keluar dengan `2`, sebagian, karena pekerjaan sudah dijalankan).
 
 Semua keluaran CLI, termasuk pesan kesalahan dan diagnostik, masuk ke stdout; tidak ada aliran stderr terpisah. Kode keluar adalah sinyal yang terbaca mesin (dan entri log peristiwa Application per proses mencerminkannya), jadi skrip sebaiknya berpatokan pada kode keluar alih-alih mengurai teksnya, dan `installerclean-cli /s > audit.txt` menangkap seluruh proses termasuk baris kesalahan apa pun.
 

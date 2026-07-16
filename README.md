@@ -163,7 +163,7 @@ If Windows Installer is currently writing to the cache, has a previous transacti
 
 The scan, query, move, delete, settings and pending-reboot services are covered by an automated test suite that runs on every commit (see the CI badge above).
 
-**Verifying the binary.** InstallerClean is unsigned, but you don't have to take it on trust:
+**Verifying the binary.** InstallerClean is unsigned, but you don't have to trust that it's safe:
 
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
 - VirusTotal: every build is scanned, with the full per-engine results linked on its release page so you can see how each file scored and re-scan it yourself. Any false positive is called out and explained in the release notes, not hidden.
@@ -219,7 +219,7 @@ If anything here gets in your way, [open an issue](../../issues). Accessibility 
 
 - WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, run `Dism /Online /Cleanup-Image /StartComponentCleanup` from an elevated prompt.
 - No background service, no scheduled task, no auto-clean. The app runs when you launch it.
-- The registry is read-only. The app queries the Windows Installer database; it doesn't change it.
+- It doesn't change your installed programs or the Windows Installer database, only reads them. The only thing it ever writes to the registry is a one-time Windows Event Log entry the command-line tool needs so scheduled runs can be audited.
 - It only connects to the internet when you tell it to: a manual update check; the optional anonymous report (just to let me know it's working); and links to the GitHub docs and a donate page, which open in your browser if you choose to click them.
 - No toolbars, no bundled software, no adware.
 
@@ -342,11 +342,21 @@ Run with no argument, or an unrecognised flag, and `installerclean-cli` prints t
 
 `/s` is a dry run: it scans, lists what it would remove with filenames and sizes, then exits. Useful for auditing before cleanup. Exit code is `0` on a successful scan, `1` if the scan fails and `130` on Ctrl+C. All files are in `C:\Windows\Installer`.
 
-`/d` and `/m` scan and then act. `/d` moves removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments or every file in the batch failed), `75` for a transient condition that blocked the run (the printed message explains which and whether a retry will help), `130` for a Ctrl+C before any file was processed (a Ctrl+C that lands mid-batch exits `2`, partial, since work was committed).
+`/d` and `/m` scan and then act. `/d` moves removable files to the Recycle Bin. `/m` moves them to a folder (either one you specify on the command line, or the default saved from the GUI). That saved default is stored per-user, so a scheduled task running as SYSTEM or a service account won't see it; those runs have to pass the folder explicitly with `/m PATH`. Exit codes: `0` for full success, `2` for partial (some files succeeded, some failed), `1` for total failure (scan failed, bad arguments or every file in the batch failed), `75` for a transient condition that blocked the run (the printed message explains which and whether a retry will help), `130` for a Ctrl+C before any file was processed (a Ctrl+C that lands mid-batch exits `2`, partial, since work was committed).
 
 All of the CLI's output, including error and diagnostic messages, goes to stdout; there is no separate stderr stream. The exit code is the machine-readable signal (and the per-run Application event log entry mirrors it), so a script should key off the exit code rather than parse the text, and `installerclean-cli /s > audit.txt` captures the whole run including any error line.
 
 All three require an elevated (administrator) command prompt. If Group Policy blocks the UAC elevation prompt the process refuses to start and Windows returns error 740 to the parent shell (`$LASTEXITCODE = 740` in PowerShell). `taskkill /pid <pid>` does not fire a graceful cancel; the single-instance mutex is recovered by the next run via the AbandonedMutexException path.
+
+### Scheduling a regular clean
+
+To clean on a schedule, point Task Scheduler at `installerclean-cli`. Run it as SYSTEM or a service account with the highest privileges, so it gets the elevation it needs without an interactive prompt, and give the move destination on the command line, because the per-user default set in the GUI doesn't apply to a SYSTEM or service-account run. For a monthly move to `D:\InstallerBackup`, with a copy of the CLI dropped at `C:\Tools`:
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+The task blocks until the run finishes and records the exit code as its Last Run Result, so your RMM can key off the codes above (`0` full success, `2` partial, `75` transient, `1` hard failure) the same way a script would.
 
 ### Why `installerclean-cli` and not `installerclean.exe`?
 
