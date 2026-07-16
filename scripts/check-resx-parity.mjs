@@ -60,10 +60,18 @@ const arityMismatch = (neutralPh, satPh) =>
 // they live only in the satellites that use them. Allowed when the base key (its
 // .Plural sibling, or the flat key itself) is in the neutral, which ties each
 // override to a real string and still catches a typo'd key.
-const isOptionalPlural = (key) => {
+//
+// Returns the neutral base key an override inflects (its .Plural sibling, else the
+// flat key), or null when the key is not a well-formed override of a real neutral
+// key. The base is what the override's {N} arity is validated against below.
+const overrideBaseKey = (key) => {
   const m = key.match(/^(.+)\.(?:One|Few|Many)$/);
-  return m !== null && (neutral.has(`${m[1]}.Plural`) || neutral.has(m[1]));
+  if (m === null) return null;
+  if (neutral.has(`${m[1]}.Plural`)) return `${m[1]}.Plural`;
+  if (neutral.has(m[1])) return m[1];
+  return null;
 };
+const isOptionalPlural = (key) => overrideBaseKey(key) !== null;
 const satellites = readdirSync(dir)
   .filter((f) => /^Strings\.[A-Za-z-]+\.resx$/.test(f) && f !== 'Strings.resx')
   .sort();
@@ -96,8 +104,22 @@ for (const file of satellites) {
   }
 
   for (const key of sat.keys()) {
-    if (!neutral.has(key) && !isOptionalPlural(key))
+    if (neutral.has(key)) continue;
+    const base = overrideBaseKey(key);
+    if (base === null) {
       errors.push(`STRAY (not in neutral): ${key}`);
+      continue;
+    }
+    // A satellite-only override is checked for presence and shape above but its
+    // {N} arity is not, because the neutral has no key of that name to compare
+    // it to. It is still passed to string.Format with the base key's arguments,
+    // so an index the base never provides throws FormatException at runtime for
+    // exactly the count that selects this form. Validate the override references
+    // no placeholder its base does not.
+    const basePh = neutral.get(base);
+    const extra = [...sat.get(key)].filter((i) => !basePh.has(i)).sort();
+    if (extra.length)
+      errors.push(`PLACEHOLDER override ${key}: {${extra}} not provided by base ${base} {${[...basePh].sort()}}`);
   }
 
   if (errors.length) {
