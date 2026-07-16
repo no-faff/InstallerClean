@@ -729,6 +729,11 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>未知参数：“{0}”</value></data>
+  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
+       than it accepts, most often an unquoted move path with a space, so the
+       message names the quoting fix. The literal " quotes and the \ in the
+       example are part of the sentence the user copies. -->
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>正在取消…</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>已取消。</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -751,7 +756,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>错误：此驱动器的回收站不可用，因此未删除任何内容。请改用 /m 移动这些文件，或重新启用回收站后再次运行。</value></data>
   <!-- 0 = mode arg ("/d") -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>错误：未指定移动位置。请使用 /m 路径，或在 GUI 中设置默认位置。</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>错误：目标位置不能位于 Windows Installer 文件夹内。</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>错误：目标位置必须是完整路径。收到：{0}</value></data>
@@ -842,6 +847,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli 是一个真正的控制台进程，在运行结束前会一直</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>占用命令提示符；可像对待其他控制台程序那样重定向或通过管道处理其输出。</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>GUI 就位于同目录下的 InstallerClean.exe 中。</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>退出码：</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   成功：已处理每个被标记的文件</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   失败：未处理任何文件（参数错误、扫描失败或所有文件均失败）</value></data>

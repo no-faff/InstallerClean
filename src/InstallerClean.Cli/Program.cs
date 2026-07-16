@@ -91,20 +91,18 @@ internal static class Program
                     Console.WriteLine(Strings.Cli_EventLogUnavailable);
                 return ExitError;
             case CliCommand.UnknownArgument:
+                return ReportBadArguments(invocation,
+                    string.Format(Strings.Cli_UnknownArgument, invocation.OffendingArgument));
             case CliCommand.TooManyArguments:
-                Console.WriteLine(string.Format(Strings.Cli_UnknownArgument, invocation.OffendingArgument));
-                Console.WriteLine();
-                PrintUsage();
-                // Audit the bad invocation: a scheduled task with a
-                // fat-fingered flag otherwise exits 1 with no Application-channel
-                // trace, the exact ambiguity the EventLog summary exists to
-                // remove. This switch returns before the try/finally that emits
-                // the unavailable note, so emit it inline as the mutex path does.
-                MachineContract.WriteEventLog(CliEventClass.HardError,
-                    () => string.Format(Strings.Cli_EventLogBadArguments, invocation.OffendingArgument));
-                if (EventLogWriter.EventLogUnavailable)
-                    Console.WriteLine(Strings.Cli_EventLogUnavailable);
-                return ExitError;
+                // A recognised flag carried an extra token. The commonest cause is
+                // an unquoted move path with a space ("/m D:\My Backup" arrives
+                // split into three tokens, leaving "Backup" over), so this names
+                // the quoting fix rather than calling the user's own path fragment
+                // an unknown flag. The audit entry and exit code are identical to
+                // the unknown-flag case (the machine contract does not distinguish
+                // the two); only the stdout hint differs.
+                return ReportBadArguments(invocation,
+                    string.Format(Strings.Cli_TooManyArguments, invocation.OffendingArgument));
         }
 
         // Only the work commands (/s, /d, /m) remain. The lower-cased flag
@@ -485,6 +483,28 @@ internal static class Program
     }
 
     /// <summary>
+    /// Prints a bad-invocation message and usage, writes the one shared
+    /// Application-log entry, and returns <see cref="ExitError"/>. The stdout
+    /// <paramref name="stdoutMessage"/> differs between an unrecognised flag and a
+    /// recognised flag with an extra token, but the audit entry
+    /// (<c>Cli.EventLogBadArguments</c>) and the exit code are identical for both,
+    /// so an RMM filter matching the Application channel sees one "bad arguments"
+    /// contract whichever the user hit. The arg switch returns before the work
+    /// loop's try/finally, so the event-log-unavailable note is emitted inline here.
+    /// </summary>
+    private static int ReportBadArguments(CliInvocation invocation, string stdoutMessage)
+    {
+        Console.WriteLine(stdoutMessage);
+        Console.WriteLine();
+        PrintUsage();
+        MachineContract.WriteEventLog(CliEventClass.HardError,
+            () => string.Format(Strings.Cli_EventLogBadArguments, invocation.OffendingArgument));
+        if (EventLogWriter.EventLogUnavailable)
+            Console.WriteLine(Strings.Cli_EventLogUnavailable);
+        return ExitError;
+    }
+
+    /// <summary>
     /// The last-resort handler for an exception no specific catch anticipated,
     /// shared by <see cref="RunWorkAsync"/>'s catch-all and <see cref="Main"/>'s
     /// pre-flight guard so the two report on the same contract. Writes the full
@@ -631,6 +651,11 @@ internal static class Program
         Console.WriteLine(Strings.Cli_Help_NoteLine1);
         Console.WriteLine(Strings.Cli_Help_NoteLine2);
         Console.WriteLine(Strings.Cli_Help_NoteLine3);
+        Console.WriteLine();
+        // The saved /m default lives under %LOCALAPPDATA%, which a scheduled task
+        // or service account (SYSTEM) does not share with the interactive user, so
+        // a no-path /m there exits 1 every run: say so where /m is documented.
+        Console.WriteLine(Strings.Cli_Help_MoveScheduledNote);
         Console.WriteLine();
     }
 

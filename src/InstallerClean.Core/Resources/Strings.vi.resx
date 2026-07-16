@@ -729,6 +729,11 @@ Không thể ghi nhật ký sự cố.</value></data>
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Đối số không xác định: '{0}'</value></data>
+  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
+       than it accepts, most often an unquoted move path with a space, so the
+       message names the quoting fix. The literal " quotes and the \ in the
+       example are part of the sentence the user copies. -->
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Đang hủy...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Đã hủy.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -751,7 +756,7 @@ Không thể ghi nhật ký sự cố.</value></data>
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Lỗi: Thùng rác không khả dụng cho ổ đĩa này, nên không có gì bị xóa. Hãy dùng /m để chuyển các tệp thay vào đó, hoặc bật lại Thùng rác rồi chạy lại.</value></data>
   <!-- 0 = mode arg ("/d") -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Lỗi: chưa chỉ định đích để chuyển. Hãy dùng /m ĐƯỜNG_DẪN hoặc đặt một mặc định trong GUI.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Lỗi: đích không thể nằm bên trong thư mục Windows Installer.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Lỗi: đích phải là một đường dẫn đầy đủ. Nhận được: {0}</value></data>
@@ -843,6 +848,7 @@ Không thể ghi nhật ký sự cố.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli là một tiến trình console thật và chặn dấu nhắc</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>cho đến khi xong; hãy chuyển hướng hoặc nối ống đầu ra của nó như</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>với mọi tệp console khác. GUI nằm trong InstallerClean.exe cùng chỗ.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Mã thoát:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   thành công: mọi tệp được đánh dấu đều đã được xử lý</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   thất bại: không xử lý được gì (sai đối số, quét thất bại, mọi tệp đều thất bại)</value></data>

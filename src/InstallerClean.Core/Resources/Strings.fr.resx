@@ -729,6 +729,11 @@ Le crash.log n'a pas pu être écrit.</value></data>
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Argument inconnu : « {0} »</value></data>
+  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
+       than it accepts, most often an unquoted move path with a space, so the
+       message names the quoting fix. The literal " quotes and the \ in the
+       example are part of the sentence the user copies. -->
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Annulation...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Annulé.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -751,7 +756,7 @@ Le crash.log n'a pas pu être écrit.</value></data>
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Erreur : la Corbeille est indisponible pour ce volume, donc rien n'a été supprimé. Utilisez /m pour déplacer les fichiers, ou réactivez la Corbeille et relancez.</value></data>
   <!-- 0 = mode arg ("/d") -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Erreur : aucune destination de déplacement spécifiée. Utilisez /m CHEMIN ou définissez une valeur par défaut dans l'interface.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Erreur : la destination ne peut pas se trouver dans le dossier Windows Installer.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Erreur : la destination doit être un chemin entièrement qualifié. Reçu : {0}</value></data>
@@ -844,6 +849,7 @@ Le crash.log n'a pas pu être écrit.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli est un vrai processus de console et bloque l'invite</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>jusqu'à la fin ; redirigez ou acheminez sa sortie comme vous le feriez</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>pour tout autre exécutable de console. L'interface se trouve dans InstallerClean.exe.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Codes de sortie :</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   succès : tous les fichiers signalés ont été traités</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   échec : rien de traité (arguments incorrects, échec de l'analyse, tous les fichiers ont échoué)</value></data>

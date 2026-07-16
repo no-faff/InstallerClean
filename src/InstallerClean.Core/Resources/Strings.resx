@@ -729,6 +729,11 @@ The crash log could not be written.</value></data>
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Unknown argument: '{0}'</value></data>
+  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
+       than it accepts, most often an unquoted move path with a space, so the
+       message names the quoting fix. The literal " quotes and the \ in the
+       example are part of the sentence the user copies. -->
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Cancelling...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Cancelled.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -755,7 +760,7 @@ The crash log could not be written.</value></data>
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again.</value></data>
   <!-- 0 = mode arg ("/d") -->
   <data name="Cli.EventLogRecycleUnavailable" xml:space="preserve"><value>{0} mode aborted: the Recycle Bin is unavailable for the Windows volume; no files were deleted.</value></data>
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH or set a default in the GUI.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
   <data name="Cli.EventLogMoveNoDestination" xml:space="preserve"><value>{0} mode aborted: no destination specified.</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Error: destination cannot be inside the Windows Installer folder.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
@@ -864,6 +869,7 @@ The crash log could not be written.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli is a real console process and blocks the prompt</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>until it finishes; redirect or pipe its output as you would any</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>other console exe. The GUI lives in InstallerClean.exe alongside it.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Exit codes:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   success: every flagged file was processed</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   failure: nothing processed (bad args, scan failed, all files failed)</value></data>

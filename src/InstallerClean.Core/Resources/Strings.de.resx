@@ -729,6 +729,11 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Unbekanntes Argument: '{0}'</value></data>
+  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
+       than it accepts, most often an unquoted move path with a space, so the
+       message names the quoting fix. The literal " quotes and the \ in the
+       example are part of the sentence the user copies. -->
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Wird abgebrochen...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Abgebrochen.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -751,7 +756,7 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Fehler: Der Papierkorb ist für dieses Volume nicht verfügbar, daher wurde nichts gelöscht. Nutze /m, um die Dateien stattdessen zu verschieben, oder aktiviere den Papierkorb wieder und führe den Vorgang erneut aus.</value></data>
   <!-- 0 = mode arg ("/d") -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Fehler: kein Verschiebeziel angegeben. Nutze /m PFAD oder lege in der GUI einen Standard fest.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Fehler: Das Ziel darf nicht im Windows-Installer-Ordner liegen.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Fehler: Das Ziel muss ein vollständig qualifizierter Pfad sein. Erhalten: {0}</value></data>
@@ -843,6 +848,7 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli ist ein echter Konsolenprozess und blockiert die</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>Eingabeaufforderung, bis er fertig ist; leite seine Ausgabe wie bei jeder</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>anderen Konsolen-EXE um oder per Pipe weiter. Die GUI liegt in InstallerClean.exe.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Exit-Codes:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   Erfolg: jede markierte Datei wurde verarbeitet</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   Fehler: nichts verarbeitet (ungültige Argumente, Scan fehlgeschlagen, alle Dateien fehlgeschlagen)</value></data>

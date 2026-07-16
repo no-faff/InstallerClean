@@ -729,6 +729,11 @@ Nie udało się zapisać dziennika awarii.</value></data>
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Nieznany argument: „{0}”</value></data>
+  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
+       than it accepts, most often an unquoted move path with a space, so the
+       message names the quoting fix. The literal " quotes and the \ in the
+       example are part of the sentence the user copies. -->
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Anulowanie...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Anulowano.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -751,7 +756,7 @@ Nie udało się zapisać dziennika awarii.</value></data>
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Błąd: Kosz jest niedostępny dla tego woluminu, więc nic nie usunięto. Użyj /m, aby zamiast tego przenieść pliki, albo ponownie włącz Kosz i uruchom jeszcze raz.</value></data>
   <!-- 0 = mode arg ("/d") -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Błąd: nie podano folderu docelowego przenoszenia. Użyj /m ŚCIEŻKA lub ustaw domyślny w GUI.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Błąd: folder docelowy nie może znajdować się wewnątrz folderu Windows Installer.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Błąd: folder docelowy musi być pełną ścieżką. Otrzymano: {0}</value></data>
@@ -843,6 +848,7 @@ Nie udało się zapisać dziennika awarii.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli to prawdziwy proces konsolowy i blokuje wiersz poleceń,</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>dopóki się nie zakończy; przekieruj lub przekaż potokiem jego wyjście</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>jak każdy inny program konsolowy exe. GUI jest obok, w InstallerClean.exe.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Kody wyjścia:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   sukces: przetworzono każdy oznaczony plik</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   błąd: nic nie przetworzono (złe argumenty, skanowanie nie powiodło się, wszystkie pliki zawiodły)</value></data>

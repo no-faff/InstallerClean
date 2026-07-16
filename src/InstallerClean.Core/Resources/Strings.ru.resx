@@ -728,6 +728,10 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        exception: Cli.EventLogUnavailable is a stdout warning (it tells the
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
+  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
+       than it accepts, most often an unquoted move path with a space, so the
+       message names the quoting fix. The literal " quotes and the \ in the
+       example are part of the sentence the user copies. -->
   <!-- 0 = exception type name (full message + stack trace go to the
        crash log; the CLI runs elevated so .Message could include paths
        from another user's profile if logged to a shared file).
@@ -842,7 +846,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Cli.DeletingFiles" xml:space="preserve"><value>Удаление: {0} {1}...</value></data>
   <data name="Cli.DeletedFiles" xml:space="preserve"><value>Удалено {0} {1}.</value></data>
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Ошибка: Корзина недоступна для этого диска, поэтому ничего не удалено. Воспользуйтесь /m, чтобы переместить файлы, либо снова включите Корзину и запустите ещё раз.</value></data>
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Ошибка: не указана папка назначения для перемещения. Воспользуйтесь /m ПУТЬ или задайте значение по умолчанию в GUI.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Ошибка: папка назначения не может находиться внутри папки Windows Installer.</value></data>
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Ошибка: папка назначения должна быть полным путём. Получено: {0}</value></data>
   <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Ошибка: папка назначения {0} ведёт в системную папку Windows. Выберите путь за пределами %SystemRoot%, %ProgramFiles% и %ProgramData%.</value></data>
@@ -870,4 +874,6 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   частично: часть файлов обработана, часть с ошибкой</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  временно: запуск заблокирован временным состоянием (см. сообщение)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 отменено (Ctrl+C)</value></data>
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
 </root>

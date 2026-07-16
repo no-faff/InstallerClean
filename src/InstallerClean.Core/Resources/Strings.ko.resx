@@ -729,6 +729,11 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>알 수 없는 인수: '{0}'</value></data>
+  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
+       than it accepts, most often an unquoted move path with a space, so the
+       message names the quoting fix. The literal " quotes and the \ in the
+       example are part of the sentence the user copies. -->
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>취소 중...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>취소되었습니다.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -751,7 +756,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>오류: 이 볼륨에서 휴지통을 사용할 수 없어 아무것도 삭제하지 않았습니다. /m으로 파일을 대신 이동하거나, 휴지통을 다시 활성화한 후 다시 실행하세요.</value></data>
   <!-- 0 = mode arg ("/d") -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하거나 GUI에서 기본값을 설정하세요.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>오류: 대상은 Windows Installer 폴더 안에 있을 수 없습니다.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0}</value></data>
@@ -843,6 +848,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli는 실제 콘솔 프로세스로, 명령 프롬프트를 점유하며,</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>실행이 끝날 때까지 기다립니다. 다른 콘솔 실행 파일처럼 출력을 리디렉션하거나</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>파이프로 넘길 수 있습니다. GUI는 바로 옆 InstallerClean.exe에 들어 있습니다.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>종료 코드:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   성공: 표시된 모든 파일을 처리함</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   실패: 아무것도 처리하지 못함 (잘못된 인수, 검사 실패, 모든 파일 실패)</value></data>

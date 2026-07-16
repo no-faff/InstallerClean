@@ -729,6 +729,11 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Argomento sconosciuto: '{0}'</value></data>
+  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
+       than it accepts, most often an unquoted move path with a space, so the
+       message names the quoting fix. The literal " quotes and the \ in the
+       example are part of the sentence the user copies. -->
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Annullamento...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Operazione annullata.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -751,7 +756,7 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Errore: per questa unità il Cestino non è disponibile, quindi non è stato eliminato nulla. Usa /m per spostare i file oppure riattiva il Cestino e riprova.</value></data>
   <!-- 0 = mode arg ("/d") -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Errore: nessuna destinazione spostamento specificata. Usa /m PERCORSO o imposta un valore predefinito nella GUI.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Errore: la destinazione non può trovarsi all'interno della cartella di Windows Installer.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Errore: la destinazione deve essere un percorso completo. Ricevuto: {0}</value></data>
@@ -844,6 +849,7 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli è un vero processo console e blocca il prompt</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>finché non termina; reindirizza o usa una pipe sul suo output come</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>per qualsiasi altro eseguibile console. La GUI è in InstallerClean.exe.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Codici di uscita:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   successo: ogni file segnalato è stato elaborato</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   errore: nessuna elaborazione (argomenti errati, scansione non riuscita, tutti i file non riusciti)</value></data>

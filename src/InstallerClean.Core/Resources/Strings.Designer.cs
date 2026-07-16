@@ -170,6 +170,7 @@ public static class Strings
     public static string Cli_Help_Help => Get("Cli.Help.Help");
     public static string Cli_Help_MoveDefault => Get("Cli.Help.MoveDefault");
     public static string Cli_Help_MovePath => Get("Cli.Help.MovePath");
+    public static string Cli_Help_MoveScheduledNote => Get("Cli.Help.MoveScheduledNote");
     public static string Cli_Help_NoteLine1 => Get("Cli.Help.NoteLine1");
     public static string Cli_Help_NoteLine2 => Get("Cli.Help.NoteLine2");
     public static string Cli_Help_NoteLine3 => Get("Cli.Help.NoteLine3");
@@ -189,6 +190,7 @@ public static class Strings
     public static string Cli_PendingRebootBlocked_PendingRenameInCache => Get("Cli.PendingRebootBlocked.PendingRenameInCache");
     public static string Cli_RecycleUnavailable => Get("Cli.RecycleUnavailable");
     public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
+    public static string Cli_TooManyArguments => Get("Cli.TooManyArguments");
     public static string Cli_UnknownArgument => Get("Cli.UnknownArgument");
     public static string Completion_AllClean => Get("Completion.AllClean");
     public static string Completion_CleanedUp => Get("Completion.CleanedUp");

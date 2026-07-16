@@ -729,6 +729,11 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>不明な引数：'{0}'</value></data>
+  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
+       than it accepts, most often an unquoted move path with a space, so the
+       message names the quoting fix. The literal " quotes and the \ in the
+       example are part of the sentence the user copies. -->
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>キャンセル中...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>キャンセルされました。</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -755,7 +760,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>エラー：このボリュームではごみ箱が利用できないため、何も削除されませんでした。代わりに/mを使用してファイルを移動するか、ごみ箱を再度有効にして再実行してください。</value></data>
   <!-- 0 = mode arg ("/d") -->
   <data name="Cli.EventLogRecycleUnavailable" xml:space="preserve"><value>{0}モードは中止されました：Windows ボリュームでごみ箱が利用できません。ファイルは削除されませんでした。</value></data>
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>エラー：移動先が指定されていません。/m PATH を使用するか、GUI でデフォルトを設定してください。</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
   <data name="Cli.EventLogMoveNoDestination" xml:space="preserve"><value>{0}モードは中止されました：移動先が指定されていません。</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>エラー：移動先を Windows Installer フォルダー内にすることはできません。</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
@@ -864,6 +869,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cliは実際のコンソールプロセスであり、完了するまで</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>プロンプトをブロックします。他のコンソール exe と同様に、出力をリダイレクト</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>またはパイプできます。GUI は同じ場所にある InstallerClean.exe にあります。</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>終了コード：</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   成功：フラグが立てられたすべてのファイルが処理されました</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   失敗：何も処理されませんでした (不正な引数、スキャン失敗、すべてのファイルが失敗)</value></data>

@@ -729,6 +729,11 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Невідомий аргумент: «{0}»</value></data>
+  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
+       than it accepts, most often an unquoted move path with a space, so the
+       message names the quoting fix. The literal " quotes and the \ in the
+       example are part of the sentence the user copies. -->
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Скасування...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Скасовано.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -751,7 +756,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Помилка: Кошик недоступний для цього тому, тож нічого не видалено. Скористайтеся /m, щоб перемістити файли натомість, або знову ввімкніть Кошик і запустіть ще раз.</value></data>
   <!-- 0 = mode arg ("/d") -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Помилка: не вказано призначення для переміщення. Скористайтеся /m ШЛЯХ або задайте типове в графічному інтерфейсі.</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Помилка: призначення не може бути всередині папки Windows Installer.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Помилка: призначення має бути повним шляхом. Отримано: {0}</value></data>
@@ -843,6 +848,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli — це консольний процес, що блокує командний рядок до</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>завершення; перенаправляйте чи передавайте його вивід, як у будь-якого</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>іншого консольного exe. Графічний інтерфейс міститься поруч, у InstallerClean.exe.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Коди виходу:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   успіх: оброблено кожен позначений файл</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   невдача: нічого не оброблено (хибні аргументи, збій сканування, усі файли зазнали збою)</value></data>
