@@ -29,6 +29,21 @@ jobs:
       - name: Check resx satellite parity
         run: node scripts/check-resx-parity.mjs
 
+      # Source-level drift guards, each pinned to a concrete failure the app has
+      # actually hit: a resx key left with no consumer; the installer language
+      # set and SupportedLanguages diverging when a language is added to one and
+      # not the other; a French value that lost its narrow no-break space to a
+      # plain space (which the editing tools flatten silently). They run before
+      # the build because they need only the checkout, not the SDK.
+      - name: Check for dead resx keys
+        run: node scripts/check-dead-resx-keys.mjs
+
+      - name: Check installer language list
+        run: node scripts/check-installer-languages.mjs
+
+      - name: Lint French spacing
+        run: node scripts/check-french-spacing.mjs
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
