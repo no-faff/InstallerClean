@@ -26,7 +26,7 @@ const FILE = 'src/InstallerClean.Core/Resources/Strings.fr.resx';
 const xml = readFileSync(FILE, 'utf8');
 const dataRe = /<data\s+name="([^"]+)"[^>]*>[\s\S]*?<value>([\s\S]*?)<\/value>/g;
 // A plain ASCII space ( ) immediately before ! ? : ;. The correct U+202F
-// ( ) and U+00A0 are not in the class, so a properly spaced value is clean.
+// and U+00A0 are not in the class, so a properly spaced value is clean.
 const badSpaceRe = / [!?:;]/g;
 
 const problems = [];
