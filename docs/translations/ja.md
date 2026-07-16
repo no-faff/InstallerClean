@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed ({0}). The crash log could not be written. | 移動に失敗しました ({0})。クラッシュログを書き込めませんでした。 |
 | Delete failed ({0}). Details in {1}. | 削除に失敗しました ({0})。詳細は{1}をご覧ください。 |
 | Delete failed ({0}). The crash log could not be written. | 削除に失敗しました ({0})。クラッシュログを書き込めませんでした。 |
-| Access denied. Windows refused the scan. | Access denied. Windows refused the scan. |
+| Access denied. Windows refused the scan. | アクセスが拒否されました。Windows がスキャンを拒否しました。 |
 | Scan failed: installer database unavailable. | スキャンに失敗しました：インストーラーデータベースが利用できません。 |
 | Scan cancelled. | スキャンがキャンセルされました。 |
 | Ready | 準備完了 |
@@ -114,8 +114,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The unneeded files below are safe to delete. | 以下の不要ファイルは削除しても安全です。 |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | これらのファイルはC:\Windows\Installerにあり、プログラムがアンインストールされたとき ({0})、新しいパッチが置き換えたとき ({1})、または公開元が撤回したとき ({2})に取り残されます。InstallerClean は、Windows 自身が不要と報告したファイルのみをリストアップします。 |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | ごみ箱に削除するか、コピーを保持したい場合は代わりに「移動」を使用してください。 |
-| Nothing scanned yet. | Nothing scanned yet. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. |
+| Nothing scanned yet. | まだ何もスキャンしていません。 |
+| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | 「再スキャン」を押すと、C:\Windows\Installer を調べて、どのプログラムも必要としなくなったインストーラーファイルを探します。 |
+| These files can't be cleaned up right now. | これらのファイルは今はクリーンアップできません。 |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | 現在 Windows Installer を使用しているものがあります。通常は Windows Update またはバックグラウンドでインストール中のプログラムです。その実行中は移動と削除が一時停止され、InstallerClean は変更中のインストーラーキャッシュに触れません。完了したら、再スキャンすると復元されます。 |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | このマシンで以前の Windows Installer トランザクションが中断されています。キャッシュをクリーンアップする前に、そのインストールを再開またはロールバックするか (または Windows を再起動してください)。 |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows はインストーラーキャッシュに影響するファイル名の変更を次の再起動のためにキューに入れています。クリーンアップする前に Windows を再起動してください。 |
@@ -158,6 +159,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to the Recycle Bin | {0} 個の {1} をごみ箱に移動しました |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {0} 個の {1} をごみ箱に移動しました。{2} 個の {3} |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {0} 個の {1} をごみ箱に移動しました。{2} 個の {3} |
+| {0} {1} kept in place, needed again by a program since the scan. | {0} 個の {1} はそのまま残しました。スキャン後にプログラムが再び必要としたためです。 |
+| Moved {0} of {1} {2} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を移動しました。 |
+| Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} をごみ箱に移動しました。 |
+| Permanently deleted {0} of {1} {2} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を完全に削除しました。 |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} 個の {1} を完全に削除しました。ごみ箱には送られていません。 |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} 個の {1} を完全に削除しました。ごみ箱には送られていません。 |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} 個の {1} を完全に削除しました。ごみ箱には送られていません。{2} 個の {3} |
@@ -185,12 +190,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded files to clean up | クリーンアップ対象の不要ファイルが {0} 個 |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} 個の登録済みファイルが見つかりません (InstallerClean によって削除されたものではありません)。現時点では問題ありませんが、そのプログラムの将来の修復、更新、またはアンインストールが失敗する可能性があります。対処方法は詳細を開いてください。 |
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | {0} 個の登録済みファイルが見つかりません (InstallerClean によって削除されたものではありません)。現時点では問題ありませんが、それらのプログラムの将来の修復、更新、またはアンインストールが失敗する可能性があります。対処方法は詳細を開いてください。 |
-| {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | {0} 個の古いMSIエントリを検出しました (ファイルは既にディスクからなくなっています。InstallerClean は登録解除しません)。 |
-| {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | {0} 個の古いMSIエントリを検出しました (ファイルは既にディスクからなくなっています。InstallerClean は登録解除しません)。 |
+| Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do. | Windows の一覧には、ファイルがすでにディスクから消えている古いパッチが {0} 個、まだ残っています。害はなく、特に何もする必要はありません。 |
+| Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do. | Windows の一覧には、ファイルがすでにディスクから消えている古いパッチが {0} 個、まだ残っています。害はなく、特に何もする必要はありません。 |
 | {0} of {1} {2} | {2} {1} 個中 {0} 個 |
-| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | 孤立 {0}、置換済み {1}、廃止 {2}（{3}） |
-| {0} registered file that is still needed ({1}) | まだ必要な登録ファイルが {0} 個（{1}） |
-| {0} registered files that are still needed ({1}) | まだ必要な登録ファイルが {0} 個（{1}） |
+| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | 孤立 {0}、置換済み {1}、廃止 {2}({3}) |
+| {0} registered file that is still needed ({1}) | まだ必要な登録ファイルが {0} 個({1}) |
+| {0} registered files that are still needed ({1}) | まだ必要な登録ファイルが {0} 個({1}) |
 
 ## Confirmation dialogs
 
@@ -200,20 +205,21 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Files will be moved to: | ファイルは次の場所に移動されます： |
 | Delete {0} {1} ({2})? | {0} 個の {1} ({2})を削除しますか？ |
 | Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | ファイルはごみ箱に移動されます。バックアップコピーが必要な場合は、代わりに「移動」ボタンを使用してください。 |
-| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. |
+| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | このフォルダーは同じドライブ上にあるため、移動しただけでは空き容量は増えません。移動先からファイルを削除すれば、その分の容量が空きます。または、別のドライブのフォルダーを選ぶこともできます。 |
 
 ## Error messages
 
 | English | 日本語 |
 | --- | --- |
-| Access denied | Access denied |
-| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. |
+| Access denied | アクセスが拒否されました |
+| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows が InstallerClean によるアクセスを拒否しました。InstallerClean はすでに管理者として実行されているため、もう一度同じ方法で起動し直しても解決しません。<br><br>そうなると、考えられる原因は2つに絞られます。セキュリティソフトが C:\Windows\Installer をロックしているか、フォルダーのアクセス許可が変更されたかのどちらかです。まずはセキュリティソフトを一時停止して再試行するのが、いちばん手早く原因を切り分けられる方法です。 |
 | Installer database unavailable | インストーラーデータベースが利用できません |
 | Scan failed | スキャンに失敗しました |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Windows Installer データベースが空であるか、アクセスできないようです。これは新しい Windows インストールでも異常であり、通常はデータベースが破損しているか、サードパーティツールが消去したことを意味します。昇格したプロンプトで'sfc /scannow'を実行すると、通常は修復されます。 |
-| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer がインストール済み製品の一覧表示を拒否しました。InstallerClean はすでに管理者として実行されているため、もう一度実行しても解決しません。Windows 自身のインストーラー登録情報のアクセス許可が変更されたか、セキュリティソフトがブロックしている可能性があります。昇格したプロンプトで'sfc /scannow'を実行してみる価値はあります。 |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installerは、{0} 回の連続失敗の後も製品の一覧表示を拒否しました (最後のエラーコード{1})。Windows を再起動するか、昇格したプロンプトで'sfc /scannow'を実行してみてください。 |
 | Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installerは、{0} 回の連続失敗の後も製品のパッチの一覧表示を拒否しました (最後のエラーコード{1})。Windows を再起動するか、昇格したプロンプトで'sfc /scannow'を実行してみてください。 |
+| InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it. | InstallerClean は今回のスキャン結果を Windows と照合できませんでした。Windows が今も一覧に挙げているファイルはすべてキャッシュフォルダーに見当たらず、一方でフォルダー内のファイルは Windows が把握しているものと一つも一致しません。これは、安全に削除できるファイルがあるというよりも、インストーラー登録情報の読み取りに問題があることを示しています。そのため、クリーンアップ対象は何も表示していません。Windows を再起動してからもう一度スキャンすると、通常は解消します。 |
 | Invalid destination | 無効な移動先 |
 | Could not write to destination | 移動先に書き込めませんでした |
 | Move failed | 移動に失敗しました |
@@ -231,6 +237,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | {0} に書き込めません。クラッシュログを書き込めませんでした。 |
 | File no longer exists. | ファイルはもう存在しません。 |
 | Source file is a symlink or junction; refused for safety. | ソースファイルはシンボリックリンクまたはジャンクションです。安全のために拒否されました。 |
+| This file is not inside the Windows Installer folder; refused for safety. | このファイルは Windows Installer フォルダー内にありません。安全のために拒否されました。 |
 | Access denied. | アクセスが拒否されました。 |
 | The operation failed. Try again or restart Windows. | 操作に失敗しました。もう一度試すか、Windows を再起動してください。 |
 | Unknown error. | 不明なエラー。 |
@@ -239,8 +246,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | このファイルは別のプログラムによって開かれているかロックされています (エラー{0})。そのプログラムまたはスキャンしているものを閉じてから再試行するか、代わりに「移動」ボタンを使用してください。 |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | ごみ箱に移動できなかったため、ファイルは完全に削除されました。 |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Windows Installerフォルダー内へのファイル移動を拒否します (移動先：{0})。 |
-| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
-| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
+| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | 移動先には、ドライブ文字またはネットワーク共有から始まる、フォルダーへの完全なパスを指定してください (例：D:\Backup、\\server\backup)。InstallerClean はこのパスを使用できません：{0} |
+| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | ファイルの移動中に移動先が変更されました (フォルダーが置き換えられたか、リダイレクトされました)。誤った場所に書き込まないよう、InstallerClean は処理を停止しました。{0} を確認してから、再スキャンしてもう一度お試しください。 |
 | Cannot write to {0}. | {0} に書き込めません。 |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | 10,000回の試行後も'{0}'の一意のファイル名が見つかりませんでした。 |
 
@@ -264,8 +271,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | Couldn't open your browser | ブラウザを開けませんでした |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean はブラウザを開けませんでした。リンクはクリップボードにコピーしてあるので、ご自分で貼り付けられます：<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean はブラウザを開けず、リンクをクリップボードにコピーすることもできませんでした。リンクはこちらです：<br><br>{0} |
 
 ## Sending the summary
 
@@ -412,6 +419,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | Unknown argument: '{0}' | 不明な引数：'{0}' |
+| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | エラー：予期しない余分な引数 '{0}' があります。移動先フォルダーにスペースが含まれる場合は、パス全体を引用符で囲んでください：/m "D:\My Backup" |
 | Cancelling... | キャンセル中... |
 | Cancelled. | キャンセルされました。 |
 | Error: {0}. Details written to {1}. | エラー：{0}。詳細は {1} に書き込まれました。 |
@@ -422,11 +430,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting {0} {1}... | {0} 個の {1} を削除中... |
 | Deleted {0} {1}. | {0} 個の {1} を削除しました。 |
 | Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | エラー：このボリュームではごみ箱が利用できないため、何も削除されませんでした。代わりに/mを使用してファイルを移動するか、ごみ箱を再度有効にして再実行してください。 |
-| Error: no move destination specified. Use /m PATH or set a default in the GUI. | エラー：移動先が指定されていません。/m PATH を使用するか、GUI でデフォルトを設定してください。 |
+| Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | エラー：移動先が指定されていません。/m PATH を使用してください (GUI で設定したデフォルトはユーザーごとのもので、スケジュール実行やサービスアカウントでの実行には適用されません)。 |
 | Error: destination cannot be inside the Windows Installer folder. | エラー：移動先を Windows Installer フォルダー内にすることはできません。 |
 | Error: destination must be a fully qualified path. Got: {0} | エラー：移動先は完全修飾パスである必要があります。指定されたもの：{0} |
 | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | エラー：移動先 {0} は Windows システムフォルダー下に解決されます。%SystemRoot%、%ProgramFiles%、%ProgramData%以外のパスを選択してください。 |
-| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | エラー：現在 Windows Installer を使用しているものがあります。通常 はWindows Update  またはバックグラウンドでインストール中のプログラムです。その実行中は移動と削除がブロックされます。完了したら再試行してください。 |
+| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | エラー：現在 Windows Installer を使用しているものがあります。通常は Windows Update またはバックグラウンドでインストール中のプログラムです。その実行中は移動と削除がブロックされます。完了したら再試行してください。 |
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | エラー：このマシンで以前の Windows Installer トランザクションが中断されています。キャッシュをクリーンアップする前に、そのインストールを再開またはロールバックするか (または Windows を再起動してください)。 |
 | Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | エラー：キューに入れられた再起動後のファイル操作がインストーラーキャッシュ ({0})を対象としています。クリーンアップ前にその操作を完了するために Windows を再起動してください。 |
 | Moving {0} {1} to {2}... | {0} 個の {1} を {2} に移動中... |
@@ -444,6 +452,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cliは実際のコンソールプロセスであり、完了するまで |
 | until it finishes; redirect or pipe its output as you would any | プロンプトをブロックします。他のコンソール exe と同様に、出力をリダイレクト |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | またはパイプできます。GUI は同じ場所にある InstallerClean.exe にあります。 |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | 保存されたデフォルトはユーザーごとの設定です。スケジュール実行や SYSTEM 実行では /m PATH が必要です。 |
 | Exit codes: | 終了コード： |
 |   0   success: every flagged file was processed |   0   成功：フラグが立てられたすべてのファイルが処理されました |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   失敗：何も処理されませんでした (不正な引数、スキャン失敗、すべてのファイルが失敗) |

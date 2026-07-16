@@ -90,7 +90,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Found {0} registered {1}. | Se encontraron {0} {1} registrados. |
 | Scan complete ({0}) | Análisis completado ({0}) |
 | Scanning local packages... | Analizando los paquetes locales... |
-| Found {0} {1} you can safely delete. | {0} {1} que puedes eliminar sin riesgo. |
+| Found {0} {1} you can safely delete. | Se encontraron {0} {1} que puedes eliminar sin riesgo. |
 | Preparing destination folder... | Preparando la carpeta de destino... |
 | Moving {0} {1}... | Moviendo {0} {1}... |
 | Deleting {0} {1}... | Eliminando {0} {1}... |
@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed ({0}). The crash log could not be written. | Movimiento fallido ({0}). No se pudo escribir el archivo crash.log. |
 | Delete failed ({0}). Details in {1}. | Eliminación fallida ({0}). Detalles en {1}. |
 | Delete failed ({0}). The crash log could not be written. | Eliminación fallida ({0}). No se pudo escribir el archivo crash.log. |
-| Access denied. Windows refused the scan. | Access denied. Windows refused the scan. |
+| Access denied. Windows refused the scan. | Acceso denegado. Windows rechazó el análisis. |
 | Scan failed: installer database unavailable. | Análisis fallido: base de datos del instalador no disponible. |
 | Scan cancelled. | Análisis cancelado. |
 | Ready | Listo |
@@ -114,8 +114,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The unneeded files below are safe to delete. | Los archivos innecesarios de abajo se pueden eliminar sin riesgo. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Están en C:\Windows\Installer, donde quedaron cuando se desinstaló un programa ({0}), un parche más reciente sustituyó a otro ({1}) o el fabricante lo retiró ({2}). InstallerClean solo enumera archivos que el propio Windows da por terminados. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Elimínalos y se enviarán a la Papelera de reciclaje, o usa Mover en su lugar si prefieres conservar una copia. |
-| Nothing scanned yet. | Nothing scanned yet. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. |
+| Nothing scanned yet. | Aún no se ha analizado nada. |
+| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Pulsa Volver a analizar para revisar C:\Windows\Installer en busca de archivos de instalación que ya no necesita ningún programa. |
+| These files can't be cleaned up right now. | Estos archivos no se pueden limpiar ahora mismo. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Ahora mismo algo está usando Windows Installer, normalmente una actualización de Windows o un programa instalándose en segundo plano. Mover y Eliminar quedan en pausa mientras eso ocurre, de modo que InstallerClean no toca la caché de instalación mientras está cambiando. Cuando termine, vuelve a analizar y volverán a estar disponibles. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Hay una transacción anterior de Windows Installer suspendida en este equipo. Reanuda o revierte esa instalación (o reinicia Windows) antes de limpiar la caché. |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows tiene en cola, para el próximo reinicio, el cambio de nombre de un archivo que afecta a la caché de instalación. Reinicia Windows antes de limpiar. |
@@ -158,6 +159,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to the Recycle Bin | {0} {1} en la Papelera de reciclaje |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} en la Papelera de reciclaje. {2} {3} |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} en la Papelera de reciclaje. {2} {3} |
+| {0} {1} kept in place, needed again by a program since the scan. | {0} {1} conservados en su sitio: un programa ha vuelto a necesitarlos desde el análisis. |
+| Moved {0} of {1} {2} before you cancelled. | Cancelaste tras mover {0} de {1} {2}. |
+| Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Cancelaste tras mover {0} de {1} {2} a la Papelera de reciclaje. |
+| Permanently deleted {0} of {1} {2} before you cancelled. | Cancelaste tras eliminar definitivamente {0} de {1} {2}. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} eliminado definitivamente. No fue a la Papelera de reciclaje. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} eliminados definitivamente. No fueron a la Papelera de reciclaje. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} eliminado definitivamente. No fue a la Papelera de reciclaje. {2} {3} |
@@ -185,8 +190,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded files to clean up | {0} archivos innecesarios para limpiar |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | Falta {0} archivo registrado (no lo ha eliminado InstallerClean). Por ahora sin problemas, pero en el futuro una reparación, actualización o desinstalación de ese programa podría fallar. Abre Detalles para saber qué hacer. |
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | Faltan {0} archivos registrados (no los ha eliminado InstallerClean). Por ahora sin problemas, pero en el futuro una reparación, actualización o desinstalación de esos programas podría fallar. Abre Detalles para saber qué hacer. |
-| {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | Detectada {0} entrada MSI obsoleta (el archivo ya no está en el disco; InstallerClean no la quita del registro). |
-| {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | Detectadas {0} entradas MSI obsoletas (los archivos ya no están en el disco; InstallerClean no las quita del registro). |
+| Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do. | Windows todavía tiene registrado {0} parche antiguo cuyo archivo ya no está en el disco. No supone ningún problema y no tienes que hacer nada. |
+| Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do. | Windows todavía tiene registrados {0} parches antiguos cuyos archivos ya no están en el disco. No supone ningún problema y no tienes que hacer nada. |
 | {0} of {1} {2} | {0} de {1} {2} |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} huérfanos, {1} sustituidos, {2} obsoletos ({3}) |
 | {0} registered file that is still needed ({1}) | {0} archivo registrado aún necesario ({1}) |
@@ -200,20 +205,21 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Files will be moved to: | Los archivos se moverán a: |
 | Delete {0} {1} ({2})? | ¿Eliminar {0} {1} ({2})? |
 | Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Los archivos se moverán a la Papelera de reciclaje. Si quieres copias de seguridad, usa el botón Mover en su lugar. |
-| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. |
+| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | Esta carpeta está en la misma unidad, así que mover los archivos no liberará espacio por sí solo. Recuperarás el espacio cuando elimines los archivos de ahí, o puedes elegir una carpeta en otra unidad. |
 
 ## Error messages
 
 | English | Español |
 | --- | --- |
-| Access denied | Access denied |
-| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. |
+| Access denied | Acceso denegado |
+| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows le negó el acceso a InstallerClean. InstallerClean ya se está ejecutando como administrador, así que volver a iniciarlo de esa forma no servirá de nada.<br><br>Quedan dos causas probables: algún software de seguridad está bloqueando C:\Windows\Installer, o se han cambiado los permisos de la carpeta. Pausar el software de seguridad y volver a intentarlo es lo más rápido de descartar. |
 | Installer database unavailable | Base de datos del instalador no disponible |
 | Scan failed | Análisis fallido |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | La base de datos de Windows Installer parece estar vacía o inaccesible. Es algo inusual incluso en una instalación de Windows recién hecha y normalmente significa que la base de datos está dañada o que una herramienta de terceros la ha vaciado. Ejecutar 'sfc /scannow' desde un símbolo del sistema con privilegios elevados suele repararla. |
-| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer se negó a enumerar los productos instalados, e InstallerClean ya se está ejecutando como administrador, así que volver a ejecutarlo no servirá de nada. Puede que se hayan cambiado los permisos de los propios registros de instalación de Windows, o que algún software de seguridad los esté bloqueando. Vale la pena probar a ejecutar 'sfc /scannow' desde un símbolo del sistema con privilegios elevados. |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer se negó a enumerar los productos tras {0} errores consecutivos (último código de error {1}). Prueba a reiniciar Windows, o ejecuta 'sfc /scannow' desde un símbolo del sistema con privilegios elevados. |
 | Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer se negó a enumerar los parches de un producto tras {0} errores consecutivos (último código de error {1}). Prueba a reiniciar Windows, o ejecuta 'sfc /scannow' desde un símbolo del sistema con privilegios elevados. |
+| InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it. | InstallerClean no pudo contrastar este análisis con Windows: todo lo que Windows sigue teniendo registrado falta en la carpeta de la caché, mientras que los archivos de la carpeta no coinciden con nada que Windows conozca. Eso apunta a un problema al leer los registros de instalación, más que a archivos que puedas eliminar sin riesgo, así que no se ha ofrecido nada para limpiar. Reiniciar Windows y volver a analizar suele solucionarlo. |
 | Invalid destination | Destino no válido |
 | Could not write to destination | No se pudo escribir en el destino |
 | Move failed | Movimiento fallido |
@@ -231,6 +237,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | No se puede escribir en {0}. No se pudo escribir el archivo crash.log. |
 | File no longer exists. | El archivo ya no existe. |
 | Source file is a symlink or junction; refused for safety. | El archivo de origen es un enlace simbólico o un punto de unión; rechazado por seguridad. |
+| This file is not inside the Windows Installer folder; refused for safety. | Este archivo no está dentro de la carpeta de Windows Installer; rechazado por seguridad. |
 | Access denied. | Acceso denegado. |
 | The operation failed. Try again or restart Windows. | La operación falló. Inténtalo de nuevo o reinicia Windows. |
 | Unknown error. | Error desconocido. |
@@ -239,8 +246,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Este archivo está abierto o bloqueado por otro programa (error {0}). Cierra ese programa, o lo que sea que lo esté analizando, y vuelve a intentarlo, o usa el botón Mover en su lugar. |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | El archivo se eliminó definitivamente porque no se pudo mover a la Papelera de reciclaje. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Se rechaza mover archivos a la carpeta de Windows Installer (destino: {0}). |
-| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
-| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
+| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | La ubicación de destino tiene que ser una ruta completa a una carpeta, que empiece por una letra de unidad o un recurso compartido de red (por ejemplo D:\Backup o \\server\backup). InstallerClean no puede usar esta: {0} |
+| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | La ubicación de destino cambió mientras se movían los archivos (algo sustituyó o redirigió la carpeta), así que InstallerClean se detuvo en lugar de escribir en el lugar equivocado. Comprueba {0}, luego vuelve a analizar e inténtalo de nuevo. |
 | Cannot write to {0}. | No se puede escribir en {0}. |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | No se pudo encontrar un nombre de archivo único para '{0}' tras 10.000 intentos. |
 
@@ -264,8 +271,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Español |
 | --- | --- |
 | Couldn't open your browser | No se pudo abrir el navegador |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean no pudo abrir tu navegador. El enlace está en el portapapeles, así que puedes pegarlo tú mismo:<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean no pudo abrir tu navegador, y tampoco pudo copiar el enlace al portapapeles. El enlace es:<br><br>{0} |
 
 ## Sending the summary
 
@@ -412,6 +419,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Español |
 | --- | --- |
 | Unknown argument: '{0}' | Argumento desconocido: '{0}' |
+| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | Error: argumento extra inesperado '{0}'. Si la carpeta de destino tiene un espacio, escribe toda la ruta entre comillas: /m "D:\My Backup" |
 | Cancelling... | Cancelando... |
 | Cancelled. | Operación cancelada. |
 | Error: {0}. Details written to {1}. | Error: {0}. Detalles guardados en {1}. |
@@ -422,7 +430,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting {0} {1}... | Eliminando {0} {1}... |
 | Deleted {0} {1}. | Eliminados {0} {1}. |
 | Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Error: la Papelera de reciclaje no está disponible para este volumen, así que no se eliminó nada. Usa /m para mover los archivos en su lugar, o vuelve a activar la Papelera de reciclaje y ejecuta de nuevo. |
-| Error: no move destination specified. Use /m PATH or set a default in the GUI. | Error: no se especificó ningún destino de movimiento. Usa /m RUTA o establece un valor predeterminado en la GUI. |
+| Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Error: no se ha especificado un destino para mover. Usa /m RUTA. (Una ubicación predeterminada configurada en la GUI se guarda por usuario y no se aplica a las ejecuciones programadas ni a las de cuenta de servicio.) |
 | Error: destination cannot be inside the Windows Installer folder. | Error: el destino no puede estar dentro de la carpeta de Windows Installer. |
 | Error: destination must be a fully qualified path. Got: {0} | Error: el destino debe ser una ruta completa. Recibido: {0} |
 | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Error: el destino {0} se encuentra dentro de una carpeta del sistema de Windows. Elige una ruta fuera de %SystemRoot%, %ProgramFiles% y %ProgramData%. |
@@ -444,6 +452,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli es un verdadero proceso de consola y bloquea el |
 | until it finishes; redirect or pipe its output as you would any | símbolo del sistema hasta que termina; redirige o canaliza su salida como |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | con cualquier otro ejecutable de consola. La GUI está en InstallerClean.exe. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | La ubicación predeterminada guardada es por usuario; las ejecuciones programadas o con la cuenta SYSTEM necesitan /m RUTA. |
 | Exit codes: | Códigos de salida: |
 |   0   success: every flagged file was processed |   0   correcto: se procesó cada archivo señalado |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   error: no se procesó nada (argumentos incorrectos, análisis fallido, todos los archivos fallaron) |

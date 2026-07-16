@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed ({0}). The crash log could not be written. | Taşıma başarısız oldu ({0}). Çökme günlüğü yazılamadı. |
 | Delete failed ({0}). Details in {1}. | Silme başarısız oldu ({0}). Ayrıntılar {1} içinde. |
 | Delete failed ({0}). The crash log could not be written. | Silme başarısız oldu ({0}). Çökme günlüğü yazılamadı. |
-| Access denied. Windows refused the scan. | Access denied. Windows refused the scan. |
+| Access denied. Windows refused the scan. | Erişim reddedildi. Windows taramayı reddetti. |
 | Scan failed: installer database unavailable. | Tarama başarısız: yükleyici veritabanı kullanılamıyor. |
 | Scan cancelled. | Tarama iptal edildi. |
 | Ready | Hazır |
@@ -114,8 +114,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The unneeded files below are safe to delete. | Aşağıdaki gereksiz dosyalar güvenle silinebilir. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Bu dosyalar C:\Windows\Installer içinde yer alır; bir program kaldırıldığında ({0}), daha yeni bir yama bir öncekinin yerini aldığında ({1}) ya da yayımcı onu geri çektiğinde ({2}) geride kalır. InstallerClean her zaman yalnızca Windows'un kendisinin işi bittiğini bildirdiği dosyaları listeler. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Onları Geri Dönüşüm Kutusu'na silin ya da bir kopyasını saklamak isterseniz bunun yerine Taşı'yı kullanın. |
-| Nothing scanned yet. | Nothing scanned yet. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. |
+| Nothing scanned yet. | Henüz tarama yapılmadı. |
+| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Hiçbir programın hâlâ ihtiyaç duymadığı yükleyici dosyaları için C:\Windows\Installer klasörüne bakmak üzere Yeniden tara'ya basın. |
+| These files can't be cleaned up right now. | Bu dosyalar şu anda temizlenemez. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Şu anda bir şey Windows Installer'ı kullanıyor; genellikle bir Windows Update ya da arka planda kurulan bir program. Bu sürerken Taşı ve Sil duraklatılır, böylece InstallerClean değişmekte olan yükleyici önbelleğine dokunmaz. İşlem bittiğinde Yeniden tara'yı kullanın, geri gelirler. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Bu makinede önceki bir Windows Installer işlemi askıya alınmış durumda. Önbelleği temizlemeden önce o kurulumu sürdürün ya da geri alın (veya Windows'u yeniden başlatın). |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows, bir sonraki yeniden başlatmada yükleyici önbelleğini etkileyen bir dosya yeniden adlandırması sıraya almış. Temizlemeden önce Windows'u yeniden başlatın. |
@@ -130,7 +131,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Türkçe |
 | --- | --- |
-| Orphaned | Yetim |
+| Orphaned | Sahipsiz |
 | Superseded | Yerine geçilmiş |
 | Obsoleted | Geçersiz kılınmış |
 
@@ -144,7 +145,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Copy them back if anything breaks ([it won't!]). | Bir şey bozulursa onları geri kopyalayın ([bozulmaz!]). |
 | Until then, you can restore them if anything breaks ([it won't!]). | O zamana kadar, bir şey bozulursa onları geri yükleyebilirsiniz ([bozulmaz!]). |
 | Empty it to actually reclaim the space. | Alanı gerçekten geri kazanmak için onu boşaltın. |
-| {0} freed | {0} açıldı |
+| {0} freed | {0} yer açıldı |
 | {0} cleaned up | {0} temizlendi |
 | {0} moved | {0} taşındı |
 | {0} moved, some files could not be processed | {0} taşındı, bazı dosyalar işlenemedi |
@@ -158,12 +159,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to the Recycle Bin | {0} {1} Geri Dönüşüm Kutusu'na taşındı |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} Geri Dönüşüm Kutusu'na taşındı. {2} {3} |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} Geri Dönüşüm Kutusu'na taşındı. {2} {3} |
+| {0} {1} kept in place, needed again by a program since the scan. | Taramadan bu yana bir programın yeniden ihtiyaç duyduğu {0} {1} yerinde bırakıldı. |
+| Moved {0} of {1} {2} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi taşındı. |
+| Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi Geri Dönüşüm Kutusu'na taşındı. |
+| Permanently deleted {0} of {1} {2} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi kalıcı olarak silindi. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. {2} {3} |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | {0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. {2} {3} |
-| That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
-| That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
+| That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
+| That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
 
 ## Recycle Bin unavailable
 
@@ -172,8 +177,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The Recycle Bin isn't available for this drive | Bu sürücü için Geri Dönüşüm Kutusu kullanılamıyor |
 | So this {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently. | Bu yüzden bu {1} ({2}) silinmedi. Güvenli bir yere taşıyabilir ya da kalıcı olarak silebilirsiniz. |
 | So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently. | Bu yüzden bu {0} {1} ({2}) silinmedi. Güvenli bir yere taşıyabilir ya da kalıcı olarak silebilirsiniz. |
-| Deleting it is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla, ve Geri Dönüşüm Kutusu yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
-| Deleting them is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla, ve Geri Dönüşüm Kutusu yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
+| Deleting it is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez; Geri Dönüşüm Kutusu ise yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
+| Deleting them is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez; Geri Dönüşüm Kutusu ise yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
 
 ## Summaries and counts
 
@@ -185,10 +190,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded files to clean up | temizlenecek {0} gereksiz dosya |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride bir onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın. |
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | {0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride bir onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın. |
-| {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | {0} eski MSI kaydı algılandı (dosya diskten çoktan silinmiş; InstallerClean bu kaydı silmez). |
-| {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | {0} eski MSI kaydı algılandı (dosya diskten çoktan silinmiş; InstallerClean bu kaydı silmez). |
+| Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do. | Windows, dosyası diskte artık bulunmayan {0} eski yamayı hâlâ listeliyor. Bunun bir zararı yok ve yapmanız gereken bir şey yok. |
+| Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do. | Windows, dosyası diskte artık bulunmayan {0} eski yamayı hâlâ listeliyor. Bunun bir zararı yok ve yapmanız gereken bir şey yok. |
 | {0} of {1} {2} | {1} {2} içinden {0} |
-| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} yetim, {1} yerine geçilmiş, {2} geçersiz kılınmış ({3}) |
+| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} sahipsiz, {1} yerine geçilmiş, {2} geçersiz kılınmış ({3}) |
 | {0} registered file that is still needed ({1}) | {0} kayıtlı dosya hâlâ gerekli ({1}) |
 | {0} registered files that are still needed ({1}) | {0} kayıtlı dosya hâlâ gerekli ({1}) |
 
@@ -200,20 +205,21 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Files will be moved to: | Dosyalar şu konuma taşınacak: |
 | Delete {0} {1} ({2})? | {0} {1} ({2}) silinsin mi? |
 | Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Dosyalar Geri Dönüşüm Kutusu'na taşınacak. Yedek kopya isterseniz bunun yerine Taşı düğmesini kullanın. |
-| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. |
+| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | Bu klasör aynı sürücüde olduğu için taşımak tek başına yer açmaz. Dosyaları oradan sildiğinizde yeri geri kazanırsınız ya da bunun yerine başka bir sürücüde bir klasör seçebilirsiniz. |
 
 ## Error messages
 
 | English | Türkçe |
 | --- | --- |
-| Access denied | Access denied |
-| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. |
+| Access denied | Erişim reddedildi |
+| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows, InstallerClean'in erişimini reddetti. InstallerClean zaten yönetici olarak çalışıyor, bu yüzden onu bu şekilde yeniden başlatmak işe yaramaz.<br><br>Geriye iki olası neden kalıyor: bir güvenlik yazılımı C:\Windows\Installer'ı meşgul tutuyor ya da klasörün izinleri değiştirilmiş. Bunu elemenin en hızlı yolu, güvenlik yazılımını duraklatıp yeniden denemektir. |
 | Installer database unavailable | Yükleyici veritabanı kullanılamıyor |
 | Scan failed | Tarama başarısız |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Windows Installer veritabanı boş ya da erişilemez görünüyor. Bu, yeni bir Windows kurulumunda bile olağan dışıdır ve genellikle veritabanının bozuk olduğu ya da üçüncü taraf bir aracın onu temizlediği anlamına gelir. Yükseltilmiş bir komut isteminden 'sfc /scannow' çalıştırmak genellikle onu onarır. |
-| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer, yüklü ürünleri listelemeyi reddetti ve InstallerClean zaten yönetici olarak çalışıyor, bu yüzden onu yeniden çalıştırmak işe yaramaz. Windows'un kendi yükleyici kayıtlarındaki izinler değiştirilmiş olabilir ya da bir güvenlik yazılımı bunları engelliyor olabilir. Yükseltilmiş bir komut isteminden 'sfc /scannow' çalıştırmak denemeye değer. |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer, {0} ardışık hatadan sonra ürünleri listelemeyi reddetti (son hata kodu {1}). Windows'u yeniden başlatmayı deneyin ya da yükseltilmiş bir komut isteminden 'sfc /scannow' çalıştırın. |
 | Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer, {0} ardışık hatadan sonra bir ürünün yamalarını listelemeyi reddetti (son hata kodu {1}). Windows'u yeniden başlatmayı deneyin ya da yükseltilmiş bir komut isteminden 'sfc /scannow' çalıştırın. |
+| InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it. | InstallerClean bu taramayı Windows ile çapraz denetleyemedi: Windows'un hâlâ listelediği her şey önbellek klasöründe yok, klasördeki dosyalar ise Windows'un bildiği hiçbir şeyle eşleşmiyor. Bu, güvenle kaldırabileceğiniz dosyalardan çok yükleyici kayıtlarını okumakta bir soruna işaret ediyor, bu yüzden temizlik için hiçbir şey sunulmadı. Windows'u yeniden başlatıp yeniden taramak genellikle bunu giderir. |
 | Invalid destination | Geçersiz hedef |
 | Could not write to destination | Hedefe yazılamadı |
 | Move failed | Taşıma başarısız |
@@ -231,6 +237,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | {0} konumuna yazılamıyor. Çökme günlüğü yazılamadı. |
 | File no longer exists. | Dosya artık yok. |
 | Source file is a symlink or junction; refused for safety. | Kaynak dosya bir sembolik bağlantı ya da bağlantı noktası (junction); güvenlik için reddedildi. |
+| This file is not inside the Windows Installer folder; refused for safety. | Bu dosya Windows Installer klasörünün içinde değil; güvenlik için reddedildi. |
 | Access denied. | Erişim reddedildi. |
 | The operation failed. Try again or restart Windows. | İşlem başarısız oldu. Yeniden deneyin ya da Windows'u yeniden başlatın. |
 | Unknown error. | Bilinmeyen hata. |
@@ -239,8 +246,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Bu dosya başka bir program tarafından açık ya da kilitli (hata {0}). O programı, ya da onu tarayan her ne varsa kapatıp yeniden deneyin ya da bunun yerine Taşı düğmesini kullanın. |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | Geri Dönüşüm Kutusu'na taşınamadığı için dosya kalıcı olarak silindi. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Dosyaların Windows Installer klasörüne taşınması reddediliyor (hedef: {0}). |
-| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
-| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
+| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | Taşıma konumu, bir sürücü harfiyle ya da ağ paylaşımıyla başlayan ve bir klasöre giden tam bir yol olmalıdır (örneğin D:\Backup ya da \\server\backup). InstallerClean bunu kullanamaz: {0} |
+| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | Dosyalar taşınırken Taşıma konumu değişti (bir şey klasörü değiştirdi ya da başka bir yere yönlendirdi), bu yüzden InstallerClean yanlış yere yazmaktansa durdu. {0} konumunu kontrol edin, ardından Yeniden tara ile tekrar deneyin. |
 | Cannot write to {0}. | {0} konumuna yazılamıyor. |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | '{0}' için 10.000 denemeden sonra benzersiz bir dosya adı bulunamadı. |
 
@@ -264,8 +271,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Türkçe |
 | --- | --- |
 | Couldn't open your browser | Tarayıcınız açılamadı |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean tarayıcınızı açamadı. Bağlantı panonuzda, böylece onu kendiniz yapıştırabilirsiniz:<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean tarayıcınızı açamadı ve bağlantıyı panonuza da kopyalayamadı. Bağlantı şu:<br><br>{0} |
 
 ## Sending the summary
 
@@ -412,6 +419,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Türkçe |
 | --- | --- |
 | Unknown argument: '{0}' | Bilinmeyen argüman: '{0}' |
+| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | Hata: beklenmeyen fazladan argüman '{0}'. Taşıma klasörünüzün adında boşluk varsa tüm yolu tırnak içine alın: /m "D:\My Backup" |
 | Cancelling... | İptal ediliyor... |
 | Cancelled. | İptal edildi. |
 | Error: {0}. Details written to {1}. | Hata: {0}. Ayrıntılar {1} içine yazıldı. |
@@ -422,7 +430,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting {0} {1}... | {0} {1} siliniyor... |
 | Deleted {0} {1}. | {0} {1} silindi. |
 | Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Hata: bu birim için Geri Dönüşüm Kutusu kullanılamıyor, bu yüzden hiçbir şey silinmedi. Dosyaları taşımak için /m kullanın ya da Geri Dönüşüm Kutusu'nu yeniden etkinleştirip tekrar çalıştırın. |
-| Error: no move destination specified. Use /m PATH or set a default in the GUI. | Hata: taşıma hedefi belirtilmedi. /m YOL kullanın ya da GUI'de bir varsayılan ayarlayın. |
+| Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Hata: taşıma hedefi belirtilmedi. /m YOL kullanın. (GUI'de ayarlanan bir varsayılan, kullanıcıya özeldir ve zamanlanmış ya da hizmet hesabı çalıştırmaları için geçerli değildir.) |
 | Error: destination cannot be inside the Windows Installer folder. | Hata: hedef, Windows Installer klasörünün içinde olamaz. |
 | Error: destination must be a fully qualified path. Got: {0} | Hata: hedef, tam nitelenmiş bir yol olmalıdır. Alınan: {0} |
 | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Hata: {0} hedefi bir Windows sistem klasörünün altına çözümleniyor. %SystemRoot%, %ProgramFiles% ve %ProgramData% dışında bir yol seçin. |
@@ -444,6 +452,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli gerçek bir konsol işlemidir ve bitene kadar istemi |
 | until it finishes; redirect or pipe its output as you would any | bloke eder; çıktısını başka herhangi bir konsol exe'sinde olduğu gibi |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | yönlendirin ya da boruya verin. GUI, yanındaki InstallerClean.exe'dedir. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Kaydedilen varsayılan kullanıcıya özeldir; zamanlanmış ya da SYSTEM çalıştırmaları /m YOL gerektirir. |
 | Exit codes: | Çıkış kodları: |
 |   0   success: every flagged file was processed |   0   başarılı: işaretlenen her dosya işlendi |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   hata: hiçbir şey işlenmedi (hatalı argümanlar, tarama başarısız, tüm dosyalar başarısız) |

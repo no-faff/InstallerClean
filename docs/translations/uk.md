@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed ({0}). The crash log could not be written. | Не вдалося перемістити ({0}). Не вдалося записати журнал збоїв. |
 | Delete failed ({0}). Details in {1}. | Не вдалося видалити ({0}). Деталі у {1}. |
 | Delete failed ({0}). The crash log could not be written. | Не вдалося видалити ({0}). Не вдалося записати журнал збоїв. |
-| Access denied. Windows refused the scan. | Access denied. Windows refused the scan. |
+| Access denied. Windows refused the scan. | Відмовлено в доступі. Windows відхилив сканування. |
 | Scan failed: installer database unavailable. | Збій сканування: база даних інсталятора недоступна. |
 | Scan cancelled. | Сканування скасовано. |
 | Ready | Готово |
@@ -114,15 +114,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The unneeded files below are safe to delete. | Наведені нижче непотрібні файли можна безпечно видалити. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Вони лежать у C:\Windows\Installer, лишившись після видалення програми ({0}), заміни старого патча новішим ({1}) чи відкликання видавцем ({2}). InstallerClean перелічує лише ті файли, які сама Windows позначає як завершені. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Видаліть їх до Кошика, або скористайтеся натомість функцією «Перемістити», якщо хочете зберегти копію. |
-| Nothing scanned yet. | Nothing scanned yet. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. |
+| Nothing scanned yet. | Ще нічого не проскановано. |
+| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Натисніть «Повторити сканування», щоб переглянути C:\Windows\Installer і знайти файли інсталятора, яких уже не потребує жодна програма. |
+| These files can't be cleaned up right now. | Ці файли зараз не можна прибрати. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Щось саме зараз використовує Windows Installer, зазвичай це Windows Update або програма, що встановлюється у фоні. Переміщення та видалення призупинено, доки це триває, тож InstallerClean не чіпатиме кеш інсталятора, поки той змінюється. Коли це завершиться, виконайте повторне сканування, і вони повернуться. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | На цій машині призупинено попередню транзакцію Windows Installer. Поновіть або відкотіть те встановлення (чи перезавантажте Windows), перш ніж очищати кеш. |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows має перейменування файлу, поставлене в чергу на наступне перезавантаження, яке стосується кешу інсталятора. Перезавантажте Windows, перш ніж очищати. |
 | Select a file to view details. | Виберіть файл, щоб переглянути деталі. |
 | Select a product to view details. | Виберіть продукт, щоб переглянути деталі. |
 | No metadata available. | Метадані недоступні. |
-| This installer file has been deleted. InstallerClean didn't do it, it never removes a file a program still needs; something else deleted this one before you ran InstallerClean.<br><br>It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself. | Цей файл інсталятора видалено. InstallerClean цього не робив, він ніколи не видаляє файл, який ще потрібен програмі; цей видалило щось інше, перш ніж ви запустили InstallerClean.<br><br>Зараз це не завдає клопоту і не завдаватиме аж до дня, коли ви спробуєте відновити, оновити чи видалити програму, якій він належить. Тоді цей крок може не вдатися, бо Windows шукатиме цей файл, а його там немає.<br><br>Щоб спробувати це виправити, завантажте інсталятор тієї програми в її виробника та запустіть його поверх наявної копії (не видаляйте програму спершу, бо видалення саме по собі є кроком, який потребує цього файлу). Якщо можете дістати ту версію, яку ви встановили, використайте її, бо Windows може відхилити іншу. Зазвичай це відновлює файл, і ваші налаштування звичайно лишаються недоторканими, але Microsoft цього не гарантує, її власний останній засіб — це перевстановлення програми або самої Windows. |
+| This installer file has been deleted. InstallerClean didn't do it, it never removes a file a program still needs; something else deleted this one before you ran InstallerClean.<br><br>It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself. | Цей файл інсталятора видалено. InstallerClean цього не робив, він ніколи не видаляє файл, який ще потрібен програмі; цей видалило щось інше, перш ніж ви запустили InstallerClean.<br><br>Зараз це не завдає клопоту і не завдаватиме аж до дня, коли ви спробуєте відновити, оновити чи видалити програму, якій він належить. Тоді цей крок може не вдатися, бо Windows шукатиме цей файл, а його там немає.<br><br>Щоб спробувати це виправити, завантажте інсталятор тієї програми від її виробника та запустіть його поверх наявної копії (не видаляйте програму спершу, бо видалення саме по собі є кроком, який потребує цього файлу). Якщо можете дістати ту версію, яку ви встановили, використайте її, бо Windows може відхилити іншу. Зазвичай це відновлює файл, і ваші налаштування звичайно лишаються недоторканими, але Microsoft цього не гарантує, її власний останній засіб — це перевстановлення програми або самої Windows. |
 | The README [explains this folder], and how to recover a file, in Microsoft's own words. | README [пояснює цю папку] і як відновити файл, словами самої Microsoft. |
 | (none) | (немає) |
 
@@ -158,6 +159,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to the Recycle Bin | {0} {1} переміщено до Кошика |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} переміщено до Кошика. {2} {3} |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} переміщено до Кошика. {2} {3} |
+| {0} {1} kept in place, needed again by a program since the scan. | {0} {1} залишено на місці: після сканування вони знову знадобилися програмі. |
+| Moved {0} of {1} {2} before you cancelled. | Переміщено {0} з {1} {2}, перш ніж ви скасували. |
+| Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Переміщено {0} з {1} {2} до Кошика, перш ніж ви скасували. |
+| Permanently deleted {0} of {1} {2} before you cancelled. | Безповоротно видалено {0} з {1} {2}, перш ніж ви скасували. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} безповоротно видалено. Він не потрапив до Кошика. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} безповоротно видалено. Вони не потрапили до Кошика. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} безповоротно видалено. Він не потрапив до Кошика. {2} {3} |
@@ -185,8 +190,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded files to clean up | {0} непотрібних файлів для очищення |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} зареєстрований файл відсутній (його не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тієї програми може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити. |
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | {0} зареєстрованих файлів відсутні (їх не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тих програм може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити. |
-| {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | Виявлено {0} застарілий запис MSI (файл уже зник з диска; InstallerClean не скасовує його реєстрації). |
-| {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | Виявлено {0} застарілих записів MSI (файли вже зникли з диска; InstallerClean не скасовує їхньої реєстрації). |
+| Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do. | Windows досі має в списку {0} старий патч, файл якого вже зник з диска. Це нешкідливо, і вам нічого не потрібно робити. |
+| Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do. | Windows досі має в списку {0} старих патчів, файли яких уже зникли з диска. Це нешкідливо, і вам нічого не потрібно робити. |
 | {0} of {1} {2} | {0} з {1} {2} |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} осиротілих, {1} заміщених, {2} застарілих ({3}) |
 | {0} registered file that is still needed ({1}) | {0} зареєстрований файл, який ще потрібен ({1}) |
@@ -200,20 +205,21 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Files will be moved to: | Файли буде переміщено до: |
 | Delete {0} {1} ({2})? | Видалити {0} {1} ({2})? |
 | Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Файли буде переміщено до Кошика. Якщо ви хочете зберегти резервні копії, скористайтеся кнопкою «Перемістити». |
-| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. |
+| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | Ця папка на тому самому диску, тож саме переміщення не звільнить місця. Місце повернеться, коли ви видалите з неї файли, або ж можете натомість вибрати папку на іншому диску. |
 
 ## Error messages
 
 | English | Українська |
 | --- | --- |
-| Access denied | Access denied |
-| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. |
+| Access denied | Відмовлено в доступі |
+| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows відмовив InstallerClean у доступі. InstallerClean уже працює від імені адміністратора, тож повторний запуск у такий спосіб не допоможе.<br><br>Залишаються дві ймовірні причини: захисне програмне забезпечення тримає C:\Windows\Installer або було змінено дозволи на цю папку. Найшвидше перевірити першу: призупиніть захисне програмне забезпечення і спробуйте ще раз. |
 | Installer database unavailable | База даних інсталятора недоступна |
 | Scan failed | Збій сканування |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | База даних Windows Installer видається порожньою чи недоступною. Це незвично навіть на щойно встановленій Windows і зазвичай означає, що база даних пошкоджена або її очистив сторонній інструмент. Запуск «sfc /scannow» з командного рядка з підвищеними правами зазвичай її відновлює. |
-| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer відмовився перелічувати встановлені продукти, а InstallerClean уже працює від імені адміністратора, тож повторний запуск не допоможе. Можливо, було змінено дозволи на власні записи інсталятора Windows або їх блокує захисне програмне забезпечення. Варто спробувати запустити «sfc /scannow» з командного рядка з підвищеними правами. |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer відмовився перелічувати продукти після {0} послідовних збоїв (останній код помилки {1}). Спробуйте перезавантажити Windows або запустіть «sfc /scannow» з командного рядка з підвищеними правами. |
 | Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer відмовився перелічувати патчі продукту після {0} послідовних збоїв (останній код помилки {1}). Спробуйте перезавантажити Windows або запустіть «sfc /scannow» з командного рядка з підвищеними правами. |
+| InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it. | InstallerClean не зміг звірити це сканування з даними Windows: усе, що Windows досі перелічує, відсутнє в папці кешу, а файли в цій папці не відповідають нічому, що відоме Windows. Це вказує радше на проблему з читанням записів інсталятора, ніж на файли, які можна безпечно видалити, тож для очищення нічого не запропоновано. Зазвичай це виправляє перезавантаження Windows і повторне сканування. |
 | Invalid destination | Недійсне призначення |
 | Could not write to destination | Не вдалося записати в призначення |
 | Move failed | Не вдалося перемістити |
@@ -231,6 +237,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | Не вдається записати в {0}. Не вдалося записати журнал збоїв. |
 | File no longer exists. | Файл більше не існує. |
 | Source file is a symlink or junction; refused for safety. | Вихідний файл є символьним посиланням або junction; відмовлено з міркувань безпеки. |
+| This file is not inside the Windows Installer folder; refused for safety. | Цей файл не міститься в папці Windows Installer; відмовлено з міркувань безпеки. |
 | Access denied. | Відмовлено в доступі. |
 | The operation failed. Try again or restart Windows. | Операція не вдалася. Спробуйте ще раз або перезавантажте Windows. |
 | Unknown error. | Невідома помилка. |
@@ -239,8 +246,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | Цей файл відкритий або заблокований іншою програмою (помилка {0}). Закрийте цю програму чи те, що його сканує, а потім спробуйте ще раз або скористайтеся кнопкою «Перемістити». |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | Файл видалено безповоротно, бо його не вдалося перемістити до Кошика. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Відмова перемістити файли до папки Windows Installer (призначення: {0}). |
-| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
-| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
+| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | Розташування для переміщення має бути повним шляхом до папки, що починається з літери диска або мережевої папки (наприклад, D:\Backup чи \\server\backup). InstallerClean не може використати такий шлях: {0} |
+| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | Папка призначення змінилася, поки тривало переміщення (щось замінило чи перенаправило її), тож InstallerClean зупинився, щоб не записати файли не туди. Перевірте {0}, потім повторіть сканування і спробуйте ще раз. |
 | Cannot write to {0}. | Не вдається записати в {0}. |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | Не вдалося знайти унікальне ім'я файлу для «{0}» після 10 000 спроб. |
 
@@ -264,8 +271,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Українська |
 | --- | --- |
 | Couldn't open your browser | Не вдалося відкрити ваш браузер |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean не зміг відкрити ваш браузер. Посилання скопійовано до буфера обміну, тож ви можете вставити його самі:<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean не зміг відкрити ваш браузер і не зміг скопіювати посилання до буфера обміну. Ось воно:<br><br>{0} |
 
 ## Sending the summary
 
@@ -298,7 +305,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Donate | Підтримати |
 | It's thirsty work! | Робота не з легких, аж у горлі пересохло! |
-| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Скасування запитано. InstallerClean чекає, доки поточний крок дійде до точки зупинки. Це може зайняти кілька секунд під час інтенсивного вводу-виводу чи звернення до бази даних MSI. |
+| Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Скасування запитано. InstallerClean чекає, доки поточний крок дійде до точки зупинки. Це може тривати кілька секунд під час інтенсивного вводу-виводу чи звернення до бази даних MSI. |
 | Close | Закрити |
 | Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Лишіть зірку на GitHub, повідомте про проблему (Issue) чи напишіть в обговореннях (Discussions). Будь-який відгук вітається. |
 | or report an Issue or post in Discussions. Any feedback welcome. | або повідомте про проблему (Issue) чи напишіть в обговореннях (Discussions). Будь-який відгук вітається. |
@@ -412,17 +419,18 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Українська |
 | --- | --- |
 | Unknown argument: '{0}' | Невідомий аргумент: «{0}» |
+| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | Помилка: неочікуваний зайвий аргумент «{0}». Якщо в назві папки для переміщення є пробіл, візьміть увесь шлях у лапки: /m "D:\My Backup" |
 | Cancelling... | Скасування... |
 | Cancelled. | Скасовано. |
 | Error: {0}. Details written to {1}. | Помилка: {0}. Деталі записано до {1}. |
 | Error: {0}. The crash log could not be written. | Помилка: {0}. Не вдалося записати журнал збоїв. |
 | Scanning C:\Windows\Installer... | Сканування C:\Windows\Installer... |
 | Found {0} {1} to clean up ({2}). | Знайдено {0} {1} для очищення ({2}). |
-| Nothing to do. | Нічого робити. |
+| Nothing to do. | Немає чого робити. |
 | Deleting {0} {1}... | Видалення: {0} {1}... |
 | Deleted {0} {1}. | Видалено {0} {1}. |
 | Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Помилка: Кошик недоступний для цього тому, тож нічого не видалено. Скористайтеся /m, щоб перемістити файли натомість, або знову ввімкніть Кошик і запустіть ще раз. |
-| Error: no move destination specified. Use /m PATH or set a default in the GUI. | Помилка: не вказано призначення для переміщення. Скористайтеся /m ШЛЯХ або задайте типове в графічному інтерфейсі. |
+| Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Помилка: не вказано розташування для переміщення. Скористайтеся /m ШЛЯХ. (Типове значення, задане в графічному інтерфейсі, діє лише для поточного користувача і не застосовується до запусків за розкладом чи від імені службового облікового запису.) |
 | Error: destination cannot be inside the Windows Installer folder. | Помилка: призначення не може бути всередині папки Windows Installer. |
 | Error: destination must be a fully qualified path. Got: {0} | Помилка: призначення має бути повним шляхом. Отримано: {0} |
 | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Помилка: призначення {0} вказує всередину системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles% та %ProgramData%. |
@@ -443,10 +451,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m ШЛЯХ    Перемістити за вказаним шляхом |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli — це консольний процес, що блокує командний рядок до |
 | until it finishes; redirect or pipe its output as you would any | завершення; перенаправляйте чи передавайте його вивід, як у будь-якого |
-| other console exe. The GUI lives in InstallerClean.exe alongside it. | іншого консольного exe. Графічний інтерфейс, у InstallerClean.exe поруч. |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | іншого консольного exe. Графічний інтерфейс міститься поруч, у InstallerClean.exe. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Збережене типове розташування діє лише для поточного користувача; для запусків за розкладом чи від імені SYSTEM потрібно вказати /m ШЛЯХ. |
 | Exit codes: | Коди виходу: |
 |   0   success: every flagged file was processed |   0   успіх: оброблено кожен позначений файл |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   невдача: нічого не оброблено (хибні аргументи, збій сканування, усі файли) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   невдача: нічого не оброблено (хибні аргументи, збій сканування, усі файли зазнали збою) |
 |   2   partial: some files processed, some failed |   2   частково: частину файлів оброблено, частину ні |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  тимчасова: запуск заблокувала тимчасова умова (див. повідомлення) |
 |   130 cancelled (Ctrl+C) |   130 скасовано (Ctrl+C) |

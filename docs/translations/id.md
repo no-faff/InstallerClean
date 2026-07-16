@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed ({0}). The crash log could not be written. | Pemindahan gagal ({0}). Log kerusakan tidak bisa ditulis. |
 | Delete failed ({0}). Details in {1}. | Penghapusan gagal ({0}). Detail di {1}. |
 | Delete failed ({0}). The crash log could not be written. | Penghapusan gagal ({0}). Log kerusakan tidak bisa ditulis. |
-| Access denied. Windows refused the scan. | Access denied. Windows refused the scan. |
+| Access denied. Windows refused the scan. | Akses ditolak. Windows menolak pemindaian. |
 | Scan failed: installer database unavailable. | Pemindaian gagal: basis data penginstal tidak tersedia. |
 | Scan cancelled. | Pemindaian dibatalkan. |
 | Ready | Siap |
@@ -112,12 +112,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Bahasa Indonesia |
 | --- | --- |
 | The unneeded files below are safe to delete. | File yang tidak diperlukan di bawah ini aman dihapus. |
-| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | File-file ini berada di C:\Windows\Installer, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mendaftar file yang Windows sendiri laporkan sudah tidak terpakai. |
+| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | File-file ini berada di C:\Windows\Installer, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mencantumkan file yang Windows sendiri laporkan sudah tidak terpakai. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Hapus ke Keranjang Sampah, atau gunakan Pindahkan sebagai gantinya jika Anda lebih suka menyimpan salinan. |
-| Nothing scanned yet. | Nothing scanned yet. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. |
+| Nothing scanned yet. | Belum ada yang dipindai. |
+| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Tekan Pindai ulang untuk menelusuri C:\Windows\Installer mencari file penginstal yang tidak lagi diperlukan program mana pun. |
+| These files can't be cleaned up right now. | File-file ini tidak bisa dibersihkan sekarang. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Ada sesuatu yang sedang menggunakan Windows Installer saat ini, biasanya Windows Update atau program yang memasang di latar belakang. Pindahkan dan Hapus dijeda selama itu berjalan, sehingga InstallerClean tidak menyentuh cache penginstal saat sedang berubah. Setelah selesai, Pindai ulang dan keduanya kembali. |
-| A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Ada transaksi Windows Installer sebelumnya yang tertunda di mesin ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache. |
+| A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Ada transaksi Windows Installer sebelumnya yang ditangguhkan di komputer ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache. |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows memiliki antrean penggantian nama file untuk mulai ulang berikutnya yang memengaruhi cache Installer. Mulai ulang Windows sebelum membersihkan. |
 | Select a file to view details. | Pilih file untuk melihat detail. |
 | Select a product to view details. | Pilih produk untuk melihat detail. |
@@ -130,7 +131,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Bahasa Indonesia |
 | --- | --- |
-| Orphaned | Yatim |
+| Orphaned | Terisolasi |
 | Superseded | Digantikan |
 | Obsoleted | Usang |
 
@@ -158,6 +159,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to the Recycle Bin | {0} {1} dipindahkan ke Keranjang Sampah |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} dipindahkan ke Keranjang Sampah. {2} {3} |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} dipindahkan ke Keranjang Sampah. {2} {3} |
+| {0} {1} kept in place, needed again by a program since the scan. | {0} {1} dibiarkan di tempatnya, kembali diperlukan sebuah program sejak pemindaian. |
+| Moved {0} of {1} {2} before you cancelled. | {0} dari {1} {2} dipindahkan sebelum Anda membatalkan. |
+| Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | {0} dari {1} {2} dipindahkan ke Keranjang Sampah sebelum Anda membatalkan. |
+| Permanently deleted {0} of {1} {2} before you cancelled. | {0} dari {1} {2} dihapus permanen sebelum Anda membatalkan. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. {2} {3} |
@@ -185,10 +190,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded files to clean up | {0} file tidak diperlukan untuk dibersihkan |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} file terdaftar hilang (bukan dihapus oleh InstallerClean). Tidak masalah sekarang, tetapi perbaikan, pembaruan, atau penghapusan instalasi program itu di kemudian hari bisa gagal. Buka Detail untuk tahu apa yang harus dilakukan. |
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | {0} file terdaftar hilang (bukan dihapus oleh InstallerClean). Tidak masalah sekarang, tetapi perbaikan, pembaruan, atau penghapusan instalasi program-program itu di kemudian hari bisa gagal. Buka Detail untuk tahu apa yang harus dilakukan. |
-| {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | {0} entri MSI usang terdeteksi (file sudah hilang dari disk; InstallerClean tidak membatalkan pendaftarannya). |
-| {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | {0} entri MSI usang terdeteksi (file sudah hilang dari disk; InstallerClean tidak membatalkan pendaftarannya). |
+| Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do. | Windows masih mendaftarkan {0} patch lama yang file-nya sudah tidak ada di disk. Itu tidak berbahaya, dan tidak ada yang perlu Anda lakukan. |
+| Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do. | Windows masih mendaftarkan {0} patch lama yang file-nya sudah tidak ada di disk. Itu tidak berbahaya, dan tidak ada yang perlu Anda lakukan. |
 | {0} of {1} {2} | {0} dari {1} {2} |
-| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} yatim, {1} digantikan, {2} usang ({3}) |
+| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} terisolasi, {1} digantikan, {2} usang ({3}) |
 | {0} registered file that is still needed ({1}) | {0} file terdaftar yang masih diperlukan ({1}) |
 | {0} registered files that are still needed ({1}) | {0} file terdaftar yang masih diperlukan ({1}) |
 
@@ -200,20 +205,21 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Files will be moved to: | File akan dipindahkan ke: |
 | Delete {0} {1} ({2})? | Hapus {0} {1} ({2})? |
 | Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | File akan dipindahkan ke Keranjang Sampah. Jika Anda ingin salinan cadangan, gunakan tombol Pindahkan sebagai gantinya. |
-| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. |
+| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | Folder ini berada di drive yang sama, jadi pemindahan itu sendiri tidak akan mengosongkan ruang apa pun. Ruangnya akan kembali saat Anda menghapus file di dalamnya, atau Anda bisa memilih folder di drive lain. |
 
 ## Error messages
 
 | English | Bahasa Indonesia |
 | --- | --- |
-| Access denied | Access denied |
-| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. |
+| Access denied | Akses ditolak |
+| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows menolak akses InstallerClean. InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi dengan cara itu tidak akan membantu.<br><br>Tinggal dua kemungkinan penyebabnya: perangkat lunak keamanan sedang menahan C:\Windows\Installer, atau izin folder itu telah diubah. Menjeda perangkat lunak keamanan lalu mencoba lagi adalah cara tercepat untuk menyingkirkan salah satu kemungkinan itu. |
 | Installer database unavailable | Basis data penginstal tidak tersedia |
 | Scan failed | Pemindaian gagal |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Basis data Windows Installer tampak kosong atau tidak bisa diakses. Ini tidak biasa bahkan pada Windows yang baru dipasang dan biasanya berarti basis data rusak atau alat pihak ketiga telah mengosongkannya. Menjalankan 'sfc /scannow' dari prompt dengan hak administrator biasanya memperbaikinya. |
-| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer menolak menampilkan daftar produk yang terpasang, dan InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi tidak akan membantu. Izin pada catatan penginstal milik Windows sendiri mungkin telah diubah, atau perangkat lunak keamanan mungkin memblokirnya. Menjalankan 'sfc /scannow' dari prompt dengan hak administrator layak dicoba. |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer menolak menampilkan daftar produk setelah {0} kali gagal berturut-turut (kode kesalahan terakhir {1}). Coba mulai ulang Windows, atau jalankan 'sfc /scannow' dari prompt dengan hak administrator. |
 | Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | Windows Installer menolak menampilkan daftar patch untuk sebuah produk setelah {0} kali gagal berturut-turut (kode kesalahan terakhir {1}). Coba mulai ulang Windows, atau jalankan 'sfc /scannow' dari prompt dengan hak administrator. |
+| InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it. | InstallerClean tidak bisa memeriksa silang pemindaian ini dengan Windows: semua yang masih didaftarkan Windows tidak ada di folder cache, sementara file-file di folder itu tidak cocok dengan apa pun yang Windows ketahui. Itu menunjukkan adanya masalah dalam membaca catatan penginstal, bukan file yang aman Anda hapus, jadi tidak ada yang ditawarkan untuk dibersihkan. Memulai ulang Windows lalu memindai lagi biasanya mengatasinya. |
 | Invalid destination | Tujuan tidak valid |
 | Could not write to destination | Tidak bisa menulis ke tujuan |
 | Move failed | Pemindahan gagal |
@@ -231,6 +237,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | Tidak bisa menulis ke {0}. Log kerusakan tidak bisa ditulis. |
 | File no longer exists. | File sudah tidak ada lagi. |
 | Source file is a symlink or junction; refused for safety. | File sumber adalah symlink atau junction; ditolak demi keamanan. |
+| This file is not inside the Windows Installer folder; refused for safety. | File ini tidak berada di dalam folder Windows Installer; ditolak demi keamanan. |
 | Access denied. | Akses ditolak. |
 | The operation failed. Try again or restart Windows. | Operasi gagal. Coba lagi atau mulai ulang Windows. |
 | Unknown error. | Kesalahan tidak diketahui. |
@@ -239,8 +246,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | File ini sedang dibuka atau dikunci oleh program lain (kesalahan {0}). Tutup program itu, atau apa pun yang sedang memindainya, lalu coba lagi, atau gunakan tombol Pindahkan sebagai gantinya. |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | File dihapus permanen karena tidak bisa dipindahkan ke Keranjang Sampah. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Menolak memindahkan file ke dalam folder Windows Installer (tujuan: {0}). |
-| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
-| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
+| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | Lokasi pemindahan harus berupa jalur lengkap ke sebuah folder, yang dimulai dengan huruf drive atau jalur jaringan (misalnya D:\Backup, atau \\server\backup). InstallerClean tidak bisa memakai yang ini: {0} |
+| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | Lokasi pemindahan berubah saat file sedang dipindahkan (ada sesuatu yang mengganti atau mengalihkan folder itu), jadi InstallerClean berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu Pindai ulang dan coba lagi. |
 | Cannot write to {0}. | Tidak bisa menulis ke {0}. |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | Tidak bisa menemukan nama file yang unik untuk '{0}' setelah 10.000 percobaan. |
 
@@ -264,8 +271,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Bahasa Indonesia |
 | --- | --- |
 | Couldn't open your browser | Tidak bisa membuka peramban Anda |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean tidak bisa membuka peramban Anda. Tautannya sudah ada di papan klip, jadi Anda bisa menempelkannya sendiri:<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean tidak bisa membuka peramban Anda, dan juga tidak bisa menyalin tautan ke papan klip. Tautannya:<br><br>{0} |
 
 ## Sending the summary
 
@@ -276,7 +283,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Sending failed. Try again later. | Pengiriman gagal. Coba lagi nanti. |
 | No report to send. | Tidak ada laporan untuk dikirim. |
 | Send this? | Kirim ini? |
-| It goes to nofaff.netlify.app/api/result-log. Nothing identifies you or your machine; it just lets me know InstallerClean's working and [how much space people are freeing]. | Dikirim ke nofaff.netlify.app/api/result-log. Tidak ada yang mengidentifikasi Anda atau mesin Anda; ini hanya memberi tahu saya bahwa InstallerClean berfungsi dan [berapa banyak ruang yang dikosongkan orang-orang]. |
+| It goes to nofaff.netlify.app/api/result-log. Nothing identifies you or your machine; it just lets me know InstallerClean's working and [how much space people are freeing]. | Dikirim ke nofaff.netlify.app/api/result-log. Tidak ada yang mengidentifikasi Anda atau komputer Anda; ini hanya memberi tahu saya bahwa InstallerClean berfungsi dan [berapa banyak ruang yang dikosongkan orang-orang]. |
 
 ## Startup and crashes
 
@@ -297,7 +304,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Bahasa Indonesia |
 | --- | --- |
 | Donate | Donasi |
-| It's thirsty work! | Bikin haus, lho! |
+| It's thirsty work! | Membuat haus! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa memakan waktu beberapa detik saat I/O berat atau panggilan basis data MSI. |
 | Close | Tutup |
 | Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Beri bintang di GitHub, laporkan Issue, atau tulis di Discussions. Masukan apa pun diterima. |
@@ -412,6 +419,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Bahasa Indonesia |
 | --- | --- |
 | Unknown argument: '{0}' | Argumen tidak dikenal: '{0}' |
+| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | Kesalahan: argumen tambahan yang tidak terduga '{0}'. Jika folder pemindahan Anda mengandung spasi, apit seluruh jalur dengan tanda kutip: /m "D:\My Backup" |
 | Cancelling... | Membatalkan... |
 | Cancelled. | Dibatalkan. |
 | Error: {0}. Details written to {1}. | Kesalahan: {0}. Detail ditulis ke {1}. |
@@ -422,12 +430,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting {0} {1}... | Menghapus {0} {1}... |
 | Deleted {0} {1}. | {0} {1} dihapus. |
 | Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Kesalahan: Keranjang Sampah tidak tersedia untuk volume ini, jadi tidak ada yang dihapus. Gunakan /m untuk memindahkan file, atau aktifkan kembali Keranjang Sampah dan jalankan lagi. |
-| Error: no move destination specified. Use /m PATH or set a default in the GUI. | Kesalahan: tujuan pemindahan tidak ditentukan. Gunakan /m JALUR atau atur default di GUI. |
+| Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Kesalahan: tujuan pemindahan tidak ditentukan. Gunakan /m JALUR. (Default yang diatur di GUI bersifat per-pengguna dan tidak berlaku untuk tugas terjadwal atau proses akun layanan.) |
 | Error: destination cannot be inside the Windows Installer folder. | Kesalahan: tujuan tidak boleh berada di dalam folder Windows Installer. |
 | Error: destination must be a fully qualified path. Got: {0} | Kesalahan: tujuan harus berupa jalur absolut lengkap. Diterima: {0} |
 | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Kesalahan: tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, dan %ProgramData%. |
 | Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | Kesalahan: ada sesuatu yang sedang menggunakan Windows Installer saat ini, biasanya Windows Update atau program yang memasang di latar belakang. Pindahkan dan Hapus diblokir selama itu berjalan. Coba lagi setelah selesai. |
-| Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Kesalahan: ada transaksi Windows Installer sebelumnya yang tertunda di mesin ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache. |
+| Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Kesalahan: ada transaksi Windows Installer sebelumnya yang ditangguhkan di komputer ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache. |
 | Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | Kesalahan: operasi file yang diantrekan setelah mulai ulang menyasar cache Installer ({0}). Mulai ulang Windows untuk menyelesaikan operasi itu sebelum membersihkan. |
 | Moving {0} {1} to {2}... | Memindahkan {0} {1} ke {2}... |
 | Moved {0} {1}. | {0} {1} dipindahkan. |
@@ -443,7 +451,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m JALUR   Pindahkan ke jalur yang ditentukan |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli adalah proses konsol sungguhan dan memblokir prompt |
 | until it finishes; redirect or pipe its output as you would any | sampai selesai; alihkan atau salurkan keluarannya seperti |
-| other console exe. The GUI lives in InstallerClean.exe alongside it. | executable konsol lainnya. GUI ada di InstallerClean.exe di sebelahnya. |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | file exe konsol lainnya. GUI ada di InstallerClean.exe di sebelahnya. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Lokasi default tersimpan bersifat per-pengguna; tugas terjadwal atau proses SYSTEM memerlukan /m JALUR. |
 | Exit codes: | Kode keluar: |
 |   0   success: every flagged file was processed |   0   berhasil: setiap file yang ditandai telah diproses |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   gagal: tidak ada yang diproses (argumen salah, pemindaian gagal, semua file gagal) |

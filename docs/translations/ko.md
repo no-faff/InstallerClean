@@ -100,7 +100,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed ({0}). The crash log could not be written. | 이동 실패 ({0}). 크래시 로그를 기록할 수 없었습니다. |
 | Delete failed ({0}). Details in {1}. | 삭제 실패 ({0}). 자세한 내용은 {1}에 있습니다. |
 | Delete failed ({0}). The crash log could not be written. | 삭제 실패 ({0}). 크래시 로그를 기록할 수 없었습니다. |
-| Access denied. Windows refused the scan. | Access denied. Windows refused the scan. |
+| Access denied. Windows refused the scan. | 액세스가 거부되었습니다. Windows가 검사를 거부했습니다. |
 | Scan failed: installer database unavailable. | 검사 실패: 설치 관리자 데이터베이스를 사용할 수 없습니다. |
 | Scan cancelled. | 검사가 취소되었습니다. |
 | Ready | 준비됨 |
@@ -114,8 +114,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The unneeded files below are safe to delete. | 아래의 불필요한 파일은 안전하게 삭제할 수 있습니다. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 이 파일들은 C:\Windows\Installer에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | 휴지통으로 삭제하거나, 사본을 남기고 싶다면 대신 이동을 사용하세요. |
-| Nothing scanned yet. | Nothing scanned yet. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. |
+| Nothing scanned yet. | 아직 검사하지 않았습니다. |
+| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | 다시 검사를 눌러 C:\Windows\Installer에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요. |
+| These files can't be cleaned up right now. | 지금은 이 파일들을 정리할 수 없습니다. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | 지금 무언가가 Windows Installer를 사용하고 있습니다. 대개 Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램입니다. 그 작업이 실행되는 동안에는 이동과 삭제가 일시 중지되어, InstallerClean이 변경 중인 설치 관리자 캐시를 건드리지 않습니다. 작업이 끝난 뒤 다시 검사하면 두 기능이 돌아옵니다. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | 이 컴퓨터에 이전 Windows Installer 트랜잭션이 일시 중단되어 있습니다. 캐시를 정리하기 전에 그 설치를 다시 진행하거나 롤백하세요(또는 Windows를 다시 시작하세요). |
 | Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows가 다음 다시 시작 때 실행할 파일 이름 바꾸기 작업을 예약해 두었고, 이는 설치 관리자 캐시에 영향을 줍니다. 정리하기 전에 Windows를 다시 시작하세요. |
@@ -130,7 +131,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 한국어 |
 | --- | --- |
-| Orphaned | 고아 |
+| Orphaned | 고립됨 |
 | Superseded | 대체됨 |
 | Obsoleted | 폐기됨 |
 
@@ -158,6 +159,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to the Recycle Bin | {1} {0}개를 휴지통으로 이동함 |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {1} {0}개를 휴지통으로 이동함. {3} {2}개 |
 | {0} {1} moved to the Recycle Bin. {2} {3} | {1} {0}개를 휴지통으로 이동함. {3} {2}개 |
+| {0} {1} kept in place, needed again by a program since the scan. | {1} {0}개는 검사 이후 어떤 프로그램이 다시 필요로 하게 되어 그대로 두었습니다. |
+| Moved {0} of {1} {2} before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 이동했습니다. |
+| Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 휴지통으로 이동했습니다. |
+| Permanently deleted {0} of {1} {2} before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 영구 삭제했습니다. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. {3} {2}개 |
@@ -185,10 +190,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded files to clean up | 정리할 불필요한 파일 {0}개 |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | 등록된 파일 {0}개가 누락되었습니다(InstallerClean이 삭제한 것은 아닙니다). 지금은 문제가 없지만, 나중에 해당 프로그램을 복구, 업데이트 또는 제거할 때 실패할 수 있습니다. 어떻게 해야 할지는 세부 정보를 여세요. |
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | 등록된 파일 {0}개가 누락되었습니다(InstallerClean이 삭제한 것은 아닙니다). 지금은 문제가 없지만, 나중에 해당 프로그램들을 복구, 업데이트 또는 제거할 때 실패할 수 있습니다. 어떻게 해야 할지는 세부 정보를 여세요. |
-| {0} stale MSI entry detected (file already gone from disk; InstallerClean doesn't unregister it). | 오래된 MSI 항목 {0}개가 감지되었습니다(파일이 이미 디스크에서 사라졌습니다. InstallerClean은 그 등록을 해제하지 않습니다). |
-| {0} stale MSI entries detected (files already gone from disk; InstallerClean doesn't unregister them). | 오래된 MSI 항목 {0}개가 감지되었습니다(파일이 이미 디스크에서 사라졌습니다. InstallerClean은 그 등록을 해제하지 않습니다). |
+| Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do. | Windows가 디스크에서 이미 사라진 오래된 패치 {0}개를 여전히 목록에 남겨 두고 있습니다. 문제 될 것은 없으며, 따로 하실 일은 없습니다. |
+| Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do. | Windows가 디스크에서 이미 사라진 오래된 패치 {0}개를 여전히 목록에 남겨 두고 있습니다. 문제 될 것은 없으며, 따로 하실 일은 없습니다. |
 | {0} of {1} {2} | {2} {1}개 중 {0}개 |
-| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | 고아 {0}개, 대체됨 {1}개, 폐기됨 {2}개 ({3}) |
+| {0} orphaned, {1} superseded, {2} obsoleted ({3}) | 고립됨 {0}개, 대체됨 {1}개, 폐기됨 {2}개 ({3}) |
 | {0} registered file that is still needed ({1}) | 아직 필요한 등록된 파일 {0}개 ({1}) |
 | {0} registered files that are still needed ({1}) | 아직 필요한 등록된 파일 {0}개 ({1}) |
 
@@ -200,20 +205,21 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Files will be moved to: | 파일이 다음 위치로 이동됩니다: |
 | Delete {0} {1} ({2})? | {1} {0}개를 삭제하시겠습니까? ({2}) |
 | Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | 파일이 휴지통으로 이동됩니다. 백업 사본을 원하시면 대신 이동 버튼을 사용하세요. |
-| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. |
+| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | 이 폴더는 같은 드라이브에 있어, 이동만으로는 공간이 확보되지 않습니다. 옮긴 파일을 그 폴더에서 삭제하면 공간이 확보되고, 아니면 다른 드라이브에 있는 폴더를 대신 선택할 수도 있습니다. |
 
 ## Error messages
 
 | English | 한국어 |
 | --- | --- |
-| Access denied | Access denied |
-| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. |
+| Access denied | 액세스 거부됨 |
+| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows가 InstallerClean의 액세스를 거부했습니다. InstallerClean은 이미 관리자 권한으로 실행 중이므로, 그렇게 다시 시작해도 도움이 되지 않습니다.<br><br>그렇다면 원인은 두 가지로 좁혀집니다. 보안 소프트웨어가 C:\Windows\Installer를 붙잡고 있거나, 이 폴더의 권한이 변경된 경우입니다. 보안 소프트웨어를 잠시 멈추고 다시 시도해 보는 것이 가장 빠르게 확인하는 방법입니다. |
 | Installer database unavailable | 설치 관리자 데이터베이스를 사용할 수 없음 |
 | Scan failed | 검사 실패 |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Windows Installer 데이터베이스가 비어 있거나 접근할 수 없는 것으로 보입니다. 이는 새로 설치한 Windows에서도 드문 일이며, 보통 데이터베이스가 손상되었거나 타사 도구가 이를 비웠다는 뜻입니다. 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행하면 대개 복구됩니다. |
-| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer가 설치된 제품의 목록 표시를 거부했으며, InstallerClean은 이미 관리자 권한으로 실행 중이므로 다시 실행해도 도움이 되지 않습니다. Windows 자체 설치 관리자 기록의 권한이 변경되었거나, 보안 소프트웨어가 이를 차단하고 있을 수 있습니다. 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행해 볼 만합니다. |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | {0}번 연속 실패한 끝에 Windows Installer가 제품 목록 표시를 거부했습니다(마지막 오류 코드 {1}). Windows를 다시 시작하거나, 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행해 보세요. |
 | Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | {0}번 연속 실패한 끝에 Windows Installer가 제품의 패치 목록 표시를 거부했습니다(마지막 오류 코드 {1}). Windows를 다시 시작하거나, 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행해 보세요. |
+| InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it. | InstallerClean이 이번 검사 결과를 Windows와 대조 확인할 수 없었습니다. Windows가 여전히 목록에 올려 둔 항목이 캐시 폴더에는 하나도 없고, 그 폴더에 있는 파일은 Windows가 아는 어떤 것과도 일치하지 않습니다. 이는 안전하게 제거할 수 있는 파일의 문제라기보다 설치 관리자 기록을 읽는 데 생긴 문제를 가리키므로, 정리 대상으로 아무것도 제시하지 않았습니다. Windows를 다시 시작하고 다시 검사하면 대개 해결됩니다. |
 | Invalid destination | 잘못된 대상 |
 | Could not write to destination | 대상에 쓸 수 없음 |
 | Move failed | 이동 실패 |
@@ -231,6 +237,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | {0}에 쓸 수 없습니다. 크래시 로그를 기록할 수 없었습니다. |
 | File no longer exists. | 파일이 더 이상 존재하지 않습니다. |
 | Source file is a symlink or junction; refused for safety. | 원본 파일이 심볼릭 링크 또는 정션입니다. 안전을 위해 거부했습니다. |
+| This file is not inside the Windows Installer folder; refused for safety. | 이 파일은 Windows Installer 폴더 안에 있지 않습니다. 안전을 위해 거부했습니다. |
 | Access denied. | 액세스가 거부되었습니다. |
 | The operation failed. Try again or restart Windows. | 작업에 실패했습니다. 다시 시도하거나 Windows를 다시 시작하세요. |
 | Unknown error. | 알 수 없는 오류입니다. |
@@ -239,8 +246,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | 이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다(오류 {0}). 그 프로그램이나, 이 파일을 검사 중인 무언가를 닫은 다음 다시 시도하거나, 대신 이동 버튼을 사용하세요. |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | 이 파일을 휴지통으로 이동할 수 없어 영구 삭제되었습니다. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | 파일을 Windows Installer 폴더로 이동하는 것을 거부합니다(대상: {0}). |
-| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} |
-| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. |
+| The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | 이동 위치는 드라이브 문자나 네트워크 공유로 시작하는, 폴더의 전체 경로여야 합니다(예: D:\Backup 또는 \\server\backup). InstallerClean은 이 경로를 사용할 수 없습니다: {0} |
+| The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | 파일을 이동하는 도중에 이동 위치가 바뀌었습니다(무언가가 폴더를 교체했거나 다른 곳으로 연결했습니다). 그래서 InstallerClean은 엉뚱한 곳에 쓰지 않도록 작업을 멈췄습니다. {0} 폴더를 확인한 다음, 다시 검사한 뒤 다시 시도하세요. |
 | Cannot write to {0}. | {0}에 쓸 수 없습니다. |
 | Could not find a unique filename for '{0}' after 10,000 attempts. | 10,000번 시도한 후에도 '{0}'에 대한 고유한 파일 이름을 찾을 수 없었습니다. |
 
@@ -264,8 +271,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 한국어 |
 | --- | --- |
 | Couldn't open your browser | 브라우저를 열 수 없음 |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean이 브라우저를 열지 못했습니다. 링크를 클립보드에 복사해 두었으니 직접 붙여넣으시면 됩니다:<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean이 브라우저를 열지 못했고, 링크를 클립보드에 복사하지도 못했습니다. 링크는 다음과 같습니다:<br><br>{0} |
 
 ## Sending the summary
 
@@ -412,6 +419,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 한국어 |
 | --- | --- |
 | Unknown argument: '{0}' | 알 수 없는 인수: '{0}' |
+| Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | 오류: 예상치 못한 추가 인수 '{0}'. 이동 폴더 경로에 공백이 있으면 전체 경로를 큰따옴표로 묶으세요: /m "D:\My Backup" |
 | Cancelling... | 취소 중... |
 | Cancelled. | 취소되었습니다. |
 | Error: {0}. Details written to {1}. | 오류: {0}. 자세한 내용을 {1}에 기록했습니다. |
@@ -422,7 +430,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Deleting {0} {1}... | {1} {0}개를 삭제하는 중... |
 | Deleted {0} {1}. | {1} {0}개를 삭제했습니다. |
 | Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | 오류: 이 볼륨에서 휴지통을 사용할 수 없어 아무것도 삭제하지 않았습니다. /m으로 파일을 대신 이동하거나, 휴지통을 다시 활성화한 후 다시 실행하세요. |
-| Error: no move destination specified. Use /m PATH or set a default in the GUI. | 오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하거나 GUI에서 기본값을 설정하세요. |
+| Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | 오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하세요. (GUI에서 설정한 기본값은 사용자별로 저장되므로, 예약된 작업이나 서비스 계정 실행에는 적용되지 않습니다.) |
 | Error: destination cannot be inside the Windows Installer folder. | 오류: 대상은 Windows Installer 폴더 안에 있을 수 없습니다. |
 | Error: destination must be a fully qualified path. Got: {0} | 오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0} |
 | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | 오류: 지정한 대상이 Windows 시스템 폴더 아래로 해석됩니다 ({0}). %SystemRoot%, %ProgramFiles%, %ProgramData% 밖의 경로를 선택하세요. |
@@ -444,6 +452,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli는 실제 콘솔 프로세스로, 명령 프롬프트를 점유하며, |
 | until it finishes; redirect or pipe its output as you would any | 실행이 끝날 때까지 기다립니다. 다른 콘솔 실행 파일처럼 출력을 리디렉션하거나 |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | 파이프로 넘길 수 있습니다. GUI는 바로 옆 InstallerClean.exe에 들어 있습니다. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | 저장된 기본값은 사용자별로 적용되므로, 예약된 작업이나 SYSTEM 계정 실행에는 /m 경로가 필요합니다. |
 | Exit codes: | 종료 코드: |
 |   0   success: every flagged file was processed |   0   성공: 표시된 모든 파일을 처리함 |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   실패: 아무것도 처리하지 못함 (잘못된 인수, 검사 실패, 모든 파일 실패) |
