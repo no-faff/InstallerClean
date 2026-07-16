@@ -12,9 +12,10 @@
     TypeConverter (ThicknessConverter etc), so a Double resource will
     not satisfy a Thickness setter. Numeric tokens with multiple
     consumer-property types therefore need parallel resources of each
-    type (see BorderThickness.* / StrokeThickness.* in Tokens.xaml). Inline
-    attribute syntax does run TypeConverters, so BorderThickness="1"
-    is fine; only StaticResource lookups have the strict-typing rule.
+    type (see BorderThickness.* / StrokeThickness.* in Tokens.xaml).
+    Inline attribute syntax does run TypeConverters, so
+    BorderThickness="1" is fine; only StaticResource lookups have the
+    strict-typing rule.
 
     Naming: <ramp>.<step>. Steps follow Tailwind v3's convention so that
     swapping a primitive for a different shade reads as a numeric move
@@ -65,9 +66,9 @@
 
     <!-- Red ramp. Destructive actions and the close-window caption. -->
     <Color x:Key="Primitive.Red.500">#ef4444</Color>
-    <!-- Custom reds used for the hover/pressed states of the title-bar X.
-         Tailwind v3's red-700 is #b91c1c, so the 700 places these on this
-         ramp, not on the Tailwind one. -->
+    <!-- Custom reds used for the hover/pressed states of the title-bar
+         X. Their 700 marks where they sit on this ramp: Tailwind v3's
+         red-700 is #b91c1c, and neither of these is on that ramp. -->
     <Color x:Key="Primitive.Red.700.CaptionHover">#c0392b</Color>
     <Color x:Key="Primitive.Red.700.CaptionPressed">#a93226</Color>
     <Color x:Key="Primitive.Red.800">#991b1b</Color>
