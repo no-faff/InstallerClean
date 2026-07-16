@@ -44,14 +44,14 @@ public sealed class InstallerQueryService : IInstallerQueryService
     public InstallerQueryService(IMsiApi msi) => _msi = msi;
 
     /// <inheritdoc />
-    public Task<IReadOnlyList<RegisteredPackage>> GetRegisteredPackagesAsync(
+    public Task<InstallerQueryResult> GetRegisteredPackagesAsync(
         IProgress<ScanProgressUpdate>? progress = null,
         CancellationToken cancellationToken = default)
     {
         return Task.Run(() => GetRegisteredPackagesCore(progress, cancellationToken), cancellationToken);
     }
 
-    private IReadOnlyList<RegisteredPackage> GetRegisteredPackagesCore(
+    private InstallerQueryResult GetRegisteredPackagesCore(
         IProgress<ScanProgressUpdate>? progress,
         CancellationToken ct)
     {
@@ -62,7 +62,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         progress?.Report(new ScanProgressUpdate(Strings.Status_EnumeratingProducts));
 
-        var products = EnumerateProducts(ct);
+        var (products, unreadableRows) = EnumerateProducts(ct);
+
+        // Rows the two enumerations had to skip. A skipped product row is one
+        // installed product whose patch claims are wholly missing; a skipped
+        // patch row is one installed product whose patch claims are short by at
+        // least one. Both leave the same hole, so both count the product once.
+        var unreadableProducts = unreadableRows;
 
         progress?.Report(new ScanProgressUpdate(Strings.Status_FoundProducts));
 
@@ -85,7 +91,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     ClaimSource.InstallerApi);
             }
 
-            var patches = EnumeratePatches(productCode, userSid, context, ct);
+            var (patches, patchesIncomplete) = EnumeratePatches(productCode, userSid, context, ct);
+            if (patchesIncomplete) unreadableProducts++;
 
             foreach (var (patchCode, patchUserSid, patchContext) in patches)
             {
@@ -173,7 +180,32 @@ public sealed class InstallerQueryService : IInstallerQueryService
             Helpers.DisplayHelpers.Pluralise(claimed.Count, Strings.Status_RegisteredPackagesFound, "Status.RegisteredPackagesFound"),
             claimed.Count, Helpers.DisplayHelpers.PluralisePackage(claimed.Count))));
 
-        return claimed.Values.ToList().AsReadOnly();
+        var packages = claimed.Values.ToList();
+
+        // An enumeration that skipped a row withholds the whole removable class.
+        // "Removable" asserts that NO installed product still needs the file, and
+        // a product set known to be short of at least one member cannot support
+        // that assertion for any patch on the machine: the product behind a
+        // skipped row is exactly the one whose "I still have this applied" claim
+        // never reached the merge, and a patch is cached once and shared across
+        // the products that hold it.
+        //
+        // Nothing finer is sound. A failed row's product code is undefined (the
+        // API documents its output buffers for ERROR_SUCCESS and ERROR_MORE_DATA
+        // only) and the loop clears the buffer per iteration, so the missing
+        // product's identity is unknowable, and with it the set of patches it
+        // could still be holding. Scan-wide is the finest granularity the
+        // information supports.
+        //
+        // Only the removable class moves, and the cost is bounded by that: this
+        // withholds superseded-patch cleanup, not orphan cleanup, and only on a
+        // scan that demonstrably lost a row.
+        if (unreadableProducts > 0)
+            for (var i = 0; i < packages.Count; i++)
+                if (packages[i].IsRemovable)
+                    packages[i] = packages[i] with { IsRemovable = false, RemovableWithheld = true };
+
+        return new InstallerQueryResult(packages.AsReadOnly(), unreadableProducts);
     }
 
     /// <summary>
@@ -247,7 +279,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
             claimed[candidate.LocalPackagePath] = candidate;
     }
 
-
     /// <summary>
     /// Reads one SID subtree's Products and Patches keys into the fallback set.
     /// Each key read is independently guarded so one corrupt entry costs only
@@ -320,13 +351,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
     private const int MaxProductIndex = 10_000;
     private const int MaxConsecutiveNonSuccess = 20;
 
-    private List<(string ProductCode, string? UserSid, MsiInstallContext Context)> EnumerateProducts(
-        CancellationToken ct)
+    /// <summary>
+    /// Enumerates every installed product across all contexts. <c>UnreadableRows</c>
+    /// counts the rows this loop had to skip (a non-success return, or a Success
+    /// that wrote no GUID): each one is an installed product whose patches will
+    /// never be enumerated, which is what
+    /// <see cref="InstallerQueryResult.RecordsIncomplete"/> is built from.
+    /// </summary>
+    private (List<(string ProductCode, string? UserSid, MsiInstallContext Context)> Products, int UnreadableRows)
+        EnumerateProducts(CancellationToken ct)
     {
         var results = new List<(string, string?, MsiInstallContext)>();
         var productCode = new char[Msi.GuidBufferLength];
         var sidBuffer = new char[SidBufferLength];
         int consecutiveNonSuccess = 0;
+        int unreadableRows = 0;
         uint lastError = MsiError.Success;
         bool reachedEnd = false;
 
@@ -403,6 +442,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // orphaned). Count it against the tolerance instead of
                     // adding an empty row.
                     consecutiveNonSuccess++;
+                    unreadableRows++;
                     if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                         throw new LocalisedInvalidOperationException(
                             string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));
@@ -425,16 +465,26 @@ public sealed class InstallerQueryService : IInstallerQueryService
             {
                 // Scattered per-product failures are tolerated on purpose:
                 // this call cannot tell "product has no cached package" from
-                // "product unreadable", and ERROR_BAD_CONFIGURATION residue is
-                // common on exactly the machines this app serves, so a
-                // per-product throw would brick the scan for the people who
-                // most need it. The protection is layered elsewhere: the
-                // registry fallback covers the paths a scattered failure loses,
-                // and FileSystemScanService's correlation gate refuses the scan
-                // if the correlation as a whole has collapsed. Only a long RUN
-                // of consecutive failures (a wholesale enumeration collapse)
-                // throws. Do not "fix" this into a per-product hard failure.
+                // "product unreadable", so a per-product throw would brick the
+                // scan over a single bad row. ERROR_BAD_CONFIGURATION is a
+                // documented per-row return of MsiEnumProductsEx and the state
+                // is reported in the wild (failed-install residue); how often
+                // is not known, and no claim about it is needed here, because
+                // the tolerance is paid for either way.
+                //
+                // What pays for it is the demotion in GetRegisteredPackagesCore:
+                // a skipped row is safe to skip precisely BECAUSE the removable
+                // class is withheld from the scan that skipped it. The two are
+                // one mechanism. The registry fallback is not the safety net it
+                // reads like: it recovers lost PATHS, never lost VERDICTS. A
+                // fallback row has no State to read, so it can supply a path
+                // this row would have contributed and can never correct a verdict
+                // built without it. FileSystemScanService's correlation gate only
+                // catches a total collapse. Only a long RUN of consecutive
+                // failures (a wholesale enumeration collapse) throws. Do not
+                // "fix" this into a per-product hard failure.
                 consecutiveNonSuccess++;
+                unreadableRows++;
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                     throw new LocalisedInvalidOperationException(
                         string.Format(Strings.Error_MsiNonSuccess, consecutiveNonSuccess, error));
@@ -450,7 +500,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             throw new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiNonSuccess, MaxProductIndex, lastError));
 
-        return results;
+        return (results, unreadableRows);
     }
 
     /// <summary>
@@ -466,7 +516,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
     private const int MaxPatchIndex = 10_000;
 
-    private List<(string PatchCode, string? UserSid, MsiInstallContext Context)> EnumeratePatches(
+    /// <summary>
+    /// Enumerates one product's patches. <c>Incomplete</c> reports that at least
+    /// one row was skipped, which costs this product's claim on whatever patch
+    /// the row named. It reaches the same demotion the product loop's skips do:
+    /// the two loops tolerate a bad row identically, so they open the identical
+    /// corridor and a verdict built through either is short the same way.
+    /// </summary>
+    private (List<(string PatchCode, string? UserSid, MsiInstallContext Context)> Patches, bool Incomplete)
+        EnumeratePatches(
         string productCode,
         string? userSid,
         MsiInstallContext context,
@@ -476,6 +534,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var patchCode = new char[Msi.GuidBufferLength];
         var targetProductCode = new char[Msi.GuidBufferLength];
         int consecutiveNonSuccess = 0;
+        bool incomplete = false;
         uint lastError = MsiError.Success;
         bool reachedEnd = false;
 
@@ -531,6 +590,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // registered set (the unsafe direction). Count it against
                     // the tolerance rather than adding an empty row.
                     consecutiveNonSuccess++;
+                    incomplete = true;
                     if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                         throw new LocalisedInvalidOperationException(
                             string.Format(Strings.Error_MsiPatchNonSuccess, consecutiveNonSuccess, error));
@@ -543,6 +603,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             else
             {
                 consecutiveNonSuccess++;
+                incomplete = true;
                 // Match EnumerateProducts: throw rather than silently
                 // truncate. A patch enumeration that returns a few real
                 // entries then collapses to non-success would otherwise
@@ -563,7 +624,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             throw new LocalisedInvalidOperationException(
                 string.Format(Strings.Error_MsiPatchNonSuccess, MaxPatchIndex, lastError));
 
-        return results;
+        return (results, incomplete);
     }
 
     /// <summary>

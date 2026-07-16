@@ -219,6 +219,7 @@ public static class Strings
     public static string Completion_PermanentDeleteSummary_Singular => Get("Completion.PermanentDeleteSummary.Singular");
     public static string Completion_PermanentDeleteSummaryWithErrors_Plural => Get("Completion.PermanentDeleteSummaryWithErrors.Plural");
     public static string Completion_PermanentDeleteSummaryWithErrors_Singular => Get("Completion.PermanentDeleteSummaryWithErrors.Singular");
+    public static string Completion_ReverifyIncomplete => Get("Completion.ReverifyIncomplete");
     public static string Completion_ReverifySkipped => Get("Completion.ReverifySkipped");
     public static string Confirm_DeleteTitle => Get("Confirm.DeleteTitle");
     public static string Confirm_DeleteToRecycleBin => Get("Confirm.DeleteToRecycleBin");
@@ -359,6 +360,8 @@ public static class Strings
     public static string Summary_OrphanedToCleanUp_Plural => Get("Summary.OrphanedToCleanUp.Plural");
     public static string Summary_OrphanedToCleanUp_Singular => Get("Summary.OrphanedToCleanUp.Singular");
     public static string Summary_OrphanedWindow => Get("Summary.OrphanedWindow");
+    public static string Summary_ProgramsUnreadable_Plural => Get("Summary.ProgramsUnreadable.Plural");
+    public static string Summary_ProgramsUnreadable_Singular => Get("Summary.ProgramsUnreadable.Singular");
     public static string Summary_RegisteredStillUsed_Plural => Get("Summary.RegisteredStillUsed.Plural");
     public static string Summary_RegisteredStillUsed_Singular => Get("Summary.RegisteredStillUsed.Singular");
     public static string Summary_RegisteredWindow_Plural => Get("Summary.RegisteredWindow.Plural");

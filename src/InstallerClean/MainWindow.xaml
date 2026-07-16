@@ -326,6 +326,22 @@
                            Margin="{StaticResource GapTop.Sm}"
                            AutomationProperties.LiveSetting="Polite"/>
 
+                <!-- Programs the scan could not read (informational). Their
+                     records were unreadable, so this scan kept every superseded
+                     patch rather than judge one on an incomplete picture. Same
+                     low-emphasis treatment as the stale-entries line above and
+                     for the same reason: nothing is wrong with the machine and
+                     there is nothing to do. It earns a line because without one
+                     the only symptom is a quietly shorter list. -->
+                <TextBlock x:Name="ProgramsUnreadableText"
+                           Visibility="{Binding Scan.HasUnreadableProducts, Converter={StaticResource BoolToVis}}"
+                           Text="{Binding Scan.ProgramsUnreadableText}"
+                           Foreground="{StaticResource Text.Muted}"
+                           FontStyle="Italic" FontSize="{DynamicResource Type.Caption}"
+                           TextWrapping="Wrap"
+                           Margin="{StaticResource GapTop.Sm}"
+                           AutomationProperties.LiveSetting="Polite"/>
+
             </StackPanel>
             </ScrollViewer>
 

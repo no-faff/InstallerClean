@@ -12,6 +12,13 @@ namespace InstallerClean.ViewModels;
 /// (so an MSI and its patches show as a single row), sorts alphabetically
 /// by product name, and lazy-loads MSI summary metadata for the
 /// selected row off the UI thread. The cache survives selection cycles.
+///
+/// Rows flag as missing on <c>IsMissingAndNeeded</c>, not on the raw
+/// FileExists: the flag drives the "this file has been deleted, a future
+/// repair could fail" note and the window's opening selection, and a scan that
+/// withheld a superseded patch's verdict passes that patch through here with
+/// its file legitimately gone. Alarming the user about it would be the fault
+/// the note exists to report.
 /// </summary>
 public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
 {
@@ -99,7 +106,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                     msi.FileSizeBytes,
                     patches.Count,
                     patches,
-                    IsMissing: !msi.FileExists));
+                    IsMissing: msi.IsMissingAndNeeded));
 
                 // One ProductCode can be registered with several .msi
                 // caches (a product installed per machine AND per user
@@ -120,7 +127,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                         extra.FileSizeBytes,
                         PatchCount: 0,
                         new List<PatchRow>(),
-                        IsMissing: !extra.FileExists));
+                        IsMissing: extra.IsMissingAndNeeded));
                 }
             }
             else
@@ -138,7 +145,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
                     patchBytes,
                     patches.Count,
                     patches,
-                    IsMissing: !items.First().FileExists));
+                    IsMissing: items.First().IsMissingAndNeeded));
             }
         }
 

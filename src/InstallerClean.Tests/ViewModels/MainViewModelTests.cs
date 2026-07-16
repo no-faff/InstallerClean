@@ -1,6 +1,7 @@
 using System.IO.Abstractions.TestingHelpers;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Resources;
 using InstallerClean.Services;
@@ -11,6 +12,7 @@ namespace InstallerClean.Tests.ViewModels;
 public class MainViewModelTests
 {
     private static readonly string Orphaned = Strings.Reason_Orphaned;
+    private static readonly string Superseded = Strings.Reason_Superseded;
 
     private readonly IFileSystemScanService _scanService = Substitute.For<IFileSystemScanService>();
     private readonly IMoveFilesService _moveService = Substitute.For<IMoveFilesService>();
@@ -847,6 +849,73 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task MoveAllAsync_a_degraded_reverify_reports_the_unread_records_not_a_reclaim()
+    {
+        // A re-verify that could not read the records keeps files back without any
+        // program having reclaimed them. Reporting the reclaim reason there would
+        // state a specific cause that did not happen, which is the fault this
+        // release exists to fix, not a wording preference.
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, true, false, Superseded),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .Returns(new ReverifyResult(
+                Array.Empty<string>(),
+                new[] { @"C:\Windows\Installer\a.msp" },
+                RecordsIncomplete: true));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-reverify-degraded");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        Assert.Equal(
+            string.Format(Strings.Completion_ReverifyIncomplete, 1, DisplayHelpers.PluraliseFile(1)),
+            vm.Completion.Summary);
+    }
+
+    [Fact]
+    public async Task MoveAllAsync_a_healthy_reverify_still_reports_the_reclaim_reason()
+    {
+        var vm = CreateViewModel();
+        var orphans = new List<OrphanedFile>
+        {
+            new(@"C:\Windows\Installer\a.msp", 1_048_576, true, true, false, Superseded),
+            new(@"C:\Windows\Installer\b.msi", 1_048_576, false, false, false, Orphaned),
+        };
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .Returns(new ReverifyResult(
+                new[] { @"C:\Windows\Installer\b.msi" },
+                new[] { @"C:\Windows\Installer\a.msp" }));
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-reverify-healthy");
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        Assert.Equal(
+            string.Format(Strings.Completion_ReverifySkipped, 1, DisplayHelpers.PluraliseFile(1)),
+            vm.Completion.Skipped);
+    }
+
+    [Fact]
     public async Task DeleteAllAsync_reverify_dropping_one_acts_on_the_rest_and_reports_it_skipped()
     {
         var vm = CreateViewModel();
@@ -1373,6 +1442,42 @@ public class MainViewModelTests
         Assert.False(vm.Scan.HasMissingFromDisk);
         Assert.Equal(2, vm.Scan.MissingRemovableCount);
         Assert.Contains("2", vm.Scan.StaleMsiEntriesText);
+    }
+
+    [Fact]
+    public async Task ScanViewModel_HasUnreadableProducts_tracks_UnreadableProductCount()
+    {
+        // A scan that could not read every program's records kept its superseded
+        // patches back. Without this line the only symptom is a quietly shorter
+        // list, so the line is the whole point of the count reaching the VM.
+        var vm = CreateViewModel();
+
+        var scan = new ScanResult(
+            RemovableFiles: Array.Empty<OrphanedFile>(),
+            RegisteredPackages: Array.Empty<RegisteredPackage>(),
+            RegisteredTotalBytes: 0,
+            UnreadableProductCount: 3);
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(scan);
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        Assert.True(vm.Scan.HasUnreadableProducts);
+        Assert.Equal(3, vm.Scan.UnreadableProductCount);
+        Assert.Contains("3", vm.Scan.ProgramsUnreadableText);
+    }
+
+    [Fact]
+    public async Task ScanViewModel_HasUnreadableProducts_is_false_on_a_healthy_scan()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new ScanResult(
+                Array.Empty<OrphanedFile>(), Array.Empty<RegisteredPackage>(), 0));
+
+        await vm.Scan.ScanCommand.ExecuteAsync(null);
+
+        Assert.False(vm.Scan.HasUnreadableProducts);
     }
 
     [Fact]

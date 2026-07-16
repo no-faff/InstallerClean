@@ -17,6 +17,74 @@ public class FileSystemScanServiceTests
     private static RegisteredPackage Obsoleted(string path) =>
         new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}", PatchState: 4, IsRemovable: true);
 
+    /// <summary>
+    /// A superseded patch from a scan whose product enumeration was incomplete:
+    /// the API called it removable, the scan withheld the verdict.
+    /// </summary>
+    private static RegisteredPackage Withheld(string path) =>
+        new(path, "Test Product", "{00000000-0000-0000-0000-000000000001}",
+            PatchState: 2, IsRemovable: false, RemovableWithheld: true);
+
+    private static IInstallerQueryService QueryReturning(InstallerQueryResult result)
+    {
+        var q = Substitute.For<IInstallerQueryService>();
+        q.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(result);
+        return q;
+    }
+
+    [Fact]
+    public async Task ScanAsync_never_offers_a_withheld_patch_for_removal()
+    {
+        const string patch = @"C:\Windows\Installer\withheld.msp";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { Withheld(patch) }.AsReadOnly(), UnreadableProductCount: 1));
+
+        var fs = new MockFileSystem();
+        fs.AddFile(patch, new MockFileData("x"));
+
+        var result = await new FileSystemScanService(query, fs, new[] { patch }, null).ScanAsync();
+
+        Assert.Empty(result.RemovableFiles);
+        Assert.Single(result.RegisteredPackages);
+        Assert.Equal(1, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task ScanAsync_keeps_a_withheld_patch_missing_from_disk_off_the_missing_from_disk_banner()
+    {
+        // The hazard in withholding by flipping IsRemovable: MissingNonRemovable
+        // drives the "a future repair, update or uninstall could fail" banner. A
+        // withheld patch whose file is already gone is the same benign end state
+        // it was before the verdict was withheld, and firing that banner would
+        // tell the user their machine has a problem it does not have.
+        const string gone = @"C:\Windows\Installer\withheld-gone.msp";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { Withheld(gone) }.AsReadOnly(), UnreadableProductCount: 1));
+
+        var result = await new FileSystemScanService(
+            query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(0, result.MissingNonRemovableCount);
+        Assert.Equal(1, result.MissingRemovableCount);
+    }
+
+    [Fact]
+    public async Task ScanAsync_still_counts_a_genuinely_needed_missing_file_as_missing()
+    {
+        // The other side of the branch above: a row that is non-removable because
+        // Windows needs it, not because a verdict was withheld, still fires it.
+        const string gone = @"C:\Windows\Installer\needed-gone.msi";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { Registered(gone) }.AsReadOnly()));
+
+        var result = await new FileSystemScanService(
+            query, new MockFileSystem(), Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(1, result.MissingNonRemovableCount);
+        Assert.Equal(0, result.MissingRemovableCount);
+    }
+
     [Fact]
     public async Task ScanAsync_returns_files_not_in_registered_set()
     {
@@ -28,7 +96,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(registered.AsReadOnly());
+            .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         var fakeFiles = new[]
         {
@@ -57,7 +125,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<RegisteredPackage>().AsReadOnly());
+            .Returns(new InstallerQueryResult(new List<RegisteredPackage>().AsReadOnly()));
 
         // Only root-level files are candidates. A registered LocalPackage path
         // never sits in a subdirectory, so the API can say nothing about a file
@@ -89,7 +157,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(registered.AsReadOnly());
+            .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         var fakeFiles = new[] { @"C:\Windows\Installer\aaa.msi" };
 
@@ -115,7 +183,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(registered.AsReadOnly());
+            .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         var fs = new MockFileSystem();
         fs.AddFile(@"C:\Windows\Installer\aaa.msi", new MockFileData(new byte[100]));
@@ -144,7 +212,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(registered.AsReadOnly());
+            .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         // Both registered files present on disk so the superseded entry
         // passes the on-disk existence guard.
@@ -177,7 +245,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(registered.AsReadOnly());
+            .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         var fs = new MockFileSystem();
         fs.AddFile(@"C:\Windows\Installer\obsoleted.msp", new MockFileData(new byte[150]));
@@ -205,7 +273,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(registered.AsReadOnly());
+            .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         // Empty MockFileSystem: ghost.msp is registered but not present.
         var fs = new MockFileSystem();
@@ -236,7 +304,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(registered.AsReadOnly());
+            .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         var fs = new MockFileSystem();
 
@@ -262,7 +330,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(registered.AsReadOnly());
+            .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         var fakeFiles = Array.Empty<string>();
 
@@ -280,7 +348,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<RegisteredPackage>().AsReadOnly());
+            .Returns(new InstallerQueryResult(new List<RegisteredPackage>().AsReadOnly()));
 
         var fakeFiles = Enumerable.Range(0, 10_000)
             .Select(i => $@"C:\Windows\Installer\orphan{i:D5}.msi")
@@ -304,7 +372,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(registered.AsReadOnly());
+            .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         var fakeFiles = Enumerable.Range(0, 5_000)
             .Select(i => $@"C:\Windows\Installer\reg{i:D5}.msi")
@@ -331,7 +399,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<RegisteredPackage>().AsReadOnly());
+            .Returns(new InstallerQueryResult(new List<RegisteredPackage>().AsReadOnly()));
 
         var fakeFiles = Enumerable.Range(0, 10_000)
             .Select(i => $@"C:\Windows\Installer\orphan{i:D5}.msi")
@@ -351,7 +419,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<RegisteredPackage>().AsReadOnly());
+            .Returns(new InstallerQueryResult(new List<RegisteredPackage>().AsReadOnly()));
 
         var fakeFiles = new[]
         {
@@ -398,7 +466,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(registered.AsReadOnly());
+            .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         // Empty filesystem: none of the registered files exist on disk.
         var fs = new MockFileSystem();
@@ -422,7 +490,7 @@ public class FileSystemScanServiceTests
         var mockQuery = Substitute.For<IInstallerQueryService>();
         mockQuery
             .GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(registered.AsReadOnly());
+            .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         var fs = new MockFileSystem();
         fs.AddFile(@"C:\Windows\Installer\reg00.msi", new MockFileData("x")); // one present

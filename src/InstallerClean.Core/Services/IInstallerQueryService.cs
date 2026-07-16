@@ -25,7 +25,15 @@ public interface IInstallerQueryService
     /// superseded, obsoleted) and an <c>IsRemovable</c> flag set when
     /// Windows itself has marked the patch unused.
     /// </summary>
-    Task<IReadOnlyList<RegisteredPackage>> GetRegisteredPackagesAsync(
+    /// <remarks>
+    /// The result also reports whether the enumeration read every installed
+    /// product's records. Where it did not, no row comes back removable: a
+    /// verdict that no product still needs a file cannot be drawn from a product
+    /// set short of a member. Every consumer of a removable verdict therefore
+    /// inherits the withholding by consuming this method, including the act-time
+    /// re-verify, which is the same call.
+    /// </remarks>
+    Task<InstallerQueryResult> GetRegisteredPackagesAsync(
         IProgress<ScanProgressUpdate>? progress = null,
         CancellationToken cancellationToken = default);
 }

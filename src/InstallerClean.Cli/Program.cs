@@ -227,6 +227,22 @@ internal static class Program
                 DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
                 count, DisplayHelpers.PluraliseFile(count), size));
 
+            // A scan that could not read every program's records withheld its
+            // superseded-patch verdicts, so this run's list is shorter than the
+            // same machine would normally give. Reported for the same reason the
+            // GUI reports it: the only other symptom is a quietly shorter list,
+            // and a weekly figure that drops with no cause stated is worse than
+            // the extra line. Human stdout, in the OS language, like the
+            // re-verify's kept-back line below; the event log's machine contract
+            // is unchanged.
+            if (scanResult.UnreadableProductCount > 0)
+                Console.WriteLine(string.Format(
+                    DisplayHelpers.Pluralise(scanResult.UnreadableProductCount,
+                        Strings.Summary_ProgramsUnreadable_Singular,
+                        Strings.Summary_ProgramsUnreadable_Plural,
+                        "Summary.ProgramsUnreadable"),
+                    scanResult.UnreadableProductCount));
+
             if (count == 0)
             {
                 Console.WriteLine(Strings.Cli_NothingToDo);
@@ -280,15 +296,23 @@ internal static class Program
             var survivingFiles = scanResult.RemovableFiles
                 .Where(f => survivingSet.Contains(f.FullPath)).ToList();
 
-            // Anything a currently-registered package reclaimed is kept in place and
-            // reported (human stdout, OS language; deliberately NOT a machine-read
-            // line). The counts and byte figures below are recomputed from the
-            // survivor subset so "X of Y" and the freed-space total describe what was
-            // acted on, not the pre-reverify scan.
+            // Anything the re-verify kept back is reported with its reason (human
+            // stdout, OS language; deliberately NOT a machine-read line). A
+            // re-verify that could not read the records keeps files back without
+            // any program having reclaimed them, so the reason comes from the
+            // re-verify rather than being assumed from the count. The counts and
+            // byte figures below are recomputed from the survivor subset so
+            // "X of Y" and the freed-space total describe what was acted on, not
+            // the pre-reverify scan.
             if (reverify.Dropped.Count > 0)
+            {
+                var (flat, key) = reverify.RecordsIncomplete
+                    ? (Strings.Completion_ReverifyIncomplete, "Completion.ReverifyIncomplete")
+                    : (Strings.Completion_ReverifySkipped, "Completion.ReverifySkipped");
                 Console.WriteLine(string.Format(
-                    DisplayHelpers.Pluralise(reverify.Dropped.Count, Strings.Completion_ReverifySkipped, "Completion.ReverifySkipped"),
+                    DisplayHelpers.Pluralise(reverify.Dropped.Count, flat, key),
                     reverify.Dropped.Count, DisplayHelpers.PluraliseFile(reverify.Dropped.Count)));
+            }
 
             var filePaths = survivingFiles.Select(f => f.FullPath).ToList();
             count = survivingFiles.Count;

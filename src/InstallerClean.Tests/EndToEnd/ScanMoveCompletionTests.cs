@@ -171,10 +171,10 @@ public class ScanMoveCompletionTests
         var queryService = Substitute.For<IInstallerQueryService>();
         queryService.GetRegisteredPackagesAsync(
                 Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<RegisteredPackage>
+            .Returns(new InstallerQueryResult(new List<RegisteredPackage>
             {
                 new($@"{installerFolder}\registered.msi", "Registered", "{AAA}", FileSizeBytes: 1024),
-            }.AsReadOnly());
+            }.AsReadOnly()));
 
         // Real scan service over the in-memory FS.
         var scanService = new FileSystemScanService(queryService, fs, null, installerFolder);

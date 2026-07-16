@@ -23,14 +23,20 @@ public sealed class RemovableReverifier : IRemovableReverifier
 
         // ConfigureAwait(false): Core has no thread affinity; the caller runs this
         // off the dispatcher (behind the operating overlay), exactly as the scan does.
-        var registered = await _queryService.GetRegisteredPackagesAsync(null, cancellationToken)
+        var query = await _queryService.GetRegisteredPackagesAsync(null, cancellationToken)
             .ConfigureAwait(false);
 
         // The set of paths a currently NON-removable registered package claims. A
         // reverted patch (Superseded -> Applied) reappears here; a still-superseded
         // patch is IsRemovable and stays out; a true orphan was never registered.
+        //
+        // A re-verify whose own enumeration was incomplete inherits the withheld
+        // removable class from the query, so every superseded candidate lands in
+        // this set and is dropped. That is the intended direction (the check that
+        // cannot confirm keeps the file), and it is why the result reports WHY it
+        // dropped: the drop no longer implies a program reclaimed the file.
         var nonRemovable = new HashSet<string>(
-            registered.Where(p => !p.IsRemovable).Select(p => p.LocalPackagePath),
+            query.Packages.Where(p => !p.IsRemovable).Select(p => p.LocalPackagePath),
             StringComparer.OrdinalIgnoreCase);
 
         var surviving = new List<string>(candidatePaths.Count);
@@ -43,6 +49,6 @@ public sealed class RemovableReverifier : IRemovableReverifier
                 surviving.Add(path);
         }
 
-        return new ReverifyResult(surviving.AsReadOnly(), dropped.AsReadOnly());
+        return new ReverifyResult(surviving.AsReadOnly(), dropped.AsReadOnly(), query.RecordsIncomplete);
     }
 }

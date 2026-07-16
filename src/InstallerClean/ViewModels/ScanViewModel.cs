@@ -131,6 +131,17 @@ public partial class ScanViewModel : ObservableObject
     private int _missingRemovableCount;
 
     /// <summary>
+    /// Count of installed programs whose Windows Installer records the last scan
+    /// could not fully read. Non-zero means that scan withheld every
+    /// superseded-patch verdict, so it drives the line that says why the list is
+    /// shorter than usual.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasUnreadableProducts))]
+    [NotifyPropertyChangedFor(nameof(ProgramsUnreadableText))]
+    private int _unreadableProductCount;
+
+    /// <summary>
     /// Cached result of the most recent successful scan. Null until
     /// the first scan completes; remains the same instance until the
     /// next scan replaces it.
@@ -227,6 +238,25 @@ public partial class ScanViewModel : ObservableObject
                 "Summary.StaleMsiEntries"),
             MissingRemovableCount);
 
+    /// <summary>
+    /// True when the last scan could not read every installed program's records
+    /// and therefore kept its superseded patches back. Informational, like
+    /// <see cref="HasStaleMsiEntries"/> and unlike
+    /// <see cref="HasMissingFromDisk"/>: nothing is wrong with the machine and
+    /// there is nothing for the user to do. It is shown because the alternative
+    /// is a quietly shorter list, and a scan that says less than usual without
+    /// saying so is the fault this line exists to avoid.
+    /// </summary>
+    public bool HasUnreadableProducts => UnreadableProductCount > 0;
+
+    public string ProgramsUnreadableText =>
+        string.Format(
+            DisplayHelpers.Pluralise(UnreadableProductCount,
+                Strings.Summary_ProgramsUnreadable_Singular,
+                Strings.Summary_ProgramsUnreadable_Plural,
+                "Summary.ProgramsUnreadable"),
+            UnreadableProductCount);
+
     partial void OnRegisteredFileCountChanged(int value) =>
         OnPropertyChanged(nameof(RegisteredSummaryText));
 
@@ -274,6 +304,7 @@ public partial class ScanViewModel : ObservableObject
             OrphanedSizeDisplay = orphanedSize;
             MissingNonRemovableCount = result.MissingNonRemovableCount;
             MissingRemovableCount = result.MissingRemovableCount;
+            UnreadableProductCount = result.UnreadableProductCount;
             HasScanned = true;
         }
         finally

@@ -425,6 +425,8 @@ public partial class MainWindow : Window
             AnnounceLiveRegions(MissingFromDiskBannerText);
         if (e.PropertyName == nameof(ScanViewModel.HasStaleMsiEntries) && _vm.Scan.HasStaleMsiEntries)
             AnnounceLiveRegions(StaleMsiEntriesText);
+        if (e.PropertyName == nameof(ScanViewModel.HasUnreadableProducts) && _vm.Scan.HasUnreadableProducts)
+            AnnounceLiveRegions(ProgramsUnreadableText);
     }
 
     // Routes focus to the move-destination field, the entry point of the Move

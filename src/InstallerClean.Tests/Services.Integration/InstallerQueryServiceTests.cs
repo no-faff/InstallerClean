@@ -96,7 +96,7 @@ public class InstallerQueryServiceTests
     public async Task GetRegisteredPackagesAsync_returns_readonly_list_when_elevated()
     {
         var svc = new InstallerQueryService();
-        var packages = await svc.GetRegisteredPackagesAsync();
+        var packages = (await svc.GetRegisteredPackagesAsync()).Packages;
 
         Assert.IsAssignableFrom<IReadOnlyList<RegisteredPackage>>(packages);
         Assert.NotNull(packages);
@@ -106,7 +106,7 @@ public class InstallerQueryServiceTests
     public async Task GetRegisteredPackagesAsync_all_paths_non_empty_when_elevated()
     {
         var svc = new InstallerQueryService();
-        var packages = await svc.GetRegisteredPackagesAsync();
+        var packages = (await svc.GetRegisteredPackagesAsync()).Packages;
 
         Assert.All(packages, p =>
             Assert.False(string.IsNullOrWhiteSpace(p.LocalPackagePath)));
@@ -116,7 +116,7 @@ public class InstallerQueryServiceTests
     public async Task GetRegisteredPackagesAsync_paths_unique_case_insensitive_when_elevated()
     {
         var svc = new InstallerQueryService();
-        var packages = await svc.GetRegisteredPackagesAsync();
+        var packages = (await svc.GetRegisteredPackagesAsync()).Packages;
 
         var uniquePaths = new HashSet<string>(
             packages.Select(p => p.LocalPackagePath),
@@ -129,7 +129,7 @@ public class InstallerQueryServiceTests
     public async Task GetRegisteredPackagesAsync_removable_only_when_superseded_when_elevated()
     {
         var svc = new InstallerQueryService();
-        var packages = await svc.GetRegisteredPackagesAsync();
+        var packages = (await svc.GetRegisteredPackagesAsync()).Packages;
 
         foreach (var pkg in packages.Where(p => p.IsRemovable))
         {
@@ -145,7 +145,7 @@ public class InstallerQueryServiceTests
         var messages = new List<string>();
         var progress = new SyncProgress<ScanProgressUpdate>(u => messages.Add(u.Message));
 
-        var packages = await svc.GetRegisteredPackagesAsync(progress);
+        var packages = (await svc.GetRegisteredPackagesAsync(progress)).Packages;
 
         var completionMsg = messages.Last();
         var noun = packages.Count == 1 ? "package" : "packages";

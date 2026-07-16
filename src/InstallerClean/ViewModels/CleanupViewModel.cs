@@ -571,14 +571,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
             var survivingSet = new HashSet<string>(reverify.Surviving, StringComparer.OrdinalIgnoreCase);
             var survivingFiles = removableFiles.Where(f => survivingSet.Contains(f.FullPath)).ToList();
-            var droppedCount = reverify.Dropped.Count;
 
             if (survivingFiles.Count == 0)
             {
-                // Every candidate was reclaimed between the scan and the click.
-                // Act on nothing and report it all skipped.
+                // The re-verify kept every candidate back. Act on nothing and
+                // report it, with the re-verify's own reason for keeping them.
                 await _scan.RefreshAsync();
-                _completion.ShowReverifyAllSkipped(droppedCount);
+                _completion.ShowReverifyAllSkipped(reverify);
                 OperationProgress = string.Empty;
                 return;
             }
@@ -622,7 +621,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     _completion.ShowMoveCancelledSummary(
                         result.MovedCount, survivingFiles.Count,
                         CompletedBytes(survivingFiles, result.MovedCount, result.Errors),
-                        result.Errors, cancelledFreesSpace, droppedCount);
+                        result.Errors, cancelledFreesSpace, reverify);
                 }
                 OperationProgress = string.Empty;
                 return;
@@ -652,7 +651,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             var freesSpace = destinationKind is MoveDestinationKinds.DifferentFixedDrive
                 or MoveDestinationKinds.RemovableDrive
                 or MoveDestinationKinds.UncShare;
-            _completion.ShowMoveSummary(movedCount, movedBytes, movedDest, result.Errors, freesSpace, droppedCount);
+            _completion.ShowMoveSummary(movedCount, movedBytes, movedDest, result.Errors, freesSpace, reverify);
 
             // Skip the last-run.json write once the result-log surface
             // is locked. Nothing will ever read the file from this point
@@ -869,14 +868,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
             var survivingSet = new HashSet<string>(reverify.Surviving, StringComparer.OrdinalIgnoreCase);
             var survivingFiles = ctx.RemovableFiles.Where(f => survivingSet.Contains(f.FullPath)).ToList();
-            var droppedCount = reverify.Dropped.Count;
 
             if (survivingFiles.Count == 0)
             {
-                // Every candidate was reclaimed between the scan and the click.
-                // Act on nothing and report it all skipped.
+                // The re-verify kept every candidate back. Act on nothing and
+                // report it, with the re-verify's own reason for keeping them.
                 await _scan.RefreshAsync();
-                _completion.ShowReverifyAllSkipped(droppedCount);
+                _completion.ShowReverifyAllSkipped(reverify);
                 OperationProgress = string.Empty;
                 return false;
             }
@@ -927,10 +925,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     var cancelledBytes = CompletedBytes(survivingFiles, result.DeletedCount, result.Errors);
                     if (permitPermanentDelete)
                         _completion.ShowPermanentDeleteCancelledSummary(
-                            result.DeletedCount, survivingFiles.Count, cancelledBytes, result.Errors, droppedCount);
+                            result.DeletedCount, survivingFiles.Count, cancelledBytes, result.Errors, reverify);
                     else
                         _completion.ShowDeleteCancelledSummary(
-                            result.DeletedCount, survivingFiles.Count, cancelledBytes, result.Errors, droppedCount);
+                            result.DeletedCount, survivingFiles.Count, cancelledBytes, result.Errors, reverify);
                 }
                 OperationProgress = string.Empty;
                 return false;
@@ -953,9 +951,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // A consented permanent delete did not reach the Recycle Bin, so it
             // gets its own summary copy rather than reusing the recycle-bin one.
             if (permitPermanentDelete)
-                _completion.ShowPermanentDeleteSummary(deletedCount, deletedBytes, result.Errors, droppedCount);
+                _completion.ShowPermanentDeleteSummary(deletedCount, deletedBytes, result.Errors, reverify);
             else
-                _completion.ShowDeleteSummary(deletedCount, deletedBytes, result.Errors, droppedCount);
+                _completion.ShowDeleteSummary(deletedCount, deletedBytes, result.Errors, reverify);
 
             // Same lock-aware gate as MoveAllAsync: skip the write once the
             // result-log surface is closed for the rest of the session and

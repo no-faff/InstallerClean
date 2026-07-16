@@ -18,7 +18,10 @@ namespace InstallerClean.Models;
 /// <c>LocalPackage</c> paths the API still claims that aren't marked
 /// superseded or obsoleted. Superseded patches go into
 /// <see cref="RemovableFiles"/> instead. Drives the registered list
-/// and the totals on the main screen.
+/// and the totals on the main screen. On a scan with a non-zero
+/// <see cref="UnreadableProductCount"/> the superseded patches are in here as
+/// well, carrying <c>RemovableWithheld</c>: that scan is keeping them, so it
+/// counts them among the files it is keeping.
 /// </param>
 /// <param name="RegisteredTotalBytes">
 /// Sum of <see cref="RegisteredPackage.FileSizeBytes"/> across
@@ -39,14 +42,23 @@ namespace InstallerClean.Models;
 /// the file has already been removed, the entry is just leftover MSI
 /// registration. Counted separately from
 /// <see cref="MissingNonRemovableCount"/> so the banner only fires for
-/// the actionable case.
+/// the actionable case. A superseded package whose verdict this scan withheld
+/// counts here too: the file having gone is the same expected end state either
+/// way, and only this scan's verdict was withheld.
+/// </param>
+/// <param name="UnreadableProductCount">
+/// Installed products whose Windows Installer records this scan could not fully
+/// read. Non-zero means the scan withheld every superseded-patch verdict, so
+/// <see cref="RemovableFiles"/> carries orphans only; the summary says so. Zero
+/// on any healthy machine, which is why nothing else keys off it.
 /// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
     IReadOnlyList<RegisteredPackage> RegisteredPackages,
     long RegisteredTotalBytes,
     int MissingNonRemovableCount = 0,
-    int MissingRemovableCount = 0)
+    int MissingRemovableCount = 0,
+    int UnreadableProductCount = 0)
 {
     /// <summary>Total registered packages missing on disk; sum of the two sub-counts.</summary>
     public int MissingFromDiskCount => MissingNonRemovableCount + MissingRemovableCount;

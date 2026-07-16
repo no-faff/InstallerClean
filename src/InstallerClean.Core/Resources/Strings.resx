@@ -410,6 +410,15 @@
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, because a program started needing them again after the scan.</value></data>
+  <!-- The other reason the pre-action re-check keeps files back: its own read of
+       the Windows Installer records came up short, so it withheld every
+       superseded-patch verdict rather than act on one it could not confirm.
+       Distinct from Completion.ReverifySkipped, which names a specific cause (a
+       program needing the file again) that did not happen here. 0 = the count
+       kept, 1 = pluralised "file"/"files". Flat string; a language may add a
+       satellite-only Completion.ReverifyIncomplete.One/.Few/.Many override for
+       its count grammar. -->
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>{0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -474,6 +483,14 @@
        anything, so this is purely diagnostic. -->
   <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
   <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
+  <!-- Informational line shown when the scan could not read every installed
+       program's Windows Installer records. Superseded patches are then kept
+       rather than offered, because whether one is still needed is a question
+       about every installed program and this scan could not ask them all. The
+       second sentence is load-bearing: the main job (finding orphaned files) ran
+       normally, so a shorter list is not a fault. 0 = the count of programs. -->
+  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>{0} installed program could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected.</value></data>
+  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>{0} installed programs could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three

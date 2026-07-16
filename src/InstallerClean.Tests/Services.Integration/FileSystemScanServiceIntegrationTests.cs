@@ -27,7 +27,7 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
 
         var query = Substitute.For<IInstallerQueryService>();
         query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<RegisteredPackage>().AsReadOnly());
+            .Returns(new InstallerQueryResult(new List<RegisteredPackage>().AsReadOnly()));
 
         var svc = new FileSystemScanService(query, null, _fakeInstallerDir);
         var result = await svc.ScanAsync();
@@ -47,10 +47,10 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
 
         var query = Substitute.For<IInstallerQueryService>();
         query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<RegisteredPackage>
+            .Returns(new InstallerQueryResult(new List<RegisteredPackage>
             {
                 new(Path.Combine(_fakeInstallerDir, "kept.msi"), "Kept Product", "{K}"),
-            }.AsReadOnly());
+            }.AsReadOnly()));
 
         var svc = new FileSystemScanService(query, null, _fakeInstallerDir);
         var result = await svc.ScanAsync();

@@ -86,8 +86,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         progress?.Report(new ScanProgressUpdate(Strings.Status_QueryingApi));
 
-        var registered = await _queryService.GetRegisteredPackagesAsync(progress, cancellationToken)
+        var query = await _queryService.GetRegisteredPackagesAsync(progress, cancellationToken)
             .ConfigureAwait(false);
+        var registered = query.Packages;
 
         var registeredPaths = new HashSet<string>(
             registered.Select(p => p.LocalPackagePath),
@@ -174,6 +175,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // + missing is benign (Windows considers the patch already
             // removed; the file having gone is the expected end state)
             // and counts separately so the banner does not fire on it.
+            // A withheld row is removable-in-fact on a scan that could not
+            // prove it, so it takes the benign side too: only this scan's
+            // verdict was withheld, and the API's own reading of the file
+            // did not change.
             if (pkg.IsRemovable)
             {
                 // Containment guard at candidate creation. Unlike the orphan
@@ -213,17 +218,18 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     missingRemovable++;
                 }
             }
+            else if (exists)
+            {
+                stillUsedBytes += size;
+                nonRemovablePresent++;
+            }
+            else if (pkg.RemovableWithheld)
+            {
+                missingRemovable++;
+            }
             else
             {
-                if (exists)
-                {
-                    stillUsedBytes += size;
-                    nonRemovablePresent++;
-                }
-                else
-                {
-                    missingNonRemovable++;
-                }
+                missingNonRemovable++;
             }
         }
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
@@ -247,7 +253,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_FoundUnused,
             removable.Count, DisplayHelpers.PluraliseFile(removable.Count))));
-        return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingNonRemovable, missingRemovable);
+        return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingNonRemovable, missingRemovable,
+            query.UnreadableProductCount);
     }
 
     /// <summary>

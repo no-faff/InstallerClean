@@ -35,6 +35,14 @@ public interface IRemovableReverifier
 /// the input: <see cref="Surviving"/> is still safe to act on, <see cref="Dropped"/>
 /// is now claimed by a non-removable registered package and must be skipped.
 /// </summary>
+/// <param name="RecordsIncomplete">
+/// The re-verify's own enumeration could not read every product, so it withheld
+/// the removable class and dropped every superseded candidate on those grounds
+/// rather than on a program reclaiming them. It says which of the two happened,
+/// because the report the user reads names a cause and only one of the two causes
+/// is true.
+/// </param>
 public record ReverifyResult(
     IReadOnlyList<string> Surviving,
-    IReadOnlyList<string> Dropped);
+    IReadOnlyList<string> Dropped,
+    bool RecordsIncomplete = false);

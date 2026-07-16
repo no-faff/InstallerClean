@@ -18,13 +18,15 @@ namespace InstallerClean.Tests.Services;
 /// crash.log; either way it only ADDS non-removable rows, so these assertions
 /// filter to the specific paths the fake produces rather than asserting a total
 /// count (except where the fake yields entries the fallback cannot collide
-/// with).
+/// with). That the fallback only ever adds is the very rule the merge tests
+/// pin, and they call <c>MergeClaim</c> directly to do it: the fallback reads
+/// the live registry through no seam, so a test cannot feed it a colliding row.
 /// </summary>
 public class InstallerQueryServiceUnitTests
 {
     private const uint Success = 0, AccessDenied = 5, MoreData = 234, NoMoreItems = 259;
 
-    private static async Task<IReadOnlyList<RegisteredPackage>> Run(FakeMsiApi msi) =>
+    private static async Task<InstallerQueryResult> Run(FakeMsiApi msi) =>
         await new InstallerQueryService(msi).GetRegisteredPackagesAsync();
 
     // ---- Item 1: shared-patch verdict merge ----
@@ -46,7 +48,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        var row = Assert.Single(result, r => r.LocalPackagePath == shared);
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == shared);
         Assert.False(row.IsRemovable);
         Assert.Equal(1, row.PatchState); // carries the applied product's state
     }
@@ -69,7 +71,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.False(Assert.Single(result, r => r.LocalPackagePath == productPackage).IsRemovable);
+        Assert.False(Assert.Single(result.Packages, r => r.LocalPackagePath == productPackage).IsRemovable);
     }
 
     [Fact]
@@ -86,7 +88,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.False(Assert.Single(result, r => r.LocalPackagePath == productPackage).IsRemovable);
+        Assert.False(Assert.Single(result.Packages, r => r.LocalPackagePath == productPackage).IsRemovable);
     }
 
     [Fact]
@@ -155,7 +157,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.True(Assert.Single(result, r => r.LocalPackagePath == dead).IsRemovable);
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
     }
 
     // ---- Item 2: Uninstallable guard fails safe ----
@@ -171,7 +173,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.False(Assert.Single(result, r => r.LocalPackagePath == p).IsRemovable);
+        Assert.False(Assert.Single(result.Packages, r => r.LocalPackagePath == p).IsRemovable);
     }
 
     [Fact]
@@ -184,7 +186,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.True(Assert.Single(result, r => r.LocalPackagePath == p).IsRemovable);
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == p).IsRemovable);
     }
 
     // ---- Item 6: patch enumeration AccessDenied throws (matches product loop) ----
@@ -212,8 +214,8 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.DoesNotContain(result, r => r.LocalPackagePath.Length == 0);
-        Assert.Contains(result, r => r.LocalPackagePath == p);
+        Assert.DoesNotContain(result.Packages, r => r.LocalPackagePath.Length == 0);
+        Assert.Contains(result.Packages, r => r.LocalPackagePath == p);
     }
 
     [Fact]
@@ -229,7 +231,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.Contains(result, r => r.LocalPackagePath == ppath);
+        Assert.Contains(result.Packages, r => r.LocalPackagePath == ppath);
     }
 
     // ---- Item 8: the index cap ends enumeration loudly, not silently ----
@@ -272,7 +274,7 @@ public class InstallerQueryServiceUnitTests
 
         var result = await Run(msi);
 
-        Assert.Equal(20, result.Count(r => r.LocalPackagePath.StartsWith(@"C:\Windows\Installer\ok")));
+        Assert.Equal(20, result.Packages.Count(r => r.LocalPackagePath.StartsWith(@"C:\Windows\Installer\ok")));
     }
 
     [Fact]
@@ -283,6 +285,139 @@ public class InstallerQueryServiceUnitTests
             msi.AddProduct($"{{bad{i}}}", result: 1603);
 
         await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
+    }
+
+    // ---- An incomplete enumeration withholds the removable class ----
+    //
+    // A tolerated skip costs one product's patch claims, and a patch is cached
+    // once and shared across the products holding it, so the product behind a
+    // skipped row may be the one that still has a removable-looking patch
+    // applied. Its identity is unknowable (a failed row's product code is
+    // undefined), so no narrower rule is available than withholding the class.
+    // Each of the four ways a row can be lost reaches the same demotion.
+
+    [Fact]
+    public async Task A_clean_enumeration_keeps_its_removable_verdicts()
+    {
+        const string dead = @"C:\Windows\Installer\clean-dead.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0");
+
+        var result = await Run(msi);
+
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
+        Assert.Equal(0, result.UnreadableProductCount);
+        Assert.False(result.RecordsIncomplete);
+    }
+
+    [Fact]
+    public async Task A_skipped_product_row_withholds_every_removable_verdict()
+    {
+        const string dead = @"C:\Windows\Installer\skipped-product.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0");
+        // Product B is unreadable, so its patches are never enumerated and its
+        // claim on {P} (which may be Applied there) never reaches the merge.
+        msi.AddProduct("{B}", result: 1603 /* ERROR_INSTALL_FAILURE */);
+
+        var result = await Run(msi);
+
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+        Assert.Equal(1, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task A_skipped_patch_row_withholds_every_removable_verdict()
+    {
+        // The same corridor reached through a product whose own row read fine:
+        // B enumerates, but one of its patch rows fails, so whatever that row
+        // named is missing from B's claims.
+        const string dead = @"C:\Windows\Installer\skipped-patch.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0");
+        msi.AddProduct("{B}");
+        msi.AddPatch("{B}", "{Q}", localPackage: @"C:\Windows\Installer\other.msp", state: "1", uninstallable: "1");
+        msi.PatchRowResult[("{B}", 0)] = 1603;
+
+        var result = await Run(msi);
+
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+        Assert.Equal(1, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task An_empty_product_guid_withholds_every_removable_verdict()
+    {
+        const string dead = @"C:\Windows\Installer\empty-product.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0");
+        msi.AddProduct("");   // Success return, no GUID written: the row is lost
+
+        var result = await Run(msi);
+
+        Assert.False(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
+        Assert.Equal(1, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task An_empty_patch_guid_withholds_every_removable_verdict()
+    {
+        const string dead = @"C:\Windows\Installer\empty-patch.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0");
+        msi.AddProduct("{B}");
+        msi.PatchCodes["{B}"] = new() { "" };   // Success return, no GUID written
+
+        var result = await Run(msi);
+
+        Assert.False(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
+        Assert.Equal(1, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task Unreadable_products_count_a_lost_product_row_and_a_lost_patch_row_alike()
+    {
+        // Both leave the same hole (a product whose claims are short), so the
+        // count the user reads adds them together. A product is counted once
+        // however many of its patch rows failed.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{bad}", result: 1603);
+        msi.AddProduct("{B}");
+        msi.AddPatch("{B}", "{Q}", localPackage: @"C:\Windows\Installer\q.msp", state: "1", uninstallable: "1");
+        msi.AddPatch("{B}", "{R}", localPackage: @"C:\Windows\Installer\r.msp", state: "1", uninstallable: "1");
+        msi.PatchRowResult[("{B}", 0)] = 1603;
+        msi.PatchRowResult[("{B}", 1)] = 1603;
+
+        var result = await Run(msi);
+
+        Assert.Equal(2, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task Withholding_the_removable_class_leaves_orphan_detection_alone()
+    {
+        // The bounded-cost claim the user-facing copy makes ("Orphaned files are
+        // not affected"): a withheld scan still carries every registered path, so
+        // the walk still has everything it needs to tell an orphan from a
+        // registered file.
+        const string productPackage = @"C:\Windows\Installer\kept.msi";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", productPackage);
+        msi.AddProduct("{bad}", result: 1603);
+
+        var result = await Run(msi);
+
+        Assert.Contains(result.Packages, r => r.LocalPackagePath == productPackage);
     }
 
     /// <summary>
@@ -298,6 +433,14 @@ public class InstallerQueryServiceUnitTests
         public string? NeverEndPatchesFor { get; set; }
         public Dictionary<string, List<string>> PatchCodes { get; } = new();
         public Dictionary<string, uint> PatchEnumResult { get; } = new();
+
+        /// <summary>
+        /// Fails ONE row of a product's patch enumeration, keyed by (product,
+        /// index). Distinct from <see cref="PatchEnumResult"/>, which refuses the
+        /// product's enumeration outright: this is the scattered-failure case the
+        /// loop tolerates, where the rows either side of the bad one come back.
+        /// </summary>
+        public Dictionary<(string ProductCode, uint Index), uint> PatchRowResult { get; } = new();
         private readonly Dictionary<(string, string), string> _productProps = new();
         private readonly Dictionary<(string, string, string), string> _patchProps = new();
 
@@ -356,6 +499,8 @@ public class InstallerQueryServiceUnitTests
                 return err;
             var list = (productCode is not null && PatchCodes.TryGetValue(productCode, out var l)) ? l : null;
             if (list is null || index >= list.Count) return NoMoreItems;
+            if (productCode is not null && PatchRowResult.TryGetValue((productCode, index), out var rowErr))
+                return rowErr;
             WriteCode(patchCode, list[(int)index]);
             return Success;
         }
