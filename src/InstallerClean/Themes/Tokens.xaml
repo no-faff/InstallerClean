@@ -62,14 +62,17 @@
     <SolidColorBrush x:Key="Action.Danger.Hover"      Color="{StaticResource Primitive.Red.950}"/>
     <SolidColorBrush x:Key="Action.Danger.Pressed"    Color="{StaticResource Primitive.Red.950.Pressed}"/>
 
+    <!-- Caption-button: the title-bar minimise and maximise fill. Only
+         the pressed state needs a step of its own; the hover state takes
+         Action.Standard.Background, so there is no matching
+         Action.CaptionButton.Hover to reach for. -->
+    <SolidColorBrush x:Key="Action.CaptionButton.Pressed" Color="{StaticResource Primitive.Slate.600}"/>
+
     <!-- Caption-close: distinct red used only on the title-bar X button.
          Different shade from Action.Danger so the chrome reads
          consistently with Windows close-button conventions. -->
     <SolidColorBrush x:Key="Action.CaptionClose.Hover"   Color="{StaticResource Primitive.Red.700.CaptionHover}"/>
     <SolidColorBrush x:Key="Action.CaptionClose.Pressed" Color="{StaticResource Primitive.Red.700.CaptionPressed}"/>
-
-    <!-- Neutral: badges, dividers, low-emphasis fills. -->
-    <SolidColorBrush x:Key="Action.Neutral" Color="{StaticResource Primitive.Slate.600}"/>
 
     <!-- Status. Outcome and state colours. Warning is imminent risk
          requiring user attention; Success is completion or positive

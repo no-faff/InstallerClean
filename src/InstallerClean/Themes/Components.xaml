@@ -738,7 +738,7 @@
                             <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Neutral}"/>
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.CaptionButton.Pressed}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
