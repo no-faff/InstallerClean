@@ -408,9 +408,8 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Оставлено {0} {1} на месте: с момента сканирования они снова понадобились программе.</value></data>
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Оставлено {0} {1} на месте: после сканирования они снова понадобились программе.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -823,7 +822,7 @@
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} зарегистрированных файла ещё нужны ({1})</value></data>
   <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину.</value></data>
   <data name="Completion.PermanentDeleteSummaryWithErrors.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину. {2} {3}</value></data>
-  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Оставлен {0} {1} на месте: с момента сканирования он снова понадобился программе.</value></data>
+  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Оставлен {0} {1} на месте: после сканирования он снова понадобился программе.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Найдено {0} зарегистрированный {1}.</value></data>
   <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Найдено {0} зарегистрированных {1}.</value></data>
 

@@ -408,9 +408,8 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} dibiarkan di tempatnya, kembali diperlukan sebuah program sejak pemindaian.</value></data>
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} dibiarkan di tempatnya, karena sebuah program kembali membutuhkannya setelah pemindaian.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -522,7 +521,7 @@ Tinggal dua kemungkinan penyebabnya: perangkat lunak keamanan sedang menahan C:\
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Basis data penginstal tidak tersedia</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Pemindaian gagal</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Basis data Windows Installer tampak kosong atau tidak bisa diakses. Ini tidak biasa bahkan pada Windows yang baru dipasang dan biasanya berarti basis data rusak atau alat pihak ketiga telah mengosongkannya. Menjalankan 'sfc /scannow' dari prompt dengan hak administrator biasanya memperbaikinya.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer menolak menampilkan daftar produk yang terpasang, dan InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi tidak akan membantu. Izin pada catatan penginstal milik Windows sendiri mungkin telah diubah, atau perangkat lunak keamanan mungkin memblokirnya. Menjalankan 'sfc /scannow' dari prompt dengan hak administrator layak dicoba.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer menolak menampilkan daftar produk yang terpasang, dan InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi tidak akan membantu. Izin pada catatan Windows Installer mungkin telah diubah, atau perangkat lunak keamanan mungkin memblokirnya. Menjalankan 'sfc /scannow' dari prompt dengan hak administrator layak dicoba.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->

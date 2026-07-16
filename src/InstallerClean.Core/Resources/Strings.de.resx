@@ -408,9 +408,8 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} an Ort und Stelle belassen, seit dem Scan wieder von einem Programm benötigt.</value></data>
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} an Ort und Stelle belassen, weil ein Programm sie nach dem Scan wieder benötigt.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -522,7 +521,7 @@ Damit bleiben zwei wahrscheinliche Ursachen: Eine Sicherheitssoftware hält C:\W
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Installer-Datenbank nicht verfügbar</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scan fehlgeschlagen</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Die Windows-Installer-Datenbank scheint leer oder nicht zugänglich zu sein. Das ist selbst bei einer frischen Windows-Installation ungewöhnlich und bedeutet meist, dass die Datenbank beschädigt ist oder ein Drittanbieter-Tool sie geleert hat. 'sfc /scannow' an einer Eingabeaufforderung mit erhöhten Rechten behebt das in der Regel.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer hat das Auflisten der installierten Produkte verweigert, und InstallerClean läuft bereits als Administrator, es noch einmal auszuführen hilft also nicht. Die Berechtigungen für die Installer-Einträge von Windows selbst wurden möglicherweise geändert, oder eine Sicherheitssoftware blockiert sie. Es lohnt sich, 'sfc /scannow' an einer Eingabeaufforderung mit erhöhten Rechten auszuführen.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer hat das Auflisten der installierten Produkte verweigert, und InstallerClean läuft bereits als Administrator, es noch einmal auszuführen hilft also nicht. Die Berechtigungen für die Einträge von Windows Installer wurden möglicherweise geändert, oder eine Sicherheitssoftware blockiert sie. Es lohnt sich, 'sfc /scannow' an einer Eingabeaufforderung mit erhöhten Rechten auszuführen.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->

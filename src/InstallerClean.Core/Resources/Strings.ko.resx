@@ -408,8 +408,7 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{1} {0}개는 검사 이후 어떤 프로그램이 다시 필요로 하게 되어 그대로 두었습니다.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
@@ -522,7 +521,7 @@
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>설치 관리자 데이터베이스를 사용할 수 없음</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>검사 실패</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer 데이터베이스가 비어 있거나 접근할 수 없는 것으로 보입니다. 이는 새로 설치한 Windows에서도 드문 일이며, 보통 데이터베이스가 손상되었거나 타사 도구가 이를 비웠다는 뜻입니다. 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행하면 대개 복구됩니다.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer가 설치된 제품의 목록 표시를 거부했으며, InstallerClean은 이미 관리자 권한으로 실행 중이므로 다시 실행해도 도움이 되지 않습니다. Windows 자체 설치 관리자 기록의 권한이 변경되었거나, 보안 소프트웨어가 이를 차단하고 있을 수 있습니다. 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행해 볼 만합니다.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer가 설치된 제품의 목록 표시를 거부했으며, InstallerClean은 이미 관리자 권한으로 실행 중이므로 다시 실행해도 도움이 되지 않습니다. Windows Installer 기록의 권한이 변경되었거나, 보안 소프트웨어가 이를 차단하고 있을 수 있습니다. 관리자 권한 명령 프롬프트에서 'sfc /scannow'를 실행해 볼 만합니다.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->

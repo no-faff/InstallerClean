@@ -408,9 +408,8 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} conservados en su sitio: un programa ha vuelto a necesitarlos desde el análisis.</value></data>
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} conservados en su sitio: un programa ha vuelto a necesitarlos después del análisis.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -522,7 +521,7 @@ Quedan dos causas probables: algún software de seguridad está bloqueando C:\Wi
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Base de datos del instalador no disponible</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Análisis fallido</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>La base de datos de Windows Installer parece estar vacía o inaccesible. Es algo inusual incluso en una instalación de Windows recién hecha y normalmente significa que la base de datos está dañada o que una herramienta de terceros la ha vaciado. Ejecutar 'sfc /scannow' desde un símbolo del sistema con privilegios elevados suele repararla.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer se negó a enumerar los productos instalados, e InstallerClean ya se está ejecutando como administrador, así que volver a ejecutarlo no servirá de nada. Puede que se hayan cambiado los permisos de los propios registros de instalación de Windows, o que algún software de seguridad los esté bloqueando. Vale la pena probar a ejecutar 'sfc /scannow' desde un símbolo del sistema con privilegios elevados.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer se negó a enumerar los productos instalados, e InstallerClean ya se está ejecutando como administrador, así que volver a ejecutarlo no servirá de nada. Puede que se hayan cambiado los permisos de los registros de Windows Installer, o que algún software de seguridad los esté bloqueando. Vale la pena probar a ejecutar 'sfc /scannow' desde un símbolo del sistema con privilegios elevados.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
@@ -855,5 +854,5 @@ No se pudo escribir el archivo crash.log.</value></data>
   <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Encontrado {0} {1} para limpiar ({2}).</value></data>
   <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Eliminado {0} {1}.</value></data>
   <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Movido {0} {1}.</value></data>
-  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>{0} {1} conservado en su sitio: un programa ha vuelto a necesitarlo desde el análisis.</value></data>
+  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>{0} {1} conservado en su sitio: un programa ha vuelto a necesitarlo después del análisis.</value></data>
 </root>

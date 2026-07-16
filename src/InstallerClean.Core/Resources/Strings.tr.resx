@@ -408,9 +408,8 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Taramadan bu yana bir programın yeniden ihtiyaç duyduğu {0} {1} yerinde bırakıldı.</value></data>
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Taramadan sonra bir programın yeniden ihtiyaç duymaya başladığı {0} {1} yerinde bırakıldı.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -522,7 +521,7 @@ Geriye iki olası neden kalıyor: bir güvenlik yazılımı C:\Windows\Installer
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Yükleyici veritabanı kullanılamıyor</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Tarama başarısız</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer veritabanı boş ya da erişilemez görünüyor. Bu, yeni bir Windows kurulumunda bile olağan dışıdır ve genellikle veritabanının bozuk olduğu ya da üçüncü taraf bir aracın onu temizlediği anlamına gelir. Yükseltilmiş bir komut isteminden 'sfc /scannow' çalıştırmak genellikle onu onarır.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer, yüklü ürünleri listelemeyi reddetti ve InstallerClean zaten yönetici olarak çalışıyor, bu yüzden onu yeniden çalıştırmak işe yaramaz. Windows'un kendi yükleyici kayıtlarındaki izinler değiştirilmiş olabilir ya da bir güvenlik yazılımı bunları engelliyor olabilir. Yükseltilmiş bir komut isteminden 'sfc /scannow' çalıştırmak denemeye değer.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer, yüklü ürünleri listelemeyi reddetti ve InstallerClean zaten yönetici olarak çalışıyor, bu yüzden onu yeniden çalıştırmak işe yaramaz. Windows Installer kayıtlarındaki izinler değiştirilmiş olabilir ya da bir güvenlik yazılımı bunları engelliyor olabilir. Yükseltilmiş bir komut isteminden 'sfc /scannow' çalıştırmak denemeye değer.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->

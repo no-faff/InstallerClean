@@ -159,7 +159,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to the Recycle Bin | 已将 {0} 个{1}移到回收站 |
 | {0} {1} moved to the Recycle Bin. {2} {3} | 已将 {0} 个{1}移到回收站。{2} 个{3} |
 | {0} {1} moved to the Recycle Bin. {2} {3} | 已将 {0} 个{1}移到回收站。{2} 个{3} |
-| {0} {1} kept in place, needed again by a program since the scan. | {0} 个{1}已保留在原处，自这次扫描以来又有程序需要它们。 |
+| {0} {1} kept in place, because a program started needing them again after the scan. | {0} 个{1}已保留在原处，因为这次扫描之后又有程序需要它们了。 |
 | Moved {0} of {1} {2} before you cancelled. | 在您取消前，已移动 {1} 个{2}中的 {0} 个。 |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | 在您取消前，已将 {1} 个{2}中的 {0} 个移到回收站。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | 在您取消前，已永久删除 {1} 个{2}中的 {0} 个。 |
@@ -216,7 +216,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Installer database unavailable | 安装程序数据库不可用 |
 | Scan failed | 扫描失败 |
 | The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Windows Installer 数据库似乎为空或无法访问。即便在全新安装的 Windows 上这也很不寻常，通常意味着数据库已损坏，或被某个第三方工具清空了。在提权的命令提示符中运行“sfc /scannow”通常可以修复它。 |
-| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer 拒绝列出已安装的产品，而 InstallerClean 已经以管理员身份运行，所以再运行一次也无济于事。可能是 Windows 自身的安装程序记录的权限被更改了，或者有安全软件正在阻止访问。可以试试在提权的命令提示符中运行“sfc /scannow”。 |
+| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on the Windows Installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer 拒绝列出已安装的产品，而 InstallerClean 已经以管理员身份运行，所以再运行一次也无济于事。可能是 Windows Installer 记录的权限被更改了，或者有安全软件正在阻止访问。可以试试在提权的命令提示符中运行“sfc /scannow”。 |
 | Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | 在连续 {0} 次失败后，Windows Installer 拒绝列出产品（最后的错误代码为 {1}）。请尝试重启 Windows，或在提权的命令提示符中运行“sfc /scannow”。 |
 | Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | 在连续 {0} 次失败后，Windows Installer 拒绝列出某个产品的补丁（最后的错误代码为 {1}）。请尝试重启 Windows，或在提权的命令提示符中运行“sfc /scannow”。 |
 | InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it. | InstallerClean 无法将这次扫描与 Windows 进行交叉核对：Windows 仍列出的每一项都在缓存文件夹中缺失，而文件夹中的文件又与 Windows 所知的任何内容都对不上。这更像是读取安装程序记录时出了问题，而不是有文件可以安全删除，因此没有列出任何可清理的内容。重启 Windows 后再次扫描通常就能解决。 |

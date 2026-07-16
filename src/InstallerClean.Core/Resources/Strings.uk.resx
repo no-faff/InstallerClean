@@ -408,8 +408,7 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} залишено на місці: після сканування вони знову знадобилися програмі.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the

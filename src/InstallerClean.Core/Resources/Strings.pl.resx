@@ -408,9 +408,8 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Pozostawiono na miejscu {0} {1}, których program znów potrzebuje od czasu skanowania.</value></data>
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął ich potrzebować.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -861,7 +860,7 @@ Nie udało się zapisać dziennika awarii.</value></data>
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} zarejestrowane pliki nadal potrzebne ({1})</value></data>
   <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>Usunięto trwale {0} {1}. Nie trafiły do Kosza.</value></data>
   <data name="Completion.PermanentDeleteSummaryWithErrors.Few" xml:space="preserve"><value>Usunięto trwale {0} {1}. Nie trafiły do Kosza. {2} {3}</value></data>
-  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Pozostawiono na miejscu {0} {1}, którego program znów potrzebuje od czasu skanowania.</value></data>
+  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął go potrzebować.</value></data>
   <data name="RecycleUnavailable.Body.Few" xml:space="preserve"><value>Dlatego te {0} {1} ({2}) nie zostały usunięte. Możesz przenieść je w bezpieczne miejsce lub usunąć trwale.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Znaleziono {0} zarejestrowany {1}.</value></data>
   <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Znaleziono {0} zarejestrowane {1}.</value></data>

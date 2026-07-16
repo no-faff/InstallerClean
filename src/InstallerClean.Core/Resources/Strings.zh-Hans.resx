@@ -408,9 +408,8 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} 个{1}已保留在原处，自这次扫描以来又有程序需要它们。</value></data>
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} 个{1}已保留在原处，因为这次扫描之后又有程序需要它们了。</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -522,7 +521,7 @@
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>安装程序数据库不可用</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>扫描失败</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer 数据库似乎为空或无法访问。即便在全新安装的 Windows 上这也很不寻常，通常意味着数据库已损坏，或被某个第三方工具清空了。在提权的命令提示符中运行“sfc /scannow”通常可以修复它。</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer 拒绝列出已安装的产品，而 InstallerClean 已经以管理员身份运行，所以再运行一次也无济于事。可能是 Windows 自身的安装程序记录的权限被更改了，或者有安全软件正在阻止访问。可以试试在提权的命令提示符中运行“sfc /scannow”。</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer 拒绝列出已安装的产品，而 InstallerClean 已经以管理员身份运行，所以再运行一次也无济于事。可能是 Windows Installer 记录的权限被更改了，或者有安全软件正在阻止访问。可以试试在提权的命令提示符中运行“sfc /scannow”。</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->

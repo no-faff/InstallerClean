@@ -408,8 +408,7 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} mantidos no lugar: um programa voltou a precisar deles depois da análise.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
@@ -522,7 +521,7 @@ Restam duas causas prováveis: algum software de segurança está bloqueando C:\
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Banco de dados do instalador indisponível</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Falha na análise</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>O banco de dados do Windows Installer parece estar vazio ou inacessível. Isso é incomum mesmo em uma instalação nova do Windows e normalmente significa que o banco de dados está corrompido ou que uma ferramenta de terceiros o esvaziou. Executar 'sfc /scannow' em um prompt elevado costuma repará-lo.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>O Windows Installer recusou-se a listar os produtos instalados, e o InstallerClean já está em execução como administrador, então executá-lo de novo não vai ajudar. As permissões dos próprios registros de instalação do Windows podem ter sido alteradas, ou algum software de segurança pode estar bloqueando o acesso. Vale a pena executar 'sfc /scannow' em um prompt elevado.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>O Windows Installer recusou-se a listar os produtos instalados, e o InstallerClean já está em execução como administrador, então executá-lo de novo não vai ajudar. As permissões dos registros do Windows Installer podem ter sido alteradas, ou algum software de segurança pode estar bloqueando o acesso. Vale a pena executar 'sfc /scannow' em um prompt elevado.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->

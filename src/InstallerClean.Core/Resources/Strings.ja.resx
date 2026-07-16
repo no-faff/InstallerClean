@@ -408,8 +408,7 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} 個の {1} はそのまま残しました。スキャン後にプログラムが再び必要としたためです。</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
@@ -522,7 +521,7 @@
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>インストーラーデータベースが利用できません</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>スキャンに失敗しました</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer データベースが空であるか、アクセスできないようです。これは新しい Windows インストールでも異常であり、通常はデータベースが破損しているか、サードパーティツールが消去したことを意味します。昇格したプロンプトで'sfc /scannow'を実行すると、通常は修復されます。</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer がインストール済み製品の一覧表示を拒否しました。InstallerClean はすでに管理者として実行されているため、もう一度実行しても解決しません。Windows 自身のインストーラー登録情報のアクセス許可が変更されたか、セキュリティソフトがブロックしている可能性があります。昇格したプロンプトで'sfc /scannow'を実行してみる価値はあります。</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer がインストール済み製品の一覧表示を拒否しました。InstallerClean はすでに管理者として実行されているため、もう一度実行しても解決しません。Windows Installer の登録情報のアクセス許可が変更されたか、セキュリティソフトがブロックしている可能性があります。昇格したプロンプトで'sfc /scannow'を実行してみる価値はあります。</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
