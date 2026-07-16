@@ -35,8 +35,6 @@ public static class Strings
     private static string Get(string key) =>
         Manager.GetString(key, Localisation.UiCulture) ?? key;
 
-    public static string About_Provenance_Body => Get("About.Provenance.Body");
-    public static string About_Provenance_Heading => Get("About.Provenance.Heading");
     public static string Action_About => Get("Action.About");
     public static string Action_Browse => Get("Action.Browse");
     public static string Action_BuyMeACuppa => Get("Action.BuyMeACuppa");

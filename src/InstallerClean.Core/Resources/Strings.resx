@@ -99,15 +99,6 @@
   <data name="Section.Registered.Details" xml:space="preserve"><value>PRODUCT DETAILS</value></data>
   <data name="Section.Move.Location" xml:space="preserve"><value>MOVE LOCATION</value></data>
   <data name="Section.SayThanks" xml:space="preserve"><value>SAY THANKS</value></data>
-  <!-- About-window provenance panel (what it is, who wrote it, that the source
-       is open) for the suspicious user of an unsigned, elevated app. SHIP-GATE:
-       these values are deliberately BLANK. The copy is the owner's, supplied
-       before the final build; until then the panel collapses (bound to the body
-       being empty), so a blank panel can never reach a release. If the copy has
-       not arrived by the final build, the panel is reverted and the feature held
-       for a later release. Do NOT write provenance prose here. -->
-  <data name="About.Provenance.Heading" xml:space="preserve"><value></value></data>
-  <data name="About.Provenance.Body" xml:space="preserve"><value></value></data>
 
   <!-- Field labels (used in detail panels) -->
   <data name="Field.Reason" xml:space="preserve"><value>Reason</value></data>
