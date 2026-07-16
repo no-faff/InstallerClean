@@ -34,6 +34,11 @@ jobs:
         uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4
         with:
           languages: csharp
+          # security-extended adds the higher-recall, lower-precision query pack on
+          # top of the default suite: more alerts to triage in exchange for catching
+          # classes the default set leaves out, which is the right trade for an app
+          # that runs elevated and reaches COM, P/Invoke and the registry.
+          queries: security-extended
 
       - name: Build
         # The whole solution, so the CLI host is analysed too; Core flows
