@@ -123,6 +123,9 @@ public class CliContractTests
     [InlineData(5, 0, 0)]  // no errors -> success
     [InlineData(3, 2, 2)]  // some processed, some failed -> partial
     [InlineData(0, 5, 1)]  // nothing processed -> hard failure
+    [InlineData(0, 0, 0)]  // nothing to process, nothing failed -> success (the
+                           // act-time re-verify dropped every candidate; the CLI
+                           // acts on none and the run still exits Ok)
     public void ClassifyFileOperation_maps_counts_to_exit_code(int processed, int errors, int expectedExit)
     {
         Assert.Equal(expectedExit, CliContract.ClassifyFileOperation(processed, errors).ExitCode);

@@ -258,54 +258,41 @@ internal static class Program
                 var rebootService = services.GetRequiredService<IPendingRebootService>();
                 var rebootCheck = rebootService.Check();
                 if (rebootCheck.IsBlocked)
-                {
                     // Block + null Reason is unreachable per the PendingRebootResult.Block
                     // factory contract; .Value is safe inside this IsBlocked branch.
-                    var reason = rebootCheck.Reason!.Value;
-                    var stdoutMessage = reason switch
-                    {
-                        PendingRebootReason.MsiExecuteMutexHeld =>
-                            Strings.Cli_PendingRebootBlocked_MsiExecuteMutex,
-                        PendingRebootReason.InstallerInProgress =>
-                            Strings.Cli_PendingRebootBlocked_InstallerInProgress,
-                        PendingRebootReason.PendingRenameInCache =>
-                            string.Format(
-                                Strings.Cli_PendingRebootBlocked_PendingRenameInCache,
-                                rebootCheck.Detail ?? string.Empty),
-                        _ => throw new InvalidOperationException(
-                            $"Unhandled PendingRebootReason: {reason}. " +
-                            "A new enum value was added without updating the CLI message switch."),
-                    };
-                    Console.WriteLine(stdoutMessage);
-                    // The reason label and template are built English: the
-                    // Cli.EventLogReason.* labels ARE translated in the
-                    // satellites, but the Application channel is sysadmin-facing
-                    // and an RMM grep on a known phrase needs a stable English
-                    // target. The localised stdout sentence above is what the
-                    // operator reads; the label switch lives inside the scope so
-                    // it resolves en-GB, not the OS language.
-                    MachineContract.WriteEventLog(CliEventClass.TransientSkip, () =>
-                    {
-                        var reasonLabel = reason switch
-                        {
-                            PendingRebootReason.MsiExecuteMutexHeld =>
-                                Strings.Cli_EventLogReason_MsiExecuteMutex,
-                            PendingRebootReason.InstallerInProgress =>
-                                Strings.Cli_EventLogReason_InstallerInProgress,
-                            PendingRebootReason.PendingRenameInCache =>
-                                Strings.Cli_EventLogReason_PendingRenameInCache,
-                            _ => reason.ToString(),
-                        };
-                        return string.Format(Strings.Cli_EventLogPendingRebootBlocked,
-                            arg, reasonLabel, rebootCheck.Detail ?? string.Empty);
-                    });
-                    // Transient: a reboot clears the gate. Hard scan and
-                    // move/delete failures stay on ExitError.
-                    return ExitTransient;
-                }
+                    return EmitPendingRebootBlocked(arg, rebootCheck.Reason!.Value, rebootCheck.Detail);
             }
 
-            var filePaths = scanResult.RemovableFiles.Select(f => f.FullPath).ToList();
+            // P2: re-verify the removable set against the Windows Installer API
+            // immediately before acting. This is the one window neither the fresh
+            // gate above nor the P1 mutex hold can see: a patch whose state changed
+            // AND settled between the scan and now (a superseded patch reverted to
+            // Applied because its superseding patch was uninstalled). It runs inside
+            // this try, so a re-verify that throws (the enumeration can fail, e.g.
+            // LocalisedAccessException) stops the batch through the existing error
+            // path rather than acting on an un-verified set, and a cancellation
+            // routes to the OCE catch. It runs synchronously before the batch; the
+            // CLI blocks on it naturally.
+            var reverifier = services.GetRequiredService<IRemovableReverifier>();
+            var reverify = await reverifier.ReverifyAsync(
+                scanResult.RemovableFiles.Select(f => f.FullPath).ToList(), token);
+            var survivingSet = new HashSet<string>(reverify.Surviving, StringComparer.OrdinalIgnoreCase);
+            var survivingFiles = scanResult.RemovableFiles
+                .Where(f => survivingSet.Contains(f.FullPath)).ToList();
+
+            // Anything a currently-registered package reclaimed is kept in place and
+            // reported (human stdout, OS language; deliberately NOT a machine-read
+            // line). The counts and byte figures below are recomputed from the
+            // survivor subset so "X of Y" and the freed-space total describe what was
+            // acted on, not the pre-reverify scan.
+            if (reverify.Dropped.Count > 0)
+                Console.WriteLine(string.Format(
+                    DisplayHelpers.Pluralise(reverify.Dropped.Count, Strings.Completion_ReverifySkipped, "Completion.ReverifySkipped"),
+                    reverify.Dropped.Count, DisplayHelpers.PluraliseFile(reverify.Dropped.Count)));
+
+            var filePaths = survivingFiles.Select(f => f.FullPath).ToList();
+            count = survivingFiles.Count;
+            totalBytes = survivingFiles.Sum(f => f.SizeBytes);
 
             // Per-file progress, reported synchronously on the producing
             // thread (see SynchronousProgress). A console Main has no
@@ -328,8 +315,30 @@ internal static class Program
                 Console.WriteLine(string.Format(
                     DisplayHelpers.Pluralise(count, Strings.Cli_DeletingFiles, Strings.Cli_DeletingFiles, "Cli.DeletingFiles"),
                     count, DisplayHelpers.PluraliseFile(count)));
-                var result = await deleteService.DeleteFilesAsync(
-                    filePaths, permitPermanentDelete: false, progress: progress, cancellationToken: token);
+                // Skip the service when the re-verify left nothing to act on:
+                // DeleteFilesService returns 0/0 for an empty list anyway, but
+                // synthesizing it keeps the /d and /m branches symmetric (Move
+                // would otherwise create and probe its destination for an empty
+                // batch). The summary path below still fires with 0, exit Ok, so the
+                // one-entry-per-run event-log contract holds.
+                var result = filePaths.Count == 0
+                    ? new DeleteResult(0, Array.Empty<FileOperationError>())
+                    : await deleteService.DeleteFilesAsync(
+                        filePaths, permitPermanentDelete: false, progress: progress, cancellationToken: token);
+
+                // P1: a Windows Installer transaction grabbed Global\_MSIExecute in
+                // the race after the gate check passed, so the service refused and
+                // touched nothing. Report it identically to a pre-act gate block.
+                if (result.InstallerBusy)
+                    return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexHeld, null);
+
+                // Item 17: the service now RETURNS the partial result on a mid-batch
+                // cancel instead of throwing. Re-enter the existing OCE catch so the
+                // cancelled-run event-log entry and Partial/Cancelled exit code come
+                // out byte-for-byte as before (processedCount is already tracked by
+                // the progress reporter).
+                if (result.Cancelled)
+                    token.ThrowIfCancellationRequested();
 
                 // The shell recycle is recycle-or-permanently-delete. When the bin is
                 // unavailable for the volume the service refuses rather than nuking, and a
@@ -368,7 +377,7 @@ internal static class Program
                 // that didn't process every file.
                 long actualBytes = result.Errors.Count == 0
                     ? totalBytes
-                    : SumBytesExcludingErrors(scanResult.RemovableFiles, result.Errors);
+                    : SumBytesExcludingErrors(survivingFiles, result.Errors);
                 var outcome = CliContract.ClassifyFileOperation(result.DeletedCount, result.Errors.Count);
                 // Size and nouns are recomputed inside the en-GB scope, not
                 // reused from the stdout copies, so the audit line reads fully
@@ -388,7 +397,23 @@ internal static class Program
             Console.WriteLine(string.Format(
                 DisplayHelpers.Pluralise(count, Strings.Cli_MovingFiles, Strings.Cli_MovingFiles, "Cli.MovingFiles"),
                 count, DisplayHelpers.PluraliseFile(count), moveDest));
-            var moveResult = await moveService.MoveFilesAsync(filePaths, moveDest, progress, token);
+            // See the /d branch: skip the service (and MoveFilesService's
+            // destination-folder create + probe) when nothing survived the
+            // re-verify; synthesize the empty result so the summary path still fires
+            // with 0 and exit Ok.
+            var moveResult = filePaths.Count == 0
+                ? new MoveResult(0, Array.Empty<FileOperationError>())
+                : await moveService.MoveFilesAsync(filePaths, moveDest, progress, token);
+
+            // P1: mutex held at the service boundary => same outcome as a gate block.
+            if (moveResult.InstallerBusy)
+                return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexHeld, null);
+
+            // Item 17: partial result returned on a mid-batch cancel; re-enter the
+            // OCE catch so the machine contract is unchanged.
+            if (moveResult.Cancelled)
+                token.ThrowIfCancellationRequested();
+
             Console.WriteLine(string.Format(
                 DisplayHelpers.Pluralise(moveResult.MovedCount, Strings.Cli_MovedFiles, Strings.Cli_MovedFiles, "Cli.MovedFiles"),
                 moveResult.MovedCount, DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
@@ -405,7 +430,7 @@ internal static class Program
             // Same per-file error exclusion as the /d branch.
             long actualMovedBytes = moveResult.Errors.Count == 0
                 ? totalBytes
-                : SumBytesExcludingErrors(scanResult.RemovableFiles, moveResult.Errors);
+                : SumBytesExcludingErrors(survivingFiles, moveResult.Errors);
             var moveOutcome = CliContract.ClassifyFileOperation(moveResult.MovedCount, moveResult.Errors.Count);
             // Size and nouns recomputed inside the en-GB scope; see the /d
             // summary above for why the stdout copies are not reused.
@@ -555,6 +580,62 @@ internal static class Program
         return removableFiles
             .Where(f => !errorPaths.Contains(f.FullPath))
             .Sum(f => f.SizeBytes);
+    }
+
+    /// <summary>
+    /// Emits the pending-reboot-blocked outcome: the localised stdout reason
+    /// sentence, the English Application-log entry, and <see cref="ExitTransient"/>.
+    /// Shared by the pre-act gate check and the P1 service-boundary refusal. When a
+    /// Move or Delete service acquires <c>Global\_MSIExecute</c> and finds it held
+    /// (<see cref="Models.MoveResult.InstallerBusy"/> /
+    /// <see cref="Models.DeleteResult.InstallerBusy"/>), a Windows Installer
+    /// transaction started in the sub-millisecond race after the gate check passed;
+    /// mapping that to <see cref="PendingRebootReason.MsiExecuteMutexHeld"/> here
+    /// makes the service-boundary refusal produce the identical machine contract
+    /// (stdout line, event-log entry, exit code) a gate block does, so an RMM
+    /// consumer cannot tell the two apart.
+    /// </summary>
+    private static int EmitPendingRebootBlocked(string arg, PendingRebootReason reason, string? detail)
+    {
+        var stdoutMessage = reason switch
+        {
+            PendingRebootReason.MsiExecuteMutexHeld =>
+                Strings.Cli_PendingRebootBlocked_MsiExecuteMutex,
+            PendingRebootReason.InstallerInProgress =>
+                Strings.Cli_PendingRebootBlocked_InstallerInProgress,
+            PendingRebootReason.PendingRenameInCache =>
+                string.Format(
+                    Strings.Cli_PendingRebootBlocked_PendingRenameInCache,
+                    detail ?? string.Empty),
+            _ => throw new InvalidOperationException(
+                $"Unhandled PendingRebootReason: {reason}. " +
+                "A new enum value was added without updating the CLI message switch."),
+        };
+        Console.WriteLine(stdoutMessage);
+        // The reason label and template are built English: the
+        // Cli.EventLogReason.* labels ARE translated in the satellites, but the
+        // Application channel is sysadmin-facing and an RMM grep on a known phrase
+        // needs a stable English target. The localised stdout sentence above is
+        // what the operator reads; the label switch lives inside the scope so it
+        // resolves en-GB, not the OS language.
+        MachineContract.WriteEventLog(CliEventClass.TransientSkip, () =>
+        {
+            var reasonLabel = reason switch
+            {
+                PendingRebootReason.MsiExecuteMutexHeld =>
+                    Strings.Cli_EventLogReason_MsiExecuteMutex,
+                PendingRebootReason.InstallerInProgress =>
+                    Strings.Cli_EventLogReason_InstallerInProgress,
+                PendingRebootReason.PendingRenameInCache =>
+                    Strings.Cli_EventLogReason_PendingRenameInCache,
+                _ => reason.ToString(),
+            };
+            return string.Format(Strings.Cli_EventLogPendingRebootBlocked,
+                arg, reasonLabel, detail ?? string.Empty);
+        });
+        // Transient: a reboot (or the in-flight transaction finishing) clears the
+        // gate. Hard scan and move/delete failures stay on ExitError.
+        return ExitTransient;
     }
 
     /// <summary>
