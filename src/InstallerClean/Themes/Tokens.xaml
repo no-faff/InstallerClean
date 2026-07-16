@@ -14,8 +14,9 @@
     Naming: <category>.<role>[.<state>].
         Surface.*, Text.*, Action.<intent>.<state>, Status.*,
         Decoration.*, Link.*, Scrollbar.*, Type.*,
-        Radius.*, StrokeThickness.*, BorderThickness.*, Gap.*,
-        GapBottom.*, GapTop.*, GapRight.*, GapLeft.*, GapX.*.
+        Radius.*, StrokeThickness.*, BorderThickness.*, Margin.*,
+        Padding.*, Gap.*, GapBottom.*, GapTop.*, GapRight.*,
+        GapLeft.*, GapX.*.
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -202,7 +203,7 @@
 
     <!-- Outer margin shared by the detail windows (Orphaned, Registered,
          About) so they share a consistent inset. -->
-    <Thickness x:Key="DetailWindowMargin">24,4,24,24</Thickness>
+    <Thickness x:Key="Margin.DetailWindow">24,4,24,24</Thickness>
 
     <!-- Padding shared by the modal-card Borders. Each of them also
          shares Surface.Card, Radius.ModalCard and the
@@ -214,13 +215,13 @@
          SizeToContent="Height", so the panel sits in its own Auto row
          above the bottom-nav row: top clears the 32px title bar, bottom
          is the gap to the nav (which carries its own 8px top margin). -->
-    <Thickness x:Key="MainContentMargin">24,16,24,16</Thickness>
+    <Thickness x:Key="Margin.MainContent">24,16,24,16</Thickness>
 
     <!-- Negative top/right margin used by the detail-window caption-X
          close buttons (About, Registered, Orphaned). The -24 right
-         component pulls the X out past DetailWindowMargin's 24 right
+         component pulls the X out past Margin.DetailWindow's 24 right
          component so the X sits at the window edge; the two move
          together. -->
-    <Thickness x:Key="CloseButtonOverhangMargin">0,-4,-24,0</Thickness>
+    <Thickness x:Key="Margin.CloseButtonOverhang">0,-4,-24,0</Thickness>
 
 </ResourceDictionary>

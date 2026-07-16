@@ -42,7 +42,7 @@
         <!-- Title bar. Row 0 height matches WindowChrome.CaptionHeight (32)
              so the icon and the 32px caption buttons share a centerline.
              Left margin (16) matches where the detail windows' title bars
-             land (DetailWindowMargin 24 + StackPanel -8). -->
+             land (Margin.DetailWindow 24 + StackPanel -8). -->
         <StackPanel Grid.Row="0" Orientation="Horizontal"
                     VerticalAlignment="Center" Margin="16,0,0,0">
             <chrome:DecorativeImage Source="Assets/splash-icon.png" Width="16" Height="16"
@@ -81,7 +81,7 @@
              text-size factor in step with the explicit scaled window
              width set in code-behind, so the window widens with its
              text instead of starving the counts row. -->
-        <Grid Grid.Row="1" Margin="{StaticResource MainContentMargin}"
+        <Grid Grid.Row="1" Margin="{StaticResource Margin.MainContent}"
               MaxWidth="{a11y:TextScaled 780}" HorizontalAlignment="Center"
               IsEnabled="{Binding IsMainContentInteractive}">
             <!-- Three rows, not five with fixed 16 and 12 spacer rows between

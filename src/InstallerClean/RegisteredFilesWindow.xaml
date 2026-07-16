@@ -20,7 +20,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
 
-    <Grid Margin="{StaticResource DetailWindowMargin}">
+    <Grid Margin="{StaticResource Margin.DetailWindow}">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition Height="Auto"/><RowDefinition Height="8"/>
@@ -50,7 +50,7 @@
         </StackPanel>
         <Button Grid.Row="0" Style="{StaticResource CaptionCloseButton}" Content="&#xE8BB;"
                 Click="CloseClick" HorizontalAlignment="Right" VerticalAlignment="Top"
-                Margin="{StaticResource CloseButtonOverhangMargin}" AutomationProperties.Name="{loc:Translate Automation.CloseWindow}" ToolTip="{loc:Translate Tooltip.Close}"/>
+                Margin="{StaticResource Margin.CloseButtonOverhang}" AutomationProperties.Name="{loc:Translate Automation.CloseWindow}" ToolTip="{loc:Translate Tooltip.Close}"/>
 
         <TextBlock Grid.Row="1" Text="{loc:Translate Section.Registered.Products}" Foreground="{StaticResource Text.Body}"
                    FontSize="{DynamicResource Type.Heading.Sm}"
