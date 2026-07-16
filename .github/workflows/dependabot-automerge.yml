@@ -5,6 +5,7 @@ on: pull_request
 permissions:
   contents: write
   pull-requests: write
+  actions: write   # the relock job dispatches ci.yml and codeql.yml (workflow_dispatch)
 
 jobs:
   # Dependabot's NuGet updater does not rewrite every packages.lock.json when it
@@ -19,13 +20,24 @@ jobs:
   # is a no-op on the bumps it already gets right (a package used by one project
   # only).
   #
-  # Two consequences worth knowing before touching this job. GitHub will not run
-  # workflows recursively off a GITHUB_TOKEN push, so the CI run for the commit
-  # pushed here arrives in an approval-required state: someone with write access
-  # clicks "Approve and run" on the PR before the checks complete and auto-merge
-  # can act. And Dependabot stops rebasing a PR once a commit it did not write
-  # lands on the branch, so if such a PR later goes stale against main, close it
-  # and let Dependabot raise a fresh one rather than waiting for a rebase.
+  # Two things to know before touching this job.
+  #
+  # A commit pushed with the default GITHUB_TOKEN starts no workflow run of its
+  # own (GitHub's anti-recursion rule), so nothing checks the head SHA this job
+  # pushes and branch protection's required checks (build-and-test, Analyse C#)
+  # would wait on it forever. The "Re-run the required checks" step below closes
+  # that by dispatching ci.yml and codeql.yml: workflow_dispatch is the one event
+  # the anti-recursion rule exempts, and a dispatched run's checks land on the
+  # branch tip, which is the SHA the required checks are matched against. An
+  # "Approve and run" click is a different mechanism (a first-time contributor's
+  # fork PR held for a maintainer) and does not apply to a branch in this repo, so
+  # it is not what unblocks this push. This is a reading of GitHub's documented
+  # behaviour; the job has never met a real Dependabot nuget PR, so the next one is
+  # the first live test of the dispatch path.
+  #
+  # And Dependabot stops rebasing a PR once a commit it did not write lands on the
+  # branch, so if such a PR later goes stale against main, close it and let
+  # Dependabot raise a fresh one rather than waiting for a rebase.
   relock:
     if: |
       github.actor == 'dependabot[bot]' &&
@@ -54,10 +66,12 @@ jobs:
         run: dotnet restore src/InstallerClean.sln --force-evaluate
 
       - name: Commit any lock files Dependabot missed
+        id: relock
         shell: bash
         run: |
           if git diff --quiet -- '*packages.lock.json'; then
             echo "All four lock files already agree with the bumped projects."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name 'github-actions[bot]'
@@ -65,7 +79,24 @@ jobs:
           git add -- '*packages.lock.json'
           git commit -m 'chore(deps): regenerate the lock files for the bumped packages'
           git push
-          echo "::notice::Lock files regenerated and pushed. Approve the queued CI run on the PR ('Approve and run') to let the checks finish."
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+          echo "::notice::Lock files regenerated and pushed; dispatching CI and CodeQL against the update branch so the required checks run on the new commit."
+
+      # The push above lands a new head SHA that no pull_request run will ever
+      # check: GitHub does not start a workflow run for a commit pushed with the
+      # default GITHUB_TOKEN. workflow_dispatch is the documented exception, so
+      # dispatching ci.yml and codeql.yml against the PR branch runs build-and-test
+      # and Analyse C# on the branch tip, which is the SHA branch protection matches
+      # the required checks against. Only needed when a commit was actually pushed;
+      # if the locks already agreed, the original pull_request run still stands.
+      - name: Re-run the required checks on the pushed commit
+        if: steps.relock.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$HEAD_REF"
+          gh workflow run codeql.yml --repo "$GITHUB_REPOSITORY" --ref "$HEAD_REF"
 
   automerge:
     runs-on: ubuntu-latest

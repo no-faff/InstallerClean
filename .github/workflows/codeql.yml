@@ -7,6 +7,9 @@ on:
     branches: [main]
   schedule:
     - cron: '0 6 * * 1'  # Weekly Monday 06:00 UTC
+  # Dispatched by the Dependabot relock job so this required check runs on the
+  # lock-file commit it pushes; a GITHUB_TOKEN push starts no run of its own.
+  workflow_dispatch:
 
 jobs:
   analyse:

@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Lets the Dependabot relock job re-run these checks on the commit it pushes: a
+  # commit pushed with the default GITHUB_TOKEN starts no workflow run of its own
+  # (GitHub's anti-recursion rule), and workflow_dispatch is the documented
+  # exception. Also usable as a manual re-run from the Actions tab.
+  workflow_dispatch:
 
 jobs:
   build-and-test:
