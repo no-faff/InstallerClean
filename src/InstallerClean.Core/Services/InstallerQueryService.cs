@@ -55,9 +55,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
         IProgress<ScanProgressUpdate>? progress,
         CancellationToken ct)
     {
-        // TryAdd on this dictionary means the API enumeration wins over the
-        // registry fallback when both report the same path, because the
-        // API entry carries product metadata the fallback lacks.
+        // One entry per LocalPackage path. Every insertion goes through
+        // MergeClaim, which carries the whole policy for what a second claim on
+        // an already-claimed path does.
         var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
 
         progress?.Report(new ScanProgressUpdate(Strings.Status_EnumeratingProducts));
@@ -80,7 +80,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // not feed it to a screen-reader live region.
                 progress?.Report(new ScanProgressUpdate(
                     productName.Length > 0 ? productName : productCode, IsMilestone: false));
-                claimed.TryAdd(localPackage, new RegisteredPackage(localPackage, productName, productCode));
+                MergeClaim(claimed,
+                    new RegisteredPackage(localPackage, productName, productCode),
+                    ClaimSource.InstallerApi);
             }
 
             var patches = EnumeratePatches(productCode, userSid, context, ct);
@@ -111,8 +113,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     var isUninstallable = uninstallableStr != "0";
                     var isRemovable = isSuperseded && !isUninstallable;
 
-                    MergePatchVerdict(claimed, patchPath, new RegisteredPackage(
-                        patchPath, productName, productCode, patchState, isRemovable));
+                    MergeClaim(claimed,
+                        new RegisteredPackage(patchPath, productName, productCode, patchState, isRemovable),
+                        ClaimSource.InstallerApi);
                 }
             }
         }
@@ -174,31 +177,76 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     /// <summary>
-    /// Merges one API patch row into <paramref name="claimed"/>. A patch is
-    /// cached once per code but its State is per product, so the same .msp can
-    /// be Superseded (removable) for one product and Applied (still needed) for
-    /// another. First-writer-wins would offer a still-applied patch for removal
-    /// on a coin flip of enumeration order; instead, once ANY product claims a
-    /// path non-removable the path stays non-removable, and a previously
-    /// removable row is downgraded to carry the applied product's verdict.
-    /// The verdict is never upgraded the other way. This merge applies to the
-    /// API patch loop only; the product row and the registry-fallback rows keep
-    /// TryAdd, because API-beats-fallback layering is deliberate and a fallback
-    /// row carries no state to downgrade a real verdict with.
+    /// Where a claim on a cached file's path came from. The two sources carry
+    /// different authority and <see cref="MergeClaim"/> is the only place that
+    /// difference is expressed.
     /// </summary>
-    private static void MergePatchVerdict(
-        Dictionary<string, RegisteredPackage> claimed, string patchPath, RegisteredPackage candidate)
+    internal enum ClaimSource
     {
-        if (!claimed.TryGetValue(patchPath, out var existing))
+        /// <summary>
+        /// A product row or a patch row from the Windows Installer API. The API
+        /// is authoritative about what a file IS: whose package it is, and, for
+        /// a patch, its state under each product that holds it.
+        /// </summary>
+        InstallerApi,
+
+        /// <summary>
+        /// A LocalPackage value read straight out of the UserData registry keys.
+        /// Presence-only: it establishes that some registration names the path
+        /// and nothing else, having no state to read a verdict from.
+        /// </summary>
+        RegistryFallback,
+    }
+
+    /// <summary>
+    /// The single insertion policy for <paramref name="claimed"/>: every claim on
+    /// a path runs through here, so what a second claim does is one function
+    /// rather than a rule per call site.
+    ///
+    /// An API claim moves a path towards non-removable and never away from it.
+    /// A patch is cached once per code but its State is per product, so one .msp
+    /// can be Superseded (removable) under one product and Applied (still
+    /// needed) under another, and a corrupt LocalPackage can aim a patch row at
+    /// a product's own cached .msi. First-writer-wins decided both on a coin
+    /// flip of enumeration order. Under this policy, once anything claims a path
+    /// non-removable it stays non-removable, and an existing removable row is
+    /// downgraded by a later non-removable claim; the verdict is never upgraded
+    /// the other way.
+    ///
+    /// A fallback claim can only ADD a path, never displace the row on one. That
+    /// scoping is load-bearing, not a layering preference. The fallback reads the
+    /// same UserData keys the API read and runs after the whole API loop, so every
+    /// removable patch already has a fallback row waiting for its own path, and
+    /// every fallback row is non-removable by construction (RegisteredPackage
+    /// defaults IsRemovable to false, and a fallback row has no State to set it
+    /// from). Letting a fallback claim downgrade would therefore walk in behind
+    /// the API and strip the removable verdict off every superseded patch it had
+    /// just correctly identified: superseded-patch detection would return nothing,
+    /// on every machine, for as long as the change stood.
+    /// </summary>
+    internal static void MergeClaim(
+        Dictionary<string, RegisteredPackage> claimed,
+        RegisteredPackage candidate,
+        ClaimSource source)
+    {
+        if (source == ClaimSource.RegistryFallback)
         {
-            claimed[patchPath] = candidate;
+            claimed.TryAdd(candidate.LocalPackagePath, candidate);
             return;
         }
 
-        // Downgrade only: a removable row loses to a later non-removable claim.
+        if (!claimed.TryGetValue(candidate.LocalPackagePath, out var existing))
+        {
+            claimed[candidate.LocalPackagePath] = candidate;
+            return;
+        }
+
+        // Downgrade only: a removable row loses to a later non-removable claim,
+        // and nothing else moves.
         if (existing.IsRemovable && !candidate.IsRemovable)
-            claimed[patchPath] = candidate;
+            claimed[candidate.LocalPackagePath] = candidate;
     }
+
 
     /// <summary>
     /// Reads one SID subtree's Products and Patches keys into the fallback set.
@@ -225,7 +273,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
                         var localPkg = ipKey?.GetValue("LocalPackage") as string;
                         if (!string.IsNullOrEmpty(localPkg))
-                            claimed.TryAdd(localPkg, new RegisteredPackage(localPkg, "", ""));
+                            MergeClaim(claimed, new RegisteredPackage(localPkg, "", ""),
+                                ClaimSource.RegistryFallback);
                     }
                     catch (Exception ex) when (ex is not OperationCanceledException)
                     {
@@ -252,7 +301,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         using var patchKey = patchesKey.OpenSubKey(patchGuid);
                         var localPkg = patchKey?.GetValue("LocalPackage") as string;
                         if (!string.IsNullOrEmpty(localPkg))
-                            claimed.TryAdd(localPkg, new RegisteredPackage(localPkg, "", ""));
+                            MergeClaim(claimed, new RegisteredPackage(localPkg, "", ""),
+                                ClaimSource.RegistryFallback);
                     }
                     catch (Exception ex) when (ex is not OperationCanceledException)
                     {

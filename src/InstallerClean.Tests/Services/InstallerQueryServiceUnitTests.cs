@@ -52,6 +52,100 @@ public class InstallerQueryServiceUnitTests
     }
 
     [Fact]
+    public async Task A_product_row_downgrades_a_corrupt_patch_claim_on_its_own_package()
+    {
+        // The in-cache variant of the corrupt-record threat CandidateGuard covers
+        // out-of-cache: patch X's LocalPackage is corrupt and names product B's
+        // cached .msi instead of an .msp of its own. A enumerates first and claims
+        // the path removable. B's product row must be able to take it back;
+        // first-writer-wins would decide it on enumeration order and recycle a
+        // package B still needs.
+        const string productPackage = @"C:\Windows\Installer\product-b.msi";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddProduct("{B}");
+        msi.AddPatch("{A}", "{P}", localPackage: productPackage, state: "2", uninstallable: "0");
+        msi.SetProductProperty("{B}", "LocalPackage", productPackage);
+
+        var result = await Run(msi);
+
+        Assert.False(Assert.Single(result, r => r.LocalPackagePath == productPackage).IsRemovable);
+    }
+
+    [Fact]
+    public async Task A_patch_row_never_upgrades_a_products_claim_on_its_own_package()
+    {
+        // The same collision in the other enumeration order. Downgrade-only means
+        // the outcome does not depend on which of the two enumerated first.
+        const string productPackage = @"C:\Windows\Installer\product-a.msi";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddProduct("{B}");
+        msi.SetProductProperty("{A}", "LocalPackage", productPackage);
+        msi.AddPatch("{B}", "{P}", localPackage: productPackage, state: "2", uninstallable: "0");
+
+        var result = await Run(msi);
+
+        Assert.False(Assert.Single(result, r => r.LocalPackagePath == productPackage).IsRemovable);
+    }
+
+    [Fact]
+    public void A_registry_fallback_claim_never_downgrades_an_api_verdict()
+    {
+        // The scoping rule the whole merge rests on, pinned here because the real
+        // fallback reads the live registry and cannot be driven from a test. The
+        // fallback reads the same UserData keys the API read and runs after it, so
+        // every superseded patch has a fallback row waiting for its own path:
+        // letting one downgrade would strip the removable verdict off every patch
+        // the API had just identified, and superseded-patch detection would return
+        // nothing at all.
+        const string superseded = @"C:\Windows\Installer\superseded.msp";
+        var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(superseded, "Product", "{A}", PatchState: 2, IsRemovable: true),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(superseded, "", ""),
+            InstallerQueryService.ClaimSource.RegistryFallback);
+
+        Assert.True(claimed[superseded].IsRemovable);
+        Assert.Equal("Product", claimed[superseded].ProductName);
+    }
+
+    [Fact]
+    public void A_registry_fallback_claim_adds_a_path_the_api_never_returned()
+    {
+        // The other half of the fallback's contract: it is the app's second
+        // "still needed" source, so a path only it knows about must land, or the
+        // file it names is offered as an orphan.
+        const string onlyInRegistry = @"C:\Windows\Installer\registry-only.msi";
+        var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
+
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(onlyInRegistry, "", ""),
+            InstallerQueryService.ClaimSource.RegistryFallback);
+
+        Assert.False(Assert.Contains(onlyInRegistry, claimed).IsRemovable);
+    }
+
+    [Fact]
+    public void An_api_claim_never_upgrades_a_non_removable_row()
+    {
+        const string shared = @"C:\Windows\Installer\shared.msp";
+        var claimed = new Dictionary<string, RegisteredPackage>(StringComparer.OrdinalIgnoreCase);
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(shared, "Applied", "{A}", PatchState: 1),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        InstallerQueryService.MergeClaim(claimed,
+            new RegisteredPackage(shared, "Superseded", "{B}", PatchState: 2, IsRemovable: true),
+            InstallerQueryService.ClaimSource.InstallerApi);
+
+        Assert.False(claimed[shared].IsRemovable);
+    }
+
+    [Fact]
     public async Task Superseded_patch_claimed_by_a_single_product_stays_removable()
     {
         const string dead = @"C:\Windows\Installer\dead.msp";
