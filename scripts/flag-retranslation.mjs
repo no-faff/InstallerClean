@@ -117,4 +117,11 @@ console.log(`\nFlagged ${keys.length} key(s) across ${files.length} generator(s)
   `${totalReset} reset in place, ${totalAdded} appended.`);
 console.log('Each is now the English neutral value, so every generator will report it as ' +
   '"still English (untranslated)" until translated.');
-console.log('Logged in PENDING-RETRANSLATION.md. Next: translate each in the gen MAPs and regenerate.');
+// This script writes to the generators and nothing else. It used to sign off
+// "Logged in PENDING-RETRANSLATION.md", which it has never done: that log is a
+// manual step, and a session taking the line at its word skipped it and left no
+// record that a translation was owed.
+console.log('Next: log the key(s) in PENDING-RETRANSLATION.md by hand (this script does not),');
+console.log('then translate each in the gen MAPs and regenerate.');
+console.log('Satellite-only plural overrides (Key.One/.Few/.Many) are NOT touched here and');
+console.log('the still-English gate cannot see them: find and rewrite any by hand.');
