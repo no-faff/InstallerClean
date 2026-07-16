@@ -43,7 +43,7 @@ public sealed class AccessibilitySettings : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// True when Windows' "show animations" is off, i.e. animation should
+    /// True when the Windows "show animations" setting is off, i.e. animation should
     /// be suppressed. The inverse of
     /// <see cref="SystemParameters.ClientAreaAnimation"/>.
     /// </summary>

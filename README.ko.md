@@ -29,7 +29,7 @@
 - **이래서 오셨을지도 모릅니다:** [WinDirStat](https://github.com/windirstat/windirstat)나 WizTree, TreeSize를 써 보니 `C:\Windows\Installer`가 공간을 많이 차지하고 있는데, 그 안에 무엇이 들어 있는지는 알 수 없으셨을 겁니다. InstallerClean이 바로 필요한 도구입니다. `9f05cba.msi`처럼 알 수 없는 이름의 파일 안에 무엇이 들어 있는지 파악해, 어느 것을 안전하게 삭제할 수 있는지 빠르게 알려 줍니다.
 - **얼마나 비워지나:** 지금까지 (자발적으로) 보내 주신 보고서에 따르면, <!-- reports-freedpct-start -->50%<!-- reports-freedpct-end -->의 컴퓨터에 정리할 불필요한 파일이 있었습니다. 그중 확보된 공간의 중앙값은 <!-- reports-median-start -->21GB<!-- reports-median-end -->입니다. 수백 GB를 비운 경우도 몇 있었습니다. 제 경우에는 1.28 GB였습니다. 나머지 <!-- reports-nothingpct-start -->50%<!-- reports-nothingpct-end -->는 제거할 것을 찾지 못했는데, 이는 그저 Installer 폴더가 이미 깨끗했다는 뜻일 뿐입니다. 자세한 내용은 아래 [자주 묻는 질문](#자주-묻는-질문)을 참고하세요.
 - **안전한가요:** 네. 어떤 파일이 아직 필요한지를 Windows Installer API에 직접 물어보고, Windows가 다 썼다고 보고한 파일만 목록에 올립니다. 오픈 소스(MIT)이며 사용자에 대해 아무것도 묻지 않습니다. 계정도, 광고도, 추적도, 텔레메트리도 없고, 백그라운드에서 도는 것도 없습니다. 스스로 인터넷에 접속하는 일도 절대 없습니다.
-- **받기:** [최신 릴리스를 다운로드하세요](../../releases/latest). 실행하고, [Windows의 경고](#unknown-publisher)와 [관리자 권한 요청](#admin)을 클릭해서 넘어가세요. 불필요한 파일을 삭제하세요. 끝입니다.
+- **받기:** [최신 릴리스를 다운로드하세요](../../releases/latest). 실행하고, [“알 수 없는 게시자” 경고](#unknown-publisher)와 [관리자 권한 요청](#admin)을 클릭해서 넘어가세요. 불필요한 파일을 삭제하세요. 끝입니다.
 
 ## 목차
 

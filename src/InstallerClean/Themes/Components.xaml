@@ -852,7 +852,7 @@
     <!-- Progress bar. Slim dark bar. Determinate uses PART_Indicator
          (WPF stock). Indeterminate has two presentations: a sweeping
          bar when animations are on, and a static full-width fill when
-         Windows' "show animations" is off (reduced motion). The sweep
+         the Windows "show animations" setting is off (reduced motion). The sweep
          moves the RepeatBehavior onto the DoubleAnimation rather than
          the wrapping Storyboard so the compiled BAML carries no literal
          "Storyboard RepeatBehavior=Forever" attribute pair.

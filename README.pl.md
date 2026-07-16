@@ -29,7 +29,7 @@
 - **Może jesteś tu, bo:** Użyłeś [WinDirStat](https://github.com/windirstat/windirstat), WizTree albo TreeSize, zobaczyłeś, że `C:\Windows\Installer` zajmuje mnóstwo miejsca, i nie wiedziałeś, co w nim siedzi. InstallerClean to dokładnie to, czego potrzebujesz. Wie, co kryje się w tych plikach o pozornie przypadkowych nazwach, jak `9f05cba.msi`, i szybko mówi ci, które z nich możesz bezpiecznie usunąć.
 - **Ile miejsca:** Nadesłane jak dotąd (opcjonalne) raporty pokazują, że <!-- reports-freedpct-start -->50%<!-- reports-freedpct-end --> maszyn miało niepotrzebne pliki do wyczyszczenia. Na tych maszynach mediana zwolnionego miejsca to <!-- reports-median-start -->21 GB<!-- reports-median-end -->. Kilka osób odzyskało setki GB. U mnie było to 1,28 GB. Pozostałe <!-- reports-nothingpct-start -->50%<!-- reports-nothingpct-end --> nie znalazły nic do usunięcia, co po prostu oznacza, że ich folder Installer był już czysty. Więcej szczegółów w [FAQ](#faq) poniżej.
 - **Czy to bezpieczne:** Tak. Pyta samo API Windows Installer, które pliki są nadal potrzebne, i wymienia wyłącznie te, które Windows zgłasza jako już niepotrzebne. Jest otwartoźródłowy (MIT) i o nic cię nie pyta: bez konta, bez reklam, bez śledzenia, bez telemetrii, bez niczego działającego w tle. Nigdy sam nie łączy się z siecią.
-- **Pobierz:** [Pobierz najnowszą wersję](../../releases/latest). Uruchom; przeklikaj się przez [ostrzeżenie Windows](#unknown-publisher) i [monit administratora](#admin). Usuń wszelkie niepotrzebne pliki. Gotowe.
+- **Pobierz:** [Pobierz najnowszą wersję](../../releases/latest). Uruchom; przeklikaj się przez [ostrzeżenie o „nieznanym wydawcy”](#unknown-publisher) i [monit administratora](#admin). Usuń wszelkie niepotrzebne pliki. Gotowe.
 
 ## Spis treści
 

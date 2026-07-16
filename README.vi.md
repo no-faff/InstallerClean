@@ -29,7 +29,7 @@
 - **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. InstallerClean chính là thứ bạn cần. Nó biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và nhanh chóng cho bạn biết tệp nào có thể xóa an toàn.
 - **Giải phóng được bao nhiêu:** Các báo cáo (tùy chọn) gửi về cho đến nay cho thấy <!-- reports-freedpct-start -->50%<!-- reports-freedpct-end --> số máy có tệp không cần thiết để dọn. Trong số đó, trung vị giải phóng được là <!-- reports-median-start -->21 GB<!-- reports-median-end -->. Một số máy dọn được hàng trăm GB. Với tôi thì được 1,28 GB. <!-- reports-nothingpct-start -->50%<!-- reports-nothingpct-end --> còn lại không tìm thấy gì để loại bỏ, điều đó chỉ có nghĩa là thư mục Installer của họ vốn đã sạch. Xem thêm chi tiết trong phần [FAQ](#faq) bên dưới.
 - **Có an toàn không:** Có. Nó hỏi chính API Windows Installer xem những tệp nào vẫn còn cần, và chỉ liệt kê những tệp Windows báo là đã dùng xong. Nó là mã nguồn mở (MIT) và không hỏi gì về bạn: không tài khoản, không quảng cáo, không theo dõi, không thu thập dữ liệu, không có gì chạy ngầm. Nó không bao giờ tự kết nối mạng.
-- **Tải về:** [Tải bản phát hành mới nhất](../../releases/latest). Chạy nó; bấm qua [cảnh báo của Windows](#unknown-publisher) và [lời nhắc quyền quản trị](#admin). Xóa mọi tệp không cần thiết. Xong.
+- **Tải về:** [Tải bản phát hành mới nhất](../../releases/latest). Chạy nó; bấm qua [cảnh báo “Nhà phát hành không xác định”](#unknown-publisher) và [lời nhắc quyền quản trị](#admin). Xóa mọi tệp không cần thiết. Xong.
 
 ## Nội dung
 
