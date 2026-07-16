@@ -408,9 +408,8 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
-       DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, needed again by a program since the scan.</value></data>
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, because a program started needing them again after the scan.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -522,7 +521,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Installer database unavailable</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scan failed</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on the Windows Installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
