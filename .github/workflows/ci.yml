@@ -44,6 +44,13 @@ jobs:
       - name: Lint French spacing
         run: node scripts/check-french-spacing.mjs
 
+      # The only mechanical check on XAML resource keys. A {StaticResource} whose
+      # key nothing defines compiles clean and throws a XamlParseException when
+      # the window is first opened, so neither the build nor the test run below
+      # can catch a rename that misses a consumer.
+      - name: Check XAML resource keys
+        run: node scripts/check-xaml-resources.mjs
+
       # Held out of CI until the 2.0.2 translation batch landed (it was red by
       # design during that window); now every satellite is translated, so it is
       # a required gate: a satellite shipping the English neutral for a required
