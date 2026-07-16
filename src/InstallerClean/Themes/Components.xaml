@@ -569,28 +569,28 @@
         </Style.Triggers>
     </Style>
 
-    <!-- Links. SubtleLink is an in-body Hyperlink: underlined at rest so it
-         reads as a link without leaning on its hue, and brightening to the
-         full Link colour on hover or keyboard focus so it does not shout when
-         sat in a paragraph. -->
+    <!-- Links. SubtleLink is the app's only link style, on every link in
+         every window: an in-body Hyperlink, underlined at rest so it reads as
+         a link without leaning on its hue, and brightening on hover and
+         keyboard focus. -->
 
     <Style x:Key="SubtleLink" TargetType="Hyperlink">
-        <Setter Property="Foreground" Value="{StaticResource Link.Inline}"/>
+        <Setter Property="Foreground" Value="{StaticResource Link.Rest}"/>
         <!-- Underlined at rest, not only on hover/focus. An in-sentence link
-             set apart by its hue alone fails WCAG 1.4.1: the at-rest inline
-             hue is 1.16:1 and 2.01:1 against the two surrounding text tiers,
-             both under the 3:1 the guideline asks of a non-text distinction,
-             and a reader with reduced colour vision cannot tell it is a link.
-             The underline is the always-on, colour-independent cue; hover and
-             keyboard focus still brighten the hue on top of it. -->
+             set apart by its hue alone fails WCAG 1.4.1: the rest hue is
+             1.16:1 and 2.01:1 against the two surrounding text tiers, both
+             under the 3:1 the guideline asks of a non-text distinction, and a
+             reader with reduced colour vision cannot tell it is a link. The
+             underline is the always-on, colour-independent cue and the
+             brighten below sits on top of it, never in place of it. -->
         <Setter Property="TextDecorations" Value="Underline"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Foreground" Value="{StaticResource Link.Default}"/>
+                <Setter Property="Foreground" Value="{StaticResource Link.Hover}"/>
             </Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True">
-                <Setter Property="Foreground" Value="{StaticResource Link.Default}"/>
+                <Setter Property="Foreground" Value="{StaticResource Link.Hover}"/>
             </Trigger>
         </Style.Triggers>
     </Style>

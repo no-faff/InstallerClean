@@ -45,6 +45,7 @@
     <Color x:Key="Primitive.Slate.950.Alpha50">#80020617</Color>
 
     <!-- Indigo ramp. Accent, CTA, links. -->
+    <Color x:Key="Primitive.Indigo.300">#a5b4fc</Color>
     <Color x:Key="Primitive.Indigo.400">#818cf8</Color>
     <Color x:Key="Primitive.Indigo.600">#4f46e5</Color>
     <Color x:Key="Primitive.Indigo.700">#443cc7</Color>

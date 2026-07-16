@@ -91,15 +91,17 @@
     <SolidColorBrush x:Key="Decoration.Heart" Color="{StaticResource Primitive.Red.500}"/>
     <SolidColorBrush x:Key="Decoration.Star"  Color="{StaticResource Primitive.Amber.400}"/>
 
-    <!-- Links. Inline and default link tokens both resolve to full-
-         opacity Indigo.400. A 66% alpha wash on Surface.Sidebar (the
-         AboutWindow MIT licence link's home) measures 2.95:1 against
-         background, below the WCAG AA-text 4.5:1 line; full opacity
-         sits at 4.90:1. SubtleLink's hover-brighten remains the
-         visual differentiation between in-body and full-weight
-         links. -->
-    <SolidColorBrush x:Key="Link.Default" Color="{StaticResource Primitive.Indigo.400}"/>
-    <SolidColorBrush x:Key="Link.Inline"  Color="{StaticResource Primitive.Indigo.400}"/>
+    <!-- Links. SubtleLink is the app's only link, so these are its two
+         states rather than two kinds of link. Rest is Indigo.400 at full
+         opacity, measured on Surface.Sidebar (the AboutWindow MIT licence
+         link's home, and the lightest surface a link sits on): a 66%
+         alpha wash of it there measures 2.95:1, under the WCAG AA-text
+         4.5:1 line, where full opacity sits at 4.90:1. Dimming rest for
+         subtlety therefore fails AA and must not come back. Hover
+         brightens to Indigo.300, 7.34:1 on the same surface, and serves
+         keyboard focus as well as the pointer. -->
+    <SolidColorBrush x:Key="Link.Rest"  Color="{StaticResource Primitive.Indigo.400}"/>
+    <SolidColorBrush x:Key="Link.Hover" Color="{StaticResource Primitive.Indigo.300}"/>
 
     <!-- Scrollbar. -->
     <SolidColorBrush x:Key="Scrollbar.Thumb"        Color="{StaticResource Primitive.Slate.50.Alpha20}"/>
