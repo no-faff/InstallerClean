@@ -260,15 +260,15 @@
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
-    <value>Nothing scanned yet.</value>
+    <value>Ancora nessuna scansione.</value>
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
+    <value>Premi Ripeti scansione per cercare in C:\Windows\Installer i file di installazione che nessun programma usa più.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
-    <value>These files can't be cleaned up right now.</value>
+    <value>Al momento questi file non si possono ripulire.</value>
     <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
   </data>
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>In questo momento qualcosa sta usando Windows Installer, di solito un aggiornamento di Windows o un programma che si sta installando in background. Mentre questo avviene 'Sposta' ed 'Elimina' sono in pausa, così InstallerClean non tocca la cache di installazione quando ci sono modifiche in corso. Ad attività completate ripeti la scansione e torneranno disponibili.</value></data>
@@ -336,7 +336,7 @@
   <data name="Status.MoveFailed.NoLog" xml:space="preserve"><value>Spostamento non riuscito ({0}). Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Status.DeleteFailed" xml:space="preserve"><value>Eliminazione non riuscita ({0}). Dettagli in {1}.</value></data>
   <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Eliminazione non riuscita ({0}). Non è stato possibile scrivere il file crash.log.</value></data>
-  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Access denied. Windows refused the scan.</value></data>
+  <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Accesso negato. Windows ha rifiutato la scansione.</value></data>
   <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scansione non riuscita: database installazioni non disponibile.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Scansione annullata.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Pronto</value></data>
@@ -393,10 +393,10 @@
        ends the sentence at the verb/preposition so the WPF host can force
        the path onto its own line at the exact point {2} substitutes, the
        same technique the move-confirmation dialog uses. -->
-  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} {1} in: {2}</value></data>
-  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} {1} in: {2}</value></data>
+  <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>Spostato {0} {1} in: {2}</value></data>
+  <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>Spostati {0} {1} in: {2}</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
-  <data name="Completion.MoveSummaryWithErrors.Singular" xml:space="preserve"><value>Spostati {0} {1} in: {2}. {3} {4}</value></data>
+  <data name="Completion.MoveSummaryWithErrors.Singular" xml:space="preserve"><value>Spostato {0} {1} in: {2}. {3} {4}</value></data>
   <data name="Completion.MoveSummaryWithErrors.Plural" xml:space="preserve"><value>Spostati {0} {1} in: {2}. {3} {4}</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
   <data name="Completion.DeleteSummary.Singular" xml:space="preserve"><value>Spostato {0} {1} nel Cestino</value></data>
@@ -410,7 +410,7 @@
        "file"/"files". Flat string; a language may add a satellite-only
        Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
        DRAFT wording, owner to refine in the translation batch. -->
-  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} kept in place, needed again by a program since the scan.</value></data>
+  <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} lasciati al loro posto, di nuovo necessari a un programma dopo la scansione.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -418,9 +418,9 @@
        body-row status line; these are the overlay's own summary sentence. The
        permanent variant never claims the Recycle Bin: those files did not reach
        it. -->
-  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Moved {0} of {1} {2} before you cancelled.</value></data>
-  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>Sent {0} of {1} {2} to the Recycle Bin before you cancelled.</value></data>
-  <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Permanently deleted {0} of {1} {2} before you cancelled.</value></data>
+  <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>Spostati {0} di {1} {2} prima dell'annullamento.</value></data>
+  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>Spostati {0} di {1} {2} nel Cestino prima dell'annullamento.</value></data>
+  <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>Eliminati definitivamente {0} di {1} {2} prima dell'annullamento.</value></data>
   <!-- Completion copy for a consented permanent delete (the Recycle Bin
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
@@ -473,8 +473,8 @@
        because the files are removable already; only the MSI
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
-  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
-  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do.</value></data>
+  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows elenca ancora {0} vecchia patch il cui file non è più sul disco. Non è un problema e non devi fare nulla.</value></data>
+  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows elenca ancora {0} vecchie patch i cui file non sono più sul disco. Non è un problema e non devi fare nulla.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} di {1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
@@ -506,7 +506,7 @@
        signal they get otherwise is the absence of the word "freed" on the
        completion screen, which nobody reads as a warning. This is a free-space
        tool, so the one moment it knows the answer is the moment to say it. -->
-  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead.</value></data>
+  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>Questa cartella è sulla stessa unità, quindi lo spostamento da solo non libera spazio. Recupererai lo spazio quando eliminerai i file da lì, oppure puoi scegliere una cartella su un'altra unità.</value></data>
 
   <!-- Error messages -->
   <!-- Both manifests declare requireAdministrator, so the process is
@@ -515,14 +515,14 @@
        administrator", and telling the user to run as administrator hands
        them the one instruction they have already followed. The key names
        predate that correction; what they say is what matters. -->
-  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Access denied</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.
+  <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Accesso negato</value></data>
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows ha negato l'accesso a InstallerClean. InstallerClean è già in esecuzione come amministratore, quindi avviarlo di nuovo in quel modo non serve.
 
-That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out.</value></data>
+Restano due cause probabili: un software di sicurezza sta bloccando C:\Windows\Installer, oppure i permessi della cartella sono stati modificati. Mettere in pausa il software di sicurezza e riprovare è il modo più rapido per escluderne una.</value></data>
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Database installazioni non disponibile</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scansione non riuscita</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Il database di Windows Installer risulta vuoto o non accessibile. È una cosa insolita anche in un'installazione di Windows appena fatta e di solito significa che il database è danneggiato o che uno strumento di terze parti lo ha svuotato. L'esecuzione di 'sfc /scannow' da un prompt con privilegi elevati di solito lo ripara.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on Windows's own installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer ha rifiutato di elencare i prodotti installati e InstallerClean è già in esecuzione come amministratore, quindi eseguirlo di nuovo non serve. I permessi sui record di Windows Installer potrebbero essere stati modificati, oppure un software di sicurezza potrebbe bloccarli. Vale la pena provare a eseguire 'sfc /scannow' da un prompt con privilegi elevati.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
@@ -534,7 +534,7 @@ That leaves two likely causes: security software is holding C:\Windows\Installer
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean non è riuscito a verificare questa scansione confrontandola con Windows: tutto ciò che Windows elenca ancora manca dalla cartella cache, mentre i file nella cartella non corrispondono a nulla di ciò che Windows conosce. Questo indica un problema nella lettura dei record di Windows Installer, più che file che puoi rimuovere senza rischi, quindi non è stato proposto nulla da eliminare. Riavviare Windows ed eseguire di nuovo la scansione di solito risolve.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Destinazione non valida</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Impossibile scrivere nella destinazione</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Spostamento non riuscito</value></data>
@@ -568,7 +568,7 @@ Dettagli in {1}.</value></data>
   <!-- Category-only, no path (elevated path-leak rule). Shown for a candidate
        that does not resolve inside C:\Windows\Installer, refused at the Move /
        Delete service boundary. Should never reach a user in practice. -->
-  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>This file is not inside the Windows Installer folder; refused for safety.</value></data>
+  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>Questo file non si trova all'interno della cartella di Windows Installer; rifiutato per sicurezza.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file
@@ -593,7 +593,7 @@ Dettagli in {1}.</value></data>
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>La destinazione dello spostamento deve essere un percorso completo verso una cartella, che inizia con una lettera di unità o una condivisione di rete (per esempio D:\Backup oppure \\server\backup). InstallerClean non può usare questo: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Impossibile aprire il browser</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Controlla aggiornamenti</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Controllo aggiornamenti...</value></data>
@@ -611,13 +611,13 @@ Dettagli in {1}.</value></data>
        user's own medium-integrity shell, and that chain was unavailable) is
        an internal distinction with no name outside this codebase; the user
        gets what happened and what they can do about it. -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean non è riuscito ad aprire il browser. Il link è negli appunti, così puoi incollarlo da te:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean non è riuscito ad aprire il browser e non è riuscito nemmeno a copiare il link negli appunti. Il link è:&#10;&#10;{0}</value></data>
   <!-- 0 = the destination folder whose canonical path changed mid-batch.
        Raised when the folder is replaced or redirected between two files of
        the same Move, so the copy must not claim where the files moved before
        that point ended up: they went wherever the folder pointed then. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>La destinazione dello spostamento è cambiata mentre i file venivano spostati (qualcosa ha sostituito o reindirizzato la cartella), quindi InstallerClean si è fermato invece di scrivere nel posto sbagliato. Controlla {0}, poi ripeti la scansione e riprova.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -724,7 +724,7 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        than it accepts, most often an unquoted move path with a space, so the
        message names the quoting fix. The literal " quotes and the \ in the
        example are part of the sentence the user copies. -->
-  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
+  <data name="Cli.TooManyArguments" xml:space="preserve"><value>Errore: argomento aggiuntivo imprevisto '{0}'. Se la cartella di destinazione contiene uno spazio, racchiudi l'intero percorso tra virgolette: /m "D:\My Backup"</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Annullamento...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Operazione annullata.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -747,7 +747,7 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
   <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Errore: per questa unità il Cestino non è disponibile, quindi non è stato eliminato nulla. Usa /m per spostare i file oppure riattiva il Cestino e riprova.</value></data>
   <!-- 0 = mode arg ("/d") -->
-  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)</value></data>
+  <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Errore: nessuna destinazione di spostamento specificata. Usa /m PERCORSO. (Una destinazione predefinita impostata nella GUI è specifica per utente e non si applica alle esecuzioni pianificate o con account di servizio.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Errore: la destinazione non può trovarsi all'interno della cartella di Windows Installer.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Errore: la destinazione deve essere un percorso completo. Ricevuto: {0}</value></data>
@@ -840,7 +840,7 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli è un vero processo console e blocca il prompt</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>finché non termina; reindirizza o usa una pipe sul suo output come</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>per qualsiasi altro eseguibile console. La GUI è in InstallerClean.exe.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>The saved default is per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>La destinazione predefinita salvata è specifica per utente; le esecuzioni pianificate o come SYSTEM richiedono /m PERCORSO.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Codici di uscita:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   successo: ogni file segnalato è stato elaborato</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   errore: nessuna elaborazione (argomenti errati, scansione non riuscita, tutti i file non riusciti)</value></data>
@@ -855,4 +855,5 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Trovato {0} {1} da eliminare ({2}).</value></data>
   <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Eliminato {0} {1}.</value></data>
   <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Spostato {0} {1}.</value></data>
+  <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>{0} {1} lasciato al suo posto, di nuovo necessario a un programma dopo la scansione.</value></data>
 </root>
