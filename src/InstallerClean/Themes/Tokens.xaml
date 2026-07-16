@@ -121,16 +121,18 @@
     <sys:Double x:Key="Type.Caption">12</sys:Double>     <!-- metadata labels, footer -->
 
     <!-- Radius. Seven roles cover the app:
-           Pill         - fully rounded 40 px action buttons.
+           Pill         - fully rounded 40 px action buttons. The Card
+                          styles take it too, so a pill and a card round
+                          alike; it is not only the button radius.
            CompactPill  - fully rounded 30 px compact buttons.
-           Card         - rounded cards and overlay containers.
+           ModalCard    - the modal dialog cards.
            CardSm       - smaller rounded surfaces (splash card border).
            Inset        - card-within-a-card surfaces (JSON preview, etc.).
            Chip         - context menus, tooltips, list rows.
            Tight        - menu-item highlight chip. -->
     <CornerRadius x:Key="Radius.Pill">20</CornerRadius>
     <CornerRadius x:Key="Radius.CompactPill">15</CornerRadius>
-    <CornerRadius x:Key="Radius.Card">16</CornerRadius>
+    <CornerRadius x:Key="Radius.ModalCard">16</CornerRadius>
     <CornerRadius x:Key="Radius.CardSm">12</CornerRadius>
     <CornerRadius x:Key="Radius.Inset">6</CornerRadius>
     <CornerRadius x:Key="Radius.Chip">4</CornerRadius>
@@ -196,11 +198,10 @@
          About) so they share a consistent inset. -->
     <Thickness x:Key="DetailWindowMargin">24,4,24,24</Thickness>
 
-    <!-- Padding shared by the five modal-card Borders (ConfirmDelete,
-         ConfirmMove, ConfirmSendResultLog, RecycleUnavailable,
-         UpdateAvailable). The modals also share Surface.Card,
-         Radius.Card and the Action.Standard.Background outline; the
-         32,28 pair completes the card shape. -->
+    <!-- Padding shared by the modal-card Borders. Each of them also
+         shares Surface.Card, Radius.ModalCard and the
+         Action.Standard.Background outline; the 32,28 pair completes the
+         card shape. -->
     <Thickness x:Key="Padding.ModalCard">32,28</Thickness>
 
     <!-- Inset of the main-window scan-result panel. The window is
