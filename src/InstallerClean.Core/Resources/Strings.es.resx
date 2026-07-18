@@ -551,6 +551,15 @@ Quedan dos causas probables: algún software de seguridad está bloqueando C:\Wi
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
   <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean no pudo contrastar este análisis con Windows: todo lo que Windows sigue teniendo registrado falta en la carpeta de la caché, mientras que los archivos de la carpeta no coinciden con nada que Windows conozca. Eso apunta a un problema al leer los registros de instalación, más que a archivos que puedas eliminar sin riesgo, así que no se ha ofrecido nada para limpiar. Reiniciar Windows y volver a analizar suele solucionarlo.</value></data>
+  <!-- Shown when BOTH of the app's sources for "what is still needed" came
+       back short on the same scan: the Windows Installer enumeration lost at
+       least one program's records, and reading the same registrations out of
+       the registry hit errors of its own. Neither can bound what the other
+       lost, so the scan is refused rather than shortened. Distinct from
+       Error.ScanCorrelationFailed, which names a specific mismatch between the
+       records and the folder; this one claims nothing about the folder. No
+       placeholders. -->
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading those registrations straight from the registry ran into errors too. With both routes incomplete, nothing has been offered for cleanup. Scanning again is worth a try, and so is running 'sfc /scannow' from an elevated prompt if it keeps happening.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Destino no válido</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>No se pudo escribir en el destino</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Movimiento fallido</value></data>

@@ -551,6 +551,15 @@
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
   <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean は今回のスキャン結果を Windows と照合できませんでした。Windows が今も一覧に挙げているファイルはすべてキャッシュフォルダーに見当たらず、一方でフォルダー内のファイルは Windows が把握しているものと一つも一致しません。これは、安全に削除できるファイルがあるというよりも、インストーラー登録情報の読み取りに問題があることを示しています。そのため、クリーンアップ対象は何も表示していません。Windows を再起動してからもう一度スキャンすると、通常は解消します。</value></data>
+  <!-- Shown when BOTH of the app's sources for "what is still needed" came
+       back short on the same scan: the Windows Installer enumeration lost at
+       least one program's records, and reading the same registrations out of
+       the registry hit errors of its own. Neither can bound what the other
+       lost, so the scan is refused rather than shortened. Distinct from
+       Error.ScanCorrelationFailed, which names a specific mismatch between the
+       records and the folder; this one claims nothing about the folder. No
+       placeholders. -->
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading those registrations straight from the registry ran into errors too. With both routes incomplete, nothing has been offered for cleanup. Scanning again is worth a try, and so is running 'sfc /scannow' from an elevated prompt if it keeps happening.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>無効な移動先</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>移動先に書き込めませんでした</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>移動に失敗しました</value></data>

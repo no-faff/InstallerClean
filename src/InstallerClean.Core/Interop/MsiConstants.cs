@@ -11,6 +11,15 @@ public static class MsiError
     public const uint AccessDenied = 5;
     public const uint MoreData = 234;
     public const uint NoMoreItems = 259;
+
+    /// <summary>
+    /// The record exists and does not carry the property asked for. Separates a
+    /// benign absence (a product with no cached package) from a record that
+    /// could not be read, which for LocalPackage is the difference between a
+    /// file nothing claims and a file whose claim was lost; see
+    /// <c>InstallerQueryService.IsBenignPropertyRead</c>.
+    /// </summary>
+    public const uint UnknownProperty = 1608;
 }
 
 /// <summary>

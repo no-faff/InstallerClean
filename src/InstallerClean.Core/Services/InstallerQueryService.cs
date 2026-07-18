@@ -26,6 +26,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
     private const int SidBufferLength = 256;
 
     private readonly IMsiApi _msi;
+    private readonly FallbackReader _readFallback;
+
+    /// <summary>
+    /// Reads the registry fallback into <paramref name="claimed"/> and returns
+    /// how many key reads failed.
+    ///
+    /// A seam rather than a direct call because the fallback is one half of the
+    /// degraded-sources gate below, and the other half is already drivable
+    /// through <see cref="IMsiApi"/>. Without it the gate's condition could not
+    /// be reached by a test at all: the real reader opens HKLM directly, so a
+    /// test can neither make it fail nor keep it from succeeding, and a rule
+    /// about what happens when BOTH sources are short cannot be pinned by
+    /// varying only one of them. Production wiring is unchanged; both public
+    /// constructors bind the real reader.
+    /// </summary>
+    internal delegate int FallbackReader(Dictionary<string, RegisteredPackage> claimed, CancellationToken ct);
 
     /// <summary>
     /// Production constructor: talks to the real msi.dll through
@@ -41,7 +57,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <see cref="PendingRebootService"/> taking <c>IRegistryReader</c> /
     /// <c>IMutexProbe</c>.
     /// </summary>
-    public InstallerQueryService(IMsiApi msi) => _msi = msi;
+    public InstallerQueryService(IMsiApi msi) : this(msi, ReadRegistryFallback) { }
+
+    /// <summary>
+    /// Full seam constructor, for the tests that drive both sources. See
+    /// <see cref="FallbackReader"/>.
+    /// </summary>
+    internal InstallerQueryService(IMsiApi msi, FallbackReader readFallback)
+    {
+        _msi = msi;
+        _readFallback = readFallback;
+    }
 
     /// <inheritdoc />
     public Task<InstallerQueryResult> GetRegisteredPackagesAsync(
@@ -64,10 +90,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         var (products, unreadableRows) = EnumerateProducts(ct);
 
-        // Rows the two enumerations had to skip. A skipped product row is one
-        // installed product whose patch claims are wholly missing; a skipped
-        // patch row is one installed product whose patch claims are short by at
-        // least one. Both leave the same hole, so both count the product once.
+        // Installed products this scan could not read in full. A skipped product
+        // row is one product whose claims are wholly missing; a skipped patch
+        // row, or a LocalPackage value that could not be read, is one product
+        // whose claims are short by at least one. All three leave the same hole,
+        // a claim that never reached the merge, so all three count the product
+        // once. The loop below adds its own; this starts from the rows the
+        // product enumeration itself lost.
         var unreadableProducts = unreadableRows;
 
         progress?.Report(new ScanProgressUpdate(Strings.Status_FoundProducts));
@@ -76,10 +105,32 @@ public sealed class InstallerQueryService : IInstallerQueryService
         {
             ct.ThrowIfCancellationRequested();
 
-            var productName = GetProductProperty(productCode, userSid, context, MsiInstallProperty.ProductName);
+            // Every way this one product's records can come back short reaches
+            // the same count, and reaches it once. The number the user reads is
+            // programs, not failures, so one program with a failed package read
+            // AND two failed patch rows is one program, exactly as a product
+            // whose whole row was skipped is one. Counting failures instead
+            // would inflate the notice without telling anyone more.
+            var recordsShort = false;
+
+            var productName = GetProductProperty(productCode, userSid, context, MsiInstallProperty.ProductName).Value;
             var localPackage = GetProductProperty(productCode, userSid, context, MsiInstallProperty.LocalPackage);
 
-            if (!string.IsNullOrEmpty(localPackage))
+            // LocalPackage is the one property whose failed read DELETES this
+            // product's claim rather than degrading it. An unreadable State
+            // leaves patchState 0 and an unreadable Uninstallable leans
+            // non-removable, so either still merges a row that says "needed";
+            // an unreadable LocalPackage skips the insertion entirely, and the
+            // product's "I still have this file" never reaches the merge at all.
+            // That is the same information loss as a skipped enumeration row, so
+            // it is counted the same way and withholds the same class. Without
+            // the count it is worse than a skipped row, because the scan would
+            // report itself complete while short of a claim.
+            if (localPackage.Unreadable)
+            {
+                recordsShort = true;
+            }
+            else if (localPackage.Value.Length > 0)
             {
                 // Ticker, not milestone: one of these fires per product,
                 // up to hundreds in a few seconds, so the consumer must
@@ -87,12 +138,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 progress?.Report(new ScanProgressUpdate(
                     productName.Length > 0 ? productName : productCode, IsMilestone: false));
                 MergeClaim(claimed,
-                    new RegisteredPackage(localPackage, productName, productCode),
+                    new RegisteredPackage(localPackage.Value, productName, productCode),
                     ClaimSource.InstallerApi);
             }
 
             var (patches, patchesIncomplete) = EnumeratePatches(productCode, userSid, context, ct);
-            if (patchesIncomplete) unreadableProducts++;
+            if (patchesIncomplete) recordsShort = true;
 
             foreach (var (patchCode, patchUserSid, patchContext) in patches)
             {
@@ -100,10 +151,20 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
                 var patchPath = GetPatchProperty(patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.LocalPackage);
 
-                if (!string.IsNullOrEmpty(patchPath))
+                // The patch-side half of the same loss: this product holds the
+                // patch, the row naming it came back, and the path it claims
+                // could not be read. A patch is cached once and shared across
+                // the products holding it, so the claim just lost may be the
+                // Applied one that keeps another product's superseded-looking
+                // copy alive.
+                if (patchPath.Unreadable)
                 {
-                    var stateStr = GetPatchProperty(patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.State);
-                    var uninstallableStr = GetPatchProperty(patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.Uninstallable);
+                    recordsShort = true;
+                }
+                else if (patchPath.Value.Length > 0)
+                {
+                    var stateStr = GetPatchProperty(patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.State).Value;
+                    var uninstallableStr = GetPatchProperty(patchCode, productCode, patchUserSid, patchContext, MsiInstallProperty.Uninstallable).Value;
 
                     // Unparseable State leaves patchState at 0 (not-a-patch),
                     // so isSuperseded is false and the row is kept: the zero
@@ -121,54 +182,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     var isRemovable = isSuperseded && !isUninstallable;
 
                     MergeClaim(claimed,
-                        new RegisteredPackage(patchPath, productName, productCode, patchState, isRemovable),
+                        new RegisteredPackage(patchPath.Value, productName, productCode, patchState, isRemovable),
                         ClaimSource.InstallerApi);
                 }
             }
+
+            if (recordsShort) unreadableProducts++;
         }
 
         progress?.Report(new ScanProgressUpdate(Strings.Status_CheckingRegistry));
 
-        // Registry64 is pinned explicitly. Registry.LocalMachine resolves to
-        // the process-bitness view, which redirects to WOW6432Node under an
-        // x86 process and silently misses installer-cache entries written by
-        // 64-bit installers. Pinning to Registry64 keeps the fallback path
-        // correct regardless of host bitness.
-        //
-        // The per-SID and per-key try/catch below is deliberate and must not
-        // be collapsed back into one outer try: this fallback is the second of
-        // the app's two independent "still needed" sources, and a single try
-        // spanning every SID once let one corrupt subkey or unreadable DACL
-        // abandon the entire remaining fallback, turning every registration
-        // only it would have contributed into an orphan candidate. Scoping the
-        // catch to each key read costs one entry per bad key, never the net.
-        try
-        {
-            using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
-                Microsoft.Win32.RegistryHive.LocalMachine,
-                Microsoft.Win32.RegistryView.Registry64);
-            using var udKey = hklm.OpenSubKey(
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData");
-            if (udKey is not null)
-            {
-                foreach (var sidName in udKey.GetSubKeyNames())
-                {
-                    ct.ThrowIfCancellationRequested();
-                    ReadFallbackSid(udKey, sidName, claimed, ct);
-                }
-            }
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            // Last resort: a failure opening UserData itself or enumerating
-            // its SID names (the per-SID reads have their own catches below).
-            // The crash log preserves a diagnostic trail for reports of
-            // missing registered products. Cancellation is excluded:
-            // ThrowIfCancellationRequested fires inside this try, so a plain
-            // catch would log the user's own Cancel as a fault and swallow the
-            // stop the caller is waiting on.
-            Helpers.CrashLog.Write(ex);
-        }
+        var fallbackReadFailures = _readFallback(claimed, ct);
 
         // Even a fresh Windows install has OS-level MSI products. Zero
         // here means the database is corrupt or inaccessible; silently
@@ -176,26 +200,54 @@ public sealed class InstallerQueryService : IInstallerQueryService
         if (claimed.Count == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty);
 
+        // Both sources degraded at once: refuse the scan outright rather than
+        // report a shorter one.
+        //
+        // Withholding the removable class answers a short API enumeration on its
+        // own, because the paths the lost product would have claimed are still
+        // reachable: the fallback reads the same UserData keys and contributes
+        // them as non-removable rows, so the file stays out of the orphan list
+        // even though its owner went missing from the API's answer. That is the
+        // whole reason the withholding can say orphan detection is unaffected.
+        //
+        // The moment the fallback is ALSO failing reads, that recovery is no
+        // longer established. A product lost from the API whose UserData key was
+        // one of the unreadable ones is claimed by neither source, and its cached
+        // file is walked, matched against nothing, and offered as an orphan by a
+        // scan whose own notice says orphaned files are not affected. The two
+        // failures are not independent, either: the same corrupt registration
+        // that loses an API row can equally make that product's UserData subtree
+        // unreadable, so the backup is likeliest to be missing exactly the
+        // product the primary lost. Neither counter can bound what the other
+        // lost, so nothing here can be salvaged into a narrower rule.
+        //
+        // On any healthy machine both counters are zero and this is dead code.
+        if (unreadableProducts > 0 && fallbackReadFailures > 0)
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanRecordsUnreadable);
+
         progress?.Report(new ScanProgressUpdate(string.Format(
             Helpers.DisplayHelpers.Pluralise(claimed.Count, Strings.Status_RegisteredPackagesFound, "Status.RegisteredPackagesFound"),
             claimed.Count, Helpers.DisplayHelpers.PluralisePackage(claimed.Count))));
 
         var packages = claimed.Values.ToList();
 
-        // An enumeration that skipped a row withholds the whole removable class.
+        // A scan that lost any claim withholds the whole removable class.
         // "Removable" asserts that NO installed product still needs the file, and
-        // a product set known to be short of at least one member cannot support
-        // that assertion for any patch on the machine: the product behind a
-        // skipped row is exactly the one whose "I still have this applied" claim
-        // never reached the merge, and a patch is cached once and shared across
-        // the products that hold it.
+        // a product set known to be short of at least one claim cannot support
+        // that assertion for any patch on the machine: the product behind the
+        // loss is exactly the one whose "I still have this applied" claim never
+        // reached the merge, and a patch is cached once and shared across the
+        // products that hold it.
         //
         // Nothing finer is sound. A failed row's product code is undefined (the
         // API documents its output buffers for ERROR_SUCCESS and ERROR_MORE_DATA
         // only) and the loop clears the buffer per iteration, so the missing
         // product's identity is unknowable, and with it the set of patches it
-        // could still be holding. Scan-wide is the finest granularity the
-        // information supports.
+        // could still be holding. A failed LocalPackage read names its product
+        // but not the path it would have claimed, which is the half that matters:
+        // the lost claim could be on any cached file, so knowing who lost it
+        // narrows nothing. Scan-wide is the finest granularity the information
+        // supports either way.
         //
         // Only the removable class moves, and the cost is bounded by that: this
         // withholds superseded-patch cleanup, not orphan cleanup, and only on a
@@ -280,17 +332,81 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     /// <summary>
+    /// The real registry fallback: every SID subtree under UserData, read into
+    /// <paramref name="claimed"/>, returning how many key reads failed.
+    ///
+    /// Registry64 is pinned explicitly. Registry.LocalMachine resolves to the
+    /// process-bitness view, which redirects to WOW6432Node under an x86 process
+    /// and silently misses installer-cache entries written by 64-bit installers.
+    /// Pinning to Registry64 keeps the fallback path correct regardless of host
+    /// bitness.
+    ///
+    /// The per-SID and per-key try/catch is deliberate and must not be collapsed
+    /// back into one outer try: this fallback is the second of the app's two
+    /// independent "still needed" sources, and a single try spanning every SID
+    /// once let one corrupt subkey or unreadable DACL abandon the entire
+    /// remaining fallback, turning every registration only it would have
+    /// contributed into an orphan candidate. Scoping the catch to each key read
+    /// costs one entry per bad key, never the net.
+    /// </summary>
+    private static int ReadRegistryFallback(
+        Dictionary<string, RegisteredPackage> claimed,
+        CancellationToken ct)
+    {
+        var failures = 0;
+
+        try
+        {
+            using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
+                Microsoft.Win32.RegistryHive.LocalMachine,
+                Microsoft.Win32.RegistryView.Registry64);
+            using var udKey = hklm.OpenSubKey(
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData");
+            if (udKey is not null)
+            {
+                foreach (var sidName in udKey.GetSubKeyNames())
+                {
+                    ct.ThrowIfCancellationRequested();
+                    failures += ReadFallbackSid(udKey, sidName, claimed, ct);
+                }
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            // Last resort: a failure opening UserData itself or enumerating
+            // its SID names (the per-SID reads have their own catches).
+            // The crash log preserves a diagnostic trail for reports of
+            // missing registered products. Cancellation is excluded:
+            // ThrowIfCancellationRequested fires inside this try, so a plain
+            // catch would log the user's own Cancel as a fault and swallow the
+            // stop the caller is waiting on.
+            failures++;
+            Helpers.CrashLog.Write(ex);
+        }
+
+        return failures;
+    }
+
+    /// <summary>
     /// Reads one SID subtree's Products and Patches keys into the fallback set.
     /// Each key read is independently guarded so one corrupt entry costs only
     /// itself; see the try/catch rationale at the call site. Cancellation is
     /// re-thrown, never swallowed.
+    ///
+    /// Returns how many reads failed. Every catch here logs and continues, which
+    /// is right (one bad key must not cost the net) but leaves the caller unable
+    /// to tell a clean fallback from one that read almost nothing, and the
+    /// caller's other source may be short at the same time. The count is what
+    /// makes that state visible; see the gate in GetRegisteredPackagesCore.
     /// </summary>
-    private static void ReadFallbackSid(
+    private static int ReadFallbackSid(
         Microsoft.Win32.RegistryKey udKey,
         string sidName,
         Dictionary<string, RegisteredPackage> claimed,
         CancellationToken ct)
     {
+        var failures = 0;
+
         try
         {
             using var productsKey = udKey.OpenSubKey($@"{sidName}\Products");
@@ -309,6 +425,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     }
                     catch (Exception ex) when (ex is not OperationCanceledException)
                     {
+                        failures++;
                         Helpers.CrashLog.Write(ex);
                     }
                 }
@@ -316,6 +433,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
+            failures++;
             Helpers.CrashLog.Write(ex);
         }
 
@@ -337,6 +455,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     }
                     catch (Exception ex) when (ex is not OperationCanceledException)
                     {
+                        failures++;
                         Helpers.CrashLog.Write(ex);
                     }
                 }
@@ -344,8 +463,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
+            failures++;
             Helpers.CrashLog.Write(ex);
         }
+
+        return failures;
     }
 
     private const int MaxProductIndex = 10_000;
@@ -355,8 +477,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Enumerates every installed product across all contexts. <c>UnreadableRows</c>
     /// counts the rows this loop had to skip (a non-success return, or a Success
     /// that wrote no GUID): each one is an installed product whose patches will
-    /// never be enumerated, which is what
-    /// <see cref="InstallerQueryResult.RecordsIncomplete"/> is built from.
+    /// never be enumerated. It is one of the three losses
+    /// <see cref="InstallerQueryResult.RecordsIncomplete"/> is built from, the
+    /// others being a skipped patch row and an unreadable LocalPackage value.
     /// </summary>
     private (List<(string ProductCode, string? UserSid, MsiInstallContext Context)> Products, int UnreadableRows)
         EnumerateProducts(CancellationToken ct)
@@ -628,11 +751,47 @@ public sealed class InstallerQueryService : IInstallerQueryService
     }
 
     /// <summary>
-    /// Retrieves a product property using the double-call buffer
-    /// pattern. Returns an empty string if the property cannot be
-    /// read.
+    /// One property read's outcome. The returned value alone cannot carry it:
+    /// an empty string means both "this record has no such property" and "the
+    /// read failed", and for LocalPackage those are opposite facts. A benign
+    /// absence is a product that never had a cached package to lose. A failed
+    /// read is a product that has one, still needs it, and whose claim on it has
+    /// just gone missing from the scan. Both reach the call site as "", so the
+    /// call site cannot skip the row on the second the way it safely skips it on
+    /// the first unless the outcome travels with the value.
     /// </summary>
-    private string GetProductProperty(
+    private readonly record struct PropertyRead(string Value, bool Unreadable);
+
+    /// <summary>
+    /// The benign returns of an Msi*GetInfoEx property read, as an ALLOWLIST.
+    /// ERROR_SUCCESS is a value (or, at zero length, a property present and
+    /// empty); ERROR_UNKNOWN_PROPERTY is the answer for a property the record
+    /// does not carry, which is what a product or a registered-not-applied patch
+    /// with no cached package gives. A probe of 136 products and 2 patches on
+    /// Windows 10.0.26200 / msi.dll 5.0.26100.7920 (2026-07-18) established that
+    /// the two cases are distinguishable at all: an absent property returned
+    /// 1608 rather than a zero-length success, and a product that could not be
+    /// read returned 87. No product on that machine genuinely lacked a cached
+    /// package, so 1608 was observed for an absent property rather than for a
+    /// real absent LocalPackage; both shapes are on this list, so either reading
+    /// lands on the benign side.
+    ///
+    /// The direction matters more than the membership. One machine can show
+    /// which codes ARE benign; no machine can enumerate every failure code that
+    /// exists, so an unlisted code falls to the unreadable side and withholds.
+    /// Inverting this into a list of known-bad codes reinstates the exact fault
+    /// it closes: the failure nobody has seen yet would read as an absence and
+    /// silently delete a product's claim on a file it still needs.
+    /// </summary>
+    private static bool IsBenignPropertyRead(uint error) =>
+        error is MsiError.Success or MsiError.MoreData or MsiError.UnknownProperty;
+
+    /// <summary>
+    /// Retrieves a product property using the double-call buffer pattern,
+    /// reporting whether an empty result is an absence or a failed read (see
+    /// <see cref="PropertyRead"/>).
+    /// </summary>
+    private PropertyRead GetProductProperty(
         string productCode,
         string? userSid,
         MsiInstallContext context,
@@ -649,10 +808,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
             valueLength: ref bufferLen);
 
         if (error != MsiError.Success && error != MsiError.MoreData)
-            return string.Empty;
+            return new PropertyRead(string.Empty, Unreadable: !IsBenignPropertyRead(error));
 
         if (bufferLen == 0)
-            return string.Empty;
+            return new PropertyRead(string.Empty, Unreadable: false);
 
         bufferLen++; // space for null terminator
         var buffer = new char[bufferLen];
@@ -665,21 +824,28 @@ public sealed class InstallerQueryService : IInstallerQueryService
             value: buffer,
             valueLength: ref bufferLen);
 
-        // Defensive clamp: a successful Msi*GetInfoEx returns
-        // bufferLen as the count excluding the terminator and never
-        // larger than the input. Math.Min bounds an unbounded read
-        // even if the API ever violates that contract.
+        // Only ERROR_SUCCESS is benign on the second call, which is narrower
+        // than the allowlist above and deliberately so: the first call has
+        // already reported a value of this length, so the record demonstrably
+        // carries the property and anything other than success here is a value
+        // that exists and could not be read. The allowlist's
+        // ERROR_UNKNOWN_PROPERTY arm describes a record that never carried it.
+        //
+        // Defensive clamp: a successful Msi*GetInfoEx returns bufferLen as the
+        // count excluding the terminator and never larger than the input.
+        // Math.Min bounds an unbounded read even if the API ever violates that
+        // contract.
         return error == MsiError.Success
-            ? new string(buffer, 0, (int)Math.Min(bufferLen, (uint)buffer.Length))
-            : string.Empty;
+            ? new PropertyRead(new string(buffer, 0, (int)Math.Min(bufferLen, (uint)buffer.Length)), Unreadable: false)
+            : new PropertyRead(string.Empty, Unreadable: true);
     }
 
     /// <summary>
-    /// Retrieves a patch property using the double-call buffer
-    /// pattern. Returns an empty string if the property cannot be
-    /// read.
+    /// Retrieves a patch property using the double-call buffer pattern,
+    /// reporting whether an empty result is an absence or a failed read (see
+    /// <see cref="PropertyRead"/>).
     /// </summary>
-    private string GetPatchProperty(
+    private PropertyRead GetPatchProperty(
         string patchCode,
         string productCode,
         string? userSid,
@@ -698,10 +864,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
             valueLength: ref bufferLen);
 
         if (error != MsiError.Success && error != MsiError.MoreData)
-            return string.Empty;
+            return new PropertyRead(string.Empty, Unreadable: !IsBenignPropertyRead(error));
 
         if (bufferLen == 0)
-            return string.Empty;
+            return new PropertyRead(string.Empty, Unreadable: false);
 
         bufferLen++; // space for null terminator
         var buffer = new char[bufferLen];
@@ -715,12 +881,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
             value: buffer,
             valueLength: ref bufferLen);
 
-        // Defensive clamp: a successful Msi*GetInfoEx returns
-        // bufferLen as the count excluding the terminator and never
-        // larger than the input. Math.Min bounds an unbounded read
-        // even if the API ever violates that contract.
+        // See GetProductProperty: the second call's narrower rule, and the
+        // reason for the clamp.
         return error == MsiError.Success
-            ? new string(buffer, 0, (int)Math.Min(bufferLen, (uint)buffer.Length))
-            : string.Empty;
+            ? new PropertyRead(new string(buffer, 0, (int)Math.Min(bufferLen, (uint)buffer.Length)), Unreadable: false)
+            : new PropertyRead(string.Empty, Unreadable: true);
     }
 }

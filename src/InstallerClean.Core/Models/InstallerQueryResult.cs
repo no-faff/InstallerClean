@@ -15,11 +15,13 @@ namespace InstallerClean.Models;
 /// </param>
 /// <param name="UnreadableProductCount">
 /// Installed products whose records this enumeration could not fully read: a
-/// product row the API skipped (identity unknowable, counted one per row), or a
-/// product whose own row read cleanly but whose patch enumeration skipped a row.
-/// Both leave the same hole, a product whose claim on a shared patch never
-/// reached the merge, so both count here. Surfaced to the user as the scan
-/// summary's kept-patches notice.
+/// product row the API skipped (identity unknowable, counted one per row), a
+/// product whose own row read cleanly but whose patch enumeration skipped a row,
+/// or a product whose rows all came back but whose LocalPackage value could not
+/// be read. All three leave the same hole, a claim on a cached file that never
+/// reached the merge, so all three count here, and a product with more than one
+/// of them counts once. Surfaced to the user as the scan summary's kept-patches
+/// notice.
 /// </param>
 public record InstallerQueryResult(
     IReadOnlyList<RegisteredPackage> Packages,
