@@ -224,7 +224,7 @@ internal static class Program
             var totalBytes = scanResult.RemovableFiles.Sum(f => f.SizeBytes);
             var size = DisplayHelpers.FormatSize(totalBytes);
             Console.WriteLine(string.Format(
-                DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
+                DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
                 count, DisplayHelpers.PluraliseFile(count), size));
 
             // A scan that could not read every program's records withheld its
@@ -337,7 +337,7 @@ internal static class Program
             {
                 var deleteService = services.GetRequiredService<IDeleteFilesService>();
                 Console.WriteLine(string.Format(
-                    DisplayHelpers.Pluralise(count, Strings.Cli_DeletingFiles, Strings.Cli_DeletingFiles, "Cli.DeletingFiles"),
+                    DisplayHelpers.Pluralise(count, Strings.Cli_DeletingFiles, "Cli.DeletingFiles"),
                     count, DisplayHelpers.PluraliseFile(count)));
                 // Skip the service when the re-verify left nothing to act on:
                 // DeleteFilesService returns 0/0 for an empty list anyway, but
@@ -378,7 +378,7 @@ internal static class Program
                 }
 
                 Console.WriteLine(string.Format(
-                    DisplayHelpers.Pluralise(result.DeletedCount, Strings.Cli_DeletedFiles, Strings.Cli_DeletedFiles, "Cli.DeletedFiles"),
+                    DisplayHelpers.Pluralise(result.DeletedCount, Strings.Cli_DeletedFiles, "Cli.DeletedFiles"),
                     result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
                 if (result.Errors.Count > 0)
                 {
@@ -419,7 +419,7 @@ internal static class Program
             // fully qualified and outside the Installer and system folders.
             var moveService = services.GetRequiredService<IMoveFilesService>();
             Console.WriteLine(string.Format(
-                DisplayHelpers.Pluralise(count, Strings.Cli_MovingFiles, Strings.Cli_MovingFiles, "Cli.MovingFiles"),
+                DisplayHelpers.Pluralise(count, Strings.Cli_MovingFiles, "Cli.MovingFiles"),
                 count, DisplayHelpers.PluraliseFile(count), moveDest));
             // See the /d branch: skip the service (and MoveFilesService's
             // destination-folder create + probe) when nothing survived the
@@ -439,7 +439,7 @@ internal static class Program
                 token.ThrowIfCancellationRequested();
 
             Console.WriteLine(string.Format(
-                DisplayHelpers.Pluralise(moveResult.MovedCount, Strings.Cli_MovedFiles, Strings.Cli_MovedFiles, "Cli.MovedFiles"),
+                DisplayHelpers.Pluralise(moveResult.MovedCount, Strings.Cli_MovedFiles, "Cli.MovedFiles"),
                 moveResult.MovedCount, DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
             if (moveResult.Errors.Count > 0)
             {
