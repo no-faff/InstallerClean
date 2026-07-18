@@ -138,7 +138,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 progress?.Report(new ScanProgressUpdate(
                     productName.Length > 0 ? productName : productCode, IsMilestone: false));
                 MergeClaim(claimed,
-                    new RegisteredPackage(localPackage.Value, productName, productCode),
+                    new RegisteredPackage(NormaliseLocalPackagePath(localPackage.Value), productName, productCode),
                     ClaimSource.InstallerApi);
             }
 
@@ -182,7 +182,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     var isRemovable = isSuperseded && !isUninstallable;
 
                     MergeClaim(claimed,
-                        new RegisteredPackage(patchPath.Value, productName, productCode, patchState, isRemovable),
+                        new RegisteredPackage(NormaliseLocalPackagePath(patchPath.Value), productName, productCode, patchState, isRemovable),
                         ClaimSource.InstallerApi);
                 }
             }
@@ -258,6 +258,51 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     packages[i] = packages[i] with { IsRemovable = false, RemovableWithheld = true };
 
         return new InstallerQueryResult(packages.AsReadOnly(), unreadableProducts);
+    }
+
+    /// <summary>
+    /// Puts a LocalPackage value into the one spelling the folder walk produces,
+    /// before it becomes a claim.
+    ///
+    /// Orphanhood is decided by string equality between these values and the
+    /// paths the walk enumerates, while existence is decided by the filesystem,
+    /// so any spelling Windows can hand back and the walk never produces splits
+    /// one file into two answers: registered-and-present on this side, and
+    /// unclaimed-therefore-orphaned on the other. Doubled separators, forward
+    /// slashes, a relative segment, a trailing space or dot, and the <c>\\?\</c>
+    /// prefix are all such spellings, and all of them survive into the registry
+    /// because nothing writing there is obliged to canonicalise. GetFullPath
+    /// settles every one; the prefix is stripped first because GetFullPath
+    /// deliberately leaves a <c>\\?\</c> path alone, that being the point of the
+    /// prefix.
+    ///
+    /// This is also the string a removable candidate is later moved or deleted
+    /// by (FileSystemScanService builds the candidate straight off it), which is
+    /// the right direction: the normalised form names the same file and names it
+    /// the way the rest of the app spells it.
+    ///
+    /// One member of the class stays open: 8.3 short names. GetFullPath does not
+    /// expand them, so a registration holding <c>C:\Windows\Installer\ABCDEF~1.MSI</c>
+    /// still misses a walk that produced the long name. Closing it needs
+    /// GetFinalPathNameByHandle per registered path, which is an open handle per
+    /// registration on every scan, and it must not be written from an argument
+    /// alone: it wants Windows evidence first that the state occurs and that the
+    /// per-path cost is bearable on a machine with hundreds of registrations.
+    /// </summary>
+    private static string NormaliseLocalPackagePath(string value)
+    {
+        try
+        {
+            return Path.GetFullPath(InstallerCacheHelpers.StripLongPathPrefix(value));
+        }
+        catch
+        {
+            // A value GetFullPath refuses (an embedded null, a device name, a
+            // length past the API's limit) is kept exactly as Windows returned
+            // it. It cannot be improved, and dropping the claim would turn an
+            // unreadable spelling into an orphaned file.
+            return value;
+        }
     }
 
     /// <summary>
@@ -420,7 +465,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
                         var localPkg = ipKey?.GetValue("LocalPackage") as string;
                         if (!string.IsNullOrEmpty(localPkg))
-                            MergeClaim(claimed, new RegisteredPackage(localPkg, "", ""),
+                            MergeClaim(claimed,
+                                new RegisteredPackage(NormaliseLocalPackagePath(localPkg), "", ""),
                                 ClaimSource.RegistryFallback);
                     }
                     catch (Exception ex) when (ex is not OperationCanceledException)
@@ -450,7 +496,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                         using var patchKey = patchesKey.OpenSubKey(patchGuid);
                         var localPkg = patchKey?.GetValue("LocalPackage") as string;
                         if (!string.IsNullOrEmpty(localPkg))
-                            MergeClaim(claimed, new RegisteredPackage(localPkg, "", ""),
+                            MergeClaim(claimed,
+                                new RegisteredPackage(NormaliseLocalPackagePath(localPkg), "", ""),
                                 ClaimSource.RegistryFallback);
                     }
                     catch (Exception ex) when (ex is not OperationCanceledException)

@@ -678,6 +678,66 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(0, result.UnreadableProductCount);
     }
 
+    // ---- Claim-time path normalisation ----
+
+    [Theory]
+    // Doubled separator, the shape a naive string concatenation writes.
+    [InlineData(@"C:\Windows\\Installer\normalised.msi")]
+    // Forward slashes, which Windows accepts everywhere and the walk never emits.
+    [InlineData(@"C:/Windows/Installer/normalised.msi")]
+    // A relative segment, left behind by a path built from a base plus a suffix.
+    [InlineData(@"C:\Windows\Temp\..\Installer\normalised.msi")]
+    // The long-path prefix, which GetFullPath deliberately leaves alone.
+    [InlineData(@"\\?\C:\Windows\Installer\normalised.msi")]
+    public async Task A_claim_is_normalised_to_the_spelling_the_folder_walk_produces(string registeredAs)
+    {
+        // Orphanhood is string equality against the walked paths while existence
+        // is the filesystem's answer, so a registered value in any spelling the
+        // walk never produces counted the file as needed on one side and offered
+        // the same physical file for removal on the other.
+        const string walked = @"C:\Windows\Installer\normalised.msi";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", registeredAs);
+
+        var result = await Run(msi);
+
+        Assert.Equal(walked, Assert.Single(result.Packages).LocalPackagePath);
+    }
+
+    [Fact]
+    public async Task A_patch_claim_is_normalised_the_same_way()
+    {
+        // The patch side carries the removable verdict, so a spelling that
+        // missed here would offer a still-needed .msp rather than merely
+        // mis-file an .msi.
+        const string walked = @"C:\Windows\Installer\patch.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: @"C:\Windows\\Installer\patch.msp",
+            state: "2", uninstallable: "0");
+
+        var result = await Run(msi);
+
+        Assert.Equal(walked, Assert.Single(result.Packages).LocalPackagePath);
+    }
+
+    [Fact]
+    public async Task A_value_that_cannot_be_normalised_is_claimed_exactly_as_returned()
+    {
+        // GetFullPath refuses an embedded null. The claim must survive it
+        // anyway: dropping the row would turn a spelling nobody can improve
+        // into a file with no claim on it at all, which is an orphan.
+        const string unimprovable = "C:\\Windows\\Installer\\bad\0name.msi";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", unimprovable);
+
+        var result = await Run(msi);
+
+        Assert.Equal(unimprovable, Assert.Single(result.Packages).LocalPackagePath);
+    }
+
     /// <summary>
     /// Scriptable fake over <see cref="IMsiApi"/>. Reproduces the double-call
     /// buffer contract of msi.dll: a sizing call with a null buffer returns the
