@@ -341,7 +341,7 @@
        Error.InstallerDbUnavailableTitle, passed together in one record, so the
        two are read together and must use one vocabulary: "records", not
        "database". -->
-  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scan failed: couldn't read the Windows Installer records.</value></data>
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>검사 실패: Windows Installer 기록을 읽을 수 없습니다.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>검사가 취소되었습니다.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>준비됨</value></data>
   <!-- 0 = exception type name. Full message + stack trace go only to
@@ -536,40 +536,40 @@
        them the one instruction they have already followed. The key names
        predate that correction; what they say is what matters. -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>액세스 거부됨</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows refused InstallerClean access, so it stopped. Nothing has been removed.
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows가 InstallerClean의 접근을 거부해서 작업을 멈췄습니다. 아무것도 제거되지 않았습니다.
 
-InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try.</value></data>
+InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런 식으로 다시 시작해도 도움이 되지 않습니다. Windows는 무엇이 접근을 거부했는지 더 이상 알려주지 않으므로 구체적으로 시도해 볼 것이 없습니다.</value></data>
   <!-- Fronts every LocalisedInvalidOperationException in the scan ladder, so it
        must be true of all of them: InstallerDbEmpty, MsiNonSuccess,
        MsiEnumerationNeverEnded, MsiPatchNonSuccess,
        MsiPatchEnumerationNeverEnded, ScanRecordsUnreadable and
        ScanCorrelationFailed. "Records" rather than "database" because that is
        the word every one of those bodies uses. -->
-  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Couldn't read the Windows Installer records</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Windows Installer 기록을 읽을 수 없습니다</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>검사 실패</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer 기록이 완전히 비어서 돌아왔습니다. 설치된 프로그램도, 업데이트도 캐시된 설치 파일을 하나도 요구하지 않습니다. 정상적으로 작동하는 컴퓨터에서는 이런 일이 없으므로(갓 설치한 Windows에도 그런 파일이 있습니다) 기록이 손상되었거나 읽을 수 없었던 것이고, 이 답을 그대로 믿은 검사는 C:\Windows\Installer의 모든 파일을 잘못 고립된 것으로 판단했을 것입니다. InstallerClean은 그러지 않고 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer가 InstallerClean에게 설치된 항목의 목록 표시를 허용하지 않았습니다. InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 관리자 권한으로 다시 실행해도 달라지는 것이 없습니다. 그 목록이 없으면 캐시된 파일 중 어느 것이 아직 필요한지 안전하게 알아낼 방법이 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer가 InstallerClean에게 읽을 수 있는 설치된 프로그램 목록을 주지 못했습니다. {0}개 항목이 연속으로 읽을 수 없는 상태로 돌아왔습니다(마지막 오류 코드 {1}). 일부만 읽은 목록으로 작업하는 대신 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
   <!-- The index cap, which is a different condition from the consecutive
        failures above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
        count) and 1 = the last row's error code, which here is Success (0) when
        every row read cleanly and the list simply never terminated. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer가 설치된 프로그램 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
   <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
        runs per product and fails on its own. Same two placeholders. -->
-  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer couldn't give InstallerClean a readable list of one program's patches: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer가 InstallerClean에게 읽을 수 있는 한 프로그램의 패치 목록을 주지 못했습니다. {0}개 항목이 연속으로 읽을 수 없는 상태로 돌아왔습니다(마지막 오류 코드 {1}). 일부만 읽은 목록으로 작업하는 대신 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same two placeholders. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer가 한 프로그램의 패치 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
   <!-- Shown when the scan's two halves (what Windows still registers, and
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean이 이번 검사를 Windows Installer 기록과 맞춰 볼 수 없었습니다. Windows가 여전히 필요하다고 올려 둔 파일은 모두 C:\Windows\Installer에 없고, 그 폴더에 실제로 있는 파일은 어떤 기록과도 일치하지 않습니다. 실제 컴퓨터가 이런 모습일 리 없으므로, 이는 안전하게 제거할 수 있는 파일이 아니라 기록을 읽는 데 생긴 문제를 가리킵니다. 정리 대상으로 아무것도 제시하지 않았고 아무것도 제거되지 않았습니다.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -578,7 +578,7 @@ InstallerClean was already running as administrator, so starting it again that w
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean이 무엇이 아직 필요한지 확신할 만큼 Windows Installer 기록을 읽지 못했습니다. 설치된 프로그램 목록이 일부 빠진 채로 돌아왔고, 같은 기록을 레지스트리에서 직접 읽는 것도 오류를 만났습니다. 어떤 파일을 가리키는 기록이 읽을 수 없는 것 중 하나였다는 이유만으로 그 파일이 고립된 것처럼 보일 수 있으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>잘못된 대상</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>대상에 쓸 수 없음</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>이동 실패</value></data>
@@ -619,7 +619,7 @@ InstallerClean was already running as administrator, so starting it again that w
        UnauthorizedAccessException / IOException messages can carry
        paths from other users' profiles into the displayed error list. -->
   <data name="Error.AccessDenied" xml:space="preserve"><value>액세스가 거부되었습니다.</value></data>
-  <data name="Error.IOFailure" xml:space="preserve"><value>Windows reported a file error; the file was left in place.</value></data>
+  <data name="Error.IOFailure" xml:space="preserve"><value>Windows가 파일 오류를 알렸습니다. 파일은 그대로 두었습니다.</value></data>
   <data name="Error.UnknownError" xml:space="preserve"><value>알 수 없는 오류입니다.</value></data>
   <!-- 0 = shell error code -->
   <!-- These recovery errors point at the Move feature by its button name ("the
@@ -634,9 +634,9 @@ InstallerClean was already running as administrator, so starting it again that w
        and the fallthrough is the codes that are neither, where the pre-delete
        probe has already recycled a real throwaway file seconds earlier, so the
        bin demonstrably worked and Move is worth offering. Do not level them. -->
-  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin.</value></data>
-  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file.</value></data>
-  <data name="Error.RecycleInUse" xml:space="preserve"><value>This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later.</value></data>
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>이 파일을 휴지통으로 이동할 수 없습니다(오류 {0}). 그 코드만으로는 InstallerClean이 이유를 알려 드릴 수 없습니다. 파일은 그대로 두었습니다. 대신 이동 버튼을 사용해 보세요. 이동은 휴지통을 쓰지 않습니다.</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>관리자 권한으로도 Windows가 접근을 거부했습니다(오류 {0}). InstallerClean은 문제가 파일에 있는지 휴지통에 있는지 구분할 수 없습니다. 파일은 그대로 두었습니다. 문제가 휴지통이라면 이동 버튼이 통하지만, 문제가 파일이라면 통하지 않습니다.</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다(오류 {0}). 그래서 지금은 무엇으로도 제거할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도해 보세요.</value></data>
   <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>이 파일을 휴지통으로 이동할 수 없어 영구 삭제되었습니다.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>파일을 Windows Installer 폴더로 이동하는 것을 거부합니다(대상: {0}).</value></data>

@@ -101,7 +101,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Delete failed ({0}). Details in {1}. | 删除失败（{0}）。详情见 {1}。 |
 | Delete failed ({0}). The crash log could not be written. | 删除失败（{0}）。无法写入崩溃日志。 |
 | Access denied. Windows refused the scan. | 访问被拒绝。Windows 拒绝了扫描。 |
-| Scan failed: installer database unavailable. | 扫描失败：安装程序数据库不可用。 |
+| Scan failed: couldn't read the Windows Installer records. | 扫描失败：无法读取 Windows Installer 记录。 |
 | Scan cancelled. | 扫描已取消。 |
 | Ready | 就绪 |
 | Scan failed ({0}). Details in {1}. | 扫描失败（{0}）。详情见 {1}。 |
@@ -160,6 +160,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to the Recycle Bin. {2} {3} | 已将 {0} 个{1}移到回收站。{2} 个{3} |
 | {0} {1} moved to the Recycle Bin. {2} {3} | 已将 {0} 个{1}移到回收站。{2} 个{3} |
 | {0} {1} kept in place, because a program started needing them again after the scan. | {0} 个{1}已保留在原处，因为这次扫描之后又有程序需要它们了。 |
+| {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} 个{1}已保留在原处，因为重新检查时无法完整读取 Windows Installer 记录。 |
 | Moved {0} of {1} {2} before you cancelled. | 在您取消前，已移动 {1} 个{2}中的 {0} 个。 |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | 在您取消前，已将 {1} 个{2}中的 {0} 个移到回收站。 |
 | Permanently deleted {0} of {1} {2} before you cancelled. | 在您取消前，已永久删除 {1} 个{2}中的 {0} 个。 |
@@ -192,6 +193,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | 有 {0} 个已注册文件缺失（并非 InstallerClean 删除）。目前没有问题，但日后修复、更新或卸载这些程序时可能会失败。打开“详情”了解该怎么做。 |
 | Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do. | Windows 仍列出 {0} 个旧补丁，其文件其实已经不在磁盘上了。这没有影响，您也无需做任何处理。 |
 | Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do. | Windows 仍列出 {0} 个旧补丁，其文件其实已经不在磁盘上了。这没有影响，您也无需做任何处理。 |
+| {0} installed program could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | 本次扫描无法读取 {0} 个已安装的程序，因此被取代的补丁已保留。孤立文件不受影响。 |
+| {0} installed programs could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | 本次扫描无法读取 {0} 个已安装的程序，因此被取代的补丁已保留。孤立文件不受影响。 |
 | {0} of {1} {2} | {1} 个{2}中的 {0} 个 |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | 孤立 {0} 个，被取代 {1} 个，已废弃 {2} 个（{3}） |
 | {0} registered file that is still needed ({1}) | {0} 个仍需要的已注册文件（{1}） |
@@ -212,14 +215,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | Access denied | 访问被拒绝 |
-| Windows refused InstallerClean access. InstallerClean is already running as administrator, so starting it again that way won't help.<br><br>That leaves two likely causes: security software is holding C:\Windows\Installer, or the folder's permissions have been changed. Pausing the security software and trying again is the quickest one to rule out. | Windows 拒绝了 InstallerClean 的访问。InstallerClean 已经以管理员身份运行，因此再以这种方式重新启动也无济于事。<br><br>那么，可能的原因有两个：安全软件正占用 C:\Windows\Installer，或者该文件夹的权限被更改了。先暂停安全软件再试一次，是最容易排除的一项。 |
-| Installer database unavailable | 安装程序数据库不可用 |
+| Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows 拒绝了 InstallerClean 的访问，因此已停止。没有删除任何内容。<br><br>InstallerClean 本来就以管理员身份运行，所以再那样启动一次也无济于事。Windows 没有进一步说明是什么拒绝了访问，因此没有具体可以尝试的办法。 |
+| Couldn't read the Windows Installer records | 无法读取 Windows Installer 记录 |
 | Scan failed | 扫描失败 |
-| The Windows Installer database appears to be empty or inaccessible. This is unusual even on a fresh Windows install and typically means the database is corrupt or a third-party tool has cleared it. Running 'sfc /scannow' from an elevated prompt usually repairs it. | Windows Installer 数据库似乎为空或无法访问。即便在全新安装的 Windows 上这也很不寻常，通常意味着数据库已损坏，或被某个第三方工具清空了。在提权的命令提示符中运行“sfc /scannow”通常可以修复它。 |
-| Windows Installer refused to list the installed products, and InstallerClean is already running as administrator, so running it again won't help. The permissions on the Windows Installer records may have been changed, or security software may be blocking them. Running 'sfc /scannow' from an elevated prompt is worth a try. | Windows Installer 拒绝列出已安装的产品，而 InstallerClean 已经以管理员身份运行，所以再运行一次也无济于事。可能是 Windows Installer 记录的权限被更改了，或者有安全软件正在阻止访问。可以试试在提权的命令提示符中运行“sfc /scannow”。 |
-| Windows Installer refused to list products after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | 在连续 {0} 次失败后，Windows Installer 拒绝列出产品（最后的错误代码为 {1}）。请尝试重启 Windows，或在提权的命令提示符中运行“sfc /scannow”。 |
-| Windows Installer refused to list a product's patches after {0} consecutive failures (last error code {1}). Try restarting Windows, or run 'sfc /scannow' from an elevated prompt. | 在连续 {0} 次失败后，Windows Installer 拒绝列出某个产品的补丁（最后的错误代码为 {1}）。请尝试重启 Windows，或在提权的命令提示符中运行“sfc /scannow”。 |
-| InstallerClean couldn't cross-check this scan against Windows: everything Windows still lists is missing from the cache folder, while the files in the folder match nothing Windows knows about. That points to a problem reading the installer records rather than to files you can safely remove, so nothing has been offered for cleanup. Restarting Windows and scanning again usually clears it. | InstallerClean 无法将这次扫描与 Windows 进行交叉核对：Windows 仍列出的每一项都在缓存文件夹中缺失，而文件夹中的文件又与 Windows 所知的任何内容都对不上。这更像是读取安装程序记录时出了问题，而不是有文件可以安全删除，因此没有列出任何可清理的内容。重启 Windows 后再次扫描通常就能解决。 |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed. | Windows Installer 记录返回的内容完全为空：没有任何一个已安装的程序或更新声称拥有缓存的安装文件。在正常工作的电脑上不会出现这种情况（即使是刚装好的 Windows 也会有一些），所以要么记录已损坏，要么无法读取；而一次相信这个结果的扫描，会把 C:\Windows\Installer 中的每个文件都错误地判定为孤立。InstallerClean 没有那样做，而是停了下来。没有删除任何内容。 |
+| Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer 不允许 InstallerClean 列出已安装的内容。InstallerClean 本来就以管理员身份运行，所以再以管理员身份运行一次也不会有任何改变。没有这份清单，就无法安全地判断哪些缓存文件仍然需要，因此 InstallerClean 停了下来。没有删除任何内容。 |
+| Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer 无法向 InstallerClean 提供一份可读的已安装程序清单：连续 {0} 个条目返回时无法读取（最后的错误代码为 {1}）。InstallerClean 没有基于只读到一半的清单继续，而是停了下来。没有删除任何内容。 |
+| Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer 始终没有发出已安装程序清单结束的信号：InstallerClean 在 {0} 个条目后放弃（最后的错误代码为 {1}）。没有尽头的清单无法信任，因此 InstallerClean 停了下来。没有删除任何内容。 |
+| Windows Installer couldn't give InstallerClean a readable list of one program's patches: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer 无法向 InstallerClean 提供某个程序的可读补丁清单：连续 {0} 个条目返回时无法读取（最后的错误代码为 {1}）。InstallerClean 没有基于只读到一半的清单继续，而是停了下来。没有删除任何内容。 |
+| Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer 始终没有发出某个程序补丁清单结束的信号：InstallerClean 在 {0} 个条目后放弃（最后的错误代码为 {1}）。没有尽头的清单无法信任，因此 InstallerClean 停了下来。没有删除任何内容。 |
+| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean 无法把这次扫描与 Windows Installer 记录对上：Windows 仍然列为需要的每个文件都不在 C:\Windows\Installer 中，而文件夹里实际存在的文件又与任何记录都对不上。真实的电脑不会是这个样子，所以这说明读取记录时出了问题，而不是有文件可以安全删除。没有列出任何可清理的内容，也没有删除任何内容。 |
+| InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean 未能读取到足够的 Windows Installer 记录，无法确定哪些内容仍然需要：已安装程序的清单返回时并不完整，而直接从注册表读取同样的记录也遇到了错误。一个文件可能仅仅因为指明它的那条记录属于读不到的记录之一，就显得像是孤立的，因此 InstallerClean 停了下来。没有删除任何内容。 |
 | Invalid destination | 目标无效 |
 | Could not write to destination | 无法写入目标 |
 | Move failed | 移动失败 |
@@ -239,11 +245,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Source file is a symlink or junction; refused for safety. | 源文件是符号链接或目录联接；为安全起见已拒绝。 |
 | This file is not inside the Windows Installer folder; refused for safety. | 此文件不在 Windows Installer 文件夹内；为安全起见已拒绝。 |
 | Access denied. | 访问被拒绝。 |
-| The operation failed. Try again or restart Windows. | 操作失败。请重试或重启 Windows。 |
+| Windows reported a file error; the file was left in place. | Windows 报告了一个文件错误；该文件已留在原处。 |
 | Unknown error. | 未知错误。 |
-| Couldn't move this file to the Recycle Bin (error {0}). It may be locked, in use or blocked by Windows. Use the Move button instead. | 无法将此文件移到回收站（错误 {0}）。它可能被锁定、正在使用，或被 Windows 阻止。请改用“移动”按钮。 |
-| Windows blocked access to this file, even with administrator rights (error {0}). It is usually an ownership or permissions lock. Use the Move button instead. | 即使拥有管理员权限，Windows 仍阻止了对此文件的访问（错误 {0}）。这通常是所有权或权限锁定。请改用“移动”按钮。 |
-| This file is open or locked by another program (error {0}). Close that program, or whatever is scanning it, then try again, or use the Move button instead. | 此文件正被另一个程序打开或锁定（错误 {0}）。请关闭那个程序，或任何正在扫描它的程序，然后重试，或改用“移动”按钮。 |
+| Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | 无法将此文件移到回收站（错误 {0}），而且仅凭这个代码，InstallerClean 无法告诉你原因。该文件已留在原处。请改用“移动”按钮，它不使用回收站。 |
+| Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | 即使拥有管理员权限，Windows 仍拒绝了访问（错误 {0}），而且 InstallerClean 无法判断问题出在文件上还是回收站上。该文件已留在原处。如果问题出在回收站，“移动”按钮可以奏效；如果问题出在文件本身，则不行。 |
+| This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | 此文件正被另一个程序打开或锁定（错误 {0}），因此目前没有任何方式能移除它。该文件已留在原处；请稍后再试。 |
 | The file was permanently deleted because it could not be moved to the Recycle Bin. | 由于无法将该文件移到回收站，它已被永久删除。 |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | 拒绝将文件移动到 Windows Installer 文件夹（目标：{0}）。 |
 | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | 移动位置需要是指向文件夹的完整路径，以驱动器盘符或网络共享开头（例如 D:\Backup，或 \\server\backup）。InstallerClean 无法使用这个：{0} |
