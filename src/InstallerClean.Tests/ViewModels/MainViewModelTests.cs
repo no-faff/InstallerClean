@@ -244,14 +244,16 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new LocalisedInvalidOperationException(
-                "The Windows Installer database appears to be empty or inaccessible."));
+            .ThrowsAsync(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
+        // Equality against the resx, not a fragment of it: the ladder passes
+        // ex.Message through untouched and titles it, and a fragment match kept
+        // a copy of the English in the test that went stale the moment the
+        // string was reworded.
         _dialogService.Received(1).ShowError(
-            Arg.Is<string>(s => s != null && s.Contains("installer database", StringComparison.OrdinalIgnoreCase)),
-            Arg.Any<string>());
+            Strings.Error_InstallerDbEmpty, Strings.Error_InstallerDbUnavailableTitle);
     }
 
     [Fact]
@@ -799,8 +801,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(ScanResultWithOrphans(2));
         _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new LocalisedInvalidOperationException(
-                "The Windows Installer database appears to be empty or inaccessible."));
+            .ThrowsAsync(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
         _confirmationService.ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
 
@@ -1520,8 +1521,7 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new LocalisedInvalidOperationException(
-                "The Windows Installer database appears to be empty or inaccessible."));
+            .ThrowsAsync(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
 
         // Must NOT throw: App.OnStartup used to catch the propagated exception and
         // exit. It now returns, so the window opens.
@@ -1529,7 +1529,7 @@ public class MainViewModelTests
 
         Assert.False(vm.Scan.HasScanned);
         Assert.True(vm.Scan.HasScanError);
-        Assert.Contains("installer database", vm.Scan.LastScanError, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(Strings.Error_InstallerDbEmpty, vm.Scan.LastScanError);
         // The window's intro shows the diagnosis, not "nothing scanned yet", and
         // the startup path is inline: no modal fires over the splash.
         Assert.Equal(Strings.Error_ScanFailedTitle, vm.IntroLead);
@@ -1544,8 +1544,7 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new LocalisedInvalidOperationException(
-                "The Windows Installer database appears to be empty or inaccessible."));
+            .ThrowsAsync(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 

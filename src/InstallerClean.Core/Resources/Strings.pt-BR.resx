@@ -337,7 +337,11 @@
   <data name="Status.DeleteFailed" xml:space="preserve"><value>Falha na exclusão ({0}). Detalhes em {1}.</value></data>
   <data name="Status.DeleteFailed.NoLog" xml:space="preserve"><value>Falha na exclusão ({0}). Não foi possível gravar o crash.log.</value></data>
   <data name="Status.ScanAccessDenied" xml:space="preserve"><value>Acesso negado. O Windows recusou a análise.</value></data>
-  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Falha na análise: banco de dados do instalador indisponível.</value></data>
+  <!-- The overlay line for the same ladder branch as
+       Error.InstallerDbUnavailableTitle, passed together in one record, so the
+       two are read together and must use one vocabulary: "records", not
+       "database". -->
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Scan failed: couldn't read the Windows Installer records.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Análise cancelada.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Pronto</value></data>
   <!-- 0 = exception type name. Full message + stack trace go only to
@@ -532,17 +536,23 @@
        them the one instruction they have already followed. The key names
        predate that correction; what they say is what matters. -->
   <data name="Error.AdminRequiredTitle" xml:space="preserve"><value>Acesso negado</value></data>
-  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>O Windows negou o acesso ao InstallerClean. O InstallerClean já está em execução como administrador, então iniciá-lo de novo dessa forma não vai ajudar.
+  <data name="Error.AdminRequiredBody" xml:space="preserve"><value>Windows refused InstallerClean access, so it stopped. Nothing has been removed.
 
-Restam duas causas prováveis: algum software de segurança está bloqueando C:\Windows\Installer, ou as permissões da pasta foram alteradas. Pausar o software de segurança e tentar de novo é a forma mais rápida de descartar uma delas.</value></data>
-  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Banco de dados do instalador indisponível</value></data>
+InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try.</value></data>
+  <!-- Fronts every LocalisedInvalidOperationException in the scan ladder, so it
+       must be true of all of them: InstallerDbEmpty, MsiNonSuccess,
+       MsiEnumerationNeverEnded, MsiPatchNonSuccess,
+       MsiPatchEnumerationNeverEnded, ScanRecordsUnreadable and
+       ScanCorrelationFailed. "Records" rather than "database" because that is
+       the word every one of those bodies uses. -->
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Couldn't read the Windows Installer records</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Falha na análise</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>O banco de dados do Windows Installer parece estar vazio ou inacessível. Isso é incomum mesmo em uma instalação nova do Windows e normalmente significa que o banco de dados está corrompido ou que uma ferramenta de terceiros o esvaziou. Executar 'sfc /scannow' em um prompt elevado costuma repará-lo.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>O Windows Installer recusou-se a listar os produtos instalados, e o InstallerClean já está em execução como administrador, então executá-lo de novo não vai ajudar. As permissões dos registros do Windows Installer podem ter sido alteradas, ou algum software de segurança pode estar bloqueando o acesso. Vale a pena executar 'sfc /scannow' em um prompt elevado.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>O Windows Installer recusou-se a listar os produtos após {0} falhas consecutivas (último código de erro {1}). Tente reiniciar o Windows, ou execute 'sfc /scannow' em um prompt elevado.</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed.</value></data>
   <!-- The index cap, which is a different condition from the consecutive
        failures above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
@@ -551,7 +561,7 @@ Restam duas causas prováveis: algum software de segurança está bloqueando C:\
   <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
   <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
        runs per product and fails on its own. Same two placeholders. -->
-  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>O Windows Installer recusou-se a listar os patches de um produto após {0} falhas consecutivas (último código de erro {1}). Tente reiniciar o Windows, ou execute 'sfc /scannow' em um prompt elevado.</value></data>
+  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer couldn't give InstallerClean a readable list of one program's patches: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same two placeholders. -->
   <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
@@ -559,7 +569,7 @@ Restam duas causas prováveis: algum software de segurança está bloqueando C:\
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>O InstallerClean não conseguiu conferir esta análise com o Windows: tudo o que o Windows ainda lista está ausente da pasta de cache, enquanto os arquivos que estão na pasta não correspondem a nada que o Windows conheça. Isso aponta para um problema na leitura dos registros de instalação, e não para arquivos que você possa remover com segurança, então nada foi oferecido para limpeza. Reiniciar o Windows e analisar de novo costuma resolver.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -568,7 +578,7 @@ Restam duas causas prováveis: algum software de segurança está bloqueando C:\
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading those registrations straight from the registry ran into errors too. With both routes incomplete, nothing has been offered for cleanup. Scanning again is worth a try, and so is running 'sfc /scannow' from an elevated prompt if it keeps happening.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Destino inválido</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Não foi possível gravar no destino</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Falha na movimentação</value></data>
@@ -609,15 +619,24 @@ Detalhes em {1}.</value></data>
        UnauthorizedAccessException / IOException messages can carry
        paths from other users' profiles into the displayed error list. -->
   <data name="Error.AccessDenied" xml:space="preserve"><value>Acesso negado.</value></data>
-  <data name="Error.IOFailure" xml:space="preserve"><value>A operação falhou. Tente de novo ou reinicie o Windows.</value></data>
+  <data name="Error.IOFailure" xml:space="preserve"><value>Windows reported a file error; the file was left in place.</value></data>
   <data name="Error.UnknownError" xml:space="preserve"><value>Erro desconhecido.</value></data>
   <!-- 0 = shell error code -->
   <!-- These recovery errors point at the Move feature by its button name ("the
        Move button") so the suggestion isn't taken as the delete verb, which now
        also says "moved to the Recycle Bin". -->
-  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Não foi possível mover este arquivo para a Lixeira (erro {0}). Ele pode estar bloqueado, em uso ou impedido pelo Windows. Use o botão Mover em vez disso.</value></data>
-  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>O Windows bloqueou o acesso a este arquivo, mesmo com direitos de administrador (erro {0}). Normalmente é um bloqueio de propriedade ou de permissões. Use o botão Mover em vez disso.</value></data>
-  <data name="Error.RecycleInUse" xml:space="preserve"><value>Este arquivo está aberto ou bloqueado por outro programa (erro {0}). Feche esse programa, ou o que estiver analisando o arquivo, e tente de novo, ou use o botão Mover.</value></data>
+  <!-- The three recycle failures differ in how strongly they point at Move, and
+       that difference is load-bearing. Move is a plain filesystem move that
+       never touches the shell or the bin (MoveFilesService), so: a sharing or
+       lock violation holds the file itself and a move fails identically, so
+       RecycleInUse suggests Move not at all; an access refusal could sit on
+       either the file or the bin, so RecycleAccessDenied says exactly that;
+       and the fallthrough is the codes that are neither, where the pre-delete
+       probe has already recycled a real throwaway file seconds earlier, so the
+       bin demonstrably worked and Move is worth offering. Do not level them. -->
+  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin.</value></data>
+  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file.</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later.</value></data>
   <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>O arquivo foi excluído permanentemente porque não foi possível movê-lo para a Lixeira.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Recusando mover arquivos para a pasta do Windows Installer (destino: {0}).</value></data>
