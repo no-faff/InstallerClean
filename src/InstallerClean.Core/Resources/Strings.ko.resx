@@ -392,8 +392,8 @@
        and the overlay paints these in the warning colour instead of the success
        green. The failure count line beneath carries how many and the detail box
        carries which. -->
-  <data name="Completion.NothingMoved" xml:space="preserve"><value>Nothing was moved</value></data>
-  <data name="Completion.NothingDeleted" xml:space="preserve"><value>Nothing was deleted</value></data>
+  <data name="Completion.NothingMoved" xml:space="preserve"><value>이동된 파일 없음</value></data>
+  <data name="Completion.NothingDeleted" xml:space="preserve"><value>삭제된 파일 없음</value></data>
   <!-- Failure count line: its own zone directly under the heading, so the
        heading states one outcome and never trails a second clause, and the
        summary line never carries an error count where a path belongs.
@@ -405,10 +405,10 @@
        noun should read the two independently and may add a satellite-only
        .One/.Few/.Many override. The Delete variant covers both a Recycle Bin
        delete and a consented permanent one. -->
-  <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>{0} of {1} files could not be moved.</value></data>
-  <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>{0} of {1} files could not be moved.</value></data>
-  <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>{0} of {1} files could not be deleted.</value></data>
-  <data name="Completion.FailedCountDelete.Plural" xml:space="preserve"><value>{0} of {1} files could not be deleted.</value></data>
+  <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>파일 {1}개 중 {0}개를 이동하지 못했습니다.</value></data>
+  <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>파일 {1}개 중 {0}개를 이동하지 못했습니다.</value></data>
+  <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>파일 {1}개 중 {0}개를 삭제하지 못했습니다.</value></data>
+  <data name="Completion.FailedCountDelete.Plural" xml:space="preserve"><value>파일 {1}개 중 {0}개를 삭제하지 못했습니다.</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path. The colon
        ends the sentence at the verb/preposition so the WPF host can force
        the path onto its own line at the exact point {2} substitutes, the
@@ -635,14 +635,14 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        side, minus the shell error code: Move discriminates a sharing or lock
        violation from the IOException HResult, so there is no code worth
        showing and the detail goes to crash.log. -->
-  <data name="Error.AccessDenied.Singular" xml:space="preserve"><value>Windows refused access to this file; it was left in place.</value></data>
-  <data name="Error.AccessDenied.Plural" xml:space="preserve"><value>Windows refused access to these files; they were left in place.</value></data>
-  <data name="Error.FileInUse.Singular" xml:space="preserve"><value>This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later.</value></data>
-  <data name="Error.FileInUse.Plural" xml:space="preserve"><value>These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later.</value></data>
+  <data name="Error.AccessDenied.Singular" xml:space="preserve"><value>Windows가 이 파일에 대한 접근을 거부했습니다. 파일은 그대로 두었습니다.</value></data>
+  <data name="Error.AccessDenied.Plural" xml:space="preserve"><value>Windows가 이 파일들에 대한 접근을 거부했습니다. 파일은 그대로 두었습니다.</value></data>
+  <data name="Error.FileInUse.Singular" xml:space="preserve"><value>이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다. 그래서 지금은 무엇으로도 이동할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도해 보세요.</value></data>
+  <data name="Error.FileInUse.Plural" xml:space="preserve"><value>이 파일들이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다. 그래서 지금은 무엇으로도 이동할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도해 보세요.</value></data>
   <data name="Error.IOFailure.Singular" xml:space="preserve"><value>Windows가 파일 오류를 알렸습니다. 파일은 그대로 두었습니다.</value></data>
-  <data name="Error.IOFailure.Plural" xml:space="preserve"><value>Windows reported file errors; these files were left in place.</value></data>
-  <data name="Error.UnknownError.Singular" xml:space="preserve"><value>Something went wrong with this file; it was left in place.</value></data>
-  <data name="Error.UnknownError.Plural" xml:space="preserve"><value>Something went wrong with these files; they were left in place.</value></data>
+  <data name="Error.IOFailure.Plural" xml:space="preserve"><value>Windows가 파일 오류를 알렸습니다. 이 파일들은 그대로 두었습니다.</value></data>
+  <data name="Error.UnknownError.Singular" xml:space="preserve"><value>이 파일에서 문제가 발생했습니다. 파일은 그대로 두었습니다.</value></data>
+  <data name="Error.UnknownError.Plural" xml:space="preserve"><value>이 파일들에서 문제가 발생했습니다. 파일은 그대로 두었습니다.</value></data>
   <!-- 0 = shell error code -->
   <!-- These recovery errors point at the Move feature by its button name ("the
        Move button") so the suggestion isn't taken as the delete verb, which now
