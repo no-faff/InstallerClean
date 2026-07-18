@@ -395,30 +395,36 @@
                             Content="{loc:Translate Action.Browse}" Command="{Binding Cleanup.BrowseDestinationCommand}"/>
                 </Grid>
 
-                <!-- Buttons row. Delete is the emphasised action and wears the
-                     loud accent pill: InstallerClean only ever offers files that
-                     are safe to remove, and only to the Recycle Bin, so removing
-                     them is the main path. Move is the quieter reassurance, on
-                     the standard pill, for anyone who would rather park a copy
-                     somewhere first. TabIndex puts Delete before Move so Tab
-                     follows left-to-right visual order; DockPanel Dock="Right"
-                     places Move at the far right and Delete to its left, but XAML
-                     order alone would visit Move first under Tab. The completion
-                     overlay's Done pill and the confirm dialogs' own emphasis
-                     line up with Delete as the default action. -->
+                <!-- Buttons row. Delete is the emphasised action and carries
+                     both signals, the loud accent pill and the rightmost slot:
+                     InstallerClean only ever offers files that are safe to
+                     remove, and only to the Recycle Bin, so removing them is
+                     the main path. Move is the quieter reassurance, on the
+                     standard pill, for anyone who would rather park a copy
+                     somewhere first. Dock="Right" gives the first declared
+                     child the furthest-right slot, so Delete is declared first
+                     and Move takes the one to its left, carrying the gap
+                     between the two. Tab deliberately does not follow visual
+                     order here: TabIndex pins Delete first whatever the
+                     declaration order, reaching the emphasised action before
+                     the quiet one to its left, which was judged to matter more
+                     than left-to-right reading order. The completion overlay's
+                     Done pill and the confirm dialogs, which put their own
+                     accent action rightmost, line up with Delete as the
+                     default action. -->
                 <DockPanel Grid.Row="4" KeyboardNavigation.TabNavigation="Local">
-                    <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
-                            KeyboardNavigation.TabIndex="1"
-                            Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
-                            AutomationProperties.HelpText="{loc:Translate Automation.MoveAllFiles}"
-                            ToolTip="{Binding Cleanup.MoveButtonTooltip}"
-                            ToolTipService.ShowOnDisabled="True"/>
-
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
                             KeyboardNavigation.TabIndex="0"
                             Content="{loc:Translate Action.Delete}" Command="{Binding Cleanup.DeleteAllCommand}"
                             AutomationProperties.HelpText="{loc:Translate Automation.DeleteAllFiles}"
                             ToolTip="{loc:Translate Tooltip.Delete}"
+                            ToolTipService.ShowOnDisabled="True"/>
+
+                    <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
+                            KeyboardNavigation.TabIndex="1"
+                            Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
+                            AutomationProperties.HelpText="{loc:Translate Automation.MoveAllFiles}"
+                            ToolTip="{Binding Cleanup.MoveButtonTooltip}"
                             ToolTipService.ShowOnDisabled="True"
                             Margin="{StaticResource GapRight.Sm}"/>
 
