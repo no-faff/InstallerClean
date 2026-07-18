@@ -80,9 +80,19 @@
              window gives at 100% text scale and grows with the OS
              text-size factor in step with the explicit scaled window
              width set in code-behind, so the window widens with its
-             text instead of starving the counts row. -->
+             text instead of starving the counts row.
+
+             Stretch, never Center: a centred column sizes to its
+             content, and in the states that collapse the wide elements
+             (all-clean and not-yet-scanned, where the move box and the
+             long lead are gone) it shrank to the counts grid and
+             floated mid-window while the bottom nav stayed at the left
+             margin. Stretch holds the column at the cell's width in
+             every state, and if the cell ever outgrew MaxWidth a
+             clamped stretched element is centred by WPF anyway, so the
+             wide-window intent is unchanged. -->
         <Grid Grid.Row="1" Margin="{StaticResource Margin.MainContent}"
-              MaxWidth="{a11y:TextScaled 780}" HorizontalAlignment="Center"
+              MaxWidth="{a11y:TextScaled 780}" HorizontalAlignment="Stretch"
               IsEnabled="{Binding IsMainContentInteractive}">
             <!-- Three rows, not five with fixed 16 and 12 spacer rows between
                  them: the separator and the action zone collapse together when
