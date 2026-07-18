@@ -534,7 +534,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // Heading before IsOperating: a heading assigned after the reveal
         // can be spoken twice (see OperationHeadingText in MainWindow.xaml).
         OperationProgress = string.Format(
-            DisplayHelpers.Pluralise(count, Strings.Status_Moving, Strings.Status_Moving, "Status.Moving"),
+            DisplayHelpers.Pluralise(count, Strings.Status_Moving, "Status.Moving"),
             count, DisplayHelpers.PluraliseFile(count));
         IsOperating = true;
 
@@ -835,7 +835,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // Heading before IsOperating: a heading assigned after the reveal
         // can be spoken twice (see OperationHeadingText in MainWindow.xaml).
         OperationProgress = string.Format(
-            DisplayHelpers.Pluralise(ctx.Count, Strings.Status_Deleting, Strings.Status_Deleting, "Status.Deleting"),
+            DisplayHelpers.Pluralise(ctx.Count, Strings.Status_Deleting, "Status.Deleting"),
             ctx.Count, DisplayHelpers.PluraliseFile(ctx.Count));
         IsOperating = true;
 
