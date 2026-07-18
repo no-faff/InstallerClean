@@ -72,4 +72,69 @@ public class FileOperationErrorTests
         // reach the user literally.
         Assert.DoesNotContain("{0}", err.LocalisedMessage);
     }
+
+    [Fact]
+    public void FileInUse_reads_as_a_move_failure_not_a_removal_failure()
+    {
+        // Move's counterpart to Error.RecycleInUse. It must say "move": the
+        // Delete-side sentence says "remove", and a user reading this one has
+        // pressed Move.
+        var err = new FileInUse(@"C:\Windows\Installer\x.msi");
+
+        Assert.Equal(Strings.Error_FileInUse_Singular, err.LocalisedMessage);
+        Assert.Contains("move it", err.LocalisedMessage);
+        Assert.DoesNotContain("x.msi", err.LocalisedMessage);
+    }
+
+    /// <summary>
+    /// The per-file sentence and the list heading are two different jobs. The
+    /// CLI prints LocalisedMessage after "filename: " for every failed file, so
+    /// it stays singular whatever the bucket size; the completion overlay puts
+    /// LocalisedGroupHeading over the indented list, so it inflects.
+    /// </summary>
+    [Fact]
+    public void LocalisedMessage_stays_singular_while_the_heading_inflects()
+    {
+        var err = new FileInUse(@"C:\Windows\Installer\x.msi");
+
+        Assert.Equal(Strings.Error_FileInUse_Singular, err.LocalisedMessage);
+        Assert.Equal(Strings.Error_FileInUse_Singular, err.LocalisedGroupHeading(1));
+        Assert.Equal(Strings.Error_FileInUse_Plural, err.LocalisedGroupHeading(4));
+    }
+
+    [Fact]
+    public void The_four_pluralising_categories_pick_their_plural_heading_for_a_bucket()
+    {
+        FileOperationError[] errors =
+        [
+            new FileInUse(@"C:\Windows\Installer\a.msi"),
+            new IOFailure(@"C:\Windows\Installer\b.msi"),
+            new AccessDenied(@"C:\Windows\Installer\c.msi"),
+            new UnknownError(@"C:\Windows\Installer\d.msi"),
+        ];
+        string[] plurals =
+        [
+            Strings.Error_FileInUse_Plural,
+            Strings.Error_IOFailure_Plural,
+            Strings.Error_AccessDenied_Plural,
+            Strings.Error_UnknownError_Plural,
+        ];
+
+        for (int i = 0; i < errors.Length; i++)
+            Assert.Equal(plurals[i], errors[i].LocalisedGroupHeading(3));
+    }
+
+    [Fact]
+    public void A_category_with_no_plural_form_heads_its_bucket_with_its_own_sentence()
+    {
+        // The rare and the already-complete sentences (a missing source, a
+        // reparse point, an out-of-cache candidate, the recycle family) were
+        // deliberately left without plural variants, so the base class default
+        // has to carry them rather than a lookup missing and returning empty.
+        var missing = new MissingSourceFile(@"C:\Windows\Installer\x.msi");
+        var recycle = new RecycleFailed(@"C:\Windows\Installer\y.msi", unchecked((int)0x80070020));
+
+        Assert.Equal(missing.LocalisedMessage, missing.LocalisedGroupHeading(5));
+        Assert.Equal(recycle.LocalisedMessage, recycle.LocalisedGroupHeading(5));
+    }
 }

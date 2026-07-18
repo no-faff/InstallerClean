@@ -27,6 +27,55 @@ public class CompletionViewModelTests
     }
 
     [Fact]
+    public void FormatErrorBreakdown_heads_a_bucket_with_its_pluralised_sentence()
+    {
+        var errors = new List<FileOperationError>
+        {
+            new FileInUse(@"C:\Windows\Installer\a.msi"),
+            new FileInUse(@"C:\Windows\Installer\b.msi"),
+        };
+
+        var text = CompletionViewModel.FormatErrorBreakdown(errors);
+
+        // The heading introduces the list, and carries no "(2)" bracket: that
+        // was a count no language could inflect, sitting on a singular
+        // sentence, and it read as a reference number.
+        Assert.StartsWith(Strings.Error_FileInUse_Plural, text);
+        Assert.DoesNotContain("(2)", text);
+    }
+
+    [Fact]
+    public void FormatErrorBreakdown_keeps_a_single_failure_singular()
+    {
+        var errors = new List<FileOperationError> { new FileInUse(@"C:\Windows\Installer\a.msi") };
+
+        var text = CompletionViewModel.FormatErrorBreakdown(errors);
+
+        Assert.StartsWith(Strings.Error_FileInUse_Singular, text);
+    }
+
+    [Fact]
+    public void FormatErrorBreakdown_indents_filenames_with_a_visible_marker()
+    {
+        var errors = new List<FileOperationError>
+        {
+            new AccessDenied(@"C:\Windows\Installer\a.msi"),
+            new AccessDenied(@"C:\Windows\Installer\b.msi"),
+        };
+
+        var text = CompletionViewModel.FormatErrorBreakdown(errors);
+
+        // Two spaces alone are invisible in a proportional font, which left the
+        // filenames reading as a run-on of the sentence above them. The hyphen
+        // is what makes the indent survive Poppins.
+        Assert.Contains("  - a.msi", text);
+        Assert.Contains("  - b.msi", text);
+        // Filenames only: the full path can name another user's profile under
+        // elevation.
+        Assert.DoesNotContain(@"C:\Windows\Installer", text);
+    }
+
+    [Fact]
     public void ShowDeleteSummary_reads_cleaned_up_not_freed_and_sets_the_space_hint()
     {
         var vm = new CompletionViewModel();
@@ -178,5 +227,157 @@ public class CompletionViewModelTests
             errors: new List<FileOperationError>());
 
         Assert.Equal(string.Empty, spaceHintDuringRestoreChange);
+    }
+
+    // The three heading states, the failure count line and the acted-on-nothing
+    // suppressions. The contract in one line: the heading says one thing, the
+    // count line says how many failed, and nothing on the screen describes files
+    // arriving somewhere none of them reached.
+
+    private static List<FileOperationError> Failures(int count) =>
+        [.. Enumerable.Range(0, count).Select(i =>
+            (FileOperationError)new FileInUse($@"C:\Windows\Installer\f{i}.msi"))];
+
+    [Fact]
+    public void A_move_that_fully_succeeded_keeps_the_success_heading_and_no_count_line()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowMoveSummary(movedCount: 3, movedBytes: 1024 * 1024, destination: @"D:\backup",
+            errors: [], freesSpace: true);
+
+        Assert.False(vm.HeadingIsWarning);
+        Assert.Contains("freed", vm.Heading);
+        Assert.Equal(string.Empty, vm.FailedCount);
+    }
+
+    [Fact]
+    public void A_partly_failed_move_keeps_the_success_heading_and_states_the_count()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowMoveSummary(movedCount: 69, movedBytes: 1024 * 1024, destination: @"D:\backup",
+            errors: Failures(2), freesSpace: true);
+
+        // Something really was freed, so the heading says so and the failures
+        // get their own line. The heading used to carry both, in one clause too
+        // long for the card, and clipped.
+        Assert.False(vm.HeadingIsWarning);
+        Assert.Contains("freed", vm.Heading);
+        Assert.Equal("2 of 71 files could not be moved.", vm.FailedCount);
+        // The destination line is the plain variant whatever happened: the
+        // error count used to be appended here, where it read as part of the
+        // folder name.
+        Assert.Equal(@"69 files moved to: D:\backup", vm.Summary);
+    }
+
+    [Fact]
+    public void A_move_that_achieved_nothing_says_so_and_claims_no_destination()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowMoveSummary(movedCount: 0, movedBytes: 0, destination: @"D:\backup",
+            errors: Failures(2), freesSpace: true);
+
+        // This used to render "0 B freed, some files could not be proce": wrong
+        // twice, reporting a total failure as a result and then clipping.
+        Assert.True(vm.HeadingIsWarning);
+        Assert.Equal(Strings.Completion_NothingMoved, vm.Heading);
+        Assert.Equal("2 of 2 files could not be moved.", vm.FailedCount);
+        // Nothing reached the destination, so nothing on screen may say files
+        // are there or invite copying them back.
+        Assert.Equal(string.Empty, vm.Summary);
+        Assert.Equal(string.Empty, vm.SummaryDestination);
+        Assert.Equal(string.Empty, vm.Restore);
+        Assert.NotEqual(string.Empty, vm.Errors);
+    }
+
+    [Fact]
+    public void A_delete_that_achieved_nothing_offers_neither_bin_nor_restore()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowDeleteSummary(deletedCount: 0, deletedBytes: 0, errors: Failures(3));
+
+        Assert.True(vm.HeadingIsWarning);
+        Assert.Equal(Strings.Completion_NothingDeleted, vm.Heading);
+        Assert.Equal("3 of 3 files could not be deleted.", vm.FailedCount);
+        Assert.Equal(string.Empty, vm.Summary);
+        // The bin gained nothing, so there is nothing to empty and nothing to
+        // restore from it.
+        Assert.Equal(string.Empty, vm.SpaceHint);
+        Assert.Equal(string.Empty, vm.Restore);
+    }
+
+    [Fact]
+    public void A_permanent_delete_that_achieved_nothing_drops_its_reassurance()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowPermanentDeleteSummary(deletedCount: 0, deletedBytes: 0, errors: Failures(1));
+
+        Assert.True(vm.HeadingIsWarning);
+        Assert.Equal(Strings.Completion_NothingDeleted, vm.Heading);
+        Assert.Equal("1 of 1 files could not be deleted.", vm.FailedCount);
+        Assert.Equal(string.Empty, vm.Summary);
+        // "That's fine, it was safe to remove" is about a file that was
+        // removed. None was.
+        Assert.Equal(string.Empty, vm.Restore);
+    }
+
+    [Fact]
+    public void A_partly_failed_delete_keeps_its_bin_and_restore_copy()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowDeleteSummary(deletedCount: 5, deletedBytes: 1024, errors: Failures(1));
+
+        Assert.False(vm.HeadingIsWarning);
+        Assert.Contains("cleaned up", vm.Heading);
+        Assert.Equal(Strings.Completion_DeleteSpaceHint, vm.SpaceHint);
+        Assert.Equal(Strings.Completion_DeleteRestoreHint, vm.Restore);
+    }
+
+    [Fact]
+    public void A_cancelled_move_counts_what_it_tried_not_the_batch_it_was_given()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowMoveCancelledSummary(movedCount: 3, totalCount: 71, movedBytes: 1024,
+            errors: Failures(2), freesSpace: true);
+
+        // 5 tried, not 71 queued: the 66 the cancel never reached are not files
+        // that could not be moved. The summary line below still names the whole
+        // batch, which is its own job.
+        Assert.Equal("2 of 5 files could not be moved.", vm.FailedCount);
+        Assert.Contains("71", vm.Summary);
+        // A cancel is not a failure, so the heading stays as it was.
+        Assert.False(vm.HeadingIsWarning);
+    }
+
+    [Fact]
+    public void A_cancelled_delete_that_moved_nothing_still_keeps_its_heading()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowDeleteCancelledSummary(deletedCount: 0, totalCount: 40, deletedBytes: 0,
+            errors: Failures(1));
+
+        Assert.False(vm.HeadingIsWarning);
+        Assert.Equal("1 of 1 files could not be deleted.", vm.FailedCount);
+        Assert.NotEqual(string.Empty, vm.Summary);
+    }
+
+    [Fact]
+    public void The_count_line_and_warning_heading_do_not_survive_into_the_next_operation()
+    {
+        // The view-model instance is reused across operations, so a count line
+        // or a warning heading left over from a failed run would sit under the
+        // next run's green heading.
+        var vm = new CompletionViewModel();
+        vm.ShowMoveSummary(movedCount: 0, movedBytes: 0, destination: @"D:\backup",
+            errors: Failures(2), freesSpace: true);
+        Assert.True(vm.HeadingIsWarning);
+        Assert.NotEqual(string.Empty, vm.FailedCount);
+
+        vm.ShowDeleteSummary(deletedCount: 2, deletedBytes: 1024, errors: []);
+        Assert.False(vm.HeadingIsWarning);
+        Assert.Equal(string.Empty, vm.FailedCount);
+
+        vm.ShowAllClear(installedProductCount: 5, scanDurationMs: 10);
+        Assert.False(vm.HeadingIsWarning);
+        Assert.Equal(string.Empty, vm.FailedCount);
     }
 }

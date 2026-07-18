@@ -106,6 +106,33 @@ public class ResultLogEntryTests
     }
 
     [Fact]
+    public void Move_error_bucket_categorises_a_held_open_file_as_FileInUse()
+    {
+        // The result log derives a bucket's category from the record's type
+        // name, so splitting a held-open file out of IOFailure gives the
+        // aggregate a new category for free. That is the whole cost of the
+        // split as far as the log is concerned: schema 3 is untouched, and the
+        // category stays a label with no path or identifier in it. The name is
+        // therefore load-bearing, which is what this pins.
+        var errors = new List<FileOperationError>
+        {
+            new FileInUse(@"C:\Windows\Installer\a.msi"),
+            new FileInUse(@"C:\Windows\Installer\b.msi"),
+            new IOFailure(@"C:\Windows\Installer\c.msi"),
+        };
+
+        var op = OperationInfo.FromMove(new MoveResult(0, errors), totalCandidates: 3,
+            bytesFreed: 0, moveDestinationKind: MoveDestinationKinds.DifferentFixedDrive);
+
+        var inUse = Assert.Single(op.Errors, b => b.Category == "FileInUse");
+        Assert.Equal(2, inUse.Count);
+        // No shell HRESULT on this category: Move reads the code off the
+        // exception to choose the category and keeps it off the record.
+        Assert.Null(inUse.Codes);
+        Assert.Single(op.Errors, b => b.Category == "IOFailure");
+    }
+
+    [Fact]
     public void Delete_error_bucket_carries_codes_for_PermanentlyDeleted()
     {
         // PermanentlyDeleted records the hrDelete that accompanied the

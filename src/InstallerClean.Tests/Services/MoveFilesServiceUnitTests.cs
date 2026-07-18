@@ -1,4 +1,6 @@
+using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using NSubstitute;
 using InstallerClean.Models;
 using InstallerClean.Services;
 
@@ -256,5 +258,64 @@ public class MoveFilesServiceUnitTests
 
         Assert.Equal(0, result.MovedCount);
         Assert.Empty(result.Errors);
+    }
+
+    /// <summary>
+    /// A filesystem whose File.Move throws <paramref name="onMove"/> for the one
+    /// source path, and which reports nothing else as existing so the
+    /// unique-name probe takes the first candidate. MockFileSystem cannot raise
+    /// an IOException carrying a chosen HRESULT, and the HRESULT is the whole
+    /// subject of the tests below.
+    /// </summary>
+    private static IFileSystem FileSystemThatFailsMove(string source, Exception onMove)
+    {
+        var fs = Substitute.For<IFileSystem>();
+        // MockFileSystem's Path is a working implementation; a bare substitute
+        // would return null from Combine and GetRandomFileName.
+        fs.Path.Returns(new MockFileSystem().Path);
+        // A substituted IDirectory reports the cache folder as absent, which
+        // returns the post-batch empty-subdirectory prune at its first line.
+        fs.Directory.Returns(Substitute.For<IDirectory>());
+
+        var file = Substitute.For<IFile>();
+        fs.File.Returns(file);
+        file.Exists(Arg.Any<string>()).Returns(ci => (string?)ci[0] == source);
+        file.When(f => f.Move(source, Arg.Any<string>())).Do(_ => throw onMove);
+        fs.File.Returns(file);
+        return fs;
+    }
+
+    [Theory]
+    [InlineData(0x80070020)] // ERROR_SHARING_VIOLATION
+    [InlineData(0x80070021)] // ERROR_LOCK_VIOLATION
+    public async Task MoveFilesAsync_files_a_held_open_file_as_in_use(long hresult)
+    {
+        var source = $@"{SourceDir}\locked.msi";
+        var fs = FileSystemThatFailsMove(source,
+            new IOException("held open") { HResult = unchecked((int)hresult) });
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        // The one IO failure with a cause the user can act on, so it must not
+        // be flattened into the generic "Windows reported a file error".
+        var error = Assert.Single(result.Errors);
+        Assert.IsType<FileInUse>(error);
+        Assert.Equal(0, result.MovedCount);
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_files_any_other_io_error_as_a_generic_failure()
+    {
+        var source = $@"{SourceDir}\a.msi";
+        // ERROR_DISK_FULL: real, and nothing to do with the file being held.
+        var fs = FileSystemThatFailsMove(source,
+            new IOException("disk full") { HResult = unchecked((int)0x80070070) });
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        var error = Assert.Single(result.Errors);
+        Assert.IsType<IOFailure>(error);
     }
 }
