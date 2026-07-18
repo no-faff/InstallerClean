@@ -28,13 +28,38 @@ internal static class InstallerCacheHelpers
     {
         if (string.IsNullOrWhiteSpace(path)) return false;
 
-        var resolvedInput = ResolveFinalPath(path)
+        TryResolveFinalPath(path, out var resolvedInput);
+        return ResolvesInsideInstallerFolder(resolvedInput, installerFolderRoot);
+    }
+
+    /// <summary>
+    /// The containment comparison itself, over an ALREADY-resolved input. The
+    /// source-side gate (<see cref="CandidateGuard"/>) takes this form together
+    /// with <see cref="TryResolveFinalPath"/>, so that it can refuse a path
+    /// whose resolution degraded; the destination gate above ignores that
+    /// distinction, and the two sides want opposite answers for it. A
+    /// destination gate asks "is this forbidden", so an unresolvable answer of
+    /// "not forbidden" lets the move proceed, where refusing would strand a user
+    /// with no destination they could use. A source gate asks "is this in
+    /// bounds", and the whole reason it exists is that a corrupt LocalPackage
+    /// value can name a file anywhere on disk, so "could not prove it is in
+    /// bounds" and "out of bounds" earn the same refusal.
+    ///
+    /// The cache root is compared in its best-effort form even when ITS
+    /// resolution degraded, and that is safe in the direction that matters: a
+    /// fully resolved input is a real canonical path, so if the root is a
+    /// junction this comparison fails to match and the caller refuses. An
+    /// unresolvable root can only cost a false negative, never a false positive.
+    /// </summary>
+    internal static bool ResolvesInsideInstallerFolder(string resolvedInput, string? installerFolderRoot = null)
+    {
+        var input = resolvedInput
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        var resolvedInstaller = ResolveFinalPath(installerFolderRoot ?? InstallerFolder)
+        var installer = ResolveFinalPath(installerFolderRoot ?? InstallerFolder)
             .TrimEnd(Path.DirectorySeparatorChar);
 
-        return resolvedInput.Equals(resolvedInstaller, StringComparison.OrdinalIgnoreCase)
-            || resolvedInput.StartsWith(resolvedInstaller + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+        return input.Equals(installer, StringComparison.OrdinalIgnoreCase)
+            || input.StartsWith(installer + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -87,9 +112,30 @@ internal static class InstallerCacheHelpers
     /// </summary>
     internal static string ResolveFinalPath(string path)
     {
+        TryResolveFinalPath(path, out var resolved);
+        return resolved;
+    }
+
+    /// <summary>
+    /// <see cref="ResolveFinalPath"/> with its degradation made visible: false
+    /// means the kernel never expanded this path and
+    /// <paramref name="resolved"/> is the best-effort string instead of a proven
+    /// one. Every caller gets the same string either way, so the bool is the
+    /// only difference and no caller is forced to handle it.
+    ///
+    /// It matters because a degraded result is exactly a path whose reparse
+    /// points went UNexpanded, which is the one thing a containment check is
+    /// there to see through. A gate that cannot tell the two apart calls a
+    /// junction in-bounds on the strength of how its name is spelled. See
+    /// <see cref="ResolvesInsideInstallerFolder"/> for which side wants which.
+    /// </summary>
+    internal static bool TryResolveFinalPath(string path, out string resolved)
+    {
         string normalised;
         try { normalised = Path.GetFullPath(path); }
-        catch { return path; }
+        catch { resolved = path; return false; }
+
+        resolved = normalised;
 
         // GetFinalPathNameByHandle needs an existing target; walk up
         // until an ancestor exists and open that.
@@ -97,7 +143,7 @@ internal static class InstallerCacheHelpers
         while (probe.Length > 0 && !Directory.Exists(probe) && !File.Exists(probe))
         {
             var parent = Path.GetDirectoryName(probe);
-            if (string.IsNullOrEmpty(parent) || parent == probe) return normalised;
+            if (string.IsNullOrEmpty(parent) || parent == probe) return false;
             probe = parent;
         }
 
@@ -112,12 +158,12 @@ internal static class InstallerCacheHelpers
                 Kernel32.FILE_FLAG_BACKUP_SEMANTICS,
                 IntPtr.Zero);
 
-            if (handle.IsInvalid) return normalised;
+            if (handle.IsInvalid) return false;
 
             var buffer = new char[PathBufferLength];
             var length = Kernel32.GetFinalPathNameByHandle(
                 handle, buffer, (uint)buffer.Length, Kernel32.VOLUME_NAME_DOS);
-            if (length == 0) return normalised;
+            if (length == 0) return false;
             if (length >= buffer.Length)
             {
                 // Buffer too small. The returned length includes the
@@ -126,10 +172,10 @@ internal static class InstallerCacheHelpers
                 buffer = new char[length];
                 length = Kernel32.GetFinalPathNameByHandle(
                     handle, buffer, (uint)buffer.Length, Kernel32.VOLUME_NAME_DOS);
-                if (length == 0) return normalised;
+                if (length == 0) return false;
             }
 
-            var resolved = StripLongPathPrefix(new string(buffer, 0, (int)length));
+            var final = StripLongPathPrefix(new string(buffer, 0, (int)length));
 
             // Reattach the not-yet-created suffix to the resolved root.
             // Path.Combine handles the separator boundary; probe = "C:\"
@@ -138,14 +184,16 @@ internal static class InstallerCacheHelpers
             {
                 var suffix = normalised.Substring(probe.Length)
                     .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                resolved = Path.Combine(resolved, suffix);
+                final = Path.Combine(final, suffix);
             }
 
-            return resolved;
+            resolved = final;
+            return true;
         }
         catch
         {
-            return normalised;
+            resolved = normalised;
+            return false;
         }
     }
 
@@ -154,7 +202,7 @@ internal static class InstallerCacheHelpers
     /// the path comparable to user-typed paths and to the value of
     /// <see cref="InstallerFolder"/>.
     /// </summary>
-    private static string StripLongPathPrefix(string path)
+    internal static string StripLongPathPrefix(string path)
     {
         const string uncPrefix = @"\\?\UNC\";
         const string longPrefix = @"\\?\";

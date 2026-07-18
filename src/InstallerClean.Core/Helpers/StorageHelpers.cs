@@ -141,24 +141,79 @@ internal static class StorageHelpers
     }
 
     /// <summary>
-    /// True if <paramref name="path"/> is a junction or symlink. Move
-    /// and Delete refuse source files in C:\Windows\Installer that
-    /// have been replaced with a symlink because following the link
-    /// would silently relocate an OS file out of System32. The check
-    /// is best-effort against a TOCTOU swap; <see cref="OpenAtomic"/>
-    /// is the race-free path for the write side.
+    /// What an attribute read established about <paramref name="path"/> in
+    /// <see cref="CheckReparsePoint"/>. Three states, not two, because
+    /// "attributes say it is an ordinary file" and "the attributes could not be
+    /// read" are opposite facts to a safety gate and a bool collapses them.
     /// </summary>
-    internal static bool IsReparsePoint(string path)
+    internal enum ReparseCheck
     {
+        /// <summary>The attributes were read and carry no reparse-point bit.</summary>
+        No,
+        /// <summary>The attributes were read and carry the reparse-point bit.</summary>
+        Yes,
+        /// <summary>
+        /// The attributes could not be read, so neither of the above was
+        /// established. A safety gate must refuse; a metadata reader may
+        /// proceed and fail on its own terms.
+        /// </summary>
+        Unreadable,
+    }
+
+    /// <summary>
+    /// Reads <paramref name="path"/>'s attributes to decide whether it is a
+    /// junction or symlink. Move and Delete refuse source files in
+    /// C:\Windows\Installer that have been replaced with a symlink because
+    /// following the link would silently relocate an OS file out of System32.
+    /// The check is best-effort against a TOCTOU swap; <see cref="OpenAtomic"/>
+    /// is the race-free path for the write side.
+    ///
+    /// A path with nothing at it is <see cref="ReparseCheck.No"/> rather than
+    /// <see cref="ReparseCheck.Unreadable"/>: absence is not unreadability. Win32
+    /// documents GetFileAttributes as returning the attributes OF a symbolic link
+    /// rather than of its target, which is the only reason the reparse bit is
+    /// observable here at all, so a link whose target is gone still answers Yes
+    /// and cannot hide behind a not-found. What is left on the not-found side is
+    /// a path that names nothing, where the operation about to run would fail on
+    /// its own with a truthful error. Every other failure (a refused DACL, a
+    /// malformed or over-long path, a device error) leaves the question open and
+    /// answers Unreadable.
+    ///
+    /// <paramref name="error"/> carries the exception behind an Unreadable so a
+    /// caller can put it in the crash log; it is null for the other two.
+    /// </summary>
+    internal static ReparseCheck CheckReparsePoint(string path, out Exception? error)
+    {
+        error = null;
         try
         {
             var attrs = File.GetAttributes(path);
-            return (attrs & FileAttributes.ReparsePoint) != 0;
+            return (attrs & FileAttributes.ReparsePoint) != 0 ? ReparseCheck.Yes : ReparseCheck.No;
         }
-        catch
+        catch (FileNotFoundException)
         {
-            return false;
+            return ReparseCheck.No;
+        }
+        catch (DirectoryNotFoundException)
+        {
+            return ReparseCheck.No;
+        }
+        catch (Exception ex)
+        {
+            error = ex;
+            return ReparseCheck.Unreadable;
         }
     }
+
+    /// <summary>
+    /// The tolerant form, for callers reading metadata rather than guarding an
+    /// action: an unreadable attribute read answers false, so the caller goes on
+    /// and meets the same failure where it actually matters. Any caller deciding
+    /// whether to MOVE or DELETE a file wants
+    /// <see cref="CheckReparsePoint(string, out Exception?)"/> instead, and its
+    /// Unreadable state.
+    /// </summary>
+    internal static bool IsReparsePoint(string path) =>
+        CheckReparsePoint(path, out _) == ReparseCheck.Yes;
 
 }
