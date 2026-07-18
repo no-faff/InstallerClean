@@ -384,13 +384,22 @@
                     <!-- The placeholder is the box's Tag, rendered inside the
                          PillTextBox template so it lines up with the caret;
                          there is no separate tooltip: the placeholder
-                         carries the what and the why. -->
+                         carries the what and the why.
+
+                         Tag text is drawn by the template and reaches no
+                         screen reader, so the same key is also the box's
+                         HelpText. It is deliberately one key feeding both:
+                         the hint a screen reader hears and the hint on
+                         screen are the same sentence by construction and
+                         cannot drift apart, which is the failure two
+                         separate strings produce. -->
                     <TextBox Grid.Column="0" x:Name="MoveDestinationInput" Style="{StaticResource PillTextBox}"
                              Text="{Binding Cleanup.MoveDestination, Mode=TwoWay,
                                             UpdateSourceTrigger=PropertyChanged}"
                              MaxLength="8192"
                              Tag="{loc:Translate Action.MoveDestinationPlaceholder}"
                              AutomationProperties.Name="{loc:Translate Automation.MoveDestinationFolder}"
+                             AutomationProperties.HelpText="{loc:Translate Action.MoveDestinationPlaceholder}"
                              AutomationProperties.IsRequiredForForm="True"/>
 
                     <Button Grid.Column="2" Style="{StaticResource GhostPill}" Padding="12,8"
