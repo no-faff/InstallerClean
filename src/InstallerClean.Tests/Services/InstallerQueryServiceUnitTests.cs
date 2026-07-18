@@ -738,6 +738,42 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(unimprovable, Assert.Single(result.Packages).LocalPackagePath);
     }
 
+    // ---- Item 16: the SID-buffer retry's own return code ----
+
+    [Fact]
+    public async Task AccessDenied_from_the_sid_retry_refuses_the_scan()
+    {
+        // The refusal check used to sit above the retry, so this code came back
+        // from the second call and fell into the tolerated-failure branch: the
+        // row was counted and demoted, and the scan reported itself as merely
+        // short of a record when Windows had refused it outright. Contract-wise
+        // near unreachable (the retry only runs for a SID past 256 characters),
+        // so this pins the refusal contract rather than a field failure.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.ProductSidRetryResult[0] = AccessDenied;
+
+        await Assert.ThrowsAsync<LocalisedAccessException>(() => Run(msi));
+    }
+
+    [Fact]
+    public async Task A_successful_sid_retry_still_yields_its_row()
+    {
+        // The other side: moving the classification below the retry must not
+        // cost the retry's whole purpose, which is that a row needing a bigger
+        // SID buffer still lands.
+        const string pkg = @"C:\Windows\Installer\after-retry.msi";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", pkg);
+        msi.ProductSidRetryResult[0] = Success;
+
+        var result = await Run(msi);
+
+        Assert.Equal(pkg, Assert.Single(result.Packages).LocalPackagePath);
+        Assert.Equal(0, result.UnreadableProductCount);
+    }
+
     /// <summary>
     /// Scriptable fake over <see cref="IMsiApi"/>. Reproduces the double-call
     /// buffer contract of msi.dll: a sizing call with a null buffer returns the
@@ -769,6 +805,18 @@ public class InstallerQueryServiceUnitTests
         /// not be read both arrive as "" without it, and no test could reach the
         /// branch that tells them apart.
         /// </summary>
+        /// <summary>
+        /// Scripts the SID-buffer retry for one product row, keyed by index: the
+        /// first EnumProducts call at that index reports MoreData, and the retry
+        /// returns the value given here (Success meaning the row then comes back
+        /// normally). The real API only asks for a bigger buffer for a SID past
+        /// 256 characters, so nothing else in this fake can reach the retry, and
+        /// what the retry RETURNS is the whole subject of the tests using it.
+        /// </summary>
+        public Dictionary<uint, uint> ProductSidRetryResult { get; } = new();
+
+        private readonly HashSet<uint> _sidRetried = new();
+
         public Dictionary<(string ProductCode, string Property), uint> ProductPropertyResult { get; } = new();
         public Dictionary<(string PatchCode, string ProductCode, string Property), uint> PatchPropertyResult { get; } = new();
 
@@ -810,6 +858,13 @@ public class InstallerQueryServiceUnitTests
                 return Success;
             }
             if (index >= Products.Count) return NoMoreItems;
+            if (ProductSidRetryResult.TryGetValue(index, out var afterRetry))
+            {
+                // MoreData carries the required size INCLUDING the terminator,
+                // and the caller allocates exactly that and passes it back.
+                if (_sidRetried.Add(index)) { sidLength = 64; return MoreData; }
+                if (afterRetry != Success) return afterRetry;
+            }
             var (code, result) = Products[(int)index];
             if (result != Success) return result;
             WriteCode(installedProductCode, code);

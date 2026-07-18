@@ -568,15 +568,6 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 sid: sidBuffer,
                 sidLength: ref sidLen);
 
-            if (error == MsiError.NoMoreItems)
-            {
-                reachedEnd = true;
-                break;
-            }
-
-            if (error == MsiError.AccessDenied)
-                throw new LocalisedAccessException(Strings.Error_MsiAccessDenied);
-
             if (error == MsiError.MoreData)
             {
                 // Defensive only. Real-world SIDs are ~45 chars and
@@ -597,6 +588,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     sid: sidBuffer,
                     sidLength: ref sidLen);
             }
+
+            // Every classification below sits AFTER the retry so it judges
+            // whichever call actually produced this row's answer. With the
+            // refusal check above the retry, an AccessDenied returned BY the
+            // retry fell through to the tolerated-failure branch and demoted the
+            // row instead of stopping the scan, which is the one return this
+            // loop is not allowed to absorb. The case is near unreachable by
+            // contract, since the retry only runs for a SID longer than 256
+            // characters, so this is the refusal contract being uniform rather
+            // than a failure anybody has met.
+            if (error == MsiError.NoMoreItems)
+            {
+                reachedEnd = true;
+                break;
+            }
+
+            if (error == MsiError.AccessDenied)
+                throw new LocalisedAccessException(Strings.Error_MsiAccessDenied);
 
             lastError = error;
 
