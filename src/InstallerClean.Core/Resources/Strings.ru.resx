@@ -250,7 +250,11 @@
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение и сколько места люди освобождают. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Переместить ненужные файлы в папку для перемещения.</value></data>
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Переместить ненужные файлы в папку для перемещения. Сначала выберите её.</value></data>
+  <!-- The Move button's tooltip while the Move location box is empty. The
+       button still works from here: pressing it opens the folder browser
+       and then moves, so this says a folder is coming rather than asking
+       for one to be set first. -->
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files somewhere safe. You'll choose the folder next.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Переместить ненужные файлы в Корзину.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Имя субъекта из встроенного сертификата Authenticode. Цепочка не проверялась.</value></data>
 

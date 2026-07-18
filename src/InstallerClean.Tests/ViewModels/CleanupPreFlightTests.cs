@@ -361,6 +361,77 @@ public class CleanupPreFlightTests
     }
 
     [Fact]
+    public async Task Move_is_offered_with_no_destination_typed()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        Assert.Equal(string.Empty, vm.Cleanup.MoveDestination);
+        // Gating this on the box would drop the button out of the tab order,
+        // taking the action and its own explanation of what it needs with it.
+        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task Move_with_no_destination_asks_for_one_and_moves_there()
+    {
+        var chosen = Path.Combine(Path.GetTempPath(), "ic-test-picked");
+        _confirmationService.AskForMoveDestination().Returns(chosen);
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _confirmationService.Received(1).AskForMoveDestination();
+        await _moveService.Received(1).MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), chosen,
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        // The answer is kept, so the box shows where the files went.
+        Assert.Equal(chosen, vm.Cleanup.MoveDestination);
+    }
+
+    [Fact]
+    public async Task Backing_out_of_the_destination_browser_moves_nothing()
+    {
+        // Null is the cancelled answer.
+        _confirmationService.AskForMoveDestination().Returns((string?)null);
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+        _confirmationService.DidNotReceive().ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
+        // Backing out leaves the box as it was rather than recording a choice
+        // the user withdrew, and leaves the command usable.
+        Assert.Equal(string.Empty, vm.Cleanup.MoveDestination);
+        Assert.False(vm.Cleanup.IsOperationInFlight);
+        Assert.True(vm.Cleanup.MoveAllCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task A_destination_already_typed_is_not_asked_for_again()
+    {
+        _confirmationService.ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _confirmationService.DidNotReceive().AskForMoveDestination();
+    }
+
+    [Fact]
     public async Task A_relative_destination_is_refused_without_creating_it()
     {
         var vm = CreateViewModel();

@@ -399,8 +399,7 @@
                              MaxLength="8192"
                              Tag="{loc:Translate Action.MoveDestinationPlaceholder}"
                              AutomationProperties.Name="{loc:Translate Automation.MoveDestinationFolder}"
-                             AutomationProperties.HelpText="{loc:Translate Action.MoveDestinationPlaceholder}"
-                             AutomationProperties.IsRequiredForForm="True"/>
+                             AutomationProperties.HelpText="{loc:Translate Action.MoveDestinationPlaceholder}"/>
 
                     <Button Grid.Column="2" Style="{StaticResource GhostPill}" Padding="12,8"
                             Content="{loc:Translate Action.Browse}" Command="{Binding Cleanup.BrowseDestinationCommand}"/>

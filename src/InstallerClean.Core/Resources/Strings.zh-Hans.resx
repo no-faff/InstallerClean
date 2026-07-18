@@ -250,7 +250,11 @@
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>将不需要的文件移动到移动位置。</value></data>
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>将不需要的文件移动到移动位置。请先选择一个位置。</value></data>
+  <!-- The Move button's tooltip while the Move location box is empty. The
+       button still works from here: pressing it opens the folder browser
+       and then moves, so this says a folder is coming rather than asking
+       for one to be set first. -->
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files somewhere safe. You'll choose the folder next.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>将不需要的文件移到回收站。</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>来自内嵌 Authenticode 证书的主题名称。未验证证书链。</value></data>
 

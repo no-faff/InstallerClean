@@ -1,4 +1,5 @@
 using System.Windows;
+using InstallerClean.Resources;
 
 namespace InstallerClean.Services;
 
@@ -46,5 +47,15 @@ public sealed class ConfirmationService : IConfirmationService
             Owner = Application.Current.MainWindow,
         };
         return dialog.ShowDialog() == true;
+    }
+
+    public string? AskForMoveDestination()
+    {
+        if (Application.Current is null) return null;
+        var dialog = new Microsoft.Win32.OpenFolderDialog
+        {
+            Title = Strings.FilePicker_ChooseDestinationTitle,
+        };
+        return dialog.ShowDialog() == true ? dialog.FolderName : null;
     }
 }

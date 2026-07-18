@@ -250,7 +250,11 @@
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているか、どれだけの容量が解放されているかを知るためのものです。次の画面で送信前に送信内容を確認できます。</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているかを知るためのものです。次の画面で送信前に送信内容を確認できます。</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>不要ファイルを移動先に移動します。</value></data>
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>不要ファイルを移動先に移動します。先に移動先を選択してください。</value></data>
+  <!-- The Move button's tooltip while the Move location box is empty. The
+       button still works from here: pressing it opens the folder browser
+       and then moves, so this says a folder is coming rather than asking
+       for one to be set first. -->
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files somewhere safe. You'll choose the folder next.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>不要ファイルをごみ箱に移動します。</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>埋め込まれた Authenticode 証明書のサブジェクト名です。チェーン検証はされていません。</value></data>
 

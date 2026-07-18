@@ -250,7 +250,11 @@
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Size kalmış ama makbule geçer. Yalnızca uygulamanın çalışıp çalışmadığını ve insanların ne kadar yer açtığını bana bildiren anonim bir özet gönderir. Sonraki ekran, onaylamadan önce ne gönderileceğini görmenizi sağlar.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Size kalmış ama makbule geçer. Yalnızca uygulamanın çalışıp çalışmadığını bana bildiren anonim bir özet gönderir. Sonraki ekran, onaylamadan önce ne gönderileceğini görmenizi sağlar.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Gereksiz dosyaları Taşıma konumuna taşır.</value></data>
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Gereksiz dosyaları Taşıma konumuna taşır. Önce bir konum seçin.</value></data>
+  <!-- The Move button's tooltip while the Move location box is empty. The
+       button still works from here: pressing it opens the folder browser
+       and then moves, so this says a folder is coming rather than asking
+       for one to be set first. -->
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files somewhere safe. You'll choose the folder next.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Gereksiz dosyaları Geri Dönüşüm Kutusu'na taşır.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Gömülü Authenticode sertifikasındaki konu adı. Zincir doğrulaması yapılmadı.</value></data>
 

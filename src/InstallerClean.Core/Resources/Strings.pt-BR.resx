@@ -250,7 +250,11 @@
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Você decide, mas eu agradeço. Envia um resumo anônimo que só me diz se está funcionando e quanto espaço as pessoas estão liberando. A próxima tela mostra o que será enviado antes de você confirmar.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Você decide, mas eu agradeço. Envia um resumo anônimo que só me diz se está funcionando. A próxima tela mostra o que será enviado antes de você confirmar.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Mover os arquivos desnecessários para o local de destino.</value></data>
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Mover os arquivos desnecessários para o local de destino. Escolha um primeiro.</value></data>
+  <!-- The Move button's tooltip while the Move location box is empty. The
+       button still works from here: pressing it opens the folder browser
+       and then moves, so this says a folder is coming rather than asking
+       for one to be set first. -->
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files somewhere safe. You'll choose the folder next.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Mover os arquivos desnecessários para a Lixeira.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Nome do titular do certificado Authenticode incorporado. Cadeia não verificada.</value></data>
 

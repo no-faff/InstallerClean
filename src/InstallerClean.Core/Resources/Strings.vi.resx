@@ -250,7 +250,11 @@
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không và mọi người đang giải phóng được bao nhiêu dung lượng. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Chuyển các tệp không cần thiết tới Nơi chuyển đến.</value></data>
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Chuyển các tệp không cần thiết tới Nơi chuyển đến. Hãy chọn một nơi trước.</value></data>
+  <!-- The Move button's tooltip while the Move location box is empty. The
+       button still works from here: pressing it opens the folder browser
+       and then moves, so this says a folder is coming rather than asking
+       for one to be set first. -->
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files somewhere safe. You'll choose the folder next.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Di chuyển các tệp không cần thiết vào Thùng rác.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Tên chủ thể từ chứng chỉ Authenticode được nhúng. Chưa xác minh chuỗi.</value></data>
 

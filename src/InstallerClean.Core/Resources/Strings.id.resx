@@ -250,7 +250,11 @@
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi dan berapa banyak ruang yang dikosongkan orang-orang. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>Pindahkan file yang tidak diperlukan ke lokasi pemindahan.</value></data>
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Pindahkan file yang tidak diperlukan ke lokasi pemindahan. Pilih lokasinya dulu.</value></data>
+  <!-- The Move button's tooltip while the Move location box is empty. The
+       button still works from here: pressing it opens the folder browser
+       and then moves, so this says a folder is coming rather than asking
+       for one to be set first. -->
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files somewhere safe. You'll choose the folder next.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Pindahkan file yang tidak diperlukan ke Keranjang Sampah.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Nama subjek dari sertifikat Authenticode yang disematkan. Rantai sertifikat tidak diverifikasi.</value></data>
 

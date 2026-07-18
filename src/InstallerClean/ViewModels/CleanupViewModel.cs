@@ -180,9 +180,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     partial void OnIsOperatingChanged(bool value) =>
         CancelOperationCommand.NotifyCanExecuteChanged();
 
-    // Surfaced on the disabled Move button (ToolTipService.ShowOnDisabled
-    // in the view): with no destination set, point the user at the one
-    // missing step rather than describing an action they cannot take yet.
+    // The Move button works from either state, so this says what pressing it
+    // will do rather than naming a missing step: with no destination set it
+    // warns that a folder browser opens first, so the browser is expected
+    // rather than a surprise.
     public string MoveButtonTooltip =>
         string.IsNullOrWhiteSpace(MoveDestination)
             ? Strings.Tooltip_MoveNeedsDestination
@@ -190,8 +191,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
     partial void OnMoveDestinationChanged(string value)
     {
-        MoveAllCommand.NotifyCanExecuteChanged();
-
         // settings.json holds the trimmed string so a reader (CLI /m,
         // next session start) gets a normalised path. The TextBox
         // binding keeps the typed value mid-session.
@@ -278,11 +277,18 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // in for them: IsScanning is only set once a scan passes 200 ms, and
     // IsOperating is unset through both pre-flights. Reading either here left
     // a window in which the other destructive command was still clickable.
+    // Deliberately identical to CanDelete: Move does NOT require a
+    // destination to be typed first. A Move with an empty box asks where to
+    // put the files and carries on, so gating the button on the box would
+    // hide the action from anyone moving through the window by keyboard.
+    // A disabled control is skipped by Tab entirely, so the button, its
+    // spoken description and the tooltip explaining what it needs were all
+    // unreachable without a mouse, which is the one route a screen-reader
+    // user does not have.
     private bool CanMove() =>
         !_scan.IsScanInFlight && !IsOperationInFlight
         && !_scan.HasPendingReboot
-        && _scan.OrphanedFileCount > 0
-        && !string.IsNullOrWhiteSpace(MoveDestination);
+        && _scan.OrphanedFileCount > 0;
 
     private bool CanDelete() =>
         !_scan.IsScanInFlight && !IsOperationInFlight
@@ -292,14 +298,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void BrowseDestination()
     {
-        var dialog = new Microsoft.Win32.OpenFolderDialog
-        {
-            Title = Strings.FilePicker_ChooseDestinationTitle,
-        };
-        if (dialog.ShowDialog() == true)
-        {
-            MoveDestination = dialog.FolderName;
-        }
+        var chosen = _confirmationService.AskForMoveDestination();
+        if (chosen is not null) MoveDestination = chosen;
     }
 
     private bool CanCancelOperation() => IsOperating && !IsCancellationRequested;
@@ -325,6 +325,16 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     private async Task MoveAllAsync()
     {
         if (_scan.LastScanResult is null) return;
+
+        // Move is offered without a destination typed, so this is where one
+        // gets asked for. Cancelling the browser abandons the move and
+        // touches nothing; the box is left as it was, empty.
+        if (string.IsNullOrWhiteSpace(MoveDestination))
+        {
+            var chosen = _confirmationService.AskForMoveDestination();
+            if (chosen is null) return;
+            MoveDestination = chosen;
+        }
 
         // Capture pre-operation scan state for the result-log entry.
         // RefreshAsync below replaces _scan.LastScanResult with the
@@ -1015,26 +1025,14 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// <summary>
     /// Routes the recycle-unavailable "Move instead" choice into the standard
     /// Move flow so its destination validation, free-space and write-probe
-    /// checks and the Move confirmation all apply. A destination is required;
-    /// when none is set the folder picker opens first so the safe path is never
-    /// a dead end. If the user backs out of the picker, nothing happens.
+    /// checks and the Move confirmation all apply. Asking for a destination is
+    /// the Move flow's own job, so an unset one is not handled here; backing
+    /// out of that browser abandons the move and deletes nothing.
     /// </summary>
     private async Task MoveInsteadAsync()
     {
-        if (string.IsNullOrWhiteSpace(MoveDestination))
-        {
-            var dialog = new Microsoft.Win32.OpenFolderDialog
-            {
-                Title = Strings.FilePicker_ChooseDestinationTitle,
-            };
-            if (dialog.ShowDialog() != true) return;
-            MoveDestination = dialog.FolderName;
-        }
-
-        // Setting MoveDestination above re-evaluates CanMove synchronously via
-        // OnMoveDestinationChanged, so the command is executable here once a
-        // destination is present. The guard covers the rare case where it is
-        // not (for example the scan emptied between the dialogs).
+        // The guard covers the rare case where the move became unavailable
+        // between the two dialogs (for example the scan emptied).
         if (MoveAllCommand.CanExecute(null))
             await MoveAllCommand.ExecuteAsync(null);
     }

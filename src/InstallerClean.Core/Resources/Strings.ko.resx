@@ -250,7 +250,11 @@
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.</value></data>
   <data name="Tooltip.Move" xml:space="preserve"><value>불필요한 파일을 이동 위치로 옮깁니다.</value></data>
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>불필요한 파일을 이동 위치로 옮깁니다. 먼저 위치를 선택하세요.</value></data>
+  <!-- The Move button's tooltip while the Move location box is empty. The
+       button still works from here: pressing it opens the folder browser
+       and then moves, so this says a folder is coming rather than asking
+       for one to be set first. -->
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files somewhere safe. You'll choose the folder next.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>불필요한 파일을 휴지통으로 이동합니다.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>내장된 Authenticode 인증서의 주체 이름입니다. 인증서 체인은 검증하지 않았습니다.</value></data>
 

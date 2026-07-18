@@ -57,4 +57,16 @@ public interface IConfirmationService
     /// closed the window.
     /// </summary>
     bool ConfirmSendResultLog(string jsonContent);
+
+    /// <summary>
+    /// Shows the folder browser for the Move location. Returns the chosen
+    /// folder, or <c>null</c> if the user cancelled or there is no host
+    /// window to own the dialog.
+    ///
+    /// It sits behind this interface for the same reason the confirmations
+    /// do: Move asks for a destination when none is set, so without it that
+    /// path could only be exercised by opening a real folder browser, which
+    /// a test run cannot answer.
+    /// </summary>
+    string? AskForMoveDestination();
 }
