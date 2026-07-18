@@ -88,6 +88,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
 
             int deleted = 0;
             var errors = new List<FileOperationError>();
+            var failureLog = new PerFileFailureLog("Delete");
             bool cancelled = false;
 
             try
@@ -152,16 +153,25 @@ public sealed class DeleteFilesService : IDeleteFilesService
                             break;
                     }
                 }
-                catch (UnauthorizedAccessException)
+                // Logged for the same reason as the matching block in
+                // MoveFilesService: the framework exception's detail exists
+                // nowhere else once the category has been filed. A recycle
+                // failure the shell reports through an HRESULT is not an
+                // exception and does not come through here; it carries its code
+                // on the RecycleFailed entry instead.
+                catch (UnauthorizedAccessException ex)
                 {
+                    failureLog.Record(ex);
                     errors.Add(new AccessDenied(filePath));
                 }
-                catch (IOException)
+                catch (IOException ex)
                 {
+                    failureLog.Record(ex);
                     errors.Add(new IOFailure(filePath));
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    failureLog.Record(ex);
                     errors.Add(new UnknownError(filePath));
                 }
             }
@@ -174,6 +184,10 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 // per-file catch, so only a real cancel lands here.
                 cancelled = true;
             }
+
+            // Outside the cancel catch so a batch the user stopped still
+            // accounts for what its failures cost the log.
+            failureLog.WriteClosingEntry();
 
             // CancellationToken.None: best-effort cleanup. See the
             // matching comment in MoveFilesService for the rationale.
