@@ -79,20 +79,25 @@ jobs:
         run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained false -p:RestoreLockedMode=true -p:PublishSingleFile=true -o publish/framework-dependent
 
       - name: Smoke-publish CLI framework-dependent
-        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained false -p:RestoreLockedMode=true -p:PublishSingleFile=true -o publish/cli
+        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained false -p:RestoreLockedMode=true -p:PublishSingleFile=true -o publish/cli-framework-dependent
 
-      # The released installerclean-cli.exe is this self-contained single-file
-      # shape; the framework-dependent publish above exercises the lighter one.
+      # publish/cli is where installer/InstallerClean.iss reads the CLI from, so
+      # it holds the self-contained single-file build: that is the shape the
+      # release script puts there and the shape the shipped setup embeds. The
+      # framework-dependent publish above parks beside it and exercises the
+      # lighter build without deciding what the compile step below bundles.
       - name: Smoke-publish CLI self-contained
-        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/cli-self-contained
+        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/cli
 
       # The setup is the artefact CI could not build: ISCC is the only thing
       # that reads installer/*.iss, so a typo there, a message missing from one
       # of the three bundled community .isl files, or an #include that lost its
       # UTF-8 BOM used to surface for the first time mid-release, on the one
-      # machine that compiles it. The two publishes above put the exes exactly
-      # where the [Files] section looks for them, so this compiles the real
-      # setup rather than a stub.
+      # machine that compiles it. The self-contained GUI and CLI publishes above
+      # put the exes exactly where the [Files] section looks for them, in the
+      # shapes the release script builds, so this compiles the real setup rather
+      # than a stub. Repointing either at a different publish directory quietly
+      # turns it back into one.
       #
       # The version is pinned for the same reason the runner is: an Inno release
       # must not redden an unrelated push. 6.7.1 is the compiler that built the
