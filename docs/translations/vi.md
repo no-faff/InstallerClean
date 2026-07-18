@@ -111,7 +111,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Tiếng Việt |
 | --- | --- |
-| The unneeded files below are safe to delete. | Các tệp không cần thiết bên dưới có thể xóa an toàn. |
+| Any unneeded files below are safe to delete. | Mọi tệp không cần thiết bên dưới đều có thể xóa an toàn. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Chúng nằm trong C:\Windows\Installer, còn sót lại khi một chương trình bị gỡ cài đặt ({0}), khi một bản vá mới hơn thay thế một bản ({1}) hoặc khi nhà phát hành thu hồi nó ({2}). InstallerClean chỉ liệt kê những tệp mà chính Windows báo là đã dùng xong. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Xóa chúng vào Thùng rác, hoặc dùng Chuyển thay vào đó nếu bạn muốn giữ một bản sao. |
 | Nothing scanned yet. | Chưa quét gì cả. |
@@ -148,17 +148,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} freed | Đã giải phóng {0} |
 | {0} cleaned up | Đã dọn {0} |
 | {0} moved | Đã chuyển {0} |
-| {0} moved, some files could not be processed | Đã chuyển {0}, một số tệp không thể xử lý |
-| {0} freed, some files could not be processed | Đã giải phóng {0}, một số tệp không thể xử lý |
-| {0} cleaned up, some files could not be processed | Đã dọn {0}, một số tệp không thể xử lý |
+| Nothing was moved | Không có tệp nào được chuyển |
+| Nothing was deleted | Không có tệp nào bị xóa |
+| {0} of {1} files could not be moved. | Không thể chuyển {0} trong số {1} tệp. |
+| {0} of {1} files could not be moved. | Không thể chuyển {0} trong số {1} tệp. |
+| {0} of {1} files could not be deleted. | Không thể xóa {0} trong số {1} tệp. |
+| {0} of {1} files could not be deleted. | Không thể xóa {0} trong số {1} tệp. |
 | {0} {1} moved to: {2} | Đã chuyển {0} {1} tới: {2} |
 | {0} {1} moved to: {2} | Đã chuyển {0} {1} tới: {2} |
-| {0} {1} moved to: {2}. {3} {4} | Đã chuyển {0} {1} tới: {2}. {3} {4} |
-| {0} {1} moved to: {2}. {3} {4} | Đã chuyển {0} {1} tới: {2}. {3} {4} |
 | {0} {1} moved to the Recycle Bin | Đã di chuyển {0} {1} vào Thùng rác |
 | {0} {1} moved to the Recycle Bin | Đã di chuyển {0} {1} vào Thùng rác |
-| {0} {1} moved to the Recycle Bin. {2} {3} | Đã di chuyển {0} {1} vào Thùng rác. {2} {3} |
-| {0} {1} moved to the Recycle Bin. {2} {3} | Đã di chuyển {0} {1} vào Thùng rác. {2} {3} |
 | {0} {1} kept in place, because a program started needing them again after the scan. | Đã giữ nguyên {0} {1} vì sau lần quét, một chương trình lại cần đến chúng. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | Đã giữ nguyên {0} {1} vì khi kiểm tra lại, không thể đọc đầy đủ các bản ghi trình cài đặt của Windows. |
 | Moved {0} of {1} {2} before you cancelled. | Đã chuyển {0}/{1} {2} trước khi bạn hủy. |
@@ -166,8 +165,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Permanently deleted {0} of {1} {2} before you cancelled. | Đã xóa vĩnh viễn {0}/{1} {2} trước khi bạn hủy. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác. |
-| {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác. {2} {3} |
-| {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác. {2} {3} |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Không sao, những tệp đó đều an toàn để loại bỏ. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Không sao, những tệp đó đều an toàn để loại bỏ. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó. |
 
@@ -244,9 +241,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | File no longer exists. | Tệp không còn tồn tại. |
 | Source file is a symlink or junction; refused for safety. | Tệp nguồn là một symlink hoặc junction; bị từ chối vì lý do an toàn. |
 | This file is not inside the Windows Installer folder; refused for safety. | Tệp này không nằm trong thư mục Windows Installer; bị từ chối vì lý do an toàn. |
-| Access denied. | Truy cập bị từ chối. |
+| Windows refused access to this file; it was left in place. | Windows từ chối truy cập tệp này; tệp được giữ nguyên tại chỗ. |
+| Windows refused access to these files; they were left in place. | Windows từ chối truy cập các tệp này; các tệp được giữ nguyên tại chỗ. |
+| This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | Tệp này đang được mở hoặc bị khóa bởi một chương trình khác, nên hiện không gì có thể chuyển nó. Tệp được giữ nguyên tại chỗ; hãy thử lại sau. |
+| These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later. | Các tệp này đang được mở hoặc bị khóa bởi một chương trình khác, nên hiện không gì có thể chuyển chúng. Các tệp được giữ nguyên tại chỗ; hãy thử lại sau. |
 | Windows reported a file error; the file was left in place. | Windows báo một lỗi tệp; tệp được giữ nguyên tại chỗ. |
-| Unknown error. | Lỗi không xác định. |
+| Windows reported file errors; these files were left in place. | Windows báo lỗi tệp; các tệp này được giữ nguyên tại chỗ. |
+| Something went wrong with this file; it was left in place. | Đã có trục trặc với tệp này; tệp được giữ nguyên tại chỗ. |
+| Something went wrong with these files; they were left in place. | Đã có trục trặc với các tệp này; các tệp được giữ nguyên tại chỗ. |
 | Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | Không thể chuyển tệp này vào Thùng rác (lỗi {0}), và từ mã đó InstallerClean không thể cho bạn biết lý do. Tệp được giữ nguyên tại chỗ. Hãy thử nút Chuyển, vì nút đó không dùng Thùng rác. |
 | Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | Windows đã từ chối truy cập ngay cả với quyền quản trị viên (lỗi {0}), và InstallerClean không thể biết vấn đề nằm ở tệp hay ở Thùng rác. Tệp được giữ nguyên tại chỗ. Nút Chuyển sẽ dùng được nếu vấn đề là Thùng rác, nhưng không dùng được nếu vấn đề là chính tệp đó. |
 | This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | Tệp này đang được mở hoặc bị khóa bởi một chương trình khác (lỗi {0}), nên hiện không gì có thể xóa nó. Tệp được giữ nguyên tại chỗ; hãy thử lại sau. |
@@ -319,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không và mọi người đang giải phóng được bao nhiêu dung lượng. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận. |
 | Move the unneeded files to the Move location. | Chuyển các tệp không cần thiết tới Nơi chuyển đến. |
-| Move the unneeded files to the Move location. Choose one first. | Chuyển các tệp không cần thiết tới Nơi chuyển đến. Hãy chọn một nơi trước. |
+| Move the unneeded files somewhere safe. You'll choose the folder next. | Chuyển các tệp không cần thiết tới nơi an toàn. Bạn sẽ chọn thư mục ở bước tiếp theo. |
 | Move the unneeded files to the Recycle Bin. | Di chuyển các tệp không cần thiết vào Thùng rác. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Tên chủ thể từ chứng chỉ Authenticode được nhúng. Chưa xác minh chuỗi. |
 | Change language. The program will restart. | Thay đổi ngôn ngữ. Chương trình sẽ khởi động lại. |
@@ -339,7 +341,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub | Gắn sao trên GitHub |
 | Leave a star on GitHub (About window) | Gắn sao trên GitHub (cửa sổ Giới thiệu) |
 | Minimise | Thu nhỏ |
-| Move all unneeded installer files to the chosen destination folder | Chuyển tất cả các tệp cài đặt không cần thiết tới thư mục đích đã chọn |
+| Move all unneeded installer files to the Move location | Chuyển tất cả các tệp cài đặt không cần thiết tới Nơi chuyển đến |
 | Move all unneeded installer files to the Recycle Bin | Di chuyển tất cả các tệp cài đặt không cần thiết vào Thùng rác |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Xóa sẽ di chuyển các tệp không cần thiết vào Thùng rác. Hủy sẽ đóng lại mà không xóa. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Chuyển sẽ đặt các tệp không cần thiết vào thư mục đích đã chọn. Hủy sẽ để chúng nguyên chỗ cũ. |
@@ -358,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Products | Sản phẩm |
 | Patches | Bản vá |
 | Product details | Chi tiết sản phẩm |
-| Move destination folder | Thư mục đích để chuyển đến |
+| Move location | Nơi chuyển đến |
 | Operation progress | Tiến trình thao tác |
 | Scan C:\Windows\Installer again | Quét lại C:\Windows\Installer |
 | Scanning progress | Tiến trình quét |
@@ -376,7 +378,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} ({1}) | {0} ({1}) |
 | Files that could not be processed | Các tệp không thể xử lý |
 | Explains this folder, and how to recover a file, in the README | Giải thích thư mục này, và cách khôi phục một tệp, trong README |
-| Result log preview | Xem trước nhật ký kết quả |
+| Report preview | Xem trước báo cáo |
 | Change language | Thay đổi ngôn ngữ |
 | The program will restart. | Chương trình sẽ khởi động lại. |
 

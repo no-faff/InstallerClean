@@ -111,7 +111,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Українська |
 | --- | --- |
-| The unneeded files below are safe to delete. | Наведені нижче непотрібні файли можна безпечно видалити. |
+| Any unneeded files below are safe to delete. | Будь-які непотрібні файли нижче можна безпечно видалити. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Вони лежать у C:\Windows\Installer, лишившись після видалення програми ({0}), заміни старого патча новішим ({1}) чи відкликання видавцем ({2}). InstallerClean перелічує лише ті файли, які сама Windows позначає як завершені. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Видаліть їх до Кошика, або скористайтеся натомість функцією «Перемістити», якщо хочете зберегти копію. |
 | Nothing scanned yet. | Ще нічого не проскановано. |
@@ -148,17 +148,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} freed | Звільнено {0} |
 | {0} cleaned up | Очищено {0} |
 | {0} moved | Переміщено {0} |
-| {0} moved, some files could not be processed | Переміщено {0}, деякі файли не вдалося обробити |
-| {0} freed, some files could not be processed | Звільнено {0}, деякі файли не вдалося обробити |
-| {0} cleaned up, some files could not be processed | Очищено {0}, деякі файли не вдалося обробити |
+| Nothing was moved | Нічого не переміщено |
+| Nothing was deleted | Нічого не видалено |
+| {0} of {1} files could not be moved. | Не вдалося перемістити {0} файл з {1}. |
+| {0} of {1} files could not be moved. | Не вдалося перемістити {0} файлів з {1}. |
+| {0} of {1} files could not be deleted. | Не вдалося видалити {0} файл з {1}. |
+| {0} of {1} files could not be deleted. | Не вдалося видалити {0} файлів з {1}. |
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
-| {0} {1} moved to: {2}. {3} {4} | {0} {1} переміщено до: {2}. {3} {4} |
-| {0} {1} moved to: {2}. {3} {4} | {0} {1} переміщено до: {2}. {3} {4} |
 | {0} {1} moved to the Recycle Bin | {0} {1} переміщено до Кошика |
 | {0} {1} moved to the Recycle Bin | {0} {1} переміщено до Кошика |
-| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} переміщено до Кошика. {2} {3} |
-| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} переміщено до Кошика. {2} {3} |
 | {0} {1} kept in place, because a program started needing them again after the scan. | {0} {1} залишено на місці: після сканування вони знову знадобилися програмі. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} залишено на місці: під час повторної перевірки не вдалося повністю прочитати записи інсталятора Windows. |
 | Moved {0} of {1} {2} before you cancelled. | Переміщено {0} з {1} {2}, перш ніж ви скасували. |
@@ -166,8 +165,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Permanently deleted {0} of {1} {2} before you cancelled. | Безповоротно видалено {0} з {1} {2}, перш ніж ви скасували. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} безповоротно видалено. Він не потрапив до Кошика. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} безповоротно видалено. Вони не потрапили до Кошика. |
-| {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} безповоротно видалено. Він не потрапив до Кошика. {2} {3} |
-| {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | {0} {1} безповоротно видалено. Вони не потрапили до Кошика. {2} {3} |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Це нормально, його можна було безпечно прибрати. InstallerClean прибирає лише ті файли, які Windows позначає як завершені, ніколи той, що ще потрібен програмі. У малоймовірному разі, якщо видалення колись лишило програму нездатною відновитися, оновитися чи видалитися, перевстановлення її від виробника зазвичай повертає файл, хоча Microsoft цього не гарантує. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Це нормально, їх можна було безпечно прибрати. InstallerClean прибирає лише ті файли, які Windows позначає як завершені, ніколи той, що ще потрібен програмі. У малоймовірному разі, якщо видалення колись лишило програму нездатною відновитися, оновитися чи видалитися, перевстановлення її від виробника зазвичай повертає файл, хоча Microsoft цього не гарантує. |
 
@@ -244,9 +241,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | File no longer exists. | Файл більше не існує. |
 | Source file is a symlink or junction; refused for safety. | Вихідний файл є символьним посиланням або junction; відмовлено з міркувань безпеки. |
 | This file is not inside the Windows Installer folder; refused for safety. | Цей файл не міститься в папці Windows Installer; відмовлено з міркувань безпеки. |
-| Access denied. | Відмовлено в доступі. |
+| Windows refused access to this file; it was left in place. | Windows відмовив у доступі до цього файлу; його залишено на місці. |
+| Windows refused access to these files; they were left in place. | Windows відмовив у доступі до цих файлів; їх залишено на місці. |
+| This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | Цей файл відкритий або заблокований іншою програмою, тож зараз його ніщо не може перемістити. Його залишено на місці; спробуйте ще раз пізніше. |
+| These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later. | Ці файли відкриті або заблоковані іншою програмою, тож зараз їх ніщо не може перемістити. Їх залишено на місці; спробуйте ще раз пізніше. |
 | Windows reported a file error; the file was left in place. | Windows повідомив про помилку файлу; файл залишено на місці. |
-| Unknown error. | Невідома помилка. |
+| Windows reported file errors; these files were left in place. | Windows повідомив про помилки файлів; ці файли залишено на місці. |
+| Something went wrong with this file; it was left in place. | З цим файлом щось пішло не так; його залишено на місці. |
+| Something went wrong with these files; they were left in place. | З цими файлами щось пішло не так; їх залишено на місці. |
 | Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | Не вдалося перемістити цей файл до Кошика (помилка {0}), і за цим кодом InstallerClean не може сказати чому. Файл залишено на місці. Спробуйте натомість кнопку «Перемістити», яка не використовує Кошик. |
 | Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | Windows відмовив у доступі навіть із правами адміністратора (помилка {0}), і InstallerClean не може визначити, у чому річ — у файлі чи в Кошику. Файл залишено на місці. Кнопка «Перемістити» допоможе, якщо річ у Кошику, але не допоможе, якщо річ у файлі. |
 | This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | Цей файл відкритий або заблокований іншою програмою (помилка {0}), тож зараз його ніщо не може видалити. Його залишено на місці; спробуйте ще раз пізніше. |
@@ -319,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма і скільки місця люди звільняють. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити. |
 | Move the unneeded files to the Move location. | Перемістити непотрібні файли до вказаного розташування. |
-| Move the unneeded files to the Move location. Choose one first. | Перемістити непотрібні файли до вказаного розташування. Спершу виберіть його. |
+| Move the unneeded files somewhere safe. You'll choose the folder next. | Перемістити непотрібні файли в безпечне місце. Папку ви виберете на наступному кроці. |
 | Move the unneeded files to the Recycle Bin. | Перемістити непотрібні файли до Кошика. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Назва суб'єкта з вбудованого сертифіката Authenticode. Ланцюжок не перевірено. |
 | Change language. The program will restart. | Змінити мову. Програму буде перезапущено. |
@@ -339,7 +341,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub | Лишити зірку на GitHub |
 | Leave a star on GitHub (About window) | Лишити зірку на GitHub (вікно «Про програму») |
 | Minimise | Згорнути |
-| Move all unneeded installer files to the chosen destination folder | Перемістити всі непотрібні файли інсталятора до обраної папки призначення |
+| Move all unneeded installer files to the Move location | Перемістити всі непотрібні файли інсталятора до вказаного розташування |
 | Move all unneeded installer files to the Recycle Bin | Перемістити всі непотрібні файли інсталятора до Кошика |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | «Видалити» переміщує непотрібні файли до Кошика. «Скасувати» закриває вікно без видалення. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | «Перемістити» кладе непотрібні файли до обраної папки призначення. «Скасувати» лишає їх там, де вони є. |
@@ -358,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Products | Продукти |
 | Patches | Патчі |
 | Product details | Деталі продукту |
-| Move destination folder | Папка призначення для переміщення |
+| Move location | Куди перемістити |
 | Operation progress | Перебіг операції |
 | Scan C:\Windows\Installer again | Просканувати C:\Windows\Installer ще раз |
 | Scanning progress | Перебіг сканування |
@@ -376,7 +378,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} ({1}) | {0} ({1}) |
 | Files that could not be processed | Файли, які не вдалося обробити |
 | Explains this folder, and how to recover a file, in the README | Пояснює цю папку і як відновити файл, у README |
-| Result log preview | Попередній перегляд журналу результатів |
+| Report preview | Попередній перегляд звіту |
 | Change language | Змінити мову |
 | The program will restart. | Програму буде перезапущено. |
 

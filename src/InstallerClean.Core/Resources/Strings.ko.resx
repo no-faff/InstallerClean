@@ -165,7 +165,7 @@
   <!-- Names the destination the way the Move button's own tooltip does
        (Tooltip.Move), so the spoken help and the hover text agree on what
        the folder is called. -->
-  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Move all unneeded installer files to the Move location</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>불필요한 설치 관리자 파일을 모두 이동 위치로 옮기기</value></data>
   <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>불필요한 설치 관리자 파일을 모두 휴지통으로 이동</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -203,7 +203,7 @@
        the field the way the label does and voice control can reach it by
        the words on screen; it stays identical to
        Automation.Section.MoveLocation in every language. -->
-  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Move location</value></data>
+  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>이동 위치</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>작업 진행 상황</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>C:\Windows\Installer 다시 검사</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>검사 진행 상황</value></data>
@@ -254,13 +254,13 @@
        button still works from here: pressing it opens the folder browser
        and then moves, so this says a folder is coming rather than asking
        for one to be set first. -->
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files somewhere safe. You'll choose the folder next.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>불필요한 파일을 안전한 곳으로 옮깁니다. 폴더는 다음 단계에서 선택합니다.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>불필요한 파일을 휴지통으로 이동합니다.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>내장된 Authenticode 인증서의 주체 이름입니다. 인증서 체인은 검증하지 않았습니다.</value></data>
 
   <!-- Body copy -->
   <data name="Body.MainExplanation.Lead" xml:space="preserve">
-    <value>Any unneeded files below are safe to delete.</value>
+    <value>아래의 불필요한 파일은 안전하게 삭제할 수 있습니다.</value>
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
@@ -743,7 +743,7 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        readers announce its content rather than "edit, read-only". The
        noun follows the button that opens this dialog (Action.SendResultLog,
        "Send report") and the surrounding copy, which call it a report. -->
-  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Report preview</value></data>
+  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>보고서 미리 보기</value></data>
 
   <!-- Single instance / startup / crash -->
   <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>

@@ -111,7 +111,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Polski |
 | --- | --- |
-| The unneeded files below are safe to delete. | Niepotrzebne pliki poniżej można bezpiecznie usunąć. |
+| Any unneeded files below are safe to delete. | Wszelkie niepotrzebne pliki poniżej można bezpiecznie usunąć. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Leżą w C:\Windows\Installer, pozostawione po odinstalowaniu programu ({0}), gdy nowsza poprawka zastąpiła jedną z nich ({1}) lub gdy wydawca ją wycofał ({2}). InstallerClean wymienia wyłącznie pliki, które sam Windows zgłasza jako już niepotrzebne. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Usuń je do Kosza albo użyj zamiast tego Przenieś, jeśli wolisz zachować kopię. |
 | Nothing scanned yet. | Jeszcze nic nie przeskanowano. |
@@ -148,17 +148,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} freed | Zwolniono {0} |
 | {0} cleaned up | Wyczyszczono {0} |
 | {0} moved | Przeniesiono {0} |
-| {0} moved, some files could not be processed | Przeniesiono {0}, niektórych plików nie udało się przetworzyć |
-| {0} freed, some files could not be processed | Zwolniono {0}, niektórych plików nie udało się przetworzyć |
-| {0} cleaned up, some files could not be processed | Wyczyszczono {0}, niektórych plików nie udało się przetworzyć |
+| Nothing was moved | Niczego nie przeniesiono |
+| Nothing was deleted | Niczego nie usunięto |
+| {0} of {1} files could not be moved. | Nie udało się przenieść {0} pliku z {1}. |
+| {0} of {1} files could not be moved. | Nie udało się przenieść {0} plików z {1}. |
+| {0} of {1} files could not be deleted. | Nie udało się usunąć {0} pliku z {1}. |
+| {0} of {1} files could not be deleted. | Nie udało się usunąć {0} plików z {1}. |
 | {0} {1} moved to: {2} | Przeniesiono {0} {1} do: {2} |
 | {0} {1} moved to: {2} | Przeniesiono {0} {1} do: {2} |
-| {0} {1} moved to: {2}. {3} {4} | Przeniesiono {0} {1} do: {2}. {3} {4} |
-| {0} {1} moved to: {2}. {3} {4} | Przeniesiono {0} {1} do: {2}. {3} {4} |
 | {0} {1} moved to the Recycle Bin | Przeniesiono {0} {1} do Kosza |
 | {0} {1} moved to the Recycle Bin | Przeniesiono {0} {1} do Kosza |
-| {0} {1} moved to the Recycle Bin. {2} {3} | Przeniesiono {0} {1} do Kosza. {2} {3} |
-| {0} {1} moved to the Recycle Bin. {2} {3} | Przeniesiono {0} {1} do Kosza. {2} {3} |
 | {0} {1} kept in place, because a program started needing them again after the scan. | Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął ich potrzebować. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | Pozostawiono na miejscu {0} {1}, ponieważ przy powtórzeniu sprawdzenia nie udało się w pełni odczytać rekordów Windows Installera. |
 | Moved {0} of {1} {2} before you cancelled. | Przed anulowaniem przeniesiono {0}/{1} {2}. |
@@ -166,8 +165,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Permanently deleted {0} of {1} {2} before you cancelled. | Przed anulowaniem usunięto trwale {0}/{1} {2}. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | Usunięto trwale {0} {1}. Nie trafił do Kosza. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | Usunięto trwale {0} {1}. Nie trafiło do Kosza. |
-| {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | Usunięto trwale {0} {1}. Nie trafił do Kosza. {2} {3} |
-| {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | Usunięto trwale {0} {1}. Nie trafiło do Kosza. {2} {3} |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | W porządku, można go było bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | W porządku, można je było bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje. |
 
@@ -244,9 +241,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | File no longer exists. | Plik już nie istnieje. |
 | Source file is a symlink or junction; refused for safety. | Plik źródłowy jest dowiązaniem symbolicznym lub złączem (junction); odrzucono ze względów bezpieczeństwa. |
 | This file is not inside the Windows Installer folder; refused for safety. | Ten plik nie znajduje się w folderze Windows Installer; odrzucono ze względów bezpieczeństwa. |
-| Access denied. | Odmowa dostępu. |
+| Windows refused access to this file; it was left in place. | Windows odmówił dostępu do tego pliku; został pozostawiony na miejscu. |
+| Windows refused access to these files; they were left in place. | Windows odmówił dostępu do tych plików; zostały pozostawione na miejscu. |
+| This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | Ten plik jest otwarty lub zablokowany przez inny program, więc nic nie może go teraz przenieść. Został pozostawiony na miejscu; spróbuj ponownie później. |
+| These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later. | Te pliki są otwarte lub zablokowane przez inny program, więc nic nie może ich teraz przenieść. Zostały pozostawione na miejscu; spróbuj ponownie później. |
 | Windows reported a file error; the file was left in place. | Windows zgłosił błąd pliku; plik został pozostawiony na miejscu. |
-| Unknown error. | Nieznany błąd. |
+| Windows reported file errors; these files were left in place. | Windows zgłosił błędy plików; te pliki zostały pozostawione na miejscu. |
+| Something went wrong with this file; it was left in place. | Coś poszło nie tak z tym plikiem; został pozostawiony na miejscu. |
+| Something went wrong with these files; they were left in place. | Coś poszło nie tak z tymi plikami; zostały pozostawione na miejscu. |
 | Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | Nie udało się przenieść tego pliku do Kosza (błąd {0}), a na podstawie tego kodu InstallerClean nie potrafi powiedzieć dlaczego. Plik został pozostawiony na miejscu. Spróbuj zamiast tego przycisku Przenieś, który nie korzysta z Kosza. |
 | Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | Windows odmówił dostępu nawet z uprawnieniami administratora (błąd {0}), a InstallerClean nie potrafi stwierdzić, czy problemem jest plik, czy Kosz. Plik został pozostawiony na miejscu. Przycisk Przenieś zadziała, jeśli problemem jest Kosz, ale nie wtedy, gdy jest nim plik. |
 | This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | Ten plik jest otwarty lub zablokowany przez inny program (błąd {0}), więc nic nie może go teraz usunąć. Został pozostawiony na miejscu; spróbuj ponownie później. |
@@ -319,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Twoja decyzja, ale będzie miło. Wysyła anonimowe podsumowanie, które po prostu daje mi znać, czy działa i ile miejsca ludzie zwalniają. Na następnym ekranie zobaczysz, co zostanie wysłane, zanim potwierdzisz. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Twoja decyzja, ale będzie miło. Wysyła anonimowe podsumowanie, które po prostu daje mi znać, czy działa. Na następnym ekranie zobaczysz, co zostanie wysłane, zanim potwierdzisz. |
 | Move the unneeded files to the Move location. | Przenieś niepotrzebne pliki do lokalizacji przenoszenia. |
-| Move the unneeded files to the Move location. Choose one first. | Przenieś niepotrzebne pliki do lokalizacji przenoszenia. Najpierw ją wybierz. |
+| Move the unneeded files somewhere safe. You'll choose the folder next. | Przenieś niepotrzebne pliki w bezpieczne miejsce. Folder wybierzesz w następnym kroku. |
 | Move the unneeded files to the Recycle Bin. | Przenieś niepotrzebne pliki do Kosza. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Nazwa podmiotu z osadzonego certyfikatu Authenticode. Łańcuch nie został zweryfikowany. |
 | Change language. The program will restart. | Zmień język. Program zostanie ponownie uruchomiony. |
@@ -339,7 +341,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub | Zostaw gwiazdkę na GitHubie |
 | Leave a star on GitHub (About window) | Zostaw gwiazdkę na GitHubie (okno O programie) |
 | Minimise | Minimalizuj |
-| Move all unneeded installer files to the chosen destination folder | Przenieś wszystkie niepotrzebne pliki instalatora do wybranego folderu docelowego |
+| Move all unneeded installer files to the Move location | Przenieś wszystkie niepotrzebne pliki instalatora do lokalizacji przenoszenia |
 | Move all unneeded installer files to the Recycle Bin | Przenieś wszystkie niepotrzebne pliki instalatora do Kosza |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Usuń przenosi niepotrzebne pliki do Kosza. Anuluj zamyka okno bez usuwania. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Przenieś umieszcza niepotrzebne pliki w wybranym folderze docelowym. Anuluj zostawia je na miejscu. |
@@ -358,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Products | Produkty |
 | Patches | Poprawki |
 | Product details | Szczegóły produktu |
-| Move destination folder | Folder docelowy przenoszenia |
+| Move location | Lokalizacja przenoszenia |
 | Operation progress | Postęp operacji |
 | Scan C:\Windows\Installer again | Skanuj ponownie C:\Windows\Installer |
 | Scanning progress | Postęp skanowania |
@@ -376,7 +378,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} ({1}) | {0} ({1}) |
 | Files that could not be processed | Pliki, których nie udało się przetworzyć |
 | Explains this folder, and how to recover a file, in the README | Wyjaśnia ten folder i sposób odzyskania pliku w README |
-| Result log preview | Podgląd dziennika wyników |
+| Report preview | Podgląd raportu |
 | Change language | Zmień język |
 | The program will restart. | Program zostanie ponownie uruchomiony. |
 

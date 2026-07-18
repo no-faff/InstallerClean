@@ -111,7 +111,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Bahasa Indonesia |
 | --- | --- |
-| The unneeded files below are safe to delete. | File yang tidak diperlukan di bawah ini aman dihapus. |
+| Any unneeded files below are safe to delete. | File yang tidak diperlukan di bawah ini aman dihapus. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | File-file ini berada di C:\Windows\Installer, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mencantumkan file yang Windows sendiri laporkan sudah tidak terpakai. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Hapus ke Keranjang Sampah, atau gunakan Pindahkan sebagai gantinya jika Anda lebih suka menyimpan salinan. |
 | Nothing scanned yet. | Belum ada yang dipindai. |
@@ -148,17 +148,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} freed | {0} dikosongkan |
 | {0} cleaned up | {0} dibersihkan |
 | {0} moved | {0} dipindahkan |
-| {0} moved, some files could not be processed | {0} dipindahkan, sebagian file tidak dapat diproses |
-| {0} freed, some files could not be processed | {0} dikosongkan, sebagian file tidak dapat diproses |
-| {0} cleaned up, some files could not be processed | {0} dibersihkan, sebagian file tidak dapat diproses |
+| Nothing was moved | Tidak ada yang dipindahkan |
+| Nothing was deleted | Tidak ada yang dihapus |
+| {0} of {1} files could not be moved. | {0} dari {1} file tidak bisa dipindahkan. |
+| {0} of {1} files could not be moved. | {0} dari {1} file tidak bisa dipindahkan. |
+| {0} of {1} files could not be deleted. | {0} dari {1} file tidak bisa dihapus. |
+| {0} of {1} files could not be deleted. | {0} dari {1} file tidak bisa dihapus. |
 | {0} {1} moved to: {2} | {0} {1} dipindahkan ke: {2} |
 | {0} {1} moved to: {2} | {0} {1} dipindahkan ke: {2} |
-| {0} {1} moved to: {2}. {3} {4} | {0} {1} dipindahkan ke: {2}. {3} {4} |
-| {0} {1} moved to: {2}. {3} {4} | {0} {1} dipindahkan ke: {2}. {3} {4} |
 | {0} {1} moved to the Recycle Bin | {0} {1} dipindahkan ke Keranjang Sampah |
 | {0} {1} moved to the Recycle Bin | {0} {1} dipindahkan ke Keranjang Sampah |
-| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} dipindahkan ke Keranjang Sampah. {2} {3} |
-| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} dipindahkan ke Keranjang Sampah. {2} {3} |
 | {0} {1} kept in place, because a program started needing them again after the scan. | {0} {1} dibiarkan di tempatnya, karena sebuah program kembali membutuhkannya setelah pemindaian. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} dibiarkan di tempatnya, karena catatan Windows Installer tidak dapat dibaca sepenuhnya saat pemeriksaan diulang. |
 | Moved {0} of {1} {2} before you cancelled. | {0} dari {1} {2} dipindahkan sebelum Anda membatalkan. |
@@ -166,8 +165,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Permanently deleted {0} of {1} {2} before you cancelled. | {0} dari {1} {2} dihapus permanen sebelum Anda membatalkan. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. |
-| {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. {2} {3} |
-| {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | {0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. {2} {3} |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Tidak masalah, file itu memang aman dihapus. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Tidak masalah, file itu memang aman dihapus. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya. |
 
@@ -244,9 +241,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | File no longer exists. | File sudah tidak ada lagi. |
 | Source file is a symlink or junction; refused for safety. | File sumber adalah symlink atau junction; ditolak demi keamanan. |
 | This file is not inside the Windows Installer folder; refused for safety. | File ini tidak berada di dalam folder Windows Installer; ditolak demi keamanan. |
-| Access denied. | Akses ditolak. |
+| Windows refused access to this file; it was left in place. | Windows menolak akses ke file ini; file dibiarkan di tempatnya. |
+| Windows refused access to these files; they were left in place. | Windows menolak akses ke file-file ini; semuanya dibiarkan di tempatnya. |
+| This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | File ini sedang dibuka atau dikunci oleh program lain, jadi saat ini tidak ada yang bisa memindahkannya. File dibiarkan di tempatnya; coba lagi nanti. |
+| These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later. | File-file ini sedang dibuka atau dikunci oleh program lain, jadi saat ini tidak ada yang bisa memindahkannya. Semuanya dibiarkan di tempatnya; coba lagi nanti. |
 | Windows reported a file error; the file was left in place. | Windows melaporkan kesalahan file; file dibiarkan di tempatnya. |
-| Unknown error. | Kesalahan tidak diketahui. |
+| Windows reported file errors; these files were left in place. | Windows melaporkan kesalahan file; file-file ini dibiarkan di tempatnya. |
+| Something went wrong with this file; it was left in place. | Ada yang tidak beres dengan file ini; file dibiarkan di tempatnya. |
+| Something went wrong with these files; they were left in place. | Ada yang tidak beres dengan file-file ini; semuanya dibiarkan di tempatnya. |
 | Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | Tidak bisa memindahkan file ini ke Keranjang Sampah (kesalahan {0}), dan dari kode itu InstallerClean tidak bisa memberi tahu Anda alasannya. File dibiarkan di tempatnya. Coba tombol Pindahkan saja, karena tombol itu tidak memakai Keranjang Sampah. |
 | Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | Windows menolak akses bahkan dengan hak administrator (kesalahan {0}), dan InstallerClean tidak bisa memastikan apakah masalahnya ada pada file atau pada Keranjang Sampah. File dibiarkan di tempatnya. Tombol Pindahkan akan berhasil jika masalahnya Keranjang Sampah, tetapi tidak jika masalahnya file itu sendiri. |
 | This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | File ini sedang dibuka atau dikunci oleh program lain (kesalahan {0}), jadi saat ini tidak ada yang bisa menghapusnya. File dibiarkan di tempatnya; coba lagi nanti. |
@@ -319,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi dan berapa banyak ruang yang dikosongkan orang-orang. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi. |
 | Move the unneeded files to the Move location. | Pindahkan file yang tidak diperlukan ke lokasi pemindahan. |
-| Move the unneeded files to the Move location. Choose one first. | Pindahkan file yang tidak diperlukan ke lokasi pemindahan. Pilih lokasinya dulu. |
+| Move the unneeded files somewhere safe. You'll choose the folder next. | Pindahkan file yang tidak diperlukan ke tempat aman. Anda akan memilih foldernya setelah ini. |
 | Move the unneeded files to the Recycle Bin. | Pindahkan file yang tidak diperlukan ke Keranjang Sampah. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Nama subjek dari sertifikat Authenticode yang disematkan. Rantai sertifikat tidak diverifikasi. |
 | Change language. The program will restart. | Ganti bahasa. Program akan dimulai ulang. |
@@ -339,7 +341,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub | Beri bintang di GitHub |
 | Leave a star on GitHub (About window) | Beri bintang di GitHub (jendela Tentang) |
 | Minimise | Kecilkan |
-| Move all unneeded installer files to the chosen destination folder | Pindahkan semua file penginstal yang tidak diperlukan ke folder tujuan yang dipilih |
+| Move all unneeded installer files to the Move location | Pindahkan semua file penginstal yang tidak diperlukan ke lokasi pemindahan |
 | Move all unneeded installer files to the Recycle Bin | Pindahkan semua file penginstal yang tidak diperlukan ke Keranjang Sampah |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Hapus memindahkan file yang tidak diperlukan ke Keranjang Sampah. Batal menutup tanpa menghapus. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Pindahkan menaruh file yang tidak diperlukan di folder tujuan yang dipilih. Batal membiarkannya di tempatnya. |
@@ -358,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Products | Produk |
 | Patches | Patch |
 | Product details | Detail produk |
-| Move destination folder | Folder tujuan pemindahan |
+| Move location | Lokasi pemindahan |
 | Operation progress | Kemajuan operasi |
 | Scan C:\Windows\Installer again | Pindai ulang C:\Windows\Installer |
 | Scanning progress | Kemajuan pemindaian |
@@ -376,7 +378,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} ({1}) | {0} ({1}) |
 | Files that could not be processed | File yang tidak dapat diproses |
 | Explains this folder, and how to recover a file, in the README | Menjelaskan folder ini, dan cara memulihkan file, di README |
-| Result log preview | Pratinjau log hasil |
+| Report preview | Pratinjau laporan |
 | Change language | Ganti bahasa |
 | The program will restart. | Program akan dimulai ulang. |
 

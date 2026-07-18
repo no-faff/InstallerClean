@@ -111,7 +111,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 한국어 |
 | --- | --- |
-| The unneeded files below are safe to delete. | 아래의 불필요한 파일은 안전하게 삭제할 수 있습니다. |
+| Any unneeded files below are safe to delete. | 아래의 불필요한 파일은 안전하게 삭제할 수 있습니다. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 이 파일들은 C:\Windows\Installer에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | 휴지통으로 삭제하거나, 사본을 남기고 싶다면 대신 이동을 사용하세요. |
 | Nothing scanned yet. | 아직 검사하지 않았습니다. |
@@ -148,17 +148,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} freed | {0} 확보 |
 | {0} cleaned up | {0} 정리 |
 | {0} moved | {0} 이동 |
-| {0} moved, some files could not be processed | {0} 이동, 일부 파일은 처리하지 못함 |
-| {0} freed, some files could not be processed | {0} 확보, 일부 파일은 처리하지 못함 |
-| {0} cleaned up, some files could not be processed | {0} 정리, 일부 파일은 처리하지 못함 |
+| Nothing was moved | 이동된 파일 없음 |
+| Nothing was deleted | 삭제된 파일 없음 |
+| {0} of {1} files could not be moved. | 파일 {1}개 중 {0}개를 이동하지 못했습니다. |
+| {0} of {1} files could not be moved. | 파일 {1}개 중 {0}개를 이동하지 못했습니다. |
+| {0} of {1} files could not be deleted. | 파일 {1}개 중 {0}개를 삭제하지 못했습니다. |
+| {0} of {1} files could not be deleted. | 파일 {1}개 중 {0}개를 삭제하지 못했습니다. |
 | {0} {1} moved to: {2} | {1} {0}개를 다음 위치로 이동함: {2} |
 | {0} {1} moved to: {2} | {1} {0}개를 다음 위치로 이동함: {2} |
-| {0} {1} moved to: {2}. {3} {4} | {1} {0}개를 다음 위치로 이동함: {2}. {4} {3}개 |
-| {0} {1} moved to: {2}. {3} {4} | {1} {0}개를 다음 위치로 이동함: {2}. {4} {3}개 |
 | {0} {1} moved to the Recycle Bin | {1} {0}개를 휴지통으로 이동함 |
 | {0} {1} moved to the Recycle Bin | {1} {0}개를 휴지통으로 이동함 |
-| {0} {1} moved to the Recycle Bin. {2} {3} | {1} {0}개를 휴지통으로 이동함. {3} {2}개 |
-| {0} {1} moved to the Recycle Bin. {2} {3} | {1} {0}개를 휴지통으로 이동함. {3} {2}개 |
 | {0} {1} kept in place, because a program started needing them again after the scan. | {1} {0}개는 검사 이후 어떤 프로그램이 다시 필요로 하게 되어 그대로 두었습니다. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {1} {0}개는 확인을 다시 했을 때 Windows Installer 기록을 완전히 읽을 수 없어 그대로 두었습니다. |
 | Moved {0} of {1} {2} before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 이동했습니다. |
@@ -166,8 +165,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Permanently deleted {0} of {1} {2} before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 영구 삭제했습니다. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. |
-| {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. {3} {2}개 |
-| {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. {3} {2}개 |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
 
@@ -244,9 +241,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | File no longer exists. | 파일이 더 이상 존재하지 않습니다. |
 | Source file is a symlink or junction; refused for safety. | 원본 파일이 심볼릭 링크 또는 정션입니다. 안전을 위해 거부했습니다. |
 | This file is not inside the Windows Installer folder; refused for safety. | 이 파일은 Windows Installer 폴더 안에 있지 않습니다. 안전을 위해 거부했습니다. |
-| Access denied. | 액세스가 거부되었습니다. |
+| Windows refused access to this file; it was left in place. | Windows가 이 파일에 대한 접근을 거부했습니다. 파일은 그대로 두었습니다. |
+| Windows refused access to these files; they were left in place. | Windows가 이 파일들에 대한 접근을 거부했습니다. 파일은 그대로 두었습니다. |
+| This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | 이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다. 그래서 지금은 무엇으로도 이동할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도해 보세요. |
+| These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later. | 이 파일들이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다. 그래서 지금은 무엇으로도 이동할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도해 보세요. |
 | Windows reported a file error; the file was left in place. | Windows가 파일 오류를 알렸습니다. 파일은 그대로 두었습니다. |
-| Unknown error. | 알 수 없는 오류입니다. |
+| Windows reported file errors; these files were left in place. | Windows가 파일 오류를 알렸습니다. 이 파일들은 그대로 두었습니다. |
+| Something went wrong with this file; it was left in place. | 이 파일에서 문제가 발생했습니다. 파일은 그대로 두었습니다. |
+| Something went wrong with these files; they were left in place. | 이 파일들에서 문제가 발생했습니다. 파일은 그대로 두었습니다. |
 | Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | 이 파일을 휴지통으로 이동할 수 없습니다(오류 {0}). 그 코드만으로는 InstallerClean이 이유를 알려 드릴 수 없습니다. 파일은 그대로 두었습니다. 대신 이동 버튼을 사용해 보세요. 이동은 휴지통을 쓰지 않습니다. |
 | Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | 관리자 권한으로도 Windows가 접근을 거부했습니다(오류 {0}). InstallerClean은 문제가 파일에 있는지 휴지통에 있는지 구분할 수 없습니다. 파일은 그대로 두었습니다. 문제가 휴지통이라면 이동 버튼이 통하지만, 문제가 파일이라면 통하지 않습니다. |
 | This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | 이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다(오류 {0}). 그래서 지금은 무엇으로도 제거할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도해 보세요. |
@@ -319,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다. |
 | Move the unneeded files to the Move location. | 불필요한 파일을 이동 위치로 옮깁니다. |
-| Move the unneeded files to the Move location. Choose one first. | 불필요한 파일을 이동 위치로 옮깁니다. 먼저 위치를 선택하세요. |
+| Move the unneeded files somewhere safe. You'll choose the folder next. | 불필요한 파일을 안전한 곳으로 옮깁니다. 폴더는 다음 단계에서 선택합니다. |
 | Move the unneeded files to the Recycle Bin. | 불필요한 파일을 휴지통으로 이동합니다. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | 내장된 Authenticode 인증서의 주체 이름입니다. 인증서 체인은 검증하지 않았습니다. |
 | Change language. The program will restart. | 언어를 변경합니다. 프로그램이 다시 시작됩니다. |
@@ -339,7 +341,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub | GitHub에 별 남기기 |
 | Leave a star on GitHub (About window) | GitHub에 별 남기기 (정보 창) |
 | Minimise | 최소화 |
-| Move all unneeded installer files to the chosen destination folder | 불필요한 설치 관리자 파일을 모두 선택한 대상 폴더로 이동 |
+| Move all unneeded installer files to the Move location | 불필요한 설치 관리자 파일을 모두 이동 위치로 옮기기 |
 | Move all unneeded installer files to the Recycle Bin | 불필요한 설치 관리자 파일을 모두 휴지통으로 이동 |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | 삭제하면 불필요한 파일이 휴지통으로 이동됩니다. 취소하면 삭제하지 않고 닫습니다. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 이동하면 불필요한 파일이 선택한 대상 폴더에 들어갑니다. 취소하면 파일은 있던 자리에 그대로 남습니다. |
@@ -358,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Products | 제품 |
 | Patches | 패치 |
 | Product details | 제품 세부 정보 |
-| Move destination folder | 이동 대상 폴더 |
+| Move location | 이동 위치 |
 | Operation progress | 작업 진행 상황 |
 | Scan C:\Windows\Installer again | C:\Windows\Installer 다시 검사 |
 | Scanning progress | 검사 진행 상황 |
@@ -376,7 +378,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} ({1}) | {0} ({1}) |
 | Files that could not be processed | 처리할 수 없는 파일 |
 | Explains this folder, and how to recover a file, in the README | 이 폴더에 대한 설명과 파일 복구 방법을 README에서 안내 |
-| Result log preview | 결과 로그 미리 보기 |
+| Report preview | 보고서 미리 보기 |
 | Change language | 언어 변경 |
 | The program will restart. | 프로그램이 다시 시작됩니다. |
 

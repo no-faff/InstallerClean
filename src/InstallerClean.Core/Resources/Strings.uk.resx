@@ -165,7 +165,7 @@
   <!-- Names the destination the way the Move button's own tooltip does
        (Tooltip.Move), so the spoken help and the hover text agree on what
        the folder is called. -->
-  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Move all unneeded installer files to the Move location</value></data>
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Перемістити всі непотрібні файли інсталятора до вказаного розташування</value></data>
   <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Перемістити всі непотрібні файли інсталятора до Кошика</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -203,7 +203,7 @@
        the field the way the label does and voice control can reach it by
        the words on screen; it stays identical to
        Automation.Section.MoveLocation in every language. -->
-  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Move location</value></data>
+  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Куди перемістити</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Перебіг операції</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>Просканувати C:\Windows\Installer ще раз</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Перебіг сканування</value></data>
@@ -254,13 +254,13 @@
        button still works from here: pressing it opens the folder browser
        and then moves, so this says a folder is coming rather than asking
        for one to be set first. -->
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files somewhere safe. You'll choose the folder next.</value></data>
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Перемістити непотрібні файли в безпечне місце. Папку ви виберете на наступному кроці.</value></data>
   <data name="Tooltip.Delete" xml:space="preserve"><value>Перемістити непотрібні файли до Кошика.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Назва суб'єкта з вбудованого сертифіката Authenticode. Ланцюжок не перевірено.</value></data>
 
   <!-- Body copy -->
   <data name="Body.MainExplanation.Lead" xml:space="preserve">
-    <value>Any unneeded files below are safe to delete.</value>
+    <value>Будь-які непотрібні файли нижче можна безпечно видалити.</value>
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
@@ -743,7 +743,7 @@ InstallerClean уже працював від імені адміністрат�
        readers announce its content rather than "edit, read-only". The
        noun follows the button that opens this dialog (Action.SendResultLog,
        "Send report") and the surrounding copy, which call it a report. -->
-  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Report preview</value></data>
+  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Попередній перегляд звіту</value></data>
 
   <!-- Single instance / startup / crash -->
   <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>

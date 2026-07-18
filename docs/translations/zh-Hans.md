@@ -111,7 +111,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 简体中文 |
 | --- | --- |
-| The unneeded files below are safe to delete. | 下面这些不需要的文件可以安全删除。 |
+| Any unneeded files below are safe to delete. | 下面任何不需要的文件都可以安全删除。 |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 它们位于 C:\Windows\Installer，是在卸载程序（{0}）、新补丁取代旧补丁（{1}）或发布者撤回补丁（{2}）时遗留下来的。InstallerClean 只会列出 Windows 自己报告为不再需要的文件。 |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | 将它们删除到回收站，如果您想保留副本，也可以改用“移动”。 |
 | Nothing scanned yet. | 尚未扫描。 |
@@ -148,17 +148,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} freed | 已释放 {0} |
 | {0} cleaned up | 已清理 {0} |
 | {0} moved | 已移动 {0} |
-| {0} moved, some files could not be processed | 已移动 {0}，部分文件无法处理 |
-| {0} freed, some files could not be processed | 已释放 {0}，部分文件无法处理 |
-| {0} cleaned up, some files could not be processed | 已清理 {0}，部分文件无法处理 |
+| Nothing was moved | 没有移动任何文件 |
+| Nothing was deleted | 没有删除任何文件 |
+| {0} of {1} files could not be moved. | {1} 个文件中有 {0} 个无法移动。 |
+| {0} of {1} files could not be moved. | {1} 个文件中有 {0} 个无法移动。 |
+| {0} of {1} files could not be deleted. | {1} 个文件中有 {0} 个无法删除。 |
+| {0} of {1} files could not be deleted. | {1} 个文件中有 {0} 个无法删除。 |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
-| {0} {1} moved to: {2}. {3} {4} | 已将 {0} 个{1}移动到：{2}。{3} 个{4} |
-| {0} {1} moved to: {2}. {3} {4} | 已将 {0} 个{1}移动到：{2}。{3} 个{4} |
 | {0} {1} moved to the Recycle Bin | 已将 {0} 个{1}移到回收站 |
 | {0} {1} moved to the Recycle Bin | 已将 {0} 个{1}移到回收站 |
-| {0} {1} moved to the Recycle Bin. {2} {3} | 已将 {0} 个{1}移到回收站。{2} 个{3} |
-| {0} {1} moved to the Recycle Bin. {2} {3} | 已将 {0} 个{1}移到回收站。{2} 个{3} |
 | {0} {1} kept in place, because a program started needing them again after the scan. | {0} 个{1}已保留在原处，因为这次扫描之后又有程序需要它们了。 |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} 个{1}已保留在原处，因为重新检查时无法完整读取 Windows Installer 记录。 |
 | Moved {0} of {1} {2} before you cancelled. | 在您取消前，已移动 {1} 个{2}中的 {0} 个。 |
@@ -166,8 +165,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Permanently deleted {0} of {1} {2} before you cancelled. | 在您取消前，已永久删除 {1} 个{2}中的 {0} 个。 |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | 已永久删除 {0} 个{1}。它没有进入回收站。 |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | 已永久删除 {0} 个{1}。它们没有进入回收站。 |
-| {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | 已永久删除 {0} 个{1}。它没有进入回收站。{2} 个{3} |
-| {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | 已永久删除 {0} 个{1}。它们没有进入回收站。{2} 个{3} |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 没关系，它本来就可以安全删除。InstallerClean 只清除 Windows 报告为不再需要的文件，绝不会删除程序仍然需要的文件。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。 |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 没关系，它们本来就可以安全删除。InstallerClean 只清除 Windows 报告为不再需要的文件，绝不会删除程序仍然需要的文件。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。 |
 
@@ -244,9 +241,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | File no longer exists. | 文件已不存在。 |
 | Source file is a symlink or junction; refused for safety. | 源文件是符号链接或目录联接；为安全起见已拒绝。 |
 | This file is not inside the Windows Installer folder; refused for safety. | 此文件不在 Windows Installer 文件夹内；为安全起见已拒绝。 |
-| Access denied. | 访问被拒绝。 |
+| Windows refused access to this file; it was left in place. | Windows 拒绝了对此文件的访问；该文件已留在原处。 |
+| Windows refused access to these files; they were left in place. | Windows 拒绝了对这些文件的访问；这些文件已留在原处。 |
+| This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | 此文件正被另一个程序打开或锁定，因此目前没有任何方式能移动它。该文件已留在原处；请稍后再试。 |
+| These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later. | 这些文件正被另一个程序打开或锁定，因此目前没有任何方式能移动它们。这些文件已留在原处；请稍后再试。 |
 | Windows reported a file error; the file was left in place. | Windows 报告了一个文件错误；该文件已留在原处。 |
-| Unknown error. | 未知错误。 |
+| Windows reported file errors; these files were left in place. | Windows 报告了文件错误；这些文件已留在原处。 |
+| Something went wrong with this file; it was left in place. | 此文件出了点问题；该文件已留在原处。 |
+| Something went wrong with these files; they were left in place. | 这些文件出了点问题；它们已留在原处。 |
 | Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | 无法将此文件移到回收站（错误 {0}），而且仅凭这个代码，InstallerClean 无法告诉你原因。该文件已留在原处。请改用“移动”按钮，它不使用回收站。 |
 | Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | 即使拥有管理员权限，Windows 仍拒绝了访问（错误 {0}），而且 InstallerClean 无法判断问题出在文件上还是回收站上。该文件已留在原处。如果问题出在回收站，“移动”按钮可以奏效；如果问题出在文件本身，则不行。 |
 | This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | 此文件正被另一个程序打开或锁定（错误 {0}），因此目前没有任何方式能移除它。该文件已留在原处；请稍后再试。 |
@@ -319,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。 |
 | Move the unneeded files to the Move location. | 将不需要的文件移动到移动位置。 |
-| Move the unneeded files to the Move location. Choose one first. | 将不需要的文件移动到移动位置。请先选择一个位置。 |
+| Move the unneeded files somewhere safe. You'll choose the folder next. | 将不需要的文件移动到安全的位置。下一步再选择文件夹。 |
 | Move the unneeded files to the Recycle Bin. | 将不需要的文件移到回收站。 |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | 来自内嵌 Authenticode 证书的主题名称。未验证证书链。 |
 | Change language. The program will restart. | 更改语言。程序会重启。 |
@@ -339,7 +341,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub | 在 GitHub 上点个星 |
 | Leave a star on GitHub (About window) | 在 GitHub 上点个星（关于窗口） |
 | Minimise | 最小化 |
-| Move all unneeded installer files to the chosen destination folder | 将所有不需要的安装程序文件移动到所选的目标文件夹 |
+| Move all unneeded installer files to the Move location | 将所有不需要的安装程序文件移动到移动位置 |
 | Move all unneeded installer files to the Recycle Bin | 将所有不需要的安装程序文件移到回收站 |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | 删除会将不需要的文件移到回收站。取消则关闭且不删除。 |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 移动会将不需要的文件放入所选的目标文件夹。取消则让它们留在原处。 |
@@ -358,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Products | 产品 |
 | Patches | 补丁 |
 | Product details | 产品详情 |
-| Move destination folder | 移动目标文件夹 |
+| Move location | 移动位置 |
 | Operation progress | 操作进度 |
 | Scan C:\Windows\Installer again | 重新扫描 C:\Windows\Installer |
 | Scanning progress | 扫描进度 |
@@ -376,7 +378,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} ({1}) | {0} ({1}) |
 | Files that could not be processed | 无法处理的文件 |
 | Explains this folder, and how to recover a file, in the README | 在 README 中解释了这个文件夹，以及如何恢复文件 |
-| Result log preview | 结果日志预览 |
+| Report preview | 报告预览 |
 | Change language | 更改语言 |
 | The program will restart. | 程序会重启。 |
 

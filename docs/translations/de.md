@@ -111,7 +111,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Deutsch |
 | --- | --- |
-| The unneeded files below are safe to delete. | Die nicht benötigten Dateien unten können bedenkenlos gelöscht werden. |
+| Any unneeded files below are safe to delete. | Etwaige nicht benötigte Dateien unten können bedenkenlos gelöscht werden. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Sie liegen in C:\Windows\Installer und blieben zurück, als ein Programm deinstalliert wurde ({0}), ein neuerer Patch einen älteren ersetzt hat ({1}) oder der Herausgeber ihn zurückgezogen hat ({2}). InstallerClean listet nur Dateien auf, die Windows selbst als erledigt meldet. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Lösche sie in den Papierkorb, oder nutze stattdessen Verschieben, wenn du lieber eine Kopie behalten möchtest. |
 | Nothing scanned yet. | Noch nichts gescannt. |
@@ -148,17 +148,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} freed | {0} freigegeben |
 | {0} cleaned up | {0} aufgeräumt |
 | {0} moved | {0} verschoben |
-| {0} moved, some files could not be processed | {0} verschoben, einige Dateien konnten nicht verarbeitet werden |
-| {0} freed, some files could not be processed | {0} freigegeben, einige Dateien konnten nicht verarbeitet werden |
-| {0} cleaned up, some files could not be processed | {0} aufgeräumt, einige Dateien konnten nicht verarbeitet werden |
+| Nothing was moved | Nichts verschoben |
+| Nothing was deleted | Nichts gelöscht |
+| {0} of {1} files could not be moved. | {0} Datei von {1} konnte nicht verschoben werden. |
+| {0} of {1} files could not be moved. | {0} Dateien von {1} konnten nicht verschoben werden. |
+| {0} of {1} files could not be deleted. | {0} Datei von {1} konnte nicht gelöscht werden. |
+| {0} of {1} files could not be deleted. | {0} Dateien von {1} konnten nicht gelöscht werden. |
 | {0} {1} moved to: {2} | {0} {1} verschoben nach: {2} |
 | {0} {1} moved to: {2} | {0} {1} verschoben nach: {2} |
-| {0} {1} moved to: {2}. {3} {4} | {0} {1} verschoben nach: {2}. {3} {4} |
-| {0} {1} moved to: {2}. {3} {4} | {0} {1} verschoben nach: {2}. {3} {4} |
 | {0} {1} moved to the Recycle Bin | {0} {1} in den Papierkorb verschoben |
 | {0} {1} moved to the Recycle Bin | {0} {1} in den Papierkorb verschoben |
-| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} in den Papierkorb verschoben. {2} {3} |
-| {0} {1} moved to the Recycle Bin. {2} {3} | {0} {1} in den Papierkorb verschoben. {2} {3} |
 | {0} {1} kept in place, because a program started needing them again after the scan. | {0} {1} an Ort und Stelle belassen, weil ein Programm sie nach dem Scan wieder benötigt. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} an Ort und Stelle belassen, weil die Einträge von Windows Installer bei der wiederholten Prüfung nicht vollständig gelesen werden konnten. |
 | Moved {0} of {1} {2} before you cancelled. | {0} von {1} {2} verschoben, bevor du abgebrochen hast. |
@@ -166,8 +165,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Permanently deleted {0} of {1} {2} before you cancelled. | {0} von {1} {2} endgültig gelöscht, bevor du abgebrochen hast. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} endgültig gelöscht. Sie ist nicht in den Papierkorb gewandert. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} endgültig gelöscht. Sie sind nicht in den Papierkorb gewandert. |
-| {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} endgültig gelöscht. Sie ist nicht in den Papierkorb gewandert. {2} {3} |
-| {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | {0} {1} endgültig gelöscht. Sie sind nicht in den Papierkorb gewandert. {2} {3} |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Das ist in Ordnung, sie konnte bedenkenlos entfernt werden. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Das ist in Ordnung, sie konnten bedenkenlos entfernt werden. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert. |
 
@@ -244,9 +241,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | File no longer exists. | Die Datei existiert nicht mehr. |
 | Source file is a symlink or junction; refused for safety. | Die Quelldatei ist ein Symlink oder eine Junction; aus Sicherheitsgründen abgelehnt. |
 | This file is not inside the Windows Installer folder; refused for safety. | Diese Datei liegt nicht im Windows-Installer-Ordner; aus Sicherheitsgründen abgelehnt. |
-| Access denied. | Zugriff verweigert. |
+| Windows refused access to this file; it was left in place. | Windows hat den Zugriff auf diese Datei verweigert; sie wurde an ihrem Platz belassen. |
+| Windows refused access to these files; they were left in place. | Windows hat den Zugriff auf diese Dateien verweigert; sie wurden an ihrem Platz belassen. |
+| This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | Diese Datei ist von einem anderen Programm geöffnet oder gesperrt, deshalb kann sie im Moment von nichts verschoben werden. Sie wurde an ihrem Platz belassen; versuch es später noch einmal. |
+| These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later. | Diese Dateien sind von einem anderen Programm geöffnet oder gesperrt, deshalb können sie im Moment von nichts verschoben werden. Sie wurden an ihrem Platz belassen; versuch es später noch einmal. |
 | Windows reported a file error; the file was left in place. | Windows hat einen Dateifehler gemeldet; die Datei wurde an ihrem Platz belassen. |
-| Unknown error. | Unbekannter Fehler. |
+| Windows reported file errors; these files were left in place. | Windows hat Dateifehler gemeldet; diese Dateien wurden an ihrem Platz belassen. |
+| Something went wrong with this file; it was left in place. | Bei dieser Datei ist etwas schiefgelaufen; sie wurde an ihrem Platz belassen. |
+| Something went wrong with these files; they were left in place. | Bei diesen Dateien ist etwas schiefgelaufen; sie wurden an ihrem Platz belassen. |
 | Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | Diese Datei konnte nicht in den Papierkorb verschoben werden (Fehler {0}), und InstallerClean kann dir anhand dieses Codes nicht sagen, warum. Die Datei wurde an ihrem Platz belassen. Versuch stattdessen die Schaltfläche „Verschieben“, die den Papierkorb nicht benutzt. |
 | Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | Windows hat den Zugriff selbst mit Administratorrechten verweigert (Fehler {0}), und InstallerClean kann nicht erkennen, ob das Problem bei der Datei oder beim Papierkorb liegt. Die Datei wurde an ihrem Platz belassen. Die Schaltfläche „Verschieben“ hilft, wenn es am Papierkorb liegt, aber nicht, wenn es an der Datei liegt. |
 | This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | Diese Datei ist von einem anderen Programm geöffnet oder gesperrt (Fehler {0}), deshalb kann sie im Moment von nichts entfernt werden. Sie wurde an ihrem Platz belassen; versuch es später noch einmal. |
@@ -319,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Ganz wie du magst, aber ich freue mich darüber. Sendet eine anonyme Zusammenfassung, die mir nur zeigt, ob es funktioniert und wie viel Platz die Leute freigeben. Auf dem nächsten Bildschirm siehst du vor dem Bestätigen, was gesendet wird. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Ganz wie du magst, aber ich freue mich darüber. Sendet eine anonyme Zusammenfassung, die mir nur zeigt, ob es funktioniert. Auf dem nächsten Bildschirm siehst du vor dem Bestätigen, was gesendet wird. |
 | Move the unneeded files to the Move location. | Verschiebt die nicht benötigten Dateien an den Zielort. |
-| Move the unneeded files to the Move location. Choose one first. | Verschiebt die nicht benötigten Dateien an den Zielort. Wähle zuerst einen aus. |
+| Move the unneeded files somewhere safe. You'll choose the folder next. | Verschiebt die nicht benötigten Dateien an einen sicheren Ort. Den Ordner wählst du als Nächstes. |
 | Move the unneeded files to the Recycle Bin. | Verschiebt die nicht benötigten Dateien in den Papierkorb. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Antragstellername aus dem eingebetteten Authenticode-Zertifikat. Die Zertifikatskette wurde nicht geprüft. |
 | Change language. The program will restart. | Sprache ändern. Das Programm wird neu gestartet. |
@@ -339,7 +341,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub | Einen Stern auf GitHub hinterlassen |
 | Leave a star on GitHub (About window) | Einen Stern auf GitHub hinterlassen (Fenster Über) |
 | Minimise | Minimieren |
-| Move all unneeded installer files to the chosen destination folder | Alle nicht benötigten Installer-Dateien in den gewählten Zielordner verschieben |
+| Move all unneeded installer files to the Move location | Alle nicht benötigten Installer-Dateien an den Zielort verschieben |
 | Move all unneeded installer files to the Recycle Bin | Alle nicht benötigten Installer-Dateien in den Papierkorb verschieben |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Löschen verschiebt die nicht benötigten Dateien in den Papierkorb. Abbrechen schließt, ohne zu löschen. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Verschieben legt die nicht benötigten Dateien in den gewählten Zielordner. Abbrechen lässt sie, wo sie sind. |
@@ -358,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Products | Produkte |
 | Patches | Patches |
 | Product details | Produktdetails |
-| Move destination folder | Zielordner zum Verschieben |
+| Move location | Zielort |
 | Operation progress | Vorgangsfortschritt |
 | Scan C:\Windows\Installer again | C:\Windows\Installer erneut scannen |
 | Scanning progress | Scan-Fortschritt |
@@ -376,7 +378,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} ({1}) | {0} ({1}) |
 | Files that could not be processed | Dateien, die nicht verarbeitet werden konnten |
 | Explains this folder, and how to recover a file, in the README | Erklärt diesen Ordner, und wie sich eine Datei wiederherstellen lässt, im README |
-| Result log preview | Vorschau des Ergebnisprotokolls |
+| Report preview | Vorschau des Berichts |
 | Change language | Sprache ändern |
 | The program will restart. | Das Programm wird neu gestartet. |
 

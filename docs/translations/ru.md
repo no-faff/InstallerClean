@@ -111,7 +111,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Русский |
 | --- | --- |
-| The unneeded files below are safe to delete. | Ненужные файлы ниже можно безопасно удалить. |
+| Any unneeded files below are safe to delete. | Любые ненужные файлы ниже можно безопасно удалить. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Они лежат в C:\Windows\Installer и остаются после того, как программа была удалена ({0}), более новый патч заменил один из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими. |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Удалите их в Корзину, или используйте вместо этого функцию «Переместить», если хотите сохранить копию. |
 | Nothing scanned yet. | Пока ничего не просканировано. |
@@ -148,17 +148,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} freed | Освобождено {0} |
 | {0} cleaned up | Очищено {0} |
 | {0} moved | Перемещено {0} |
-| {0} moved, some files could not be processed | Перемещено {0}, некоторые файлы не удалось обработать |
-| {0} freed, some files could not be processed | Освобождено {0}, некоторые файлы не удалось обработать |
-| {0} cleaned up, some files could not be processed | Очищено {0}, некоторые файлы не удалось обработать |
+| Nothing was moved | Ничего не перемещено |
+| Nothing was deleted | Ничего не удалено |
+| {0} of {1} files could not be moved. | Не удалось переместить {0} файл из {1}. |
+| {0} of {1} files could not be moved. | Не удалось переместить {0} файлов из {1}. |
+| {0} of {1} files could not be deleted. | Не удалось удалить {0} файл из {1}. |
+| {0} of {1} files could not be deleted. | Не удалось удалить {0} файлов из {1}. |
 | {0} {1} moved to: {2} | Перемещено {0} {1} в: {2} |
 | {0} {1} moved to: {2} | Перемещено {0} {1} в: {2} |
-| {0} {1} moved to: {2}. {3} {4} | Перемещено {0} {1} в: {2}. {3} {4} |
-| {0} {1} moved to: {2}. {3} {4} | Перемещено {0} {1} в: {2}. {3} {4} |
 | {0} {1} moved to the Recycle Bin | Перемещено {0} {1} в Корзину |
 | {0} {1} moved to the Recycle Bin | Перемещено {0} {1} в Корзину |
-| {0} {1} moved to the Recycle Bin. {2} {3} | Перемещено {0} {1} в Корзину. {2} {3} |
-| {0} {1} moved to the Recycle Bin. {2} {3} | Перемещено {0} {1} в Корзину. {2} {3} |
 | {0} {1} kept in place, because a program started needing them again after the scan. | Оставлено {0} {1} на месте: после сканирования они снова понадобились программе. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | Оставлено {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи установщика Windows. |
 | Moved {0} of {1} {2} before you cancelled. | Перемещено {0}/{1} {2} до отмены. |
@@ -166,8 +165,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Permanently deleted {0} of {1} {2} before you cancelled. | Удалено безвозвратно {0}/{1} {2} до отмены. |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} удалён безвозвратно. Он не попал в Корзину. |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} удалено безвозвратно. Они не попали в Корзину. |
-| {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} {1} удалён безвозвратно. Он не попал в Корзину. {2} {3} |
-| {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | {0} {1} удалено безвозвратно. Они не попали в Корзину. {2} {3} |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Это нормально, его можно было безопасно удалить. InstallerClean очищает только те файлы, которые Windows объявляет отработавшими, и никогда тот, что ещё нужен программе. В маловероятном случае, если удаление когда-нибудь лишит программу возможности восстановления, обновления или удаления, переустановка её у разработчика обычно возвращает файл, хотя Microsoft этого не гарантирует. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Это нормально, их можно было безопасно удалить. InstallerClean очищает только те файлы, которые Windows объявляет отработавшими, и никогда тот, что ещё нужен программе. В маловероятном случае, если удаление когда-нибудь лишит программу возможности восстановления, обновления или удаления, переустановка её у разработчика обычно возвращает файл, хотя Microsoft этого не гарантирует. |
 
@@ -244,9 +241,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | File no longer exists. | Файл больше не существует. |
 | Source file is a symlink or junction; refused for safety. | Исходный файл является символической ссылкой или точкой соединения; отклонено в целях безопасности. |
 | This file is not inside the Windows Installer folder; refused for safety. | Этот файл находится не в папке Windows Installer; отклонено в целях безопасности. |
-| Access denied. | Доступ запрещён. |
+| Windows refused access to this file; it was left in place. | Windows отказал в доступе к этому файлу; он оставлен на месте. |
+| Windows refused access to these files; they were left in place. | Windows отказал в доступе к этим файлам; они оставлены на месте. |
+| This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | Этот файл открыт или заблокирован другой программой, поэтому сейчас его ничто не может переместить. Он оставлен на месте; повторите попытку позже. |
+| These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later. | Эти файлы открыты или заблокированы другой программой, поэтому сейчас их ничто не может переместить. Они оставлены на месте; повторите попытку позже. |
 | Windows reported a file error; the file was left in place. | Windows сообщил об ошибке файла; файл оставлен на месте. |
-| Unknown error. | Неизвестная ошибка. |
+| Windows reported file errors; these files were left in place. | Windows сообщил об ошибках файлов; эти файлы оставлены на месте. |
+| Something went wrong with this file; it was left in place. | С этим файлом что-то пошло не так; он оставлен на месте. |
+| Something went wrong with these files; they were left in place. | С этими файлами что-то пошло не так; они оставлены на месте. |
 | Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | Не удалось переместить этот файл в Корзину (ошибка {0}), и по этому коду InstallerClean не может сказать почему. Файл оставлен на месте. Попробуйте вместо этого кнопку «Переместить», которая не использует Корзину. |
 | Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | Windows отказал в доступе даже с правами администратора (ошибка {0}), и InstallerClean не может определить, в чём дело — в файле или в Корзине. Файл оставлен на месте. Кнопка «Переместить» поможет, если дело в Корзине, но не поможет, если дело в файле. |
 | This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | Этот файл открыт или заблокирован другой программой (ошибка {0}), поэтому сейчас его ничто не может удалить. Он оставлен на месте; повторите попытку позже. |
@@ -319,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение и сколько места люди освобождают. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
 | Move the unneeded files to the Move location. | Переместить ненужные файлы в папку для перемещения. |
-| Move the unneeded files to the Move location. Choose one first. | Переместить ненужные файлы в папку для перемещения. Сначала выберите её. |
+| Move the unneeded files somewhere safe. You'll choose the folder next. | Переместить ненужные файлы в надёжное место. Папку вы выберете на следующем шаге. |
 | Move the unneeded files to the Recycle Bin. | Переместить ненужные файлы в Корзину. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Имя субъекта из встроенного сертификата Authenticode. Цепочка не проверялась. |
 | Change language. The program will restart. | Изменить язык. Программа перезапустится. |
@@ -339,7 +341,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub | Поставить звезду на GitHub |
 | Leave a star on GitHub (About window) | Поставить звезду на GitHub (окно «О программе») |
 | Minimise | Свернуть |
-| Move all unneeded installer files to the chosen destination folder | Переместить все ненужные файлы установщика в выбранную папку назначения |
+| Move all unneeded installer files to the Move location | Переместить все ненужные файлы установщика в папку для перемещения |
 | Move all unneeded installer files to the Recycle Bin | Переместить все ненужные файлы установщика в Корзину |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | «Удалить» перемещает ненужные файлы в Корзину. «Отмена» закрывает окно без удаления. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | «Переместить» помещает ненужные файлы в выбранную папку назначения. «Отмена» оставляет их на месте. |
@@ -358,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Products | Продукты |
 | Patches | Патчи |
 | Product details | Сведения о продукте |
-| Move destination folder | Папка назначения для перемещения |
+| Move location | Папка для перемещения |
 | Operation progress | Ход операции |
 | Scan C:\Windows\Installer again | Сканировать C:\Windows\Installer заново |
 | Scanning progress | Ход сканирования |
@@ -376,7 +378,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} ({1}) | {0} ({1}) |
 | Files that could not be processed | Файлы, которые не удалось обработать |
 | Explains this folder, and how to recover a file, in the README | Объясняет эту папку и то, как восстановить файл, в README |
-| Result log preview | Предпросмотр журнала результатов |
+| Report preview | Предпросмотр отчёта |
 | Change language | Изменить язык |
 | The program will restart. | Программа перезапустится. |
 

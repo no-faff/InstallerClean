@@ -111,7 +111,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 日本語 |
 | --- | --- |
-| The unneeded files below are safe to delete. | 以下の不要ファイルは削除しても安全です。 |
+| Any unneeded files below are safe to delete. | 以下の不要ファイルは削除しても安全です。 |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | これらのファイルはC:\Windows\Installerにあり、プログラムがアンインストールされたとき ({0})、新しいパッチが置き換えたとき ({1})、または公開元が撤回したとき ({2})に取り残されます。InstallerClean は、Windows 自身が不要と報告したファイルのみをリストアップします。 |
 | Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | ごみ箱に削除するか、コピーを保持したい場合は代わりに「移動」を使用してください。 |
 | Nothing scanned yet. | まだ何もスキャンしていません。 |
@@ -148,17 +148,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} freed | {0} 解放 |
 | {0} cleaned up | {0} クリーンアップ |
 | {0} moved | {0} 移動 |
-| {0} moved, some files could not be processed | {0} 移動、一部のファイルは処理できませんでした |
-| {0} freed, some files could not be processed | {0} 解放、一部のファイルは処理できませんでした |
-| {0} cleaned up, some files could not be processed | {0} クリーンアップ、一部のファイルは処理できませんでした |
+| Nothing was moved | 何も移動されませんでした |
+| Nothing was deleted | 何も削除されませんでした |
+| {0} of {1} files could not be moved. | {1} 個中 {0} 個のファイルを移動できませんでした。 |
+| {0} of {1} files could not be moved. | {1} 個中 {0} 個のファイルを移動できませんでした。 |
+| {0} of {1} files could not be deleted. | {1} 個中 {0} 個のファイルを削除できませんでした。 |
+| {0} of {1} files could not be deleted. | {1} 個中 {0} 個のファイルを削除できませんでした。 |
 | {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
 | {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
-| {0} {1} moved to: {2}. {3} {4} | {0} 個の {1} を次の場所に移動しました：{2}。{3} 個の {4} |
-| {0} {1} moved to: {2}. {3} {4} | {0} 個の {1} を次の場所に移動しました：{2}。{3} 個の {4} |
 | {0} {1} moved to the Recycle Bin | {0} 個の {1} をごみ箱に移動しました |
 | {0} {1} moved to the Recycle Bin | {0} 個の {1} をごみ箱に移動しました |
-| {0} {1} moved to the Recycle Bin. {2} {3} | {0} 個の {1} をごみ箱に移動しました。{2} 個の {3} |
-| {0} {1} moved to the Recycle Bin. {2} {3} | {0} 個の {1} をごみ箱に移動しました。{2} 個の {3} |
 | {0} {1} kept in place, because a program started needing them again after the scan. | {0} 個の {1} はそのまま残しました。スキャン後にプログラムが再び必要としたためです。 |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} 個の {1} はそのまま残しました。確認をやり直した際に Windows Installer の登録情報を完全に読み取れなかったためです。 |
 | Moved {0} of {1} {2} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を移動しました。 |
@@ -166,8 +165,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Permanently deleted {0} of {1} {2} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を完全に削除しました。 |
 | {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} 個の {1} を完全に削除しました。ごみ箱には送られていません。 |
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} 個の {1} を完全に削除しました。ごみ箱には送られていません。 |
-| {0} {1} permanently deleted. It did not go to the Recycle Bin. {2} {3} | {0} 個の {1} を完全に削除しました。ごみ箱には送られていません。{2} 個の {3} |
-| {0} {1} permanently deleted. They did not go to the Recycle Bin. {2} {3} | {0} 個の {1} を完全に削除しました。ごみ箱には送られていません。{2} 個の {3} |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 問題ありません。削除しても安全でした。InstallerCleanはWindowsが不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただしMicrosoftは保証していません)。 |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 問題ありません。削除しても安全でした。InstallerClean は Windows が不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただし Microsoft は保証していません)。 |
 
@@ -244,12 +241,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | File no longer exists. | ファイルはもう存在しません。 |
 | Source file is a symlink or junction; refused for safety. | ソースファイルはシンボリックリンクまたはジャンクションです。安全のために拒否されました。 |
 | This file is not inside the Windows Installer folder; refused for safety. | このファイルは Windows Installer フォルダー内にありません。安全のために拒否されました。 |
-| Access denied. | アクセスが拒否されました。 |
+| Windows refused access to this file; it was left in place. | Windows がこのファイルへのアクセスを拒否しました。ファイルはそのままにしてあります。 |
+| Windows refused access to these files; they were left in place. | Windows がこれらのファイルへのアクセスを拒否しました。ファイルはそのままにしてあります。 |
+| This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | このファイルは別のプログラムによって開かれているか、ロックされています。そのため今はどうやっても移動できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。 |
+| These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later. | これらのファイルは別のプログラムによって開かれているか、ロックされています。そのため今はどうやっても移動できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。 |
 | Windows reported a file error; the file was left in place. | Windows がファイルエラーを報告しました。ファイルはそのままにしてあります。 |
-| Unknown error. | 不明なエラー。 |
+| Windows reported file errors; these files were left in place. | Windows がファイルエラーを報告しました。これらのファイルはそのままにしてあります。 |
+| Something went wrong with this file; it was left in place. | このファイルで何らかの問題が発生しました。ファイルはそのままにしてあります。 |
+| Something went wrong with these files; they were left in place. | これらのファイルで何らかの問題が発生しました。ファイルはそのままにしてあります。 |
 | Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | このファイルをごみ箱に移動できませんでした (エラー{0})。そのコードからは、InstallerClean が理由をお伝えすることはできません。ファイルはそのままにしてあります。代わりに「移動」ボタンをお試しください。「移動」はごみ箱を使いません。 |
 | Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | 管理者権限があっても Windows がアクセスを拒否しました (エラー{0})。InstallerClean には、問題がファイルにあるのかごみ箱にあるのかを判別できません。ファイルはそのままにしてあります。問題がごみ箱であれば「移動」ボタンで対処できますが、問題がファイル自体であれば対処できません。 |
-| This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | このファイルは別のプログラムによって開かれているか、ロックされています (エラー{0})。そのため今は何をもってしても削除できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。 |
+| This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | このファイルは別のプログラムによって開かれているか、ロックされています (エラー{0})。そのため今はどうやっても削除できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。 |
 | Windows deleted this file outright rather than moving it to the Recycle Bin. InstallerClean asked for the Recycle Bin, and Windows did this instead. The file is gone. | Windows はこのファイルをごみ箱に移動せず、完全に削除しました。InstallerClean はごみ箱への移動を要求しましたが、Windows は代わりにこの処理を行いました。ファイルは失われました。 |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Windows Installerフォルダー内へのファイル移動を拒否します (移動先：{0})。 |
 | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | 移動先には、ドライブ文字またはネットワーク共有から始まる、フォルダーへの完全なパスを指定してください (例：D:\Backup、\\server\backup)。InstallerClean はこのパスを使用できません：{0} |
@@ -319,7 +321,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているか、どれだけの容量が解放されているかを知るためのものです。次の画面で送信前に送信内容を確認できます。 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているかを知るためのものです。次の画面で送信前に送信内容を確認できます。 |
 | Move the unneeded files to the Move location. | 不要ファイルを移動先に移動します。 |
-| Move the unneeded files to the Move location. Choose one first. | 不要ファイルを移動先に移動します。先に移動先を選択してください。 |
+| Move the unneeded files somewhere safe. You'll choose the folder next. | 不要ファイルを安全な場所に移動します。フォルダーはこの後選択します。 |
 | Move the unneeded files to the Recycle Bin. | 不要ファイルをごみ箱に移動します。 |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | 埋め込まれた Authenticode 証明書のサブジェクト名です。チェーン検証はされていません。 |
 | Change language. The program will restart. | 言語を変更します。プログラムが再起動します。 |
@@ -339,7 +341,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a star on GitHub | GitHub でスターを付ける |
 | Leave a star on GitHub (About window) | GitHub でスターを付ける (バージョン情報ウィンドウ) |
 | Minimise | 最小化 |
-| Move all unneeded installer files to the chosen destination folder | 不要なインストーラーファイルをすべて、選択した移動先フォルダーに移動 |
+| Move all unneeded installer files to the Move location | 不要なインストーラーファイルをすべて移動先に移動 |
 | Move all unneeded installer files to the Recycle Bin | 不要なインストーラーファイルをすべてごみ箱に移動 |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | 削除を実行すると不要ファイルがごみ箱に移動されます。キャンセルは削除せずに閉じます。 |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 移動を実行すると不要ファイルが選択した移動先フォルダーに移動されます。キャンセルはそのままの場所に残します。 |
@@ -358,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Products | 製品 |
 | Patches | パッチ |
 | Product details | 製品詳細 |
-| Move destination folder | 移動先フォルダー |
+| Move location | 移動先 |
 | Operation progress | 操作の進捗 |
 | Scan C:\Windows\Installer again | C:\Windows\Installer を再スキャン |
 | Scanning progress | スキャンの進捗 |
@@ -376,7 +378,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} ({1}) | {0} ({1}) |
 | Files that could not be processed | 処理できなかったファイル |
 | Explains this folder, and how to recover a file, in the README | このフォルダーとファイルの回復方法を README で説明しています |
-| Result log preview | 結果ログのプレビュー |
+| Report preview | レポートのプレビュー |
 | Change language | 言語を変更 |
 | The program will restart. | プログラムが再起動します。 |
 
