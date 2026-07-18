@@ -260,12 +260,22 @@ public class InstallerQueryServiceUnitTests
 
     // ---- Item 8: the index cap ends enumeration loudly, not silently ----
 
+    // The message is asserted, not just the type. The cap and the consecutive
+    // failures are different conditions and shared one string until 2.0.2: at
+    // the cap the count is the budget rather than a run of failures, and the
+    // error code is Success when every row read cleanly, so the shared string
+    // described the stop falsely in both halves. Asserting the type alone let
+    // that stand.
     [Fact]
     public async Task Product_enumeration_that_never_ends_throws_at_the_cap()
     {
         var msi = new FakeMsiApi { NeverEndProducts = true };
 
-        await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
+
+        Assert.Equal(
+            string.Format(Strings.Error_MsiEnumerationNeverEnded, 10_000, MsiError.Success),
+            ex.Message);
     }
 
     [Fact]
@@ -275,7 +285,11 @@ public class InstallerQueryServiceUnitTests
         msi.AddProduct("{A}");
         msi.NeverEndPatchesFor = "{A}";
 
-        await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
+
+        Assert.Equal(
+            string.Format(Strings.Error_MsiPatchEnumerationNeverEnded, 10_000, MsiError.Success),
+            ex.Message);
     }
 
     // ---- Item 9: scattered per-product failures are tolerated (no throw) ----

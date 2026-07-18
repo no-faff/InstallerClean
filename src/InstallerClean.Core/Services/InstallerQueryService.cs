@@ -619,9 +619,16 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // would be unseen and classified orphaned. Cannot happen on a real
         // machine (nobody has 10,000 products), but if it ever did it falls to
         // the catastrophic side, so fail loudly rather than truncate silently.
+        //
+        // This carries its own message and must not be merged back into the
+        // consecutive-failures one for symmetry. Here the first placeholder is
+        // the budget rather than a failure count, and the second is the last
+        // row's error, which is Success when every row read cleanly and the
+        // list simply never terminated: that string would state two things
+        // that are not true of this condition.
         if (!reachedEnd)
             throw new LocalisedInvalidOperationException(
-                string.Format(Strings.Error_MsiNonSuccess, MaxProductIndex, lastError));
+                string.Format(Strings.Error_MsiEnumerationNeverEnded, MaxProductIndex, lastError));
 
         return (results, unreadableRows);
     }
@@ -742,10 +749,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
         }
 
         // See EnumerateProducts: hitting the cap is an unterminated
-        // enumeration, not a clean end. Fail loudly rather than truncate.
+        // enumeration, not a clean end. Fail loudly rather than truncate, and
+        // keep its own message for the reason given there.
         if (!reachedEnd)
             throw new LocalisedInvalidOperationException(
-                string.Format(Strings.Error_MsiPatchNonSuccess, MaxPatchIndex, lastError));
+                string.Format(Strings.Error_MsiPatchEnumerationNeverEnded, MaxPatchIndex, lastError));
 
         return (results, incomplete);
     }

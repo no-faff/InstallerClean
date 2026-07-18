@@ -543,9 +543,18 @@ Restam duas causas prováveis: algum software de segurança está bloqueando C:\
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
   <data name="Error.MsiNonSuccess" xml:space="preserve"><value>O Windows Installer recusou-se a listar os produtos após {0} falhas consecutivas (último código de erro {1}). Tente reiniciar o Windows, ou execute 'sfc /scannow' em um prompt elevado.</value></data>
+  <!-- The index cap, which is a different condition from the consecutive
+       failures above and must not borrow that string: the enumeration ran out
+       of budget rather than failing, so 0 = the cap reached (not a failure
+       count) and 1 = the last row's error code, which here is Success (0) when
+       every row read cleanly and the list simply never terminated. -->
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
   <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
        runs per product and fails on its own. Same two placeholders. -->
   <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>O Windows Installer recusou-se a listar os patches de um produto após {0} falhas consecutivas (último código de erro {1}). Tente reiniciar o Windows, ou execute 'sfc /scannow' em um prompt elevado.</value></data>
+  <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
+       condition and the same two placeholders. -->
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed.</value></data>
   <!-- Shown when the scan's two halves (what Windows still registers, and
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
