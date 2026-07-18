@@ -15,12 +15,12 @@
 // lists in step with the generators' KEEP_ENGLISH / ALSO_KEEP; adding a language
 // means adding its ALSO_KEEP here too.
 //
-// >>> WIRING: this lands as an INFORMATIONAL check, NOT a required status check.
-// During the known-English window (before the translation batch runs) it is RED
-// by design, and it must not block the owner's own pushes to main. The
-// coordinator promotes it to a required branch-protection check only once the
-// batch has landed and it reports clean. A gate that blocked pushes during the
-// very window it exists to track would be worse than no gate. <<<
+// WIRING: a required CI step (ci.yml), promoted there once the 2.0.2 batch had
+// landed and it reported clean. So a new or reworded key must be translated
+// before its branch can go green, which is the point: it is the only check that
+// catches a satellite still holding English, parity seeing presence and arity
+// alone. Adding a key and translating it in the same session keeps this green;
+// leaving it for a later batch is what made it red for a fortnight in 2026-07.
 //
 // Run from the repo root: node scripts/check-still-english.mjs
 import { readdirSync, readFileSync } from 'node:fs';
@@ -104,7 +104,7 @@ if (totalStillEnglish > 0) {
   const distinct = new Set(perLang.flatMap(([, keys]) => keys)).size;
   console.error(`\nStill-English gate: ${totalStillEnglish} untranslated key-slot(s) across ${satellites.length} satellites (${distinct} distinct keys).`);
   console.error('These clear when the per-language translation batch runs (CHANGING-A-TRANSLATED-STRING.md).');
-  console.error('Until then this is EXPECTED and must stay an informational check, not a required one.');
+  console.error('This is a required CI step, so translate these before the branch can go green.');
   process.exit(1);
 }
 console.log(`\nStill-English gate: clean. Every satellite has a real translation for all required keys.`);
