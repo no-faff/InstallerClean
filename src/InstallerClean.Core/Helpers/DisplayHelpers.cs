@@ -89,7 +89,7 @@ internal static class DisplayHelpers
     /// <summary>
     /// Picks the count fragment for <paramref name="count"/> in the current UI
     /// language. <paramref name="singular"/>/<paramref name="plural"/> are the resx
-    /// one/other forms; a language may override any CLDR category with a satellite-only
+    /// one/other forms; a language may override a CLDR category with a satellite-only
     /// <c>{keyPrefix}.One</c> / <c>.Few</c> / <c>.Many</c> key, read here by name
     /// (absent ones fall back to <paramref name="singular"/> for One, else
     /// <paramref name="plural"/>). The <c>.One</c> override lets a flat string (passed
@@ -114,8 +114,8 @@ internal static class DisplayHelpers
     /// string twice, reads like a copy-paste slip and invites being "fixed" into
     /// a single argument, which silently drops the inflection an inflecting
     /// language needs. This overload states that intent and takes only one
-    /// string, so it cannot be misused that way. Use it wherever singular and
-    /// plural would be the same resx key.
+    /// string, so it cannot be misused that way, and is the form every call
+    /// site whose singular and plural are the same resx key takes.
     /// </summary>
     internal static string Pluralise(int count, string flat, string keyPrefix) =>
         Pluralise(count, flat, flat, keyPrefix);

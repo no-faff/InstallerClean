@@ -10,11 +10,10 @@ namespace InstallerClean.Helpers;
 /// <c>LineBreak</c>, <c>Hyperlink</c>); the decisions about WHERE a sentence
 /// splits and WHAT the wrapped path looks like live here, in Core, so they can be
 /// exercised by a unit test with no UI thread. That is the point of the
-/// extraction: the shipped destination-wrap bug (a regular-string literal that
-/// inserted the six ordinary characters of a \u200B escape instead of one
-/// zero-width space, so a path read as D:\u200BBackup on screen) had no test that
-/// could have caught it, because the only copy of the logic sat inside a
-/// <c>Window</c> constructor.
+/// extraction: the shipped destination-wrap bug (<c>Replace("\\", "\\u200B")</c>,
+/// where escaping the backslash left the following six characters as ordinary
+/// text, so a path read as D:\u200BBackup on screen) sat in a <c>Window</c>'s
+/// code-behind, where no test without a UI thread could reach it.
 /// </summary>
 public static class CompositionParsing
 {
@@ -22,9 +21,9 @@ public static class CompositionParsing
     /// Inserts a zero-width space (U+200B) after every backslash so a long path
     /// wraps at a folder boundary (after <c>...\Installer\</c>, not inside a
     /// folder name) instead of overflowing the card. The zero-width space is
-    /// spelled with the C# unicode escape and never as a literal character: it is
-    /// invisible in an editor and tooling mangles it, which is exactly how the
-    /// original bug arose.
+    /// spelled with the C# unicode escape rather than a literal character, which
+    /// would be invisible in the editor and in a diff and is liable to be
+    /// flattened to a plain space by tooling.
     /// </summary>
     public static string InsertPathWrapPoints(string path) =>
         path.Replace("\\", "\\\u200B");

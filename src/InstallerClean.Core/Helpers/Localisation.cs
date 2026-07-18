@@ -41,7 +41,7 @@ public static class Localisation
     /// could call <see cref="Set"/> at all, because the override is process-
     /// global and every <c>Strings</c> lookup reads it, so one test pinning
     /// French would rewrite the expected strings of every test that ran after
-    /// it. That is why the explicit-language path went untested until now.
+    /// it.
     /// </summary>
     internal static void Reset()
     {

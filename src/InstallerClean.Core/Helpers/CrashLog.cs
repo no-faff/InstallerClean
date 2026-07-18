@@ -4,8 +4,10 @@ using InstallerClean.Resources;
 namespace InstallerClean.Helpers;
 
 /// <summary>
-/// Writes unhandled exceptions to a persistent log file so crashes can
-/// be diagnosed after the fact.
+/// Appends exceptions to a persistent log file so a failure can be
+/// diagnosed after the fact. The callers are the unhandled-exception
+/// handlers, catch blocks that recover and carry on, and paths that
+/// synthesise an exception purely to record a breadcrumb.
 /// </summary>
 public static class CrashLog
 {
@@ -56,10 +58,10 @@ public static class CrashLog
             // refresh writes from the dispatcher, and a CLI /s run (read-only,
             // so it skips the single-instance mutex by design) writes to this
             // same file from a second process. Opened for GENERIC_WRITE and
-            // seeked to the end, as this was, both writers resolve "the end" to
-            // the same offset and the second overwrites the first, and several
-            // code paths exist for no other purpose than to leave a breadcrumb
-            // in this file.
+            // seeked to the end instead, both writers would resolve "the end"
+            // to the same offset and the second would overwrite the first,
+            // losing an entry that several code paths exist for no other
+            // purpose than to write.
             //
             // Returns null if LogFile is a symlink; drop the entry rather than
             // append into the symlink's target.
@@ -87,8 +89,9 @@ public static class CrashLog
             fs.Seek(0, SeekOrigin.End);
 
             var entry = $"---- {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz} ----{Environment.NewLine}{ex}{Environment.NewLine}{Environment.NewLine}";
-            // The BOM goes in with the header, on the fresh file only, which is
-            // where the StreamWriter this replaced used to put it.
+            // The BOM goes in with the header, on a fresh file only: written
+            // again on an append it would sit in the log body as a stray
+            // U+FEFF.
             ReadOnlySpan<byte> bom = writeHeader ? Encoding.UTF8.GetPreamble() : default;
             byte[] payload = [.. bom, .. Encoding.UTF8.GetBytes(writeHeader ? PrivacyHeader + entry : entry)];
             fs.Write(payload, 0, payload.Length);
