@@ -711,6 +711,13 @@ public partial class MainWindow : Window
                 IsCheckable = true,
                 IsChecked = isActive,
             };
+            // A MenuItem takes its spoken name from a string Header, and the
+            // header above is a StackPanel, which leaves the item unnamed: a
+            // screen reader then has only the list position and the checked
+            // state to read out, never the language. An explicit
+            // AutomationProperties.Name is consulted ahead of any header
+            // fallback, so the endonym is spoken whatever the header holds.
+            AutomationProperties.SetName(item, endonym);
             // Close on invoke regardless of what the command does. Picking the
             // displayed language is a no-op command (no relaunch), and a
             // keyboard Enter on that ticked item does not dismiss the menu on
