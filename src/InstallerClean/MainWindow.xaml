@@ -765,17 +765,65 @@
                            RenderOptions.BitmapScalingMode="HighQuality"
                            Margin="{StaticResource GapBottom.Lg}"/>
 
-                    <!-- Heading -->
+                    <!-- Heading. Wraps rather than clipping: it is a translated
+                         sentence in fifteen languages inside a card of bounded
+                         width, and it used to run off both ends.
+
+                         Foreground is set through the Style, not as an
+                         attribute, because an attribute is a local value and a
+                         local value beats a trigger's setter: with the inline
+                         Foreground still there the warning colour would never
+                         paint, whatever HeadingIsWarning said. Green is the
+                         default; the warning amber is for the one outcome where
+                         nothing succeeded. -->
                     <TextBlock x:Name="CompletionHeadingText" Grid.Row="1" Text="{Binding Completion.Heading}"
-                               Foreground="{StaticResource Status.Success}" FontSize="{DynamicResource Type.Heading.Lg}" FontWeight="Bold"
-                               HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Sm}"
-                               AutomationProperties.LiveSetting="Polite"/>
+                               FontSize="{DynamicResource Type.Heading.Lg}" FontWeight="Bold"
+                               HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
+                               Margin="{StaticResource GapBottom.Sm}"
+                               AutomationProperties.LiveSetting="Polite">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{StaticResource Status.Success}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Completion.HeadingIsWarning}" Value="True">
+                                        <Setter Property="Foreground" Value="{StaticResource Status.Warning}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
 
                     <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled"
                                   Style="{StaticResource BodyScrollRegion}"
                                   AutomationProperties.Name="{loc:Translate Automation.Scroll.ResultDetails}">
                     <StackPanel>
+
+                    <!-- Failure count. Its own line, directly under the heading
+                         and above the summary, so the heading carries one
+                         message and the summary's destination path is never
+                         followed by an error count that reads as part of the
+                         folder name. Empty (and collapsed) on every run that
+                         failed at nothing, which is nearly all of them.
+                         LiveSetting because after the outcome itself this is
+                         the next thing a screen-reader user needs. -->
+                    <TextBlock x:Name="CompletionFailedCountText"
+                               Text="{Binding Completion.FailedCount}"
+                               Foreground="{StaticResource Status.Warning}" FontSize="{DynamicResource Type.Heading.Sm}"
+                               HorizontalAlignment="Center" TextAlignment="Center"
+                               TextWrapping="Wrap" Margin="{StaticResource GapBottom.Sm}"
+                               AutomationProperties.LiveSetting="Polite">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Completion.FailedCount}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
 
                     <!-- 6px bottom (off the 8/12/16/24 scale) tightens
                          the summary against the caption that follows
@@ -793,7 +841,27 @@
                                Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="0,0,0,6"
-                               AutomationProperties.LiveSetting="Polite"/>
+                               AutomationProperties.LiveSetting="Polite">
+                        <!-- Collapses when Summary is empty, which an operation
+                             that acted on no file at all leaves it: the summary
+                             would otherwise say files went somewhere none did.
+                             Without the trigger an empty TextBlock still holds
+                             its bottom margin and line height, so the daft line
+                             becomes a phantom gap, the same reason the restore
+                             and skipped blocks below carry one. The trigger
+                             reads Completion.Summary even though the visible
+                             inlines are composed in code-behind. -->
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Completion.Summary}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
 
                     <!-- Restore guidance. On a recycle-delete this leads with
                          Completion.SpaceHint ("Empty it to actually reclaim the
@@ -857,8 +925,14 @@
                         </TextBlock.Style>
                     </TextBlock>
 
-                    <!-- Error details (only visible when there are errors) -->
-                    <Border Margin="{StaticResource GapBottom.Xl}" MaxHeight="{a11y:TextScaled 80}">
+                    <!-- Error details (only visible when there are errors).
+                         160 rather than 80: at 80 the box showed about two
+                         lines, so a single group heading and one filename
+                         filled it and everything else was behind a scrollbar.
+                         It still scrolls internally and the card's own scroll
+                         region backs it up, so a hundred failures cannot push
+                         the buttons off screen. -->
+                    <Border Margin="{StaticResource GapBottom.Xl}" MaxHeight="{a11y:TextScaled 160}">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Visibility" Value="Visible"/>
