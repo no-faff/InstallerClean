@@ -637,8 +637,8 @@ InstallerClean はすでに管理者として実行されていたため、同�
        showing and the detail goes to crash.log. -->
   <data name="Error.AccessDenied.Singular" xml:space="preserve"><value>Windows がこのファイルへのアクセスを拒否しました。ファイルはそのままにしてあります。</value></data>
   <data name="Error.AccessDenied.Plural" xml:space="preserve"><value>Windows がこれらのファイルへのアクセスを拒否しました。ファイルはそのままにしてあります。</value></data>
-  <data name="Error.FileInUse.Singular" xml:space="preserve"><value>このファイルは別のプログラムによって開かれているか、ロックされています。そのため今は何をもってしても移動できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。</value></data>
-  <data name="Error.FileInUse.Plural" xml:space="preserve"><value>これらのファイルは別のプログラムによって開かれているか、ロックされています。そのため今は何をもってしても移動できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。</value></data>
+  <data name="Error.FileInUse.Singular" xml:space="preserve"><value>このファイルは別のプログラムによって開かれているか、ロックされています。そのため今はどうやっても移動できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。</value></data>
+  <data name="Error.FileInUse.Plural" xml:space="preserve"><value>これらのファイルは別のプログラムによって開かれているか、ロックされています。そのため今はどうやっても移動できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。</value></data>
   <data name="Error.IOFailure.Singular" xml:space="preserve"><value>Windows がファイルエラーを報告しました。ファイルはそのままにしてあります。</value></data>
   <data name="Error.IOFailure.Plural" xml:space="preserve"><value>Windows がファイルエラーを報告しました。これらのファイルはそのままにしてあります。</value></data>
   <data name="Error.UnknownError.Singular" xml:space="preserve"><value>このファイルで何らかの問題が発生しました。ファイルはそのままにしてあります。</value></data>
@@ -658,7 +658,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        bin demonstrably worked and Move is worth offering. Do not level them. -->
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>このファイルをごみ箱に移動できませんでした (エラー{0})。そのコードからは、InstallerClean が理由をお伝えすることはできません。ファイルはそのままにしてあります。代わりに「移動」ボタンをお試しください。「移動」はごみ箱を使いません。</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>管理者権限があっても Windows がアクセスを拒否しました (エラー{0})。InstallerClean には、問題がファイルにあるのかごみ箱にあるのかを判別できません。ファイルはそのままにしてあります。問題がごみ箱であれば「移動」ボタンで対処できますが、問題がファイル自体であれば対処できません。</value></data>
-  <data name="Error.RecycleInUse" xml:space="preserve"><value>このファイルは別のプログラムによって開かれているか、ロックされています (エラー{0})。そのため今は何をもってしても削除できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。</value></data>
+  <data name="Error.RecycleInUse" xml:space="preserve"><value>このファイルは別のプログラムによって開かれているか、ロックされています (エラー{0})。そのため今はどうやっても削除できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。</value></data>
   <!-- Shown only when the user did NOT consent to permanent deletion: with
        consent the file counts as deleted and never reaches the errors list
        (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
