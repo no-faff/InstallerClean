@@ -637,7 +637,17 @@ Details in {1}.</value></data>
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Diese Datei konnte nicht in den Papierkorb verschoben werden (Fehler {0}), und InstallerClean kann dir anhand dieses Codes nicht sagen, warum. Die Datei wurde an ihrem Platz belassen. Versuch stattdessen die Schaltfläche „Verschieben“, die den Papierkorb nicht benutzt.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows hat den Zugriff selbst mit Administratorrechten verweigert (Fehler {0}), und InstallerClean kann nicht erkennen, ob das Problem bei der Datei oder beim Papierkorb liegt. Die Datei wurde an ihrem Platz belassen. Die Schaltfläche „Verschieben“ hilft, wenn es am Papierkorb liegt, aber nicht, wenn es an der Datei liegt.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>Diese Datei ist von einem anderen Programm geöffnet oder gesperrt (Fehler {0}), deshalb kann sie im Moment von nichts entfernt werden. Sie wurde an ihrem Platz belassen; versuch es später noch einmal.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Die Datei wurde endgültig gelöscht, weil sie nicht in den Papierkorb verschoben werden konnte.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows hat diese Datei endgültig gelöscht, statt sie in den Papierkorb zu verschieben. InstallerClean hatte den Papierkorb angefordert, Windows hat es anders gemacht. Die Datei ist weg.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Das Verschieben von Dateien in den Windows-Installer-Ordner wird abgelehnt (Ziel: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

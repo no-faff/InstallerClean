@@ -637,7 +637,17 @@ InstallerClean はすでに管理者として実行されていたため、同�
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>このファイルをごみ箱に移動できませんでした (エラー{0})。そのコードからは、InstallerClean が理由をお伝えすることはできません。ファイルはそのままにしてあります。代わりに「移動」ボタンをお試しください。「移動」はごみ箱を使いません。</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>管理者権限があっても Windows がアクセスを拒否しました (エラー{0})。InstallerClean には、問題がファイルにあるのかごみ箱にあるのかを判別できません。ファイルはそのままにしてあります。問題がごみ箱であれば「移動」ボタンで対処できますが、問題がファイル自体であれば対処できません。</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>このファイルは別のプログラムによって開かれているか、ロックされています (エラー{0})。そのため今は何をもってしても削除できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>ごみ箱に移動できなかったため、ファイルは完全に削除されました。</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows はこのファイルをごみ箱に移動せず、完全に削除しました。InstallerClean はごみ箱への移動を要求しましたが、Windows は代わりにこの処理を行いました。ファイルは失われました。</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Windows Installerフォルダー内へのファイル移動を拒否します (移動先：{0})。</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

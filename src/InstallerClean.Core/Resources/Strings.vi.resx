@@ -637,7 +637,17 @@ Chi tiết trong {1}.</value></data>
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Không thể chuyển tệp này vào Thùng rác (lỗi {0}), và từ mã đó InstallerClean không thể cho bạn biết lý do. Tệp được giữ nguyên tại chỗ. Hãy thử nút Chuyển, vì nút đó không dùng Thùng rác.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows đã từ chối truy cập ngay cả với quyền quản trị viên (lỗi {0}), và InstallerClean không thể biết vấn đề nằm ở tệp hay ở Thùng rác. Tệp được giữ nguyên tại chỗ. Nút Chuyển sẽ dùng được nếu vấn đề là Thùng rác, nhưng không dùng được nếu vấn đề là chính tệp đó.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>Tệp này đang được mở hoặc bị khóa bởi một chương trình khác (lỗi {0}), nên hiện không gì có thể xóa nó. Tệp được giữ nguyên tại chỗ; hãy thử lại sau.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Tệp đã bị xóa vĩnh viễn vì không thể di chuyển vào Thùng rác.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows đã xóa thẳng tệp này thay vì chuyển nó vào Thùng rác. InstallerClean đã yêu cầu Thùng rác, còn Windows thì làm khác. Tệp không còn nữa.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Từ chối chuyển tệp vào thư mục Windows Installer (đích: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

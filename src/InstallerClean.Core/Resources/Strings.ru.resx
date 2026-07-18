@@ -637,7 +637,17 @@ InstallerClean уже был запущен от имени администра
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Не удалось переместить этот файл в Корзину (ошибка {0}), и по этому коду InstallerClean не может сказать почему. Файл оставлен на месте. Попробуйте вместо этого кнопку «Переместить», которая не использует Корзину.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows отказал в доступе даже с правами администратора (ошибка {0}), и InstallerClean не может определить, в чём дело — в файле или в Корзине. Файл оставлен на месте. Кнопка «Переместить» поможет, если дело в Корзине, но не поможет, если дело в файле.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>Этот файл открыт или заблокирован другой программой (ошибка {0}), поэтому сейчас его ничто не может удалить. Он оставлен на месте; повторите попытку позже.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Файл был удалён безвозвратно, потому что его не удалось переместить в Корзину.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows удалил этот файл сразу и безвозвратно, вместо того чтобы переместить его в Корзину. InstallerClean запросил Корзину, а Windows поступил иначе. Файла больше нет.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Перемещение файлов в папку Windows Installer отклонено (назначение: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

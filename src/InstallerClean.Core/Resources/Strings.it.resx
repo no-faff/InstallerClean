@@ -637,7 +637,17 @@ Dettagli in {1}.</value></data>
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Impossibile spostare questo file nel Cestino (errore {0}), e da quel codice InstallerClean non può dirti perché. Il file è stato lasciato al suo posto. Prova invece il pulsante Sposta, che non usa il Cestino.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows ha negato l'accesso anche con i diritti di amministratore (errore {0}), e InstallerClean non può stabilire se il problema sia il file o il Cestino. Il file è stato lasciato al suo posto. Il pulsante Sposta funziona se il problema è il Cestino, ma non se è il file.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>Questo file è aperto o bloccato da un altro programma (errore {0}), quindi al momento nulla può rimuoverlo. È stato lasciato al suo posto; riprova più tardi.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Il file è stato eliminato definitivamente perché non è stato possibile spostarlo nel Cestino.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows ha eliminato definitivamente questo file invece di spostarlo nel Cestino. InstallerClean aveva chiesto il Cestino, e Windows ha fatto altrimenti. Il file non c'è più.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Spostamento dei file nella cartella di Windows Installer rifiutato (destinazione: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

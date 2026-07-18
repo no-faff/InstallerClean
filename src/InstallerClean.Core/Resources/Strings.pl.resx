@@ -637,7 +637,17 @@ Szczegóły w {1}.</value></data>
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Nie udało się przenieść tego pliku do Kosza (błąd {0}), a na podstawie tego kodu InstallerClean nie potrafi powiedzieć dlaczego. Plik został pozostawiony na miejscu. Spróbuj zamiast tego przycisku Przenieś, który nie korzysta z Kosza.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows odmówił dostępu nawet z uprawnieniami administratora (błąd {0}), a InstallerClean nie potrafi stwierdzić, czy problemem jest plik, czy Kosz. Plik został pozostawiony na miejscu. Przycisk Przenieś zadziała, jeśli problemem jest Kosz, ale nie wtedy, gdy jest nim plik.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>Ten plik jest otwarty lub zablokowany przez inny program (błąd {0}), więc nic nie może go teraz usunąć. Został pozostawiony na miejscu; spróbuj ponownie później.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Plik został usunięty trwale, ponieważ nie udało się przenieść go do Kosza.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows usunął ten plik trwale, zamiast przenieść go do Kosza. InstallerClean poprosił o Kosz, a Windows zrobił co innego. Pliku już nie ma.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Odmowa przeniesienia plików do folderu Windows Installer (cel: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

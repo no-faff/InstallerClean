@@ -637,7 +637,17 @@ InstallerClean уже працював від імені адміністрат�
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Не вдалося перемістити цей файл до Кошика (помилка {0}), і за цим кодом InstallerClean не може сказати чому. Файл залишено на місці. Спробуйте натомість кнопку «Перемістити», яка не використовує Кошик.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows відмовив у доступі навіть із правами адміністратора (помилка {0}), і InstallerClean не може визначити, у чому річ — у файлі чи в Кошику. Файл залишено на місці. Кнопка «Перемістити» допоможе, якщо річ у Кошику, але не допоможе, якщо річ у файлі.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>Цей файл відкритий або заблокований іншою програмою (помилка {0}), тож зараз його ніщо не може видалити. Його залишено на місці; спробуйте ще раз пізніше.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Файл видалено безповоротно, бо його не вдалося перемістити до Кошика.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows видалив цей файл безповоротно, а не перемістив його до Кошика. InstallerClean попросив Кошик, а Windows вчинив інакше. Файла більше немає.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Відмова перемістити файли до папки Windows Installer (призначення: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

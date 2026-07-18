@@ -637,7 +637,17 @@ Detalles en {1}.</value></data>
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>No se pudo mover este archivo a la Papelera de reciclaje (error {0}), y con ese código InstallerClean no puede decirte por qué. El archivo se dejó donde estaba. Prueba el botón Mover, que no usa la Papelera de reciclaje.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows denegó el acceso incluso con permisos de administrador (error {0}), e InstallerClean no puede saber si el problema es el archivo o la Papelera de reciclaje. El archivo se dejó donde estaba. El botón Mover funcionará si el problema es la Papelera de reciclaje, pero no si es el archivo.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>Este archivo está abierto o bloqueado por otro programa (error {0}), así que ahora mismo nada puede quitarlo. Se dejó donde estaba; inténtalo más tarde.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>El archivo se eliminó definitivamente porque no se pudo mover a la Papelera de reciclaje.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows eliminó este archivo directamente en lugar de moverlo a la Papelera de reciclaje. InstallerClean pidió la Papelera de reciclaje y Windows hizo otra cosa. El archivo ya no está.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Se rechaza mover archivos a la carpeta de Windows Installer (destino: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

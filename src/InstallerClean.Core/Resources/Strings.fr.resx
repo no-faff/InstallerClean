@@ -637,7 +637,17 @@ Détails dans {1}.</value></data>
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Impossible de déplacer ce fichier vers la Corbeille (erreur {0}), et ce code ne permet pas à InstallerClean de vous dire pourquoi. Le fichier a été laissé en place. Essayez plutôt le bouton Déplacer, qui n'utilise pas la Corbeille.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows a refusé l'accès même avec des droits d'administrateur (erreur {0}), et InstallerClean ne peut pas déterminer si le problème vient du fichier ou de la Corbeille. Le fichier a été laissé en place. Le bouton Déplacer fonctionnera si le problème vient de la Corbeille, mais pas s'il vient du fichier.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>Ce fichier est ouvert ou verrouillé par un autre programme (erreur {0}), donc rien ne peut le supprimer pour l'instant. Il a été laissé en place ; réessayez plus tard.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Le fichier a été supprimé définitivement parce qu'il n'a pas pu être déplacé vers la Corbeille.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows a supprimé ce fichier purement et simplement au lieu de le déplacer vers la Corbeille. InstallerClean avait demandé la Corbeille, et Windows a fait autrement. Le fichier n'existe plus.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Refus de déplacer des fichiers dans le dossier Windows Installer (destination : {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

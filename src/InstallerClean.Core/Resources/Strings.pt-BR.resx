@@ -637,7 +637,17 @@ Detalhes em {1}.</value></data>
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Não foi possível mover este arquivo para a Lixeira (erro {0}), e por esse código o InstallerClean não tem como dizer o motivo. O arquivo foi deixado onde estava. Tente o botão Mover, que não usa a Lixeira.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>O Windows negou o acesso mesmo com direitos de administrador (erro {0}), e o InstallerClean não tem como saber se o problema é o arquivo ou a Lixeira. O arquivo foi deixado onde estava. O botão Mover vai funcionar se o problema for a Lixeira, mas não se for o arquivo.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>Este arquivo está aberto ou bloqueado por outro programa (erro {0}), então nada consegue removê-lo agora. Ele foi deixado onde estava; tente de novo mais tarde.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>O arquivo foi excluído permanentemente porque não foi possível movê-lo para a Lixeira.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>O Windows excluiu este arquivo de vez, em vez de movê-lo para a Lixeira. O InstallerClean pediu a Lixeira, e o Windows fez diferente. O arquivo se foi.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Recusando mover arquivos para a pasta do Windows Installer (destino: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

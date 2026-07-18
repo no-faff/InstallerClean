@@ -637,7 +637,17 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>이 파일을 휴지통으로 이동할 수 없습니다(오류 {0}). 그 코드만으로는 InstallerClean이 이유를 알려 드릴 수 없습니다. 파일은 그대로 두었습니다. 대신 이동 버튼을 사용해 보세요. 이동은 휴지통을 쓰지 않습니다.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>관리자 권한으로도 Windows가 접근을 거부했습니다(오류 {0}). InstallerClean은 문제가 파일에 있는지 휴지통에 있는지 구분할 수 없습니다. 파일은 그대로 두었습니다. 문제가 휴지통이라면 이동 버튼이 통하지만, 문제가 파일이라면 통하지 않습니다.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다(오류 {0}). 그래서 지금은 무엇으로도 제거할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도해 보세요.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>이 파일을 휴지통으로 이동할 수 없어 영구 삭제되었습니다.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows가 이 파일을 휴지통으로 옮기지 않고 곧바로 삭제했습니다. InstallerClean은 휴지통으로 보내 달라고 요청했지만, Windows가 대신 이렇게 처리했습니다. 파일은 사라졌습니다.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>파일을 Windows Installer 폴더로 이동하는 것을 거부합니다(대상: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

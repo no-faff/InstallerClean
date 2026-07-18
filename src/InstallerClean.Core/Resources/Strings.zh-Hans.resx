@@ -637,7 +637,17 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>无法将此文件移到回收站（错误 {0}），而且仅凭这个代码，InstallerClean 无法告诉你原因。该文件已留在原处。请改用“移动”按钮，它不使用回收站。</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>即使拥有管理员权限，Windows 仍拒绝了访问（错误 {0}），而且 InstallerClean 无法判断问题出在文件上还是回收站上。该文件已留在原处。如果问题出在回收站，“移动”按钮可以奏效；如果问题出在文件本身，则不行。</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>此文件正被另一个程序打开或锁定（错误 {0}），因此目前没有任何方式能移除它。该文件已留在原处；请稍后再试。</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>由于无法将该文件移到回收站，它已被永久删除。</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows 没有把此文件移到回收站，而是直接将其永久删除。InstallerClean 请求的是回收站，Windows 却没有照做。该文件已经没有了。</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>拒绝将文件移动到 Windows Installer 文件夹（目标：{0}）。</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

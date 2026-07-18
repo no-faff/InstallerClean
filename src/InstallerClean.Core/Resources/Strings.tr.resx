@@ -637,7 +637,17 @@ Ayrıntılar {1} içinde.</value></data>
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Bu dosya Geri Dönüşüm Kutusu'na taşınamadı (hata {0}) ve InstallerClean bu koda bakarak size nedenini söyleyemiyor. Dosya yerinde bırakıldı. Bunun yerine Taşı düğmesini deneyin, çünkü o Geri Dönüşüm Kutusu'nu kullanmıyor.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows yönetici haklarıyla bile erişimi reddetti (hata {0}) ve InstallerClean sorunun dosyada mı yoksa Geri Dönüşüm Kutusu'nda mı olduğunu ayırt edemiyor. Dosya yerinde bırakıldı. Sorun Geri Dönüşüm Kutusu'ndaysa Taşı düğmesi işe yarar, ama sorun dosyadaysa yaramaz.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>Bu dosya başka bir program tarafından açık ya da kilitli (hata {0}), bu yüzden şu anda onu hiçbir şey kaldıramaz. Dosya yerinde bırakıldı; daha sonra yeniden deneyin.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Geri Dönüşüm Kutusu'na taşınamadığı için dosya kalıcı olarak silindi.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows bu dosyayı Geri Dönüşüm Kutusu'na taşımak yerine doğrudan sildi. InstallerClean Geri Dönüşüm Kutusu'nu istedi, Windows ise farklı davrandı. Dosya gitti.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Dosyaların Windows Installer klasörüne taşınması reddediliyor (hedef: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a

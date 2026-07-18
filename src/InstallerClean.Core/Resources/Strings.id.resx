@@ -637,7 +637,17 @@ Detail di {1}.</value></data>
   <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Tidak bisa memindahkan file ini ke Keranjang Sampah (kesalahan {0}), dan dari kode itu InstallerClean tidak bisa memberi tahu Anda alasannya. File dibiarkan di tempatnya. Coba tombol Pindahkan saja, karena tombol itu tidak memakai Keranjang Sampah.</value></data>
   <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows menolak akses bahkan dengan hak administrator (kesalahan {0}), dan InstallerClean tidak bisa memastikan apakah masalahnya ada pada file atau pada Keranjang Sampah. File dibiarkan di tempatnya. Tombol Pindahkan akan berhasil jika masalahnya Keranjang Sampah, tetapi tidak jika masalahnya file itu sendiri.</value></data>
   <data name="Error.RecycleInUse" xml:space="preserve"><value>File ini sedang dibuka atau dikunci oleh program lain (kesalahan {0}), jadi saat ini tidak ada yang bisa menghapusnya. File dibiarkan di tempatnya; coba lagi nanti.</value></data>
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>File dihapus permanen karena tidak bisa dipindahkan ke Keranjang Sampah.</value></data>
+  <!-- Shown only when the user did NOT consent to permanent deletion: with
+       consent the file counts as deleted and never reaches the errors list
+       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
+       never agreed to lose the file, which is why the sentence does not
+       soften. It names Windows as the actor because the app asked the shell
+       to recycle and the shell reported success while psiNewlyCreated came
+       back null, meaning nothing arrived in the bin. No cause is offered: the
+       likely one is the bin's per-drive size limit, but the code cannot tell
+       whether that was it in any given case, and a guessed reason after the
+       file is gone gives the reader nothing to act on. -->
+  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows menghapus file ini secara permanen alih-alih memindahkannya ke Keranjang Sampah. InstallerClean meminta Keranjang Sampah, dan Windows justru melakukan ini. File itu sudah hilang.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Menolak memindahkan file ke dalam folder Windows Installer (tujuan: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a
