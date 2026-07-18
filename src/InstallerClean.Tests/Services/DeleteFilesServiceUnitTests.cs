@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
@@ -212,6 +213,65 @@ public class DeleteFilesServiceUnitTests
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<CandidateOutsideCache>(Assert.Single(result.Errors));
         engine.DidNotReceive().RecycleFile(outside);
+    }
+
+    /// <summary>
+    /// A filesystem reporting exactly one path as existing. See the twin in
+    /// <see cref="MoveFilesServiceUnitTests"/>: the reparse and containment
+    /// gates consult the REAL filesystem whatever is injected, so reaching them
+    /// means handing the service a source string the real filesystem cannot
+    /// hold, which MockFileSystem will not store.
+    /// </summary>
+    private static IFileSystem FileSystemReporting(string source)
+    {
+        var fs = Substitute.For<IFileSystem>();
+        fs.Path.Returns(new MockFileSystem().Path);
+        fs.Directory.Returns(Substitute.For<IDirectory>());
+        var file = Substitute.For<IFile>();
+        fs.File.Returns(file);
+        file.Exists(Arg.Any<string>()).Returns(ci => (string?)ci[0] == source);
+        return fs;
+    }
+
+    [Fact]
+    public async Task Refuses_a_source_whose_attributes_cannot_be_read()
+    {
+        // An embedded null makes File.GetAttributes throw ArgumentException on
+        // every platform and every version: the "the read failed" arm, which
+        // used to answer "not a reparse point" and let the file through to the
+        // recycle call.
+        var source = $"{Dir}\\unreadable\0.msi";
+        var (_, engine) = Setup();
+
+        var svc = new DeleteFilesService(FileSystemReporting(source), engine);
+        var result = await svc.DeleteFilesAsync(new[] { source }, permitPermanentDelete: true);
+
+        // UnknownError, NOT SourceIsReparsePoint: a read that could not be made
+        // has not shown the file is a symlink.
+        Assert.IsType<UnknownError>(Assert.Single(result.Errors));
+        Assert.Equal(0, result.DeletedCount);
+        engine.DidNotReceive().RecycleFile(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task Refuses_a_source_it_cannot_resolve()
+    {
+        // A path on a drive letter nothing is mounted on: no existing ancestor
+        // to open, so where the path really leads was never established and the
+        // file is refused rather than recycled on the strength of its spelling.
+        var unmounted = TestHost.FirstUnmountedDriveLetter();
+        if (unmounted is null)
+            return; // every letter is in use on this host; nothing to pose the question with
+
+        var source = $@"{unmounted}:\Windows\Installer\unresolvable.msi";
+        var (_, engine) = Setup();
+
+        var svc = new DeleteFilesService(FileSystemReporting(source), engine);
+        var result = await svc.DeleteFilesAsync(new[] { source }, permitPermanentDelete: true);
+
+        Assert.IsType<UnknownError>(Assert.Single(result.Errors));
+        Assert.Equal(0, result.DeletedCount);
+        engine.DidNotReceive().RecycleFile(Arg.Any<string>());
     }
 
     [Fact]

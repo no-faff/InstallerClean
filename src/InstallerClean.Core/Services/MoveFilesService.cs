@@ -152,10 +152,20 @@ public sealed class MoveFilesService : IMoveFilesService
                     // Refuse a source that's a symlink or junction:
                     // moving the symlink would pull an OS file out of
                     // System32. Real-FS check (MockFileSystem cannot
-                    // bypass).
-                    if (Helpers.StorageHelpers.IsReparsePoint(sourcePath))
+                    // bypass). An attribute read that FAILS refuses the file
+                    // too, but as UnknownError: SourceIsReparsePoint tells the
+                    // user the file is a symlink, and a read that could not be
+                    // made has not shown that.
+                    var reparse = Helpers.StorageHelpers.CheckReparsePoint(sourcePath, out var reparseError);
+                    if (reparse == Helpers.StorageHelpers.ReparseCheck.Yes)
                     {
                         errors.Add(new SourceIsReparsePoint(sourcePath));
+                        continue;
+                    }
+                    if (reparse == Helpers.StorageHelpers.ReparseCheck.Unreadable)
+                    {
+                        failureLog.Record(reparseError!);
+                        errors.Add(new UnknownError(sourcePath));
                         continue;
                     }
 
@@ -165,11 +175,21 @@ public sealed class MoveFilesService : IMoveFilesService
                     // already filters candidates, but a corrupt LocalPackage
                     // value or a future caller could reach here with an
                     // out-of-bounds path; this is the choke point that refuses
-                    // it. Reparse is handled just above, so a failure here is an
-                    // out-of-bounds path.
-                    if (!CandidateGuard.IsSafeToRemove(sourcePath, _installerFolderOverride))
+                    // it. Reparse is handled just above, so a Refused here is an
+                    // out-of-bounds path and CandidateOutsideCache says so; an
+                    // Unproven one is a path that could not be resolved at all,
+                    // which is the same refusal without the same claim.
+                    var safety = CandidateGuard.CheckSafeToRemove(sourcePath, _installerFolderOverride);
+                    if (safety == CandidateGuard.RemovalSafety.Refused)
                     {
                         errors.Add(new CandidateOutsideCache(sourcePath));
+                        continue;
+                    }
+                    if (safety == CandidateGuard.RemovalSafety.Unproven)
+                    {
+                        failureLog.Record(new InvalidOperationException(
+                            $"Move refused: {sourcePath} could not be resolved, so it could not be shown to be inside the Installer cache."));
+                        errors.Add(new UnknownError(sourcePath));
                         continue;
                     }
 

@@ -285,6 +285,68 @@ public class MoveFilesServiceUnitTests
         return fs;
     }
 
+    /// <summary>
+    /// A filesystem reporting exactly one path as existing, with nothing wired
+    /// to fail. Lets a test hand the service a source string the real
+    /// filesystem could never hold, which is the only way to reach the two
+    /// gates below: both deliberately consult the REAL filesystem whatever is
+    /// injected, so a MockFileSystem entry cannot pose them a question.
+    /// </summary>
+    private static (IFileSystem Fs, IFile File) FileSystemReporting(string source)
+    {
+        var fs = Substitute.For<IFileSystem>();
+        fs.Path.Returns(new MockFileSystem().Path);
+        fs.Directory.Returns(Substitute.For<IDirectory>());
+        var file = Substitute.For<IFile>();
+        fs.File.Returns(file);
+        file.Exists(Arg.Any<string>()).Returns(ci => (string?)ci[0] == source);
+        return (fs, file);
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_refuses_a_source_whose_attributes_cannot_be_read()
+    {
+        // An embedded null makes File.GetAttributes throw ArgumentException on
+        // every platform and every version, which is the "the read failed" arm.
+        // It used to answer "not a reparse point" and let the file through.
+        var source = $"{SourceDir}\\unreadable\0.msi";
+        var (fs, file) = FileSystemReporting(source);
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        // UnknownError, NOT SourceIsReparsePoint: that entry tells the user the
+        // file IS a symlink, which a read that could not be made has not shown.
+        Assert.IsType<UnknownError>(Assert.Single(result.Errors));
+        Assert.Equal(0, result.MovedCount);
+        file.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_refuses_a_source_it_cannot_resolve()
+    {
+        // A path on a drive letter nothing is mounted on: the resolver finds no
+        // existing ancestor to open, so nothing about where the path really
+        // leads was ever established and the file is refused rather than moved
+        // on the strength of how its name is spelled.
+        var unmounted = Helpers.TestHost.FirstUnmountedDriveLetter();
+        if (unmounted is null)
+            return; // every letter is in use on this host; nothing to pose the question with
+
+        var source = $@"{unmounted}:\Windows\Installer\unresolvable.msi";
+        var (fs, file) = FileSystemReporting(source);
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        // UnknownError rather than CandidateOutsideCache, for the same reason
+        // as the test above: the check did not place the file anywhere, so the
+        // report must not say where it is.
+        Assert.IsType<UnknownError>(Assert.Single(result.Errors));
+        Assert.Equal(0, result.MovedCount);
+        file.DidNotReceive().Move(Arg.Any<string>(), Arg.Any<string>());
+    }
+
     [Theory]
     [InlineData(0x80070020)] // ERROR_SHARING_VIOLATION
     [InlineData(0x80070021)] // ERROR_LOCK_VIOLATION

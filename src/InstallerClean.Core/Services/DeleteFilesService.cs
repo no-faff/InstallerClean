@@ -114,20 +114,40 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     // a shell recycle of a symlink removes the link, so following
                     // one out of the cache is refused. Real-FS check
                     // (MockFileSystem cannot bypass). Reparse first, then the
-                    // containment check, so a symlink is reported as one.
-                    if (Helpers.StorageHelpers.IsReparsePoint(filePath))
+                    // containment check, so a symlink is reported as one. An
+                    // attribute read that FAILS refuses the file as UnknownError
+                    // rather than as a symlink, which it has not been shown to be.
+                    var reparse = Helpers.StorageHelpers.CheckReparsePoint(filePath, out var reparseError);
+                    if (reparse == Helpers.StorageHelpers.ReparseCheck.Yes)
                     {
                         errors.Add(new SourceIsReparsePoint(filePath));
+                        continue;
+                    }
+                    if (reparse == Helpers.StorageHelpers.ReparseCheck.Unreadable)
+                    {
+                        failureLog.Record(reparseError!);
+                        errors.Add(new UnknownError(filePath));
                         continue;
                     }
 
                     // Containment guard at the service boundary: never recycle a
                     // file that does not resolve inside C:\Windows\Installer, even
                     // if a corrupt candidate reached here. This is the source-side
-                    // choke point the destination has always had.
-                    if (!CandidateGuard.IsSafeToRemove(filePath, _installerFolderOverride))
+                    // choke point the destination has always had. A path that
+                    // could not be resolved at all is refused the same way and
+                    // reported without the out-of-bounds claim; see the matching
+                    // block in MoveFilesService.
+                    var safety = CandidateGuard.CheckSafeToRemove(filePath, _installerFolderOverride);
+                    if (safety == CandidateGuard.RemovalSafety.Refused)
                     {
                         errors.Add(new CandidateOutsideCache(filePath));
+                        continue;
+                    }
+                    if (safety == CandidateGuard.RemovalSafety.Unproven)
+                    {
+                        failureLog.Record(new InvalidOperationException(
+                            $"Delete refused: {filePath} could not be resolved, so it could not be shown to be inside the Installer cache."));
+                        errors.Add(new UnknownError(filePath));
                         continue;
                     }
 
