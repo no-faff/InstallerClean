@@ -111,11 +111,17 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // Containment guard at candidate creation. A walk file is normally
             // in-bounds (it came out of the folder root), but assert it, so a
             // reparse point that slipped the enumeration filter is dropped rather
-            // than offered. A refused candidate is logged and skipped.
-            if (!CandidateGuard.IsSafeToRemove(filePath, _installerFolderOverride))
+            // than offered. A refused candidate is logged and skipped; an
+            // unproven one is kept off the list under words that do not claim
+            // more than the check showed, and a transient read failure
+            // self-heals on the next scan.
+            var walkSafety = CandidateGuard.CheckSafeToRemove(filePath, _installerFolderOverride);
+            if (walkSafety != CandidateGuard.RemovalSafety.Safe)
             {
                 CrashLog.Write(new InvalidOperationException(
-                    $"Removal candidate refused (outside the Installer cache or a reparse point): {filePath}"));
+                    walkSafety == CandidateGuard.RemovalSafety.Refused
+                        ? $"Removal candidate refused (outside the Installer cache or a reparse point): {filePath}"
+                        : $"Removal candidate not offered (its symlink status or location could not be read): {filePath}"));
                 continue;
             }
 
@@ -186,8 +192,13 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 // API or registry LocalPackage value, which a corrupt
                 // registration could point anywhere on disk. Drop one that does
                 // not resolve inside the cache (or is a reparse point) rather
-                // than offer it; a genuine cache patch always passes.
-                if (exists && CandidateGuard.IsSafeToRemove(pkg.LocalPackagePath, _installerFolderOverride))
+                // than offer it; a genuine cache patch always passes. An
+                // unproven answer drops it too, logged under words that do not
+                // claim more than the check showed.
+                var patchSafety = exists
+                    ? CandidateGuard.CheckSafeToRemove(pkg.LocalPackagePath, _installerFolderOverride)
+                    : CandidateGuard.RemovalSafety.Refused;
+                if (exists && patchSafety == CandidateGuard.RemovalSafety.Safe)
                 {
                     var ext = _fs.Path.GetExtension(pkg.LocalPackagePath);
                     // PatchState 2 = superseded by a newer patch.
@@ -211,7 +222,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     // In-bounds check failed on an existing removable file: drop
                     // it (do not offer, do not count as missing) and log.
                     CrashLog.Write(new InvalidOperationException(
-                        $"Removable-patch candidate refused (outside the Installer cache or a reparse point): {pkg.LocalPackagePath}"));
+                        patchSafety == CandidateGuard.RemovalSafety.Refused
+                            ? $"Removable-patch candidate refused (outside the Installer cache or a reparse point): {pkg.LocalPackagePath}"
+                            : $"Removable-patch candidate not offered (its symlink status or location could not be read): {pkg.LocalPackagePath}"));
                 }
                 else
                 {

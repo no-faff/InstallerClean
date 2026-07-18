@@ -74,12 +74,4 @@ internal static class CandidateGuard
             : RemovalSafety.Refused;
     }
 
-    /// <summary>
-    /// True only if <paramref name="path"/> resolves inside the Installer cache
-    /// folder and is not a symlink or junction. Anything else, established or
-    /// not, is false: a caller taking this form has no different action to take
-    /// for the two, and the safe answer for both is to leave the file alone.
-    /// </summary>
-    internal static bool IsSafeToRemove(string path, string? installerFolderRoot = null) =>
-        CheckSafeToRemove(path, installerFolderRoot) == RemovalSafety.Safe;
 }
