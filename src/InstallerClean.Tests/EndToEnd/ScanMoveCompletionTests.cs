@@ -269,16 +269,24 @@ public class ScanMoveCompletionTests
 
         Assert.True(vm.Completion.IsComplete);
 
-        // The breakdown groups by category: a header line
-        // ("File no longer exists. (2)") followed by indented filenames.
-        // Verify the structural ordering, not just substring presence,
-        // so a regression where one of the files lands in a different
-        // bucket (e.g. IOFailure) would be caught.
+        // The count line replaces the old "(2)" bracket on the group header:
+        // 2 failed of the 3 the batch attempted (1 moved + 2 errors).
+        Assert.Equal(
+            string.Format(InstallerClean.Resources.Strings.Completion_FailedCount_Plural, 2, 3),
+            vm.Completion.FailedCount);
+
+        // The breakdown groups by category: a header sentence once per
+        // bucket, then each filename on its own "  - " line. Verify the
+        // structural ordering, not just substring presence, so a regression
+        // where one of the files lands in a different bucket (e.g.
+        // IOFailure) would be caught.
         var lines = vm.Completion.Errors.Split('\n').Select(l => l.TrimEnd('\r')).ToArray();
-        var headerIndex = Array.FindIndex(lines, l => l.Contains("(2)"));
-        Assert.True(headerIndex >= 0, "expected a category header with count (2)");
+        var headerIndex = Array.FindIndex(lines,
+            l => l == InstallerClean.Resources.Strings.Error_MissingSourceFile);
+        Assert.True(headerIndex >= 0, "expected the missing-file group heading");
         var followingFilenames = lines.Skip(headerIndex + 1).Take(2).ToArray();
         Assert.Equal(2, followingFilenames.Length);
+        Assert.All(followingFilenames, l => Assert.StartsWith("  - ", l));
         Assert.Contains("b.msi", followingFilenames[0] + followingFilenames[1]);
         Assert.Contains("c.msi", followingFilenames[0] + followingFilenames[1]);
     }
