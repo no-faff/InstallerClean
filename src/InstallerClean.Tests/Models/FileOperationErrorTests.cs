@@ -55,4 +55,21 @@ public class FileOperationErrorTests
 
         Assert.Equal(string.Format(Strings.Error_ShellRecycleFailed, "0x80270000"), err.LocalisedMessage);
     }
+
+    [Fact]
+    public void PermanentlyDeleted_is_category_only_with_no_path_or_code()
+    {
+        // The shell nuked a file it was asked to recycle while reporting
+        // success throughout, so the HResult this carries is a SUCCESS code
+        // held for telemetry. It stays out of the sentence, where it would
+        // read as a failure code with nothing to look up, and so does the
+        // path, which in an elevated run can name another user's profile.
+        var err = new PermanentlyDeleted(@"C:\Windows\Installer\x.msi", 0);
+
+        Assert.Equal(Strings.Error_DeletedNotRecycled, err.LocalisedMessage);
+        Assert.DoesNotContain("x.msi", err.LocalisedMessage);
+        // No placeholder: nothing formats this one, so an added {0} would
+        // reach the user literally.
+        Assert.DoesNotContain("{0}", err.LocalisedMessage);
+    }
 }
