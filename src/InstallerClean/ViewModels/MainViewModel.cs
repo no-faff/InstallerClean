@@ -164,38 +164,49 @@ public partial class MainViewModel : ObservableObject, IDisposable
     ///
     /// The failed state takes precedence over not-yet-scanned, because a failed
     /// scan leaves <see cref="ScanViewModel.HasScanned"/> false too but must say
-    /// what went wrong rather than "nothing scanned yet". The all-clear line used
-    /// to read "The unneeded files below are safe to delete" directly above "0
-    /// unneeded files to clean up", the app telling the user to act on files it
-    /// has just told them do not exist.
+    /// what went wrong rather than "nothing scanned yet". A completed scan gets
+    /// the same lead at any count, zero included: "Any unneeded files below" is
+    /// written to read correctly over an empty list, and the all-clear overlay
+    /// has already announced the result in its own words by the time this
+    /// window is read.
     /// </summary>
     public string IntroLead =>
         Scan.HasScanError ? Strings.Error_ScanFailedTitle
         : !Scan.HasScanned ? Strings.Body_NotScanned_Lead
         : Scan.HasOrphans && Scan.HasPendingReboot ? Strings.Body_PendingReboot_Lead
-        : Scan.HasOrphans ? Strings.Body_MainExplanation_Lead
-        : Strings.Completion_NothingToCleanUp;
+        : Strings.Body_MainExplanation_Lead;
 
     /// <summary>
     /// The muted second line under <see cref="IntroLead"/>. Carries the tailored
-    /// message on a failed scan; empty on an all-clear (the lead says it all, and
-    /// the count rows below carry the receipt) and on a pending-reboot hold (the
-    /// banner below carries the specific reason), which collapses the TextBlock.
+    /// message on a failed scan. Shown for every completed scan, zero files
+    /// included: it is the app explaining what it does, and a clean machine is
+    /// when a first-time user needs that most. Empty only on a pending-reboot
+    /// hold (the banner below carries the specific reason), which collapses the
+    /// TextBlock.
     /// </summary>
     public string IntroDetail =>
         Scan.HasScanError ? Scan.LastScanError
         : !Scan.HasScanned ? Strings.Body_NotScanned_Why
         : Scan.HasOrphans && Scan.HasPendingReboot ? string.Empty
-        : Scan.HasOrphans ? MainExplanationWhyText
-        : string.Empty;
+        : MainExplanationWhyText;
 
     /// <summary>
-    /// Whether to show the "Move them somewhere safe, or delete them" action line.
-    /// True only when a scan found files AND they can be acted on: with a Windows
-    /// Installer operation in progress the buttons are held, so an instruction to
-    /// press them is removed (the pending-reboot banner and lead explain the hold).
+    /// Whether to show the "Delete them to the Recycle Bin, or use Move" action
+    /// line. True for every completed scan except during a Windows Installer
+    /// hold: the buttons are held then, so an instruction to press them is
+    /// removed (the pending-reboot banner and lead explain the hold). At zero
+    /// files the line stays: "them" reads with the implied "if there are any".
     /// </summary>
-    public bool ShowMainAction => Scan.HasOrphans && !Scan.HasPendingReboot;
+    public bool ShowMainAction => Scan.HasScanned && !Scan.HasScanError && !Scan.HasPendingReboot;
+
+    /// <summary>
+    /// Whether the separator, the Move location box and the two action buttons
+    /// are in the window. True for every completed scan, zero files included:
+    /// at zero the buttons disable through their commands, and during a Windows
+    /// Installer hold the zone stays while the banner explains the greyed
+    /// buttons.
+    /// </summary>
+    public bool ShowActionZone => Scan.HasScanned && !Scan.HasScanError;
 
     /// <summary>
     /// "Scan cancelled." under the not-yet-scanned intro, so a user who
@@ -236,6 +247,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(IntroDetail));
             OnPropertyChanged(nameof(IntroNotice));
             OnPropertyChanged(nameof(ShowMainAction));
+            OnPropertyChanged(nameof(ShowActionZone));
         }
 
         if (e.PropertyName == nameof(ScanViewModel.IsScanning) ||

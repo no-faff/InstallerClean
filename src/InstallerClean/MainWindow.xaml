@@ -134,15 +134,11 @@
                           AutomationProperties.Name="{loc:Translate Automation.Scroll.ScanResults}">
             <StackPanel Margin="0,0,4,4">
 
-                <!-- Explanatory text in three tiers: the lead reads prominent
-                     (heading tier), the detail recedes (muted), the action line
-                     sits at body tier. The lead and the detail are computed by
-                     the view-model, because what they say depends on what the
-                     scan found: an intro written for "a scan found files" is
-                     wrong in the two states where it did not (nothing scanned
-                     yet, and nothing to clean up), and those are the states most
-                     users end in. The action line belongs to the found-files
-                     case alone, so it collapses with the buttons it mirrors.
+                <!-- Explanatory text in three tiers: the lead reassurance reads
+                     prominent (heading tier), the "why" detail recedes (muted),
+                     the action line sits at body tier. Three resx keys so each
+                     styles independently; the lead and the detail bind to the
+                     view-model, which picks them by scan state.
 
                      The block carries the gap below the intro, not its last
                      child: which child IS last changes with the state, so a
@@ -359,15 +355,11 @@
                  used to sit between. -->
             <chrome:DecorativeBorder Grid.Row="1" BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="0,1,0,0"
                                      Margin="0,16,0,12"
-                                     Visibility="{Binding Scan.HasOrphans, Converter={StaticResource BoolToVis}}"/>
+                                     Visibility="{Binding ShowActionZone, Converter={StaticResource BoolToVis}}"/>
 
-            <!-- Action zone: move/delete. Collapses when the scan found nothing
-                 to act on (and before it has run at all): a disabled Move and
-                 Delete under copy telling the user to press them reads as a
-                 broken app, and it is the state every successful clean-up ends
-                 in. -->
+            <!-- Action zone: move/delete -->
             <Grid Grid.Row="2"
-                  Visibility="{Binding Scan.HasOrphans, Converter={StaticResource BoolToVis}}">
+                  Visibility="{Binding ShowActionZone, Converter={StaticResource BoolToVis}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="8"/>

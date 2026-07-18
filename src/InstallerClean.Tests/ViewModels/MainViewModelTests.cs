@@ -1571,7 +1571,7 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task A_scan_that_finds_nothing_stops_telling_the_user_to_delete_files()
+    public async Task A_scan_that_finds_nothing_keeps_the_windows_one_shape()
     {
         var vm = CreateViewModel();
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
@@ -1579,13 +1579,19 @@ public class MainViewModelTests
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
-        // The lead used to read "The unneeded files below are safe to delete"
-        // above a zero count, with Move and Delete greyed out beneath it.
-        Assert.Equal(Strings.Completion_NothingToCleanUp, vm.IntroLead);
-        Assert.Equal(string.Empty, vm.IntroDetail);
+        // Zero files changes no part of the window's shape: the lead ("Any
+        // unneeded files below...") reads correctly over an empty list, the
+        // explanation and the action line stay, and the action zone shows with
+        // the buttons disabled through their commands.
+        Assert.Equal(Strings.Body_MainExplanation_Lead, vm.IntroLead);
+        Assert.Equal(vm.MainExplanationWhyText, vm.IntroDetail);
         Assert.True(vm.Scan.HasScanned);
         Assert.False(vm.Scan.HasOrphans);
-        // A live Details button here opened an empty list.
+        Assert.True(vm.ShowMainAction);
+        Assert.True(vm.ShowActionZone);
+        Assert.False(vm.Cleanup.MoveAllCommand.CanExecute(null));
+        Assert.False(vm.Cleanup.DeleteAllCommand.CanExecute(null));
+        // Details still greys: the orphaned list it opens is empty here.
         Assert.False(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
     }
 
@@ -1603,6 +1609,7 @@ public class MainViewModelTests
         Assert.Equal(string.Empty, vm.IntroNotice);
         Assert.True(vm.Scan.HasOrphans);
         Assert.True(vm.ShowMainAction);
+        Assert.True(vm.ShowActionZone);
         Assert.True(vm.Chrome.OpenOrphanedDetailsCommand.CanExecute(null));
     }
 
@@ -1624,6 +1631,8 @@ public class MainViewModelTests
         Assert.Equal(Strings.Body_PendingReboot_Lead, vm.IntroLead);
         Assert.Equal(string.Empty, vm.IntroDetail);
         Assert.False(vm.ShowMainAction);
+        // The zone itself stays: greyed buttons under the banner, not a hole.
+        Assert.True(vm.ShowActionZone);
         // Move and Delete are held.
         Assert.False(vm.Cleanup.MoveAllCommand.CanExecute(null));
         Assert.False(vm.Cleanup.DeleteAllCommand.CanExecute(null));
