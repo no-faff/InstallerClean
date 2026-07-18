@@ -386,28 +386,38 @@
   <data name="Completion.Freed" xml:space="preserve"><value>已释放 {0}</value></data>
   <data name="Completion.CleanedUp" xml:space="preserve"><value>已清理 {0}</value></data>
   <data name="Completion.Moved" xml:space="preserve"><value>已移动 {0}</value></data>
-  <data name="Completion.PartlyMoved" xml:space="preserve"><value>已移动 {0}，部分文件无法处理</value></data>
-  <!-- Heading shown when an operation succeeded for SOME files but errored for
-       others. PartlyCleanedUp is the delete-path counterpart of PartlyFreed
-       (see Completion.CleanedUp for why delete reads "cleaned up").
-       0 = total size (e.g. "120.5 MB"). -->
-  <data name="Completion.PartlyFreed" xml:space="preserve"><value>已释放 {0}，部分文件无法处理</value></data>
-  <data name="Completion.PartlyCleanedUp" xml:space="preserve"><value>已清理 {0}，部分文件无法处理</value></data>
+  <!-- Heading for the one outcome a size figure cannot state: every file the
+       operation tried failed, so there is nothing to report a size for and
+       "0 B freed" would read as a result rather than a failure. No placeholder,
+       and the overlay paints these in the warning colour instead of the success
+       green. The failure count line beneath carries how many and the detail box
+       carries which. -->
+  <data name="Completion.NothingMoved" xml:space="preserve"><value>Nothing was moved</value></data>
+  <data name="Completion.NothingDeleted" xml:space="preserve"><value>Nothing was deleted</value></data>
+  <!-- Failure count line: its own zone directly under the heading, so the
+       heading states one outcome and never trails a second clause, and the
+       summary line never carries an error count where a path belongs.
+       0 = files that failed, 1 = files the operation actually tried
+       (succeeded + failed). On a run the user cancelled, {1} is smaller than
+       the batch total the cancelled summary line names, because it counts what
+       was tried rather than what was queued. The count selecting the plural
+       form is {0}; the noun belongs to {1}, so a language that inflects the
+       noun should read the two independently and may add a satellite-only
+       .One/.Few/.Many override. The Delete variant covers both a Recycle Bin
+       delete and a consented permanent one. -->
+  <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>{0} of {1} files could not be moved.</value></data>
+  <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>{0} of {1} files could not be moved.</value></data>
+  <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>{0} of {1} files could not be deleted.</value></data>
+  <data name="Completion.FailedCountDelete.Plural" xml:space="preserve"><value>{0} of {1} files could not be deleted.</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path. The colon
        ends the sentence at the verb/preposition so the WPF host can force
        the path onto its own line at the exact point {2} substitutes, the
        same technique the move-confirmation dialog uses. -->
   <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>已将 {0} 个{1}移动到：{2}</value></data>
   <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>已将 {0} 个{1}移动到：{2}</value></data>
-  <!-- 0 = moved count, 1 = pluralised noun, 2 = destination, 3 = error count, 4 = pluralised "error"/"errors" -->
-  <data name="Completion.MoveSummaryWithErrors.Singular" xml:space="preserve"><value>已将 {0} 个{1}移动到：{2}。{3} 个{4}</value></data>
-  <data name="Completion.MoveSummaryWithErrors.Plural" xml:space="preserve"><value>已将 {0} 个{1}移动到：{2}。{3} 个{4}</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun -->
   <data name="Completion.DeleteSummary.Singular" xml:space="preserve"><value>已将 {0} 个{1}移到回收站</value></data>
   <data name="Completion.DeleteSummary.Plural" xml:space="preserve"><value>已将 {0} 个{1}移到回收站</value></data>
-  <!-- 0 = deleted count, 1 = pluralised noun, 2 = error count, 3 = pluralised "error"/"errors" -->
-  <data name="Completion.DeleteSummaryWithErrors.Singular" xml:space="preserve"><value>已将 {0} 个{1}移到回收站。{2} 个{3}</value></data>
-  <data name="Completion.DeleteSummaryWithErrors.Plural" xml:space="preserve"><value>已将 {0} 个{1}移到回收站。{2} 个{3}</value></data>
   <!-- Shown when the pre-action re-check found some candidates are needed again
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
@@ -437,16 +447,10 @@
        was unavailable for the volume and the user chose to delete anyway).
        Distinct from DeleteSummary so it never claims the bin: these files
        did not reach it and cannot be restored from it. 0 = deleted count,
-       1 = pluralised noun; the WithErrors variants add 2 = error count,
-       3 = pluralised "error"/"errors". Both the clean and the WithErrors
-       copy split singular/plural so the "It"/"They did not go to the
-       Recycle Bin" clause agrees with the count, and the WithErrors copy
-       carries that same clause so a partial failure still never reads as
-       though the files reached the bin. -->
+       1 = pluralised noun. The copy splits singular/plural so the "It"/"They
+       did not go to the Recycle Bin" clause agrees with the count. -->
   <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>已永久删除 {0} 个{1}。它没有进入回收站。</value></data>
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>已永久删除 {0} 个{1}。它们没有进入回收站。</value></data>
-  <data name="Completion.PermanentDeleteSummaryWithErrors.Singular" xml:space="preserve"><value>已永久删除 {0} 个{1}。它没有进入回收站。{2} 个{3}</value></data>
-  <data name="Completion.PermanentDeleteSummaryWithErrors.Plural" xml:space="preserve"><value>已永久删除 {0} 个{1}。它们没有进入回收站。{2} 个{3}</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>没关系，它本来就可以安全删除。InstallerClean 只清除 Windows 报告为不再需要的文件，绝不会删除程序仍然需要的文件。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>没关系，它们本来就可以安全删除。InstallerClean 只清除 Windows 报告为不再需要的文件，绝不会删除程序仍然需要的文件。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。</value></data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
@@ -617,10 +621,28 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file
        UnauthorizedAccessException / IOException messages can carry
-       paths from other users' profiles into the displayed error list. -->
-  <data name="Error.AccessDenied" xml:space="preserve"><value>访问被拒绝。</value></data>
-  <data name="Error.IOFailure" xml:space="preserve"><value>Windows 报告了一个文件错误；该文件已留在原处。</value></data>
-  <data name="Error.UnknownError" xml:space="preserve"><value>未知错误。</value></data>
+       paths from other users' profiles into the displayed error list.
+
+       Singular and plural are different jobs, not one string inflected.
+       The singular is the per-file sentence: the CLI prints it after a
+       filename and a colon, so it must read as a whole sentence about one
+       named file and must not end on a colon of its own. The plural is the
+       heading the completion overlay puts over a bucket of filenames, so it
+       introduces a list. Neither ends with a colon, which is why the
+       indented "  - name" lines beneath carry the relationship instead.
+
+       FileInUse is Move's counterpart to Error.RecycleInUse on the Delete
+       side, minus the shell error code: Move discriminates a sharing or lock
+       violation from the IOException HResult, so there is no code worth
+       showing and the detail goes to crash.log. -->
+  <data name="Error.AccessDenied.Singular" xml:space="preserve"><value>Windows refused access to this file; it was left in place.</value></data>
+  <data name="Error.AccessDenied.Plural" xml:space="preserve"><value>Windows refused access to these files; they were left in place.</value></data>
+  <data name="Error.FileInUse.Singular" xml:space="preserve"><value>This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later.</value></data>
+  <data name="Error.FileInUse.Plural" xml:space="preserve"><value>These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later.</value></data>
+  <data name="Error.IOFailure.Singular" xml:space="preserve"><value>Windows 报告了一个文件错误；该文件已留在原处。</value></data>
+  <data name="Error.IOFailure.Plural" xml:space="preserve"><value>Windows reported file errors; these files were left in place.</value></data>
+  <data name="Error.UnknownError.Singular" xml:space="preserve"><value>Something went wrong with this file; it was left in place.</value></data>
+  <data name="Error.UnknownError.Plural" xml:space="preserve"><value>Something went wrong with these files; they were left in place.</value></data>
   <!-- 0 = shell error code -->
   <!-- These recovery errors point at the Move feature by its button name ("the
        Move button") so the suggestion isn't taken as the delete verb, which now
