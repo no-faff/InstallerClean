@@ -162,7 +162,10 @@
   <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Gắn sao trên GitHub</value></data>
   <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Gắn sao trên GitHub (cửa sổ Giới thiệu)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Thu nhỏ</value></data>
-  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Chuyển tất cả các tệp cài đặt không cần thiết tới thư mục đích đã chọn</value></data>
+  <!-- Names the destination the way the Move button's own tooltip does
+       (Tooltip.Move), so the spoken help and the hover text agree on what
+       the folder is called. -->
+  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Move all unneeded installer files to the Move location</value></data>
   <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Di chuyển tất cả các tệp cài đặt không cần thiết vào Thùng rác</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -195,7 +198,12 @@
   <data name="Automation.Section.Products" xml:space="preserve"><value>Sản phẩm</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>Bản vá</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Chi tiết sản phẩm</value></data>
-  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Thư mục đích để chuyển đến</value></data>
+  <!-- Spoken name for the box the destination is typed into. It reads as
+       the MOVE LOCATION label directly above it, so a screen reader names
+       the field the way the label does and voice control can reach it by
+       the words on screen; it stays identical to
+       Automation.Section.MoveLocation in every language. -->
+  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Move location</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Tiến trình thao tác</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>Quét lại C:\Windows\Installer</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Tiến trình quét</value></data>
@@ -728,8 +736,10 @@ Chi tiết trong {1}.</value></data>
        as MainWindow's "[it won't!]". -->
   <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Nó được gửi tới nofaff.netlify.app/api/result-log. Không có gì nhận dạng bạn hay máy của bạn; nó chỉ cho tôi biết InstallerClean có hoạt động không và [mọi người đang giải phóng được bao nhiêu dung lượng].</value></data>
   <!-- AutomationProperties.Name on the JSON preview TextBox so screen
-       readers announce its content rather than "edit, read-only". -->
-  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Xem trước nhật ký kết quả</value></data>
+       readers announce its content rather than "edit, read-only". The
+       noun follows the button that opens this dialog (Action.SendResultLog,
+       "Send report") and the surrounding copy, which call it a report. -->
+  <data name="Automation.ResultLogPreview" xml:space="preserve"><value>Report preview</value></data>
 
   <!-- Single instance / startup / crash -->
   <data name="Startup.AlreadyRunningTitle" xml:space="preserve"><value>InstallerClean</value></data>
