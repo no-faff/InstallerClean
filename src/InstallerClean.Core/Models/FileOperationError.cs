@@ -1,3 +1,4 @@
+using InstallerClean.Helpers;
 using InstallerClean.Resources;
 
 namespace InstallerClean.Models;
@@ -17,8 +18,26 @@ namespace InstallerClean.Models;
 /// </summary>
 public abstract record FileOperationError(string FilePath)
 {
-    /// <summary>Human-readable description in the current UI culture.</summary>
+    /// <summary>
+    /// Human-readable description of ONE file's failure, in the current UI
+    /// culture. Singular throughout: the CLI prints it per file after a
+    /// filename and a colon, so a category that also has a plural form still
+    /// answers here with the sentence about a single file.
+    /// </summary>
     public abstract string LocalisedMessage { get; }
+
+    /// <summary>
+    /// Heading the completion overlay puts above a bucket of
+    /// <paramref name="count"/> filenames that all failed this way. The default
+    /// is the singular sentence, which is right for the categories that are
+    /// either rare or already read as a complete statement whatever the count
+    /// (a missing source, a reparse point, an out-of-cache candidate, the
+    /// recycle family, which carries a shell code per file). A category that
+    /// reads wrong over a list overrides this with a properly pluralised
+    /// introducer, which also gives an inflecting language the satellite-only
+    /// .One/.Few/.Many override slot it needs.
+    /// </summary>
+    public virtual string LocalisedGroupHeading(int count) => LocalisedMessage;
 }
 
 /// <summary>
@@ -52,7 +71,11 @@ public sealed record MissingSourceFile(string FilePath)
 public sealed record AccessDenied(string FilePath)
     : FileOperationError(FilePath)
 {
-    public override string LocalisedMessage => Strings.Error_AccessDenied;
+    public override string LocalisedMessage => Strings.Error_AccessDenied_Singular;
+
+    public override string LocalisedGroupHeading(int count) =>
+        DisplayHelpers.Pluralise(count, Strings.Error_AccessDenied_Singular,
+            Strings.Error_AccessDenied_Plural, "Error.AccessDenied");
 }
 
 /// <summary>
@@ -143,14 +166,44 @@ public sealed record CandidateOutsideCache(string FilePath)
 }
 
 /// <summary>
-/// Generic IO failure (disk full, sharing violation, etc). The UI sees
+/// The file is open or locked by another program, so it could not be
+/// moved and was left in place. Move only: the Delete path reaches the
+/// same condition through the shell's own HRESULT and reports it as
+/// <see cref="RecycleFailed"/> with <c>Error.RecycleInUse</c>.
+///
+/// Split out of <see cref="IOFailure"/> because it is the one IO failure
+/// with a cause the user can act on, and the only one that is not a fault:
+/// closing the holding program and running again fixes it. The underlying
+/// exception message stays off the record for the same path-leak reason as
+/// <see cref="AccessDenied"/>; the full exception goes to crash.log at the
+/// catch site.
+/// </summary>
+public sealed record FileInUse(string FilePath)
+    : FileOperationError(FilePath)
+{
+    public override string LocalisedMessage => Strings.Error_FileInUse_Singular;
+
+    public override string LocalisedGroupHeading(int count) =>
+        DisplayHelpers.Pluralise(count, Strings.Error_FileInUse_Singular,
+            Strings.Error_FileInUse_Plural, "Error.FileInUse");
+}
+
+/// <summary>
+/// Generic IO failure (disk full, path too long, a device that went away).
+/// A sharing or lock violation is NOT one of these: it is discriminated at
+/// the catch site and filed as <see cref="FileInUse"/>, so this category
+/// means "an IO failure with no cause we can name". The UI sees
 /// only a category-only sentence; the underlying exception message
 /// stays off the record for the same reason as <see cref="AccessDenied"/>.
 /// </summary>
 public sealed record IOFailure(string FilePath)
     : FileOperationError(FilePath)
 {
-    public override string LocalisedMessage => Strings.Error_IOFailure;
+    public override string LocalisedMessage => Strings.Error_IOFailure_Singular;
+
+    public override string LocalisedGroupHeading(int count) =>
+        DisplayHelpers.Pluralise(count, Strings.Error_IOFailure_Singular,
+            Strings.Error_IOFailure_Plural, "Error.IOFailure");
 }
 
 /// <summary>
@@ -162,5 +215,9 @@ public sealed record IOFailure(string FilePath)
 public sealed record UnknownError(string FilePath)
     : FileOperationError(FilePath)
 {
-    public override string LocalisedMessage => Strings.Error_UnknownError;
+    public override string LocalisedMessage => Strings.Error_UnknownError_Singular;
+
+    public override string LocalisedGroupHeading(int count) =>
+        DisplayHelpers.Pluralise(count, Strings.Error_UnknownError_Singular,
+            Strings.Error_UnknownError_Plural, "Error.UnknownError");
 }

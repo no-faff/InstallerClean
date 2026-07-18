@@ -117,6 +117,7 @@ public sealed class MoveFilesService : IMoveFilesService
 
             int moved = 0;
             var errors = new List<FileOperationError>();
+            var failureLog = new PerFileFailureLog("Move");
             var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
             var total = pathList.Count;
             bool cancelled = false;
@@ -177,20 +178,38 @@ public sealed class MoveFilesService : IMoveFilesService
                     _fs.File.Move(sourcePath, destPath);
                     moved++;
                 }
+                // DestinationCollisionException alone is not logged: it is this
+                // class's own control flow, thrown from one place, and its
+                // error entry already states the whole cause. The rest are
+                // framework exceptions whose detail exists nowhere else once
+                // the category has been filed, which is what left the
+                // 2026-07-18 move failures with no trace at all.
                 catch (DestinationCollisionException ex)
                 {
                     errors.Add(new DestinationCollision(sourcePath, ex.FileName));
                 }
-                catch (UnauthorizedAccessException)
+                catch (UnauthorizedAccessException ex)
                 {
+                    failureLog.Record(ex);
                     errors.Add(new AccessDenied(sourcePath));
                 }
-                catch (IOException)
+                catch (IOException ex)
                 {
-                    errors.Add(new IOFailure(sourcePath));
+                    failureLog.Record(ex);
+                    // ERROR_SHARING_VIOLATION and ERROR_LOCK_VIOLATION as
+                    // HRESULTs: another program holds the file open, which is
+                    // the one IO failure here with a cause the user can act on
+                    // and the one that is not a fault. The Delete path
+                    // discriminates the same two codes off the shell's HRESULT
+                    // (FileOperationError.RecycleFailed), so the two halves of
+                    // the app now name the same condition the same way.
+                    errors.Add(ex.HResult is unchecked((int)0x80070020) or unchecked((int)0x80070021)
+                        ? new FileInUse(sourcePath)
+                        : new IOFailure(sourcePath));
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    failureLog.Record(ex);
                     errors.Add(new UnknownError(sourcePath));
                 }
             }
@@ -204,6 +223,10 @@ public sealed class MoveFilesService : IMoveFilesService
                 // mid-batch error (a destination junction swap) still propagates.
                 cancelled = true;
             }
+
+            // Outside the cancel catch so a batch the user stopped still
+            // accounts for what its failures cost the log.
+            failureLog.WriteClosingEntry();
 
             // Pass CancellationToken.None: the prune is best-effort
             // post-operation cleanup. If the user pressed Cancel during
