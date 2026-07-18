@@ -284,12 +284,6 @@ Atau pasang melalui [winget](https://learn.microsoft.com/windows/package-manager
 winget install NoFaff.InstallerClean
 ```
 
-Atau pasang melalui [Chocolatey](https://chocolatey.org):
-
-```
-choco install installerclean
-```
-
 Atau pasang melalui [Scoop](https://scoop.sh):
 
 ```

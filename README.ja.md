@@ -284,12 +284,6 @@ v1.8.0 でこのオプションが追加されて以来、ご厚意で送って�
 winget install NoFaff.InstallerClean
 ```
 
-または [Chocolatey](https://chocolatey.org) でインストールできます。
-
-```
-choco install installerclean
-```
-
 または [Scoop](https://scoop.sh) でインストールできます。
 
 ```

@@ -286,12 +286,6 @@
 winget install NoFaff.InstallerClean
 ```
 
-أو ثبّته عبر [Chocolatey](https://chocolatey.org):
-
-```
-choco install installerclean
-```
-
 أو ثبّته عبر [Scoop](https://scoop.sh):
 
 ```

@@ -284,12 +284,6 @@ InstallerClean створено так, щоб ним можна було пов
 winget install NoFaff.InstallerClean
 ```
 
-Або встановіть через [Chocolatey](https://chocolatey.org):
-
-```
-choco install installerclean
-```
-
 Або встановіть через [Scoop](https://scoop.sh):
 
 ```

@@ -285,12 +285,6 @@ Ya da [winget](https://learn.microsoft.com/windows/package-manager/winget/) ile 
 winget install NoFaff.InstallerClean
 ```
 
-Ya da [Chocolatey](https://chocolatey.org) ile kurun:
-
-```
-choco install installerclean
-```
-
 Ya da [Scoop](https://scoop.sh) ile kurun:
 
 ```

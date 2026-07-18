@@ -284,12 +284,6 @@ Hoặc cài qua [winget](https://learn.microsoft.com/windows/package-manager/win
 winget install NoFaff.InstallerClean
 ```
 
-Hoặc cài qua [Chocolatey](https://chocolatey.org):
-
-```
-choco install installerclean
-```
-
 Hoặc cài qua [Scoop](https://scoop.sh):
 
 ```
