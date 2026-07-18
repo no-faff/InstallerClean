@@ -182,6 +182,16 @@ public partial class MainWindow : Window
 
     private void OnClosing(object? sender, CancelEventArgs e)
     {
+        // IsOperating, the overlay flag, and not IsOperationInFlight, the
+        // execution gate the two destructive commands use. That is a contract,
+        // not the near-miss it looks like. The hold is released by
+        // OnCleanupPropertyChanged watching this same property go false, so a
+        // hold taken on the other flag would never be released: nothing raises a
+        // change notification the close is waiting on. And the window where the
+        // two disagree costs nothing, because it is before any file is touched:
+        // IsOperationInFlight covers the pre-flights, both of which set
+        // IsOperating immediately before calling the service, so every moment a
+        // file is being moved or recycled is inside this flag.
         if (!_vm.Cleanup.IsOperating) return;
 
         // A Move or a Delete is running. Letting this close through kills the
