@@ -290,8 +290,24 @@ public partial class App : Application
     /// The event a second launch signals to say "you are the one with the
     /// window, come to the front". Only the GUI creates it, so its absence is
     /// how the second launch knows the mutex holder is the CLI.
+    ///
+    /// <c>Local\</c>, the per-session namespace, while the single-instance mutex
+    /// next door stays <c>Global\</c>. The two want opposite scopes because they
+    /// answer opposite questions. The mutex asks whether any InstallerClean
+    /// anywhere on the machine is touching C:\Windows\Installer, which is one
+    /// folder shared by every session, so it must span them. This event's whole
+    /// job is to raise a window in front of the person who just double-clicked
+    /// the icon, and a window belongs to one desktop. Signalled across sessions
+    /// it raises the window on somebody else's desktop AND suppresses the
+    /// already-running message on this one, so the person who clicked sees the
+    /// icon, the UAC prompt, then nothing at all. Under fast user switching, a
+    /// terminal server or an RDP reconnect that is the ordinary case, not an
+    /// exotic one. Scoped to the session, a launch from another one finds no
+    /// event, falls back to the dialog, and is told what is actually true.
+    /// Same-session relaunch is untouched, elevation included: the session
+    /// namespace does not change across the elevation boundary.
     /// </summary>
-    private const string ActivationEventName = @"Global\InstallerClean_Activate";
+    private const string ActivationEventName = @"Local\InstallerClean_Activate";
 
     private static EventWaitHandle? _activationSignal;
 
