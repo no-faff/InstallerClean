@@ -18,12 +18,22 @@ internal sealed class FakeMutexProbe : IMutexProbe
     public int Acquired { get; private set; }
     public int Released { get; private set; }
 
+    /// <summary>
+    /// How many times the acquire was ATTEMPTED, whichever way it went.
+    /// <see cref="Acquired"/> counts only the attempts that took a lease, so it
+    /// cannot tell "the caller never asked" from "the caller asked and was
+    /// refused", which is the whole question for a test pinning what runs
+    /// before the hold is taken.
+    /// </summary>
+    public int AcquireAttempts { get; private set; }
+
     public FakeMutexProbe(Mode mode) => _mode = mode;
 
     public bool IsHeld(string name) => _mode == Mode.HeldByAnother;
 
     public IMutexLease? TryAcquire(string name, out bool heldByAnother)
     {
+        AcquireAttempts++;
         heldByAnother = false;
         switch (_mode)
         {

@@ -85,6 +85,22 @@ public sealed class MoveFilesService : IMoveFilesService
             // DACL-refused acquire (lease null, not heldByAnother) falls back to
             // today's behaviour: proceed without the hold. This closes only the
             // sub-millisecond race after the host-side gate re-check has passed.
+            //
+            // What the hold costs, so nobody widens it and nobody removes it:
+            // _MSIExecute is the machine-wide Windows Installer serialisation
+            // mutex, so for as long as this batch runs, every installer on the
+            // machine that wants it waits or fails with 1618. A single file
+            // operation that hangs (a stalled network destination) therefore
+            // holds the machine's installer lock until this process is killed.
+            // That is accepted because the alternative is msiexec writing the
+            // cache in the middle of a move, which costs a needed file rather
+            // than a wait.
+            //
+            // Delete runs its volume probe before its acquire, and this does NOT
+            // match it: everything between here and the loop is the destination
+            // work, and moving it out would create the destination folder before
+            // the gates below could refuse it. A refusal that has touched nothing
+            // is worth more than a shorter hold.
             var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
             if (lease is null && heldByAnother)
                 return new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);

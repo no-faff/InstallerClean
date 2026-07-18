@@ -60,20 +60,6 @@ public sealed class DeleteFilesService : IDeleteFilesService
             if (total == 0)
                 return new DeleteResult(0, Array.Empty<FileOperationError>());
 
-            // P1: hold Global\_MSIExecute for the batch on this worker thread so a
-            // msiexec starting mid-delete waits on the mutex instead of racing the
-            // cache. Acquired here and released in the finally on the SAME thread
-            // (Win32 owner-thread rule); the body is synchronous, so no await hops
-            // threads between acquire and release. Held by a live transaction =>
-            // refuse and touch nothing (the caller re-checks the pending-reboot
-            // gate and shows its banner). A DACL-refused acquire falls back to
-            // today's behaviour: proceed without the hold.
-            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
-            if (lease is null && heldByAnother)
-                return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
-
-            try
-            {
             cancellationToken.ThrowIfCancellationRequested();
 
             // The shell recycle is recycle-or-permanently-delete: when the
@@ -83,9 +69,43 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // refuse the whole batch rather than silently deleting. Recycle
             // behaviour is per-volume, so the probe rides on the volume the
             // files actually sit on (orphans are all under the same one).
+            //
+            // Ahead of the mutex acquire below on purpose. The probe mutates
+            // nothing and can refuse the whole batch, so running it inside the
+            // hold would extend a machine-wide Windows Installer lock across
+            // work that may end in touching no file at all. It also decides
+            // which refusal a caller sees when both apply, and the bin winning
+            // is the accepted outcome: neither has touched a file, and a caller
+            // that answers the bin question meets the installer one on the very
+            // next call.
             if (!permitPermanentDelete && !_engine.CanRecycleToVolume(pathList[0]))
                 return new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true);
 
+            // P1: hold Global\_MSIExecute for the batch on this worker thread so a
+            // msiexec starting mid-delete waits on the mutex instead of racing the
+            // cache. Acquired here and released in the finally on the SAME thread
+            // (Win32 owner-thread rule); the body is synchronous, so no await hops
+            // threads between acquire and release. Held by a live transaction =>
+            // refuse and touch nothing (the caller re-checks the pending-reboot
+            // gate and shows its banner). A DACL-refused acquire falls back to
+            // today's behaviour: proceed without the hold.
+            //
+            // What the hold costs, so nobody widens it and nobody removes it:
+            // _MSIExecute is the machine-wide Windows Installer serialisation
+            // mutex, so for as long as this batch runs, every installer on the
+            // machine that wants it waits or fails with 1618. The batch is
+            // bounded by file count and each file is one shell call, but a single
+            // recycle that hangs (an unresponsive shell, a stalled network
+            // volume) holds the machine's installer lock until this process is
+            // killed. That is accepted because the alternative is msiexec writing
+            // the cache in the middle of a delete, which costs a needed file
+            // rather than a wait. Keep non-mutating pre-work outside it.
+            var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
+            if (lease is null && heldByAnother)
+                return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
+
+            try
+            {
             int deleted = 0;
             var errors = new List<FileOperationError>();
             var failureLog = new PerFileFailureLog("Delete");

@@ -288,8 +288,32 @@ public class DeleteFilesServiceUnitTests
         Assert.Equal(0, result.DeletedCount);
         Assert.Empty(result.Errors);
         engine.DidNotReceive().RecycleFile(Arg.Any<string>());
-        // Refused before the bin probe even runs.
-        engine.DidNotReceive().CanRecycleToVolume(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task Probes_the_bin_before_taking_the_installer_mutex()
+    {
+        // The probe mutates nothing, so it runs outside the hold: everything
+        // between the acquire and the release blocks every installer on the
+        // machine, and a batch that ends up refusing the whole list should not
+        // have decided that inside the lock. The visible consequence is the
+        // order of the two refusals, pinned here so it is a decision rather
+        // than a side effect: a machine where the bin is unavailable AND an
+        // installer holds the lock now reports the bin, not the installer.
+        // Both refuse and neither touches a file, and the second refusal
+        // arrives the moment the first is answered.
+        var (fs, engine) = Setup();
+        engine.CanRecycleToVolume(Arg.Any<string>()).Returns(false);
+        var a = AddFile(fs, "a.msi");
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.HeldByAnother);
+        var svc = new DeleteFilesService(fs, engine, mutex);
+
+        var result = await svc.DeleteFilesAsync(new[] { a });
+
+        Assert.True(result.RecycleUnavailable);
+        Assert.False(result.InstallerBusy);
+        Assert.Equal(0, mutex.AcquireAttempts); // the refusal happened before the hold existed
+        engine.DidNotReceive().RecycleFile(Arg.Any<string>());
     }
 
     [Fact]
