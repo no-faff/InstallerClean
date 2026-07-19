@@ -59,6 +59,15 @@ jobs:
       - name: Check every satellite is translated
         run: node scripts/check-still-english.mjs
 
+      # docs/translations/*.md carry the same "generated, never hand-edited"
+      # contract as the resx guards above and had no guard at all, which is how
+      # all fourteen reached HEAD in 47a00f5 still quoting two strings that
+      # commit had removed from the app. They are the pages the README's
+      # Contributing section points native speakers at, so a stale one asks for
+      # corrections to text that no longer exists.
+      - name: Check translation review tables are in step
+        run: node scripts/gen-translation-table.mjs --check
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:

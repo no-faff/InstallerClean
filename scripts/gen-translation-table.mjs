@@ -8,7 +8,9 @@
 // key-names. It is generated, never hand-edited, so it cannot drift from the
 // resx; re-run it whenever a satellite changes.
 //
-// USAGE  node scripts/gen-translation-table.mjs <code>
+// USAGE  node scripts/gen-translation-table.mjs <code>       write one table
+//        node scripts/gen-translation-table.mjs --check      verify all fourteen
+//        node scripts/gen-translation-table.mjs --check <code>
 //   <code> is a satellite code: zh-Hans, de, ko, es, it, ja, pt-BR, ru, fr, pl,
 //   tr, id, vi, uk.
 // It reads the English neutral Strings.resx and Strings.<code>.resx, pairs them by
@@ -16,7 +18,15 @@
 // are translated and shown in their own group; the 21 machine-contract
 // Cli.EventLog* keys (bar Cli.EventLogUnavailable) stay English by contract, so they
 // are skipped here whether or not the satellite carries them (ja does).
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+//
+// --check is what makes "generated, never hand-edited" enforceable rather than
+// merely stated. It rebuilds every table in memory and fails on any difference
+// from the committed file, so a resx change that skips this script is caught on
+// the commit that causes it instead of by whoever next reads the public page.
+// Without it the fourteen tables went stale in 47a00f5 and reached HEAD still
+// quoting two strings the app no longer had, on the very pages the project
+// invites native speakers to review.
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 
 const LANGS = {
   'zh-Hans': { en: 'Simplified Chinese',    endo: '简体中文' },
@@ -35,18 +45,18 @@ const LANGS = {
   'uk':      { en: 'Ukrainian',             endo: 'Українська' },
 };
 
-const code = process.argv[2];
-if (!code || !LANGS[code]) {
+const args = process.argv.slice(2);
+const checkMode = args[0] === '--check';
+const code = checkMode ? args[1] : args[0];
+if ((code && !LANGS[code]) || (!code && !checkMode)) {
   console.error('usage: node scripts/gen-translation-table.mjs <code>');
+  console.error('       node scripts/gen-translation-table.mjs --check [<code>]');
   console.error('  <code> is one of: ' + Object.keys(LANGS).join(', '));
   process.exit(1);
 }
-const lang = LANGS[code];
 
 const dir = 'src/InstallerClean.Core/Resources';
 const BASE = `${dir}/Strings.resx`;             // English neutral
-const TARGET = `${dir}/Strings.${code}.resx`;   // the satellite under review
-const OUT = `docs/translations/${code}.md`;
 
 // Same <data><value> capture the generator and its self-check use: the key name,
 // then the inner value (non-greedy to the first </value>). The captured value is RAW,
@@ -60,7 +70,6 @@ const parse = (xml) => {
 };
 
 const neutral = parse(readFileSync(BASE, 'utf8'));
-const target = parse(readFileSync(TARGET, 'utf8'));
 
 // Groups in the order a user meets them: visible UI first, then the hover/tooltip and
 // screen-reader text, then internals. A key joins the FIRST group whose prefix it
@@ -109,31 +118,97 @@ const cell = (raw) => raw
 // Cli.* keys are translated and belong in the table.
 const isMachineCliKey = (k) => k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
 const keys = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
-const buckets = GROUPS.map(() => []);
-for (const k of keys) buckets[groupOf(k)].push(k);
 
-let missing = 0;
-let md = `# InstallerClean in ${lang.endo} (${lang.en})\n\n`;
-md += `The text of InstallerClean's interface and command-line tool in English on the left, with the ${lang.en} translation beside it, grouped by where each line appears in the app. It is here so someone who really knows ${lang.en} can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.\n\n`;
-md += `A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [\`Strings.${code}.resx\`](../../${dir}/Strings.${code}.resx). This page is generated from it by \`scripts/gen-translation-table.mjs\`, so do not edit it by hand.\n`;
+// Builds one language's whole page in memory. Both modes go through it, so
+// --check cannot drift from what a write would produce.
+const buildTable = (c) => {
+  const lang = LANGS[c];
+  const target = parse(readFileSync(`${dir}/Strings.${c}.resx`, 'utf8'));
+  const buckets = GROUPS.map(() => []);
+  for (const k of keys) buckets[groupOf(k)].push(k);
 
-for (let i = 0; i < GROUPS.length; i++) {
-  const list = buckets[i];
-  if (!list.length) continue;
-  md += `\n## ${GROUPS[i][0]}\n\n`;
-  md += `| English | ${lang.endo} |\n| --- | --- |\n`;
-  for (const k of list) {
-    const en = cell(neutral.get(k) ?? '');
-    let tr;
-    if (target.has(k)) tr = cell(target.get(k));
-    else { tr = '_(missing)_'; missing++; }
-    md += `| ${en} | ${tr} |\n`;
+  let missing = 0;
+  let md = `# InstallerClean in ${lang.endo} (${lang.en})\n\n`;
+  md += `The text of InstallerClean's interface and command-line tool in English on the left, with the ${lang.en} translation beside it, grouped by where each line appears in the app. It is here so someone who really knows ${lang.en} can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.\n\n`;
+  md += `A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [\`Strings.${c}.resx\`](../../${dir}/Strings.${c}.resx). This page is generated from it by \`scripts/gen-translation-table.mjs\`, so do not edit it by hand.\n`;
+
+  for (let i = 0; i < GROUPS.length; i++) {
+    const list = buckets[i];
+    if (!list.length) continue;
+    md += `\n## ${GROUPS[i][0]}\n\n`;
+    md += `| English | ${lang.endo} |\n| --- | --- |\n`;
+    for (const k of list) {
+      const en = cell(neutral.get(k) ?? '');
+      let tr;
+      if (target.has(k)) tr = cell(target.get(k));
+      else { tr = '_(missing)_'; missing++; }
+      md += `| ${en} | ${tr} |\n`;
+    }
   }
+
+  return {
+    md: md.endsWith('\n') ? md : md + '\n',
+    missing,
+    groups: buckets.filter((b) => b.length).length,
+  };
+};
+
+const outPath = (c) => `docs/translations/${c}.md`;
+
+if (!checkMode) {
+  const { md, missing, groups } = buildTable(code);
+  mkdirSync('docs/translations', { recursive: true });
+  writeFileSync(outPath(code), md, 'utf8');
+  console.log(`wrote ${outPath(code)}: ${keys.length} strings across ${groups} groups` +
+    (missing ? `  !! ${missing} MISSING translations` : ''));
+  process.exit(0);
 }
 
-mkdirSync('docs/translations', { recursive: true });
-writeFileSync(OUT, md.endsWith('\n') ? md : md + '\n', 'utf8');
+// --check: rebuild and compare, never write. The summary counts differing lines
+// rather than printing a diff, because every line here is a full UI string and
+// fourteen tables' worth would bury the one fact that matters, which language
+// and how far out of step.
+const codes = code ? [code] : Object.keys(LANGS);
+let stale = 0;
 
-const used = buckets.filter((b) => b.length).length;
-console.log(`wrote ${OUT}: ${keys.length} strings across ${used} groups` +
-  (missing ? `  !! ${missing} MISSING translations` : ''));
+// Multiset line comparison. An LCS diff would report the same totals for the
+// edits these files actually take (a row's value changing, a row appearing or
+// retiring) and this cannot get the counts subtly wrong on a 400-row table.
+const lineDelta = (committed, generated) => {
+  const counts = new Map();
+  for (const l of committed.split('\n')) counts.set(l, (counts.get(l) ?? 0) + 1);
+  let added = 0;
+  for (const l of generated.split('\n')) {
+    const n = counts.get(l) ?? 0;
+    if (n > 0) counts.set(l, n - 1); else added++;
+  }
+  let removed = 0;
+  for (const n of counts.values()) removed += n;
+  return { added, removed };
+};
+
+for (const c of codes) {
+  const path = outPath(c);
+  const { md } = buildTable(c);
+  if (!existsSync(path)) {
+    console.error(`${path}: MISSING. Run: node scripts/gen-translation-table.mjs ${c}`);
+    stale++;
+    continue;
+  }
+  const committed = readFileSync(path, 'utf8');
+  if (committed === md) continue;
+  const { added, removed } = lineDelta(committed, md);
+  console.error(`${path}: STALE (${added} line(s) to add, ${removed} to remove).`);
+  stale++;
+}
+
+if (stale) {
+  console.error('');
+  console.error(`Translation-table gate: ${stale} of ${codes.length} table(s) out of step with the resx.`);
+  console.error('These pages are what the project invites native speakers to review, so a stale one');
+  console.error('asks for corrections to text the app no longer has. Regenerate and commit:');
+  console.error('  for c in ' + Object.keys(LANGS).join(' ') + '; do node scripts/gen-translation-table.mjs $c; done');
+  process.exit(1);
+}
+
+console.log(`Translation tables: all ${codes.length} in step with the resx.`);
