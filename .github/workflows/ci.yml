@@ -51,10 +51,11 @@ jobs:
       - name: Check XAML resource keys
         run: node scripts/check-xaml-resources.mjs
 
-      # Held out of CI until the 2.0.2 translation batch landed (it was red by
-      # design during that window); now every satellite is translated, so it is
-      # a required gate: a satellite shipping the English neutral for a required
-      # key fails the build.
+      # A required gate: a satellite shipping the English neutral for a
+      # required key fails the build. It is red by design for the window
+      # between a string's English landing and its translation round running,
+      # so it is expected to fail on the commits in between rather than only
+      # on a mistake.
       - name: Check every satellite is translated
         run: node scripts/check-still-english.mjs
 
