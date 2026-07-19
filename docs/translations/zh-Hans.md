@@ -45,7 +45,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Details | 详情 |
 | _Buy me a cuppa | 请我喝杯茶(_B) |
 | Leave a _star on GitHub | 在 GitHub 上点个星(_S) |
-| MIT licence | MIT 许可证 |
+| Apache 2.0 licence | Apache 2.0 许可证 |
 | _Move | 移动(_M) |
 | _Move instead | 改为移动(_M) |
 | Path to folder if you Move instead of Delete | 文件夹路径（若选择移动而非删除） |
@@ -92,7 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | 正在扫描本地程序包… |
 | Found {0} {1} you can safely delete. | 找到 {0} 个{1}，可安全删除。 |
 | Preparing destination folder... | 正在准备目标文件夹… |
-| Checking the Recycle Bin... | Checking the Recycle Bin... |
+| Checking the Recycle Bin... | 正在检查回收站… |
 | Moving {0} {1}... | 正在移动 {0} 个{1}… |
 | Deleting {0} {1}... | 正在删除 {0} 个{1}… |
 | Move cancelled. {0} of {1} {2} processed. | 移动已取消。{1} 个{2}中已处理 {0} 个。 |
@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | 已移动 {0} |
 | Nothing was moved | 没有移动任何文件 |
 | Nothing was deleted | 没有删除任何文件 |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be moved. | {1} 个文件中有 {0} 个无法移动。 |
+| {0} of {1} could not be moved. | {1} 个文件中有 {0} 个无法移动。 |
+| {0} of {1} could not be deleted. | {1} 个文件中有 {0} 个无法删除。 |
+| {0} of {1} could not be deleted. | {1} 个文件中有 {0} 个无法删除。 |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
 | {0} {1} moved to the Recycle Bin | 已将 {0} 个{1}移到回收站 |
@@ -353,7 +353,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 检查更新 |
 | Checks the GitHub releases API over HTTPS for a newer version. | 通过 HTTPS 查询 GitHub 发布 API，检查是否有更新版本。 |
 | Open the release page to download the newer version, or cancel to keep the current version. | 打开发布页面以下载更新版本，或取消以保留当前版本。 |
-| MIT licence | MIT 许可证 |
+| Apache 2.0 licence | Apache 2.0 许可证 |
 | Opens the licence file on github.com in your browser. | 在浏览器中打开 github.com 上的许可证文件。 |
 | Move location | 移动位置 |
 | Products | 产品 |

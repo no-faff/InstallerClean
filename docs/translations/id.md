@@ -45,7 +45,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Details | Detail |
 | _Buy me a cuppa | Traktir _kopi |
 | Leave a _star on GitHub | Beri _bintang di GitHub |
-| MIT licence | Lisensi MIT |
+| Apache 2.0 licence | Lisensi Apache 2.0 |
 | _Move | _Pindahkan |
 | _Move instead | _Pindahkan saja |
 | Path to folder if you Move instead of Delete | Jalur folder jika Anda memilih Pindahkan, bukan Hapus |
@@ -92,7 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Memindai paket lokal... |
 | Found {0} {1} you can safely delete. | Ditemukan {0} {1} yang aman Anda hapus. |
 | Preparing destination folder... | Menyiapkan folder tujuan... |
-| Checking the Recycle Bin... | Checking the Recycle Bin... |
+| Checking the Recycle Bin... | Memeriksa Keranjang Sampah... |
 | Moving {0} {1}... | Memindahkan {0} {1}... |
 | Deleting {0} {1}... | Menghapus {0} {1}... |
 | Move cancelled. {0} of {1} {2} processed. | Pemindahan dibatalkan. {0} dari {1} {2} diproses. |
@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | {0} dipindahkan |
 | Nothing was moved | Tidak ada yang dipindahkan |
 | Nothing was deleted | Tidak ada yang dihapus |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be moved. | {0} dari {1} file tidak bisa dipindahkan. |
+| {0} of {1} could not be moved. | {0} dari {1} file tidak bisa dipindahkan. |
+| {0} of {1} could not be deleted. | {0} dari {1} file tidak bisa dihapus. |
+| {0} of {1} could not be deleted. | {0} dari {1} file tidak bisa dihapus. |
 | {0} {1} moved to: {2} | {0} {1} dipindahkan ke: {2} |
 | {0} {1} moved to: {2} | {0} {1} dipindahkan ke: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} dipindahkan ke Keranjang Sampah |
@@ -353,7 +353,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Periksa pembaruan |
 | Checks the GitHub releases API over HTTPS for a newer version. | Memeriksa API rilis GitHub melalui HTTPS untuk versi yang lebih baru. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini. |
-| MIT licence | Lisensi MIT |
+| Apache 2.0 licence | Lisensi Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Membuka file lisensi di github.com melalui peramban Anda. |
 | Move location | Lokasi pemindahan |
 | Products | Produk |

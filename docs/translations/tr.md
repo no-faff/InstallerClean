@@ -45,7 +45,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Details | Ayrıntılar |
 | _Buy me a cuppa | _Bana bir çay ısmarla |
 | Leave a _star on GitHub | GitHub'da _yıldız bırak |
-| MIT licence | MIT lisansı |
+| Apache 2.0 licence | Apache 2.0 lisansı |
 | _Move | _Taşı |
 | _Move instead | Bunun yerine _taşı |
 | Path to folder if you Move instead of Delete | Silmek yerine taşıyacaksanız klasör yolu |
@@ -92,7 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Yerel paketler taranıyor... |
 | Found {0} {1} you can safely delete. | Güvenle silebileceğiniz {0} {1} bulundu. |
 | Preparing destination folder... | Hedef klasör hazırlanıyor... |
-| Checking the Recycle Bin... | Checking the Recycle Bin... |
+| Checking the Recycle Bin... | Geri Dönüşüm Kutusu kontrol ediliyor... |
 | Moving {0} {1}... | {0} {1} taşınıyor... |
 | Deleting {0} {1}... | {0} {1} siliniyor... |
 | Move cancelled. {0} of {1} {2} processed. | Taşıma iptal edildi. {1} {2} içinden {0} tanesi işlendi. |
@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | {0} taşındı |
 | Nothing was moved | Hiçbir dosya taşınmadı |
 | Nothing was deleted | Hiçbir dosya silinmedi |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be moved. | {1} dosya içinden {0} tanesi taşınamadı. |
+| {0} of {1} could not be moved. | {1} dosya içinden {0} tanesi taşınamadı. |
+| {0} of {1} could not be deleted. | {1} dosya içinden {0} tanesi silinemedi. |
+| {0} of {1} could not be deleted. | {1} dosya içinden {0} tanesi silinemedi. |
 | {0} {1} moved to: {2} | {0} {1} şu konuma taşındı: {2} |
 | {0} {1} moved to: {2} | {0} {1} şu konuma taşındı: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} Geri Dönüşüm Kutusu'na taşındı |
@@ -353,7 +353,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Güncellemeleri denetle |
 | Checks the GitHub releases API over HTTPS for a newer version. | Daha yeni bir sürüm için GitHub sürüm API'sini HTTPS üzerinden denetler. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Daha yeni sürümü indirmek için sürüm sayfasını açın ya da geçerli sürümü korumak için iptal edin. |
-| MIT licence | MIT lisansı |
+| Apache 2.0 licence | Apache 2.0 lisansı |
 | Opens the licence file on github.com in your browser. | github.com üzerindeki lisans dosyasını tarayıcınızda açar. |
 | Move location | Taşıma konumu |
 | Products | Ürünler |

@@ -45,7 +45,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Details | Подробности |
 | _Buy me a cuppa | _Угостить чаем |
 | Leave a _star on GitHub | Поставить з_везду на GitHub |
-| MIT licence | Лицензия MIT |
+| Apache 2.0 licence | Лицензия Apache 2.0 |
 | _Move | _Переместить |
 | _Move instead | _Переместить вместо этого |
 | Path to folder if you Move instead of Delete | Путь к папке, если вы выберете «Переместить» вместо «Удалить» |
@@ -92,7 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Сканирование локальных пакетов... |
 | Found {0} {1} you can safely delete. | Найдено {0} {1} для безопасного удаления. |
 | Preparing destination folder... | Подготовка папки назначения... |
-| Checking the Recycle Bin... | Checking the Recycle Bin... |
+| Checking the Recycle Bin... | Проверка Корзины... |
 | Moving {0} {1}... | Перемещение: {0} {1}... |
 | Deleting {0} {1}... | Удаление: {0} {1}... |
 | Move cancelled. {0} of {1} {2} processed. | Перемещение отменено. Обработано {0}/{1} {2}. |
@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | Перемещено {0} |
 | Nothing was moved | Ничего не перемещено |
 | Nothing was deleted | Ничего не удалено |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be moved. | Не удалось переместить {0} файл из {1}. |
+| {0} of {1} could not be moved. | Не удалось переместить {0} файлов из {1}. |
+| {0} of {1} could not be deleted. | Не удалось удалить {0} файл из {1}. |
+| {0} of {1} could not be deleted. | Не удалось удалить {0} файлов из {1}. |
 | {0} {1} moved to: {2} | Перемещено {0} {1} в: {2} |
 | {0} {1} moved to: {2} | Перемещено {0} {1} в: {2} |
 | {0} {1} moved to the Recycle Bin | Перемещено {0} {1} в Корзину |
@@ -353,7 +353,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Проверить обновления |
 | Checks the GitHub releases API over HTTPS for a newer version. | Проверяет наличие более новой версии через API выпусков GitHub по HTTPS. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Откройте страницу выпуска, чтобы скачать более новую версию, или нажмите «Отмена», чтобы оставить текущую. |
-| MIT licence | Лицензия MIT |
+| Apache 2.0 licence | Лицензия Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Открывает файл лицензии на github.com в вашем браузере. |
 | Move location | Папка для перемещения |
 | Products | Продукты |

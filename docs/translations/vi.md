@@ -45,7 +45,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Details | Chi tiết |
 | _Buy me a cuppa | _Mời tôi một ly cà phê |
 | Leave a _star on GitHub | Gắn _sao trên GitHub |
-| MIT licence | Giấy phép MIT |
+| Apache 2.0 licence | Giấy phép Apache 2.0 |
 | _Move | _Chuyển |
 | _Move instead | _Chuyển thay vào đó |
 | Path to folder if you Move instead of Delete | Đường dẫn thư mục nếu bạn Chuyển thay vì Xóa |
@@ -92,7 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Đang quét các gói cục bộ... |
 | Found {0} {1} you can safely delete. | Đã tìm thấy {0} {1} bạn có thể xóa an toàn. |
 | Preparing destination folder... | Đang chuẩn bị thư mục đích... |
-| Checking the Recycle Bin... | Checking the Recycle Bin... |
+| Checking the Recycle Bin... | Đang kiểm tra Thùng rác... |
 | Moving {0} {1}... | Đang chuyển {0} {1}... |
 | Deleting {0} {1}... | Đang xóa {0} {1}... |
 | Move cancelled. {0} of {1} {2} processed. | Đã hủy chuyển. Đã xử lý {0}/{1} {2}. |
@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | Đã chuyển {0} |
 | Nothing was moved | Không có tệp nào được chuyển |
 | Nothing was deleted | Không có tệp nào bị xóa |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be moved. | Không thể chuyển {0} trong số {1} tệp. |
+| {0} of {1} could not be moved. | Không thể chuyển {0} trong số {1} tệp. |
+| {0} of {1} could not be deleted. | Không thể xóa {0} trong số {1} tệp. |
+| {0} of {1} could not be deleted. | Không thể xóa {0} trong số {1} tệp. |
 | {0} {1} moved to: {2} | Đã chuyển {0} {1} tới: {2} |
 | {0} {1} moved to: {2} | Đã chuyển {0} {1} tới: {2} |
 | {0} {1} moved to the Recycle Bin | Đã di chuyển {0} {1} vào Thùng rác |
@@ -353,7 +353,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Kiểm tra cập nhật |
 | Checks the GitHub releases API over HTTPS for a newer version. | Kiểm tra API phát hành của GitHub qua HTTPS để tìm phiên bản mới hơn. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Mở trang phát hành để tải phiên bản mới hơn, hoặc hủy để giữ phiên bản hiện tại. |
-| MIT licence | Giấy phép MIT |
+| Apache 2.0 licence | Giấy phép Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Mở tệp giấy phép trên github.com trong trình duyệt của bạn. |
 | Move location | Nơi chuyển đến |
 | Products | Sản phẩm |

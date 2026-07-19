@@ -140,7 +140,7 @@
   <data name="Action.Details" xml:space="preserve"><value>Detalhes</value></data>
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Me paga um _café</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>_Deixe uma estrela no GitHub</value></data>
-  <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
+  <data name="Action.Licence" xml:space="preserve"><value>Licença Apache 2.0</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Mover</value></data>
   <data name="Action.MoveInstead" xml:space="preserve"><value>_Mover em vez disso</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Caminho da pasta, se você Mover em vez de Excluir</value></data>
@@ -187,7 +187,7 @@
        ConfirmSendResultLog windows. The version numbers are in the body
        text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Abra a página da versão para baixar a versão mais recente, ou cancele para manter a versão atual.</value></data>
-  <data name="Automation.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
+  <data name="Automation.Licence" xml:space="preserve"><value>Licença Apache 2.0</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Abre o arquivo da licença em github.com no seu navegador.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
@@ -337,7 +337,7 @@
   <!-- Overlay heading while the pre-delete probe checks the volume's Recycle
        Bin. Shown only when that probe is slow, which is the case where the bin
        is unhealthy, so it must name the wait without predicting its outcome. -->
-  <data name="Status.CheckingRecycleBin" xml:space="preserve"><value>Checking the Recycle Bin...</value></data>
+  <data name="Status.CheckingRecycleBin" xml:space="preserve"><value>Verificando a Lixeira...</value></data>
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>Movendo {0} {1}...</value></data>
   <data name="Status.Deleting" xml:space="preserve"><value>Excluindo {0} {1}...</value></data>
@@ -426,10 +426,10 @@
        which reads worse. A language whose noun sits beside {0} inflects
        correctly at every count and needs no such surgery. The Delete variant
        covers both a Recycle Bin delete and a consented permanent one. -->
-  <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>{0} of {1} could not be moved.</value></data>
-  <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>{0} of {1} could not be moved.</value></data>
-  <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>{0} of {1} could not be deleted.</value></data>
-  <data name="Completion.FailedCountDelete.Plural" xml:space="preserve"><value>{0} of {1} could not be deleted.</value></data>
+  <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>{0} arquivo de {1} não pôde ser movido.</value></data>
+  <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>{0} arquivos de {1} não puderam ser movidos.</value></data>
+  <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>{0} arquivo de {1} não pôde ser excluído.</value></data>
+  <data name="Completion.FailedCountDelete.Plural" xml:space="preserve"><value>{0} arquivos de {1} não puderam ser excluídos.</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path. The colon
        ends the sentence at the verb/preposition so the WPF host can force
        the path onto its own line at the exact point {2} substitutes, the

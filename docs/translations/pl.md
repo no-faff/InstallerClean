@@ -45,7 +45,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Details | Szczegóły |
 | _Buy me a cuppa | Postaw mi _kawę |
 | Leave a _star on GitHub | Zostaw _gwiazdkę na GitHubie |
-| MIT licence | Licencja MIT |
+| Apache 2.0 licence | Licencja Apache 2.0 |
 | _Move | _Przenieś |
 | _Move instead | _Przenieś zamiast tego |
 | Path to folder if you Move instead of Delete | Ścieżka do folderu, jeśli zamiast usuwać wybierzesz Przenieś |
@@ -92,7 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Skanowanie pakietów lokalnych... |
 | Found {0} {1} you can safely delete. | Znaleziono {0} {1} do bezpiecznego usunięcia. |
 | Preparing destination folder... | Przygotowywanie folderu docelowego... |
-| Checking the Recycle Bin... | Checking the Recycle Bin... |
+| Checking the Recycle Bin... | Sprawdzanie Kosza... |
 | Moving {0} {1}... | Przenoszenie: {0} {1}... |
 | Deleting {0} {1}... | Usuwanie: {0} {1}... |
 | Move cancelled. {0} of {1} {2} processed. | Przenoszenie anulowane. Przetworzono {0}/{1} {2}. |
@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | Przeniesiono {0} |
 | Nothing was moved | Niczego nie przeniesiono |
 | Nothing was deleted | Niczego nie usunięto |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be moved. | Nie udało się przenieść {0} pliku z {1}. |
+| {0} of {1} could not be moved. | Nie udało się przenieść {0} plików z {1}. |
+| {0} of {1} could not be deleted. | Nie udało się usunąć {0} pliku z {1}. |
+| {0} of {1} could not be deleted. | Nie udało się usunąć {0} plików z {1}. |
 | {0} {1} moved to: {2} | Przeniesiono {0} {1} do: {2} |
 | {0} {1} moved to: {2} | Przeniesiono {0} {1} do: {2} |
 | {0} {1} moved to the Recycle Bin | Przeniesiono {0} {1} do Kosza |
@@ -353,7 +353,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Sprawdź aktualizacje |
 | Checks the GitHub releases API over HTTPS for a newer version. | Sprawdza w API wydań GitHub przez HTTPS, czy jest nowsza wersja. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Otwórz stronę wydania, aby pobrać nowszą wersję, lub anuluj, aby zachować bieżącą. |
-| MIT licence | Licencja MIT |
+| Apache 2.0 licence | Licencja Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Otwiera plik licencji na github.com w twojej przeglądarce. |
 | Move location | Lokalizacja przenoszenia |
 | Products | Produkty |

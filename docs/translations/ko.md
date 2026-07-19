@@ -45,7 +45,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Details | 세부 정보 |
 | _Buy me a cuppa | 커피 한 잔 사주기(_B) |
 | Leave a _star on GitHub | GitHub에 별 남기기(_S) |
-| MIT licence | MIT 라이선스 |
+| Apache 2.0 licence | Apache 2.0 라이선스 |
 | _Move | 이동(_M) |
 | _Move instead | 대신 이동(_M) |
 | Path to folder if you Move instead of Delete | 삭제 대신 이동할 경우의 폴더 경로 |
@@ -92,7 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | 로컬 패키지를 검사하는 중... |
 | Found {0} {1} you can safely delete. | 안전하게 삭제할 수 있는 {1} {0}개를 찾았습니다. |
 | Preparing destination folder... | 대상 폴더를 준비하는 중... |
-| Checking the Recycle Bin... | Checking the Recycle Bin... |
+| Checking the Recycle Bin... | 휴지통을 확인하는 중... |
 | Moving {0} {1}... | {1} {0}개를 이동하는 중... |
 | Deleting {0} {1}... | {1} {0}개를 삭제하는 중... |
 | Move cancelled. {0} of {1} {2} processed. | 이동이 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다. |
@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | {0} 이동 |
 | Nothing was moved | 이동된 파일 없음 |
 | Nothing was deleted | 삭제된 파일 없음 |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be moved. | 파일 {1}개 중 {0}개를 이동하지 못했습니다. |
+| {0} of {1} could not be moved. | 파일 {1}개 중 {0}개를 이동하지 못했습니다. |
+| {0} of {1} could not be deleted. | 파일 {1}개 중 {0}개를 삭제하지 못했습니다. |
+| {0} of {1} could not be deleted. | 파일 {1}개 중 {0}개를 삭제하지 못했습니다. |
 | {0} {1} moved to: {2} | {1} {0}개를 다음 위치로 이동함: {2} |
 | {0} {1} moved to: {2} | {1} {0}개를 다음 위치로 이동함: {2} |
 | {0} {1} moved to the Recycle Bin | {1} {0}개를 휴지통으로 이동함 |
@@ -353,7 +353,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 업데이트 확인 |
 | Checks the GitHub releases API over HTTPS for a newer version. | GitHub 릴리스 API를 HTTPS로 조회해 새 버전이 있는지 확인합니다. |
 | Open the release page to download the newer version, or cancel to keep the current version. | 새 버전을 내려받으려면 릴리스 페이지를 열고, 현재 버전을 유지하려면 취소하세요. |
-| MIT licence | MIT 라이선스 |
+| Apache 2.0 licence | Apache 2.0 라이선스 |
 | Opens the licence file on github.com in your browser. | 브라우저에서 github.com의 라이선스 파일을 엽니다. |
 | Move location | 이동 위치 |
 | Products | 제품 |

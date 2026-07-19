@@ -45,7 +45,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Details | 詳細 |
 | _Buy me a cuppa | コーヒーをおごる(_B) |
 | Leave a _star on GitHub | GitHubでスターを付ける(_S) |
-| MIT licence | MITライセンス |
+| Apache 2.0 licence | Apache 2.0 ライセンス |
 | _Move | 移動(_M) |
 | _Move instead | 代わりに移動(_M) |
 | Path to folder if you Move instead of Delete | 削除せずに移動する場合のフォルダーパス |
@@ -92,7 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | ローカルパッケージをスキャン中... |
 | Found {0} {1} you can safely delete. | 安全に削除できる {0} 個の {1} が見つかりました。 |
 | Preparing destination folder... | 移動先フォルダーを準備中... |
-| Checking the Recycle Bin... | Checking the Recycle Bin... |
+| Checking the Recycle Bin... | ごみ箱を確認中... |
 | Moving {0} {1}... | {0} 個の {1} を移動中... |
 | Deleting {0} {1}... | {0} 個の {1} を削除中... |
 | Move cancelled. {0} of {1} {2} processed. | 移動がキャンセルされました。{1} 個中 {0} 個の {2} を処理しました。 |
@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | {0} 移動 |
 | Nothing was moved | 何も移動されませんでした |
 | Nothing was deleted | 何も削除されませんでした |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
-| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be moved. | {1} 個中 {0} 個のファイルを移動できませんでした。 |
+| {0} of {1} could not be moved. | {1} 個中 {0} 個のファイルを移動できませんでした。 |
+| {0} of {1} could not be deleted. | {1} 個中 {0} 個のファイルを削除できませんでした。 |
+| {0} of {1} could not be deleted. | {1} 個中 {0} 個のファイルを削除できませんでした。 |
 | {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
 | {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
 | {0} {1} moved to the Recycle Bin | {0} 個の {1} をごみ箱に移動しました |
@@ -353,7 +353,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 更新の確認 |
 | Checks the GitHub releases API over HTTPS for a newer version. | HTTPS 経由で GitHub リリース API をチェックし、新しいバージョンがないか確認します。 |
 | Open the release page to download the newer version, or cancel to keep the current version. | リリースページを開いて新しいバージョンをダウンロードするか、キャンセルして現在のバージョンを維持します。 |
-| MIT licence | MIT ライセンス |
+| Apache 2.0 licence | Apache 2.0 ライセンス |
 | Opens the licence file on github.com in your browser. | ブラウザで github.com のライセンスファイルを開きます。 |
 | Move location | 移動先 |
 | Products | 製品 |
