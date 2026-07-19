@@ -103,9 +103,15 @@ public class CliContractTests
     [Fact]
     public void ParseArguments_move_with_path_carries_the_destination_untrimmed()
     {
-        var result = CliContract.ParseArguments(["/m", @"D:\Backup"]);
+        // Surrounding whitespace is what makes this test say anything: with a
+        // clean "D:\Backup" it passes whether the parser trims or not. The
+        // token is handed back exactly as the shell delivered it, spaces and
+        // case alike, because a path is the caller's to state and a parser
+        // that tidied it would be guessing at a folder name. The GUI trims its
+        // own text box; this side does not.
+        var result = CliContract.ParseArguments(["/m", "  D:\\Backup  "]);
         Assert.Equal(CliCommand.Move, result.Command);
-        Assert.Equal(@"D:\Backup", result.MoveDestination);
+        Assert.Equal("  D:\\Backup  ", result.MoveDestination);
     }
 
     [Fact]

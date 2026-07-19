@@ -155,6 +155,22 @@ public class MutexProbeTests
     }
 
     [Fact]
+    public void IsHeld_is_false_for_a_name_that_exists_but_nobody_holds()
+    {
+        // The case the acquire-rather-than-check design exists for, and the one
+        // the name-does-not-exist test above cannot reach. The Windows Installer
+        // service keeps Global\_MSIExecute alive unheld for minutes after its
+        // last job, so an existence test would answer "installer busy" long
+        // after the install finished and refuse every batch in that window.
+        // An unowned handle held open is precisely that state: the object
+        // exists, so TryOpenExisting succeeds, and the zero-wait acquire is
+        // what tells the two apart.
+        using var existsUnheld = new Mutex(initiallyOwned: false, _name);
+
+        Assert.False(new MutexProbe().IsHeld(_name));
+    }
+
+    [Fact]
     public void IsHeld_is_true_while_another_thread_holds_the_name()
     {
         WithNameHeldElsewhere(_name, () => Assert.True(new MutexProbe().IsHeld(_name)));
