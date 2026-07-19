@@ -467,8 +467,25 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Relaunches the app to apply a new UI language. Releases the
-    /// single-instance mutex BEFORE starting the child: the child takes the
+    /// Relaunches the app to apply a new UI language. Disposes the container
+    /// and releases the single-instance mutex BEFORE starting the child.
+    ///
+    /// The container first, because disposing it is what settles this process's
+    /// last writes to settings.json: MainViewModel.Dispose flushes a
+    /// MoveDestination edit still inside its 400 ms debounce (see
+    /// CleanupViewModel.Dispose, which names the language switch as one of the
+    /// paths it exists for) and waits out the result-log lifetime-lock write.
+    /// The child reads that same file twice early, in OnStartup for the
+    /// language and in CleanupViewModel's constructor for the destination.
+    /// Leaving the disposal to OnExit put both writes after Process.Start, a
+    /// race the parent happened to win only because the child has process
+    /// creation, runtime start, DI build and a splash-driven scan to get
+    /// through first. The lifetime-lock wait is bounded at five seconds and now
+    /// sits before the launch rather than beside it, which is the right side of
+    /// that trade: the bound is only reached by a disk that has stopped
+    /// answering, and a child that reads a stale file gets it wrong every time.
+    ///
+    /// Then the mutex: the child takes the
     /// same Global\InstallerClean_SingleInstance mutex on startup, and a
     /// still-held mutex would send it down the "already running" exit, so the
     /// release order is load-bearing. ReleaseMutex must run on the thread that
@@ -479,6 +496,12 @@ public partial class App : Application
     /// </summary>
     public void RelaunchForLanguageChange()
     {
+        // Nulled so OnExit's own _services?.Dispose() is a no-op rather than a
+        // second teardown; the flush obligation stays in the one place that has
+        // always held it, MainViewModel.Dispose.
+        _services?.Dispose();
+        _services = null;
+
         if (_holdsSingleInstanceMutex)
         {
             _singleInstanceMutex?.ReleaseMutex();
