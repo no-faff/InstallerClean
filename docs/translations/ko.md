@@ -188,8 +188,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded files to clean up | 정리할 불필요한 파일 {0}개 |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | 등록된 파일 {0}개가 누락되었습니다(InstallerClean이 삭제한 것은 아닙니다). 지금은 문제가 없지만, 나중에 해당 프로그램을 복구, 업데이트 또는 제거할 때 실패할 수 있습니다. 어떻게 해야 할지는 세부 정보를 여세요. |
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | 등록된 파일 {0}개가 누락되었습니다(InstallerClean이 삭제한 것은 아닙니다). 지금은 문제가 없지만, 나중에 해당 프로그램들을 복구, 업데이트 또는 제거할 때 실패할 수 있습니다. 어떻게 해야 할지는 세부 정보를 여세요. |
-| Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do. | Windows가 디스크에서 이미 사라진 오래된 패치 {0}개를 여전히 목록에 남겨 두고 있습니다. 문제 될 것은 없으며, 따로 하실 일은 없습니다. |
-| Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do. | Windows가 디스크에서 이미 사라진 오래된 패치 {0}개를 여전히 목록에 남겨 두고 있습니다. 문제 될 것은 없으며, 따로 하실 일은 없습니다. |
 | {0} installed program could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | 이번 검사에서 설치된 프로그램 {0}개를 읽을 수 없어 대체된 패치를 그대로 두었습니다. 고립된 파일은 영향을 받지 않습니다. |
 | {0} installed programs could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | 이번 검사에서 설치된 프로그램 {0}개를 읽을 수 없어 대체된 패치를 그대로 두었습니다. 고립된 파일은 영향을 받지 않습니다. |
 | {0} of {1} {2} | {2} {1}개 중 {0}개 |

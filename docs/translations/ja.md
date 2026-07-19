@@ -188,8 +188,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded files to clean up | クリーンアップ対象の不要ファイルが {0} 個 |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} 個の登録済みファイルが見つかりません (InstallerClean によって削除されたものではありません)。現時点では問題ありませんが、そのプログラムの将来の修復、更新、またはアンインストールが失敗する可能性があります。対処方法は詳細を開いてください。 |
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | {0} 個の登録済みファイルが見つかりません (InstallerClean によって削除されたものではありません)。現時点では問題ありませんが、それらのプログラムの将来の修復、更新、またはアンインストールが失敗する可能性があります。対処方法は詳細を開いてください。 |
-| Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do. | Windows の一覧には、ファイルがすでにディスクから消えている古いパッチが {0} 個、まだ残っています。害はなく、特に何もする必要はありません。 |
-| Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do. | Windows の一覧には、ファイルがすでにディスクから消えている古いパッチが {0} 個、まだ残っています。害はなく、特に何もする必要はありません。 |
 | {0} installed program could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | 今回のスキャンでインストール済みプログラム {0} 個を読み取れなかったため、置換済みのパッチは残してあります。孤立ファイルには影響しません。 |
 | {0} installed programs could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | 今回のスキャンでインストール済みプログラム {0} 個を読み取れなかったため、置換済みのパッチは残してあります。孤立ファイルには影響しません。 |
 | {0} of {1} {2} | {2} {1} 個中 {0} 個 |

@@ -188,8 +188,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded files to clean up | {0} 个不需要的文件可清理 |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | 有 {0} 个已注册文件缺失（并非 InstallerClean 删除）。目前没有问题，但日后修复、更新或卸载该程序时可能会失败。打开“详情”了解该怎么做。 |
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | 有 {0} 个已注册文件缺失（并非 InstallerClean 删除）。目前没有问题，但日后修复、更新或卸载这些程序时可能会失败。打开“详情”了解该怎么做。 |
-| Windows still lists {0} old patch whose file is already gone from disk. That's harmless, and there's nothing you need to do. | Windows 仍列出 {0} 个旧补丁，其文件其实已经不在磁盘上了。这没有影响，您也无需做任何处理。 |
-| Windows still lists {0} old patches whose files are already gone from disk. That's harmless, and there's nothing you need to do. | Windows 仍列出 {0} 个旧补丁，其文件其实已经不在磁盘上了。这没有影响，您也无需做任何处理。 |
 | {0} installed program could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | 本次扫描无法读取 {0} 个已安装的程序，因此被取代的补丁已保留。孤立文件不受影响。 |
 | {0} installed programs could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | 本次扫描无法读取 {0} 个已安装的程序，因此被取代的补丁已保留。孤立文件不受影响。 |
 | {0} of {1} {2} | {1} 个{2}中的 {0} 个 |
