@@ -18,7 +18,7 @@ I'll confirm I've received it, keep you posted on the fix and credit you in the 
 
 InstallerClean runs with administrator privileges and touches the Windows Installer database. Of particular interest:
 
-- Anything that could cause Move or Delete to act on files outside `C:\Windows\Installer` or its subfolders
+- Anything that could cause Move or Delete to act on a file outside the top level of `C:\Windows\Installer` (the app scans only the top level and never acts inside subfolders, so below-top-level counts as outside)
 - Anything that could cause a registered file to be flagged as removable
 - Path traversal or TOCTOU issues around the Move destination
 
