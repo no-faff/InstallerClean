@@ -16,12 +16,12 @@ namespace InstallerClean.Tests.Services;
 ///
 /// The registry fallback runs after the API enumeration on every call, and
 /// these tests bind it to a stub that reads nothing and reports no failures, so
-/// a run's outcome depends on the scripted API alone. It used to read the live
-/// UserData keys of whatever host the suite ran on, which was tolerable while
-/// the fallback could only ADD rows (the assertions filter to the paths the fake
-/// produces), but the degraded-sources gate now reads its failure count, and a
-/// CI machine with one unreadable key would decide the outcome of every test
-/// that scripts a short enumeration. The merge rules the fallback participates
+/// a run's outcome depends on the scripted API alone. Letting it read the live
+/// UserData keys of whatever host the suite ran on would be tolerable if the
+/// fallback could only ADD rows (the assertions filter to the paths the fake
+/// produces), but the degraded-sources gate reads its failure count, so a CI
+/// machine with one unreadable key would decide the outcome of every test that
+/// scripts a short enumeration. The merge rules the fallback participates
 /// in are pinned by calling <c>MergeClaim</c> directly.
 /// </summary>
 public class InstallerQueryServiceUnitTests
@@ -260,12 +260,11 @@ public class InstallerQueryServiceUnitTests
 
     // ---- The index cap ends enumeration loudly, not silently ----
 
-    // The message is asserted, not just the type. The cap and the consecutive
-    // failures are different conditions and shared one string until 2.0.2: at
-    // the cap the count is the budget rather than a run of failures, and the
-    // error code is Success when every row read cleanly, so the shared string
-    // described the stop falsely in both halves. Asserting the type alone let
-    // that stand.
+    // The message is asserted, not just the type, because the cap and the
+    // consecutive-failure stop are different conditions that a shared string
+    // describes falsely in both halves: at the cap the count is the budget
+    // rather than a run of failures, and the error code is Success when every
+    // row read cleanly. Asserting the type alone cannot tell the two apart.
     [Fact]
     public async Task Product_enumeration_that_never_ends_throws_at_the_cap()
     {
@@ -743,12 +742,13 @@ public class InstallerQueryServiceUnitTests
     [Fact]
     public async Task AccessDenied_from_the_sid_retry_refuses_the_scan()
     {
-        // The refusal check used to sit above the retry, so this code came back
-        // from the second call and fell into the tolerated-failure branch: the
-        // row was counted and demoted, and the scan reported itself as merely
-        // short of a record when Windows had refused it outright. Contract-wise
-        // near unreachable (the retry only runs for a SID past 256 characters),
-        // so this pins the refusal contract rather than a field failure.
+        // The refusal check has to cover the retry's return code too, not just
+        // the first call's. A refusal coming back from the second call and
+        // falling into the tolerated-failure branch would count and demote the
+        // row, leaving the scan reporting itself as merely short of a record
+        // when Windows had refused it outright. Near unreachable in practice
+        // (the retry only runs for a SID past 256 characters), so this pins the
+        // refusal contract rather than a field failure.
         var msi = new FakeMsiApi();
         msi.AddProduct("{A}");
         msi.ProductSidRetryResult[0] = AccessDenied;

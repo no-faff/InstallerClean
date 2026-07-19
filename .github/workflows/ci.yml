@@ -33,8 +33,8 @@ jobs:
       # actually hit: a resx key left with no consumer; the installer language
       # set and SupportedLanguages diverging when a language is added to one and
       # not the other; a French value that lost its narrow no-break space to a
-      # plain space (which the editing tools flatten silently). They run before
-      # the build because they need only the checkout, not the SDK.
+      # plain space (which plenty of editors do silently). They run before the
+      # build because they need only the checkout, not the SDK.
       - name: Check for dead resx keys
         run: node scripts/check-dead-resx-keys.mjs
 

@@ -56,7 +56,7 @@ public class InstallerQueryServiceTests
         var progress = new SyncProgress<ScanProgressUpdate>(u => messages.Add(u.Message));
 
         // The service reports "Enumerating installed products..." before
-        // calling the API. Even if the API fails, we should see that message.
+        // calling the API, so the message arrives even when the API then fails.
         try
         {
             await svc.GetRegisteredPackagesAsync(progress);

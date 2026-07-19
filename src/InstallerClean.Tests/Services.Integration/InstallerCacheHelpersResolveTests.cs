@@ -155,7 +155,7 @@ public class InstallerCacheHelpersResolveTests
     public void CheckSafeToRemove_reports_Refused_for_a_path_outside_the_cache()
     {
         // The other arm, so the test above is not passing merely because
-        // everything now answers Unproven.
+        // everything answers Unproven.
         Assert.Equal(CandidateGuard.RemovalSafety.Refused,
             CandidateGuard.CheckSafeToRemove(Path.Combine(Path.GetTempPath(), "outside.msi")));
     }

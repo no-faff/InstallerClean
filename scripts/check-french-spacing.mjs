@@ -46,7 +46,7 @@ if (problems.length) {
   for (const p of problems)
     console.error(`  ${p.key}: "...${p.around}" (before '${p.mark}')`);
   console.error('\nReplace the space before ! ? : ; with a narrow no-break space (U+202F), written');
-  console.error('with python3/printf (the Edit tool flattens it to a plain space).');
+  console.error('with python3/printf, since many editors normalise it to a plain space.');
   process.exit(1);
 }
 console.log(`French spacing OK: no plain ASCII space before ! ? : ; in ${FILE.split('/').pop()}.`);

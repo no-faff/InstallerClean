@@ -307,8 +307,9 @@ public class MoveFilesServiceUnitTests
     public async Task MoveFilesAsync_refuses_a_source_whose_attributes_cannot_be_read()
     {
         // An embedded null makes File.GetAttributes throw ArgumentException on
-        // every platform and every version, which is the "the read failed" arm.
-        // It used to answer "not a reparse point" and let the file through.
+        // every platform and every version, which is how the "the read failed"
+        // arm is reached. That arm must refuse: answering "not a reparse point"
+        // on a failed read would let the file through.
         var source = $"{SourceDir}\\unreadable\0.msi";
         var (fs, file) = FileSystemReporting(source);
 

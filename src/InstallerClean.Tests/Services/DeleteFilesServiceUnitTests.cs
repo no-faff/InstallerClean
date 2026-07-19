@@ -237,9 +237,9 @@ public class DeleteFilesServiceUnitTests
     public async Task Refuses_a_source_whose_attributes_cannot_be_read()
     {
         // An embedded null makes File.GetAttributes throw ArgumentException on
-        // every platform and every version: the "the read failed" arm, which
-        // used to answer "not a reparse point" and let the file through to the
-        // recycle call.
+        // every platform and every version, which is how the "the read failed"
+        // arm is reached. That arm must refuse: answering "not a reparse point"
+        // on a failed read would let the file through to the recycle call.
         var source = $"{Dir}\\unreadable\0.msi";
         var (_, engine) = Setup();
 
@@ -299,7 +299,7 @@ public class DeleteFilesServiceUnitTests
         // have decided that inside the lock. The visible consequence is the
         // order of the two refusals, pinned here so it is a decision rather
         // than a side effect: a machine where the bin is unavailable AND an
-        // installer holds the lock now reports the bin, not the installer.
+        // installer holds the lock reports the bin, not the installer.
         // Both refuse and neither touches a file, and the second refusal
         // arrives the moment the first is answered.
         var (fs, engine) = Setup();

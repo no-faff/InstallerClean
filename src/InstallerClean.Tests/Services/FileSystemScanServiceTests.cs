@@ -129,8 +129,8 @@ public class FileSystemScanServiceTests
 
         // Only root-level files are candidates. A registered LocalPackage path
         // never sits in a subdirectory, so the API can say nothing about a file
-        // there. A payload .msp under $PatchCache$ (the patch engine's baseline
-        // copy) and any other subfolder file are both out of scope now.
+        // there. That puts a payload .msp under $PatchCache$ (the patch engine's
+        // baseline copy) and every other subfolder file out of scope.
         var fs = new MockFileSystem(new Dictionary<string, MockFileData>
         {
             [@"C:\Windows\Installer\bbb.msi"] = new("x"),                                     // root: a candidate

@@ -270,8 +270,9 @@ public class ScanMoveCompletionTests
 
         Assert.True(vm.Completion.IsComplete);
 
-        // The count line replaces the old "(2)" bracket on the group header:
-        // 2 failed of the 3 the batch attempted (1 moved + 2 errors).
+        // The failure count lives on its own line rather than as a bracket on
+        // the group header: 2 failed of the 3 the batch attempted (1 moved + 2
+        // errors).
         Assert.Equal(
             string.Format(InstallerClean.Resources.Strings.Completion_FailedCount_Plural, 2, 3),
             vm.Completion.FailedCount);

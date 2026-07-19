@@ -55,9 +55,10 @@ public class LocalisationOverrideTests
     [Fact]
     public void The_long_elapsed_form_follows_the_format_culture_too()
     {
-        // FormatElapsedLong was the one formatter in DisplayHelpers that did
-        // not pass Localisation.FormatCulture, so it rendered the French
-        // sentence with an English decimal point. This fails on that code.
+        // Every formatter in DisplayHelpers has to pass
+        // Localisation.FormatCulture explicitly. One that does not renders the
+        // French sentence with an English decimal point, which is what this
+        // catches: the number is the only part of the line that gives it away.
         using var thread = new CultureScope(British);
         using var scope = new LocalisationScope(French, French);
 
