@@ -243,6 +243,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // and saves atomically under its own lock, so this thread-pool debounce
         // cannot lose the result-log lifetime lock or the language pick that run
         // on the dispatcher to a last-writer-wins rename.
+        //
+        // No token on this Task.Run, deliberately. The debounce is the
+        // cancellable part and it is already over; the body has nothing to
+        // interrupt (one Update call, which serialises on its own lock) and
+        // nothing to gain by being skipped. Passing the token instead made a
+        // keystroke that cancelled the CTS between the delay completing and the
+        // run starting, an interleaving both continuations queue on the
+        // dispatcher for, hand back a Canceled task, whose TaskCanceledException
+        // escaped this fire-and-forget method and reached
+        // TaskScheduler.UnobservedTaskException, writing a phantom entry to
+        // crash.log at whatever later GC observed it.
         var destinationSnapshot = _settings.MoveDestination;
         await Task.Run(() =>
         {
@@ -255,7 +266,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 CrashLog.TryWrite(new InvalidOperationException(
                     "Settings.Update returned false during MoveDestination debounced save."));
             }
-        }, token).ConfigureAwait(true);
+        }).ConfigureAwait(true);
 
         // Dispose the type-once-and-stop case (every other path is
         // covered by the next schedule call replacing the field).
