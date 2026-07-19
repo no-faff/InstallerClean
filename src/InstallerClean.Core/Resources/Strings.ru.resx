@@ -501,8 +501,6 @@
        because the files are removable already; only the MSI
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
-  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>В списке Windows всё ещё есть {0} старый патч, файла которого уже нет на диске. Это не страшно, и делать ничего не нужно.</value></data>
-  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>В списке Windows всё ещё есть {0} старых патчей, файлов которых уже нет на диске. Это не страшно, и делать ничего не нужно.</value></data>
   <!-- Informational line shown when the scan could not read every installed
        program's Windows Installer records. Superseded patches are then kept
        rather than offered, because whether one is still needed is a question
@@ -920,7 +918,6 @@ InstallerClean уже был запущен от имени администра
   <data name="Summary.RegisteredStillUsed.Few" xml:space="preserve"><value>{0} файла ещё нужны</value></data>
   <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} ненужных файла для очистки</value></data>
   <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>Отсутствует {0} зарегистрированных файла (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
-  <data name="Summary.StaleMsiEntries.Few" xml:space="preserve"><value>В списке Windows всё ещё есть {0} старых патча, файлов которых уже нет на диске. Это не страшно, и делать ничего не нужно.</value></data>
   <data name="Summary.ProgramsUnreadable.Few" xml:space="preserve"><value>При этом сканировании не удалось прочитать {0} установленные программы, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается.</value></data>
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} зарегистрированных файла ещё нужны ({1})</value></data>
   <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину.</value></data>

@@ -501,8 +501,6 @@
        because the files are removable already; only the MSI
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
-  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows todavía tiene registrado {0} parche antiguo cuyo archivo ya no está en el disco. No supone ningún problema y no tienes que hacer nada.</value></data>
-  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows todavía tiene registrados {0} parches antiguos cuyos archivos ya no están en el disco. No supone ningún problema y no tienes que hacer nada.</value></data>
   <!-- Informational line shown when the scan could not read every installed
        program's Windows Installer records. Superseded patches are then kept
        rather than offered, because whether one is still needed is a question

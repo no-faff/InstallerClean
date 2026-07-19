@@ -371,8 +371,6 @@ public static class Strings
     public static string Summary_RegisteredStillUsed_Singular => Get("Summary.RegisteredStillUsed.Singular");
     public static string Summary_RegisteredWindow_Plural => Get("Summary.RegisteredWindow.Plural");
     public static string Summary_RegisteredWindow_Singular => Get("Summary.RegisteredWindow.Singular");
-    public static string Summary_StaleMsiEntries_Plural => Get("Summary.StaleMsiEntries.Plural");
-    public static string Summary_StaleMsiEntries_Singular => Get("Summary.StaleMsiEntries.Singular");
     public static string Tooltip_BuyMeACuppa => Get("Tooltip.BuyMeACuppa");
     public static string Tooltip_BuyMeACuppa_About => Get("Tooltip.BuyMeACuppa.About");
     public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");

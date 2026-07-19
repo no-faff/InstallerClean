@@ -126,8 +126,6 @@ public partial class ScanViewModel : ObservableObject
     /// explanation.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasStaleMsiEntries))]
-    [NotifyPropertyChangedFor(nameof(StaleMsiEntriesText))]
     private int _missingRemovableCount;
 
     /// <summary>
@@ -220,28 +218,8 @@ public partial class ScanViewModel : ObservableObject
             MissingNonRemovableCount);
 
     /// <summary>
-    /// True when the MSI database carries superseded-patch registrations
-    /// whose underlying files are already gone from disk. Distinct from
-    /// <see cref="HasMissingFromDisk"/>: that case is load-bearing
-    /// (Windows still claims the file but it's gone, so a future
-    /// install/uninstall/patch will fail); this case is benign (Windows
-    /// considers the patch removable, the file having gone is the
-    /// expected end state). Surfaced as a small informational line.
-    /// </summary>
-    public bool HasStaleMsiEntries => MissingRemovableCount > 0;
-
-    public string StaleMsiEntriesText =>
-        string.Format(
-            DisplayHelpers.Pluralise(MissingRemovableCount,
-                Strings.Summary_StaleMsiEntries_Singular,
-                Strings.Summary_StaleMsiEntries_Plural,
-                "Summary.StaleMsiEntries"),
-            MissingRemovableCount);
-
-    /// <summary>
     /// True when the last scan could not read every installed program's records
-    /// and therefore kept its superseded patches back. Informational, like
-    /// <see cref="HasStaleMsiEntries"/> and unlike
+    /// and therefore kept its superseded patches back. Informational, unlike
     /// <see cref="HasMissingFromDisk"/>: nothing is wrong with the machine and
     /// there is nothing for the user to do. It is shown because the alternative
     /// is a quietly shorter list, and a scan that says less than usual without

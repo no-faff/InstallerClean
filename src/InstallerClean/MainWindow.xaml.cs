@@ -434,8 +434,6 @@ public partial class MainWindow : Window
             AnnounceLiveRegions(PendingRebootBannerText);
         if (e.PropertyName == nameof(ScanViewModel.HasMissingFromDisk) && _vm.Scan.HasMissingFromDisk)
             AnnounceLiveRegions(MissingFromDiskBannerText);
-        if (e.PropertyName == nameof(ScanViewModel.HasStaleMsiEntries) && _vm.Scan.HasStaleMsiEntries)
-            AnnounceLiveRegions(StaleMsiEntriesText);
         if (e.PropertyName == nameof(ScanViewModel.HasUnreadableProducts) && _vm.Scan.HasUnreadableProducts)
             AnnounceLiveRegions(ProgramsUnreadableText);
     }

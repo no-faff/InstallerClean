@@ -501,8 +501,6 @@
        because the files are removable already; only the MSI
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
-  <data name="Summary.StaleMsiEntries.Singular" xml:space="preserve"><value>Windows masih mendaftarkan {0} patch lama yang file-nya sudah tidak ada di disk. Itu tidak berbahaya, dan tidak ada yang perlu Anda lakukan.</value></data>
-  <data name="Summary.StaleMsiEntries.Plural" xml:space="preserve"><value>Windows masih mendaftarkan {0} patch lama yang file-nya sudah tidak ada di disk. Itu tidak berbahaya, dan tidak ada yang perlu Anda lakukan.</value></data>
   <!-- Informational line shown when the scan could not read every installed
        program's Windows Installer records. Superseded patches are then kept
        rather than offered, because whether one is still needed is a question

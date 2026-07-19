@@ -1416,13 +1416,15 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task ScanViewModel_HasStaleMsiEntries_tracks_MissingRemovableCount()
+    public async Task ScanViewModel_MissingRemovableCount_stays_off_the_missing_from_disk_banner()
     {
-        // The stale-MSI banner sources from MissingRemovableCount, a
-        // separate counter from the load-bearing missing-from-disk
-        // banner. Removable+missing is the expected end state of a
-        // patch the API still claims but the file has already been
-        // cleaned away.
+        // Removable+missing is the expected end state of a patch the API
+        // still claims but whose file has already been cleaned away, and
+        // InstallerClean leaves one behind every time it removes a
+        // superseded patch. Nothing on screen reports them; the count is
+        // carried for the opt-in report. What matters is that it never
+        // reaches the load-bearing missing-from-disk banner, which means
+        // files Windows still needs have gone.
         var vm = CreateViewModel();
 
         var removable = new RegisteredPackage(
@@ -1439,10 +1441,8 @@ public class MainViewModelTests
 
         await vm.Scan.ScanCommand.ExecuteAsync(null);
 
-        Assert.True(vm.Scan.HasStaleMsiEntries);
         Assert.False(vm.Scan.HasMissingFromDisk);
         Assert.Equal(2, vm.Scan.MissingRemovableCount);
-        Assert.Contains("2", vm.Scan.StaleMsiEntriesText);
     }
 
     [Fact]
