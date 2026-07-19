@@ -22,11 +22,11 @@ public sealed class ResultLogService : IResultLogService
 
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
 
-    private static readonly string LogFolder = Path.Combine(
+    private static readonly string DefaultLogFile = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "NoFaff", "InstallerClean");
+        "NoFaff", "InstallerClean", "last-run.json");
 
-    private static readonly string LogFile = Path.Combine(LogFolder, "last-run.json");
+    private readonly string _logFile;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -50,9 +50,22 @@ public sealed class ResultLogService : IResultLogService
         MaxResponseContentBufferSize = 4 * 1024,
     };
 
-    public string LastLogPath => LogFile;
+    public ResultLogService() : this(DefaultLogFile) { }
 
-    public bool HasFreshLog => File.Exists(LogFile);
+    /// <summary>
+    /// Test seam, mirroring <see cref="SettingsService"/>'s next door: points
+    /// the whole write-read cycle at a sandbox path so the byte cap, the
+    /// atomic write and the temp-file cleanup can be driven without a test run
+    /// writing over the real last-run.json in the running user's profile.
+    /// </summary>
+    internal ResultLogService(string logFile)
+    {
+        _logFile = logFile;
+    }
+
+    public string LastLogPath => _logFile;
+
+    public bool HasFreshLog => File.Exists(_logFile);
 
     public async Task<bool> WriteAsync(ResultLogEntry entry, CancellationToken cancellationToken = default)
     {
@@ -60,10 +73,13 @@ public sealed class ResultLogService : IResultLogService
         // matching SettingsService.TrySave. A refused open, a cancelled token, a
         // full disk or a failed rename all leave the temp file on disk otherwise,
         // and it shares a folder with settings.json for the life of the install.
-        var tempFile = LogFile + "." + Path.GetRandomFileName() + ".tmp";
+        var tempFile = _logFile + "." + Path.GetRandomFileName() + ".tmp";
         try
         {
-            Directory.CreateDirectory(LogFolder);
+            // GetDirectoryName is null only for a root path, which the
+            // default never is and a test sandbox never should be.
+            var folder = Path.GetDirectoryName(_logFile);
+            if (folder is not null) Directory.CreateDirectory(folder);
 
             var json = JsonSerializer.Serialize(entry, JsonOptions);
 
@@ -86,7 +102,7 @@ public sealed class ResultLogService : IResultLogService
                 await fs.WriteAsync(Encoding.UTF8.GetBytes(json), cancellationToken).ConfigureAwait(false);
             }
 
-            File.Move(tempFile, LogFile, overwrite: true);
+            File.Move(tempFile, _logFile, overwrite: true);
             return true;
         }
         catch (Exception ex)
@@ -150,13 +166,13 @@ public sealed class ResultLogService : IResultLogService
 
     public async Task<string?> ReadLastLogAsync(CancellationToken cancellationToken = default)
     {
-        if (!File.Exists(LogFile))
+        if (!File.Exists(_logFile))
             return null;
 
         try
         {
             using var handle = StorageHelpers.OpenAtomic(
-                LogFile, FileAccess.Read, StorageHelpers.AtomicOpenMode.OpenExisting);
+                _logFile, FileAccess.Read, StorageHelpers.AtomicOpenMode.OpenExisting);
             if (handle is null) return null;
             using var fs = new FileStream(handle, FileAccess.Read);
             if (fs.Length > IResultLogService.MaxLogBytes)
