@@ -693,16 +693,33 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (LocalisedInvalidOperationException ex)
         {
+            // Refresh before the dialog: Error_DestinationChangedMidBatch is
+            // thrown from inside the per-file loop (MoveFilesService, the
+            // per-iteration junction re-resolve), so files may already have
+            // left the cache. Without this the window keeps the pre-move count
+            // and size behind the modal, and the orphaned Details window lists
+            // files that are no longer there, until the next scan.
+            await _scan.RefreshAsync();
             _dialogService.ShowWarning(ex.Message, Strings.Error_InvalidDestinationTitle);
             OperationProgress = string.Empty;
         }
         catch (LocalisedAccessException ex)
         {
+            // No refresh here, and that asymmetry is deliberate: every
+            // LocalisedAccessException comes from CreateDestinationFolder or
+            // ProbeDestinationWriteable, both of which run before the per-file
+            // loop starts, so no file has moved and the counts on screen are
+            // still correct.
             _dialogService.ShowWarning(ex.Message, Strings.Error_DestinationWriteFailedTitle);
             OperationProgress = string.Empty;
         }
         catch (Exception ex)
         {
+            // Refresh for the same reason as the mid-batch arm above: this is
+            // the unforeseen-failure arm, so whether any file moved before it
+            // is by definition unknown, and stale counts are the wrong thing to
+            // leave on screen either way.
+            await _scan.RefreshAsync();
             // A mid-move crash is surfaced the way every other failure in the
             // app is: a dialog naming the exception type and the crash-log
             // path, never ex.Message (it can carry another user's profile path
