@@ -309,7 +309,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void BrowseDestination()
     {
-        var chosen = _confirmationService.AskForMoveDestination();
+        var chosen = _confirmationService.AskForMoveDestination(MoveDestination);
         if (chosen is not null) MoveDestination = chosen;
     }
 

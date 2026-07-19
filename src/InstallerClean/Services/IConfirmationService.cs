@@ -63,10 +63,16 @@ public interface IConfirmationService
     /// folder, or <c>null</c> if the user cancelled or there is no host
     /// window to own the dialog.
     ///
+    /// <paramref name="currentDestination"/> is whatever the Move box holds,
+    /// and the browser opens there when it names a folder that exists. Browse
+    /// is most often pressed to change a destination rather than to set the
+    /// first one, and starting at the shell default made the user navigate back
+    /// to a path already on screen.
+    ///
     /// It sits behind this interface for the same reason the confirmations
     /// do: Move asks for a destination when none is set, so without it that
     /// path could only be exercised by opening a real folder browser, which
     /// a test run cannot answer.
     /// </summary>
-    string? AskForMoveDestination();
+    string? AskForMoveDestination(string? currentDestination = null);
 }

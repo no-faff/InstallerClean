@@ -336,6 +336,22 @@ public class CleanupPreFlightTests
     }
 
     [Fact]
+    public async Task Browse_starts_at_the_folder_the_box_already_names()
+    {
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        vm.Cleanup.BrowseDestinationCommand.Execute(null);
+
+        // Browse is pressed to CHANGE a destination more often than to set the
+        // first one, so the browser opens where the box points rather than
+        // making the user navigate back to a path already on screen. Whether
+        // that path still exists is the service's call, not the view-model's.
+        _confirmationService.Received(1).AskForMoveDestination(_destination);
+    }
+
+    [Fact]
     public async Task Cancelling_the_confirmation_removes_the_folder_the_pre_flight_created()
     {
         // Exists is unconfigured, so it answers false: the pre-flight is the
