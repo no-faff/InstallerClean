@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | 已移动 {0} |
 | Nothing was moved | 没有移动任何文件 |
 | Nothing was deleted | 没有删除任何文件 |
-| {0} of {1} files could not be moved. | {1} 个文件中有 {0} 个无法移动。 |
-| {0} of {1} files could not be moved. | {1} 个文件中有 {0} 个无法移动。 |
-| {0} of {1} files could not be deleted. | {1} 个文件中有 {0} 个无法删除。 |
-| {0} of {1} files could not be deleted. | {1} 个文件中有 {0} 个无法删除。 |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
 | {0} {1} moved to the Recycle Bin | 已将 {0} 个{1}移到回收站 |

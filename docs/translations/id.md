@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | {0} dipindahkan |
 | Nothing was moved | Tidak ada yang dipindahkan |
 | Nothing was deleted | Tidak ada yang dihapus |
-| {0} of {1} files could not be moved. | {0} dari {1} file tidak bisa dipindahkan. |
-| {0} of {1} files could not be moved. | {0} dari {1} file tidak bisa dipindahkan. |
-| {0} of {1} files could not be deleted. | {0} dari {1} file tidak bisa dihapus. |
-| {0} of {1} files could not be deleted. | {0} dari {1} file tidak bisa dihapus. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
 | {0} {1} moved to: {2} | {0} {1} dipindahkan ke: {2} |
 | {0} {1} moved to: {2} | {0} {1} dipindahkan ke: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} dipindahkan ke Keranjang Sampah |

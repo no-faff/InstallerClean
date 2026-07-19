@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | Przeniesiono {0} |
 | Nothing was moved | Niczego nie przeniesiono |
 | Nothing was deleted | Niczego nie usunięto |
-| {0} of {1} files could not be moved. | Nie udało się przenieść {0} pliku z {1}. |
-| {0} of {1} files could not be moved. | Nie udało się przenieść {0} plików z {1}. |
-| {0} of {1} files could not be deleted. | Nie udało się usunąć {0} pliku z {1}. |
-| {0} of {1} files could not be deleted. | Nie udało się usunąć {0} plików z {1}. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
 | {0} {1} moved to: {2} | Przeniesiono {0} {1} do: {2} |
 | {0} {1} moved to: {2} | Przeniesiono {0} {1} do: {2} |
 | {0} {1} moved to the Recycle Bin | Przeniesiono {0} {1} do Kosza |

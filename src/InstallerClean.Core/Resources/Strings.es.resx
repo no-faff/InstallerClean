@@ -417,14 +417,19 @@
        (succeeded + failed). On a run the user cancelled, {1} is smaller than
        the batch total the cancelled summary line names, because it counts what
        was tried rather than what was queued. The count selecting the plural
-       form is {0}; the noun belongs to {1}, so a language that inflects the
-       noun should read the two independently and may add a satellite-only
-       .One/.Few/.Many override. The Delete variant covers both a Recycle Bin
-       delete and a consented permanent one. -->
-  <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>No se pudo mover {0} archivo de {1}.</value></data>
-  <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>No se pudieron mover {0} archivos de {1}.</value></data>
-  <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>No se pudo eliminar {0} archivo de {1}.</value></data>
-  <data name="Completion.FailedCountDelete.Plural" xml:space="preserve"><value>No se pudieron eliminar {0} archivos de {1}.</value></data>
+       form is {0}; the noun, if a language uses one, agrees with whichever of
+       the two it is placed beside, so the two must be read independently and a
+       language may add a satellite-only .One/.Few/.Many override. The English
+       carries NO noun for exactly that reason: with the noun beside {1} it
+       rendered "1 of 1 files could not be moved" whenever a single-file batch
+       failed, and English cannot move it beside {0} without "1 file of 1",
+       which reads worse. A language whose noun sits beside {0} inflects
+       correctly at every count and needs no such surgery. The Delete variant
+       covers both a Recycle Bin delete and a consented permanent one. -->
+  <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>{0} of {1} could not be moved.</value></data>
+  <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>{0} of {1} could not be moved.</value></data>
+  <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>{0} of {1} could not be deleted.</value></data>
+  <data name="Completion.FailedCountDelete.Plural" xml:space="preserve"><value>{0} of {1} could not be deleted.</value></data>
   <!-- 0 = moved count, 1 = pluralised noun, 2 = destination path. The colon
        ends the sentence at the verb/preposition so the WPF host can force
        the path onto its own line at the exact point {2} substitutes, the

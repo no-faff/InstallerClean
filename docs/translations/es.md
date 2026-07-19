@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | {0} movidos |
 | Nothing was moved | No se movió nada |
 | Nothing was deleted | No se eliminó nada |
-| {0} of {1} files could not be moved. | No se pudo mover {0} archivo de {1}. |
-| {0} of {1} files could not be moved. | No se pudieron mover {0} archivos de {1}. |
-| {0} of {1} files could not be deleted. | No se pudo eliminar {0} archivo de {1}. |
-| {0} of {1} files could not be deleted. | No se pudieron eliminar {0} archivos de {1}. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
 | {0} {1} moved to: {2} | {0} {1} en: {2} |
 | {0} {1} moved to: {2} | {0} {1} en: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} en la Papelera de reciclaje |

@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | Đã chuyển {0} |
 | Nothing was moved | Không có tệp nào được chuyển |
 | Nothing was deleted | Không có tệp nào bị xóa |
-| {0} of {1} files could not be moved. | Không thể chuyển {0} trong số {1} tệp. |
-| {0} of {1} files could not be moved. | Không thể chuyển {0} trong số {1} tệp. |
-| {0} of {1} files could not be deleted. | Không thể xóa {0} trong số {1} tệp. |
-| {0} of {1} files could not be deleted. | Không thể xóa {0} trong số {1} tệp. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
 | {0} {1} moved to: {2} | Đã chuyển {0} {1} tới: {2} |
 | {0} {1} moved to: {2} | Đã chuyển {0} {1} tới: {2} |
 | {0} {1} moved to the Recycle Bin | Đã di chuyển {0} {1} vào Thùng rác |

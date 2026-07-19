@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | {0} 이동 |
 | Nothing was moved | 이동된 파일 없음 |
 | Nothing was deleted | 삭제된 파일 없음 |
-| {0} of {1} files could not be moved. | 파일 {1}개 중 {0}개를 이동하지 못했습니다. |
-| {0} of {1} files could not be moved. | 파일 {1}개 중 {0}개를 이동하지 못했습니다. |
-| {0} of {1} files could not be deleted. | 파일 {1}개 중 {0}개를 삭제하지 못했습니다. |
-| {0} of {1} files could not be deleted. | 파일 {1}개 중 {0}개를 삭제하지 못했습니다. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
 | {0} {1} moved to: {2} | {1} {0}개를 다음 위치로 이동함: {2} |
 | {0} {1} moved to: {2} | {1} {0}개를 다음 위치로 이동함: {2} |
 | {0} {1} moved to the Recycle Bin | {1} {0}개를 휴지통으로 이동함 |

@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | {0} taşındı |
 | Nothing was moved | Hiçbir dosya taşınmadı |
 | Nothing was deleted | Hiçbir dosya silinmedi |
-| {0} of {1} files could not be moved. | {1} dosya içinden {0} tanesi taşınamadı. |
-| {0} of {1} files could not be moved. | {1} dosya içinden {0} tanesi taşınamadı. |
-| {0} of {1} files could not be deleted. | {1} dosya içinden {0} tanesi silinemedi. |
-| {0} of {1} files could not be deleted. | {1} dosya içinden {0} tanesi silinemedi. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
 | {0} {1} moved to: {2} | {0} {1} şu konuma taşındı: {2} |
 | {0} {1} moved to: {2} | {0} {1} şu konuma taşındı: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} Geri Dönüşüm Kutusu'na taşındı |

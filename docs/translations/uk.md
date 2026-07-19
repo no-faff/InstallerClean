@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | Переміщено {0} |
 | Nothing was moved | Нічого не переміщено |
 | Nothing was deleted | Нічого не видалено |
-| {0} of {1} files could not be moved. | Не вдалося перемістити {0} файл з {1}. |
-| {0} of {1} files could not be moved. | Не вдалося перемістити {0} файлів з {1}. |
-| {0} of {1} files could not be deleted. | Не вдалося видалити {0} файл з {1}. |
-| {0} of {1} files could not be deleted. | Не вдалося видалити {0} файлів з {1}. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} переміщено до Кошика |

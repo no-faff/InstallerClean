@@ -151,10 +151,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} moved | {0} 移動 |
 | Nothing was moved | 何も移動されませんでした |
 | Nothing was deleted | 何も削除されませんでした |
-| {0} of {1} files could not be moved. | {1} 個中 {0} 個のファイルを移動できませんでした。 |
-| {0} of {1} files could not be moved. | {1} 個中 {0} 個のファイルを移動できませんでした。 |
-| {0} of {1} files could not be deleted. | {1} 個中 {0} 個のファイルを削除できませんでした。 |
-| {0} of {1} files could not be deleted. | {1} 個中 {0} 個のファイルを削除できませんでした。 |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be moved. | {0} of {1} could not be moved. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
+| {0} of {1} could not be deleted. | {0} of {1} could not be deleted. |
 | {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
 | {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
 | {0} {1} moved to the Recycle Bin | {0} 個の {1} をごみ箱に移動しました |

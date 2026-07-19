@@ -262,7 +262,7 @@ public class CompletionViewModelTests
         // long for the card, and clipped.
         Assert.False(vm.HeadingIsWarning);
         Assert.Contains("freed", vm.Heading);
-        Assert.Equal("2 of 71 files could not be moved.", vm.FailedCount);
+        Assert.Equal("2 of 71 could not be moved.", vm.FailedCount);
         // The destination line is the plain variant whatever happened: the
         // error count used to be appended here, where it read as part of the
         // folder name.
@@ -280,7 +280,7 @@ public class CompletionViewModelTests
         // twice, reporting a total failure as a result and then clipping.
         Assert.True(vm.HeadingIsWarning);
         Assert.Equal(Strings.Completion_NothingMoved, vm.Heading);
-        Assert.Equal("2 of 2 files could not be moved.", vm.FailedCount);
+        Assert.Equal("2 of 2 could not be moved.", vm.FailedCount);
         // Nothing reached the destination, so nothing on screen may say files
         // are there or invite copying them back.
         Assert.Equal(string.Empty, vm.Summary);
@@ -297,7 +297,7 @@ public class CompletionViewModelTests
 
         Assert.True(vm.HeadingIsWarning);
         Assert.Equal(Strings.Completion_NothingDeleted, vm.Heading);
-        Assert.Equal("3 of 3 files could not be deleted.", vm.FailedCount);
+        Assert.Equal("3 of 3 could not be deleted.", vm.FailedCount);
         Assert.Equal(string.Empty, vm.Summary);
         // The bin gained nothing, so there is nothing to empty and nothing to
         // restore from it.
@@ -313,7 +313,7 @@ public class CompletionViewModelTests
 
         Assert.True(vm.HeadingIsWarning);
         Assert.Equal(Strings.Completion_NothingDeleted, vm.Heading);
-        Assert.Equal("1 of 1 files could not be deleted.", vm.FailedCount);
+        Assert.Equal("1 of 1 could not be deleted.", vm.FailedCount);
         Assert.Equal(string.Empty, vm.Summary);
         // "That's fine, it was safe to remove" is about a file that was
         // removed. None was.
@@ -342,7 +342,7 @@ public class CompletionViewModelTests
         // 5 tried, not 71 queued: the 66 the cancel never reached are not files
         // that could not be moved. The summary line below still names the whole
         // batch, which is its own job.
-        Assert.Equal("2 of 5 files could not be moved.", vm.FailedCount);
+        Assert.Equal("2 of 5 could not be moved.", vm.FailedCount);
         Assert.Contains("71", vm.Summary);
         // A cancel is not a failure, so the heading stays as it was.
         Assert.False(vm.HeadingIsWarning);
@@ -356,7 +356,7 @@ public class CompletionViewModelTests
             errors: Failures(1));
 
         Assert.False(vm.HeadingIsWarning);
-        Assert.Equal("1 of 1 files could not be deleted.", vm.FailedCount);
+        Assert.Equal("1 of 1 could not be deleted.", vm.FailedCount);
         Assert.NotEqual(string.Empty, vm.Summary);
     }
 
