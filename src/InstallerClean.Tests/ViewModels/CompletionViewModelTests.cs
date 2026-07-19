@@ -360,6 +360,75 @@ public class CompletionViewModelTests
         Assert.NotEqual(string.Empty, vm.Summary);
     }
 
+    // The three cancelled paths reach the same nothing-was-acted-on state the
+    // completed paths guard against, by a different route: a cancel pressed
+    // after the first few files failed. The advice is about files that arrived
+    // somewhere, so it is as false here as it is there. The heading is the one
+    // thing that stays, per the test above.
+
+    [Fact]
+    public void A_cancelled_move_that_moved_nothing_drops_its_restore_hint()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowMoveCancelledSummary(movedCount: 0, totalCount: 40, movedBytes: 0,
+            errors: Failures(2), freesSpace: true);
+
+        // Nothing reached the destination, so nothing may invite copying it back.
+        Assert.Equal(string.Empty, vm.Restore);
+    }
+
+    [Fact]
+    public void A_cancelled_delete_that_deleted_nothing_offers_neither_bin_nor_restore()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowDeleteCancelledSummary(deletedCount: 0, totalCount: 40, deletedBytes: 0,
+            errors: Failures(3));
+
+        Assert.Equal(string.Empty, vm.SpaceHint);
+        Assert.Equal(string.Empty, vm.Restore);
+    }
+
+    [Fact]
+    public void A_cancelled_permanent_delete_that_deleted_nothing_drops_its_reassurance()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowPermanentDeleteCancelledSummary(deletedCount: 0, totalCount: 40, deletedBytes: 0,
+            errors: Failures(1));
+
+        Assert.Equal(string.Empty, vm.Restore);
+    }
+
+    [Fact]
+    public void A_cancelled_move_that_moved_something_keeps_its_restore_hint()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowMoveCancelledSummary(movedCount: 3, totalCount: 40, movedBytes: 1024,
+            errors: Failures(2), freesSpace: true);
+
+        Assert.Equal(Strings.Completion_MoveRestoreHint, vm.Restore);
+    }
+
+    [Fact]
+    public void A_cancelled_delete_that_deleted_something_keeps_its_bin_and_restore_copy()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowDeleteCancelledSummary(deletedCount: 3, totalCount: 40, deletedBytes: 1024,
+            errors: Failures(2));
+
+        Assert.Equal(Strings.Completion_DeleteSpaceHint, vm.SpaceHint);
+        Assert.Equal(Strings.Completion_DeleteRestoreHint, vm.Restore);
+    }
+
+    [Fact]
+    public void A_cancelled_permanent_delete_that_deleted_something_keeps_its_reassurance()
+    {
+        var vm = new CompletionViewModel();
+        vm.ShowPermanentDeleteCancelledSummary(deletedCount: 3, totalCount: 40, deletedBytes: 1024,
+            errors: Failures(2));
+
+        Assert.NotEqual(string.Empty, vm.Restore);
+    }
+
     [Fact]
     public void The_count_line_and_warning_heading_do_not_survive_into_the_next_operation()
     {

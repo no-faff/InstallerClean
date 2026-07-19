@@ -453,7 +453,11 @@ public partial class CompletionViewModel : ObservableObject
             DisplayHelpers.Pluralise(totalCount, Strings.Completion_MoveCancelledSummary, "Completion.MoveCancelledSummary"),
             movedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
         SpaceHint = string.Empty;
-        Restore = Strings.Completion_MoveRestoreHint;
+        // Same rule as ShowMoveSummary: "copy them back if anything breaks" is
+        // about files sitting in the destination, and a cancel that came before
+        // the first file moved put none there. Reachable because a cancel with
+        // zero moved and a non-zero error count still raises a summary.
+        Restore = movedCount == 0 ? string.Empty : Strings.Completion_MoveRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
@@ -478,8 +482,13 @@ public partial class CompletionViewModel : ObservableObject
         Summary = string.Format(
             DisplayHelpers.Pluralise(totalCount, Strings.Completion_DeleteCancelledSummary, "Completion.DeleteCancelledSummary"),
             deletedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
-        SpaceHint = Strings.Completion_DeleteSpaceHint;
-        Restore = Strings.Completion_DeleteRestoreHint;
+        // Same rule as ShowDeleteSummary: a cancel that came before the first
+        // file reached the bin left it holding nothing, so there is neither
+        // anything to empty nor anything to restore. The heading is the one
+        // thing that differs between the two, and deliberately: a cancel is not
+        // a failure, so it stays as it was.
+        SpaceHint = deletedCount == 0 ? string.Empty : Strings.Completion_DeleteSpaceHint;
+        Restore = deletedCount == 0 ? string.Empty : Strings.Completion_DeleteRestoreHint;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
@@ -504,10 +513,15 @@ public partial class CompletionViewModel : ObservableObject
             DisplayHelpers.Pluralise(totalCount, Strings.Completion_PermanentDeleteCancelledSummary, "Completion.PermanentDeleteCancelledSummary"),
             deletedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
         SpaceHint = string.Empty;
-        Restore = DisplayHelpers.Pluralise(deletedCount,
-            Strings.Completion_PermanentDeleteRestoreHint_Singular,
-            Strings.Completion_PermanentDeleteRestoreHint_Plural,
-            "Completion.PermanentDeleteRestoreHint");
+        // Same rule as ShowPermanentDeleteSummary: "that's fine, they were safe
+        // to remove" is about files that were removed, and a cancel that came
+        // before the first delete removed none.
+        Restore = deletedCount == 0
+            ? string.Empty
+            : DisplayHelpers.Pluralise(deletedCount,
+                Strings.Completion_PermanentDeleteRestoreHint_Singular,
+                Strings.Completion_PermanentDeleteRestoreHint_Plural,
+                "Completion.PermanentDeleteRestoreHint");
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
