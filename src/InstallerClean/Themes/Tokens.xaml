@@ -93,7 +93,7 @@
 
     <!-- Links. SubtleLink is the app's only link, so these are its two
          states rather than two kinds of link. Rest is Indigo.400 at full
-         opacity, measured on Surface.Sidebar (the AboutWindow MIT licence
+         opacity, measured on Surface.Sidebar (the AboutWindow licence
          link's home, and the lightest surface a link sits on): a 66%
          alpha wash of it there measures 2.95:1, under the WCAG AA-text
          4.5:1 line, where full opacity sits at 4.90:1. Dimming rest for

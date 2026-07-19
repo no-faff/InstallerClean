@@ -1,7 +1,7 @@
 # Contributing to InstallerClean
 
-Thanks for your interest in contributing. InstallerClean is MIT-licensed and
-welcomes pull requests.
+Thanks for your interest in contributing. InstallerClean is Apache-2.0 licensed
+and welcomes pull requests.
 
 ## Build and test
 

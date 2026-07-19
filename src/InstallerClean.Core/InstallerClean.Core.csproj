@@ -24,6 +24,12 @@
     <!-- AllowUnsafeBlocks lets the LibraryImport source generator emit
          the pointer-handling stubs it needs. -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Never packed, so this feeds no .nupkg. It is here so the licence
+         reads the same in all three project files: the Apache 2.0 switch
+         missed CONTRIBUTING.md precisely because the licence was stated in
+         some places and merely absent in others, which a sweep reads as
+         nothing to change. -->
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
