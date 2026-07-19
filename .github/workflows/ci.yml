@@ -29,6 +29,15 @@ jobs:
       - name: Check resx satellite parity
         run: node scripts/check-resx-parity.mjs
 
+      # Strings.Designer.cs is hand-regenerated, so it can drift from the neutral
+      # resx silently: an accessor whose key has been removed still compiles, and
+      # Get() falls back to returning the key, so the first sign is a raw key on
+      # screen. Placed ahead of the still-english gate below, which is red by
+      # design for the whole window between a string landing and its translation
+      # round and would otherwise hide this one.
+      - name: Check Strings.Designer.cs is in step
+        run: node scripts/check-designer-parity.mjs
+
       # Source-level drift guards, each pinned to a concrete failure the app has
       # actually hit: a resx key left with no consumer; the installer language
       # set and SupportedLanguages diverging when a language is added to one and
