@@ -15,7 +15,7 @@
 <p align="center"><em>쓸 일은 가뭄에 콩 나듯. 어쩌면 공간이 좀 생길지도. 개운하게 떠나세요.</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="라이선스: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="라이선스: Apache 2.0"></a>
   <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
@@ -28,7 +28,7 @@
 - **개요:** InstallerClean은 한 가지 일만 합니다. Windows가 한 번도 정리하지 않는 숨겨진 폴더 `C:\Windows\Installer`에서 불필요한 파일을 제거합니다. 거의 즉시 끝나는 검사 후, 그런 파일이 있는지 알려 주고, 궁금한 분께는 더 자세한 내용을 보여 주며, 그 파일을 삭제해 C: 드라이브 공간을 확보할 수 있게 합니다. 한 번 쓰고 나면 그걸로 끝입니다.
 - **이래서 오셨을지도 모릅니다:** [WinDirStat](https://github.com/windirstat/windirstat)나 WizTree, TreeSize를 써 보니 `C:\Windows\Installer`가 공간을 많이 차지하고 있는데, 그 안에 무엇이 들어 있는지는 알 수 없으셨을 겁니다. InstallerClean이 바로 필요한 도구입니다. `9f05cba.msi`처럼 알 수 없는 이름의 파일 안에 무엇이 들어 있는지 파악해, 어느 것을 안전하게 삭제할 수 있는지 빠르게 알려 줍니다.
 - **얼마나 비워지나:** 지금까지 (자발적으로) 보내 주신 보고서에 따르면, <!-- reports-freedpct-start -->52%<!-- reports-freedpct-end -->의 컴퓨터에 정리할 불필요한 파일이 있었습니다. 그중 확보된 공간의 중앙값은 <!-- reports-median-start -->19GB<!-- reports-median-end -->입니다. 수백 GB를 비운 경우도 몇 있었습니다. 제 경우에는 1.28 GB였습니다. 나머지 <!-- reports-nothingpct-start -->48%<!-- reports-nothingpct-end -->는 제거할 것을 찾지 못했는데, 이는 그저 Installer 폴더가 이미 깨끗했다는 뜻일 뿐입니다. 자세한 내용은 아래 [자주 묻는 질문](#자주-묻는-질문)을 참고하세요.
-- **안전한가요:** 네. 어떤 파일이 아직 필요한지를 Windows Installer API에 직접 물어보고, Windows가 다 썼다고 보고한 파일만 목록에 올립니다. 오픈 소스(MIT)이며 사용자에 대해 아무것도 묻지 않습니다. 계정도, 광고도, 추적도, 텔레메트리도 없고, 백그라운드에서 도는 것도 없습니다. 스스로 인터넷에 접속하는 일도 절대 없습니다.
+- **안전한가요:** 네. 어떤 파일이 아직 필요한지를 Windows Installer API에 직접 물어보고, Windows가 다 썼다고 보고한 파일만 목록에 올립니다. 오픈 소스(Apache 2.0)이며 사용자에 대해 아무것도 묻지 않습니다. 계정도, 광고도, 추적도, 텔레메트리도 없고, 백그라운드에서 도는 것도 없습니다. 스스로 인터넷에 접속하는 일도 절대 없습니다.
 - **받기:** [최신 릴리스를 다운로드하세요](../../releases/latest). 실행하고, [“알 수 없는 게시자” 경고](#unknown-publisher)와 [관리자 권한 요청](#admin)을 클릭해서 넘어가세요. 불필요한 파일을 삭제하세요. 끝입니다.
 
 ## 목차
@@ -303,7 +303,7 @@ InstallerClean은 Windows Installer 자체의 패치 기록을 읽으므로, 어
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | 최종 업데이트 | 2026년(활발히 개발 중) | 2016년 3월 3일 |
-| 소스 코드 | 오픈 소스(MIT) | 비공개 소스 |
+| 소스 코드 | 오픈 소스(Apache 2.0) | 비공개 소스 |
 | 런타임 | .NET 10(자체 포함) | .NET + VBScript |
 | API | Windows Installer COM(프로세스 내) | Windows Installer COM(VBScript를 통한 프로세스 외부) |
 | 대체된 패치 감지 | 있음 | 없음 |
@@ -393,7 +393,7 @@ InstallerClean이 도움이 됐다면, [No Faff 후원](https://nofaff.netlify.a
 
 ## 라이선스
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

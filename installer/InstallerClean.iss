@@ -114,7 +114,7 @@ Source: "{#PublishDir}\self-contained\InstallerClean.exe"; DestDir: "{app}"; Fla
 ; ships alongside the GUI so PowerShell and cmd block on the process
 ; subsystem naturally.
 Source: "{#PublishDir}\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ignoreversion
-; pad.xml's Distribution_Permissions requires the MIT licence text to
+; pad.xml's Distribution_Permissions requires the Apache 2.0 licence text to
 ; travel alongside any redistributed binary, so Setup installs it too.
 ; DestName gives the installed copy a .txt extension so a double-click opens it
 ; in Notepad; a bare "LICENSE" with no extension makes Windows show the "how do

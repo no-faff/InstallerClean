@@ -15,7 +15,7 @@
 <p align="center"><em>Kırk yılda bir çalıştırın. Belki biraz yer açarsınız. Tertemiz, yolunuza devam edin.</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Lisans: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Lisans: Apache 2.0"></a>
   <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
@@ -28,7 +28,7 @@
 - **Ne yapar:** InstallerClean tek bir iş yapar: Windows'un hiç temizlemediği gizli bir klasör olan `C:\Windows\Installer` içindeki gereksiz dosyaları kaldırır. Neredeyse anında biten bir taramanın ardından böyle dosyalarınız olup olmadığını size söyler, merak edenler için daha fazla ayrıntı gösterir ve C: sürücünüzde yer açmak için bunları silmenize olanak tanır. Bir kez kullanır, yolunuza devam edersiniz.
 - **Buraya gelme nedeniniz belki de şu:** [WinDirStat](https://github.com/windirstat/windirstat), WizTree ya da TreeSize kullandınız, `C:\Windows\Installer`'ın çok yer kapladığını gördünüz ama içinde ne olduğunu bilmiyordunuz. InstallerClean tam da ihtiyacınız olan şey. `9f05cba.msi` gibi rastgele görünen adlı o dosyaların içinde ne olduğunu bilir ve hangilerini güvenle silebileceğinizi size hızlıca söyler.
 - **Ne kadar yer:** Şimdiye dek gönderilen (isteğe bağlı) raporlar, makinelerin <!-- reports-freedpct-start -->%52<!-- reports-freedpct-end -->'sinde temizlenecek gereksiz dosyalar bulunduğunu gösteriyor. Bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->19 GB<!-- reports-median-end -->. Birkaçı yüzlerce GB temizledi. Bende 1,28 GB çıktı. Geri kalan <!-- reports-nothingpct-start -->%48<!-- reports-nothingpct-end -->'i kaldıracak bir şey bulamadı; bu da yalnızca Installer klasörlerinin zaten temiz olduğu anlamına geliyor. Daha fazla ayrıntı aşağıdaki [SSS](#sss) bölümünde.
-- **Güvenli mi:** Evet. Hangi dosyaların hâlâ gerekli olduğunu doğrudan Windows Installer API'sine sorar ve yalnızca Windows'un işi bittiğini bildirdiği dosyaları listeler. Açık kaynaklıdır (MIT) ve sizinle ilgili hiçbir şey sormaz: hesap yok, reklam yok, takip yok, telemetri yok, arka planda çalışan hiçbir şey yok. Kendi başına asla internete bağlanmaz.
+- **Güvenli mi:** Evet. Hangi dosyaların hâlâ gerekli olduğunu doğrudan Windows Installer API'sine sorar ve yalnızca Windows'un işi bittiğini bildirdiği dosyaları listeler. Açık kaynaklıdır (Apache 2.0) ve sizinle ilgili hiçbir şey sormaz: hesap yok, reklam yok, takip yok, telemetri yok, arka planda çalışan hiçbir şey yok. Kendi başına asla internete bağlanmaz.
 - **Edinme:** [En son sürümü indirin](../../releases/latest). Çalıştırın; [“bilinmeyen yayımcı” uyarısına](#unknown-publisher) ve [yönetici istemine](#admin) tıklayıp geçin. Gereksiz dosyaları silin. Tamam.
 
 ## İçindekiler
@@ -304,7 +304,7 @@ InstallerClean, Windows Installer'ın kendi yama kayıtlarını okur, dolayısı
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | Son güncelleme | 2026 (etkin) | 3 Mart 2016 |
-| Kaynak kod | Açık kaynak (MIT) | Kapalı kaynak |
+| Kaynak kod | Açık kaynak (Apache 2.0) | Kapalı kaynak |
 | Çalışma zamanı | .NET 10 (kendi kendine yeten) | .NET + VBScript |
 | API | Windows Installer COM (süreç içi) | Windows Installer COM (VBScript ile süreç dışı) |
 | Yerine yenisi gelen yama algılama | Var | Yok |
@@ -394,7 +394,7 @@ InstallerClean işinize yaradıysa, [No Faff'ı desteklemeyi](https://nofaff.net
 
 ## Lisans
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

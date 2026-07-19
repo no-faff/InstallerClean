@@ -15,7 +15,7 @@
 <p align="center"><em>Pakai sesekali saja. Mungkin sedikit ruang jadi lega. Lalu lanjutkan harimu, terasa bersih.</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Lisensi: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Lisensi: Apache 2.0"></a>
   <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
@@ -28,7 +28,7 @@
 - **Apa:** InstallerClean melakukan satu hal: menghapus file yang tidak diperlukan dari `C:\Windows\Installer`, folder tersembunyi yang tidak pernah dibersihkan Windows. Setelah pemindaian yang hampir seketika, aplikasi memberi tahu Anda apakah ada file seperti itu, menampilkan detail lebih lanjut bagi yang penasaran, dan memungkinkan Anda menghapusnya untuk mengosongkan ruang di drive C: Anda. Anda cukup memakainya sekali lalu lanjut.
 - **Mungkin Anda di sini karena:** Anda memakai [WinDirStat](https://github.com/windirstat/windirstat), WizTree, atau TreeSize, melihat `C:\Windows\Installer` memakan banyak ruang, dan tidak tahu apa isinya. InstallerClean justru yang Anda butuhkan. Aplikasi ini tahu isi file dengan nama yang tampak acak seperti `9f05cba.msi` dan dengan cepat memberi tahu Anda mana yang aman dihapus.
 - **Berapa banyak ruang:** Laporan (opsional) yang masuk sejauh ini menunjukkan bahwa <!-- reports-freedpct-start -->52%<!-- reports-freedpct-end --> mesin memiliki file tidak diperlukan untuk dibersihkan. Dari mesin-mesin itu, median yang dikosongkan adalah <!-- reports-median-start -->19 GB<!-- reports-median-end -->. Beberapa membersihkan ratusan GB. Bagi saya jumlahnya 1,28 GB. Sisanya, <!-- reports-nothingpct-start -->48%<!-- reports-nothingpct-end -->, tidak menemukan apa pun untuk dihapus, yang berarti folder Installer mereka memang sudah bersih. Detail lebih lanjut ada di [FAQ](#faq) di bawah.
-- **Apakah aman:** Ya. Aplikasi menanyakan langsung ke Windows Installer API sendiri file mana yang masih diperlukan dan hanya pernah mendaftar file yang dilaporkan Windows sudah tidak terpakai. Aplikasi ini sumber terbuka (MIT) dan tidak menanyakan apa pun tentang Anda: tanpa akun, tanpa iklan, tanpa pelacakan, tanpa telemetri, tidak ada yang berjalan di latar belakang. Aplikasi tidak pernah terhubung ke internet dengan sendirinya.
+- **Apakah aman:** Ya. Aplikasi menanyakan langsung ke Windows Installer API sendiri file mana yang masih diperlukan dan hanya pernah mendaftar file yang dilaporkan Windows sudah tidak terpakai. Aplikasi ini sumber terbuka (Apache 2.0) dan tidak menanyakan apa pun tentang Anda: tanpa akun, tanpa iklan, tanpa pelacakan, tanpa telemetri, tidak ada yang berjalan di latar belakang. Aplikasi tidak pernah terhubung ke internet dengan sendirinya.
 - **Dapatkan:** [Unduh rilis terbaru](../../releases/latest). Jalankan; lewati [peringatan "unknown publisher"](#unknown-publisher) dan [permintaan administrator](#admin). Hapus file yang tidak diperlukan. Selesai.
 
 ## Daftar Isi
@@ -303,7 +303,7 @@ InstallerClean membaca catatan patch milik Windows Installer sendiri, jadi bisa 
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | Terakhir diperbarui | 2026 (aktif) | 3 Maret 2016 |
-| Kode sumber | Sumber terbuka (MIT) | Sumber tertutup |
+| Kode sumber | Sumber terbuka (Apache 2.0) | Sumber tertutup |
 | Runtime | .NET 10 (mandiri) | .NET + VBScript |
 | API | Windows Installer COM (dalam proses) | Windows Installer COM (di luar proses, via VBScript) |
 | Deteksi patch yang digantikan | Ya | Tidak |
@@ -393,7 +393,7 @@ Jika InstallerClean membantu, pertimbangkan untuk [mendukung No Faff](https://no
 
 ## Lisensi
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

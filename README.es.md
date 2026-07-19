@@ -15,7 +15,7 @@
 <p align="center"><em>Úsala de Pascuas a Ramos. Quizá liberes algo de espacio. Sigue adelante, todo limpio.</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licencia: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Licencia: Apache 2.0"></a>
   <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
@@ -28,7 +28,7 @@
 - **Qué hace:** InstallerClean hace una sola cosa: elimina archivos innecesarios de `C:\Windows\Installer`, una carpeta oculta que Windows nunca limpia. Tras un análisis casi instantáneo te dice si tienes alguno, muestra más detalle para los curiosos y te deja eliminarlos para liberar espacio en tu unidad C:. Lo usas una vez y a otra cosa.
 - **Quizá estés aquí porque:** Usaste [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, viste que `C:\Windows\Installer` ocupaba mucho espacio y no sabías qué había dentro. InstallerClean es justo lo que necesitas. Sabe qué contienen esos archivos con nombres que parecen aleatorios como `9f05cba.msi` y te dice enseguida cuáles puedes eliminar sin riesgo.
 - **Cuánto espacio:** Los informes (opcionales) enviados hasta ahora muestran que el <!-- reports-freedpct-start -->52 %<!-- reports-freedpct-end --> de los equipos tenían archivos innecesarios que limpiar. De esos, la mediana liberada es de <!-- reports-median-start -->19 GB<!-- reports-median-end -->. Unos pocos liberaron cientos de GB. En mi caso fue de 1,28 GB. El otro <!-- reports-nothingpct-start -->48 %<!-- reports-nothingpct-end --> no encontró nada que eliminar, lo que solo significa que su carpeta Installer ya estaba limpia. Más detalle en las [Preguntas frecuentes](#preguntas-frecuentes) más abajo.
-- **¿Es seguro?** Sí. Le pregunta a la propia API de Windows Installer qué archivos siguen haciendo falta y solo enumera los que Windows da por terminados. Es de código abierto (MIT) y no pregunta nada sobre ti: sin cuenta, sin anuncios, sin seguimiento, sin telemetría, nada corriendo en segundo plano. Nunca se conecta a internet por su cuenta.
+- **¿Es seguro?** Sí. Le pregunta a la propia API de Windows Installer qué archivos siguen haciendo falta y solo enumera los que Windows da por terminados. Es de código abierto (Apache 2.0) y no pregunta nada sobre ti: sin cuenta, sin anuncios, sin seguimiento, sin telemetría, nada corriendo en segundo plano. Nunca se conecta a internet por su cuenta.
 - **Cómo obtenerlo:** [Descarga la última versión](../../releases/latest). Ejecútala; pasa [el aviso de «editor desconocido»](#unknown-publisher) y [la solicitud de permisos de administrador](#admin). Elimina los archivos innecesarios. Listo.
 
 ## Contenido
@@ -303,7 +303,7 @@ InstallerClean lee los propios registros de parches de Windows Installer, así q
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | Última actualización | 2026 (activo) | 3 de marzo de 2016 |
-| Código fuente | Código abierto (MIT) | Código cerrado |
+| Código fuente | Código abierto (Apache 2.0) | Código cerrado |
 | Runtime | .NET 10 (autónomo) | .NET + VBScript |
 | API | Windows Installer COM (en proceso) | Windows Installer COM (fuera de proceso, mediante VBScript) |
 | Detección de parches sustituidos | Sí | No |
@@ -393,7 +393,7 @@ Si InstallerClean te ha sido útil, considera [apoyar a No Faff](https://nofaff.
 
 ## Licencia
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

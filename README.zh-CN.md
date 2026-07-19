@@ -15,7 +15,7 @@
 <p align="center"><em>难得用上一回。说不定能省点空间。清清爽爽，继续前行。</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="许可证：MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="许可证：Apache 2.0"></a>
   <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
@@ -28,7 +28,7 @@
 - **简介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 里不需要的文件，这是个 Windows 从不清理的隐藏文件夹。它几乎瞬间扫描完，告诉您有没有这类文件，想细看的还能查看更多细节，并让您删掉它们，给 C: 盘腾出空间。用上一次，就可以不再惦记了。
 - **您可能正是为此而来：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 时，看到 `C:\Windows\Installer` 占了很大空间，却不知道里面都是些什么。InstallerClean 正是您需要的工具。像 `9f05cba.msi` 这样名字看起来毫无规律的文件，它清楚里面装的是什么，并很快告诉您哪些可以安全删除。
 - **能释放多少空间：** 目前收到的（自愿）报告显示，<!-- reports-freedpct-start -->52%<!-- reports-freedpct-end --> 的机器有需要清理的文件。这些机器里，释放空间的中位数是 <!-- reports-median-start -->19 GB<!-- reports-median-end -->。有几台清出了好几百 GB。我自己是 1.28 GB。其余 <!-- reports-nothingpct-start -->48%<!-- reports-nothingpct-end --> 没找到可清理的，这只是说明它们的 Installer 文件夹本来就是干净的。更多细节见下文的[常见问题](#常见问题)。
-- **是否安全：** 是的。它直接问 Windows Installer API 哪些文件还需要，只会列出 Windows 报告为已经用完的那些。它是开源的（MIT），不向您索取任何信息：没有账号、没有广告、没有跟踪、没有遥测，也没有任何东西在后台运行。它从不自行联网。
+- **是否安全：** 是的。它直接问 Windows Installer API 哪些文件还需要，只会列出 Windows 报告为已经用完的那些。它是开源的（Apache 2.0），不向您索取任何信息：没有账号、没有广告、没有跟踪、没有遥测，也没有任何东西在后台运行。它从不自行联网。
 - **如何获取：** [下载最新版本](../../releases/latest)。运行；点过 [“未知发布者”的警告](#unknown-publisher)和[管理员提示](#admin)。删掉任何不需要的文件。搞定。
 
 ## 目录
@@ -303,7 +303,7 @@ InstallerClean 读取的是 Windows Installer 自己的补丁记录，所以它�
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | 最近更新 | 2026（活跃维护中） | 2016 年 3 月 3 日 |
-| 源代码 | 开源（MIT） | 闭源 |
+| 源代码 | 开源（Apache 2.0） | 闭源 |
 | 运行时 | .NET 10（自包含） | .NET + VBScript |
 | API | Windows Installer COM（进程内） | Windows Installer COM（进程外，经 VBScript） |
 | 被取代补丁检测 | 有 | 无 |
@@ -393,7 +393,7 @@ InstallerClean 现已全面提供简体中文：应用、安装程序、命令�
 
 ## 许可证
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

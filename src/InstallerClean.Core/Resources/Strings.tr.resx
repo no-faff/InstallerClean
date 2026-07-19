@@ -140,7 +140,7 @@
   <data name="Action.Details" xml:space="preserve"><value>Ayrıntılar</value></data>
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>_Bana bir çay ısmarla</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>GitHub'da _yıldız bırak</value></data>
-  <data name="Action.MITLicence" xml:space="preserve"><value>MIT lisansı</value></data>
+  <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Taşı</value></data>
   <data name="Action.MoveInstead" xml:space="preserve"><value>Bunun yerine _taşı</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Silmek yerine taşıyacaksanız klasör yolu</value></data>
@@ -187,8 +187,8 @@
        ConfirmSendResultLog windows. The version numbers are in the body
        text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Daha yeni sürümü indirmek için sürüm sayfasını açın ya da geçerli sürümü korumak için iptal edin.</value></data>
-  <data name="Automation.MITLicence" xml:space="preserve"><value>MIT lisansı</value></data>
-  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>github.com üzerindeki lisans dosyasını tarayıcınızda açar.</value></data>
+  <data name="Automation.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
+  <data name="Automation.Licence.HelpText" xml:space="preserve"><value>github.com üzerindeki lisans dosyasını tarayıcınızda açar.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
        DETAILS). Narrator at default verbosity spells short uppercase

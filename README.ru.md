@@ -15,7 +15,7 @@
 <p align="center"><em>Запускайте раз в кои-то веки. Может, освободите немного места. Идите дальше, налегке.</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Лицензия: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Лицензия: Apache 2.0"></a>
   <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
@@ -28,7 +28,7 @@
 - **Что это:** InstallerClean делает одно дело: убирает ненужные файлы из `C:\Windows\Installer` — скрытой папки, которую Windows никогда не очищает. После почти мгновенного сканирования он сообщает, есть ли они у вас, показывает подробности для любопытных и позволяет удалить их, чтобы освободить место на диске C:. Запускаете один раз — и идёте дальше.
 - **Возможно, вы здесь вот почему:** вы пользовались [WinDirStat](https://github.com/windirstat/windirstat), WizTree или TreeSize, увидели, что `C:\Windows\Installer` занимает много места, и не знали, что там внутри. InstallerClean — как раз то, что вам нужно. Он знает, что содержится в этих файлах со случайными на вид именами вроде `9f05cba.msi`, и быстро подскажет, какие из них можно безопасно удалить.
 - **Сколько места:** По присланным (необязательным) отчётам на данный момент у <!-- reports-freedpct-start -->52 %<!-- reports-freedpct-end --> машин нашлись ненужные файлы для очистки. У них медиана освобождённого — <!-- reports-median-start -->19 ГБ<!-- reports-median-end -->. У некоторых очистилось по нескольку сотен гигабайт. У меня — 1,28 ГБ. Остальные <!-- reports-nothingpct-start -->48 %<!-- reports-nothingpct-end --> не нашли ничего лишнего, а это просто значит, что их папка Installer уже была чистой. Подробнее в разделе [Частые вопросы](#частые-вопросы) ниже.
-- **Это безопасно:** Да. Он спрашивает у самого API Windows Installer, какие файлы ещё нужны, и показывает только те, что Windows объявляет отработавшими. Это проект с открытым исходным кодом (MIT), и он ничего о вас не спрашивает: ни учётной записи, ни рекламы, ни слежки, ни телеметрии, ничего работающего в фоне. Сам он в сеть никогда не выходит.
+- **Это безопасно:** Да. Он спрашивает у самого API Windows Installer, какие файлы ещё нужны, и показывает только те, что Windows объявляет отработавшими. Это проект с открытым исходным кодом (Apache 2.0), и он ничего о вас не спрашивает: ни учётной записи, ни рекламы, ни слежки, ни телеметрии, ничего работающего в фоне. Сам он в сеть никогда не выходит.
 - **Как получить:** [Скачайте последнюю версию](../../releases/latest). Запустите, пройдите через [предупреждение о «неизвестном издателе»](#unknown-publisher) и [запрос прав администратора](#admin). Удалите ненужные файлы. Готово.
 
 ## Содержание
@@ -303,7 +303,7 @@ InstallerClean читает собственные записи Windows Installe
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | Последнее обновление | 2026 (активная разработка) | 3 марта 2016 |
-| Исходный код | Открытый (MIT) | Закрытый |
+| Исходный код | Открытый (Apache 2.0) | Закрытый |
 | Среда выполнения | .NET 10 (автономная) | .NET + VBScript |
 | API | Windows Installer COM (внутри процесса) | Windows Installer COM (вне процесса, через VBScript) |
 | Обнаружение замещённых патчей | Да | Нет |
@@ -393,7 +393,7 @@ dotnet test src/InstallerClean.Tests/
 
 ## Лицензия
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

@@ -140,7 +140,7 @@
   <data name="Action.Details" xml:space="preserve"><value>Detail</value></data>
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Traktir _kopi</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Beri _bintang di GitHub</value></data>
-  <data name="Action.MITLicence" xml:space="preserve"><value>Lisensi MIT</value></data>
+  <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Pindahkan</value></data>
   <data name="Action.MoveInstead" xml:space="preserve"><value>_Pindahkan saja</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Jalur folder jika Anda memilih Pindahkan, bukan Hapus</value></data>
@@ -187,8 +187,8 @@
        ConfirmSendResultLog windows. The version numbers are in the body
        text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini.</value></data>
-  <data name="Automation.MITLicence" xml:space="preserve"><value>Lisensi MIT</value></data>
-  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Membuka file lisensi di github.com melalui peramban Anda.</value></data>
+  <data name="Automation.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
+  <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Membuka file lisensi di github.com melalui peramban Anda.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
        DETAILS). Narrator at default verbosity spells short uppercase

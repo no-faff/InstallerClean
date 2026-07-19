@@ -45,7 +45,7 @@
       <Keywords>installer, msi, msp, cleanup, windows installer, patch cleaner, disk space, orphaned files, system utility, free, open source</Keywords>
       <Char_Desc_45>Clean orphaned Windows Installer cache files.</Char_Desc_45>
       <Char_Desc_80>Find and safely move or delete orphaned MSI and MSP files from C:\Windows\Installer.</Char_Desc_80>
-      <Char_Desc_250>InstallerClean scans C:\Windows\Installer for MSI and MSP files no longer registered to any installed product, then deletes them to the Recycle Bin, or moves them to a folder of your choice if you'd rather keep a copy. Open source, MIT licensed.</Char_Desc_250>
+      <Char_Desc_250>InstallerClean scans C:\Windows\Installer for MSI and MSP files no longer registered to any installed product, then deletes them to the Recycle Bin, or moves them to a folder of your choice if you'd rather keep a copy. Open source (Apache 2.0).</Char_Desc_250>
       <Char_Desc_450>InstallerClean scans C:\Windows\Installer for MSI and MSP files no longer registered to any installed product. It only lists files Windows itself reports as finished with, so deleting is safe (to the Recycle Bin); Move parks them in a folder of your choice instead. Useful on machines with heavy MSI-based software (Adobe Acrobat, AutoCAD, Office) where the cache can grow into tens of gigabytes. A modern, open source replacement for PatchCleaner.</Char_Desc_450>
       <Char_Desc_2000>InstallerClean removes orphaned MSI and MSP files from C:\Windows\Installer, the hidden cache Windows uses to repair and update installed software. Files that no longer belong to any registered product can sit in the cache forever and grow into tens of gigabytes on machines with heavy MSI-based software such as Adobe Acrobat, AutoCAD or Microsoft Office.
 
@@ -57,7 +57,7 @@ Other safety measures include a hard block on cleaning during an active Windows 
 
 A separate console executable (installerclean-cli.exe) ships both in the setup build and as a standalone download, for scheduled tasks and unattended use, with distinct exit codes per outcome for scripting.
 
-The application is open source under the MIT licence. Setup and portable distributions are available, both self-contained and requiring no .NET runtime.
+The application is open source under the Apache 2.0 licence. Setup and portable distributions are available, both self-contained and requiring no .NET runtime.
 
 Modern replacement for PatchCleaner, which was last updated in March 2016.</Char_Desc_2000>
     </English>
@@ -78,7 +78,7 @@ Modern replacement for PatchCleaner, which was last updated in March 2016.</Char
   </Web_Info>
 
   <Permissions>
-    <Distribution_Permissions>InstallerClean is open source under the MIT licence. You may host the binaries on your download site, mirror them, redistribute them and bundle them in compilations, provided the MIT licence text is preserved alongside the binary. The source repository is at https://github.com/no-faff/InstallerClean.</Distribution_Permissions>
-    <EULA>The MIT licence, full text at https://github.com/no-faff/InstallerClean/blob/main/LICENSE.</EULA>
+    <Distribution_Permissions>InstallerClean is open source under the Apache 2.0 licence. You may host the binaries on your download site, mirror them, redistribute them and bundle them in compilations, provided the Apache 2.0 licence text is preserved alongside the binary. The source repository is at https://github.com/no-faff/InstallerClean.</Distribution_Permissions>
+    <EULA>The Apache 2.0 licence, full text at https://github.com/no-faff/InstallerClean/blob/main/LICENSE.</EULA>
   </Permissions>
 </XML_DIZ_INFO>

@@ -15,7 +15,7 @@
 <p align="center"><em>Use it once in a blue moon. Maybe save some space. Move on, feeling clean.</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licence: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Licence: Apache 2.0"></a>
   <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
@@ -28,7 +28,7 @@
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
 - **You might be here because:** You used [WinDirStat](https://github.com/windirstat/windirstat), WizTree or TreeSize, saw `C:\Windows\Installer` taking up a lot of space and didn't know what was in there. InstallerClean is just what you need. It knows what's in those files with random-looking names like `9f05cba.msi` and quickly tells you which ones you can safely delete.
 - **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->52%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->19 GB<!-- reports-median-end -->. A few cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->48%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean. More detail in the [FAQ](#faq) below.
-- **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (MIT) and asks nothing about you: no account, no ads, no tracking, no telemetry, nothing running in the background. It never goes online by itself.
+- **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (Apache 2.0) and asks nothing about you: no account, no ads, no tracking, no telemetry, nothing running in the background. It never goes online by itself.
 - **Get it:** [Download the latest release](../../releases/latest). Run it; click through [the unknown-publisher warning](#unknown-publisher) and [the admin prompt](#admin). Delete any unneeded files. Done.
 
 ## Contents
@@ -301,7 +301,7 @@ InstallerClean reads the Windows Installer's own patch records, so it can tell w
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | Last updated | 2026 (active) | 3 March 2016 |
-| Source code | Open source (MIT) | Closed source |
+| Source code | Open source (Apache 2.0) | Closed source |
 | Runtime | .NET 10 (self-contained) | .NET + VBScript |
 | API | Windows Installer COM (in-process) | Windows Installer COM (out-of-process via VBScript) |
 | Superseded patch detection | Yes | No |
@@ -401,7 +401,7 @@ If InstallerClean helped, consider [supporting No Faff](https://nofaff.netlify.a
 
 ## Licence
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

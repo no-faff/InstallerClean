@@ -15,7 +15,7 @@
 <p align="center"><em>Năm thì mười họa mới dùng đến. Biết đâu dọn ra được chút dung lượng. Rồi nhẹ nhõm bước tiếp.</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Giấy phép: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Giấy phép: Apache 2.0"></a>
   <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
@@ -28,7 +28,7 @@
 - **Là gì:** InstallerClean chỉ làm một việc: nó loại bỏ những tệp không cần thiết khỏi `C:\Windows\Installer`, một thư mục ẩn mà Windows không bao giờ dọn dẹp. Sau một lần quét gần như tức thì, nó cho bạn biết bạn có tệp như vậy hay không, hiển thị thêm chi tiết cho ai tò mò, và cho phép bạn xóa chúng để giải phóng dung lượng trên ổ C:. Bạn dùng một lần rồi thôi.
 - **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. InstallerClean chính là thứ bạn cần. Nó biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và nhanh chóng cho bạn biết tệp nào có thể xóa an toàn.
 - **Giải phóng được bao nhiêu:** Các báo cáo (tùy chọn) gửi về cho đến nay cho thấy <!-- reports-freedpct-start -->52%<!-- reports-freedpct-end --> số máy có tệp không cần thiết để dọn. Trong số đó, trung vị giải phóng được là <!-- reports-median-start -->19 GB<!-- reports-median-end -->. Một số máy dọn được hàng trăm GB. Với tôi thì được 1,28 GB. <!-- reports-nothingpct-start -->48%<!-- reports-nothingpct-end --> còn lại không tìm thấy gì để loại bỏ, điều đó chỉ có nghĩa là thư mục Installer của họ vốn đã sạch. Xem thêm chi tiết trong phần [FAQ](#faq) bên dưới.
-- **Có an toàn không:** Có. Nó hỏi chính API Windows Installer xem những tệp nào vẫn còn cần, và chỉ liệt kê những tệp Windows báo là đã dùng xong. Nó là mã nguồn mở (MIT) và không hỏi gì về bạn: không tài khoản, không quảng cáo, không theo dõi, không thu thập dữ liệu, không có gì chạy ngầm. Nó không bao giờ tự kết nối mạng.
+- **Có an toàn không:** Có. Nó hỏi chính API Windows Installer xem những tệp nào vẫn còn cần, và chỉ liệt kê những tệp Windows báo là đã dùng xong. Nó là mã nguồn mở (Apache 2.0) và không hỏi gì về bạn: không tài khoản, không quảng cáo, không theo dõi, không thu thập dữ liệu, không có gì chạy ngầm. Nó không bao giờ tự kết nối mạng.
 - **Tải về:** [Tải bản phát hành mới nhất](../../releases/latest). Chạy nó; bấm qua [cảnh báo “Nhà phát hành không xác định”](#unknown-publisher) và [lời nhắc quyền quản trị](#admin). Xóa mọi tệp không cần thiết. Xong.
 
 ## Nội dung
@@ -303,7 +303,7 @@ InstallerClean đọc chính bản ghi bản vá của Windows Installer, nên n
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | Cập nhật gần nhất | 2026 (đang hoạt động) | 3 tháng 3 năm 2016 |
-| Mã nguồn | Mã nguồn mở (MIT) | Mã nguồn đóng |
+| Mã nguồn | Mã nguồn mở (Apache 2.0) | Mã nguồn đóng |
 | Runtime | .NET 10 (độc lập) | .NET + VBScript |
 | API | Windows Installer COM (trong tiến trình) | Windows Installer COM (ngoài tiến trình, qua VBScript) |
 | Phát hiện bản vá bị thay thế | Có | Không |
@@ -393,7 +393,7 @@ Nếu InstallerClean đã giúp ích, hãy cân nhắc [ủng hộ No Faff](http
 
 ## Giấy phép
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

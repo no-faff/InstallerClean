@@ -140,7 +140,7 @@
   <data name="Action.Details" xml:space="preserve"><value>Szczegóły</value></data>
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Postaw mi _kawę</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Zostaw _gwiazdkę na GitHubie</value></data>
-  <data name="Action.MITLicence" xml:space="preserve"><value>Licencja MIT</value></data>
+  <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Przenieś</value></data>
   <data name="Action.MoveInstead" xml:space="preserve"><value>_Przenieś zamiast tego</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Ścieżka do folderu, jeśli zamiast usuwać wybierzesz Przenieś</value></data>
@@ -187,8 +187,8 @@
        ConfirmSendResultLog windows. The version numbers are in the body
        text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Otwórz stronę wydania, aby pobrać nowszą wersję, lub anuluj, aby zachować bieżącą.</value></data>
-  <data name="Automation.MITLicence" xml:space="preserve"><value>Licencja MIT</value></data>
-  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>Otwiera plik licencji na github.com w twojej przeglądarce.</value></data>
+  <data name="Automation.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
+  <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Otwiera plik licencji na github.com w twojej przeglądarce.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
        DETAILS). Narrator at default verbosity spells short uppercase

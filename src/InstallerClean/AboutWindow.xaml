@@ -77,8 +77,8 @@
             <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/blob/main/LICENSE"
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}"
-                       AutomationProperties.Name="{loc:Translate Automation.MITLicence}"
-                       AutomationProperties.HelpText="{loc:Translate Automation.MITLicence.HelpText}"><Run Text="{loc:Translate Action.MITLicence}"/></Hyperlink>
+                       AutomationProperties.Name="{loc:Translate Automation.Licence}"
+                       AutomationProperties.HelpText="{loc:Translate Automation.Licence.HelpText}"><Run Text="{loc:Translate Action.Licence}"/></Hyperlink>
         </TextBlock>
 
         <Button Grid.Row="7" Style="{StaticResource CompactPill}"

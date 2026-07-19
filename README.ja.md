@@ -15,7 +15,7 @@
 <p align="center"><em>思い出した頃に使う。少し容量が空くかも。すっきりして、また日常へ。</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="ライセンス: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="ライセンス: Apache 2.0"></a>
   <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
@@ -28,7 +28,7 @@
 - **概要：** InstallerClean がすることは 1 つだけです。Windows が一切クリーンアップしない隠しフォルダー `C:\Windows\Installer` から、不要なファイルを取り除きます。ほぼ一瞬で終わるスキャンのあと、不要なファイルがあるかどうかを知らせ、詳しく見たい人にはさらに詳細を示し、それらを削除して C: ドライブの空き容量を増やせるようにします。一度使ったら、それで終わりです。
 - **こんな覚えはありませんか：** [WinDirStat](https://github.com/windirstat/windirstat)、WizTree、TreeSize などでディスクを調べていて、`C:\Windows\Installer` が大量の容量を占めているのに気づいたものの、中に何が入っているのか分からなかった。InstallerClean は、まさにそんなあなたのためのツールです。`9f05cba.msi` のような一見ランダムな名前のファイルの中身を把握していて、どれなら安全に削除できるのかをすぐに教えてくれます。
 - **どれくらい空くか：** これまでに（任意で）送られてきたレポートでは、<!-- reports-freedpct-start -->52%<!-- reports-freedpct-end --> のマシンに掃除できる不要なファイルがありました。そのうち、解放できた容量の中央値は <!-- reports-median-start -->19 GB<!-- reports-median-end --> です。数百 GB を片づけた例もいくつかありました。私の場合は 1.28 GB でした。残りの <!-- reports-nothingpct-start -->48%<!-- reports-nothingpct-end --> は削除するものが見つからず、これは単に Installer フォルダーがすでにきれいだったというだけのことです。詳しくは下の [よくある質問](#よくある質問) をご覧ください。
-- **安全性：** はい。どのファイルがまだ必要かを Windows インストーラー API 自身に問い合わせ、Windows が「用済み」と報告したファイルだけを一覧に出します。オープンソース（MIT）で、あなたについて何も尋ねません。アカウントも、広告も、追跡も、テレメトリもなく、バックグラウンドで動くものもありません。自分から勝手にインターネットへ接続することもありません。
+- **安全性：** はい。どのファイルがまだ必要かを Windows インストーラー API 自身に問い合わせ、Windows が「用済み」と報告したファイルだけを一覧に出します。オープンソース（Apache 2.0）で、あなたについて何も尋ねません。アカウントも、広告も、追跡も、テレメトリもなく、バックグラウンドで動くものもありません。自分から勝手にインターネットへ接続することもありません。
 - **入手方法：** [最新リリースをダウンロード](../../releases/latest)してください。実行し、[「不明な発行元」の警告](#unknown-publisher)と[管理者権限の確認](#admin)をクリックして進みます。不要なファイルがあれば削除します。これで完了です。
 
 ## 目次
@@ -303,7 +303,7 @@ InstallerClean は Windows インストーラー自身のパッチ記録を読�
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | 最終更新 | 2026 年（活発に更新中） | 2016 年 3 月 3 日 |
-| ソースコード | オープンソース（MIT） | クローズドソース |
+| ソースコード | オープンソース（Apache 2.0） | クローズドソース |
 | ランタイム | .NET 10（自己完結型） | .NET + VBScript |
 | API | Windows インストーラー COM（プロセス内） | Windows インストーラー COM（VBScript 経由のプロセス外） |
 | 置き換えられたパッチの検出 | あり | なし |
@@ -395,7 +395,7 @@ InstallerClean が役に立ったなら、[No Faff を応援](https://nofaff.net
 
 ## ライセンス
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

@@ -17,7 +17,7 @@
 <p align="center"><em>استخدمه بين الفينة والأخرى. ربما توفّر بعض المساحة. ثم امضِ في يومك نظيفاً مرتاحاً.</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="الترخيص: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="الترخيص: Apache 2.0"></a>
   <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
@@ -30,7 +30,7 @@
 - **ما هو:** يفعل InstallerClean شيئاً واحداً: يزيل الملفات غير الضرورية من `C:\Windows\Installer`، وهو مجلد مخفي لا ينظفه Windows أبداً. بعد فحص شبه فوري يخبرك إن كان لديك أي منها، ويعرض مزيداً من التفاصيل للفضوليين، ويتيح لك حذفها لتحرير مساحة على قرص C:. تستخدمه مرة واحدة ثم تمضي في طريقك.
 - **قد تكون هنا لأنك:** استخدمت [WinDirStat](https://github.com/windirstat/windirstat) أو WizTree أو TreeSize، فرأيت `C:\Windows\Installer` يشغل مساحة كبيرة ولم تعرف ما بداخله. وInstallerClean هو ما تحتاج إليه تماماً. فهو يعرف ما بداخل تلك الملفات ذات الأسماء التي تبدو عشوائية مثل `9f05cba.msi`، ويخبرك بسرعة أيّها يمكنك حذفه بأمان.
 - **كم من المساحة:** تُظهر التقارير (الاختيارية) الواردة حتى الآن أن <!-- reports-freedpct-start -->52%<!-- reports-freedpct-end --> من الأجهزة كان فيها ملفات غير ضرورية للتنظيف. ومن بين هذه الأجهزة، بلغ الوسيط المُحرَّر <!-- reports-median-start -->19 GB<!-- reports-median-end -->. وحرّر بعضها مئات الـ GB. وبالنسبة لي كان 1.28 GB. أما الـ <!-- reports-nothingpct-start -->48%<!-- reports-nothingpct-end --> الباقية فلم تجد شيئاً لإزالته، وهذا يعني ببساطة أن مجلد Installer لديها كان نظيفاً بالفعل. مزيد من التفاصيل في [الأسئلة الشائعة](#الأسئلة-الشائعة) أدناه.
-- **هل هو آمن:** نعم. فهو يسأل واجهة Windows Installer البرمجية نفسها عن الملفات التي لا تزال مطلوبة، ولا يُدرج إلا ما يفيد Windows بأنه انتهى منه. إنه مفتوح المصدر (MIT) ولا يسأل عنك شيئاً: لا حساب، ولا إعلانات، ولا تتبع، ولا قياس عن بُعد، ولا شيء يعمل في الخلفية. ولا يتصل بالإنترنت من تلقاء نفسه أبداً.
+- **هل هو آمن:** نعم. فهو يسأل واجهة Windows Installer البرمجية نفسها عن الملفات التي لا تزال مطلوبة، ولا يُدرج إلا ما يفيد Windows بأنه انتهى منه. إنه مفتوح المصدر (Apache 2.0) ولا يسأل عنك شيئاً: لا حساب، ولا إعلانات، ولا تتبع، ولا قياس عن بُعد، ولا شيء يعمل في الخلفية. ولا يتصل بالإنترنت من تلقاء نفسه أبداً.
 - **احصل عليه:** [نزّل أحدث إصدار](../../releases/latest). شغّله؛ وتجاوز [تحذير «ناشر غير معروف»](#unknown-publisher) و[طلب صلاحيات المسؤول](#admin). احذف أي ملفات غير ضرورية. تم.
 
 ## المحتويات
@@ -305,7 +305,7 @@ scoop install installerclean
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | آخر تحديث | 2026 (نشط) | 3 مارس 2016 |
-| الشيفرة المصدرية | مفتوحة المصدر (MIT) | مغلقة المصدر |
+| الشيفرة المصدرية | مفتوحة المصدر (Apache 2.0) | مغلقة المصدر |
 | بيئة التشغيل | .NET 10 (مكتفية ذاتياً) | .NET + VBScript |
 | الواجهة البرمجية | Windows Installer COM (داخل العملية) | Windows Installer COM (خارج العملية عبر VBScript) |
 | كشف التصحيحات المستبدَلة | نعم | لا |
@@ -397,7 +397,7 @@ dotnet test src/InstallerClean.Tests/
 
 ## الترخيص
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

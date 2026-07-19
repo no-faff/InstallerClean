@@ -140,7 +140,7 @@
   <data name="Action.Details" xml:space="preserve"><value>详情</value></data>
   <data name="Action.BuyMeACuppa" xml:space="preserve"><value>请我喝杯茶(_B)</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>在 GitHub 上点个星(_S)</value></data>
-  <data name="Action.MITLicence" xml:space="preserve"><value>MIT 许可证</value></data>
+  <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
   <data name="Action.Move" xml:space="preserve"><value>移动(_M)</value></data>
   <data name="Action.MoveInstead" xml:space="preserve"><value>改为移动(_M)</value></data>
   <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>文件夹路径（若选择移动而非删除）</value></data>
@@ -187,8 +187,8 @@
        ConfirmSendResultLog windows. The version numbers are in the body
        text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>打开发布页面以下载更新版本，或取消以保留当前版本。</value></data>
-  <data name="Automation.MITLicence" xml:space="preserve"><value>MIT 许可证</value></data>
-  <data name="Automation.MITLicence.HelpText" xml:space="preserve"><value>在浏览器中打开 github.com 上的许可证文件。</value></data>
+  <data name="Automation.Licence" xml:space="preserve"><value>Apache 2.0 licence</value></data>
+  <data name="Automation.Licence.HelpText" xml:space="preserve"><value>在浏览器中打开 github.com 上的许可证文件。</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
        DETAILS). Narrator at default verbosity spells short uppercase

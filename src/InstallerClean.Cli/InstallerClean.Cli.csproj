@@ -23,7 +23,7 @@
     <Description>Command-line front-end for InstallerClean.</Description>
     <Authors>No Faff</Authors>
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <NeutralLanguage>en-GB</NeutralLanguage>
   </PropertyGroup>

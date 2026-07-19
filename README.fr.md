@@ -15,7 +15,7 @@
 <p align="center"><em>Servez-vous-en tous les trente-six du mois. Gagnez peut-être un peu d'espace. Repartez, tout propre.</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-blue.svg" alt="Licence : MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-Apache_2.0-blue.svg" alt="Licence : Apache 2.0"></a>
   <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10"></a>
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
@@ -28,7 +28,7 @@
 - **En bref :** InstallerClean fait une seule chose : il supprime les fichiers inutiles de `C:\Windows\Installer`, un dossier caché que Windows ne nettoie jamais. Après une analyse quasi instantanée, il vous dit si vous en avez, donne plus de détails pour les curieux, et vous permet de les supprimer pour libérer de l'espace sur votre disque C:. Vous l'utilisez une fois, puis vous passez à autre chose.
 - **Vous êtes peut-être ici parce que :** vous avez utilisé [WinDirStat](https://github.com/windirstat/windirstat), WizTree ou TreeSize, vous avez vu que `C:\Windows\Installer` occupait beaucoup de place et vous ne saviez pas ce qu'il y avait dedans. InstallerClean est exactement ce qu'il vous faut. Il sait ce que contiennent ces fichiers aux noms apparemment aléatoires comme `9f05cba.msi` et vous dit rapidement lesquels vous pouvez supprimer sans risque.
 - **Combien d'espace :** Les rapports (facultatifs) reçus jusqu'ici montrent que <!-- reports-freedpct-start -->52 %<!-- reports-freedpct-end --> des machines avaient des fichiers inutiles à nettoyer. Pour celles-ci, la médiane libérée est de <!-- reports-median-start -->19 Go<!-- reports-median-end -->. Quelques-unes ont récupéré des centaines de Go. Pour moi, c'était 1,28 Go. Les <!-- reports-nothingpct-start -->48 %<!-- reports-nothingpct-end --> restants n'avaient rien à supprimer, ce qui veut simplement dire que leur dossier Installer était déjà propre. Plus de détails dans la [FAQ](#faq) ci-dessous.
-- **Est-ce sûr :** Oui. Il demande à l'API Windows Installer elle-même quels fichiers sont encore nécessaires et ne liste jamais que ceux dont Windows déclare avoir fini de se servir. C'est un logiciel open source (MIT) qui ne demande rien sur vous : pas de compte, pas de publicité, pas de pistage, pas de télémétrie, rien qui tourne en arrière-plan. Il ne se connecte jamais de lui-même.
+- **Est-ce sûr :** Oui. Il demande à l'API Windows Installer elle-même quels fichiers sont encore nécessaires et ne liste jamais que ceux dont Windows déclare avoir fini de se servir. C'est un logiciel open source (Apache 2.0) qui ne demande rien sur vous : pas de compte, pas de publicité, pas de pistage, pas de télémétrie, rien qui tourne en arrière-plan. Il ne se connecte jamais de lui-même.
 - **Comment l'obtenir :** [Téléchargez la dernière version](../../releases/latest). Lancez-la ; cliquez pour passer [l'avertissement « Éditeur inconnu »](#unknown-publisher) et [l'invite d'administrateur](#admin). Supprimez les fichiers inutiles. C'est tout.
 
 ## Sommaire
@@ -303,7 +303,7 @@ InstallerClean lit les propres enregistrements de correctifs de Windows Installe
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
 | Dernière mise à jour | 2026 (actif) | 3 mars 2016 |
-| Code source | Open source (MIT) | Fermé |
+| Code source | Open source (Apache 2.0) | Fermé |
 | Runtime | .NET 10 (autonome) | .NET + VBScript |
 | API | Windows Installer COM (intra-processus) | Windows Installer COM (hors processus via VBScript) |
 | Détection des correctifs remplacés | Oui | Non |
@@ -394,7 +394,7 @@ Si InstallerClean vous a été utile, vous pouvez [soutenir No Faff](https://nof
 
 ## Licence
 
-[MIT](LICENSE)
+[Apache 2.0](LICENSE)
 
 ---
 

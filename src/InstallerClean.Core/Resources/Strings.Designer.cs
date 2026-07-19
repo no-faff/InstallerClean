@@ -48,7 +48,7 @@ public static class Strings
     public static string Action_Details => Get("Action.Details");
     public static string Action_Done => Get("Action.Done");
     public static string Action_LeaveStarOnGitHub => Get("Action.LeaveStarOnGitHub");
-    public static string Action_MITLicence => Get("Action.MITLicence");
+    public static string Action_Licence => Get("Action.Licence");
     public static string Action_Move => Get("Action.Move");
     public static string Action_MoveDestinationPlaceholder => Get("Action.MoveDestinationPlaceholder");
     public static string Action_MoveInstead => Get("Action.MoveInstead");
@@ -78,9 +78,9 @@ public static class Strings
     public static string Automation_DeleteAllFiles => Get("Automation.DeleteAllFiles");
     public static string Automation_LeaveStarOnGitHub => Get("Automation.LeaveStarOnGitHub");
     public static string Automation_LeaveStarOnGitHub_About => Get("Automation.LeaveStarOnGitHub.About");
+    public static string Automation_Licence => Get("Automation.Licence");
+    public static string Automation_Licence_HelpText => Get("Automation.Licence.HelpText");
     public static string Automation_Minimise => Get("Automation.Minimise");
-    public static string Automation_MITLicence => Get("Automation.MITLicence");
-    public static string Automation_MITLicence_HelpText => Get("Automation.MITLicence.HelpText");
     public static string Automation_MoveAllFiles => Get("Automation.MoveAllFiles");
     public static string Automation_MoveDestinationFolder => Get("Automation.MoveDestinationFolder");
     public static string Automation_OperationProgress => Get("Automation.OperationProgress");

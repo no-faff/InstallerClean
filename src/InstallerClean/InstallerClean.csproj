@@ -24,7 +24,7 @@
     <Description>Safely clean up C:\Windows\Installer unused files</Description>
     <Authors>No Faff</Authors>
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <!-- en-GB is the source-of-truth language; the neutral Strings.resx
          in InstallerClean.Core holds the source content. -->
