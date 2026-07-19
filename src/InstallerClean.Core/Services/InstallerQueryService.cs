@@ -583,9 +583,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // Defensive only. Real-world SIDs are ~45 chars and
                 // the first call passes a 256-char buffer, so this
                 // branch isn't exercised in normal use. On MoreData
-                // pcchSid carries the size required INCLUDING the
-                // terminator; the retry allocates exactly that size and
-                // passes the same value back as the new buffer size.
+                // pcchSid carries the SID length EXCLUDING the
+                // terminator ("not including the terminating NULL
+                // character", MsiEnumProductsExW on pcchSid), and the
+                // documented retry size is that count plus one for the
+                // null the buffer must also hold.
+                sidLen++;
                 sidBuffer = new char[sidLen];
 
                 error = _msi.EnumProducts(

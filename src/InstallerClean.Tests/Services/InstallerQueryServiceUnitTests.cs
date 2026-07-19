@@ -774,6 +774,24 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(0, result.UnreadableProductCount);
     }
 
+    [Fact]
+    public async Task The_sid_retry_buffer_holds_one_more_character_than_the_reported_length()
+    {
+        // msi.dll reports the required SID length on MoreData EXCLUDING the
+        // null terminator and documents the retry buffer as that count plus
+        // one. An exact-size retry is one character short, draws MoreData
+        // again, and the row it exists to rescue is refused instead.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\sized.msi");
+        msi.ProductSidRetryResult[0] = Success;
+
+        var result = await Run(msi);
+
+        Assert.Equal(65u, msi.RetrySidLengthSeen);
+        Assert.Single(result.Packages);
+    }
+
     /// <summary>
     /// Scriptable fake over <see cref="IMsiApi"/>. Reproduces the double-call
     /// buffer contract of msi.dll: a sizing call with a null buffer returns the
@@ -814,6 +832,13 @@ public class InstallerQueryServiceUnitTests
         /// what the retry RETURNS is the whole subject of the tests using it.
         /// </summary>
         public Dictionary<uint, uint> ProductSidRetryResult { get; } = new();
+
+        /// <summary>
+        /// The sidLength the retry call arrived with, so a test can pin the
+        /// buffer contract: the sizing call reports 64 (excluding the null),
+        /// so a correctly sized retry arrives with 65.
+        /// </summary>
+        public uint? RetrySidLengthSeen { get; private set; }
 
         private readonly HashSet<uint> _sidRetried = new();
 
@@ -860,9 +885,11 @@ public class InstallerQueryServiceUnitTests
             if (index >= Products.Count) return NoMoreItems;
             if (ProductSidRetryResult.TryGetValue(index, out var afterRetry))
             {
-                // MoreData carries the required size INCLUDING the terminator,
-                // and the caller allocates exactly that and passes it back.
+                // MoreData reports the required SID length EXCLUDING the
+                // terminator, as msi.dll documents for pcchSid, so the
+                // correct retry buffer is one larger than the report.
                 if (_sidRetried.Add(index)) { sidLength = 64; return MoreData; }
+                RetrySidLengthSeen = sidLength;
                 if (afterRetry != Success) return afterRetry;
             }
             var (code, result) = Products[(int)index];
