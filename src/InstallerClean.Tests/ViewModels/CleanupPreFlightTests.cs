@@ -336,6 +336,63 @@ public class CleanupPreFlightTests
     }
 
     [Fact]
+    public async Task Cancelling_the_confirmation_removes_the_folder_the_pre_flight_created()
+    {
+        // Exists is unconfigured, so it answers false: the pre-flight is the
+        // one that brings the folder into existence.
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(false);
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // A fully cancelled Move leaves nothing behind. Non-recursive, so a
+        // folder that gained a file meanwhile refuses at the syscall.
+        _directory.Received(1).Delete(_destination);
+    }
+
+    [Fact]
+    public async Task Cancelling_the_confirmation_leaves_a_folder_that_was_already_there()
+    {
+        _directory.Exists(_destination).Returns(true);
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(false);
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // The user's own folder, whatever is in it. Cancelling a move they
+        // never confirmed must not reach into it.
+        _directory.DidNotReceive().Delete(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task A_confirmed_move_keeps_the_folder_the_pre_flight_created()
+    {
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(true);
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        // The removal is scoped to the cancel; the files went here.
+        _directory.DidNotReceive().Delete(Arg.Any<string>());
+    }
+
+    [Fact]
     public async Task A_move_to_the_same_drive_tells_the_confirmation_it_frees_no_space()
     {
         // Built from the actual system drive rather than %TEMP%, which is what

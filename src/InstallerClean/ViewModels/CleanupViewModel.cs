@@ -410,6 +410,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             if (InstallerCacheHelpers.IsSystemFolderOrChild(dest))
                 return DestinationPreFlight.Rejected(insideSystemFolder: true);
 
+            // Asked before the create, because after it the answer is always
+            // yes. A destination this pass conjured up and a move that then
+            // never happens should leave nothing behind; one that was already
+            // there is the user's folder and is never touched.
+            var created = !_fs.Directory.Exists(dest);
             _fs.Directory.CreateDirectory(dest);
             probeToken.ThrowIfCancellationRequested();
             var probe = _fs.Path.Combine(dest, _fs.Path.GetRandomFileName());
@@ -425,7 +430,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             return new DestinationPreFlight(
                 false, false,
                 ClassifyMoveDestination(dest),
-                StorageHelpers.GetAvailableFreeSpace(dest));
+                StorageHelpers.GetAvailableFreeSpace(dest),
+                created);
         }, probeToken);
 
         DestinationPreFlight preFlight;
@@ -534,6 +540,14 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // CTS is no longer needed; dispose it before returning.
             DisposeOperationCts();
             OperationProgress = string.Empty;
+            // A fully cancelled Move should leave nothing behind, and the
+            // folder the pre-flight created for it is the one thing that
+            // otherwise would: type a fresh path, press Move, cancel here, and
+            // an empty folder stays at that path. Only ever a folder this run
+            // created (CreatedDestination), and the removal is left to fail on
+            // its own terms if anything is in it.
+            if (preFlight.CreatedDestination)
+                await RemoveCreatedDestinationAsync(dest);
             return;
         }
 
@@ -1087,6 +1101,37 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>
+    /// Removes a destination folder the pre-flight created for a Move the user
+    /// then cancelled. Caller checks
+    /// <see cref="DestinationPreFlight.CreatedDestination"/> first, so a folder
+    /// that was already there is never a candidate.
+    ///
+    /// The non-recursive Delete IS the emptiness test, rather than an Exists or
+    /// Any check followed by a delete: Win32 refuses to remove a directory that
+    /// holds anything, so a file that arrived between the pre-flight and the
+    /// cancel stops the removal at the syscall, with no window in which a check
+    /// could pass and the delete then take something with it.
+    ///
+    /// Off the dispatcher for the same reason every other touch of the
+    /// destination is (a stalled network path), and silent on failure because
+    /// nothing depends on the folder being gone: it is tidiness, not a
+    /// guarantee, and a dialog about a folder the user chose to abandon would
+    /// be noise at the end of an operation they cancelled.
+    /// </summary>
+    private Task RemoveCreatedDestinationAsync(string destination) => Task.Run(() =>
+    {
+        try
+        {
+            _fs.Directory.Delete(destination);
+        }
+        catch (Exception)
+        {
+            // Not empty any more, gone already, or refused: all fine, all leave
+            // the user exactly where a pre-2.1.0 cancel did.
+        }
+    });
+
+    /// <summary>
     /// Routes the recycle-unavailable "Move instead" choice into the standard
     /// Move flow so its destination validation, free-space and write-probe
     /// checks and the Move confirmation all apply. Asking for a destination is
@@ -1108,12 +1153,17 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// <see cref="AvailableFreeSpace"/> are only meaningful when neither
     /// rejection flag is set, because the pass returns at the first gate that
     /// refuses and never touches the destination after that.
+    ///
+    /// <see cref="CreatedDestination"/> records whether the pass itself brought
+    /// the folder into existence, which is what makes removing it again safe: a
+    /// folder that was already there is the user's, whatever it holds.
     /// </summary>
     private sealed record DestinationPreFlight(
         bool InsideInstallerCache,
         bool InsideSystemFolder,
         string Kind,
-        long? AvailableFreeSpace)
+        long? AvailableFreeSpace,
+        bool CreatedDestination = false)
     {
         public static DestinationPreFlight Rejected(
             bool insideInstallerCache = false, bool insideSystemFolder = false) =>
