@@ -31,16 +31,15 @@ internal static class Program
 
     public static int Main(string[] args)
     {
-        // A throw from the pre-flight in Run (setting the console encoding on a
-        // console-less "run whether user is logged on or not" scheduled task, a
-        // name or ACL clash constructing the single-instance mutex) would
-        // otherwise reach the runtime's default handler: ex.ToString() to stderr
-        // (a cross-profile path leak under elevation), no Application-log record,
-        // and an undocumented exit code no RMM can branch on. Route any such
-        // throw through the same crash-log + audit + ExitError path the work loop
-        // uses. Run holds the single-instance mutex on this thread (acquire and
-        // release both here, per the Win32 owner-thread rule) and RunWorkAsync
-        // owns its own catch-all, so only genuine pre-flight throws reach here.
+        // A throw from the pre-flight in Run (a name or ACL clash constructing the
+        // single-instance mutex, say) would otherwise reach the runtime's default
+        // handler: ex.ToString() to stderr (a cross-profile path leak under
+        // elevation), no Application-log record, and an undocumented exit code no
+        // RMM can branch on. Route any such throw through the same crash-log +
+        // audit + ExitError path the work loop uses. Run holds the single-instance
+        // mutex on this thread (acquire and release both here, per the Win32
+        // owner-thread rule) and RunWorkAsync owns its own catch-all, so only
+        // genuine pre-flight throws reach here.
         try
         {
             return Run(args);
@@ -57,7 +56,22 @@ internal static class Program
         // doesn't mojibake under redirected output (cmd /c
         // installerclean-cli /s > out.txt) or PowerShell 5's OEM
         // default code page.
-        Console.OutputEncoding = Encoding.UTF8;
+        //
+        // Swallowed locally, and that asymmetry with the rest of the pre-flight is
+        // the point: the setter calls SetConsoleOutputCP, which fails when the
+        // process has no console at all (a DETACHED_PROCESS launcher, a session-0
+        // service wrapper), and the BCL surfaces that as an IOException. What is
+        // lost is cosmetic, correct glyphs in non-ASCII stdout nobody is reading on
+        // a headless run; what letting it escape would cost is the whole run, every
+        // run, with the cache never cleaned. Nothing below reads the encoding back.
+        try
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+        }
+        catch (Exception)
+        {
+            // Deliberately empty: see above. Carry on in the inherited code page.
+        }
 
         // Human-facing stdout follows the OS UI culture: Italian on an Italian
         // machine, Japanese on a Japanese one; a locale with no satellite falls
