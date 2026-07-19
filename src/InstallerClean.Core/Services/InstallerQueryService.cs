@@ -281,13 +281,23 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// the right direction: the normalised form names the same file and names it
     /// the way the rest of the app spells it.
     ///
-    /// One member of the class stays open: 8.3 short names. GetFullPath does not
-    /// expand them, so a registration holding <c>C:\Windows\Installer\ABCDEF~1.MSI</c>
-    /// still misses a walk that produced the long name. Closing it needs
-    /// GetFinalPathNameByHandle per registered path, which is an open handle per
-    /// registration on every scan, and it must not be written from an argument
-    /// alone: it wants Windows evidence first that the state occurs and that the
-    /// per-path cost is bearable on a machine with hundreds of registrations.
+    /// 8.3 short names are the one spelling GetFullPath does not settle, and they
+    /// are deliberately not handled, on the strength of where these paths come
+    /// from rather than on a cost argument. Windows Installer names the files it
+    /// caches itself, as short hex (<c>9f05cba.msi</c>, <c>1e4a2f.msp</c>), so a
+    /// path this method receives is 8.3-clean by construction and its short and
+    /// long forms cannot differ. The hazard case, a registration holding
+    /// <c>ABCDEF~1.MSI</c> against a walk that produced the long name, needs a
+    /// long-named file in the cache root, and a long-named file in the cache root
+    /// is one Windows Installer did not put there, so nothing registered names
+    /// it and orphaned is the correct verdict for it.
+    ///
+    /// Should that ever be revisited, the expansion needs
+    /// GetFinalPathNameByHandle per registered path, an open handle per
+    /// registration on every scan. The cheap form is a lexical <c>~</c>-plus-digit
+    /// pre-filter deciding which registrations are worth a handle, so the
+    /// per-path cost is paid only where the hazard could exist, which on a
+    /// healthy machine is nowhere.
     /// </summary>
     private static string NormaliseLocalPackagePath(string value)
     {
