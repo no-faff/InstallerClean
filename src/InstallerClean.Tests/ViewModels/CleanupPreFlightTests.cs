@@ -371,6 +371,58 @@ public class CleanupPreFlightTests
     }
 
     [Fact]
+    public async Task A_pending_reboot_at_act_time_removes_the_folder_the_pre_flight_created()
+    {
+        // Past the confirmation, refused at the last moment by a Windows
+        // Installer transaction that started while the dialog was open. The
+        // move does not go ahead and nothing was placed in the folder, so the
+        // rule is the same as the cancel's.
+        // Clean through the scan and the pre-flight, blocked from the moment
+        // the confirmation is answered: an install that started while the
+        // dialog sat open, which is the exact condition the act-time re-check
+        // exists to catch. Blocking from the start instead would have failed
+        // the scan-side gate and never reached this path.
+        var confirmed = false;
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(_ => { confirmed = true; return true; });
+        _rebootService.Check().Returns(_ => confirmed
+            ? PendingRebootResult.Block(PendingRebootReason.MsiExecuteMutexHeld)
+            : PendingRebootResult.Clean);
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _directory.Received(1).Delete(_destination);
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_failed_write_probe_removes_the_folder_it_had_just_created()
+    {
+        // The probe's own failure arm, which never receives a pre-flight record
+        // at all: CreateDirectory succeeded and the write probe then threw, so
+        // the folder exists, the move is abandoned and the user gets the
+        // write-failure dialog.
+        _file.When(f => f.WriteAllBytes(Arg.Any<string>(), Arg.Any<byte[]>()))
+            .Do(_ => throw new UnauthorizedAccessException("probe refused"));
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _directory.Received(1).Delete(_destination);
+        _confirmationService.DidNotReceive().ConfirmMove(
+            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
+    }
+
+    [Fact]
     public async Task Cancelling_the_confirmation_leaves_a_folder_that_was_already_there()
     {
         _directory.Exists(_destination).Returns(true);
