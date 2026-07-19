@@ -6,11 +6,10 @@
 
           Themes/Primitives.xaml - raw colour atoms; never referenced
                                    from windows or component styles.
-          Themes/Tokens.xaml     - semantic roles (Surface.*, Text.*,
-                                   Action.*, Type.*, Radius.*, Border.*,
-                                   BorderThickness.*, Gap.*, GapBottom.*,
-                                   GapRight.*, GapLeft.*) consumed by
-                                   both components and windows.
+          Themes/Tokens.xaml     - semantic roles (colour, type, radius,
+                                   line thickness, spacing) consumed by
+                                   both components and windows; its own
+                                   header carries the naming scheme.
           Themes/Components.xaml - control styles (StandardPill, Card,
                                    ProgressBar, etc) consuming tokens.
 

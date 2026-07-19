@@ -24,11 +24,12 @@ public partial class SplashWindow : Window
         // the star spacer rows absorbing the slack while the content is
         // shorter, and the card grows when the content is taller, e.g. a
         // larger OS text scale or a longer-language hero name / step text /
-        // Cancel outgrowing 320. A fixed Height clipped the bottom-pinned
+        // Cancel outgrowing 320. A fixed Height clips the bottom-pinned
         // version against the card's edge. MaxHeight caps growth at the work
         // area. The splash opens before any other window exists, so the clamp
         // resolves against the primary monitor's work area (the helper's null
-        // fallback). Width stays fixed; the content fits 480 in every language.
+        // fallback). Width is assigned rather than sized to content: the
+        // content fits 480 in every language.
         var factor = AccessibilitySettings.Current.TextScaleFactor;
         Width = Math.Min(480 * factor, DetailWindowSizing.WorkAreaWidthLimit(null));
         MinHeight = Math.Min(320 * factor, DetailWindowSizing.WorkAreaHeightLimit(null));

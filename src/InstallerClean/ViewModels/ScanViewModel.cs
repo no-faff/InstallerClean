@@ -39,10 +39,10 @@ public partial class ScanViewModel : ObservableObject
     ///
     /// <see cref="IsScanning"/> cannot serve as this gate: it is an
     /// overlay-reveal flag, set only once a scan outlives the 200 ms delay,
-    /// and never at all by the silent refresh. It left the Move and Delete
-    /// buttons live through the first 200 ms of a scan, which is long enough
-    /// to start a destructive batch against the previous scan's result while
-    /// a fresh scan walks the same folder, and to leave two scans writing
+    /// and never at all by the silent refresh. It would leave the Move and
+    /// Delete buttons live through the first 200 ms of a scan, which is long
+    /// enough to start a destructive batch against the previous scan's result
+    /// while a fresh scan walks the same folder, and to leave two scans writing
     /// <see cref="LastScanResult"/> with no ordering between them.
     /// </summary>
     [ObservableProperty]
@@ -508,9 +508,9 @@ public partial class ScanViewModel : ObservableObject
             // A failed startup scan opens the main window in an error state rather
             // than exiting: record the tailored message through the one ladder,
             // shared with the Scan command, so the window's not-yet-scanned state
-            // shows it with Re-scan focused. Do NOT rethrow: the exception used to
-            // propagate to App.OnStartup, which told an already-elevated user to
-            // run as administrator and then exited. An app that diagnoses "your
+            // shows it with Re-scan focused. Do NOT rethrow: the exception then
+            // propagates to App.OnStartup, which tells an already-elevated user to
+            // run as administrator and exits. An app that diagnoses "your
             // installer database is empty" and then vanishes is strictly worse than
             // one that says it and offers Re-scan.
             LastScanError = DescribeScanFailure(ex).Message;

@@ -58,13 +58,13 @@ public partial class AboutWindow : Window
     /// <summary>
     /// The About box sizes its height to its content
     /// (SizeToContent="Height", set in XAML) so a taller content set grows
-    /// the window instead of overflowing it; a fixed height clipped the
+    /// the window instead of overflowing it; a fixed height clips the
     /// say-thanks and Close rows off the bottom. MinHeight holds the
     /// designed 500 x 400 box at 100% text
     /// scale; while the content is shorter than the box the layout's star
     /// spacer row takes up the slack and pins the say-thanks block to the
     /// bottom. MaxHeight caps growth at the work area so a large OS text
-    /// scale cannot push the box past the screen (a fixed height cut the
+    /// scale cannot push the box past the screen (a fixed height cuts the
     /// Close row off this way at 208%). The box grows sub-linearly with
     /// text scale because the margins and gaps are fixed. Width is
     /// explicit; Height itself is never assigned, which would re-pin the

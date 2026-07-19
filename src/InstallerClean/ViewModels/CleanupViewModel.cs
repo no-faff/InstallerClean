@@ -157,26 +157,24 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         saveCts?.Dispose();
 
         // A non-null CTS means an edit is still waiting out its debounce: the
-        // field is nulled once a save lands. Cancelling it, which is all this
-        // did, threw the edit away, so a destination typed or picked within
-        // 400 ms of the window closing was never persisted and the box came
-        // back empty (or holding the old path) next session. The language
-        // switch, which relaunches the app, went through the same Dispose and
-        // lost the same edit.
+        // field is nulled once a save lands. Cancelling alone throws that edit
+        // away, so a destination typed or picked within 400 ms of the window
+        // closing is never persisted and the box comes back empty (or holding
+        // the old path) next session. The language switch relaunches through
+        // this same Dispose, so it loses the same edit.
         //
-        // Flushing it here is safe: the debounced save's own continuation is
+        // Flushing here is safe: the debounced save's own continuation is
         // posted to a dispatcher that is about to stop pumping, so it would not
         // run anyway, and SettingsService.Update takes its own lock, reloads,
-        // applies and saves atomically, so it cannot race the write it just
-        // cancelled. (The old comment justified the cancel by saying a late
-        // write could land "after the VM is gone". Update touches no view-model
-        // state, so that was never a hazard.)
+        // applies and saves atomically, so it cannot race the write just
+        // cancelled. Update touches no view-model state, so a late write
+        // landing after this VM is gone is not a hazard either.
         if (saveCts is not null)
             _settingsService.Update(s => s.MoveDestination = _settings.MoveDestination);
     }
 
     // Move and Delete gate on IsOperationInFlight, which is already set when
-    // IsOperating flips; only the overlay's Cancel button reads IsOperating.
+    // IsOperating flips; of the commands, only Cancel gates on IsOperating.
     partial void OnIsOperatingChanged(bool value) =>
         CancelOperationCommand.NotifyCanExecuteChanged();
 
@@ -236,9 +234,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // keystroke landing during the disk hop writes into
         // _settings.MoveDestination on the dispatcher and gets picked
         // up by the next debounce cycle without disturbing this save.
-        // The _settings field is NOT reassigned; an earlier version of this
-        // method swapped _settings = fresh and lost a keystroke that landed on
-        // the orphan instance between the worker's snapshot read and the field
+        // The _settings field is NOT reassigned. Swapping in a freshly loaded
+        // instance orphans the one the dispatcher is writing into, losing any
+        // keystroke that landed between the worker's snapshot read and the
         // swap. SettingsService.Update reloads, applies the captured destination
         // and saves atomically under its own lock, so this thread-pool debounce
         // cannot lose the result-log lifetime lock or the language pick that run
@@ -247,13 +245,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // No token on this Task.Run, deliberately. The debounce is the
         // cancellable part and it is already over; the body has nothing to
         // interrupt (one Update call, which serialises on its own lock) and
-        // nothing to gain by being skipped. Passing the token instead made a
-        // keystroke that cancelled the CTS between the delay completing and the
-        // run starting, an interleaving both continuations queue on the
-        // dispatcher for, hand back a Canceled task, whose TaskCanceledException
-        // escaped this fire-and-forget method and reached
-        // TaskScheduler.UnobservedTaskException, writing a phantom entry to
-        // crash.log at whatever later GC observed it.
+        // nothing to gain by being skipped. Passing the token hands back a
+        // Canceled task whenever a keystroke cancels the CTS between the delay
+        // completing and the run starting, an interleaving both continuations
+        // queue on the dispatcher for; its TaskCanceledException then escapes
+        // this fire-and-forget method into
+        // TaskScheduler.UnobservedTaskException, writing a phantom crash.log
+        // entry at whatever later GC observes it.
         var destinationSnapshot = _settings.MoveDestination;
         await Task.Run(() =>
         {
@@ -284,10 +282,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // post-reboot rename targets the cache (see IPendingRebootService).
     // The banner is informational only; the CanExecute predicate is what
     // stops a click from reaching the service.
-    // Both gates are execution flags, not the overlay flags that used to stand
-    // in for them: IsScanning is only set once a scan passes 200 ms, and
-    // IsOperating is unset through both pre-flights. Reading either here left
-    // a window in which the other destructive command was still clickable.
+    // Both gates are execution flags, not the overlay flags: IsScanning is only
+    // set once a scan passes 200 ms, and IsOperating is unset through both
+    // pre-flights, so reading either here leaves a window in which the other
+    // destructive command is still clickable.
     // Deliberately identical to CanDelete: Move does NOT require a
     // destination to be typed first. A Move with an empty box asks where to
     // put the files and carries on, so gating the button on the box would
@@ -634,10 +632,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             if (result.InstallerBusy)
             {
                 // A Windows Installer transaction grabbed Global\_MSIExecute in the
-                // sub-millisecond gap between item 4's gate re-check passing and
-                // the service acquiring the mutex, so the service refused and
-                // touched nothing. Re-run the gate, which now reports the held
-                // mutex, to paint the banner, and report no completed operation.
+                // sub-millisecond gap between the act-time gate re-check above
+                // passing and the service acquiring the mutex, so the service
+                // refused and touched nothing. Re-run the gate, which now reports
+                // the held mutex, to paint the banner, and report no completed
+                // operation.
                 await _scan.RecheckPendingRebootAsync();
                 OperationProgress = string.Empty;
                 return;
@@ -876,9 +875,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // (write a file, recycle it, then permanently delete the bin entry it
         // created), plus the recycle thread's creation and CoInitializeEx on
         // the session's first Delete. It is slowest exactly when the bin is
-        // sick, which is the only case it exists to detect, and it used to run
-        // on the dispatcher: the window sat frozen between the confirmation
-        // dialog closing and the delete starting.
+        // sick, which is the only case it exists to detect. On the dispatcher
+        // it freezes the window between the confirmation dialog closing and
+        // the delete starting.
         if (!permitPermanentDelete && ctx.FilePaths.Count > 0)
         {
             var probeToken = _operationCts.Token;
@@ -982,9 +981,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             if (result.InstallerBusy)
             {
                 // A Windows Installer transaction grabbed Global\_MSIExecute after
-                // item 4's gate re-check passed, so the service refused and touched
-                // nothing. Re-run the gate to paint the banner and report no
-                // completed operation.
+                // the act-time gate re-check above passed, so the service refused
+                // and touched nothing. Re-run the gate to paint the banner and
+                // report no completed operation.
                 await _scan.RecheckPendingRebootAsync();
                 OperationProgress = string.Empty;
                 return false;

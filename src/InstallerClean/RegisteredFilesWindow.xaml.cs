@@ -66,10 +66,10 @@ public partial class RegisteredFilesWindow : Window
         {
             // The row to open on is the view-model's: the first product missing
             // from disk if there is one, else the first row. Hardcoding index 0
-            // here overrode that selection, which is how the missing-from-disk
-            // banner came to send the user to a window that opened somewhere
-            // else. SelectedIndex is already the bound selection by Loaded; the
-            // Max guards a selection the list has not resolved.
+            // here overrides that selection, which sends a user who followed the
+            // missing-from-disk banner to a window that opens somewhere else.
+            // SelectedIndex is already the bound selection by Loaded; the Max
+            // guards a selection the list has not resolved.
             var index = Math.Max(ProductsList.SelectedIndex, 0);
             ProductsList.SelectedIndex = index;
             ProductsList.ScrollIntoView(ProductsList.Items[index]);

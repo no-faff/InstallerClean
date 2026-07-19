@@ -16,7 +16,7 @@ namespace InstallerClean.ViewModels;
 /// commands so the detail windows always show the same scan the main
 /// window is currently summarising. The details commands' CanExecute
 /// reflects whether a scan has completed at all, so the buttons are
-/// disabled (greyed out via the standard pill IsEnabled trigger) until
+/// disabled (greyed out by the pill styles' IsEnabled trigger) until
 /// the user has data to view.
 /// </summary>
 public partial class ChromeViewModel : ObservableObject, IDisposable

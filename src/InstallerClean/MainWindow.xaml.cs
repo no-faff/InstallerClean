@@ -775,7 +775,7 @@ public partial class MainWindow : Window
         HwndSource.FromHwnd(hwnd)?.AddHook(SuppressMaximize);
     }
 
-    // The main window's centred-column layout caps its width (672
+    // The main window's centred-column layout caps its width (780
     // content units, text-scaled) and does not fill a maximised
     // viewport: the content stays in the middle
     // with the dark sidebar surface around it. The custom chrome
@@ -797,7 +797,7 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// Click-outside-to-dismiss for the result overlay. Routed via
-    /// the dim Rectangle's MouseLeftButtonDown so only a click on the
+    /// the dim Border's MouseLeftButtonDown so only a click on the
     /// dim margin triggers it; clicks on the inner content card are
     /// absorbed by their own hit-testing.
     /// </summary>

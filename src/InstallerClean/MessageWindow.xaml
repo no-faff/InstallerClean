@@ -57,10 +57,11 @@
 
             <!-- Read-only TextBox, not a TextBlock: these messages carry the
                  crash-log path and, on a failed browser launch, the URL itself,
-                 and the stock message box this replaced let the user select and
-                 copy them. It scrolls itself, so there is no nested ScrollViewer
-                 to swallow the wheel. Named so a screen reader announces what
-                 the text is rather than a bare "edit, read-only". -->
+                 so the text has to be selectable and copyable, as it is in a
+                 stock message box. It scrolls itself, so there is no nested
+                 ScrollViewer to swallow the wheel. Named so a screen reader
+                 announces what the text is rather than a bare "edit,
+                 read-only". -->
             <TextBox x:Name="MessageText" Grid.Row="1"
                      Style="{StaticResource SelectableText}"
                      Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"

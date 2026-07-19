@@ -333,8 +333,9 @@
             </StackPanel>
             </ScrollViewer>
 
-            <!-- Separator. The 16 above and 12 below were the two spacer rows it
-                 used to sit between. -->
+            <!-- Separator. It carries the 16 above and 12 below in its own
+                 margin so the spacing collapses with it; fixed spacer rows
+                 hold their height whatever sits in them. -->
             <chrome:DecorativeBorder Grid.Row="1" BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="0,1,0,0"
                                      Margin="0,16,0,12"
                                      Visibility="{Binding ShowActionZone, Converter={StaticResource BoolToVis}}"/>
@@ -420,9 +421,9 @@
                             ToolTipService.ShowOnDisabled="True"
                             Margin="{StaticResource GapRight.Sm}"/>
 
-                    <!-- LiveSetting is on the overlay's matching pill
+                    <!-- LiveSetting is on the overlay's matching line
                          (the load-bearing surface during an operation);
-                         this body-row pill sits behind the operating
+                         this body-row line sits behind the operating
                          overlay during the only window where the text
                          is changing, so re-announcing here doubles every
                          progress callback for screen readers. -->
@@ -949,8 +950,11 @@
 
                     <!-- Closes the result overlay, NOT the app: exiting
                          from here would trap the user with no way to
-                         re-scan or open About. Auto-focused on overlay
-                         show so Esc/Enter dismiss without mouse. -->
+                         re-scan or open About. Focused on overlay show so a
+                         keyboard user lands on the dismiss action with a
+                         visible ring; Enter follows from IsDefault and Esc
+                         from the window's own key handler, so neither needs
+                         the focus. -->
                     <Button x:Name="CompletionCloseButton" Grid.Row="3" Style="{StaticResource AccentPill}"
                             Content="{loc:Translate Action.Done}" Command="{Binding Completion.DismissCommand}"
                             IsDefault="True"
@@ -958,10 +962,13 @@
                             Margin="{StaticResource GapBottom.Sm}"
                             AutomationProperties.HelpText="{loc:Translate Automation.CloseResult}"/>
 
-                    <!-- Send-result-log button. The lifetime lock in
-                         AppSettings.HasSentResultLog hides it after a
-                         send (success or failure) and across future
-                         sessions, so no user is asked twice.
+                    <!-- Send-result-log button. Two locks hide it, and they
+                         are deliberately asymmetric: the session lock closes
+                         it on any click outcome, success or failure, while
+                         only a successful send persists
+                         AppSettings.HasSentResultLog and keeps it hidden in
+                         later sessions. A transient failure therefore costs
+                         one prompt, not the machine's only chance to send.
                          FocusVisualStyle is set explicitly so this
                          GhostPill paints a ring under Tab navigation. -->
                     <Button Grid.Row="4" Style="{StaticResource GhostPill}"

@@ -21,13 +21,14 @@ public enum MessageKind
 /// <see cref="MessageWindow"/> on the UI thread, owned by the main window when
 /// there is one.
 ///
-/// Every one of these used to be a stock <c>MessageBox</c>: a light-grey Win32
-/// dialog with no owner, in an app whose every other surface is a dark card. So
-/// the moments the app looked least like itself were the moments it had just
-/// failed while running elevated inside C:\Windows\Installer, which is exactly
-/// when a nervous user needs it to look like the app they trusted. (The delete
-/// confirmation was moved off MessageBox for that reason before v1 shipped; the
-/// error surface never got the same treatment.)
+/// One entry point so no message reaches the user as a stock
+/// <c>MessageBox</c> by default: a light-grey Win32 dialog with no owner, in
+/// an app whose every other surface is a dark card. That would make the
+/// moments the app looks least like itself the moments it has just failed
+/// while running elevated inside C:\Windows\Installer, which is exactly when a
+/// nervous user needs it to look like the app they trusted. The stock box
+/// survives only as the last-resort fallback in <see cref="ShowCore"/>, for
+/// when the themed window itself cannot be built.
 /// </summary>
 internal static class MessageDialog
 {

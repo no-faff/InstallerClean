@@ -124,10 +124,11 @@
 
     <!-- Focus ring for flat, rectangular controls (the read-only JSON
          preview TextBox in ConfirmSendResultLogWindow). The pill
-         visuals above sit around rounded controls and would paint a
-         16px-rounded ring outside a sharp-cornered TextBox edge. This
-         one uses a 2px corner radius so the ring shape tracks the
-         underlying rectangle. -->
+         visuals above sit around rounded controls and paint a 16 to
+         22 px rounded ring, which outside a sharp-cornered TextBox
+         edge traces a shape the control does not have. This one uses a
+         2px corner radius so the ring tracks the underlying
+         rectangle. -->
     <Style x:Key="FlatTextBoxFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
@@ -143,7 +144,8 @@
     </Style>
 
     <!-- Pill buttons. Four flavours share one visual language (40px
-         minimum height, fully rounded, 14pt Medium label):
+         minimum height, fully rounded, a Type.Heading.Sm label at
+         Medium weight):
            AccentPill   - the accent fill, for the one action a screen leads with.
            StandardPill - the default filled action.
            DangerPill   - destructive confirm (Delete, Delete permanently).
@@ -296,7 +298,7 @@
     </Style>
 
     <!-- Compact pill buttons (30 px minimum height). Compact variants
-         for the About dialog action row. -->
+         for the About dialog's rows. -->
 
     <Style x:Key="CompactPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
@@ -434,8 +436,8 @@
     </Style>
 
     <!-- List items. ListView and ListBox row styles. Selection
-         highlight uses the standard action background (not the violet
-         selection accent) so a selected row reads as "active
+         highlight uses the standard action background rather than the
+         indigo accent fill, so a selected row reads as "active
          selection" rather than "brand-flavoured". -->
 
     <Style TargetType="ListViewItem">
@@ -493,9 +495,10 @@
          generates past the last column out of the tab order, where it would
          otherwise be a focusable stop with no column behind it. The
          IsKeyboardFocused fill gives the focused header a visible cue on the
-         dark surface; the sort direction itself is exposed to a screen reader
-         via AutomationProperties.ItemStatus (set in UpdateSortIndicators),
-         not by the ▲/▼ glyph in the header text. -->
+         dark surface; the sort direction itself reaches a screen reader as the
+         sorted header's AutomationProperties.Name (set in UpdateSortIndicators),
+         which also keeps the ▲/▼ glyph appended to the visible header text out
+         of speech. -->
     <Style TargetType="GridViewColumnHeader">
         <Setter Property="Foreground" Value="{StaticResource Text.Muted}"/>
         <Setter Property="FontSize" Value="{DynamicResource Type.Caption}"/>

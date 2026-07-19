@@ -158,7 +158,7 @@ public partial class RegisteredFilesViewModel : ObservableObject, IDisposable
         // Open on the first product whose installer file is missing from disk,
         // when there is one. The main window's missing-from-disk banner ends
         // "Open Details for what to do", and what to do is the note that only
-        // that row's details pane carries. Selecting the top row instead left
+        // that row's details pane carries. Selecting the top row instead leaves
         // the user hunting for a small amber triangle somewhere in an
         // alphabetical list of every installed product, which is an instruction
         // they cannot follow. Products is sorted by product name, so the missing

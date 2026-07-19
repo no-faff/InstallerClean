@@ -96,8 +96,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         // Drive IsMainContentInteractive off the three overlay states.
         // The caption buttons themselves remain IsEnabled=true, but the
-        // scanning and operating overlays span all four grid rows so
-        // their dim Rectangle absorbs clicks on the title bar. Esc is
+        // scanning and operating overlays span all three grid rows so
+        // their dim Border absorbs clicks on the title bar. Esc is
         // wired through MainWindow.OnPreviewKeyDown for each overlay,
         // and Alt+F4 reaches the window's normal SC_CLOSE path through
         // WM_SYSCOMMAND (only SC_MAXIMIZE is intercepted).

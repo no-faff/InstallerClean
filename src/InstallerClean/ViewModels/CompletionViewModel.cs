@@ -70,12 +70,12 @@ public partial class CompletionViewModel : ObservableObject
     /// The failure count line ("2 of 71 could not be moved."), shown in
     /// the warning colour directly under the heading and empty on every run
     /// that failed at nothing, which collapses the bound TextBlock. It exists
-    /// as its own zone because the two places this used to live both merged two
-    /// messages into one: the heading carried the outcome AND a trailing "some
-    /// files could not be processed" clause that clipped, and the summary line
-    /// carried the destination path AND an error count that read as part of the
-    /// folder name. Cleared everywhere else, because the view-model instance is
-    /// reused across operations.
+    /// as its own zone because either of the two lines that could carry it
+    /// instead merges two messages into one: on the heading, the outcome plus a
+    /// trailing "some files could not be processed" clause that clips; on the
+    /// summary line, the destination path followed by an error count that reads
+    /// as part of the folder name. Cleared everywhere else, because the
+    /// view-model instance is reused across operations.
     /// </summary>
     [ObservableProperty] private string _failedCount = string.Empty;
 
@@ -643,13 +643,13 @@ public partial class CompletionViewModel : ObservableObject
                 // clean reject so a regression can't ride
                 // DispatcherUnhandledException to a process exit.
                 //
-                // A cancellation catch used to sit above this one, saying it
-                // handled a "caller-driven cancel". There is no caller-driven
-                // cancel: the send is passed no token, and SendAsync maps its
-                // own HttpClient timeout to the Timeout outcome and only
-                // rethrows a cancellation when the token it was given was
-                // cancelled. It could not fire, and it described a send the
-                // user could abandon, which this one is not.
+                // No cancellation branch above this catch, because there is no
+                // caller-driven cancel to handle: the send is passed no token,
+                // and SendAsync maps its own HttpClient timeout to the Timeout
+                // outcome and only rethrows a cancellation when the token it
+                // was given was cancelled. A branch for one could not fire, and
+                // would describe a send the user can abandon, which this is
+                // not.
                 CrashLog.TryWrite(ex);
                 outcome = ResultLogSendOutcome.Unknown;
             }
@@ -731,8 +731,8 @@ public partial class CompletionViewModel : ObservableObject
         {
             // The bucket's own count picks singular or plural through the resx
             // plural machinery, so an inflecting language gets its .One/.Few/
-            // .Many form. This replaces a "(3)" bracket appended to a singular
-            // sentence, which no language could inflect and which read as a
+            // .Many form. The alternative, a "(3)" bracket appended to a
+            // singular sentence, is one no language can inflect and reads as a
             // reference number.
             var count = bucket.Count();
             sb.Append(bucket.First().LocalisedGroupHeading(count)).AppendLine();

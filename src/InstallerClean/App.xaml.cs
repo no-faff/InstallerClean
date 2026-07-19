@@ -371,7 +371,8 @@ public partial class App : Application
         catch (Exception ex)
         {
             // Without the event, a second launch falls back to the message box,
-            // which is where this app was before. Not worth failing a start-up over.
+            // which is a degraded outcome, not a broken one. Not worth failing
+            // a start-up over.
             CrashLog.TryWrite(ex);
             return;
         }
