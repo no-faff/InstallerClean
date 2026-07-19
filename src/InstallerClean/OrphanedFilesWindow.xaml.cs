@@ -25,7 +25,7 @@ public partial class OrphanedFilesWindow : Window
         // The window always opens at this computed size; it does not
         // remember a previous one, so the size always suits the current OS
         // text setting and screen (a saved size scales with neither). 1000 x
-        // 540 is the 100% default, multiplied by the text-scale factor
+        // 620 is the 100% default, multiplied by the text-scale factor
         // because the columns and the details pane inside scale with it, so
         // an unscaled default would overflow into a horizontal scrollbar.
         // The clamps keep the window inside the screen's work area.
@@ -33,7 +33,7 @@ public partial class OrphanedFilesWindow : Window
         Width = DetailWindowSizing.ClampWidthToWorkArea(
             Application.Current?.MainWindow, preferred: 1000 * factor, minimum: MinWidth);
         Height = DetailWindowSizing.ClampHeightToWorkArea(
-            Application.Current?.MainWindow, preferred: 540 * factor, minimum: MinHeight);
+            Application.Current?.MainWindow, preferred: 620 * factor, minimum: MinHeight);
 
         Closed += OnClosed;
         this.EnableAltSpaceSystemMenu();
