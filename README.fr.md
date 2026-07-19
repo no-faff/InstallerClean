@@ -146,7 +146,7 @@ Pour les trouver, InstallerClean appelle directement l'interface COM de Windows 
 
 Tout fichier `.msi` ou `.msp` de `C:\Windows\Installer` qu'aucun produit enregistré ne revendique est orphelin et marqué comme supprimable. Il en va de même pour tout correctif que la base de données marque comme remplacé ou obsolète et qui n'est pas requis pour la désinstallation.
 
-Si l'API renvoie des données incomplètes (rare, mais possible avec un état d'installation corrompu), l'application se rabat sur la lecture du registre. Ce repli n'ajoute des fichiers qu'à l'ensemble « encore utiles », jamais à l'ensemble « supprimables ».
+L'application lit aussi ces mêmes enregistrements directement dans le registre à chaque analyse, comme seconde source indépendante. Si l'une des deux lectures revient incomplète (rare, mais possible avec un état d'installation corrompu), InstallerClean retient des fichiers ou refuse l'analyse plutôt que de deviner. Cette seconde lecture n'ajoute des fichiers qu'à l'ensemble « encore utiles », jamais à l'ensemble « supprimables ».
 
 Une fois un déplacement ou une suppression terminé, les sous-dossiers vides de `C:\Windows\Installer` (les répertoires que le cache laisse derrière lui une fois leur contenu parti) sont nettoyés dans la même passe.
 
@@ -221,7 +221,7 @@ Si quelque chose ici vous gêne, [ouvrez un ticket](../../issues). Les problème
 
 - WinSxS (`C:\Windows\WinSxS`) est un dossier différent, avec des règles différentes. Pour celui-là, exécutez `Dism /Online /Cleanup-Image /StartComponentCleanup` depuis une invite élevée.
 - Aucun service en arrière-plan, aucune tâche planifiée, aucun nettoyage automatique. L'application s'exécute quand vous la lancez.
-- Elle ne modifie ni vos programmes installés ni la base de données de Windows Installer, elle ne fait que les lire. La seule chose qu'elle écrit dans le registre est une entrée unique dans le journal des événements de Windows dont l'outil en ligne de commande a besoin pour que les exécutions planifiées puissent être auditées.
+- Elle ne modifie ni vos programmes installés ni la base de données de Windows Installer, elle ne fait que les lire. La seule chose qu'elle écrit dans le registre est l'enregistrement unique de la source d'événements dont l'outil en ligne de commande a besoin pour que ses exécutions apparaissent dans le journal des événements de Windows.
 - Il ne se connecte à Internet que lorsque vous le lui demandez : une vérification manuelle des mises à jour ; le rapport anonyme facultatif (juste pour me faire savoir que ça fonctionne) ; et des liens vers la documentation GitHub et une page de dons, qui s'ouvrent dans votre navigateur si vous choisissez de cliquer.
 - Pas de barres d'outils, pas de logiciels groupés, pas de publiciels.
 

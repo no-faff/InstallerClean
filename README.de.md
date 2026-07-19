@@ -146,7 +146,7 @@ Um sie zu finden, ruft InstallerClean die COM-Schnittstelle von Windows Installe
 
 Jede `.msi`- oder `.msp`-Datei in `C:\Windows\Installer`, die keinem registrierten Produkt zugeordnet ist, ist verwaist und wird als entfernbar markiert. Ebenso jeder Patch, den die Datenbank als ersetzt oder veraltet markiert und der nicht für die Deinstallation benötigt wird.
 
-Wenn die API unvollständige Daten zurückgibt (selten, aber bei beschädigtem Installer-Zustand möglich), greift die App ersatzweise auf das Lesen der Registrierung zurück. Dabei werden Dateien nur der Menge der „noch benötigten“ hinzugefügt, nie der Menge der „entfernbaren“.
+Die App liest dieselben Einträge bei jedem Scan zusätzlich direkt aus der Registrierung, als zweite, unabhängige Quelle. Kommt eine der beiden Lesungen unvollständig zurück (selten, aber bei beschädigtem Installer-Zustand möglich), hält InstallerClean Dateien zurück oder verweigert den Scan, statt zu raten. Diese zweite Lesung fügt Dateien nur der Menge der „noch benötigten“ hinzu, nie der Menge der „entfernbaren“.
 
 Nach einem abgeschlossenen Verschieben oder Löschen werden leere Unterordner in `C:\Windows\Installer` (die Verzeichnisse, die der Cache zurücklässt, sobald ihr Inhalt weg ist) im selben Durchgang entfernt.
 
@@ -221,7 +221,7 @@ Wenn dir hier etwas im Weg ist, [erstelle ein Issue](../../issues). Barrierefrei
 
 - WinSxS (`C:\Windows\WinSxS`) ist ein anderer Ordner mit anderen Regeln. Dafür führe `Dism /Online /Cleanup-Image /StartComponentCleanup` in einer Eingabeaufforderung mit erhöhten Rechten aus.
 - Kein Hintergrunddienst, keine geplante Aufgabe, kein automatisches Aufräumen. Die App läuft, wenn du sie startest.
-- Sie verändert weder deine installierten Programme noch die Windows-Installer-Datenbank, sondern liest sie nur. Das Einzige, was sie überhaupt in die Registrierung schreibt, ist ein einmaliger Windows-Ereignisprotokoll-Eintrag, den das Befehlszeilenprogramm braucht, damit geplante Ausführungen nachvollziehbar sind.
+- Sie verändert weder deine installierten Programme noch die Windows-Installer-Datenbank, sondern liest sie nur. Das Einzige, was sie überhaupt in die Registrierung schreibt, ist die einmalige Registrierung der Ereignisquelle, die das Befehlszeilenprogramm braucht, damit seine Ausführungen im Windows-Ereignisprotokoll erscheinen können.
 - Sie verbindet sich nur mit dem Internet, wenn du es ihr sagst: eine manuelle Update-Prüfung; der optionale anonyme Bericht (nur damit ich weiß, dass es funktioniert); und Links zur GitHub-Dokumentation und einer Spendenseite, die sich in deinem Browser öffnen, wenn du sie anklickst.
 - Keine Symbolleisten, keine gebündelte Software, keine Adware.
 

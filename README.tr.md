@@ -146,7 +146,7 @@ Bunları bulmak için InstallerClean, Windows Installer COM arabirimini doğruda
 
 `C:\Windows\Installer` içindeki, kayıtlı bir ürüne ait olmayan her `.msi` veya `.msp` dosyası yetimdir ve kaldırılabilir olarak işaretlenir. Veritabanının yerine yenisi gelmiş ya da geçersiz kılınmış olarak işaretlediği ve kaldırma için gerekmeyen her yama da öyle.
 
-API eksik veri döndürürse (nadirdir, ama bozuk bir Installer durumunda olabilir), uygulama yedek olarak kayıt defterini okumaya geçer. Bu yedek, dosyaları yalnızca “hâlâ gerekli” kümesine ekler, asla “kaldırılabilir” kümesine değil.
+Uygulama her taramada aynı kayıtları doğrudan kayıt defterinden de okur; bu ikinci, bağımsız bir kaynaktır. İki okumadan herhangi biri eksik dönerse (nadirdir, ama bozuk bir Installer durumunda olabilir), InstallerClean tahmin yürütmek yerine dosyaları geride tutar ya da taramayı reddeder. Bu ikinci okuma, dosyaları yalnızca “hâlâ gerekli” kümesine ekler, asla “kaldırılabilir” kümesine değil.
 
 Bir Taşı veya Sil işlemi tamamlandıktan sonra, `C:\Windows\Installer` içindeki boş alt klasörler (önbelleğin, içeriği gittiğinde geride bıraktığı dizinler) aynı geçişte budanır.
 
@@ -221,7 +221,7 @@ Burada bir şey size engel oluyorsa, [bir konu açın](../../issues). Erişilebi
 
 - WinSxS (`C:\Windows\WinSxS`) farklı kurallara sahip farklı bir klasördür. Onun için, yükseltilmiş bir komut isteminden `Dism /Online /Cleanup-Image /StartComponentCleanup` komutunu çalıştırın.
 - Arka plan hizmeti yok, zamanlanmış görev yok, otomatik temizlik yok. Uygulama yalnızca siz başlattığınızda çalışır.
-- Yüklü programlarınızı ya da Windows Installer veritabanını değiştirmez, yalnızca okur. Kayıt defterine yazdığı tek şey, komut satırı aracının zamanlanmış çalıştırmaların denetlenebilmesi için ihtiyaç duyduğu tek seferlik bir Windows Olay Günlüğü kaydıdır.
+- Yüklü programlarınızı ya da Windows Installer veritabanını değiştirmez, yalnızca okur. Kayıt defterine yazdığı tek şey, komut satırı aracının çalıştırmalarının Windows Olay Günlüğü'nde görünebilmesi için ihtiyaç duyduğu tek seferlik olay kaynağı kaydıdır.
 - İnternete yalnızca siz söylediğinizde bağlanır: elle yapılan bir güncelleme kontrolü; isteğe bağlı anonim rapor (yalnızca çalıştığını bana bildirmek için); ve GitHub belgelerine ve bir bağış sayfasına giden, tıklamayı seçerseniz tarayıcınızda açılan bağlantılar.
 - Araç çubuğu yok, paketlenmiş yazılım yok, reklam yazılımı yok.
 

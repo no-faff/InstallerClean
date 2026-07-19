@@ -146,7 +146,7 @@ To find them, InstallerClean calls the Windows Installer COM interface directly 
 
 Any `.msi` or `.msp` file in `C:\Windows\Installer` that isn't claimed by a registered product is orphaned and flagged as removable. So is any patch the database marks superseded or obsoleted that isn't required for uninstall.
 
-If the API returns incomplete data (rare, but it can happen with a corrupted installer state), the app falls back to reading the registry. The fallback only adds files to the "still needed" set, never to the "removable" set.
+The app also reads the same records straight from the registry on every scan, as a second, independent source. If either reading comes back incomplete (rare, but it can happen with a corrupted installer state), InstallerClean keeps files back or refuses the scan rather than guess. That second reading only adds files to the "still needed" set, never to the "removable" set.
 
 After a Move or Delete completes, empty subfolders inside `C:\Windows\Installer` (the directories the cache leaves behind once their contents are gone) are pruned in the same pass.
 
@@ -219,7 +219,7 @@ If anything here gets in your way, [open an issue](../../issues). Accessibility 
 
 - WinSxS (`C:\Windows\WinSxS`) is a different folder with different rules. For that one, run `Dism /Online /Cleanup-Image /StartComponentCleanup` from an elevated prompt.
 - No background service, no scheduled task, no auto-clean. The app runs when you launch it.
-- It doesn't change your installed programs or the Windows Installer database, only reads them. The only thing it ever writes to the registry is a one-time Windows Event Log entry the command-line tool needs so scheduled runs can be audited.
+- It doesn't change your installed programs or the Windows Installer database, only reads them. The only thing it ever writes to the registry is the one-time event-source registration the command-line tool needs so its runs can appear in the Windows Event Log.
 - It only connects to the internet when you tell it to: a manual update check; the optional anonymous report (just to let me know it's working); and links to the GitHub docs and a donate page, which open in your browser if you choose to click them.
 - No toolbars, no bundled software, no adware.
 

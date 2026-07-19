@@ -146,7 +146,7 @@ Untuk menemukannya, InstallerClean memanggil antarmuka COM Windows Installer sec
 
 Setiap file `.msi` atau `.msp` di `C:\Windows\Installer` yang tidak diklaim oleh produk terdaftar mana pun berarti yatim dan ditandai bisa dihapus. Demikian pula setiap patch yang ditandai digantikan atau usang oleh basis data dan tidak diperlukan untuk penghapusan instalasi.
 
-Jika API mengembalikan data yang tidak lengkap (jarang, tetapi bisa terjadi pada keadaan penginstal yang rusak), aplikasi beralih ke pembacaan registri. Cadangan ini hanya menambahkan file ke kumpulan "masih diperlukan", tidak pernah ke kumpulan "bisa dihapus".
+Aplikasi juga membaca catatan yang sama langsung dari registri pada setiap pemindaian, sebagai sumber kedua yang berdiri sendiri. Jika salah satu dari kedua pembacaan itu kembali tidak lengkap (jarang, tetapi bisa terjadi pada keadaan penginstal yang rusak), InstallerClean menahan file atau menolak pemindaian alih-alih menebak. Pembacaan kedua ini hanya menambahkan file ke kumpulan "masih diperlukan", tidak pernah ke kumpulan "bisa dihapus".
 
 Setelah Pindahkan atau Hapus selesai, subfolder kosong di dalam `C:\Windows\Installer` (direktori yang ditinggalkan cache setelah isinya hilang) dipangkas dalam satu proses yang sama.
 
@@ -221,7 +221,7 @@ Jika ada sesuatu di sini yang menghalangi Anda, [buka sebuah issue](../../issues
 
 - WinSxS (`C:\Windows\WinSxS`) adalah folder berbeda dengan aturan berbeda. Untuk folder itu, jalankan `Dism /Online /Cleanup-Image /StartComponentCleanup` dari prompt perintah yang ditinggikan.
 - Tanpa layanan latar belakang, tanpa tugas terjadwal, tanpa pembersihan otomatis. Aplikasi berjalan ketika Anda menjalankannya.
-- Aplikasi tidak mengubah program yang terpasang atau basis data Windows Installer, hanya membacanya. Satu-satunya hal yang pernah ditulisnya ke registri adalah satu entri Log Peristiwa Windows sekali saja yang dibutuhkan alat baris perintah agar proses terjadwal dapat diaudit.
+- Aplikasi tidak mengubah program yang terpasang atau basis data Windows Installer, hanya membacanya. Satu-satunya hal yang pernah ditulisnya ke registri adalah pendaftaran sumber peristiwa sekali saja yang dibutuhkan alat baris perintah agar proses jalannya muncul di Log Peristiwa Windows.
 - Aplikasi hanya terhubung ke internet ketika Anda memerintahkannya: pemeriksaan pembaruan secara manual; laporan anonim opsional (sekadar memberi tahu saya bahwa aplikasi berfungsi); serta tautan ke dokumentasi GitHub dan halaman donasi, yang terbuka di peramban Anda jika Anda memilih mengekliknya.
 - Tanpa bilah alat, tanpa perangkat lunak yang dibundel, tanpa adware.
 

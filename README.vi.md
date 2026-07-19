@@ -146,7 +146,7 @@ InstallerClean nhận diện ba loại tệp không cần thiết.
 
 Bất kỳ tệp `.msi` hoặc `.msp` nào trong `C:\Windows\Installer` mà không được sản phẩm đã đăng ký nào nhận là của mình thì đều là tệp mồ côi và bị đánh dấu là có thể loại bỏ. Tương tự với bất kỳ bản vá nào mà cơ sở dữ liệu đánh dấu là đã bị thay thế hoặc đã lỗi thời và không cần thiết cho việc gỡ cài đặt.
 
-Nếu API trả về dữ liệu không đầy đủ (hiếm, nhưng có thể xảy ra khi trạng thái trình cài đặt bị hỏng), ứng dụng sẽ chuyển sang đọc registry để dự phòng. Phương án dự phòng chỉ thêm tệp vào nhóm “vẫn cần giữ”, không bao giờ thêm vào nhóm “có thể loại bỏ”.
+Ứng dụng còn đọc chính những bản ghi đó trực tiếp từ registry trong mỗi lần quét, như một nguồn thứ hai, độc lập. Nếu một trong hai lần đọc trả về dữ liệu không đầy đủ (hiếm, nhưng có thể xảy ra khi trạng thái trình cài đặt bị hỏng), InstallerClean sẽ giữ tệp lại hoặc từ chối lượt quét thay vì đoán. Lần đọc thứ hai này chỉ thêm tệp vào nhóm “vẫn cần giữ”, không bao giờ thêm vào nhóm “có thể loại bỏ”.
 
 Sau khi một thao tác Chuyển hoặc Xóa hoàn tất, các thư mục con rỗng bên trong `C:\Windows\Installer` (những thư mục mà bộ nhớ đệm để lại khi nội dung đã biến mất) được dọn luôn trong cùng lượt đó.
 
@@ -221,7 +221,7 @@ Nếu có điều gì ở đây cản trở bạn, hãy [mở một issue](../..
 
 - WinSxS (`C:\Windows\WinSxS`) là một thư mục khác với những quy tắc khác. Với thư mục đó, hãy chạy `Dism /Online /Cleanup-Image /StartComponentCleanup` từ một dấu nhắc lệnh có quyền nâng cao.
 - Không có dịch vụ chạy ngầm, không có tác vụ theo lịch, không tự động dọn. Ứng dụng chỉ chạy khi bạn khởi động nó.
-- Nó không thay đổi các chương trình đã cài đặt của bạn hay cơ sở dữ liệu Windows Installer, chỉ đọc chúng. Thứ duy nhất nó từng ghi vào Registry là một mục nhật ký sự kiện Windows chỉ tạo một lần mà công cụ dòng lệnh cần đến để các lần chạy theo lịch có thể được kiểm tra.
+- Nó không thay đổi các chương trình đã cài đặt của bạn hay cơ sở dữ liệu Windows Installer, chỉ đọc chúng. Thứ duy nhất nó từng ghi vào Registry là việc đăng ký nguồn sự kiện, chỉ làm một lần, mà công cụ dòng lệnh cần đến để các lần chạy của nó hiện ra trong Nhật ký Sự kiện Windows.
 - Nó chỉ kết nối internet khi bạn yêu cầu: một lần kiểm tra cập nhật thủ công; báo cáo ẩn danh tùy chọn (chỉ để cho tôi biết nó đang hoạt động); và các liên kết tới tài liệu trên GitHub cùng một trang quyên góp, sẽ mở trong trình duyệt của bạn nếu bạn chọn bấm vào.
 - Không thanh công cụ, không phần mềm đi kèm, không phần mềm quảng cáo.
 

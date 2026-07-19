@@ -146,7 +146,7 @@ Para encontrá-los, o InstallerClean chama a interface COM do Windows Installer 
 
 Qualquer arquivo `.msi` ou `.msp` em `C:\Windows\Installer` que não seja reivindicado por um produto registrado é órfão e marcado como removível. O mesmo vale para qualquer patch que o banco de dados marque como substituído ou obsoleto e que não seja necessário para a desinstalação.
 
-Se a API retornar dados incompletos (raro, mas pode acontecer com um estado do instalador corrompido), o aplicativo recorre à leitura do registro. Essa alternativa só adiciona arquivos ao conjunto "ainda necessários", nunca ao conjunto "removíveis".
+O aplicativo também lê esses mesmos dados diretamente do registro a cada verificação, como uma segunda fonte independente. Se qualquer uma das duas leituras voltar incompleta (raro, mas pode acontecer com um estado do instalador corrompido), o InstallerClean retém arquivos ou recusa a verificação em vez de adivinhar. Essa segunda leitura só adiciona arquivos ao conjunto "ainda necessários", nunca ao conjunto "removíveis".
 
 Depois que um Mover ou Excluir é concluído, as subpastas vazias dentro de `C:\Windows\Installer` (os diretórios que o cache deixa para trás quando o conteúdo some) são removidas na mesma passagem.
 
@@ -221,7 +221,7 @@ Se algo aqui atrapalhar você, [abra uma issue](../../issues). Problemas de aces
 
 - O WinSxS (`C:\Windows\WinSxS`) é uma pasta diferente, com regras diferentes. Para essa, rode `Dism /Online /Cleanup-Image /StartComponentCleanup` em um prompt elevado.
 - Sem serviço em segundo plano, sem tarefa agendada, sem limpeza automática. O aplicativo roda quando você o abre.
-- Ele não altera seus programas instalados nem o banco de dados do Windows Installer, apenas os consulta. A única coisa que ele chega a escrever no registro é uma entrada única no log de eventos do Windows de que a ferramenta de linha de comando precisa para que execuções agendadas possam ser auditadas.
+- Ele não altera seus programas instalados nem o banco de dados do Windows Installer, apenas os consulta. A única coisa que ele chega a escrever no registro é o cadastro, feito uma única vez, da fonte de eventos de que a ferramenta de linha de comando precisa para que suas execuções apareçam no log de eventos do Windows.
 - Ele só se conecta à internet quando você manda: uma verificação manual de atualizações; o relatório anônimo opcional (só para eu saber que está funcionando); e links para a documentação no GitHub e para uma página de doação, que abrem no seu navegador se você optar por clicar.
 - Sem barras de ferramentas, sem software empacotado, sem adware.
 

@@ -146,7 +146,7 @@ Per trovarle, InstallerClean chiama direttamente l'interfaccia COM di Windows In
 
 Qualunque file `.msi` o `.msp` in `C:\Windows\Installer` che non sia rivendicato da un prodotto registrato è orfano e viene contrassegnato come rimovibile. Lo stesso vale per qualunque patch che il database segni come sostituita o obsoleta e che non serva per la disinstallazione.
 
-Se l'API restituisce dati incompleti (cosa rara, ma che può capitare con uno stato del programma di installazione danneggiato), l'app ripiega sulla lettura del registro di sistema. Questo ripiego aggiunge file solo all'insieme degli «ancora necessari», mai a quello dei «rimovibili».
+L'app legge gli stessi record anche direttamente dal registro di sistema a ogni scansione, come seconda fonte indipendente. Se una delle due letture torna incompleta (cosa rara, ma che può capitare con uno stato del programma di installazione danneggiato), InstallerClean trattiene i file o rifiuta la scansione anziché tirare a indovinare. Questa seconda lettura aggiunge file solo all'insieme degli «ancora necessari», mai a quello dei «rimovibili».
 
 Una volta completato uno spostamento o un'eliminazione, le sottocartelle vuote dentro `C:\Windows\Installer` (le directory che la cache lascia indietro quando il loro contenuto sparisce) vengono eliminate nella stessa passata.
 
@@ -221,7 +221,7 @@ Se qualcosa qui ti ostacola, [apri un issue](../../issues). I problemi di access
 
 - WinSxS (`C:\Windows\WinSxS`) è una cartella diversa con regole diverse. Per quella, esegui `Dism /Online /Cleanup-Image /StartComponentCleanup` da un prompt con privilegi elevati.
 - Nessun servizio in background, nessuna attività pianificata, nessuna pulizia automatica. L'app gira quando la avvii tu.
-- Non modifica i tuoi programmi installati né il database di Windows Installer, li legge soltanto. L'unica cosa che scrive mai nel registro di sistema è una voce una tantum nel registro eventi di Windows, che serve allo strumento da riga di comando perché le esecuzioni pianificate possano essere verificate.
+- Non modifica i tuoi programmi installati né il database di Windows Installer, li legge soltanto. L'unica cosa che scrive mai nel registro di sistema è la registrazione una tantum dell'origine eventi, che serve allo strumento da riga di comando perché le sue esecuzioni compaiano nel registro eventi di Windows.
 - Si collega a internet solo quando glielo dici tu: un controllo manuale degli aggiornamenti; il rapporto anonimo opzionale (solo per farmi sapere che funziona); e i link alla documentazione su GitHub e a una pagina per le donazioni, che si aprono nel tuo browser se scegli di cliccarli.
 - Niente barre degli strumenti, niente software incluso, niente adware.
 

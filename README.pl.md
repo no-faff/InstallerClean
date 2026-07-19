@@ -146,7 +146,7 @@ Aby je znaleźć, InstallerClean wywołuje interfejs COM Windows Installer bezpo
 
 Każdy plik `.msi` lub `.msp` w `C:\Windows\Installer`, którego nie przypisuje sobie żaden zarejestrowany produkt, jest osierocony i oznaczany jako do usunięcia. Tak samo każda poprawka, którą baza danych oznacza jako zastąpioną lub wycofaną, a która nie jest wymagana do odinstalowania.
 
-Jeśli API zwróci niekompletne dane (rzadko, ale przy uszkodzonym stanie instalatora to możliwe), aplikacja awaryjnie sięga po odczyt rejestru. Tryb awaryjny dodaje pliki wyłącznie do zbioru „nadal potrzebnych”, nigdy do zbioru „do usunięcia”.
+Aplikacja przy każdym skanowaniu czyta te same wpisy również wprost z rejestru, jako drugie, niezależne źródło. Jeśli którykolwiek z dwóch odczytów wróci niekompletny (rzadko, ale przy uszkodzonym stanie instalatora to możliwe), InstallerClean zatrzymuje pliki albo odmawia skanowania, zamiast zgadywać. Ten drugi odczyt dodaje pliki wyłącznie do zbioru „nadal potrzebnych”, nigdy do zbioru „do usunięcia”.
 
 Po zakończeniu przenoszenia lub usuwania puste podfoldery wewnątrz `C:\Windows\Installer` (katalogi, które pamięć podręczna pozostawia po zniknięciu ich zawartości) są usuwane w tym samym przebiegu.
 
@@ -221,7 +221,7 @@ Jeśli cokolwiek tutaj ci przeszkadza, [zgłoś problem](../../issues). Problemy
 
 - WinSxS (`C:\Windows\WinSxS`) to inny folder o innych zasadach. Do niego użyj `Dism /Online /Cleanup-Image /StartComponentCleanup` z wiersza poleceń z podwyższonymi uprawnieniami.
 - Brak usługi w tle, brak zaplanowanego zadania, brak automatycznego czyszczenia. Aplikacja działa wtedy, gdy ją uruchomisz.
-- Nie zmienia ani twoich zainstalowanych programów, ani bazy danych Windows Installer, tylko je odczytuje. Jedyne, co w ogóle zapisuje do rejestru, to jednorazowy wpis w dzienniku zdarzeń Windows, którego narzędzie wiersza poleceń potrzebuje, aby można było skontrolować zaplanowane uruchomienia.
+- Nie zmienia ani twoich zainstalowanych programów, ani bazy danych Windows Installer, tylko je odczytuje. Jedyne, co w ogóle zapisuje do rejestru, to jednorazowa rejestracja źródła zdarzeń, której narzędzie wiersza poleceń potrzebuje, aby jego uruchomienia pojawiały się w dzienniku zdarzeń Windows.
 - Łączy się z internetem tylko wtedy, gdy mu każesz: ręczne sprawdzenie aktualizacji; opcjonalny anonimowy raport (tylko po to, bym wiedział, że działa); oraz linki do dokumentacji na GitHubie i strony wsparcia, które otwierają się w twojej przeglądarce, jeśli zdecydujesz się je kliknąć.
 - Bez pasków narzędzi, bez dołączanego oprogramowania, bez adware.
 
