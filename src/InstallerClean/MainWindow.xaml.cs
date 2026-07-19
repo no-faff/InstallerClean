@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
@@ -717,8 +718,31 @@ public partial class MainWindow : Window
             // screen reader then has only the list position and the checked
             // state to read out, never the language. An explicit
             // AutomationProperties.Name is consulted ahead of any header
-            // fallback, so the endonym is spoken whatever the header holds.
-            AutomationProperties.SetName(item, endonym);
+            // fallback, so the name is spoken whatever the header holds.
+            //
+            // The endonym alone is not enough. A speech engine renders only the
+            // scripts it has a voice for, so an English-voiced Narrator reaching
+            // Русский, Українська, 日本語, 简体中文 or 한국어 says nothing for the
+            // name and falls back to "item 12" and the checked state, which is
+            // indistinguishable from the unnamed bug above. Appending the
+            // culture's display name fixes that without touching the visible
+            // menu: it comes from ICU already translated into the running UI
+            // language, so an English UI hears "Russian", a French one "russe"
+            // and a Japanese one "ロシア語" - always a string the voice for that
+            // UI can pronounce, and never a resx key to keep in step.
+            var spokenName = new CultureInfo(culture).DisplayName;
+            AutomationProperties.SetName(item,
+                // Skip the suffix where it would repeat the endonym: exact for a
+                // language listed in its own UI ("日本語"), prefix for one whose
+                // display name only adds a region ("English (United Kingdom)").
+                // Case-insensitively, because several languages lowercase their
+                // own name where the endonym capitalises it, and "Français,
+                // français" is the same word twice.
+                spokenName.StartsWith(endonym, StringComparison.CurrentCultureIgnoreCase)
+                    ? endonym
+                    // A comma, not brackets: pt-BR's display name carries its own
+                    // parenthetical, and nesting them reads badly aloud.
+                    : $"{endonym}, {spokenName}");
             // Close on invoke regardless of what the command does. Picking the
             // displayed language is a no-op command (no relaunch), and a
             // keyboard Enter on that ticked item does not dismiss the menu on
