@@ -92,6 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | 로컬 패키지를 검사하는 중... |
 | Found {0} {1} you can safely delete. | 안전하게 삭제할 수 있는 {1} {0}개를 찾았습니다. |
 | Preparing destination folder... | 대상 폴더를 준비하는 중... |
+| Checking the Recycle Bin... | Checking the Recycle Bin... |
 | Moving {0} {1}... | {1} {0}개를 이동하는 중... |
 | Deleting {0} {1}... | {1} {0}개를 삭제하는 중... |
 | Move cancelled. {0} of {1} {2} processed. | 이동이 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다. |

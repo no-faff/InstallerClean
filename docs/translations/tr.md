@@ -92,6 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Yerel paketler taranıyor... |
 | Found {0} {1} you can safely delete. | Güvenle silebileceğiniz {0} {1} bulundu. |
 | Preparing destination folder... | Hedef klasör hazırlanıyor... |
+| Checking the Recycle Bin... | Checking the Recycle Bin... |
 | Moving {0} {1}... | {0} {1} taşınıyor... |
 | Deleting {0} {1}... | {0} {1} siliniyor... |
 | Move cancelled. {0} of {1} {2} processed. | Taşıma iptal edildi. {1} {2} içinden {0} tanesi işlendi. |

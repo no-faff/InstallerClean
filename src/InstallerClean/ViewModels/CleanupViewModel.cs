@@ -818,28 +818,66 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             return false;
         }
 
-        // Probe the volume before showing any overlay on the recycle-first
-        // pass: when the bin is unavailable the service deletes nothing, so a
-        // "Deleting N files..." overlay (and its screen-reader announcement)
-        // for that pass would describe an operation that never happens. Hand
+        // Probe the volume before raising the "Deleting N files..." overlay on
+        // the recycle-first pass: when the bin is unavailable the service
+        // deletes nothing, so that heading (and its screen-reader
+        // announcement) would describe an operation that never happens. Hand
         // straight back so DeleteAllAsync offers the Move / permanent / cancel
         // choice. The permanent-retry pass (permitPermanentDelete) skips this
         // and always runs. DeleteFilesAsync re-checks the same volume and
-        // still fails closed, so this only governs whether the overlay shows.
+        // still fails closed, so this only governs which heading shows.
         //
         // Task.Run because the probe is a full shell IFileOperation round trip
         // (write a file, recycle it, then permanently delete the bin entry it
         // created), plus the recycle thread's creation and CoInitializeEx on
         // the session's first Delete. It is slowest exactly when the bin is
         // sick, which is the only case it exists to detect, and it used to run
-        // on the dispatcher: the window sat frozen, with no overlay and no
-        // Cancel, between the confirmation dialog closing and the delete
-        // starting.
-        if (!permitPermanentDelete && ctx.FilePaths.Count > 0
-            && !await Task.Run(() => _deleteService.CanRecycleToVolume(ctx.FilePaths[0])))
+        // on the dispatcher: the window sat frozen between the confirmation
+        // dialog closing and the delete starting.
+        if (!permitPermanentDelete && ctx.FilePaths.Count > 0)
         {
-            DisposeOperationCts();
-            return true;
+            var probeToken = _operationCts.Token;
+            var probeTask = Task.Run(() => _deleteService.CanRecycleToVolume(ctx.FilePaths[0]), probeToken);
+
+            bool canRecycle;
+            try
+            {
+                // Reveal an overlay only if the probe is slow, the way the scan
+                // and the Move pre-flight do. A healthy bin answers in well
+                // under 200 ms, so neither the overlay nor its announcement
+                // flashes in the instant before the delete's own heading
+                // replaces it; a sick bin, the case that is slow, gets an
+                // overlay saying what is being waited on. Heading before
+                // IsOperating keeps the start announced exactly once.
+                if (await Task.WhenAny(probeTask, Task.Delay(200, probeToken)) != probeTask)
+                {
+                    OperationProgress = Strings.Status_CheckingRecycleBin;
+                    IsOperating = true;
+                }
+                canRecycle = await probeTask;
+                // The shell round trip takes no cancellation token and cannot
+                // be interrupted, so Cancel here means "do not go on to delete"
+                // rather than "stop the probe": it is honoured the moment the
+                // probe returns, before anything is touched. Without this check
+                // the click would be swallowed and the delete would run.
+                probeToken.ThrowIfCancellationRequested();
+            }
+            catch (OperationCanceledException)
+            {
+                IsOperating = false;
+                OperationProgress = string.Empty;
+                DisposeOperationCts();
+                return false;
+            }
+
+            IsOperating = false;
+            OperationProgress = string.Empty;
+
+            if (!canRecycle)
+            {
+                DisposeOperationCts();
+                return true;
+            }
         }
 
         // Heading before IsOperating: a heading assigned after the reveal

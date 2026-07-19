@@ -92,6 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Сканування локальних пакетів... |
 | Found {0} {1} you can safely delete. | Знайдено {0} {1} для безпечного видалення. |
 | Preparing destination folder... | Підготовка папки призначення... |
+| Checking the Recycle Bin... | Checking the Recycle Bin... |
 | Moving {0} {1}... | Переміщення: {0} {1}... |
 | Deleting {0} {1}... | Видалення: {0} {1}... |
 | Move cancelled. {0} of {1} {2} processed. | Переміщення скасовано. Опрацьовано {0} з {1} {2}. |

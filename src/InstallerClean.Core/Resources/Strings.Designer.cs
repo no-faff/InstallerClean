@@ -334,6 +334,7 @@ public static class Strings
     public static string Startup_UnhandledBody_NoLog => Get("Startup.UnhandledBody.NoLog");
     public static string Startup_UnhandledTitle => Get("Startup.UnhandledTitle");
     public static string Status_Cancelling => Get("Status.Cancelling");
+    public static string Status_CheckingRecycleBin => Get("Status.CheckingRecycleBin");
     public static string Status_CheckingRegistry => Get("Status.CheckingRegistry");
     public static string Status_DeleteCancelled_Partial => Get("Status.DeleteCancelled.Partial");
     public static string Status_DeleteFailed => Get("Status.DeleteFailed");

@@ -92,6 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | ローカルパッケージをスキャン中... |
 | Found {0} {1} you can safely delete. | 安全に削除できる {0} 個の {1} が見つかりました。 |
 | Preparing destination folder... | 移動先フォルダーを準備中... |
+| Checking the Recycle Bin... | Checking the Recycle Bin... |
 | Moving {0} {1}... | {0} 個の {1} を移動中... |
 | Deleting {0} {1}... | {0} 個の {1} を削除中... |
 | Move cancelled. {0} of {1} {2} processed. | 移動がキャンセルされました。{1} 個中 {0} 個の {2} を処理しました。 |

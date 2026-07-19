@@ -92,6 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Lokale Pakete werden gescannt... |
 | Found {0} {1} you can safely delete. | {0} {1} gefunden, die du bedenkenlos löschen kannst. |
 | Preparing destination folder... | Zielordner wird vorbereitet... |
+| Checking the Recycle Bin... | Checking the Recycle Bin... |
 | Moving {0} {1}... | {0} {1} werden verschoben... |
 | Deleting {0} {1}... | {0} {1} werden gelöscht... |
 | Move cancelled. {0} of {1} {2} processed. | Verschieben abgebrochen. {0} von {1} {2} verarbeitet. |

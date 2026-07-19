@@ -92,6 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Đang quét các gói cục bộ... |
 | Found {0} {1} you can safely delete. | Đã tìm thấy {0} {1} bạn có thể xóa an toàn. |
 | Preparing destination folder... | Đang chuẩn bị thư mục đích... |
+| Checking the Recycle Bin... | Checking the Recycle Bin... |
 | Moving {0} {1}... | Đang chuyển {0} {1}... |
 | Deleting {0} {1}... | Đang xóa {0} {1}... |
 | Move cancelled. {0} of {1} {2} processed. | Đã hủy chuyển. Đã xử lý {0}/{1} {2}. |

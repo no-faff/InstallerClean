@@ -92,6 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Memindai paket lokal... |
 | Found {0} {1} you can safely delete. | Ditemukan {0} {1} yang aman Anda hapus. |
 | Preparing destination folder... | Menyiapkan folder tujuan... |
+| Checking the Recycle Bin... | Checking the Recycle Bin... |
 | Moving {0} {1}... | Memindahkan {0} {1}... |
 | Deleting {0} {1}... | Menghapus {0} {1}... |
 | Move cancelled. {0} of {1} {2} processed. | Pemindahan dibatalkan. {0} dari {1} {2} diproses. |

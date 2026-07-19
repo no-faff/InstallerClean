@@ -92,6 +92,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | 正在扫描本地程序包… |
 | Found {0} {1} you can safely delete. | 找到 {0} 个{1}，可安全删除。 |
 | Preparing destination folder... | 正在准备目标文件夹… |
+| Checking the Recycle Bin... | Checking the Recycle Bin... |
 | Moving {0} {1}... | 正在移动 {0} 个{1}… |
 | Deleting {0} {1}... | 正在删除 {0} 个{1}… |
 | Move cancelled. {0} of {1} {2} processed. | 移动已取消。{1} 个{2}中已处理 {0} 个。 |
