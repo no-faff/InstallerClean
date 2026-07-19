@@ -14,10 +14,12 @@
 //   <code> is a satellite code: zh-Hans, de, ko, es, it, ja, pt-BR, ru, fr, pl,
 //   tr, id, vi, uk.
 // It reads the English neutral Strings.resx and Strings.<code>.resx, pairs them by
-// key, and writes docs/translations/<code>.md (LF). The 39 human-facing Cli.* keys
-// are translated and shown in their own group; the 21 machine-contract
-// Cli.EventLog* keys (bar Cli.EventLogUnavailable) stay English by contract, so they
-// are skipped here whether or not the satellite carries them (ja does).
+// key, and writes docs/translations/<code>.md (LF). The human-facing Cli.* keys are
+// translated and shown in their own group; the 21 machine-contract Cli.EventLog*
+// keys (bar Cli.EventLogUnavailable) stay English by contract, so they are skipped
+// here whether or not the satellite carries them (ja does). Only the machine set
+// is counted, because it is closed by that contract while the human set grows
+// with every string the CLI gains.
 //
 // --check is what makes "generated, never hand-edited" enforceable rather than
 // merely stated. It rebuilds every table in memory and fails on any difference
@@ -114,8 +116,8 @@ const cell = (raw) => raw
   .replace(/\|/g, '\\|');
 
 // Drop only the 21 machine-contract CLI keys (the Cli.EventLog* set bar
-// Cli.EventLogUnavailable, the one operator-facing warning); the 39 human-facing
-// Cli.* keys are translated and belong in the table.
+// Cli.EventLogUnavailable, the one operator-facing warning); every other Cli.*
+// key is translated and belongs in the table.
 const isMachineCliKey = (k) => k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
 const keys = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
 

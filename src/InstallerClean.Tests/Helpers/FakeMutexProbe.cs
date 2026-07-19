@@ -3,8 +3,9 @@ using InstallerClean.Services;
 namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
-/// Hand fake for <see cref="IMutexProbe"/> so the action services' P1 mutex-hold
-/// path can be driven without the real Windows named mutex. Simulates the three
+/// Hand fake for <see cref="IMutexProbe"/> so the action services'
+/// <c>Global\_MSIExecute</c> hold can be driven without a real Windows named
+/// mutex. Simulates the three
 /// outcomes of <see cref="IMutexProbe.TryAcquire"/>: the mutex is held by another
 /// (refuse), it was acquired (proceed, then release), or it could not be acquired
 /// for another reason (fall back and proceed). Records how many times a lease was

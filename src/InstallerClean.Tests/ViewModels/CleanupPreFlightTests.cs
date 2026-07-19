@@ -115,9 +115,9 @@ public class CleanupPreFlightTests
             Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
 
-        // The regression: IsCancellationRequested is what gates the Cancel
-        // button, and the cancelled pre-flight used to leave it set, so Cancel
-        // and Esc were dead for the whole of the next operation.
+        // IsCancellationRequested is what gates the Cancel button, so a
+        // pre-flight that cancels without clearing it leaves Cancel and Esc
+        // dead for the whole of the next operation.
         Assert.False(vm.Cleanup.IsCancellationRequested);
 
         var releaseMove = new ManualResetEventSlim();
@@ -164,10 +164,10 @@ public class CleanupPreFlightTests
         await move;
 
         Assert.True(probeFinishing.IsSet);
-        // The pre-flight used to check the token only between its filesystem
-        // calls, so a Cancel this late was honoured too late: the user who
-        // cancelled still got the "move 1 file?" dialog, and only the move
-        // behind it failed on the already-cancelled token.
+        // A pre-flight that checked the token only between its filesystem calls
+        // would honour a Cancel this late too late: the user who cancelled
+        // still gets the "move 1 file?" dialog, and only the move behind it
+        // fails on the already-cancelled token.
         _confirmationService.DidNotReceive().ConfirmMove(
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
         await _moveService.DidNotReceive().MoveFilesAsync(
@@ -373,15 +373,12 @@ public class CleanupPreFlightTests
     [Fact]
     public async Task A_pending_reboot_at_act_time_removes_the_folder_the_pre_flight_created()
     {
-        // Past the confirmation, refused at the last moment by a Windows
-        // Installer transaction that started while the dialog was open. The
-        // move does not go ahead and nothing was placed in the folder, so the
-        // rule is the same as the cancel's.
-        // Clean through the scan and the pre-flight, blocked from the moment
-        // the confirmation is answered: an install that started while the
-        // dialog sat open, which is the exact condition the act-time re-check
-        // exists to catch. Blocking from the start instead would have failed
-        // the scan-side gate and never reached this path.
+        // Clean through the scan and the pre-flight, blocked from the moment the
+        // confirmation is answered: an install that started while the dialog sat
+        // open, which is the exact condition the act-time re-check exists to
+        // catch. Blocking from the start instead would fail the scan-side gate
+        // and never reach this path. The move does not go ahead and nothing was
+        // placed in the folder, so the clean-up rule is the cancel's.
         var confirmed = false;
         _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
             .Returns(_ => { confirmed = true; return true; });
@@ -406,8 +403,9 @@ public class CleanupPreFlightTests
     {
         // The probe's own failure arm, which never receives a pre-flight record
         // at all: CreateDirectory succeeded and the write probe then threw, so
-        // the folder exists, the move is abandoned and the user gets the
-        // write-failure dialog.
+        // by that point the folder exists, the move is abandoned and the user
+        // gets the write-failure dialog. The removal therefore has to run off
+        // the caller's captured createdDestination rather than off a record.
         _file.When(f => f.WriteAllBytes(Arg.Any<string>(), Arg.Any<byte[]>()))
             .Do(_ => throw new UnauthorizedAccessException("probe refused"));
 

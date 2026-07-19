@@ -7,14 +7,13 @@
 ; Programs continuity across versions.
 ;
 ; AppVersion is passed in by CI and by the release script, both reading it
-; from Directory.Build.props: "ISCC.exe /DAppVersion=1.8.0 ...". A compile
-; without it fails here rather than falling back. The fallback this replaced
-; was a hand-maintained #define whose own comment claimed it tracked the
-; current shipping target, which it could only do until the next version bump
-; forgot it; a stale one produces a setup whose Add/Remove Programs entry
-; states a version the binaries inside it are not, silently, on the one build
-; nobody checks. There is no correct value to fall back TO, so there is no
-; fallback.
+; from Directory.Build.props: "ISCC.exe /DAppVersion=X.Y.Z ...". A compile
+; without it fails here rather than falling back, and there is deliberately no
+; fallback to add: any hand-maintained default tracks the shipping version only
+; until the version bump that forgets it, and a stale one produces a setup whose
+; Add/Remove Programs entry states a version the binaries inside it are not,
+; silently, on the one build nobody checks. There is no correct value to fall
+; back TO.
 [Setup]
 #ifndef AppVersion
   #error AppVersion is not defined. Pass it on the command line, reading the value from Directory.Build.props: ISCC.exe /DAppVersion=X.Y.Z installer\InstallerClean.iss

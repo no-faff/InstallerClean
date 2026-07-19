@@ -13,9 +13,8 @@
 //      documented asymmetry: it is README-only (no UI, no installer), so it is in
 //      neither set and needs no handling here.
 //   2. The Inno-name-to-culture map below covers every installer language. A new
-//      installer language with no mapping fails here, which is the point: adding a
-//      language means teaching this guard the pairing, and it says so when you
-//      have not.
+//      installer language with no mapping fails here, which is the point: adding
+//      a language means teaching this guard the pairing.
 //   3. Every installer language carries its full set of per-language override
 //      keys in [Messages] and [CustomMessages]. A language added to [Languages]
 //      but left without its welcome/finished/app-running/uninstall/launch strings

@@ -3,10 +3,11 @@ using InstallerClean.Services;
 namespace InstallerClean.Tests.Services.Integration;
 
 /// <summary>
-/// The real <see cref="MutexProbe"/> against real Win32 named mutexes. Only
-/// <c>FakeMutexProbe</c> was exercised before this, which meant the contract
-/// the fake imitates had never itself been checked: P1 (the mutex hold that
-/// stops a msiexec racing a delete batch) rests entirely on
+/// The real <see cref="MutexProbe"/> against real Win32 named mutexes. Covering
+/// it separately is what stops <c>FakeMutexProbe</c> being the only thing under
+/// test: the fake defines the contract it imitates, so the real probe has to be
+/// held to that contract independently. The mutex hold that stops a msiexec
+/// racing a delete batch rests entirely on
 /// <c>TryAcquire</c> setting <c>heldByAnother</c> correctly, since
 /// DeleteFilesService and MoveFilesService refuse the whole batch and report
 /// InstallerBusy on exactly that flag.
@@ -93,9 +94,10 @@ public class MutexProbeTests
 
             var lease = probe.TryAcquire(_name, out var heldByAnother);
 
-            // The pair P1 depends on. A null lease with heldByAnother false
-            // would instead mean "carry on without the hold", which on a live
-            // installer transaction is the one outcome that must not happen.
+            // The pair the refuse-the-batch path depends on. A null lease with
+            // heldByAnother false would instead mean "carry on without the
+            // hold", which on a live installer transaction is the one outcome
+            // that must not happen.
             Assert.Null(lease);
             Assert.True(heldByAnother);
         });
@@ -125,7 +127,7 @@ public class MutexProbeTests
         // abandoned, which surfaces as AbandonedMutexException on the next
         // acquire WITH ownership already transferred. Reporting that as
         // heldByAnother would refuse every batch after a crashed installer,
-        // for good, until the machine restarted.
+        // and go on refusing until the machine restarted.
         var holder = new Thread(() =>
         {
             var mutex = new Mutex(initiallyOwned: false, _name);
@@ -146,8 +148,9 @@ public class MutexProbeTests
     [Fact]
     public void IsHeld_is_false_for_a_name_nobody_holds()
     {
-        // Existence is deliberately NOT the signal: this name is created by
-        // the probe's own open attempt and must still read as unheld.
+        // A name nothing has ever created: IsHeld opens with TryOpenExisting,
+        // which does not create, so this exercises the name-does-not-exist
+        // miss rather than the exists-but-unheld answer.
         Assert.False(new MutexProbe().IsHeld(_name));
     }
 

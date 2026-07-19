@@ -15,12 +15,12 @@
 // lists in step with the generators' KEEP_ENGLISH / ALSO_KEEP; adding a language
 // means adding its ALSO_KEEP here too.
 //
-// WIRING: a required CI step (ci.yml), promoted there once the 2.0.2 batch had
-// landed and it reported clean. So a new or reworded key must be translated
-// before its branch can go green, which is the point: it is the only check that
-// catches a satellite still holding English, parity seeing presence and arity
-// alone. Adding a key and translating it in the same session keeps this green;
-// leaving it for a later batch is what made it red for a fortnight in 2026-07.
+// WIRING: a required CI step (ci.yml). So a new or reworded key must be
+// translated before its branch can go green, which is the point: it is the only
+// check that catches a satellite still holding English, parity seeing presence
+// and arity alone. Adding a key and translating it in the same session keeps
+// this green; leaving it for a later batch is what made it red for a fortnight
+// in 2026-07.
 //
 // Run from the repo root: node scripts/check-still-english.mjs
 import { readdirSync, readFileSync } from 'node:fs';

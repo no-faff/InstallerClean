@@ -6,14 +6,15 @@ namespace InstallerClean.Tests.Services.Integration;
 
 /// <summary>
 /// The write-and-read half of <see cref="ResultLogService"/>, driven against a
-/// %TEMP% sandbox through the internal path-taking constructor. Before that
-/// seam existed the paths were static readonly fields off %LOCALAPPDATA%, so
-/// the byte cap, the atomic write and the temp-file cleanup had no test at all
-/// and could only have been exercised by writing over the real last-run.json in
-/// whichever profile ran the suite.
+/// %TEMP% sandbox through the internal path-taking constructor. That seam is
+/// what makes the byte cap, the atomic write and the temp-file cleanup testable
+/// at all: with the paths fixed to %LOCALAPPDATA%, exercising them would mean
+/// writing over the real last-run.json in whichever profile ran the suite.
 ///
-/// SendAsync is deliberately not covered here: it posts to a live No Faff
-/// endpoint and the seam does not reach it.
+/// SendAsync's network path is deliberately not covered: it posts to a live No
+/// Faff endpoint. Its two pre-network guards (an empty body, and a body over
+/// the byte cap) are covered below, which is possible precisely because both
+/// return before the request is built.
 /// </summary>
 public class ResultLogServiceTests : IDisposable
 {
@@ -75,8 +76,8 @@ public class ResultLogServiceTests : IDisposable
     public async Task WriteAsync_leaves_no_temp_file_behind_when_the_rename_cannot_land()
     {
         // A directory sitting where the log file goes: the temp write succeeds
-        // and File.Move then fails, which is the path that used to strand a
-        // file under a fresh random name on every attempt.
+        // and File.Move then fails. Without the cleanup this pins, that path
+        // strands a file under a fresh random name on every attempt.
         Directory.CreateDirectory(_logFile);
         var svc = new ResultLogService(_logFile);
 

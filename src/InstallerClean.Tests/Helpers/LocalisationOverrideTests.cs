@@ -8,14 +8,14 @@ namespace InstallerClean.Tests.Helpers;
 /// Covers the explicit-language path: what happens when the user picks a
 /// language rather than leaving it on Automatic. Everything downstream of that
 /// pick runs through Localisation's override, the resx resolution in
-/// Strings.Get and the number formatting in DisplayHelpers, and none of it had
-/// a test, because Localisation could be set but never unset and one test
-/// pinning a language would have rewritten the expected strings of every test
-/// after it.
+/// Strings.Get and the number formatting in DisplayHelpers. Covering it at all
+/// depends on LocalisationScope: an override that can be set but not unset
+/// leaks the pinned language into every test that runs after it, rewriting
+/// their expected strings.
 ///
-/// The assertions deliberately hold no French text. The Edit tooling used on
-/// this repo cannot reliably emit the narrow no-break spaces French
-/// punctuation needs, so an expected value typed into C# here could differ
+/// The assertions deliberately hold no French text. French punctuation needs
+/// narrow no-break spaces, which many editors and text tools normalise away
+/// without showing it, so an expected value typed into C# here could differ
 /// from the resx by an invisible character. Every expectation below is read
 /// back out of the resx, or is a decimal separator.
 /// </summary>

@@ -53,7 +53,7 @@ public class InstallerQueryServiceUnitTests
     private static async Task<InstallerQueryResult> Run(FakeMsiApi msi, int fallbackFailures) =>
         await new InstallerQueryService(msi, (_, _) => fallbackFailures).GetRegisteredPackagesAsync();
 
-    // ---- Item 1: shared-patch verdict merge ----
+    // ---- Shared-patch verdict merge ----
 
     [Theory]
     [InlineData(true)]   // superseded product enumerates first
@@ -184,7 +184,7 @@ public class InstallerQueryServiceUnitTests
         Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == dead).IsRemovable);
     }
 
-    // ---- Item 2: Uninstallable guard fails safe ----
+    // ---- Uninstallable guard fails safe ----
 
     [Fact]
     public async Task Unreadable_Uninstallable_keeps_a_superseded_patch()
@@ -213,7 +213,7 @@ public class InstallerQueryServiceUnitTests
         Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == p).IsRemovable);
     }
 
-    // ---- Item 6: patch enumeration AccessDenied throws (matches product loop) ----
+    // ---- Patch enumeration AccessDenied throws (matches product loop) ----
 
     [Fact]
     public async Task Patch_enumeration_access_denied_throws()
@@ -225,7 +225,7 @@ public class InstallerQueryServiceUnitTests
         await Assert.ThrowsAsync<LocalisedAccessException>(() => Run(msi));
     }
 
-    // ---- Item 7: an empty GUID accepted as success is not added ----
+    // ---- An empty GUID accepted as success is not added ----
 
     [Fact]
     public async Task Empty_product_guid_is_not_added_and_counts_as_non_success()
@@ -258,7 +258,7 @@ public class InstallerQueryServiceUnitTests
         Assert.Contains(result.Packages, r => r.LocalPackagePath == ppath);
     }
 
-    // ---- Item 8: the index cap ends enumeration loudly, not silently ----
+    // ---- The index cap ends enumeration loudly, not silently ----
 
     // The message is asserted, not just the type. The cap and the consecutive
     // failures are different conditions and shared one string until 2.0.2: at
@@ -292,7 +292,7 @@ public class InstallerQueryServiceUnitTests
             ex.Message);
     }
 
-    // ---- Item 9: scattered per-product failures are tolerated (no throw) ----
+    // ---- Scattered per-product failures are tolerated (no throw) ----
 
     [Fact]
     public async Task Scattered_product_failures_do_not_throw_and_good_products_survive()
@@ -738,7 +738,7 @@ public class InstallerQueryServiceUnitTests
         Assert.Equal(unimprovable, Assert.Single(result.Packages).LocalPackagePath);
     }
 
-    // ---- Item 16: the SID-buffer retry's own return code ----
+    // ---- The SID-buffer retry's own return code ----
 
     [Fact]
     public async Task AccessDenied_from_the_sid_retry_refuses_the_scan()

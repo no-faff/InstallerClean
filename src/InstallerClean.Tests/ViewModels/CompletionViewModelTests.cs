@@ -37,9 +37,9 @@ public class CompletionViewModelTests
 
         var text = CompletionViewModel.FormatErrorBreakdown(errors);
 
-        // The heading introduces the list, and carries no "(2)" bracket: that
-        // was a count no language could inflect, sitting on a singular
-        // sentence, and it read as a reference number.
+        // The heading introduces the list, and carries no "(2)" bracket. Such a
+        // bracket is a count no language can inflect, sitting on a sentence that
+        // is already singular or plural, and it reads as a reference number.
         Assert.StartsWith(Strings.Error_FileInUse_Plural, text);
         Assert.DoesNotContain("(2)", text);
     }
@@ -65,7 +65,7 @@ public class CompletionViewModelTests
 
         var text = CompletionViewModel.FormatErrorBreakdown(errors);
 
-        // Two spaces alone are invisible in a proportional font, which left the
+        // Two spaces alone are invisible in a proportional font, which leaves the
         // filenames reading as a run-on of the sentence above them. The hyphen
         // is what makes the indent survive Poppins.
         Assert.Contains("  - a.msi", text);
@@ -258,14 +258,14 @@ public class CompletionViewModelTests
             errors: Failures(2), freesSpace: true);
 
         // Something really was freed, so the heading says so and the failures
-        // get their own line. The heading used to carry both, in one clause too
-        // long for the card, and clipped.
+        // get their own line. Carrying both in the heading makes one clause too
+        // long for the card, and it clips.
         Assert.False(vm.HeadingIsWarning);
         Assert.Contains("freed", vm.Heading);
         Assert.Equal("2 of 71 could not be moved.", vm.FailedCount);
-        // The destination line is the plain variant whatever happened: the
-        // error count used to be appended here, where it read as part of the
-        // folder name.
+        // The destination line is the plain variant whatever happened. An error
+        // count appended here lands immediately after the path, where it reads
+        // as part of the folder name.
         Assert.Equal(@"69 files moved to: D:\backup", vm.Summary);
     }
 
@@ -276,8 +276,9 @@ public class CompletionViewModelTests
         vm.ShowMoveSummary(movedCount: 0, movedBytes: 0, destination: @"D:\backup",
             errors: Failures(2), freesSpace: true);
 
-        // This used to render "0 B freed, some files could not be proce": wrong
-        // twice, reporting a total failure as a result and then clipping.
+        // Routing a total failure through the success heading renders
+        // "0 B freed, some files could not be proce": wrong twice, reporting a
+        // total failure as a result and then clipping mid-word.
         Assert.True(vm.HeadingIsWarning);
         Assert.Equal(Strings.Completion_NothingMoved, vm.Heading);
         Assert.Equal("2 of 2 could not be moved.", vm.FailedCount);

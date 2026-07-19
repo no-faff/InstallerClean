@@ -31,15 +31,16 @@ internal static class Program
 
     public static int Main(string[] args)
     {
-        // A throw from the pre-flight in Run (a name or ACL clash constructing the
-        // single-instance mutex, say) would otherwise reach the runtime's default
-        // handler: ex.ToString() to stderr (a cross-profile path leak under
-        // elevation), no Application-log record, and an undocumented exit code no
-        // RMM can branch on. Route any such throw through the same crash-log +
-        // audit + ExitError path the work loop uses. Run holds the single-instance
-        // mutex on this thread (acquire and release both here, per the Win32
-        // owner-thread rule) and RunWorkAsync owns its own catch-all, so only
-        // genuine pre-flight throws reach here.
+        // A throw from Run outside the work loop (a name or ACL clash constructing
+        // the single-instance mutex, say, or an unwritable stdout in the cleanup
+        // finally) would otherwise reach the runtime's default handler:
+        // ex.ToString() to stderr (a cross-profile path leak under elevation), no
+        // Application-log record, and an undocumented exit code no RMM can branch
+        // on. Route any such throw through the same crash-log + audit + ExitError
+        // path the work loop uses. Run holds the single-instance mutex on this
+        // thread (acquire and release both here, per the Win32 owner-thread rule)
+        // and RunWorkAsync owns its own catch-all, so the work itself never lands
+        // here: only Run's pre-flight and its cleanup can.
         try
         {
             return Run(args);
@@ -130,9 +131,11 @@ internal static class Program
         ConsoleCancelEventHandler cancelHandler = (_, cancelArgs) =>
         {
             cancelArgs.Cancel = true; // keep the process running long enough to stop gracefully
-            // Idempotent under repeated Ctrl+C: the stdout "Cancelling..."
-            // line must not double or scripts grepping `\d+ errors:` on
-            // a later line count drift by one.
+            // A second Ctrl+C arriving while the first is still unwinding must
+            // not print the notice again. CancellationTokenSource.Cancel is
+            // already idempotent, so this guard earns its place for the stdout
+            // line alone: the CLI's output is a scraped surface, and one run
+            // reports its cancellation once.
             if (cts.IsCancellationRequested) return;
             Console.WriteLine();
             Console.WriteLine(Strings.Cli_Cancelling);
@@ -205,10 +208,11 @@ internal static class Program
 
     private static async Task<int> RunWorkAsync(string arg, CliInvocation invocation, CancellationToken token)
     {
-        // Tracks the highest CurrentFile reported by the move/delete
-        // progress reporter. On a Ctrl+C mid-loop the OCE catch reads
-        // this to write an EventLog summary and pick ExitPartial vs
-        // ExitCancelled.
+        // Carries the last CurrentFile reported by the move/delete progress
+        // reporter, which is also the highest: SynchronousProgress runs the
+        // handler inline on the producing thread, so the reports arrive in
+        // loop order. On a Ctrl+C mid-loop the OCE catch reads this to write
+        // an EventLog summary and pick ExitPartial vs ExitCancelled.
         int processedCount = 0;
         int totalToProcess = 0;
 
@@ -293,10 +297,11 @@ internal static class Program
                     return EmitPendingRebootBlocked(arg, rebootCheck.Reason!.Value, rebootCheck.Detail);
             }
 
-            // P2: re-verify the removable set against the Windows Installer API
-            // immediately before acting. This is the one window neither the fresh
-            // gate above nor the P1 mutex hold can see: a patch whose state changed
-            // AND settled between the scan and now (a superseded patch reverted to
+            // Re-verify the removable set against the Windows Installer API
+            // immediately before acting. This is the one window neither the
+            // pending-reboot gate above nor the Global\_MSIExecute hold the action
+            // services take can see: a patch whose state changed AND settled
+            // between the scan and now (a superseded patch reverted to
             // Applied because its superseding patch was uninstalled). It runs inside
             // this try, so a re-verify that throws (the enumeration can fail, e.g.
             // LocalisedAccessException) stops the batch through the existing error
@@ -364,17 +369,18 @@ internal static class Program
                     : await deleteService.DeleteFilesAsync(
                         filePaths, permitPermanentDelete: false, progress: progress, cancellationToken: token);
 
-                // P1: a Windows Installer transaction grabbed Global\_MSIExecute in
-                // the race after the gate check passed, so the service refused and
+                // A Windows Installer transaction grabbed Global\_MSIExecute in the
+                // race after the gate check passed, so the service refused and
                 // touched nothing. Report it identically to a pre-act gate block.
                 if (result.InstallerBusy)
                     return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexHeld, null);
 
-                // Item 17: the service now RETURNS the partial result on a mid-batch
-                // cancel instead of throwing. Re-enter the existing OCE catch so the
-                // cancelled-run event-log entry and Partial/Cancelled exit code come
-                // out byte-for-byte as before (processedCount is already tracked by
-                // the progress reporter).
+                // The service returns its partial result on a mid-batch cancel
+                // rather than throwing, so re-enter the OCE catch by hand: a
+                // cancelled run gets one cancelled-run event-log entry and a
+                // Partial or Cancelled exit code whichever way the cancellation
+                // reached the host (processedCount is already tracked by the
+                // progress reporter).
                 if (result.Cancelled)
                     token.ThrowIfCancellationRequested();
 
@@ -443,12 +449,14 @@ internal static class Program
                 ? new MoveResult(0, Array.Empty<FileOperationError>())
                 : await moveService.MoveFilesAsync(filePaths, moveDest, progress, token);
 
-            // P1: mutex held at the service boundary => same outcome as a gate block.
+            // Global\_MSIExecute found held at the service boundary: same outcome
+            // as a gate block.
             if (moveResult.InstallerBusy)
                 return EmitPendingRebootBlocked(arg, PendingRebootReason.MsiExecuteMutexHeld, null);
 
-            // Item 17: partial result returned on a mid-batch cancel; re-enter the
-            // OCE catch so the machine contract is unchanged.
+            // Partial result returned on a mid-batch cancel; re-enter the OCE catch
+            // so the machine contract matches a thrown cancellation. See the /d
+            // branch above.
             if (moveResult.Cancelled)
                 token.ThrowIfCancellationRequested();
 
@@ -623,8 +631,9 @@ internal static class Program
     /// <summary>
     /// Emits the pending-reboot-blocked outcome: the localised stdout reason
     /// sentence, the English Application-log entry, and <see cref="ExitTransient"/>.
-    /// Shared by the pre-act gate check and the P1 service-boundary refusal. When a
-    /// Move or Delete service acquires <c>Global\_MSIExecute</c> and finds it held
+    /// Shared by the pre-act gate check and the action services' own boundary
+    /// refusal. When a Move or Delete service acquires <c>Global\_MSIExecute</c>
+    /// and finds it held
     /// (<see cref="Models.MoveResult.InstallerBusy"/> /
     /// <see cref="Models.DeleteResult.InstallerBusy"/>), a Windows Installer
     /// transaction started in the sub-millisecond race after the gate check passed;

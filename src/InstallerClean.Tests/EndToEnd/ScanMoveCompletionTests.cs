@@ -191,7 +191,8 @@ public class ScanMoveCompletionTests
         rebootService.Check().Returns(PendingRebootResult.Clean);
         // Real re-verifier over the same query service: it re-runs the same
         // enumeration the scan did, so the two orphans (unclaimed by the API) stay
-        // removable and nothing is dropped, exercising the P2 path end to end.
+        // removable and nothing is dropped, exercising the act-time re-verify
+        // end to end.
         var reverifier = new RemovableReverifier(queryService);
         var msiInfoService = Substitute.For<IMsiFileInfoService>();
         var dialogService = Substitute.For<IDialogService>();

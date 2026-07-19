@@ -47,8 +47,8 @@ public class MainViewModelTests
         // Tests covering the gate override with a Clean-then-Block sequence.
         _rebootService.Check().Returns(PendingRebootResult.Clean);
         // Default the act-time re-verify to a no-op: every candidate survives and
-        // nothing is dropped, so a Move/Delete acts on the full set as before.
-        // Tests covering P2 override this to drop entries or to throw.
+        // nothing is dropped, so a Move/Delete acts on the full scanned set.
+        // Tests covering the re-verify override this to drop entries or to throw.
         _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
             .Returns(ci => new ReverifyResult((IReadOnlyList<string>)ci[0]!, Array.Empty<string>()));
 
@@ -336,8 +336,8 @@ public class MainViewModelTests
         vm.Dispose();
 
         // Browse to a folder, change your mind about cleaning up, close the
-        // window: the destination used to be thrown away with the pending save,
-        // and the box came back empty next session.
+        // window. Without the flush on Dispose the destination goes down with
+        // the pending debounced save, and the box is empty next session.
         _settingsService.Received(1).Update(Arg.Is<Action<AppSettings>>(
             a => a != null && Applied(a).MoveDestination == @"D:\Backup\picked-then-closed"));
     }
@@ -390,11 +390,12 @@ public class MainViewModelTests
 
         var scan = vm.Scan.ScanCommand.ExecuteAsync(null);
 
-        // Asserted synchronously after the command's first await, so the scan
-        // is provably still inside its 200 ms overlay-reveal delay: IsScanning
-        // is false, and gating the buttons on it used to leave a window in
-        // which a Delete could start against the previous scan's result while
-        // this one walked the same folder.
+        // Asserted synchronously after the command's first await, so the scan is
+        // provably still inside its 200 ms overlay-reveal delay: IsScanning is
+        // false throughout it. Gating the buttons on IsScanning therefore leaves
+        // a window in which a Delete can start against the previous scan's
+        // result while this one walks the same folder, which is why
+        // IsScanInFlight exists and is what the buttons read.
         Assert.False(vm.Scan.IsScanning);
         Assert.True(vm.Scan.IsScanInFlight);
         Assert.False(vm.Cleanup.MoveAllCommand.CanExecute(null));
@@ -422,7 +423,7 @@ public class MainViewModelTests
 
         // The refresh a Move or Delete runs on completion never sets IsScanning
         // (it must not: the operating overlay owns the screen at that point), so
-        // it was invisible to the Scan command's CanExecute.
+        // IsScanning alone cannot make the Scan command's CanExecute see it.
         var refresh = vm.Scan.RefreshAsync();
 
         Assert.True(vm.Scan.IsScanInFlight);
@@ -616,7 +617,7 @@ public class MainViewModelTests
         };
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        // The service now returns the partial with Cancelled set rather than
+        // The service returns its partial result with Cancelled set rather than
         // throwing the tally away: two moved before the stop.
         _moveService.MoveFilesAsync(
                 Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
@@ -630,8 +631,9 @@ public class MainViewModelTests
 
         await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
 
-        // The overlay carries "Moved 2 of 3 files before you cancelled.", not just
-        // an empty status line as before.
+        // The overlay carries "Moved 2 of 3 files before you cancelled.", so a
+        // cancel reports what it managed rather than leaving an empty status
+        // line.
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains("2 of 3", vm.Completion.Summary);
         Assert.Contains("cancel", vm.Completion.Summary, StringComparison.OrdinalIgnoreCase);
@@ -854,8 +856,8 @@ public class MainViewModelTests
     {
         // A re-verify that could not read the records keeps files back without any
         // program having reclaimed them. Reporting the reclaim reason there would
-        // state a specific cause that did not happen, which is the fault this
-        // release exists to fix, not a wording preference.
+        // state a specific cause that did not happen, which is a false statement
+        // about the user's machine rather than a wording preference.
         var vm = CreateViewModel();
         var orphans = new List<OrphanedFile>
         {
@@ -1507,9 +1509,9 @@ public class MainViewModelTests
             () => vm.Scan.ScanWithProgressAsync(null));
 
         // The cancellation reaches App.OnStartup, which opens the main window
-        // anyway. Before this, that window painted "0 unneeded files to clean
-        // up" and "0 files still needed": a clean bill of health for a scan that
-        // never ran.
+        // anyway. HasScanned is what stops that window painting "0 unneeded
+        // files to clean up" and "0 files still needed": a clean bill of health
+        // for a scan that never ran.
         Assert.False(vm.Scan.HasScanned);
         Assert.True(vm.Scan.LastScanWasCancelled);
         Assert.Equal(Strings.Body_NotScanned_Lead, vm.IntroLead);
@@ -1523,8 +1525,9 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new LocalisedInvalidOperationException(Strings.Error_InstallerDbEmpty));
 
-        // Must NOT throw: App.OnStartup used to catch the propagated exception and
-        // exit. It now returns, so the window opens.
+        // Must NOT throw. A propagated exception here reaches App.OnStartup,
+        // which exits the process; returning instead is what lets the window
+        // open in its error state.
         await vm.Scan.ScanWithProgressAsync(null);
 
         Assert.False(vm.Scan.HasScanned);
@@ -1668,7 +1671,7 @@ public class MainViewModelTests
 
         vm.Chrome.SetLanguageCommand.Execute(different);
 
-        // Idle, so the new busy check does not block: the relaunch still fires.
+        // Idle, so the busy check does not block: the relaunch still fires.
         _windowService.Received(1).RelaunchForLanguageChange();
     }
 }

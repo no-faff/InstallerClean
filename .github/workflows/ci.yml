@@ -13,11 +13,11 @@ on:
 
 jobs:
   build-and-test:
-    # Pinned to windows-2025 ahead of the windows-latest image flip from
-    # Server 2022 (VS2022) to Server 2025 (VS2026) on 2026-06-15: pinning
-    # before the flip surfaces any incompatibility on a controlled schedule
-    # rather than on flip day. windows-2022 is the fallback if the 2025
-    # image regresses.
+    # Pinned rather than windows-latest so a GitHub image roll cannot redden an
+    # unrelated push: that label moved from Server 2022 (VS2022) to Server 2025
+    # (VS2026) on 2026-06-15, and an image change that breaks the build belongs
+    # on a deliberate bump of this line rather than on GitHub's schedule.
+    # windows-2022 is the fallback if the 2025 image regresses.
     runs-on: windows-2025
 
     steps:
@@ -127,12 +127,11 @@ jobs:
           & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
 
       # NuGet Audit runs during restore and reports a vulnerable package as a
-      # warning; -warnaserror is what turns that into a failed build. This
-      # replaced four `dotnet list package --vulnerable` steps that could not
-      # fail one: the command exits 0 even while printing a high-severity
-      # advisory (verified), and every step carried continue-on-error on top, so
-      # a known-vulnerable package shipped green unless somebody opened the log.
-      # NuGetAuditMode=all is explicit rather than relied on: transitive
-      # packages are where an advisory actually arrives.
+      # warning; -warnaserror is what turns that into a failed build. It is the
+      # gate because `dotnet list package --vulnerable` cannot be one: that
+      # command exits 0 even while printing a high-severity advisory (verified),
+      # so a step built on it stays green on a vulnerable package unless
+      # somebody opens the log. NuGetAuditMode=all is explicit rather than
+      # relied on: transitive packages are where an advisory actually arrives.
       - name: Fail on a vulnerable package
         run: dotnet restore src/InstallerClean.sln -p:RestoreLockedMode=true -p:NuGetAuditMode=all -warnaserror:NU1901,NU1902,NU1903,NU1904

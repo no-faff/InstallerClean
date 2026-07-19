@@ -1,22 +1,23 @@
 #!/usr/bin/env node
 // Fails (exit 1) when a French resx value has a plain ASCII space (U+0020) before
 // a high punctuation mark (! ? : ;) where French typography requires a narrow
-// no-break space (U+202F). This is the one mechanically-clean member of the
-// spacing-and-punctuation class the localisation audit found: an ASCII space
-// there both reads wrong and lets the mark wrap onto the next line on its own.
+// no-break space (U+202F). An ASCII space there both reads wrong and lets the
+// mark wrap onto the next line on its own. Of the spacing-and-punctuation rules
+// the fifteen languages between them need, this is the one a machine can check
+// without drowning the result in false positives.
 //
-// It also guards a live tooling hazard: the Edit/Write tooling flattens U+202F to
-// a plain space, so a French value edited through it silently loses the narrow
-// space it needs. This catches exactly that.
+// It also guards a live hazard: plenty of editors and text tooling silently
+// normalise U+202F to a plain space, so a French value can lose the narrow space
+// it needs on any edit that passes through one. This catches exactly that.
 //
 // SCOPE (deliberate): French only, and only the space-before-punctuation rule.
-// The CJK members of the same audit class (ASCII vs full-width parentheses and
-// quotes in zh/ja) are NOT linted here: on the current, corrected resx a naive
-// "ASCII punctuation next to a CJK character" rule produces ~100 false positives,
-// all legitimate (the (_X) access-key accelerators, the ASCII ellipsis, {N}
-// placeholders, product names and paths, and the half-width parentheses Japanese
-// uses on purpose). Telling those from a real slip needs per-language, per-context
-// rules, so that half was assessed and left out rather than shipped noisy.
+// The CJK equivalents (ASCII vs full-width parentheses and quotes in zh/ja) are
+// NOT linted here: on a correct resx a naive "ASCII punctuation next to a CJK
+// character" rule produces ~100 false positives, all legitimate (the (_X)
+// access-key accelerators, the ASCII ellipsis, {N} placeholders, product names
+// and paths, and the half-width parentheses Japanese uses on purpose). Telling
+// those from a real slip needs per-language, per-context rules, so that half was
+// assessed and left out rather than shipped noisy.
 //
 // Run from the repo root: node scripts/check-french-spacing.mjs
 import { readFileSync } from 'node:fs';

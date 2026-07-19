@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// flag-retranslation.mjs — mark one or more neutral string keys as needing
+// flag-retranslation.mjs: mark one or more neutral string keys as needing
 // re-translation across every satellite generator.
 //
 // For each gen-strings-<code>.mjs (all satellites, the native it and ja
@@ -117,10 +117,10 @@ console.log(`\nFlagged ${keys.length} key(s) across ${files.length} generator(s)
   `${totalReset} reset in place, ${totalAdded} appended.`);
 console.log('Each is now the English neutral value, so every generator will report it as ' +
   '"still English (untranslated)" until translated.');
-// This script writes to the generators and nothing else. It used to sign off
-// "Logged in PENDING-RETRANSLATION.md", which it has never done: that log is a
-// manual step, and a session taking the line at its word skipped it and left no
-// record that a translation was owed.
+// This script writes to the generators and nothing else, so the sign-off says
+// so outright. PENDING-RETRANSLATION.md is a manual step; a closing line that
+// merely implies the log was written gets taken at its word, and the debt goes
+// unrecorded.
 console.log('Next: log the key(s) in PENDING-RETRANSLATION.md by hand (this script does not),');
 console.log('then translate each in the gen MAPs and regenerate.');
 console.log('Satellite-only plural overrides (Key.One/.Few/.Many) are NOT touched here and');
