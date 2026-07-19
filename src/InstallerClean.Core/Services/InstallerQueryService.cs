@@ -602,8 +602,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // Every classification below sits AFTER the retry so it judges
             // whichever call actually produced this row's answer. With the
             // refusal check above the retry, an AccessDenied returned BY the
-            // retry fell through to the tolerated-failure branch and demoted the
-            // row instead of stopping the scan, which is the one return this
+            // retry would fall through to the tolerated-failure branch and demote
+            // the row instead of stopping the scan, which is the one return this
             // loop is not allowed to absorb. The case is near unreachable by
             // contract, since the retry only runs for a SID longer than 256
             // characters, so this is the refusal contract being uniform rather
@@ -670,8 +670,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // this row would have contributed and can never correct a verdict
                 // built without it. FileSystemScanService's correlation gate only
                 // catches a total collapse. Only a long RUN of consecutive
-                // failures (a wholesale enumeration collapse) throws. Do not
-                // "fix" this into a per-product hard failure.
+                // failures (a wholesale enumeration collapse) throws.
                 consecutiveNonSuccess++;
                 unreadableRows++;
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
@@ -768,9 +767,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             if (error == MsiError.AccessDenied)
                 // Match the product loop: an API refusal must land on the scan,
-                // not on the verdict. Breaking here silently yielded zero
-                // patches for this product, and its cached .msp files were then
-                // presented as orphaned. The scan command's catch routes this
+                // not on the verdict. Breaking here would silently yield zero
+                // patches for this product, and its cached .msp files would then
+                // be presented as orphaned. The scan command's catch routes this
                 // to a dialog and to crash.log.
                 throw new LocalisedAccessException(Strings.Error_MsiAccessDenied);
 

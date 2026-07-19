@@ -4,8 +4,8 @@ namespace InstallerClean.Services;
 /// The single containment invariant for every file InstallerClean offers to
 /// move or delete: it must resolve inside <c>C:\Windows\Installer</c> and must
 /// not be a reparse point. The destination of a Move is guarded six ways; this
-/// is the matching guard on the SOURCE, which the app enforced only as a side
-/// effect of enumeration before. Orphan-walk candidates are in-bounds because
+/// is the matching guard on the SOURCE, which enumeration alone would enforce
+/// only as a side effect. Orphan-walk candidates are in-bounds because
 /// they came out of the folder, but the superseded and obsoleted candidates
 /// come from an API or registry <c>LocalPackage</c> value that a corrupt
 /// registration could point anywhere, so the guard is applied both where a
@@ -44,7 +44,7 @@ internal static class CandidateGuard
     /// <see cref="Helpers.StorageHelpers.CheckReparsePoint"/>), so a test's
     /// MockFileSystem cannot make an out-of-bounds path look safe.
     ///
-    /// Unproven exists because the two callers of this want different words for
+    /// Unproven exists because the two kinds of caller want different words for
     /// it. At candidate creation it simply keeps the file off the list, and a
     /// transient read failure self-heals on the next scan. At the action
     /// services it decides which per-file error the user is shown, and the ones

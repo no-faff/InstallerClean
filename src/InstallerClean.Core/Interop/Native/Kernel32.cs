@@ -15,8 +15,12 @@ internal static partial class Kernel32
     private const string Library = "kernel32.dll";
 
     /// <summary>
-    /// Opens a file or directory and returns a handle suitable for
-    /// passing to <see cref="GetFinalPathNameByHandle"/>.
+    /// Opens a file or directory. Declared here rather than reached
+    /// through FileStream because the callers need creation flags and
+    /// access bits the framework does not surface:
+    /// FILE_FLAG_OPEN_REPARSE_POINT for the reparse-point guards,
+    /// FILE_FLAG_BACKUP_SEMANTICS to open a directory handle at all, and
+    /// FILE_APPEND_DATA granted without FILE_WRITE_DATA.
     /// </summary>
     [LibraryImport(Library, EntryPoint = "CreateFileW", SetLastError = true,
                    StringMarshalling = StringMarshalling.Utf16)]
@@ -31,9 +35,12 @@ internal static partial class Kernel32
 
     /// <summary>
     /// Resolves a file handle to its final canonical path, expanding
-    /// junctions and symlinks. The output buffer must be sized in
-    /// characters; the return value is the character count required
-    /// (excluding the null terminator).
+    /// junctions and symlinks. The output buffer is sized in characters.
+    /// The return value counts characters, but on the two outcomes it
+    /// counts them differently: on success it is the length written,
+    /// EXCLUDING the null terminator; when the buffer was too small it is
+    /// the size required, INCLUDING the null terminator. A retry therefore
+    /// allocates exactly the returned count, not one more.
     /// </summary>
     [LibraryImport(Library, EntryPoint = "GetFinalPathNameByHandleW", SetLastError = true)]
     public static partial uint GetFinalPathNameByHandle(
@@ -113,8 +120,10 @@ internal static partial class Kernel32
 
     public const uint FILE_ATTRIBUTE_REPARSE_POINT  = 0x00000400;
 
-    // GetFinalPathNameByHandle flags. VolumeNameDos returns a path of
-    // the form "X:\Folder\..." rather than the raw NT-namespace
-    // "\\?\Volume{guid}\..." form.
+    // GetFinalPathNameByHandle flags. VOLUME_NAME_DOS names the volume by
+    // its drive letter, giving "\\?\X:\Folder\...", where VOLUME_NAME_GUID
+    // would give "\\?\Volume{guid}\...". Both forms keep the \\?\ prefix,
+    // which callers strip (InstallerCacheHelpers.StripLongPathPrefix) to
+    // get back a path comparable to a user-typed one.
     public const uint VOLUME_NAME_DOS = 0x0;
 }

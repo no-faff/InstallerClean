@@ -78,8 +78,8 @@ internal sealed class MutexProbe : IMutexProbe
         catch (UnauthorizedAccessException)
         {
             // The object exists but its DACL refuses us create/open rights.
-            // Fall back to today's behaviour (proceed without the hold); do NOT
-            // refuse, because we cannot show the object is held.
+            // Proceed without the hold rather than refusing: the object has not
+            // been shown to be held.
             return null;
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)

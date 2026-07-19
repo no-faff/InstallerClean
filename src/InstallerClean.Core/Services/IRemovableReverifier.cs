@@ -3,7 +3,8 @@ namespace InstallerClean.Services;
 /// <summary>
 /// Re-checks a set of removal candidates against the Windows Installer API
 /// immediately before a Move or Delete acts on them, to catch the one window
-/// neither the fresh pending-reboot gate nor the P1 mutex hold can see: a patch
+/// neither the fresh pending-reboot gate nor the <c>Global\_MSIExecute</c> hold
+/// can see: a patch
 /// whose state changed AND settled between the scan and the click (a superseded
 /// patch reverted to Applied because its superseding patch was uninstalled).
 ///

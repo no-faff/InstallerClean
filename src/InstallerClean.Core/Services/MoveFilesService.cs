@@ -23,11 +23,11 @@ public sealed class MoveFilesService : IMoveFilesService
     /// Constructor. The DI container injects the registered
     /// <see cref="IFileSystem"/> and <see cref="IMutexProbe"/> singletons in
     /// production; the mutex is held for the batch so a msiexec starting
-    /// mid-move waits instead of racing the cache (P1).
+    /// mid-move waits instead of racing the cache.
     /// </summary>
     public MoveFilesService(IFileSystem fileSystem, IMutexProbe mutex) : this(fileSystem, mutex, null) { }
 
-    /// <summary>Test constructor. No mutex hold (the P1 path is exercised via the seam constructor below).</summary>
+    /// <summary>Test constructor. No mutex hold (the hold is exercised via the seam constructor below).</summary>
     internal MoveFilesService(IFileSystem fileSystem) : this(fileSystem, NullMutexProbe.Instance, null) { }
 
     /// <summary>Test constructor. Points the source containment guard at a real sandbox folder; no mutex hold.</summary>
@@ -75,15 +75,15 @@ public sealed class MoveFilesService : IMoveFilesService
 
         return Task.Run(() =>
         {
-            // P1: hold Global\_MSIExecute for the batch on this worker thread so a
+            // Hold Global\_MSIExecute for the batch on this worker thread so a
             // msiexec starting mid-move waits on the mutex instead of racing the
             // cache. Acquired here (not on the dispatcher) and released in the
             // finally on the SAME thread (Win32 owner-thread rule); the body is
             // synchronous, so no await hops threads between acquire and release.
             // Held by a live transaction => refuse and touch nothing (the caller
             // re-checks the pending-reboot gate and shows its banner). A
-            // DACL-refused acquire (lease null, not heldByAnother) falls back to
-            // today's behaviour: proceed without the hold. This closes only the
+            // DACL-refused acquire (lease null, not heldByAnother) proceeds
+            // without the hold rather than refusing. This closes only the
             // sub-millisecond race after the host-side gate re-check has passed.
             //
             // What the hold costs, so nobody widens it and nobody removes it:
@@ -98,9 +98,10 @@ public sealed class MoveFilesService : IMoveFilesService
             //
             // Delete runs its volume probe before its acquire, and this does NOT
             // match it: everything between here and the loop is the destination
-            // work, and moving it out would create the destination folder before
-            // the gates below could refuse it. A refusal that has touched nothing
-            // is worth more than a shorter hold.
+            // work, and running it before the acquire would create the
+            // destination folder even on the runs the busy check above refuses.
+            // A refusal that has touched nothing is worth more than a shorter
+            // hold.
             var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
             if (lease is null && heldByAnother)
                 return new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
@@ -218,8 +219,8 @@ public sealed class MoveFilesService : IMoveFilesService
                 // class's own control flow, thrown from one place, and its
                 // error entry already states the whole cause. The rest are
                 // framework exceptions whose detail exists nowhere else once
-                // the category has been filed, which is what left the
-                // 2026-07-18 move failures with no trace at all.
+                // the category has been filed, so without this a move that
+                // failed for an unforeseen reason leaves no trace at all.
                 catch (DestinationCollisionException ex)
                 {
                     errors.Add(new DestinationCollision(sourcePath, ex.FileName));
@@ -237,8 +238,8 @@ public sealed class MoveFilesService : IMoveFilesService
                     // the one IO failure here with a cause the user can act on
                     // and the one that is not a fault. The Delete path
                     // discriminates the same two codes off the shell's HRESULT
-                    // (FileOperationError.RecycleFailed), so the two halves of
-                    // the app now name the same condition the same way.
+                    // (FileOperationError.RecycleFailed), so both halves of the
+                    // app name the same condition the same way.
                     errors.Add(ex.HResult is unchecked((int)0x80070020) or unchecked((int)0x80070021)
                         ? new FileInUse(sourcePath)
                         : new IOFailure(sourcePath));

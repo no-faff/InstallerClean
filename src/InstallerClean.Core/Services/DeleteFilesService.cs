@@ -23,12 +23,12 @@ public sealed class DeleteFilesService : IDeleteFilesService
     /// <see cref="IFileSystem"/>, <see cref="IRecycleEngine"/> and
     /// <see cref="IMutexProbe"/> singletons in production; the mutex is held for
     /// the batch so a msiexec starting mid-delete waits instead of racing the
-    /// cache (P1).
+    /// cache.
     /// </summary>
     public DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine, IMutexProbe mutex)
         : this(fileSystem, engine, mutex, null) { }
 
-    /// <summary>Test constructor. No mutex hold (the P1 path is exercised via the seam constructor below).</summary>
+    /// <summary>Test constructor. No mutex hold (the hold is exercised via the seam constructor below).</summary>
     internal DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine)
         : this(fileSystem, engine, NullMutexProbe.Instance, null) { }
 
@@ -81,14 +81,14 @@ public sealed class DeleteFilesService : IDeleteFilesService
             if (!permitPermanentDelete && !_engine.CanRecycleToVolume(pathList[0]))
                 return new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true);
 
-            // P1: hold Global\_MSIExecute for the batch on this worker thread so a
+            // Hold Global\_MSIExecute for the batch on this worker thread so a
             // msiexec starting mid-delete waits on the mutex instead of racing the
             // cache. Acquired here and released in the finally on the SAME thread
             // (Win32 owner-thread rule); the body is synchronous, so no await hops
             // threads between acquire and release. Held by a live transaction =>
             // refuse and touch nothing (the caller re-checks the pending-reboot
-            // gate and shows its banner). A DACL-refused acquire falls back to
-            // today's behaviour: proceed without the hold.
+            // gate and shows its banner). A DACL-refused acquire proceeds without
+            // the hold rather than refusing.
             //
             // What the hold costs, so nobody widens it and nobody removes it:
             // _MSIExecute is the machine-wide Windows Installer serialisation
@@ -99,7 +99,8 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // volume) holds the machine's installer lock until this process is
             // killed. That is accepted because the alternative is msiexec writing
             // the cache in the middle of a delete, which costs a needed file
-            // rather than a wait. Keep non-mutating pre-work outside it.
+            // rather than a wait. Non-mutating pre-work stays outside the hold,
+            // which is why the volume probe above runs ahead of it.
             var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
             if (lease is null && heldByAnother)
                 return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
@@ -153,7 +154,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     // Containment guard at the service boundary: never recycle a
                     // file that does not resolve inside C:\Windows\Installer, even
                     // if a corrupt candidate reached here. This is the source-side
-                    // choke point the destination has always had. A path that
+                    // choke point matching the destination's. A path that
                     // could not be resolved at all is refused the same way and
                     // reported without the out-of-bounds claim; see the matching
                     // block in MoveFilesService.

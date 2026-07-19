@@ -59,17 +59,17 @@ public sealed class FileSystemScanService : IFileSystemScanService
         progress?.Report(new ScanProgressUpdate(Strings.Status_ScanningCache));
 
         // Walk the disk BEFORE querying the API, and materialise the walk here
-        // rather than leaving it lazy. What the swap buys: a package cached
-        // after the walk finishes is simply absent from the candidate set, so a
-        // fast install that completes during the scan can no longer land its
-        // freshly cached, still-needed file in the orphan list. It is not a
-        // guarantee for every interleaving (a registration that completes in the
-        // gap between the query passing its position and the post-scan reboot
-        // probe can still slip through); the P1/P2 action-time checks close that
-        // sliver. The walk was already lazy and ran after the first await, i.e.
-        // off the dispatcher; keep it off the calling thread with Task.Run,
-        // because the GUI calls ScanAsync from the dispatcher and a synchronous
-        // directory walk here would freeze the very window the scan keeps free.
+        // rather than leaving it lazy. A package cached after the walk finishes
+        // is then simply absent from the candidate set, so a fast install
+        // completing during the scan cannot land its freshly cached, still-needed
+        // file in the orphan list. It is not a guarantee for every interleaving
+        // (a registration that completes in the gap between the query passing its
+        // position and the post-scan reboot probe can still slip through); the
+        // action-time gates close that sliver, being the pending-reboot re-check,
+        // the removable re-verify and the Global\_MSIExecute hold. Task.Run keeps
+        // the walk off the calling thread: the GUI calls ScanAsync from the
+        // dispatcher, and a synchronous directory walk here would freeze the very
+        // window the scan keeps free.
         // ConfigureAwait(false): Core services do not bind to a caller's
         // SynchronizationContext.
         List<string> diskFiles;
@@ -297,10 +297,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // would be asking Windows about a file it was never told to track.
         // Root-only makes the candidate set "files at the root that no
         // registered package claims", which cannot acquire a new blind spot.
-        // The old recurse-everything approach depended on a denylist
-        // ($PatchCache$, the patch engine's baseline payload copies) that could
-        // only ever exclude a subtree after it had already bitten someone; with
-        // root-only that whole subtree is out of scope, so the denylist is gone.
+        // Recursing instead needs a denylist ($PatchCache$, the patch engine's
+        // baseline payload copies), and a denylist can only ever exclude a
+        // subtree after it has already bitten someone; root-only puts that whole
+        // subtree out of scope to begin with.
         // Reparse points are skipped so a junction planted at the root cannot
         // redirect enumeration outside it; Hidden and System stay included
         // because real cache entries sometimes carry those attributes.

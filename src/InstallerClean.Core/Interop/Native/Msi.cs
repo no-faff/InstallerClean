@@ -149,8 +149,7 @@ internal static partial class Msi
         ref uint pcchValueBuf);
 
     /// <summary>
-    /// Closes any handle returned by an Msi* function. Safe to call
-    /// with 0; returns success in that case.
+    /// Closes any handle returned by an Msi* function.
     /// </summary>
     [LibraryImport(Library, EntryPoint = "MsiCloseHandle")]
     public static partial uint MsiCloseHandle(uint hAny);

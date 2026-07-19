@@ -46,10 +46,10 @@ internal static class InstallerCacheHelpers
     /// bounds" and "out of bounds" earn the same refusal.
     ///
     /// The cache root is compared in its best-effort form even when ITS
-    /// resolution degraded, and that is safe in the direction that matters: a
-    /// fully resolved input is a real canonical path, so if the root is a
-    /// junction this comparison fails to match and the caller refuses. An
-    /// unresolvable root can only cost a false negative, never a false positive.
+    /// resolution degraded. A fully resolved input is a real canonical path, so
+    /// a root left unexpanded cannot match it and the comparison answers "not
+    /// inside": the refusal the source gate wants, and a permission for the
+    /// destination gate.
     /// </summary>
     internal static bool ResolvesInsideInstallerFolder(string resolvedInput, string? installerFolderRoot = null)
     {
@@ -68,13 +68,14 @@ internal static class InstallerCacheHelpers
     /// <c>%ProgramFiles%</c>, <c>%ProgramFiles(x86)%</c>, or
     /// <c>%ProgramData%</c>. Symlinks, junctions and subst-mapped
     /// drives are expanded the same way as
-    /// <see cref="IsInstallerFolderOrChild"/>. The CLI uses this to
-    /// refuse a saved Move destination that resolves under a system
-    /// folder, since those folders are on documented DLL-search and
-    /// SxS-resolution paths and the CLI writes there silently
-    /// (without showing the user the resolved path first). Per-user
-    /// Documents/Desktop are deliberately not in this list: they're
-    /// data folders, not system trust boundaries.
+    /// <see cref="IsInstallerFolderOrChild"/>. Move refuses a destination
+    /// that resolves under one, anchored at the <c>MoveFilesService</c>
+    /// boundary and repeated in the GUI's and CLI's own destination
+    /// validation: those folders sit on documented DLL-search and
+    /// SxS-resolution paths, and a CLI run writes to its saved
+    /// destination without ever showing the user the resolved path.
+    /// Per-user Documents/Desktop are deliberately not in this list:
+    /// they're data folders, not system trust boundaries.
     /// </summary>
     internal static bool IsSystemFolderOrChild(string path)
     {
@@ -214,10 +215,12 @@ internal static class InstallerCacheHelpers
     }
 
     /// <summary>
-    /// Deletes empty subdirectories inside C:\Windows\Installer.
-    /// Processes deepest first so nested empty trees collapse in one
-    /// pass. Cancellable because a deeply nested Installer tree can
-    /// take several seconds to walk.
+    /// Deletes empty subdirectories inside C:\Windows\Installer. Sorted
+    /// by descending path length, which puts every directory after its
+    /// own descendants (a child's path is strictly longer than its
+    /// parent's), so a nested empty tree collapses in one pass.
+    /// Cancellable because a deeply nested Installer tree can take
+    /// several seconds to walk.
     /// </summary>
     /// <remarks>
     /// Goes through the caller's <paramref name="fileSystem"/> rather than

@@ -12,21 +12,21 @@ public sealed class AppSettings
 {
     /// <summary>
     /// Folder last picked for the Move-orphans operation. Empty until
-    /// the first Move; Browse is required to populate it before the
-    /// Move command's CanExecute returns true.
+    /// the first Move, and Move is offered with it empty: the command
+    /// asks for a destination at the point of use and writes the
+    /// choice back here.
     /// </summary>
     /// <remarks>
     /// Validation contract: the textbox accepts any string and the
-    /// debounced write to settings.json never validates. The
+    /// debounced write to settings.json never validates, so a
+    /// hand-edited settings.json, or one carried in from a prior
+    /// install with a since-invalidated destination, reaches the Move
+    /// with nothing having checked it. The
     /// <c>IsInstallerFolderOrChild</c> / <c>IsSystemFolderOrChild</c>
-    /// gates run at use time in <c>CleanupViewModel.MoveAllAsync</c>
-    /// and in the CLI's <c>Program.cs</c>. The dual gate is the
-    /// defence: removing either use-time gate without adding a
-    /// write-time equivalent re-opens the system-folder-destination
-    /// class of bugs because a hand-edited settings.json (or a
-    /// settings.json carried in from a prior install with a since-
-    /// invalidated destination) would silently bypass the missing
-    /// gate.
+    /// gates therefore run at use time: in
+    /// <c>CleanupViewModel.MoveAllAsync</c>, in the CLI's
+    /// <c>Program.cs</c>, and again inside <c>MoveFilesService</c>,
+    /// which is the one no caller can route around.
     /// </remarks>
     public string MoveDestination { get; set; } = string.Empty;
 

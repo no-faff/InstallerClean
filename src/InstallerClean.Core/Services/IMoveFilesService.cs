@@ -6,9 +6,10 @@ namespace InstallerClean.Services;
 /// Moves orphaned MSI / MSP files out of <c>C:\Windows\Installer</c>
 /// to a user-chosen destination. Refuses any destination that resolves
 /// (after symlink expansion) to <c>C:\Windows\Installer</c> or a
-/// descendant: that would defeat the restore-after-mistakes contract.
-/// The reparse-point check uses the real filesystem regardless of any
-/// injected <c>IFileSystem</c>.
+/// descendant, which would defeat the restore-after-mistakes contract,
+/// and any that resolves under a Windows system folder, which would put
+/// installer files on a DLL-search path. The reparse-point check uses
+/// the real filesystem regardless of any injected <c>IFileSystem</c>.
 /// </summary>
 public interface IMoveFilesService
 {
@@ -16,7 +17,9 @@ public interface IMoveFilesService
     /// Move every path in <paramref name="filePaths"/> into
     /// <paramref name="destinationFolder"/> (created if missing).
     /// Throws <see cref="InvalidOperationException"/> if the destination
-    /// resolves inside the Installer folder, or
+    /// is not fully qualified, resolves inside the Installer folder,
+    /// resolves under a Windows system folder, or is swapped for another
+    /// folder part-way through the batch, and
     /// <see cref="UnauthorizedAccessException"/> if the destination is
     /// not writable. Per-file failures are surfaced via the result's
     /// <see cref="MoveResult.Errors"/>, not exceptions. A cancellation

@@ -81,8 +81,9 @@ public sealed class PendingRebootService : IPendingRebootService
         if (installerInProgress)
             return PendingRebootResult.Block(PendingRebootReason.InstallerInProgress);
 
-        // Bare PendingFileRenameOperations is too broad (any third-party uninstaller writes
-        // to it); refine to "source path inside %SystemRoot%\Installer".
+        // Bare PendingFileRenameOperations is too broad (any third-party uninstaller
+        // writes to it); refine to "an entry, source or destination, resolving
+        // inside %SystemRoot%\Installer".
         string[]? renames;
         try
         {

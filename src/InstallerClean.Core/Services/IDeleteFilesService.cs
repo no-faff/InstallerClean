@@ -54,8 +54,9 @@ public interface IDeleteFilesService
 }
 
 /// <summary>
-/// Outcome of a Delete. When <see cref="RecycleUnavailable"/> and
-/// <see cref="Cancelled"/> are both <c>false</c>, <see cref="DeletedCount"/> +
+/// Outcome of a Delete. When <see cref="RecycleUnavailable"/>,
+/// <see cref="Cancelled"/> and <see cref="InstallerBusy"/> are all
+/// <c>false</c>, <see cref="DeletedCount"/> +
 /// <see cref="Errors"/>.Count sum to the input count: every file was recycled,
 /// permanently deleted with consent, or recorded as an error. When
 /// <see cref="RecycleUnavailable"/> is <c>true</c> the batch was refused

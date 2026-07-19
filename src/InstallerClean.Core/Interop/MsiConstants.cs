@@ -107,7 +107,8 @@ public static class MsiSummaryProperty
 /// <summary>
 /// VARTYPE values returned by MsiSummaryInfoGetProperty in puiDataType.
 /// The summary stream stores everything the project reads as VT_LPSTR;
-/// other VARTYPEs are documented in Microsoft's STDOLE2 reference.
+/// the other VARTYPE values are documented under Microsoft's VARENUM
+/// enumeration.
 /// </summary>
 public static class VtType
 {
