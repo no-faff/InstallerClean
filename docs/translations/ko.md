@@ -113,7 +113,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Any unneeded files below are safe to delete. | 아래의 불필요한 파일은 안전하게 삭제할 수 있습니다. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 이 파일들은 C:\Windows\Installer에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다. |
-| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | 휴지통으로 삭제하거나, 사본을 남기고 싶다면 대신 이동을 사용하세요. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | 휴지통으로 삭제하거나, 백업 사본을 남기려면 대신 이동을 사용하세요. 파일을 C:\Windows\Installer에 다시 넣으면 정확히 원래 상태로 돌아갑니다. |
 | Nothing scanned yet. | 아직 검사하지 않았습니다. |
 | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | 다시 검사를 눌러 C:\Windows\Installer에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요. |
 | These files can't be cleaned up right now. | 지금은 이 파일들을 정리할 수 없습니다. |
@@ -142,8 +142,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | 모두 깨끗합니다 |
 | Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer에 정리할 것이 없습니다 |
 | Scanned {0} {1} in {2} | {1} {0}개 검사, {2} 소요 |
-| Copy them back if anything breaks ([it won't!]). | 무언가 망가지면 다시 복사해 오면 됩니다 ([그럴 일 없습니다!]). |
-| Until then, you can restore them if anything breaks ([it won't!]). | 그때까지는 무언가 망가지면 복원할 수 있습니다 ([그럴 일 없습니다!]). |
+| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | 혹시라도 무언가 망가지면 C:\Windows\Installer에 다시 복사해 넣으면 됩니다 ([그럴 가능성은 극히 낮습니다]). |
+| Until then, you can restore them if anything ever breaks ([extremely unlikely]). | 그때까지는 혹시라도 무언가 망가지면 복원할 수 있습니다 ([그럴 가능성은 극히 낮습니다]). |
 | Empty it to actually reclaim the space. | 휴지통을 비워야 공간이 실제로 확보됩니다. |
 | {0} freed | {0} 확보 |
 | {0} cleaned up | {0} 정리 |

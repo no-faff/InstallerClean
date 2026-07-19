@@ -490,10 +490,10 @@ public partial class MainWindow : Window
 
     // Stable README anchor (an explicit <a id="is-it-safe"> before the
     // "Is it safe?" section of every README, so rewording a heading never
-    // breaks the link). The post-Move / post-Delete restore hints carry an
-    // "[it won't!]" phrase that links here, the reassurance that a cleaned
-    // file was safe to remove; the URL targets the README in the displayed
-    // language.
+    // breaks the link). The post-Move / post-Delete restore hints each carry a
+    // bracket-delimited phrase that links here, the reasoning behind the claim
+    // that a cleaned file was safe to remove; the URL targets the README in the
+    // displayed language.
     private static string SafetyUrl => ReadmeLinks.For("is-it-safe", Localisation.UiCulture);
 
     /// <summary>
@@ -568,9 +568,10 @@ public partial class MainWindow : Window
             Style = (Style)FindResource("SubtleLink"),
         };
         link.Click += Hyperlink_Click;
-        // "it won't!" is meaningless to a screen reader focused on the link
-        // alone; the whole restore sentence (brackets removed) is the
-        // self-contained accessible name, already in the user's language.
+        // The bracketed phrase is a parenthetical aside, not a destination, so
+        // it says nothing to a screen reader focused on the link alone; the
+        // whole restore sentence (brackets removed) is the self-contained
+        // accessible name, already in the user's language.
         AutomationProperties.SetName(link, split.Prefix + split.LinkText + split.Suffix);
 
         if (split.Prefix.Length > 0) CompletionRestoreText.Inlines.Add(new Run(split.Prefix));

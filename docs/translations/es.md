@@ -113,7 +113,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Any unneeded files below are safe to delete. | Los archivos innecesarios que haya abajo se pueden eliminar sin riesgo. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Están en C:\Windows\Installer, donde quedaron cuando se desinstaló un programa ({0}), un parche más reciente sustituyó a otro ({1}) o el fabricante lo retiró ({2}). InstallerClean solo enumera archivos que el propio Windows da por terminados. |
-| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Elimínalos y se enviarán a la Papelera de reciclaje, o usa Mover en su lugar si prefieres conservar una copia. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Elimínalos y se enviarán a la Papelera de reciclaje, o usa Mover en su lugar para conservar una copia de seguridad. Si vuelves a poner los archivos en C:\Windows\Installer, todo queda exactamente como estaba. |
 | Nothing scanned yet. | Aún no se ha analizado nada. |
 | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Pulsa Volver a analizar para revisar C:\Windows\Installer en busca de archivos de instalación que ya no necesita ningún programa. |
 | These files can't be cleaned up right now. | Estos archivos no se pueden limpiar ahora mismo. |
@@ -142,8 +142,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Todo limpio |
 | Nothing to clean up in C:\Windows\Installer | Nada que limpiar en C:\Windows\Installer |
 | Scanned {0} {1} in {2} | Análisis de {0} {1} en {2} |
-| Copy them back if anything breaks ([it won't!]). | Vuelve a copiarlos a su sitio si algo falla ([¡no fallará!]). |
-| Until then, you can restore them if anything breaks ([it won't!]). | Hasta entonces, puedes restaurarlos si algo falla ([¡no fallará!]). |
+| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Vuelve a copiarlos a C:\Windows\Installer si alguna vez falla algo ([extremadamente improbable]). |
+| Until then, you can restore them if anything ever breaks ([extremely unlikely]). | Hasta entonces, puedes restaurarlos si alguna vez falla algo ([extremadamente improbable]). |
 | Empty it to actually reclaim the space. | Vacíala para liberar el espacio de verdad. |
 | {0} freed | {0} liberados |
 | {0} cleaned up | {0} limpiados |

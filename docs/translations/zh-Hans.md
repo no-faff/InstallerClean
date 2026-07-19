@@ -113,7 +113,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Any unneeded files below are safe to delete. | 下面任何不需要的文件都可以安全删除。 |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 它们位于 C:\Windows\Installer，是在卸载程序（{0}）、新补丁取代旧补丁（{1}）或发布者撤回补丁（{2}）时遗留下来的。InstallerClean 只会列出 Windows 自己报告为不再需要的文件。 |
-| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | 将它们删除到回收站，如果您想保留副本，也可以改用“移动”。 |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | 将它们删除到回收站，或者改用“移动”保留一份备份副本。把文件放回 C:\Windows\Installer，一切就完全恢复原状。 |
 | Nothing scanned yet. | 尚未扫描。 |
 | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | 点击“重新扫描”，在 C:\Windows\Installer 中查找没有任何程序仍然需要的安装程序文件。 |
 | These files can't be cleaned up right now. | 这些文件现在无法清理。 |
@@ -142,8 +142,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | 全部干净 |
 | Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer 中没有需要清理的内容 |
 | Scanned {0} {1} in {2} | 扫描了 {0} 个{1}，用时 {2} |
-| Copy them back if anything breaks ([it won't!]). | 万一出了什么问题，把它们复制回原处（[不会的！]）。 |
-| Until then, you can restore them if anything breaks ([it won't!]). | 在那之前，万一出了什么问题，您可以把它们还原（[不会的！]）。 |
+| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | 万一哪天出了什么问题（[这种可能性极低]），把它们复制回 C:\Windows\Installer。 |
+| Until then, you can restore them if anything ever breaks ([extremely unlikely]). | 在那之前，万一哪天出了什么问题（[这种可能性极低]），您可以把它们还原。 |
 | Empty it to actually reclaim the space. | 清空回收站才能真正释放空间。 |
 | {0} freed | 已释放 {0} |
 | {0} cleaned up | 已清理 {0} |

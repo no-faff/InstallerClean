@@ -113,7 +113,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Any unneeded files below are safe to delete. | Mọi tệp không cần thiết bên dưới đều có thể xóa an toàn. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Chúng nằm trong C:\Windows\Installer, còn sót lại khi một chương trình bị gỡ cài đặt ({0}), khi một bản vá mới hơn thay thế một bản ({1}) hoặc khi nhà phát hành thu hồi nó ({2}). InstallerClean chỉ liệt kê những tệp mà chính Windows báo là đã dùng xong. |
-| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Xóa chúng vào Thùng rác, hoặc dùng Chuyển thay vào đó nếu bạn muốn giữ một bản sao. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Xóa chúng vào Thùng rác, hoặc dùng Chuyển thay vào đó để giữ một bản sao lưu. Đặt các tệp trở lại C:\Windows\Installer sẽ đưa mọi thứ về đúng như lúc ban đầu. |
 | Nothing scanned yet. | Chưa quét gì cả. |
 | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Nhấn Quét lại để tìm trong C:\Windows\Installer những tệp cài đặt mà không chương trình nào còn cần. |
 | These files can't be cleaned up right now. | Hiện chưa thể dọn những tệp này. |
@@ -142,8 +142,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Đã sạch |
 | Nothing to clean up in C:\Windows\Installer | Không còn gì để dọn trong C:\Windows\Installer |
 | Scanned {0} {1} in {2} | Đã quét {0} {1} trong {2} |
-| Copy them back if anything breaks ([it won't!]). | Sao chép chúng trở lại nếu có gì trục trặc ([sẽ không đâu!]). |
-| Until then, you can restore them if anything breaks ([it won't!]). | Cho đến lúc đó, bạn có thể khôi phục chúng nếu có gì trục trặc ([sẽ không đâu!]). |
+| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Sao chép chúng trở lại C:\Windows\Installer nếu chẳng may có gì trục trặc ([cực kỳ khó xảy ra]). |
+| Until then, you can restore them if anything ever breaks ([extremely unlikely]). | Cho đến lúc đó, bạn có thể khôi phục chúng nếu chẳng may có gì trục trặc ([cực kỳ khó xảy ra]). |
 | Empty it to actually reclaim the space. | Dọn sạch Thùng rác để thực sự lấy lại dung lượng. |
 | {0} freed | Đã giải phóng {0} |
 | {0} cleaned up | Đã dọn {0} |

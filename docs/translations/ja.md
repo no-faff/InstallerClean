@@ -113,7 +113,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Any unneeded files below are safe to delete. | 以下の不要ファイルは削除しても安全です。 |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | これらのファイルはC:\Windows\Installerにあり、プログラムがアンインストールされたとき ({0})、新しいパッチが置き換えたとき ({1})、または公開元が撤回したとき ({2})に取り残されます。InstallerClean は、Windows 自身が不要と報告したファイルのみをリストアップします。 |
-| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | ごみ箱に削除するか、コピーを保持したい場合は代わりに「移動」を使用してください。 |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | ごみ箱に削除するか、バックアップコピーを残すには代わりに「移動」を使用してください。ファイルをC:\Windows\Installerに戻せば、完全に元どおりになります。 |
 | Nothing scanned yet. | まだ何もスキャンしていません。 |
 | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | 「再スキャン」を押すと、C:\Windows\Installer を調べて、どのプログラムも必要としなくなったインストーラーファイルを探します。 |
 | These files can't be cleaned up right now. | これらのファイルは今はクリーンアップできません。 |
@@ -142,8 +142,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | すべてクリーン |
 | Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer にクリーンアップするものはありません |
 | Scanned {0} {1} in {2} | {0} 個の {1} を {2} でスキャンしました |
-| Copy them back if anything breaks ([it won't!]). | 何かが動作しなくなったらコピーを戻してください ([そんなことはありませんが！])。 |
-| Until then, you can restore them if anything breaks ([it won't!]). | それまでは、何かが動作しなくなったら復元できます ([そんなことはありませんが！])。 |
+| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | 万一何かが動作しなくなったら、C:\Windows\Installerにコピーを戻してください ([その可能性は極めて低いです])。 |
+| Until then, you can restore them if anything ever breaks ([extremely unlikely]). | それまでは、万一何かが動作しなくなったら復元できます ([その可能性は極めて低いです])。 |
 | Empty it to actually reclaim the space. | ごみ箱を空にすると、実際に空き容量が増えます。 |
 | {0} freed | {0} 解放 |
 | {0} cleaned up | {0} クリーンアップ |

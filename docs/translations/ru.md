@@ -113,7 +113,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Any unneeded files below are safe to delete. | Любые ненужные файлы ниже можно безопасно удалить. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Они лежат в C:\Windows\Installer и остаются после того, как программа была удалена ({0}), более новый патч заменил один из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими. |
-| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Удалите их в Корзину, или используйте вместо этого функцию «Переместить», если хотите сохранить копию. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Удалите их в Корзину, или используйте вместо этого функцию «Переместить», чтобы сохранить резервную копию. Если вернуть файлы обратно в C:\Windows\Installer, всё станет ровно так, как было. |
 | Nothing scanned yet. | Пока ничего не просканировано. |
 | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Нажмите «Повторить сканирование», чтобы просмотреть C:\Windows\Installer в поисках файлов установщика, которые больше не нужны ни одной программе. |
 | These files can't be cleaned up right now. | Эти файлы сейчас нельзя очистить. |
@@ -142,8 +142,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Всё чисто |
 | Nothing to clean up in C:\Windows\Installer | В C:\Windows\Installer нечего очищать |
 | Scanned {0} {1} in {2} | Просканировано {0} {1} за {2} |
-| Copy them back if anything breaks ([it won't!]). | Скопируйте их обратно, если что-то сломается ([а оно не сломается!]). |
-| Until then, you can restore them if anything breaks ([it won't!]). | А пока их можно восстановить, если что-то сломается ([а оно не сломается!]). |
+| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Скопируйте их обратно в C:\Windows\Installer, если вдруг что-то сломается ([крайне маловероятно]). |
+| Until then, you can restore them if anything ever breaks ([extremely unlikely]). | А пока их можно восстановить, если вдруг что-то сломается ([крайне маловероятно]). |
 | Empty it to actually reclaim the space. | Очистите Корзину, чтобы действительно освободить место. |
 | {0} freed | Освобождено {0} |
 | {0} cleaned up | Очищено {0} |

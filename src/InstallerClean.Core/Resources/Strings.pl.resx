@@ -268,7 +268,7 @@
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started.</value>
+    <value>Usuń je do Kosza albo użyj zamiast tego Przenieś, aby zachować kopię zapasową. Umieszczenie plików z powrotem w C:\Windows\Installer cofa wszystko dokładnie do punktu wyjścia.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons. The second sentence covers BOTH buttons and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and both a Recycle Bin restore and a manual move back put the file at that same path under the same name. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -381,8 +381,8 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]).</value></data>
-  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Until then, you can restore them if anything ever breaks ([extremely unlikely]).</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Skopiuj je z powrotem do C:\Windows\Installer, gdyby coś się kiedykolwiek zepsuło ([skrajnie mało prawdopodobne]).</value></data>
+  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Do tego czasu możesz je przywrócić, gdyby coś się kiedykolwiek zepsuło ([skrajnie mało prawdopodobne]).</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
        emptied; this line names that step. "actually" carries "this is what

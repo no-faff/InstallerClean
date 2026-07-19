@@ -113,7 +113,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Any unneeded files below are safe to delete. | Aşağıdaki gereksiz dosyalar güvenle silinebilir. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Bu dosyalar C:\Windows\Installer içinde yer alır; bir program kaldırıldığında ({0}), daha yeni bir yama bir öncekinin yerini aldığında ({1}) ya da yayımcı onu geri çektiğinde ({2}) geride kalır. InstallerClean her zaman yalnızca Windows'un kendisinin işi bittiğini bildirdiği dosyaları listeler. |
-| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Onları Geri Dönüşüm Kutusu'na silin ya da bir kopyasını saklamak isterseniz bunun yerine Taşı'yı kullanın. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Onları Geri Dönüşüm Kutusu'na silin ya da yedek kopya saklamak için bunun yerine Taşı'yı kullanın. Dosyaları C:\Windows\Installer içine geri koyduğunuzda her şey tam olarak başladığınız noktaya döner. |
 | Nothing scanned yet. | Henüz tarama yapılmadı. |
 | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Hiçbir programın hâlâ ihtiyaç duymadığı yükleyici dosyaları için C:\Windows\Installer klasörüne bakmak üzere Yeniden tara'ya basın. |
 | These files can't be cleaned up right now. | Bu dosyalar şu anda temizlenemez. |
@@ -142,8 +142,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Her şey temiz |
 | Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer içinde temizlenecek bir şey yok |
 | Scanned {0} {1} in {2} | {2} içinde {0} {1} tarandı |
-| Copy them back if anything breaks ([it won't!]). | Bir şey bozulursa onları geri kopyalayın ([bozulmaz!]). |
-| Until then, you can restore them if anything breaks ([it won't!]). | O zamana kadar, bir şey bozulursa onları geri yükleyebilirsiniz ([bozulmaz!]). |
+| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Bir gün bir şey bozulursa onları C:\Windows\Installer içine geri kopyalayın ([ihtimali son derece düşük]). |
+| Until then, you can restore them if anything ever breaks ([extremely unlikely]). | O zamana kadar, bir gün bir şey bozulursa onları geri yükleyebilirsiniz ([ihtimali son derece düşük]). |
 | Empty it to actually reclaim the space. | Alanı gerçekten geri kazanmak için onu boşaltın. |
 | {0} freed | {0} yer açıldı |
 | {0} cleaned up | {0} temizlendi |

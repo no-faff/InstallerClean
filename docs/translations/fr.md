@@ -113,7 +113,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Any unneeded files below are safe to delete. | Les éventuels fichiers inutiles ci-dessous peuvent être supprimés sans risque. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Ils se trouvent dans C:\Windows\Installer, laissés là quand un programme a été désinstallé ({0}), qu'un correctif plus récent en a remplacé un ({1}) ou que l'éditeur l'a retiré ({2}). InstallerClean ne liste jamais que les fichiers dont Windows lui-même déclare avoir fini de se servir. |
-| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Supprimez-les vers la Corbeille, ou utilisez plutôt Déplacer si vous préférez en garder une copie. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Supprimez-les vers la Corbeille, ou utilisez plutôt Déplacer pour en conserver une copie de sauvegarde. Remettre les fichiers dans C:\Windows\Installer vous ramène exactement à votre point de départ. |
 | Nothing scanned yet. | Rien n'a encore été analysé. |
 | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Cliquez sur Réanalyser pour parcourir C:\Windows\Installer à la recherche de fichiers d'installation dont aucun programme n'a plus besoin. |
 | These files can't be cleaned up right now. | Ces fichiers ne peuvent pas être nettoyés pour le moment. |
@@ -142,8 +142,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Tout est propre |
 | Nothing to clean up in C:\Windows\Installer | Rien à nettoyer dans C:\Windows\Installer |
 | Scanned {0} {1} in {2} | Analyse de {0} {1} en {2} |
-| Copy them back if anything breaks ([it won't!]). | Recopiez-les si quelque chose ne fonctionne plus ([ce ne sera pas le cas !]). |
-| Until then, you can restore them if anything breaks ([it won't!]). | D'ici là, vous pouvez les restaurer si quelque chose ne fonctionne plus ([ce ne sera pas le cas !]). |
+| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Recopiez-les dans C:\Windows\Installer si jamais quelque chose ne fonctionne plus ([extrêmement improbable]). |
+| Until then, you can restore them if anything ever breaks ([extremely unlikely]). | D'ici là, vous pouvez les restaurer si jamais quelque chose ne fonctionne plus ([extrêmement improbable]). |
 | Empty it to actually reclaim the space. | Videz la Corbeille pour vraiment récupérer l'espace. |
 | {0} freed | {0} libérés |
 | {0} cleaned up | {0} nettoyés |

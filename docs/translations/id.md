@@ -113,7 +113,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Any unneeded files below are safe to delete. | File yang tidak diperlukan di bawah ini aman dihapus. |
 | They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | File-file ini berada di C:\Windows\Installer, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mencantumkan file yang Windows sendiri laporkan sudah tidak terpakai. |
-| Delete them to the Recycle Bin, or use Move instead if you'd rather keep a copy. | Hapus ke Keranjang Sampah, atau gunakan Pindahkan sebagai gantinya jika Anda lebih suka menyimpan salinan. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Hapus ke Keranjang Sampah, atau gunakan Pindahkan sebagai gantinya untuk menyimpan salinan cadangan. Mengembalikan file ke C:\Windows\Installer akan membuat semuanya persis seperti semula. |
 | Nothing scanned yet. | Belum ada yang dipindai. |
 | Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Tekan Pindai ulang untuk menelusuri C:\Windows\Installer mencari file penginstal yang tidak lagi diperlukan program mana pun. |
 | These files can't be cleaned up right now. | File-file ini tidak bisa dibersihkan sekarang. |
@@ -142,8 +142,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Semua bersih |
 | Nothing to clean up in C:\Windows\Installer | Tidak ada yang perlu dibersihkan di C:\Windows\Installer |
 | Scanned {0} {1} in {2} | {0} {1} dipindai dalam {2} |
-| Copy them back if anything breaks ([it won't!]). | Salin kembali jika ada yang rusak ([tidak akan!]). |
-| Until then, you can restore them if anything breaks ([it won't!]). | Sampai saat itu, Anda bisa memulihkannya jika ada yang rusak ([tidak akan!]). |
+| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Salin kembali ke C:\Windows\Installer jika suatu saat ada yang rusak ([kemungkinannya sangat kecil]). |
+| Until then, you can restore them if anything ever breaks ([extremely unlikely]). | Sampai saat itu, Anda bisa memulihkannya jika suatu saat ada yang rusak ([kemungkinannya sangat kecil]). |
 | Empty it to actually reclaim the space. | Kosongkan Keranjang Sampah untuk benar-benar membebaskan ruang. |
 | {0} freed | {0} dikosongkan |
 | {0} cleaned up | {0} dibersihkan |
