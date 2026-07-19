@@ -6,14 +6,18 @@
 ; Uninstall\InstallerClean_is1. Changing AppId breaks Add/Remove
 ; Programs continuity across versions.
 ;
-; AppVersion is normally passed by the release script via
-; "ISCC.exe /DAppVersion=1.8.0 ...". The #define fallback below is
-; for ad-hoc local builds; it tracks the current shipping target so a
-; from-source install doesn't claim an older version on the Add/Remove
-; Programs entry.
+; AppVersion is passed in by CI and by the release script, both reading it
+; from Directory.Build.props: "ISCC.exe /DAppVersion=1.8.0 ...". A compile
+; without it fails here rather than falling back. The fallback this replaced
+; was a hand-maintained #define whose own comment claimed it tracked the
+; current shipping target, which it could only do until the next version bump
+; forgot it; a stale one produces a setup whose Add/Remove Programs entry
+; states a version the binaries inside it are not, silently, on the one build
+; nobody checks. There is no correct value to fall back TO, so there is no
+; fallback.
 [Setup]
 #ifndef AppVersion
-  #define AppVersion "2.0.1"
+  #error AppVersion is not defined. Pass it on the command line, reading the value from Directory.Build.props: ISCC.exe /DAppVersion=X.Y.Z installer\InstallerClean.iss
 #endif
 ; Copyright year comes from the build clock (compile-time) so the
 ; notice never goes stale.
