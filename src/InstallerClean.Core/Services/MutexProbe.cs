@@ -70,6 +70,27 @@ internal sealed class MutexProbe : IMutexProbe
         // it and take the lock, so a msiexec starting mid-batch opens the same
         // named object and waits on us. If it exists we open it and measure
         // ownership with a zero wait.
+        //
+        // Creating it is the COMMON path, not the rare one: Windows Installer
+        // creates _MSIExecute when an install begins and drops it when the
+        // install ends, so between installs the object is absent. That means
+        // this process usually owns the object's security descriptor for the
+        // batch, and with no explicit one passed it takes the default DACL from
+        // this (elevated) process's token, rather than the wider one the
+        // Installer service would have given it.
+        //
+        // Left at the default deliberately. A token default DACL grants SYSTEM,
+        // and the installs that write the cache this app is protecting run
+        // through the Windows Installer service as SYSTEM, so they can still
+        // open the object and serialise against it, which is the whole point of
+        // the hold. Passing an explicit permissive DACL to cover the remaining
+        // case (a non-elevated per-user install, which does not write the
+        // machine cache anyway) would hand every logged-on user the right to
+        // take the machine's installer mutex and stall every install on the box
+        // for as long as they cared to hold it. A stray refusal on a per-user
+        // install for the length of one batch is the better end of that trade.
+        // The object dies with the last handle, so the window is the batch, not
+        // the session.
         Mutex mutex;
         try
         {
