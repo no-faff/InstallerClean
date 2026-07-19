@@ -90,11 +90,12 @@ public class CompositionParsingTests
     [Fact]
     public void SplitAtBracketedPhrase_splits_prefix_link_and_suffix()
     {
-        var split = CompositionParsing.SplitAtBracketedPhrase("Copy them back if anything breaks ([it won't!]).");
+        var split = CompositionParsing.SplitAtBracketedPhrase(
+            @"Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]).");
 
         Assert.NotNull(split);
-        Assert.Equal("Copy them back if anything breaks (", split!.Prefix);
-        Assert.Equal("it won't!", split.LinkText);
+        Assert.Equal(@"Copy them back to C:\Windows\Installer if anything ever breaks (", split!.Prefix);
+        Assert.Equal("extremely unlikely", split.LinkText);
         Assert.Equal(").", split.Suffix);
     }
 
