@@ -314,6 +314,14 @@ public sealed class MoveFilesService : IMoveFilesService
     {
         // Fail fast with one clean error rather than collecting per-file
         // errors for every source when the destination is read-only.
+        //
+        // On a destination whose ACL grants create but not delete, the write
+        // lands and the delete is what throws, so the probe file stays behind.
+        // Nothing here can clear it: a second delete is the operation that was
+        // just refused, and any probe that proves a folder accepts a file has
+        // to create one. The move is refused, which is the outcome that
+        // matters, and the residue is one empty random-named file on a
+        // destination Windows will not let this process tidy.
         var probe = _fs.Path.Combine(folder, _fs.Path.GetRandomFileName());
         try
         {

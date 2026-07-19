@@ -426,8 +426,24 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             probeToken.ThrowIfCancellationRequested();
             var probe = _fs.Path.Combine(dest, _fs.Path.GetRandomFileName());
             _fs.File.WriteAllBytes(probe, Array.Empty<byte>());
-            probeToken.ThrowIfCancellationRequested();
-            _fs.File.Delete(probe);
+            try
+            {
+                probeToken.ThrowIfCancellationRequested();
+                // The delete stays inside the try so a failure to remove the
+                // probe still refuses the destination: a folder that takes a
+                // file and will not give it back is not writable for a Move.
+                _fs.File.Delete(probe);
+            }
+            catch (OperationCanceledException)
+            {
+                // Cancelled between the write and the delete. The probe has to
+                // go on this path too, because RemoveCreatedDestinationAsync
+                // removes the folder non-recursively as its emptiness test, so
+                // a probe left here strands the folder along with it. Silent
+                // because the cancel is the outcome being reported.
+                try { _fs.File.Delete(probe); } catch { }
+                throw;
+            }
             probeToken.ThrowIfCancellationRequested();
 
             // A same-volume move is a rename and consumes no space, so the
@@ -600,6 +616,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             {
                 var failure = _scan.DescribeScanFailure(ex);
                 OperationProgress = string.Empty;
+                // The re-verify runs before the batch, so nothing was placed.
+                if (createdDestination) await RemoveCreatedDestinationAsync(dest);
                 if (failure.IsError)
                     _dialogService.ShowError(failure.Message, failure.Title);
                 else
@@ -617,6 +635,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 await _scan.RefreshAsync();
                 _completion.ShowReverifyAllSkipped(reverify);
                 OperationProgress = string.Empty;
+                if (createdDestination) await RemoveCreatedDestinationAsync(dest);
                 return;
             }
 
@@ -639,6 +658,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // operation.
                 await _scan.RecheckPendingRebootAsync();
                 OperationProgress = string.Empty;
+                // The service refused at the mutex, before its own
+                // CreateDestinationFolder, so nothing was placed.
+                if (createdDestination) await RemoveCreatedDestinationAsync(dest);
                 return;
             }
 
@@ -719,6 +741,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // refresh the counts and clear.
             await _scan.RefreshAsync();
             OperationProgress = string.Empty;
+            if (createdDestination) await RemoveCreatedDestinationAsync(dest);
         }
         catch (LocalisedInvalidOperationException ex)
         {
@@ -738,7 +761,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // LocalisedAccessException comes from CreateDestinationFolder or
             // ProbeDestinationWriteable, both of which run before the per-file
             // loop starts, so no file has moved and the counts on screen are
-            // still correct.
+            // still correct. That same ordering is why the created folder can
+            // be removed here: nothing was placed in it.
+            if (createdDestination) await RemoveCreatedDestinationAsync(dest);
             _dialogService.ShowWarning(ex.Message, Strings.Error_DestinationWriteFailedTitle);
             OperationProgress = string.Empty;
         }
@@ -1106,12 +1131,24 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
     /// <summary>
     /// Removes a destination folder the pre-flight created for a Move that then
-    /// did not go ahead. Every such path calls this: a cancel or a write
-    /// failure during the probe itself, the free-space refusal, a cancel at the
-    /// confirmation dialog, and the act-time pending-reboot refusal. All five
-    /// abandon the move with nothing placed in the folder, so all five leave
-    /// nothing behind. The caller checks its createdDestination local first, so
-    /// a folder that was already there is never a candidate.
+    /// did not go ahead. The rule, rather than a list that goes stale as paths
+    /// are added: every abandon path on which NOTHING WAS PLACED in the folder
+    /// calls this, both before the confirmation (probe cancel, probe write
+    /// failure, free-space refusal, confirmation decline, act-time
+    /// pending-reboot refusal) and after it (re-verify failure, re-verify
+    /// keeping every candidate back, a cancel before the first file, the
+    /// service refusing at the Global\_MSIExecute mutex, and the service's own
+    /// write-probe failure). The last two are safe because the service refuses
+    /// ahead of its CreateDestinationFolder and its per-file loop respectively.
+    ///
+    /// The paths that deliberately do NOT call this are the ones where a file
+    /// may already have arrived: Error_DestinationChangedMidBatch, thrown from
+    /// inside the per-file loop, and the unaccounted-for catch that can fire at
+    /// any point in the batch. Removing a folder there could take a moved file
+    /// with it, which is the one outcome worse than a stray empty folder.
+    ///
+    /// The caller checks its createdDestination local first, so a folder that
+    /// was already there is never a candidate.
     ///
     /// The non-recursive Delete IS the emptiness test, rather than an Exists or
     /// Any check followed by a delete: Win32 refuses to remove a directory that

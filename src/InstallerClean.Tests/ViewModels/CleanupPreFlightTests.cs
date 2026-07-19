@@ -459,6 +459,96 @@ public class CleanupPreFlightTests
     }
 
     [Fact]
+    public async Task An_installer_taking_the_lock_at_the_service_removes_the_folder_the_pre_flight_created()
+    {
+        // The sub-millisecond race the act-time gate cannot close: the gate
+        // passed, then a transaction took Global\_MSIExecute before the service
+        // acquired it. The service refuses ahead of its own
+        // CreateDestinationFolder, so nothing was placed and the folder goes.
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(true);
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(new MoveResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true));
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _directory.Received(1).Delete(_destination);
+    }
+
+    [Fact]
+    public async Task A_re_verify_that_keeps_every_file_back_removes_the_folder_the_pre_flight_created()
+    {
+        // A patch that was superseded at scan time but is wanted again by act
+        // time: nothing survives the re-verify, so the batch never runs and the
+        // folder the pre-flight made has nothing in it.
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(true);
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .Returns(ci => new ReverifyResult(
+                Array.Empty<string>(), (IReadOnlyList<string>)ci[0]!));
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _directory.Received(1).Delete(_destination);
+        await _moveService.DidNotReceive().MoveFilesAsync(
+            Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task A_re_verify_that_fails_removes_the_folder_the_pre_flight_created()
+    {
+        // The re-verify runs between the confirmation and the batch, so a throw
+        // from it abandons the move with the folder still empty.
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(true);
+        _reverifier.ReverifyAsync(Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+            .Returns<ReverifyResult>(_ => throw new LocalisedInvalidOperationException("boom"));
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _directory.Received(1).Delete(_destination);
+    }
+
+    [Fact]
+    public async Task A_move_that_fails_inside_the_batch_keeps_the_folder_its_files_may_be_in()
+    {
+        // The load-bearing negative. Error_DestinationChangedMidBatch is thrown
+        // from inside the per-file loop, so files may already have arrived, and
+        // the non-recursive Delete would only refuse at the syscall AFTER the
+        // app had decided to try. A stray empty folder is the lesser outcome
+        // than any path that reaches for a folder holding moved files.
+        _confirmationService.ConfirmMove(Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(true);
+        _moveService.MoveFilesAsync(
+                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns<MoveResult>(_ => throw new LocalisedInvalidOperationException("swapped"));
+
+        var vm = CreateViewModel();
+        await vm.Scan.ScanWithProgressAsync(null);
+        vm.Cleanup.MoveDestination = _destination;
+
+        await vm.Cleanup.MoveAllCommand.ExecuteAsync(null);
+
+        _directory.DidNotReceive().Delete(Arg.Any<string>());
+    }
+
+    [Fact]
     public async Task A_move_to_the_same_drive_tells_the_confirmation_it_frees_no_space()
     {
         // Built from the actual system drive rather than %TEMP%, which is what
