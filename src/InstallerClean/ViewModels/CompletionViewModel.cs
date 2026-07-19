@@ -67,7 +67,7 @@ public partial class CompletionViewModel : ObservableObject
     [ObservableProperty] private string _spaceHint = string.Empty;
 
     /// <summary>
-    /// The failure count line ("2 of 71 files could not be moved."), shown in
+    /// The failure count line ("2 of 71 could not be moved."), shown in
     /// the warning colour directly under the heading and empty on every run
     /// that failed at nothing, which collapses the bound TextBlock. It exists
     /// as its own zone because the two places this used to live both merged two
