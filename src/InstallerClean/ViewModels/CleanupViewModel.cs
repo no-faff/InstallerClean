@@ -771,7 +771,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         var removableFiles = _scan.LastScanResult.RemovableFiles;
         var count = removableFiles.Count;
-        var totalBytes = removableFiles.Sum(f => f.SizeBytes);
         var sizeDisplay = _scan.OrphanedSizeDisplay;
 
         if (!_confirmationService.ConfirmDelete(count, sizeDisplay)) return;
@@ -785,7 +784,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             removableFiles,
             removableFiles.Select(f => f.FullPath).ToList(),
             count,
-            totalBytes,
             _scan.LastScanResult,
             _scan.LastScanDurationMs,
             _scan.PendingRebootLabel);
@@ -1132,7 +1130,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         IReadOnlyList<OrphanedFile> RemovableFiles,
         IReadOnlyList<string> FilePaths,
         int Count,
-        long TotalBytes,
         ScanResult PreOpScan,
         long PreOpDurationMs,
         string PreOpRebootLabel);
