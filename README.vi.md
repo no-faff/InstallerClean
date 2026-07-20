@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-34k-brightgreen" alt="Tổng lượt tải"></a>
 </p>
 
-![Ảnh chụp màn hình InstallerClean sau khi dọn dẹp thành công: đã dọn 1,28 GB, 69 tệp đã được chuyển vào Thùng rác](docs/screenshots/vi/06-success-done.webp)
+![Ảnh chụp màn hình InstallerClean sau khi dọn dẹp thành công: đã dọn 1,28 GB, 69 tệp đã được chuyển vào Thùng rác](docs/screenshots/vi/07-success-done.webp)
 
 - **Là gì:** InstallerClean chỉ làm một việc: nó loại bỏ những tệp không cần thiết khỏi `C:\Windows\Installer`, một thư mục ẩn mà Windows không bao giờ dọn dẹp. Sau một lần quét gần như tức thì, nó cho bạn biết bạn có tệp như vậy hay không, hiển thị thêm chi tiết cho ai tò mò, và cho phép bạn xóa chúng để giải phóng dung lượng trên ổ C:. Bạn dùng một lần rồi thôi.
 - **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. InstallerClean chính là thứ bạn cần. Nó biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và nhanh chóng cho bạn biết tệp nào có thể xóa an toàn.
@@ -93,7 +93,7 @@ Lời khuyên thường gặp nhầm lẫn giữa việc xóa tệp một cách 
 </p>
 
 <p>
-  <img src="docs/screenshots/vi/02-main-window.webp" alt="Cửa sổ chính hiển thị 120 tệp vẫn cần giữ (2,83 GB) và 69 tệp không cần thiết để dọn (1,28 GB), với ô chọn nơi chuyển đến và các nút Xóa và Chuyển" width="900"><br>
+  <img src="docs/screenshots/vi/02-main-window.webp" alt="Cửa sổ chính hiển thị 141 tệp vẫn cần giữ (3,60 GB) và 69 tệp không cần thiết để dọn (1,28 GB), với ô chọn nơi chuyển đến và các nút Xóa và Chuyển" width="900"><br>
   <em>Kết quả: còn cần giữ bao nhiêu, có thể loại bỏ bao nhiêu.</em>
   <br><br>
 </p>
@@ -117,13 +117,19 @@ Lời khuyên thường gặp nhầm lẫn giữa việc xóa tệp một cách 
 </p>
 
 <p>
-  <img src="docs/screenshots/vi/06-success-done.webp" alt="Lớp phủ thành công hiển thị đã dọn 1,28 GB, với 69 tệp đã được chuyển vào Thùng rác" width="900"><br>
+  <img src="docs/screenshots/vi/06-deleting.webp" alt="Lớp phủ tiến trình trong khi xóa: đã xong 51 trên 69 tệp (74%), tệp đang được xóa và nút Hủy" width="900"><br>
+  <em>Quá trình xóa đang chạy. Hủy sẽ dừng giữa chừng.</em>
+  <br><br>
+</p>
+
+<p>
+  <img src="docs/screenshots/vi/07-success-done.webp" alt="Lớp phủ thành công hiển thị đã dọn 1,28 GB, với 69 tệp đã được chuyển vào Thùng rác" width="900"><br>
   <em>Sau khi Xóa thành công.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/vi/07-scanned-again-all-clean.webp" alt="Lớp phủ “đã sạch” sau khi quét lại: không còn gì để dọn trong C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/vi/08-scanned-again-all-clean.webp" alt="Lớp phủ “đã sạch” sau khi quét lại: không còn gì để dọn trong C:\Windows\Installer" width="900"><br>
   <em>Sau khi quét lại. Không còn gì để dọn.</em>
   <br><br>
 </p>

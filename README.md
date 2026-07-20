@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-34k-brightgreen" alt="Total downloads"></a>
 </p>
 
-![Screenshot of InstallerClean after a successful clean-up: 1.28 GB cleaned up, 69 files moved to the Recycle Bin](docs/screenshots/en/06-success-done.webp)
+![Screenshot of InstallerClean after a successful clean-up: 1.28 GB cleaned up, 69 files moved to the Recycle Bin](docs/screenshots/en/07-success-done.webp)
 
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
 - **You might be here because:** You used [WinDirStat](https://github.com/windirstat/windirstat), WizTree or TreeSize, saw `C:\Windows\Installer` taking up a lot of space and didn't know what was in there. InstallerClean is just what you need. It knows what's in those files with random-looking names like `9f05cba.msi` and quickly tells you which ones you can safely delete.
@@ -93,7 +93,7 @@ The standard advice confuses deleting files at random (which genuinely is danger
 </p>
 
 <p>
-  <img src="docs/screenshots/en/02-main-window.webp" alt="Main window showing 120 files still needed (2.83 GB) and 69 unneeded files to clean up (1.28 GB), with a move location box and Delete and Move buttons" width="900"><br>
+  <img src="docs/screenshots/en/02-main-window.webp" alt="Main window showing 141 files still needed (3.60 GB) and 69 unneeded files to clean up (1.28 GB), with a move location box and Delete and Move buttons" width="900"><br>
   <em>Results: how much is still needed, how much is removable.</em>
   <br><br>
 </p>
@@ -117,13 +117,19 @@ The standard advice confuses deleting files at random (which genuinely is danger
 </p>
 
 <p>
-  <img src="docs/screenshots/en/06-success-done.webp" alt="Success overlay showing 1.28 GB cleaned up, with 69 files moved to the Recycle Bin" width="900"><br>
+  <img src="docs/screenshots/en/06-deleting.webp" alt="Progress overlay while the delete runs: 50 of 69 files done (72%), the file currently being deleted, and a Cancel button" width="900"><br>
+  <em>The delete running. Cancel stops it part-way.</em>
+  <br><br>
+</p>
+
+<p>
+  <img src="docs/screenshots/en/07-success-done.webp" alt="Success overlay showing 1.28 GB cleaned up, with 69 files moved to the Recycle Bin" width="900"><br>
   <em>After a successful Delete.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/en/07-scanned-again-all-clean.webp" alt="All clean overlay after scanning again: nothing to clean up in C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/en/08-scanned-again-all-clean.webp" alt="All clean overlay after scanning again: nothing to clean up in C:\Windows\Installer" width="900"><br>
   <em>After scanning again. Nothing left to clean.</em>
   <br><br>
 </p>

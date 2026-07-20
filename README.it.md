@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-34k-brightgreen" alt="Download totali"></a>
 </p>
 
-![Schermata di InstallerClean dopo una pulizia riuscita: 1,28 GB ripuliti, 69 file spostati al Cestino](docs/screenshots/it/06-success-done.webp)
+![Schermata di InstallerClean dopo una pulizia riuscita: 1,28 GB ripuliti, 69 file spostati al Cestino](docs/screenshots/it/07-success-done.webp)
 
 - **Cosa fa:** InstallerClean fa una cosa sola: rimuove i file non necessari da `C:\Windows\Installer`, una cartella nascosta che Windows non pulisce mai. Dopo una scansione quasi istantanea ti dice se ne hai, mostra qualche dettaglio in più per i curiosi e ti lascia eliminarli per liberare spazio sull'unità C:. La usi una volta e passi oltre.
 - **Forse sei qui perché:** Hai usato [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, hai visto che `C:\Windows\Installer` occupava un sacco di spazio e non sapevi cosa ci fosse dentro. InstallerClean è proprio quello che ti serve. Sa cosa contengono quei file dai nomi all'apparenza casuali come `9f05cba.msi` e ti dice rapidamente quali puoi eliminare in sicurezza.
@@ -93,7 +93,7 @@ Il consiglio abituale confonde l'eliminare file a caso (cosa che è davvero peri
 </p>
 
 <p>
-  <img src="docs/screenshots/it/02-main-window.webp" alt="Finestra principale con 120 file ancora necessari (2,83 GB) e 69 file non necessari da pulire (1,28 GB), con un campo per la destinazione spostamento e i pulsanti Elimina e Sposta" width="900"><br>
+  <img src="docs/screenshots/it/02-main-window.webp" alt="Finestra principale con 141 file ancora necessari (3,60 GB) e 69 file non necessari da pulire (1,28 GB), con un campo per la destinazione spostamento e i pulsanti Elimina e Sposta" width="900"><br>
   <em>Risultati: quanto serve ancora, quanto è rimovibile.</em>
   <br><br>
 </p>
@@ -117,13 +117,19 @@ Il consiglio abituale confonde l'eliminare file a caso (cosa che è davvero peri
 </p>
 
 <p>
-  <img src="docs/screenshots/it/06-success-done.webp" alt="Schermata di esito positivo che mostra 1,28 GB ripuliti, con 69 file spostati al Cestino" width="900"><br>
+  <img src="docs/screenshots/it/06-deleting.webp" alt="Schermata di avanzamento durante l'eliminazione: 38 file su 69 completati (55%), il file in corso di eliminazione e un pulsante Annulla" width="900"><br>
+  <em>L'eliminazione in corso. Annulla la interrompe a metà.</em>
+  <br><br>
+</p>
+
+<p>
+  <img src="docs/screenshots/it/07-success-done.webp" alt="Schermata di esito positivo che mostra 1,28 GB ripuliti, con 69 file spostati al Cestino" width="900"><br>
   <em>Dopo un'eliminazione riuscita.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/it/07-scanned-again-all-clean.webp" alt="Schermata «Tutto pulito» dopo una nuova scansione: niente da pulire in C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/it/08-scanned-again-all-clean.webp" alt="Schermata «Tutto pulito» dopo una nuova scansione: niente da pulire in C:\Windows\Installer" width="900"><br>
   <em>Dopo una nuova scansione. Non resta nulla da pulire.</em>
   <br><br>
 </p>

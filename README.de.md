@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-34k-brightgreen" alt="Downloads insgesamt"></a>
 </p>
 
-![Screenshot von InstallerClean nach einem erfolgreichen Aufräumen: 1,28 GB aufgeräumt, 69 Dateien in den Papierkorb verschoben](docs/screenshots/de/06-success-done.webp)
+![Screenshot von InstallerClean nach einem erfolgreichen Aufräumen: 1,28 GB aufgeräumt, 69 Dateien in den Papierkorb verschoben](docs/screenshots/de/07-success-done.webp)
 
 - **Was:** InstallerClean tut eine Sache: Es entfernt nicht benötigte Dateien aus `C:\Windows\Installer`, einem versteckten Ordner, den Windows nie aufräumt. Nach einem fast augenblicklichen Scan sagt es dir, ob du welche hast, zeigt Neugierigen mehr Details und lässt dich die Dateien löschen, um Platz auf deiner C:-Festplatte freizugeben. Du benutzt es einmal und machst weiter.
 - **Warum du vielleicht hier bist:** Du hast [WinDirStat](https://github.com/windirstat/windirstat), WizTree oder TreeSize benutzt, gesehen, dass `C:\Windows\Installer` viel Platz belegt, und nicht gewusst, was darin steckt. InstallerClean ist genau das Richtige. Es weiß, was in diesen Dateien mit ihren zufällig wirkenden Namen wie `9f05cba.msi` steckt, und sagt dir schnell, welche du bedenkenlos löschen kannst.
@@ -93,7 +93,7 @@ Der übliche Rat verwechselt das wahllose Löschen von Dateien (was tatsächlich
 </p>
 
 <p>
-  <img src="docs/screenshots/de/02-main-window.webp" alt="Hauptfenster mit 120 noch benötigten Dateien (2,83 GB) und 69 nicht benötigten Dateien zum Aufräumen (1,28 GB), mit einem Feld für den Verschiebeort und den Schaltflächen Löschen und Verschieben" width="900"><br>
+  <img src="docs/screenshots/de/02-main-window.webp" alt="Hauptfenster mit 141 noch benötigten Dateien (3,60 GB) und 69 nicht benötigten Dateien zum Aufräumen (1,28 GB), mit einem Feld für den Verschiebeort und den Schaltflächen Löschen und Verschieben" width="900"><br>
   <em>Ergebnisse: wie viel noch benötigt wird, wie viel entfernt werden kann.</em>
   <br><br>
 </p>
@@ -117,13 +117,19 @@ Der übliche Rat verwechselt das wahllose Löschen von Dateien (was tatsächlich
 </p>
 
 <p>
-  <img src="docs/screenshots/de/06-success-done.webp" alt="Erfolgs-Overlay mit 1,28 GB aufgeräumt und 69 in den Papierkorb verschobenen Dateien" width="900"><br>
+  <img src="docs/screenshots/de/06-deleting.webp" alt="Fortschritts-Overlay während des Löschens: 39 von 69 Dateien erledigt (57 %), die gerade gelöschte Datei und eine Schaltfläche Abbrechen" width="900"><br>
+  <em>Das Löschen läuft. Abbrechen stoppt es mittendrin.</em>
+  <br><br>
+</p>
+
+<p>
+  <img src="docs/screenshots/de/07-success-done.webp" alt="Erfolgs-Overlay mit 1,28 GB aufgeräumt und 69 in den Papierkorb verschobenen Dateien" width="900"><br>
   <em>Nach einem erfolgreichen Löschen.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/de/07-scanned-again-all-clean.webp" alt="Overlay „Alles sauber“ nach erneutem Scan: nichts aufzuräumen in C:\Windows\Installer" width="900"><br>
+  <img src="docs/screenshots/de/08-scanned-again-all-clean.webp" alt="Overlay „Alles sauber“ nach erneutem Scan: nichts aufzuräumen in C:\Windows\Installer" width="900"><br>
   <em>Nach erneutem Scan. Nichts mehr aufzuräumen.</em>
   <br><br>
 </p>
