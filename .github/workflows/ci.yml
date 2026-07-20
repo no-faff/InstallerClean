@@ -50,6 +50,13 @@ jobs:
       - name: Check installer language list
         run: node scripts/check-installer-languages.mjs
 
+      # Directory.Build.props and the two app.manifest identities, checked here
+      # rather than only at release time: the manifests are build inputs, so
+      # after a release has built its binaries the fix costs a rebuild and every
+      # hash it was scanned under.
+      - name: Check version surfaces agree
+        run: node scripts/check-version-surfaces.mjs
+
       - name: Lint French spacing
         run: node scripts/check-french-spacing.mjs
 

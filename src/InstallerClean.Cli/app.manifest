@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
-  <!-- assemblyIdentity is advisory: Windows ignores it for trust, and
-       InstallerClean reports its version from the assembly
-       (Directory.Build.props <Version>, read via Assembly.GetName().Version),
-       not from here. This value is inert and need not track the release
-       version. -->
-  <assemblyIdentity version="2.0.1.0" name="InstallerClean.cli"/>
+  <!-- Nothing at runtime reads this version: elevation is decided by trustInfo
+       below, no dependentAssembly entry binds against the identity, and every
+       version the tool reports comes from Assembly.GetName().Version. It cannot
+       be dropped, though, because the loader validates the element at process
+       start, so it has to carry some value.
+
+       That value tracks Directory.Build.props, stamped by bump-version.sh and
+       enforced by scripts/check-version-surfaces.mjs. The manifest is embedded
+       in the exe, where sigcheck -m and any resource viewer show it; this
+       comment is not. Untying it from the release version leaves the shipped
+       binary asserting a version it is not, to the people most likely to look. -->
+  <assemblyIdentity version="2.1.0.0" name="InstallerClean.cli"/>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
