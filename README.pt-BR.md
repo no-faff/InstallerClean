@@ -111,7 +111,7 @@ O conselho padrão confunde apagar arquivos a esmo (o que é de fato perigoso) c
 </p>
 
 <p>
-  <img src="docs/screenshots/pt/05-delete-dialogue.webp" alt="Confirmação de exclusão perguntando se deve excluir 69 arquivos (1,28 GB), avisando que os arquivos serão movidos para a Lixeira" width="900"><br>
+  <img src="docs/screenshots/pt/05-delete-dialog.webp" alt="Confirmação de exclusão perguntando se deve excluir 69 arquivos (1,28 GB), avisando que os arquivos serão movidos para a Lixeira" width="900"><br>
   <em>Confirmação antes de cada ação. Excluir move para a Lixeira; Mover coloca os arquivos onde você quiser.</em>
   <br><br>
 </p>
@@ -242,7 +242,7 @@ Entre os 136 relatórios que as pessoas tiveram a gentileza de enviar (obrigado 
 <details>
 <summary>Esses relatórios vêm do botão opcional "Enviar relatório". Veja o que você verá antes de qualquer coisa ser enviada.</summary>
 
-![Caixa de diálogo de confirmação intitulada "Enviar isto?" mostrando o relatório completo que seria enviado: versão do aplicativo, versão do Windows, contagens da análise, arquivos processados e bytes liberados, sem nenhum caminho de arquivo, nome ou ID de máquina, e uma observação de que nada identifica você ou a sua máquina, apenas se o aplicativo funcionou e quanto espaço foi liberado, com os botões Cancelar e Enviar.](docs/screenshots/pt/optional-send-report-confirmation-dialogue.webp)
+![Caixa de diálogo de confirmação intitulada "Enviar isto?" mostrando o relatório completo que seria enviado: versão do aplicativo, versão do Windows, contagens da análise, arquivos processados e bytes liberados, sem nenhum caminho de arquivo, nome ou ID de máquina, e uma observação de que nada identifica você ou a sua máquina, apenas se o aplicativo funcionou e quanto espaço foi liberado, com os botões Cancelar e Enviar.](docs/screenshots/pt/optional-send-report-confirmation-dialog.webp)
 
 </details>
 

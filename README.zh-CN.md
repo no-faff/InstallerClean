@@ -111,7 +111,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/zh/05-delete-dialogue.webp" alt="删除确认对话框，询问是否删除 69 个文件（1.28 GB），并说明这些文件将被移到回收站" width="900"><br>
+  <img src="docs/screenshots/zh/05-delete-dialog.webp" alt="删除确认对话框，询问是否删除 69 个文件（1.28 GB），并说明这些文件将被移到回收站" width="900"><br>
   <em>每次操作前都会确认。删除会移到回收站；移动则把文件放到您选择的位置。</em>
   <br><br>
 </p>
@@ -242,7 +242,7 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 <details>
 <summary>这些报告来自可选的“发送报告”按钮。下面是发送前您会看到的内容。</summary>
 
-![确认对话框，标题为“把这个发送吗？”，显示将要发送的完整报告：应用版本、Windows 版本、扫描计数、处理的文件数和释放的字节数，不含任何文件路径、名称或机器标识，并附一句说明：没有任何内容能识别您或您的机器，只有应用是否正常工作以及释放了多少空间，下方是“取消”和“发送”按钮。](docs/screenshots/zh/optional-send-report-confirmation-dialogue.webp)
+![确认对话框，标题为“把这个发送吗？”，显示将要发送的完整报告：应用版本、Windows 版本、扫描计数、处理的文件数和释放的字节数，不含任何文件路径、名称或机器标识，并附一句说明：没有任何内容能识别您或您的机器，只有应用是否正常工作以及释放了多少空间，下方是“取消”和“发送”按钮。](docs/screenshots/zh/optional-send-report-confirmation-dialog.webp)
 
 </details>
 

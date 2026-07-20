@@ -111,7 +111,7 @@ Der übliche Rat verwechselt das wahllose Löschen von Dateien (was tatsächlich
 </p>
 
 <p>
-  <img src="docs/screenshots/de/05-delete-dialogue.webp" alt="Löschbestätigung, die fragt, ob 69 Dateien (1,28 GB) gelöscht werden sollen, mit dem Hinweis, dass die Dateien in den Papierkorb verschoben werden" width="900"><br>
+  <img src="docs/screenshots/de/05-delete-dialog.webp" alt="Löschbestätigung, die fragt, ob 69 Dateien (1,28 GB) gelöscht werden sollen, mit dem Hinweis, dass die Dateien in den Papierkorb verschoben werden" width="900"><br>
   <em>Bestätigung vor beiden Aktionen. Löschen verschiebt in den Papierkorb; Verschieben legt die Dateien an einen Ort deiner Wahl.</em>
   <br><br>
 </p>
@@ -242,7 +242,7 @@ Von den 136 Berichten, die seit der Einführung der Option in v1.8.0 freundliche
 <details>
 <summary>Diese Berichte stammen von der optionalen Schaltfläche „Bericht senden“. Das siehst du, bevor etwas gesendet wird.</summary>
 
-![Bestätigungsdialog mit dem Titel „Das senden?“, der den vollständigen Bericht zeigt, der gesendet würde: App-Version, Windows-Version, Scan-Zähler, verarbeitete Dateien und freigegebene Bytes, ohne Dateipfade, Namen oder Geräte-IDs, mit dem Hinweis, dass nichts dich oder deinen Rechner identifiziert, nur ob die App funktioniert hat und wie viel Platz freigegeben wurde, mit den Schaltflächen Abbrechen und Senden.](docs/screenshots/de/optional-send-report-confirmation-dialogue.webp)
+![Bestätigungsdialog mit dem Titel „Das senden?“, der den vollständigen Bericht zeigt, der gesendet würde: App-Version, Windows-Version, Scan-Zähler, verarbeitete Dateien und freigegebene Bytes, ohne Dateipfade, Namen oder Geräte-IDs, mit dem Hinweis, dass nichts dich oder deinen Rechner identifiziert, nur ob die App funktioniert hat und wie viel Platz freigegeben wurde, mit den Schaltflächen Abbrechen und Senden.](docs/screenshots/de/optional-send-report-confirmation-dialog.webp)
 
 </details>
 

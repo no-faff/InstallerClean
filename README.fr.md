@@ -111,7 +111,7 @@ Le conseil habituel confond la suppression de fichiers au hasard (ce qui est ré
 </p>
 
 <p>
-  <img src="docs/screenshots/fr/05-delete-dialogue.webp" alt="Confirmation de suppression demandant de supprimer 69 fichiers (1,28 Go), précisant que les fichiers seront déplacés vers la Corbeille" width="900"><br>
+  <img src="docs/screenshots/fr/05-delete-dialog.webp" alt="Confirmation de suppression demandant de supprimer 69 fichiers (1,28 Go), précisant que les fichiers seront déplacés vers la Corbeille" width="900"><br>
   <em>Une confirmation avant chaque action. La suppression déplace vers la Corbeille ; le déplacement place les fichiers à l'endroit de votre choix.</em>
   <br><br>
 </p>
@@ -242,7 +242,7 @@ Sur les 136 rapports que des utilisateurs nous ont gentiment envoyés (merci �
 <details>
 <summary>Ces rapports proviennent du bouton facultatif « Envoyer le rapport ». Voici ce que vous verrez avant que quoi que ce soit ne soit envoyé.</summary>
 
-![Boîte de dialogue de confirmation intitulée « Envoyer ceci ? », montrant l'intégralité du rapport qui serait envoyé : version de l'application, version de Windows, compteurs d'analyse, fichiers traités et octets libérés, sans aucun chemin de fichier, nom ou identifiant de machine, et une note précisant que rien ne vous identifie, vous ou votre machine, seulement si l'application a fonctionné et combien d'espace a été libéré, avec les boutons Annuler et Envoyer.](docs/screenshots/fr/optional-send-report-confirmation-dialogue.webp)
+![Boîte de dialogue de confirmation intitulée « Envoyer ceci ? », montrant l'intégralité du rapport qui serait envoyé : version de l'application, version de Windows, compteurs d'analyse, fichiers traités et octets libérés, sans aucun chemin de fichier, nom ou identifiant de machine, et une note précisant que rien ne vous identifie, vous ou votre machine, seulement si l'application a fonctionné et combien d'espace a été libéré, avec les boutons Annuler et Envoyer.](docs/screenshots/fr/optional-send-report-confirmation-dialog.webp)
 
 </details>
 

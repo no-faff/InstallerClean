@@ -111,7 +111,7 @@ Standardowa porada myli usuwanie plików na chybił trafił (co naprawdę jest n
 </p>
 
 <p>
-  <img src="docs/screenshots/pl/05-delete-dialogue.webp" alt="Potwierdzenie usunięcia z pytaniem o usunięcie 69 plików (1,28 GB), z informacją, że pliki trafią do Kosza" width="900"><br>
+  <img src="docs/screenshots/pl/05-delete-dialog.webp" alt="Potwierdzenie usunięcia z pytaniem o usunięcie 69 plików (1,28 GB), z informacją, że pliki trafią do Kosza" width="900"><br>
   <em>Potwierdzenie przed każdą z akcji. Usuń przenosi do Kosza; Przenieś umieszcza pliki w wybranym przez ciebie miejscu.</em>
   <br><br>
 </p>
@@ -242,7 +242,7 @@ Spośród 136 raportów, które nadesłano (dziękuję 🙏) od czasu, gdy opcj�
 <details>
 <summary>Te raporty pochodzą z opcjonalnego przycisku „Wyślij raport”. Oto co zobaczysz, zanim cokolwiek zostanie wysłane.</summary>
 
-![Okno potwierdzenia zatytułowane „Wysłać to?” pokazujące pełny raport, który zostałby wysłany: wersja aplikacji, wersja Windows, liczniki skanowania, przetworzone pliki i zwolnione bajty, bez ścieżek plików, nazw czy identyfikatorów maszyny, z informacją, że nic nie identyfikuje ciebie ani twojej maszyny, a jedynie to, czy aplikacja zadziałała i ile miejsca zwolniono, z przyciskami Anuluj i Wyślij.](docs/screenshots/pl/optional-send-report-confirmation-dialogue.webp)
+![Okno potwierdzenia zatytułowane „Wysłać to?” pokazujące pełny raport, który zostałby wysłany: wersja aplikacji, wersja Windows, liczniki skanowania, przetworzone pliki i zwolnione bajty, bez ścieżek plików, nazw czy identyfikatorów maszyny, z informacją, że nic nie identyfikuje ciebie ani twojej maszyny, a jedynie to, czy aplikacja zadziałała i ile miejsca zwolniono, z przyciskami Anuluj i Wyślij.](docs/screenshots/pl/optional-send-report-confirmation-dialog.webp)
 
 </details>
 

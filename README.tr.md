@@ -111,7 +111,7 @@ Sıradan tavsiyeler, dosyaları gelişigüzel silmeyi (ki bu gerçekten tehlikel
 </p>
 
 <p>
-  <img src="docs/screenshots/tr/05-delete-dialogue.webp" alt="69 dosyayı (1,28 GB) silmeyi soran, dosyaların Geri Dönüşüm Kutusu'na taşınacağını belirten silme onayı" width="900"><br>
+  <img src="docs/screenshots/tr/05-delete-dialog.webp" alt="69 dosyayı (1,28 GB) silmeyi soran, dosyaların Geri Dönüşüm Kutusu'na taşınacağını belirten silme onayı" width="900"><br>
   <em>Her iki işlemden önce onay. Sil, Geri Dönüşüm Kutusu'na taşır; Taşı, dosyaları seçtiğiniz bir yere koyar.</em>
   <br><br>
 </p>
@@ -242,7 +242,7 @@ v1.8.0'da seçenek eklendiğinden bu yana gönderilen 136 rapora göre (teşekk�
 <details>
 <summary>Bu raporlar isteğe bağlı “Rapor gönder” düğmesinden gelir. Bir şey gönderilmeden önce göreceğiniz şey şudur.</summary>
 
-![“Bunu göndermek ister misiniz?” başlıklı, gönderilecek tam raporu gösteren onay penceresi: uygulama sürümü, Windows sürümü, tarama sayıları, işlenen dosyalar ve açılan baytlar; hiçbir dosya yolu, ad veya makine kimliği olmadan, sizi ya da makinenizi hiçbir şeyin tanımlamadığına, yalnızca uygulamanın çalışıp çalışmadığını ve ne kadar yer açıldığını gösterdiğine dair bir notla, İptal ve Gönder düğmeleriyle.](docs/screenshots/tr/optional-send-report-confirmation-dialogue.webp)
+![“Bunu göndermek ister misiniz?” başlıklı, gönderilecek tam raporu gösteren onay penceresi: uygulama sürümü, Windows sürümü, tarama sayıları, işlenen dosyalar ve açılan baytlar; hiçbir dosya yolu, ad veya makine kimliği olmadan, sizi ya da makinenizi hiçbir şeyin tanımlamadığına, yalnızca uygulamanın çalışıp çalışmadığını ve ne kadar yer açıldığını gösterdiğine dair bir notla, İptal ve Gönder düğmeleriyle.](docs/screenshots/tr/optional-send-report-confirmation-dialog.webp)
 
 </details>
 

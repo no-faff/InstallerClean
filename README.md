@@ -111,7 +111,7 @@ The standard advice confuses deleting files at random (which genuinely is danger
 </p>
 
 <p>
-  <img src="docs/screenshots/en/05-delete-dialogue.webp" alt="Delete confirmation asking to delete 69 files (1.28 GB), noting the files will be moved to the Recycle Bin" width="900"><br>
+  <img src="docs/screenshots/en/05-delete-dialog.webp" alt="Delete confirmation asking to delete 69 files (1.28 GB), noting the files will be moved to the Recycle Bin" width="900"><br>
   <em>Confirmation before either action. Delete moves to the Recycle Bin; Move puts the files somewhere of your choice.</em>
   <br><br>
 </p>
@@ -240,7 +240,7 @@ Across the 136 reports people have sent in (thanks 🙏) since v1.8.0 added the 
 <details>
 <summary>Those reports come from the optional "Send report" button. Here's what you'll see before anything's sent.</summary>
 
-![Confirmation dialogue titled "Send this?" showing the full report that would be sent: app version, Windows version, scan counts, files processed and bytes freed, with no file paths, names or machine IDs, and a note that nothing identifies you or your machine, just whether the app worked and how much space was freed, with Cancel and Send buttons.](docs/screenshots/en/optional-send-report-confirmation-dialogue.webp)
+![Confirmation dialog titled "Send this?" showing the full report that would be sent: app version, Windows version, scan counts, files processed and bytes freed, with no file paths, names or machine IDs, and a note that nothing identifies you or your machine, just whether the app worked and how much space was freed, with Cancel and Send buttons.](docs/screenshots/en/optional-send-report-confirmation-dialog.webp)
 
 </details>
 

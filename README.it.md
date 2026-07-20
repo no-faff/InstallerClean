@@ -111,7 +111,7 @@ Il consiglio abituale confonde l'eliminare file a caso (cosa che è davvero peri
 </p>
 
 <p>
-  <img src="docs/screenshots/it/05-delete-dialogue.webp" alt="Conferma di eliminazione che chiede di eliminare 69 file (1,28 GB), segnalando che i file verranno spostati nel Cestino" width="900"><br>
+  <img src="docs/screenshots/it/05-delete-dialog.webp" alt="Conferma di eliminazione che chiede di eliminare 69 file (1,28 GB), segnalando che i file verranno spostati nel Cestino" width="900"><br>
   <em>Conferma prima di ogni azione. Elimina sposta nel Cestino; Sposta colloca i file dove scegli tu.</em>
   <br><br>
 </p>
@@ -242,7 +242,7 @@ Su 136 report che mi sono stati inviati (grazie 🙏) da quando la v1.8.0 ha agg
 <details>
 <summary>Quei report arrivano dal pulsante opzionale «Invia rapporto». Ecco cosa vedrai prima che venga inviato qualcosa.</summary>
 
-![Finestra di conferma intitolata «Vuoi inviare questo?» che mostra il report completo che verrebbe inviato: versione dell'app, versione di Windows, conteggi della scansione, file elaborati e byte liberati, senza percorsi di file, nomi o identificatori del computer, e con una nota che niente identifica te o il tuo computer, solo se l'app ha funzionato e quanto spazio è stato liberato, con i pulsanti Annulla e Invia.](docs/screenshots/it/optional-send-report-confirmation-dialogue.webp)
+![Finestra di conferma intitolata «Vuoi inviare questo?» che mostra il report completo che verrebbe inviato: versione dell'app, versione di Windows, conteggi della scansione, file elaborati e byte liberati, senza percorsi di file, nomi o identificatori del computer, e con una nota che niente identifica te o il tuo computer, solo se l'app ha funzionato e quanto spazio è stato liberato, con i pulsanti Annulla e Invia.](docs/screenshots/it/optional-send-report-confirmation-dialog.webp)
 
 </details>
 

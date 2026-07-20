@@ -111,7 +111,7 @@ Lời khuyên thường gặp nhầm lẫn giữa việc xóa tệp một cách 
 </p>
 
 <p>
-  <img src="docs/screenshots/vi/05-delete-dialogue.webp" alt="Hộp thoại xác nhận xóa hỏi có xóa 69 tệp (1,28 GB) không, lưu ý rằng các tệp sẽ được chuyển vào Thùng rác" width="900"><br>
+  <img src="docs/screenshots/vi/05-delete-dialog.webp" alt="Hộp thoại xác nhận xóa hỏi có xóa 69 tệp (1,28 GB) không, lưu ý rằng các tệp sẽ được chuyển vào Thùng rác" width="900"><br>
   <em>Xác nhận trước cả hai thao tác. Xóa sẽ di chuyển vào Thùng rác; Chuyển đặt các tệp ở nơi bạn chọn.</em>
   <br><br>
 </p>
@@ -242,7 +242,7 @@ Trong số 136 báo cáo mọi người đã gửi về (cảm ơn 🙏) kể t�
 <details>
 <summary>Những báo cáo đó đến từ nút “Gửi báo cáo” tùy chọn. Đây là những gì bạn thấy trước khi có bất cứ thứ gì được gửi đi.</summary>
 
-![Hộp thoại xác nhận với tiêu đề “Gửi cái này?” hiển thị toàn bộ báo cáo sẽ được gửi: phiên bản ứng dụng, phiên bản Windows, số liệu quét, số tệp đã xử lý và số byte đã giải phóng, không có đường dẫn tệp, tên tệp hay mã định danh máy, kèm ghi chú rằng không có gì nhận dạng bạn hay máy của bạn, chỉ cho biết ứng dụng có hoạt động hay không và đã giải phóng được bao nhiêu dung lượng, với các nút Hủy và Gửi.](docs/screenshots/vi/optional-send-report-confirmation-dialogue.webp)
+![Hộp thoại xác nhận với tiêu đề “Gửi cái này?” hiển thị toàn bộ báo cáo sẽ được gửi: phiên bản ứng dụng, phiên bản Windows, số liệu quét, số tệp đã xử lý và số byte đã giải phóng, không có đường dẫn tệp, tên tệp hay mã định danh máy, kèm ghi chú rằng không có gì nhận dạng bạn hay máy của bạn, chỉ cho biết ứng dụng có hoạt động hay không và đã giải phóng được bao nhiêu dung lượng, với các nút Hủy và Gửi.](docs/screenshots/vi/optional-send-report-confirmation-dialog.webp)
 
 </details>
 

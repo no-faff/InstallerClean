@@ -111,7 +111,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/ko/05-delete-dialogue.webp" alt="69개 파일(1.28 GB) 삭제를 확인하며, 파일이 휴지통으로 이동된다는 점을 알리는 삭제 확인 대화상자" width="900"><br>
+  <img src="docs/screenshots/ko/05-delete-dialog.webp" alt="69개 파일(1.28 GB) 삭제를 확인하며, 파일이 휴지통으로 이동된다는 점을 알리는 삭제 확인 대화상자" width="900"><br>
   <em>어느 작업이든 실행 전에 확인을 거칩니다. 삭제는 휴지통으로 이동하고, 이동은 직접 고른 위치에 파일을 둡니다.</em>
   <br><br>
 </p>
@@ -242,7 +242,7 @@ v1.8.0에서 이 옵션이 추가된 이후 보내 주신 136건의 보고서(�
 <details>
 <summary>이 보고서는 선택 사항인 ‘보고서 보내기’ 버튼을 통해 전송됩니다. 무언가 전송되기 전에 보게 될 내용은 다음과 같습니다.</summary>
 
-![제목이 "이 내용을 보내시겠습니까?"인 확인 대화상자. 전송될 보고서 전체가 표시됨: 앱 버전, Windows 버전, 검사 횟수, 처리된 파일 수, 확보된 바이트 수. 파일 경로나 이름, 컴퓨터 ID는 포함되지 않으며, 사용자나 컴퓨터를 식별하는 것은 전혀 없고 앱이 동작했는지와 공간이 얼마나 확보됐는지만 담긴다는 안내, 그리고 취소와 보내기 버튼이 있음.](docs/screenshots/ko/optional-send-report-confirmation-dialogue.webp)
+![제목이 "이 내용을 보내시겠습니까?"인 확인 대화상자. 전송될 보고서 전체가 표시됨: 앱 버전, Windows 버전, 검사 횟수, 처리된 파일 수, 확보된 바이트 수. 파일 경로나 이름, 컴퓨터 ID는 포함되지 않으며, 사용자나 컴퓨터를 식별하는 것은 전혀 없고 앱이 동작했는지와 공간이 얼마나 확보됐는지만 담긴다는 안내, 그리고 취소와 보내기 버튼이 있음.](docs/screenshots/ko/optional-send-report-confirmation-dialog.webp)
 
 </details>
 

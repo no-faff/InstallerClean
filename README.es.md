@@ -111,7 +111,7 @@ El consejo habitual confunde borrar archivos al azar (lo cual sí es peligroso) 
 </p>
 
 <p>
-  <img src="docs/screenshots/es/05-delete-dialogue.webp" alt="Confirmación de eliminación que pregunta si eliminar 69 archivos (1,28 GB) e indica que los archivos se moverán a la Papelera de reciclaje" width="900"><br>
+  <img src="docs/screenshots/es/05-delete-dialog.webp" alt="Confirmación de eliminación que pregunta si eliminar 69 archivos (1,28 GB) e indica que los archivos se moverán a la Papelera de reciclaje" width="900"><br>
   <em>Confirmación antes de cada acción. Eliminar mueve a la Papelera de reciclaje; Mover coloca los archivos donde tú elijas.</em>
   <br><br>
 </p>
@@ -242,7 +242,7 @@ De los 136 informes que me han enviado amablemente (gracias 🙏) desde que la v
 <details>
 <summary>Esos informes provienen del botón opcional «Enviar informe». Esto es lo que verás antes de que se envíe nada.</summary>
 
-![Diálogo de confirmación titulado «¿Enviar esto?» que muestra el informe completo que se enviaría: la versión de la aplicación, la versión de Windows, los recuentos del análisis, los archivos procesados y los bytes liberados, sin rutas de archivo, sin nombres ni identificadores de equipo, y con una nota de que nada te identifica a ti ni a tu equipo, solo si la aplicación funcionó y cuánto espacio se liberó, con los botones Cancelar y Enviar.](docs/screenshots/es/optional-send-report-confirmation-dialogue.webp)
+![Diálogo de confirmación titulado «¿Enviar esto?» que muestra el informe completo que se enviaría: la versión de la aplicación, la versión de Windows, los recuentos del análisis, los archivos procesados y los bytes liberados, sin rutas de archivo, sin nombres ni identificadores de equipo, y con una nota de que nada te identifica a ti ni a tu equipo, solo si la aplicación funcionó y cuánto espacio se liberó, con los botones Cancelar y Enviar.](docs/screenshots/es/optional-send-report-confirmation-dialog.webp)
 
 </details>
 
