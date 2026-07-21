@@ -248,7 +248,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | 无法写入 {0}。无法写入崩溃日志。 |
 | File no longer exists. | 文件已不存在。 |
 | Source file is a symlink or junction; refused for safety. | 源文件是符号链接或目录联接；为安全起见已拒绝。 |
-| This file is not inside the Windows Installer folder; refused for safety. | 此文件不在 Windows Installer 文件夹内；为安全起见已拒绝。 |
+| This file is not directly inside the Windows Installer folder; refused for safety. | 此文件不直接位于 Windows Installer 文件夹内；为安全起见已拒绝。 |
 | Windows refused access to this file; it was left in place. | Windows 拒绝了对此文件的访问；该文件已留在原处。 |
 | Windows refused access to these files; they were left in place. | Windows 拒绝了对这些文件的访问；这些文件已留在原处。 |
 | This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | 此文件正被另一个程序打开或锁定，因此目前没有任何方式能移动它。该文件已留在原处；请稍后再试。 |

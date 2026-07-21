@@ -248,7 +248,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | {0} に書き込めません。クラッシュログを書き込めませんでした。 |
 | File no longer exists. | ファイルはもう存在しません。 |
 | Source file is a symlink or junction; refused for safety. | ソースファイルはシンボリックリンクまたはジャンクションです。安全のために拒否されました。 |
-| This file is not inside the Windows Installer folder; refused for safety. | このファイルは Windows Installer フォルダー内にありません。安全のために拒否されました。 |
+| This file is not directly inside the Windows Installer folder; refused for safety. | このファイルは Windows Installer フォルダーの直下にありません。安全のために拒否されました。 |
 | Windows refused access to this file; it was left in place. | Windows がこのファイルへのアクセスを拒否しました。ファイルはそのままにしてあります。 |
 | Windows refused access to these files; they were left in place. | Windows がこれらのファイルへのアクセスを拒否しました。ファイルはそのままにしてあります。 |
 | This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | このファイルは別のプログラムによって開かれているか、ロックされています。そのため今はどうやっても移動できません。ファイルはそのままにしてあります。しばらくしてからもう一度お試しください。 |

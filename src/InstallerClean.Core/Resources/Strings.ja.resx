@@ -664,7 +664,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
   <!-- Category-only, no path (elevated path-leak rule). Shown for a candidate
        that does not resolve inside C:\Windows\Installer, refused at the Move /
        Delete service boundary. Should never reach a user in practice. -->
-  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>このファイルは Windows Installer フォルダー内にありません。安全のために拒否されました。</value></data>
+  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>このファイルは Windows Installer フォルダーの直下にありません。安全のために拒否されました。</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file

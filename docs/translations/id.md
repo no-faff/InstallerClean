@@ -248,7 +248,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | Tidak bisa menulis ke {0}. Log kerusakan tidak bisa ditulis. |
 | File no longer exists. | File sudah tidak ada lagi. |
 | Source file is a symlink or junction; refused for safety. | File sumber adalah symlink atau junction; ditolak demi keamanan. |
-| This file is not inside the Windows Installer folder; refused for safety. | File ini tidak berada di dalam folder Windows Installer; ditolak demi keamanan. |
+| This file is not directly inside the Windows Installer folder; refused for safety. | File ini tidak berada langsung di dalam folder Windows Installer; ditolak demi keamanan. |
 | Windows refused access to this file; it was left in place. | Windows menolak akses ke file ini; file dibiarkan di tempatnya. |
 | Windows refused access to these files; they were left in place. | Windows menolak akses ke file-file ini; semuanya dibiarkan di tempatnya. |
 | This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | File ini sedang dibuka atau dikunci oleh program lain, jadi saat ini tidak ada yang bisa memindahkannya. File dibiarkan di tempatnya; coba lagi nanti. |

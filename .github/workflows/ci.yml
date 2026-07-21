@@ -60,6 +60,18 @@ jobs:
       - name: Lint French spacing
         run: node scripts/check-french-spacing.mjs
 
+      # Two controls live on one window at one moment must not share an Alt
+      # access key: WPF answers a duplicate by cycling focus between the matches
+      # instead of invoking either, so a clash silently retires BOTH, in one
+      # language, on the route only a keyboard or screen-reader user takes. An
+      # eye-verify pass runs in a single language and reads the English
+      # accelerator, so nothing but this sees it. Placed ahead of the
+      # still-english gate below for the same reason the designer check is:
+      # that gate is red by design during a translation window and would
+      # otherwise hide this one.
+      - name: Check access keys do not clash
+        run: node scripts/check-accelerators.mjs
+
       # The only mechanical check on XAML resource keys. A {StaticResource} whose
       # key nothing defines compiles clean and throws a XamlParseException when
       # the window is first opened, so neither the build nor the test run below

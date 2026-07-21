@@ -664,7 +664,7 @@ Chi tiết trong {1}.</value></data>
   <!-- Category-only, no path (elevated path-leak rule). Shown for a candidate
        that does not resolve inside C:\Windows\Installer, refused at the Move /
        Delete service boundary. Should never reach a user in practice. -->
-  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>Tệp này không nằm trong thư mục Windows Installer; bị từ chối vì lý do an toàn.</value></data>
+  <data name="Error.CandidateOutsideCache" xml:space="preserve"><value>Tệp này không nằm trực tiếp trong thư mục Windows Installer; bị từ chối vì lý do an toàn.</value></data>
   <!-- Category-only sentences for FileOperationError.LocalisedMessage.
        These intentionally do NOT include a path or framework message
        fragment: with the app running elevated, the per-file

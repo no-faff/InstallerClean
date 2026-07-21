@@ -248,7 +248,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | Không thể ghi vào {0}. Không thể ghi nhật ký sự cố. |
 | File no longer exists. | Tệp không còn tồn tại. |
 | Source file is a symlink or junction; refused for safety. | Tệp nguồn là một symlink hoặc junction; bị từ chối vì lý do an toàn. |
-| This file is not inside the Windows Installer folder; refused for safety. | Tệp này không nằm trong thư mục Windows Installer; bị từ chối vì lý do an toàn. |
+| This file is not directly inside the Windows Installer folder; refused for safety. | Tệp này không nằm trực tiếp trong thư mục Windows Installer; bị từ chối vì lý do an toàn. |
 | Windows refused access to this file; it was left in place. | Windows từ chối truy cập tệp này; tệp được giữ nguyên tại chỗ. |
 | Windows refused access to these files; they were left in place. | Windows từ chối truy cập các tệp này; các tệp được giữ nguyên tại chỗ. |
 | This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | Tệp này đang được mở hoặc bị khóa bởi một chương trình khác, nên hiện không gì có thể chuyển nó. Tệp được giữ nguyên tại chỗ; hãy thử lại sau. |

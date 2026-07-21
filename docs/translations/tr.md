@@ -248,7 +248,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | {0} konumuna yazılamıyor. Çökme günlüğü yazılamadı. |
 | File no longer exists. | Dosya artık yok. |
 | Source file is a symlink or junction; refused for safety. | Kaynak dosya bir sembolik bağlantı ya da bağlantı noktası (junction); güvenlik için reddedildi. |
-| This file is not inside the Windows Installer folder; refused for safety. | Bu dosya Windows Installer klasörünün içinde değil; güvenlik için reddedildi. |
+| This file is not directly inside the Windows Installer folder; refused for safety. | Bu dosya doğrudan Windows Installer klasörünün içinde değil; güvenlik için reddedildi. |
 | Windows refused access to this file; it was left in place. | Windows bu dosyaya erişimi reddetti; dosya yerinde bırakıldı. |
 | Windows refused access to these files; they were left in place. | Windows bu dosyalara erişimi reddetti; dosyalar yerinde bırakıldı. |
 | This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | Bu dosya başka bir program tarafından açık ya da kilitli, bu yüzden şu anda onu hiçbir şey taşıyamaz. Dosya yerinde bırakıldı; daha sonra yeniden deneyin. |

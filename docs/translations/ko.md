@@ -248,7 +248,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | {0}에 쓸 수 없습니다. 크래시 로그를 기록할 수 없었습니다. |
 | File no longer exists. | 파일이 더 이상 존재하지 않습니다. |
 | Source file is a symlink or junction; refused for safety. | 원본 파일이 심볼릭 링크 또는 정션입니다. 안전을 위해 거부했습니다. |
-| This file is not inside the Windows Installer folder; refused for safety. | 이 파일은 Windows Installer 폴더 안에 있지 않습니다. 안전을 위해 거부했습니다. |
+| This file is not directly inside the Windows Installer folder; refused for safety. | 이 파일은 Windows Installer 폴더 바로 아래에 있지 않습니다. 안전을 위해 거부했습니다. |
 | Windows refused access to this file; it was left in place. | Windows가 이 파일에 대한 접근을 거부했습니다. 파일은 그대로 두었습니다. |
 | Windows refused access to these files; they were left in place. | Windows가 이 파일들에 대한 접근을 거부했습니다. 파일은 그대로 두었습니다. |
 | This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | 이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다. 그래서 지금은 무엇으로도 이동할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도해 보세요. |

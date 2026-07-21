@@ -248,7 +248,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | Schreiben in {0} nicht möglich. Das Absturzprotokoll konnte nicht geschrieben werden. |
 | File no longer exists. | Die Datei existiert nicht mehr. |
 | Source file is a symlink or junction; refused for safety. | Die Quelldatei ist ein Symlink oder eine Junction; aus Sicherheitsgründen abgelehnt. |
-| This file is not inside the Windows Installer folder; refused for safety. | Diese Datei liegt nicht im Windows-Installer-Ordner; aus Sicherheitsgründen abgelehnt. |
+| This file is not directly inside the Windows Installer folder; refused for safety. | Diese Datei liegt nicht direkt im Windows-Installer-Ordner; aus Sicherheitsgründen abgelehnt. |
 | Windows refused access to this file; it was left in place. | Windows hat den Zugriff auf diese Datei verweigert; sie wurde an ihrem Platz belassen. |
 | Windows refused access to these files; they were left in place. | Windows hat den Zugriff auf diese Dateien verweigert; sie wurden an ihrem Platz belassen. |
 | This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | Diese Datei ist von einem anderen Programm geöffnet oder gesperrt, deshalb kann sie im Moment von nichts verschoben werden. Sie wurde an ihrem Platz belassen; versuch es später noch einmal. |

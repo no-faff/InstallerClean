@@ -248,7 +248,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cannot write to {0}. The crash log could not be written. | Não é possível gravar em {0}. Não foi possível gravar o crash.log. |
 | File no longer exists. | O arquivo não existe mais. |
 | Source file is a symlink or junction; refused for safety. | O arquivo de origem é um link simbólico ou junção; recusado por segurança. |
-| This file is not inside the Windows Installer folder; refused for safety. | Este arquivo não está dentro da pasta do Windows Installer; recusado por segurança. |
+| This file is not directly inside the Windows Installer folder; refused for safety. | Este arquivo não está diretamente dentro da pasta do Windows Installer; recusado por segurança. |
 | Windows refused access to this file; it was left in place. | O Windows negou o acesso a este arquivo; ele foi deixado onde estava. |
 | Windows refused access to these files; they were left in place. | O Windows negou o acesso a estes arquivos; eles foram deixados onde estavam. |
 | This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | Este arquivo está aberto ou bloqueado por outro programa, então nada consegue movê-lo agora. Ele foi deixado onde estava; tente de novo mais tarde. |
