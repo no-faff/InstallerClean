@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.1.0-blue" alt="Versão do GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-34k-brightgreen" alt="Total de downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-36k-brightgreen" alt="Total de downloads"></a>
 </p>
 
 ![Captura de tela do InstallerClean após uma limpeza bem-sucedida: 1,28 GB limpos, 69 arquivos movidos para a Lixeira](docs/screenshots/pt/07-success-done.webp)
@@ -163,7 +163,7 @@ Sim. O InstallerClean consulta o mesmo banco de dados da API do Windows Installe
 
 **Sobre Excluir e Mover.** Os arquivos que o InstallerClean exclui podem ser excluídos permanentemente sem risco. **Excluir** move os arquivos para a Lixeira (você será avisado se ela não estiver disponível); você recupera o espaço no seu disco C: quando esvazia a Lixeira.
 
-Ainda assim, você não precisa acreditar na minha palavra de que os arquivos podem ser excluídos sem risco. Enquanto eles estão na Lixeira, você tem a chance de verificar se os aplicativos que usam essa pasta, Office, Acrobat, Visual Studio e afins, continuam atualizando e desinstalando sem problemas. Se você encontrar algo quebrado (extremamente improvável, e até agora nada foi relatado depois de <!-- downloads-start -->34.000+<!-- downloads-end --> downloads), restaure os arquivos pela Lixeira para resolver. Para ter ainda mais segurança, você pode usar **Mover** em vez disso, para fazer um backup dos arquivos em uma pasta que você escolher (obviamente, escolha uma pasta em outra partição ou unidade se o que você quer é liberar espaço em C:). Basta copiar os arquivos de volta para `C:\Windows\Installer` para deixar tudo como estava (embora você quase certamente nunca vá precisar).
+Ainda assim, você não precisa acreditar na minha palavra de que os arquivos podem ser excluídos sem risco. Enquanto eles estão na Lixeira, você tem a chance de verificar se os aplicativos que usam essa pasta, Office, Acrobat, Visual Studio e afins, continuam atualizando e desinstalando sem problemas. Se você encontrar algo quebrado (extremamente improvável, e até agora nada foi relatado depois de <!-- downloads-start -->36.000+<!-- downloads-end --> downloads), restaure os arquivos pela Lixeira para resolver. Para ter ainda mais segurança, você pode usar **Mover** em vez disso, para fazer um backup dos arquivos em uma pasta que você escolher (obviamente, escolha uma pasta em outra partição ou unidade se o que você quer é liberar espaço em C:). Basta copiar os arquivos de volta para `C:\Windows\Installer` para deixar tudo como estava (embora você quase certamente nunca vá precisar).
 
 Se o Windows Installer estiver gravando no cache naquele momento, tiver uma transação anterior suspensa ou tiver um renomeamento pós-reinicialização na fila apontando para o cache, Mover e Excluir ficam desativados e o motivo específico é exibido.
 
@@ -174,7 +174,7 @@ Os serviços de análise, consulta, movimentação, exclusão, configurações e
 - Os hashes SHA-256 de cada versão estão listados na [página de versões](../../releases/latest).
 - VirusTotal: cada build é escaneado, com os resultados completos por mecanismo vinculados na página da versão, para que você possa ver como cada arquivo pontuou e escaneá-lo de novo você mesmo. Qualquer falso positivo é apontado e explicado nas notas da versão, nunca escondido.
 - O código-fonte está em [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), e a CI compila e testa cada commit (veja o selo verde de CI acima).
-- <!-- downloads-start -->34.000+<!-- downloads-end --> downloads entre o GitHub, o MajorGeeks e a Softpedia.
+- <!-- downloads-start -->36.000+<!-- downloads-end --> downloads entre o GitHub, o MajorGeeks e a Softpedia.
 - O [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testa cada envio em uma máquina virtual e só publica se passar na avaliação deles.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certificado 100% limpo pelo MajorGeeks" width="263"></a>
 - A [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testa cada versão em busca de vírus, spyware e adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificado 100% limpo pela Softpedia" width="190"></a>
 
@@ -237,7 +237,7 @@ Se algo aqui atrapalhar você, [abra uma issue](../../issues). Problemas de aces
 **Vou realmente liberar vários GB de espaço?** Depende da sua máquina. Uma instalação limpa do Windows 11 sem programas extras não tem nada para remover. Uma estação de trabalho de desenvolvimento usada há muito tempo, ou qualquer máquina com muito programa baseado em MSI (Acrobat, Office, LibreOffice, ferramentas de desenvolvimento grandes), pode ter dezenas de GB. De um jeito ou de outro, você vê exatamente quanto no momento em que executa.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-Entre os 136 relatórios que as pessoas tiveram a gentileza de enviar (obrigado 🙏) desde que a v1.8.0 adicionou a opção:
+Entre os 140 relatórios que as pessoas tiveram a gentileza de enviar (obrigado 🙏) desde que a v1.8.0 adicionou a opção:
 
 | Resultado | Proporção | Menor | Mediana | Maior |
 |---|---|---|---|---|
