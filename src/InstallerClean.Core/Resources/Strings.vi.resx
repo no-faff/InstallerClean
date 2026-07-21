@@ -150,6 +150,22 @@
   <data name="Action.SendResultLog" xml:space="preserve"><value>Gửi báo cáo</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Gửi</value></data>
 
+  <!-- About window: the two links and the auto-update switch. Kept out of
+       the Action.* block because none of the three is a button label; the
+       two links are in-sentence hyperlinks and the third is a checkbox. -->
+  <data name="About.Link.Guide" xml:space="preserve">
+    <value>Hướng dẫn và câu hỏi thường gặp</value>
+    <comment>About-window link to the README in the app's display language.</comment>
+  </data>
+  <data name="About.Link.ReportProblem" xml:space="preserve">
+    <value>Báo cáo vấn đề</value>
+    <comment>About-window link to the GitHub issue tracker.</comment>
+  </data>
+  <data name="About.AutoUpdateCheck" xml:space="preserve">
+    <value>Tự động kiểm tra cập nhật</value>
+    <comment>Checkbox label in the About window.</comment>
+  </data>
+
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Ủng hộ</value></data>
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Mời tôi một ly cà phê (cửa sổ Giới thiệu)</value></data>
@@ -159,7 +175,6 @@
   <data name="Automation.Close" xml:space="preserve"><value>Đóng</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Đóng cửa sổ</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Đóng kết quả và quay lại cửa sổ chính</value></data>
-  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Gắn sao trên GitHub</value></data>
   <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Gắn sao trên GitHub (cửa sổ Giới thiệu)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Thu nhỏ</value></data>
   <!-- Names the destination the way the Move button's own tooltip does
@@ -182,6 +197,18 @@
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Kiểm tra cập nhật</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Kiểm tra API phát hành của GitHub qua HTTPS để tìm phiên bản mới hơn.</value></data>
+  <data name="Automation.About.Guide.HelpText" xml:space="preserve">
+    <value>Mở hướng dẫn (README) trên github.com trong trình duyệt của bạn.</value>
+    <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
+  </data>
+  <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
+    <value>Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn.</value>
+    <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
+  </data>
+  <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
+    <value>Khi được đánh dấu, mỗi lần bạn chạy InstallerClean, ứng dụng sẽ kiểm tra GitHub xem có phiên bản mới hơn không.</value>
+    <comment>Screen-reader help on the About window's auto-update checkbox.</comment>
+  </data>
   <!-- Window-level description for the update-available modal, read by a
        screen reader on open, mirroring the RecycleUnavailable and
        ConfirmSendResultLog windows. The version numbers are in the body
@@ -240,12 +267,10 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Giải thích thư mục này, và cách khôi phục một tệp, trong README</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Ủng hộ</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Làm việc này khát nước lắm!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Đã yêu cầu hủy. InstallerClean đang chờ bước hiện tại tới điểm dừng. Việc này có thể mất vài giây khi I/O nặng hoặc khi đang gọi cơ sở dữ liệu MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Đóng</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Gắn sao trên GitHub, báo một Issue hoặc đăng trong Discussions. Mọi phản hồi đều được hoan nghênh.</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>hoặc báo một Issue hay đăng trong Discussions. Mọi phản hồi đều được hoan nghênh.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>Một ngôi sao trên GitHub giúp người khác tìm thấy InstallerClean.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Thu nhỏ</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không và mọi người đang giải phóng được bao nhiêu dung lượng. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.</value></data>
@@ -474,6 +499,10 @@
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác.</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Không sao, những tệp đó đều an toàn để loại bỏ. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó.</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Không sao, những tệp đó đều an toàn để loại bỏ. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó.</value></data>
+  <data name="Completion.DonateAsk" xml:space="preserve">
+    <value>Nếu điều này khiến bạn vui, ủng hộ một chút được không?</value>
+    <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words.</comment>
+  </data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
        the files' volume: Move (the safe default), delete permanently with
        consent, or cancel. Wording states only the confirmed fact (the probe
@@ -702,6 +731,10 @@ Chi tiết trong {1}.</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Kiểm tra cập nhật</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Đang kiểm tra...</value></data>
   <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>Đã cập nhật.</value></data>
+  <data name="UpdateCheck.Status.UpdateAvailable" xml:space="preserve">
+    <value>Phiên bản {0} đã có.</value>
+    <comment>Status line and hyperlink on the main window once a check finds a newer version. {0} = the newer version number. Clicking opens that release's page.</comment>
+  </data>
   <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Có bản cập nhật</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Bạn đang dùng phiên bản {0}.&#10;Phiên bản {1} đã có.</value></data>

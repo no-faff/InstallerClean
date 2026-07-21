@@ -55,6 +55,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send report | Wyślij raport |
 | _Send | _Wyślij |
 
+## About window
+
+| English | Polski |
+| --- | --- |
+| Guide and FAQ | Przewodnik i FAQ |
+| Report a problem | Zgłoś problem |
+| Check for updates automatically | Automatycznie sprawdzaj aktualizacje |
+
 ## Field labels
 
 | English | Polski |
@@ -168,6 +176,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | Usunięto trwale {0} {1}. Nie trafiło do Kosza. |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | W porządku, można go było bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | W porządku, można je było bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje. |
+| If this made you happy, how about a small donation? | Jeśli sprawiło ci to radość, może mała dotacja? |
 
 ## Recycle Bin unavailable
 
@@ -265,6 +274,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Sprawdź aktualizacje |
 | Checking... | Sprawdzanie... |
 | Up to date. | Wszystko aktualne. |
+| Version {0} is available. | Dostępna jest wersja {0}. |
 | Update available | Dostępna aktualizacja |
 | You're running version {0}.<br>Version {1} is available. | Masz zainstalowaną wersję {0}.<br>Dostępna jest wersja {1}. |
 | Couldn't reach GitHub. Check your internet connection and try again. | Nie udało się połączyć z GitHub. Sprawdź połączenie internetowe i spróbuj ponownie. |
@@ -310,12 +320,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Polski |
 | --- | --- |
-| Donate | Wesprzyj |
 | It's thirsty work! | Aż zaschło w gardle! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Zażądano anulowania. InstallerClean czeka, aż bieżący krok dojdzie do punktu, w którym może się zatrzymać. Przy intensywnych operacjach wejścia/wyjścia lub zapytaniu do bazy danych MSI może to potrwać kilka sekund. |
 | Close | Zamknij |
-| Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Zostaw gwiazdkę na GitHubie, zgłoś problem (Issue) lub napisz w Dyskusjach (Discussions). Każda opinia mile widziana. |
-| or report an Issue or post in Discussions. Any feedback welcome. | lub zgłoś problem (Issue), albo napisz w Dyskusjach (Discussions). Każda opinia mile widziana. |
+| A GitHub star helps other people find it. | Gwiazdka na GitHubie pomaga innym znaleźć InstallerClean. |
 | Minimise | Minimalizuj |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Twoja decyzja, ale będzie miło. Wysyła anonimowe podsumowanie, które po prostu daje mi znać, czy działa i ile miejsca ludzie zwalniają. Na następnym ekranie zobaczysz, co zostanie wysłane, zanim potwierdzisz. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Twoja decyzja, ale będzie miło. Wysyła anonimowe podsumowanie, które po prostu daje mi znać, czy działa. Na następnym ekranie zobaczysz, co zostanie wysłane, zanim potwierdzisz. |
@@ -337,7 +345,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close | Zamknij |
 | Close window | Zamknij okno |
 | Close result and return to main window | Zamknij wynik i wróć do okna głównego |
-| Leave a star on GitHub | Zostaw gwiazdkę na GitHubie |
 | Leave a star on GitHub (About window) | Zostaw gwiazdkę na GitHubie (okno O programie) |
 | Minimise | Minimalizuj |
 | Move all unneeded installer files to the Move location | Przenieś wszystkie niepotrzebne pliki instalatora do lokalizacji przenoszenia |
@@ -352,6 +359,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send posts the report shown to No Faff. Cancel sends nothing. | Wyślij przekazuje pokazany raport do No Faff. Anuluj nie wysyła niczego. |
 | Check for updates | Sprawdź aktualizacje |
 | Checks the GitHub releases API over HTTPS for a newer version. | Sprawdza w API wydań GitHub przez HTTPS, czy jest nowsza wersja. |
+| Opens the guide (README) on github.com in your browser. | Otwiera przewodnik (README) na github.com w twojej przeglądarce. |
+| Opens the issue tracker on github.com in your browser. | Otwiera listę zgłoszeń (Issues) na github.com w twojej przeglądarce. |
+| When ticked, InstallerClean checks GitHub for a newer version when you run it. | Gdy zaznaczone, InstallerClean sprawdza na GitHubie przy każdym uruchomieniu, czy jest nowsza wersja. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Otwórz stronę wydania, aby pobrać nowszą wersję, lub anuluj, aby zachować bieżącą. |
 | Apache 2.0 licence | Licencja Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Otwiera plik licencji na github.com w twojej przeglądarce. |

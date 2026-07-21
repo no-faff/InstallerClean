@@ -81,6 +81,7 @@ const GROUPS = [
   ['Window titles',                    ['Window.']],
   ['Section headings',                 ['Section.']],
   ['Buttons and actions',              ['Action.']],
+  ['About window',                     ['About.']],
   ['Field labels',                     ['Field.']],
   ['Status and progress',              ['Status.']],
   ['Main screen text',                 ['Body.']],

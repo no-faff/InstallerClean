@@ -55,6 +55,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send report | Kirim laporan |
 | _Send | _Kirim |
 
+## About window
+
+| English | Bahasa Indonesia |
+| --- | --- |
+| Guide and FAQ | Panduan dan FAQ |
+| Report a problem | Laporkan masalah |
+| Check for updates automatically | Periksa pembaruan secara otomatis |
+
 ## Field labels
 
 | English | Bahasa Indonesia |
@@ -168,6 +176,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah. |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Tidak masalah, file itu memang aman dihapus. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Tidak masalah, file itu memang aman dihapus. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya. |
+| If this made you happy, how about a small donation? | Kalau ini membuat Anda senang, bagaimana kalau donasi kecil? |
 
 ## Recycle Bin unavailable
 
@@ -265,6 +274,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Periksa pembaruan |
 | Checking... | Memeriksa... |
 | Up to date. | Sudah versi terbaru. |
+| Version {0} is available. | Versi {0} tersedia. |
 | Update available | Pembaruan tersedia |
 | You're running version {0}.<br>Version {1} is available. | Anda menjalankan versi {0}.<br>Versi {1} tersedia. |
 | Couldn't reach GitHub. Check your internet connection and try again. | Tidak bisa menjangkau GitHub. Periksa koneksi internet Anda dan coba lagi. |
@@ -310,12 +320,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Bahasa Indonesia |
 | --- | --- |
-| Donate | Donasi |
 | It's thirsty work! | Membuat haus! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Pembatalan diminta. InstallerClean sedang menunggu langkah yang berjalan mencapai titik berhenti. Ini bisa memakan waktu beberapa detik saat I/O berat atau panggilan basis data MSI. |
 | Close | Tutup |
-| Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Beri bintang di GitHub, laporkan Issue, atau tulis di Discussions. Masukan apa pun diterima. |
-| or report an Issue or post in Discussions. Any feedback welcome. | atau laporkan Issue, atau tulis di Discussions. Masukan apa pun diterima. |
+| A GitHub star helps other people find it. | Bintang di GitHub membantu orang lain menemukan InstallerClean. |
 | Minimise | Kecilkan |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi dan berapa banyak ruang yang dikosongkan orang-orang. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi. |
@@ -337,7 +345,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close | Tutup |
 | Close window | Tutup jendela |
 | Close result and return to main window | Tutup hasil dan kembali ke jendela utama |
-| Leave a star on GitHub | Beri bintang di GitHub |
 | Leave a star on GitHub (About window) | Beri bintang di GitHub (jendela Tentang) |
 | Minimise | Kecilkan |
 | Move all unneeded installer files to the Move location | Pindahkan semua file penginstal yang tidak diperlukan ke lokasi pemindahan |
@@ -352,6 +359,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send posts the report shown to No Faff. Cancel sends nothing. | Kirim mengirimkan laporan yang ditampilkan ke No Faff. Batal tidak mengirim apa pun. |
 | Check for updates | Periksa pembaruan |
 | Checks the GitHub releases API over HTTPS for a newer version. | Memeriksa API rilis GitHub melalui HTTPS untuk versi yang lebih baru. |
+| Opens the guide (README) on github.com in your browser. | Membuka panduan (README) di github.com melalui peramban Anda. |
+| Opens the issue tracker on github.com in your browser. | Membuka pelacak masalah (Issues) di github.com melalui peramban Anda. |
+| When ticked, InstallerClean checks GitHub for a newer version when you run it. | Jika dicentang, InstallerClean memeriksa GitHub untuk versi yang lebih baru setiap kali Anda menjalankannya. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini. |
 | Apache 2.0 licence | Lisensi Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Membuka file lisensi di github.com melalui peramban Anda. |

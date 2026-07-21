@@ -55,6 +55,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send report | レポートを送信 |
 | _Send | 送信(_S) |
 
+## About window
+
+| English | 日本語 |
+| --- | --- |
+| Guide and FAQ | ガイドとよくある質問 |
+| Report a problem | 問題を報告 |
+| Check for updates automatically | 更新を自動的に確認する |
+
 ## Field labels
 
 | English | 日本語 |
@@ -168,6 +176,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} 個の {1} を完全に削除しました。ごみ箱には送られていません。 |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 問題ありません。削除しても安全でした。InstallerCleanはWindowsが不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただしMicrosoftは保証していません)。 |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 問題ありません。削除しても安全でした。InstallerClean は Windows が不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただし Microsoft は保証していません)。 |
+| If this made you happy, how about a small donation? | 気に入っていただけたら、少額の寄付はいかがですか？ |
 
 ## Recycle Bin unavailable
 
@@ -265,6 +274,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 更新の確認 |
 | Checking... | 確認中... |
 | Up to date. | 最新です。 |
+| Version {0} is available. | バージョン {0} が利用可能です。 |
 | Update available | 更新があります |
 | You're running version {0}.<br>Version {1} is available. | バージョン {0} を実行しています。<br>バージョン {1} が利用可能です。 |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub に到達できませんでした。インターネット接続を確認して再試行してください。 |
@@ -310,12 +320,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 日本語 |
 | --- | --- |
-| Donate | 寄付 |
 | It's thirsty work! | 喉が渇く仕事です！ |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | キャンセルが要求されました。InstallerClean は現在のステップが停止可能なポイントに達するのを待っています。大量の I/O または MSI データベース呼び出し中は数秒かかることがあります。 |
 | Close | 閉じる |
-| Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | GitHub でスターを付けたり、問題を報告したり、ディスカッションに投稿したりしてください。あらゆるフィードバックを歓迎します。 |
-| or report an Issue or post in Discussions. Any feedback welcome. | または問題を報告するか、ディスカッションに投稿してください。あらゆるフィードバックを歓迎します。 |
+| A GitHub star helps other people find it. | GitHub でスターを付けると、InstallerClean を見つけてもらいやすくなります。 |
 | Minimise | 最小化 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているか、どれだけの容量が解放されているかを知るためのものです。次の画面で送信前に送信内容を確認できます。 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているかを知るためのものです。次の画面で送信前に送信内容を確認できます。 |
@@ -337,7 +345,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close | 閉じる |
 | Close window | ウィンドウを閉じる |
 | Close result and return to main window | 結果を閉じてメインウィンドウに戻る |
-| Leave a star on GitHub | GitHub でスターを付ける |
 | Leave a star on GitHub (About window) | GitHub でスターを付ける (バージョン情報ウィンドウ) |
 | Minimise | 最小化 |
 | Move all unneeded installer files to the Move location | 不要なインストーラーファイルをすべて移動先に移動 |
@@ -352,6 +359,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send posts the report shown to No Faff. Cancel sends nothing. | 送信を実行すると表示されたレポートが No Faff に投稿されます。キャンセルは何も送信しません。 |
 | Check for updates | 更新の確認 |
 | Checks the GitHub releases API over HTTPS for a newer version. | HTTPS 経由で GitHub リリース API をチェックし、新しいバージョンがないか確認します。 |
+| Opens the guide (README) on github.com in your browser. | ブラウザで github.com のガイド (README) を開きます。 |
+| Opens the issue tracker on github.com in your browser. | ブラウザで github.com の Issue トラッカーを開きます。 |
+| When ticked, InstallerClean checks GitHub for a newer version when you run it. | チェックを入れると、InstallerClean は起動のたびに GitHub で新しいバージョンを確認します。 |
 | Open the release page to download the newer version, or cancel to keep the current version. | リリースページを開いて新しいバージョンをダウンロードするか、キャンセルして現在のバージョンを維持します。 |
 | Apache 2.0 licence | Apache 2.0 ライセンス |
 | Opens the licence file on github.com in your browser. | ブラウザで github.com のライセンスファイルを開きます。 |

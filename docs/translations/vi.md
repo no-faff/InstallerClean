@@ -55,6 +55,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send report | Gửi báo cáo |
 | _Send | _Gửi |
 
+## About window
+
+| English | Tiếng Việt |
+| --- | --- |
+| Guide and FAQ | Hướng dẫn và câu hỏi thường gặp |
+| Report a problem | Báo cáo vấn đề |
+| Check for updates automatically | Tự động kiểm tra cập nhật |
+
 ## Field labels
 
 | English | Tiếng Việt |
@@ -168,6 +176,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác. |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Không sao, những tệp đó đều an toàn để loại bỏ. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Không sao, những tệp đó đều an toàn để loại bỏ. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó. |
+| If this made you happy, how about a small donation? | Nếu điều này khiến bạn vui, ủng hộ một chút được không? |
 
 ## Recycle Bin unavailable
 
@@ -265,6 +274,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Kiểm tra cập nhật |
 | Checking... | Đang kiểm tra... |
 | Up to date. | Đã cập nhật. |
+| Version {0} is available. | Phiên bản {0} đã có. |
 | Update available | Có bản cập nhật |
 | You're running version {0}.<br>Version {1} is available. | Bạn đang dùng phiên bản {0}.<br>Phiên bản {1} đã có. |
 | Couldn't reach GitHub. Check your internet connection and try again. | Không thể kết nối tới GitHub. Hãy kiểm tra kết nối internet và thử lại. |
@@ -310,12 +320,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Tiếng Việt |
 | --- | --- |
-| Donate | Ủng hộ |
 | It's thirsty work! | Làm việc này khát nước lắm! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Đã yêu cầu hủy. InstallerClean đang chờ bước hiện tại tới điểm dừng. Việc này có thể mất vài giây khi I/O nặng hoặc khi đang gọi cơ sở dữ liệu MSI. |
 | Close | Đóng |
-| Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Gắn sao trên GitHub, báo một Issue hoặc đăng trong Discussions. Mọi phản hồi đều được hoan nghênh. |
-| or report an Issue or post in Discussions. Any feedback welcome. | hoặc báo một Issue hay đăng trong Discussions. Mọi phản hồi đều được hoan nghênh. |
+| A GitHub star helps other people find it. | Một ngôi sao trên GitHub giúp người khác tìm thấy InstallerClean. |
 | Minimise | Thu nhỏ |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không và mọi người đang giải phóng được bao nhiêu dung lượng. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận. |
@@ -337,7 +345,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close | Đóng |
 | Close window | Đóng cửa sổ |
 | Close result and return to main window | Đóng kết quả và quay lại cửa sổ chính |
-| Leave a star on GitHub | Gắn sao trên GitHub |
 | Leave a star on GitHub (About window) | Gắn sao trên GitHub (cửa sổ Giới thiệu) |
 | Minimise | Thu nhỏ |
 | Move all unneeded installer files to the Move location | Chuyển tất cả các tệp cài đặt không cần thiết tới Nơi chuyển đến |
@@ -352,6 +359,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send posts the report shown to No Faff. Cancel sends nothing. | Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì. |
 | Check for updates | Kiểm tra cập nhật |
 | Checks the GitHub releases API over HTTPS for a newer version. | Kiểm tra API phát hành của GitHub qua HTTPS để tìm phiên bản mới hơn. |
+| Opens the guide (README) on github.com in your browser. | Mở hướng dẫn (README) trên github.com trong trình duyệt của bạn. |
+| Opens the issue tracker on github.com in your browser. | Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn. |
+| When ticked, InstallerClean checks GitHub for a newer version when you run it. | Khi được đánh dấu, mỗi lần bạn chạy InstallerClean, ứng dụng sẽ kiểm tra GitHub xem có phiên bản mới hơn không. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Mở trang phát hành để tải phiên bản mới hơn, hoặc hủy để giữ phiên bản hiện tại. |
 | Apache 2.0 licence | Giấy phép Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Mở tệp giấy phép trên github.com trong trình duyệt của bạn. |

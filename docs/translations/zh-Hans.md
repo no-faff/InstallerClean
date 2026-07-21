@@ -55,6 +55,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send report | 发送报告 |
 | _Send | 发送(_S) |
 
+## About window
+
+| English | 简体中文 |
+| --- | --- |
+| Guide and FAQ | 指南和常见问题 |
+| Report a problem | 报告问题 |
+| Check for updates automatically | 自动检查更新 |
+
 ## Field labels
 
 | English | 简体中文 |
@@ -168,6 +176,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | 已永久删除 {0} 个{1}。它们没有进入回收站。 |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 没关系，它本来就可以安全删除。InstallerClean 只清除 Windows 报告为不再需要的文件，绝不会删除程序仍然需要的文件。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。 |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 没关系，它们本来就可以安全删除。InstallerClean 只清除 Windows 报告为不再需要的文件，绝不会删除程序仍然需要的文件。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。 |
+| If this made you happy, how about a small donation? | 如果这让您开心，要不要来个小额捐赠？ |
 
 ## Recycle Bin unavailable
 
@@ -265,6 +274,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 检查更新 |
 | Checking... | 正在检查… |
 | Up to date. | 已是最新版本。 |
+| Version {0} is available. | {0} 版现已推出。 |
 | Update available | 有可用更新 |
 | You're running version {0}.<br>Version {1} is available. | 您正在运行 {0} 版。<br>{1} 版现已推出。 |
 | Couldn't reach GitHub. Check your internet connection and try again. | 无法连接到 GitHub。请检查您的网络连接后重试。 |
@@ -310,12 +320,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 简体中文 |
 | --- | --- |
-| Donate | 捐赠 |
 | It's thirsty work! | 该来杯茶了！ |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | 已请求取消。InstallerClean 正在等待当前步骤到达一个可以停下来的位置。在大量 I/O 操作或 MSI 数据库调用期间，这可能需要几秒钟。 |
 | Close | 关闭 |
-| Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | 在 GitHub 上点个星、提交 Issue 或在 Discussions 中发帖。欢迎任何反馈。 |
-| or report an Issue or post in Discussions. Any feedback welcome. | 或提交 Issue，或在 Discussions 中发帖。欢迎任何反馈。 |
+| A GitHub star helps other people find it. | 在 GitHub 上点星有助于更多人发现 InstallerClean。 |
 | Minimise | 最小化 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。 |
@@ -337,7 +345,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close | 关闭 |
 | Close window | 关闭窗口 |
 | Close result and return to main window | 关闭结果并返回主窗口 |
-| Leave a star on GitHub | 在 GitHub 上点个星 |
 | Leave a star on GitHub (About window) | 在 GitHub 上点个星（关于窗口） |
 | Minimise | 最小化 |
 | Move all unneeded installer files to the Move location | 将所有不需要的安装程序文件移动到移动位置 |
@@ -352,6 +359,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send posts the report shown to No Faff. Cancel sends nothing. | 发送会将所示报告提交给 No Faff。取消则不发送任何内容。 |
 | Check for updates | 检查更新 |
 | Checks the GitHub releases API over HTTPS for a newer version. | 通过 HTTPS 查询 GitHub 发布 API，检查是否有更新版本。 |
+| Opens the guide (README) on github.com in your browser. | 在浏览器中打开 github.com 上的指南（README）。 |
+| Opens the issue tracker on github.com in your browser. | 在浏览器中打开 github.com 上的问题追踪页面（Issues）。 |
+| When ticked, InstallerClean checks GitHub for a newer version when you run it. | 勾选后，InstallerClean 每次运行时都会在 GitHub 上检查是否有更新版本。 |
 | Open the release page to download the newer version, or cancel to keep the current version. | 打开发布页面以下载更新版本，或取消以保留当前版本。 |
 | Apache 2.0 licence | Apache 2.0 许可证 |
 | Opens the licence file on github.com in your browser. | 在浏览器中打开 github.com 上的许可证文件。 |

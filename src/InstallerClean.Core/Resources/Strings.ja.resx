@@ -150,6 +150,22 @@
   <data name="Action.SendResultLog" xml:space="preserve"><value>レポートを送信</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>送信(_S)</value></data>
 
+  <!-- About window: the two links and the auto-update switch. Kept out of
+       the Action.* block because none of the three is a button label; the
+       two links are in-sentence hyperlinks and the third is a checkbox. -->
+  <data name="About.Link.Guide" xml:space="preserve">
+    <value>ガイドとよくある質問</value>
+    <comment>About-window link to the README in the app's display language.</comment>
+  </data>
+  <data name="About.Link.ReportProblem" xml:space="preserve">
+    <value>問題を報告</value>
+    <comment>About-window link to the GitHub issue tracker.</comment>
+  </data>
+  <data name="About.AutoUpdateCheck" xml:space="preserve">
+    <value>更新を自動的に確認する</value>
+    <comment>Checkbox label in the About window.</comment>
+  </data>
+
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>寄付</value></data>
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>一杯おごる (バージョン情報ウィンドウ)</value></data>
@@ -159,7 +175,6 @@
   <data name="Automation.Close" xml:space="preserve"><value>閉じる</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>ウィンドウを閉じる</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>結果を閉じてメインウィンドウに戻る</value></data>
-  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>GitHub でスターを付ける</value></data>
   <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>GitHub でスターを付ける (バージョン情報ウィンドウ)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>最小化</value></data>
   <!-- Names the destination the way the Move button's own tooltip does
@@ -182,6 +197,18 @@
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>送信を実行すると表示されたレポートが No Faff に投稿されます。キャンセルは何も送信しません。</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>更新の確認</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>HTTPS 経由で GitHub リリース API をチェックし、新しいバージョンがないか確認します。</value></data>
+  <data name="Automation.About.Guide.HelpText" xml:space="preserve">
+    <value>ブラウザで github.com のガイド (README) を開きます。</value>
+    <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
+  </data>
+  <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
+    <value>ブラウザで github.com の Issue トラッカーを開きます。</value>
+    <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
+  </data>
+  <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
+    <value>チェックを入れると、InstallerClean は起動のたびに GitHub で新しいバージョンを確認します。</value>
+    <comment>Screen-reader help on the About window's auto-update checkbox.</comment>
+  </data>
   <!-- Window-level description for the update-available modal, read by a
        screen reader on open, mirroring the RecycleUnavailable and
        ConfirmSendResultLog windows. The version numbers are in the body
@@ -240,12 +267,10 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>このフォルダーとファイルの回復方法を README で説明しています</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>寄付</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>喉が渇く仕事です！</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>キャンセルが要求されました。InstallerClean は現在のステップが停止可能なポイントに達するのを待っています。大量の I/O または MSI データベース呼び出し中は数秒かかることがあります。</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>閉じる</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>GitHub でスターを付けたり、問題を報告したり、ディスカッションに投稿したりしてください。あらゆるフィードバックを歓迎します。</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>または問題を報告するか、ディスカッションに投稿してください。あらゆるフィードバックを歓迎します。</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>GitHub でスターを付けると、InstallerClean を見つけてもらいやすくなります。</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>最小化</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているか、どれだけの容量が解放されているかを知るためのものです。次の画面で送信前に送信内容を確認できます。</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているかを知るためのものです。次の画面で送信前に送信内容を確認できます。</value></data>
@@ -474,6 +499,10 @@
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} 個の {1} を完全に削除しました。ごみ箱には送られていません。</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>問題ありません。削除しても安全でした。InstallerCleanはWindowsが不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただしMicrosoftは保証していません)。</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>問題ありません。削除しても安全でした。InstallerClean は Windows が不要と報告したファイルのみを削除し、プログラムがまだ必要とするファイルを削除することは決してありません。万が一、削除によってプログラムが修復、更新、またはアンインストールできなくなった場合でも、メーカーから再インストールすることで通常はファイルが復元されます (ただし Microsoft は保証していません)。</value></data>
+  <data name="Completion.DonateAsk" xml:space="preserve">
+    <value>気に入っていただけたら、少額の寄付はいかがですか？</value>
+    <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words.</comment>
+  </data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
        the files' volume: Move (the safe default), delete permanently with
        consent, or cancel. Wording states only the confirmed fact (the probe
@@ -702,6 +731,10 @@ InstallerClean はすでに管理者として実行されていたため、同�
   <data name="UpdateCheck.Title" xml:space="preserve"><value>更新の確認</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>確認中...</value></data>
   <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>最新です。</value></data>
+  <data name="UpdateCheck.Status.UpdateAvailable" xml:space="preserve">
+    <value>バージョン {0} が利用可能です。</value>
+    <comment>Status line and hyperlink on the main window once a check finds a newer version. {0} = the newer version number. Clicking opens that release's page.</comment>
+  </data>
   <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>更新があります</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>バージョン {0} を実行しています。&#10;バージョン {1} が利用可能です。</value></data>

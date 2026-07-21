@@ -150,6 +150,22 @@
   <data name="Action.SendResultLog" xml:space="preserve"><value>Надіслати звіт</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Надіслати</value></data>
 
+  <!-- About window: the two links and the auto-update switch. Kept out of
+       the Action.* block because none of the three is a button label; the
+       two links are in-sentence hyperlinks and the third is a checkbox. -->
+  <data name="About.Link.Guide" xml:space="preserve">
+    <value>Посібник і поширені запитання</value>
+    <comment>About-window link to the README in the app's display language.</comment>
+  </data>
+  <data name="About.Link.ReportProblem" xml:space="preserve">
+    <value>Повідомити про проблему</value>
+    <comment>About-window link to the GitHub issue tracker.</comment>
+  </data>
+  <data name="About.AutoUpdateCheck" xml:space="preserve">
+    <value>Автоматично перевіряти оновлення</value>
+    <comment>Checkbox label in the About window.</comment>
+  </data>
+
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Підтримати</value></data>
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Пригостіть мене кавою (вікно «Про програму»)</value></data>
@@ -159,7 +175,6 @@
   <data name="Automation.Close" xml:space="preserve"><value>Закрити</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Закрити вікно</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Закрити результат і повернутися до головного вікна</value></data>
-  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Лишити зірку на GitHub</value></data>
   <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Лишити зірку на GitHub (вікно «Про програму»)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Згорнути</value></data>
   <!-- Names the destination the way the Move button's own tooltip does
@@ -182,6 +197,18 @@
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>«Надіслати» надсилає показаний звіт до No Faff. «Скасувати» не надсилає нічого.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Перевірити оновлення</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Перевіряє API випусків GitHub через HTTPS на наявність новішої версії.</value></data>
+  <data name="Automation.About.Guide.HelpText" xml:space="preserve">
+    <value>Відкриває посібник (README) на github.com у вашому браузері.</value>
+    <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
+  </data>
+  <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
+    <value>Відкриває список проблем (Issues) на github.com у вашому браузері.</value>
+    <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
+  </data>
+  <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
+    <value>Якщо позначено, InstallerClean під час кожного запуску перевіряє на GitHub наявність новішої версії.</value>
+    <comment>Screen-reader help on the About window's auto-update checkbox.</comment>
+  </data>
   <!-- Window-level description for the update-available modal, read by a
        screen reader on open, mirroring the RecycleUnavailable and
        ConfirmSendResultLog windows. The version numbers are in the body
@@ -240,12 +267,10 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Пояснює цю папку і як відновити файл, у README</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Підтримати</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Робота не з легких, аж у горлі пересохло!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Скасування запитано. InstallerClean чекає, доки поточний крок дійде до точки зупинки. Це може тривати кілька секунд під час інтенсивного вводу-виводу чи звернення до бази даних MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Закрити</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Лишіть зірку на GitHub, повідомте про проблему (Issue) чи напишіть в обговореннях (Discussions). Будь-який відгук вітається.</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>або повідомте про проблему (Issue) чи напишіть в обговореннях (Discussions). Будь-який відгук вітається.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>Зірка на GitHub допомагає іншим знайти InstallerClean.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Згорнути</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма і скільки місця люди звільняють. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити.</value></data>
@@ -474,6 +499,10 @@
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} безповоротно видалено. Вони не потрапили до Кошика.</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Це нормально, його можна було безпечно прибрати. InstallerClean прибирає лише ті файли, які Windows позначає як завершені, ніколи той, що ще потрібен програмі. У малоймовірному разі, якщо видалення колись лишило програму нездатною відновитися, оновитися чи видалитися, перевстановлення її від виробника зазвичай повертає файл, хоча Microsoft цього не гарантує.</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Це нормально, їх можна було безпечно прибрати. InstallerClean прибирає лише ті файли, які Windows позначає як завершені, ніколи той, що ще потрібен програмі. У малоймовірному разі, якщо видалення колись лишило програму нездатною відновитися, оновитися чи видалитися, перевстановлення її від виробника зазвичай повертає файл, хоча Microsoft цього не гарантує.</value></data>
+  <data name="Completion.DonateAsk" xml:space="preserve">
+    <value>Якщо це вас потішило, як щодо невеликої пожертви?</value>
+    <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words.</comment>
+  </data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
        the files' volume: Move (the safe default), delete permanently with
        consent, or cancel. Wording states only the confirmed fact (the probe
@@ -702,6 +731,10 @@ InstallerClean уже працював від імені адміністрат�
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Перевірити оновлення</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Перевірка...</value></data>
   <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>Актуальна версія.</value></data>
+  <data name="UpdateCheck.Status.UpdateAvailable" xml:space="preserve">
+    <value>Доступна версія {0}.</value>
+    <comment>Status line and hyperlink on the main window once a check finds a newer version. {0} = the newer version number. Clicking opens that release's page.</comment>
+  </data>
   <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Доступне оновлення</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Ви використовуєте версію {0}.&#10;Доступна версія {1}.</value></data>

@@ -55,6 +55,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send report | Отправить отчёт |
 | _Send | От_править |
 
+## About window
+
+| English | Русский |
+| --- | --- |
+| Guide and FAQ | Руководство и частые вопросы |
+| Report a problem | Сообщить о проблеме |
+| Check for updates automatically | Автоматически проверять обновления |
+
 ## Field labels
 
 | English | Русский |
@@ -168,6 +176,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} удалено безвозвратно. Они не попали в Корзину. |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Это нормально, его можно было безопасно удалить. InstallerClean очищает только те файлы, которые Windows объявляет отработавшими, и никогда тот, что ещё нужен программе. В маловероятном случае, если удаление когда-нибудь лишит программу возможности восстановления, обновления или удаления, переустановка её у разработчика обычно возвращает файл, хотя Microsoft этого не гарантирует. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Это нормально, их можно было безопасно удалить. InstallerClean очищает только те файлы, которые Windows объявляет отработавшими, и никогда тот, что ещё нужен программе. В маловероятном случае, если удаление когда-нибудь лишит программу возможности восстановления, обновления или удаления, переустановка её у разработчика обычно возвращает файл, хотя Microsoft этого не гарантирует. |
+| If this made you happy, how about a small donation? | Если это вас порадовало, как насчёт небольшого пожертвования? |
 
 ## Recycle Bin unavailable
 
@@ -265,6 +274,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Проверка обновлений |
 | Checking... | Проверка... |
 | Up to date. | Установлена последняя версия. |
+| Version {0} is available. | Доступна версия {0}. |
 | Update available | Доступно обновление |
 | You're running version {0}.<br>Version {1} is available. | У вас установлена версия {0}.<br>Доступна версия {1}. |
 | Couldn't reach GitHub. Check your internet connection and try again. | Не удалось подключиться к GitHub. Проверьте подключение к интернету и повторите попытку. |
@@ -310,12 +320,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Русский |
 | --- | --- |
-| Donate | Поддержать |
 | It's thirsty work! | В горле пересохло! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Запрошена отмена. InstallerClean ждёт, когда текущий шаг дойдёт до точки остановки. Это может занять несколько секунд при интенсивном вводе-выводе или обращении к базе данных MSI. |
 | Close | Закрыть |
-| Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Поставьте звезду на GitHub, сообщите о проблеме (Issue) или напишите в обсуждениях (Discussions). Любые отзывы приветствуются. |
-| or report an Issue or post in Discussions. Any feedback welcome. | или сообщите о проблеме (Issue), или напишите в обсуждениях (Discussions). Любые отзывы приветствуются. |
+| A GitHub star helps other people find it. | Звезда на GitHub помогает другим найти InstallerClean. |
 | Minimise | Свернуть |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение и сколько места люди освобождают. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | На ваше усмотрение, но будет приятно. Отправляет анонимную сводку, которая просто даёт мне знать, работает ли приложение. На следующем экране вы увидите, что именно будет отправлено, прежде чем подтвердить. |
@@ -337,7 +345,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close | Закрыть |
 | Close window | Закрыть окно |
 | Close result and return to main window | Закрыть результат и вернуться в главное окно |
-| Leave a star on GitHub | Поставить звезду на GitHub |
 | Leave a star on GitHub (About window) | Поставить звезду на GitHub (окно «О программе») |
 | Minimise | Свернуть |
 | Move all unneeded installer files to the Move location | Переместить все ненужные файлы установщика в папку для перемещения |
@@ -352,6 +359,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send posts the report shown to No Faff. Cancel sends nothing. | «Отправить» передаёт показанный отчёт в No Faff. «Отмена» не отправляет ничего. |
 | Check for updates | Проверить обновления |
 | Checks the GitHub releases API over HTTPS for a newer version. | Проверяет наличие более новой версии через API выпусков GitHub по HTTPS. |
+| Opens the guide (README) on github.com in your browser. | Открывает руководство (README) на github.com в вашем браузере. |
+| Opens the issue tracker on github.com in your browser. | Открывает список проблем (Issues) на github.com в вашем браузере. |
+| When ticked, InstallerClean checks GitHub for a newer version when you run it. | Если флажок установлен, InstallerClean при каждом запуске проверяет на GitHub наличие более новой версии. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Откройте страницу выпуска, чтобы скачать более новую версию, или нажмите «Отмена», чтобы оставить текущую. |
 | Apache 2.0 licence | Лицензия Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Открывает файл лицензии на github.com в вашем браузере. |

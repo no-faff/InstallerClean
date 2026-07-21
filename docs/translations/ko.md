@@ -55,6 +55,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send report | 보고서 보내기 |
 | _Send | 보내기(_S) |
 
+## About window
+
+| English | 한국어 |
+| --- | --- |
+| Guide and FAQ | 안내서 및 자주 묻는 질문 |
+| Report a problem | 문제 신고 |
+| Check for updates automatically | 자동으로 업데이트 확인 |
+
 ## Field labels
 
 | English | 한국어 |
@@ -168,6 +176,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
+| If this made you happy, how about a small donation? | 마음에 드셨다면 작은 후원도 환영합니다. |
 
 ## Recycle Bin unavailable
 
@@ -265,6 +274,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | 업데이트 확인 |
 | Checking... | 확인 중... |
 | Up to date. | 최신 버전입니다. |
+| Version {0} is available. | {0} 버전을 사용할 수 있습니다. |
 | Update available | 업데이트 사용 가능 |
 | You're running version {0}.<br>Version {1} is available. | 현재 {0} 버전을 사용하고 있습니다.<br>{1} 버전을 사용할 수 있습니다. |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요. |
@@ -310,12 +320,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | 한국어 |
 | --- | --- |
-| Donate | 후원 |
 | It's thirsty work! | 이게 생각보다 목마른 일입니다! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | 취소가 요청되었습니다. InstallerClean이 현재 단계가 멈출 수 있는 지점에 이를 때까지 기다리고 있습니다. I/O가 많거나 MSI 데이터베이스를 호출하는 동안에는 몇 초 걸릴 수 있습니다. |
 | Close | 닫기 |
-| Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | GitHub에 별을 남기거나, Issue를 등록하거나, Discussions에 글을 남겨 주세요. 어떤 피드백이든 환영합니다. |
-| or report an Issue or post in Discussions. Any feedback welcome. | 또는 Issue를 등록하거나 Discussions에 글을 남겨 주세요. 어떤 피드백이든 환영합니다. |
+| A GitHub star helps other people find it. | GitHub 별은 다른 사람들이 InstallerClean을 찾는 데 도움이 됩니다. |
 | Minimise | 최소화 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다. |
@@ -337,7 +345,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close | 닫기 |
 | Close window | 창 닫기 |
 | Close result and return to main window | 결과를 닫고 메인 창으로 돌아가기 |
-| Leave a star on GitHub | GitHub에 별 남기기 |
 | Leave a star on GitHub (About window) | GitHub에 별 남기기 (정보 창) |
 | Minimise | 최소화 |
 | Move all unneeded installer files to the Move location | 불필요한 설치 관리자 파일을 모두 이동 위치로 옮기기 |
@@ -352,6 +359,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send posts the report shown to No Faff. Cancel sends nothing. | 보내기를 누르면 표시된 보고서가 No Faff에 전송됩니다. 취소하면 아무것도 보내지 않습니다. |
 | Check for updates | 업데이트 확인 |
 | Checks the GitHub releases API over HTTPS for a newer version. | GitHub 릴리스 API를 HTTPS로 조회해 새 버전이 있는지 확인합니다. |
+| Opens the guide (README) on github.com in your browser. | 브라우저에서 github.com의 안내서(README)를 엽니다. |
+| Opens the issue tracker on github.com in your browser. | 브라우저에서 github.com의 이슈 트래커를 엽니다. |
+| When ticked, InstallerClean checks GitHub for a newer version when you run it. | 선택하면 InstallerClean이 실행할 때마다 GitHub에서 새 버전이 있는지 확인합니다. |
 | Open the release page to download the newer version, or cancel to keep the current version. | 새 버전을 내려받으려면 릴리스 페이지를 열고, 현재 버전을 유지하려면 취소하세요. |
 | Apache 2.0 licence | Apache 2.0 라이선스 |
 | Opens the licence file on github.com in your browser. | 브라우저에서 github.com의 라이선스 파일을 엽니다. |

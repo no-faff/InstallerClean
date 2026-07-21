@@ -55,6 +55,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send report | Надіслати звіт |
 | _Send | _Надіслати |
 
+## About window
+
+| English | Українська |
+| --- | --- |
+| Guide and FAQ | Посібник і поширені запитання |
+| Report a problem | Повідомити про проблему |
+| Check for updates automatically | Автоматично перевіряти оновлення |
+
 ## Field labels
 
 | English | Українська |
@@ -168,6 +176,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} безповоротно видалено. Вони не потрапили до Кошика. |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Це нормально, його можна було безпечно прибрати. InstallerClean прибирає лише ті файли, які Windows позначає як завершені, ніколи той, що ще потрібен програмі. У малоймовірному разі, якщо видалення колись лишило програму нездатною відновитися, оновитися чи видалитися, перевстановлення її від виробника зазвичай повертає файл, хоча Microsoft цього не гарантує. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Це нормально, їх можна було безпечно прибрати. InstallerClean прибирає лише ті файли, які Windows позначає як завершені, ніколи той, що ще потрібен програмі. У малоймовірному разі, якщо видалення колись лишило програму нездатною відновитися, оновитися чи видалитися, перевстановлення її від виробника зазвичай повертає файл, хоча Microsoft цього не гарантує. |
+| If this made you happy, how about a small donation? | Якщо це вас потішило, як щодо невеликої пожертви? |
 
 ## Recycle Bin unavailable
 
@@ -265,6 +274,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Перевірити оновлення |
 | Checking... | Перевірка... |
 | Up to date. | Актуальна версія. |
+| Version {0} is available. | Доступна версія {0}. |
 | Update available | Доступне оновлення |
 | You're running version {0}.<br>Version {1} is available. | Ви використовуєте версію {0}.<br>Доступна версія {1}. |
 | Couldn't reach GitHub. Check your internet connection and try again. | Не вдалося зв'язатися з GitHub. Перевірте інтернет-з'єднання та спробуйте ще раз. |
@@ -310,12 +320,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Українська |
 | --- | --- |
-| Donate | Підтримати |
 | It's thirsty work! | Робота не з легких, аж у горлі пересохло! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Скасування запитано. InstallerClean чекає, доки поточний крок дійде до точки зупинки. Це може тривати кілька секунд під час інтенсивного вводу-виводу чи звернення до бази даних MSI. |
 | Close | Закрити |
-| Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | Лишіть зірку на GitHub, повідомте про проблему (Issue) чи напишіть в обговореннях (Discussions). Будь-який відгук вітається. |
-| or report an Issue or post in Discussions. Any feedback welcome. | або повідомте про проблему (Issue) чи напишіть в обговореннях (Discussions). Будь-який відгук вітається. |
+| A GitHub star helps other people find it. | Зірка на GitHub допомагає іншим знайти InstallerClean. |
 | Minimise | Згорнути |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма і скільки місця люди звільняють. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити. |
@@ -337,7 +345,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close | Закрити |
 | Close window | Закрити вікно |
 | Close result and return to main window | Закрити результат і повернутися до головного вікна |
-| Leave a star on GitHub | Лишити зірку на GitHub |
 | Leave a star on GitHub (About window) | Лишити зірку на GitHub (вікно «Про програму») |
 | Minimise | Згорнути |
 | Move all unneeded installer files to the Move location | Перемістити всі непотрібні файли інсталятора до вказаного розташування |
@@ -352,6 +359,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send posts the report shown to No Faff. Cancel sends nothing. | «Надіслати» надсилає показаний звіт до No Faff. «Скасувати» не надсилає нічого. |
 | Check for updates | Перевірити оновлення |
 | Checks the GitHub releases API over HTTPS for a newer version. | Перевіряє API випусків GitHub через HTTPS на наявність новішої версії. |
+| Opens the guide (README) on github.com in your browser. | Відкриває посібник (README) на github.com у вашому браузері. |
+| Opens the issue tracker on github.com in your browser. | Відкриває список проблем (Issues) на github.com у вашому браузері. |
+| When ticked, InstallerClean checks GitHub for a newer version when you run it. | Якщо позначено, InstallerClean під час кожного запуску перевіряє на GitHub наявність новішої версії. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Відкрийте сторінку випуску, щоб завантажити новішу версію, або скасуйте, щоб лишити поточну версію. |
 | Apache 2.0 licence | Ліцензія Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Відкриває файл ліцензії на github.com у вашому браузері. |

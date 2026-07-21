@@ -150,6 +150,22 @@
   <data name="Action.SendResultLog" xml:space="preserve"><value>Invia rapporto</value></data>
   <data name="Action.SendResultLogConfirm" xml:space="preserve"><value>_Invia</value></data>
 
+  <!-- About window: the two links and the auto-update switch. Kept out of
+       the Action.* block because none of the three is a button label; the
+       two links are in-sentence hyperlinks and the third is a checkbox. -->
+  <data name="About.Link.Guide" xml:space="preserve">
+    <value>Guida e FAQ</value>
+    <comment>About-window link to the README in the app's display language.</comment>
+  </data>
+  <data name="About.Link.ReportProblem" xml:space="preserve">
+    <value>Segnala un problema</value>
+    <comment>About-window link to the GitHub issue tracker.</comment>
+  </data>
+  <data name="About.AutoUpdateCheck" xml:space="preserve">
+    <value>Controlla aggiornamenti automaticamente</value>
+    <comment>Checkbox label in the About window.</comment>
+  </data>
+
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Dona</value></data>
   <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Offrimi un caffè (finestra Informazioni)</value></data>
@@ -159,7 +175,6 @@
   <data name="Automation.Close" xml:space="preserve"><value>Chiudi</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Chiudi finestra</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Chiudi finestra risultato e torna alla finestra principale</value></data>
-  <data name="Automation.LeaveStarOnGitHub" xml:space="preserve"><value>Lascia una stella su GitHub</value></data>
   <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Lascia una stella su GitHub (finestra Informazioni)</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Riduci a icona</value></data>
   <!-- Names the destination the way the Move button's own tooltip does
@@ -182,6 +197,18 @@
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>'Invia' trasmette a No Faff il rapporto mostrato. Annulla non invia nulla.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Controlla aggiornamenti</value></data>
   <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Verifica tramite l'API delle release di GitHub, via HTTPS, se è disponibile una versione più recente.</value></data>
+  <data name="Automation.About.Guide.HelpText" xml:space="preserve">
+    <value>Apre guida (README) in github.com nel browser.</value>
+    <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
+  </data>
+  <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
+    <value>Apre elenco problemi (issue) in github.com nel browser.</value>
+    <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
+  </data>
+  <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
+    <value>Se selezionata, InstallerClean verifica su GitHub se è disponibile una versione più recente a ogni avvio.</value>
+    <comment>Screen-reader help on the About window's auto-update checkbox.</comment>
+  </data>
   <!-- Window-level description for the update-available modal, read by a
        screen reader on open, mirroring the RecycleUnavailable and
        ConfirmSendResultLog windows. The version numbers are in the body
@@ -240,12 +267,10 @@
   <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Spiega questa cartella, e come recuperare un file, nel README</value></data>
 
   <!-- Tooltips -->
-  <data name="Tooltip.BuyMeACuppa" xml:space="preserve"><value>Dona</value></data>
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Ci vuole un caffè!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Annullamento richiesto. InstallerClean sta aspettando che il passaggio in corso arrivi a un punto in cui fermarsi. Può richiedere qualche secondo durante operazioni di I/O intense o una chiamata al database MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Chiudi</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub" xml:space="preserve"><value>Lascia una stella su GitHub, segnala un problema (issue) o scrivi nelle discussioni. Ogni feedback è il benvenuto.</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>o segnala un problema (issue) o scrivi nelle discussioni. Ogni feedback è il benvenuto.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>Una stella su GitHub aiuta altre persone a trovare InstallerClean.</value></data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Riduci a icona</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Come preferisci, ma è apprezzato. Invia un riepilogo anonimo che mi fa solo sapere se funziona e quanto spazio le persone stanno liberando. La schermata successiva visualizza cosa verrà inviato prima di confermare.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Come preferisci, ma è apprezzato. Invia un riepilogo anonimo che mi fa solo sapere se funziona. La schermata successiva ti mostra cosa verrà inviato prima di confermare.</value></data>
@@ -474,6 +499,10 @@
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>Eliminati definitivamente {0} {1}. Non sono finiti nel Cestino.</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Va bene così, si poteva rimuovere senza rischi. InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora. Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce.</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Va bene così, si potevano rimuovere senza rischi. InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora. Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce.</value></data>
+  <data name="Completion.DonateAsk" xml:space="preserve">
+    <value>Se ti ha fatto piacere, che ne dici di una piccola donazione?</value>
+    <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words.</comment>
+  </data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
        the files' volume: Move (the safe default), delete permanently with
        consent, or cancel. Wording states only the confirmed fact (the probe
@@ -702,6 +731,10 @@ Dettagli in {1}.</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Controlla aggiornamenti</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Controllo aggiornamenti...</value></data>
   <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>Versione aggiornata.</value></data>
+  <data name="UpdateCheck.Status.UpdateAvailable" xml:space="preserve">
+    <value>È disponibile la versione {0}.</value>
+    <comment>Status line and hyperlink on the main window once a check finds a newer version. {0} = the newer version number. Clicking opens that release's page.</comment>
+  </data>
   <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Aggiornamento disponibile</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>La versione in uso è la versione {0}.&#10;È disponibile la versione {1}.</value></data>

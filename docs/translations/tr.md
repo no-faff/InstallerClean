@@ -55,6 +55,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send report | Rapor gönder |
 | _Send | _Gönder |
 
+## About window
+
+| English | Türkçe |
+| --- | --- |
+| Guide and FAQ | Kılavuz ve SSS |
+| Report a problem | Sorun bildir |
+| Check for updates automatically | Güncellemeleri otomatik olarak denetle |
+
 ## Field labels
 
 | English | Türkçe |
@@ -168,6 +176,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
+| If this made you happy, how about a small donation? | Bu sizi mutlu ettiyse, küçük bir bağışa ne dersiniz? |
 
 ## Recycle Bin unavailable
 
@@ -265,6 +274,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Check for updates | Güncellemeleri denetle |
 | Checking... | Denetleniyor... |
 | Up to date. | Güncel. |
+| Version {0} is available. | {0} sürümü mevcut. |
 | Update available | Güncelleme mevcut |
 | You're running version {0}.<br>Version {1} is available. | {0} sürümünü çalıştırıyorsunuz.<br>{1} sürümü mevcut. |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub'a ulaşılamadı. İnternet bağlantınızı kontrol edip yeniden deneyin. |
@@ -310,12 +320,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Türkçe |
 | --- | --- |
-| Donate | Bağış yap |
 | It's thirsty work! | Susatan bir iş! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | İptal istendi. InstallerClean, geçerli adımın durabileceği bir noktaya gelmesini bekliyor. Yoğun G/Ç sırasında ya da bir MSI veritabanı çağrısında bu birkaç saniye sürebilir. |
 | Close | Kapat |
-| Leave a star on GitHub, report an Issue or post in Discussions. Any feedback welcome. | GitHub'da yıldız bırakın, bir sorun (Issue) bildirin ya da Tartışmalar'a yazın. Her türlü geri bildirim memnuniyetle karşılanır. |
-| or report an Issue or post in Discussions. Any feedback welcome. | ya da bir sorun (Issue) bildirin ya da Tartışmalar'a yazın. Her türlü geri bildirim memnuniyetle karşılanır. |
+| A GitHub star helps other people find it. | GitHub'da bir yıldız, başkalarının InstallerClean'i bulmasına yardımcı olur. |
 | Minimise | Simge durumuna küçült |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Size kalmış ama makbule geçer. Yalnızca uygulamanın çalışıp çalışmadığını ve insanların ne kadar yer açtığını bana bildiren anonim bir özet gönderir. Sonraki ekran, onaylamadan önce ne gönderileceğini görmenizi sağlar. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Size kalmış ama makbule geçer. Yalnızca uygulamanın çalışıp çalışmadığını bana bildiren anonim bir özet gönderir. Sonraki ekran, onaylamadan önce ne gönderileceğini görmenizi sağlar. |
@@ -337,7 +345,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close | Kapat |
 | Close window | Pencereyi kapat |
 | Close result and return to main window | Sonucu kapat ve ana pencereye dön |
-| Leave a star on GitHub | GitHub'da yıldız bırak |
 | Leave a star on GitHub (About window) | GitHub'da yıldız bırak (Hakkında penceresi) |
 | Minimise | Simge durumuna küçült |
 | Move all unneeded installer files to the Move location | Gereksiz tüm yükleyici dosyalarını Taşıma konumuna taşı |
@@ -352,6 +359,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send posts the report shown to No Faff. Cancel sends nothing. | Gönder, gösterilen raporu No Faff'a iletir. İptal hiçbir şey göndermez. |
 | Check for updates | Güncellemeleri denetle |
 | Checks the GitHub releases API over HTTPS for a newer version. | Daha yeni bir sürüm için GitHub sürüm API'sini HTTPS üzerinden denetler. |
+| Opens the guide (README) on github.com in your browser. | github.com üzerindeki kılavuzu (README) tarayıcınızda açar. |
+| Opens the issue tracker on github.com in your browser. | github.com üzerindeki sorun izleyiciyi (Issues) tarayıcınızda açar. |
+| When ticked, InstallerClean checks GitHub for a newer version when you run it. | İşaretliyse InstallerClean, her çalıştırdığınızda GitHub'da daha yeni bir sürüm olup olmadığını denetler. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Daha yeni sürümü indirmek için sürüm sayfasını açın ya da geçerli sürümü korumak için iptal edin. |
 | Apache 2.0 licence | Apache 2.0 lisansı |
 | Opens the licence file on github.com in your browser. | github.com üzerindeki lisans dosyasını tarayıcınızda açar. |
