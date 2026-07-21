@@ -361,6 +361,41 @@ public partial class MainWindow : Window
         _updateStatusLineShown = shown;
     }
 
+    /// <summary>
+    /// Whether the update button held keyboard focus when the manual check
+    /// took it away. The command disallows concurrent execution and its own
+    /// execution covers the cooldown, so the button is disabled from the
+    /// press until several seconds after the answer, and WPF drops focus to
+    /// the window root when the focused element is disabled.
+    /// </summary>
+    private bool _restoreFocusToUpdateButton;
+
+    // ButtonBase raises Click before it invokes the command, so this reads
+    // the focus state from before the disable. A press made while focus sat
+    // somewhere else orphans nothing, and pulling focus across the bar when
+    // the button comes back would be the bug.
+    private void UpdateCheckButton_Click(object sender, RoutedEventArgs e)
+        => _restoreFocusToUpdateButton = UpdateCheckButton.IsKeyboardFocused;
+
+    /// <summary>
+    /// Hands the button its focus back once the check and the cooldown are
+    /// done, so a keyboard user who pressed Enter on it is not left ringless
+    /// with Tab restarting from the first stop. Two guards, and both matter:
+    /// only when the disable was this button's own, because the whole bottom
+    /// bar is disabled while an overlay is up and that path has its own focus
+    /// destination; and only when focus has not moved on to another control
+    /// meanwhile, orphaned focus reading back as null or the window itself.
+    /// The About window's check button carried the same restore before the
+    /// control moved to the bottom bar.
+    /// </summary>
+    private void UpdateCheckButton_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (e.NewValue is not true || !_restoreFocusToUpdateButton) return;
+        _restoreFocusToUpdateButton = false;
+        if (FocusManager.GetFocusedElement(this) is null or MainWindow)
+            UpdateCheckButton.Focus();
+    }
+
     private void OnCleanupPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(CleanupViewModel.IsOperating) && !_vm.Cleanup.IsOperating

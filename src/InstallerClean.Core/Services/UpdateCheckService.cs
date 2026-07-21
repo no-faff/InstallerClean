@@ -9,10 +9,12 @@ namespace InstallerClean.Services;
 /// Version check against the GitHub Releases API.
 /// </summary>
 /// <remarks>
-/// The HTTP call lives inside the elevated process. CheckAsync runs at
-/// most twice in a session and only from ChromeViewModel: once at launch
-/// if <c>AppSettings.AutoUpdateCheck</c> is set, and once per press of the
-/// main window's update button. There is no timer and no retry.
+/// The HTTP call lives inside the elevated process. CheckAsync is reached
+/// only from ChromeViewModel, from two places: the automatic check, which
+/// runs once per session at launch if <c>AppSettings.AutoUpdateCheck</c> is
+/// set, and the main window's update button, which the user can press any
+/// number of times, each press spaced from the last by the button's own
+/// cooldown. There is no timer and no retry.
 ///
 /// HttpClient is held in a static field per the documented BCL
 /// guidance: a fresh instance per call leaks Windows-side socket

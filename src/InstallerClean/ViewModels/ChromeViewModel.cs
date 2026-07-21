@@ -146,8 +146,11 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     /// Fire-and-forget because nothing downstream awaits it and every
     /// outcome but "newer version found" is deliberately invisible; every
     /// exception is swallowed, so it cannot disturb the splash path. The
-    /// enabling setting is read inside the call rather than here, so
-    /// unticking the About checkbox stops a check that has not yet fired.
+    /// enabling setting is read from disk inside the call, before anything
+    /// touches the network, so an install that has opted out opens no
+    /// socket. That read happens on this startup path, before the main
+    /// window and with it the About checkbox exist, so unticking the box
+    /// governs the next launch rather than this one.
     /// </summary>
     public void StartAutomaticUpdateCheck() => _ = RunAutomaticUpdateCheckAsync();
 
@@ -250,8 +253,17 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
 
     private void ShowUpdateFound(UpdateAvailable available)
     {
-        // URL before text: the XAML swaps presentation on the URL and
-        // reads the text, so both are in place when either raise lands.
+        // URL before text, and load-bearing. Each assignment's raise runs
+        // MainWindow.OnChromePropertyChanged synchronously, and that handler
+        // queues one live-region announcement per line that has just become
+        // visible. Setting the URL first makes the link's line the only one
+        // that qualifies. Text first would pass the plain line's "shown"
+        // test on the automatic path (empty text, no link yet) and queue a
+        // second announcement against a line that the URL then collapses,
+        // so a screen reader would be handed a line that is gone by the time
+        // it speaks. What makes either safe is that the raises are queued at
+        // Background priority rather than made from the setter: by the time
+        // they run, both assignments and the bindings behind them are done.
         UpdateAvailableUrl = available.ReleaseUrl;
         UpdateStatusText = string.Format(
             Strings.UpdateCheck_Status_UpdateAvailable, available.LatestVersion);

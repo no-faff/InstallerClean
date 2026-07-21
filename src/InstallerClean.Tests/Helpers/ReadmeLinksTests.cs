@@ -26,18 +26,18 @@ public class ReadmeLinksTests
             ReadmeLinks.For("recovery", CultureInfo.GetCultureInfo(culture)));
 
     // Home is the About window's guide link: the whole document rather than
-    // one section of it, so the only difference from For is the missing
-    // fragment. The per-language file has to stay identical, because the two
-    // are the same map and a divergence would send one link to a page the
-    // other says does not exist.
+    // one section of it. For the fourteen translations that is For's URL
+    // without the fragment; English is the one language where the two
+    // differ, because an anchor works from the repository home and an
+    // unanchored landing there does not (see ReadmeLinks.Home).
 
     [Theory]
     [InlineData("en-GB")]
     [InlineData("en-US")]
     [InlineData("nl-NL")]
-    public void Home_links_the_repository_home_when_english_is_displayed(string culture)
+    public void Home_links_the_english_readme_when_english_is_displayed(string culture)
         => Assert.Equal(
-            "https://github.com/no-faff/InstallerClean",
+            "https://github.com/no-faff/InstallerClean/blob/main/README.md",
             ReadmeLinks.Home(CultureInfo.GetCultureInfo(culture)));
 
     [Theory]
@@ -73,10 +73,24 @@ public class ReadmeLinksTests
 
         Assert.True(Uri.TryCreate(url, UriKind.Absolute, out var uri));
         Assert.Equal(Uri.UriSchemeHttps, uri!.Scheme);
-
-        var isEnglish = cultureName == SupportedLanguages.Neutral;
-        Assert.Equal(isEnglish, url == "https://github.com/no-faff/InstallerClean");
-        if (!isEnglish)
-            Assert.EndsWith(".md", url, StringComparison.Ordinal);
+        Assert.StartsWith(
+            "https://github.com/no-faff/InstallerClean/blob/main/README",
+            url,
+            StringComparison.Ordinal);
+        Assert.EndsWith(".md", url, StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// The About window's star pill opens the repository home
+    /// (<c>AboutWindow.StarClick</c>). The guide link sits a few lines above
+    /// it in the same small window, so a language whose guide resolves to
+    /// that same page gives the reader two differently-labelled controls
+    /// onto one destination.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(SupportedCultureNames))]
+    public void Home_never_repeats_the_star_pills_destination(string cultureName)
+        => Assert.NotEqual(
+            "https://github.com/no-faff/InstallerClean",
+            ReadmeLinks.Home(CultureInfo.GetCultureInfo(cultureName)));
 }

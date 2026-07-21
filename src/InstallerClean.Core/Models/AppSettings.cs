@@ -54,9 +54,11 @@ public sealed class AppSettings
     /// answer after the user had closed the window. The check itself stays
     /// quiet: a newer version paints one status line by the update button;
     /// an up-to-date result and a failure both say nothing. The off switch
-    /// is the checkbox in the About window, and it is read when the check
-    /// fires rather than at construction, so it takes effect in the
-    /// session that unticks it.
+    /// is the checkbox in the About window; the check reads this file as it
+    /// fires, on the startup path, before there is a window to untick it
+    /// from, so a change made in one session governs the next launch and
+    /// every one after. It gates the automatic check only: the main
+    /// window's update button checks on demand whatever this says.
     /// </summary>
     public bool AutoUpdateCheck { get; set; } = true;
 

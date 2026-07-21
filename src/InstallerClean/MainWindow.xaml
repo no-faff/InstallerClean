@@ -457,10 +457,12 @@
                  automatic path is deliberately silent on both. Its own
                  execution covers the cooldown, so the pill's disabled paint
                  is the feedback while it runs. -->
-            <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
+            <Button x:Name="UpdateCheckButton" DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     KeyboardNavigation.TabIndex="2"
                     Content="{loc:Translate Action.CheckForUpdates}"
                     Command="{Binding Chrome.CheckForUpdatesCommand}" Margin="4,0,0,0"
+                    Click="UpdateCheckButton_Click"
+                    IsEnabledChanged="UpdateCheckButton_IsEnabledChanged"
                     AutomationProperties.Name="{loc:Translate Automation.CheckForUpdates}"
                     AutomationProperties.HelpText="{loc:Translate Automation.CheckForUpdates.HelpText}"/>
             <!-- Language switcher: a wordless globe so it reads in any UI

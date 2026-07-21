@@ -100,9 +100,12 @@
         </TextBlock>
 
         <!-- The off switch for the automatic once-per-session update check.
-             Read when the check fires rather than at startup, so unticking
-             it stops this session's check as well as every later one, and
-             ticking it back on needs no restart.
+             That check is started on the splash path, before the main window
+             this window opens from exists, so it has already run or been
+             skipped by the time the box can be reached: a change here
+             governs the next launch and every one after. The main window's
+             update button is unaffected either way, it checks on demand
+             whatever this says.
 
              Checked/Unchecked are attached in code-behind, not here: the
              constructor's own assignment of IsChecked would otherwise fire
