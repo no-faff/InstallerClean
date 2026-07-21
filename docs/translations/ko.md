@@ -176,7 +176,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} permanently deleted. They did not go to the Recycle Bin. | {1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다. |
 | That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
 | That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | 괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다. |
-| If this made you happy, how about a small donation? | 마음에 드셨다면 작은 후원도 환영합니다. |
+| Glad to help. There's a tip jar if you're feeling kind. | 도움이 되어 기쁩니다. 너그러운 마음이 있으시면 작은 성의도 반갑습니다. |
 
 ## Recycle Bin unavailable
 

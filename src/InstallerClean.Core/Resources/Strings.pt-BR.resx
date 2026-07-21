@@ -500,8 +500,8 @@
   <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Tudo bem, era seguro remover. O InstallerClean só remove os arquivos que o Windows informa ter terminado de usar, nunca um que um programa ainda precisa. No caso improvável de uma exclusão deixar um programa sem conseguir reparar, atualizar ou desinstalar, reinstalá-lo pelo site do fabricante normalmente recoloca o arquivo, embora a Microsoft não garanta.</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Tudo bem, eram seguros para remover. O InstallerClean só remove os arquivos que o Windows informa ter terminado de usar, nunca um que um programa ainda precisa. No caso improvável de uma exclusão deixar um programa sem conseguir reparar, atualizar ou desinstalar, reinstalá-lo pelo site do fabricante normalmente recoloca o arquivo, embora a Microsoft não garanta.</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
-    <value>Se isso te deixou feliz, que tal uma pequena doação?</value>
-    <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words.</comment>
+    <value>Que bom que ajudou. A caixinha está ali, se te der vontade de ser generoso.</value>
+    <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
   </data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
        the files' volume: Move (the safe default), delete permanently with

@@ -500,8 +500,8 @@
   <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Das ist in Ordnung, sie konnte bedenkenlos entfernt werden. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Das ist in Ordnung, sie konnten bedenkenlos entfernt werden. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
-    <value>Wenn dich das glücklich gemacht hat, wie wäre es mit einer kleinen Spende?</value>
-    <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words.</comment>
+    <value>Freut mich, dass es geholfen hat. Die Kaffeekasse steht bereit, falls dir großzügig zumute ist.</value>
+    <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
   </data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
        the files' volume: Move (the safe default), delete permanently with
