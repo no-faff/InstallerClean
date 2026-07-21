@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.1.0-blue" alt="Versión de GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-36k-brightgreen" alt="Descargas totales"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-37k-brightgreen" alt="Descargas totales"></a>
 </p>
 
 ![Captura de pantalla de InstallerClean tras limpiar con éxito: 1,28 GB limpiados, 69 archivos en la Papelera de reciclaje](docs/screenshots/es/07-success-done.webp)
@@ -163,7 +163,7 @@ Sí. InstallerClean consulta la misma base de datos de la API de Windows Install
 
 **Sobre Eliminar y Mover.** Los archivos que InstallerClean elimina se pueden borrar de forma permanente sin riesgo. **Eliminar** los mueve a la Papelera de reciclaje (se te avisará si no está disponible); recuperas el espacio en tu unidad C: cuando vacías la Papelera de reciclaje.
 
-Aun así, no tienes que fiarte de mi palabra de que se pueden borrar sin riesgo. Mientras están en la Papelera de reciclaje, tienes ocasión de comprobar que las aplicaciones que usan esta carpeta (Office, Acrobat, Visual Studio y similares) siguen actualizándose y desinstalándose sin problemas. Si encuentras algo que falla (extremadamente improbable, y tras <!-- downloads-start -->36.000+<!-- downloads-end --> descargas nadie ha informado de nada hasta ahora), restaura los archivos desde la Papelera de reciclaje para arreglarlo. Para mayor seguridad todavía, puedes usar **Mover** en su lugar, para hacer una copia de seguridad de los archivos en una carpeta que tú elijas (obviamente, elige una carpeta en otra partición o unidad si lo que buscas es liberar espacio en C:). Solo tienes que volver a copiar los archivos a `C:\Windows\Installer` para dejar las cosas como estaban (aunque es casi seguro que nunca te hará falta).
+Aun así, no tienes que fiarte de mi palabra de que se pueden borrar sin riesgo. Mientras están en la Papelera de reciclaje, tienes ocasión de comprobar que las aplicaciones que usan esta carpeta (Office, Acrobat, Visual Studio y similares) siguen actualizándose y desinstalándose sin problemas. Si encuentras algo que falla (extremadamente improbable, y tras <!-- downloads-start -->37.000+<!-- downloads-end --> descargas nadie ha informado de nada hasta ahora), restaura los archivos desde la Papelera de reciclaje para arreglarlo. Para mayor seguridad todavía, puedes usar **Mover** en su lugar, para hacer una copia de seguridad de los archivos en una carpeta que tú elijas (obviamente, elige una carpeta en otra partición o unidad si lo que buscas es liberar espacio en C:). Solo tienes que volver a copiar los archivos a `C:\Windows\Installer` para dejar las cosas como estaban (aunque es casi seguro que nunca te hará falta).
 
 Si Windows Installer está escribiendo en la caché en ese momento, tiene una transacción anterior suspendida o tiene un renombrado pendiente tras reiniciar que apunta a la caché, Mover y Eliminar quedan desactivados y se muestra el motivo concreto.
 
@@ -174,7 +174,7 @@ Los servicios de análisis, consulta, movimiento, eliminación, configuración y
 - Los hashes SHA-256 de cada versión están listados en la [página de versiones](../../releases/latest).
 - VirusTotal: cada build se analiza, con los resultados completos por motor enlazados en su página de versión para que puedas ver cómo ha puntuado cada archivo y volver a analizarlo tú mismo. Cualquier falso positivo se señala y se explica en las notas de la versión, no se oculta.
 - El código fuente está en [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) y la CI compila y prueba cada commit (consulta la insignia verde de CI más arriba).
-- <!-- downloads-start -->36.000+<!-- downloads-end --> descargas entre GitHub, MajorGeeks y Softpedia.
+- <!-- downloads-start -->37.000+<!-- downloads-end --> descargas entre GitHub, MajorGeeks y Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) prueba cada envío en una máquina virtual y solo lo publica si pasa su revisión.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certificado 100 % limpio por MajorGeeks" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analiza cada versión en busca de virus, spyware y adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificado 100 % limpio por Softpedia" width="190"></a>
 

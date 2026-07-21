@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.1.0-blue" alt="Versione di GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-36k-brightgreen" alt="Download totali"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-37k-brightgreen" alt="Download totali"></a>
 </p>
 
 ![Schermata di InstallerClean dopo una pulizia riuscita: 1,28 GB ripuliti, 69 file spostati al Cestino](docs/screenshots/it/07-success-done.webp)
@@ -163,7 +163,7 @@ Sì. InstallerClean interroga lo stesso database dell'API di Windows Installer c
 
 **Su Elimina e Sposta.** I file che InstallerClean elimina si possono eliminare definitivamente senza rischi. **Elimina** li sposta nel Cestino (verrai avvisato se non è disponibile); recuperi lo spazio sull'unità C: quando svuoti il Cestino.
 
-Non sei comunque costretto a fidarti di me sul fatto che i file si possano eliminare senza rischi. Finché sono nel Cestino, hai modo di verificare che le app che usano questa cartella, Office, Acrobat, Visual Studio e simili, continuino ad aggiornarsi e a disinstallarsi senza problemi. Se trovi qualcosa che non funziona (estremamente improbabile, e finora non è stato segnalato nulla dopo <!-- downloads-start -->36.000+<!-- downloads-end --> download), ripristina i file dal Cestino per sistemare le cose. Per andare ancora più sul sicuro, puoi invece usare **Sposta**, per fare un backup dei file in una cartella che scegli tu (ovviamente scegli una cartella su un'altra partizione o unità se quello che vuoi è liberare spazio su C:). Per tornare com'era basta ricopiare i file in `C:\Windows\Installer` (anche se quasi certamente non ti servirà mai).
+Non sei comunque costretto a fidarti di me sul fatto che i file si possano eliminare senza rischi. Finché sono nel Cestino, hai modo di verificare che le app che usano questa cartella, Office, Acrobat, Visual Studio e simili, continuino ad aggiornarsi e a disinstallarsi senza problemi. Se trovi qualcosa che non funziona (estremamente improbabile, e finora non è stato segnalato nulla dopo <!-- downloads-start -->37.000+<!-- downloads-end --> download), ripristina i file dal Cestino per sistemare le cose. Per andare ancora più sul sicuro, puoi invece usare **Sposta**, per fare un backup dei file in una cartella che scegli tu (ovviamente scegli una cartella su un'altra partizione o unità se quello che vuoi è liberare spazio su C:). Per tornare com'era basta ricopiare i file in `C:\Windows\Installer` (anche se quasi certamente non ti servirà mai).
 
 Se Windows Installer in quel momento sta scrivendo nella cache, ha una transazione precedente sospesa o ha in coda per il prossimo riavvio la ridenominazione di un file che riguarda la cache, allora Sposta ed Elimina sono disattivati e viene mostrato il motivo specifico.
 
@@ -174,7 +174,7 @@ I servizi di scansione, interrogazione, spostamento, eliminazione, impostazioni 
 - Gli hash SHA-256 di ogni versione sono elencati nella [pagina delle release](../../releases/latest).
 - VirusTotal: ogni build viene analizzata, con i risultati completi per ciascun motore collegati alla pagina della relativa versione, così puoi vedere come ha ottenuto ogni file e riscansionarlo tu stesso. Ogni falso positivo viene segnalato e spiegato nelle note di versione, mai nascosto.
 - Il codice sorgente è su [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) e la CI compila e testa ogni commit (vedi il badge verde della CI qui sopra).
-- <!-- downloads-start -->36.000+<!-- downloads-end --> download tra GitHub, MajorGeeks e Softpedia.
+- <!-- downloads-start -->37.000+<!-- downloads-end --> download tra GitHub, MajorGeeks e Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) prova ogni invio in una macchina virtuale e lo pubblica solo se supera la loro revisione.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certificato 100% pulito da MajorGeeks" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analizza ogni versione alla ricerca di virus, spyware e adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificato 100% pulito da Softpedia" width="190"></a>
 

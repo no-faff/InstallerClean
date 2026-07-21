@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.1.0-blue" alt="Wydanie GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-36k-brightgreen" alt="Łączna liczba pobrań"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-37k-brightgreen" alt="Łączna liczba pobrań"></a>
 </p>
 
 ![Zrzut ekranu InstallerClean po udanym oczyszczeniu: wyczyszczono 1,28 GB, 69 plików przeniesiono do Kosza](docs/screenshots/pl/07-success-done.webp)
@@ -163,7 +163,7 @@ Tak. InstallerClean odpytuje tę samą bazę danych API Windows Installer, któr
 
 **O usuwaniu i przenoszeniu.** Pliki, które InstallerClean usuwa, można bezpiecznie usunąć na stałe. **Usuń** przenosi je do Kosza (dostaniesz ostrzeżenie, jeśli jest niedostępny); miejsce na dysku C: odzyskujesz po opróżnieniu Kosza.
 
-Nie musisz mi jednak wierzyć na słowo, że pliki można bezpiecznie usunąć. Dopóki są w Koszu, masz okazję sprawdzić, czy programy korzystające z tego folderu, Office, Acrobat, Visual Studio i podobne, nadal bez problemu się aktualizują i odinstalowują. Jeśli znajdziesz coś zepsutego (skrajnie mało prawdopodobne, a po <!-- downloads-start -->36 000+<!-- downloads-end --> pobraniach jak dotąd nikt nic nie zgłosił), przywróć pliki z Kosza, aby to naprawić. Dla pełnej pewności możesz zamiast tego użyć przycisku **Przenieś**, aby utworzyć kopię zapasową plików w wybranym przez siebie folderze (rzecz jasna wybierz folder na innej partycji lub dysku, jeśli zależy ci na zwolnieniu miejsca na C:). Wystarczy skopiować pliki z powrotem do `C:\Windows\Installer`, aby przywrócić wszystko do poprzedniego stanu (choć niemal na pewno nigdy nie będziesz musiał).
+Nie musisz mi jednak wierzyć na słowo, że pliki można bezpiecznie usunąć. Dopóki są w Koszu, masz okazję sprawdzić, czy programy korzystające z tego folderu, Office, Acrobat, Visual Studio i podobne, nadal bez problemu się aktualizują i odinstalowują. Jeśli znajdziesz coś zepsutego (skrajnie mało prawdopodobne, a po <!-- downloads-start -->37 000+<!-- downloads-end --> pobraniach jak dotąd nikt nic nie zgłosił), przywróć pliki z Kosza, aby to naprawić. Dla pełnej pewności możesz zamiast tego użyć przycisku **Przenieś**, aby utworzyć kopię zapasową plików w wybranym przez siebie folderze (rzecz jasna wybierz folder na innej partycji lub dysku, jeśli zależy ci na zwolnieniu miejsca na C:). Wystarczy skopiować pliki z powrotem do `C:\Windows\Installer`, aby przywrócić wszystko do poprzedniego stanu (choć niemal na pewno nigdy nie będziesz musiał).
 
 Jeśli Windows Installer akurat zapisuje do pamięci podręcznej, ma zawieszoną wcześniejszą transakcję lub ma w kolejce zmianę nazwy po ponownym uruchomieniu dotyczącą tej pamięci podręcznej, przyciski Przenieś i Usuń są wyłączone, a konkretny powód jest wyświetlany.
 
@@ -174,7 +174,7 @@ Usługi skanowania, odpytywania, przenoszenia, usuwania, ustawień i oczekujące
 - Skróty SHA-256 dla każdej wersji są wymienione na [stronie wydań](../../releases/latest).
 - VirusTotal: każdy build jest skanowany, a pełne wyniki dla każdego silnika są linkowane na stronie danego wydania, dzięki czemu możesz zobaczyć, jak oceniono każdy plik, i przeskanować go ponownie samodzielnie. Każdy fałszywy alarm jest wskazany i wyjaśniony w informacjach o wydaniu, nigdy ukrywany.
 - Kod źródłowy jest pod adresem [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), a CI buduje i testuje każdy commit (zob. zieloną plakietkę CI powyżej).
-- <!-- downloads-start -->36 000+<!-- downloads-end --> pobrań w GitHub, MajorGeeks i Softpedia.
+- <!-- downloads-start -->37 000+<!-- downloads-end --> pobrań w GitHub, MajorGeeks i Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testuje każde zgłoszenie w maszynie wirtualnej i umieszcza je na liście tylko wtedy, gdy przejdzie ich kontrolę.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks: certyfikat 100% czystości" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testuje każde wydanie pod kątem wirusów, programów szpiegujących i adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia: certyfikat 100% czystości" width="190"></a>
 
