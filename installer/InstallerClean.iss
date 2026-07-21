@@ -69,7 +69,12 @@ DefaultDirName={autopf}\InstallerClean
 DefaultGroupName=InstallerClean
 UninstallDisplayIcon={app}\InstallerClean.exe
 OutputDir={#PublishDir}
-OutputBaseFilename=InstallerClean-setup
+; The version is part of the download's name from 2.2.0 on. A setup exe sitting
+; in a Downloads folder months later otherwise has nothing on it to say which
+; release it is, and neither does the SHA-256 sidecar published beside it. The
+; release pipeline builds the same name from the same version to find this
+; file afterwards, so the two have to agree.
+OutputBaseFilename=InstallerClean-{#AppVersion}-setup
 ; Compression=bzip; SolidCompression=no. Every other Inno
 ; compression combination tested on this project has tripped a
 ; static-ML false positive on the setup hash: lzma2 trips
