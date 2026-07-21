@@ -500,7 +500,7 @@
   <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>没关系，它本来就可以安全删除。InstallerClean 只清除 Windows 报告为不再需要的文件，绝不会删除程序仍然需要的文件。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。</value></data>
   <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>没关系，它们本来就可以安全删除。InstallerClean 只清除 Windows 报告为不再需要的文件，绝不会删除程序仍然需要的文件。万一某次删除真的让某个程序无法修复、更新或卸载，从其厂商处重新安装通常就能把文件恢复回来，不过 Microsoft 并不保证这一点。</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
-    <value>很高兴帮上忙。您若有心，这里也可以打赏。</value>
+    <value>很高兴帮上忙。您若有心，这里可以打赏。</value>
     <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
   </data>
   <!-- The choice offered when Delete finds the Recycle Bin unavailable for
