@@ -28,7 +28,7 @@
 - **Co:** InstallerClean robi jedną rzecz: usuwa niepotrzebne pliki z `C:\Windows\Installer`, ukrytego folderu, którego Windows nigdy nie czyści. Po niemal natychmiastowym skanowaniu mówi ci, czy w ogóle jakieś masz, pokazuje więcej szczegółów ciekawskim i pozwala je usunąć, by zwolnić miejsce na dysku C:. Uruchamiasz go raz i ruszasz dalej.
 - **Może jesteś tu, bo:** Użyłeś [WinDirStat](https://github.com/windirstat/windirstat), WizTree albo TreeSize, zobaczyłeś, że `C:\Windows\Installer` zajmuje mnóstwo miejsca, i nie wiedziałeś, co w nim siedzi. InstallerClean to dokładnie to, czego potrzebujesz. Wie, co kryje się w tych plikach o pozornie przypadkowych nazwach, jak `9f05cba.msi`, i szybko mówi ci, które z nich możesz bezpiecznie usunąć.
 - **Ile miejsca:** Nadesłane jak dotąd (opcjonalne) raporty pokazują, że <!-- reports-freedpct-start -->53%<!-- reports-freedpct-end --> maszyn miało niepotrzebne pliki do wyczyszczenia. Na tych maszynach mediana zwolnionego miejsca to <!-- reports-median-start -->21 GB<!-- reports-median-end -->. Kilka osób odzyskało setki GB. U mnie było to 1,28 GB. Pozostałe <!-- reports-nothingpct-start -->47%<!-- reports-nothingpct-end --> nie znalazły nic do usunięcia, co po prostu oznacza, że ich folder Installer był już czysty. Więcej szczegółów w [FAQ](#faq) poniżej.
-- **Czy to bezpieczne:** Tak. Pyta samo API Windows Installer, które pliki są nadal potrzebne, i wymienia wyłącznie te, które Windows zgłasza jako już niepotrzebne. Jest otwartoźródłowy (Apache 2.0) i o nic cię nie pyta: bez konta, bez reklam, bez śledzenia, bez telemetrii, bez niczego działającego w tle. Nigdy sam nie łączy się z siecią.
+- **Czy to bezpieczne:** Tak. Pyta samo API Windows Installer, które pliki są nadal potrzebne, i wymienia wyłącznie te, które Windows zgłasza jako już niepotrzebne. Jest otwartoźródłowy (Apache 2.0) i o nic cię nie pyta: bez konta, bez reklam, bez śledzenia, bez telemetrii, bez niczego działającego w tle. Jedyne, co robi w sieci, to sprawdza przy uruchomieniu, czy na GitHubie jest nowsza wersja, a to możesz wyłączyć.
 - **Pobierz:** [Pobierz najnowszą wersję](../../releases/latest). Uruchom; przeklikaj się przez [ostrzeżenie o „nieznanym wydawcy”](#unknown-publisher) i [monit administratora](#admin). Usuń wszelkie niepotrzebne pliki. Gotowe.
 
 ## Spis treści
@@ -228,7 +228,7 @@ Jeśli cokolwiek tutaj ci przeszkadza, [zgłoś problem](../../issues). Problemy
 - WinSxS (`C:\Windows\WinSxS`) to inny folder o innych zasadach. Do niego użyj `Dism /Online /Cleanup-Image /StartComponentCleanup` z wiersza poleceń z podwyższonymi uprawnieniami.
 - Brak usługi w tle, brak zaplanowanego zadania, brak automatycznego czyszczenia. Aplikacja działa wtedy, gdy ją uruchomisz.
 - Nie zmienia ani twoich zainstalowanych programów, ani bazy danych Windows Installer, tylko je odczytuje. Jedyne, co w ogóle zapisuje do rejestru, to jednorazowa rejestracja źródła zdarzeń, której narzędzie wiersza poleceń potrzebuje, aby jego uruchomienia pojawiały się w dzienniku zdarzeń Windows.
-- Łączy się z internetem tylko wtedy, gdy mu każesz: ręczne sprawdzenie aktualizacji; opcjonalny anonimowy raport (tylko po to, bym wiedział, że działa); oraz linki do dokumentacji na GitHubie i strony wsparcia, które otwierają się w twojej przeglądarce, jeśli zdecydujesz się je kliknąć.
+- Z własnej inicjatywy nawiązuje tylko jedno połączenie: przy uruchomieniu szybko sprawdza na stronie wydań GitHuba, czy jest nowsza wersja, co możesz wyłączyć w oknie O programie. Cała reszta dzieje się tylko wtedy, gdy mu każesz: opcjonalny anonimowy raport (tylko po to, bym wiedział, że działa) oraz linki do dokumentacji na GitHubie i strony wsparcia, które otwierają się w twojej przeglądarce, jeśli je klikniesz. Sam nigdy niczego nie pobiera.
 - Bez pasków narzędzi, bez dołączanego oprogramowania, bez adware.
 
 ## FAQ
@@ -279,6 +279,8 @@ Trzy warianty, wybierz jeden:
 - **Setup** (`InstallerClean-setup.exe`): zwykły instalator Windows z dołączonym środowiskiem uruchomieniowym .NET 10. Dodaje wpis w menu Start i odinstalowuje się czysto. Schowany wśród programów, więc łatwo go znaleźć za pół roku.
 - **Portable** (`InstallerClean-portable.exe`): pojedynczy samodzielny plik exe z dołączonym środowiskiem uruchomieniowym. Bez instalacji, bez deinstalatora. Uruchom, użyj, usuń. Uruchom ponownie, kiedy zechcesz.
 - **CLI** (`installerclean-cli.exe`): sama wersja wiersza poleceń, pojedynczy samodzielny plik exe. Bez instalacji, nic nie zostaje potem na maszynie. Wrzuć go na komputer kliencki, uruchom skanowanie lub czyszczenie, usuń. Stworzony do skryptowania, zaplanowanych zadań i masowego wdrażania, gdy chcesz wykonać operacje bez aplikacji desktopowej na komputerze klienta. Zob. [Wiersz poleceń](#wiersz-poleceń), aby poznać argumenty i kody wyjścia.
+
+Od wersji 2.2.0 nazwy plików instalatora i wersji przenośnej zawierają numer wersji, więc pobrana kopia zawsze mówi, czym jest; wersja wiersza poleceń zachowuje zwykłą nazwę `installerclean-cli.exe`, żeby zaplanowane zadania i skrypty, które na nią wskazują, działały dalej mimo aktualizacji.
 
 Pobierz ze [strony wydań](../../releases/latest), a następnie uruchom. Jest niepodpisany, więc Windows pokazuje ostrzeżenie o „nieznanym wydawcy”; [FAQ](#unknown-publisher) wyjaśnia, co zobaczysz i dlaczego jest to bezpieczne.
 

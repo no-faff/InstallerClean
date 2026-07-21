@@ -28,7 +28,7 @@
 - **Là gì:** InstallerClean chỉ làm một việc: nó loại bỏ những tệp không cần thiết khỏi `C:\Windows\Installer`, một thư mục ẩn mà Windows không bao giờ dọn dẹp. Sau một lần quét gần như tức thì, nó cho bạn biết bạn có tệp như vậy hay không, hiển thị thêm chi tiết cho ai tò mò, và cho phép bạn xóa chúng để giải phóng dung lượng trên ổ C:. Bạn dùng một lần rồi thôi.
 - **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. InstallerClean chính là thứ bạn cần. Nó biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và nhanh chóng cho bạn biết tệp nào có thể xóa an toàn.
 - **Giải phóng được bao nhiêu:** Các báo cáo (tùy chọn) gửi về cho đến nay cho thấy <!-- reports-freedpct-start -->53%<!-- reports-freedpct-end --> số máy có tệp không cần thiết để dọn. Trong số đó, trung vị giải phóng được là <!-- reports-median-start -->21 GB<!-- reports-median-end -->. Một số máy dọn được hàng trăm GB. Với tôi thì được 1,28 GB. <!-- reports-nothingpct-start -->47%<!-- reports-nothingpct-end --> còn lại không tìm thấy gì để loại bỏ, điều đó chỉ có nghĩa là thư mục Installer của họ vốn đã sạch. Xem thêm chi tiết trong phần [FAQ](#faq) bên dưới.
-- **Có an toàn không:** Có. Nó hỏi chính API Windows Installer xem những tệp nào vẫn còn cần, và chỉ liệt kê những tệp Windows báo là đã dùng xong. Nó là mã nguồn mở (Apache 2.0) và không hỏi gì về bạn: không tài khoản, không quảng cáo, không theo dõi, không thu thập dữ liệu, không có gì chạy ngầm. Nó không bao giờ tự kết nối mạng.
+- **Có an toàn không:** Có. Nó hỏi chính API Windows Installer xem những tệp nào vẫn còn cần, và chỉ liệt kê những tệp Windows báo là đã dùng xong. Nó là mã nguồn mở (Apache 2.0) và không hỏi gì về bạn: không tài khoản, không quảng cáo, không theo dõi, không thu thập dữ liệu, không có gì chạy ngầm. Việc duy nhất nó làm trên mạng là kiểm tra GitHub xem có phiên bản mới hơn không mỗi khi bạn chạy nó, và bạn có thể tắt việc đó.
 - **Tải về:** [Tải bản phát hành mới nhất](../../releases/latest). Chạy nó; bấm qua [cảnh báo “Nhà phát hành không xác định”](#unknown-publisher) và [lời nhắc quyền quản trị](#admin). Xóa mọi tệp không cần thiết. Xong.
 
 ## Nội dung
@@ -228,7 +228,7 @@ Nếu có điều gì ở đây cản trở bạn, hãy [mở một issue](../..
 - WinSxS (`C:\Windows\WinSxS`) là một thư mục khác với những quy tắc khác. Với thư mục đó, hãy chạy `Dism /Online /Cleanup-Image /StartComponentCleanup` từ một dấu nhắc lệnh có quyền nâng cao.
 - Không có dịch vụ chạy ngầm, không có tác vụ theo lịch, không tự động dọn. Ứng dụng chỉ chạy khi bạn khởi động nó.
 - Nó không thay đổi các chương trình đã cài đặt của bạn hay cơ sở dữ liệu Windows Installer, chỉ đọc chúng. Thứ duy nhất nó từng ghi vào Registry là việc đăng ký nguồn sự kiện, chỉ làm một lần, mà công cụ dòng lệnh cần đến để các lần chạy của nó hiện ra trong Nhật ký Sự kiện Windows.
-- Nó chỉ kết nối internet khi bạn yêu cầu: một lần kiểm tra cập nhật thủ công; báo cáo ẩn danh tùy chọn (chỉ để cho tôi biết nó đang hoạt động); và các liên kết tới tài liệu trên GitHub cùng một trang quyên góp, sẽ mở trong trình duyệt của bạn nếu bạn chọn bấm vào.
+- Nó tự mình tạo đúng một loại kết nối: mỗi khi bạn chạy, nó xem nhanh trang phát hành của GitHub có phiên bản mới hơn không, và bạn có thể tắt việc này trong cửa sổ Giới thiệu. Mọi thứ khác chỉ xảy ra khi bạn yêu cầu: báo cáo ẩn danh tùy chọn (chỉ để cho tôi biết nó đang hoạt động) và các liên kết tới tài liệu trên GitHub cùng một trang quyên góp, sẽ mở trong trình duyệt của bạn nếu bạn bấm vào. Nó không bao giờ tự tải về bất cứ thứ gì.
 - Không thanh công cụ, không phần mềm đi kèm, không phần mềm quảng cáo.
 
 ## FAQ
@@ -279,6 +279,8 @@ Ba bản dựng, chọn một:
 - **Setup** (`InstallerClean-setup.exe`): một trình cài đặt Windows thông thường, đã đóng gói sẵn .NET 10 runtime. Thêm một mục vào Start Menu và gỡ cài đặt gọn gàng. Được xếp vào danh sách chương trình để bạn dễ tìm lại sau sáu tháng nữa.
 - **Portable** (`InstallerClean-portable.exe`): một tệp exe độc lập duy nhất đã đóng gói sẵn runtime. Không cài đặt, không có trình gỡ. Chạy, dùng, rồi xóa. Chạy lại bất cứ khi nào.
 - **CLI** (`installerclean-cli.exe`): riêng bản dòng lệnh, một tệp exe độc lập duy nhất. Không cài đặt, không để lại gì trên máy sau đó. Thả nó lên một máy khách, chạy một lần quét hay một lần dọn, rồi xóa. Được tạo ra cho việc viết script, các tác vụ theo lịch và triển khai hàng loạt, khi bạn muốn thực hiện các thao tác mà không cần ứng dụng desktop trên máy khách. Xem [Dòng lệnh](#dòng-lệnh) để biết các tham số và mã thoát.
+
+Từ 2.2.0, tên tệp của bản cài đặt và bản portable có kèm số phiên bản, nên một bản đã tải về luôn cho biết nó là gì; công cụ dòng lệnh vẫn giữ tên đơn giản `installerclean-cli.exe` để các tác vụ theo lịch và script đang trỏ tới nó tiếp tục chạy qua các lần cập nhật.
 
 Tải từ [trang phát hành](../../releases/latest), rồi chạy. Nó không được ký số, nên Windows hiện cảnh báo “Nhà phát hành không xác định”; phần [FAQ](#unknown-publisher) giải thích bạn sẽ thấy gì và vì sao nó an toàn.
 
