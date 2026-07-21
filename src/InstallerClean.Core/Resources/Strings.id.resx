@@ -127,7 +127,7 @@
   <data name="Action.SelectAll" xml:space="preserve"><value>Pilih semua</value></data>
   <data name="Action.Browse" xml:space="preserve"><value>Te_lusuri...</value></data>
   <data name="Action.Cancel" xml:space="preserve"><value>_Batal</value></data>
-  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Periksa _pembaruan</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Periksa pem_baruan</value></data>
   <data name="Action.Close" xml:space="preserve"><value>_Tutup</value></data>
   <data name="Action.Delete" xml:space="preserve"><value>_Hapus</value></data>
   <data name="Action.DeletePermanently" xml:space="preserve"><value>_Hapus permanen</value></data>

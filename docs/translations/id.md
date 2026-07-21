@@ -37,7 +37,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Select all | Pilih semua |
 | _Browse... | Te_lusuri... |
 | _Cancel | _Batal |
-| Check for _updates | Periksa _pembaruan |
+| Check for _updates | Periksa pem_baruan |
 | _Close | _Tutup |
 | _Delete | _Hapus |
 | _Delete permanently | _Hapus permanen |

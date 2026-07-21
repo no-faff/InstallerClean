@@ -120,7 +120,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             {
                 CrashLog.Write(new InvalidOperationException(
                     walkSafety == CandidateGuard.RemovalSafety.Refused
-                        ? $"Removal candidate refused (outside the Installer cache or a reparse point): {filePath}"
+                        ? $"Removal candidate refused (not directly in the Installer cache, or a reparse point): {filePath}"
                         : $"Removal candidate not offered (its symlink status or location could not be read): {filePath}"));
                 continue;
             }
@@ -191,10 +191,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 // walk, a superseded/obsoleted candidate's path comes from an
                 // API or registry LocalPackage value, which a corrupt
                 // registration could point anywhere on disk. Drop one that does
-                // not resolve inside the cache (or is a reparse point) rather
-                // than offer it; a genuine cache patch always passes. An
-                // unproven answer drops it too, logged under words that do not
-                // claim more than the check showed.
+                // not resolve to a file directly in the cache root (or is a
+                // reparse point) rather than offer it; a genuine cache patch
+                // always passes, its LocalPackage naming a file at that root.
+                // Below the root is out of scope for the same reason the walk
+                // never descends. An unproven answer drops it too, logged under
+                // words that do not claim more than the check showed.
                 var patchSafety = exists
                     ? CandidateGuard.CheckSafeToRemove(pkg.LocalPackagePath, _installerFolderOverride)
                     : CandidateGuard.RemovalSafety.Refused;
@@ -223,7 +225,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     // it (do not offer, do not count as missing) and log.
                     CrashLog.Write(new InvalidOperationException(
                         patchSafety == CandidateGuard.RemovalSafety.Refused
-                            ? $"Removable-patch candidate refused (outside the Installer cache or a reparse point): {pkg.LocalPackagePath}"
+                            ? $"Removable-patch candidate refused (not directly in the Installer cache, or a reparse point): {pkg.LocalPackagePath}"
                             : $"Removable-patch candidate not offered (its symlink status or location could not be read): {pkg.LocalPackagePath}"));
                 }
                 else

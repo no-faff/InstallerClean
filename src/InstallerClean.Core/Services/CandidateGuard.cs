@@ -2,14 +2,24 @@ namespace InstallerClean.Services;
 
 /// <summary>
 /// The single containment invariant for every file InstallerClean offers to
-/// move or delete: it must resolve inside <c>C:\Windows\Installer</c> and must
-/// not be a reparse point. The destination of a Move is guarded six ways; this
-/// is the matching guard on the SOURCE, which enumeration alone would enforce
-/// only as a side effect. Orphan-walk candidates are in-bounds because
-/// they came out of the folder, but the superseded and obsoleted candidates
-/// come from an API or registry <c>LocalPackage</c> value that a corrupt
-/// registration could point anywhere, so the guard is applied both where a
-/// candidate is created and again per file at each action-service boundary.
+/// move or delete: it must resolve to a file sitting DIRECTLY in
+/// <c>C:\Windows\Installer</c>, and must not be a reparse point. The
+/// destination of a Move is guarded six ways; this is the matching guard on the
+/// SOURCE, which enumeration alone would enforce only as a side effect.
+/// Orphan-walk candidates are in-bounds because they came out of the folder,
+/// but the superseded and obsoleted candidates come from an API or registry
+/// <c>LocalPackage</c> value that a corrupt registration could point anywhere,
+/// so the guard is applied both where a candidate is created and again per file
+/// at each action-service boundary.
+///
+/// Directly, not merely inside: the walk never descends, and a registered
+/// <c>LocalPackage</c> value names a file at the root, so no legitimate
+/// candidate is a descendant. The descendant form let in exactly one thing, a
+/// corrupt registration naming a file under <c>$PatchCache$</c> (the patch
+/// engine's baseline payload copies, a subtree the scan deliberately puts out
+/// of scope by never descending). SECURITY.md states the narrow promise to
+/// anyone deciding whether they have found a bug worth reporting, so the code
+/// has to be what makes it true.
 /// </summary>
 internal static class CandidateGuard
 {
@@ -18,12 +28,13 @@ internal static class CandidateGuard
     /// </summary>
     internal enum RemovalSafety
     {
-        /// <summary>Resolves inside the cache folder and is not a reparse point.</summary>
+        /// <summary>Resolves to a file directly in the cache folder and is not a reparse point.</summary>
         Safe,
 
         /// <summary>
-        /// Established as not qualifying: it resolves outside the cache folder,
-        /// or its attributes carry the reparse-point bit.
+        /// Established as not qualifying: it resolves outside the cache folder
+        /// or into one of its subfolders, or its attributes carry the
+        /// reparse-point bit.
         /// </summary>
         Refused,
 
@@ -69,7 +80,7 @@ internal static class CandidateGuard
         if (!InstallerCacheHelpers.TryResolveFinalPath(path, out var resolved))
             return RemovalSafety.Unproven;
 
-        return InstallerCacheHelpers.ResolvesInsideInstallerFolder(resolved, installerFolderRoot)
+        return InstallerCacheHelpers.ResolvesDirectlyInInstallerFolder(resolved, installerFolderRoot)
             ? RemovalSafety.Safe
             : RemovalSafety.Refused;
     }

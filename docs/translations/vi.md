@@ -37,7 +37,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Select all | Chọn tất cả |
 | _Browse... | _Duyệt... |
 | _Cancel | _Hủy |
-| Check for _updates | Kiểm tra _cập nhật |
+| Check for _updates | _Kiểm tra cập nhật |
 | _Close | Đón_g |
 | _Delete | _Xóa |
 | _Delete permanently | _Xóa vĩnh viễn |

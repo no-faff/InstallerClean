@@ -127,7 +127,7 @@
   <data name="Action.SelectAll" xml:space="preserve"><value>Chọn tất cả</value></data>
   <data name="Action.Browse" xml:space="preserve"><value>_Duyệt...</value></data>
   <data name="Action.Cancel" xml:space="preserve"><value>_Hủy</value></data>
-  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Kiểm tra _cập nhật</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>_Kiểm tra cập nhật</value></data>
   <data name="Action.Close" xml:space="preserve"><value>Đón_g</value></data>
   <data name="Action.Delete" xml:space="preserve"><value>_Xóa</value></data>
   <data name="Action.DeletePermanently" xml:space="preserve"><value>_Xóa vĩnh viễn</value></data>

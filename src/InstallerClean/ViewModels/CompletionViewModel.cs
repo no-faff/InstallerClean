@@ -119,13 +119,17 @@ public partial class CompletionViewModel : ObservableObject
 
     /// <summary>
     /// Shows the donate heart in the completion card's corner. True only
-    /// when the completed operation actually freed bytes, so the ask only
-    /// ever follows delivered value: an all-clear, a run the re-verify
-    /// held back entirely, and a Move or Delete that reached no file all
-    /// leave it false. Set from the bytes argument in each Show* method
-    /// rather than derived from <see cref="LastResultFreedNothing"/>,
-    /// which happens to agree today but answers a different question (it
-    /// picks the send-report tooltip's wording) and is free to diverge.
+    /// when the operation actually shifted files, so the ask only ever
+    /// follows work done: an all-clear, a run the re-verify held back
+    /// entirely, and a Move or Delete that reached no file all leave it
+    /// false. It measures the bytes the run moved or deleted, NOT whether
+    /// the disk got any emptier, so a same-drive Move earns the heart on
+    /// the strength of having done what the user asked, while its heading
+    /// still says "moved" rather than "freed" because nothing was
+    /// reclaimed. Set from the bytes argument in each Show* method rather
+    /// than derived from <see cref="LastResultFreedNothing"/>, which
+    /// happens to agree today but answers a different question (it picks
+    /// the send-report tooltip's wording) and is free to diverge.
     /// </summary>
     [ObservableProperty] private bool _showDonate;
 

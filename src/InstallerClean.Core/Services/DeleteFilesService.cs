@@ -152,12 +152,13 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     }
 
                     // Containment guard at the service boundary: never recycle a
-                    // file that does not resolve inside C:\Windows\Installer, even
-                    // if a corrupt candidate reached here. This is the source-side
-                    // choke point matching the destination's. A path that
-                    // could not be resolved at all is refused the same way and
-                    // reported without the out-of-bounds claim; see the matching
-                    // block in MoveFilesService.
+                    // file that does not resolve directly into
+                    // C:\Windows\Installer, even if a corrupt candidate reached
+                    // here. This is the source-side choke point matching the
+                    // destination's. A path that could not be resolved at all is
+                    // refused the same way and reported without the
+                    // out-of-bounds claim; see the matching block in
+                    // MoveFilesService.
                     var safety = CandidateGuard.CheckSafeToRemove(filePath, _installerFolderOverride);
                     if (safety == CandidateGuard.RemovalSafety.Refused)
                     {

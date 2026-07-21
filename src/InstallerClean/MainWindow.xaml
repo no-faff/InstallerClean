@@ -979,8 +979,10 @@
                          card's bottom-right corner, so it sits level with
                          "Scan again" without taking a row of its own or
                          shifting anything when it is absent. Shown only when
-                         the run actually freed bytes (Completion.ShowDonate),
-                         so the ask only ever follows delivered value.
+                         the run actually moved or deleted files
+                         (Completion.ShowDonate), so the ask only ever follows
+                         work done; a same-drive Move reclaims no space and
+                         still earns it.
 
                          Declared last so it is the final stop in the
                          overlay's Tab cycle: the named actions the user came

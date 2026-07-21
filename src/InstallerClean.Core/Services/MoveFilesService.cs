@@ -188,14 +188,15 @@ public sealed class MoveFilesService : IMoveFilesService
 
                     // Containment guard at the service boundary, matching the
                     // IsSystemFolderOrChild anchoring above: never move a source
-                    // that does not resolve inside C:\Windows\Installer. The scan
-                    // already filters candidates, but a corrupt LocalPackage
-                    // value or a future caller could reach here with an
-                    // out-of-bounds path; this is the choke point that refuses
-                    // it. Reparse is handled just above, so a Refused here is an
-                    // out-of-bounds path and CandidateOutsideCache says so; an
-                    // Unproven one is a path that could not be resolved at all,
-                    // which is the same refusal without the same claim.
+                    // that does not resolve to a file directly in
+                    // C:\Windows\Installer. The scan already filters candidates,
+                    // but a corrupt LocalPackage value or a future caller could
+                    // reach here with an out-of-bounds path; this is the choke
+                    // point that refuses it. Reparse is handled just above, so a
+                    // Refused here is an out-of-bounds path and
+                    // CandidateOutsideCache says so; an Unproven one is a path
+                    // that could not be resolved at all, which is the same
+                    // refusal without the same claim.
                     var safety = CandidateGuard.CheckSafeToRemove(sourcePath, _installerFolderOverride);
                     if (safety == CandidateGuard.RemovalSafety.Refused)
                     {

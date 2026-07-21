@@ -187,6 +187,10 @@ internal static class CliContract
     /// Shared by the <c>/d</c> and <c>/m</c> paths so both report on one
     /// axis: no errors is success, some processed with some failed is
     /// partial, nothing processed is a hard failure.
+    ///
+    /// The result log labels the same batch from the same two counts
+    /// (<c>ResultLogEntry</c>'s <c>ClassifyOutcome</c>). One operation, two
+    /// readings of it, so a change to this rule belongs in both.
     /// </summary>
     internal static CliOperationOutcome ClassifyFileOperation(int processedCount, int errorCount)
     {

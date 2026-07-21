@@ -33,17 +33,19 @@ internal static class InstallerCacheHelpers
     }
 
     /// <summary>
-    /// The containment comparison itself, over an ALREADY-resolved input. The
-    /// source-side gate (<see cref="CandidateGuard"/>) takes this form together
-    /// with <see cref="TryResolveFinalPath"/>, so that it can refuse a path
-    /// whose resolution degraded; the destination gate above ignores that
-    /// distinction, and the two sides want opposite answers for it. A
-    /// destination gate asks "is this forbidden", so an unresolvable answer of
-    /// "not forbidden" lets the move proceed, where refusing would strand a user
-    /// with no destination they could use. A source gate asks "is this in
-    /// bounds", and the whole reason it exists is that a corrupt LocalPackage
-    /// value can name a file anywhere on disk, so "could not prove it is in
-    /// bounds" and "out of bounds" earn the same refusal.
+    /// The containment comparison itself, over an ALREADY-resolved input. This
+    /// is the DESTINATION side's question ("is this forbidden"), so a
+    /// descendant counts; the source side asks a narrower one and takes
+    /// <see cref="ResolvesDirectlyInInstallerFolder"/> instead. Both are paired
+    /// with <see cref="TryResolveFinalPath"/> by their callers, so that a
+    /// source gate can refuse a path whose resolution degraded; the destination
+    /// gate above ignores that distinction, and the two sides want opposite
+    /// answers for it. An unresolvable answer of "not forbidden" lets a move
+    /// proceed, where refusing would strand a user with no destination they
+    /// could use. The source gate asks "is this in bounds", and the whole
+    /// reason it exists is that a corrupt LocalPackage value can name a file
+    /// anywhere on disk, so "could not prove it is in bounds" and "out of
+    /// bounds" earn the same refusal.
     ///
     /// The cache root is compared in its best-effort form even when ITS
     /// resolution degraded. A fully resolved input is a real canonical path, so
@@ -60,6 +62,37 @@ internal static class InstallerCacheHelpers
 
         return input.Equals(installer, StringComparison.OrdinalIgnoreCase)
             || input.StartsWith(installer + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// The stricter form the SOURCE gate takes, over an ALREADY-resolved input:
+    /// the path must sit DIRECTLY in the cache root, not merely somewhere under
+    /// it. Nothing below the root is ever a candidate. The orphan walk is
+    /// root-only (<c>FileSystemScanService.GetInstallerFiles</c>), because a
+    /// file in a subdirectory is one the registration data says nothing about,
+    /// and <c>$PatchCache$</c> in particular holds the patch engine's baseline
+    /// payload copies. A registered <c>LocalPackage</c> value names a file at
+    /// the root too, so the descendant form let in exactly one thing: a corrupt
+    /// registration pointing at a subtree the app had deliberately put out of
+    /// scope. SECURITY.md tells a reporter the app never acts inside a
+    /// subfolder; this is where that holds rather than happens to be true.
+    ///
+    /// The root itself answers false: a candidate is a file, and the folder is
+    /// not one.
+    /// </summary>
+    internal static bool ResolvesDirectlyInInstallerFolder(string resolvedInput, string? installerFolderRoot = null)
+    {
+        if (string.IsNullOrWhiteSpace(resolvedInput)) return false;
+
+        var input = resolvedInput
+            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        var installer = ResolveFinalPath(installerFolderRoot ?? InstallerFolder)
+            .TrimEnd(Path.DirectorySeparatorChar);
+
+        var parent = Path.GetDirectoryName(input);
+        return parent is not null
+            && parent.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                .Equals(installer, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

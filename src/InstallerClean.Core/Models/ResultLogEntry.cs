@@ -63,7 +63,7 @@ public sealed record ResultLogEntry(
             AppInfo.Current(),
             ResolveOs(),
             ScanInfo.From(scan, scanDurationMs, pendingReboot),
-            OperationInfo.FromMove(move, scan.RemovableFiles.Count, bytesFreed, moveDestinationKind));
+            OperationInfo.FromMove(move, bytesFreed, moveDestinationKind));
 
     public static ResultLogEntry ForDelete(
         ScanResult scan,
@@ -76,7 +76,7 @@ public sealed record ResultLogEntry(
             AppInfo.Current(),
             ResolveOs(),
             ScanInfo.From(scan, scanDurationMs, pendingReboot),
-            OperationInfo.FromDelete(delete, scan.RemovableFiles.Count, bytesFreed));
+            OperationInfo.FromDelete(delete, bytesFreed));
 
     private static string ResolveOs()
     {
@@ -162,32 +162,48 @@ public sealed record OperationInfo(
     public static OperationInfo ScanOnly() =>
         new(OperationKinds.Scan, OperationOutcomes.NoFiles, 0, 0, 0, Array.Empty<ErrorBucket>(), null);
 
-    public static OperationInfo FromMove(MoveResult result, int totalCandidates, long bytesFreed,
+    public static OperationInfo FromMove(MoveResult result, long bytesFreed,
         string moveDestinationKind) =>
         new(
             OperationKinds.Move,
-            ClassifyOutcome(result.MovedCount, result.Errors.Count, totalCandidates),
+            ClassifyOutcome(result.MovedCount, result.Errors.Count),
             result.MovedCount,
             result.Errors.Count,
             bytesFreed,
             BucketErrors(result.Errors),
             moveDestinationKind);
 
-    public static OperationInfo FromDelete(DeleteResult result, int totalCandidates, long bytesFreed) =>
+    public static OperationInfo FromDelete(DeleteResult result, long bytesFreed) =>
         new(
             OperationKinds.Delete,
-            ClassifyOutcome(result.DeletedCount, result.Errors.Count, totalCandidates),
+            ClassifyOutcome(result.DeletedCount, result.Errors.Count),
             result.DeletedCount,
             result.Errors.Count,
             bytesFreed,
             BucketErrors(result.Errors),
             null);
 
-    private static string ClassifyOutcome(int processed, int failed, int total)
+    /// <summary>
+    /// The outcome label, decided from the two counts the finished batch
+    /// reports and nothing else. Deliberately the same rule as
+    /// <see cref="Helpers.CliContract.ClassifyFileOperation"/>, which reaches
+    /// the same three answers for the CLI's exit code: the two surfaces
+    /// describe one operation and must agree about it.
+    ///
+    /// No candidate total is taken. Those two counts ARE the batch that was
+    /// attempted, whereas any total handed in from outside describes an
+    /// earlier moment, and the act-time re-verify sits between the two: it can
+    /// hold a candidate back, so a scan-shaped total exceeds what was attempted
+    /// and "everything failed" stops being expressible as failed == total. That
+    /// is what silently retired the failed label once, and a rule that reads
+    /// only its own batch cannot be broken again by a stage landing between the
+    /// scan and the act.
+    /// </summary>
+    private static string ClassifyOutcome(int processed, int failed)
     {
-        if (processed == 0 && failed == total && total > 0) return OperationOutcomes.Failed;
         if (failed == 0) return OperationOutcomes.Complete;
-        return OperationOutcomes.Partial;
+        if (processed > 0) return OperationOutcomes.Partial;
+        return OperationOutcomes.Failed;
     }
 
     private static IReadOnlyList<ErrorBucket> BucketErrors(IReadOnlyList<FileOperationError> errors)

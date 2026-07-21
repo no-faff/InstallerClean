@@ -37,7 +37,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Select all | Выделить всё |
 | _Browse... | _Обзор... |
 | _Cancel | _Отмена |
-| Check for _updates | Проверить _обновления |
+| Check for _updates | Проверить о_бновления |
 | _Close | _Закрыть |
 | _Delete | _Удалить |
 | _Delete permanently | _Удалить безвозвратно |

@@ -37,7 +37,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Select all | Seleccionar todo |
 | _Browse... | E_xaminar... |
 | _Cancel | _Cancelar |
-| Check for _updates | Buscar _actualizaciones |
+| Check for _updates | _Buscar actualizaciones |
 | _Close | _Cerrar |
 | _Delete | _Eliminar |
 | _Delete permanently | _Eliminar definitivamente |

@@ -151,9 +151,10 @@ public sealed record SourceIsReparsePoint(string FilePath)
 }
 
 /// <summary>
-/// The candidate does not resolve inside <c>C:\Windows\Installer</c>, so Move
-/// and Delete refuse it at the service boundary. A candidate should never reach
-/// here (both are already filtered where they are created), but a corrupt
+/// The candidate does not resolve to a file directly in
+/// <c>C:\Windows\Installer</c> (it is outside the cache, or below its root), so
+/// Move and Delete refuse it at the service boundary. A candidate should never
+/// reach here (both are already filtered where they are created), but a corrupt
 /// <c>LocalPackage</c> registration pointing outside the cache would otherwise
 /// make an arbitrary file a removal target; this is the choke point that makes
 /// that structurally impossible. The path is kept off the displayed sentence

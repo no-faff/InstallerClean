@@ -159,4 +159,79 @@ public class InstallerCacheHelpersResolveTests
         Assert.Equal(CandidateGuard.RemovalSafety.Refused,
             CandidateGuard.CheckSafeToRemove(Path.Combine(Path.GetTempPath(), "outside.msi")));
     }
+
+    [Fact]
+    public void CheckSafeToRemove_accepts_a_file_sitting_directly_in_the_cache_root()
+    {
+        // The baseline for the four refusals below: every real candidate, from
+        // the walk or from a LocalPackage value, is a bare filename at the root.
+        WithCacheSandbox(root =>
+            Assert.Equal(CandidateGuard.RemovalSafety.Safe,
+                CandidateGuard.CheckSafeToRemove(Path.Combine(root, "12ab34.msi"), root)));
+    }
+
+    [Fact]
+    public void CheckSafeToRemove_refuses_a_file_one_level_inside_the_cache()
+    {
+        // SECURITY.md tells a reporter the app never acts inside a subfolder.
+        // Only a corrupt registration can name one, since the walk does not
+        // descend, but "only a corrupt registration" is precisely the case the
+        // source guard exists for.
+        WithCacheSandbox(root =>
+            Assert.Equal(CandidateGuard.RemovalSafety.Refused,
+                CandidateGuard.CheckSafeToRemove(Path.Combine(root, "sub", "12ab34.msi"), root)));
+    }
+
+    [Fact]
+    public void CheckSafeToRemove_refuses_a_file_in_the_PatchCache_subtree()
+    {
+        // The subtree this is really about: $PatchCache$ holds the patch
+        // engine's baseline payload copies, which the scan puts out of scope by
+        // never descending, and which nothing may then delete by another route.
+        WithCacheSandbox(root =>
+            Assert.Equal(CandidateGuard.RemovalSafety.Refused,
+                CandidateGuard.CheckSafeToRemove(
+                    Path.Combine(root, "$PatchCache$", "Managed", "0AB", "1.0.0", "patch.msp"), root)));
+    }
+
+    [Fact]
+    public void CheckSafeToRemove_refuses_the_cache_root_itself()
+    {
+        // A candidate is a file. The folder answering Safe would have made the
+        // guard's own name a lie, whatever the services do with it afterwards.
+        WithCacheSandbox(root =>
+            Assert.Equal(CandidateGuard.RemovalSafety.Refused,
+                CandidateGuard.CheckSafeToRemove(root, root)));
+    }
+
+    [Fact]
+    public void CheckSafeToRemove_refuses_a_sibling_folder_whose_name_starts_with_the_root()
+    {
+        // The prefix trap: "...\ic-cache-<id>-notreally\x.msi" starts with the
+        // root's spelling and is not under it. The parent comparison is exact,
+        // so the trap cannot fire, and this is here to keep it that way.
+        WithCacheSandbox(root =>
+            Assert.Equal(CandidateGuard.RemovalSafety.Refused,
+                CandidateGuard.CheckSafeToRemove(root + "-notreally" + Path.DirectorySeparatorChar + "x.msi", root)));
+    }
+
+    /// <summary>
+    /// Runs <paramref name="body"/> against a real throwaway directory standing
+    /// in for <c>C:\Windows\Installer</c>. Real, not mocked: the containment
+    /// gate resolves through the kernel whatever <c>IFileSystem</c> is injected,
+    /// which is the property that stops a MockFileSystem entry reaching it.
+    /// </summary>
+    private static void WithCacheSandbox(Action<string> body)
+    {
+        var root = Path.Combine(Path.GetTempPath(), "ic-cache-" + Guid.NewGuid());
+        Directory.CreateDirectory(root);
+        try
+        {
+            body(root);
+        }
+        finally
+        {
+            try { Directory.Delete(root, recursive: true); } catch { }
+        }
+    }
 }

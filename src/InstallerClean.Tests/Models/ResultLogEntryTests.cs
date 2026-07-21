@@ -1,4 +1,5 @@
 using System.Text.Json;
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
 using Xunit;
@@ -95,7 +96,7 @@ public class ResultLogEntryTests
             new RecycleFailed(@"C:\Windows\Installer\c.msi", unchecked((int)0x80070005)),
         };
 
-        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), totalCandidates: 3, bytesFreed: 0);
+        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), bytesFreed: 0);
 
         var bucket = Assert.Single(op.Errors);
         Assert.Equal("RecycleFailed", bucket.Category);
@@ -121,7 +122,7 @@ public class ResultLogEntryTests
             new IOFailure(@"C:\Windows\Installer\c.msi"),
         };
 
-        var op = OperationInfo.FromMove(new MoveResult(0, errors), totalCandidates: 3,
+        var op = OperationInfo.FromMove(new MoveResult(0, errors),
             bytesFreed: 0, moveDestinationKind: MoveDestinationKinds.DifferentFixedDrive);
 
         var inUse = Assert.Single(op.Errors, b => b.Category == "FileInUse");
@@ -146,7 +147,7 @@ public class ResultLogEntryTests
             new PermanentlyDeleted(@"C:\Windows\Installer\b.msi", unchecked((int)0x00270008)),
         };
 
-        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), totalCandidates: 2, bytesFreed: 0);
+        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), bytesFreed: 0);
 
         var bucket = Assert.Single(op.Errors);
         Assert.Equal("PermanentlyDeleted", bucket.Category);
@@ -163,7 +164,7 @@ public class ResultLogEntryTests
         // code never emits an empty map.
         var errors = new List<FileOperationError> { new MissingSourceFile(@"C:\Windows\Installer\gone.msi") };
 
-        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), totalCandidates: 1, bytesFreed: 0);
+        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), bytesFreed: 0);
 
         var bucket = Assert.Single(op.Errors);
         Assert.Null(bucket.Codes);
@@ -185,7 +186,7 @@ public class ResultLogEntryTests
             new RecycleFailed(@"C:\Windows\Installer\a.msi", unchecked((int)0x80004005)),
         };
 
-        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), totalCandidates: 1, bytesFreed: 0);
+        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), bytesFreed: 0);
 
         var json = JsonSerializer.Serialize(op, JsonOptions);
         Assert.Contains("\"codes\"", json);
@@ -203,6 +204,82 @@ public class ResultLogEntryTests
         Assert.Equal(0, op.BytesFreed);
         Assert.Empty(op.Errors);
         Assert.Null(op.MoveDestinationKind);
+    }
+
+    [Fact]
+    public void A_batch_whose_every_file_failed_is_failed_even_though_the_scan_offered_more()
+    {
+        // The act-time re-verify runs between the scan and the batch and can
+        // hold candidates back, so the batch is a subset of what the scan
+        // offered. Five files were offered, the re-verify kept three back, and
+        // both survivors then failed: nothing was processed, so the operation
+        // failed, and a rule measuring against the scan's five would call this
+        // a partial success beside filesProcessed: 0.
+        var errors = new List<FileOperationError>
+        {
+            new FileInUse(@"C:\Windows\Installer\a.msi"),
+            new FileInUse(@"C:\Windows\Installer\b.msi"),
+        };
+
+        var op = OperationInfo.FromDelete(new DeleteResult(0, errors), bytesFreed: 0);
+
+        Assert.Equal(OperationOutcomes.Failed, op.Outcome);
+        Assert.Equal(0, op.FilesProcessed);
+        Assert.Equal(2, op.FilesFailed);
+    }
+
+    [Fact]
+    public void A_batch_that_reached_no_file_at_all_is_complete_not_failed()
+    {
+        // The all-dropped shape: the re-verify held every candidate back, so
+        // nothing was attempted and nothing errored. Failure needs something to
+        // have failed, and an operation that correctly declined to act on
+        // anything is not one. (The GUI does not even write an entry for this
+        // one, showing the held-back summary instead, but the classifier is
+        // reached by the CLI and must not invent a failure from two zeroes.)
+        var op = OperationInfo.FromMove(new MoveResult(0, Array.Empty<FileOperationError>()),
+            bytesFreed: 0, moveDestinationKind: MoveDestinationKinds.SameDrive);
+
+        Assert.Equal(OperationOutcomes.Complete, op.Outcome);
+        Assert.Equal(0, op.FilesProcessed);
+        Assert.Equal(0, op.FilesFailed);
+    }
+
+    [Fact]
+    public void A_batch_with_one_success_and_one_failure_is_partial()
+    {
+        var errors = new List<FileOperationError> { new FileInUse(@"C:\Windows\Installer\a.msi") };
+
+        var op = OperationInfo.FromDelete(new DeleteResult(1, errors), bytesFreed: 1024);
+
+        Assert.Equal(OperationOutcomes.Partial, op.Outcome);
+    }
+
+    [Fact]
+    public void The_result_log_and_the_CLI_label_the_same_batch_the_same_way()
+    {
+        // Two surfaces read one operation: the CLI's exit code and the result
+        // log's outcome. They are separate rules by necessity (different return
+        // types), so this walks the three answers over the same counts to keep
+        // the pair honest.
+        (int Processed, int Failed)[] batches = [(3, 0), (2, 1), (0, 2), (0, 0)];
+
+        foreach (var (processed, failed) in batches)
+        {
+            var errors = Enumerable.Range(0, failed)
+                .Select(i => (FileOperationError)new FileInUse($@"C:\Windows\Installer\{i}.msi"))
+                .ToList();
+            var outcome = OperationInfo.FromDelete(new DeleteResult(processed, errors), bytesFreed: 0).Outcome;
+            var cli = CliContract.ClassifyFileOperation(processed, failed);
+
+            var expected = cli.ExitCode switch
+            {
+                CliExitCode.Ok => OperationOutcomes.Complete,
+                CliExitCode.Partial => OperationOutcomes.Partial,
+                _ => OperationOutcomes.Failed,
+            };
+            Assert.Equal(expected, outcome);
+        }
     }
 
     [Fact]

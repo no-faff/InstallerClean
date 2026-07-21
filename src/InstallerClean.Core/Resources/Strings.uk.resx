@@ -127,7 +127,7 @@
   <data name="Action.SelectAll" xml:space="preserve"><value>Виділити все</value></data>
   <data name="Action.Browse" xml:space="preserve"><value>_Огляд...</value></data>
   <data name="Action.Cancel" xml:space="preserve"><value>_Скасувати</value></data>
-  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Перевірити _оновлення</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Перевірити о_новлення</value></data>
   <data name="Action.Close" xml:space="preserve"><value>_Закрити</value></data>
   <data name="Action.Delete" xml:space="preserve"><value>_Видалити</value></data>
   <data name="Action.DeletePermanently" xml:space="preserve"><value>Видалити _назавжди</value></data>

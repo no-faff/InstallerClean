@@ -127,7 +127,7 @@
   <data name="Action.SelectAll" xml:space="preserve"><value>Seleccionar todo</value></data>
   <data name="Action.Browse" xml:space="preserve"><value>E_xaminar...</value></data>
   <data name="Action.Cancel" xml:space="preserve"><value>_Cancelar</value></data>
-  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Buscar _actualizaciones</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>_Buscar actualizaciones</value></data>
   <data name="Action.Close" xml:space="preserve"><value>_Cerrar</value></data>
   <data name="Action.Delete" xml:space="preserve"><value>_Eliminar</value></data>
   <data name="Action.DeletePermanently" xml:space="preserve"><value>_Eliminar definitivamente</value></data>
