@@ -10,7 +10,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - A "Check for updates automatically" checkbox in the About window governs the automatic check. On by default; a change applies from the next launch, and with it off the app makes no network request unless you press the update button. It is the app's first checkbox, so there is now a house CheckBox style built from the existing theme tokens.
 - A "Check for updates" button on the main window's bottom bar, with a status line beside it for "Checking...", "Up to date." and the update link. The check no longer hides behind About, where the button read as credits rather than updates.
 - The About window links to the guide (the README, opened in the app's display language and landing on the document itself rather than the repository page the star button already opens) and to the issue tracker ("Report a problem"). The README, which is the app's actual manual, was previously only reachable via the star button.
-- A small donate heart in the corner of the completion screen, shown only after a clean-up that actually freed something. Its tooltip does the asking, quietly.
+- A small donate heart in the corner of the completion screen. Its tooltip does the asking, quietly.
 - Release downloads carry the version in the filename from this release (`InstallerClean-2.2.0-setup.exe`, `InstallerClean-2.2.0-portable.exe`), so a copy on a mirror, a USB stick or a support thread says what it is. The command-line tool deliberately keeps its unversioned `installerclean-cli.exe` name: scheduled tasks and scripts hold a path to it, and a versioned name would break them all on every update.
 
 ### Changed
