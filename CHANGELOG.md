@@ -15,6 +15,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 ### Changed
 
+- Every string this release adds or rewords is translated in all fourteen languages: the About window's guide and "Report a problem" links, the automatic-update checkbox, the update status line on the bottom bar, the donate ask on the completion screen, and the names and help a screen reader reads out on each of them. The star button's tooltip in About is reworded to say what a star actually does. A non-English user sees all of it in their own language instead of falling back to English.
 - The bottom bar slims to Re-scan, About, Check for updates and the language globe: the star and heart buttons are gone. The star lives on in About; the donate ask moved to the completion screen, where it follows an actual result instead of sitting in the window chrome.
 - The About window lost its update button and inline status (moved to the main window) and gained the links block and the updates checkbox, with the licence line grouped into the links as one block.
 - The star pill's tooltip now says what a star does ("A GitHub star helps other people find it.") instead of doubling as the route to Issues and Discussions, which "Report a problem" covers properly.
