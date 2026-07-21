@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.1.0-blue" alt="Version GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-37k-brightgreen" alt="Total des téléchargements"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-38k-brightgreen" alt="Total des téléchargements"></a>
 </p>
 
 ![Capture d'écran d'InstallerClean après un nettoyage réussi : 1,28 Go nettoyés, 69 fichiers déplacés à la Corbeille](docs/screenshots/fr/07-success-done.webp)
@@ -163,7 +163,7 @@ Oui. InstallerClean interroge la même base de données de l'API Windows Install
 
 **À propos de Supprimer et Déplacer.** Les fichiers qu'InstallerClean supprime peuvent être supprimés définitivement sans risque. **Supprimer** les déplace vers la Corbeille (vous serez prévenu si elle n'est pas disponible) ; vous récupérez l'espace sur votre disque C: une fois la Corbeille vidée.
 
-Cela dit, vous n'avez pas à me croire sur parole quand je vous dis que ces fichiers peuvent être supprimés sans risque. Tant qu'ils sont dans votre Corbeille, vous avez la possibilité de vérifier que les applications qui utilisent ce dossier, Office, Acrobat, Visual Studio et compagnie, continuent de se mettre à jour et de se désinstaller sans problème. Si vous constatez que quelque chose ne fonctionne plus (extrêmement improbable, et rien n'a été signalé à ce jour après <!-- downloads-start -->37 000+<!-- downloads-end --> téléchargements), restaurez les fichiers depuis la Corbeille pour régler le problème. Pour être encore plus tranquille, vous pouvez plutôt utiliser **Déplacer**, qui sauvegarde les fichiers dans un dossier de votre choix (choisissez évidemment un dossier sur une autre partition ou un autre disque si vous cherchez à libérer de l'espace sur C:). Il suffit ensuite de recopier les fichiers dans `C:\Windows\Installer` pour tout remettre comme avant (même si vous n'en aurez très probablement jamais besoin).
+Cela dit, vous n'avez pas à me croire sur parole quand je vous dis que ces fichiers peuvent être supprimés sans risque. Tant qu'ils sont dans votre Corbeille, vous avez la possibilité de vérifier que les applications qui utilisent ce dossier, Office, Acrobat, Visual Studio et compagnie, continuent de se mettre à jour et de se désinstaller sans problème. Si vous constatez que quelque chose ne fonctionne plus (extrêmement improbable, et rien n'a été signalé à ce jour après <!-- downloads-start -->38 000+<!-- downloads-end --> téléchargements), restaurez les fichiers depuis la Corbeille pour régler le problème. Pour être encore plus tranquille, vous pouvez plutôt utiliser **Déplacer**, qui sauvegarde les fichiers dans un dossier de votre choix (choisissez évidemment un dossier sur une autre partition ou un autre disque si vous cherchez à libérer de l'espace sur C:). Il suffit ensuite de recopier les fichiers dans `C:\Windows\Installer` pour tout remettre comme avant (même si vous n'en aurez très probablement jamais besoin).
 
 Si Windows Installer est en train d'écrire dans le cache, qu'une transaction précédente est suspendue ou qu'un renommage post-redémarrage visant le cache est en attente, le déplacement et la suppression sont désactivés et la raison précise est affichée.
 
@@ -174,7 +174,7 @@ Les services d'analyse, de requête, de déplacement, de suppression, de réglag
 - Les empreintes SHA-256 de chaque version sont listées sur la [page des versions](../../releases/latest).
 - VirusTotal : chaque build est analysé, avec les résultats complets par moteur liés sur la page de la version afin que vous puissiez voir comment chaque fichier a été noté et le réanalyser vous-même. Tout faux positif est signalé et expliqué dans les notes de version, jamais caché.
 - Le code source est sur [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) et la CI compile et teste chaque commit (voir le badge CI vert plus haut).
-- <!-- downloads-start -->37 000+<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
+- <!-- downloads-start -->38 000+<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) teste chaque soumission dans une machine virtuelle et ne la référence que si elle passe son contrôle.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certifié 100 % propre par MajorGeeks" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analyse chaque version à la recherche de virus, logiciels espions et publiciels.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certifié 100 % propre par Softpedia" width="190"></a>
 
@@ -237,7 +237,7 @@ Si quelque chose ici vous gêne, [ouvrez un ticket](../../issues). Les problème
 **Vais-je vraiment libérer des Go d'espace ?** Ça dépend de votre machine. Une installation neuve de Windows 11 sans logiciel supplémentaire n'a rien à supprimer. Une station de développement utilisée de longue date, ou toute machine chargée de logiciels basés sur MSI (Acrobat, Office, LibreOffice, gros outils de développement), peut en contenir des dizaines de Go. Dans tous les cas, vous verrez exactement combien dès que vous la lancez.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-Sur les 141 rapports que des utilisateurs nous ont gentiment envoyés (merci 🙏) depuis que la v1.8.0 a ajouté l'option :
+Sur les 143 rapports que des utilisateurs nous ont gentiment envoyés (merci 🙏) depuis que la v1.8.0 a ajouté l'option :
 
 | Résultat | Proportion | Minimum | Médiane | Maximum |
 |---|---|---|---|---|

@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.1.0-blue" alt="GitHub Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-37k-brightgreen" alt="Total downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-38k-brightgreen" alt="Total downloads"></a>
 </p>
 
 ![Screenshot of InstallerClean after a successful clean-up: 1.28 GB cleaned up, 69 files moved to the Recycle Bin](docs/screenshots/en/07-success-done.webp)
@@ -163,7 +163,7 @@ Yes. InstallerClean queries the same Windows Installer API database that Windows
 
 **About Delete and Move.** The files InstallerClean deletes are safe to delete permanently. **Delete** moves them to the Recycle Bin (you'll be warned if it's not available); you gain the space back on your C: drive when you empty your Recycle Bin.
 
-You don't have to trust me that the files are safe to delete, though. While they're in your Recycle Bin, you have a chance to check that the apps that use this folder, Office, Acrobat, Visual Studio and the like, still update and uninstall without trouble. If you find something broken (extremely unlikely and nothing has been reported so far after <!-- downloads-start -->37,000+<!-- downloads-end --> downloads), restore the files from the Recycle Bin to fix it. To be extra safe, you can instead use **Move** to back up the files to a folder of your choice (obviously choose a folder on another drive/partition if you're looking to free space on C:). Simply copy the files back to `C:\Windows\Installer` to restore things back to how they were (though you almost certainly won't ever need to).
+You don't have to trust me that the files are safe to delete, though. While they're in your Recycle Bin, you have a chance to check that the apps that use this folder, Office, Acrobat, Visual Studio and the like, still update and uninstall without trouble. If you find something broken (extremely unlikely and nothing has been reported so far after <!-- downloads-start -->38,000+<!-- downloads-end --> downloads), restore the files from the Recycle Bin to fix it. To be extra safe, you can instead use **Move** to back up the files to a folder of your choice (obviously choose a folder on another drive/partition if you're looking to free space on C:). Simply copy the files back to `C:\Windows\Installer` to restore things back to how they were (though you almost certainly won't ever need to).
 
 If Windows Installer is currently writing to the cache, has a previous transaction suspended or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown.
 
@@ -174,7 +174,7 @@ The scan, query, move, delete, settings and pending-reboot services are covered 
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
 - VirusTotal: every build is scanned, with the full per-engine results linked on its release page so you can see how each file scored and re-scan it yourself. Any false positive is called out and explained in the release notes, not hidden.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
-- <!-- downloads-start -->37,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
+- <!-- downloads-start -->38,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) tests each submission in a virtual machine and lists it only if it passes their review.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks certified 100% clean" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) tests each release for viruses, spyware and adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
@@ -235,7 +235,7 @@ If anything here gets in your way, [open an issue](../../issues). Accessibility 
 **Will I actually free up GBs of space?** It depends on your machine. A clean Windows 11 install with no extra software has nothing to remove. A long-running developer workstation, or any machine with heavy MSI-based software (Acrobat, Office, LibreOffice, large dev tools), can have tens of GB. Either way, you'll see exactly how much the moment you run it.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-Across the 141 reports people have sent in (thanks 🙏) since v1.8.0 added the option:
+Across the 143 reports people have sent in (thanks 🙏) since v1.8.0 added the option:
 
 | Outcome | Share | Smallest | Median | Largest |
 |---|---|---|---|---|

@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.1.0-blue" alt="Rilis GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-37k-brightgreen" alt="Total unduhan"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-38k-brightgreen" alt="Total unduhan"></a>
 </p>
 
 ![Tangkapan layar InstallerClean setelah pembersihan berhasil: 1,28 GB dibersihkan, 69 file dipindahkan ke Keranjang Sampah](docs/screenshots/id/07-success-done.webp)
@@ -163,7 +163,7 @@ Ya. InstallerClean menanyakan ke basis data Windows Installer API yang sama deng
 
 **Tentang Hapus dan Pindahkan.** File yang dihapus InstallerClean aman untuk dihapus permanen. **Hapus** memindahkannya ke Keranjang Sampah (Anda akan diperingatkan jika Keranjang Sampah tidak tersedia); Anda mendapatkan kembali ruang di drive C: saat mengosongkan Keranjang Sampah.
 
-Namun, Anda tidak harus percaya begitu saja pada saya bahwa file-file itu aman dihapus. Selama berada di Keranjang Sampah, Anda berkesempatan memeriksa apakah aplikasi yang memakai folder ini, Office, Acrobat, Visual Studio dan sejenisnya, masih bisa diperbarui dan dihapus instalasinya tanpa masalah. Jika Anda menemukan ada yang rusak (kemungkinannya sangat kecil, dan sejauh ini belum ada laporan setelah <!-- downloads-start -->37.000+<!-- downloads-end --> unduhan), pulihkan file dari Keranjang Sampah untuk memperbaikinya. Agar benar-benar aman, Anda bisa menggunakan **Pindahkan** sebagai gantinya, untuk mencadangkan file ke folder pilihan Anda (tentu pilih folder di partisi/drive lain jika Anda ingin mengosongkan ruang di C:). Cukup salin kembali file ke `C:\Windows\Installer` untuk mengembalikan semuanya seperti semula (meskipun hampir pasti Anda tidak akan pernah memerlukannya).
+Namun, Anda tidak harus percaya begitu saja pada saya bahwa file-file itu aman dihapus. Selama berada di Keranjang Sampah, Anda berkesempatan memeriksa apakah aplikasi yang memakai folder ini, Office, Acrobat, Visual Studio dan sejenisnya, masih bisa diperbarui dan dihapus instalasinya tanpa masalah. Jika Anda menemukan ada yang rusak (kemungkinannya sangat kecil, dan sejauh ini belum ada laporan setelah <!-- downloads-start -->38.000+<!-- downloads-end --> unduhan), pulihkan file dari Keranjang Sampah untuk memperbaikinya. Agar benar-benar aman, Anda bisa menggunakan **Pindahkan** sebagai gantinya, untuk mencadangkan file ke folder pilihan Anda (tentu pilih folder di partisi/drive lain jika Anda ingin mengosongkan ruang di C:). Cukup salin kembali file ke `C:\Windows\Installer` untuk mengembalikan semuanya seperti semula (meskipun hampir pasti Anda tidak akan pernah memerlukannya).
 
 Jika Windows Installer sedang menulis ke cache, memiliki transaksi sebelumnya yang ditangguhkan, atau memiliki antrean penggantian nama setelah mulai ulang yang menyasar cache, Pindahkan dan Hapus dinonaktifkan dan alasan spesifiknya ditampilkan.
 
@@ -174,7 +174,7 @@ Layanan pemindaian, kueri, pemindahan, penghapusan, pengaturan, dan mulai-ulang-
 - Hash SHA-256 untuk tiap rilis tercantum di [halaman rilis](../../releases/latest).
 - VirusTotal: setiap build dipindai, dengan hasil lengkap per mesin pemindai ditautkan di halaman rilisnya sehingga Anda bisa melihat skor tiap file dan memindai ulang sendiri. Setiap positif palsu disebutkan dan dijelaskan di catatan rilis, tidak disembunyikan.
 - Kode sumber ada di [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) dan CI membangun serta menguji setiap commit (lihat lencana CI hijau di atas).
-- <!-- downloads-start -->37.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks, dan Softpedia.
+- <!-- downloads-start -->38.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks, dan Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) menguji tiap kiriman di mesin virtual dan hanya mendaftarkannya jika lolos tinjauan mereka.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Disertifikasi MajorGeeks 100% bersih" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) menguji tiap rilis dari virus, spyware, dan adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Disertifikasi Softpedia 100% bersih" width="190"></a>
 
@@ -237,7 +237,7 @@ Jika ada sesuatu di sini yang menghalangi Anda, [buka sebuah issue](../../issues
 **Apakah saya benar-benar akan mengosongkan ruang sebesar GB?** Tergantung mesin Anda. Instalasi Windows 11 yang bersih tanpa perangkat lunak tambahan tidak punya apa pun untuk dihapus. Workstation pengembang yang sudah lama berjalan, atau mesin mana pun dengan banyak perangkat lunak berbasis MSI (Acrobat, Office, LibreOffice, alat pengembangan besar), bisa menyimpan puluhan GB. Apa pun keadaannya, Anda akan melihat persis berapa banyak begitu menjalankannya.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-Dari 141 laporan yang dikirimkan orang-orang (terima kasih 🙏) sejak opsi ini ditambahkan di v1.8.0:
+Dari 143 laporan yang dikirimkan orang-orang (terima kasih 🙏) sejak opsi ini ditambahkan di v1.8.0:
 
 | Hasil | Persentase | Terkecil | Median | Terbesar |
 |---|---|---|---|---|

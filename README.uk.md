@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.1.0-blue" alt="Реліз на GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-37k-brightgreen" alt="Усього завантажень"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-38k-brightgreen" alt="Усього завантажень"></a>
 </p>
 
 ![Знімок екрана InstallerClean після успішного очищення: очищено 1,28 GB, 69 файлів переміщено до Кошика](docs/screenshots/uk/07-success-done.webp)
@@ -163,7 +163,7 @@ InstallerClean розрізняє три види непотрібних фай�
 
 **Про видалення та переміщення.** Файли, які InstallerClean видаляє, можна безпечно видалити назавжди. **Видалити** переміщує їх до Кошика (вас попередять, якщо він недоступний); місце на диску C: ви отримуєте назад, коли спорожнюєте Кошик.
 
-Утім, вам не обов'язково вірити мені на слово, що файли безпечно видаляти. Поки вони в Кошику, ви маєте змогу перевірити, що програми, які користуються цією папкою, Office, Acrobat, Visual Studio тощо, і далі оновлюються та видаляються без проблем. Якщо ви виявите, що щось зламалося (вкрай малоймовірно, і після <!-- downloads-start -->37 000+<!-- downloads-end --> завантажень поки що не надійшло жодного повідомлення), відновіть файли з Кошика, щоб це виправити. Щоб бути геть спокійним, можна натомість скористатися кнопкою **Перемістити**, аби зробити резервну копію файлів у папці на ваш вибір (звісно, оберіть папку на іншому розділі чи диску, якщо хочете звільнити місце на C:). Просто скопіюйте файли назад до `C:\Windows\Installer`, щоб повернути все як було (хоча вам майже напевно ніколи це не знадобиться).
+Утім, вам не обов'язково вірити мені на слово, що файли безпечно видаляти. Поки вони в Кошику, ви маєте змогу перевірити, що програми, які користуються цією папкою, Office, Acrobat, Visual Studio тощо, і далі оновлюються та видаляються без проблем. Якщо ви виявите, що щось зламалося (вкрай малоймовірно, і після <!-- downloads-start -->38 000+<!-- downloads-end --> завантажень поки що не надійшло жодного повідомлення), відновіть файли з Кошика, щоб це виправити. Щоб бути геть спокійним, можна натомість скористатися кнопкою **Перемістити**, аби зробити резервну копію файлів у папці на ваш вибір (звісно, оберіть папку на іншому розділі чи диску, якщо хочете звільнити місце на C:). Просто скопіюйте файли назад до `C:\Windows\Installer`, щоб повернути все як було (хоча вам майже напевно ніколи це не знадобиться).
 
 Якщо Windows Installer саме зараз пише в кеш, має призупинену попередню транзакцію або поставлене в чергу перейменування після перезавантаження, націлене на кеш, переміщення та видалення вимикаються, і показується конкретна причина.
 
@@ -174,7 +174,7 @@ InstallerClean розрізняє три види непотрібних фай�
 - Хеші SHA-256 для кожного релізу наведено на [сторінці релізів](../../releases/latest).
 - VirusTotal: кожну збірку скановано, а повні результати за кожним рушієм пов'язано зі сторінкою відповідного релізу, тож ви можете побачити, як оцінено кожен файл, і повторно перевірити його самостійно. Будь-яке хибне спрацювання зазначається і пояснюється в нотатках релізу, а не приховується.
 - Вихідний код на [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), а CI збирає й тестує кожен коміт (див. зелений значок CI вище).
-- <!-- downloads-start -->37 000+<!-- downloads-end --> завантажень через GitHub, MajorGeeks і Softpedia.
+- <!-- downloads-start -->38 000+<!-- downloads-end --> завантажень через GitHub, MajorGeeks і Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) перевіряє кожну подачу у віртуальній машині й додає її до каталогу лише після проходження перевірки.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Сертифіковано MajorGeeks як 100% чисте" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) перевіряє кожен реліз на віруси, шпигунське та рекламне ПЗ.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Сертифіковано Softpedia як 100% чисте" width="190"></a>
 
@@ -237,7 +237,7 @@ InstallerClean створено так, щоб ним можна було пов
 **Чи справді я звільню гігабайти місця?** Залежить від вашої машини. Чиста інсталяція Windows 11 без додаткових програм не має чого видаляти. Робоча станція розробника з тривалим стажем або будь-яка машина з великою кількістю програм на основі MSI (Acrobat, Office, LibreOffice, великі інструменти розробки) може мати десятки GB. Хай там як, ви побачите точну кількість тієї ж миті, щойно її запустите.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-Серед 141 звітів, які люди надіслали (дякуємо 🙏) відтоді, як v1.8.0 додала таку можливість:
+Серед 143 звітів, які люди надіслали (дякуємо 🙏) відтоді, як v1.8.0 додала таку можливість:
 
 | Результат | Частка | Найменше | Медіана | Найбільше |
 |---|---|---|---|---|

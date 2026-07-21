@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.1.0-blue" alt="Bản phát hành GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-37k-brightgreen" alt="Tổng lượt tải"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-38k-brightgreen" alt="Tổng lượt tải"></a>
 </p>
 
 ![Ảnh chụp màn hình InstallerClean sau khi dọn dẹp thành công: đã dọn 1,28 GB, 69 tệp đã được chuyển vào Thùng rác](docs/screenshots/vi/07-success-done.webp)
@@ -163,7 +163,7 @@ Có. InstallerClean truy vấn chính cơ sở dữ liệu API Windows Installer
 
 **Về Xóa và Chuyển.** Những tệp InstallerClean xóa có thể xóa vĩnh viễn một cách an toàn. **Xóa** sẽ di chuyển chúng vào Thùng rác (bạn sẽ được cảnh báo nếu Thùng rác không khả dụng); bạn lấy lại dung lượng trên ổ C: khi dọn sạch Thùng rác.
 
-Tuy nhiên, bạn không cần phải tin lời tôi rằng các tệp đó an toàn để xóa. Khi chúng còn trong Thùng rác, bạn có cơ hội kiểm tra xem những ứng dụng dùng thư mục này, như Office, Acrobat, Visual Studio và tương tự, vẫn cập nhật và gỡ cài đặt bình thường hay không. Nếu bạn phát hiện có gì đó hỏng (cực kỳ khó xảy ra, và cho đến nay chưa có báo cáo nào sau <!-- downloads-start -->37.000+<!-- downloads-end --> lượt tải), hãy khôi phục các tệp từ Thùng rác để khắc phục. Để cho thật chắc, bạn có thể dùng **Chuyển** thay vào đó, để sao lưu các tệp vào một thư mục bạn chọn (tất nhiên hãy chọn thư mục trên một phân vùng/ổ đĩa khác nếu bạn muốn giải phóng dung lượng trên C:). Chỉ cần chép các tệp trở lại `C:\Windows\Installer` là mọi thứ về như cũ (dù gần như chắc chắn bạn sẽ không bao giờ cần đến).
+Tuy nhiên, bạn không cần phải tin lời tôi rằng các tệp đó an toàn để xóa. Khi chúng còn trong Thùng rác, bạn có cơ hội kiểm tra xem những ứng dụng dùng thư mục này, như Office, Acrobat, Visual Studio và tương tự, vẫn cập nhật và gỡ cài đặt bình thường hay không. Nếu bạn phát hiện có gì đó hỏng (cực kỳ khó xảy ra, và cho đến nay chưa có báo cáo nào sau <!-- downloads-start -->38.000+<!-- downloads-end --> lượt tải), hãy khôi phục các tệp từ Thùng rác để khắc phục. Để cho thật chắc, bạn có thể dùng **Chuyển** thay vào đó, để sao lưu các tệp vào một thư mục bạn chọn (tất nhiên hãy chọn thư mục trên một phân vùng/ổ đĩa khác nếu bạn muốn giải phóng dung lượng trên C:). Chỉ cần chép các tệp trở lại `C:\Windows\Installer` là mọi thứ về như cũ (dù gần như chắc chắn bạn sẽ không bao giờ cần đến).
 
 Nếu Windows Installer đang ghi vào bộ nhớ đệm, có một giao dịch trước đó đang bị tạm dừng, hoặc có một thao tác đổi tên sau khi khởi động lại đang xếp hàng nhắm vào bộ nhớ đệm, thì Chuyển và Xóa bị vô hiệu hóa và lý do cụ thể sẽ được hiển thị.
 
@@ -174,7 +174,7 @@ Các dịch vụ quét, truy vấn, chuyển, xóa, cài đặt và kiểm tra k
 - Mã băm SHA-256 của mỗi bản phát hành được liệt kê trên [trang phát hành](../../releases/latest).
 - VirusTotal: mỗi bản dựng đều được quét, với kết quả đầy đủ theo từng công cụ được liên kết trên trang phát hành của bản đó, để bạn có thể xem từng tệp được chấm điểm ra sao và tự quét lại. Bất kỳ báo động giả nào cũng được nêu ra và giải thích trong ghi chú phát hành, không giấu giếm.
 - Mã nguồn nằm tại [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) và CI biên dịch và kiểm thử mọi lần commit (xem huy hiệu CI màu xanh ở trên).
-- <!-- downloads-start -->37.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
+- <!-- downloads-start -->38.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) kiểm tra mỗi lần gửi trong một máy ảo và chỉ đăng nếu nó vượt qua được phần đánh giá của họ.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Được MajorGeeks chứng nhận 100% sạch" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) kiểm tra mỗi bản phát hành để phát hiện virus, phần mềm gián điệp và phần mềm quảng cáo.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Được Softpedia chứng nhận 100% sạch" width="190"></a>
 
@@ -237,7 +237,7 @@ Nếu có điều gì ở đây cản trở bạn, hãy [mở một issue](../..
 **Tôi có thật sự giải phóng được hàng GB dung lượng không?** Còn tùy máy của bạn. Một bản Windows 11 cài mới không có phần mềm nào thêm thì chẳng có gì để loại bỏ. Một máy trạm của lập trình viên dùng lâu năm, hoặc bất kỳ máy nào có nhiều phần mềm dựa trên MSI (Acrobat, Office, LibreOffice, các công cụ phát triển lớn), có thể có hàng chục GB. Dù sao đi nữa, bạn sẽ thấy chính xác là bao nhiêu ngay khi chạy nó.
 
 <!-- reports-stats-start (generated by non-repo-files/refresh-reports-table.mjs; do not hand-edit between these markers) -->
-Trong số 141 báo cáo mọi người đã gửi về (cảm ơn 🙏) kể từ khi v1.8.0 thêm tùy chọn này:
+Trong số 143 báo cáo mọi người đã gửi về (cảm ơn 🙏) kể từ khi v1.8.0 thêm tùy chọn này:
 
 | Kết quả | Tỷ lệ | Nhỏ nhất | Trung vị | Lớn nhất |
 |---|---|---|---|---|
