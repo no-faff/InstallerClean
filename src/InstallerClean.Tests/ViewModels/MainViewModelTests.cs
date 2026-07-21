@@ -24,6 +24,7 @@ public class MainViewModelTests
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
     private readonly IResultLogService _resultLogService = Substitute.For<IResultLogService>();
+    private readonly IUpdateCheckService _updateCheckService = Substitute.For<IUpdateCheckService>();
     private readonly IRemovableReverifier _reverifier = Substitute.For<IRemovableReverifier>();
     private readonly MockFileSystem _fileSystem = new();
 
@@ -56,7 +57,7 @@ public class MainViewModelTests
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService,
-            _fileSystem, _resultLogService, _reverifier);
+            _fileSystem, _resultLogService, _updateCheckService, _reverifier);
     }
 
     private static ScanResult EmptyScanResult() =>
@@ -1185,16 +1186,6 @@ public class MainViewModelTests
         vm.Chrome.CloseAppCommand.Execute(null);
 
         _windowService.Received(1).CloseMainWindow();
-    }
-
-    [Fact]
-    public void StarOnGitHub_opens_repo_url()
-    {
-        var vm = CreateViewModel();
-
-        vm.Chrome.StarOnGitHubCommand.Execute(null);
-
-        _windowService.Received(1).OpenUrl("https://github.com/no-faff/InstallerClean");
     }
 
     [Fact]

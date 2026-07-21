@@ -57,6 +57,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         IWindowService windowService,
         IFileSystem fileSystem,
         IResultLogService resultLogService,
+        IUpdateCheckService updateCheckService,
         IRemovableReverifier reverifier)
     {
         _resultLogService = resultLogService;
@@ -84,7 +85,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             moveService, deleteService, settingsService,
             dialogService, confirmationService, fileSystem,
             Scan, Completion, resultLogService, reverifier);
-        Chrome = new ChromeViewModel(windowService, msiInfoService, settingsService, Scan,
+        Chrome = new ChromeViewModel(windowService, msiInfoService, settingsService,
+            updateCheckService, dialogService, Scan,
             isBusy: () => IsBusy);
 
         // Surface the all-clear overlay when a scan finishes with no

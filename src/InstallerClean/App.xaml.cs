@@ -234,6 +234,17 @@ public partial class App : Application
             _services = Composition.BuildServiceProvider();
             var viewModel = _services.GetRequiredService<MainViewModel>();
 
+            // Started here rather than after the window shows, and before the
+            // startup scan is awaited rather than after it, because a typical
+            // session is over in seconds: a check queued behind the scan
+            // routinely resolves after the user has closed the window. It runs
+            // beside the scan instead, so the status line is usually already
+            // painted at first paint. Fire-and-forget by contract (it swallows
+            // every outcome, exceptions included), so it cannot fail the splash
+            // path or delay the window; the AutoUpdateCheck setting is read
+            // inside it, so an opted-out install opens no socket.
+            viewModel.Chrome.StartAutomaticUpdateCheck();
+
             using var startupCts = new CancellationTokenSource();
             splash.CancelRequested += (_, _) => startupCts.Cancel();
 

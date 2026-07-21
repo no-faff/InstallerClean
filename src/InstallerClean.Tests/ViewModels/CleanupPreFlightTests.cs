@@ -37,6 +37,8 @@ public class CleanupPreFlightTests
     private readonly IDirectory _directory = Substitute.For<IDirectory>();
     private readonly IFile _file = Substitute.For<IFile>();
 
+    private readonly IUpdateCheckService _updateCheckService = Substitute.For<IUpdateCheckService>();
+
     private readonly string _destination = Path.Combine(Path.GetTempPath(), "ic-test-preflight");
 
     public CleanupPreFlightTests()
@@ -68,7 +70,7 @@ public class CleanupPreFlightTests
         new(_scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService,
-            _fileSystem, _resultLogService, _reverifier);
+            _fileSystem, _resultLogService, _updateCheckService, _reverifier);
 
     /// <summary>
     /// Spins until <paramref name="condition"/> holds. The view-models have no

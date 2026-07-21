@@ -1,10 +1,13 @@
 namespace InstallerClean.Services;
 
 /// <summary>
-/// Single-call check against the GitHub Releases API. Triggered only
-/// by an explicit user action (the "Check for updates" button in the
-/// About window), never automatically. No outbound network capability
-/// fires without a deliberate click.
+/// Single-call check against the GitHub Releases API. Two call sites,
+/// both in ChromeViewModel: the "Check for updates" button on the main
+/// window, and the once-per-session automatic check the app starts at
+/// launch. The automatic one is gated on <c>AppSettings.AutoUpdateCheck</c>,
+/// read at the moment it fires, so an install that has opted out opens no
+/// socket at all. This is the app's only outbound call besides the
+/// explicitly consented result-log send.
 /// </summary>
 public interface IUpdateCheckService
 {

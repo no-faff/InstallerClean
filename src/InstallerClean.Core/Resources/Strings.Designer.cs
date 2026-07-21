@@ -35,6 +35,9 @@ public static class Strings
     private static string Get(string key) =>
         Manager.GetString(key, Localisation.UiCulture) ?? key;
 
+    public static string About_AutoUpdateCheck => Get("About.AutoUpdateCheck");
+    public static string About_Link_Guide => Get("About.Link.Guide");
+    public static string About_Link_ReportProblem => Get("About.Link.ReportProblem");
     public static string Action_About => Get("Action.About");
     public static string Action_Browse => Get("Action.Browse");
     public static string Action_BuyMeACuppa => Get("Action.BuyMeACuppa");
@@ -59,6 +62,9 @@ public static class Strings
     public static string Action_SelectAll => Get("Action.SelectAll");
     public static string Action_SendResultLog => Get("Action.SendResultLog");
     public static string Action_SendResultLogConfirm => Get("Action.SendResultLogConfirm");
+    public static string Automation_About_Guide_HelpText => Get("Automation.About.Guide.HelpText");
+    public static string Automation_About_ReportProblem_HelpText => Get("Automation.About.ReportProblem.HelpText");
+    public static string Automation_AutoUpdateCheck_HelpText => Get("Automation.AutoUpdateCheck.HelpText");
     public static string Automation_BuyMeACuppa => Get("Automation.BuyMeACuppa");
     public static string Automation_BuyMeACuppa_About => Get("Automation.BuyMeACuppa.About");
     public static string Automation_CancelOperation => Get("Automation.CancelOperation");
@@ -76,7 +82,6 @@ public static class Strings
     public static string Automation_ConfirmMove => Get("Automation.ConfirmMove");
     public static string Automation_ConfirmSendResultLog => Get("Automation.ConfirmSendResultLog");
     public static string Automation_DeleteAllFiles => Get("Automation.DeleteAllFiles");
-    public static string Automation_LeaveStarOnGitHub => Get("Automation.LeaveStarOnGitHub");
     public static string Automation_LeaveStarOnGitHub_About => Get("Automation.LeaveStarOnGitHub.About");
     public static string Automation_Licence => Get("Automation.Licence");
     public static string Automation_Licence_HelpText => Get("Automation.Licence.HelpText");
@@ -197,6 +202,7 @@ public static class Strings
     public static string Completion_DeleteSpaceHint => Get("Completion.DeleteSpaceHint");
     public static string Completion_DeleteSummary_Plural => Get("Completion.DeleteSummary.Plural");
     public static string Completion_DeleteSummary_Singular => Get("Completion.DeleteSummary.Singular");
+    public static string Completion_DonateAsk => Get("Completion.DonateAsk");
     public static string Completion_FailedCountDelete_Plural => Get("Completion.FailedCountDelete.Plural");
     public static string Completion_FailedCountDelete_Singular => Get("Completion.FailedCountDelete.Singular");
     public static string Completion_FailedCount_Plural => Get("Completion.FailedCount.Plural");
@@ -372,13 +378,11 @@ public static class Strings
     public static string Summary_RegisteredStillUsed_Singular => Get("Summary.RegisteredStillUsed.Singular");
     public static string Summary_RegisteredWindow_Plural => Get("Summary.RegisteredWindow.Plural");
     public static string Summary_RegisteredWindow_Singular => Get("Summary.RegisteredWindow.Singular");
-    public static string Tooltip_BuyMeACuppa => Get("Tooltip.BuyMeACuppa");
     public static string Tooltip_BuyMeACuppa_About => Get("Tooltip.BuyMeACuppa.About");
     public static string Tooltip_CancellingPending => Get("Tooltip.CancellingPending");
     public static string Tooltip_ChangeLanguage => Get("Tooltip.ChangeLanguage");
     public static string Tooltip_Close => Get("Tooltip.Close");
     public static string Tooltip_Delete => Get("Tooltip.Delete");
-    public static string Tooltip_LeaveStarOnGitHub => Get("Tooltip.LeaveStarOnGitHub");
     public static string Tooltip_LeaveStarOnGitHub_About => Get("Tooltip.LeaveStarOnGitHub.About");
     public static string Tooltip_Minimise => Get("Tooltip.Minimise");
     public static string Tooltip_Move => Get("Tooltip.Move");
@@ -392,6 +396,7 @@ public static class Strings
     public static string UpdateCheck_Failed_Timeout => Get("UpdateCheck.Failed.Timeout");
     public static string UpdateCheck_Failed_Unknown => Get("UpdateCheck.Failed.Unknown");
     public static string UpdateCheck_Status_Checking => Get("UpdateCheck.Status.Checking");
+    public static string UpdateCheck_Status_UpdateAvailable => Get("UpdateCheck.Status.UpdateAvailable");
     public static string UpdateCheck_Status_UpToDate => Get("UpdateCheck.Status.UpToDate");
     public static string UpdateCheck_Title => Get("UpdateCheck.Title");
     public static string UpdateCheck_UpdateAvailable_Body => Get("UpdateCheck.UpdateAvailable.Body");

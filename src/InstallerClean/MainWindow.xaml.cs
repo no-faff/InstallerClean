@@ -30,6 +30,7 @@ public partial class MainWindow : Window
         _vm.Completion.PropertyChanged += OnCompletionPropertyChanged;
         _vm.Cleanup.PropertyChanged += OnCleanupPropertyChanged;
         _vm.Scan.PropertyChanged += OnScanPropertyChanged;
+        _vm.Chrome.PropertyChanged += OnChromePropertyChanged;
         _vm.Scan.ScanCompleted += OnScanCompleted;
         PreviewKeyDown += OnPreviewKeyDown;
         Closing += OnClosing;
@@ -97,8 +98,7 @@ public partial class MainWindow : Window
                     ScanResultAnnouncer.Text = _vm.Scan.LastScanError);
         }
 
-        StarToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
-        HeartToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
+        CompletionDonateToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
 
         // Width is explicit, the designed 828 (the content column's 780
         // MaxWidth plus the content margins) multiplied by the
@@ -157,23 +157,6 @@ public partial class MainWindow : Window
     private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
         => DetailWindowSizing.NudgeIntoWorkArea(this);
 
-    // PlacementMode.Top aligns the tooltip's left edge with the
-    // target's and grows rightward, so on the bottom-right corner
-    // icons the tooltip crosses the window edge onto the desktop
-    // (popups respect screen edges, not window edges), and no mode in
-    // the enum aligns right edges. This pins the tooltip's right edge
-    // to the button's right edge, flush above, which keeps it inside
-    // the window and matches the About window's pair, whose buttons
-    // sit at the window's left where plain Top placement already
-    // lands inside. The second candidate (flush below) is taken by
-    // WPF only when there is no room above, e.g. the window dragged
-    // to the top of the screen.
-    private static CustomPopupPlacement[] PlaceAboveRightAligned(Size popupSize, Size targetSize, Point offset) =>
-    [
-        new CustomPopupPlacement(new Point(targetSize.Width - popupSize.Width, -popupSize.Height), PopupPrimaryAxis.Horizontal),
-        new CustomPopupPlacement(new Point(targetSize.Width - popupSize.Width, targetSize.Height), PopupPrimaryAxis.Horizontal)
-    ];
-
     /// <summary>
     /// True once a close has been requested during a Move or a Delete: the
     /// close is held, the operation cancelled, and the window closed for real
@@ -222,6 +205,7 @@ public partial class MainWindow : Window
         _vm.Completion.PropertyChanged -= OnCompletionPropertyChanged;
         _vm.Cleanup.PropertyChanged -= OnCleanupPropertyChanged;
         _vm.Scan.PropertyChanged -= OnScanPropertyChanged;
+        _vm.Chrome.PropertyChanged -= OnChromePropertyChanged;
         _vm.Scan.ScanCompleted -= OnScanCompleted;
         PreviewKeyDown -= OnPreviewKeyDown;
         AccessibilitySettings.Current.PropertyChanged -= OnAccessibilitySettingsChanged;
@@ -337,6 +321,44 @@ public partial class MainWindow : Window
         {
             AnnounceLiveRegions(ResultLogStatusText);
         }
+    }
+
+    /// <summary>
+    /// Whether the plain update-status line is in the rendered tree. The UIA
+    /// bridge announces a text change inside an already-rendered subtree by
+    /// itself but never a Collapsed-to-Visible reveal, so the reveal is the
+    /// one transition the window has to raise, and raising the rest as well
+    /// would speak them twice.
+    /// </summary>
+    private bool _updateStatusLineShown;
+
+    /// <summary>
+    /// Both halves of the update status line start life Collapsed, and each
+    /// appears by a DataTrigger rather than by its text changing, which is
+    /// the reveal the UIA bridge does not announce (the same gap the
+    /// pending-reboot banner and the result-log status line each carry an
+    /// explicit raise for). Both halves need it, for opposite reasons: the
+    /// automatic check's find lands unprompted with focus wherever the user
+    /// left it, and the manual check's "Checking..." is the answer to a click
+    /// the user is actively waiting on, which would otherwise be five silent
+    /// seconds.
+    /// </summary>
+    private void OnChromePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ChromeViewModel.HasUpdateLink) && _vm.Chrome.HasUpdateLink)
+        {
+            AnnounceLiveRegions(UpdateLinkText);
+            return;
+        }
+
+        if (e.PropertyName != nameof(ChromeViewModel.UpdateStatusText)) return;
+
+        // Mirrors the plain line's own visibility triggers: it shows when
+        // there is text and no link to show instead.
+        var shown = !_vm.Chrome.HasUpdateLink && _vm.Chrome.UpdateStatusText.Length > 0;
+        if (shown && !_updateStatusLineShown)
+            AnnounceLiveRegions(UpdateStatusLineText);
+        _updateStatusLineShown = shown;
     }
 
     private void OnCleanupPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -455,6 +477,21 @@ public partial class MainWindow : Window
         if (!MoveDestinationInput.Focus())
             RescanButton.Focus();
     }
+
+    // PlacementMode.Top aligns the tooltip's left edge with the target's and
+    // grows rightward, so a tooltip on a control near the right of the window
+    // runs off it (popups respect screen edges, not window edges), and no mode
+    // in the enum aligns right edges. This pins the tooltip's right edge to the
+    // target's, flush above. The completion card's donate heart needs it: the
+    // heart sits at the card's right edge and its wrapped two-line tooltip is
+    // wider than the gap from there to the window edge. The second candidate
+    // (flush below) is taken by WPF only when there is no room above, e.g. the
+    // window dragged to the top of the screen.
+    private static CustomPopupPlacement[] PlaceAboveRightAligned(Size popupSize, Size targetSize, Point offset) =>
+    [
+        new CustomPopupPlacement(new Point(targetSize.Width - popupSize.Width, -popupSize.Height), PopupPrimaryAxis.Horizontal),
+        new CustomPopupPlacement(new Point(targetSize.Width - popupSize.Width, targetSize.Height), PopupPrimaryAxis.Horizontal)
+    ];
 
     /// <summary>
     /// Queues LiveRegionChanged raises for <paramref name="elements"/> at

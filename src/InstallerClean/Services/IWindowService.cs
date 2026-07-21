@@ -16,6 +16,14 @@ public interface IWindowService
 
     void ShowAbout();
 
+    /// <summary>
+    /// Shows the update-available dialog for a check that found a newer
+    /// version. Returns true when the user chose to open the release
+    /// page; the caller launches the URL, keeping the window layer free
+    /// of the launcher and the view-model free of Window construction.
+    /// </summary>
+    bool ShowUpdateAvailable(string currentVersion, string latestVersion);
+
     void CloseMainWindow();
 
     void OpenUrl(string url);

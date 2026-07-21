@@ -29,6 +29,7 @@ public class ScanMoveCompletionTests
     private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
     private readonly IResultLogService _resultLogService = Substitute.For<IResultLogService>();
+    private readonly IUpdateCheckService _updateCheckService = Substitute.For<IUpdateCheckService>();
     private readonly IRemovableReverifier _reverifier = Substitute.For<IRemovableReverifier>();
 
     private readonly MockFileSystem _fileSystem = new();
@@ -50,7 +51,7 @@ public class ScanMoveCompletionTests
             _scanService, _moveService, _deleteService,
             _settingsService, _rebootService, _msiInfoService,
             _dialogService, _confirmationService, _windowService,
-            _fileSystem, _resultLogService, _reverifier);
+            _fileSystem, _resultLogService, _updateCheckService, _reverifier);
     }
 
     [Fact]
@@ -201,6 +202,7 @@ public class ScanMoveCompletionTests
             Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
         var windowService = Substitute.For<IWindowService>();
         var resultLogService = Substitute.For<IResultLogService>();
+        var updateCheckService = Substitute.For<IUpdateCheckService>();
 
         // Pass the same `fs` instance the production services were
         // wired against. Two distinct MockFileSystems in one test
@@ -212,7 +214,7 @@ public class ScanMoveCompletionTests
             scanService, moveService, deleteService,
             settingsService, rebootService, msiInfoService,
             dialogService, confirmationService, windowService,
-            fs, resultLogService, reverifier);
+            fs, resultLogService, updateCheckService, reverifier);
 
         // Stage 1: real scan finds the two orphans.
         await vm.Scan.ScanWithProgressAsync(null);

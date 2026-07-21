@@ -57,8 +57,8 @@ public static class CoreComposition
         // Persistence.
         services.AddSingleton<ISettingsService, SettingsService>();
 
-        // User-triggered network. Singleton keeps the HttpClient
-        // connection pool reused across the button-click lifetime.
+        // The two outbound-network services. Singleton keeps each one's
+        // HttpClient connection pool reused for the life of the process.
         services.AddSingleton<IUpdateCheckService, UpdateCheckService>();
         services.AddSingleton<IResultLogService, ResultLogService>();
 

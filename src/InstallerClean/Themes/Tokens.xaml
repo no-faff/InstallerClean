@@ -194,7 +194,6 @@
     <Thickness x:Key="GapTop.Sm">0,8,0,0</Thickness>
 
     <Thickness x:Key="GapRight.Sm">0,0,8,0</Thickness>
-    <Thickness x:Key="GapRight.Md">0,0,12,0</Thickness>
     <!-- Icon-after-text spacing: 6 sits below the 8/12/16/24 scale on
          purpose. A 12 to 18 px icon next to body text reads tightly at
          6 and slightly loose at 8; the irregular value names the

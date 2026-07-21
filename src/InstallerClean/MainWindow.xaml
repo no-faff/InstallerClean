@@ -450,18 +450,30 @@
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     KeyboardNavigation.TabIndex="1"
                     Content="{loc:Translate Action.About}" Command="{Binding Chrome.ShowAboutCommand}" Margin="4,0,0,0"/>
-            <!-- Docked-right group, declared far-right-first: the globe is
-                 declared first (far right), then Heart, then Star, so the
-                 visual order left-to-right is Star, Heart, Globe. TabIndex
-                 (2, 3, 4) restores that reading order for Tab, which would
-                 otherwise follow declaration order (Globe -> Heart -> Star,
-                 reversed). Each item carries the gap to the one on its right. -->
+            <!-- Manual update check. The automatic once-per-session check
+                 fires at launch without a click; this button is for anyone
+                 who wants to ask again, and it is the only control that
+                 reports an up-to-date result or a failure, because the
+                 automatic path is deliberately silent on both. Its own
+                 execution covers the cooldown, so the pill's disabled paint
+                 is the feedback while it runs. -->
+            <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
+                    KeyboardNavigation.TabIndex="2"
+                    Content="{loc:Translate Action.CheckForUpdates}"
+                    Command="{Binding Chrome.CheckForUpdatesCommand}" Margin="4,0,0,0"
+                    AutomationProperties.Name="{loc:Translate Automation.CheckForUpdates}"
+                    AutomationProperties.HelpText="{loc:Translate Automation.CheckForUpdates.HelpText}"/>
             <!-- Language switcher: a wordless globe so it reads in any UI
                  language. It opens a menu of language names (endonyms) with
                  the running one ticked (LanguageButton_Click); picking
-                 another restarts the app into it. Functional, not an
-                 affective ask, so it uses the default tooltip (the accent
-                 tooltip is the star's and heart's) and has no hover-grow. -->
+                 another restarts the app into it. Declared before the status
+                 line below (which docks Left) so the DockPanel reserves its
+                 slot at the far right first and the status line takes only
+                 what is left between the buttons and the globe, which is
+                 also what gives the status line a width to ellipsize
+                 against. TabIndex 4 puts it last in the bar's reading order,
+                 after the status hyperlink at 3, rather than at its
+                 declaration position. -->
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
                     x:Name="LanguageButton"
                     KeyboardNavigation.TabIndex="4"
@@ -476,120 +488,62 @@
                       Stroke="{StaticResource Text.Muted}" StrokeThickness="2" Fill="{x:Null}"
                       Width="18" Height="18" Stretch="Uniform"/>
             </Button>
-            <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
-                    KeyboardNavigation.TabIndex="3"
-                    Command="{Binding Chrome.DonateCommand}"
-                    AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa}"
-                    FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
-                    ToolTipService.InitialShowDelay="0"
-                    Padding="6,0" MinHeight="28" Margin="{StaticResource GapRight.Md}">
-                <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                      Fill="{StaticResource Decoration.Heart}" Width="18" Height="18" Stretch="Uniform"
-                      RenderTransformOrigin="0.5,0.5">
-                    <Path.RenderTransform>
-                        <ScaleTransform ScaleX="1" ScaleY="1"/>
-                    </Path.RenderTransform>
-                    <Path.Style>
-                        <Style TargetType="Path">
-                            <Style.Triggers>
-                                <!-- Hover grow honours "show animations": the scale
-                                     plays only while ReduceMotion is false, so an
-                                     animation-off user gets a static icon. IsMouseOver
-                                     and the live setting gate it together, and a
-                                     runtime toggle re-evaluates because ReduceMotion
-                                     raises PropertyChanged. -->
-                                <MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
-                                        <Condition Binding="{Binding Source={x:Static a11y:AccessibilitySettings.Current}, Path=ReduceMotion}" Value="False"/>
-                                    </MultiDataTrigger.Conditions>
-                                    <MultiDataTrigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
-                                                                 To="1.2" Duration="0:0:0.15"/>
-                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
-                                                                 To="1.2" Duration="0:0:0.15"/>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </MultiDataTrigger.EnterActions>
-                                    <MultiDataTrigger.ExitActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
-                                                                 To="1.0" Duration="0:0:0.15"/>
-                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
-                                                                 To="1.0" Duration="0:0:0.15"/>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </MultiDataTrigger.ExitActions>
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Path.Style>
-                </Path>
-                <Button.ToolTip>
-                    <ToolTip x:Name="HeartToolTip" Style="{StaticResource AccentTooltip}" Content="{loc:Translate Tooltip.BuyMeACuppa}"
-                             Placement="Custom"/>
-                </Button.ToolTip>
-            </Button>
-            <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
-                    KeyboardNavigation.TabIndex="2"
-                    Command="{Binding Chrome.StarOnGitHubCommand}"
-                    AutomationProperties.Name="{loc:Translate Automation.LeaveStarOnGitHub}"
-                    FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
-                    ToolTipService.InitialShowDelay="0"
-                    Padding="6,0" MinHeight="28" Margin="{StaticResource GapRight.Md}">
-                <Path Data="m12.672.668 3.059 6.197 6.838.993a.75.75 0 0 1 .416 1.28l-4.948 4.823 1.168 6.812a.75.75 0 0 1-1.088.79L12 18.347l-6.116 3.216a.75.75 0 0 1-1.088-.791l1.168-6.811-4.948-4.823a.749.749 0 0 1 .416-1.279l6.838-.994L11.327.668a.75.75 0 0 1 1.345 0Z"
-                      Fill="{StaticResource Decoration.Star}" Width="18" Height="18" Stretch="Uniform"
-                      RenderTransformOrigin="0.5,0.5">
-                    <Path.RenderTransform>
-                        <ScaleTransform ScaleX="1" ScaleY="1"/>
-                    </Path.RenderTransform>
-                    <Path.Style>
-                        <Style TargetType="Path">
-                            <Style.Triggers>
-                                <!-- Hover grow honours "show animations": the scale
-                                     plays only while ReduceMotion is false, so an
-                                     animation-off user gets a static icon. IsMouseOver
-                                     and the live setting gate it together, and a
-                                     runtime toggle re-evaluates because ReduceMotion
-                                     raises PropertyChanged. -->
-                                <MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
-                                        <Condition Binding="{Binding Source={x:Static a11y:AccessibilitySettings.Current}, Path=ReduceMotion}" Value="False"/>
-                                    </MultiDataTrigger.Conditions>
-                                    <MultiDataTrigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
-                                                                 To="1.2" Duration="0:0:0.15"/>
-                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
-                                                                 To="1.2" Duration="0:0:0.15"/>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </MultiDataTrigger.EnterActions>
-                                    <MultiDataTrigger.ExitActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
-                                                                 To="1.0" Duration="0:0:0.15"/>
-                                                <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
-                                                                 To="1.0" Duration="0:0:0.15"/>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </MultiDataTrigger.ExitActions>
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Path.Style>
-                </Path>
-                <Button.ToolTip>
-                    <ToolTip x:Name="StarToolTip" Style="{StaticResource AccentTooltip}" Content="{loc:Translate Tooltip.LeaveStarOnGitHub}"
-                             Placement="Custom"/>
-                </Button.ToolTip>
-            </Button>
+            <!-- Update status line, in two mutually exclusive
+                 presentations of the same sentence. Both dock Left after the
+                 globe so they take the space between the buttons and the
+                 globe, which is also what gives them a width to ellipsize
+                 against; both carry LiveSetting=Polite so an outcome that
+                 arrives while focus is elsewhere is still spoken (the
+                 automatic check lands unprompted, so it always is).
+
+                 Plain muted text while there is nothing to click
+                 ("Checking...", "Up to date."). A hyperlink once a check has
+                 found a newer version, because at that moment the sentence
+                 announcing the update is also the way to get it. The link
+                 takes the app's one link style, whose indigo is the accent
+                 family's only text-legible step: Action.Accent.Background,
+                 what the accent pills fill with, measures 2.33:1 against
+                 this window's surface and cannot carry type.
+
+                 The plain line hides on HasUpdateLink rather than on the URL
+                 itself because a DataTrigger tests equality only, so the URL
+                 string can express "no link" and never "a link". -->
+            <TextBlock x:Name="UpdateStatusLineText"
+                       DockPanel.Dock="Left" Text="{Binding Chrome.UpdateStatusText}"
+                       VerticalAlignment="Center" Margin="8,0,0,0"
+                       Foreground="{StaticResource Text.Muted}"
+                       FontSize="{DynamicResource Type.Body}"
+                       TextTrimming="CharacterEllipsis"
+                       AutomationProperties.LiveSetting="Polite">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Chrome.UpdateStatusText}" Value="">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Chrome.HasUpdateLink}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <TextBlock x:Name="UpdateLinkText" DockPanel.Dock="Left"
+                       VerticalAlignment="Center" Margin="8,0,0,0"
+                       FontSize="{DynamicResource Type.Body}"
+                       TextTrimming="CharacterEllipsis"
+                       Visibility="{Binding Chrome.HasUpdateLink, Converter={StaticResource BoolToVis}}"
+                       AutomationProperties.LiveSetting="Polite">
+                <!-- No AutomationProperties.Name or HelpText: the Run IS the
+                     link's accessible name, and it is already a whole
+                     sentence naming the version, spoken after the "link"
+                     control type. There is nothing left to add that would
+                     not be a second reading of the same words. -->
+                <Hyperlink Command="{Binding Chrome.OpenUpdatePageCommand}"
+                           Style="{StaticResource SubtleLink}"
+                           KeyboardNavigation.TabIndex="3"><Run Text="{Binding Chrome.UpdateStatusText}"/></Hyperlink>
+            </TextBlock>
         </DockPanel>
 
         <!-- Scanning overlay -->
@@ -1018,6 +972,85 @@
                             MinHeight="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             AutomationProperties.HelpText="{loc:Translate Automation.RescanInstaller}"/>
+
+                    <!-- Donate heart. Spans every row and pins itself to the
+                         card's bottom-right corner, so it sits level with
+                         "Scan again" without taking a row of its own or
+                         shifting anything when it is absent. Shown only when
+                         the run actually freed bytes (Completion.ShowDonate),
+                         so the ask only ever follows delivered value.
+
+                         Declared last so it is the final stop in the
+                         overlay's Tab cycle: the named actions the user came
+                         for are reached first, and nothing in the card
+                         carries an explicit TabIndex, so declaration order is
+                         the order.
+
+                         Hover text is invisible to a screen reader, which is
+                         why the same sentence is also the HelpText; the Name
+                         says what the control does and the HelpText carries
+                         the ask. -->
+                    <Button Grid.Row="0" Grid.RowSpan="7" Style="{StaticResource GhostPill}"
+                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                            Padding="6,0" MinHeight="28"
+                            Visibility="{Binding Completion.ShowDonate, Converter={StaticResource BoolToVis}}"
+                            Command="{Binding Chrome.DonateCommand}"
+                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
+                            ToolTipService.InitialShowDelay="0"
+                            AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa}"
+                            AutomationProperties.HelpText="{loc:Translate Completion.DonateAsk}">
+                        <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                              Fill="{StaticResource Decoration.Heart}" Width="18" Height="18" Stretch="Uniform"
+                              RenderTransformOrigin="0.5,0.5">
+                            <Path.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1"/>
+                            </Path.RenderTransform>
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Style.Triggers>
+                                        <!-- Hover grow honours "show animations": the scale
+                                             plays only while ReduceMotion is false, so an
+                                             animation-off user gets a static icon. IsMouseOver
+                                             and the live setting gate it together, and a
+                                             runtime toggle re-evaluates because ReduceMotion
+                                             raises PropertyChanged. -->
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                                <Condition Binding="{Binding Source={x:Static a11y:AccessibilitySettings.Current}, Path=ReduceMotion}" Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <MultiDataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                                                         To="1.2" Duration="0:0:0.15"/>
+                                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                                                         To="1.2" Duration="0:0:0.15"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </MultiDataTrigger.EnterActions>
+                                            <MultiDataTrigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                                                         To="1.0" Duration="0:0:0.15"/>
+                                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                                                         To="1.0" Duration="0:0:0.15"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </MultiDataTrigger.ExitActions>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+                        </Path>
+                        <Button.ToolTip>
+                            <ToolTip x:Name="CompletionDonateToolTip"
+                                     Style="{StaticResource AccentTooltip}"
+                                     Content="{loc:Translate Completion.DonateAsk}"
+                                     Placement="Custom"/>
+                        </Button.ToolTip>
+                    </Button>
 
                 </Grid>
             </Border>

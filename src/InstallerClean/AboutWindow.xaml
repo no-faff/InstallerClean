@@ -20,10 +20,21 @@
             <RowDefinition Height="32"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="6"/>
+            <!-- Version -->
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
+            <!-- Guide link, then the issue-tracker link a tighter 6 below it:
+                 the two are one block of doors out to GitHub, and the wider
+                 gaps either side are what separate that block from the
+                 version above and the setting below. -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="6"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
+            <!-- Auto-update checkbox -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <!-- Licence -->
             <RowDefinition Height="Auto"/>
             <!-- Star spacer: the gap before the say-thanks block. Under
                  SizeToContent="Height" it sits at MinHeight and expands past it
@@ -53,27 +64,46 @@
         <TextBlock Grid.Row="1" Text="{loc:Translate Window.Main.Title}"
                    Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Md}" FontWeight="SemiBold"/>
 
-        <!-- The status TextBlock to the right of the version is the
-             result channel for the Check-for-updates button below.
-             LiveSetting=Polite so the in-flight wait is announced to
-             Narrator / NVDA / JAWS; without it the button click reads
-             as silent. -->
-        <Grid Grid.Row="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" x:Name="VersionText"
-                     Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
-                     VerticalAlignment="Center" Margin="-2,0,0,0"/>
-            <TextBlock Grid.Column="2" x:Name="CheckStatusText"
-                       Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
-                       VerticalAlignment="Center" TextWrapping="NoWrap"
-                       AutomationProperties.LiveSetting="Polite"/>
-        </Grid>
+        <TextBox Grid.Row="3" x:Name="VersionText" HorizontalAlignment="Left"
+                 Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
+                 VerticalAlignment="Center" Margin="-2,0,0,0"/>
 
+        <!-- The guide link. Each supported language has its own README file,
+             so the target is resolved in code-behind (ReadmeLinks.Home)
+             against the language on screen rather than pinned here: it
+             should not open on English for someone reading the window in
+             Polish. The app's other two README links are both mid-sentence
+             and both point at one section of it (the missing-file note, the
+             completion screen's restore hint); this is the only one that
+             offers the document itself. -->
         <TextBlock Grid.Row="5" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
+            <Hyperlink x:Name="GuideLink"
+                       Click="Hyperlink_Click"
+                       Style="{StaticResource SubtleLink}"
+                       AutomationProperties.HelpText="{loc:Translate Automation.About.Guide.HelpText}"><Run Text="{loc:Translate About.Link.Guide}"/></Hyperlink>
+        </TextBlock>
+
+        <TextBlock Grid.Row="7" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
+            <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/issues"
+                       Click="Hyperlink_Click"
+                       Style="{StaticResource SubtleLink}"
+                       AutomationProperties.HelpText="{loc:Translate Automation.About.ReportProblem.HelpText}"><Run Text="{loc:Translate About.Link.ReportProblem}"/></Hyperlink>
+        </TextBlock>
+
+        <!-- The off switch for the automatic once-per-session update check.
+             Read when the check fires rather than at startup, so unticking
+             it stops this session's check as well as every later one, and
+             ticking it back on needs no restart.
+
+             Checked/Unchecked are attached in code-behind, not here: the
+             constructor's own assignment of IsChecked would otherwise fire
+             the handler and write the setting back on every open. -->
+        <CheckBox Grid.Row="9" x:Name="AutoUpdateCheckBox"
+                  HorizontalAlignment="Left"
+                  Content="{loc:Translate About.AutoUpdateCheck}"
+                  AutomationProperties.HelpText="{loc:Translate Automation.AutoUpdateCheck.HelpText}"/>
+
+        <TextBlock Grid.Row="11" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
             <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/blob/main/LICENSE"
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}"
@@ -81,23 +111,16 @@
                        AutomationProperties.HelpText="{loc:Translate Automation.Licence.HelpText}"><Run Text="{loc:Translate Action.Licence}"/></Hyperlink>
         </TextBlock>
 
-        <Button Grid.Row="7" Style="{StaticResource CompactPill}"
-                x:Name="CheckNowButton"
-                Content="{loc:Translate Action.CheckForUpdates}" Click="CheckNowClick"
-                HorizontalAlignment="Left"
-                AutomationProperties.Name="{loc:Translate Automation.CheckForUpdates}"
-                AutomationProperties.HelpText="{loc:Translate Automation.CheckForUpdates.HelpText}"/>
-
         <!-- Section header above the Star + Buy-me-a-cuppa row. The
              resx value is already uppercased so screen readers don't
              see SmallCaps glyph mapping at all. Type.Heading.Sm +
              Text.Body matches MOVE LOCATION and the registered-
              window PRODUCTS / PATCHES / PRODUCT DETAILS labels. -->
-        <TextBlock Grid.Row="9" Text="{loc:Translate Section.SayThanks}"
+        <TextBlock Grid.Row="13" Text="{loc:Translate Section.SayThanks}"
                    Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                    AutomationProperties.Name="{loc:Translate Automation.SayThanks}"/>
 
-        <Grid Grid.Row="11">
+        <Grid Grid.Row="15">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                 <Button Style="{StaticResource CompactGhostPill}"
                         Click="StarClick" AutomationProperties.Name="{loc:Translate Automation.LeaveStarOnGitHub.About}"

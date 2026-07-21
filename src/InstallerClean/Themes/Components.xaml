@@ -122,13 +122,14 @@
         </Setter>
     </Style>
 
-    <!-- Focus ring for flat, rectangular controls (the read-only JSON
-         preview TextBox in ConfirmSendResultLogWindow). The pill
-         visuals above sit around rounded controls and paint a 16 to
-         22 px rounded ring, which outside a sharp-cornered TextBox
-         edge traces a shape the control does not have. This one uses a
-         2px corner radius so the ring tracks the underlying
-         rectangle. -->
+    <!-- Focus ring for flat, rectangular controls: the read-only JSON
+         preview TextBox in ConfirmSendResultLogWindow, and the checkbox
+         row further down (whose focusable extent is the box plus its
+         label, a rectangle). The pill visuals above sit around rounded
+         controls and paint a 16 to 22 px rounded ring, which outside a
+         sharp-cornered edge traces a shape the control does not have.
+         This one uses a 2px corner radius so the ring tracks the
+         underlying rectangle. -->
     <Style x:Key="FlatTextBoxFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
@@ -367,6 +368,86 @@
     </Style>
 
     <!-- Inputs. -->
+
+    <!-- Checkbox. Implicit rather than keyed, like ProgressBar and
+         ScrollBar below: the app has one checkbox (the About window's
+         auto-update switch), the control type has a single house look,
+         and a second one should inherit it without opting in.
+
+         The tick is a FILLED Path, not a stroked one. The theme's only
+         stroke weights are Hairline (1) and the focus ring's 2, and a
+         1px tick inside an 18px box reads as a scratch; a fill needs no
+         new token to be legible.
+
+         The row's whole extent takes the click (the transparent
+         StackPanel background), so the label toggles the box, which is
+         what a checkbox label is for. -->
+    <Style TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{StaticResource Text.Body}"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
+        <Setter Property="FontFamily" Value="{StaticResource Type.FontFamily}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FlatTextBoxFocusVisual}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <StackPanel x:Name="Root" Orientation="Horizontal" Background="Transparent">
+                        <Border x:Name="Box" Width="18" Height="18"
+                                CornerRadius="{StaticResource Radius.Chip}"
+                                Background="{StaticResource Action.Standard.Background}"
+                                Margin="{StaticResource GapRight.Sm}"
+                                VerticalAlignment="Center"
+                                SnapsToDevicePixels="True">
+                            <Path x:Name="Tick"
+                                  Data="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                                  Fill="{StaticResource Text.Heading}"
+                                  Width="11" Height="11" Stretch="Uniform"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  Visibility="Collapsed"/>
+                        </Border>
+                        <ContentPresenter VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Box" Property="Background" Value="{StaticResource Action.Standard.Hover}"/>
+                            <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Box" Property="Background" Value="{StaticResource Action.Standard.Pressed}"/>
+                        </Trigger>
+                        <!-- Declared after the two above so a checked box keeps
+                             the accent fill under the pointer rather than
+                             reverting to the standard hover; the two
+                             MultiTriggers then carry the accent's own hover and
+                             pressed steps. -->
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Box" Property="Background" Value="{StaticResource Action.Accent.Background}"/>
+                            <Setter TargetName="Tick" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsChecked" Value="True"/>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Box" Property="Background" Value="{StaticResource Action.Accent.Hover}"/>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsChecked" Value="True"/>
+                                <Condition Property="IsPressed" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Box" Property="Background" Value="{StaticResource Action.Accent.Pressed}"/>
+                        </MultiTrigger>
+                        <!-- Same disabled treatment as the pills: half opacity
+                             on the whole control, box and label together. -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <Style x:Key="PillTextBox" TargetType="TextBox">
         <Setter Property="Background" Value="{StaticResource Surface.Card}"/>

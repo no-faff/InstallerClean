@@ -45,6 +45,22 @@ public sealed class AppSettings
     public bool HasSentResultLog { get; set; }
 
     /// <summary>
+    /// Whether the app checks GitHub's releases API for a newer version
+    /// once per session, started at launch. Defaults to true (absent from
+    /// an older settings file reads as true, so existing installs gain the
+    /// check on upgrade, matching how mainstream desktop apps behave). A
+    /// typical session lasts seconds, so the check races the startup scan
+    /// rather than waiting behind it: any delay would routinely land the
+    /// answer after the user had closed the window. The check itself stays
+    /// quiet: a newer version paints one status line by the update button;
+    /// an up-to-date result and a failure both say nothing. The off switch
+    /// is the checkbox in the About window, and it is read when the check
+    /// fires rather than at construction, so it takes effect in the
+    /// session that unticks it.
+    /// </summary>
+    public bool AutoUpdateCheck { get; set; } = true;
+
+    /// <summary>
     /// UI-language preference. <c>null</c> or absent means Automatic:
     /// follow the Windows display language. A non-null value is a culture
     /// name the app ships a translation for (an entry of

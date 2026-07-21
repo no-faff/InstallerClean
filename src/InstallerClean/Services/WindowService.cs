@@ -6,11 +6,11 @@ namespace InstallerClean.Services;
 
 public sealed class WindowService : IWindowService
 {
-    private readonly IUpdateCheckService _updateCheckService;
+    private readonly ISettingsService _settingsService;
 
-    public WindowService(IUpdateCheckService updateCheckService)
+    public WindowService(ISettingsService settingsService)
     {
-        _updateCheckService = updateCheckService;
+        _settingsService = settingsService;
     }
 
     public void ShowOrphanedDetails(OrphanedFilesViewModel viewModel)
@@ -36,11 +36,21 @@ public sealed class WindowService : IWindowService
     public void ShowAbout()
     {
         if (Application.Current is null) return;
-        var window = new AboutWindow(_updateCheckService)
+        var window = new AboutWindow(_settingsService)
         {
             Owner = Application.Current.MainWindow,
         };
         window.ShowDialog();
+    }
+
+    public bool ShowUpdateAvailable(string currentVersion, string latestVersion)
+    {
+        if (Application.Current is null) return false;
+        var dialog = new UpdateAvailableWindow(currentVersion, latestVersion)
+        {
+            Owner = Application.Current.MainWindow,
+        };
+        return dialog.ShowDialog() == true;
     }
 
     public void CloseMainWindow()
