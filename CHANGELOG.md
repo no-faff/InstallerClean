@@ -11,14 +11,19 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - A "Check for updates" button on the main window's bottom bar, with a status line beside it for "Checking...", "Up to date." and the update link. The check no longer hides behind About, where the button read as credits rather than updates.
 - The About window links to the guide (the README, opened in the app's display language and landing on the document itself rather than the repository page the star button already opens) and to the issue tracker ("Report a problem"). The README, which is the app's actual manual, was previously only reachable via the star button.
 - A small donate heart in the corner of the completion screen, shown only after a clean-up that actually did something. Its tooltip does the asking, quietly.
+- The per-file safety check that runs before any Move or Delete now refuses anything that is not directly in the top level of `C:\Windows\Installer`, enforcing outright the "never acts inside subfolders" promise SECURITY.md makes. The scan has never offered such a file; now nothing downstream could act on one either.
 - Release downloads carry the version in the filename from this release (`InstallerClean-2.2.0-setup.exe`, `InstallerClean-2.2.0-portable.exe`), so a copy on a mirror, a USB stick or a support thread says what it is. The command-line tool deliberately keeps its unversioned `installerclean-cli.exe` name: scheduled tasks and scripts hold a path to it, and a versioned name would break them all on every update.
 
 ### Changed
 
-- Every string this release adds or rewords is translated in all fourteen languages: the About window's guide and "Report a problem" links, the automatic-update checkbox, the update status line on the bottom bar, the donate ask on the completion screen, and the names and help a screen reader reads out on each of them. The star button's tooltip in About is reworded to say what a star actually does. A non-English user sees all of it in their own language instead of falling back to English.
+- Every string this release adds or rewords is translated in all fourteen languages: the About window's guide and "Report a problem" links, the automatic-update checkbox, the update status line on the bottom bar, the donate ask on the completion screen, and the names and help a screen reader reads out on each of them. The star button's tooltip in About is reworded to say what a star actually does. A non-English user sees all of it in their own language instead of falling back to English. Five languages had their keyboard access keys re-picked along the way so every control on the main window keeps a unique Alt shortcut.
 - The bottom bar slims to Re-scan, About, Check for updates and the language globe: the star and heart buttons are gone. The star lives on in About; the donate ask moved to the completion screen, where it follows an actual result instead of sitting in the window chrome.
 - The About window lost its update button and inline status (moved to the main window) and gained the links block and the updates checkbox, with the licence line grouped into the links as one block.
 - The star pill's tooltip now says what a star does ("A GitHub star helps other people find it.") instead of doubling as the route to Issues and Discussions, which "Report a problem" covers properly.
+
+### Fixed
+
+- The optional anonymous report can say "failed" again when a clean-up achieved nothing. Since the act-time re-check arrived in 2.1.0, a run where that check kept some files back and every remaining file then failed was misreported as "partial" with zero files processed.
 
 ## [2.1.0] - 2026-07-20
 
