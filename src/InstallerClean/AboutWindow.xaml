@@ -23,18 +23,19 @@
             <!-- Version -->
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
-            <!-- Guide link, then the issue-tracker link a tighter 6 below it:
-                 the two are one block of doors out to GitHub, and the wider
-                 gaps either side are what separate that block from the
-                 version above and the setting below. -->
+            <!-- The three link lines (guide, issue tracker, licence) at a
+                 tighter 6 apart: all three render as links, so they read as
+                 one block of doors out to GitHub, and the wider gaps either
+                 side separate that block from the version above and the
+                 checkbox below. -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="6"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="6"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
-            <!-- Auto-update checkbox -->
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="10"/>
-            <!-- Licence -->
+            <!-- Auto-update checkbox: last, and alone, because it is the
+                 window's one control rather than another link. -->
             <RowDefinition Height="Auto"/>
             <!-- Star spacer: the gap before the say-thanks block. Under
                  SizeToContent="Height" it sits at MinHeight and expands past it
@@ -90,6 +91,14 @@
                        AutomationProperties.HelpText="{loc:Translate Automation.About.ReportProblem.HelpText}"><Run Text="{loc:Translate About.Link.ReportProblem}"/></Hyperlink>
         </TextBlock>
 
+        <TextBlock Grid.Row="9" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
+            <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/blob/main/LICENSE"
+                       Click="Hyperlink_Click"
+                       Style="{StaticResource SubtleLink}"
+                       AutomationProperties.Name="{loc:Translate Automation.Licence}"
+                       AutomationProperties.HelpText="{loc:Translate Automation.Licence.HelpText}"><Run Text="{loc:Translate Action.Licence}"/></Hyperlink>
+        </TextBlock>
+
         <!-- The off switch for the automatic once-per-session update check.
              Read when the check fires rather than at startup, so unticking
              it stops this session's check as well as every later one, and
@@ -98,18 +107,10 @@
              Checked/Unchecked are attached in code-behind, not here: the
              constructor's own assignment of IsChecked would otherwise fire
              the handler and write the setting back on every open. -->
-        <CheckBox Grid.Row="9" x:Name="AutoUpdateCheckBox"
+        <CheckBox Grid.Row="11" x:Name="AutoUpdateCheckBox"
                   HorizontalAlignment="Left"
                   Content="{loc:Translate About.AutoUpdateCheck}"
                   AutomationProperties.HelpText="{loc:Translate Automation.AutoUpdateCheck.HelpText}"/>
-
-        <TextBlock Grid.Row="11" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
-            <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/blob/main/LICENSE"
-                       Click="Hyperlink_Click"
-                       Style="{StaticResource SubtleLink}"
-                       AutomationProperties.Name="{loc:Translate Automation.Licence}"
-                       AutomationProperties.HelpText="{loc:Translate Automation.Licence.HelpText}"><Run Text="{loc:Translate Action.Licence}"/></Hyperlink>
-        </TextBlock>
 
         <!-- Section header above the Star + Buy-me-a-cuppa row. The
              resx value is already uppercased so screen readers don't
