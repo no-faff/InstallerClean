@@ -50,8 +50,9 @@ internal static class InstallerCacheHelpers
     /// The cache root is compared in its best-effort form even when ITS
     /// resolution degraded. A fully resolved input is a real canonical path, so
     /// a root left unexpanded cannot match it and the comparison answers "not
-    /// inside": the refusal the source gate wants, and a permission for the
-    /// destination gate.
+    /// inside", which this gate reads as permission. The strict form below
+    /// compares the root the same way, where the same answer becomes the source
+    /// side's refusal.
     /// </summary>
     internal static bool ResolvesInsideInstallerFolder(string resolvedInput, string? installerFolderRoot = null)
     {
@@ -72,10 +73,11 @@ internal static class InstallerCacheHelpers
     /// file in a subdirectory is one the registration data says nothing about,
     /// and <c>$PatchCache$</c> in particular holds the patch engine's baseline
     /// payload copies. A registered <c>LocalPackage</c> value names a file at
-    /// the root too, so the descendant form let in exactly one thing: a corrupt
-    /// registration pointing at a subtree the app had deliberately put out of
-    /// scope. SECURITY.md tells a reporter the app never acts inside a
-    /// subfolder; this is where that holds rather than happens to be true.
+    /// the root too, so everything the descendant form additionally admitted was
+    /// illegitimate: the cache folder itself, and a corrupt registration
+    /// pointing into a subtree the app had deliberately put out of scope.
+    /// SECURITY.md tells a reporter the app never acts inside a subfolder; this
+    /// is where that holds rather than happens to be true.
     ///
     /// The root itself answers false: a candidate is a file, and the folder is
     /// not one.

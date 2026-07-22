@@ -14,8 +14,9 @@ namespace InstallerClean.Services;
 ///
 /// Directly, not merely inside: the walk never descends, and a registered
 /// <c>LocalPackage</c> value names a file at the root, so no legitimate
-/// candidate is a descendant. The descendant form let in exactly one thing, a
-/// corrupt registration naming a file under <c>$PatchCache$</c> (the patch
+/// candidate is a descendant. What the descendant form additionally admitted
+/// was all illegitimate: the cache folder itself, and a corrupt registration
+/// naming any file below the root, <c>$PatchCache$</c> included (the patch
 /// engine's baseline payload copies, a subtree the scan deliberately puts out
 /// of scope by never descending). SECURITY.md states the narrow promise to
 /// anyone deciding whether they have found a bug worth reporting, so the code
