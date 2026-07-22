@@ -875,7 +875,20 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToolTip">
+                    <!-- Hairline in the card surface, so the tooltip's own
+                         edge survives being drawn over an accent pill: fill
+                         on fill, the two indigos are the same colour and the
+                         tooltip appears to be part of the button underneath
+                         it. Invisible where it belongs, on the card, which is
+                         where these tooltips spend most of their life; the
+                         completion heart's tooltip is the one that reliably
+                         crosses a pill, sitting directly above Done. Thickness
+                         resource, not the Double one: a {StaticResource}
+                         lookup runs no TypeConverter, so a Double will not
+                         satisfy BorderThickness. -->
                     <Border Background="{StaticResource Action.Accent.Background}"
+                            BorderBrush="{StaticResource Surface.Card}"
+                            BorderThickness="{StaticResource BorderThickness.Hairline}"
                             CornerRadius="{StaticResource Radius.Chip}"
                             Padding="10,6">
                         <TextBlock Text="{TemplateBinding Content}"
