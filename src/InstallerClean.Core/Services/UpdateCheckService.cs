@@ -27,8 +27,8 @@ namespace InstallerClean.Services;
 /// answering 403 with x-ratelimit-remaining=0 once they are gone. Behind a
 /// shared address, an office, CGNAT, or a commercial VPN's exit node,
 /// unrelated traffic can leave nothing for this check, and there is
-/// nothing the app or the user can do about it. The ordinary releases page
-/// has no per-address allowance to exhaust.
+/// nothing the app or the user can do about it. GitHub publishes no such
+/// allowance for the ordinary releases page.
 ///
 /// The redirect is GitHub's long-standing behaviour rather than a
 /// documented contract, so every unexpected-answer path below is kept: if
@@ -98,8 +98,13 @@ public sealed class UpdateCheckService : IUpdateCheckService
     {
         var client = new HttpClient(handler);
         client.Timeout = RequestTimeout;
-        // Nothing reads the response body, so nothing should be able to
-        // hand this process one: the cap holds if a later edit does.
+        // Bounds the eager buffering only: MaxResponseContentBufferSize gates
+        // HttpCompletionOption.ResponseContentRead, and a ReadAsStringAsync
+        // taken after the ResponseHeadersRead send in CheckAsync buffers
+        // straight past it (400 KiB read back whole under this 256 KiB cap,
+        // .NET 10). It is what would gate the read if that completion option
+        // ever changed; what keeps a body out of this process is that
+        // nothing reads one.
         client.MaxResponseContentBufferSize = 256 * 1024;
         return client;
     }
@@ -247,7 +252,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
     ///
     /// The automatic check stays silent because the machines it fails on are
     /// a normal population rather than an error state: offline, air-gapped,
-    /// or behind egress filtering that refuses api.github.com. That check
+    /// or behind egress filtering that refuses github.com. That check
     /// runs unattended at every launch, so a logged failure there is a stack
     /// trace per run, accumulating in a file named crash.log on a machine
     /// where nothing has crashed. It is also a file this project invites
@@ -312,10 +317,12 @@ public sealed class UpdateCheckService : IUpdateCheckService
         tag = string.Empty;
         if (location is null) return false;
 
-        // A relative Location is legal per RFC 9110 and GitHub does not
-        // currently send one; resolving it against the request's own URL
-        // costs nothing and cannot introduce a host, since a relative
-        // reference has none to introduce.
+        // A relative Location is legal per RFC 9110, so it is resolved
+        // against the request's own URL rather than refused outright.
+        // Resolution is not a safety step: "//host/path" is relative by
+        // System.Uri's reckoning (IsAbsoluteUri is false) and resolves to
+        // that host, so the scheme and host comparisons below are what keep
+        // an answer from nominating where the version comes from.
         var absolute = location.IsAbsoluteUri ? location : new Uri(ReleasesPage, location);
 
         if (!string.Equals(absolute.Scheme, ReleasesPage.Scheme, StringComparison.OrdinalIgnoreCase))

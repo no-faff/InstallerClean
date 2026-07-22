@@ -34,9 +34,9 @@ public class UpdateCheckServiceTests
 
     private static HttpResponseMessage Refused()
     {
-        // Shaped as GitHub's own refusal, headers included, so the
-        // breadcrumb assertion below is reading what the app would really
-        // have been handed rather than a bare status.
+        // A refusal carrying the throttling headers the breadcrumb reports,
+        // so the assertion below reads a status plus what arrived beside it
+        // rather than a status alone.
         var response = new HttpResponseMessage(HttpStatusCode.Forbidden);
         response.Headers.Add("x-ratelimit-remaining", "0");
         response.Headers.Add("x-ratelimit-reset", "1750000000");
@@ -77,11 +77,13 @@ public class UpdateCheckServiceTests
     [Fact]
     public void UserAgent_parses_as_a_well_formed_HTTP_product()
     {
-        // RFC 9110 product = token "/" token; if the version token
-        // contains a space (e.g. "Version 1.8.0" from a localised
-        // display string) HttpRequestMessage.Headers.UserAgent.ParseAdd
-        // either throws or attaches "Version" as a separate product.
-        // GitHub returns 403 if the User-Agent isn't well-formed.
+        // RFC 9110 product = token "/" token. A version token carrying a
+        // space (e.g. "Version 1.8.0" from a localised display string) does
+        // not throw: ParseAdd reads "Version" as the version and "1.8.0" as
+        // a second product, so a malformed constant reaches the wire looking
+        // parsed and the product count is what catches it. An empty version
+        // token does throw, out of CheckAsync's try and into the catch-all
+        // that writes crash.log.
         using var request = new HttpRequestMessage(HttpMethod.Get, "https://example.test/");
         request.Headers.UserAgent.ParseAdd(UpdateCheckService.UserAgent);
 

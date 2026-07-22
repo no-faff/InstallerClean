@@ -43,8 +43,9 @@ public enum UpdateCheckFailureReason
     ServerError,
 
     /// <summary>
-    /// The answer was not the redirect the check reads a version out of, or
-    /// pointed somewhere the version could not be trusted from.
+    /// The answer carried no version the check will take: not a redirect at
+    /// all, a redirect pointing outside the project's own releases path, or
+    /// one whose tag does not parse as a version.
     /// </summary>
     ResponseParseError,
 
