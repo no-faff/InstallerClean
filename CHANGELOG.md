@@ -20,10 +20,12 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The bottom bar slims to Re-scan, About, Check for updates and the language globe: the star and heart buttons are gone. The star lives on in About; the donate ask moved to the completion screen, where it follows an actual result instead of sitting in the window chrome.
 - The About window lost its update button and inline status (moved to the main window) and gained the links block and the updates checkbox, with the licence line grouped into the links as one block.
 - The star pill's tooltip now says what a star does ("A star helps other people find it.") instead of doubling as the route to Issues and Discussions, which "Report a problem" covers properly. The button's label already says GitHub, so the tooltip does not say it again.
+- A comments pass covered everything that changed since 2.1.0, the same discipline as the 2.1.0 whole-tree pass: every comment added or changed was checked as a claim against the code, and the unchanged comments around changed code with it. Thirteen were brought back in line and phrasing that dated itself was replaced with the reasons themselves; the pass also caught the access-key check defect fixed below.
 - The indigo tooltips, on the About window's star and cuppa buttons and the completion screen's new heart, now draw a hairline border in the card colour. Where one opens across the equally indigo Done button they used to read as one shape; the border keeps an edge between them.
 
 ### Fixed
 
+- The access-key check now reads a doubled underscore the way the app renders it, as a literal underscore rather than a key marker. No current label uses one; the first that did would have made the check report a key that isn't there or hide a clash that is. Its failure message also now gives advice a contributor can follow.
 - The optional anonymous report can say "failed" again when a clean-up achieved nothing. Since the act-time re-check arrived in 2.1.0, a run where that check kept some files back and every remaining file then failed was misreported as "partial" with zero files processed.
 
 ## [2.1.0] - 2026-07-20
