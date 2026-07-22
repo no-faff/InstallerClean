@@ -9,11 +9,13 @@ updates:
       nuget:
         patterns:
           - "*"
-    # Patch bumps on the three runtime packages that travel in the
-    # binary closure (Microsoft.Extensions.DependencyInjection,
-    # .Abstractions, System.Diagnostics.EventLog) shift the apphost
-    # hash and have tripped Avast/AVG/DeepInstinct ML classifiers
-    # before. Security advisories still PR through because Dependabot's
+    # The three runtime packages (Microsoft.Extensions.DependencyInjection,
+    # .Abstractions, System.Diagnostics.EventLog) travel in the binary
+    # closure, so a patch bump changes the shipped bytes, and every new
+    # binary is a fresh VirusTotal result. They are held still between
+    # releases so a patch-level change does not re-roll one; no flag in
+    # this project's history has been traced to a dependency bump.
+    # Security advisories still PR through because Dependabot's
     # security-update path overrides version-update:ignore.
     #
     # Microsoft.NET.ILLink.Tasks is ignored outright (every version): it

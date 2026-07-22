@@ -7,11 +7,11 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 ### Added
 
 - The app now checks for a newer version by itself: once per run, started the moment the app opens, as a single request to GitHub's releases API. If one exists, a quiet "Version X is available." link appears in the bottom bar and opens that release's page in your normal browser. Nothing is downloaded, nothing interrupts you, and an up-to-date result or a failed check says nothing at all.
-- A "Check for updates automatically" checkbox in the About window governs the automatic check. On by default; a change applies from the next launch, and with it off the app makes no network request unless you press the update button. It is the app's first checkbox, so there is now a house CheckBox style built from the existing theme tokens.
+- A "Check for updates automatically" checkbox in the About window governs the automatic check. On by default; a change applies from the next launch, and with it off the app makes no network request unless you press a button that makes one. It is the app's first checkbox, so there is now a house CheckBox style built from the existing theme tokens.
 - A "Check for updates" button on the main window's bottom bar, with a status line beside it for "Checking...", "Up to date." and the update link. The check no longer hides behind About, where the button read as credits rather than updates.
 - The About window links to the guide (the README, opened in the app's display language and landing on the document itself rather than the repository page the star button already opens) and to the issue tracker ("Report a problem"). The README, which is the app's actual manual, was previously only reachable via the star button.
 - A small donate heart in the corner of the completion screen, shown only after a clean-up that actually did something. Its tooltip does the asking, quietly.
-- The per-file safety check that runs before any Move or Delete now refuses anything that is not directly in the top level of `C:\Windows\Installer`, enforcing outright the "never acts inside subfolders" promise SECURITY.md makes. The scan has never offered such a file; now nothing downstream could act on one either, and the refusal message says "not directly inside" precisely, in all fifteen languages.
+- The per-file safety check that runs before any Move or Delete now refuses anything that is not directly in the top level of `C:\Windows\Installer`, enforcing outright the "never acts inside subfolders" promise SECURITY.md makes. The scan has not offered such a file since 2.1.0 stopped looking inside subfolders; now nothing downstream could act on one either, and the refusal message says "not directly inside" precisely, in all fifteen languages.
 - Release downloads carry the version in the filename from this release (`InstallerClean-2.2.0-setup.exe`, `InstallerClean-2.2.0-portable.exe`), so a copy on a mirror, a USB stick or a support thread says what it is. The command-line tool deliberately keeps its unversioned `installerclean-cli.exe` name: scheduled tasks and scripts hold a path to it, and a versioned name would break them all on every update.
 
 ### Changed
@@ -452,7 +452,7 @@ An audit-driven release: a large sweep of correctness fixes (thread affinity, ex
 - SubtleLink picks up an underline + brighten on keyboard focus matching the existing hover behaviour, so the About window's MIT licence link surfaces the same visual cue to a tabbing keyboard-only user that a mouse hover already shows.
 - Body explanation paragraph now templates three Reason values (Orphaned, Superseded, Obsoleted) so a translator can edit the column labels in one place and have the body copy follow. The Obsoleted case (PatchState 4, publisher-withdrawn) gets its own clause distinct from Superseded.
 - `BrowserLaunchFailed*` resx keys renamed to the `BrowserLaunch.*` dotted-category prefix every other key uses.
-- `installerclean-cli.csproj` pins `PublishReadyToRun=false` matching the WPF host so a future SDK feature-band change to the default cannot silently shift the CLI's R2R section count (same AV-signal-stability rationale).
+- `installerclean-cli.csproj` pins `PublishReadyToRun=false` matching the WPF host so a future SDK feature-band change to the default cannot silently shift the CLI's R2R section count (the same reason the runtime packages are held still: it changes the shipped bytes, and a new binary is a fresh scan result).
 - `installerclean-cli.csproj` carries an ApplicationIcon so the CLI exe paints with the Squeegee in Explorer instead of the generic Windows console-exe icon, matching the GUI sibling in the install directory.
 - CLI app.manifest assemblyIdentity bumps to 1.8.2.0 (the GUI manifest was bumped earlier; the CLI was missed). Sigcheck / AppLocker rules pinned to manifest version are now consistent across the two exes.
 - Result-log schema bumps to version 2. `supersededCount` now counts only PatchState=Superseded (2); a new `obsoletedCount` field counts PatchState=Obsoleted (4). v1 receivers saw both lumped under `supersededCount`. `OrphanedFile.IsSuperseded` renamed to `IsRemovablePatch` (true for both states); a new `IsObsoleted` flag isolates the obsoleted case.
@@ -465,7 +465,7 @@ An audit-driven release: a large sweep of correctness fixes (thread affinity, ex
 - AboutWindow's version TextBox is keyboard-reachable again so users can Tab to it and Ctrl+C the version string for a bug report; the previous `IsTabStop="False"` opt-out blocked that.
 - Stale-MSI banner and Send-summary status text raise `LiveRegionChanged` explicitly on first reveal, matching the existing fix for the pending-reboot and missing-from-disk banners. WPF's UIA bridge does not re-fire LiveRegionChanged for a Visibility=Collapsed→Visible transition.
 - Decorative window chrome hidden from the UIA tree via a custom automation peer.
-- Post-1.8.1 NuGet bumps reverted to preserve the AV-trained-clean binary fingerprint, and Dependabot ignores patch bumps on the three runtime packages for the same reason.
+- Post-1.8.1 NuGet bumps reverted to keep the shipped bytes as close as possible to the last build that scanned clean, and Dependabot now ignores patch bumps on the three runtime packages that travel in the binary closure for the same reason: a patch-level change should not re-roll a scan result between releases. No flag in the project's history has been traced to a dependency bump.
 - `pad.xml` drops the 32-bit Windows 10 support claim.
 - Spacing tokens tidied: horizontal-only `GapX.*` Thickness tokens added, five unused tokens deleted.
 - The crash log's privacy header moves into resx; the `Summary` string splits singular and plural forms instead of straddling a placeholder.
@@ -649,7 +649,7 @@ The largest engineering release in the project's history. The codebase was split
 
 ### Removed
 
-- `UpdateCheckService` (the HTTP-based update check). Check for updates now opens the GitHub releases page in the browser. The slim binary was being flagged by DeepInstinct on VirusTotal; auto-HTTP-on-startup from an elevated process was the leading suspicion at the time.
+- `UpdateCheckService` (the HTTP-based update check). Check for updates now opens the GitHub releases page in the browser. The setup was being flagged by DeepInstinct on VirusTotal; auto-HTTP-on-startup from an elevated process was the leading suspicion at the time.
 
 ## [1.5.2] - 2026-04-17
 
@@ -731,7 +731,7 @@ The largest engineering release in the project's history. The codebase was split
 ### Changed
 
 - Donate link now points to `nofaff.netlify.app`.
-- An automatic startup update check (with an opt-out toggle) was added and removed within the release: elevated plus network at startup reads as command-and-control to ML AV engines (DeepInstinct flagged it), so the check shipped manual-only.
+- An automatic startup update check (with an opt-out toggle) was added and removed within the release: DeepInstinct flagged the build on VirusTotal and the startup network call from an elevated process was the leading suspicion, so the check shipped manual-only.
 
 ## [1.4.1] - 2026-03-10
 
@@ -746,7 +746,7 @@ The largest engineering release in the project's history. The codebase was split
 - Design tokens: ~35 hardcoded colour values replaced with named resources (`Warning`, `Dim`, `Danger`, `Base200`, `Primary`).
 - `CommunityToolkit.Mvvm` pinned to 8.4.0 (was `8.*`).
 - Em dashes replaced with plain dashes and full stops across the UI and docs.
-- CONTRIBUTING notes that the `Func<>` testability pattern also triggers AV heuristics.
+- CONTRIBUTING noted the suspicion that the `Func<>` testability pattern triggers AV heuristics.
 
 ### Removed
 
@@ -763,7 +763,7 @@ The largest engineering release in the project's history. The codebase was split
 ### Changed
 
 - Test mocking framework switched from Moq to NSubstitute (Moq's SponsorLink dependency was a concern for a freely-distributed project).
-- A `Func<>`-delegate testability seam for `MainViewModel` was added and reverted within the release; the pattern trips AV heuristics.
+- A `Func<>`-delegate testability seam for `MainViewModel` was added and reverted within the release, on a suspicion that the pattern trips AV heuristics, not a reproduction.
 
 ## [1.3.0] - 2026-03-08
 
