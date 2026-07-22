@@ -236,7 +236,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed | Chuyển thất bại |
 | Delete failed | Xóa thất bại |
 | Setting not saved | Không lưu được cài đặt |
-| The change could not be saved. The app will go back to the previous setting next time it starts. | Không thể lưu thay đổi. Lần chạy tiếp theo, InstallerClean sẽ quay lại cài đặt trước đó. |
+| The change could not be saved. InstallerClean will go back to the previous setting next time it starts. | Không thể lưu thay đổi. Lần chạy tiếp theo, InstallerClean sẽ quay lại cài đặt trước đó. |
 | The destination cannot be inside the Windows Installer folder. | Đích không thể nằm bên trong thư mục Windows Installer. |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Đích {0} nằm dưới một thư mục hệ thống của Windows. Hãy chọn một đường dẫn ngoài %SystemRoot%, %ProgramFiles% và %ProgramData%. |
 | Not enough space | Không đủ dung lượng |

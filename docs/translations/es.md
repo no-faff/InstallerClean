@@ -236,7 +236,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed | Movimiento fallido |
 | Delete failed | Eliminación fallida |
 | Setting not saved | Ajuste no guardado |
-| The change could not be saved. The app will go back to the previous setting next time it starts. | No se pudo guardar el cambio. La próxima vez que se inicie, InstallerClean volverá al ajuste anterior. |
+| The change could not be saved. InstallerClean will go back to the previous setting next time it starts. | No se pudo guardar el cambio. La próxima vez que se inicie, InstallerClean volverá al ajuste anterior. |
 | The destination cannot be inside the Windows Installer folder. | El destino no puede estar dentro de la carpeta de Windows Installer. |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | El destino {0} se encuentra dentro de una carpeta del sistema de Windows. Elige una ruta fuera de %SystemRoot%, %ProgramFiles% y %ProgramData%. |
 | Not enough space | Espacio insuficiente |

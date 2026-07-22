@@ -236,7 +236,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed | Сбой перемещения |
 | Delete failed | Сбой удаления |
 | Setting not saved | Настройка не сохранена |
-| The change could not be saved. The app will go back to the previous setting next time it starts. | Не удалось сохранить изменение. При следующем запуске InstallerClean вернётся к прежней настройке. |
+| The change could not be saved. InstallerClean will go back to the previous setting next time it starts. | Не удалось сохранить изменение. При следующем запуске InstallerClean вернётся к прежней настройке. |
 | The destination cannot be inside the Windows Installer folder. | Папка назначения не может находиться внутри папки Windows Installer. |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Папка назначения {0} ведёт в системную папку Windows. Выберите путь за пределами %SystemRoot%, %ProgramFiles% и %ProgramData%. |
 | Not enough space | Недостаточно места |

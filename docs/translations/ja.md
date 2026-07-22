@@ -236,7 +236,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed | 移動に失敗しました |
 | Delete failed | 削除に失敗しました |
 | Setting not saved | 設定の保存に失敗しました |
-| The change could not be saved. The app will go back to the previous setting next time it starts. | 変更を保存できませんでした。次回の起動時に、InstallerClean は以前の設定に戻ります。 |
+| The change could not be saved. InstallerClean will go back to the previous setting next time it starts. | 変更を保存できませんでした。次回の起動時に、InstallerClean は以前の設定に戻ります。 |
 | The destination cannot be inside the Windows Installer folder. | 移動先を Windows Installer フォルダー内にすることはできません。 |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | 移動先 {0} は Windows システムフォルダー下に解決されます。%SystemRoot%、%ProgramFiles%、%ProgramData% 以外のパスを選択してください。 |
 | Not enough space | 空き容量が不足しています |

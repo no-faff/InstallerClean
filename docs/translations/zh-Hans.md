@@ -236,7 +236,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed | 移动失败 |
 | Delete failed | 删除失败 |
 | Setting not saved | 设置未保存 |
-| The change could not be saved. The app will go back to the previous setting next time it starts. | 无法保存此更改。下次启动时，InstallerClean 将恢复为之前的设置。 |
+| The change could not be saved. InstallerClean will go back to the previous setting next time it starts. | 无法保存此更改。下次启动时，InstallerClean 将恢复为之前的设置。 |
 | The destination cannot be inside the Windows Installer folder. | 目标不能位于 Windows Installer 文件夹内。 |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | 目标 {0} 解析后位于 Windows 系统文件夹下。请选择 %SystemRoot%、%ProgramFiles% 和 %ProgramData% 之外的路径。 |
 | Not enough space | 空间不足 |

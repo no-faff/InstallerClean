@@ -236,7 +236,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move failed | Przenoszenie nie powiodło się |
 | Delete failed | Usuwanie nie powiodło się |
 | Setting not saved | Ustawienie nie zostało zapisane |
-| The change could not be saved. The app will go back to the previous setting next time it starts. | Nie udało się zapisać zmiany. Przy następnym uruchomieniu InstallerClean wróci do poprzedniego ustawienia. |
+| The change could not be saved. InstallerClean will go back to the previous setting next time it starts. | Nie udało się zapisać zmiany. Przy następnym uruchomieniu InstallerClean wróci do poprzedniego ustawienia. |
 | The destination cannot be inside the Windows Installer folder. | Folder docelowy nie może znajdować się wewnątrz folderu Windows Installer. |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Folder docelowy {0} prowadzi do folderu systemowego Windows. Wybierz ścieżkę poza %SystemRoot%, %ProgramFiles% i %ProgramData%. |
 | Not enough space | Za mało miejsca |
