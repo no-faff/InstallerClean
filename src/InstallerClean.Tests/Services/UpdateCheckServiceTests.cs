@@ -6,11 +6,11 @@ using Xunit;
 namespace InstallerClean.Tests.Services;
 
 /// <summary>
-/// UpdateCheckService unit tests. The comparison against a real GitHub
-/// response is not covered here (it needs the live API); what is covered is
-/// the User-Agent (must parse through HttpRequestMessage.Headers.UserAgent -
-/// a localised display string in the version slot causes GitHub to return
-/// 403), the JSON depth cap, and what each origin is allowed to write to
+/// UpdateCheckService unit tests. The version comparison against a release
+/// payload is not covered here; what is covered is the User-Agent (must parse
+/// through HttpRequestMessage.Headers.UserAgent - a localised display string
+/// in the version slot causes GitHub to return 403), the JSON depth cap, the
+/// releases-page constant, and what each origin is allowed to write to
 /// crash.log when the network will not answer. The last of those runs
 /// against a stub handler and a collecting sink, so the failures are
 /// deterministic and nothing is written under the runner's profile.

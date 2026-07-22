@@ -16,7 +16,7 @@ namespace InstallerClean.Tests.ViewModels;
 public class ChromeViewModelTests
 {
     // The one destination every update control opens; the found release's
-    // own tag page is no longer anywhere in the flow.
+    // own tag page is nowhere in the flow.
     private const string ReleasesPage = UpdateCheckService.ReleasesPageUrl;
 
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();

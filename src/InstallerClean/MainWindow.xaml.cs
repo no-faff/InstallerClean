@@ -346,8 +346,7 @@ public partial class MainWindow : Window
     /// explicit raise for). Both halves need it, for opposite reasons: the
     /// automatic check's find lands unprompted with focus wherever the user
     /// left it, and the manual check's "Checking..." is the answer to a click
-    /// the user is actively waiting on, which would otherwise be five silent
-    /// seconds.
+    /// the user is actively waiting on, which without it goes unspoken.
     /// </summary>
     private void OnChromePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -603,8 +602,8 @@ public partial class MainWindow : Window
     /// same drain and a polite item speaks once the focus announcement
     /// finishes. Background still runs after data binding and render, so
     /// the peers carry the final text. The plain update status line is the
-    /// one assertive caller and cuts in rather than queueing, which is what
-    /// the reasoning above says it needs to do.
+    /// one assertive caller, so it cuts in rather than waiting its turn; why
+    /// that is acceptable there is on the element itself, in MainWindow.xaml.
     /// </summary>
     private void AnnounceLiveRegions(params FrameworkElement[] elements)
     {

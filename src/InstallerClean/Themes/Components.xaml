@@ -880,7 +880,8 @@
                          indigos are the same colour and the tooltip reads as
                          part of the button under it rather than as something
                          on top. The completion heart's is the one that
-                         reliably crosses one, opening directly above Done.
+                         reliably crosses one: it opens flush above the heart,
+                         across the Done button.
 
                          One brush has to serve three consumers on two
                          surfaces, and only the completion heart's tooltip
