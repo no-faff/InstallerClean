@@ -352,6 +352,16 @@ Die gesamte Ausgabe der CLI, einschließlich Fehler- und Diagnosemeldungen, geht
 
 Alle drei erfordern eine Eingabeaufforderung mit erhöhten Rechten (Administrator). Wenn eine Gruppenrichtlinie die UAC-Eingabeaufforderung blockiert, verweigert der Prozess den Start und Windows gibt den Fehler 740 an die übergeordnete Shell zurück (`$LASTEXITCODE = 740` in PowerShell). `taskkill /pid <pid>` löst keinen kontrollierten Abbruch aus; der Einzelinstanz-Mutex wird vom nächsten Lauf über den AbandonedMutexException-Pfad wiederhergestellt.
 
+### Eine regelmäßige Bereinigung planen
+
+Für eine Bereinigung nach Zeitplan richtest du die Aufgabenplanung auf `installerclean-cli` aus. Lass es als SYSTEM oder unter einem Dienstkonto und mit höchsten Privilegien laufen, damit es die nötige Rechteerhöhung ohne interaktive Abfrage bekommt, und gib das Verschiebeziel auf der Befehlszeile an, denn der in der GUI gespeicherte Standard wird pro Benutzer abgelegt und gilt für einen Lauf als SYSTEM oder unter einem Dienstkonto nicht. Ein monatliches Verschieben nach `D:\InstallerBackup`, mit einer Kopie der CLI in `C:\Tools`:
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+Die Aufgabe blockiert, bis der Lauf fertig ist, und hält den Exit-Code als „Letztes Ausführungsergebnis“ fest, dein RMM kann sich also genauso an den Codes oben orientieren (`0` voller Erfolg, `2` teilweise, `75` vorübergehend, `1` völliges Scheitern) wie ein Skript.
+
 ### Warum `installerclean-cli` und nicht `installerclean.exe`?
 
 `InstallerClean.exe` ist die WPF-GUI; sie reagiert nicht auf Befehlszeilenargumente. `installerclean-cli.exe` ist eine separate Konsolenanwendung, die im selben Installationsverzeichnis liegt und dieselben Scan-/Verschiebe-/Löschvorgänge für PowerShell, cmd und geplante Aufgaben bereitstellt. Da es ein echter Konsolenprozess ist, blockiert er die Eingabeaufforderung, bis er fertig ist; leite seine Ausgabe um oder per Pipe weiter wie bei jeder anderen Konsolen-exe.

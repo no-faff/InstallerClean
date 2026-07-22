@@ -352,6 +352,16 @@ Tutto l'output della CLI, compresi i messaggi di errore e di diagnostica, va su 
 
 Tutte e tre richiedono un prompt dei comandi con privilegi elevati (amministratore). Se Criteri di gruppo blocca la richiesta di elevazione UAC, il processo si rifiuta di avviarsi e Windows restituisce l'errore 740 alla shell chiamante (`$LASTEXITCODE = 740` in PowerShell). `taskkill /pid <pid>` non provoca un annullamento controllato; il mutex di istanza singola viene recuperato dall'esecuzione successiva tramite il percorso AbandonedMutexException.
 
+### Pianificare una pulizia periodica
+
+Per fare pulizia a intervalli regolari, punta l'Utilità di pianificazione su `installerclean-cli`. Eseguilo come SYSTEM o con un account di servizio e con i privilegi più elevati, così ottiene l'elevazione che gli serve senza una richiesta interattiva, e indica la cartella di destinazione sulla riga di comando, perché la destinazione predefinita salvata dalla GUI è memorizzata per utente e non vale per un'esecuzione come SYSTEM o con un account di servizio. Per uno spostamento mensile in `D:\InstallerBackup`, con una copia della CLI messa in `C:\Tools`:
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+L'attività resta in attesa finché l'esecuzione non termina e registra il codice di uscita come proprio Risultato ultima esecuzione, quindi il tuo RMM può basarsi sui codici qui sopra (`0` successo completo, `2` parziale, `75` transitorio, `1` fallimento totale) esattamente come farebbe uno script.
+
 ### Perché `installerclean-cli` e non `installerclean.exe`?
 
 `InstallerClean.exe` è la GUI WPF; non risponde agli argomenti da riga di comando. `installerclean-cli.exe` è un eseguibile da console separato che viene distribuito nella stessa cartella di installazione ed espone le stesse operazioni di scansione / spostamento / eliminazione a PowerShell, cmd e attività pianificate. Essendo un vero processo da console, blocca il prompt finché non termina; redirigi o invia in pipe il suo output come faresti con qualunque altro exe da console.

@@ -352,6 +352,16 @@ Toda la salida de la CLI, incluidos los mensajes de error y de diagnóstico, va 
 
 Las tres requieren un símbolo del sistema elevado (administrador). Si una directiva de grupo bloquea el aviso de elevación de UAC, el proceso se niega a iniciarse y Windows devuelve el error 740 al shell que lo invocó (`$LASTEXITCODE = 740` en PowerShell). `taskkill /pid <pid>` no provoca una cancelación controlada; el mutex de instancia única se recupera en la siguiente ejecución mediante la vía AbandonedMutexException.
 
+### Programar una limpieza periódica
+
+Para limpiar de forma periódica, apunta el Programador de tareas a `installerclean-cli`. Ejecútalo como SYSTEM o con una cuenta de servicio y con los privilegios más altos, para que consiga la elevación que necesita sin un aviso interactivo, e indica la carpeta de destino en la línea de comandos, porque el valor por defecto guardado desde la interfaz gráfica se almacena por usuario y no se aplica a una ejecución como SYSTEM o con una cuenta de servicio. Para un traslado mensual a `D:\InstallerBackup`, con una copia de la CLI dejada en `C:\Tools`:
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+La tarea espera a que la ejecución termine y anota el código de salida como su Resultado de la última ejecución, así que tu RMM puede guiarse por los códigos de arriba (`0` éxito completo, `2` parcial, `75` transitorio, `1` fallo total) igual que lo haría un script.
+
 ### ¿Por qué `installerclean-cli` y no `installerclean.exe`?
 
 `InstallerClean.exe` es la interfaz gráfica WPF; no responde a argumentos de línea de comandos. `installerclean-cli.exe` es un ejecutable de consola aparte que se incluye en el mismo directorio de instalación y expone las mismas operaciones de análisis / movimiento / eliminación a PowerShell, cmd y tareas programadas. Como es un proceso de consola real, bloquea la consola hasta que termina; redirige o canaliza su salida igual que con cualquier otro exe de consola.

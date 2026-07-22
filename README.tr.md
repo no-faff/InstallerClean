@@ -353,6 +353,16 @@ CLI'nin tüm çıktısı, hata ve tanılama iletileri dahil, stdout'a gider; ayr
 
 Üçü de yükseltilmiş (yönetici) bir komut istemi gerektirir. Bir Grup İlkesi UAC yükseltme istemini engellerse, süreç başlamayı reddeder ve Windows üst kabuğa 740 hatası döndürür (PowerShell'de `$LASTEXITCODE = 740`). `taskkill /pid <pid>` düzgün bir iptal tetiklemez; tek örnek muteksi, AbandonedMutexException yolu üzerinden bir sonraki çalıştırma tarafından kurtarılır.
 
+### Düzenli bir temizliği zamanlama
+
+Düzenli aralıklarla temizlemek için Görev Zamanlayıcı'yı `installerclean-cli`'ye yönlendirin. Onu SYSTEM olarak ya da bir hizmet hesabıyla ve en yüksek ayrıcalıklarla çalıştırın ki etkileşimli bir istem olmadan ihtiyaç duyduğu yükseltmeyi alsın; taşıma hedefini de komut satırında verin, çünkü GUI'den kaydedilen varsayılan kullanıcı başına saklanır ve SYSTEM ya da hizmet hesabı çalıştırmalarında geçerli olmaz. CLI'nin bir kopyası `C:\Tools` içindeyken `D:\InstallerBackup` klasörüne aylık taşıma şöyle görünür:
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+Görev, çalıştırma bitene kadar bloke olur ve çıkış kodunu Son Çalıştırma Sonucu olarak kaydeder; böylece RMM'iniz de yukarıdaki kodlara (`0` tam başarı, `2` kısmi, `75` geçici, `1` tam başarısızlık) tıpkı bir betiğin yapacağı gibi dayanabilir.
+
 ### Neden `installerclean-cli`, `installerclean.exe` değil?
 
 `InstallerClean.exe` WPF GUI'sidir; komut satırı argümanlarına yanıt vermez. `installerclean-cli.exe`, aynı kurulum dizininde bulunan ve aynı tarama / taşıma / silme işlemlerini PowerShell, cmd ve zamanlanmış görevlere sunan ayrı bir konsol yürütülebilir dosyasıdır. Gerçek bir konsol süreci olduğundan, bitene kadar istemi bloke eder; çıktısını diğer her konsol exe'sinde olduğu gibi yönlendirin ya da bir boruyla aktarın.

@@ -352,6 +352,16 @@ Cała komunikacja CLI, w tym komunikaty o błędach i diagnostyczne, trafia do s
 
 Wszystkie trzy wymagają wiersza poleceń z podwyższonymi uprawnieniami (administratora). Jeśli zasady grupy blokują monit podniesienia uprawnień UAC, proces odmawia uruchomienia, a Windows zwraca błąd 740 do nadrzędnej powłoki (`$LASTEXITCODE = 740` w PowerShell). `taskkill /pid <pid>` nie wywołuje łagodnego anulowania; muteks pojedynczej instancji jest odzyskiwany przy następnym uruchomieniu przez ścieżkę AbandonedMutexException.
 
+### Planowanie regularnego czyszczenia
+
+Aby czyścić folder według harmonogramu, wskaż `installerclean-cli` w Harmonogramie zadań. Uruchamiaj go jako SYSTEM lub na koncie usługi i z najwyższymi uprawnieniami, żeby dostawał potrzebne podniesienie uprawnień bez interaktywnego monitu, a folder docelowy przenoszenia podawaj w wierszu poleceń, bo domyślny folder zapisany w GUI jest przechowywany dla każdego użytkownika i nie dotyczy przebiegu jako SYSTEM ani na koncie usługi. Comiesięczne przeniesienie do `D:\InstallerBackup`, z kopią CLI umieszczoną w `C:\Tools`, wygląda tak:
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+Zadanie czeka na zakończenie przebiegu i zapisuje kod wyjścia jako swój Wynik ostatniego uruchomienia, więc twój system RMM może opierać się na powyższych kodach (`0` pełny sukces, `2` częściowy, `75` stan przejściowy, `1` całkowita porażka) tak samo jak skrypt.
+
 ### Dlaczego `installerclean-cli`, a nie `installerclean.exe`?
 
 `InstallerClean.exe` to GUI WPF; nie reaguje na argumenty wiersza poleceń. `installerclean-cli.exe` to osobny program konsolowy, który jest dostarczany w tym samym katalogu instalacyjnym i udostępnia te same operacje skanowania / przenoszenia / usuwania dla PowerShell, cmd i zaplanowanych zadań. Ponieważ jest prawdziwym procesem konsolowym, blokuje wiersz poleceń do czasu zakończenia; przekieruj lub przekaż potokiem jego komunikację tak jak każdy inny program konsolowy exe.

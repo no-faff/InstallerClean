@@ -352,6 +352,16 @@ Toda a saída da CLI, incluindo as mensagens de erro e de diagnóstico, vai para
 
 Os três exigem um prompt de comando elevado (administrador). Se a Diretiva de Grupo bloquear o prompt de elevação do UAC, o processo se recusa a iniciar e o Windows retorna o erro 740 para o shell pai (`$LASTEXITCODE = 740` no PowerShell). `taskkill /pid <pid>` não dispara um cancelamento gracioso; o mutex de instância única é recuperado na próxima execução pelo caminho do AbandonedMutexException.
 
+### Agendar uma limpeza periódica
+
+Para limpar em uma programação regular, aponte o Agendador de Tarefas para o `installerclean-cli`. Execute-o como SYSTEM ou com uma conta de serviço e com privilégios mais altos, para que ele consiga a elevação de que precisa sem um prompt interativo, e informe a pasta de destino na linha de comando, porque o padrão salvo pela interface gráfica fica armazenado por usuário e não vale para uma execução como SYSTEM ou com conta de serviço. Para uma movimentação mensal para `D:\InstallerBackup`, com uma cópia da CLI colocada em `C:\Tools`:
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+A tarefa fica bloqueada até a execução terminar e registra o código de saída como seu Resultado da Última Execução, então o seu RMM pode se orientar pelos códigos acima (`0` sucesso total, `2` parcial, `75` transitório, `1` falha total) do mesmo jeito que um script faria.
+
 ### Por que `installerclean-cli` e não `installerclean.exe`?
 
 O `InstallerClean.exe` é a interface gráfica WPF; ela não responde a argumentos de linha de comando. O `installerclean-cli.exe` é um executável de console separado, entregue no mesmo diretório de instalação, que expõe as mesmas operações de análise / movimentação / exclusão para o PowerShell, o cmd e tarefas agendadas. Como é um processo de console de verdade, ele bloqueia o prompt até terminar; redirecione ou canalize a saída dele como faria com qualquer outro exe de console.

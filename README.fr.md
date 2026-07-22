@@ -352,6 +352,16 @@ Toute la sortie de la CLI, y compris les messages d'erreur et de diagnostic, va 
 
 Les trois nécessitent une invite de commandes élevée (administrateur). Si une stratégie de groupe bloque l'invite d'élévation UAC, le processus refuse de démarrer et Windows renvoie l'erreur 740 à l'invite parente (`$LASTEXITCODE = 740` sous PowerShell). `taskkill /pid <pid>` ne déclenche pas d'annulation propre ; le mutex d'instance unique est récupéré au lancement suivant, par le chemin AbandonedMutexException.
 
+### Planifier un nettoyage régulier
+
+Pour nettoyer à intervalles réguliers, faites pointer le Planificateur de tâches vers `installerclean-cli`. Exécutez-le sous SYSTEM ou sous un compte de service, avec les autorisations maximales, pour qu'il obtienne l'élévation nécessaire sans invite interactive, et indiquez le dossier de destination sur la ligne de commande, car le dossier par défaut enregistré depuis l'interface graphique l'est par utilisateur et ne s'applique pas à une exécution sous SYSTEM ou sous un compte de service. Pour un déplacement mensuel vers `D:\InstallerBackup`, avec une copie de la CLI déposée dans `C:\Tools` :
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+La tâche bloque jusqu'à la fin de l'exécution et enregistre le code de sortie comme Résultat de la dernière exécution ; votre RMM peut donc se fonder sur les codes ci-dessus (`0` succès complet, `2` partiel, `75` transitoire, `1` échec total) exactement comme le ferait un script.
+
 
 ### Pourquoi `installerclean-cli` et pas `installerclean.exe` ?
 

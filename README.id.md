@@ -352,6 +352,16 @@ Semua keluaran CLI, termasuk pesan kesalahan dan diagnostik, masuk ke stdout; ti
 
 Ketiganya memerlukan prompt perintah yang ditinggikan (administrator). Jika Group Policy memblokir permintaan elevasi UAC, proses menolak untuk dijalankan dan Windows mengembalikan kesalahan 740 ke shell induk (`$LASTEXITCODE = 740` di PowerShell). `taskkill /pid <pid>` tidak memicu pembatalan yang mulus; mutex instans-tunggal dipulihkan oleh proses berikutnya melalui jalur AbandonedMutexException.
 
+### Menjadwalkan pembersihan berkala
+
+Untuk membersihkan secara berkala, arahkan Task Scheduler ke `installerclean-cli`. Jalankan sebagai SYSTEM atau akun layanan dengan hak tertinggi, supaya ia mendapat elevasi yang dibutuhkannya tanpa permintaan interaktif, dan sebutkan folder tujuan pemindahan di baris perintah, karena default yang tersimpan dari GUI disimpan per-pengguna dan tidak berlaku untuk proses sebagai SYSTEM atau akun layanan. Untuk pemindahan bulanan ke `D:\InstallerBackup`, dengan salinan CLI ditaruh di `C:\Tools`:
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+Tugas itu menunggu sampai prosesnya selesai dan mencatat kode keluar sebagai Last Run Result miliknya, jadi RMM Anda bisa berpatokan pada kode-kode di atas (`0` berhasil penuh, `2` sebagian, `75` sementara, `1` kegagalan total) persis seperti yang dilakukan sebuah skrip.
+
 ### Mengapa `installerclean-cli` dan bukan `installerclean.exe`?
 
 `InstallerClean.exe` adalah GUI WPF; ia tidak menanggapi argumen baris perintah. `installerclean-cli.exe` adalah executable konsol terpisah yang disertakan dalam direktori instalasi yang sama dan mengekspos operasi pindai / pindah / hapus yang sama ke PowerShell, cmd, dan tugas terjadwal. Karena ia proses konsol sungguhan, ia memblokir prompt sampai selesai; alihkan atau salurkan keluarannya seperti executable konsol lainnya.

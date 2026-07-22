@@ -352,6 +352,16 @@ Toàn bộ đầu ra của CLI, bao gồm các thông báo lỗi và chẩn đo�
 
 Cả ba đều cần một dấu nhắc lệnh có quyền nâng cao (quản trị viên). Nếu Group Policy chặn lời nhắc nâng quyền UAC thì tiến trình từ chối khởi động và Windows trả về lỗi 740 cho shell cha (`$LASTEXITCODE = 740` trong PowerShell). `taskkill /pid <pid>` không kích hoạt việc hủy êm; mutex một-thực-thể được lần chạy kế tiếp khôi phục qua đường AbandonedMutexException.
 
+### Lên lịch dọn dẹp định kỳ
+
+Để dọn dẹp theo lịch, hãy trỏ Task Scheduler tới `installerclean-cli`. Chạy nó dưới quyền SYSTEM hoặc một tài khoản dịch vụ với quyền cao nhất, để nó nhận được quyền nâng cao cần thiết mà không cần lời nhắc tương tác, và chỉ định thư mục đích của việc di chuyển ngay trên dòng lệnh, vì giá trị mặc định lưu từ GUI được lưu theo từng người dùng và không áp dụng cho lần chạy dưới quyền SYSTEM hay tài khoản dịch vụ. Để mỗi tháng chuyển sang `D:\InstallerBackup`, với một bản sao của CLI đặt tại `C:\Tools`:
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+Tác vụ sẽ chờ đến khi lần chạy kết thúc và ghi mã thoát vào Last Run Result của nó, nên hệ thống RMM của bạn có thể dựa vào các mã ở trên (`0` thành công hoàn toàn, `2` một phần, `75` tạm thời, `1` thất bại toàn bộ) đúng như cách một script vẫn làm.
+
 ### Vì sao là `installerclean-cli` chứ không phải `installerclean.exe`?
 
 `InstallerClean.exe` là GUI WPF; nó không phản hồi các tham số dòng lệnh. `installerclean-cli.exe` là một tệp thực thi console riêng, đi kèm trong cùng thư mục cài đặt và cung cấp đúng các thao tác quét / chuyển / xóa cho PowerShell, cmd và các tác vụ theo lịch. Vì nó là một tiến trình console thật, nó chặn dấu nhắc cho đến khi xong; hãy chuyển hướng hoặc nối ống đầu ra của nó như với bất kỳ tệp exe console nào khác.

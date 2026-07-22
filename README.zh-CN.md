@@ -352,6 +352,16 @@ CLI 的所有输出，包括错误和诊断信息，都写到 stdout；没有单
 
 这三个命令都需要一个已提权的（管理员）命令提示符。如果组策略拦截了 UAC 提权提示，进程会拒绝启动，Windows 会向父 Shell 返回错误码 740（在 PowerShell 中即 `$LASTEXITCODE = 740`）。`taskkill /pid <pid>` 不会触发优雅取消；单实例互斥锁会由下一次运行通过 AbandonedMutexException 路径恢复。
 
+### 安排定期清理
+
+若要按计划定期清理，就让任务计划程序去运行 `installerclean-cli`。以 SYSTEM 或服务账户身份、并用最高权限运行它，这样它无需交互式提示就能拿到所需的提权；移动的目标位置要在命令行上给出，因为图形界面里保存的默认位置是按用户存储的，对 SYSTEM 或服务账户的运行并不适用。把 CLI 的一份副本放在 `C:\Tools`，每月移动到 `D:\InstallerBackup`，命令是这样：
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+任务会一直等到这次运行结束，并把退出码记录为它的“上次运行结果”，所以您的 RMM 可以像脚本一样，依据上面那些代码（`0` 完全成功、`2` 部分成功、`75` 临时性状况、`1` 彻底失败）来判断。
+
 ### 为什么是 `installerclean-cli` 而不是 `installerclean.exe`？
 
 `InstallerClean.exe` 是 WPF 图形界面，它不响应命令行参数。`installerclean-cli.exe` 是另一个独立的控制台程序，与图形界面装在同一个目录下，把相同的扫描 / 移动 / 删除操作开放给 PowerShell、cmd 和计划任务。因为它是一个真正的控制台进程，会阻塞命令行直到运行结束；可以像对待任何其他控制台 exe 一样，对它的输出做重定向或管道。

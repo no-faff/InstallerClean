@@ -352,6 +352,16 @@ GUI를 실행하려면 `InstallerClean.exe`를 실행하세요(또는 Setup으�
 
 셋 다 권한이 상승된(관리자) 명령 프롬프트가 필요합니다. 그룹 정책이 UAC 권한 상승 프롬프트를 차단하면 프로세스는 시작을 거부하고, Windows는 상위 셸에 오류 740을 반환합니다(PowerShell에서는 `$LASTEXITCODE = 740`). `taskkill /pid <pid>`는 정상적인 취소를 일으키지 않습니다. 단일 인스턴스 뮤텍스는 다음 실행 때 AbandonedMutexException 경로를 통해 복구됩니다.
 
+### 정기적인 정리 예약하기
+
+정기적으로 정리하려면 작업 스케줄러가 `installerclean-cli`를 실행하도록 지정하세요. SYSTEM이나 서비스 계정으로, 가장 높은 권한으로 실행하면 대화형 프롬프트 없이 필요한 권한 상승을 받습니다. 이동할 대상 폴더는 명령줄에서 지정하세요. GUI에서 저장한 기본 위치는 사용자별로 저장되므로 SYSTEM이나 서비스 계정 실행에는 적용되지 않기 때문입니다. CLI 사본을 `C:\Tools`에 두고 매월 `D:\InstallerBackup`으로 옮기려면 다음과 같이 합니다:
+
+```
+schtasks /create /tn "InstallerClean monthly" /tr "C:\Tools\installerclean-cli.exe /m D:\InstallerBackup" /sc monthly /ru SYSTEM /rl highest
+```
+
+작업은 실행이 끝날 때까지 기다렸다가 종료 코드를 마지막 실행 결과로 기록하므로, 쓰고 계신 RMM도 스크립트와 똑같이 위의 코드(`0` 완전 성공, `2` 부분 성공, `75` 일시적 상태, `1` 전체 실패)를 기준으로 삼을 수 있습니다.
+
 ### 왜 `installerclean.exe`가 아니라 `installerclean-cli`인가요?
 
 `InstallerClean.exe`는 WPF GUI이며 명령줄 인수에 반응하지 않습니다. `installerclean-cli.exe`는 같은 설치 디렉터리에 함께 들어가는 별도의 콘솔 실행 파일로, 동일한 검사 / 이동 / 삭제 작업을 PowerShell, cmd, 예약 작업에 노출합니다. 진짜 콘솔 프로세스이므로 끝날 때까지 프롬프트를 붙잡습니다. 다른 콘솔 exe와 마찬가지로 출력을 리디렉션하거나 파이프로 넘기면 됩니다.
