@@ -35,6 +35,10 @@ public partial class MainWindow : Window
         PreviewKeyDown += OnPreviewKeyDown;
         Closing += OnClosing;
         Closed += OnClosed;
+        // The pair exists only for the update button's focus restore; see
+        // _focusBeforeDeactivation.
+        Deactivated += OnDeactivatedDuringUpdateCheck;
+        Activated += OnActivatedDuringUpdateCheck;
 
         // The splash-driven startup scan can complete (and Completion
         // .ShowAllClear() can already have set IsComplete=true) before
@@ -370,29 +374,82 @@ public partial class MainWindow : Window
     /// </summary>
     private bool _restoreFocusToUpdateButton;
 
+    /// <summary>
+    /// Keyboard focus as it stood when this window last lost activation
+    /// during a manual check, and, when reactivation put focus somewhere
+    /// else, where it was put. The comparison is what separates a placement
+    /// nobody asked for from one the user made: WPF preserves focus across a
+    /// deactivation, so Alt+Tab, or a dialog opened from a control that is
+    /// still enabled, comes back to the same element and leaves the record
+    /// alone. The update dialog is the case that does not, because the button
+    /// the user pressed is disabled for the rest of the cooldown: focus is
+    /// orphaned on the way out and WPF hands it to the window's first control
+    /// on the way back in.
+    /// </summary>
+    private IInputElement? _focusBeforeDeactivation;
+    private IInputElement? _focusPlacedOnReactivation;
+
+    private void OnDeactivatedDuringUpdateCheck(object? sender, EventArgs e)
+    {
+        if (!_restoreFocusToUpdateButton) return;
+        _focusBeforeDeactivation = FocusManager.GetFocusedElement(this);
+    }
+
+    // Read a dispatcher pass later than the event: WPF restores focus off
+    // the same activation, and reading from the handler would see the state
+    // before the restore rather than after it. Background so it also follows
+    // anything the app itself queues at Input from an activation.
+    //
+    // Records only a move, never a stay, so a later Alt+Tab out and back does
+    // not erase what the dialog did: the cooldown outlasts the dialog by
+    // several seconds and there is time for one.
+    private void OnActivatedDuringUpdateCheck(object? sender, EventArgs e)
+    {
+        if (!_restoreFocusToUpdateButton) return;
+        Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+        {
+            var focused = FocusManager.GetFocusedElement(this);
+            if (!ReferenceEquals(focused, _focusBeforeDeactivation))
+                _focusPlacedOnReactivation = focused;
+        });
+    }
+
     // ButtonBase raises Click before it invokes the command, so this reads
     // the focus state from before the disable. A press made while focus sat
     // somewhere else orphans nothing, and pulling focus across the bar when
     // the button comes back would be the bug.
     private void UpdateCheckButton_Click(object sender, RoutedEventArgs e)
-        => _restoreFocusToUpdateButton = UpdateCheckButton.IsKeyboardFocused;
+    {
+        _restoreFocusToUpdateButton = UpdateCheckButton.IsKeyboardFocused;
+        _focusBeforeDeactivation = null;
+        _focusPlacedOnReactivation = null;
+    }
 
     /// <summary>
     /// Hands the button its focus back once the check and the cooldown are
     /// done, so a keyboard user who pressed Enter on it is not left ringless
-    /// with Tab restarting from the first stop. Two guards, and both matter:
-    /// only when the disable was this button's own, because the whole bottom
-    /// bar is disabled while an overlay is up and that path has its own focus
-    /// destination; and only when focus has not moved on to another control
-    /// meanwhile, orphaned focus reading back as null or the window itself.
-    /// The About window's check button carried the same restore before the
-    /// control moved to the bottom bar.
+    /// with Tab restarting from the first stop. Restores in two cases, both
+    /// of them focus the user did not choose: orphaned, which reads back as
+    /// null or the window itself, and still sitting exactly where the update
+    /// dialog's dismissal dropped it. A check that ends "Up to date." shows
+    /// no dialog and only ever takes the first; a check that finds something
+    /// ends in the dialog and takes the second, several seconds after it is
+    /// dismissed, because the cooldown outlasts it. Focus the user has since
+    /// moved elsewhere matches neither and is left alone. The guard on the
+    /// disable being this button's own matters as well: the whole bottom bar
+    /// is disabled while an overlay is up, and that path has its own focus
+    /// destination.
     /// </summary>
     private void UpdateCheckButton_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         if (e.NewValue is not true || !_restoreFocusToUpdateButton) return;
         _restoreFocusToUpdateButton = false;
-        if (FocusManager.GetFocusedElement(this) is null or MainWindow)
+        var focused = FocusManager.GetFocusedElement(this);
+        var placedByDialog = _focusPlacedOnReactivation is not null
+                             && ReferenceEquals(focused, _focusPlacedOnReactivation);
+        _focusBeforeDeactivation = null;
+        _focusPlacedOnReactivation = null;
+        if (focused is null or MainWindow || placedByDialog)
             UpdateCheckButton.Focus();
     }
 
