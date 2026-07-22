@@ -38,7 +38,16 @@ public sealed class UpdateCheckService : IUpdateCheckService
 
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
 
-    private const string ReleasesPageUrl =
+    /// <summary>
+    /// The one page any "there is an update" control opens: the status-line
+    /// link and the update dialog's open button both come here. Deliberately
+    /// the /latest redirect rather than the found release's own tag page, so
+    /// the click lands on whatever is newest at the moment it happens rather
+    /// than on the tag this particular check saw. It also keeps the browser's
+    /// destination out of the response body entirely: nothing GitHub returns
+    /// decides where the user is sent.
+    /// </summary>
+    public const string ReleasesPageUrl =
         "https://github.com/no-faff/InstallerClean/releases/latest";
 
     // MaxDepth=8 matches SettingsService.JsonOptions. The schema is
@@ -101,20 +110,12 @@ public sealed class UpdateCheckService : IUpdateCheckService
 
             if (latestNormalised > currentNormalised)
             {
-                // html_url comes from a TLS-validated github.com response,
-                // so trust is anchored at the transport. Even so, the
-                // returned string is constrained to the project's own
-                // releases path; any other shape falls back to the
-                // hardcoded ReleasesPageUrl so a manipulated response
-                // can't redirect the user's browser elsewhere.
-                var rawUrl = doc.RootElement.TryGetProperty("html_url", out var urlElement)
-                    ? urlElement.GetString() : null;
-                var releaseUrl = IsTrustedReleaseUrl(rawUrl) ? rawUrl! : ReleasesPageUrl;
-
+                // Only the two version strings. The destination is
+                // ReleasesPageUrl, fixed, so the response body supplies
+                // nothing the browser acts on.
                 return new UpdateAvailable(
                     CurrentVersion: FormatVersion(currentNormalised),
-                    LatestVersion: FormatVersion(latestNormalised),
-                    ReleaseUrl: releaseUrl);
+                    LatestVersion: FormatVersion(latestNormalised));
             }
 
             return new UpToDate(FormatVersion(currentNormalised));
@@ -160,17 +161,4 @@ public sealed class UpdateCheckService : IUpdateCheckService
 
     private static string FormatVersion(Version v) =>
         $"{v.Major}.{v.Minor}.{v.Build}";
-
-    internal static bool IsTrustedReleaseUrl(string? url)
-    {
-        if (string.IsNullOrEmpty(url)) return false;
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return false;
-        if (uri.Scheme != Uri.UriSchemeHttps) return false;
-        if (!string.Equals(uri.Host, "github.com", StringComparison.OrdinalIgnoreCase)) return false;
-        // Host check is case-insensitive; path check follows. GitHub
-        // serves the canonical lowercase form, but a redirect through
-        // "/No-Faff/InstallerClean/releases/..." would still belong
-        // to this project.
-        return uri.AbsolutePath.StartsWith("/no-faff/InstallerClean/releases/", StringComparison.OrdinalIgnoreCase);
-    }
 }

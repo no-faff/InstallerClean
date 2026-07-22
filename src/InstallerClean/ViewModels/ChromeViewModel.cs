@@ -119,23 +119,17 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     [ObservableProperty] private string _updateStatusText = string.Empty;
 
     /// <summary>
-    /// The release page of a newer version once a check has found one;
-    /// empty otherwise. Non-empty swaps the status line's presentation
-    /// from plain text to a hyperlink onto this URL, so the sentence
-    /// announcing the update is itself the way to get it.
+    /// Set once a check has found a newer version. It picks which of the
+    /// status line's two presentations is live: plain text while false, and
+    /// a hyperlink onto <see cref="UpdateCheckService.ReleasesPageUrl"/>
+    /// once true, so the sentence announcing the update is itself the way
+    /// to get it. A bool rather than the URL because the destination is
+    /// fixed, and because the bindings need the POSITIVE form of the test:
+    /// a XAML DataTrigger tests equality only, so a string could express
+    /// "no link" and never "a link", which is the case the plain line has
+    /// to hide itself in.
     /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasUpdateLink))]
-    private string _updateAvailableUrl = string.Empty;
-
-    /// <summary>
-    /// Which of the status line's two presentations is live. The bindings
-    /// need the POSITIVE form of "a URL is set": a XAML DataTrigger tests
-    /// equality only, so <see cref="UpdateAvailableUrl"/> alone can express
-    /// "no link" and never "a link", and the plain line has to hide itself
-    /// in exactly that case.
-    /// </summary>
-    public bool HasUpdateLink => UpdateAvailableUrl.Length > 0;
+    [ObservableProperty] private bool _hasUpdateLink;
 
     /// <summary>
     /// Starts the once-per-session automatic check. Called by the App as
@@ -196,7 +190,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     private async Task CheckForUpdatesAsync()
     {
         var token = ResetUpdateCheckToken();
-        UpdateAvailableUrl = string.Empty;
+        HasUpdateLink = false;
         UpdateStatusText = Strings.UpdateCheck_Status_Checking;
 
         UpdateCheckResult result;
@@ -219,7 +213,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
             case UpdateAvailable available:
                 ShowUpdateFound(available);
                 if (_windowService.ShowUpdateAvailable(available.CurrentVersion, available.LatestVersion))
-                    _windowService.OpenUrl(available.ReleaseUrl);
+                    _windowService.OpenUrl(UpdateCheckService.ReleasesPageUrl);
                 break;
 
             case CheckFailed failed:
@@ -239,32 +233,32 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
         // The transient wordings clear once read; the update-available
         // sentence stays, because it is the one the user still needs after
         // dismissing the dialog, and it carries the link.
-        if (UpdateAvailableUrl.Length == 0 && UpdateStatusText == Strings.UpdateCheck_Status_UpToDate)
+        if (!HasUpdateLink && UpdateStatusText == Strings.UpdateCheck_Status_UpToDate)
             UpdateStatusText = string.Empty;
     }
 
-    /// <summary>Opens the found release's page; bound to the status hyperlink.</summary>
+    /// <summary>Opens the releases page; bound to the status hyperlink.</summary>
     [RelayCommand]
     private void OpenUpdatePage()
     {
-        if (UpdateAvailableUrl.Length > 0)
-            _windowService.OpenUrl(UpdateAvailableUrl);
+        if (HasUpdateLink)
+            _windowService.OpenUrl(UpdateCheckService.ReleasesPageUrl);
     }
 
     private void ShowUpdateFound(UpdateAvailable available)
     {
-        // URL before text, and load-bearing. Each assignment's raise runs
+        // Flag before text, and load-bearing. Each assignment's raise runs
         // MainWindow.OnChromePropertyChanged synchronously, and that handler
         // queues one live-region announcement per line that has just become
-        // visible. Setting the URL first makes the link's line the only one
+        // visible. Setting the flag first makes the link's line the only one
         // that qualifies. Text first would pass the plain line's "shown"
         // test on the automatic path (empty text, no link yet) and queue a
-        // second announcement against a line that the URL then collapses,
+        // second announcement against a line that the flag then collapses,
         // so a screen reader would be handed a line that is gone by the time
         // it speaks. What makes either safe is that the raises are queued at
         // Background priority rather than made from the setter: by the time
         // they run, both assignments and the bindings behind them are done.
-        UpdateAvailableUrl = available.ReleaseUrl;
+        HasUpdateLink = true;
         UpdateStatusText = string.Format(
             Strings.UpdateCheck_Status_UpdateAvailable, available.LatestVersion);
     }

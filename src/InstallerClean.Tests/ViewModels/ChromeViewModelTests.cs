@@ -15,7 +15,9 @@ namespace InstallerClean.Tests.ViewModels;
 /// </summary>
 public class ChromeViewModelTests
 {
-    private const string ReleaseUrl = "https://github.com/no-faff/InstallerClean/releases/tag/v9.9.9";
+    // The one destination every update control opens; the found release's
+    // own tag page is no longer anywhere in the flow.
+    private const string ReleasesPage = UpdateCheckService.ReleasesPageUrl;
 
     private readonly IWindowService _windowService = Substitute.For<IWindowService>();
     private readonly IMsiFileInfoService _msiInfoService = Substitute.For<IMsiFileInfoService>();
@@ -71,7 +73,7 @@ public class ChromeViewModelTests
     public async Task Automatic_check_paints_the_link_when_a_newer_version_exists()
     {
         _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
-            .Returns(new UpdateAvailable("2.1.0", "9.9.9", ReleaseUrl));
+            .Returns(new UpdateAvailable("2.1.0", "9.9.9"));
         var vm = CreateViewModel();
 
         await vm.RunAutomaticUpdateCheckAsync();
@@ -79,7 +81,6 @@ public class ChromeViewModelTests
         Assert.Equal(
             string.Format(Strings.UpdateCheck_Status_UpdateAvailable, "9.9.9"),
             vm.UpdateStatusText);
-        Assert.Equal(ReleaseUrl, vm.UpdateAvailableUrl);
         Assert.True(vm.HasUpdateLink);
         // A check nobody asked for never opens a window over whatever the
         // user was doing; the status line is the whole of its voice.
@@ -97,7 +98,6 @@ public class ChromeViewModelTests
         await vm.RunAutomaticUpdateCheckAsync();
 
         Assert.Equal(string.Empty, vm.UpdateStatusText);
-        Assert.Equal(string.Empty, vm.UpdateAvailableUrl);
         Assert.False(vm.HasUpdateLink);
         _dialogService.DidNotReceive().ShowWarning(Arg.Any<string>(), Arg.Any<string>());
     }
@@ -135,26 +135,26 @@ public class ChromeViewModelTests
     public async Task Manual_check_opens_the_release_page_when_the_user_accepts()
     {
         _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
-            .Returns(new UpdateAvailable("2.1.0", "9.9.9", ReleaseUrl));
+            .Returns(new UpdateAvailable("2.1.0", "9.9.9"));
         _windowService.ShowUpdateAvailable("2.1.0", "9.9.9").Returns(true);
         var vm = CreateViewModel();
 
         await vm.CheckForUpdatesCommand.ExecuteAsync(null);
 
-        _windowService.Received(1).OpenUrl(ReleaseUrl);
+        _windowService.Received(1).OpenUrl(ReleasesPage);
         // Both survive the cooldown's clear: the dialog is dismissed by then,
         // and the line is the only remaining route to the download.
         Assert.Equal(
             string.Format(Strings.UpdateCheck_Status_UpdateAvailable, "9.9.9"),
             vm.UpdateStatusText);
-        Assert.Equal(ReleaseUrl, vm.UpdateAvailableUrl);
+        Assert.True(vm.HasUpdateLink);
     }
 
     [Fact]
     public async Task Manual_check_leaves_the_release_page_alone_when_the_user_declines()
     {
         _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
-            .Returns(new UpdateAvailable("2.1.0", "9.9.9", ReleaseUrl));
+            .Returns(new UpdateAvailable("2.1.0", "9.9.9"));
         _windowService.ShowUpdateAvailable("2.1.0", "9.9.9").Returns(false);
         var vm = CreateViewModel();
 
@@ -190,15 +190,15 @@ public class ChromeViewModelTests
     }
 
     [Fact]
-    public async Task OpenUpdatePage_opens_the_release_found_by_the_automatic_check()
+    public async Task OpenUpdatePage_opens_the_releases_page_after_the_automatic_check()
     {
         _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
-            .Returns(new UpdateAvailable("2.1.0", "9.9.9", ReleaseUrl));
+            .Returns(new UpdateAvailable("2.1.0", "9.9.9"));
         var vm = CreateViewModel();
         await vm.RunAutomaticUpdateCheckAsync();
 
         vm.OpenUpdatePageCommand.Execute(null);
 
-        _windowService.Received(1).OpenUrl(ReleaseUrl);
+        _windowService.Received(1).OpenUrl(ReleasesPage);
     }
 }

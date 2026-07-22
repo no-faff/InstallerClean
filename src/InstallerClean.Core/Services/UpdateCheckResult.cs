@@ -13,11 +13,12 @@ public abstract record UpdateCheckResult;
 public sealed record UpToDate(string CurrentVersion) : UpdateCheckResult;
 
 /// <summary>
-/// A newer release tag is published on GitHub. <see cref="ReleaseUrl"/>
-/// is the html_url from the GitHub API and lands on the release page
-/// for the new version, with the binaries attached.
+/// A newer release tag is published on GitHub. The two version strings
+/// and nothing else: where a click goes is
+/// <see cref="UpdateCheckService.ReleasesPageUrl"/>, fixed in the app, so
+/// the response body has no say in it.
 /// </summary>
-public sealed record UpdateAvailable(string CurrentVersion, string LatestVersion, string ReleaseUrl)
+public sealed record UpdateAvailable(string CurrentVersion, string LatestVersion)
     : UpdateCheckResult;
 
 /// <summary>

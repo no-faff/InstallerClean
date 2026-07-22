@@ -9,9 +9,8 @@ namespace InstallerClean.Tests.Services;
 /// here because it depends on a live HttpClient against GitHub; these
 /// tests pin the User-Agent (must parse through
 /// HttpRequestMessage.Headers.UserAgent - a localised display string
-/// in the version slot causes GitHub to return 403) and the
-/// release-URL trust check (accept only this project's own releases
-/// path).
+/// in the version slot causes GitHub to return 403) and the JSON
+/// depth cap.
 /// </summary>
 public class UpdateCheckServiceTests
 {
@@ -46,21 +45,16 @@ public class UpdateCheckServiceTests
         Assert.Equal(8, UpdateCheckService.JsonParseOptions.MaxDepth);
     }
 
-    [Theory]
-    [InlineData("https://github.com/no-faff/InstallerClean/releases/tag/v1.8.0", true)]
-    [InlineData("https://github.com/no-faff/InstallerClean/releases/latest", true)]
-    [InlineData("https://github.com/no-faff/InstallerClean/releases/", true)]
-    [InlineData("https://GITHUB.COM/no-faff/InstallerClean/Releases/tag/v1.8.0", true)]
-    [InlineData("https://github.com/No-Faff/InstallerClean/releases/tag/v1.8.0", true)]
-    [InlineData("https://github.com/no-faff/InstallerClean", false)]
-    [InlineData("https://github.com/no-faff/OtherProject/releases/v1.0", false)]
-    [InlineData("https://github.com.attacker.example/no-faff/InstallerClean/releases/", false)]
-    [InlineData("http://github.com/no-faff/InstallerClean/releases/", false)]
-    [InlineData("javascript:alert(1)", false)]
-    [InlineData("", false)]
-    [InlineData(null, false)]
-    public void IsTrustedReleaseUrl_accepts_only_project_releases_paths(string? url, bool expected)
+    [Fact]
+    public void ReleasesPageUrl_is_this_project_over_https()
     {
-        Assert.Equal(expected, UpdateCheckService.IsTrustedReleaseUrl(url));
+        // Every "there is an update" click lands here, from an elevated
+        // process, so the constant itself is the whole of the destination's
+        // trust: no response field feeds it and there is nothing to
+        // validate at runtime. Pinned so a typo or an http:// slip in a
+        // later edit fails CI rather than the browser.
+        Assert.Equal(
+            "https://github.com/no-faff/InstallerClean/releases/latest",
+            UpdateCheckService.ReleasesPageUrl);
     }
 }
