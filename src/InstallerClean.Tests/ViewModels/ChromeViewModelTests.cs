@@ -103,9 +103,9 @@ public class ChromeViewModelTests
     }
 
     /// <summary>
-    /// The origin is what keeps an unreachable API out of crash.log on a
-    /// machine that simply has no route to GitHub, so which one each path
-    /// passes is part of the contract rather than an implementation detail.
+    /// The origin is what keeps a machine with no route to github.com from
+    /// writing to crash.log at every launch, so which one each path passes
+    /// is part of the contract rather than an implementation detail.
     /// </summary>
     [Fact]
     public async Task Automatic_check_tells_the_service_nobody_asked_for_it()

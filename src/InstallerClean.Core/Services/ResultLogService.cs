@@ -41,11 +41,14 @@ public sealed class ResultLogService : IResultLogService
     private static readonly HttpClient HttpClient = new()
     {
         Timeout = RequestTimeout,
-        // Defence in depth: SendAsync uses
-        // HttpCompletionOption.ResponseHeadersRead so the body never
-        // materialises in HttpClient's buffer. A caller adding
-        // response.Content.ReadAsStringAsync() would otherwise inherit
-        // the 2 GiB default. 4 KiB is generous for the expected
+        // Bounds the eager buffering only: MaxResponseContentBufferSize
+        // gates HttpCompletionOption.ResponseContentRead, which is the
+        // default, so a send that stops passing the explicit option
+        // buffers into 4 KiB rather than HttpClient's own 2 GiB. It does
+        // not reach a ReadAsStringAsync taken after the ResponseHeadersRead
+        // send in SendAsync (measured on .NET 10, a 400 KiB body read back
+        // whole under a 256 KiB cap); what keeps the ack out of this process
+        // is that nothing reads it. 4 KiB is generous for the expected
         // {"ok":true} ack.
         MaxResponseContentBufferSize = 4 * 1024,
     };
@@ -132,11 +135,12 @@ public sealed class ResultLogService : IResultLogService
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             // ResponseHeadersRead returns as soon as the status line and
-            // headers are in. The caller only reads IsSuccessStatusCode
-            // and never touches Content; with the default
-            // ResponseContentRead the body would be buffered into memory
-            // anyway, exposing the elevated process to an oversize body
-            // from a hijacked or DNS-poisoned endpoint.
+            // headers are in. Only IsSuccessStatusCode is read and Content
+            // is never touched, so a body from a hijacked or DNS-poisoned
+            // endpoint never materialises here at all; the default
+            // ResponseContentRead would buffer one, bounded by the 4 KiB
+            // MaxResponseContentBufferSize above, which refuses past that
+            // rather than truncating.
             using var response = await HttpClient.SendAsync(
                     request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
                 .ConfigureAwait(false);

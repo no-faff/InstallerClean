@@ -29,10 +29,11 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     /// Minimum spacing between successive update checks from the manual
     /// button. Only bites if something is hammering the button: a
     /// hand-driven user clicks once and reads the result. Five seconds
-    /// keeps a stuck button or a UI-automation loop from running into
-    /// GitHub's 60/hour unauthenticated rate limit on a long enough
-    /// timescale. The command stays non-executable for the duration, so
-    /// the pill's disabled paint doubles as the feedback.
+    /// keeps a stuck button or a UI-automation loop from running an
+    /// elevated process into GitHub's abuse protection, which answers a
+    /// caller with retry-after rather than a version. The command stays
+    /// non-executable for the duration, so the pill's disabled paint
+    /// doubles as the feedback.
     /// </summary>
     private static readonly TimeSpan CheckForUpdatesCooldown = TimeSpan.FromSeconds(5);
 
@@ -168,8 +169,8 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
             // UpToDate and CheckFailed both end in silence: an automatic
             // check the user never asked to watch has nothing to report
             // but a newer version. The Automatic origin extends that
-            // silence to crash.log, which is where an unreachable API would
-            // otherwise leave a trace once per launch.
+            // silence to crash.log, which is where an unreachable github.com
+            // would otherwise leave a trace once per launch.
         }
         catch (OperationCanceledException)
         {
