@@ -280,8 +280,8 @@ public sealed class UpdateCheckService : IUpdateCheckService
     /// </summary>
     private static string DescribeThrottling(HttpResponseHeaders headers)
     {
-        var parts = new List<string>(RateLimitHeaders.Length);
-        foreach (var name in RateLimitHeaders)
+        var parts = new List<string>(ThrottlingHeaders.Length);
+        foreach (var name in ThrottlingHeaders)
         {
             if (headers.TryGetValues(name, out var values))
                 parts.Add($"{name}={Clamp(string.Join(',', values))}");
@@ -297,13 +297,13 @@ public sealed class UpdateCheckService : IUpdateCheckService
     // integer or a short URL, so the cap costs nothing and anything that
     // reaches it is itself worth seeing the head of.
     private static string Clamp(string value) =>
-        value.Length <= MaxLoggedHeaderChars
+        value.Length <= MaxLoggedValueChars
             ? value
-            : value[..MaxLoggedHeaderChars] + "...(truncated)";
+            : value[..MaxLoggedValueChars] + "...(truncated)";
 
-    private const int MaxLoggedHeaderChars = 100;
+    private const int MaxLoggedValueChars = 100;
 
-    private static readonly string[] RateLimitHeaders =
+    private static readonly string[] ThrottlingHeaders =
         ["retry-after", "x-ratelimit-remaining", "x-ratelimit-reset"];
 
     /// <summary>
