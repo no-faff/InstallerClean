@@ -270,7 +270,10 @@
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>喉が渇く仕事です！</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>キャンセルが要求されました。InstallerClean は現在のステップが停止可能なポイントに達するのを待っています。大量の I/O または MSI データベース呼び出し中は数秒かかることがあります。</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>閉じる</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>GitHub でスターを付けると、InstallerClean を見つけてもらいやすくなります。</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>スターを付けると、InstallerClean を見つけてもらいやすくなります。</value>
+    <comment>Tooltip and screen-reader help on the About window's star pill. The button it hangs on already names GitHub (Action.LeaveStarOnGitHub, "Leave a star on GitHub"), so naming it again here says the same word twice in one glance; keep the tooltip to what the star does. "It" is InstallerClean, which most languages will want to say outright.</comment>
+  </data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>最小化</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているか、どれだけの容量が解放されているかを知るためのものです。次の画面で送信前に送信内容を確認できます。</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているかを知るためのものです。次の画面で送信前に送信内容を確認できます。</value></data>

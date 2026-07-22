@@ -323,7 +323,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's thirsty work! | 喉が渇く仕事です！ |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | キャンセルが要求されました。InstallerClean は現在のステップが停止可能なポイントに達するのを待っています。大量の I/O または MSI データベース呼び出し中は数秒かかることがあります。 |
 | Close | 閉じる |
-| A GitHub star helps other people find it. | GitHub でスターを付けると、InstallerClean を見つけてもらいやすくなります。 |
+| A star helps other people find it. | スターを付けると、InstallerClean を見つけてもらいやすくなります。 |
 | Minimise | 最小化 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | 任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているか、どれだけの容量が解放されているかを知るためのものです。次の画面で送信前に送信内容を確認できます。 |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | 任意ですが、歓迎します。匿名の要約を送信するもので、正常に動作しているかを知るためのものです。次の画面で送信前に送信内容を確認できます。 |

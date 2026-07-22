@@ -323,7 +323,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | It's thirsty work! | É trabalho que dá sede! |
 | Cancellation requested. InstallerClean is waiting for the current step to reach a stopping point. This can take a few seconds during heavy I/O or an MSI database call. | Cancelamento solicitado. O InstallerClean está esperando o passo atual chegar a um ponto em que possa parar. Isso pode levar alguns segundos durante operações intensas de E/S ou uma chamada ao banco de dados MSI. |
 | Close | Fechar |
-| A GitHub star helps other people find it. | Uma estrela no GitHub ajuda outras pessoas a encontrar o InstallerClean. |
+| A star helps other people find it. | Uma estrela ajuda outras pessoas a encontrar o InstallerClean. |
 | Minimise | Minimizar |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Você decide, mas eu agradeço. Envia um resumo anônimo que só me diz se está funcionando e quanto espaço as pessoas estão liberando. A próxima tela mostra o que será enviado antes de você confirmar. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Você decide, mas eu agradeço. Envia um resumo anônimo que só me diz se está funcionando. A próxima tela mostra o que será enviado antes de você confirmar. |

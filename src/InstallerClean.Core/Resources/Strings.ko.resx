@@ -270,7 +270,10 @@
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>이게 생각보다 목마른 일입니다!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>취소가 요청되었습니다. InstallerClean이 현재 단계가 멈출 수 있는 지점에 이를 때까지 기다리고 있습니다. I/O가 많거나 MSI 데이터베이스를 호출하는 동안에는 몇 초 걸릴 수 있습니다.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>닫기</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>GitHub 별은 다른 사람들이 InstallerClean을 찾는 데 도움이 됩니다.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>별 하나가 다른 사람들이 InstallerClean을 찾는 데 도움이 됩니다.</value>
+    <comment>Tooltip and screen-reader help on the About window's star pill. The button it hangs on already names GitHub (Action.LeaveStarOnGitHub, "Leave a star on GitHub"), so naming it again here says the same word twice in one glance; keep the tooltip to what the star does. "It" is InstallerClean, which most languages will want to say outright.</comment>
+  </data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>최소화</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.</value></data>

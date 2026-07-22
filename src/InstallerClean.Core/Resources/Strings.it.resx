@@ -270,7 +270,10 @@
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Ci vuole un caffè!</value></data>
   <data name="Tooltip.CancellingPending" xml:space="preserve"><value>Annullamento richiesto. InstallerClean sta aspettando che il passaggio in corso arrivi a un punto in cui fermarsi. Può richiedere qualche secondo durante operazioni di I/O intense o una chiamata al database MSI.</value></data>
   <data name="Tooltip.Close" xml:space="preserve"><value>Chiudi</value></data>
-  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve"><value>Una stella su GitHub aiuta altre persone a trovare InstallerClean.</value></data>
+  <data name="Tooltip.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>Una stella aiuta altre persone a trovare InstallerClean.</value>
+    <comment>Tooltip and screen-reader help on the About window's star pill. The button it hangs on already names GitHub (Action.LeaveStarOnGitHub, "Leave a star on GitHub"), so naming it again here says the same word twice in one glance; keep the tooltip to what the star does. "It" is InstallerClean, which most languages will want to say outright.</comment>
+  </data>
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Riduci a icona</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Come preferisci, ma è apprezzato. Invia un riepilogo anonimo che mi fa solo sapere se funziona e quanto spazio le persone stanno liberando. La schermata successiva visualizza cosa verrà inviato prima di confermare.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Come preferisci, ma è apprezzato. Invia un riepilogo anonimo che mi fa solo sapere se funziona. La schermata successiva ti mostra cosa verrà inviato prima di confermare.</value></data>
