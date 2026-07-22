@@ -86,9 +86,10 @@ const problems = [];
 const ALL_KEYS = [...new Set(Object.values(SETS).flat())];
 
 // Validate the sets against the neutral first, once. A key the resx no longer
-// holds is a fact about the sets above, not about any language: the old script
-// dropped it from the comparison instead, so a renamed key read as "this control
-// has no accelerator" and the set quietly shrank while still reporting clean.
+// holds is a fact about the sets above, not about any language. Dropping it from
+// the comparison instead reads a renamed key as "this control has no
+// accelerator", so a set quietly loses a control while the run still reports
+// clean.
 const neutral = values(readFileSync(`${DIR}/Strings.resx`, 'utf8'));
 for (const [window, keys] of Object.entries(SETS))
   for (const key of keys)

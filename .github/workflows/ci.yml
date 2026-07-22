@@ -41,9 +41,8 @@ jobs:
       # Source-level drift guards, each pinned to a concrete failure the app has
       # actually hit: a resx key left with no consumer; the installer language
       # set and SupportedLanguages diverging when a language is added to one and
-      # not the other; a French value that lost its narrow no-break space to a
-      # plain space (which plenty of editors do silently). They run before the
-      # build because they need only the checkout, not the SDK.
+      # not the other. Every node check in this job runs before the build
+      # because it needs only the checkout, not the SDK.
       - name: Check for dead resx keys
         run: node scripts/check-dead-resx-keys.mjs
 
@@ -57,6 +56,8 @@ jobs:
       - name: Check version surfaces agree
         run: node scripts/check-version-surfaces.mjs
 
+      # A French value that lost its narrow no-break space to a plain space,
+      # which plenty of editors do silently.
       - name: Lint French spacing
         run: node scripts/check-french-spacing.mjs
 
