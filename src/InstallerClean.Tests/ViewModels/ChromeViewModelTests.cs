@@ -65,14 +65,14 @@ public class ChromeViewModelTests
 
         await vm.RunAutomaticUpdateCheckAsync();
 
-        await _updateCheckService.DidNotReceive().CheckAsync(Arg.Any<CancellationToken>());
+        await _updateCheckService.DidNotReceive().CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>());
         Assert.Equal(string.Empty, vm.UpdateStatusText);
     }
 
     [Fact]
     public async Task Automatic_check_paints_the_link_when_a_newer_version_exists()
     {
-        _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
+        _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
             .Returns(new UpdateAvailable("2.1.0", "9.9.9"));
         var vm = CreateViewModel();
 
@@ -91,7 +91,7 @@ public class ChromeViewModelTests
     [Fact]
     public async Task Automatic_check_says_nothing_when_it_fails()
     {
-        _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
+        _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
             .Returns(new CheckFailed(UpdateCheckFailureReason.NetworkUnavailable));
         var vm = CreateViewModel();
 
@@ -102,10 +102,41 @@ public class ChromeViewModelTests
         _dialogService.DidNotReceive().ShowWarning(Arg.Any<string>(), Arg.Any<string>());
     }
 
+    /// <summary>
+    /// The origin is what keeps an unreachable API out of crash.log on a
+    /// machine that simply has no route to GitHub, so which one each path
+    /// passes is part of the contract rather than an implementation detail.
+    /// </summary>
+    [Fact]
+    public async Task Automatic_check_tells_the_service_nobody_asked_for_it()
+    {
+        _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
+            .Returns(new CheckFailed(UpdateCheckFailureReason.NetworkUnavailable));
+        var vm = CreateViewModel();
+
+        await vm.RunAutomaticUpdateCheckAsync();
+
+        await _updateCheckService.Received(1)
+            .CheckAsync(UpdateCheckOrigin.Automatic, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Manual_check_tells_the_service_the_user_is_waiting()
+    {
+        _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
+            .Returns(new CheckFailed(UpdateCheckFailureReason.NetworkUnavailable));
+        var vm = CreateViewModel();
+
+        await vm.CheckForUpdatesCommand.ExecuteAsync(null);
+
+        await _updateCheckService.Received(1)
+            .CheckAsync(UpdateCheckOrigin.Manual, Arg.Any<CancellationToken>());
+    }
+
     [Fact]
     public async Task Automatic_check_says_nothing_when_the_build_is_current()
     {
-        _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
+        _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
             .Returns(new UpToDate("2.1.0"));
         var vm = CreateViewModel();
 
@@ -118,7 +149,7 @@ public class ChromeViewModelTests
     [Fact]
     public async Task Manual_check_reports_up_to_date_then_clears_it()
     {
-        _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
+        _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
             .Returns(new UpToDate("2.1.0"));
         var vm = CreateViewModel();
         var seen = RecordStatusText(vm);
@@ -134,7 +165,7 @@ public class ChromeViewModelTests
     [Fact]
     public async Task Manual_check_opens_the_release_page_when_the_user_accepts()
     {
-        _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
+        _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
             .Returns(new UpdateAvailable("2.1.0", "9.9.9"));
         _windowService.ShowUpdateAvailable("2.1.0", "9.9.9").Returns(true);
         var vm = CreateViewModel();
@@ -153,7 +184,7 @@ public class ChromeViewModelTests
     [Fact]
     public async Task Manual_check_leaves_the_release_page_alone_when_the_user_declines()
     {
-        _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
+        _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
             .Returns(new UpdateAvailable("2.1.0", "9.9.9"));
         _windowService.ShowUpdateAvailable("2.1.0", "9.9.9").Returns(false);
         var vm = CreateViewModel();
@@ -167,7 +198,7 @@ public class ChromeViewModelTests
     [Fact]
     public async Task Manual_check_shows_a_warning_when_it_fails()
     {
-        _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
+        _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
             .Returns(new CheckFailed(UpdateCheckFailureReason.Timeout));
         var vm = CreateViewModel();
 
@@ -192,7 +223,7 @@ public class ChromeViewModelTests
     [Fact]
     public async Task OpenUpdatePage_opens_the_releases_page_after_the_automatic_check()
     {
-        _updateCheckService.CheckAsync(Arg.Any<CancellationToken>())
+        _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
             .Returns(new UpdateAvailable("2.1.0", "9.9.9"));
         var vm = CreateViewModel();
         await vm.RunAutomaticUpdateCheckAsync();

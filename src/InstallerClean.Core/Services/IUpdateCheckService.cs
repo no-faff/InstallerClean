@@ -22,5 +22,12 @@ public interface IUpdateCheckService
     /// a user-cancelled check from a server-cancelled one, and a caller
     /// that passes a token must catch it.
     /// </summary>
-    Task<UpdateCheckResult> CheckAsync(CancellationToken cancellationToken = default);
+    /// <param name="origin">
+    /// Which call site is asking. It changes nothing about the request or
+    /// the result, only how much of a failure reaches crash.log: a machine
+    /// with no route to api.github.com is a normal machine, and the
+    /// automatic check meets one at every launch.
+    /// </param>
+    Task<UpdateCheckResult> CheckAsync(
+        UpdateCheckOrigin origin, CancellationToken cancellationToken = default);
 }

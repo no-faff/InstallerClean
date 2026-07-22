@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http;
 using InstallerClean.Services;
 using Xunit;
@@ -5,15 +6,48 @@ using Xunit;
 namespace InstallerClean.Tests.Services;
 
 /// <summary>
-/// UpdateCheckService unit tests. CheckAsync itself isn't covered
-/// here because it depends on a live HttpClient against GitHub; these
-/// tests pin the User-Agent (must parse through
-/// HttpRequestMessage.Headers.UserAgent - a localised display string
-/// in the version slot causes GitHub to return 403) and the JSON
-/// depth cap.
+/// UpdateCheckService unit tests. The comparison against a real GitHub
+/// response is not covered here (it needs the live API); what is covered is
+/// the User-Agent (must parse through HttpRequestMessage.Headers.UserAgent -
+/// a localised display string in the version slot causes GitHub to return
+/// 403), the JSON depth cap, and what each origin is allowed to write to
+/// crash.log when the network will not answer. The last of those runs
+/// against a stub handler and a collecting sink, so the failures are
+/// deterministic and nothing is written under the runner's profile.
 /// </summary>
 public class UpdateCheckServiceTests
 {
+    /// <summary>
+    /// Stands in for the network: one canned answer, or one thrown failure,
+    /// for every request. The check issues exactly one GET, so a single
+    /// response is the whole conversation.
+    /// </summary>
+    private sealed class StubHandler(Func<HttpResponseMessage> respond) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(respond());
+    }
+
+    private static HttpResponseMessage RateLimited()
+    {
+        var response = new HttpResponseMessage(HttpStatusCode.Forbidden);
+        response.Headers.Add("x-ratelimit-remaining", "0");
+        response.Headers.Add("x-ratelimit-reset", "1750000000");
+        return response;
+    }
+
+    // A captive portal's login page: 200, and not JSON.
+    private static HttpResponseMessage CaptivePortal() =>
+        new(HttpStatusCode.OK) { Content = new StringContent("<html><body>Sign in</body></html>") };
+
+    private static (UpdateCheckService Service, List<Exception> Logged) Build(
+        Func<HttpResponseMessage> respond)
+    {
+        var logged = new List<Exception>();
+        return (new UpdateCheckService(new StubHandler(respond), logged.Add), logged);
+    }
+
     [Fact]
     public void UserAgent_parses_as_a_well_formed_HTTP_product()
     {
@@ -56,5 +90,101 @@ public class UpdateCheckServiceTests
         Assert.Equal(
             "https://github.com/no-faff/InstallerClean/releases/latest",
             UpdateCheckService.ReleasesPageUrl);
+    }
+
+    /// <summary>
+    /// The automatic check meets an unreachable api.github.com on every
+    /// launch of an offline, air-gapped or egress-filtered machine, none of
+    /// which is a fault. Writing there would put a stack trace per run into
+    /// a file called crash.log on a machine where nothing crashed.
+    /// </summary>
+    [Fact]
+    public async Task Automatic_check_writes_nothing_when_the_name_does_not_resolve()
+    {
+        var (service, logged) = Build(() => throw new HttpRequestException("No such host is known."));
+
+        var result = await service.CheckAsync(UpdateCheckOrigin.Automatic);
+
+        Assert.Equal(new CheckFailed(UpdateCheckFailureReason.NetworkUnavailable), result);
+        Assert.Empty(logged);
+    }
+
+    [Fact]
+    public async Task Manual_check_records_a_name_that_does_not_resolve()
+    {
+        var (service, logged) = Build(() => throw new HttpRequestException("No such host is known."));
+
+        var result = await service.CheckAsync(UpdateCheckOrigin.Manual);
+
+        Assert.Equal(new CheckFailed(UpdateCheckFailureReason.NetworkUnavailable), result);
+        // The user pressed the button and is reading a dialog about it; the
+        // log is what that dialog's one localised sentence stands on.
+        Assert.Single(logged);
+    }
+
+    [Fact]
+    public async Task Automatic_check_writes_no_breadcrumb_for_a_refused_status()
+    {
+        var (service, logged) = Build(RateLimited);
+
+        var result = await service.CheckAsync(UpdateCheckOrigin.Automatic);
+
+        Assert.Equal(new CheckFailed(UpdateCheckFailureReason.ServerError), result);
+        Assert.Empty(logged);
+    }
+
+    [Fact]
+    public async Task Manual_check_records_the_status_and_the_rate_limit_headers()
+    {
+        var (service, logged) = Build(RateLimited);
+
+        var result = await service.CheckAsync(UpdateCheckOrigin.Manual);
+
+        Assert.Equal(new CheckFailed(UpdateCheckFailureReason.ServerError), result);
+        var entry = Assert.Single(logged);
+        // Separating GitHub's own 60/hour limit from a proxy answering 403 in
+        // its place is the whole point of the breadcrumb, and the headers are
+        // what separates them.
+        Assert.Contains("403", entry.Message);
+        Assert.Contains("x-ratelimit-remaining=0", entry.Message);
+    }
+
+    [Fact]
+    public async Task Automatic_check_writes_nothing_when_the_answer_is_not_json()
+    {
+        var (service, logged) = Build(CaptivePortal);
+
+        var result = await service.CheckAsync(UpdateCheckOrigin.Automatic);
+
+        Assert.Equal(new CheckFailed(UpdateCheckFailureReason.ResponseParseError), result);
+        Assert.Empty(logged);
+    }
+
+    [Fact]
+    public async Task Manual_check_records_an_answer_that_is_not_json()
+    {
+        var (service, logged) = Build(CaptivePortal);
+
+        var result = await service.CheckAsync(UpdateCheckOrigin.Manual);
+
+        Assert.Equal(new CheckFailed(UpdateCheckFailureReason.ResponseParseError), result);
+        Assert.Single(logged);
+    }
+
+    /// <summary>
+    /// The catch-all is deliberately ungated: everything the origin silences
+    /// is a network the app was built to meet, and what reaches here is not.
+    /// </summary>
+    [Theory]
+    [InlineData(UpdateCheckOrigin.Automatic)]
+    [InlineData(UpdateCheckOrigin.Manual)]
+    public async Task An_unexpected_failure_is_recorded_whichever_check_hit_it(UpdateCheckOrigin origin)
+    {
+        var (service, logged) = Build(() => throw new InvalidOperationException("not a network failure"));
+
+        var result = await service.CheckAsync(origin);
+
+        Assert.Equal(new CheckFailed(UpdateCheckFailureReason.Unknown), result);
+        Assert.Single(logged);
     }
 }

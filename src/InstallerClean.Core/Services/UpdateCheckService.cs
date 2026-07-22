@@ -15,11 +15,13 @@ namespace InstallerClean.Services;
 /// runs once per session at launch if <c>AppSettings.AutoUpdateCheck</c> is
 /// set, and the main window's update button, which the user can press any
 /// number of times, each press spaced from the last by the button's own
-/// cooldown. There is no timer and no retry.
+/// cooldown. There is no timer and no retry. Which of the two is calling
+/// arrives as <see cref="UpdateCheckOrigin"/> and decides how much of a
+/// failure is worth writing down.
 ///
-/// HttpClient is held in a static field per the documented BCL
-/// guidance: a fresh instance per call leaks Windows-side socket
-/// handles under concurrent use, and the check is cheap enough that
+/// The shipping instance holds HttpClient in a static field per the
+/// documented BCL guidance: a fresh instance per call leaks Windows-side
+/// socket handles under concurrent use, and the check is cheap enough that
 /// reusing the connection pool across runs of the dialog is fine.
 /// </remarks>
 public sealed class UpdateCheckService : IUpdateCheckService
@@ -57,13 +59,41 @@ public sealed class UpdateCheckService : IUpdateCheckService
     // Internal for the config-pin test.
     internal static readonly JsonDocumentOptions JsonParseOptions = new() { MaxDepth = 8 };
 
-    private static readonly HttpClient HttpClient = new()
-    {
-        Timeout = RequestTimeout,
-        MaxResponseContentBufferSize = 256 * 1024,
-    };
+    private static readonly HttpClient SharedClient = CreateClient(handler: null);
 
-    public async Task<UpdateCheckResult> CheckAsync(CancellationToken cancellationToken = default)
+    private static HttpClient CreateClient(HttpMessageHandler? handler)
+    {
+        var client = handler is null ? new HttpClient() : new HttpClient(handler);
+        client.Timeout = RequestTimeout;
+        client.MaxResponseContentBufferSize = 256 * 1024;
+        return client;
+    }
+
+    private readonly HttpClient _http;
+    private readonly Action<Exception> _logDiagnostic;
+
+    public UpdateCheckService() : this(SharedClient, ex => CrashLog.TryWrite(ex)) { }
+
+    /// <summary>
+    /// Test seam. A handler stands in for the network so the failures this
+    /// check exists to survive (DNS refusal, a proxy's 403, an HTML login
+    /// page answered with 200) can be produced deterministically, and the
+    /// sink collects what would have gone to crash.log rather than writing
+    /// to the real one under the runner's own profile. Both are built
+    /// through the same <see cref="CreateClient"/> the shipping path uses,
+    /// so the timeout and body cap under test are the shipping values.
+    /// </summary>
+    internal UpdateCheckService(HttpMessageHandler handler, Action<Exception> logDiagnostic)
+        : this(CreateClient(handler), logDiagnostic) { }
+
+    private UpdateCheckService(HttpClient http, Action<Exception> logDiagnostic)
+    {
+        _http = http;
+        _logDiagnostic = logDiagnostic;
+    }
+
+    public async Task<UpdateCheckResult> CheckAsync(
+        UpdateCheckOrigin origin, CancellationToken cancellationToken = default)
     {
         var currentVersion = GetCurrentVersion();
 
@@ -77,7 +107,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
             // only buffered as it's read, not eagerly into HttpContent.
             // The 256 KiB cap on MaxResponseContentBufferSize still
             // gates the total bytes ReadAsStringAsync may materialise.
-            using var response = await HttpClient.SendAsync(
+            using var response = await _http.SendAsync(
                     request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
                 .ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
@@ -90,7 +120,7 @@ public sealed class UpdateCheckService : IUpdateCheckService
                 // see or report. The status plus the rate-limit headers
                 // separate them, and none of it names a user, a path or a
                 // machine.
-                CrashLog.TryWrite(new HttpRequestException(
+                LogIfUserIsWaiting(origin, new HttpRequestException(
                     $"GitHub releases API returned {(int)response.StatusCode} " +
                     $"({response.StatusCode}).{DescribeRateLimit(response.Headers)}"));
                 return new CheckFailed(UpdateCheckFailureReason.ServerError);
@@ -152,19 +182,47 @@ public sealed class UpdateCheckService : IUpdateCheckService
         }
         catch (HttpRequestException ex)
         {
-            CrashLog.TryWrite(ex);
+            LogIfUserIsWaiting(origin, ex);
             return new CheckFailed(UpdateCheckFailureReason.NetworkUnavailable);
         }
         catch (JsonException ex)
         {
-            CrashLog.TryWrite(ex);
+            // A captive portal answering 200 with an HTML login page lands
+            // here rather than in the HttpRequestException above, so it is
+            // the same filtered-network machine wearing a different
+            // exception type.
+            LogIfUserIsWaiting(origin, ex);
             return new CheckFailed(UpdateCheckFailureReason.ResponseParseError);
         }
         catch (Exception ex)
         {
-            CrashLog.TryWrite(ex);
+            // Ungated on purpose. Everything above is a network the app was
+            // built to meet; what reaches here is not, and an unanticipated
+            // exception inside an elevated process is what crash.log is for.
+            _logDiagnostic(ex);
             return new CheckFailed(UpdateCheckFailureReason.Unknown);
         }
+    }
+
+    /// <summary>
+    /// Writes a network-shaped failure to crash.log only for a check the
+    /// user pressed a button for and is watching a dialog about, where the
+    /// log entry is what backs the sentence on screen.
+    ///
+    /// The automatic check stays silent because the machines it fails on are
+    /// a normal population rather than an error state: offline, air-gapped,
+    /// or behind egress filtering that refuses api.github.com. That check
+    /// runs unattended at every launch, so a logged failure there is a stack
+    /// trace per run, accumulating in a file named crash.log on a machine
+    /// where nothing has crashed. It is also a file this project invites
+    /// sceptical users to read, which makes "the app writes a crash entry
+    /// every time I start it" the impression it leaves. The timeout path has
+    /// never written for the same reason.
+    /// </summary>
+    private void LogIfUserIsWaiting(UpdateCheckOrigin origin, Exception ex)
+    {
+        if (origin == UpdateCheckOrigin.Manual)
+            _logDiagnostic(ex);
     }
 
     /// <summary>

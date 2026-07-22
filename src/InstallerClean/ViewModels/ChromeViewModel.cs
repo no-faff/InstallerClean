@@ -162,12 +162,14 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
         {
             if (!_settings.Load().AutoUpdateCheck)
                 return;
-            var result = await _updateCheck.CheckAsync(token);
+            var result = await _updateCheck.CheckAsync(UpdateCheckOrigin.Automatic, token);
             if (result is UpdateAvailable available)
                 ShowUpdateFound(available);
             // UpToDate and CheckFailed both end in silence: an automatic
             // check the user never asked to watch has nothing to report
-            // but a newer version.
+            // but a newer version. The Automatic origin extends that
+            // silence to crash.log, which is where an unreachable API would
+            // otherwise leave a trace once per launch.
         }
         catch (OperationCanceledException)
         {
@@ -196,7 +198,7 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
         UpdateCheckResult result;
         try
         {
-            result = await _updateCheck.CheckAsync(token);
+            result = await _updateCheck.CheckAsync(UpdateCheckOrigin.Manual, token);
         }
         catch (OperationCanceledException)
         {
