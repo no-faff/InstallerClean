@@ -1,4 +1,5 @@
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text.Json;
 using InstallerClean.Helpers;
@@ -80,7 +81,19 @@ public sealed class UpdateCheckService : IUpdateCheckService
                     request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
                 .ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
+            {
+                // ServerError collapses every non-2xx into one localised
+                // sentence, which is right for the dialog and useless for
+                // diagnosis: the common case is GitHub's 60-per-hour
+                // unauthenticated rate limit answering 403, and it is
+                // indistinguishable from a real outage in what the user can
+                // see or report. The status and the rate-limit pair separate
+                // the two, and neither names a user, a path or a machine.
+                CrashLog.TryWrite(new HttpRequestException(
+                    $"GitHub releases API returned {(int)response.StatusCode} " +
+                    $"({response.StatusCode}).{DescribeRateLimit(response.Headers)}"));
                 return new CheckFailed(UpdateCheckFailureReason.ServerError);
+            }
 
             var json = await response.Content.ReadAsStringAsync(cancellationToken)
                 .ConfigureAwait(false);
@@ -152,6 +165,27 @@ public sealed class UpdateCheckService : IUpdateCheckService
             return new CheckFailed(UpdateCheckFailureReason.Unknown);
         }
     }
+
+    /// <summary>
+    /// The two GitHub rate-limit headers as a log fragment, empty when
+    /// neither arrived. Each is reported only if present: GitHub documents
+    /// them on API responses but not on everything that can answer in their
+    /// place, and a captive portal or a corporate proxy returning the 403 is
+    /// exactly the case worth telling apart from a genuine limit.
+    /// </summary>
+    private static string DescribeRateLimit(HttpResponseHeaders headers)
+    {
+        var parts = new List<string>(2);
+        foreach (var name in RateLimitHeaders)
+        {
+            if (headers.TryGetValues(name, out var values))
+                parts.Add($"{name}={string.Join(',', values)}");
+        }
+        return parts.Count == 0 ? string.Empty : " " + string.Join(", ", parts);
+    }
+
+    private static readonly string[] RateLimitHeaders =
+        ["x-ratelimit-remaining", "x-ratelimit-reset"];
 
     private static Version GetCurrentVersion() =>
         Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0);
