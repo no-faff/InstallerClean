@@ -494,9 +494,26 @@
                  presentations of the same sentence. Both dock Left after the
                  globe so they take the space between the buttons and the
                  globe, which is also what gives them a width to ellipsize
-                 against; both carry LiveSetting=Polite so an outcome that
-                 arrives while focus is elsewhere is still spoken (the
-                 automatic check lands unprompted, so it always is).
+                 against; both are live regions so an outcome that arrives
+                 while focus is elsewhere is still spoken (the automatic
+                 check lands unprompted, so it always is).
+
+                 They differ on LiveSetting, and it is the transience that
+                 decides it. The plain line is Assertive: a manual check
+                 answers within a second or two of the click, while the
+                 screen reader is typically still reading the button's own
+                 name and help text, and a polite item raised behind that
+                 loses its turn and is gone (the line clears itself after the
+                 cooldown), so "Up to date." goes unspoken. Interrupting is
+                 safe here because only the manual check ever paints this
+                 line: the automatic one sets the link first and so takes the
+                 other presentation, which means an assertive cut-in is
+                 always the answer to something the user just did, never an
+                 unprompted one talking over them. The link stays
+                 Polite because it does not clear: it is on screen and in the
+                 tab order until the user acts on it, so an announcement that
+                 waits its turn still arrives at something the user can
+                 reach, and interrupting for it would buy nothing.
 
                  Plain muted text while there is nothing to click
                  ("Checking...", "Up to date."). A hyperlink once a check has
@@ -516,7 +533,7 @@
                        Foreground="{StaticResource Text.Muted}"
                        FontSize="{DynamicResource Type.Body}"
                        TextTrimming="CharacterEllipsis"
-                       AutomationProperties.LiveSetting="Polite">
+                       AutomationProperties.LiveSetting="Assertive">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Visibility" Value="Visible"/>

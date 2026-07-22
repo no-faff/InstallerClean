@@ -595,9 +595,11 @@ public partial class MainWindow : Window
     /// cancel-on-focus; Narrator behaves the same in practice, which is
     /// how the completion outcome went unheard). Background (4) sits
     /// below Input, so the raises follow every focus event queued in the
-    /// same drain and the polite items speak once the focus announcement
+    /// same drain and a polite item speaks once the focus announcement
     /// finishes. Background still runs after data binding and render, so
-    /// the peers carry the final text.
+    /// the peers carry the final text. The plain update status line is the
+    /// one assertive caller and cuts in rather than queueing, which is what
+    /// the reasoning above says it needs to do.
     /// </summary>
     private void AnnounceLiveRegions(params FrameworkElement[] elements)
     {
