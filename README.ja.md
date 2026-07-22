@@ -174,6 +174,7 @@ Windows インストーラーが今まさにキャッシュへ書き込んでい
 - 各リリースの SHA-256 ハッシュは[リリースページ](../../releases/latest)に掲載しています。
 - VirusTotal：ビルドごとにスキャンしており、エンジンごとの詳細な結果はそのリリースページにリンクされているので、各ファイルのスコアを確認したり、ご自身で再スキャンしたりできます。リリース時点で残っている誤検知は、そのリリースのページで名指しして説明し、ベンダーが取り下げた時点でページを更新しています。
 - ソースコードは [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) にあり、CI が毎回のコミットをビルド・テストしています（上の緑色の CI バッジを参照）。
+- リリースビルドは決定論的です。コンパイラの設定により、同じソースコードと同じ SDK からは必ず同じバイト列が生成されますし、公開する exe が、まさにそのタグの時点のクリーンな作業ツリーからビルドされたものでなければ、リリース手順はそのバージョンにタグを打つことを拒否します。ですからタグをチェックアウトしてご自身でビルドし、公開されているハッシュと突き合わせることができます。ダウンロードしたものが公開されているソースコードと一致することを、そうやって証明できるわけです。まず SDK のバージョンを合わせてください（各リリースのノートに、どの SDK でビルドしたかを記載しています）。SDK のパッチバージョンが違うと生成されるバイト列も変わり、一致していないように見えますが、そうではありません。
 - GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->38,000+<!-- downloads-end --> 回ダウンロードされています。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) は各提出物を仮想マシンでテストし、審査を通過したものだけを掲載します。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 認証済み 100% クリーン" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) は各リリースをウイルス・スパイウェア・アドウェアについて検査しています。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 認証済み 100% クリーン" width="190"></a>

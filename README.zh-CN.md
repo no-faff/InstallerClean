@@ -174,6 +174,7 @@ InstallerClean 会识别三类不需要的文件。
 - 每个版本的 SHA-256 哈希值都列在[发布页面](../../releases/latest)上。
 - VirusTotal：每个构建都会扫描，各引擎的完整结果链接在对应版本的发布页面上，方便您查看每个文件的检测结果并自行重新扫描。发布时仍然存在的误报，会在该版本的发布页面上点明并解释；等厂商撤销之后，该页面也会随之更新。
 - 源代码在 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)，CI 会对每次提交进行构建和测试（见上方绿色的 CI 徽章）。
+- 发布版本的构建是确定性的：编译设置让相同的源代码和相同的 SDK 产出完全相同的字节；而且发布流程会拒绝为某个版本打标签，除非发布的 exe 正是在该标签所对应的干净工作树上构建出来的。所以您可以检出该标签、自己构建一遍，再把算出的哈希值与公布的哈希值对比：这样就能证明您下载到的文件与公开的源代码一致。请先用同一个 SDK 版本（每个版本的发布说明都会写明是用哪个 SDK 构建的）；SDK 补丁版本不同，产出的字节就会不同，看起来像是对不上，其实不是。
 - 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->38,000+<!-- downloads-end --> 次下载。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 会在虚拟机中测试每一个提交上来的版本，只有通过审核才会收录。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 认证 100% 干净" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) 会对每个版本做病毒、间谍软件和广告软件检测。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 认证 100% 干净" width="190"></a>

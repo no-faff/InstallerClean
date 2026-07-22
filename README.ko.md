@@ -174,6 +174,7 @@ Windows Installer가 지금 캐시에 쓰고 있거나, 이전 트랜잭션이 �
 - 각 릴리스의 SHA-256 해시는 [릴리스 페이지](../../releases/latest)에 올려 두었습니다.
 - VirusTotal: 모든 빌드를 스캔하며, 엔진별 전체 결과를 해당 릴리스 페이지에 링크해 두어 각 파일이 어떤 점수를 받았는지 확인하고 직접 다시 스캔해 볼 수 있습니다. 릴리스가 나가는 시점에 살아 있는 오탐은 해당 릴리스 페이지에서 이름을 밝히고 설명하며, 업체가 이를 철회하면 그 페이지를 갱신합니다.
 - 소스는 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)에 있고, CI가 모든 커밋을 빌드하고 테스트합니다(위의 초록색 CI 배지를 참고하세요).
+- 릴리스 빌드는 결정적입니다. 컴파일러 설정 덕분에 같은 소스와 같은 SDK에서는 언제나 같은 바이트가 나오고, 배포하는 exe가 바로 그 태그의 깨끗한 작업 트리에서 빌드된 것이 아니면 릴리스 과정이 해당 버전에 태그를 다는 것을 거부합니다. 그래서 태그를 체크아웃해 직접 빌드한 뒤 해시를 공개된 해시와 비교해 보실 수 있습니다. 내려받은 파일이 공개된 소스와 일치한다는 것이 그렇게 증명됩니다. 먼저 SDK 버전을 맞추세요(각 릴리스 노트에 어떤 SDK로 빌드했는지 적어 두었습니다). SDK 패치 버전이 다르면 나오는 바이트도 달라지는데, 이는 불일치처럼 보일 뿐 실제로는 아닙니다.
 - GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->38,000+<!-- downloads-end --> 회 다운로드되었습니다.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html)는 제출된 각 파일을 가상 머신에서 테스트하고, 자체 검토를 통과한 경우에만 목록에 올립니다.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 인증 100% 클린" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml)는 각 릴리스를 바이러스, 스파이웨어, 애드웨어에 대해 검사합니다.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 인증 100% 클린" width="190"></a>
