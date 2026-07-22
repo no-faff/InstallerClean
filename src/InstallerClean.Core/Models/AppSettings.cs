@@ -45,8 +45,8 @@ public sealed class AppSettings
     public bool HasSentResultLog { get; set; }
 
     /// <summary>
-    /// Whether the app checks GitHub's releases API for a newer version
-    /// once per session, started at launch. Defaults to true (absent from
+    /// Whether the app asks GitHub for a newer version once per session,
+    /// started at launch. Defaults to true (absent from
     /// an older settings file reads as true, so existing installs gain the
     /// check on upgrade, matching how mainstream desktop apps behave). A
     /// typical session lasts seconds, so the check races the startup scan

@@ -4,8 +4,8 @@ namespace InstallerClean.Services;
 /// Outcome of an <see cref="IUpdateCheckService.CheckAsync"/> call.
 /// Three discriminated states correspond to: the released version on
 /// GitHub matches the running build, a newer release is available, or
-/// the check could not be completed (network, parse, or rate-limit
-/// failure). Callers pattern-match on the record subtype.
+/// the check could not be completed. Callers pattern-match on the record
+/// subtype.
 /// </summary>
 public abstract record UpdateCheckResult;
 
@@ -16,7 +16,7 @@ public sealed record UpToDate(string CurrentVersion) : UpdateCheckResult;
 /// A newer release tag is published on GitHub. The two version strings
 /// and nothing else: where a click goes is
 /// <see cref="UpdateCheckService.ReleasesPageUrl"/>, fixed in the app, so
-/// the response body has no say in it.
+/// what GitHub answered has no say in it.
 /// </summary>
 public sealed record UpdateAvailable(string CurrentVersion, string LatestVersion)
     : UpdateCheckResult;
@@ -39,10 +39,13 @@ public enum UpdateCheckFailureReason
     /// <summary>HTTP send failed: DNS, TLS, no network, etc.</summary>
     NetworkUnavailable,
 
-    /// <summary>GitHub returned a 4xx or 5xx response. Includes 403 rate-limit.</summary>
+    /// <summary>GitHub answered with a 4xx or 5xx status.</summary>
     ServerError,
 
-    /// <summary>Response body was missing or did not parse as the expected schema.</summary>
+    /// <summary>
+    /// The answer was not the redirect the check reads a version out of, or
+    /// pointed somewhere the version could not be trusted from.
+    /// </summary>
     ResponseParseError,
 
     /// <summary>The check timed out waiting on the network.</summary>

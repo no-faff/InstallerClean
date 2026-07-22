@@ -1,13 +1,13 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
-using System.Text.Json;
 using InstallerClean.Helpers;
 
 namespace InstallerClean.Services;
 
 /// <summary>
-/// Version check against the GitHub Releases API.
+/// Version check, read from the redirect GitHub answers the releases page
+/// with.
 /// </summary>
 /// <remarks>
 /// The HTTP call lives inside the elevated process. CheckAsync is reached
@@ -19,6 +19,27 @@ namespace InstallerClean.Services;
 /// arrives as <see cref="UpdateCheckOrigin"/> and decides how much of a
 /// failure is worth writing down.
 ///
+/// The version is read from the redirect rather than from
+/// api.github.com, because that API's anonymous allowance is spent by
+/// address rather than by caller: 60 requests an hour, and GitHub
+/// documents unauthenticated requests as "associated with the originating
+/// IP address, not with the user or application that made the request",
+/// answering 403 with x-ratelimit-remaining=0 once they are gone. Behind a
+/// shared address, an office, CGNAT, or a commercial VPN's exit node,
+/// unrelated traffic can leave nothing for this check, and there is
+/// nothing the app or the user can do about it. The ordinary releases page
+/// has no per-address allowance to exhaust.
+///
+/// The redirect is GitHub's long-standing behaviour rather than a
+/// documented contract, so every unexpected-answer path below is kept: if
+/// /latest stops redirecting, the check reports a failure and the app is
+/// otherwise unaffected.
+///
+/// One GET, and the body is never read. The answer contributes a version
+/// number to compare and nothing else; the browser's destination is
+/// <see cref="ReleasesPageUrl"/>, a constant, so nothing a server returns
+/// decides where the user is sent.
+///
 /// The shipping instance holds HttpClient in a static field per the
 /// documented BCL guidance: a fresh instance per call leaks Windows-side
 /// socket handles under concurrent use, and the check is cheap enough that
@@ -26,10 +47,7 @@ namespace InstallerClean.Services;
 /// </remarks>
 public sealed class UpdateCheckService : IUpdateCheckService
 {
-    private const string ApiUrl =
-        "https://api.github.com/repos/no-faff/InstallerClean/releases/latest";
-
-    // GitHub's API returns 403 without a User-Agent. RFC 9110 product =
+    // Identifies the app to GitHub. RFC 9110 product =
     // token "/" token; the version token must be a bare semver, no spaces,
     // because the localised "Version 1.8.0" display string contains an
     // internal space and parses as two adjacent products with no slash.
@@ -42,29 +60,46 @@ public sealed class UpdateCheckService : IUpdateCheckService
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(8);
 
     /// <summary>
-    /// The one page any "there is an update" control opens: the status-line
-    /// link and the update dialog's open button both come here. Deliberately
-    /// the /latest redirect rather than the found release's own tag page, so
-    /// the click lands on whatever is newest at the moment it happens rather
-    /// than on the tag this particular check saw. It also keeps the browser's
-    /// destination out of the response body entirely: nothing GitHub returns
-    /// decides where the user is sent.
+    /// Both what the check asks for and the one page any "there is an update"
+    /// control opens: the status-line link and the update dialog's open button
+    /// both come here. Deliberately the /latest redirect rather than the found
+    /// release's own tag page, so the click lands on whatever is newest at the
+    /// moment it happens rather than on the tag this particular check saw.
     /// </summary>
     public const string ReleasesPageUrl =
         "https://github.com/no-faff/InstallerClean/releases/latest";
 
-    // MaxDepth=8 matches SettingsService.JsonOptions. The schema is
-    // shallow; the cap defends the elevated process against
-    // pathologically nested JSON under the 256 KiB body cap.
-    // Internal for the config-pin test.
-    internal static readonly JsonDocumentOptions JsonParseOptions = new() { MaxDepth = 8 };
+    private static readonly Uri ReleasesPage = new(ReleasesPageUrl);
 
-    private static readonly HttpClient SharedClient = CreateClient(handler: null);
+    /// <summary>
+    /// The path a usable Location has to sit under, built from
+    /// <see cref="ReleasesPageUrl"/> so a repository move cannot leave the
+    /// check accepting redirects into somewhere the app would never open:
+    /// "/owner/repo/releases/" with "latest" swapped for "tag/".
+    /// </summary>
+    private static readonly string TagPathPrefix =
+        ReleasesPage.AbsolutePath[..(ReleasesPage.AbsolutePath.LastIndexOf('/') + 1)] + "tag/";
 
-    private static HttpClient CreateClient(HttpMessageHandler? handler)
+    /// <summary>
+    /// Redirect following OFF is what makes the check work: the answer it
+    /// reads IS the 302, and a followed redirect delivers the tag page's
+    /// HTML instead, which carries no version this parses. Cookies off
+    /// because the elevated process has no use for the session cookie
+    /// github.com offers, and declining it is cheaper than holding it.
+    /// Internal so a test can pin both, neither being reachable through the
+    /// handler seam the rest of the tests use.
+    /// </summary>
+    internal static HttpClientHandler CreateShippingHandler() =>
+        new() { AllowAutoRedirect = false, UseCookies = false };
+
+    private static readonly HttpClient SharedClient = CreateClient(CreateShippingHandler());
+
+    private static HttpClient CreateClient(HttpMessageHandler handler)
     {
-        var client = handler is null ? new HttpClient() : new HttpClient(handler);
+        var client = new HttpClient(handler);
         client.Timeout = RequestTimeout;
+        // Nothing reads the response body, so nothing should be able to
+        // hand this process one: the cap holds if a later edit does.
         client.MaxResponseContentBufferSize = 256 * 1024;
         return client;
     }
@@ -99,55 +134,65 @@ public sealed class UpdateCheckService : IUpdateCheckService
 
         try
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, ApiUrl);
+            using var request = new HttpRequestMessage(HttpMethod.Get, ReleasesPageUrl);
             request.Headers.UserAgent.ParseAdd(UserAgent);
-            request.Headers.Accept.ParseAdd("application/vnd.github+json");
 
-            // HttpCompletionOption.ResponseHeadersRead so the body is
-            // only buffered as it's read, not eagerly into HttpContent.
-            // The 256 KiB cap on MaxResponseContentBufferSize still
-            // gates the total bytes ReadAsStringAsync may materialise.
+            // ResponseHeadersRead because the headers are the whole answer.
+            // The redirect's body is empty in practice, and none of it is
+            // read either way.
             using var response = await _http.SendAsync(
                     request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
                 .ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode)
+
+            var status = (int)response.StatusCode;
+            if (status is < 300 or >= 400)
             {
-                // ServerError collapses every non-2xx into one localised
-                // sentence, which is right for the dialog and useless for
-                // diagnosis: the common case is GitHub's 60-per-hour
-                // unauthenticated rate limit answering 403, and it is
-                // indistinguishable from a real outage in what the user can
-                // see or report. The status plus the rate-limit headers
-                // separate them, and none of it names a user, a path or a
-                // machine.
+                // Two different situations wearing one status range each,
+                // and the sentence on screen differs accordingly. A 4xx or
+                // 5xx is GitHub refusing. A 2xx is something answering in
+                // GitHub's place, a captive portal or a filtering proxy
+                // serving its own page, because the releases page itself
+                // does not answer this request with a body.
+                //
+                // Either way the status alone is useless for diagnosis
+                // after the fact, and nothing in the breadcrumb names a
+                // user, a path or a machine.
                 LogIfUserIsWaiting(origin, new HttpRequestException(
-                    $"GitHub releases API returned {(int)response.StatusCode} " +
-                    $"({response.StatusCode}).{DescribeRateLimit(response.Headers)}"));
-                return new CheckFailed(UpdateCheckFailureReason.ServerError);
+                    $"GitHub releases page returned {status} " +
+                    $"({response.StatusCode}).{DescribeThrottling(response.Headers)}"));
+                return new CheckFailed(response.IsSuccessStatusCode
+                    ? UpdateCheckFailureReason.ResponseParseError
+                    : UpdateCheckFailureReason.ServerError);
             }
 
-            var json = await response.Content.ReadAsStringAsync(cancellationToken)
-                .ConfigureAwait(false);
-            using var doc = JsonDocument.Parse(json, JsonParseOptions);
-
-            if (!doc.RootElement.TryGetProperty("tag_name", out var tagElement))
+            if (!TryReadTag(response.Headers.Location, out var tagName))
+            {
+                // A redirect somewhere else entirely. Worth the whole
+                // Location because this is the shape that would report
+                // GitHub having changed how /latest answers, which is the
+                // one assumption this check rests on.
+                LogIfUserIsWaiting(origin, new HttpRequestException(
+                    $"GitHub releases page returned {status} with an unusable " +
+                    $"Location: {Clamp(response.Headers.Location?.ToString() ?? "(absent)")}"));
                 return new CheckFailed(UpdateCheckFailureReason.ResponseParseError);
-            var tagName = tagElement.GetString();
-            if (string.IsNullOrWhiteSpace(tagName))
-                return new CheckFailed(UpdateCheckFailureReason.ResponseParseError);
+            }
 
-            // tag_name on the project's releases is "vX.Y.Z"; strip
+            // Tags on the project's releases are "vX.Y.Z"; strip
             // the leading 'v' before parsing as System.Version.
             var latestVersion = tagName.StartsWith('v')
                 ? tagName.Substring(1)
                 : tagName;
             if (!Version.TryParse(latestVersion, out var parsedLatest))
+            {
+                LogIfUserIsWaiting(origin, new HttpRequestException(
+                    $"GitHub redirected to a tag that is not a version: {Clamp(tagName)}"));
                 return new CheckFailed(UpdateCheckFailureReason.ResponseParseError);
+            }
 
             // Normalise both sides to MAJOR.MINOR.BUILD before
             // comparing: System.Version's fourth Revision component is
             // 0 in the assembly version (e.g. 1.7.0.0) but absent from
-            // the GitHub tag_name. Comparing without normalising would
+            // the GitHub tag. Comparing without normalising would
             // make 1.7.0.0 always "newer than" 1.7.0.
             var currentNormalised = NormaliseToBuild(currentVersion);
             var latestNormalised = NormaliseToBuild(parsedLatest);
@@ -155,8 +200,8 @@ public sealed class UpdateCheckService : IUpdateCheckService
             if (latestNormalised > currentNormalised)
             {
                 // Only the two version strings. The destination is
-                // ReleasesPageUrl, fixed, so the response body supplies
-                // nothing the browser acts on.
+                // ReleasesPageUrl, a constant, so nothing the answer
+                // carried reaches the browser.
                 return new UpdateAvailable(
                     CurrentVersion: FormatVersion(currentNormalised),
                     LatestVersion: FormatVersion(latestNormalised));
@@ -184,15 +229,6 @@ public sealed class UpdateCheckService : IUpdateCheckService
         {
             LogIfUserIsWaiting(origin, ex);
             return new CheckFailed(UpdateCheckFailureReason.NetworkUnavailable);
-        }
-        catch (JsonException ex)
-        {
-            // A captive portal answering 200 with an HTML login page lands
-            // here rather than in the HttpRequestException above, so it is
-            // the same filtered-network machine wearing a different
-            // exception type.
-            LogIfUserIsWaiting(origin, ex);
-            return new CheckFailed(UpdateCheckFailureReason.ResponseParseError);
         }
         catch (Exception ex)
         {
@@ -226,20 +262,18 @@ public sealed class UpdateCheckService : IUpdateCheckService
     }
 
     /// <summary>
-    /// GitHub's rate-limit headers as a log fragment, empty when none
-    /// arrived. Each is reported only if present, because absence is itself
-    /// the reading: a captive portal or a corporate proxy answering the 403
-    /// in GitHub's place sends none of them, and telling that apart from a
-    /// genuine limit is what the breadcrumb is for.
+    /// Whatever the answer says about being throttled, as a log fragment,
+    /// empty when it says nothing. Each header is reported only if present,
+    /// because absence is itself the reading.
     ///
-    /// All three are needed to cover the two limits. The primary one spends
-    /// x-ratelimit-remaining down to 0 and names its recovery in
-    /// x-ratelimit-reset. The secondary limit also answers 403 but is
-    /// documented to signal itself with retry-after and need not report the
-    /// primary allowance as exhausted, so on those two headers alone it is
-    /// indistinguishable from a bare 403 out of a proxy.
+    /// retry-after is the one that can legitimately appear here: GitHub's
+    /// abuse protection sets it, and it names its own recovery. The
+    /// x-ratelimit pair belongs to the REST API's per-address allowance,
+    /// which the releases page has no equivalent of, so either of those
+    /// turning up means something other than the releases page answered,
+    /// which is worth knowing and costs two dictionary lookups to catch.
     /// </summary>
-    private static string DescribeRateLimit(HttpResponseHeaders headers)
+    private static string DescribeThrottling(HttpResponseHeaders headers)
     {
         var parts = new List<string>(RateLimitHeaders.Length);
         foreach (var name in RateLimitHeaders)
@@ -250,12 +284,13 @@ public sealed class UpdateCheckService : IUpdateCheckService
         return parts.Count == 0 ? string.Empty : " " + string.Join(", ", parts);
     }
 
-    // Header values come from whoever answered, which on the 403 path is not
-    // necessarily GitHub. crash.log rotates at 512 KiB and HttpClient accepts
-    // 64 KiB of response headers, so verbatim values let an intermediary roll
-    // the real crash history out of the log in a handful of failed checks.
-    // A genuine value here is a small integer, so the cap costs nothing and
-    // anything that reaches it is itself worth seeing the head of.
+    // Everything clamped here came off the wire, from whoever answered,
+    // which on a failing check is not necessarily GitHub. crash.log rotates
+    // at 512 KiB and HttpClient accepts 64 KiB of response headers, so
+    // verbatim values let an intermediary roll the real crash history out of
+    // the log in a handful of failed checks. A genuine value here is a small
+    // integer or a short URL, so the cap costs nothing and anything that
+    // reaches it is itself worth seeing the head of.
     private static string Clamp(string value) =>
         value.Length <= MaxLoggedHeaderChars
             ? value
@@ -264,7 +299,40 @@ public sealed class UpdateCheckService : IUpdateCheckService
     private const int MaxLoggedHeaderChars = 100;
 
     private static readonly string[] RateLimitHeaders =
-        ["x-ratelimit-remaining", "x-ratelimit-reset", "retry-after"];
+        ["retry-after", "x-ratelimit-remaining", "x-ratelimit-reset"];
+
+    /// <summary>
+    /// Pulls the release tag out of a redirect's Location, or refuses it.
+    /// Refusing is the important half: the version taken from here is shown
+    /// to the user, so it may come only from the releases path of the host
+    /// the app itself links to, never from wherever an answer points.
+    /// </summary>
+    private static bool TryReadTag(Uri? location, out string tag)
+    {
+        tag = string.Empty;
+        if (location is null) return false;
+
+        // A relative Location is legal per RFC 9110 and GitHub does not
+        // currently send one; resolving it against the request's own URL
+        // costs nothing and cannot introduce a host, since a relative
+        // reference has none to introduce.
+        var absolute = location.IsAbsoluteUri ? location : new Uri(ReleasesPage, location);
+
+        if (!string.Equals(absolute.Scheme, ReleasesPage.Scheme, StringComparison.OrdinalIgnoreCase))
+            return false;
+        if (!string.Equals(absolute.Host, ReleasesPage.Host, StringComparison.OrdinalIgnoreCase))
+            return false;
+        if (!absolute.AbsolutePath.StartsWith(TagPathPrefix, StringComparison.Ordinal))
+            return false;
+
+        var candidate = absolute.AbsolutePath[TagPathPrefix.Length..];
+        // One path segment, or it is not a tag: a deeper path is some other
+        // page under the same prefix rather than a release.
+        if (candidate.Length == 0 || candidate.Contains('/')) return false;
+
+        tag = candidate;
+        return true;
+    }
 
     private static Version GetCurrentVersion() =>
         Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0);
