@@ -638,6 +638,13 @@ InstallerClean was already running as administrator, so starting it again that w
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Could not write to destination</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Move failed</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Delete failed</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>Setting not saved</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>The change could not be saved. The app will go back to the previous setting next time it starts.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>The destination cannot be inside the Windows Installer folder.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%.</value></data>

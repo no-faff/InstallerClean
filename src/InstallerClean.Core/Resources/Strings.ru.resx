@@ -638,6 +638,13 @@ InstallerClean уже был запущен от имени администра
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не удалось записать в папку назначения</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Сбой перемещения</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Сбой удаления</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>Настройка не сохранена</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Не удалось сохранить изменение. При следующем запуске InstallerClean вернётся к прежней настройке.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Папка назначения не может находиться внутри папки Windows Installer.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Папка назначения {0} ведёт в системную папку Windows. Выберите путь за пределами %SystemRoot%, %ProgramFiles% и %ProgramData%.</value></data>

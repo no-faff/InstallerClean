@@ -235,6 +235,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Could not write to destination | Hedefe yazılamadı |
 | Move failed | Taşıma başarısız |
 | Delete failed | Silme başarısız |
+| Setting not saved | Ayar kaydedilmedi |
+| The change could not be saved. The app will go back to the previous setting next time it starts. | Değişiklik kaydedilemedi. Bir sonraki açılışta InstallerClean önceki ayara dönecek. |
 | The destination cannot be inside the Windows Installer folder. | Hedef, Windows Installer klasörünün içinde olamaz. |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | {0} hedefi bir Windows sistem klasörünün altına çözümleniyor. %SystemRoot%, %ProgramFiles% ve %ProgramData% dışında bir yol seçin. |
 | Not enough space | Yetersiz alan |

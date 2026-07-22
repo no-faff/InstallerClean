@@ -638,6 +638,13 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Không thể ghi vào đích</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Chuyển thất bại</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Xóa thất bại</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>Không lưu được cài đặt</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Không thể lưu thay đổi. Lần chạy tiếp theo, InstallerClean sẽ quay lại cài đặt trước đó.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Đích không thể nằm bên trong thư mục Windows Installer.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Đích {0} nằm dưới một thư mục hệ thống của Windows. Hãy chọn một đường dẫn ngoài %SystemRoot%, %ProgramFiles% và %ProgramData%.</value></data>

@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Automation;
 using InstallerClean.Helpers;
+using InstallerClean.Resources;
 using InstallerClean.Services;
 
 namespace InstallerClean;
@@ -9,6 +10,11 @@ namespace InstallerClean;
 public partial class AboutWindow : Window
 {
     private readonly ISettingsService _settings;
+
+    // Set only while the auto-update box is being put back to what disk
+    // holds, so that assignment's own Checked/Unchecked raise is not read as
+    // a second click.
+    private bool _revertingAutoUpdateCheck;
 
     public AboutWindow(ISettingsService settings)
     {
@@ -108,12 +114,48 @@ public partial class AboutWindow : Window
 
     /// <summary>
     /// Persists the auto-update switch. One handler for Checked and
-    /// Unchecked because the two differ only in the value they write, and
-    /// Update is a load-modify-save that never throws, so a failed write
-    /// costs the preference rather than the window.
+    /// Unchecked because the two differ only in the value they write.
+    ///
+    /// Update never throws and returns false instead, which the language
+    /// pick and the move destination both discard: for those, a lost write
+    /// costs a preference the user can see is wrong and set again. This one
+    /// is different in kind. It is the app's only consent control over its
+    /// only unprompted network call, so a box that shows unticked while the
+    /// file on disk still says ticked has the app opening a socket at every
+    /// launch on the strength of a setting the user believes they revoked.
+    /// A refused write is reachable without anything being broken: a
+    /// redirected or read-only profile is enough, and SettingsService
+    /// deliberately refuses a settings path that resolves somewhere else.
+    /// So the box is put back to what the file actually holds and the
+    /// failure is said out loud.
     /// </summary>
-    private void AutoUpdateCheckChanged(object sender, RoutedEventArgs e) =>
-        _settings.Update(s => s.AutoUpdateCheck = AutoUpdateCheckBox.IsChecked == true);
+    private void AutoUpdateCheckChanged(object sender, RoutedEventArgs e)
+    {
+        if (_revertingAutoUpdateCheck) return;
+        if (_settings.Update(s => s.AutoUpdateCheck = AutoUpdateCheckBox.IsChecked == true))
+            return;
+
+        // Re-read rather than invert the click: what the next launch will do
+        // is whatever Load returns now, which is the file if it is readable
+        // and the defaults if it is not, and neither is derivable from here.
+        // The assignment raises Checked/Unchecked again, so the guard is what
+        // stops the revert from being taken for a fresh change and writing
+        // back into the failure.
+        _revertingAutoUpdateCheck = true;
+        try
+        {
+            AutoUpdateCheckBox.IsChecked = _settings.Load().AutoUpdateCheck;
+        }
+        finally
+        {
+            _revertingAutoUpdateCheck = false;
+        }
+
+        MessageDialog.Show(
+            Strings.Error_SettingNotSavedBody,
+            Strings.Error_SettingNotSavedTitle,
+            MessageKind.Warning);
+    }
 
     private void Hyperlink_Click(object sender, RoutedEventArgs e)
     {

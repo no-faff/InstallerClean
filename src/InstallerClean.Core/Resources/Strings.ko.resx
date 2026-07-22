@@ -638,6 +638,13 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>대상에 쓸 수 없음</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>이동 실패</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>삭제 실패</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>설정 저장 실패</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>변경 내용을 저장하지 못했습니다. 다음에 실행할 때 InstallerClean은 이전 설정으로 돌아갑니다.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>대상은 Windows Installer 폴더 안에 있을 수 없습니다.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>지정한 대상이 Windows 시스템 폴더 아래로 해석됩니다 ({0}). %SystemRoot%, %ProgramFiles%, %ProgramData% 밖의 경로를 선택하세요.</value></data>

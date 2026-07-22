@@ -638,6 +638,13 @@ InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Hedefe yazılamadı</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Taşıma başarısız</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Silme başarısız</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>Ayar kaydedilmedi</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Değişiklik kaydedilemedi. Bir sonraki açılışta InstallerClean önceki ayara dönecek.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Hedef, Windows Installer klasörünün içinde olamaz.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>{0} hedefi bir Windows sistem klasörünün altına çözümleniyor. %SystemRoot%, %ProgramFiles% ve %ProgramData% dışında bir yol seçin.</value></data>

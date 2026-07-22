@@ -281,6 +281,8 @@ public static class Strings
     public static string Error_ScanCorrelationFailed => Get("Error.ScanCorrelationFailed");
     public static string Error_ScanFailedTitle => Get("Error.ScanFailedTitle");
     public static string Error_ScanRecordsUnreadable => Get("Error.ScanRecordsUnreadable");
+    public static string Error_SettingNotSavedBody => Get("Error.SettingNotSavedBody");
+    public static string Error_SettingNotSavedTitle => Get("Error.SettingNotSavedTitle");
     public static string Error_ShellRecycleFailed => Get("Error.ShellRecycleFailed");
     public static string Error_SourceIsReparsePoint => Get("Error.SourceIsReparsePoint");
     public static string Error_UnknownError_Plural => Get("Error.UnknownError.Plural");

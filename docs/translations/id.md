@@ -235,6 +235,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Could not write to destination | Tidak bisa menulis ke tujuan |
 | Move failed | Pemindahan gagal |
 | Delete failed | Penghapusan gagal |
+| Setting not saved | Pengaturan tidak tersimpan |
+| The change could not be saved. The app will go back to the previous setting next time it starts. | Perubahan tidak dapat disimpan. Saat berikutnya dijalankan, InstallerClean akan kembali ke pengaturan sebelumnya. |
 | The destination cannot be inside the Windows Installer folder. | Tujuan tidak boleh berada di dalam folder Windows Installer. |
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, dan %ProgramData%. |
 | Not enough space | Ruang tidak cukup |

@@ -638,6 +638,13 @@ InstallerClean уже працював від імені адміністрат�
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не вдалося записати в призначення</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Не вдалося перемістити</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Не вдалося видалити</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>Налаштування не збережено</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Не вдалося зберегти зміну. Під час наступного запуску InstallerClean повернеться до попереднього налаштування.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Призначення не може бути всередині папки Windows Installer.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Призначення {0} вказує всередину системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles% та %ProgramData%.</value></data>

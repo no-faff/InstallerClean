@@ -638,6 +638,13 @@ InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi de
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Tidak bisa menulis ke tujuan</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Pemindahan gagal</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Penghapusan gagal</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>Pengaturan tidak tersimpan</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Perubahan tidak dapat disimpan. Saat berikutnya dijalankan, InstallerClean akan kembali ke pengaturan sebelumnya.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Tujuan tidak boleh berada di dalam folder Windows Installer.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, dan %ProgramData%.</value></data>

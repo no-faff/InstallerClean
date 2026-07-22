@@ -638,6 +638,13 @@ InstallerClean lief bereits als Administrator, es noch einmal so zu starten hilf
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Schreiben am Ziel nicht möglich</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Verschieben fehlgeschlagen</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Löschen fehlgeschlagen</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>Einstellung nicht gespeichert</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Die Änderung konnte nicht gespeichert werden. Beim nächsten Start verwendet InstallerClean wieder die vorherige Einstellung.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Das Ziel darf nicht im Windows-Installer-Ordner liegen.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Das Ziel {0} liegt unter einem Windows-Systemordner. Wähle einen Pfad außerhalb von %SystemRoot%, %ProgramFiles% und %ProgramData%.</value></data>

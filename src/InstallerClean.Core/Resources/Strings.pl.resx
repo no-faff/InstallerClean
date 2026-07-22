@@ -638,6 +638,13 @@ InstallerClean działał już jako administrator, więc ponowne uruchomienie go 
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Nie udało się zapisać w folderze docelowym</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Przenoszenie nie powiodło się</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Usuwanie nie powiodło się</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>Ustawienie nie zostało zapisane</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Nie udało się zapisać zmiany. Przy następnym uruchomieniu InstallerClean wróci do poprzedniego ustawienia.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Folder docelowy nie może znajdować się wewnątrz folderu Windows Installer.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>Folder docelowy {0} prowadzi do folderu systemowego Windows. Wybierz ścieżkę poza %SystemRoot%, %ProgramFiles% i %ProgramData%.</value></data>

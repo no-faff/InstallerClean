@@ -638,6 +638,13 @@ InstallerClean era già in esecuzione come amministratore, quindi riavviarlo in 
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Impossibile scrivere nella destinazione</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Spostamento non riuscito</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Eliminazione non riuscita</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>Impostazione non salvata</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Impossibile salvare la modifica. Al prossimo avvio InstallerClean tornerà all'impostazione precedente.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>La destinazione non può trovarsi all'interno della cartella di Windows Installer.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>La destinazione {0} si trova in una cartella di sistema di Windows. Scegli un percorso al di fuori di %SystemRoot%, %ProgramFiles% e %ProgramData%.</value></data>

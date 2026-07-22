@@ -638,6 +638,13 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>无法写入目标</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>移动失败</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>删除失败</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>设置未保存</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>无法保存此更改。下次启动时，InstallerClean 将恢复为之前的设置。</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>目标不能位于 Windows Installer 文件夹内。</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>目标 {0} 解析后位于 Windows 系统文件夹下。请选择 %SystemRoot%、%ProgramFiles% 和 %ProgramData% 之外的路径。</value></data>

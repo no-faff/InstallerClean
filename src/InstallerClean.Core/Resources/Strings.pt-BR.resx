@@ -638,6 +638,13 @@ O InstallerClean já estava em execução como administrador, então iniciá-lo 
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Não foi possível gravar no destino</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Falha na movimentação</value></data>
   <data name="Error.DeleteFailedTitle" xml:space="preserve"><value>Falha na exclusão</value></data>
+  <!-- Shown when the automatic-update-check tick box in About cannot write its
+       new value to settings.json (a redirected or read-only profile). The box
+       has already been put back to what the file holds by the time this shows,
+       so the second sentence is what the user will see happen. No
+       placeholders. -->
+  <data name="Error.SettingNotSavedTitle" xml:space="preserve"><value>Configuração não salva</value></data>
+  <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Não foi possível salvar a alteração. Na próxima vez que for iniciado, o InstallerClean voltará à configuração anterior.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>O destino não pode estar dentro da pasta do Windows Installer.</value></data>
   <!-- 0 = the destination path the user typed -->
   <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>O destino {0} fica dentro de uma pasta de sistema do Windows. Escolha um caminho fora de %SystemRoot%, %ProgramFiles% e %ProgramData%.</value></data>
