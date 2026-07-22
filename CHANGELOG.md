@@ -330,7 +330,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The post-Move heading claims only what happened: "{N} moved" for a same-volume move, which frees nothing until the parked folder is deleted, and "{N} freed" only when the move left the drive. Delete keeps "freed".
 - The README documents the setup's silent install (`/SILENT`, `/VERYSILENT`); the installer already skipped its post-install launch on silent runs. Asked for in discussion #26.
 - `pad.xml`'s descriptions stop selling Move as the restore path, matching the README's framing: deleting what the app lists is safe, and Move is for keeping a copy.
-- The portable build returns to the compressed single-file shape, roughly halving the download (about 135 MB to about 65 MB). It had shipped uncompressed since v1.8.2 to clear a Defender machine-learning false positive (`Trojan:Win32/Wacatac.B!ml`) on the compressed runtime bytes; Microsoft retrains on cleared false positives, so the compressed shape is clean again.
+- The portable build returns to the compressed single-file shape, roughly halving the download (about 135 MB to about 65 MB). It had shipped uncompressed since v1.8.2 to clear a Microsoft Defender machine-learning false positive on the compressed runtime bytes; Microsoft retrains on cleared false positives, so the compressed shape is clean again.
 
 ### Fixed
 
@@ -442,7 +442,7 @@ An audit-driven release: a large sweep of correctness fixes (thread affinity, ex
 
 ### Changed
 
-- InstallerClean-portable.exe ships ~135 MB instead of ~62 MB. The single-file LZMA-compressed embedded runtime that produced the smaller earlier shape tripped Microsoft Defender's `Trojan:Win32/Wacatac.B!ml` machine-learning heuristic as a false positive on the v1.8.2 build; the same code lineage cleared 0/70 on v1.8.1. Turning the inner compression off (the dotnet publish `EnableCompressionInSingleFile` flag) cleared every VirusTotal engine. Slim and CLI single-file builds are unaffected and unchanged in size.
+- InstallerClean-portable.exe ships ~135 MB instead of ~62 MB. The single-file LZMA-compressed embedded runtime that produced the smaller earlier shape tripped Microsoft Defender's machine-learning heuristic as a false positive on the v1.8.2 build; the same code lineage cleared 0/70 on v1.8.1. Turning the inner compression off (the dotnet publish `EnableCompressionInSingleFile` flag) cleared every VirusTotal engine. Slim and CLI single-file builds are unaffected and unchanged in size.
 - Inno Setup wrapper now uses `Compression=bzip` with `SolidCompression=no`. The previous `Compression=zip` configuration combined with the new uncompressed-payload portable inside picked up a DeepInstinct static-ML false positive on the setup hash; bzip was the only Inno compression algorithm tested that cleared every VirusTotal engine for the v1.8.2 setup.
 - Orphans-list Reason column promoted from `Text.Dim` to `Text.Muted` so the load-bearing column that distinguishes Orphaned from Superseded is no longer the lowest text tier on the most semantically critical cell.
 - Orphans-list now renders as a ListView + GridView (matching the registered-files window) so screen readers announce each row as column-headed cells, and its columns click-sort like the registered window's. Previously the rows announced as single cells with the three values run together.
