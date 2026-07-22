@@ -75,14 +75,13 @@ const values = (xml) => {
   return map;
 };
 
-// The first single underscore is the accelerator; a doubled one is WPF's escape
-// for a literal underscore and marks nothing.
+// WPF's rule: a doubled underscore is an escape for a literal underscore and
+// marks nothing, so the accelerator is the first single underscore left once
+// those pairs are consumed left to right. Consuming them is the part that is
+// easy to lose: "__X" carries no accelerator while "___X" marks X, and a match
+// on the first underscore not followed by another reads the second half of a
+// doubled pair as the marker.
 const accelerator = (value, lang) => {
-  // Scanned left to right as WPF parses it: each doubled underscore is
-  // consumed as one literal underscore, and the first single underscore
-  // after that consumption marks the accelerator. A single regex cannot
-  // express the consumption ("__X" must yield null but "___X" yields X),
-  // which is how a doubled pair was once read as marking its second half.
   for (let i = 0; i < value.length - 1; i++) {
     if (value[i] !== '_') continue;
     if (value[i + 1] === '_') { i++; continue; }
