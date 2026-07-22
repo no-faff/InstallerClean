@@ -87,8 +87,9 @@ public sealed class UpdateCheckService : IUpdateCheckService
                 // diagnosis: the common case is GitHub's 60-per-hour
                 // unauthenticated rate limit answering 403, and it is
                 // indistinguishable from a real outage in what the user can
-                // see or report. The status and the rate-limit pair separate
-                // the two, and neither names a user, a path or a machine.
+                // see or report. The status plus the rate-limit headers
+                // separate them, and none of it names a user, a path or a
+                // machine.
                 CrashLog.TryWrite(new HttpRequestException(
                     $"GitHub releases API returned {(int)response.StatusCode} " +
                     $"({response.StatusCode}).{DescribeRateLimit(response.Headers)}"));
@@ -167,25 +168,45 @@ public sealed class UpdateCheckService : IUpdateCheckService
     }
 
     /// <summary>
-    /// The two GitHub rate-limit headers as a log fragment, empty when
-    /// neither arrived. Each is reported only if present: GitHub documents
-    /// them on API responses but not on everything that can answer in their
-    /// place, and a captive portal or a corporate proxy returning the 403 is
-    /// exactly the case worth telling apart from a genuine limit.
+    /// GitHub's rate-limit headers as a log fragment, empty when none
+    /// arrived. Each is reported only if present, because absence is itself
+    /// the reading: a captive portal or a corporate proxy answering the 403
+    /// in GitHub's place sends none of them, and telling that apart from a
+    /// genuine limit is what the breadcrumb is for.
+    ///
+    /// All three are needed to cover the two limits. The primary one spends
+    /// x-ratelimit-remaining down to 0 and names its recovery in
+    /// x-ratelimit-reset. The secondary limit also answers 403 but is
+    /// documented to signal itself with retry-after and need not report the
+    /// primary allowance as exhausted, so on those two headers alone it is
+    /// indistinguishable from a bare 403 out of a proxy.
     /// </summary>
     private static string DescribeRateLimit(HttpResponseHeaders headers)
     {
-        var parts = new List<string>(2);
+        var parts = new List<string>(RateLimitHeaders.Length);
         foreach (var name in RateLimitHeaders)
         {
             if (headers.TryGetValues(name, out var values))
-                parts.Add($"{name}={string.Join(',', values)}");
+                parts.Add($"{name}={Clamp(string.Join(',', values))}");
         }
         return parts.Count == 0 ? string.Empty : " " + string.Join(", ", parts);
     }
 
+    // Header values come from whoever answered, which on the 403 path is not
+    // necessarily GitHub. crash.log rotates at 512 KiB and HttpClient accepts
+    // 64 KiB of response headers, so verbatim values let an intermediary roll
+    // the real crash history out of the log in a handful of failed checks.
+    // A genuine value here is a small integer, so the cap costs nothing and
+    // anything that reaches it is itself worth seeing the head of.
+    private static string Clamp(string value) =>
+        value.Length <= MaxLoggedHeaderChars
+            ? value
+            : value[..MaxLoggedHeaderChars] + "...(truncated)";
+
+    private const int MaxLoggedHeaderChars = 100;
+
     private static readonly string[] RateLimitHeaders =
-        ["x-ratelimit-remaining", "x-ratelimit-reset"];
+        ["x-ratelimit-remaining", "x-ratelimit-reset", "retry-after"];
 
     private static Version GetCurrentVersion() =>
         Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0);
