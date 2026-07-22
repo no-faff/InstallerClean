@@ -280,7 +280,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Update available | Güncelleme mevcut |
 | You're running version {0}.<br>Version {1} is available. | {0} sürümünü çalıştırıyorsunuz.<br>{1} sürümü mevcut. |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub'a ulaşılamadı. İnternet bağlantınızı kontrol edip yeniden deneyin. |
-| GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes. | GitHub bir hata yanıtı döndürdü. Sürüm API'sinde hız sınırı olabilir; birkaç dakika sonra yeniden deneyin. |
+| GitHub returned an error response. Try again in a few minutes. | GitHub bir hata yanıtı döndürdü. Birkaç dakika sonra yeniden deneyin. |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub'ın yanıtı tanınan bir sürüm içermiyordu. Daha sonra yeniden deneyin ya da sürümler sayfasını doğrudan açın. |
 | The check timed out. Your connection to GitHub may be slow; try again. | Denetim zaman aşımına uğradı. GitHub bağlantınız yavaş olabilir; yeniden deneyin. |
 | The check failed for an unknown reason. Details are in crash.log if you need to report it. | Denetim bilinmeyen bir nedenle başarısız oldu. Bildirmeniz gerekirse ayrıntılar crash.log içindedir. |
@@ -360,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Say thanks | Teşekkür etmek için |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Gönder, gösterilen raporu No Faff'a iletir. İptal hiçbir şey göndermez. |
 | Check for updates | Güncellemeleri denetle |
-| Checks the GitHub releases API over HTTPS for a newer version. | Daha yeni bir sürüm için GitHub sürüm API'sini HTTPS üzerinden denetler. |
+| Checks GitHub's releases page over HTTPS for a newer version. | Daha yeni bir sürüm için GitHub'ın sürümler sayfasını HTTPS üzerinden denetler. |
 | Opens the guide (README) on github.com in your browser. | github.com üzerindeki kılavuzu (README) tarayıcınızda açar. |
 | Opens the issue tracker on github.com in your browser. | github.com üzerindeki sorun izleyiciyi (Issues) tarayıcınızda açar. |
 | When ticked, InstallerClean checks GitHub for a newer version when you run it. | İşaretliyse InstallerClean, her çalıştırdığınızda GitHub'da daha yeni bir sürüm olup olmadığını denetler. |

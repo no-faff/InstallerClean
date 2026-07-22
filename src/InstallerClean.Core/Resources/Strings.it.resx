@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>Per ringraziarmi</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>'Invia' trasmette a No Faff il rapporto mostrato. Annulla non invia nulla.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Controlla aggiornamenti</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Verifica tramite l'API delle release di GitHub, via HTTPS, se è disponibile una versione più recente.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Verifica sulla pagina delle release di GitHub, via HTTPS, se è disponibile una versione più recente.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Apre guida (README) in github.com nel browser.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ Dettagli in {1}.</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>La versione in uso è la versione {0}.&#10;È disponibile la versione {1}.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Impossibile raggiungere GitHub. Controlla la connessione internet e riprova.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub ha restituito una risposta di errore. L'API delle release potrebbe avere un limite di frequenza; riprova tra qualche minuto.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub ha restituito una risposta di errore. Riprova tra qualche minuto.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>La risposta di GitHub non conteneva una release riconoscibile. Riprova più tardi, o apri direttamente la pagina delle release.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Il controllo è scaduto. La connessione a GitHub potrebbe essere lenta; riprova.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Il controllo non è riuscito per un motivo sconosciuto. I dettagli sono nel file crash.log, se devi segnalarlo.</value></data>

@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>Dire merci</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Envoyer transmet à No Faff le rapport affiché. Annuler n'envoie rien.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Rechercher des mises à jour</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Interroge l'API des versions de GitHub en HTTPS pour une version plus récente.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Consulte la page des versions de GitHub en HTTPS pour une version plus récente.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Ouvre le guide (README) sur github.com dans votre navigateur.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ Détails dans {1}.</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Vous utilisez la version {0}.&#10;La version {1} est disponible.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Impossible de joindre GitHub. Vérifiez votre connexion internet et réessayez.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub a renvoyé une réponse d'erreur. L'API des versions est peut-être limitée ; réessayez dans quelques minutes.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub a renvoyé une réponse d'erreur. Réessayez dans quelques minutes.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>La réponse de GitHub ne contenait pas de version reconnaissable. Réessayez plus tard, ou ouvrez directement la page des versions.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>La vérification a expiré. Votre connexion à GitHub est peut-être lente ; réessayez.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>La vérification a échoué pour une raison inconnue. Les détails sont dans le crash.log si vous devez le signaler.</value></data>

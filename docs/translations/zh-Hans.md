@@ -280,7 +280,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Update available | 有可用更新 |
 | You're running version {0}.<br>Version {1} is available. | 您正在运行 {0} 版。<br>{1} 版现已推出。 |
 | Couldn't reach GitHub. Check your internet connection and try again. | 无法连接到 GitHub。请检查您的网络连接后重试。 |
-| GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes. | GitHub 返回了错误响应。发布 API 可能受到了速率限制；请过几分钟后重试。 |
+| GitHub returned an error response. Try again in a few minutes. | GitHub 返回了错误响应。请过几分钟后重试。 |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub 的响应中没有可识别的发布版本。请稍后重试，或直接打开发布页面。 |
 | The check timed out. Your connection to GitHub may be slow; try again. | 检查超时。您与 GitHub 的连接可能较慢；请重试。 |
 | The check failed for an unknown reason. Details are in crash.log if you need to report it. | 检查因未知原因失败。如果您需要报告此问题，详情在 crash.log 中。 |
@@ -360,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Say thanks | 道声谢 |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 发送会将所示报告提交给 No Faff。取消则不发送任何内容。 |
 | Check for updates | 检查更新 |
-| Checks the GitHub releases API over HTTPS for a newer version. | 通过 HTTPS 查询 GitHub 发布 API，检查是否有更新版本。 |
+| Checks GitHub's releases page over HTTPS for a newer version. | 通过 HTTPS 查询 GitHub 发布页面，检查是否有更新版本。 |
 | Opens the guide (README) on github.com in your browser. | 在浏览器中打开 github.com 上的指南（README）。 |
 | Opens the issue tracker on github.com in your browser. | 在浏览器中打开 github.com 上的问题追踪页面（Issues）。 |
 | When ticked, InstallerClean checks GitHub for a newer version when you run it. | 勾选后，InstallerClean 每次运行时都会在 GitHub 上检查是否有更新版本。 |

@@ -280,7 +280,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Update available | Có bản cập nhật |
 | You're running version {0}.<br>Version {1} is available. | Bạn đang dùng phiên bản {0}.<br>Phiên bản {1} đã có. |
 | Couldn't reach GitHub. Check your internet connection and try again. | Không thể kết nối tới GitHub. Hãy kiểm tra kết nối internet và thử lại. |
-| GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes. | GitHub trả về phản hồi lỗi. API phát hành có thể đang bị giới hạn tần suất; hãy thử lại sau vài phút. |
+| GitHub returned an error response. Try again in a few minutes. | GitHub trả về phản hồi lỗi. Hãy thử lại sau vài phút. |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | Phản hồi của GitHub không chứa bản phát hành nào nhận ra được. Hãy thử lại sau, hoặc mở thẳng trang phát hành. |
 | The check timed out. Your connection to GitHub may be slow; try again. | Quá thời gian kiểm tra. Kết nối của bạn tới GitHub có thể chậm; hãy thử lại. |
 | The check failed for an unknown reason. Details are in crash.log if you need to report it. | Việc kiểm tra thất bại vì một lý do không xác định. Chi tiết nằm trong crash.log nếu bạn cần báo cáo. |
@@ -360,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Say thanks | Gửi lời cảm ơn |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì. |
 | Check for updates | Kiểm tra cập nhật |
-| Checks the GitHub releases API over HTTPS for a newer version. | Kiểm tra API phát hành của GitHub qua HTTPS để tìm phiên bản mới hơn. |
+| Checks GitHub's releases page over HTTPS for a newer version. | Kiểm tra trang phát hành của GitHub qua HTTPS để tìm phiên bản mới hơn. |
 | Opens the guide (README) on github.com in your browser. | Mở hướng dẫn (README) trên github.com trong trình duyệt của bạn. |
 | Opens the issue tracker on github.com in your browser. | Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn. |
 | When ticked, InstallerClean checks GitHub for a newer version when you run it. | Khi được đánh dấu, mỗi lần bạn chạy InstallerClean, ứng dụng sẽ kiểm tra GitHub xem có phiên bản mới hơn không. |

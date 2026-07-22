@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>Gửi lời cảm ơn</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Kiểm tra cập nhật</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Kiểm tra API phát hành của GitHub qua HTTPS để tìm phiên bản mới hơn.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Kiểm tra trang phát hành của GitHub qua HTTPS để tìm phiên bản mới hơn.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Mở hướng dẫn (README) trên github.com trong trình duyệt của bạn.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ Chi tiết trong {1}.</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Bạn đang dùng phiên bản {0}.&#10;Phiên bản {1} đã có.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Không thể kết nối tới GitHub. Hãy kiểm tra kết nối internet và thử lại.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub trả về phản hồi lỗi. API phát hành có thể đang bị giới hạn tần suất; hãy thử lại sau vài phút.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub trả về phản hồi lỗi. Hãy thử lại sau vài phút.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Phản hồi của GitHub không chứa bản phát hành nào nhận ra được. Hãy thử lại sau, hoặc mở thẳng trang phát hành.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Quá thời gian kiểm tra. Kết nối của bạn tới GitHub có thể chậm; hãy thử lại.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Việc kiểm tra thất bại vì một lý do không xác định. Chi tiết nằm trong crash.log nếu bạn cần báo cáo.</value></data>

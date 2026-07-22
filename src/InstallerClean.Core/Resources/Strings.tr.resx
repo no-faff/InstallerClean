@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>Teşekkür etmek için</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Gönder, gösterilen raporu No Faff'a iletir. İptal hiçbir şey göndermez.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Güncellemeleri denetle</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Daha yeni bir sürüm için GitHub sürüm API'sini HTTPS üzerinden denetler.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Daha yeni bir sürüm için GitHub'ın sürümler sayfasını HTTPS üzerinden denetler.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>github.com üzerindeki kılavuzu (README) tarayıcınızda açar.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ Ayrıntılar {1} içinde.</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>{0} sürümünü çalıştırıyorsunuz.&#10;{1} sürümü mevcut.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>GitHub'a ulaşılamadı. İnternet bağlantınızı kontrol edip yeniden deneyin.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub bir hata yanıtı döndürdü. Sürüm API'sinde hız sınırı olabilir; birkaç dakika sonra yeniden deneyin.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub bir hata yanıtı döndürdü. Birkaç dakika sonra yeniden deneyin.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub'ın yanıtı tanınan bir sürüm içermiyordu. Daha sonra yeniden deneyin ya da sürümler sayfasını doğrudan açın.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Denetim zaman aşımına uğradı. GitHub bağlantınız yavaş olabilir; yeniden deneyin.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Denetim bilinmeyen bir nedenle başarısız oldu. Bildirmeniz gerekirse ayrıntılar crash.log içindedir.</value></data>

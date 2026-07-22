@@ -280,7 +280,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Update available | Pembaruan tersedia |
 | You're running version {0}.<br>Version {1} is available. | Anda menjalankan versi {0}.<br>Versi {1} tersedia. |
 | Couldn't reach GitHub. Check your internet connection and try again. | Tidak bisa menjangkau GitHub. Periksa koneksi internet Anda dan coba lagi. |
-| GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes. | GitHub mengembalikan respons kesalahan. API rilis mungkin terkena batas laju; coba lagi beberapa menit lagi. |
+| GitHub returned an error response. Try again in a few minutes. | GitHub mengembalikan respons kesalahan. Coba lagi dalam beberapa menit. |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | Respons GitHub tidak memuat rilis yang dikenali. Coba lagi nanti, atau buka halaman rilis langsung. |
 | The check timed out. Your connection to GitHub may be slow; try again. | Pemeriksaan kehabisan waktu. Koneksi Anda ke GitHub mungkin lambat; coba lagi. |
 | The check failed for an unknown reason. Details are in crash.log if you need to report it. | Pemeriksaan gagal karena alasan yang tidak diketahui. Detailnya ada di crash.log jika Anda perlu melaporkannya. |
@@ -360,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Say thanks | Ucapkan terima kasih |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Kirim mengirimkan laporan yang ditampilkan ke No Faff. Batal tidak mengirim apa pun. |
 | Check for updates | Periksa pembaruan |
-| Checks the GitHub releases API over HTTPS for a newer version. | Memeriksa API rilis GitHub melalui HTTPS untuk versi yang lebih baru. |
+| Checks GitHub's releases page over HTTPS for a newer version. | Memeriksa halaman rilis GitHub melalui HTTPS untuk versi yang lebih baru. |
 | Opens the guide (README) on github.com in your browser. | Membuka panduan (README) di github.com melalui peramban Anda. |
 | Opens the issue tracker on github.com in your browser. | Membuka pelacak masalah (Issues) di github.com melalui peramban Anda. |
 | When ticked, InstallerClean checks GitHub for a newer version when you run it. | Jika dicentang, InstallerClean memeriksa GitHub untuk versi yang lebih baru setiap kali Anda menjalankannya. |

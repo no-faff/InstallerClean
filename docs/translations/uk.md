@@ -280,7 +280,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Update available | Доступне оновлення |
 | You're running version {0}.<br>Version {1} is available. | Ви використовуєте версію {0}.<br>Доступна версія {1}. |
 | Couldn't reach GitHub. Check your internet connection and try again. | Не вдалося зв'язатися з GitHub. Перевірте інтернет-з'єднання та спробуйте ще раз. |
-| GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes. | GitHub повернув повідомлення про помилку. Можливо, API випусків обмежує частоту запитів; спробуйте за кілька хвилин. |
+| GitHub returned an error response. Try again in a few minutes. | GitHub повернув повідомлення про помилку. Спробуйте ще раз за кілька хвилин. |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | Відповідь GitHub не містила розпізнаного випуску. Спробуйте пізніше або відкрийте сторінку випусків напряму. |
 | The check timed out. Your connection to GitHub may be slow; try again. | Час перевірки вичерпано. Можливо, ваше з'єднання з GitHub повільне; спробуйте ще раз. |
 | The check failed for an unknown reason. Details are in crash.log if you need to report it. | Перевірка не вдалася з невідомої причини. Деталі у crash.log, якщо вам потрібно про це повідомити. |
@@ -360,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Say thanks | Подякувати |
 | Send posts the report shown to No Faff. Cancel sends nothing. | «Надіслати» надсилає показаний звіт до No Faff. «Скасувати» не надсилає нічого. |
 | Check for updates | Перевірити оновлення |
-| Checks the GitHub releases API over HTTPS for a newer version. | Перевіряє API випусків GitHub через HTTPS на наявність новішої версії. |
+| Checks GitHub's releases page over HTTPS for a newer version. | Перевіряє сторінку випусків GitHub через HTTPS на наявність новішої версії. |
 | Opens the guide (README) on github.com in your browser. | Відкриває посібник (README) на github.com у вашому браузері. |
 | Opens the issue tracker on github.com in your browser. | Відкриває список проблем (Issues) на github.com у вашому браузері. |
 | When ticked, InstallerClean checks GitHub for a newer version when you run it. | Якщо позначено, InstallerClean під час кожного запуску перевіряє на GitHub наявність новішої версії. |

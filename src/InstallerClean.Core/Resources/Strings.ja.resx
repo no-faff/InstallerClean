@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>謝意を伝える</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>送信を実行すると表示されたレポートが No Faff に投稿されます。キャンセルは何も送信しません。</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>更新の確認</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>HTTPS 経由で GitHub リリース API をチェックし、新しいバージョンがないか確認します。</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>HTTPS 経由で GitHub のリリースページをチェックし、新しいバージョンがないか確認します。</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>ブラウザで github.com のガイド (README) を開きます。</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>バージョン {0} を実行しています。&#10;バージョン {1} が利用可能です。</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>GitHub に到達できませんでした。インターネット接続を確認して再試行してください。</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub がエラーレスポンスを返しました。リリース API がレート制限されている可能性があります。数分待ってから再試行してください。</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub がエラーレスポンスを返しました。数分待ってから再試行してください。</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub のレスポンスに認識可能なリリースが含まれていませんでした。後でもう一度試すか、リリースページを直接開いてください。</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>確認がタイムアウトしました。GitHub への接続が遅い可能性があります。再試行してください。</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>不明な理由で確認に失敗しました。報告が必要な場合は詳細が crash.log にあります。</value></data>

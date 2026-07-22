@@ -6,7 +6,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 ### Added
 
-- The app now checks for a newer version by itself: once per run, started the moment the app opens, as a single request to GitHub's releases API. If one exists, a quiet "Version X is available." link appears in the bottom bar and opens that release's page in your normal browser. Nothing is downloaded, nothing interrupts you, and an up-to-date result or a failed check says nothing at all.
+- The app now checks for a newer version by itself: once per run, started the moment the app opens, as a single request to GitHub's releases page. If one exists, a quiet "Version X is available." link appears in the bottom bar and opens that release's page in your normal browser. Nothing is downloaded, nothing interrupts you, and an up-to-date result or a failed check says nothing at all.
 - A "Check for updates automatically" checkbox in the About window governs the automatic check. On by default; a change applies from the next launch, and with it off the app makes no network request unless you press a button that makes one. It is the app's first checkbox, so there is now a house CheckBox style built from the existing theme tokens.
 - A "Check for updates" button on the main window's bottom bar, with a status line beside it for "Checking...", "Up to date." and the update link. The check no longer hides behind About, where the button read as credits rather than updates.
 - The About window links to the guide (the README, opened in the app's display language and landing on the document itself rather than the repository page the star button already opens) and to the issue tracker ("Report a problem"). The README, which is the app's actual manual, was previously only reachable via the star button.
@@ -25,6 +25,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 
 ### Fixed
 
+- The update check reads the version from GitHub's releases page rather than its REST API. That API refuses anonymous requests once 60 an hour have come from the same address, counted across every program behind it, so on an office connection, a mobile network or a commercial VPN the check could report an error with nothing wrong at either end.
 - The access-key check now reads a doubled underscore the way the app renders it, as a literal underscore rather than a key marker. No current label uses one; the first that did would have made the check report a key that isn't there or hide a clash that is. Its failure message also now gives advice a contributor can follow.
 - The optional anonymous report can say "failed" again when a clean-up achieved nothing. Since the act-time re-check arrived in 2.1.0, a run where that check kept some files back and every remaining file then failed was misreported as "partial" with zero files processed.
 

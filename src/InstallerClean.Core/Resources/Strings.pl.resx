@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>Podziękuj</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Wyślij przekazuje pokazany raport do No Faff. Anuluj nie wysyła niczego.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Sprawdź aktualizacje</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Sprawdza w API wydań GitHub przez HTTPS, czy jest nowsza wersja.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Sprawdza na stronie wydań GitHuba przez HTTPS, czy jest nowsza wersja.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Otwiera przewodnik (README) na github.com w twojej przeglądarce.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ Szczegóły w {1}.</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Masz zainstalowaną wersję {0}.&#10;Dostępna jest wersja {1}.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Nie udało się połączyć z GitHub. Sprawdź połączenie internetowe i spróbuj ponownie.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub zwrócił odpowiedź z błędem. API wydań może mieć ograniczoną liczbę żądań; spróbuj ponownie za kilka minut.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub zwrócił odpowiedź z błędem. Spróbuj ponownie za kilka minut.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Odpowiedź GitHub nie zawierała rozpoznawalnego wydania. Spróbuj ponownie później lub otwórz stronę wydań bezpośrednio.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Upłynął limit czasu sprawdzania. Połączenie z GitHub może być wolne; spróbuj ponownie.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Sprawdzanie nie powiodło się z nieznanej przyczyny. Szczegóły są w crash.log, jeśli chcesz to zgłosić.</value></data>

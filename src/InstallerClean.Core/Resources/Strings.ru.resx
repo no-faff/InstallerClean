@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>Поблагодарить</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>«Отправить» передаёт показанный отчёт в No Faff. «Отмена» не отправляет ничего.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Проверить обновления</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Проверяет наличие более новой версии через API выпусков GitHub по HTTPS.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Проверяет наличие более новой версии на странице выпусков GitHub по HTTPS.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Открывает руководство (README) на github.com в вашем браузере.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ InstallerClean уже был запущен от имени администра
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>У вас установлена версия {0}.&#10;Доступна версия {1}.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Не удалось подключиться к GitHub. Проверьте подключение к интернету и повторите попытку.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub вернул ответ с ошибкой. Возможно, для API выпусков действует ограничение частоты запросов; повторите попытку через несколько минут.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub вернул ответ с ошибкой. Повторите попытку через несколько минут.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>В ответе GitHub не оказалось распознаваемого выпуска. Повторите попытку позже или откройте страницу выпусков напрямую.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Время ожидания проверки истекло. Возможно, соединение с GitHub медленное; повторите попытку.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Проверка не удалась по неизвестной причине. Подробности в crash.log, если нужно сообщить об этом.</value></data>

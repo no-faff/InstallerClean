@@ -280,7 +280,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Update available | Aggiornamento disponibile |
 | You're running version {0}.<br>Version {1} is available. | La versione in uso è la versione {0}.<br>È disponibile la versione {1}. |
 | Couldn't reach GitHub. Check your internet connection and try again. | Impossibile raggiungere GitHub. Controlla la connessione internet e riprova. |
-| GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes. | GitHub ha restituito una risposta di errore. L'API delle release potrebbe avere un limite di frequenza; riprova tra qualche minuto. |
+| GitHub returned an error response. Try again in a few minutes. | GitHub ha restituito una risposta di errore. Riprova tra qualche minuto. |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | La risposta di GitHub non conteneva una release riconoscibile. Riprova più tardi, o apri direttamente la pagina delle release. |
 | The check timed out. Your connection to GitHub may be slow; try again. | Il controllo è scaduto. La connessione a GitHub potrebbe essere lenta; riprova. |
 | The check failed for an unknown reason. Details are in crash.log if you need to report it. | Il controllo non è riuscito per un motivo sconosciuto. I dettagli sono nel file crash.log, se devi segnalarlo. |
@@ -360,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Say thanks | Per ringraziarmi |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 'Invia' trasmette a No Faff il rapporto mostrato. Annulla non invia nulla. |
 | Check for updates | Controlla aggiornamenti |
-| Checks the GitHub releases API over HTTPS for a newer version. | Verifica tramite l'API delle release di GitHub, via HTTPS, se è disponibile una versione più recente. |
+| Checks GitHub's releases page over HTTPS for a newer version. | Verifica sulla pagina delle release di GitHub, via HTTPS, se è disponibile una versione più recente. |
 | Opens the guide (README) on github.com in your browser. | Apre guida (README) in github.com nel browser. |
 | Opens the issue tracker on github.com in your browser. | Apre elenco problemi (issue) in github.com nel browser. |
 | When ticked, InstallerClean checks GitHub for a newer version when you run it. | Se selezionata, InstallerClean verifica su GitHub se è disponibile una versione più recente a ogni avvio. |

@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>道声谢</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>发送会将所示报告提交给 No Faff。取消则不发送任何内容。</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>检查更新</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>通过 HTTPS 查询 GitHub 发布 API，检查是否有更新版本。</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>通过 HTTPS 查询 GitHub 发布页面，检查是否有更新版本。</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>在浏览器中打开 github.com 上的指南（README）。</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>您正在运行 {0} 版。&#10;{1} 版现已推出。</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>无法连接到 GitHub。请检查您的网络连接后重试。</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub 返回了错误响应。发布 API 可能受到了速率限制；请过几分钟后重试。</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub 返回了错误响应。请过几分钟后重试。</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub 的响应中没有可识别的发布版本。请稍后重试，或直接打开发布页面。</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>检查超时。您与 GitHub 的连接可能较慢；请重试。</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>检查因未知原因失败。如果您需要报告此问题，详情在 crash.log 中。</value></data>

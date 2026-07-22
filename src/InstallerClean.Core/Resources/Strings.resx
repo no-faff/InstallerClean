@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>Say thanks</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Send posts the report shown to No Faff. Cancel sends nothing.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Check for updates</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Checks the GitHub releases API over HTTPS for a newer version.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Checks GitHub's releases page over HTTPS for a newer version.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Opens the guide (README) on github.com in your browser.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ Details in {1}.</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>You're running version {0}.&#10;Version {1} is available.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Couldn't reach GitHub. Check your internet connection and try again.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub returned an error response. Try again in a few minutes.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>GitHub's response did not contain a recognised release. Try again later, or open the releases page directly.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>The check timed out. Your connection to GitHub may be slow; try again.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>The check failed for an unknown reason. Details are in crash.log if you need to report it.</value></data>

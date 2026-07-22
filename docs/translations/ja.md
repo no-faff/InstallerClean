@@ -280,7 +280,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Update available | 更新があります |
 | You're running version {0}.<br>Version {1} is available. | バージョン {0} を実行しています。<br>バージョン {1} が利用可能です。 |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub に到達できませんでした。インターネット接続を確認して再試行してください。 |
-| GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes. | GitHub がエラーレスポンスを返しました。リリース API がレート制限されている可能性があります。数分待ってから再試行してください。 |
+| GitHub returned an error response. Try again in a few minutes. | GitHub がエラーレスポンスを返しました。数分待ってから再試行してください。 |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub のレスポンスに認識可能なリリースが含まれていませんでした。後でもう一度試すか、リリースページを直接開いてください。 |
 | The check timed out. Your connection to GitHub may be slow; try again. | 確認がタイムアウトしました。GitHub への接続が遅い可能性があります。再試行してください。 |
 | The check failed for an unknown reason. Details are in crash.log if you need to report it. | 不明な理由で確認に失敗しました。報告が必要な場合は詳細が crash.log にあります。 |
@@ -360,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Say thanks | 謝意を伝える |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 送信を実行すると表示されたレポートが No Faff に投稿されます。キャンセルは何も送信しません。 |
 | Check for updates | 更新の確認 |
-| Checks the GitHub releases API over HTTPS for a newer version. | HTTPS 経由で GitHub リリース API をチェックし、新しいバージョンがないか確認します。 |
+| Checks GitHub's releases page over HTTPS for a newer version. | HTTPS 経由で GitHub のリリースページをチェックし、新しいバージョンがないか確認します。 |
 | Opens the guide (README) on github.com in your browser. | ブラウザで github.com のガイド (README) を開きます。 |
 | Opens the issue tracker on github.com in your browser. | ブラウザで github.com の Issue トラッカーを開きます。 |
 | When ticked, InstallerClean checks GitHub for a newer version when you run it. | チェックを入れると、InstallerClean は起動のたびに GitHub で新しいバージョンを確認します。 |

@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>Подякувати</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>«Надіслати» надсилає показаний звіт до No Faff. «Скасувати» не надсилає нічого.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Перевірити оновлення</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Перевіряє API випусків GitHub через HTTPS на наявність новішої версії.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Перевіряє сторінку випусків GitHub через HTTPS на наявність новішої версії.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Відкриває посібник (README) на github.com у вашому браузері.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ InstallerClean уже працював від імені адміністрат�
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Ви використовуєте версію {0}.&#10;Доступна версія {1}.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Не вдалося зв'язатися з GitHub. Перевірте інтернет-з'єднання та спробуйте ще раз.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub повернув повідомлення про помилку. Можливо, API випусків обмежує частоту запитів; спробуйте за кілька хвилин.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub повернув повідомлення про помилку. Спробуйте ще раз за кілька хвилин.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Відповідь GitHub не містила розпізнаного випуску. Спробуйте пізніше або відкрийте сторінку випусків напряму.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Час перевірки вичерпано. Можливо, ваше з'єднання з GitHub повільне; спробуйте ще раз.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Перевірка не вдалася з невідомої причини. Деталі у crash.log, якщо вам потрібно про це повідомити.</value></data>

@@ -280,7 +280,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Update available | 업데이트 사용 가능 |
 | You're running version {0}.<br>Version {1} is available. | 현재 {0} 버전을 사용하고 있습니다.<br>{1} 버전을 사용할 수 있습니다. |
 | Couldn't reach GitHub. Check your internet connection and try again. | GitHub에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요. |
-| GitHub returned an error response. The releases API may be rate-limited; try again in a few minutes. | GitHub가 오류 응답을 반환했습니다. 릴리스 API가 속도 제한에 걸렸을 수 있으니, 몇 분 후에 다시 시도하세요. |
+| GitHub returned an error response. Try again in a few minutes. | GitHub가 오류 응답을 반환했습니다. 몇 분 후에 다시 시도하세요. |
 | GitHub's response did not contain a recognised release. Try again later, or open the releases page directly. | GitHub의 응답에 인식할 수 있는 릴리스가 없습니다. 나중에 다시 시도하거나, 릴리스 페이지를 직접 여세요. |
 | The check timed out. Your connection to GitHub may be slow; try again. | 확인 시간이 초과되었습니다. GitHub와의 연결이 느릴 수 있으니 다시 시도하세요. |
 | The check failed for an unknown reason. Details are in crash.log if you need to report it. | 알 수 없는 이유로 확인에 실패했습니다. 신고가 필요하면 자세한 내용이 crash.log에 있습니다. |
@@ -360,7 +360,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Say thanks | 감사 인사 |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 보내기를 누르면 표시된 보고서가 No Faff에 전송됩니다. 취소하면 아무것도 보내지 않습니다. |
 | Check for updates | 업데이트 확인 |
-| Checks the GitHub releases API over HTTPS for a newer version. | GitHub 릴리스 API를 HTTPS로 조회해 새 버전이 있는지 확인합니다. |
+| Checks GitHub's releases page over HTTPS for a newer version. | GitHub 릴리스 페이지를 HTTPS로 조회해 새 버전이 있는지 확인합니다. |
 | Opens the guide (README) on github.com in your browser. | 브라우저에서 github.com의 안내서(README)를 엽니다. |
 | Opens the issue tracker on github.com in your browser. | 브라우저에서 github.com의 이슈 트래커를 엽니다. |
 | When ticked, InstallerClean checks GitHub for a newer version when you run it. | 선택하면 InstallerClean이 실행할 때마다 GitHub에서 새 버전이 있는지 확인합니다. |

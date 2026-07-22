@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>Danke sagen</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Senden übermittelt den angezeigten Bericht an No Faff. Abbrechen sendet nichts.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Nach Updates suchen</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Prüft die GitHub-Releases-API über HTTPS auf eine neuere Version.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Prüft die GitHub-Releases-Seite über HTTPS auf eine neuere Version.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Öffnet die Anleitung (README) auf github.com in deinem Browser.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ Details in {1}.</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Du verwendest Version {0}.&#10;Version {1} ist verfügbar.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>GitHub war nicht erreichbar. Prüfe deine Internetverbindung und versuch es erneut.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub hat eine Fehlerantwort zurückgegeben. Die Releases-API ist möglicherweise ratenbegrenzt; versuch es in ein paar Minuten erneut.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub hat eine Fehlerantwort zurückgegeben. Versuch es in ein paar Minuten erneut.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Die Antwort von GitHub enthielt keine erkennbare Version. Versuch es später erneut oder öffne die Releases-Seite direkt.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Bei der Prüfung wurde das Zeitlimit überschritten. Deine Verbindung zu GitHub ist vielleicht langsam; versuch es erneut.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Die Prüfung ist aus unbekanntem Grund fehlgeschlagen. Details stehen in crash.log, falls du es melden möchtest.</value></data>

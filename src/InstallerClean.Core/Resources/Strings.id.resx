@@ -196,7 +196,7 @@
   <data name="Automation.SayThanks" xml:space="preserve"><value>Ucapkan terima kasih</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Kirim mengirimkan laporan yang ditampilkan ke No Faff. Batal tidak mengirim apa pun.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Periksa pembaruan</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Memeriksa API rilis GitHub melalui HTTPS untuk versi yang lebih baru.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Memeriksa halaman rilis GitHub melalui HTTPS untuk versi yang lebih baru.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Membuka panduan (README) di github.com melalui peramban Anda.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
@@ -749,7 +749,7 @@ Detail di {1}.</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>Anda menjalankan versi {0}.&#10;Versi {1} tersedia.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>Tidak bisa menjangkau GitHub. Periksa koneksi internet Anda dan coba lagi.</value></data>
-  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub mengembalikan respons kesalahan. API rilis mungkin terkena batas laju; coba lagi beberapa menit lagi.</value></data>
+  <data name="UpdateCheck.Failed.ServerError" xml:space="preserve"><value>GitHub mengembalikan respons kesalahan. Coba lagi dalam beberapa menit.</value></data>
   <data name="UpdateCheck.Failed.ResponseParseError" xml:space="preserve"><value>Respons GitHub tidak memuat rilis yang dikenali. Coba lagi nanti, atau buka halaman rilis langsung.</value></data>
   <data name="UpdateCheck.Failed.Timeout" xml:space="preserve"><value>Pemeriksaan kehabisan waktu. Koneksi Anda ke GitHub mungkin lambat; coba lagi.</value></data>
   <data name="UpdateCheck.Failed.Unknown" xml:space="preserve"><value>Pemeriksaan gagal karena alasan yang tidak diketahui. Detailnya ada di crash.log jika Anda perlu melaporkannya.</value></data>
