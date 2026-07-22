@@ -35,7 +35,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="10"/>
             <!-- Auto-update checkbox: last, and alone, because it is the
-                 window's one control rather than another link. -->
+                 window's one setting rather than another link. -->
             <RowDefinition Height="Auto"/>
             <!-- Star spacer: the gap before the say-thanks block. Under
                  SizeToContent="Height" it sits at MinHeight and expands past it
@@ -73,10 +73,10 @@
              so the target is resolved in code-behind (ReadmeLinks.Home)
              against the language on screen rather than pinned here: it
              should not open on English for someone reading the window in
-             Polish. The app's other two README links are both mid-sentence
-             and both point at one section of it (the missing-file note, the
-             completion screen's restore hint); this is the only one that
-             offers the document itself. -->
+             Polish. The app's other three README links are all mid-sentence
+             and all point at one section of it (the missing-file note, the
+             completion screen's restore hint, the send-report confirmation);
+             this is the only one that offers the document itself. -->
         <TextBlock Grid.Row="5" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}">
             <Hyperlink x:Name="GuideLink"
                        Click="Hyperlink_Click"

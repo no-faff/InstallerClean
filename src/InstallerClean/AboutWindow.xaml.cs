@@ -117,12 +117,13 @@ public partial class AboutWindow : Window
     /// Unchecked because the two differ only in the value they write.
     ///
     /// Update never throws and returns false instead, which the language
-    /// pick and the move destination both discard: for those, a lost write
-    /// costs a preference the user can see is wrong and set again. This one
-    /// is different in kind. It is the app's only consent control over its
-    /// only unprompted network call, so a box that shows unticked while the
-    /// file on disk still says ticked has the app opening a socket at every
-    /// launch on the strength of a setting the user believes they revoked.
+    /// pick discards and the move destination's debounced save records only
+    /// in crash.log: for those, a lost write costs a preference the user can
+    /// see is wrong and set again. This one is different in kind. It is the
+    /// app's only consent control over its only unprompted network call, so a
+    /// box that shows unticked while the file on disk still says ticked has
+    /// the app opening a socket at every launch on the strength of a setting
+    /// the user believes they revoked.
     /// A refused write is reachable without anything being broken: a
     /// redirected or read-only profile is enough, and SettingsService
     /// deliberately refuses a settings path that resolves somewhere else.
