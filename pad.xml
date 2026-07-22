@@ -53,7 +53,7 @@ The app scans the cache, queries the Windows Installer API to enumerate register
 
 Everything it lists is safe to delete, because the app only ever offers files Windows itself reports as finished with. Delete sends files to the Recycle Bin where it is available; if the bin cannot be used for the drive, the app offers to Move them instead or to delete them with your explicit confirmation, so files are never deleted permanently without your consent. If you would rather keep the files around first, Move parks them in a folder you choose.
 
-Other safety measures include a hard block on cleaning during an active Windows Installer transaction (so an install or repair in flight cannot be corrupted), a confirmation step before every Move and Delete operation and refusal to move into reparse points or back into the installer cache.
+Other safety measures include a hard block on cleaning during an active Windows Installer transaction (so a clean-up cannot run against an install or repair that is in flight), a confirmation step before every Move and Delete operation and refusal to move into reparse points or back into the installer cache.
 
 A separate console executable (installerclean-cli.exe) ships both in the setup build and as a standalone download, for scheduled tasks and unattended use, with distinct exit codes per outcome for scripting.
 
