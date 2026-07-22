@@ -875,17 +875,27 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToolTip">
-                    <!-- Hairline in the card surface, so the tooltip's own
-                         edge survives being drawn over an accent pill: fill
-                         on fill, the two indigos are the same colour and the
-                         tooltip appears to be part of the button underneath
-                         it. Invisible where it belongs, on the card, which is
-                         where these tooltips spend most of their life; the
-                         completion heart's tooltip is the one that reliably
-                         crosses a pill, sitting directly above Done. Thickness
-                         resource, not the Double one: a {StaticResource}
-                         lookup runs no TypeConverter, so a Double will not
-                         satisfy BorderThickness. -->
+                    <!-- The hairline exists so the tooltip keeps an edge when
+                         it is drawn over an accent pill: fill on fill, the two
+                         indigos are the same colour and the tooltip reads as
+                         part of the button under it rather than as something
+                         on top. The completion heart's is the one that
+                         reliably crosses one, opening directly above Done.
+
+                         One brush has to serve three consumers on two
+                         surfaces, and only the completion heart's tooltip
+                         opens over a card; the About window's star and cuppa
+                         pills sit straight on the lighter window background.
+                         So the constraint is a single brush dark enough to
+                         read against the accent fill and quiet enough on
+                         every dark surface a tooltip can open over. The card
+                         colour meets both: invisible on the card, a faint
+                         darker edge on About. Anything lighter would be a
+                         frame there instead of an edge.
+
+                         Thickness resource, not the Double one: a
+                         {StaticResource} lookup runs no TypeConverter, so a
+                         Double will not satisfy BorderThickness. -->
                     <Border Background="{StaticResource Action.Accent.Background}"
                             BorderBrush="{StaticResource Surface.Card}"
                             BorderThickness="{StaticResource BorderThickness.Hairline}"

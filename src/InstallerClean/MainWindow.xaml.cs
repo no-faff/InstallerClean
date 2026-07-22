@@ -379,14 +379,17 @@ public partial class MainWindow : Window
     /// <summary>
     /// Keyboard focus as it stood when this window last lost activation
     /// during a manual check, and, when reactivation put focus somewhere
-    /// else, where it was put. The comparison is what separates a placement
-    /// nobody asked for from one the user made: WPF preserves focus across a
-    /// deactivation, so Alt+Tab, or a dialog opened from a control that is
-    /// still enabled, comes back to the same element and leaves the record
-    /// alone. The update dialog is the case that does not, because the button
-    /// the user pressed is disabled for the rest of the cooldown: focus is
-    /// orphaned on the way out and WPF hands it to the window's first control
-    /// on the way back in.
+    /// else, where it was put. Both handlers run only while the restore
+    /// window is open, which is the same span in which the pressed button
+    /// sits disabled and focus is therefore orphaned, so any reactivation
+    /// that lands focus on a control records it: the update dialog's
+    /// dismissal, an Alt+Tab round trip, whatever put activation back. That
+    /// breadth is the point rather than a leak, because in that span the
+    /// choice is always WPF's and never the user's, and undoing WPF's choice
+    /// is what the restore exists for. The comparison earns its keep at the
+    /// other end: focus that comes back to where it already was is not a
+    /// choice at all, so it leaves the record alone, and focus the user
+    /// moved themselves matches nothing and survives.
     /// </summary>
     private IInputElement? _focusBeforeDeactivation;
     private IInputElement? _focusPlacedOnReactivation;

@@ -504,12 +504,19 @@
                  screen reader is typically still reading the button's own
                  name and help text, and a polite item raised behind that
                  loses its turn and is gone (the line clears itself after the
-                 cooldown), so "Up to date." goes unspoken. Interrupting is
-                 safe here because only the manual check ever paints this
-                 line: the automatic one sets the link first and so takes the
-                 other presentation, which means an assertive cut-in is
-                 always the answer to something the user just did, never an
-                 unprompted one talking over them. The link stays
+                 cooldown), so "Up to date." goes unspoken. What makes
+                 interrupting acceptable is that only the manual check ever
+                 paints this line: the automatic one sets the link first and
+                 so takes the other presentation, which means an assertive
+                 cut-in is always the answer to a click, never something
+                 unprompted talking over the user. It can still land in the
+                 middle of something else they started, because the check
+                 disables only its own button and Re-scan stays live for the
+                 whole cooldown: press both and "Up to date.", or the clear
+                 five seconds later, cuts into the scanning overlay's polite
+                 announcements. Accepted, on the same grounds. The window for
+                 it is a few seconds wide and the user opened it themselves.
+                 The link stays
                  Polite because it does not clear: it is on screen and in the
                  tab order until the user acts on it, so an announcement that
                  waits its turn still arrives at something the user can
@@ -524,9 +531,11 @@
                  what the accent pills fill with, measures 2.33:1 against
                  this window's surface and cannot carry type.
 
-                 The plain line hides on HasUpdateLink rather than on the URL
-                 itself because a DataTrigger tests equality only, so the URL
-                 string can express "no link" and never "a link". -->
+                 The plain line's second trigger keys on HasUpdateLink, the
+                 view model's bool, which is what makes the two presentations
+                 exclusive; why that state is a bool rather than something a
+                 DataTrigger would have to interpret is on the property
+                 itself. -->
             <TextBlock x:Name="UpdateStatusLineText"
                        DockPanel.Dock="Left" Text="{Binding Chrome.UpdateStatusText}"
                        VerticalAlignment="Center" Margin="8,0,0,0"
