@@ -28,7 +28,7 @@
 - **简介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 里不需要的文件，这是个 Windows 从不清理的隐藏文件夹。它几乎瞬间扫描完，告诉您有没有这类文件，想细看的还能查看更多细节，并让您删掉它们，给 C: 盘腾出空间。用上一次，就可以不再惦记了。
 - **您可能正是为此而来：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 时，看到 `C:\Windows\Installer` 占了很大空间，却不知道里面都是些什么。InstallerClean 正是您需要的工具。像 `9f05cba.msi` 这样名字看起来毫无规律的文件，它清楚里面装的是什么，并很快告诉您哪些可以安全删除。
 - **能释放多少空间：** 目前收到的（自愿）报告显示，<!-- reports-freedpct-start -->53%<!-- reports-freedpct-end --> 的机器有需要清理的文件。这些机器里，释放空间的中位数是 <!-- reports-median-start -->21 GB<!-- reports-median-end -->。有几台清出了好几百 GB。我自己是 1.28 GB。其余 <!-- reports-nothingpct-start -->47%<!-- reports-nothingpct-end --> 没找到可清理的，这只是说明它们的 Installer 文件夹本来就是干净的。更多细节见下文的[常见问题](#常见问题)。
-- **是否安全：** 是的。它直接问 Windows Installer API 哪些文件还需要，只会列出 Windows 报告为已经用完的那些。它是开源的（Apache 2.0），不向您索取任何信息：没有账号、没有广告、没有跟踪、没有遥测，也没有任何东西在后台运行。它唯一会做的联网操作，就是在您运行时到 GitHub 查一下有没有新版本，而且这也可以关掉。
+- **是否安全：** 是的。它直接问 Windows Installer API 哪些文件还需要，只会列出 Windows 报告为已经用完的那些。它是开源的（Apache 2.0），不向您索取任何信息：没有账号、没有广告、没有跟踪、没有遥测，也没有任何东西在后台运行。它唯一会自己发起的联网操作，就是在您运行时到 GitHub 查一下有没有新版本，而且这也可以关掉。
 - **如何获取：** [下载最新版本](../../releases/latest)。运行；点过 [“未知发布者”的警告](#unknown-publisher)和[管理员提示](#admin)。删掉任何不需要的文件。搞定。
 
 ## 目录
@@ -163,7 +163,7 @@ InstallerClean 会识别三类不需要的文件。
 
 **关于删除和移动。** InstallerClean 删除的这些文件，永久删掉也是安全的。**删除**会把它们移到回收站（回收站不可用时会有提示）；等您清空回收站，C: 盘上的空间就回来了。
 
-不过，这些文件能否放心删除，您不必只听我说。趁它们还在回收站里，您有机会确认一下：用到这个文件夹的那些应用（Office、Acrobat、Visual Studio 之类）是否还能照常更新和卸载。万一您发现有什么坏了（这种可能性极低，而且在 <!-- downloads-start -->38,000+<!-- downloads-end --> 次下载之后至今没有收到过任何报告），从回收站把文件还原回去就能修好。想格外稳妥，也可以改用**移动**，把文件备份到您选定的文件夹里（当然，如果您是想给 C: 盘腾空间，就该选另一个分区或驱动器上的文件夹）。想恢复原状，把文件复制回 `C:\Windows\Installer` 就行（不过您几乎肯定永远用不着这么做）。
+不过，这些文件能否放心删除，您不必只听我说。趁它们还在回收站里，您有机会确认一下：用到这个文件夹的那些应用（Office、Acrobat、Visual Studio 之类）是否还能照常更新和卸载。万一您发现有什么坏了（这种可能性极低，而且在 <!-- downloads-start -->38,000+<!-- downloads-end --> 次下载之后至今没有收到过任何报告），从回收站把文件还原回去就能修好。想格外稳妥，也可以改用**移动**，把文件备份到您选定的文件夹里（当然，如果您是想给 C: 盘腾空间，就该选另一个分区或驱动器上的文件夹）。想恢复原状，把文件复制回 `C:\Windows\Installer` 就行（不过您几乎肯定永远用不着这么做）。如果某个文件名里多了一个“(1)”（把文件两次移到同一个文件夹时会这样），复制回去之前先把它去掉。
 
 如果 Windows Installer 正在写入缓存、有上一笔事务被挂起，或有一项排队等候的、指向该缓存的重启后重命名，移动和删除都会被禁用，并显示具体原因。
 
@@ -172,7 +172,7 @@ InstallerClean 会识别三类不需要的文件。
 **验证二进制文件。** InstallerClean 没有数字签名，但您不必盲目相信它是安全的：
 
 - 每个版本的 SHA-256 哈希值都列在[发布页面](../../releases/latest)上。
-- VirusTotal：每个构建都会扫描，各引擎的完整结果链接在对应版本的发布页面上，方便您查看每个文件的检测结果并自行重新扫描。任何误报都会在发布说明中指出并解释，绝不隐瞒。
+- VirusTotal：每个构建都会扫描，各引擎的完整结果链接在对应版本的发布页面上，方便您查看每个文件的检测结果并自行重新扫描。发布时仍然存在的误报，会在该版本的发布页面上点明并解释；等厂商撤销之后，该页面也会随之更新。
 - 源代码在 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)，CI 会对每次提交进行构建和测试（见上方绿色的 CI 徽章）。
 - 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->38,000+<!-- downloads-end --> 次下载。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 会在虚拟机中测试每一个提交上来的版本，只有通过审核才会收录。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 认证 100% 干净" width="263"></a>
@@ -258,7 +258,7 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 
 <a id="unknown-publisher"></a>
 
-**为什么 Windows 说“未知发布者”？** 因为 InstallerClean 没有代码签名。签名证书每年都要花钱，我宁愿让应用保持免费，也不想为它掏钱。所以您运行它时，Windows SmartScreen 会显示“Windows 已保护你的电脑”。点击**更多信息**，再点**仍要运行**。这么做是安全的：源代码是公开的，每个版本都有 VirusTotal 链接和 SHA-256 哈希值供您事先核对。
+**为什么 Windows 说“未知发布者”？** 因为 InstallerClean 没有代码签名，而且 Windows 会给从网上下载的文件加上标记，所以首次运行时 SmartScreen 通常会显示“Windows 已保护你的电脑”，发布者一栏写着未知。签名证书每年都要花钱，我宁愿让应用保持免费，也不想为它掏钱。点击**更多信息**，再点**仍要运行**。这么做是安全的：源代码是公开的，每个版本都有 VirusTotal 链接和 SHA-256 哈希值供您事先核对。
 
 **删除能撤销吗？** 通常可以。当该驱动器的回收站可用时，删除会把文件移到回收站，您可以从那里还原。如果回收站不可用，应用绝不会自行把文件彻底删除（见[是否安全？](#是否安全)）。如果您更想要一条自己掌控的退路，移动会把文件放进您选择的文件夹；等您满意了，再从那里删除。
 
@@ -306,7 +306,7 @@ scoop install installerclean
 >
 > HeatherBunny1111, [r/techsupport](https://www.reddit.com/r/techsupport/comments/1qc4tcf/how_to_delete_msp_files_safely/)（译自英文原帖）
 
-InstallerClean 读取的是 Windows Installer 自己的补丁记录，所以它能分辨出哪些 Adobe 补丁是真正被取代了，把那些安全地清掉，无需一刀切的过滤器。两者对比如下：
+InstallerClean 读取的是 Windows Installer 自己的补丁记录，所以它不必用一刀切的过滤器把所有 Adobe 文件都藏起来，而是能分辨出哪些补丁已被 Windows 标记为已取代，并如实标注出来。两者对比如下：
 
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|

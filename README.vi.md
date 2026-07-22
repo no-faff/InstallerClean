@@ -28,7 +28,7 @@
 - **Là gì:** InstallerClean chỉ làm một việc: nó loại bỏ những tệp không cần thiết khỏi `C:\Windows\Installer`, một thư mục ẩn mà Windows không bao giờ dọn dẹp. Sau một lần quét gần như tức thì, nó cho bạn biết bạn có tệp như vậy hay không, hiển thị thêm chi tiết cho ai tò mò, và cho phép bạn xóa chúng để giải phóng dung lượng trên ổ C:. Bạn dùng một lần rồi thôi.
 - **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. InstallerClean chính là thứ bạn cần. Nó biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và nhanh chóng cho bạn biết tệp nào có thể xóa an toàn.
 - **Giải phóng được bao nhiêu:** Các báo cáo (tùy chọn) gửi về cho đến nay cho thấy <!-- reports-freedpct-start -->53%<!-- reports-freedpct-end --> số máy có tệp không cần thiết để dọn. Trong số đó, trung vị giải phóng được là <!-- reports-median-start -->21 GB<!-- reports-median-end -->. Một số máy dọn được hàng trăm GB. Với tôi thì được 1,28 GB. <!-- reports-nothingpct-start -->47%<!-- reports-nothingpct-end --> còn lại không tìm thấy gì để loại bỏ, điều đó chỉ có nghĩa là thư mục Installer của họ vốn đã sạch. Xem thêm chi tiết trong phần [FAQ](#faq) bên dưới.
-- **Có an toàn không:** Có. Nó hỏi chính API Windows Installer xem những tệp nào vẫn còn cần, và chỉ liệt kê những tệp Windows báo là đã dùng xong. Nó là mã nguồn mở (Apache 2.0) và không hỏi gì về bạn: không tài khoản, không quảng cáo, không theo dõi, không thu thập dữ liệu, không có gì chạy ngầm. Việc duy nhất nó làm trên mạng là kiểm tra GitHub xem có phiên bản mới hơn không mỗi khi bạn chạy nó, và bạn có thể tắt việc đó.
+- **Có an toàn không:** Có. Nó hỏi chính API Windows Installer xem những tệp nào vẫn còn cần, và chỉ liệt kê những tệp Windows báo là đã dùng xong. Nó là mã nguồn mở (Apache 2.0) và không hỏi gì về bạn: không tài khoản, không quảng cáo, không theo dõi, không thu thập dữ liệu, không có gì chạy ngầm. Việc duy nhất nó tự mình làm trên mạng là kiểm tra GitHub xem có phiên bản mới hơn không mỗi khi bạn chạy nó, và bạn có thể tắt việc đó.
 - **Tải về:** [Tải bản phát hành mới nhất](../../releases/latest). Chạy nó; bấm qua [cảnh báo “Nhà phát hành không xác định”](#unknown-publisher) và [lời nhắc quyền quản trị](#admin). Xóa mọi tệp không cần thiết. Xong.
 
 ## Nội dung
@@ -163,7 +163,7 @@ Có. InstallerClean truy vấn chính cơ sở dữ liệu API Windows Installer
 
 **Về Xóa và Chuyển.** Những tệp InstallerClean xóa có thể xóa vĩnh viễn một cách an toàn. **Xóa** sẽ di chuyển chúng vào Thùng rác (bạn sẽ được cảnh báo nếu Thùng rác không khả dụng); bạn lấy lại dung lượng trên ổ C: khi dọn sạch Thùng rác.
 
-Tuy nhiên, bạn không cần phải tin lời tôi rằng các tệp đó an toàn để xóa. Khi chúng còn trong Thùng rác, bạn có cơ hội kiểm tra xem những ứng dụng dùng thư mục này, như Office, Acrobat, Visual Studio và tương tự, vẫn cập nhật và gỡ cài đặt bình thường hay không. Nếu bạn phát hiện có gì đó hỏng (cực kỳ khó xảy ra, và cho đến nay chưa có báo cáo nào sau <!-- downloads-start -->38.000+<!-- downloads-end --> lượt tải), hãy khôi phục các tệp từ Thùng rác để khắc phục. Để cho thật chắc, bạn có thể dùng **Chuyển** thay vào đó, để sao lưu các tệp vào một thư mục bạn chọn (tất nhiên hãy chọn thư mục trên một phân vùng/ổ đĩa khác nếu bạn muốn giải phóng dung lượng trên C:). Chỉ cần chép các tệp trở lại `C:\Windows\Installer` là mọi thứ về như cũ (dù gần như chắc chắn bạn sẽ không bao giờ cần đến).
+Tuy nhiên, bạn không cần phải tin lời tôi rằng các tệp đó an toàn để xóa. Khi chúng còn trong Thùng rác, bạn có cơ hội kiểm tra xem những ứng dụng dùng thư mục này, như Office, Acrobat, Visual Studio và tương tự, vẫn cập nhật và gỡ cài đặt bình thường hay không. Nếu bạn phát hiện có gì đó hỏng (cực kỳ khó xảy ra, và cho đến nay chưa có báo cáo nào sau <!-- downloads-start -->38.000+<!-- downloads-end --> lượt tải), hãy khôi phục các tệp từ Thùng rác để khắc phục. Để cho thật chắc, bạn có thể dùng **Chuyển** thay vào đó, để sao lưu các tệp vào một thư mục bạn chọn (tất nhiên hãy chọn thư mục trên một phân vùng/ổ đĩa khác nếu bạn muốn giải phóng dung lượng trên C:). Chỉ cần chép các tệp trở lại `C:\Windows\Installer` là mọi thứ về như cũ (dù gần như chắc chắn bạn sẽ không bao giờ cần đến). Nếu tên một tệp bị thêm “(1)” (điều đó xảy ra nếu bạn chuyển tệp vào cùng một thư mục hai lần), hãy bỏ phần đó đi trước khi chép tệp trở lại.
 
 Nếu Windows Installer đang ghi vào bộ nhớ đệm, có một giao dịch trước đó đang bị tạm dừng, hoặc có một thao tác đổi tên sau khi khởi động lại đang xếp hàng nhắm vào bộ nhớ đệm, thì Chuyển và Xóa bị vô hiệu hóa và lý do cụ thể sẽ được hiển thị.
 
@@ -172,7 +172,7 @@ Các dịch vụ quét, truy vấn, chuyển, xóa, cài đặt và kiểm tra k
 **Kiểm chứng tệp nhị phân.** InstallerClean không được ký số, nhưng bạn không phải tin một cách mù quáng rằng nó an toàn:
 
 - Mã băm SHA-256 của mỗi bản phát hành được liệt kê trên [trang phát hành](../../releases/latest).
-- VirusTotal: mỗi bản dựng đều được quét, với kết quả đầy đủ theo từng công cụ được liên kết trên trang phát hành của bản đó, để bạn có thể xem từng tệp được chấm điểm ra sao và tự quét lại. Bất kỳ báo động giả nào cũng được nêu ra và giải thích trong ghi chú phát hành, không giấu giếm.
+- VirusTotal: mỗi bản dựng đều được quét, với kết quả đầy đủ theo từng công cụ được liên kết trên trang phát hành của bản đó, để bạn có thể xem từng tệp được chấm điểm ra sao và tự quét lại. Một báo động giả còn hiệu lực vào lúc một bản phát hành ra mắt sẽ được nêu đích danh và giải thích trên trang của bản phát hành đó, và trang đó được cập nhật ngay khi hãng gỡ bỏ nó.
 - Mã nguồn nằm tại [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) và CI biên dịch và kiểm thử mọi lần commit (xem huy hiệu CI màu xanh ở trên).
 - <!-- downloads-start -->38.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) kiểm tra mỗi lần gửi trong một máy ảo và chỉ đăng nếu nó vượt qua được phần đánh giá của họ.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Được MajorGeeks chứng nhận 100% sạch" width="263"></a>
@@ -258,7 +258,7 @@ Trong số 144 báo cáo mọi người đã gửi về (cảm ơn 🙏) kể t�
 
 <a id="unknown-publisher"></a>
 
-**Vì sao Windows báo “Nhà phát hành không xác định”?** Vì InstallerClean không được ký số. Một chứng chỉ ký số tốn tiền mỗi năm, và tôi thà giữ ứng dụng miễn phí còn hơn phải trả tiền cho nó. Vậy nên khi bạn chạy nó, Windows SmartScreen hiện “Windows đã bảo vệ PC của bạn”. Hãy bấm **Thông tin khác**, rồi **Vẫn chạy**. Làm vậy là an toàn: mã nguồn là công khai, và mỗi bản phát hành đều có liên kết VirusTotal và mã băm SHA-256 mà bạn có thể kiểm tra trước.
+**Vì sao Windows báo “Nhà phát hành không xác định”?** Vì InstallerClean không được ký số, và Windows đánh dấu các tệp tải về từ internet, nên trong lần chạy đầu tiên Windows SmartScreen thường hiện “Windows đã bảo vệ PC của bạn” với nhà phát hành ghi là không xác định. Một chứng chỉ ký số tốn tiền mỗi năm, và tôi thà giữ ứng dụng miễn phí còn hơn phải trả tiền cho nó. Hãy bấm **Thông tin khác**, rồi **Vẫn chạy**. Làm vậy là an toàn: mã nguồn là công khai, và mỗi bản phát hành đều có liên kết VirusTotal và mã băm SHA-256 mà bạn có thể kiểm tra trước.
 
 **Tôi có thể hoàn tác một lần Xóa không?** Thường là có. Khi Thùng rác khả dụng cho ổ đĩa đó, Xóa sẽ di chuyển tệp vào đó và bạn có thể khôi phục chúng từ Thùng rác. Nếu Thùng rác không khả dụng, ứng dụng không bao giờ tự ý xóa vĩnh viễn (xem [Có an toàn không?](#có-an-toàn-không)). Và nếu bạn muốn có một lối quay lại do chính mình kiểm soát, Chuyển sẽ đặt các tệp vào một thư mục bạn chọn; hãy xóa chúng khỏi đó bất cứ khi nào bạn thấy yên tâm.
 
@@ -306,7 +306,7 @@ Nếu bạn từng tìm hiểu về thư mục này, công cụ nhiều khả n�
 >
 > HeatherBunny1111, [r/techsupport](https://www.reddit.com/r/techsupport/comments/1qc4tcf/how_to_delete_msp_files_safely/) (dịch từ nguyên văn tiếng Anh)
 
-InstallerClean đọc chính bản ghi bản vá của Windows Installer, nên nó có thể biết bản vá Adobe nào thật sự đã bị thay thế và dọn những bản đó một cách an toàn, không cần bộ lọc cào bằng. Đây là so sánh giữa hai công cụ:
+InstallerClean đọc chính bản ghi bản vá của Windows Installer, nên thay vì giấu mọi tệp của Adobe sau một bộ lọc cào bằng, nó biết được bản vá nào Windows đã đánh dấu là bị thay thế, và ghi nhãn đúng như vậy. Đây là so sánh giữa hai công cụ:
 
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|

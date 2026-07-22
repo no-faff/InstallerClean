@@ -28,7 +28,7 @@
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
 - **You might be here because:** You used [WinDirStat](https://github.com/windirstat/windirstat), WizTree or TreeSize, saw `C:\Windows\Installer` taking up a lot of space and didn't know what was in there. InstallerClean is just what you need. It knows what's in those files with random-looking names like `9f05cba.msi` and quickly tells you which ones you can safely delete.
 - **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->53%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->21 GB<!-- reports-median-end -->. A few cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->47%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean. More detail in the [FAQ](#faq) below.
-- **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (Apache 2.0) and asks nothing about you: no account, no ads, no tracking, no telemetry, nothing running in the background. The only thing it does online is check GitHub for a newer version when you run it, and you can turn that off.
+- **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (Apache 2.0) and asks nothing about you: no account, no ads, no tracking, no telemetry, nothing running in the background. The only thing it does online by itself is check GitHub for a newer version when you run it, and you can turn that off.
 - **Get it:** [Download the latest release](../../releases/latest). Run it; click through [the unknown-publisher warning](#unknown-publisher) and [the admin prompt](#admin). Delete any unneeded files. Done.
 
 ## Contents
@@ -163,7 +163,7 @@ Yes. InstallerClean queries the same Windows Installer API database that Windows
 
 **About Delete and Move.** The files InstallerClean deletes are safe to delete permanently. **Delete** moves them to the Recycle Bin (you'll be warned if it's not available); you gain the space back on your C: drive when you empty your Recycle Bin.
 
-You don't have to trust me that the files are safe to delete, though. While they're in your Recycle Bin, you have a chance to check that the apps that use this folder, Office, Acrobat, Visual Studio and the like, still update and uninstall without trouble. If you find something broken (extremely unlikely and nothing has been reported so far after <!-- downloads-start -->38,000+<!-- downloads-end --> downloads), restore the files from the Recycle Bin to fix it. To be extra safe, you can instead use **Move** to back up the files to a folder of your choice (obviously choose a folder on another drive/partition if you're looking to free space on C:). Simply copy the files back to `C:\Windows\Installer` to restore things back to how they were (though you almost certainly won't ever need to).
+You don't have to trust me that the files are safe to delete, though. While they're in your Recycle Bin, you have a chance to check that the apps that use this folder, Office, Acrobat, Visual Studio and the like, still update and uninstall without trouble. If you find something broken (extremely unlikely and nothing has been reported so far after <!-- downloads-start -->38,000+<!-- downloads-end --> downloads), restore the files from the Recycle Bin to fix it. To be extra safe, you can instead use **Move** to back up the files to a folder of your choice (obviously choose a folder on another drive/partition if you're looking to free space on C:). Simply copy the files back to `C:\Windows\Installer` to restore things back to how they were (though you almost certainly won't ever need to). If a file picked up a "(1)" in its name (that happens if you moved files into the same folder twice), remove it before copying the file back.
 
 If Windows Installer is currently writing to the cache, has a previous transaction suspended or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown.
 
@@ -172,7 +172,7 @@ The scan, query, move, delete, settings and pending-reboot services are covered 
 **Verifying the binary.** InstallerClean is unsigned, but you don't have to trust that it's safe:
 
 - SHA-256 hashes for each release are listed on the [releases page](../../releases/latest).
-- VirusTotal: every build is scanned, with the full per-engine results linked on its release page so you can see how each file scored and re-scan it yourself. Any false positive is called out and explained in the release notes, not hidden.
+- VirusTotal: every build is scanned, with the full per-engine results linked on its release page so you can see how each file scored and re-scan it yourself. A false positive that's live when a release goes out is named and explained on that release's page, and the page is updated once the vendor clears it.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
 - <!-- downloads-start -->38,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) tests each submission in a virtual machine and lists it only if it passes their review.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks certified 100% clean" width="263"></a>
@@ -256,7 +256,7 @@ Across the 144 reports people have sent in (thanks 🙏) since v1.8.0 added the 
 
 <a id="unknown-publisher"></a>
 
-**Why does Windows say "Unknown publisher"?** Because InstallerClean isn't code-signed. A signing certificate costs money every year, and I'd rather keep the app free than pay for one. So when you run it, Windows SmartScreen shows "Windows protected your PC". Click **More info**, then **Run anyway**. It's safe to do: the source code is public, and every release has VirusTotal links and SHA-256 hashes you can check first.
+**Why does Windows say "Unknown publisher"?** InstallerClean isn't code-signed, and Windows marks files downloaded from the internet, so on first run SmartScreen usually shows "Windows protected your PC" with the publisher listed as unknown. A signing certificate costs money every year, and I'd rather keep the app free than pay for one. Click **More info**, then **Run anyway**. It's safe to do: the source code is public, and every release has VirusTotal links and SHA-256 hashes you can check first.
 
 **Can I undo a Delete?** Usually, yes. When the Recycle Bin is available for the drive, Delete moves files there and you can restore them from the bin. If the bin isn't available, the app never deletes for good on its own (see [Is it safe?](#is-it-safe)). And if you'd rather have a way back you control, Move puts the files in a folder you choose; delete them from there whenever you're satisfied.
 
@@ -304,7 +304,7 @@ If you've searched for this folder before, the tool you'll most likely have foun
 >
 > HeatherBunny1111, [r/techsupport](https://www.reddit.com/r/techsupport/comments/1qc4tcf/how_to_delete_msp_files_safely/)
 
-InstallerClean reads the Windows Installer's own patch records, so it can tell which Adobe patches are genuinely superseded and clear those safely, with no blanket filter. Here's how the two compare:
+InstallerClean reads the Windows Installer's own patch records, so rather than hiding every Adobe file behind a blanket filter it can tell which patches Windows has marked superseded, and labels them as exactly that. Here's how the two compare:
 
 | | **InstallerClean** | **PatchCleaner** |
 |---|---|---|
