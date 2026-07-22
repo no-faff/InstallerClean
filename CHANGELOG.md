@@ -20,6 +20,7 @@ Every change to InstallerClean, logged in full (not just the user-facing highlig
 - The bottom bar slims to Re-scan, About, Check for updates and the language globe: the star and heart buttons are gone. The star lives on in About; the donate ask moved to the completion screen, where it follows an actual result instead of sitting in the window chrome.
 - The About window lost its update button and inline status (moved to the main window) and gained the links block and the updates checkbox, with the licence line grouped into the links as one block.
 - The star pill's tooltip now says what a star does ("A star helps other people find it.") instead of doubling as the route to Issues and Discussions, which "Report a problem" covers properly. The button's label already says GitHub, so the tooltip does not say it again.
+- The indigo tooltips, on the About window's star and cuppa buttons and the completion screen's new heart, now draw a hairline border in the card colour. Where one opens across the equally indigo Done button they used to read as one shape; the border keeps an edge between them.
 
 ### Fixed
 
