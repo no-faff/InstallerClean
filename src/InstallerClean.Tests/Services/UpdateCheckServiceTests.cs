@@ -156,6 +156,11 @@ public class UpdateCheckServiceTests
     /// </summary>
     [Theory]
     [InlineData("https://example.test/no-faff/InstallerClean/releases/tag/v99.0.0")]
+    // A network-path reference. It reads as absolute and is not: System.Uri
+    // parses it with IsAbsoluteUri false, so it is resolved against the
+    // request's own URL, and it is the one relative shape that comes out of
+    // that resolution on a different host.
+    [InlineData("//evil.test/no-faff/InstallerClean/releases/tag/v99.0.0")]
     [InlineData("http://github.com/no-faff/InstallerClean/releases/tag/v99.0.0")]
     [InlineData("https://github.com/someone-else/Other/releases/tag/v99.0.0")]
     [InlineData("https://github.com/no-faff/InstallerClean/releases")]
