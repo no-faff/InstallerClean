@@ -212,6 +212,8 @@ public partial class MainWindow : Window
         _vm.Chrome.PropertyChanged -= OnChromePropertyChanged;
         _vm.Scan.ScanCompleted -= OnScanCompleted;
         PreviewKeyDown -= OnPreviewKeyDown;
+        Deactivated -= OnDeactivatedDuringUpdateCheck;
+        Activated -= OnActivatedDuringUpdateCheck;
         AccessibilitySettings.Current.PropertyChanged -= OnAccessibilitySettingsChanged;
         SizeChanged -= OnWindowSizeChanged;
         Closing -= OnClosing;
