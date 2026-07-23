@@ -278,8 +278,8 @@ v1.8.0'da seçenek eklendiğinden bu yana gönderilen 149 rapora göre (teşekk�
 
 Üç yapı, birini seçin:
 
-- **Kurulum** (`InstallerClean-setup.exe`): .NET 10 çalışma zamanı paketlenmiş, sıradan bir Windows yükleyicisi. Başlat menüsüne bir giriş ekler ve temizce kaldırılır. Programların arasına yerleştirilir, böylece altı ay sonra bulması kolay olur.
-- **Taşınabilir** (`InstallerClean-portable.exe`): çalışma zamanı paketlenmiş, tek bir kendi kendine yeten exe. Kurulum yok, kaldırıcı yok. Çalıştırın, kullanın, silin. Ne zaman isterseniz tekrar çalıştırın.
+- **Kurulum** (`InstallerClean-2.2.0-setup.exe`): .NET 10 çalışma zamanı paketlenmiş, sıradan bir Windows yükleyicisi. Başlat menüsüne bir giriş ekler ve temizce kaldırılır. Programların arasına yerleştirilir, böylece altı ay sonra bulması kolay olur.
+- **Taşınabilir** (`InstallerClean-2.2.0-portable.exe`): çalışma zamanı paketlenmiş, tek bir kendi kendine yeten exe. Kurulum yok, kaldırıcı yok. Çalıştırın, kullanın, silin. Ne zaman isterseniz tekrar çalıştırın.
 - **CLI** (`installerclean-cli.exe`): komut satırı sürümü tek başına, tek bir kendi kendine yeten exe. Kurulum yok, sonrasında makinede hiçbir şey kalmaz. Bir istemciye bırakın, bir tarama ya da temizlik çalıştırın, silin. Betik yazma, zamanlanmış görevler ve istemcide bir masaüstü uygulaması olmadan işlemleri istediğiniz toplu dağıtım için yapıldı. Argümanlar ve çıkış kodları için [Komut satırı](#komut-satırı) bölümüne bakın.
 
 2.2.0'dan itibaren kurulum ve taşınabilir sürümlerin dosya adları sürüm numarasını taşıyor, böylece indirilen bir kopya ne olduğunu her zaman söylüyor; komut satırı aracı ise sade `installerclean-cli.exe` adını koruyor, ki ona işaret eden zamanlanmış görevler ve betikler güncellemeler boyunca çalışmayı sürdürsün.

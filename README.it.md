@@ -277,8 +277,8 @@ Su 149 report che mi sono stati inviati (grazie 🙏) da quando la v1.8.0 ha agg
 
 Tre varianti, scegline una:
 
-- **Setup** (`InstallerClean-setup.exe`): un normale programma di installazione di Windows con il runtime .NET 10 incluso. Aggiunge una voce nel menu Start e si disinstalla in modo pulito. Sistemato tra i programmi, così è facile da ritrovare tra sei mesi.
-- **Portable** (`InstallerClean-portable.exe`): un singolo exe autonomo con il runtime incluso. Nessuna installazione, nessun programma di disinstallazione. Eseguilo, usalo, eliminalo. Rieseguilo quando vuoi.
+- **Setup** (`InstallerClean-2.2.0-setup.exe`): un normale programma di installazione di Windows con il runtime .NET 10 incluso. Aggiunge una voce nel menu Start e si disinstalla in modo pulito. Sistemato tra i programmi, così è facile da ritrovare tra sei mesi.
+- **Portable** (`InstallerClean-2.2.0-portable.exe`): un singolo exe autonomo con il runtime incluso. Nessuna installazione, nessun programma di disinstallazione. Eseguilo, usalo, eliminalo. Rieseguilo quando vuoi.
 - **CLI** (`installerclean-cli.exe`): la versione a riga di comando da sola, un singolo exe autonomo. Nessuna installazione, niente lasciato sulla macchina dopo. Mettilo su un client, esegui una scansione o una pulizia, eliminalo. Pensato per scripting, attività pianificate e distribuzione di massa, quando vuoi le operazioni senza un'app desktop sul client. Vedi [Riga di comando](#riga-di-comando) per gli argomenti e i codici di uscita.
 
 Dalla 2.2.0 i nomi dei file del programma di installazione e della versione portable contengono il numero di versione, così una copia scaricata dice sempre cos'è; lo strumento da riga di comando mantiene il suo nome semplice `installerclean-cli.exe`, perché le attività pianificate e gli script che lo richiamano continuino a funzionare da un aggiornamento all'altro.
