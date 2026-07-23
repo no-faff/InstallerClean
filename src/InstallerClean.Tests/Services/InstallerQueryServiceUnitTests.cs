@@ -40,8 +40,8 @@ public class InstallerQueryServiceUnitTests
     /// <summary>
     /// ERROR_INVALID_PARAMETER. What MsiEnumPatchesEx returns at every index when
     /// the szUserSid is one MsiEnumProductsEx emitted but the patch enumerator
-    /// rejects (S-1-5-18 for a per-user-managed instance): the shape behind issue
-    /// #52, where every index refuses identically.
+    /// rejects (S-1-5-18 for a per-user-managed instance), where every index
+    /// refuses identically.
     /// </summary>
     private const uint InvalidParameter = 87;
 
@@ -235,13 +235,13 @@ public class InstallerQueryServiceUnitTests
 
     // ---- A patch enumeration that collapses degrades that product, not the scan ----
     //
-    // One product whose patch rows keep coming back unreadable (issue #52's
-    // DisplayLink shape: the SID the product enumerator emitted is rejected by the
-    // patch enumerator, so every index refuses) is a per-product loss, not a scan
+    // One product whose patch rows keep coming back unreadable (the DisplayLink
+    // shape: the SID the product enumerator emitted is rejected by the patch
+    // enumerator, so every index refuses) is a per-product loss, not a scan
     // failure. It ends that product's patch enumeration and returns Incomplete,
     // which reaches the same withholding, count and fallback the other losses do.
     // Both cap sites convert: the non-success run and the empty-GUID run. The
-    // AccessDenied throw above and the never-ended-cap throw stay scan-fatal.
+    // AccessDenied throw and the never-ended-cap throw stay scan-fatal.
 
     [Fact]
     public async Task A_products_patch_enumeration_refusing_every_index_degrades_without_aborting_the_scan()
