@@ -38,6 +38,14 @@ public class InstallerQueryServiceUnitTests
     private const uint UnknownProperty = 1608, BadConfiguration = 1610;
 
     /// <summary>
+    /// ERROR_INVALID_PARAMETER. What MsiEnumPatchesEx returns at every index when
+    /// the szUserSid is one MsiEnumProductsEx emitted but the patch enumerator
+    /// rejects (S-1-5-18 for a per-user-managed instance): the shape behind issue
+    /// #52, where every index refuses identically.
+    /// </summary>
+    private const uint InvalidParameter = 87;
+
+    /// <summary>
     /// A registry fallback that contributes nothing and fails at nothing: the
     /// healthy-second-source baseline every test but the degraded ones wants.
     /// </summary>
@@ -223,6 +231,153 @@ public class InstallerQueryServiceUnitTests
         msi.PatchEnumResult["{A}"] = AccessDenied;
 
         await Assert.ThrowsAsync<LocalisedAccessException>(() => Run(msi));
+    }
+
+    // ---- A patch enumeration that collapses degrades that product, not the scan ----
+    //
+    // One product whose patch rows keep coming back unreadable (issue #52's
+    // DisplayLink shape: the SID the product enumerator emitted is rejected by the
+    // patch enumerator, so every index refuses) is a per-product loss, not a scan
+    // failure. It ends that product's patch enumeration and returns Incomplete,
+    // which reaches the same withholding, count and fallback the other losses do.
+    // Both cap sites convert: the non-success run and the empty-GUID run. The
+    // AccessDenied throw above and the never-ended-cap throw stay scan-fatal.
+
+    [Fact]
+    public async Task A_products_patch_enumeration_refusing_every_index_degrades_without_aborting_the_scan()
+    {
+        // The DisplayLink shape: {DL}'s patch enumeration returns 87 at every
+        // index. It degrades to one unreadable product rather than taking the scan
+        // down, and the other product's rows are untouched.
+        const string dead = @"C:\Windows\Installer\other-superseded.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0"); // removable under A
+        msi.AddProduct("{DL}");
+        msi.SetProductProperty("{DL}", "LocalPackage", @"C:\Windows\Installer\displaylink.msi");
+        msi.PatchEnumResult["{DL}"] = InvalidParameter; // 87 at every index
+
+        var result = await Run(msi); // completes: no throw
+
+        Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\displaylink.msi");
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
+        Assert.False(row.IsRemovable);              // removable class withheld scan-wide
+        Assert.True(row.RemovableWithheld);
+        Assert.Equal(1, result.UnreadableProductCount); // the degraded product counts exactly once
+        Assert.True(result.RecordsIncomplete);
+    }
+
+    [Fact]
+    public async Task Patch_rows_read_before_a_collapse_still_merge_and_the_product_counts_once()
+    {
+        // {B} enumerates one real row, then its enumeration collapses into a run of
+        // failures. The row read before the collapse keeps its claim, and {B} is
+        // counted once, not once per failed index.
+        const string merged = @"C:\Windows\Installer\merged-before-collapse.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.AddProduct("{B}");
+        // Index 0 is a real patch row; indices 1..20 refuse, a 20-run collapse that
+        // trips the per-product stop count.
+        var codes = new List<string> { "{P}" };
+        for (uint i = 1; i <= 20; i++) { codes.Add($"{{x{i}}}"); msi.PatchRowResult[("{B}", i)] = InvalidParameter; }
+        msi.PatchCodes["{B}"] = codes;
+        msi.SetPatchProperty("{P}", "{B}", "LocalPackage", merged);
+        msi.SetPatchProperty("{P}", "{B}", "State", "1");        // applied, non-removable
+        msi.SetPatchProperty("{P}", "{B}", "Uninstallable", "1");
+
+        var result = await Run(msi);
+
+        Assert.Contains(result.Packages, r => r.LocalPackagePath == merged); // the read row survived
+        Assert.Equal(1, result.UnreadableProductCount);                      // B counted once
+    }
+
+    [Fact]
+    public async Task A_run_of_empty_patch_guids_degrades_the_product_the_same_way_the_error_run_does()
+    {
+        // The other converted cap site: a sustained run of Success-with-no-GUID
+        // rows is the same "this product's rows are unreadable" state and must
+        // degrade identically, proving BOTH arms convert, not only the error one.
+        const string dead = @"C:\Windows\Installer\empty-run-other.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: dead, state: "2", uninstallable: "0"); // removable under A
+        msi.AddProduct("{B}");
+        msi.SetProductProperty("{B}", "LocalPackage", @"C:\Windows\Installer\b.msi");
+        msi.PatchCodes["{B}"] = Enumerable.Repeat("", 20).ToList(); // 20 Success returns, no GUID written
+
+        var result = await Run(msi); // completes: no throw
+
+        Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\b.msi");
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == dead);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+        Assert.Equal(1, result.UnreadableProductCount);
+        Assert.True(result.RecordsIncomplete);
+    }
+
+    [Fact]
+    public async Task Every_products_patch_enumeration_refusing_still_completes_with_a_clean_fallback()
+    {
+        // Even if EVERY product's patch enumeration refuses, a clean registry
+        // fallback keeps the scan a completed scan, reporting all of them
+        // unreadable rather than aborting.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.PatchEnumResult["{A}"] = InvalidParameter;
+        msi.AddProduct("{B}");
+        msi.SetProductProperty("{B}", "LocalPackage", @"C:\Windows\Installer\b.msi");
+        msi.PatchEnumResult["{B}"] = InvalidParameter;
+
+        var result = await Run(msi, fallbackFailures: 0);
+
+        Assert.Equal(2, result.UnreadableProductCount);
+        Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\a.msi");
+        Assert.Contains(result.Packages, r => r.LocalPackagePath == @"C:\Windows\Installer\b.msi");
+    }
+
+    [Fact]
+    public async Task A_patch_collapse_alongside_a_failing_fallback_still_refuses_the_scan()
+    {
+        // The both-sources-degraded gate must still fire when the API side is
+        // degraded by a patch collapse (not only by a product-row failure, which
+        // the existing gate test covers) and the registry fallback is ALSO failing
+        // reads: that is the state the withholding cannot cover.
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.SetProductProperty("{A}", "LocalPackage", @"C:\Windows\Installer\a.msi");
+        msi.PatchEnumResult["{A}"] = InvalidParameter;
+
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(
+            () => Run(msi, fallbackFailures: 1));
+
+        Assert.Equal(Strings.Error_ScanRecordsUnreadable, ex.Message);
+    }
+
+    [Fact]
+    public async Task A_reverify_over_a_patch_collapse_degraded_query_keeps_the_candidate_and_reports_why()
+    {
+        // End to end through the reverifier, off the REAL query degraded via the
+        // IMsiApi seam (RemovableReverifierTests pins the same behaviour off a
+        // mocked query). A patch-collapse-degraded query withholds the removable
+        // class, so a superseded candidate is kept in place at action time and the
+        // result says the records were incomplete, not that a program reclaimed it.
+        const string superseded = @"C:\Windows\Installer\reverify-collapse.msp";
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: superseded, state: "2", uninstallable: "0"); // removable under A
+        msi.AddProduct("{DL}");
+        msi.SetProductProperty("{DL}", "LocalPackage", @"C:\Windows\Installer\displaylink.msi");
+        msi.PatchEnumResult["{DL}"] = InvalidParameter; // the collapse that degrades the query
+
+        var reverifier = new RemovableReverifier(new InstallerQueryService(msi, NoFallback));
+        var result = await reverifier.ReverifyAsync(new[] { superseded });
+
+        Assert.Empty(result.Surviving);
+        Assert.Equal(new[] { superseded }, result.Dropped);
+        Assert.True(result.RecordsIncomplete);
     }
 
     // ---- An empty GUID accepted as success is not added ----

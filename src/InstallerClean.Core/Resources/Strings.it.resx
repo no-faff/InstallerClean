@@ -596,10 +596,9 @@
 InstallerClean era già in esecuzione come amministratore, quindi riavviarlo in quel modo non serve. Windows non dice altro su che cosa abbia negato l'accesso, quindi non c'è nulla di specifico da provare.</value></data>
   <!-- Fronts every LocalisedInvalidOperationException in the scan ladder, so it
        must be true of all of them: InstallerDbEmpty, MsiNonSuccess,
-       MsiEnumerationNeverEnded, MsiPatchNonSuccess,
-       MsiPatchEnumerationNeverEnded, ScanRecordsUnreadable and
-       ScanCorrelationFailed. "Records" rather than "database" because that is
-       the word every one of those bodies uses. -->
+       MsiEnumerationNeverEnded, MsiPatchEnumerationNeverEnded,
+       ScanRecordsUnreadable and ScanCorrelationFailed. "Records" rather than
+       "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Impossibile leggere i record di Windows Installer</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scansione non riuscita</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>I record di Windows Installer sono tornati completamente vuoti: nemmeno un programma installato o un aggiornamento rivendica un file di installazione nella cache. Su una macchina funzionante questo non succede (perfino un'installazione di Windows appena fatta ne ha qualcuno), quindi o i record sono danneggiati o non è stato possibile leggerli, e una scansione che credesse a questa risposta classificherebbe erroneamente come orfano ogni file in C:\Windows\Installer. InstallerClean si è fermato invece di farlo. Non è stato rimosso nulla.</value></data>
@@ -614,9 +613,6 @@ InstallerClean era già in esecuzione come amministratore, quindi riavviarlo in 
        count) and 1 = the last row's error code, which here is Success (0) when
        every row read cleanly and the list simply never terminated. -->
   <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer non ha mai segnalato la fine dell'elenco dei programmi installati: InstallerClean ha rinunciato dopo {0} voci (ultimo codice di errore {1}). Di un elenco senza fine non ci si può fidare, quindi InstallerClean si è fermato. Non è stato rimosso nulla.</value></data>
-  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
-       runs per product and fails on its own. Same two placeholders. -->
-  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer non è riuscito a fornire a InstallerClean un elenco leggibile delle patch di un programma: {0} voci di seguito sono tornate illeggibili (ultimo codice di errore {1}). Invece di lavorare su un elenco letto solo in parte, InstallerClean si è fermato. Non è stato rimosso nulla.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same two placeholders. -->
   <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer non ha mai segnalato la fine dell'elenco delle patch di un programma: InstallerClean ha rinunciato dopo {0} voci (ultimo codice di errore {1}). Di un elenco senza fine non ci si può fidare, quindi InstallerClean si è fermato. Non è stato rimosso nulla.</value></data>

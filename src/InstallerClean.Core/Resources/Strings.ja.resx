@@ -596,10 +596,9 @@
 InstallerClean はすでに管理者として実行されていたため、同じように起動し直しても解決しません。Windows は何がアクセスを拒否したのかそれ以上説明しないため、具体的に試せることはありません。</value></data>
   <!-- Fronts every LocalisedInvalidOperationException in the scan ladder, so it
        must be true of all of them: InstallerDbEmpty, MsiNonSuccess,
-       MsiEnumerationNeverEnded, MsiPatchNonSuccess,
-       MsiPatchEnumerationNeverEnded, ScanRecordsUnreadable and
-       ScanCorrelationFailed. "Records" rather than "database" because that is
-       the word every one of those bodies uses. -->
+       MsiEnumerationNeverEnded, MsiPatchEnumerationNeverEnded,
+       ScanRecordsUnreadable and ScanCorrelationFailed. "Records" rather than
+       "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Windows Installer の登録情報を読み取れませんでした</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>スキャンに失敗しました</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer の登録情報が完全に空の状態で返されました。インストール済みのプログラムも更新プログラムも、キャッシュされたインストーラーファイルを一つも要求していません。正常に動作しているコンピューターでは起こらないこと (インストール直後の Windows にも該当するファイルはあります) なので、登録情報が破損しているか、読み取れなかったかのいずれかです。この答えを信じたスキャンは、C:\Windows\Installer 内のすべてのファイルを誤って孤立と判定してしまいます。InstallerClean はそうせずに中止しました。何も削除していません。</value></data>
@@ -614,9 +613,6 @@ InstallerClean はすでに管理者として実行されていたため、同�
        count) and 1 = the last row's error code, which here is Success (0) when
        every row read cleanly and the list simply never terminated. -->
   <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer がインストール済みプログラムの一覧の終わりを最後まで知らせませんでした。InstallerClean は {0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。何も削除していません。</value></data>
-  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
-       runs per product and fails on its own. Same two placeholders. -->
-  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer は InstallerClean に、あるプログラムのパッチの読み取り可能な一覧を渡せませんでした。{0} 件の項目が連続して読み取り不能で返されました (最後のエラーコード{1})。一部しか読めていない一覧を使うのではなく、InstallerClean は中止しました。何も削除していません。</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same two placeholders. -->
   <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer があるプログラムのパッチ一覧の終わりを最後まで知らせませんでした。InstallerClean は {0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。何も削除していません。</value></data>

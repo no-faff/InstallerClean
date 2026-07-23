@@ -717,9 +717,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// <summary>
     /// Enumerates one product's patches. <c>Incomplete</c> reports that at least
     /// one row was skipped, which costs this product's claim on whatever patch
-    /// the row named. It reaches the same demotion the product loop's skips do:
-    /// the two loops tolerate a bad row identically, so they open the identical
-    /// corridor and a verdict built through either is short the same way.
+    /// the row named, and reaches the same demotion the product loop's skips do:
+    /// the two loops tolerate a bad row identically, so a verdict built through
+    /// either is short the same way.
+    ///
+    /// A sustained run of unreadable rows for ONE product ends that product's
+    /// enumeration and returns <c>Incomplete</c>, rather than aborting the whole
+    /// scan. The failure is one product's, and the machinery the caller already
+    /// runs contains it: the product counts once in the unreadable tally, the
+    /// removable class is withheld scan-wide, and the registry fallback still
+    /// claims that product's cached files so none are offered. This is the honest
+    /// answer to a per-user instance recorded under a SID the enumerator emits but
+    /// then rejects as input, where every index refuses identically: the scan
+    /// declines to assert a patch list Windows will not hand over, rather than
+    /// losing the whole scan over it. Only a machine-level breakdown stays
+    /// scan-fatal (the AccessDenied and never-ended-cap throws below).
     /// </summary>
     private (List<(string PatchCode, string? UserSid, MsiInstallContext Context)> Patches, bool Incomplete)
         EnumeratePatches(
@@ -789,9 +801,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // the tolerance rather than adding an empty row.
                     consecutiveNonSuccess++;
                     incomplete = true;
+                    // A run of empty GUIDs is the same "this product's rows are
+                    // unreadable" state as the non-success arm below, and degrades
+                    // the same way: end this product's enumeration, mark it
+                    // incomplete, leave the scan running (see this method's summary
+                    // and the non-success arm for why one product's loss is not the
+                    // scan's).
                     if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
-                        throw new LocalisedInvalidOperationException(
-                            string.Format(Strings.Error_MsiPatchNonSuccess, consecutiveNonSuccess, error));
+                    {
+                        LogPatchEnumerationAbandoned(productCode, context, userSid, error, index);
+                        return (results, incomplete);
+                    }
                     continue;
                 }
 
@@ -802,17 +822,28 @@ public sealed class InstallerQueryService : IInstallerQueryService
             {
                 consecutiveNonSuccess++;
                 incomplete = true;
-                // Match EnumerateProducts: throw rather than silently
-                // truncate. A patch enumeration that returns a few real
-                // entries then collapses to non-success would otherwise
-                // leave real-but-superseded patches missing from the
-                // result set, classifying them as orphaned and offering
-                // them for cleanup. Throwing surfaces the API failure
-                // to the caller (the scan command's catch routes it
-                // to a dialog and to crash.log).
+                // One product whose patch rows keep coming back unreadable is a
+                // per-product loss, not a scan failure: stop enumerating THIS
+                // product's patches and return Incomplete so the caller records
+                // one unreadable product and carries on. The reason it is safe to
+                // stop rather than abort is the same reason a scattered skip is:
+                // the removable class is withheld scan-wide the moment any product
+                // is short (so no superseded patch is offered on a run that lost a
+                // claim), and the registry fallback claims this product's cached
+                // .msp/.msi files independently of the API (so none looks
+                // orphaned). What that costs is real and deliberate: the
+                // withholding is scan-wide, and on a machine whose registration
+                // keeps refusing one product's patch list every scan, it is the
+                // steady state until the registration itself changes, not a
+                // transient. Declining to name a patch list Windows refuses to
+                // return beats guessing at one. Orphan cleanup is unaffected. A
+                // whole-machine breakdown is a different case and still aborts: the
+                // AccessDenied and never-ended-cap throws above stay fatal.
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
-                    throw new LocalisedInvalidOperationException(
-                        string.Format(Strings.Error_MsiPatchNonSuccess, consecutiveNonSuccess, error));
+                {
+                    LogPatchEnumerationAbandoned(productCode, context, userSid, error, index);
+                    return (results, incomplete);
+                }
             }
         }
 
@@ -825,6 +856,26 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         return (results, incomplete);
     }
+
+    /// <summary>
+    /// Records that one product's patch enumeration was abandoned after a full run
+    /// of unreadable rows. Dev-facing crash-log breadcrumb only, deliberately not
+    /// localised and never surfaced: the user is told a program could not be read
+    /// through the scan summary's kept-patches notice, which carries no product
+    /// identity, whereas diagnosing WHY the withholding fired needs exactly that
+    /// identity. Without this line the abandonment left no record of which product
+    /// triggered it, so a field report could be pinned to a product only by the
+    /// reporter running the Windows Installer API by hand. Carries the product
+    /// code, its install context and SID (the round-trip that fails when the SID
+    /// is one the enumerator emits but rejects), the last error code, and the
+    /// index reached.
+    /// </summary>
+    private static void LogPatchEnumerationAbandoned(
+        string productCode, MsiInstallContext context, string? userSid, uint lastError, uint index) =>
+        Helpers.CrashLog.Write(new InvalidOperationException(
+            $"Patch enumeration abandoned for product {productCode} (context {context}, SID {userSid ?? "none"}) " +
+            $"after {MaxConsecutiveNonSuccess} consecutive unreadable rows; last error code {lastError}, reached index {index}. " +
+            "Superseded-patch cleanup is withheld scan-wide; this product's cached files are kept via the registry fallback."));
 
     /// <summary>
     /// One property read's outcome. The returned value alone cannot carry it:

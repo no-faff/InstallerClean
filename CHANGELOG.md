@@ -2,6 +2,12 @@
 
 Every change to InstallerClean, logged in full (not just the user-facing highlights). Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - Unreleased
+
+### Fixed
+
+- A single installed program whose patch list Windows refuses to return no longer stops the whole scan. This can happen with an unusual but valid registration (a per-user program recorded under a system account, as some corporate DisplayLink deployments are), where Windows rejects every entry in that one program's patch list: the scan now sets that program aside and keeps all of its cached files, reporting it through the existing "N installed programs could not be read during this scan, so superseded patches have been kept" notice, instead of failing with "Scan failed" and cleaning nothing. Orphaned-file cleanup, the app's main job, is unaffected.
+
 ## [2.2.0] - 2026-07-23
 
 ### Added

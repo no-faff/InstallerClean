@@ -596,10 +596,9 @@
 InstallerClean уже был запущен от имени администратора, поэтому повторный запуск таким же образом не поможет. Windows не сообщает ничего больше о том, что именно отказало в доступе, поэтому пробовать что-то конкретное бессмысленно.</value></data>
   <!-- Fronts every LocalisedInvalidOperationException in the scan ladder, so it
        must be true of all of them: InstallerDbEmpty, MsiNonSuccess,
-       MsiEnumerationNeverEnded, MsiPatchNonSuccess,
-       MsiPatchEnumerationNeverEnded, ScanRecordsUnreadable and
-       ScanCorrelationFailed. "Records" rather than "database" because that is
-       the word every one of those bodies uses. -->
+       MsiEnumerationNeverEnded, MsiPatchEnumerationNeverEnded,
+       ScanRecordsUnreadable and ScanCorrelationFailed. "Records" rather than
+       "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Не удалось прочитать записи установщика Windows</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Сбой сканирования</value></data>
   <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Записи установщика Windows вернулись совершенно пустыми: ни одна установленная программа и ни одно обновление не заявляет прав на кэшированный файл установщика. На работающем компьютере такого не бывает (даже у свежей установки Windows такие файлы есть), значит, записи либо повреждены, либо их не удалось прочитать, и сканирование, поверившее такому ответу, ошибочно сочло бы бесхозным каждый файл в C:\Windows\Installer. Вместо этого InstallerClean остановился. Ничего не было удалено.</value></data>
@@ -614,9 +613,6 @@ InstallerClean уже был запущен от имени администра
        count) and 1 = the last row's error code, which here is Success (0) when
        every row read cleanly and the list simply never terminated. -->
   <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer так и не сообщил о конце списка установленных программ: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>
-  <!-- The sibling of Error.MsiNonSuccess for the patch enumeration, which
-       runs per product and fails on its own. Same two placeholders. -->
-  <data name="Error.MsiPatchNonSuccess" xml:space="preserve"><value>Windows Installer не смог предоставить InstallerClean читаемый список патчей одной программы: {0} записей подряд вернулись нечитаемыми (последний код ошибки {1}). Вместо того чтобы работать с прочитанным лишь частично списком, InstallerClean остановился. Ничего не было удалено.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same two placeholders. -->
   <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer так и не сообщил о конце списка патчей одной программы: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>

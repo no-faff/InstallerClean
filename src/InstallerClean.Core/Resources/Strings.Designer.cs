@@ -271,7 +271,6 @@ public static class Strings
     public static string Error_MsiEnumerationNeverEnded => Get("Error.MsiEnumerationNeverEnded");
     public static string Error_MsiNonSuccess => Get("Error.MsiNonSuccess");
     public static string Error_MsiPatchEnumerationNeverEnded => Get("Error.MsiPatchEnumerationNeverEnded");
-    public static string Error_MsiPatchNonSuccess => Get("Error.MsiPatchNonSuccess");
     public static string Error_NotEnoughSpaceBody => Get("Error.NotEnoughSpaceBody");
     public static string Error_NotEnoughSpaceTitle => Get("Error.NotEnoughSpaceTitle");
     public static string Error_NoUniqueFilename => Get("Error.NoUniqueFilename");
