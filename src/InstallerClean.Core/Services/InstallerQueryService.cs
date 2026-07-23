@@ -838,7 +838,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // transient. Declining to name a patch list Windows refuses to
                 // return beats guessing at one. Orphan cleanup is unaffected. A
                 // whole-machine breakdown is a different case and still aborts: the
-                // AccessDenied and never-ended-cap throws above stay fatal.
+                // AccessDenied and never-ended-cap throws stay fatal.
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                 {
                     LogPatchEnumerationAbandoned(productCode, context, userSid, error, index);
@@ -863,8 +863,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// localised and never surfaced: the user is told a program could not be read
     /// through the scan summary's kept-patches notice, which carries no product
     /// identity, whereas diagnosing WHY the withholding fired needs exactly that
-    /// identity. Without this line the abandonment left no record of which product
-    /// triggered it, so a field report could be pinned to a product only by the
+    /// identity. Without this line the abandonment leaves no record of which product
+    /// triggered it, so a field report can be pinned to a product only by the
     /// reporter running the Windows Installer API by hand. Carries the product
     /// code, its install context and SID (the round-trip that fails when the SID
     /// is one the enumerator emits but rejects), the last error code, and the
