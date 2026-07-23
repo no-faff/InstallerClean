@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.2.0-blue" alt="GitHub 릴리스"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-39k-brightgreen" alt="총 다운로드 수"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-40k-brightgreen" alt="총 다운로드 수"></a>
 </p>
 
 ![성공적으로 정리를 마친 뒤의 InstallerClean 화면: 1.28 GB 정리, 69개 파일을 휴지통으로 이동함](docs/screenshots/ko/07-success-done.webp)
@@ -163,7 +163,7 @@ InstallerClean은 불필요한 파일을 세 종류로 구분해 찾아냅니다
 
 **삭제와 이동에 관하여.** InstallerClean이 삭제하는 파일은 영구히 지워도 안전합니다. **삭제**는 파일을 휴지통으로 이동합니다(휴지통을 쓸 수 없으면 알려 드립니다). 휴지통을 비우면 그만큼의 공간이 C: 드라이브로 돌아옵니다.
 
-그렇지만 파일이 삭제해도 안전하다는 걸 제 말만 믿으실 필요는 없습니다. 파일이 휴지통에 있는 동안, 이 폴더를 쓰는 앱들, 즉 Office, Acrobat, Visual Studio 같은 프로그램이 여전히 문제없이 업데이트되고 제거되는지 확인할 기회가 있습니다. 혹시 뭔가 망가진 걸 발견하셨다면(그럴 가능성은 극히 낮고, <!-- downloads-start -->39,000+<!-- downloads-end --> 회 다운로드되는 동안 보고된 사례는 아직 없습니다) 휴지통에서 파일을 복원해 되돌리면 됩니다. 더 확실히 하고 싶다면 대신 **이동**을 써서 파일을 직접 고른 폴더에 백업해 둘 수 있습니다(C: 공간을 비우는 것이 목적이라면 당연히 다른 파티션이나 드라이브에 있는 폴더를 고르세요). 원래대로 되돌리려면 파일을 `C:\Windows\Installer`로 다시 복사하기만 하면 됩니다(다만 그럴 일은 거의 확실히 없을 겁니다). 파일 이름에 “(1)”이 붙어 있다면(같은 폴더로 두 번 이동하면 그렇게 됩니다) 파일을 다시 복사하기 전에 그 부분을 지우세요.
+그렇지만 파일이 삭제해도 안전하다는 걸 제 말만 믿으실 필요는 없습니다. 파일이 휴지통에 있는 동안, 이 폴더를 쓰는 앱들, 즉 Office, Acrobat, Visual Studio 같은 프로그램이 여전히 문제없이 업데이트되고 제거되는지 확인할 기회가 있습니다. 혹시 뭔가 망가진 걸 발견하셨다면(그럴 가능성은 극히 낮고, <!-- downloads-start -->40,000+<!-- downloads-end --> 회 다운로드되는 동안 보고된 사례는 아직 없습니다) 휴지통에서 파일을 복원해 되돌리면 됩니다. 더 확실히 하고 싶다면 대신 **이동**을 써서 파일을 직접 고른 폴더에 백업해 둘 수 있습니다(C: 공간을 비우는 것이 목적이라면 당연히 다른 파티션이나 드라이브에 있는 폴더를 고르세요). 원래대로 되돌리려면 파일을 `C:\Windows\Installer`로 다시 복사하기만 하면 됩니다(다만 그럴 일은 거의 확실히 없을 겁니다). 파일 이름에 “(1)”이 붙어 있다면(같은 폴더로 두 번 이동하면 그렇게 됩니다) 파일을 다시 복사하기 전에 그 부분을 지우세요.
 
 Windows Installer가 지금 캐시에 쓰고 있거나, 이전 트랜잭션이 중단된 상태이거나, 캐시를 대상으로 한 재부팅 후 이름 변경이 대기 중이면, 이동과 삭제가 비활성화되고 구체적인 이유가 표시됩니다.
 
@@ -175,7 +175,7 @@ Windows Installer가 지금 캐시에 쓰고 있거나, 이전 트랜잭션이 �
 - VirusTotal: 모든 빌드를 스캔하며, 엔진별 전체 결과를 해당 릴리스 페이지에 링크해 두어 각 파일이 어떤 점수를 받았는지 확인하고 직접 다시 스캔해 볼 수 있습니다. 릴리스가 나가는 시점에 살아 있는 오탐은 해당 릴리스 페이지에서 이름을 밝히고 설명하며, 업체가 이를 철회하면 그 페이지를 갱신합니다.
 - 소스는 [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean)에 있고, CI가 모든 커밋을 빌드하고 테스트합니다(위의 초록색 CI 배지를 참고하세요).
 - 릴리스 빌드는 결정적입니다. 컴파일러 설정 덕분에 같은 소스와 같은 SDK에서는 언제나 같은 바이트가 나오고, 배포하는 exe가 바로 그 태그의 깨끗한 작업 트리에서 빌드된 것이 아니면 릴리스 과정이 해당 버전에 태그를 다는 것을 거부합니다. 그래서 태그를 체크아웃해 직접 빌드한 뒤 해시를 공개된 해시와 비교해 보실 수 있습니다. 내려받은 파일이 공개된 소스와 일치한다는 것이 그렇게 증명됩니다. 먼저 SDK 버전을 맞추세요(각 릴리스 노트에 어떤 SDK로 빌드했는지 적어 두었습니다). SDK 패치 버전이 다르면 나오는 바이트도 달라지는데, 이는 불일치처럼 보일 뿐 실제로는 아닙니다.
-- GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->39,000+<!-- downloads-end --> 회 다운로드되었습니다.
+- GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->40,000+<!-- downloads-end --> 회 다운로드되었습니다.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html)는 제출된 각 파일을 가상 머신에서 테스트하고, 자체 검토를 통과한 경우에만 목록에 올립니다.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 인증 100% 클린" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml)는 각 릴리스를 바이러스, 스파이웨어, 애드웨어에 대해 검사합니다.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 인증 100% 클린" width="190"></a>
 
