@@ -786,11 +786,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // this product without recording the loss, so neither the
                 // scan-wide removable withholding nor the both-sources-degraded
                 // gate would see it and the scan would report itself complete
-                // while short of a claim. What separates this from the run of
-                // unreadable rows that degrades instead (below) is exactly that:
-                // the run returns Incomplete, and a break returns nothing at all.
-                // The scan command's catch routes this to a dialog and to
-                // crash.log.
+                // while short of a claim. That is what separates it from the run
+                // of unreadable rows that degrades instead (below): the run
+                // returns Incomplete, where a break would return with the flag
+                // still false. The scan command's catch routes this to a dialog
+                // and to crash.log.
                 throw new LocalisedAccessException(Strings.Error_MsiAccessDenied);
 
             lastError = error;
