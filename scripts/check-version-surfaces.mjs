@@ -61,8 +61,9 @@ for (const [path, name] of MANIFESTS) {
 if (problems.length) {
   console.error(`check-version-surfaces: ${PROPS} says ${version}, so the manifests should say ${expected}.\n`);
   for (const p of problems) console.error(`  ${p}`);
-  console.error(`\nFix: ./non-repo-files/bump-version.sh ${version}`);
-  console.error('It stamps the props and both manifests from one argument.');
+  console.error(`\nFix: set <Version> in ${PROPS} to ${version} and the assemblyIdentity`);
+  console.error(`version in each manifest to ${expected}. The release bump script stamps`);
+  console.error('all three from one argument.');
   process.exit(1);
 }
 

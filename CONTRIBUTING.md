@@ -44,11 +44,29 @@ If you find a bug or have a feature idea, open an issue. Please include:
 ## Translations
 
 InstallerClean ships in 16 languages: the app, the installer, the command-line
-tool and the README. The string tables in
-[`docs/translations/`](docs/translations/) show every line in English beside
-each language. If something reads wrong in your language, open a
+tool and the README.
+
+To read a translation, the string tables in
+[`docs/translations/`](docs/translations/) show every line in English beside each
+language. Those pages are generated, though, so a change made there can't be
+used. The translations themselves live in
+[`scripts/translations/`](scripts/translations/), one file per language, and
+that's the one to edit.
+
+Open the file for your language, find the English line you want to fix, and
+change the words next to it. Leave the rest of the file alone, since that's the
+machinery that builds the app's string files. Then open a pull request, with as
+few or as many changes as you like.
+
+What I'll do with it: I'll merge it first, and then if I disagree with anything
+I'll change it in a commit of my own afterwards, rather than editing your work
+before it lands. That way the history shows what you wrote and what I changed,
+and you can tell me if I've got it wrong. I'd rather do it that way round than
+quietly rewrite you.
+
+If you'd rather not use git at all, a
 [translation-feedback issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md)
-or a pull request, with as few or as many changes as you like.
+or a [discussion](../../discussions) is just as welcome.
 
 ## Pull requests
 

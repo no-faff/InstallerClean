@@ -7,13 +7,13 @@
 // what makes that visible on every push rather than only to whoever reads a
 // generator's self-check.
 //
-// It is the CI-runnable aggregate of each gen-strings-<code>.mjs self-check. The
-// generators live under the gitignored non-repo-files/ and are absent in a CI
-// checkout, so this reads only the committed resx and reproduces their "still
-// English" test directly: a required key whose satellite value equals the neutral
-// value is untranslated, unless it is a legitimate keep (below). Keep the keep
-// lists in step with the generators' KEEP_ENGLISH / ALSO_KEEP; adding a language
-// means adding its ALSO_KEEP here too.
+// It is the CI-runnable aggregate of each gen-strings-<code>.mjs self-check.
+// Nothing in CI runs the generators, and it is the committed resx that ships, so
+// this reads those directly and reproduces the generators' "still English" test:
+// a required key whose satellite value equals the neutral value is untranslated,
+// unless it is a legitimate keep (below). Keep the keep lists in step with the
+// generators' KEEP_ENGLISH / ALSO_KEEP; adding a language means adding its
+// ALSO_KEEP here too.
 //
 // WIRING: a required CI step (ci.yml). So a new or reworded key must be
 // translated before its branch can go green, which is the point: it is the only

@@ -1,0 +1,634 @@
+#!/usr/bin/env node
+// German (de) satellite generator for InstallerClean. Copied from
+// gen-strings-template.mjs (the full-resx template) and filled with German.
+// It works FROM THE ENGLISH SOURCE (Strings.resx): it reads the neutral as the
+// structural base, strips ONLY the 21 machine-contract Cli.* keys, replaces the
+// inner <value> of every other key from the MAP below, appends the satellite-only
+// .One override(s), writes LF/UTF-8 and self-verifies against the neutral.
+//
+// German plural class: CategoryFor returns One only at n==1, else Other (the
+// "default" branch, same selector as es/it). German past participles do NOT
+// inflect for number (gefunden / gelöscht / verschoben are identical at 1 and
+// many), so the three CLI completion lines es/it overrode (Cli.FoundOrphans,
+// Cli.DeletedFiles, Cli.MovedFiles) need no override here. German DOES inflect
+// the finite verb (wird/werden) and the attributive adjective
+// ("1 registriertes Paket" vs "120 registrierte Pakete"), so there are FIVE
+// .One overrides: the attributive Status.RegisteredPackagesFound, and the four
+// count-bearing PROGRESS lines (Status.Moving/Deleting, Cli.DeletingFiles/
+// MovingFiles), whose base is the werden-form and whose .One is the wird-form.
+// Those four are routed through DisplayHelpers.Pluralise, so the .One keys fire
+// at n==1.
+import { readFileSync, writeFileSync } from 'node:fs';
+
+const dir = 'src/InstallerClean.Core/Resources';
+const BASE = `${dir}/Strings.resx`;            // English source (the "neutral")
+const OUT = `${dir}/Strings.de.resx`;
+
+// Universal keeps: values identical in every language (brand names, the pure-
+// placeholder string, the size/elapsed format strings). Do NOT edit per language.
+const KEEP_ENGLISH = new Set([
+  'Window.Main.Title',                 // InstallerClean
+  'Startup.AlreadyRunningTitle',       // InstallerClean
+  'Startup.UnhandledTitle',            // InstallerClean
+  'Automation.ScanResultAnnouncement', // {0} ({1})
+  'Display.Size.GB',                   // {0:F2} GB
+  'Display.Size.MB',                   // {0:F1} MB
+  'Display.Size.KB',                   // {0:F1} KB
+  'Display.Size.B',                    // {0} B
+  'Display.Elapsed.Ms',                // {0:F0}ms
+  'Display.Elapsed.S',                 // {0:F1}s
+]);
+
+// Per-language keeps: German words that are byte-identical to the English source
+// and are the correct, natural German term, so their still-"English" value is not
+// a miss. All single tokens: "Patches" (naturalised German plural of der Patch),
+// "Details" (das Detail/die Details) and "Version" (das Version-loanword stem).
+const ALSO_KEEP = [
+  'Section.Registered.Patches',  // PATCHES
+  'Field.Patches',               // Patches
+  'Automation.Section.Patches',  // Patches
+  'Action.Details',              // Details
+  'Version.Display',             // Version {0}
+];
+
+// Satellite-only .One override(s). NOT in the neutral; appended before </root>.
+// check-resx-parity.mjs allows each because its base (the flat key itself) is in
+// the neutral. The value's {N} set matches the base key's set.
+const OVERRIDES = {
+  'Status.RegisteredPackagesFound.One': `{0} registriertes {1} gefunden.`,
+  'Status.Moving.One': `{0} {1} wird verschoben...`,
+  'Status.Deleting.One': `{0} {1} wird gelöscht...`,
+  'Cli.DeletingFiles.One': `{0} {1} wird gelöscht...`,
+  'Cli.MovingFiles.One': `{0} {1} wird nach {2} verschoben...`,
+};
+
+const MAP = {
+  // Window titles
+  'Window.Main.Title': `InstallerClean`,
+  'Window.About.Title': `Über`,
+  'Window.Registered.Title': `Registrierte Dateien, die nicht gelöscht werden sollten`,
+  'Window.Orphaned.Title': `Nicht benötigte Dateien, die bedenkenlos gelöscht werden können`,
+
+  // Section headings
+  'Section.Registered.Products': `PRODUKTE`,
+  'Section.Registered.Patches': `PATCHES`,
+  'Section.Registered.Details': `PRODUKTDETAILS`,
+  'Section.Move.Location': `ZIELORT`,
+  'Section.SayThanks': `DANKE SAGEN`,
+
+  // Field labels (used in detail panels)
+  'Field.Reason': `Grund`,
+  'Field.Author': `Autor`,
+  'Field.Application': `Anwendung`,
+  'Field.Title': `Titel`,
+  'Field.Subject': `Betreff`,
+  'Field.Keywords': `Schlüsselwörter`,
+  'Field.SigningCertificate': `Signaturzertifikat`,
+  'Field.FileSize': `Dateigröße`,
+  'Field.Comment': `Kommentar`,
+  'Field.ProductName': `Produktname`,
+  'Field.File': `Datei`,
+  'Field.Size': `Größe`,
+  'Field.Patches': `Patches`,
+
+  // Placeholder shown for a registered package whose API ProductName is empty.
+  'Field.UnknownProductName': `(unbekannt)`,
+  'Field.PatchesOnly': `(nur Patches)`,
+  'Field.Missing': `fehlt`,
+
+  // Actions (button labels; underscore prefixes are WPF mnemonics)
+  'Action.About': `_Über`,
+  'Action.Copy': `Kopieren`,
+  'Action.Cut': `Ausschneiden`,
+  'Action.Paste': `Einfügen`,
+  'Action.SelectAll': `Alles auswählen`,
+  'Action.Browse': `_Durchsuchen...`,
+  'Action.Cancel': `_Abbrechen`,
+  'Action.CheckForUpdates': `Nach _Updates suchen`,
+  'Action.Close': `_Schließen`,
+  'Action.Delete': `_Löschen`,
+  'Action.DeletePermanently': `Endgültig _löschen`,
+  'Action.Done': `_Fertig`,
+  'Action.Details': `Details`,
+  'Action.BuyMeACuppa': `Spendier mir einen _Kaffee`,
+  'Action.LeaveStarOnGitHub': `Einen Stern auf _GitHub hinterlassen`,
+  'Action.Licence': `Apache-2.0-Lizenz`,
+  'Action.Move': `_Verschieben`,
+  'Action.MoveInstead': `Stattdessen _verschieben`,
+  'Action.MoveDestinationPlaceholder': `Ordnerpfad, falls du verschiebst statt löschst`,
+  'Action.OpenReleasePage': `_Release-Seite öffnen`,
+  'Action.Rescan': `_Neu scannen`,
+  'Action.ScanAgain': `Erneut _scannen`,
+  'Action.SendResultLog': `Bericht senden`,
+  'Action.SendResultLogConfirm': `_Senden`,
+
+  // Automation names (screen reader / accessibility)
+  'Automation.BuyMeACuppa': `Spenden`,
+  'Automation.BuyMeACuppa.About': `Spendier mir einen Kaffee`,
+  'Automation.CancelOperation': `Vorgang abbrechen`,
+  'Automation.CancelScan': `Scan abbrechen`,
+  'Automation.CancelStartupScan': `Start-Scan abbrechen`,
+  'Automation.Close': `Schließen`,
+  'Automation.CloseWindow': `Fenster schließen`,
+  'Automation.CloseResult': `Ergebnis schließen und zum Hauptfenster zurückkehren`,
+  'Automation.LeaveStarOnGitHub.About': `Einen Stern auf github hinterlassen`,
+  'Automation.Minimise': `Minimieren`,
+  'Automation.ConfirmDelete': `Löschen verschiebt die nicht benötigten Dateien in den Papierkorb. Abbrechen schließt, ohne zu löschen.`,
+  'Automation.ConfirmMove': `Verschieben legt die nicht benötigten Dateien in den gewählten Zielordner. Abbrechen lässt sie, wo sie sind.`,
+  'Automation.RecycleUnavailable': `Wähle, wie mit den nicht benötigten Dateien verfahren werden soll: an einen sicheren Ort verschieben, endgültig löschen oder abbrechen.`,
+  'Automation.RecycleUnavailableMove': `Die nicht benötigten Dateien in einen von dir gewählten Ordner verschieben`,
+  'Automation.RecycleUnavailableDeletePermanently': `Die nicht benötigten Dateien endgültig löschen, weil der Papierkorb für dieses Laufwerk nicht verfügbar ist`,
+  'Automation.SayThanks': `Danke sagen`,
+  'Automation.ConfirmSendResultLog': `Senden übermittelt den angezeigten Bericht an No Faff. Abbrechen sendet nichts.`,
+  'Automation.CheckForUpdates': `Nach Updates suchen`,
+  'Automation.CheckForUpdates.HelpText': `Sucht auf der Release-Seite von github nach einer neueren Version.`,
+  'Automation.UpdateAvailable.HelpText': `Öffne die Release-Seite, um die neuere Version herunterzuladen, oder brich ab, um die aktuelle Version zu behalten.`,
+  'Automation.Licence.HelpText': `Öffnet die Lizenzdatei auf github.com in deinem Browser.`,
+  'Automation.Section.MoveLocation': `Zielort`,
+  'Automation.Section.Products': `Produkte`,
+  'Automation.Section.Patches': `Patches`,
+  'Automation.Section.ProductDetails': `Produktdetails`,
+  'Automation.MoveDestinationFolder': `Zielort`,
+  'Automation.OperationProgress': `Vorgangsfortschritt`,
+  'Automation.RescanInstaller': `{InstallerFolder} erneut scannen`,
+  'Automation.ScanningProgress': `Scan-Fortschritt`,
+  'Automation.StartupScanProgress': `Fortschritt des Start-Scans`,
+  'Automation.ViewOrphanedFiles': `Details, nicht benötigte Dateien`,
+  'Automation.ViewOrphanedFiles.HelpText': `Zum Aufräumen verfügbar.`,
+  'Automation.ViewRegisteredFiles': `Details, registrierte Dateien`,
+  'Automation.ViewRegisteredFiles.HelpText': `Schreibgeschützte Übersicht.`,
+  'Automation.SortStatus.Ascending': `Sortiert nach {0}, aufsteigend`,
+  'Automation.SortStatus.Descending': `Sortiert nach {0}, absteigend`,
+  'Automation.Scroll.ScanResults': `Scan-Ergebnisse`,
+  'Automation.Scroll.ResultDetails': `Ergebnisdetails`,
+  'Automation.Scroll.FileDetails': `Dateidetails`,
+  'Automation.Scroll.DialogBody': `Dialogtext`,
+  'Automation.ScanResultAnnouncement': `{0} ({1})`,
+  'Automation.CompletionErrors': `Dateien, die nicht verarbeitet werden konnten`,
+  'Automation.RegisteredMissingSeeAlso': `Erklärt diesen Ordner, und wie sich eine Datei wiederherstellen lässt, im README`,
+
+  // Tooltips
+  'Tooltip.BuyMeACuppa.About': `Das macht durstig!`,
+  'Tooltip.CancellingPending': `Abbruch angefordert. InstallerClean wartet, bis der aktuelle Schritt einen Haltepunkt erreicht. Bei starker Datenträgeraktivität oder einem MSI-Datenbankaufruf kann das ein paar Sekunden dauern.`,
+  'Tooltip.Close': `Schließen`,
+  'Tooltip.LeaveStarOnGitHub.About': `Ein Stern hilft anderen, InstallerClean zu finden.`,
+  'Tooltip.Minimise': `Minimieren`,
+  'Tooltip.SendResultLog': `Ganz wie du magst, aber ich freue mich darüber. Sendet eine anonyme Zusammenfassung, die mir nur zeigt, ob es funktioniert und wie viel Platz die Leute freigeben. Auf dem nächsten Bildschirm siehst du vor dem Bestätigen, was gesendet wird.`,
+  'Tooltip.SendResultLog.NothingFound': `Ganz wie du magst, aber ich freue mich darüber. Sendet eine anonyme Zusammenfassung, die mir nur zeigt, ob es funktioniert. Auf dem nächsten Bildschirm siehst du vor dem Bestätigen, was gesendet wird.`,
+  'Tooltip.Move': `Verschiebt die nicht benötigten Dateien an den Zielort.`,
+  'Tooltip.MoveNeedsDestination': `Verschiebt die nicht benötigten Dateien an einen sicheren Ort. Den Ordner wählst du als Nächstes.`,
+  'Tooltip.Delete': `Verschiebt die nicht benötigten Dateien in den Papierkorb.`,
+  'Tooltip.SigningCertificate': `Antragstellername aus dem eingebetteten Authenticode-Zertifikat. Die Zertifikatskette wurde nicht geprüft.`,
+
+  // Body copy
+  'Body.MainExplanation.Lead': `Etwaige nicht benötigte Dateien unten können bedenkenlos gelöscht werden.`,
+  'Body.MainExplanation.Why': `Sie liegen in {InstallerFolder} und blieben zurück, als ein Programm deinstalliert wurde ({0}), ein neuerer Patch einen älteren ersetzt hat ({1}) oder der Herausgeber ihn zurückgezogen hat ({2}). InstallerClean listet nur Dateien auf, die Windows selbst als erledigt meldet.`,
+  'Body.MainExplanation.Action': `Lösche sie in den Papierkorb, oder nutze stattdessen Verschieben, um eine Sicherungskopie zu behalten. Wenn du die Dateien zurück in {InstallerFolder} legst, ist alles wieder genau wie vorher.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Gerade benutzt etwas Windows Installer, normalerweise ein Windows-Update oder ein Programm, das im Hintergrund installiert wird. Verschieben und Löschen pausieren, solange das läuft, damit InstallerClean den Installer-Cache nicht anrührt, während er sich ändert. Wenn es fertig ist, scanne erneut, und sie sind wieder verfügbar.`,
+  'Body.PendingReboot.InstallerInProgress': `Eine frühere Windows-Installer-Transaktion ist auf diesem Rechner ausgesetzt. Setze diese Installation fort oder mach sie rückgängig (oder starte Windows neu), bevor du den Cache aufräumst.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows hat für den nächsten Neustart eine Dateiumbenennung in der Warteschlange, die den Installer-Cache betrifft. Starte Windows neu, bevor du aufräumst.`,
+  'Body.NoFileSelected': `Wähle eine Datei, um Details anzuzeigen.`,
+  'Body.NoProductSelected': `Wähle ein Produkt, um Details anzuzeigen.`,
+  'Body.NoMetadata': `Keine Metadaten verfügbar.`,
+  'Body.RegisteredMissingFromDisk': `Diese Installer-Datei wurde gelöscht. InstallerClean war es nicht, es entfernt nie eine Datei, die ein Programm noch braucht; etwas anderes hat diese hier gelöscht, bevor du InstallerClean ausgeführt hast.&#10;&#10;Im Moment macht das keine Probleme, und es wird auch keine geben, bis zu dem Tag, an dem du das Programm, zu dem sie gehört, reparieren, aktualisieren oder deinstallieren willst. Dieser Schritt kann dann fehlschlagen, weil Windows nach dieser Datei sucht und sie nicht da ist.&#10;&#10;Um es zu beheben, lade den Installer dieses Programms beim Hersteller herunter und führe ihn über deine vorhandene Installation aus (deinstalliere nicht zuerst, denn das Deinstallieren ist selbst ein Schritt, der diese Datei braucht). Verwende möglichst die Version, die du installiert hast, denn Windows lehnt eine andere unter Umständen ab. Das setzt die Datei in der Regel wieder ein, und deine Einstellungen bleiben normalerweise unangetastet, aber Microsoft garantiert es nicht; sein eigenes letztes Mittel ist, das Programm neu zu installieren, oder Windows selbst.`,
+  'Body.RegisteredMissingFromDisk.SeeAlso': `Das README [erklärt diesen Ordner], und wie sich eine Datei wiederherstellen lässt, mit Microsofts eigenen Worten.`,
+  'Body.NoPatches': `(keine)`,
+
+  // Reasons (Reason column in the orphaned-files list)
+  'Reason.Orphaned': `Verwaist`,
+  'Reason.Superseded': `Ersetzt`,
+  'Reason.Obsoleted': `Veraltet`,
+
+  // Status / progress text
+  'Status.Scanning': `Scannen...`,
+  'Status.Cancelling': `Wird abgebrochen...`,
+  'Status.StartingScan': `Scan wird gestartet...`,
+  'Status.QueryingApi': `Windows wird nach installierter Software gefragt...`,
+  'Status.ScanningCache': `Installer-Cache-Ordner wird gescannt...`,
+  'Status.EnumeratingProducts': `Installierte Produkte werden aufgezählt...`,
+  'Status.CheckingRegistry': `Registrierung wird nach weiteren Paketen durchsucht...`,
+
+  // 0 = registered package count, 1 = pluralised "package"/"packages"
+  'Status.RegisteredPackagesFound': `{0} registrierte {1} gefunden.`,
+
+  // 0 = elapsed time text (e.g. "1.2s")
+  'Status.ScanComplete': `Scan abgeschlossen ({0})`,
+  'Status.FoundProducts': `Lokale Pakete werden gescannt...`,
+
+  // 0 = file count, 1 = pluralised noun ("file"/"files")
+  'Status.FoundUnused': `{0} {1} gefunden, die du bedenkenlos löschen kannst.`,
+  'Status.PreparingDestination': `Zielordner wird vorbereitet...`,
+
+  // 0 = file count, 1 = pluralised noun. Routed through Pluralise: base is the
+  // werden-form (n != 1), the .One override carries the wird-form.
+  'Status.Moving': `{0} {1} werden verschoben...`,
+  'Status.Deleting': `{0} {1} werden gelöscht...`,
+  'Status.MoveCancelled.Partial': `Verschieben abgebrochen. {0} von {1} {2} verarbeitet.`,
+  'Status.DeleteCancelled.Partial': `Löschen abgebrochen. {0} von {1} {2} verarbeitet.`,
+  'Status.MoveFailed': `Verschieben fehlgeschlagen ({0}). Details in {1}.`,
+  'Status.MoveFailed.NoLog': `Verschieben fehlgeschlagen ({0}). Das Absturzprotokoll konnte nicht geschrieben werden.`,
+  'Status.DeleteFailed': `Löschen fehlgeschlagen ({0}). Details in {1}.`,
+  'Status.DeleteFailed.NoLog': `Löschen fehlgeschlagen ({0}). Das Absturzprotokoll konnte nicht geschrieben werden.`,
+  'Status.ScanAccessDenied': `Zugriff verweigert. Windows hat den Scan abgelehnt.`,
+  'Status.ScanFailedDb': `Scan fehlgeschlagen: Die Einträge von Windows Installer konnten nicht gelesen werden.`,
+  'Status.ScanCancelled': `Scan abgebrochen.`,
+  'Status.Done': `Bereit`,
+  'Status.ScanFailedDetails': `Scan fehlgeschlagen ({0}). Details in {1}.`,
+  'Status.ScanFailedDetails.NoLog': `Scan fehlgeschlagen ({0}). Das Absturzprotokoll konnte nicht geschrieben werden.`,
+
+  // Completion screen
+  'Completion.AllClean': `Alles sauber`,
+  'Completion.NothingToCleanUp': `Nichts aufzuräumen in {InstallerFolder}`,
+  'Completion.NothingToCleanUpReceipt': `{0} {1} in {2} gescannt`,
+  'Completion.MoveRestoreHint': `Kopier sie zurück in {InstallerFolder}, falls jemals etwas kaputtgeht ([äußerst unwahrscheinlich]).`,
+  'Completion.DeleteRestoreHint': `Bis dahin kannst du sie wiederherstellen, falls jemals etwas kaputtgeht ([äußerst unwahrscheinlich]).`,
+
+  // 0 = size freed (e.g. "120.5 MB")
+  'Completion.Freed': `{0} freigegeben`,
+  'Completion.Moved': `{0} verschoben`,
+  // Heading for the outcome where the operation acted on no file at all, then
+  // the failure count line beneath it: 0 = files that failed, 1 = files tried
+  // (succeeded + failed). The count selecting the form is {0}; the noun belongs
+  // to {1}, so treat the two independently.
+  'Completion.NothingMoved': `Nichts verschoben`,
+  'Completion.NothingDeleted': `Nichts gelöscht`,
+  'Completion.FailedCount.Singular': `{0} Datei von {1} konnte nicht verschoben werden.`,
+  'Completion.FailedCount.Plural': `{0} Dateien von {1} konnten nicht verschoben werden.`,
+  'Completion.FailedCountDelete.Singular': `{0} Datei von {1} konnte nicht gelöscht werden.`,
+  'Completion.FailedCountDelete.Plural': `{0} Dateien von {1} konnten nicht gelöscht werden.`,
+
+  // 0 = moved count, 1 = pluralised noun, 2 = destination path
+  'Completion.MoveSummary.Singular': `{0} {1} verschoben nach: {2}`,
+  'Completion.MoveSummary.Plural': `{0} {1} verschoben nach: {2}`,
+
+  // 0 = deleted count, 1 = pluralised noun
+  'Completion.DeleteSummary.Singular': `{0} {1} in den Papierkorb verschoben`,
+  'Completion.DeleteSummary.Plural': `{0} {1} in den Papierkorb verschoben`,
+
+  // 0 = deleted count, 1 = pluralised noun
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} endgültig gelöscht. Sie ist nicht in den Papierkorb gewandert.`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} endgültig gelöscht. Sie sind nicht in den Papierkorb gewandert.`,
+  'Completion.PermanentDeleteRestoreHint.Singular': `Das ist in Ordnung, sie konnte bedenkenlos entfernt werden. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.`,
+  'Completion.PermanentDeleteRestoreHint.Plural': `Das ist in Ordnung, sie konnten bedenkenlos entfernt werden. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.`,
+  'RecycleUnavailable.Heading': `Der Papierkorb ist für dieses Laufwerk nicht verfügbar`,
+  'RecycleUnavailable.Body.Singular': `Daher wurde diese {1} ({2}) nicht gelöscht. Du kannst sie an einen sicheren Ort verschieben oder endgültig löschen.`,
+  'RecycleUnavailable.Body.Plural': `Daher wurden diese {0} {1} ({2}) nicht gelöscht. Du kannst sie an einen sicheren Ort verschieben oder endgültig löschen.`,
+  'RecycleUnavailable.Reassurance.Singular': `Sie zu löschen ist sicher. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht, und der Papierkorb ist nur eine zusätzliche Absicherung. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.`,
+  'RecycleUnavailable.Reassurance.Plural': `Sie zu löschen ist sicher. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht, und der Papierkorb ist nur eine zusätzliche Absicherung. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.`,
+
+  // Summaries
+  'Summary.RegisteredStillUsed.Singular': `{0} Datei noch benötigt`,
+  'Summary.RegisteredStillUsed.Plural': `{0} Dateien noch benötigt`,
+  'Summary.OrphanedToCleanUp.Singular': `{0} nicht benötigte Datei zum Aufräumen`,
+  'Summary.OrphanedToCleanUp.Plural': `{0} nicht benötigte Dateien zum Aufräumen`,
+  'Summary.MissingFromDisk.Singular': `{0} registrierte Datei fehlt (nicht von InstallerClean gelöscht). Im Moment kein Problem, aber eine spätere Reparatur, Aktualisierung oder Deinstallation dieses Programms könnte fehlschlagen. Öffne Details, um zu erfahren, was zu tun ist.`,
+  'Summary.MissingFromDisk.Plural': `{0} registrierte Dateien fehlen (nicht von InstallerClean gelöscht). Im Moment kein Problem, aber eine spätere Reparatur, Aktualisierung oder Deinstallation dieser Programme könnte fehlschlagen. Öffne Details, um zu erfahren, was zu tun ist.`,
+
+  // 0 = current file count, 1 = total count, 2 = pluralised noun.
+  'Summary.OperationFiles': `{0} von {1} {2}`,
+
+  // Orphaned-window footer. 0 = orphaned count, 1 = superseded count,
+  // 2 = obsoleted count, 3 = size display. Predicative adjectives, invariant.
+  'Summary.OrphanedWindow': `{0} verwaist, {1} ersetzt, {2} veraltet ({3})`,
+
+  // Registered-window footer, split so noun and verb agree. 0 = count, 1 = size.
+  'Summary.RegisteredWindow.Singular': `{0} registrierte Datei, die noch benötigt wird ({1})`,
+  'Summary.RegisteredWindow.Plural': `{0} registrierte Dateien, die noch benötigt werden ({1})`,
+
+  // Confirmation dialogs
+
+  // 0 = file count, 1 = pluralised "file"/"files", 2 = size display
+  'Confirm.MoveTitle': `{0} {1} verschieben ({2})?`,
+
+  // 0 = destination path
+  'Confirm.MoveDestination': `Die Dateien werden verschoben nach:`,
+  'Confirm.DeleteTitle': `{0} {1} löschen ({2})?`,
+  'Confirm.DeleteToRecycleBin': `Die Dateien werden in den Papierkorb verschoben. Wenn du Sicherungskopien möchtest, nutze stattdessen die Schaltfläche „Verschieben“.`,
+
+  // Error messages
+  'Error.AdminRequiredTitle': `Zugriff verweigert`,
+  'Error.AdminRequiredBody': `Windows hat InstallerClean den Zugriff verweigert, deshalb hat es abgebrochen. Es wurde nichts entfernt.\n\nInstallerClean lief bereits als Administrator, es noch einmal so zu starten hilft also nicht. Windows sagt nicht genauer, was den Zugriff verweigert hat, es gibt also nichts Bestimmtes, das du versuchen könntest.`,
+  'Error.InstallerDbUnavailableTitle': `Die Einträge von Windows Installer konnten nicht gelesen werden`,
+  'Error.ScanFailedTitle': `Scan fehlgeschlagen`,
+  'Error.InstallerDbEmpty': `Die Einträge von Windows Installer kamen völlig leer zurück: Nicht ein einziges installiertes Programm und kein einziges Update beansprucht eine zwischengespeicherte Installationsdatei. Auf einem funktionierenden System kommt das nicht vor (selbst eine frische Windows-Installation hat welche), also sind die Einträge entweder beschädigt oder sie konnten nicht gelesen werden, und ein Scan, der diese Antwort glaubt, würde jede Datei in {InstallerFolder} fälschlich als verwaist einstufen. InstallerClean hat stattdessen abgebrochen. Es wurde nichts entfernt.`,
+  'Error.MsiAccessDenied': `Windows Installer hat es InstallerClean verweigert, die installierte Software aufzulisten. InstallerClean lief bereits als Administrator, es erneut als Administrator auszuführen ändert also nichts. Ohne diese Liste lässt sich nicht sicher sagen, welche zwischengespeicherten Dateien noch gebraucht werden, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
+  'Error.MsiNonSuccess': `Windows Installer konnte InstallerClean keine lesbare Liste der installierten Programme geben: {0} Einträge in Folge kamen unlesbar zurück (letzter Fehlercode {1}). Statt mit einer nur teilweise gelesenen Liste zu arbeiten, hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
+  'Error.InvalidDestinationTitle': `Ungültiges Ziel`,
+  'Error.DestinationWriteFailedTitle': `Schreiben am Ziel nicht möglich`,
+  'Error.MoveFailedTitle': `Verschieben fehlgeschlagen`,
+  'Error.DeleteFailedTitle': `Löschen fehlgeschlagen`,
+  'Error.SettingNotSavedTitle': `Einstellung nicht gespeichert`,
+  'Error.SettingNotSavedBody': `Die Änderung konnte nicht gespeichert werden. Beim nächsten Start verwendet InstallerClean wieder die vorherige Einstellung.`,
+  'Error.DestinationInsideInstaller': `Das Ziel darf nicht im Windows-Installer-Ordner liegen.`,
+
+  // 0 = the destination path the user typed
+  'Error.DestinationInSystemFolder': `Das Ziel {0} liegt unter einem Windows-Systemordner. Wähle einen Pfad außerhalb von %SystemRoot%, %ProgramFiles% und %ProgramData%.`,
+  'Error.NotEnoughSpaceTitle': `Nicht genügend Speicherplatz`,
+
+  // 0 = destination, 1 = required size, 2 = available size
+  'Error.NotEnoughSpaceBody': `Nicht genügend Speicherplatz unter {0}\n\nBenötigt: {1}\nVerfügbar: {2}`,
+
+  // 0 = destination
+  'Error.AccessDeniedDestination': `Du hast keine Berechtigung, in {0} zu schreiben.\nVersuch einen Ordner in deinem Benutzerprofil oder auf einem Laufwerk, das dir gehört.`,
+  'Error.PathTooLong': `Der Pfad {0} ist zu lang für Windows. Wähle einen kürzeren Pfad.`,
+  'Error.DestinationMissing': `Der Ordner {0} existiert nicht und konnte nicht erstellt werden. Prüfe den Laufwerkbuchstaben oder den Netzwerkpfad.`,
+  'Error.IOWriteDestination': `Windows kann nicht in {0} schreiben.\nDetails in {1}.`,
+  'Error.IOWriteDestination.NoLog': `Windows kann nicht in {0} schreiben. Das Absturzprotokoll konnte nicht geschrieben werden.`,
+  'Error.WriteDestination': `Schreiben in {0} nicht möglich.\nDetails in {1}.`,
+  'Error.WriteDestination.NoLog': `Schreiben in {0} nicht möglich. Das Absturzprotokoll konnte nicht geschrieben werden.`,
+  'Error.MissingSourceFile': `Die Datei existiert nicht mehr.`,
+  'Error.SourceIsReparsePoint': `Die Quelldatei ist ein Symlink oder eine Junction; aus Sicherheitsgründen abgelehnt.`,
+  // Singular = the sentence for ONE file, which the CLI prints after "filename: ";
+  // plural = the heading the completion overlay puts over a list of filenames.
+  'Error.AccessDenied.Singular': `Windows hat den Zugriff auf diese Datei verweigert; sie wurde an ihrem Platz belassen.`,
+  'Error.AccessDenied.Plural': `Windows hat den Zugriff auf diese Dateien verweigert; sie wurden an ihrem Platz belassen.`,
+  'Error.FileInUse.Singular': `Diese Datei ist von einem anderen Programm geöffnet oder gesperrt, deshalb kann sie im Moment von nichts verschoben werden. Sie wurde an ihrem Platz belassen; versuch es später noch einmal.`,
+  'Error.FileInUse.Plural': `Diese Dateien sind von einem anderen Programm geöffnet oder gesperrt, deshalb können sie im Moment von nichts verschoben werden. Sie wurden an ihrem Platz belassen; versuch es später noch einmal.`,
+  'Error.IOFailure.Singular': `Windows hat einen Dateifehler gemeldet; die Datei wurde an ihrem Platz belassen.`,
+  'Error.IOFailure.Plural': `Windows hat Dateifehler gemeldet; diese Dateien wurden an ihrem Platz belassen.`,
+  'Error.UnknownError.Singular': `Bei dieser Datei ist etwas schiefgelaufen; sie wurde an ihrem Platz belassen.`,
+  'Error.UnknownError.Plural': `Bei diesen Dateien ist etwas schiefgelaufen; sie wurden an ihrem Platz belassen.`,
+
+  // 0 = shell error code
+  'Error.ShellRecycleFailed': `Diese Datei konnte nicht in den Papierkorb verschoben werden (Fehler {0}), und InstallerClean kann dir anhand dieses Codes nicht sagen, warum. Die Datei wurde an ihrem Platz belassen. Versuch stattdessen die Schaltfläche „Verschieben“, die den Papierkorb nicht benutzt.`,
+  'Error.RecycleAccessDenied': `Windows hat den Zugriff selbst mit Administratorrechten verweigert (Fehler {0}), und InstallerClean kann nicht erkennen, ob das Problem bei der Datei oder beim Papierkorb liegt. Die Datei wurde an ihrem Platz belassen. Die Schaltfläche „Verschieben“ hilft, wenn es am Papierkorb liegt, aber nicht, wenn es an der Datei liegt.`,
+  'Error.RecycleInUse': `Diese Datei ist von einem anderen Programm geöffnet oder gesperrt (Fehler {0}), deshalb kann sie im Moment von nichts entfernt werden. Sie wurde an ihrem Platz belassen; versuch es später noch einmal.`,
+  'Error.DeletedNotRecycled': `Windows hat diese Datei endgültig gelöscht, statt sie in den Papierkorb zu verschieben. InstallerClean hatte den Papierkorb angefordert, Windows hat es anders gemacht. Die Datei ist weg.`,
+
+  // 0 = destination
+  'Error.MoveIntoInstaller': `Das Verschieben von Dateien in den Windows-Installer-Ordner wird abgelehnt (Ziel: {0}).`,
+
+  // 0 = the relative path the caller passed
+  'Error.DestinationNotFullyQualified': `Der Zielort muss ein vollständiger Pfad zu einem Ordner sein, beginnend mit einem Laufwerkbuchstaben oder einer Netzwerkfreigabe (zum Beispiel D:\\Backup oder \\\\server\\backup). InstallerClean kann diesen hier nicht verwenden: {0}`,
+  'BrowserLaunch.FailedTitle': `Browser konnte nicht geöffnet werden`,
+  'UpdateCheck.Title': `Nach Updates suchen`,
+  'UpdateCheck.Status.Checking': `Wird geprüft...`,
+  'UpdateCheck.Status.UpToDate': `Auf dem neuesten Stand.`,
+  'UpdateCheck.UpdateAvailable.Title': `Update verfügbar`,
+
+  // 0 = installed version, 1 = latest version on GitHub
+  'UpdateCheck.UpdateAvailable.Body': `Du verwendest Version {0}.&#10;Version {1} ist verfügbar.`,
+  'UpdateCheck.Failed.NetworkUnavailable': `GitHub war nicht erreichbar. Prüfe deine Internetverbindung und versuch es erneut.`,
+  'UpdateCheck.Failed.ServerError': `GitHub hat eine Fehlerantwort zurückgegeben. Versuch es in ein paar Minuten erneut.`,
+  'UpdateCheck.Failed.ResponseParseError': `Die Antwort von GitHub enthielt keine erkennbare Version. Versuch es später erneut oder öffne die Releases-Seite direkt.`,
+  'UpdateCheck.Failed.Timeout': `Bei der Prüfung wurde das Zeitlimit überschritten. Deine Verbindung zu GitHub ist vielleicht langsam; versuch es erneut.`,
+  'UpdateCheck.Failed.Unknown': `Die Prüfung ist aus unbekanntem Grund fehlgeschlagen. Details stehen in crash.log, falls du es melden möchtest.`,
+
+  // 0 = the URL the user was trying to reach
+  'BrowserLaunch.ClipboardOk': `InstallerClean konnte deinen Browser nicht öffnen. Der Link liegt in deiner Zwischenablage, du kannst ihn also selbst einfügen:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `InstallerClean konnte deinen Browser nicht öffnen und den Link auch nicht in die Zwischenablage kopieren. Der Link lautet:&#10;&#10;{0}`,
+
+  // 0 = the destination folder whose canonical path changed mid-batch
+  'Error.DestinationChangedMidBatch': `Der Zielort hat sich geändert, während die Dateien verschoben wurden (etwas hat den Ordner ersetzt oder umgeleitet), deshalb hat InstallerClean gestoppt, statt an die falsche Stelle zu schreiben. Prüfe {0}, klicke dann auf „Neu scannen“ und versuch es erneut.`,
+
+  // 0 = folder, 1 = inner exception message
+  'Error.CannotWriteFolder': `Schreiben in {0} nicht möglich.`,
+
+  // 0 = file name
+  'Error.NoUniqueFilename': `Nach 10.000 Versuchen konnte kein eindeutiger Dateiname für '{0}' gefunden werden.`,
+
+  // Result log (post-cleanup diagnostic send)
+  'ResultLog.Sending': `Wird gesendet...`,
+  'ResultLog.Sent': `Danke! Bericht gesendet.`,
+  'ResultLog.Failed': `Senden fehlgeschlagen. Versuch es später erneut.`,
+  'ResultLog.NothingToSend': `Kein Bericht zum Senden.`,
+  'ConfirmSendResultLog.Title': `Das senden?`,
+  'ConfirmSendResultLog.Reassurance': `Es geht an nofaff.netlify.app/api/result-log. Nichts identifiziert dich oder deinen Rechner; es zeigt mir nur, dass InstallerClean funktioniert und [wie viel Platz die Leute freigeben].`,
+  'Automation.ResultLogPreview': `Vorschau des Berichts`,
+
+  // Single instance / startup / crash
+  'Startup.AlreadyRunningTitle': `InstallerClean`,
+  'Startup.AlreadyRunningBody': `InstallerClean läuft bereits.`,
+  'Startup.UnhandledTitle': `InstallerClean`,
+  'Startup.UnhandledBody': `Ein unerwarteter Fehler ist aufgetreten und InstallerClean muss geschlossen werden.\n\n{0}\n\nDetails gespeichert unter:\n{1}`,
+  'Startup.UnhandledBody.NoLog': `Ein unerwarteter Fehler ist aufgetreten und InstallerClean muss geschlossen werden.\n\n{0}\n\nDas Absturzprotokoll konnte nicht geschrieben werden.`,
+  'Startup.ErrorTitle': `Startfehler`,
+  'Startup.FailedToStart': `Start fehlgeschlagen ({0}). Details gespeichert unter:\n{1}`,
+  'Startup.FailedToStart.NoLog': `Start fehlgeschlagen ({0}). Das Absturzprotokoll konnte nicht geschrieben werden.`,
+
+  // File picker
+  'FilePicker.ChooseDestinationTitle': `Zielordner für verschobene Dateien wählen`,
+
+  // Version display
+
+  // 0 = major.minor.patch (e.g. "1.5.4")
+  'Version.Display': `Version {0}`,
+  'Plural.File.Singular': `Datei`,
+  'Plural.File.Plural': `Dateien`,
+  'Plural.Error.Singular': `Fehler`,
+  'Plural.Error.Plural': `Fehler`,
+  'Plural.Package.Singular': `Paket`,
+  'Plural.Package.Plural': `Pakete`,
+  'Plural.Product.Singular': `Produkt`,
+  'Plural.Product.Plural': `Produkte`,
+  'Plural.Patch.Singular': `Patch`,
+  'Plural.Patch.Plural': `Patches`,
+  'Display.Size.GB': `{0:F2} GB`,
+  'Display.Size.MB': `{0:F1} MB`,
+  'Display.Size.KB': `{0:F1} KB`,
+  'Display.Size.B': `{0} B`,
+  'Display.Elapsed.Ms': `{0:F0}ms`,
+  'Display.Elapsed.S': `{0:F1}s`,
+  'Display.ElapsedLong.LessThanASecond': `weniger als eine Sekunde`,
+  'Display.ElapsedLong.Seconds': `{0:F1} Sekunden`,
+  'CrashLog.PrivacyHeader': `# crash.log erfasst unbehandelte Ausnahmen von InstallerClean.\n# Bei erhöhten Rechten können die Ausnahmemeldungen des Frameworks\n# Dateipfade aus der laufenden Sitzung enthalten (einschließlich der\n# von Windows-Installer-Abfragen aufgezählten Profile anderer\n# Benutzer). Netzwerkfehlermeldungen der Update-Prüfung oder des\n# Ergebnisprotokoll-POSTs können die Ziel-URL und die aufgelöste\n# IP-/Proxy-Adresse enthalten. Entferne beide Arten von Details,\n# bevor du diese Datei an einen öffentlichen Fehlerbericht anhängst.\n`,
+  'Tooltip.ChangeLanguage': `Sprache ändern. Das Programm wird neu gestartet.`,
+  'Automation.ChangeLanguage': `Sprache ändern`,
+  'Automation.ChangeLanguage.HelpText': `Das Programm wird neu gestartet.`,
+
+  // Command-line tool (installerclean-cli): the HUMAN-facing Cli.* keys.
+  'Cli.UnknownArgument': `Unbekanntes Argument: '{0}'`,
+  'Cli.Cancelling': `Wird abgebrochen...`,
+  'Cli.Cancelled': `Abgebrochen.`,
+  'Cli.GenericError': `Fehler: {0}. Details gespeichert in {1}.`,
+  'Cli.GenericError.NoLog': `Fehler: {0}. Das Absturzprotokoll konnte nicht geschrieben werden.`,
+  'Cli.ScanningInstaller': `{InstallerFolder} wird gescannt...`,
+  'Cli.FoundOrphans': `{0} {1} zum Aufräumen gefunden ({2}).`,
+  'Cli.NothingToDo': `Nichts zu tun.`,
+  'Cli.DeletingFiles': `{0} {1} werden gelöscht...`,
+  'Cli.DeletedFiles': `{0} {1} gelöscht.`,
+  'Cli.RecycleUnavailable': `Fehler: Der Papierkorb ist für dieses Volume nicht verfügbar, daher wurde nichts gelöscht. Nutze /m, um die Dateien stattdessen zu verschieben, oder aktiviere den Papierkorb wieder und führe den Vorgang erneut aus.`,
+  'Cli.NoMoveDestination': `Fehler: Kein Zielordner zum Verschieben angegeben. Nutze /m PFAD. (Ein in der GUI gesetztes Standardziel gilt pro Benutzer und greift nicht bei geplanten oder Dienstkonto-Läufen.)`,
+  'Cli.MoveDestinationInsideInstaller': `Fehler: Das Ziel darf nicht im Windows-Installer-Ordner liegen.`,
+  'Cli.MoveDestinationRelative': `Fehler: Das Ziel muss ein vollständig qualifizierter Pfad sein. Erhalten: {0}`,
+  'Cli.MoveDestinationInSystemFolder': `Fehler: Das Ziel {0} liegt unter einem Windows-Systemordner. Wähle einen Pfad außerhalb von %SystemRoot%, %ProgramFiles% und %ProgramData%.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Fehler: Gerade benutzt etwas Windows Installer, normalerweise ein Windows-Update oder ein Programm, das im Hintergrund installiert wird. Verschieben und Löschen sind blockiert, solange das läuft. Versuch es erneut, sobald es fertig ist.`,
+  'Cli.PendingRebootBlocked.InstallerInProgress': `Fehler: Eine frühere Windows-Installer-Transaktion ist auf diesem Rechner ausgesetzt. Setze diese Installation fort oder mach sie rückgängig (oder starte Windows neu), bevor du den Cache aufräumst.`,
+  'Cli.PendingRebootBlocked.PendingRenameInCache': `Fehler: Ein für nach dem Neustart eingeplanter Dateivorgang betrifft den Installer-Cache ({0}). Starte Windows neu, um diesen Vorgang abzuschließen, bevor du aufräumst.`,
+  'Cli.MovingFiles': `{0} {1} werden nach {2} verschoben...`,
+  'Cli.MovedFiles': `{0} {1} verschoben.`,
+  'Cli.MutexBlocked': `Ein anderer InstallerClean-Prozess hält die Einzelinstanz-Sperre (die GUI oder ein anderer CLI-Lauf). Exit-Code 75 (vorübergehend); ein späterer Wiederholungsversuch ist sicher.`,
+  'Cli.EventLogUnavailable': `Hinweis: Das Schreiben in das Ereignisprotokoll ist fehlgeschlagen. Prüfe die Berechtigungen des Anwendungsprotokolls oder die Gruppenrichtlinie.`,
+  'Cli.Help.Header': `InstallerClean - {InstallerFolder} aufräumen`,
+  'Cli.Help.Usage': `Verwendung:`,
+  'Cli.Help.Help': `  installerclean-cli --help     Diese Hilfe anzeigen (akzeptiert auch /?, -h)`,
+  'Cli.Help.Version': `  installerclean-cli --version  Die Version ausgeben (akzeptiert auch -v)`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Nur scannen - nicht benötigte Dateien auflisten`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Nicht benötigte Dateien löschen (Papierkorb)`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m         An den gespeicherten Standardort verschieben`,
+  'Cli.Help.MovePath': `  installerclean-cli /m PFAD    An den angegebenen Pfad verschieben`,
+  'Cli.Help.NoteLine1': `installerclean-cli ist ein echter Konsolenprozess und blockiert die`,
+  'Cli.Help.NoteLine2': `Eingabeaufforderung, bis er fertig ist; leite seine Ausgabe wie bei jeder`,
+  'Cli.Help.NoteLine3': `anderen Konsolen-EXE um oder per Pipe weiter. Die GUI liegt in InstallerClean.exe.`,
+  'Cli.Help.ExitCodesHeader': `Exit-Codes:`,
+  'Cli.Help.ExitCodeOk': `  0   Erfolg: jede markierte Datei wurde verarbeitet`,
+  'Cli.Help.ExitCodeError': `  1   Fehler: nichts verarbeitet (ungültige Argumente, Scan fehlgeschlagen, alle Dateien fehlgeschlagen)`,
+  'Cli.Help.ExitCodePartial': `  2   teilweise: einige Dateien verarbeitet, einige fehlgeschlagen`,
+  'Cli.Help.ExitCodeTransient': `  75  vorübergehend: ein vorübergehender Zustand hat den Lauf blockiert (siehe Meldung)`,
+  'Cli.Help.ExitCodeCancelled': `  130 abgebrochen (Strg+C)`,
+  'Completion.CleanedUp': `{0} aufgeräumt`,
+  'Completion.DeleteSpaceHint': `Leere den Papierkorb, um den Speicherplatz wirklich freizugeben.`,
+  'Body.NotScanned.Lead': `Noch nichts gescannt.`,
+  'Body.NotScanned.Why': `Klicke auf „Neu scannen“, um {InstallerFolder} nach Installer-Dateien zu durchsuchen, die kein Programm mehr braucht.`,
+  'Confirm.MoveSameDrive': `Dieser Ordner liegt auf demselben Laufwerk, das Verschieben allein gibt also keinen Speicherplatz frei. Den Platz bekommst du zurück, wenn du die Dateien dort löschst, oder du wählst stattdessen einen Ordner auf einem anderen Laufwerk.`,
+  'Error.ScanCorrelationFailed': `InstallerClean konnte diesen Scan nicht mit den Einträgen von Windows Installer in Einklang bringen: Jede Datei, die Windows noch als benötigt führt, fehlt in {InstallerFolder}, während die Dateien, die tatsächlich im Ordner liegen, zu keinem der Einträge passen. So sieht kein reales System aus, das deutet also auf ein Problem beim Lesen der Einträge hin und nicht auf Dateien, die du bedenkenlos entfernen kannst. Es wurde nichts zum Aufräumen angeboten und nichts entfernt.`,
+  'Error.CandidateOutsideCache': `Diese Datei liegt nicht direkt im Windows-Installer-Ordner; aus Sicherheitsgründen abgelehnt.`,
+  'Completion.ReverifySkipped': `{0} {1} an Ort und Stelle belassen, weil ein Programm sie nach dem Scan wieder benötigt.`,
+  'Completion.MoveCancelledSummary': `{0} von {1} {2} verschoben, bevor du abgebrochen hast.`,
+  'Completion.DeleteCancelledSummary': `{0} von {1} {2} in den Papierkorb verschoben, bevor du abgebrochen hast.`,
+  'Completion.PermanentDeleteCancelledSummary': `{0} von {1} {2} endgültig gelöscht, bevor du abgebrochen hast.`,
+  'Body.PendingReboot.Lead': `Diese Dateien können gerade nicht aufgeräumt werden.`,
+  'Cli.TooManyArguments': `Fehler: Unerwartetes zusätzliches Argument '{0}'. Wenn dein Zielordner ein Leerzeichen enthält, setze den ganzen Pfad in Anführungszeichen: /m "D:\\My Backup"`,
+  'Cli.Help.MoveScheduledNote': `Das gespeicherte Standardziel gilt pro Benutzer; geplante oder SYSTEM-Läufe brauchen /m PFAD.`,
+  'Completion.ReverifyIncomplete': `{0} {1} an Ort und Stelle belassen, weil die Einträge von Windows Installer bei der wiederholten Prüfung nicht vollständig gelesen werden konnten.`,
+  'Summary.ProgramsUnreadable.Singular': `{0} installiertes Programm konnte bei diesem Scan nicht gelesen werden, daher wurden ersetzte Patches behalten. Verwaiste Dateien sind nicht betroffen.`,
+  'Summary.ProgramsUnreadable.Plural': `{0} installierte Programme konnten bei diesem Scan nicht gelesen werden, daher wurden ersetzte Patches behalten. Verwaiste Dateien sind nicht betroffen.`,
+  'Error.ScanRecordsUnreadable': `InstallerClean konnte nicht genug von den Einträgen von Windows Installer lesen, um sicher zu sein, was noch gebraucht wird: Die Liste der installierten Programme kam unvollständig zurück, und dieselben Einträge direkt aus der Registrierung zu lesen führte ebenfalls zu Fehlern. Eine Datei könnte allein deshalb verwaist wirken, weil der Eintrag, der sie nennt, zu den unlesbaren gehörte, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
+  'Error.MsiEnumerationNeverEnded': `Windows Installer hat das Ende der Liste der installierten Programme nie signalisiert: InstallerClean hat nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
+  'Error.MsiPatchEnumerationNeverEnded': `Windows Installer hat das Ende der Patch-Liste eines Programms nie signalisiert: InstallerClean hat nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
+  'Status.CheckingRecycleBin': `Papierkorb wird geprüft...`,
+  'UpdateCheck.Status.UpdateAvailable': `Version {0} ist verfügbar.`,
+  'Completion.DonateAsk': `Freut mich, dass es geholfen hat. Die Kaffeekasse steht bereit, falls dir großzügig zumute ist.`,
+  'About.Link.Guide': `Anleitung und FAQ`,
+  'About.Link.ReportProblem': `Ein Problem melden`,
+  'About.AutoUpdateCheck': `Automatisch nach Updates suchen`,
+  'Automation.About.Guide.HelpText': `Öffnet das readme auf github in deinem Browser.`,
+  'Automation.About.ReportProblem.HelpText': `Öffnet den Issue-Tracker auf github.com in deinem Browser.`,
+  'Automation.AutoUpdateCheck.HelpText': `Wenn aktiviert, sucht InstallerClean beim Start auf github nach einer neueren Version.`,
+};
+
+let text = readFileSync(BASE, 'utf8');
+
+// Remove ONLY the 21 machine-contract Cli.* <data> elements BY NAME (the
+// Cli.EventLog* set bar Cli.EventLogUnavailable). The human Cli keys stay and
+// are translated from MAP. Same predicate as scripts/check-resx-parity.mjs.
+const isMachineCliKey = (k) =>
+  k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
+let cliMachineRemoved = 0;
+text = text.replace(/[^\S\n]*<data name="(Cli\.[^"]*)"[\s\S]*?<\/data>\n?/g,
+  (m, name) => { if (isMachineCliKey(name)) { cliMachineRemoved++; return ''; } return m; });
+
+// Replace each key's inner <value> from MAP. The closing quote anchors the name,
+// so Status.MoveFailed never matches Status.MoveFailed.NoLog. A function
+// replacement keeps $-sequences in a value from being read as backreferences.
+const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const notApplied = [];
+for (const [key, val] of Object.entries(MAP)) {
+  const re = new RegExp('(<data name="' + escRe(key) + '"[^>]*>\\s*<value>)([\\s\\S]*?)(</value>)');
+  let applied = false;
+  text = text.replace(re, (m, p1, p2, p3) => { applied = true; return p1 + val + p3; });
+  if (!applied) notApplied.push(key);
+}
+
+// Append the satellite-only .One override <data> elements before </root>.
+const overrideBlock = Object.entries(OVERRIDES)
+  .map(([k, v]) => `  <data name="${k}" xml:space="preserve"><value>${v}</value></data>`)
+  .join('\n') + '\n';
+text = text.replace('</root>', overrideBlock + '</root>');
+
+// Normalise to LF with exactly one trailing newline.
+text = text.replace(/\r\n/g, '\n');
+if (!text.endsWith('\n')) text += '\n';
+
+writeFileSync(OUT, text, 'utf8');
+
+// ---------------- self-check the written file against the neutral ----------------
+const placeholders = (s) => new Set([...s.matchAll(/\{(\d+)(?::[^}]*)?\}/g)].map((p) => p[1]));
+const parse = (xml) => {
+  const map = new Map();
+  const re = /<data\s+name="([^"]+)"[^>]*>\s*<value>([\s\S]*?)<\/value>/g;
+  let m;
+  while ((m = re.exec(xml)) !== null) map.set(m[1], m[2]);
+  return map;
+};
+const neutral = parse(readFileSync(BASE, 'utf8'));
+const written = readFileSync(OUT, 'utf8');
+const output = parse(written);
+// Required = the non-Cli keys plus the human-facing Cli keys.
+const neutralRequired = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
+
+// The output also carries the satellite-only .One override key(s). Each must be
+// present and share its base key's placeholder set (base = the .Plural sibling if
+// it exists, else the flat key itself; mirrors check-resx-parity.mjs).
+const overrideKeys = Object.keys(OVERRIDES);
+const overrideMissing = overrideKeys.filter((k) => !output.has(k));
+const overrideArityMismatch = overrideKeys.filter((k) => {
+  if (!output.has(k)) return true;
+  const base = k.replace(/\.(?:One|Few|Many)$/, '');
+  const ref = neutral.has(`${base}.Plural`) ? `${base}.Plural` : base;
+  if (!neutral.has(ref)) return true;
+  const a = placeholders(neutral.get(ref)), b = placeholders(output.get(k));
+  return a.size !== b.size || [...a].some((i) => !b.has(i));
+});
+
+const missingFromMap = neutralRequired.filter((k) => !(k in MAP));
+const strayMapKeys = Object.keys(MAP).filter((k) => !neutral.has(k));
+const machineLeaked = [...output.keys()].filter(isMachineCliKey);
+const missingFromOutput = neutralRequired.filter((k) => !output.has(k));
+const arityMismatch = neutralRequired.filter((k) => {
+  if (!output.has(k)) return false; // already counted by missingFromOutput
+  const a = placeholders(neutral.get(k)), b = placeholders(output.get(k));
+  return a.size !== b.size || [...a].some((i) => !b.has(i));
+});
+const crlf = (written.match(/\r/g) || []).length;
+
+// Untranslated-phrase gate (KEY-based, HARD): a value still byte-identical to the
+// English neutral is a miss, UNLESS its key is a universal keep or in ALSO_KEEP.
+const alsoKeep = new Set(ALSO_KEEP);
+const untranslated = neutralRequired.filter((k) =>
+  output.has(k) && output.get(k) === neutral.get(k) && !KEEP_ENGLISH.has(k) && !alsoKeep.has(k));
+
+// Breakdown computed, never pinned: the non-Cli and human-Cli totals both grow with
+// every string the app gains, and a hardcoded pair goes stale silently while the
+// checked figure beside it stays right.
+const nonCliRequired = neutralRequired.filter((k) => !k.startsWith('Cli.')).length;
+console.log('translatable <data> in output:', output.size,
+  '(expect', neutralRequired.length + overrideKeys.length,
+  '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli +',
+  overrideKeys.length, 'override)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 21)');
+console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| CRLF:', crlf, '(expect 0)');
+
+// ALSO_KEEP audit roster, so a lazy "force it green" dump is visible at a glance.
+if (alsoKeep.size) {
+  console.log('ALSO_KEEP (' + alsoKeep.size + '), kept identical to English:');
+  for (const k of alsoKeep) {
+    const v = output.get(k);
+    const words = v == null ? 0 : v.replace(/\{\d+(?::[^}]*)?\}/g, ' ').trim().split(/\s+/).filter(Boolean).length;
+    const suspicious = v != null && (words > 2 || v.length > 24);
+    console.log('   ' + (suspicious ? '!! suspicious (longer than a word or two) ' : '') + k + ' = ' + JSON.stringify(v));
+  }
+}
+
+if (notApplied.length) console.log('!! value not applied (regex miss):', notApplied);
+if (missingFromMap.length) console.log('!! in neutral but missing from MAP:', missingFromMap);
+if (strayMapKeys.length) console.log('!! in MAP but not in neutral:', strayMapKeys);
+if (missingFromOutput.length) console.log('!! required key missing from output:', missingFromOutput);
+if (arityMismatch.length) console.log('!! placeholder arity differs from neutral:', arityMismatch);
+if (machineLeaked.length) console.log('!! machine Cli keys leaked into output:', machineLeaked);
+if (overrideMissing.length) console.log('!! override key missing from output:', overrideMissing);
+if (overrideArityMismatch.length) console.log('!! override arity differs from its base key:', overrideArityMismatch);
+if (untranslated.length) {
+  const show = untranslated.slice(0, 40).join(', ');
+  console.log('!! still English (untranslated), ' + untranslated.length + ': ' + show +
+    (untranslated.length > 40 ? ', ...and ' + (untranslated.length - 40) + ' more' : ''));
+  if (untranslated.length > 50)
+    console.log('   (that is most of the file: this is the untranslated template. Translate the MAP values, then a real miss is listed on its own.)');
+}
+
+const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
+  !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
+  !overrideMissing.length && !overrideArityMismatch.length &&
+  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 21 && crlf === 0;
+const ok = structuralOk && !untranslated.length;
+console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

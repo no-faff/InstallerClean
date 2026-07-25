@@ -21,9 +21,7 @@
 //
 // After running: translate each flagged key in each gen-strings-<code>.mjs MAP,
 // regenerate (the self-check returns to GENERATION OK), run
-// check-resx-parity.mjs, and clear the key from PENDING-RETRANSLATION.md. The
-// full process is in
-// non-repo-files/0-claude/translation/CHANGING-A-TRANSLATED-STRING.md.
+// check-resx-parity.mjs, and clear the key from PENDING-RETRANSLATION.md.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 
 const keys = process.argv.slice(2);
@@ -33,7 +31,7 @@ if (keys.length === 0) {
 }
 
 const NEUTRAL = 'src/InstallerClean.Core/Resources/Strings.resx';
-const GENDIR = 'non-repo-files/0-claude/translation';
+const GENDIR = 'scripts/translations';
 
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
