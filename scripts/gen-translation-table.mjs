@@ -134,7 +134,7 @@ const buildTable = (c) => {
   let missing = 0;
   let md = `# InstallerClean in ${lang.endo} (${lang.en})\n\n`;
   md += `The text of InstallerClean's interface and command-line tool in English on the left, with the ${lang.en} translation beside it, grouped by where each line appears in the app. It is here so someone who really knows ${lang.en} can read through the translation and flag anything that could read better: [open an issue](https://github.com/no-faff/InstallerClean/issues/new?template=translation_review.md) or a pull request, with as few or as many changes as you like.\n\n`;
-  md += `A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [\`Strings.${c}.resx\`](../../${dir}/Strings.${c}.resx). This page is generated from it by \`scripts/gen-translation-table.mjs\`, so do not edit it by hand.\n\n`;
+  md += `A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. This page is generated from [\`Strings.${c}.resx\`](../../${dir}/Strings.${c}.resx), so do not edit it by hand. The ${lang.en} translation itself lives in [\`gen-strings-${c}.mjs\`](../../scripts/translations/gen-strings-${c}.mjs).\n\n`;
   // The token is the one piece of markup a reviewer meets that is not obviously
   // machinery, and translating it is the natural mistake: it reads like a word.
   // Said here rather than only in the maintainer notes, because this page is
