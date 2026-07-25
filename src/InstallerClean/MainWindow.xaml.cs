@@ -106,6 +106,30 @@ public partial class MainWindow : Window
                     ScanResultAnnouncer.Text = _vm.Scan.LastScanError);
         }
 
+        // Chrome state is replayed for the same reason the states above are. The
+        // automatic update check is started before the startup scan is awaited
+        // (App.OnStartup says why), so in an ordinary session, which is over in
+        // seconds, it has already answered by the time this window is built and
+        // the subscription above never sees the transition. The line paints from
+        // its binding either way, so a sighted user reads it and a screen-reader
+        // user is told nothing at all. Conditions mirror
+        // OnChromePropertyChanged's, so a check that resolved with nothing to say
+        // stays silent; Background priority, below the focus moves queued above,
+        // for the reason AnnounceLiveRegions gives.
+        if (_vm.Chrome.HasUpdateLink)
+        {
+            AnnounceLiveRegions(UpdateLinkText);
+        }
+        else
+        {
+            // Seeding the field, not just announcing: leaving it false while the
+            // line is up would let the next text change re-announce a line that
+            // was never revealed inside this window's lifetime.
+            _updateStatusLineShown = _vm.Chrome.UpdateStatusText.Length > 0;
+            if (_updateStatusLineShown)
+                AnnounceLiveRegions(UpdateStatusLineText);
+        }
+
         CompletionDonateToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
 
         // Width is explicit, the designed 828 (the content column's 780
