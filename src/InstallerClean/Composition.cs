@@ -51,9 +51,27 @@ internal static class Composition
         // resolve MainViewModel itself.
         services.AddSingleton<MainViewModel>();
 
-        // validateScopes: true catches a Scoped registration captured
-        // by a Singleton. The current graph is Singleton-only; the
-        // check is cheap insurance against a future Scoped addition.
-        return services.BuildServiceProvider(validateScopes: true);
+        // ValidateScopes catches a Scoped registration captured by a
+        // Singleton. The current graph is Singleton-only; the check is
+        // cheap insurance against a future Scoped addition.
+        //
+        // ValidateOnBuild is the one earning its keep today. It builds a
+        // call site for every registration above without instantiating
+        // any of them, so a constructor parameter added without its
+        // registration fails here, naming the service it could not
+        // resolve. Without it the first thing to notice is the
+        // GetRequiredService<MainViewModel> a few lines later in
+        // App.OnStartup, whose whole visible surface is "Failed to start"
+        // and an exception type name: the app's worst failure mode
+        // reached by its least visible mistake, and one no other gate
+        // catches, because the solution still compiles, the tests build
+        // their subjects by hand rather than through the container, and
+        // publishing never runs the app. CompositionRootTests builds both
+        // roots so it lands on CI instead of a user's machine.
+        return services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateScopes = true,
+            ValidateOnBuild = true,
+        });
     }
 }

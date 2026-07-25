@@ -24,10 +24,13 @@ public static class CoreComposition
     /// process is the simplest correct choice.
     /// </summary>
     /// <remarks>
-    /// Every registration here is Singleton. A Scoped service captured
-    /// by a Singleton throws at startup via the WPF host's
-    /// <c>Composition.BuildServiceProvider(validateScopes: true)</c>
-    /// flag.
+    /// Every registration here is Singleton, which matters beyond tidiness
+    /// for <c>RecycleEngine</c>: it owns an STA thread, so a Transient one
+    /// would start a thread per resolve and the container would never join
+    /// them. Both hosts build with <c>ValidateScopes</c> and
+    /// <c>ValidateOnBuild</c> set, so a Scoped service captured by a
+    /// Singleton and a constructor parameter with no registration behind it
+    /// both fail at the container build rather than at first resolve.
     /// </remarks>
     public static IServiceCollection AddInstallerCleanCore(this IServiceCollection services)
     {

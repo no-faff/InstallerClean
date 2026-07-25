@@ -220,7 +220,11 @@ internal static class Program
         {
             using var services = new ServiceCollection()
                 .AddInstallerCleanCore()
-                .BuildServiceProvider(validateScopes: true);
+                .BuildServiceProvider(new ServiceProviderOptions
+                {
+                    ValidateScopes = true,
+                    ValidateOnBuild = true,
+                });
 
             // For /m, resolve and validate the destination before the scan so
             // a misconfigured task fails fast instead of paying a full
