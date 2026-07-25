@@ -380,7 +380,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 - The post-Move heading claims only what happened: "{N} moved" for a same-volume move, which frees nothing until the parked folder is deleted, and "{N} freed" only when the move left the drive. Delete keeps "freed".
 - The README documents the setup's silent install (`/SILENT`, `/VERYSILENT`); the installer already skipped its post-install launch on silent runs. Asked for in discussion #26.
 - `pad.xml`'s descriptions stop selling Move as the restore path, matching the README's framing: deleting what the app lists is safe, and Move is for keeping a copy.
-- The portable build returns to the compressed single-file shape, roughly halving the download (about 135 MB to about 65 MB). It had shipped uncompressed since v1.8.2 to clear a Microsoft Defender machine-learning false positive on the compressed runtime bytes; this release's compressed build was scanned on every VirusTotal engine before shipping and came back clean, so the smaller download is back.
+- The portable build returns to the compressed single-file shape, roughly halving the download (about 135 MB to about 65 MB). It had shipped uncompressed since v1.8.2 to clear a machine-learning false positive on the compressed runtime bytes; this release's compressed build was scanned on every VirusTotal engine before shipping and came back clean, so the smaller download is back.
 
 ### Fixed
 
@@ -492,8 +492,8 @@ An audit-driven release: a large sweep of correctness fixes (thread affinity, ex
 
 ### Changed
 
-- InstallerClean-portable.exe ships ~135 MB instead of ~62 MB. The single-file LZMA-compressed embedded runtime that produced the smaller earlier shape tripped Microsoft Defender's machine-learning heuristic as a false positive on the v1.8.2 build; the same code lineage cleared 0/70 on v1.8.1. Turning the inner compression off (the dotnet publish `EnableCompressionInSingleFile` flag) cleared every VirusTotal engine. Slim and CLI single-file builds are unaffected and unchanged in size.
-- Inno Setup wrapper now uses `Compression=bzip` with `SolidCompression=no`. The previous `Compression=zip` configuration combined with the new uncompressed-payload portable inside picked up a DeepInstinct static-ML false positive on the setup hash; bzip was the only Inno compression algorithm tested that cleared every VirusTotal engine for the v1.8.2 setup.
+- InstallerClean-portable.exe ships ~135 MB instead of ~62 MB. The single-file LZMA-compressed embedded runtime that produced the smaller earlier shape tripped one engine's machine-learning heuristic as a false positive on the v1.8.2 build; the same code lineage cleared 0/70 on v1.8.1. Turning the inner compression off (the dotnet publish `EnableCompressionInSingleFile` flag) cleared every VirusTotal engine. Slim and CLI single-file builds are unaffected and unchanged in size.
+- Inno Setup wrapper now uses `Compression=bzip` with `SolidCompression=no`. The previous `Compression=zip` configuration combined with the new uncompressed-payload portable inside picked up a static-ML false positive on the setup hash; bzip was the only Inno compression algorithm tested that cleared every VirusTotal engine for the v1.8.2 setup.
 - Orphans-list Reason column promoted from `Text.Dim` to `Text.Muted` so the load-bearing column that distinguishes Orphaned from Superseded is no longer the lowest text tier on the most semantically critical cell.
 - Orphans-list now renders as a ListView + GridView (matching the registered-files window) so screen readers announce each row as column-headed cells, and its columns click-sort like the registered window's. Previously the rows announced as single cells with the three values run together.
 - Completion overlay's Done button gains Alt+D access key, matching the Alt mnemonics on the Cancel / Move / Delete / Browse / Rescan / ScanAgain buttons that previously had them.
@@ -689,7 +689,7 @@ The largest engineering release in the project's history. The codebase was split
 ### Changed
 
 - About dialog redesign: version, licence and repository metadata in a compact block; Star on GitHub and Donate as labelled actions in the footer alongside Check for updates and Close.
-- Inno Setup compression switched from `lzma2/ultra64` to `zip` after `setup.exe` was flagged by DeepInstinct on VirusTotal.
+- Inno Setup compression switched from `lzma2/ultra64` to `zip` after `setup.exe` picked up a false positive from one engine on VirusTotal.
 - Scan-complete timer displays milliseconds when under one second (was rounding to "0.0s").
 
 ### Fixed
@@ -699,7 +699,7 @@ The largest engineering release in the project's history. The codebase was split
 
 ### Removed
 
-- `UpdateCheckService` (the HTTP-based update check). Check for updates now opens the GitHub releases page in the browser. The setup was being flagged by DeepInstinct on VirusTotal; auto-HTTP-on-startup from an elevated process was the leading suspicion at the time.
+- `UpdateCheckService` (the HTTP-based update check). Check for updates now opens the GitHub releases page in the browser. The setup was picking up a false positive from one engine on VirusTotal; auto-HTTP-on-startup from an elevated process was the leading suspicion at the time.
 
 ## [1.5.2] - 2026-04-17
 
@@ -781,7 +781,7 @@ The largest engineering release in the project's history. The codebase was split
 ### Changed
 
 - Donate link now points to `nofaff.netlify.app`.
-- An automatic startup update check (with an opt-out toggle) was added and removed within the release: DeepInstinct flagged the build on VirusTotal and the startup network call from an elevated process was the leading suspicion, so the check shipped manual-only.
+- An automatic startup update check (with an opt-out toggle) was added and removed within the release: the build picked up a false positive from one engine on VirusTotal and the startup network call from an elevated process was the leading suspicion, so the check shipped manual-only.
 
 ## [1.4.1] - 2026-03-10
 

@@ -77,9 +77,9 @@ OutputDir={#PublishDir}
 OutputBaseFilename=InstallerClean-{#AppVersion}-setup
 ; Compression=bzip; SolidCompression=no. Every other Inno
 ; compression combination tested on this project has tripped a
-; static-ML false positive on the setup hash: lzma2 trips
-; DeepInstinct, zip (with or without SolidCompression=yes) trips
-; Arctic Wolf or DeepInstinct depending on the embedded portable's
+; static-ML false positive on the setup hash: lzma2 trips one
+; engine, and zip (with or without SolidCompression=yes) trips one
+; of two, which of them depending on the embedded portable's
 ; runtime compression. bzip cleared every VirusTotal engine.
 Compression=bzip
 SolidCompression=no
