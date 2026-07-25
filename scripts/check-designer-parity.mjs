@@ -16,9 +16,9 @@
 //   - every accessor names a key the resx defines
 //   - the property name is the key with dots replaced by underscores
 //
-// This compares the two files rather than re-running the generator, so it costs
-// milliseconds in CI instead of the regenerate script's two-plus minutes, and it
-// fails on the drift that actually bites rather than on formatting.
+// This compares the two files rather than re-running the generator, so CI needs
+// neither a shell nor the generator's assumptions about its own environment, and
+// it fails on the drift that actually bites rather than on formatting.
 //
 // Run from the repo root: node scripts/check-designer-parity.mjs
 import { readFileSync } from 'node:fs';
