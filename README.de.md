@@ -277,8 +277,8 @@ Von den 151 Berichten, die seit der Einführung der Option in v1.8.0 freundliche
 
 Drei Varianten, wähle eine:
 
-- **Setup** (`InstallerClean-2.2.0-setup.exe`): ein normaler Windows-Installer mit gebündelter .NET-10-Laufzeit. Fügt einen Eintrag ins Startmenü ein und lässt sich sauber deinstallieren. Bei den Programmen einsortiert, damit du es in sechs Monaten leicht wiederfindest.
-- **Portable** (`InstallerClean-2.2.0-portable.exe`): eine einzelne, eigenständige exe mit gebündelter Laufzeit. Keine Installation, kein Deinstallationsprogramm. Ausführen, benutzen, löschen. Jederzeit wieder ausführen.
+- **Setup** (`InstallerClean-2.3.0-setup.exe`): ein normaler Windows-Installer mit gebündelter .NET-10-Laufzeit. Fügt einen Eintrag ins Startmenü ein und lässt sich sauber deinstallieren. Bei den Programmen einsortiert, damit du es in sechs Monaten leicht wiederfindest.
+- **Portable** (`InstallerClean-2.3.0-portable.exe`): eine einzelne, eigenständige exe mit gebündelter Laufzeit. Keine Installation, kein Deinstallationsprogramm. Ausführen, benutzen, löschen. Jederzeit wieder ausführen.
 - **CLI** (`installerclean-cli.exe`): die Befehlszeilenversion allein, eine einzelne, eigenständige exe. Keine Installation, danach bleibt nichts auf dem Rechner zurück. Leg sie auf einem Client ab, führe einen Scan oder ein Aufräumen aus, lösche sie. Gebaut für Skripting, geplante Aufgaben und Massenbereitstellung, wenn du die Operationen ohne Desktop-App auf dem Client willst. Siehe [Befehlszeile](#befehlszeile) für die Argumente und Exit-Codes.
 
 Ab 2.2.0 tragen die Dateinamen von Setup und Portable ihre Versionsnummer, sodass eine heruntergeladene Kopie immer sagt, was sie ist; das Befehlszeilenprogramm behält seinen schlichten Namen `installerclean-cli.exe`, damit geplante Aufgaben und Skripte, die darauf zeigen, über Updates hinweg weiter funktionieren.

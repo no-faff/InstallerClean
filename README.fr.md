@@ -277,8 +277,8 @@ Sur les 151 rapports que des utilisateurs nous ont gentiment envoyés (merci �
 
 Trois variantes, choisissez-en une :
 
-- **Setup** (`InstallerClean-2.2.0-setup.exe`) : un programme d'installation Windows classique, avec le runtime .NET 10 intégré. Ajoute une entrée au menu Démarrer et se désinstalle proprement. Bien rangé dans les Programmes, facile à retrouver dans six mois.
-- **Portable** (`InstallerClean-2.2.0-portable.exe`) : un exe unique et autonome, runtime intégré. Pas d'installation, pas de désinstallation. Lancez-le, utilisez-le, supprimez-le. Relancez-le quand vous voulez.
+- **Setup** (`InstallerClean-2.3.0-setup.exe`) : un programme d'installation Windows classique, avec le runtime .NET 10 intégré. Ajoute une entrée au menu Démarrer et se désinstalle proprement. Bien rangé dans les Programmes, facile à retrouver dans six mois.
+- **Portable** (`InstallerClean-2.3.0-portable.exe`) : un exe unique et autonome, runtime intégré. Pas d'installation, pas de désinstallation. Lancez-le, utilisez-le, supprimez-le. Relancez-le quand vous voulez.
 - **CLI** (`installerclean-cli.exe`) : la version en ligne de commande seule, un exe unique et autonome. Pas d'installation, rien laissé sur la machine ensuite. Déposez-le sur un poste client, lancez une analyse ou un nettoyage, supprimez-le. Conçu pour le scripting, les tâches planifiées et le déploiement de masse, quand vous voulez les opérations sans application de bureau sur le client. Voir [Ligne de commande](#ligne-de-commande) pour les arguments et les codes de sortie.
 
 Depuis la 2.2.0, les noms de fichier du programme d'installation et de la version portable comportent leur numéro de version, si bien qu'une copie téléchargée dit toujours ce qu'elle est ; l'outil en ligne de commande garde son nom simple `installerclean-cli.exe`, pour que les tâches planifiées et les scripts qui pointent vers lui continuent de fonctionner d'une mise à jour à l'autre.

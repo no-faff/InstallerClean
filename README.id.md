@@ -277,8 +277,8 @@ Dari 151 laporan yang dikirimkan orang-orang (terima kasih 🙏) sejak opsi ini 
 
 Tiga varian, pilih salah satu:
 
-- **Setup** (`InstallerClean-2.2.0-setup.exe`): penginstal Windows biasa dengan runtime .NET 10 yang sudah dibundel. Menambahkan entri di menu Mulai dan bisa dihapus instalasinya dengan bersih. Tertata di daftar Program agar mudah ditemukan enam bulan dari sekarang.
-- **Portable** (`InstallerClean-2.2.0-portable.exe`): satu file exe mandiri dengan runtime yang sudah dibundel. Tanpa instalasi, tanpa penghapus instalasi. Jalankan, pakai, hapus. Jalankan lagi kapan pun.
+- **Setup** (`InstallerClean-2.3.0-setup.exe`): penginstal Windows biasa dengan runtime .NET 10 yang sudah dibundel. Menambahkan entri di menu Mulai dan bisa dihapus instalasinya dengan bersih. Tertata di daftar Program agar mudah ditemukan enam bulan dari sekarang.
+- **Portable** (`InstallerClean-2.3.0-portable.exe`): satu file exe mandiri dengan runtime yang sudah dibundel. Tanpa instalasi, tanpa penghapus instalasi. Jalankan, pakai, hapus. Jalankan lagi kapan pun.
 - **CLI** (`installerclean-cli.exe`): versi baris perintah tersendiri, satu file exe mandiri. Tanpa instalasi, tidak ada yang tertinggal di mesin sesudahnya. Taruh di komputer klien, jalankan pemindaian atau pembersihan, lalu hapus. Dibuat untuk skrip, tugas terjadwal, dan penyebaran massal, ketika Anda menginginkan operasinya tanpa aplikasi desktop di klien. Lihat [Baris perintah](#baris-perintah) untuk argumen dan kode keluar.
 
 Mulai 2.2.0, nama file versi setup dan portabel memuat nomor versinya, sehingga salinan yang diunduh selalu menyebutkan dirinya apa; alat baris perintah tetap memakai nama polos `installerclean-cli.exe` agar tugas terjadwal dan skrip yang menunjuk ke sana tetap berjalan setelah pembaruan.
