@@ -103,8 +103,18 @@
     <SolidColorBrush x:Key="Link.Rest"  Color="{StaticResource Primitive.Indigo.400}"/>
     <SolidColorBrush x:Key="Link.Hover" Color="{StaticResource Primitive.Indigo.300}"/>
 
-    <!-- Scrollbar. -->
-    <SolidColorBrush x:Key="Scrollbar.Thumb"        Color="{StaticResource Primitive.Slate.50.Alpha20}"/>
+    <!-- Scrollbar. The thumb is the one control a user has to FIND before
+         they can use it, so the resting state is the one that has to be
+         visible, and it was the faintest thing in the theme: white at 20%
+         composites to 1.84:1 on Surface.Card and 1.88:1 on
+         Surface.Sidebar, against the 3:1 WCAG 1.4.11 asks of the visual
+         information that identifies a control. The user-agent exemption
+         does not cover it, the ScrollBar template being the app's own
+         (Components.xaml). At 38% it is 3.41:1 on the card and 3.27:1 on
+         the sidebar and still reads as a quiet thumb rather than a solid
+         bar. Hover and drag share the 50% step, 5.08:1 on the card, so
+         there is still a plain brightening between the two states. -->
+    <SolidColorBrush x:Key="Scrollbar.Thumb"        Color="{StaticResource Primitive.Slate.50.Alpha38}"/>
     <SolidColorBrush x:Key="Scrollbar.Thumb.Hover"  Color="{StaticResource Primitive.Slate.50.Alpha50}"/>
 
     <!-- Typography. Six scaled steps, Display down to Caption, which are

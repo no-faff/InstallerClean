@@ -50,7 +50,14 @@
     <Color x:Key="Primitive.Slate.700.Hover">#2b3749</Color>
     <Color x:Key="Primitive.Slate.700.Pressed">#232e3d</Color>
 
-    <Color x:Key="Primitive.Slate.50.Alpha20">#33f8fafc</Color>
+    <!-- 38, an odd-looking step, because the value is derived rather than
+         chosen: composited over the two surfaces the scrollbar thumb sits
+         on it clears the WCAG non-text 3:1 line on both with room to
+         spare, where its 20% predecessor reached 1.84:1 on the card. The
+         bare minimum is 0x59, which lands on 3.01:1 against the sidebar
+         and is too fine a margin to build on. Ratios are on the
+         Scrollbar.Thumb token that consumes this. -->
+    <Color x:Key="Primitive.Slate.50.Alpha38">#60f8fafc</Color>
     <Color x:Key="Primitive.Slate.50.Alpha50">#80f8fafc</Color>
     <Color x:Key="Primitive.Slate.950.Alpha50">#80020617</Color>
 
