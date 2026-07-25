@@ -8,7 +8,7 @@ public class ReadmeLinksTests
     [Theory]
     [InlineData("en-GB")]
     [InlineData("en-US")]
-    [InlineData("nl-NL")] // unshipped language: the English README is what the app displays
+    [InlineData("sv-SE")] // unshipped language: the English README is what the app displays
     public void For_links_the_repository_home_when_english_is_displayed(string culture)
         => Assert.Equal(
             "https://github.com/no-faff/InstallerClean#is-it-safe",
@@ -17,6 +17,7 @@ public class ReadmeLinksTests
     [Theory]
     [InlineData("it", "README.it.md")]
     [InlineData("ja-JP", "README.ja.md")]
+    [InlineData("nl-NL", "README.nl.md")]
     [InlineData("pt-BR", "README.pt-BR.md")]
     [InlineData("zh-CN", "README.zh-CN.md")] // zh-Hans satellite pairs with the zh-CN README
     [InlineData("zh-Hans", "README.zh-CN.md")]
@@ -26,7 +27,7 @@ public class ReadmeLinksTests
             ReadmeLinks.For("recovery", CultureInfo.GetCultureInfo(culture)));
 
     // Home is the About window's guide link: the whole document rather than
-    // one section of it. For the fourteen translations that is For's URL
+    // one section of it. For the fifteen translations that is For's URL
     // without the fragment; English is the one language where the two
     // differ, because an anchor works from the repository home and an
     // unanchored landing there does not (see ReadmeLinks.Home).
@@ -34,7 +35,7 @@ public class ReadmeLinksTests
     [Theory]
     [InlineData("en-GB")]
     [InlineData("en-US")]
-    [InlineData("nl-NL")]
+    [InlineData("sv-SE")]
     public void Home_links_the_english_readme_when_english_is_displayed(string culture)
         => Assert.Equal(
             "https://github.com/no-faff/InstallerClean/blob/main/README.md",
@@ -43,6 +44,7 @@ public class ReadmeLinksTests
     [Theory]
     [InlineData("it", "README.it.md")]
     [InlineData("ja-JP", "README.ja.md")]
+    [InlineData("nl-NL", "README.nl.md")]
     [InlineData("pt-BR", "README.pt-BR.md")]
     [InlineData("zh-CN", "README.zh-CN.md")]
     [InlineData("zh-Hans", "README.zh-CN.md")]

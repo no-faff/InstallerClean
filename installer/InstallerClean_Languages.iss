@@ -13,6 +13,7 @@ Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 Name: "italian"; MessagesFile: "Languages\Italian.isl"
+Name: "dutch"; MessagesFile: "compiler:Languages\Dutch.isl"
 Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl"
 Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 Name: "vietnamese"; MessagesFile: "Languages\Vietnamese.isl"
@@ -64,6 +65,12 @@ italian.WelcomeLabel2=Questo installerà InstallerClean nel computer.
 italian.FinishedHeadingLabel=Installazione completata
 italian.FinishedLabel=InstallerClean è stato installato nel computer.
 italian.ClickFinish=Per chiudere l'installazione seleziona 'Fine'.
+
+dutch.WelcomeLabel1=Welkom bij de installatie van InstallerClean
+dutch.WelcomeLabel2=Hiermee wordt InstallerClean op uw computer geïnstalleerd.
+dutch.FinishedHeadingLabel=Installatie voltooid
+dutch.FinishedLabel=InstallerClean is op uw computer geïnstalleerd.
+dutch.ClickFinish=Klik op Voltooien om de installatie af te sluiten.
 
 polish.WelcomeLabel1=Witamy w instalatorze InstallerClean
 polish.WelcomeLabel2=InstallerClean zostanie zainstalowany na tym komputerze.
@@ -124,7 +131,7 @@ korean.ClickFinish=설치를 마치려면 '마침'을 클릭하세요.
 ; "running" with nothing visible on screen: a command-line or scheduled-task run
 ; holds the same mutex. Inno's default text only says "close all instances", which
 ; strands the user in that case, so these overrides name both processes and point
-; at Task Manager. Kept here rather than in each .isl so all 15 stay in one place.
+; at Task Manager. Kept here rather than in each .isl so all 16 stay in one place.
 english.SetupAppRunningError=InstallerClean is still running, so Setup cannot continue.%n%nThis may be the app window, or a command-line or scheduled-task run working in the background. Close the window, or end InstallerClean.exe and installerclean-cli.exe in Task Manager, then click OK to continue, or Cancel to exit.
 english.UninstallAppRunningError=InstallerClean is still running, so it cannot be removed.%n%nThis may be the app window, or a command-line or scheduled-task run working in the background. Close the window, or end InstallerClean.exe and installerclean-cli.exe in Task Manager, then click OK to continue, or Cancel to exit.
 
@@ -142,6 +149,9 @@ french.UninstallAppRunningError=InstallerClean est toujours en cours d'exécutio
 
 italian.SetupAppRunningError=InstallerClean è ancora in esecuzione, quindi l'installazione non può continuare.%n%nPotrebbe essere la finestra dell'applicazione, oppure un'esecuzione in background dalla riga di comando o da un'attività pianificata. Chiudi la finestra, oppure termina InstallerClean.exe e installerclean-cli.exe in Gestione attività, quindi fai clic su OK per continuare o su Annulla per uscire.
 italian.UninstallAppRunningError=InstallerClean è ancora in esecuzione, quindi non può essere disinstallato.%n%nPotrebbe essere la finestra dell'applicazione, oppure un'esecuzione in background dalla riga di comando o da un'attività pianificata. Chiudi la finestra, oppure termina InstallerClean.exe e installerclean-cli.exe in Gestione attività, quindi fai clic su OK per continuare o su Annulla per uscire.
+
+dutch.SetupAppRunningError=InstallerClean wordt nog uitgevoerd, dus de installatie kan niet doorgaan.%n%nDit kan het venster van de app zijn, of een run via de opdrachtregel of een geplande taak die op de achtergrond werkt. Sluit het venster, of beëindig InstallerClean.exe en installerclean-cli.exe in Taakbeheer, en klik daarna op OK om door te gaan of op Annuleren om af te sluiten.
+dutch.UninstallAppRunningError=InstallerClean wordt nog uitgevoerd, dus het kan niet worden verwijderd.%n%nDit kan het venster van de app zijn, of een run via de opdrachtregel of een geplande taak die op de achtergrond werkt. Sluit het venster, of beëindig InstallerClean.exe en installerclean-cli.exe in Taakbeheer, en klik daarna op OK om door te gaan of op Annuleren om af te sluiten.
 
 polish.SetupAppRunningError=InstallerClean jest nadal uruchomiony, więc instalacja nie może być kontynuowana.%n%nMoże to być okno aplikacji albo proces działający w tle z wiersza polecenia lub zaplanowanego zadania. Zamknij okno lub zakończ InstallerClean.exe i installerclean-cli.exe w Menedżerze zadań, a następnie kliknij OK, aby kontynuować, lub Anuluj, aby zakończyć.
 polish.UninstallAppRunningError=InstallerClean jest nadal uruchomiony, więc nie można go odinstalować.%n%nMoże to być okno aplikacji albo proces działający w tle z wiersza polecenia lub zaplanowanego zadania. Zamknij okno lub zakończ InstallerClean.exe i installerclean-cli.exe w Menedżerze zadań, a następnie kliknij OK, aby kontynuować, lub Anuluj, aby zakończyć.
@@ -188,6 +198,9 @@ french.LaunchApp=Lancer InstallerClean
 
 italian.UninstallApp=Disinstalla InstallerClean
 italian.LaunchApp=Esegui InstallerClean
+
+dutch.UninstallApp=InstallerClean verwijderen
+dutch.LaunchApp=InstallerClean starten
 
 polish.UninstallApp=Odinstaluj InstallerClean
 polish.LaunchApp=Uruchom InstallerClean

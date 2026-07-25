@@ -20,7 +20,7 @@ public static class SupportedLanguages
     public static readonly IReadOnlyList<string> CultureNames = new[]
     {
         Neutral, "zh-Hans", "ru", "es", "ja", "pt-BR", "pl", "tr",
-        "ko", "fr", "it", "de", "id", "vi", "uk",
+        "ko", "fr", "it", "de", "id", "vi", "uk", "nl",
     };
 
     /// <summary>

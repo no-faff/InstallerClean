@@ -37,6 +37,7 @@ const INNO_TO_CULTURE = {
   spanish: 'es',
   french: 'fr',
   italian: 'it',
+  dutch: 'nl',
   polish: 'pl',
   brazilianportuguese: 'pt-BR',
   vietnamese: 'vi',

@@ -25,7 +25,7 @@
     <Program_Release_Status>Major Update</Program_Release_Status>
     <Program_Install_Support>Install and Uninstall</Program_Install_Support>
     <Program_OS_Support>Win10x64,Win11</Program_OS_Support>
-    <Program_Language>English, Simplified Chinese, Russian, Spanish, Japanese, Brazilian Portuguese, Polish, Turkish, Korean, French, Italian, German, Indonesian, Vietnamese, Ukrainian</Program_Language>
+    <Program_Language>English, Simplified Chinese, Russian, Spanish, Japanese, Brazilian Portuguese, Polish, Turkish, Korean, French, Italian, German, Indonesian, Vietnamese, Ukrainian, Dutch</Program_Language>
     <Program_Change_Info>InstallerClean now tells you when there is a newer version. It asks GitHub once when it opens, and if an update exists a link appears in the bottom bar; nothing is downloaded and the check can be turned off in About. The About window has been reworked around a link to the guide, a &quot;Report a problem&quot; link and that setting, and the downloads on the release page now carry the version in their filenames.</Program_Change_Info>
     <Program_Specific_Category>System</Program_Specific_Category>
     <Program_Category_Class>System &amp; Desktop Utilities::File &amp; Disk Management</Program_Category_Class>

@@ -1,5 +1,5 @@
 <p align="center">
-  <strong>English</strong> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.es.md">Español</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.pl.md">Polski</a> · <a href="README.tr.md">Türkçe</a> · <a href="README.ko.md">한국어</a> · <a href="README.fr.md">Français</a> · <a href="README.it.md">Italiano</a> · <a href="README.de.md">Deutsch</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.uk.md">Українська</a>
+  <strong>English</strong> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ru.md">Русский</a> · <a href="README.es.md">Español</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.pl.md">Polski</a> · <a href="README.tr.md">Türkçe</a> · <a href="README.ko.md">한국어</a> · <a href="README.fr.md">Français</a> · <a href="README.it.md">Italiano</a> · <a href="README.de.md">Deutsch</a> · <a href="README.id.md">Bahasa Indonesia</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.uk.md">Українська</a> · <a href="README.nl.md">Nederlands</a>
 </p>
 
 <p align="center">
@@ -392,7 +392,7 @@ dotnet test src/InstallerClean.Tests/
 
 Found a bug or have a suggestion? [Open an issue](../../issues) or start a [discussion](../../discussions). Pull requests welcome. Please run `dotnet test` before submitting.
 
-InstallerClean comes in 15 languages, each covering the whole of it: the app, the installer, the command line and this README. The Japanese was written from scratch by coolvitto, and the Italian was corrected and approved by bovirus, both native speakers; the rest are my own machine translations. I put a lot of effort into them, but they won't be perfect, and I decided to ship them as they are rather than hold them back until a native speaker could check each one. If you speak English and one of these languages and spot anything that could be improved, I'd be glad to hear it, in an [issue](../../issues/new?template=translation_review.md), a pull request or a [discussion](../../discussions).
+InstallerClean comes in 16 languages, each covering the whole of it: the app, the installer, the command line and this README. The Japanese and the Dutch were contributed complete by coolvitto and RijckAlex, and the Italian is my own machine translation corrected and approved by bovirus, all three native speakers; the rest are my own machine translations. I put a lot of effort into them, but they won't be perfect, and I decided to ship them as they are rather than hold them back until a native speaker could check each one. If you speak English and one of these languages and spot anything that could be improved, I'd be glad to hear it, in an [issue](../../issues/new?template=translation_review.md), a pull request or a [discussion](../../discussions).
 
 ## Support the project
 

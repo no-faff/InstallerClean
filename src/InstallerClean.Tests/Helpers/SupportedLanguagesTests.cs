@@ -16,6 +16,8 @@ public class SupportedLanguagesTests
     [InlineData("it-CH", "it")]
     [InlineData("ja-JP", "ja")]
     [InlineData("de-AT", "de")]
+    [InlineData("nl-NL", "nl")]
+    [InlineData("nl-BE", "nl")]
     public void Active_matches_a_regional_culture_to_its_language(string culture, string expected)
         => Assert.Equal(expected, SupportedLanguages.Active(CultureInfo.GetCultureInfo(culture)));
 
@@ -33,7 +35,7 @@ public class SupportedLanguagesTests
     [InlineData("en-US")] // no en satellite; the neutral resx is the display
     [InlineData("pt-PT")] // pt-BR is not on pt-PT's fallback chain
     [InlineData("zh-TW")] // Traditional Chinese is not shipped
-    [InlineData("nl-NL")] // no Dutch translation at all
+    [InlineData("sv-SE")] // no Swedish translation at all
     public void Active_reports_neutral_for_a_culture_that_displays_English(string culture)
         => Assert.Equal(SupportedLanguages.Neutral, SupportedLanguages.Active(CultureInfo.GetCultureInfo(culture)));
 

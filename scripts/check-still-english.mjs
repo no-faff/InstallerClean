@@ -45,7 +45,7 @@ const isMachineCliKey = (key) =>
 
 // Universal keeps: format templates and the product name, byte-identical to
 // English in every language on purpose. Mirrors KEEP_ENGLISH in every
-// gen-strings-<code>.mjs (they are identical across all fourteen).
+// gen-strings-<code>.mjs (they are identical across all fifteen).
 const KEEP_ENGLISH = new Set([
   'Window.Main.Title', 'Startup.AlreadyRunningTitle', 'Startup.UnhandledTitle',
   'Automation.ScanResultAnnouncement',
@@ -62,6 +62,7 @@ const ALSO_KEEP = {
   id: ['Plural.File.Singular', 'Plural.Patch.Singular', 'Field.File'],
   es: ['Plural.Error.Singular'],
   it: ['Field.File', 'Plural.File.Singular', 'Plural.Patch.Singular'],
+  nl: ['Section.Registered.Patches', 'Field.Patches', 'Automation.Section.Patches', 'Action.Details', 'Plural.Product.Singular', 'Plural.Patch.Singular', 'Plural.Patch.Plural'],
   'pt-BR': ['Plural.Patch.Singular', 'Plural.Patch.Plural', 'Field.Patches', 'Section.Registered.Patches', 'Automation.Section.Patches'],
 };
 

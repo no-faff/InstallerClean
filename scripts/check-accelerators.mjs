@@ -33,7 +33,7 @@ const DIR = 'src/InstallerClean.Core/Resources';
 // Priority order, matching SupportedLanguages.CultureNames. The neutral resx is
 // checked too: en-GB's own accelerators were only ever settled by hand.
 const LANGS = ['en-GB', 'zh-Hans', 'ru', 'es', 'ja', 'pt-BR', 'pl', 'tr',
-  'ko', 'fr', 'it', 'de', 'id', 'vi', 'uk'];
+  'ko', 'fr', 'it', 'de', 'id', 'vi', 'uk', 'nl'];
 
 // Every control on the window in that state, INCLUDING the ones carrying no
 // accelerator today: listing them is what catches a translation that invents one
