@@ -167,6 +167,55 @@ const FOLDER_TOKEN = '{InstallerFolder}';
 // cannot see it, the key being referenced and the reference dead.
 
 // ---------------------------------------------------------------------------
+// Rule 8. A resx value reaches a user through Strings and nothing else.
+//
+// Rule 6's token is only worth writing because Strings.Get and Strings.Find spend
+// it on the way out. Nothing in the language holds that: ResourceManager answers
+// any key by name, and a read that goes round the two doors hands a user a literal
+// {InstallerFolder} on screen, in a console or through a screen reader. Such a read
+// has already existed here once, the satellite-only plural overrides having no
+// typed accessor to come through, and it was caught by somebody reading the diff
+// rather than by anything that could fail.
+//
+// The two doors are internal to the Core assembly and so is the manager behind
+// them, which is as far as visibility goes: every project in the solution holds
+// InternalsVisibleTo, so a compiler cannot tell a sanctioned read from a bypass.
+// This can.
+//
+// Comments come off before the search, so the rule measures what a file DOES and a
+// file that merely discusses the manager is not a finding.
+const RAW_READ = /\bResourceManager\b/;
+
+// A test may read raw, and these do it deliberately. Every entry says why, because
+// the next one is a decision about whether a value can reach a user unspent, and
+// that question has an answer rather than a shrug.
+const RAW_READ_ALLOWED = [
+  {
+    file: 'src/InstallerClean.Core/Resources/Strings.Designer.cs',
+    reason: 'The doors themselves. The manager is private here and Get and Find are '
+      + 'what hold it.',
+  },
+  {
+    file: 'src/InstallerClean.Tests/Resources/SatelliteResxParityTests.cs',
+    reason: 'Enumerates a whole resource set per culture to prove each shipped '
+      + 'satellite carries what the neutral does. A door that answers one named key '
+      + 'cannot list a set.',
+  },
+  {
+    file: 'src/InstallerClean.Tests/Helpers/InstallerFolderTokenTests.cs',
+    reason: 'Audits every shipped culture for a hardcoded installer path, which needs '
+      + 'the values raw: substituted, a token-carrying string holds neither the token '
+      + 'nor the literal, so the audit would pass by construction.',
+  },
+  {
+    file: 'src/InstallerClean.Tests/Helpers/LocalisationOverrideTests.cs',
+    reason: 'Reads one key at a named culture to prove an explicit language pick '
+      + 'drives the typed accessor. The expectation has to come from the satellite '
+      + 'rather than from the door under test.',
+  },
+];
+
+// ---------------------------------------------------------------------------
 
 const values = (xml) => {
   const map = new Map();
@@ -218,6 +267,73 @@ function collectXaml(dir, out = []) {
   return out;
 }
 
+// Built with a forward slash rather than join(), because these paths are compared
+// against the ones written by hand in RAW_READ_ALLOWED and CI runs on Windows,
+// where join() would produce a separator no entry could ever match.
+function collectCs(dir, out = []) {
+  for (const name of readdirSync(dir)) {
+    if (name === 'bin' || name === 'obj') continue;
+    const p = `${dir}/${name}`;
+    if (statSync(p).isDirectory()) collectCs(p, out);
+    else if (name.endsWith('.cs')) out.push(p);
+  }
+  return out;
+}
+
+// C# with its comments taken out. String literals are left where they are: a
+// literal is code, and every form C# has for one (verbatim, interpolated, both at
+// once) has to be walked anyway to know which slashes open a comment and which sit
+// inside a path or a URL.
+const codeOnly = (src) => {
+  let out = '';
+  let i = 0;
+  while (i < src.length) {
+    const two = src.slice(i, i + 2);
+    if (two === '//') {
+      while (i < src.length && src[i] !== '\n') i++;
+      out += '\n';
+      continue;
+    }
+    if (two === '/*') {
+      i += 2;
+      while (i < src.length && src.slice(i, i + 2) !== '*/') i++;
+      i += 2;
+      out += ' ';
+      continue;
+    }
+    // Verbatim: a backslash is a backslash and the only escape is a doubled quote.
+    const three = src.slice(i, i + 3);
+    const opener = three === '$@"' || three === '@$"' ? 3 : two === '@"' ? 2 : 0;
+    if (opener) {
+      out += src.slice(i, i + opener);
+      i += opener;
+      while (i < src.length) {
+        if (src[i] === '"' && src[i + 1] === '"') { out += '""'; i += 2; continue; }
+        out += src[i];
+        i++;
+        if (src[i - 1] === '"') break;
+      }
+      continue;
+    }
+    // Regular and interpolated strings, and char literals: backslash escapes.
+    if (src[i] === '"' || src[i] === "'") {
+      const quote = src[i];
+      out += src[i];
+      i++;
+      while (i < src.length) {
+        if (src[i] === '\\') { out += src.slice(i, i + 2); i += 2; continue; }
+        out += src[i];
+        i++;
+        if (src[i - 1] === quote) break;
+      }
+      continue;
+    }
+    out += src[i];
+    i++;
+  }
+  return out;
+};
+
 const problems = [];
 // Kept apart from the findings below and reported first: a declaration this file
 // makes about a key or a control that no longer exists says nothing about any
@@ -261,6 +377,24 @@ for (const file of xamlFiles) {
       + 'so the resx value never reaches a user in any language. Drop the XAML attribute; '
       + 'drop the key too unless something else shows it.');
 }
+
+// --- Rule 8, once: source shape, not language.
+const csFiles = collectCs('src');
+const rawAllowed = new Map(RAW_READ_ALLOWED.map((e) => [e.file, e.reason]));
+const rawReaders = new Set(
+  csFiles.filter((f) => RAW_READ.test(codeOnly(readFileSync(f, 'utf8')))),
+);
+for (const file of [...rawReaders].sort())
+  if (!rawAllowed.has(file))
+    problems.push(`${file} reads a resource through ResourceManager rather than `
+      + 'Strings.Get or Strings.Find, so a value naming the installer cache folder '
+      + 'keeps its raw {InstallerFolder} all the way to a user. Route the read through '
+      + "a door, or add the file to this file's RAW_READ_ALLOWED with the reason it "
+      + 'cannot.');
+for (const file of [...rawAllowed.keys()].sort())
+  if (!rawReaders.has(file))
+    stale.push(`${file} is allowed a direct ResourceManager read in this file and makes `
+      + 'none: renamed, moved or routed through a door since. Drop its entry.');
 
 // --- Rules 1 and 3 to 6, per language.
 const neutral = values(readFileSync(`${RESX_DIR}/Strings.resx`, 'utf8'));
@@ -363,4 +497,5 @@ if (problems.length) {
 }
 
 console.log(`\nCross-key rules OK: ${LANGS.length} languages, ${MUST_AGREE.length} label/name pairs, `
-  + `${tokenKeys.length} keys carrying ${FOLDER_TOKEN}, ${namedInXaml.size} automation names classified.`);
+  + `${tokenKeys.length} keys carrying ${FOLDER_TOKEN}, ${namedInXaml.size} automation names classified, `
+  + `${csFiles.length} C# files read through Strings bar ${rawAllowed.size} allowed direct.`);

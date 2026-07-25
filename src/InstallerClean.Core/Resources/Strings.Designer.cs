@@ -16,6 +16,10 @@ using InstallerClean.Helpers;
 /// Strongly-typed accessor over Strings.resx. C# code paths use these
 /// properties for compile-time safety; XAML uses {loc:Translate Key}
 /// (see TranslateExtension) which resolves the same keys at runtime.
+/// Get and Find are the only two routes from a resx value to a user and
+/// both spend the installer-folder token, which is what lets a string
+/// name the cache folder correctly on a machine whose Windows is not on
+/// C:. scripts/check-cross-key-rules.mjs fails the build on a third.
 /// </summary>
 [global::System.CodeDom.Compiler.GeneratedCodeAttribute("InstallerClean.ResxGen", "1.0.0.0")]
 public static class Strings
@@ -24,17 +28,15 @@ public static class Strings
         new("InstallerClean.Resources.Strings", typeof(Strings).Assembly);
 
     /// <summary>
-    /// The cached ResourceManager backing every property below.
-    /// Exposed for the two reads Get cannot serve: the plural override
-    /// keys DisplayHelpers builds by name at runtime, and the whole
-    /// resource sets the satellite parity tests enumerate. Anything
-    /// resolving a known key goes through Get, so the token
-    /// substitution below is not bypassed.
+    /// The cached ResourceManager backing every property below, reached
+    /// only by the tests that audit the shipped satellites: those read
+    /// whole resource sets, which no per-key door can answer, and they
+    /// need the values raw, token and all.
     /// </summary>
-    public static ResourceManager ResourceManager => Manager;
+    internal static ResourceManager ResourceManager => Manager;
 
     /// <summary>
-    /// The one door every resource lookup comes through, XAML included
+    /// The door for every key with an accessor below, XAML included
     /// (TranslateExtension calls this), which is why the installer-folder
     /// token is substituted here: a string naming the cache folder is
     /// correct everywhere by writing it. A missing key falls back to the
@@ -42,6 +44,18 @@ public static class Strings
     /// </summary>
     internal static string Get(string key) =>
         InstallerFolderToken.Resolve(Manager.GetString(key, Localisation.UiCulture) ?? key);
+
+    /// <summary>
+    /// The door for a key assembled at runtime, which has no accessor
+    /// below to come through: the satellite-only plural overrides, built
+    /// from a key prefix and a CLDR category. Absent is the ordinary
+    /// answer there and means fall back to the neutral form, so this
+    /// returns null rather than echoing the key back the way Get does.
+    /// </summary>
+    internal static string? Find(string key) =>
+        Manager.GetString(key, Localisation.UiCulture) is { } value
+            ? InstallerFolderToken.Resolve(value)
+            : null;
 
     public static string About_AutoUpdateCheck => Get("About.AutoUpdateCheck");
     public static string About_Link_Guide => Get("About.Link.Guide");

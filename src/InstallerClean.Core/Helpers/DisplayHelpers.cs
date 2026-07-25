@@ -87,14 +87,12 @@ internal static class DisplayHelpers
     }
 
     // An override key exists only in a satellite, so it has no typed accessor and
-    // is read by name. That route skips Strings.Get, which is where the
-    // installer-folder token is substituted, so the substitution is applied here
-    // as well: an override on a key naming the cache folder would otherwise put
-    // a raw token on screen in that language alone.
-    private static string? Override(string key) =>
-        Strings.ResourceManager.GetString(key, Localisation.UiCulture) is { } value
-            ? InstallerFolderToken.Resolve(value)
-            : null;
+    // is read by name. Strings.Find is the door for exactly that: it resolves at
+    // the app's UI culture and spends the installer-folder token, so an override
+    // on a key naming the cache folder cannot reach a screen raw in that one
+    // language. Named for what the read is, the lookup missing being the normal
+    // answer here rather than a fault.
+    private static string? Override(string key) => Strings.Find(key);
 
     /// <summary>
     /// Picks the count fragment for <paramref name="count"/> in the current UI

@@ -12,10 +12,12 @@ namespace InstallerClean.Tests.Helpers;
 /// consumer receives the resolved path, so a machine whose Windows is not on C:
 /// is told the truth about the folder the app is working in.
 ///
-/// The end-to-end assertions go through <c>Strings.Get</c> rather than the
-/// helper alone, because the whole design rests on that being the single door:
-/// a consumer that resolved a resource some other way would read a raw token
-/// and nothing else here would notice.
+/// The end-to-end assertions go through <c>Strings.Get</c> and <c>Strings.Find</c>
+/// rather than the helper alone, because the design rests on those two being the
+/// only doors: a consumer that resolved a resource some other way would read a raw
+/// token and nothing else here would notice. What holds the "only" is
+/// <c>scripts/check-cross-key-rules.mjs</c> rather than a test, this suite reading
+/// raw itself, so a test forbidding a raw read would have to exempt its own.
 /// </summary>
 public class InstallerFolderTokenTests
 {
@@ -59,6 +61,30 @@ public class InstallerFolderTokenTests
 
         Assert.DoesNotContain(InstallerFolderToken.Token, value, StringComparison.Ordinal);
         Assert.Contains(InstallerCacheHelpers.InstallerFolder, value, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_key_resolved_by_name_reaches_its_consumer_resolved_too()
+    {
+        // The second door, which exists because a satellite-only plural override
+        // has no accessor to come through and so is looked up by name. Asserted on
+        // a key that does carry the token, no override naming the folder existing
+        // to assert on instead.
+        var value = Strings.Find("Automation.RescanInstaller");
+
+        Assert.NotNull(value);
+        Assert.DoesNotContain(InstallerFolderToken.Token, value, StringComparison.Ordinal);
+        Assert.Contains(InstallerCacheHelpers.InstallerFolder, value, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_key_no_resx_defines_comes_back_absent_rather_than_echoed()
+    {
+        // The one way the two doors differ, and what the override lookup rests on:
+        // absent means "this language declines the override, use the neutral form".
+        // A key echoed back the way Get echoes one would be rendered as the count
+        // noun, so "3 Plural.File.Few" would reach a screen.
+        Assert.Null(Strings.Find("Plural.File.NoSuchCategory"));
     }
 
     [Fact]
