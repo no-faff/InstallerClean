@@ -96,14 +96,26 @@ public partial class App : Application
         // Typeface constructor the framework uses puts #GLOBAL USER INTERFACE
         // behind the element's own family, so a character Poppins lacks reaches
         // that composite font; and CompositeFontFamily.GetTargetFamilyMap picks
-        // between its FontFamilyMaps by exactly this tag. A tag matching none of
-        // them takes the maps carrying no language at all, and in
-        // GlobalUserInterface.CompositeFont those lead with Meiryo and Microsoft
-        // JhengHei across the Han block, kana and the fullwidth forms. So the
-        // face a Chinese, Japanese or Korean screen got was decided by which of
-        // six fonts the machine happened to have installed rather than by the
-        // language being displayed, and Han unification means the wrong one is
-        // not a different style but different characters.
+        // between its FontFamilyMaps by exactly this tag.
+        //
+        // The composite font it picks from is the pack resource
+        // fonts/globaluserinterface.compositefont inside PresentationCore.dll,
+        // which is the URI FamilyCollection.SystemCompositeFonts builds, never the
+        // same-named file in the Windows Fonts folder. It carries one map set per
+        // Windows generation and CompositeFontParser takes the first the machine
+        // satisfies; the Windows10RS5 and Windows10RS1 sets, which between them
+        // cover every Windows the setup's MinVersion admits, agree on all of the
+        // below. A tag matching no map takes the maps carrying no language at all,
+        // and those lead with Yu Gothic UI, Meiryo UI and Meiryo over the Han
+        // block, the kana and CJK punctuation block and the fullwidth forms:
+        // Japanese faces. So Simplified Chinese draws its ideographs from a
+        // Japanese font, and Han unification makes that different characters
+        // rather than a different style. Japanese reaches the same faces either
+        // way, its maps being identical to the unlanguaged ones over kana and the
+        // fullwidth block and leading with the same three over Han, and Hangul has
+        // one map with no language on it at all, so what the tag moves for Korean
+        // is Han and CJK punctuation: a product name rather than one of the app's
+        // own strings.
         //
         // Active(), not the preference and not the OS culture raw. The preference
         // is null on Automatic. The OS culture would be wrong the other way: on a
