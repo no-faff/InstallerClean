@@ -572,12 +572,30 @@
                         <GridViewRowPresenter/>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Background}"/>
-                        </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Surface.Sidebar}"/>
                         </Trigger>
+                        <!-- Selection is declared AFTER hover, and the order is the
+                             whole point: later setters win, so with hover last a
+                             selected row swapped its selection fill for the hover
+                             fill under the pointer and the selection read as having
+                             vanished wherever the cursor went. The MultiTrigger then
+                             gives selected-and-hovered the selection fill's own
+                             hover step, the shape the CheckBox above uses for
+                             checked-and-hovered, so the row still answers the
+                             pointer without pretending to be unselected. The cells
+                             that lift their foreground on selection key on
+                             IsSelected alone and so hold through both. -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Background}"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True"/>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Hover}"/>
+                        </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -593,12 +611,23 @@
                         <ContentPresenter/>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Background}"/>
-                        </Trigger>
+                        <!-- Trigger order and the MultiTrigger are the ListViewItem
+                             style's above, for the same reason and with the same
+                             fills; the patch list is a ListBox and had the same
+                             disappearing selection. -->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Surface.Sidebar}"/>
                         </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Background}"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True"/>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Hover}"/>
+                        </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
