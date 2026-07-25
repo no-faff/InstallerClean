@@ -43,7 +43,7 @@ If you find a bug or have a feature idea, open an issue. Please include:
 
 ## Translations
 
-InstallerClean ships in 15 languages: the app, the installer, the command-line
+InstallerClean ships in 16 languages: the app, the installer, the command-line
 tool and the README. The string tables in
 [`docs/translations/`](docs/translations/) show every line in English beside
 each language. If something reads wrong in your language, open a
