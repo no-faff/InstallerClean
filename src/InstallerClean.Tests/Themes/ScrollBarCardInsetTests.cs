@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Reflection;
 using System.Xml.Linq;
 
 namespace InstallerClean.Tests.Themes;
@@ -22,8 +21,10 @@ namespace InstallerClean.Tests.Themes;
 // plain XML.
 public class ScrollBarCardInsetTests
 {
-    private static readonly XNamespace Xaml = "http://schemas.microsoft.com/winfx/2006/xaml";
-    private static readonly XNamespace Presentation = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
+    // The loader and the resource lookup are shared with the other tests in this
+    // folder; see ThemeXaml.
+    private static readonly XNamespace Xaml = ThemeXaml.Xaml;
+    private static readonly XNamespace Presentation = ThemeXaml.Presentation;
 
     [Fact]
     public void Card_scrollbar_end_insets_equal_the_card_radius()
@@ -71,19 +72,10 @@ public class ScrollBarCardInsetTests
         Assert.Equal((0, 0, 0, -bleedBottom), ParseThickness(SetterValue(horizontalTrigger, "Margin")));
     }
 
-    private static XDocument LoadXaml(string logicalName)
-    {
-        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(logicalName)
-            ?? throw new InvalidOperationException($"Embedded resource '{logicalName}' is missing.");
-        return XDocument.Load(stream);
-    }
+    private static XDocument LoadXaml(string logicalName) => ThemeXaml.Load(logicalName);
 
     private static string ResourceValue(XDocument tokens, string key)
-    {
-        var element = tokens.Root!.Elements()
-            .Single(e => (string?)e.Attribute(Xaml + "Key") == key);
-        return element.Value.Trim();
-    }
+        => ThemeXaml.ResourceValue(tokens, key);
 
     private static string SetterValue(XElement scope, string property)
         => (string)scope.Elements(Presentation + "Setter")

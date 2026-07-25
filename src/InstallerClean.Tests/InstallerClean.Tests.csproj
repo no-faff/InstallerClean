@@ -42,13 +42,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Raw XAML sources for ScrollBarCardInsetTests, which asserts
-         cross-file numeric ties (scrollbar end insets against the card
-         radius, scrollbar margins against the list bleed) that XAML
-         cannot express and a build cannot check. Embedded as plain
-         bytes, not compiled: this project has no UseWPF, so no Page
-         processing applies. -->
+    <!-- Raw XAML sources for the tests under Themes\, which assert the
+         theme's cross-file ties: numeric ones XAML cannot express and a
+         build cannot check (scrollbar end insets against the card radius,
+         scrollbar margins against the list bleed), the composited contrast
+         of a token against the surfaces it is drawn on, and the order of
+         two control-template triggers, where the wrong order is valid XAML
+         that simply looks wrong on screen. Embedded as plain bytes, not
+         compiled: this project has no UseWPF, so no Page processing
+         applies. -->
+    <EmbeddedResource Include="..\InstallerClean\Themes\Primitives.xaml" LogicalName="ThemeXaml.Primitives.xaml" />
     <EmbeddedResource Include="..\InstallerClean\Themes\Tokens.xaml" LogicalName="ThemeXaml.Tokens.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\Themes\Components.xaml" LogicalName="ThemeXaml.Components.xaml" />
     <EmbeddedResource Include="..\InstallerClean\OrphanedFilesWindow.xaml" LogicalName="ThemeXaml.OrphanedFilesWindow.xaml" />
     <EmbeddedResource Include="..\InstallerClean\RegisteredFilesWindow.xaml" LogicalName="ThemeXaml.RegisteredFilesWindow.xaml" />
   </ItemGroup>
