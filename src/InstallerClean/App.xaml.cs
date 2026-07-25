@@ -71,19 +71,57 @@ public partial class App : Application
             // every window, not just the ones built during startup. A culture set
             // only on the thread does not survive the dispatcher's later
             // callbacks, so a window opened from a click would otherwise fall back
-            // to the OS language. The thread/default-thread cultures and the
-            // FrameworkElement.Language default cover other culture-dependent
-            // framework code and XAML number bindings.
+            // to the OS language. The thread/default-thread cultures cover other
+            // culture-dependent framework code.
             Localisation.Set(languagePreference, languagePreference);
             CultureInfo.CurrentUICulture = languagePreference;
             CultureInfo.CurrentCulture = languagePreference;
             CultureInfo.DefaultThreadCurrentUICulture = languagePreference;
             CultureInfo.DefaultThreadCurrentCulture = languagePreference;
-            FrameworkElement.LanguageProperty.OverrideMetadata(
-                typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(
-                    XmlLanguage.GetLanguage(languagePreference.IetfLanguageTag)));
         }
+
+        // Outside the branch above, because Automatic is the default and returns
+        // no preference, so a fresh install never reached this and every element
+        // kept WPF's own default for the property, which is the literal en-US
+        // (FrameworkElement registers LanguageProperty with
+        // XmlLanguage.GetLanguage("en-US")). All three projects declare en-GB as
+        // their neutral language and the app ships no en-US at all, so the tag
+        // named a language it does not have, whatever was on screen.
+        //
+        // What hangs off it is font fallback, and the app leans on that harder
+        // than most: the bundled Poppins carries no CJK glyph, so every character
+        // of the Japanese, Korean and Chinese UI comes from a fallback font. The
+        // chain is all readable in dotnet/wpf. This property becomes the run's
+        // CultureInfo (DynamicPropertyReader.GetCultureInfo); the four-argument
+        // Typeface constructor the framework uses puts #GLOBAL USER INTERFACE
+        // behind the element's own family, so a character Poppins lacks reaches
+        // that composite font; and CompositeFontFamily.GetTargetFamilyMap picks
+        // between its FontFamilyMaps by exactly this tag. A tag matching none of
+        // them takes the maps carrying no language at all, and in
+        // GlobalUserInterface.CompositeFont those lead with Meiryo and Microsoft
+        // JhengHei across the Han block, kana and the fullwidth forms. So the
+        // face a Chinese, Japanese or Korean screen got was decided by which of
+        // six fonts the machine happened to have installed rather than by the
+        // language being displayed, and Han unification means the wrong one is
+        // not a different style but different characters.
+        //
+        // Active(), not the preference and not the OS culture raw. The preference
+        // is null on Automatic. The OS culture would be wrong the other way: on a
+        // Windows set to a language the app does not ship, Automatic displays the
+        // neutral en-GB text, and tagging that English prose Swedish would be a
+        // fresh instance of the same fault. Active() walks the parent chain the
+        // satellite resolution walks and answers en-GB when nothing matches, so
+        // the value is always one of the sixteen the app ships: all ASCII, all
+        // inside RFC 3066, so none of them can reach
+        // XmlLanguage.GetLanguage's throw.
+        //
+        // Line breaking does not move with the tag, which matters because the
+        // word joiners in InstallerPathText rest on it; the reading that settles
+        // that is on InstallerPathText itself.
+        FrameworkElement.LanguageProperty.OverrideMetadata(
+            typeof(FrameworkElement),
+            new FrameworkPropertyMetadata(
+                XmlLanguage.GetLanguage(SupportedLanguages.Active(Localisation.UiCulture))));
 
         // Single-instance pattern: open the mutex without taking
         // ownership, acquire via WaitOne(0), release explicitly in
