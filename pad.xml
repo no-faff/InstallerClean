@@ -14,9 +14,9 @@
 
   <Program_Info>
     <Program_Name>InstallerClean</Program_Name>
-    <Program_Version>2.2.0</Program_Version>
+    <Program_Version>2.3.0</Program_Version>
     <Program_Release_Month>07</Program_Release_Month>
-    <Program_Release_Day>23</Program_Release_Day>
+    <Program_Release_Day>25</Program_Release_Day>
     <Program_Release_Year>2026</Program_Release_Year>
     <Program_Cost_Dollars>0</Program_Cost_Dollars>
     <Program_Cost_Other_Code>GBP</Program_Cost_Other_Code>
@@ -26,14 +26,14 @@
     <Program_Install_Support>Install and Uninstall</Program_Install_Support>
     <Program_OS_Support>Win10x64,Win11</Program_OS_Support>
     <Program_Language>English, Simplified Chinese, Russian, Spanish, Japanese, Brazilian Portuguese, Polish, Turkish, Korean, French, Italian, German, Indonesian, Vietnamese, Ukrainian, Dutch</Program_Language>
-    <Program_Change_Info>InstallerClean now tells you when there is a newer version. It asks GitHub once when it opens, and if an update exists a link appears in the bottom bar; nothing is downloaded and the check can be turned off in About. The About window has been reworked around a link to the guide, a &quot;Report a problem&quot; link and that setting, and the downloads on the release page now carry the version in their filenames.</Program_Change_Info>
+    <Program_Change_Info>InstallerClean no longer stops the whole scan when Windows refuses to list one program&#x27;s updates, which can happen with an unusual but valid registration such as some corporate DisplayLink installs; that one program is set aside with all of its cached files kept, and the scan of everything else carries on. It now speaks Dutch as well, a complete translation contributed by RijckAlex and finished for this release: the app, the installer, the command-line tool and the README. The rest of the release is a pass through every window checking that what a screen reader reads out matches what is written on the screen, along with a scrollbar, a sort arrow and a set of keyboard shortcuts that all now behave.</Program_Change_Info>
     <Program_Specific_Category>System</Program_Specific_Category>
     <Program_Category_Class>System &amp; Desktop Utilities::File &amp; Disk Management</Program_Category_Class>
     <Program_System_Requirements>Windows 10 or 11 (64-bit). Administrator rights required to access C:\Windows\Installer.</Program_System_Requirements>
     <File_Info>
-      <File_Size_Bytes>96195887</File_Size_Bytes>
-      <File_Size_K>93942</File_Size_K>
-      <File_Size_MB>91.74</File_Size_MB>
+      <File_Size_Bytes>96230104</File_Size_Bytes>
+      <File_Size_K>93975</File_Size_K>
+      <File_Size_MB>91.77</File_Size_MB>
     </File_Info>
     <Expire_Info>
       <Has_Expire_Info>N</Has_Expire_Info>
@@ -71,9 +71,9 @@ Modern replacement for PatchCleaner, which was last updated in March 2016.</Char
       <Application_XML_File_URL>https://raw.githubusercontent.com/no-faff/InstallerClean/main/pad.xml</Application_XML_File_URL>
     </Application_URLs>
     <Download_URLs>
-      <Primary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v2.2.0/InstallerClean-2.2.0-setup.exe</Primary_Download_URL>
-      <Secondary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v2.2.0/InstallerClean-2.2.0-portable.exe</Secondary_Download_URL>
-      <Additional_Download_URL_1>https://github.com/no-faff/InstallerClean/releases/download/v2.2.0/installerclean-cli.exe</Additional_Download_URL_1>
+      <Primary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v2.3.0/InstallerClean-2.3.0-setup.exe</Primary_Download_URL>
+      <Secondary_Download_URL>https://github.com/no-faff/InstallerClean/releases/download/v2.3.0/InstallerClean-2.3.0-portable.exe</Secondary_Download_URL>
+      <Additional_Download_URL_1>https://github.com/no-faff/InstallerClean/releases/download/v2.3.0/installerclean-cli.exe</Additional_Download_URL_1>
     </Download_URLs>
   </Web_Info>
 
