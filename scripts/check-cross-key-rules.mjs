@@ -398,6 +398,12 @@ for (const file of [...rawAllowed.keys()].sort())
     stale.push(`${file} is allowed a direct ResourceManager read in this file and makes `
       + 'none: renamed, moved or routed through a door since. Drop its entry.');
 
+// Rules 7 and 8 fault the XAML and the C#, where neither a resx nor a generator
+// is in reach of the fix. The closing footer sends a reader to the generator for
+// a language, so it belongs to the per-language rules alone; each source-shape
+// message already carries its own instruction.
+const sourceShapeProblems = problems.length;
+
 // --- Rules 1 and 3 to 6, per language.
 const neutral = values(readFileSync(`${RESX_DIR}/Strings.resx`, 'utf8'));
 const declaredKeys = [
@@ -492,9 +498,10 @@ for (const lang of LANGS) {
 if (problems.length) {
   console.error(`\nCross-key rules FAILED (${problems.length}):`);
   for (const p of problems) console.error(`  ${p}`);
-  console.error('\nThe translated resx files are generated from the maintainer generators and'
-    + '\nare never hand-edited, so a fix goes into the generator for that language and the'
-    + '\nfile is regenerated.');
+  if (problems.length > sourceShapeProblems)
+    console.error('\nThe translated resx files are generated from'
+      + '\nscripts/translations/gen-strings-<code>.mjs and are never hand-edited, so a fix'
+      + "\ngoes into that language's generator and the file is regenerated.");
   process.exit(1);
 }
 
