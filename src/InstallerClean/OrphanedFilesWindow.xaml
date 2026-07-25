@@ -125,10 +125,9 @@
                                  unreachable past the edge; at 100% in the
                                  default window no scrollbar shows.
                                  Installer-cache names are short random hex
-                                 (8.3 style), so 270 shows them whole. -->
-                            <!-- File gives 20 to Size, which needs it for the sort
-                                 arrow: the file names here are all of the form
-                                 157a6ea.msi and never approach 250. -->
+                                 (8.3 style, 157a6ea.msi), so 250 shows them
+                                 whole, leaving Size the width its sort arrow
+                                 needs (see the note on Size below). -->
                             <GridViewColumn Header="{loc:Translate Field.File}" Width="{a11y:TextScaled 250}"
                                             x:Name="ColFileName">
                                 <GridViewColumn.CellTemplate>

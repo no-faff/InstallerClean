@@ -81,12 +81,13 @@ public partial class App : Application
         }
 
         // Outside the branch above, because Automatic is the default and returns
-        // no preference, so a fresh install never reached this and every element
-        // kept WPF's own default for the property, which is the literal en-US
-        // (FrameworkElement registers LanguageProperty with
+        // no preference: inside it, a fresh install would never reach this and
+        // every element would keep WPF's own default for the property, the
+        // literal en-US (FrameworkElement registers LanguageProperty with
         // XmlLanguage.GetLanguage("en-US")). All three projects declare en-GB as
-        // their neutral language and the app ships no en-US at all, so the tag
-        // named a language it does not have, whatever was on screen.
+        // their neutral language and the app ships no en-US at all, so that
+        // default tags every element with a language the app does not have,
+        // whatever is on screen.
         //
         // What hangs off it is font fallback, and the app leans on that harder
         // than most: the bundled Poppins carries no CJK glyph, so every character

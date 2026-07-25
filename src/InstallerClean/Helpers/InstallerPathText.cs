@@ -65,8 +65,8 @@ namespace InstallerClean.Helpers;
 /// spoken does not get them, having no layout to protect and nothing to hand a
 /// speech engine but invisible format characters: the message dialog's title
 /// and the main window's invisible scan announcer are the two hand-written
-/// sites on that side of the line, and <c>TranslateExtension</c> draws it for
-/// every automation property XAML resolves.
+/// sites on that side of the line, and <c>TranslateExtension</c> draws that
+/// same line for every automation property XAML resolves.
 /// </summary>
 internal static class InstallerPathText
 {
@@ -112,12 +112,13 @@ internal static class InstallerPathText
         return joined.ToString();
     }
 
-    // A joiner goes either side of each backslash and after the drive colon:
-    // four seams, the only places in C:\Windows\Installer a line breaker will
-    // offer a break. Not between the drive letter and its colon, because UAX #14
-    // forbids a break before ':' regardless, so a joiner there is one more
-    // invisible character for a screen reader and a braille display to carry
-    // for nothing.
+    // A joiner goes either side of each backslash: four seams, the drive
+    // colon's included, the seam after it being the same position as the one
+    // before the first backslash. Those are the only places in
+    // C:\Windows\Installer a line breaker will offer a break. Not between the
+    // drive letter and its colon, because UAX #14 forbids a break before ':'
+    // regardless, so a joiner there is one more invisible character for a
+    // screen reader and a braille display to carry for nothing.
     private static void AppendBound(StringBuilder joined, ReadOnlySpan<char> path)
     {
         for (int i = 0; i < path.Length; i++)

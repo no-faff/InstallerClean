@@ -65,8 +65,12 @@ public sealed class TranslateExtension : MarkupExtension
     }
 
     // The target property is unavailable inside a Setter or a template, where
-    // ProvideValue runs once for a value shared across instances; those keep the
-    // transform, which is the behaviour every site had before this split.
+    // ProvideValue runs once for a value shared across instances. Those keep the
+    // transform: with no target to read, the value cannot be shown to be
+    // spoken-only, and the two ways of being wrong are not equal. A joiner in a
+    // spoken string costs four invisible characters; a missing one in a drawn
+    // string breaks the path across two lines, which is the fault the transform
+    // exists for.
     private static bool IsSpokenOnly(IServiceProvider serviceProvider) =>
         serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget target
         && target.TargetProperty is DependencyProperty property

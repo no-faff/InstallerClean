@@ -97,8 +97,8 @@ public partial class MainWindow : Window
             // A failed startup scan opens the window with the tailored error in the
             // intro instead of exiting. A newly shown window speaks only its title
             // and the focused Re-scan button, so announce the diagnosis too. Two
-            // of the diagnoses name C:\Windows\Installer and the announcer takes
-            // them unbound: it is never drawn, so it has no line break to protect
+            // of the diagnoses name the installer cache folder and the announcer
+            // takes them unbound: it is never drawn, so it has no break to protect
             // and a word joiner there would only ever reach a speech engine. The
             // same split TranslateExtension makes for an automation property.
             if (!_vm.Scan.HasScanned && _vm.Scan.HasScanError)
@@ -719,7 +719,7 @@ public partial class MainWindow : Window
         // on its own line even when the pane had room to carry it up.
         var spaceHint = _vm.Completion.SpaceHint;
         var raw = spaceHint.Length > 0 ? $"{spaceHint} {_vm.Completion.Restore}" : _vm.Completion.Restore;
-        // The post-Move hint names C:\Windows\Installer. Bound before the
+        // The post-Move hint names the installer cache folder. Bound before the
         // split: KeepWhole inserts only between the path's own characters, so
         // the [ ] pair the split looks for is untouched.
         raw = InstallerPathText.KeepWhole(raw);

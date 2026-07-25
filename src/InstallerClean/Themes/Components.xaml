@@ -162,11 +162,12 @@
                           spend the alarm on the routine path.
            GhostPill    - text-only action with no fill (Cancel / Details / About).
 
-         A window whose only button is a way out still takes the accent: with
-         nothing beside it to be quieter than, the standard fill reads as
-         hesitant rather than secondary, and the accent-versus-standard
-         distinction only ever has to work where both appear together, which
-         is the main window's Delete and Move row alone.
+         A window whose only button is a way out takes the accent, the
+         bad-news case above excepted: with nothing beside it to be quieter
+         than, the standard fill reads as hesitant rather than secondary, and
+         the accent-versus-standard distinction only ever has to work where
+         both appear together, which is the main window's Delete and Move row
+         alone.
 
          Which action a screen leads with is that screen's decision, taken
          where its Button names a style. A pill is a look, not a rank, so

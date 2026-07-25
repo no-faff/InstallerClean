@@ -115,10 +115,11 @@
                 </ListView.ItemContainerStyle>
                 <ListView.View>
                     <GridView>
-                        <!-- Product name gives 40 to Size and Patches, which need it
-                             for the sort arrow; the widest translated header here is
-                             about 142 against 480, and product names wrap. The four
-                             widths still total 860. -->
+                        <!-- The four columns total 860. Size and Patches are sized
+                             for their own header plus a sort arrow (see the note
+                             on Size below) and Product name takes what is left:
+                             the widest translated header here is about 142
+                             against 480, and product names wrap. -->
                         <GridViewColumn Header="{loc:Translate Field.ProductName}" Width="{a11y:TextScaled 480}"
                                         x:Name="ColProductName">
                             <GridViewColumn.CellTemplate>

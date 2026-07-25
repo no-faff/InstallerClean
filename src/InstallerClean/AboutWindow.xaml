@@ -80,12 +80,11 @@
              control. NVDA is the readable case: it drops the UIA value for
              anything with navigable text and speaks the caret line instead
              (speech.py, _objectSpeech_calculateAllowedProps), after the name,
-             the role and the states. This once set the name to the version
-             explicitly, on the belief that an unnamed edit announces its
-             control type first; that call was inert, since it supplied the
-             string WPF was supplying anyway, and taking it away on its own
-             would have changed nothing. Only a name that is not the content
-             fixes it. -->
+             the role and the states. Naming the box with its own version
+             string, on the belief that an unnamed edit announces its control
+             type first, is inert either way: it supplies what WPF supplies
+             anyway, so adding it changes nothing and taking it away changes
+             nothing. Only a name that is not the content fixes it. -->
         <TextBox Grid.Row="3" x:Name="VersionText" HorizontalAlignment="Left"
                  Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
                  VerticalAlignment="Center" Margin="-2,0,0,0"

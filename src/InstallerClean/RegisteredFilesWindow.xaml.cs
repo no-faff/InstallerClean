@@ -99,15 +99,15 @@ public partial class RegisteredFilesWindow : Window
     /// <summary>
     /// Puts the view in the given order and repaints the indicators to match.
     /// The order the window opens in comes through here too, which is the point:
-    /// the arrow used to be painted over the view model's pre-sort without a
-    /// SortDescription behind it, and the two orders are not the same one. The
-    /// pre-sort is ordinal (<see cref="StringComparer.OrdinalIgnoreCase"/>),
-    /// which orders by UTF-16 code unit and so files every accented or
-    /// non-Latin product name after Z; a SortDescription compares
-    /// culture-aware, which interleaves them with their base letters. So on any
-    /// machine with a product name outside plain ASCII, and there are plenty,
-    /// the arrow claimed an order the list was not in and the first click on
-    /// Product name silently reordered the rows instead of reversing them.
+    /// an arrow painted over the view model's pre-sort, with no SortDescription
+    /// behind it, would claim an order the list is not in. The pre-sort is
+    /// ordinal (<see cref="StringComparer.OrdinalIgnoreCase"/>), which orders by
+    /// UTF-16 code unit and so files every accented or non-Latin product name
+    /// after Z; a SortDescription compares culture-aware, which interleaves them
+    /// with their base letters. On any machine holding a product name outside
+    /// plain ASCII, and there are plenty, the two orders differ, and the first
+    /// click on Product name would then reorder the rows rather than reverse
+    /// them.
     ///
     /// Every sort ends on the full path, which is unique per row, so the order
     /// is total: rows sharing a product name (one product code registered with
