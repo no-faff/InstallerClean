@@ -281,9 +281,11 @@ function collectCs(dir, out = []) {
 }
 
 // C# with its comments taken out. String literals are left where they are: a
-// literal is code, and every form C# has for one (verbatim, interpolated, both at
-// once) has to be walked anyway to know which slashes open a comment and which sit
-// inside a path or a URL.
+// literal is code, and the quoted forms (verbatim, interpolated, both at once,
+// and char literals) have to be walked anyway to know which slashes open a
+// comment and which sit inside a path or a URL. Raw string literals are the one
+// form not walked; a """ block carrying a // would hide the rest of that line
+// from the search, so a bypass could sit inside one unseen.
 const codeOnly = (src) => {
   let out = '';
   let i = 0;

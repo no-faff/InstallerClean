@@ -3,9 +3,10 @@
 // language set have drifted apart. Nothing else connects them: the app validates
 // a saved language against SupportedLanguages.CultureNames, while the installer
 // lists its languages by Inno name in installer/InstallerClean_Languages.iss, and
-// the fifteen line up only because someone kept them lined up by hand. That makes
-// the sixteenth language a trap, and the documented recipe for adding a language
-// never mentions the installer. This guard is what connects the two.
+// the two sets line up only because someone kept them lined up by hand. That makes
+// every language added after the first a trap, and the documented recipe for
+// adding a language never mentions the installer. This guard is what connects the
+// two.
 //
 // It checks three things:
 //   1. Every SupportedLanguages culture has an installer [Languages] entry, and
@@ -50,8 +51,8 @@ const INNO_TO_CULTURE = {
 };
 
 // Every installer language overrides these Inno [Messages] and defines these
-// [CustomMessages]; all fifteen carry the identical set today. A language missing
-// any would drop to Inno's own English for that line.
+// [CustomMessages], the same set for all of them. A language missing any would
+// drop to Inno's own English for that line.
 const REQUIRED_MESSAGE_KEYS = [
   'WelcomeLabel1', 'WelcomeLabel2', 'FinishedHeadingLabel', 'FinishedLabel',
   'ClickFinish', 'SetupAppRunningError', 'UninstallAppRunningError',

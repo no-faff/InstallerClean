@@ -782,10 +782,15 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
             if (error == MsiError.AccessDenied)
                 // Match the product loop: an API refusal must land on the scan,
-                // not on the verdict. Breaking here would silently yield zero
-                // patches for this product, and its cached .msp files would then
-                // be presented as orphaned. The scan command's catch routes this
-                // to a dialog and to crash.log.
+                // not on the verdict. Breaking here would yield zero patches for
+                // this product without recording the loss, so neither the
+                // scan-wide removable withholding nor the both-sources-degraded
+                // gate would see it and the scan would report itself complete
+                // while short of a claim. What separates this from the run of
+                // unreadable rows that degrades instead (below) is exactly that:
+                // the run returns Incomplete, and a break returns nothing at all.
+                // The scan command's catch routes this to a dialog and to
+                // crash.log.
                 throw new LocalisedAccessException(Strings.Error_MsiAccessDenied);
 
             lastError = error;

@@ -29,9 +29,11 @@ public static class Strings
 
     /// <summary>
     /// The cached ResourceManager backing every property below, reached
-    /// only by the tests that audit the shipped satellites: those read
-    /// whole resource sets, which no per-key door can answer, and they
-    /// need the values raw, token and all.
+    /// only by the tests that audit the shipped satellites, for the two
+    /// things a per-key door cannot do: enumerate a whole resource set,
+    /// and answer at a named culture rather than at the UI culture the
+    /// app is displaying. The set audits also need the values raw, token
+    /// and all.
     /// </summary>
     internal static ResourceManager ResourceManager => Manager;
 

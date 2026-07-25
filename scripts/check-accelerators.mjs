@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Fails (exit 1) when two controls that are live on the same window at the same
-// moment carry the same Alt access key, in any of the fifteen languages. WPF
+// moment carry the same Alt access key, in any language the app ships. WPF
 // answers a duplicate by cycling focus between the matches instead of invoking
 // either, so a clash silently retires BOTH accelerators. It only bites a
 // keyboard or screen-reader user, and only in the language it happens in, which
