@@ -63,15 +63,25 @@ public partial class RegisteredFilesWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        // Sort before selecting, not after painting the arrow: the view's order
+        // is what decides the index the bound selection sits at, and the scroll
+        // and the container focus below are both taken from that index.
+        ApplySort(nameof(ProductRow.ProductName), ListSortDirection.Ascending, ColProductName);
+
         if (ProductsList.Items.Count > 0)
         {
-            // The row to open on is the view-model's: the first product missing
-            // from disk if there is one, else the first row. Hardcoding index 0
-            // here overrides that selection, which sends a user who followed the
-            // missing-from-disk banner to a window that opens somewhere else.
-            // SelectedIndex is already the bound selection by Loaded; the Max
-            // guards a selection the list has not resolved.
-            var index = Math.Max(ProductsList.SelectedIndex, 0);
+            // The row to open on is the view-model's when it flagged one missing
+            // from disk: the main window's banner ends "Open Details for what to
+            // do", and what to do is the note only that row's details pane
+            // carries, so overriding the selection would send the user who
+            // followed the banner somewhere else. Otherwise the view model's
+            // intent was simply the top row, and which row that is belongs to the
+            // view's order rather than to the pre-sort's, so it is read as index 0
+            // rather than trusted to be where the pre-sort left it. The Max guards
+            // a selection the list has not resolved.
+            var index = ProductsList.SelectedItem is ProductRow { IsMissing: true }
+                ? Math.Max(ProductsList.SelectedIndex, 0)
+                : 0;
             ProductsList.SelectedIndex = index;
             ProductsList.ScrollIntoView(ProductsList.Items[index]);
             // The list virtualises, so a row below the fold has no container
@@ -83,13 +93,40 @@ public partial class RegisteredFilesWindow : Window
             container?.Focus();
         }
 
-        // VM pre-sorts by product name ascending; show the arrow to match.
-        _lastSortProperty = nameof(ProductRow.ProductName);
-        _lastSortDirection = ListSortDirection.Ascending;
-        _lastSortColumn = ColProductName;
-        UpdateSortIndicators();
-
         BuildSeeAlsoLine();
+    }
+
+    /// <summary>
+    /// Puts the view in the given order and repaints the indicators to match.
+    /// The order the window opens in comes through here too, which is the point:
+    /// the arrow used to be painted over the view model's pre-sort without a
+    /// SortDescription behind it, and the two orders are not the same one. The
+    /// pre-sort is ordinal (<see cref="StringComparer.OrdinalIgnoreCase"/>),
+    /// which orders by UTF-16 code unit and so files every accented or
+    /// non-Latin product name after Z; a SortDescription compares
+    /// culture-aware, which interleaves them with their base letters. So on any
+    /// machine with a product name outside plain ASCII, and there are plenty,
+    /// the arrow claimed an order the list was not in and the first click on
+    /// Product name silently reordered the rows instead of reversing them.
+    ///
+    /// Every sort ends on the full path, which is unique per row, so the order
+    /// is total: rows sharing a product name (one product code registered with
+    /// several caches), a size or a patch count resolve the same way every time
+    /// rather than however WPF's comparer happened to leave them. That is also
+    /// where the view model's own path tiebreaker went.
+    /// </summary>
+    private void ApplySort(string sortProperty, ListSortDirection direction, GridViewColumn column)
+    {
+        var view = CollectionViewSource.GetDefaultView(ProductsList.ItemsSource);
+        view.SortDescriptions.Clear();
+        view.SortDescriptions.Add(new SortDescription(sortProperty, direction));
+        view.SortDescriptions.Add(
+            new SortDescription(nameof(ProductRow.FullPath), ListSortDirection.Ascending));
+
+        _lastSortProperty = sortProperty;
+        _lastSortDirection = direction;
+        _lastSortColumn = column;
+        UpdateSortIndicators();
     }
 
     // Stable README anchor (an explicit <a id="recovery"> before the
@@ -203,14 +240,7 @@ public partial class RegisteredFilesWindow : Window
             ? ListSortDirection.Descending
             : ListSortDirection.Ascending;
 
-        var view = CollectionViewSource.GetDefaultView(ProductsList.ItemsSource);
-        view.SortDescriptions.Clear();
-        view.SortDescriptions.Add(new SortDescription(sortProperty, direction));
-
-        _lastSortProperty = sortProperty;
-        _lastSortDirection = direction;
-        _lastSortColumn = header.Column;
-        UpdateSortIndicators();
+        ApplySort(sortProperty, direction, header.Column);
         return true;
     }
 
