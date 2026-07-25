@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.tr.resx`](../../src/InstallerClean.Core/Resources/Strings.tr.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
+`{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
+
 ## Window titles
 
 | English | Türkçe |
@@ -12,9 +14,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | About | Hakkında |
 | Registered files that should not be deleted | Silinmemesi gereken kayıtlı dosyalar |
 | Unneeded files that are safe to delete | Silinmesi güvenli, gereksiz dosyalar |
-| Confirm move | Taşımayı onayla |
-| Confirm delete | Silmeyi onayla |
-| Recycle Bin unavailable | Geri Dönüşüm Kutusu kullanılamıyor |
 
 ## Section headings
 
@@ -121,10 +120,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Türkçe |
 | --- | --- |
 | Any unneeded files below are safe to delete. | Aşağıdaki gereksiz dosyalar güvenle silinebilir. |
-| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Bu dosyalar C:\Windows\Installer içinde yer alır; bir program kaldırıldığında ({0}), daha yeni bir yama bir öncekinin yerini aldığında ({1}) ya da yayımcı onu geri çektiğinde ({2}) geride kalır. InstallerClean her zaman yalnızca Windows'un kendisinin işi bittiğini bildirdiği dosyaları listeler. |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Onları Geri Dönüşüm Kutusu'na silin ya da yedek kopya saklamak için bunun yerine Taşı'yı kullanın. Dosyaları C:\Windows\Installer içine geri koyduğunuzda her şey tam olarak başladığınız noktaya döner. |
+| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Bu dosyalar {InstallerFolder} içinde yer alır; bir program kaldırıldığında ({0}), daha yeni bir yama bir öncekinin yerini aldığında ({1}) ya da yayımcı onu geri çektiğinde ({2}) geride kalır. InstallerClean her zaman yalnızca Windows'un kendisinin işi bittiğini bildirdiği dosyaları listeler. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | Onları Geri Dönüşüm Kutusu'na silin ya da yedek kopya saklamak için bunun yerine Taşı'yı kullanın. Dosyaları {InstallerFolder} içine geri koyduğunuzda her şey tam olarak başladığınız noktaya döner. |
 | Nothing scanned yet. | Henüz tarama yapılmadı. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Hiçbir programın hâlâ ihtiyaç duymadığı yükleyici dosyaları için C:\Windows\Installer klasörüne bakmak üzere Yeniden tara'ya basın. |
+| Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Hiçbir programın hâlâ ihtiyaç duymadığı yükleyici dosyaları için {InstallerFolder} klasörüne bakmak üzere Yeniden tara'ya basın. |
 | These files can't be cleaned up right now. | Bu dosyalar şu anda temizlenemez. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Şu anda bir şey Windows Installer'ı kullanıyor; genellikle bir Windows Update ya da arka planda kurulan bir program. Bu sürerken Taşı ve Sil duraklatılır, böylece InstallerClean değişmekte olan yükleyici önbelleğine dokunmaz. İşlem bittiğinde Yeniden tara'yı kullanın, geri gelirler. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Bu makinede önceki bir Windows Installer işlemi askıya alınmış durumda. Önbelleği temizlemeden önce o kurulumu sürdürün ya da geri alın (veya Windows'u yeniden başlatın). |
@@ -149,9 +148,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Türkçe |
 | --- | --- |
 | All clean | Her şey temiz |
-| Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer içinde temizlenecek bir şey yok |
+| Nothing to clean up in {InstallerFolder} | {InstallerFolder} içinde temizlenecek bir şey yok |
 | Scanned {0} {1} in {2} | {2} içinde {0} {1} tarandı |
-| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Bir gün bir şey bozulursa onları C:\Windows\Installer içine geri kopyalayın ([ihtimali son derece düşük]). |
+| Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]). | Bir gün bir şey bozulursa onları {InstallerFolder} içine geri kopyalayın ([ihtimali son derece düşük]). |
 | Until then, you can restore them if anything ever breaks ([extremely unlikely]). | O zamana kadar, bir gün bir şey bozulursa onları geri yükleyebilirsiniz ([ihtimali son derece düşük]). |
 | Empty it to actually reclaim the space. | Alanı gerçekten geri kazanmak için onu boşaltın. |
 | {0} freed | {0} yer açıldı |
@@ -223,12 +222,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows, InstallerClean'in erişimini reddetti, bu yüzden işlem durduruldu. Hiçbir şey kaldırılmadı.<br><br>InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden öyle başlatmak işe yaramaz. Windows erişimi neyin reddettiği konusunda başka bir şey söylemiyor, bu yüzden denenecek belirli bir şey yok. |
 | Couldn't read the Windows Installer records | Windows Installer kayıtları okunamadı |
 | Scan failed | Tarama başarısız |
-| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed. | Windows Installer kayıtları tamamen boş döndü: tek bir kurulu program ya da güncelleme bile önbellekteki bir kurulum dosyasında hak iddia etmiyor. Çalışan bir makinede bu olmaz (yeni kurulmuş bir Windows'ta bile bunlardan vardır), yani kayıtlar ya bozuk ya da okunamadı, ve bu yanıta inanan bir tarama C:\Windows\Installer içindeki her dosyayı yanlışlıkla sahipsiz sayardı. InstallerClean bunun yerine durdu. Hiçbir şey kaldırılmadı. |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Windows Installer kayıtları tamamen boş döndü: tek bir kurulu program ya da güncelleme bile önbellekteki bir kurulum dosyasında hak iddia etmiyor. Çalışan bir makinede bu olmaz (yeni kurulmuş bir Windows'ta bile bunlardan vardır), yani kayıtlar ya bozuk ya da okunamadı, ve bu yanıta inanan bir tarama {InstallerFolder} içindeki her dosyayı yanlışlıkla sahipsiz sayardı. InstallerClean bunun yerine durdu. Hiçbir şey kaldırılmadı. |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer, InstallerClean'in kurulu olanları listelemesine izin vermedi. InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden yönetici olarak çalıştırmak bir şey değiştirmez. Bu liste olmadan önbellekteki hangi dosyaların hâlâ gerekli olduğunu güvenle söylemenin yolu yok, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı. |
 | Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer, InstallerClean'e kurulu programların okunabilir bir listesini veremedi: arka arkaya {0} kayıt okunamaz döndü (son hata kodu {1}). InstallerClean, yalnızca kısmen okunmuş bir listeyle çalışmak yerine durdu. Hiçbir şey kaldırılmadı. |
 | Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer, kurulu programlar listesinin sonunu hiç bildirmedi: InstallerClean {0} kayıttan sonra vazgeçti (son hata kodu {1}). Sonu gelmeyen bir listeye güvenilemez, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı. |
 | Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer, bir programın yama listesinin sonunu hiç bildirmedi: InstallerClean {0} kayıttan sonra vazgeçti (son hata kodu {1}). Sonu gelmeyen bir listeye güvenilemez, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı. |
-| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean bu taramayı Windows Installer kayıtlarıyla bağdaştıramadı: Windows'un hâlâ gerekli olarak listelediği her dosya C:\Windows\Installer içinde yok, klasörde gerçekten bulunan dosyalar ise hiçbir kayıtla eşleşmiyor. Hiçbir gerçek makine böyle görünmez, dolayısıyla bu, güvenle kaldırabileceğiniz dosyalara değil, kayıtları okumakta bir soruna işaret ediyor. Temizlik için hiçbir şey sunulmadı ve hiçbir şey kaldırılmadı. |
+| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean bu taramayı Windows Installer kayıtlarıyla bağdaştıramadı: Windows'un hâlâ gerekli olarak listelediği her dosya {InstallerFolder} içinde yok, klasörde gerçekten bulunan dosyalar ise hiçbir kayıtla eşleşmiyor. Hiçbir gerçek makine böyle görünmez, dolayısıyla bu, güvenle kaldırabileceğiniz dosyalara değil, kayıtları okumakta bir soruna işaret ediyor. Temizlik için hiçbir şey sunulmadı ve hiçbir şey kaldırılmadı. |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean, neyin hâlâ gerekli olduğundan emin olmaya yetecek kadar Windows Installer kaydını okuyamadı: kurulu programların listesi eksik döndü, aynı kayıtları doğrudan kayıt defterinden okumak da hatalarla karşılaştı. Bir dosya, yalnızca onu adlandıran kayıt okunamayanlardan biri olduğu için sahipsiz görünebilirdi, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı. |
 | Invalid destination | Geçersiz hedef |
 | Could not write to destination | Hedefe yazılamadı |
@@ -368,7 +367,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Product details | Ürün ayrıntıları |
 | Move location | Taşıma konumu |
 | Operation progress | İşlem ilerlemesi |
-| Scan C:\Windows\Installer again | C:\Windows\Installer'ı yeniden tara |
+| Scan {InstallerFolder} again | {InstallerFolder}'ı yeniden tara |
 | Scanning progress | Tarama ilerlemesi |
 | Startup scan progress | Başlangıç taraması ilerlemesi |
 | Details, unneeded files | Ayrıntılar, gereksiz dosyalar |
@@ -438,7 +437,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cancelled. | İptal edildi. |
 | Error: {0}. Details written to {1}. | Hata: {0}. Ayrıntılar {1} içine yazıldı. |
 | Error: {0}. The crash log could not be written. | Hata: {0}. Çökme günlüğü yazılamadı. |
-| Scanning C:\Windows\Installer... | C:\Windows\Installer taranıyor... |
+| Scanning {InstallerFolder}... | {InstallerFolder} taranıyor... |
 | Found {0} {1} to clean up ({2}). | Temizlenecek {0} {1} bulundu ({2}). |
 | Nothing to do. | Yapılacak bir şey yok. |
 | Deleting {0} {1}... | {0} {1} siliniyor... |
@@ -455,7 +454,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moved {0} {1}. | {0} {1} taşındı. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Başka bir InstallerClean işlemi tek örnek kilidini tutuyor (GUI ya da başka bir CLI çalıştırması). Çıkış 75 (geçici); daha sonra yeniden denemek güvenli. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Not: Olay Günlüğü'ne yazma başarısız oldu. Uygulama günlüğü izinlerini ya da Grup İlkesi'ni kontrol edin. |
-| InstallerClean - clean up C:\Windows\Installer | InstallerClean - C:\Windows\Installer temizliği |
+| InstallerClean - clean up {InstallerFolder} | InstallerClean - {InstallerFolder} temizliği |
 | Usage: | Kullanım: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Bu yardımı göster (/?, -h de kabul edilir) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Sürümü yazdır (-v de kabul edilir) |

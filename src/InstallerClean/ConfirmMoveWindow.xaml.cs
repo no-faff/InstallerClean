@@ -29,10 +29,11 @@ public partial class ConfirmMoveWindow : Window
         if (sameDrive)
             SameDriveNote.Visibility = Visibility.Visible;
 
-        // The window title is what a screen reader announces when a
-        // dialog opens; the static "Confirm move" left the question
-        // itself, the count and size, unspoken. ShowInTaskbar is false,
-        // so the title serves announcements only. The same-drive note rides
+        // The window title is what a screen reader announces when a dialog
+        // opens, and ShowInTaskbar is false under custom chrome, so it serves
+        // the announcement and nothing else. It carries the question itself: a
+        // title naming only the category leaves the count and the size
+        // unspoken. The same-drive note rides
         // along with it: on open, only the title and the focused button are
         // spoken, so a note left in the body alone would never be heard by the
         // user deciding whether to press Move.

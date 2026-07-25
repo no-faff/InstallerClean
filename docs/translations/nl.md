@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.nl.resx`](../../src/InstallerClean.Core/Resources/Strings.nl.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
+`{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
+
 ## Window titles
 
 | English | Nederlands |
@@ -12,9 +14,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | About | Over |
 | Registered files that should not be deleted | Geregistreerde bestanden die niet mogen worden verwijderd |
 | Unneeded files that are safe to delete | Overbodige bestanden die veilig kunnen worden verwijderd |
-| Confirm move | Verplaatsing bevestigen |
-| Confirm delete | Verwijdering bevestigen |
-| Recycle Bin unavailable | Prullenbak niet beschikbaar |
 
 ## Section headings
 
@@ -121,10 +120,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Nederlands |
 | --- | --- |
 | Any unneeded files below are safe to delete. | Overbodige bestanden hieronder kun je veilig verwijderen. |
-| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Ze staan in C:\Windows\Installer, achtergebleven toen een programma werd verwijderd ({0}), een nieuwere patch een oudere verving ({1}) of de uitgever hem introk ({2}). InstallerClean toont alleen bestanden waarvan Windows zelf aangeeft dat het ermee klaar is. |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Verwijder ze naar de Prullenbak, of gebruik Verplaatsen om een back-up te houden. Zet je de bestanden terug in C:\Windows\Installer, dan is alles weer precies zoals het was. |
+| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Ze staan in {InstallerFolder}, achtergebleven toen een programma werd verwijderd ({0}), een nieuwere patch een oudere verving ({1}) of de uitgever hem introk ({2}). InstallerClean toont alleen bestanden waarvan Windows zelf aangeeft dat het ermee klaar is. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | Verwijder ze naar de Prullenbak, of gebruik Verplaatsen om een back-up te houden. Zet je de bestanden terug in {InstallerFolder}, dan is alles weer precies zoals het was. |
 | Nothing scanned yet. | Nog niets gescand. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Klik op Opnieuw scannen om C:\Windows\Installer te doorzoeken op installatiebestanden die geen enkel programma nog nodig heeft. |
+| Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Klik op Opnieuw scannen om {InstallerFolder} te doorzoeken op installatiebestanden die geen enkel programma nog nodig heeft. |
 | These files can't be cleaned up right now. | Deze bestanden kunnen nu niet worden opgeruimd. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Er is op dit moment iets met Windows Installer bezig, meestal een Windows-update of een programma dat op de achtergrond wordt geïnstalleerd. Verplaatsen en Verwijderen staan zolang stil, zodat InstallerClean niet aan de installatiecache komt terwijl die verandert. Zodra het klaar is: opnieuw scannen en ze zijn er weer. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Een eerdere Windows Installer-transactie is op deze computer opgeschort. Hervat die installatie of draai haar terug (of herstart Windows) voordat je de cache opschoont. |
@@ -149,9 +148,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Nederlands |
 | --- | --- |
 | All clean | Alles schoon |
-| Nothing to clean up in C:\Windows\Installer | Niets op te ruimen in C:\Windows\Installer |
+| Nothing to clean up in {InstallerFolder} | Niets op te ruimen in {InstallerFolder} |
 | Scanned {0} {1} in {2} | {0} {1} gescand in {2} |
-| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Kopieer ze terug naar C:\Windows\Installer als er ooit iets stukgaat ([uiterst onwaarschijnlijk]). |
+| Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]). | Kopieer ze terug naar {InstallerFolder} als er ooit iets stukgaat ([uiterst onwaarschijnlijk]). |
 | Until then, you can restore them if anything ever breaks ([extremely unlikely]). | Tot die tijd kun je ze terugzetten als er ooit iets stukgaat ([uiterst onwaarschijnlijk]). |
 | Empty it to actually reclaim the space. | Leeg hem om de ruimte echt terug te krijgen. |
 | {0} freed | {0} vrijgemaakt |
@@ -223,12 +222,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows heeft InstallerClean de toegang geweigerd, dus het is gestopt. Er is niets verwijderd.<br><br>InstallerClean draaide al als administrator, dus opnieuw starten op die manier helpt niet. Windows zegt er niet bij wat er precies weigerde, dus er valt niets gerichts te proberen. |
 | Couldn't read the Windows Installer records | Kon de Windows Installer-records niet lezen |
 | Scan failed | Scan mislukt |
-| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed. | De Windows Installer-records kwamen volledig leeg terug: geen enkel geïnstalleerd programma of geen enkele update maakt aanspraak op een installatiebestand in de cache. Dat komt op een werkende computer niet voor (zelfs een verse Windows-installatie heeft er een paar), dus of de records zijn beschadigd, of ze konden niet worden gelezen, en een scan die dit antwoord zou geloven, zou elk bestand in C:\Windows\Installer ten onrechte verweesd noemen. InstallerClean is daarom gestopt. Er is niets verwijderd. |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | De Windows Installer-records kwamen volledig leeg terug: geen enkel geïnstalleerd programma of geen enkele update maakt aanspraak op een installatiebestand in de cache. Dat komt op een werkende computer niet voor (zelfs een verse Windows-installatie heeft er een paar), dus of de records zijn beschadigd, of ze konden niet worden gelezen, en een scan die dit antwoord zou geloven, zou elk bestand in {InstallerFolder} ten onrechte verweesd noemen. InstallerClean is daarom gestopt. Er is niets verwijderd. |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer weigerde InstallerClean te laten zien wat er geïnstalleerd is. InstallerClean draaide al als administrator, dus het nogmaals als administrator uitvoeren verandert niets. Zonder die lijst is er geen veilige manier om te bepalen welke bestanden in de cache nog nodig zijn, dus InstallerClean is gestopt. Er is niets verwijderd. |
 | Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer kon InstallerClean geen leesbare lijst van de geïnstalleerde programma's geven: {0} vermeldingen op rij kwamen onleesbaar terug (laatste foutcode {1}). In plaats van met een half gelezen lijst te werken is InstallerClean gestopt. Er is niets verwijderd. |
 | Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer heeft het einde van de lijst met geïnstalleerde programma's nooit gemeld: InstallerClean heeft het na {0} vermeldingen opgegeven (laatste foutcode {1}). Een lijst zonder einde is niet te vertrouwen, dus InstallerClean is gestopt. Er is niets verwijderd. |
 | Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer heeft het einde van de patchlijst van één programma nooit gemeld: InstallerClean heeft het na {0} vermeldingen opgegeven (laatste foutcode {1}). Een lijst zonder einde is niet te vertrouwen, dus InstallerClean is gestopt. Er is niets verwijderd. |
-| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean kreeg deze scan niet te rijmen met de Windows Installer-records: elk bestand dat Windows nog als nodig aanmerkt, ontbreekt in C:\Windows\Installer, terwijl de bestanden die echt in de map staan met niets in de records overeenkomen. Zo ziet geen echte computer eruit, dus dit wijst op een probleem met het lezen van de records, niet op bestanden die je veilig kunt verwijderen. Er is niets voor opruiming aangeboden en er is niets verwijderd. |
+| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean kreeg deze scan niet te rijmen met de Windows Installer-records: elk bestand dat Windows nog als nodig aanmerkt, ontbreekt in {InstallerFolder}, terwijl de bestanden die echt in de map staan met niets in de records overeenkomen. Zo ziet geen echte computer eruit, dus dit wijst op een probleem met het lezen van de records, niet op bestanden die je veilig kunt verwijderen. Er is niets voor opruiming aangeboden en er is niets verwijderd. |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean kon niet genoeg van de Windows Installer-records lezen om zeker te weten wat er nog nodig is: de lijst met geïnstalleerde programma's kwam te kort terug, en dezelfde records rechtstreeks uit het register lezen leverde ook fouten op. Een bestand kon er verweesd uitzien enkel doordat het record dat het benoemt een van de onleesbare was, dus InstallerClean is gestopt. Er is niets verwijderd. |
 | Invalid destination | Ongeldige bestemming |
 | Could not write to destination | Kon niet naar de bestemming schrijven |
@@ -368,7 +367,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Product details | Productgegevens |
 | Move location | Verplaatslocatie |
 | Operation progress | Voortgang van de bewerking |
-| Scan C:\Windows\Installer again | C:\Windows\Installer opnieuw scannen |
+| Scan {InstallerFolder} again | {InstallerFolder} opnieuw scannen |
 | Scanning progress | Voortgang van de scan |
 | Startup scan progress | Voortgang van de opstartscan |
 | Details, unneeded files | Details, overbodige bestanden |
@@ -438,7 +437,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cancelled. | Geannuleerd. |
 | Error: {0}. Details written to {1}. | Fout: {0}. Details weggeschreven naar {1}. |
 | Error: {0}. The crash log could not be written. | Fout: {0}. Het crashlog kon niet worden geschreven. |
-| Scanning C:\Windows\Installer... | C:\Windows\Installer scannen... |
+| Scanning {InstallerFolder}... | {InstallerFolder} scannen... |
 | Found {0} {1} to clean up ({2}). | {0} {1} gevonden om op te ruimen ({2}). |
 | Nothing to do. | Niets te doen. |
 | Deleting {0} {1}... | Bezig met verwijderen van {0} {1}... |
@@ -455,7 +454,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moved {0} {1}. | {0} {1} verplaatst. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Een ander InstallerClean-proces houdt de single-instance-vergrendeling vast (de GUI of een andere CLI-run). Exit 75 (tijdelijk); later opnieuw proberen kan veilig. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Let op: schrijven naar het gebeurtenislogboek is mislukt. Controleer de rechten op het logboek Toepassing of het groepsbeleid. |
-| InstallerClean - clean up C:\Windows\Installer | InstallerClean - C:\Windows\Installer opschonen |
+| InstallerClean - clean up {InstallerFolder} | InstallerClean - {InstallerFolder} opschonen |
 | Usage: | Gebruik: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Deze hulp tonen (ook /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  De versie tonen (ook -v) |

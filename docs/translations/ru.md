@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.ru.resx`](../../src/InstallerClean.Core/Resources/Strings.ru.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
+`{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
+
 ## Window titles
 
 | English | Русский |
@@ -12,9 +14,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | About | О программе |
 | Registered files that should not be deleted | Зарегистрированные файлы, которые не стоит удалять |
 | Unneeded files that are safe to delete | Ненужные файлы, которые можно безопасно удалить |
-| Confirm move | Подтверждение перемещения |
-| Confirm delete | Подтверждение удаления |
-| Recycle Bin unavailable | Корзина недоступна |
 
 ## Section headings
 
@@ -43,7 +42,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Удалить безвозвратно |
 | _Done | _Готово |
 | Details | Подробности |
-| _Buy me a cuppa | _Угостить чаем |
+| _Buy me a cuppa | _Угостите меня чаем |
 | Leave a _star on GitHub | Поставить з_везду на GitHub |
 | Apache 2.0 licence | Лицензия Apache 2.0 |
 | _Move | _Переместить |
@@ -121,10 +120,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Русский |
 | --- | --- |
 | Any unneeded files below are safe to delete. | Любые ненужные файлы ниже можно безопасно удалить. |
-| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Они лежат в C:\Windows\Installer и остаются после того, как программа была удалена ({0}), более новый патч заменил один из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими. |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Удалите их в Корзину, или используйте вместо этого функцию «Переместить», чтобы сохранить резервную копию. Если вернуть файлы обратно в C:\Windows\Installer, всё станет ровно так, как было. |
+| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Они лежат в {InstallerFolder} и остаются после того, как программа была удалена ({0}), более новый патч заменил один из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | Удалите их в Корзину, или используйте вместо этого функцию «Переместить», чтобы сохранить резервную копию. Если вернуть файлы обратно в {InstallerFolder}, всё станет ровно так, как было. |
 | Nothing scanned yet. | Пока ничего не просканировано. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Нажмите «Повторить сканирование», чтобы просмотреть C:\Windows\Installer в поисках файлов установщика, которые больше не нужны ни одной программе. |
+| Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Нажмите «Повторить сканирование», чтобы просмотреть {InstallerFolder} в поисках файлов установщика, которые больше не нужны ни одной программе. |
 | These files can't be cleaned up right now. | Эти файлы сейчас нельзя очистить. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Прямо сейчас что-то использует Windows Installer, обычно это обновление Windows или программа, устанавливающаяся в фоне. Пока это происходит, «Переместить» и «Удалить» приостановлены, чтобы InstallerClean не трогал кэш установки, пока тот меняется. Когда всё завершится, выполните повторное сканирование, и они снова станут доступны. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | На этом компьютере приостановлена предыдущая транзакция Windows Installer. Прежде чем очищать кэш, продолжите или откатите ту установку (либо перезагрузите Windows). |
@@ -149,9 +148,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Русский |
 | --- | --- |
 | All clean | Всё чисто |
-| Nothing to clean up in C:\Windows\Installer | В C:\Windows\Installer нечего очищать |
+| Nothing to clean up in {InstallerFolder} | В {InstallerFolder} нечего очищать |
 | Scanned {0} {1} in {2} | Просканировано {0} {1} за {2} |
-| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Скопируйте их обратно в C:\Windows\Installer, если вдруг что-то сломается ([крайне маловероятно]). |
+| Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]). | Скопируйте их обратно в {InstallerFolder}, если вдруг что-то сломается ([крайне маловероятно]). |
 | Until then, you can restore them if anything ever breaks ([extremely unlikely]). | А пока их можно восстановить, если вдруг что-то сломается ([крайне маловероятно]). |
 | Empty it to actually reclaim the space. | Очистите Корзину, чтобы действительно освободить место. |
 | {0} freed | Освобождено {0} |
@@ -223,12 +222,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows отказал InstallerClean в доступе, поэтому работа была остановлена. Ничего не было удалено.<br><br>InstallerClean уже был запущен от имени администратора, поэтому повторный запуск таким же образом не поможет. Windows не сообщает ничего больше о том, что именно отказало в доступе, поэтому пробовать что-то конкретное бессмысленно. |
 | Couldn't read the Windows Installer records | Не удалось прочитать записи установщика Windows |
 | Scan failed | Сбой сканирования |
-| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed. | Записи установщика Windows вернулись совершенно пустыми: ни одна установленная программа и ни одно обновление не заявляет прав на кэшированный файл установщика. На работающем компьютере такого не бывает (даже у свежей установки Windows такие файлы есть), значит, записи либо повреждены, либо их не удалось прочитать, и сканирование, поверившее такому ответу, ошибочно сочло бы бесхозным каждый файл в C:\Windows\Installer. Вместо этого InstallerClean остановился. Ничего не было удалено. |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Записи установщика Windows вернулись совершенно пустыми: ни одна установленная программа и ни одно обновление не заявляет прав на кэшированный файл установщика. На работающем компьютере такого не бывает (даже у свежей установки Windows такие файлы есть), значит, записи либо повреждены, либо их не удалось прочитать, и сканирование, поверившее такому ответу, ошибочно сочло бы бесхозным каждый файл в {InstallerFolder}. Вместо этого InstallerClean остановился. Ничего не было удалено. |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer не позволил InstallerClean перечислить установленное. InstallerClean уже был запущен от имени администратора, поэтому повторный запуск от имени администратора ничего не изменит. Без этого списка невозможно безопасно определить, какие кэшированные файлы ещё нужны, поэтому InstallerClean остановился. Ничего не было удалено. |
 | Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer не смог предоставить InstallerClean читаемый список установленных программ: {0} записей подряд вернулись нечитаемыми (последний код ошибки {1}). Вместо того чтобы работать с прочитанным лишь частично списком, InstallerClean остановился. Ничего не было удалено. |
 | Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer так и не сообщил о конце списка установленных программ: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено. |
 | Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer так и не сообщил о конце списка патчей одной программы: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено. |
-| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean не смог сопоставить это сканирование с записями установщика Windows: каждый файл, который Windows всё ещё числит нужным, отсутствует в C:\Windows\Installer, а файлы, реально лежащие в этой папке, не соответствуют ни одной записи. Ни один настоящий компьютер так не выглядит, поэтому это указывает на проблему с чтением записей, а не на файлы, которые можно безопасно удалить. Для очистки ничего не предложено, и ничего не было удалено. |
+| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean не смог сопоставить это сканирование с записями установщика Windows: каждый файл, который Windows всё ещё числит нужным, отсутствует в {InstallerFolder}, а файлы, реально лежащие в этой папке, не соответствуют ни одной записи. Ни один настоящий компьютер так не выглядит, поэтому это указывает на проблему с чтением записей, а не на файлы, которые можно безопасно удалить. Для очистки ничего не предложено, и ничего не было удалено. |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean не смог прочитать достаточно записей установщика Windows, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено. |
 | Invalid destination | Недопустимая папка назначения |
 | Could not write to destination | Не удалось записать в папку назначения |
@@ -339,7 +338,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Русский |
 | --- | --- |
 | Donate | Поддержать |
-| Buy me a cuppa | Угостить чаем |
+| Buy me a cuppa | Угостите меня чаем |
 | Cancel operation | Отменить операцию |
 | Cancel scan | Отменить сканирование |
 | Cancel startup scan | Отменить сканирование при запуске |
@@ -368,7 +367,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Product details | Сведения о продукте |
 | Move location | Папка для перемещения |
 | Operation progress | Ход операции |
-| Scan C:\Windows\Installer again | Сканировать C:\Windows\Installer заново |
+| Scan {InstallerFolder} again | Сканировать {InstallerFolder} заново |
 | Scanning progress | Ход сканирования |
 | Startup scan progress | Ход сканирования при запуске |
 | Details, unneeded files | Подробности, ненужные файлы |
@@ -438,7 +437,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cancelled. | Отменено. |
 | Error: {0}. Details written to {1}. | Ошибка: {0}. Подробности записаны в {1}. |
 | Error: {0}. The crash log could not be written. | Ошибка: {0}. Не удалось записать журнал сбоев. |
-| Scanning C:\Windows\Installer... | Сканирование C:\Windows\Installer... |
+| Scanning {InstallerFolder}... | Сканирование {InstallerFolder}... |
 | Found {0} {1} to clean up ({2}). | Найдено {0} {1} для очистки ({2}). |
 | Nothing to do. | Делать нечего. |
 | Deleting {0} {1}... | Удаление: {0} {1}... |
@@ -455,7 +454,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moved {0} {1}. | Перемещено {0} {1}. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Другой процесс InstallerClean удерживает блокировку единственного экземпляра (GUI или другой запуск CLI). Код выхода 75 (временное состояние); можно повторить попытку позже. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Примечание: не удалось выполнить запись в журнал событий. Проверьте разрешения журнала «Приложение» или групповую политику. |
-| InstallerClean - clean up C:\Windows\Installer | InstallerClean - очистка C:\Windows\Installer |
+| InstallerClean - clean up {InstallerFolder} | InstallerClean - очистка {InstallerFolder} |
 | Usage: | Использование: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help       Показать эту справку (также принимает /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version    Показать версию (также принимает -v) |

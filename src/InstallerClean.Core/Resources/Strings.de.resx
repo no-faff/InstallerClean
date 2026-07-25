@@ -89,9 +89,6 @@
   <data name="Window.About.Title" xml:space="preserve"><value>Über</value></data>
   <data name="Window.Registered.Title" xml:space="preserve"><value>Registrierte Dateien, die nicht gelöscht werden sollten</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>Nicht benötigte Dateien, die bedenkenlos gelöscht werden können</value></data>
-  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Verschieben bestätigen</value></data>
-  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Löschen bestätigen</value></data>
-  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>Papierkorb nicht verfügbar</value></data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUKTE</value></data>
@@ -253,7 +250,7 @@
        Automation.Section.MoveLocation in every language. -->
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Zielort</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Vorgangsfortschritt</value></data>
-  <data name="Automation.RescanInstaller" xml:space="preserve"><value>C:\Windows\Installer erneut scannen</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>{InstallerFolder} erneut scannen</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Scan-Fortschritt</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Fortschritt des Start-Scans</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Details, nicht benötigte Dateien</value></data>
@@ -313,11 +310,11 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>Sie liegen in C:\Windows\Installer und blieben zurück, als ein Programm deinstalliert wurde ({0}), ein neuerer Patch einen älteren ersetzt hat ({1}) oder der Herausgeber ihn zurückgezogen hat ({2}). InstallerClean listet nur Dateien auf, die Windows selbst als erledigt meldet.</value>
+    <value>Sie liegen in {InstallerFolder} und blieben zurück, als ein Programm deinstalliert wurde ({0}), ein neuerer Patch einen älteren ersetzt hat ({1}) oder der Herausgeber ihn zurückgezogen hat ({2}). InstallerClean listet nur Dateien auf, die Windows selbst als erledigt meldet.</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Lösche sie in den Papierkorb, oder nutze stattdessen Verschieben, um eine Sicherungskopie zu behalten. Wenn du die Dateien zurück in C:\Windows\Installer legst, ist alles wieder genau wie vorher.</value>
+    <value>Lösche sie in den Papierkorb, oder nutze stattdessen Verschieben, um eine Sicherungskopie zu behalten. Wenn du die Dateien zurück in {InstallerFolder} legst, ist alles wieder genau wie vorher.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons. The second sentence covers BOTH buttons and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and both a Recycle Bin restore and a manual move back put the file at that same path under the same name. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -325,7 +322,7 @@
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>Klicke auf „Neu scannen“, um C:\Windows\Installer nach Installer-Dateien zu durchsuchen, die kein Programm mehr braucht.</value>
+    <value>Klicke auf „Neu scannen“, um {InstallerFolder} nach Installer-Dateien zu durchsuchen, die kein Programm mehr braucht.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
@@ -418,7 +415,7 @@
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>Alles sauber</value></data>
-  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nichts aufzuräumen in C:\Windows\Installer</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nichts aufzuräumen in {InstallerFolder}</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
        "less than a second"). The count is the receipt that a real
@@ -434,7 +431,7 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Kopier sie zurück in C:\Windows\Installer, falls jemals etwas kaputtgeht ([äußerst unwahrscheinlich]).</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Kopier sie zurück in {InstallerFolder}, falls jemals etwas kaputtgeht ([äußerst unwahrscheinlich]).</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Bis dahin kannst du sie wiederherstellen, falls jemals etwas kaputtgeht ([äußerst unwahrscheinlich]).</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
@@ -622,7 +619,7 @@ InstallerClean lief bereits als Administrator, es noch einmal so zu starten hilf
        "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Die Einträge von Windows Installer konnten nicht gelesen werden</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scan fehlgeschlagen</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Die Einträge von Windows Installer kamen völlig leer zurück: Nicht ein einziges installiertes Programm und kein einziges Update beansprucht eine zwischengespeicherte Installationsdatei. Auf einem funktionierenden System kommt das nicht vor (selbst eine frische Windows-Installation hat welche), also sind die Einträge entweder beschädigt oder sie konnten nicht gelesen werden, und ein Scan, der diese Antwort glaubt, würde jede Datei in C:\Windows\Installer fälschlich als verwaist einstufen. InstallerClean hat stattdessen abgebrochen. Es wurde nichts entfernt.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Die Einträge von Windows Installer kamen völlig leer zurück: Nicht ein einziges installiertes Programm und kein einziges Update beansprucht eine zwischengespeicherte Installationsdatei. Auf einem funktionierenden System kommt das nicht vor (selbst eine frische Windows-Installation hat welche), also sind die Einträge entweder beschädigt oder sie konnten nicht gelesen werden, und ein Scan, der diese Antwort glaubt, würde jede Datei in {InstallerFolder} fälschlich als verwaist einstufen. InstallerClean hat stattdessen abgebrochen. Es wurde nichts entfernt.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer hat es InstallerClean verweigert, die installierte Software aufzulisten. InstallerClean lief bereits als Administrator, es erneut als Administrator auszuführen ändert also nichts. Ohne diese Liste lässt sich nicht sicher sagen, welche zwischengespeicherten Dateien noch gebraucht werden, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
@@ -641,7 +638,7 @@ InstallerClean lief bereits als Administrator, es noch einmal so zu starten hilf
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean konnte diesen Scan nicht mit den Einträgen von Windows Installer in Einklang bringen: Jede Datei, die Windows noch als benötigt führt, fehlt in C:\Windows\Installer, während die Dateien, die tatsächlich im Ordner liegen, zu keinem der Einträge passen. So sieht kein reales System aus, das deutet also auf ein Problem beim Lesen der Einträge hin und nicht auf Dateien, die du bedenkenlos entfernen kannst. Es wurde nichts zum Aufräumen angeboten und nichts entfernt.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean konnte diesen Scan nicht mit den Einträgen von Windows Installer in Einklang bringen: Jede Datei, die Windows noch als benötigt führt, fehlt in {InstallerFolder}, während die Dateien, die tatsächlich im Ordner liegen, zu keinem der Einträge passen. So sieht kein reales System aus, das deutet also auf ein Problem beim Lesen der Einträge hin und nicht auf Dateien, die du bedenkenlos entfernen kannst. Es wurde nichts zum Aufräumen angeboten und nichts entfernt.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -899,7 +896,7 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        1 = crash log path. -->
   <data name="Cli.GenericError" xml:space="preserve"><value>Fehler: {0}. Details gespeichert in {1}.</value></data>
   <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Fehler: {0}. Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
-  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>C:\Windows\Installer wird gescannt...</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>{InstallerFolder} wird gescannt...</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>{0} {1} zum Aufräumen gefunden ({2}).</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>Nichts zu tun.</value></data>
@@ -994,7 +991,7 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
-  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - C:\Windows\Installer aufräumen</value></data>
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - {InstallerFolder} aufräumen</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Verwendung:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Diese Hilfe anzeigen (akzeptiert auch /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Die Version ausgeben (akzeptiert auch -v)</value></data>

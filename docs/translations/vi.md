@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.vi.resx`](../../src/InstallerClean.Core/Resources/Strings.vi.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
+`{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
+
 ## Window titles
 
 | English | Tiếng Việt |
@@ -12,9 +14,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | About | Giới thiệu |
 | Registered files that should not be deleted | Tệp đã đăng ký, không nên xóa |
 | Unneeded files that are safe to delete | Tệp không cần thiết, có thể xóa an toàn |
-| Confirm move | Xác nhận chuyển |
-| Confirm delete | Xác nhận xóa |
-| Recycle Bin unavailable | Thùng rác không khả dụng |
 
 ## Section headings
 
@@ -121,10 +120,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Tiếng Việt |
 | --- | --- |
 | Any unneeded files below are safe to delete. | Mọi tệp không cần thiết bên dưới đều có thể xóa an toàn. |
-| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Chúng nằm trong C:\Windows\Installer, còn sót lại khi một chương trình bị gỡ cài đặt ({0}), khi một bản vá mới hơn thay thế một bản ({1}) hoặc khi nhà phát hành thu hồi nó ({2}). InstallerClean chỉ liệt kê những tệp mà chính Windows báo là đã dùng xong. |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Xóa chúng vào Thùng rác, hoặc dùng Chuyển thay vào đó để giữ một bản sao lưu. Đặt các tệp trở lại C:\Windows\Installer sẽ đưa mọi thứ về đúng như lúc ban đầu. |
+| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Chúng nằm trong {InstallerFolder}, còn sót lại khi một chương trình bị gỡ cài đặt ({0}), khi một bản vá mới hơn thay thế một bản ({1}) hoặc khi nhà phát hành thu hồi nó ({2}). InstallerClean chỉ liệt kê những tệp mà chính Windows báo là đã dùng xong. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | Xóa chúng vào Thùng rác, hoặc dùng Chuyển thay vào đó để giữ một bản sao lưu. Đặt các tệp trở lại {InstallerFolder} sẽ đưa mọi thứ về đúng như lúc ban đầu. |
 | Nothing scanned yet. | Chưa quét gì cả. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Nhấn Quét lại để tìm trong C:\Windows\Installer những tệp cài đặt mà không chương trình nào còn cần. |
+| Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Nhấn Quét lại để tìm trong {InstallerFolder} những tệp cài đặt mà không chương trình nào còn cần. |
 | These files can't be cleaned up right now. | Hiện chưa thể dọn những tệp này. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Có thứ gì đó đang dùng Windows Installer ngay lúc này, thường là Windows Update hoặc một chương trình đang cài đặt ở chế độ nền. Chuyển và Xóa được tạm dừng trong khi việc đó chạy, nên InstallerClean sẽ không đụng tới bộ nhớ đệm trình cài đặt khi nó đang thay đổi. Khi việc đó xong, hãy Quét lại và chúng sẽ quay lại. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Một giao dịch Windows Installer trước đó đang bị tạm dừng trên máy này. Hãy tiếp tục hoặc hoàn tác lần cài đặt đó (hoặc khởi động lại Windows) trước khi dọn bộ nhớ đệm. |
@@ -149,9 +148,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Tiếng Việt |
 | --- | --- |
 | All clean | Đã sạch |
-| Nothing to clean up in C:\Windows\Installer | Không còn gì để dọn trong C:\Windows\Installer |
+| Nothing to clean up in {InstallerFolder} | Không còn gì để dọn trong {InstallerFolder} |
 | Scanned {0} {1} in {2} | Đã quét {0} {1} trong {2} |
-| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Sao chép chúng trở lại C:\Windows\Installer nếu chẳng may có gì trục trặc ([cực kỳ khó xảy ra]). |
+| Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]). | Sao chép chúng trở lại {InstallerFolder} nếu chẳng may có gì trục trặc ([cực kỳ khó xảy ra]). |
 | Until then, you can restore them if anything ever breaks ([extremely unlikely]). | Cho đến lúc đó, bạn có thể khôi phục chúng nếu chẳng may có gì trục trặc ([cực kỳ khó xảy ra]). |
 | Empty it to actually reclaim the space. | Dọn sạch Thùng rác để thực sự lấy lại dung lượng. |
 | {0} freed | Đã giải phóng {0} |
@@ -223,12 +222,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows đã từ chối quyền truy cập của InstallerClean, nên nó đã dừng lại. Không có gì bị xóa.<br><br>InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi động lại theo cách đó cũng không giúp được gì. Windows không nói gì thêm về thứ đã từ chối quyền truy cập, nên không có gì cụ thể để thử. |
 | Couldn't read the Windows Installer records | Không thể đọc các bản ghi trình cài đặt của Windows |
 | Scan failed | Quét thất bại |
-| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed. | Các bản ghi trình cài đặt của Windows trả về hoàn toàn trống: không một chương trình đã cài hay bản cập nhật nào nhận là chủ của một tệp cài đặt trong bộ nhớ đệm. Điều đó không xảy ra trên một máy hoạt động bình thường (ngay cả một bản Windows vừa cài cũng có vài tệp như vậy), nên hoặc các bản ghi đã hỏng, hoặc không đọc được, và một lần quét tin vào câu trả lời này sẽ nhầm lẫn coi mọi tệp trong C:\Windows\Installer là bị bỏ lại. Thay vào đó InstallerClean đã dừng. Không có gì bị xóa. |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Các bản ghi trình cài đặt của Windows trả về hoàn toàn trống: không một chương trình đã cài hay bản cập nhật nào nhận là chủ của một tệp cài đặt trong bộ nhớ đệm. Điều đó không xảy ra trên một máy hoạt động bình thường (ngay cả một bản Windows vừa cài cũng có vài tệp như vậy), nên hoặc các bản ghi đã hỏng, hoặc không đọc được, và một lần quét tin vào câu trả lời này sẽ nhầm lẫn coi mọi tệp trong {InstallerFolder} là bị bỏ lại. Thay vào đó InstallerClean đã dừng. Không có gì bị xóa. |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer không cho phép InstallerClean liệt kê những gì đã được cài. InstallerClean vốn đã chạy với quyền quản trị viên, nên chạy lại với quyền quản trị viên cũng không thay đổi được gì. Không có danh sách đó thì không có cách nào an toàn để biết tệp nào trong bộ nhớ đệm vẫn còn cần, nên InstallerClean đã dừng. Không có gì bị xóa. |
 | Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer không thể đưa cho InstallerClean một danh sách chương trình đã cài đọc được: {0} mục liên tiếp trả về không đọc được (mã lỗi cuối {1}). Thay vì làm việc với một danh sách chỉ đọc được một phần, InstallerClean đã dừng. Không có gì bị xóa. |
 | Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer chưa bao giờ báo hiệu kết thúc danh sách chương trình đã cài: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa. |
 | Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer chưa bao giờ báo hiệu kết thúc danh sách bản vá của một chương trình: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa. |
-| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean không thể khớp lần quét này với các bản ghi trình cài đặt của Windows: mọi tệp mà Windows vẫn liệt kê là cần thiết đều không có trong C:\Windows\Installer, trong khi các tệp thực sự nằm trong thư mục lại không khớp với bản ghi nào. Không có máy thật nào trông như vậy, nên điều này cho thấy có vấn đề khi đọc các bản ghi, chứ không phải là các tệp bạn có thể xóa an toàn. Chưa có gì được đưa ra để dọn dẹp và không có gì bị xóa. |
+| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean không thể khớp lần quét này với các bản ghi trình cài đặt của Windows: mọi tệp mà Windows vẫn liệt kê là cần thiết đều không có trong {InstallerFolder}, trong khi các tệp thực sự nằm trong thư mục lại không khớp với bản ghi nào. Không có máy thật nào trông như vậy, nên điều này cho thấy có vấn đề khi đọc các bản ghi, chứ không phải là các tệp bạn có thể xóa an toàn. Chưa có gì được đưa ra để dọn dẹp và không có gì bị xóa. |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean không đọc được đủ các bản ghi trình cài đặt của Windows để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ registry cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng. Không có gì bị xóa. |
 | Invalid destination | Đích không hợp lệ |
 | Could not write to destination | Không thể ghi vào đích |
@@ -353,7 +352,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Chọn cách xử lý các tệp không cần thiết: chuyển chúng tới nơi an toàn, xóa vĩnh viễn hoặc hủy. |
 | Move the unneeded files to a folder you choose | Chuyển các tệp không cần thiết tới một thư mục bạn chọn |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Xóa vĩnh viễn các tệp không cần thiết vì Thùng rác không khả dụng cho ổ đĩa này |
-| Say thanks | Gửi lời cảm ơn |
+| Say thanks | Lời cảm ơn |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì. |
 | Check for updates | Kiểm tra cập nhật |
 | Checks github's releases page for a newer version. | Kiểm tra trang phát hành của github xem có phiên bản mới hơn không. |
@@ -368,7 +367,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Product details | Chi tiết sản phẩm |
 | Move location | Nơi chuyển đến |
 | Operation progress | Tiến trình thao tác |
-| Scan C:\Windows\Installer again | Quét lại C:\Windows\Installer |
+| Scan {InstallerFolder} again | Quét lại {InstallerFolder} |
 | Scanning progress | Tiến trình quét |
 | Startup scan progress | Tiến trình quét khi khởi động |
 | Details, unneeded files | Chi tiết, tệp không cần thiết |
@@ -438,7 +437,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cancelled. | Đã hủy. |
 | Error: {0}. Details written to {1}. | Lỗi: {0}. Chi tiết đã ghi vào {1}. |
 | Error: {0}. The crash log could not be written. | Lỗi: {0}. Không thể ghi nhật ký sự cố. |
-| Scanning C:\Windows\Installer... | Đang quét C:\Windows\Installer... |
+| Scanning {InstallerFolder}... | Đang quét {InstallerFolder}... |
 | Found {0} {1} to clean up ({2}). | Đã tìm thấy {0} {1} để dọn ({2}). |
 | Nothing to do. | Không có gì để làm. |
 | Deleting {0} {1}... | Đang xóa {0} {1}... |
@@ -455,7 +454,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moved {0} {1}. | Đã chuyển {0} {1}. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Một tiến trình InstallerClean khác đang giữ khóa một-thực-thể (GUI hoặc một lần chạy CLI khác). Mã thoát 75 (tạm thời); có thể thử lại sau. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Lưu ý: ghi vào Nhật ký sự kiện thất bại. Hãy kiểm tra quyền của nhật ký Ứng dụng hoặc Chính sách nhóm. |
-| InstallerClean - clean up C:\Windows\Installer | InstallerClean - dọn dẹp C:\Windows\Installer |
+| InstallerClean - clean up {InstallerFolder} | InstallerClean - dọn dẹp {InstallerFolder} |
 | Usage: | Cách dùng: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help        Hiển thị trợ giúp này (cũng nhận /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version     In ra phiên bản (cũng nhận -v) |

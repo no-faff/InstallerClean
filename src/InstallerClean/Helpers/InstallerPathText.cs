@@ -2,21 +2,23 @@ using System;
 using System.Globalization;
 using System.Text;
 using System.Windows.Data;
+using InstallerClean.Services;
 
 namespace InstallerClean.Helpers;
 
 /// <summary>
-/// Keeps the literal <c>C:\Windows\Installer</c> whole when the UI draws it, by
+/// Keeps the installer cache folder's path whole when the UI draws it, by
 /// binding its punctuation seams with U+2060 WORD JOINER as the text goes to a
-/// control. Eleven resx keys name the folder; wrapped in a paragraph, the path
-/// broke after the <c>C:</c> and carried on <c>\Windows\Installer</c> on the
-/// next line, which reads as two things rather than one.
+/// control. Wrapped in a paragraph, the path broke after the drive's
+/// <c>C:</c> and carried on <c>\Windows\Installer</c> on the next line, which
+/// reads as two things rather than one.
 ///
 /// Why here rather than in the strings: this is presentation, and every resx
 /// value in sixteen languages stays exactly as the translators wrote it. It
-/// also puts the transform out of the CLI's reach by construction. Three of the
-/// eleven keys are console output, one of them machine-read, and an invisible
-/// character in a console line is a liability with no upside; the CLI takes its
+/// also puts the transform out of the CLI's reach by construction. Some of the
+/// strings naming the folder are console output, one of them machine-read, and
+/// an invisible character in a console line is a liability with no upside; the
+/// CLI takes its
 /// strings from the generated <c>Strings</c> class in Core and never comes past
 /// this project's boundary.
 ///
@@ -68,9 +70,10 @@ namespace InstallerClean.Helpers;
 /// </summary>
 internal static class InstallerPathText
 {
-    // Not a verbatim string: a lone backslash reads unambiguously in this form,
-    // and the escape sequence next to it is the one that once shipped broken.
-    private const string InstallerFolder = "C:\\Windows\\Installer";
+    // The resolved folder, not a literal, and the same one the scan uses: a
+    // hardcoded C: match target would find nothing to bind on a machine whose
+    // Windows lives elsewhere, so the path would break there and only there.
+    private static readonly string InstallerFolder = InstallerCacheHelpers.InstallerFolder;
 
     // Spelled as an escape rather than typed, so it is visible in the editor
     // and in a diff, and cannot be flattened to a plain space by tooling. The
@@ -82,9 +85,9 @@ internal static class InstallerPathText
     /// folder bound together, or unchanged when it names no such path (the
     /// overwhelming majority of strings, and the reason for the early exit).
     /// The match ignores case, because a path is case-insensitive on Windows
-    /// and a translator could reasonably lower-case it; the matched run is
-    /// rebuilt from the text itself, so whatever case it was written in
-    /// survives.
+    /// and the folder can reach a sentence from somewhere other than the token
+    /// substitution, in whatever case that source wrote it; the matched run is
+    /// rebuilt from the text itself, so the case it arrived in survives.
     /// </summary>
     public static string KeepWhole(string? text)
     {
@@ -129,9 +132,9 @@ internal static class InstallerPathText
 /// <summary>
 /// <see cref="InstallerPathText.KeepWhole"/> for a binding, where the string
 /// comes from a view model rather than from the resx at parse time. The main
-/// window's intro detail line is the one consumer: it carries the "they sit in
-/// C:\Windows\Installer" sentence, the not-yet-scanned prompt and, on a failed
-/// scan, either of the two diagnoses that name the folder.
+/// window's intro detail line is the one consumer: it carries the "they sit in"
+/// sentence that names the cache folder, the not-yet-scanned prompt and, on a
+/// failed scan, either of the two diagnoses that name it.
 /// </summary>
 internal sealed class InstallerPathTextConverter : IValueConverter
 {

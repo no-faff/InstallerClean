@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.id.resx`](../../src/InstallerClean.Core/Resources/Strings.id.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
+`{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
+
 ## Window titles
 
 | English | Bahasa Indonesia |
@@ -12,9 +14,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | About | Tentang |
 | Registered files that should not be deleted | File terdaftar yang sebaiknya tidak dihapus |
 | Unneeded files that are safe to delete | File tidak diperlukan yang aman dihapus |
-| Confirm move | Konfirmasi pemindahan |
-| Confirm delete | Konfirmasi penghapusan |
-| Recycle Bin unavailable | Keranjang Sampah tidak tersedia |
 
 ## Section headings
 
@@ -43,7 +42,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | _Hapus permanen |
 | _Done | _Selesai |
 | Details | Detail |
-| _Buy me a cuppa | Traktir _kopi |
+| _Buy me a cuppa | Traktir saya secangkir _kopi |
 | Leave a _star on GitHub | Beri _bintang di GitHub |
 | Apache 2.0 licence | Lisensi Apache 2.0 |
 | _Move | _Pindahkan |
@@ -121,10 +120,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Bahasa Indonesia |
 | --- | --- |
 | Any unneeded files below are safe to delete. | File yang tidak diperlukan di bawah ini aman dihapus. |
-| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | File-file ini berada di C:\Windows\Installer, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mencantumkan file yang Windows sendiri laporkan sudah tidak terpakai. |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Hapus ke Keranjang Sampah, atau gunakan Pindahkan sebagai gantinya untuk menyimpan salinan cadangan. Mengembalikan file ke C:\Windows\Installer akan membuat semuanya persis seperti semula. |
+| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | File-file ini berada di {InstallerFolder}, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mencantumkan file yang Windows sendiri laporkan sudah tidak terpakai. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | Hapus ke Keranjang Sampah, atau gunakan Pindahkan sebagai gantinya untuk menyimpan salinan cadangan. Mengembalikan file ke {InstallerFolder} akan membuat semuanya persis seperti semula. |
 | Nothing scanned yet. | Belum ada yang dipindai. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Tekan Pindai ulang untuk menelusuri C:\Windows\Installer mencari file penginstal yang tidak lagi diperlukan program mana pun. |
+| Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Tekan Pindai ulang untuk menelusuri {InstallerFolder} mencari file penginstal yang tidak lagi diperlukan program mana pun. |
 | These files can't be cleaned up right now. | File-file ini tidak bisa dibersihkan sekarang. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Ada sesuatu yang sedang menggunakan Windows Installer saat ini, biasanya Windows Update atau program yang memasang di latar belakang. Pindahkan dan Hapus dijeda selama itu berjalan, sehingga InstallerClean tidak menyentuh cache penginstal saat sedang berubah. Setelah selesai, Pindai ulang dan keduanya kembali. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Ada transaksi Windows Installer sebelumnya yang ditangguhkan di komputer ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache. |
@@ -149,9 +148,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Bahasa Indonesia |
 | --- | --- |
 | All clean | Semua bersih |
-| Nothing to clean up in C:\Windows\Installer | Tidak ada yang perlu dibersihkan di C:\Windows\Installer |
+| Nothing to clean up in {InstallerFolder} | Tidak ada yang perlu dibersihkan di {InstallerFolder} |
 | Scanned {0} {1} in {2} | {0} {1} dipindai dalam {2} |
-| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Salin kembali ke C:\Windows\Installer jika suatu saat ada yang rusak ([kemungkinannya sangat kecil]). |
+| Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]). | Salin kembali ke {InstallerFolder} jika suatu saat ada yang rusak ([kemungkinannya sangat kecil]). |
 | Until then, you can restore them if anything ever breaks ([extremely unlikely]). | Sampai saat itu, Anda bisa memulihkannya jika suatu saat ada yang rusak ([kemungkinannya sangat kecil]). |
 | Empty it to actually reclaim the space. | Kosongkan Keranjang Sampah untuk benar-benar membebaskan ruang. |
 | {0} freed | {0} dikosongkan |
@@ -223,12 +222,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows menolak akses untuk InstallerClean, jadi prosesnya dihentikan. Tidak ada yang dihapus.<br><br>InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi dengan cara itu tidak akan membantu. Windows tidak menjelaskan lebih jauh apa yang menolak akses, jadi tidak ada hal khusus yang bisa dicoba. |
 | Couldn't read the Windows Installer records | Catatan Windows Installer tidak bisa dibaca |
 | Scan failed | Pemindaian gagal |
-| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed. | Catatan Windows Installer kembali sepenuhnya kosong: tidak satu pun program terpasang atau pembaruan yang mengklaim file pemasang di cache. Itu tidak terjadi pada komputer yang berfungsi (bahkan pemasangan Windows yang baru pun punya beberapa), jadi catatannya rusak atau tidak bisa dibaca, dan pemindaian yang memercayai jawaban ini akan keliru menyebut setiap file di C:\Windows\Installer terisolasi. InstallerClean berhenti sebagai gantinya. Tidak ada yang dihapus. |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Catatan Windows Installer kembali sepenuhnya kosong: tidak satu pun program terpasang atau pembaruan yang mengklaim file pemasang di cache. Itu tidak terjadi pada komputer yang berfungsi (bahkan pemasangan Windows yang baru pun punya beberapa), jadi catatannya rusak atau tidak bisa dibaca, dan pemindaian yang memercayai jawaban ini akan keliru menyebut setiap file di {InstallerFolder} terisolasi. InstallerClean berhenti sebagai gantinya. Tidak ada yang dihapus. |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer tidak mengizinkan InstallerClean menampilkan daftar apa saja yang terpasang. InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi sebagai administrator tidak akan mengubah apa pun. Tanpa daftar itu tidak ada cara yang aman untuk mengetahui file cache mana yang masih diperlukan, jadi InstallerClean berhenti. Tidak ada yang dihapus. |
 | Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer tidak bisa memberi InstallerClean daftar program terpasang yang terbaca: {0} entri berturut-turut kembali tidak terbaca (kode kesalahan terakhir {1}). Alih-alih bekerja dengan daftar yang hanya terbaca sebagian, InstallerClean berhenti. Tidak ada yang dihapus. |
 | Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer tidak pernah menandai akhir daftar program terpasang: InstallerClean menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus. |
 | Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer tidak pernah menandai akhir daftar patch sebuah program: InstallerClean menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus. |
-| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean tidak bisa mencocokkan pemindaian ini dengan catatan Windows Installer: setiap file yang masih didaftarkan Windows sebagai diperlukan tidak ada di C:\Windows\Installer, sementara file yang benar-benar ada di folder itu tidak cocok dengan catatan mana pun. Tidak ada komputer nyata yang seperti itu, jadi ini menunjukkan masalah dalam membaca catatan, bukan file yang aman Anda hapus. Tidak ada yang ditawarkan untuk dibersihkan dan tidak ada yang dihapus. |
+| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean tidak bisa mencocokkan pemindaian ini dengan catatan Windows Installer: setiap file yang masih didaftarkan Windows sebagai diperlukan tidak ada di {InstallerFolder}, sementara file yang benar-benar ada di folder itu tidak cocok dengan catatan mana pun. Tidak ada komputer nyata yang seperti itu, jadi ini menunjukkan masalah dalam membaca catatan, bukan file yang aman Anda hapus. Tidak ada yang ditawarkan untuk dibersihkan dan tidak ada yang dihapus. |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean tidak bisa membaca cukup banyak catatan Windows Installer untuk memastikan apa yang masih diperlukan: daftar program terpasang kembali tidak lengkap, dan membaca catatan yang sama langsung dari registri juga menemui kesalahan. Sebuah file bisa tampak terisolasi hanya karena catatan yang menyebutkannya termasuk yang tidak terbaca, jadi InstallerClean berhenti. Tidak ada yang dihapus. |
 | Invalid destination | Tujuan tidak valid |
 | Could not write to destination | Tidak bisa menulis ke tujuan |
@@ -368,7 +367,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Product details | Detail produk |
 | Move location | Lokasi pemindahan |
 | Operation progress | Kemajuan operasi |
-| Scan C:\Windows\Installer again | Pindai ulang C:\Windows\Installer |
+| Scan {InstallerFolder} again | Pindai ulang {InstallerFolder} |
 | Scanning progress | Kemajuan pemindaian |
 | Startup scan progress | Kemajuan pemindaian awal |
 | Details, unneeded files | Detail, file yang tidak diperlukan |
@@ -438,7 +437,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cancelled. | Dibatalkan. |
 | Error: {0}. Details written to {1}. | Kesalahan: {0}. Detail ditulis ke {1}. |
 | Error: {0}. The crash log could not be written. | Kesalahan: {0}. Log kerusakan tidak bisa ditulis. |
-| Scanning C:\Windows\Installer... | Memindai C:\Windows\Installer... |
+| Scanning {InstallerFolder}... | Memindai {InstallerFolder}... |
 | Found {0} {1} to clean up ({2}). | Ditemukan {0} {1} untuk dibersihkan ({2}). |
 | Nothing to do. | Tidak ada yang perlu dilakukan. |
 | Deleting {0} {1}... | Menghapus {0} {1}... |
@@ -455,7 +454,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moved {0} {1}. | {0} {1} dipindahkan. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Proses InstallerClean lain memegang kunci instans-tunggal (GUI atau proses CLI lain). Kode keluar 75 (sementara); aman untuk dicoba lagi nanti. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Catatan: penulisan ke Log Peristiwa gagal. Periksa izin log Aplikasi atau Kebijakan Grup. |
-| InstallerClean - clean up C:\Windows\Installer | InstallerClean - pembersihan C:\Windows\Installer |
+| InstallerClean - clean up {InstallerFolder} | InstallerClean - pembersihan {InstallerFolder} |
 | Usage: | Penggunaan: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Tampilkan bantuan ini (juga menerima /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Cetak versi (juga menerima -v) |

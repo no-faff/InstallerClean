@@ -89,9 +89,6 @@
   <data name="Window.About.Title" xml:space="preserve"><value>InstallerClean について</value></data>
   <data name="Window.Registered.Title" xml:space="preserve"><value>削除すべきでない登録済みファイル</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>削除しても安全な不要ファイル</value></data>
-  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>移動の確認</value></data>
-  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>削除の確認</value></data>
-  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>ごみ箱が利用できません</value></data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Products" xml:space="preserve"><value>製品</value></data>
@@ -138,7 +135,7 @@
        keyboard shortcut. -->
   <data name="Action.Done" xml:space="preserve"><value>完了(_D)</value></data>
   <data name="Action.Details" xml:space="preserve"><value>詳細</value></data>
-  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>コーヒーをおごる(_B)</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>コーヒーを一杯おごる(_B)</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>GitHubでスターを付ける(_S)</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Apache 2.0 ライセンス</value></data>
   <data name="Action.Move" xml:space="preserve"><value>移動(_M)</value></data>
@@ -173,7 +170,7 @@
        name only, and the value says what the button says on screen, because a
        window name in the spoken one was an internal note being read out to
        somebody who can only be in that window to hear it. -->
-  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>一杯おごる</value></data>
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>コーヒーを一杯おごる</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>操作をキャンセル</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>スキャンをキャンセル</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>起動時スキャンをキャンセル</value></data>
@@ -253,7 +250,7 @@
        Automation.Section.MoveLocation in every language. -->
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>移動先</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>操作の進捗</value></data>
-  <data name="Automation.RescanInstaller" xml:space="preserve"><value>C:\Windows\Installer を再スキャン</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>{InstallerFolder} を再スキャン</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>スキャンの進捗</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>起動時スキャンの進捗</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>詳細、不要ファイル</value></data>
@@ -313,11 +310,11 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>これらのファイルはC:\Windows\Installerにあり、プログラムがアンインストールされたとき ({0})、新しいパッチが置き換えたとき ({1})、または公開元が撤回したとき ({2})に取り残されます。InstallerClean は、Windows 自身が不要と報告したファイルのみをリストアップします。</value>
+    <value>これらのファイルは{InstallerFolder}にあり、プログラムがアンインストールされたとき ({0})、新しいパッチが置き換えたとき ({1})、または公開元が撤回したとき ({2})に取り残されます。InstallerClean は、Windows 自身が不要と報告したファイルのみをリストアップします。</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>ごみ箱に削除するか、バックアップコピーを残すには代わりに「移動」を使用してください。ファイルをC:\Windows\Installerに戻せば、完全に元どおりになります。</value>
+    <value>ごみ箱に削除するか、バックアップコピーを残すには代わりに「移動」を使用してください。ファイルを{InstallerFolder}に戻せば、完全に元どおりになります。</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons. The second sentence covers BOTH buttons and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and both a Recycle Bin restore and a manual move back put the file at that same path under the same name. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -325,7 +322,7 @@
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>「再スキャン」を押すと、C:\Windows\Installer を調べて、どのプログラムも必要としなくなったインストーラーファイルを探します。</value>
+    <value>「再スキャン」を押すと、{InstallerFolder} を調べて、どのプログラムも必要としなくなったインストーラーファイルを探します。</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
@@ -418,7 +415,7 @@
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>すべてクリーン</value></data>
-  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>C:\Windows\Installer にクリーンアップするものはありません</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>{InstallerFolder} にクリーンアップするものはありません</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
        "less than a second"). The count is the receipt that a real
@@ -434,7 +431,7 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>万一何かが動作しなくなったら、C:\Windows\Installerにコピーを戻してください ([その可能性は極めて低いです])。</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>万一何かが動作しなくなったら、{InstallerFolder}にコピーを戻してください ([その可能性は極めて低いです])。</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>それまでは、万一何かが動作しなくなったら復元できます ([その可能性は極めて低いです])。</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
@@ -622,7 +619,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Windows Installer の登録情報を読み取れませんでした</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>スキャンに失敗しました</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer の登録情報が完全に空の状態で返されました。インストール済みのプログラムも更新プログラムも、キャッシュされたインストーラーファイルを一つも要求していません。正常に動作しているコンピューターでは起こらないこと (インストール直後の Windows にも該当するファイルはあります) なので、登録情報が破損しているか、読み取れなかったかのいずれかです。この答えを信じたスキャンは、C:\Windows\Installer 内のすべてのファイルを誤って孤立と判定してしまいます。InstallerClean はそうせずに中止しました。何も削除していません。</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer の登録情報が完全に空の状態で返されました。インストール済みのプログラムも更新プログラムも、キャッシュされたインストーラーファイルを一つも要求していません。正常に動作しているコンピューターでは起こらないこと (インストール直後の Windows にも該当するファイルはあります) なので、登録情報が破損しているか、読み取れなかったかのいずれかです。この答えを信じたスキャンは、{InstallerFolder} 内のすべてのファイルを誤って孤立と判定してしまいます。InstallerClean はそうせずに中止しました。何も削除していません。</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer が InstallerClean にインストール済みの一覧表示を許可しませんでした。InstallerClean はすでに管理者として実行されていたため、管理者として実行し直しても何も変わりません。この一覧がなければ、キャッシュされたどのファイルがまだ必要なのかを安全に判断する方法はないため、InstallerClean は中止しました。何も削除していません。</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
@@ -641,7 +638,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean は今回のスキャン結果を Windows Installer の登録情報と突き合わせられませんでした。Windows がまだ必要として挙げているファイルはすべて C:\Windows\Installer に見当たらず、一方でフォルダーに実際にあるファイルはどの登録情報とも一致しません。実在するコンピューターがこのような状態になることはないため、これは安全に削除できるファイルがあるということではなく、登録情報の読み取りに問題があることを示しています。クリーンアップ対象は何も表示しておらず、何も削除していません。</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean は今回のスキャン結果を Windows Installer の登録情報と突き合わせられませんでした。Windows がまだ必要として挙げているファイルはすべて {InstallerFolder} に見当たらず、一方でフォルダーに実際にあるファイルはどの登録情報とも一致しません。実在するコンピューターがこのような状態になることはないため、これは安全に削除できるファイルがあるということではなく、登録情報の読み取りに問題があることを示しています。クリーンアップ対象は何も表示しておらず、何も削除していません。</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -899,7 +896,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        1 = crash log path. -->
   <data name="Cli.GenericError" xml:space="preserve"><value>エラー：{0}。詳細は {1} に書き込まれました。</value></data>
   <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>エラー：{0}。クラッシュログを書き込めませんでした。</value></data>
-  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>C:\Windows\Installer をスキャン中...</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>{InstallerFolder} をスキャン中...</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>クリーンアップ対象の {0} 個の {1} が見つかりました ({2})。</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>実行するものはありません。</value></data>
@@ -924,7 +921,10 @@ InstallerClean はすでに管理者として実行されていたため、同�
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>エラー：移動先は完全修飾パスである必要があります。指定されたもの：{0}</value></data>
   <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>エラー：移動先 {0} は Windows システムフォルダー下に解決されます。%SystemRoot%、%ProgramFiles%、%ProgramData%以外のパスを選択してください。</value></data>
   <!-- 0 = mode, 1 = destination -->
-  <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve"><value>{0}モードは中止されました：移動先 {1} はC:\Windows\Installer 内にあります。</value></data>
+  <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve">
+    <value>{0}モードは中止されました：移動先 {1} はC:\Windows\Installer 内にあります。</value>
+    <comment>Application event log, machine-read: RMM tooling greps these lines for a known English phrase, so MachineContract forces en-GB at the emit site and the wording is held still. It is the one string naming the installer folder that keeps the literal rather than the {InstallerFolder} token: a resolved path would vary the line by machine, which is the opposite of what a matched shape needs. The operator-facing lines that name the folder all carry the token.</comment>
+  </data>
   <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>{0}モードは中止されました：移動先 {1} は完全修飾パスではありません。</value></data>
   <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0}モードは中止されました：移動先 {1} は Windows システムフォルダー内に解決されます。</value></data>
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>エラー：現在 Windows Installer を使用しているものがあります。通常は Windows Update またはバックグラウンドでインストール中のプログラムです。その実行中は移動と削除がブロックされます。完了したら再試行してください。</value></data>
@@ -1015,7 +1015,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
-  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - C:\Windows\Installer をクリーンアップ</value></data>
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - {InstallerFolder} をクリーンアップ</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>使用方法：</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     このヘルプを表示 (/?、-hも受け付けます)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  バージョンを表示 (-vも受け付けます)</value></data>

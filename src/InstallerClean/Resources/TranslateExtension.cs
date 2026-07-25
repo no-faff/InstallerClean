@@ -1,5 +1,4 @@
 using System;
-using System.Resources;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Markup;
@@ -25,14 +24,6 @@ namespace InstallerClean.Resources;
 [MarkupExtensionReturnType(typeof(string))]
 public sealed class TranslateExtension : MarkupExtension
 {
-    // Reuse the auto-generated Strings class's ResourceManager rather
-    // than constructing a parallel one. The resx is embedded in
-    // InstallerClean.Core; a fresh `new ResourceManager(...,
-    // typeof(this).Assembly)` would resolve typeof(this).Assembly to
-    // InstallerClean.dll (the WPF host), miss the embedded resources,
-    // and return literal keys for every XAML binding.
-    private static readonly ResourceManager ResourceManager = Strings.ResourceManager;
-
     public TranslateExtension() { }
 
     public TranslateExtension(string key)
@@ -48,12 +39,20 @@ public sealed class TranslateExtension : MarkupExtension
         if (string.IsNullOrEmpty(Key))
             return string.Empty;
 
-        var value = ResourceManager.GetString(Key, Localisation.UiCulture) ?? Key;
+        // Strings.Get, not a lookup of this class's own: it is the single door
+        // every resource read comes through, so the culture and the
+        // installer-folder token cannot differ between the XAML half of a screen
+        // and the C# half. A second lookup here is also how a parallel
+        // ResourceManager gets built by mistake, binding to InstallerClean.dll,
+        // missing the resx embedded in Core and returning literal keys.
+        var value = Strings.Get(Key);
 
         // Every XAML-resolved string passes through KeepWhole, which is a no-op
-        // unless the value names C:\Windows\Installer and then binds it so it
-        // cannot break across two lines. Doing it here rather than per site
-        // means a new string naming the folder is covered by writing it.
+        // unless the value names the installer cache folder and then binds it so
+        // it cannot break across two lines. Doing it here rather than per site
+        // means a new string naming the folder is covered by writing it. It runs
+        // after the resolve above and must: the folder arrives as a token, and
+        // there is no path to bind until that is spent.
         //
         // Except where the string is only ever spoken. KeepWhole's word joiners
         // are a line-breaking instruction, and an automation property is never

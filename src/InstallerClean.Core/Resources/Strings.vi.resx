@@ -89,9 +89,6 @@
   <data name="Window.About.Title" xml:space="preserve"><value>Giới thiệu</value></data>
   <data name="Window.Registered.Title" xml:space="preserve"><value>Tệp đã đăng ký, không nên xóa</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>Tệp không cần thiết, có thể xóa an toàn</value></data>
-  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Xác nhận chuyển</value></data>
-  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Xác nhận xóa</value></data>
-  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>Thùng rác không khả dụng</value></data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Products" xml:space="preserve"><value>SẢN PHẨM</value></data>
@@ -192,7 +189,7 @@
   <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Chọn cách xử lý các tệp không cần thiết: chuyển chúng tới nơi an toàn, xóa vĩnh viễn hoặc hủy.</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Chuyển các tệp không cần thiết tới một thư mục bạn chọn</value></data>
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Xóa vĩnh viễn các tệp không cần thiết vì Thùng rác không khả dụng cho ổ đĩa này</value></data>
-  <data name="Automation.SayThanks" xml:space="preserve"><value>Gửi lời cảm ơn</value></data>
+  <data name="Automation.SayThanks" xml:space="preserve"><value>Lời cảm ơn</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Kiểm tra cập nhật</value></data>
   <!-- Heard, never read: the update button carries no tooltip, so this help
@@ -253,7 +250,7 @@
        Automation.Section.MoveLocation in every language. -->
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Nơi chuyển đến</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Tiến trình thao tác</value></data>
-  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Quét lại C:\Windows\Installer</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Quét lại {InstallerFolder}</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Tiến trình quét</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Tiến trình quét khi khởi động</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Chi tiết, tệp không cần thiết</value></data>
@@ -313,11 +310,11 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>Chúng nằm trong C:\Windows\Installer, còn sót lại khi một chương trình bị gỡ cài đặt ({0}), khi một bản vá mới hơn thay thế một bản ({1}) hoặc khi nhà phát hành thu hồi nó ({2}). InstallerClean chỉ liệt kê những tệp mà chính Windows báo là đã dùng xong.</value>
+    <value>Chúng nằm trong {InstallerFolder}, còn sót lại khi một chương trình bị gỡ cài đặt ({0}), khi một bản vá mới hơn thay thế một bản ({1}) hoặc khi nhà phát hành thu hồi nó ({2}). InstallerClean chỉ liệt kê những tệp mà chính Windows báo là đã dùng xong.</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Xóa chúng vào Thùng rác, hoặc dùng Chuyển thay vào đó để giữ một bản sao lưu. Đặt các tệp trở lại C:\Windows\Installer sẽ đưa mọi thứ về đúng như lúc ban đầu.</value>
+    <value>Xóa chúng vào Thùng rác, hoặc dùng Chuyển thay vào đó để giữ một bản sao lưu. Đặt các tệp trở lại {InstallerFolder} sẽ đưa mọi thứ về đúng như lúc ban đầu.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons. The second sentence covers BOTH buttons and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and both a Recycle Bin restore and a manual move back put the file at that same path under the same name. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -325,7 +322,7 @@
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>Nhấn Quét lại để tìm trong C:\Windows\Installer những tệp cài đặt mà không chương trình nào còn cần.</value>
+    <value>Nhấn Quét lại để tìm trong {InstallerFolder} những tệp cài đặt mà không chương trình nào còn cần.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
@@ -418,7 +415,7 @@
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>Đã sạch</value></data>
-  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Không còn gì để dọn trong C:\Windows\Installer</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Không còn gì để dọn trong {InstallerFolder}</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
        "less than a second"). The count is the receipt that a real
@@ -434,7 +431,7 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Sao chép chúng trở lại C:\Windows\Installer nếu chẳng may có gì trục trặc ([cực kỳ khó xảy ra]).</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Sao chép chúng trở lại {InstallerFolder} nếu chẳng may có gì trục trặc ([cực kỳ khó xảy ra]).</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Cho đến lúc đó, bạn có thể khôi phục chúng nếu chẳng may có gì trục trặc ([cực kỳ khó xảy ra]).</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
@@ -622,7 +619,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Không thể đọc các bản ghi trình cài đặt của Windows</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Quét thất bại</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Các bản ghi trình cài đặt của Windows trả về hoàn toàn trống: không một chương trình đã cài hay bản cập nhật nào nhận là chủ của một tệp cài đặt trong bộ nhớ đệm. Điều đó không xảy ra trên một máy hoạt động bình thường (ngay cả một bản Windows vừa cài cũng có vài tệp như vậy), nên hoặc các bản ghi đã hỏng, hoặc không đọc được, và một lần quét tin vào câu trả lời này sẽ nhầm lẫn coi mọi tệp trong C:\Windows\Installer là bị bỏ lại. Thay vào đó InstallerClean đã dừng. Không có gì bị xóa.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Các bản ghi trình cài đặt của Windows trả về hoàn toàn trống: không một chương trình đã cài hay bản cập nhật nào nhận là chủ của một tệp cài đặt trong bộ nhớ đệm. Điều đó không xảy ra trên một máy hoạt động bình thường (ngay cả một bản Windows vừa cài cũng có vài tệp như vậy), nên hoặc các bản ghi đã hỏng, hoặc không đọc được, và một lần quét tin vào câu trả lời này sẽ nhầm lẫn coi mọi tệp trong {InstallerFolder} là bị bỏ lại. Thay vào đó InstallerClean đã dừng. Không có gì bị xóa.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer không cho phép InstallerClean liệt kê những gì đã được cài. InstallerClean vốn đã chạy với quyền quản trị viên, nên chạy lại với quyền quản trị viên cũng không thay đổi được gì. Không có danh sách đó thì không có cách nào an toàn để biết tệp nào trong bộ nhớ đệm vẫn còn cần, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
@@ -641,7 +638,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean không thể khớp lần quét này với các bản ghi trình cài đặt của Windows: mọi tệp mà Windows vẫn liệt kê là cần thiết đều không có trong C:\Windows\Installer, trong khi các tệp thực sự nằm trong thư mục lại không khớp với bản ghi nào. Không có máy thật nào trông như vậy, nên điều này cho thấy có vấn đề khi đọc các bản ghi, chứ không phải là các tệp bạn có thể xóa an toàn. Chưa có gì được đưa ra để dọn dẹp và không có gì bị xóa.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean không thể khớp lần quét này với các bản ghi trình cài đặt của Windows: mọi tệp mà Windows vẫn liệt kê là cần thiết đều không có trong {InstallerFolder}, trong khi các tệp thực sự nằm trong thư mục lại không khớp với bản ghi nào. Không có máy thật nào trông như vậy, nên điều này cho thấy có vấn đề khi đọc các bản ghi, chứ không phải là các tệp bạn có thể xóa an toàn. Chưa có gì được đưa ra để dọn dẹp và không có gì bị xóa.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -899,7 +896,7 @@ Không thể ghi nhật ký sự cố.</value></data>
        1 = crash log path. -->
   <data name="Cli.GenericError" xml:space="preserve"><value>Lỗi: {0}. Chi tiết đã ghi vào {1}.</value></data>
   <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Lỗi: {0}. Không thể ghi nhật ký sự cố.</value></data>
-  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Đang quét C:\Windows\Installer...</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Đang quét {InstallerFolder}...</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>Đã tìm thấy {0} {1} để dọn ({2}).</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>Không có gì để làm.</value></data>
@@ -994,7 +991,7 @@ Không thể ghi nhật ký sự cố.</value></data>
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
-  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - dọn dẹp C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - dọn dẹp {InstallerFolder}</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Cách dùng:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help        Hiển thị trợ giúp này (cũng nhận /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version     In ra phiên bản (cũng nhận -v)</value></data>

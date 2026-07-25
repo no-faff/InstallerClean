@@ -89,9 +89,6 @@
   <data name="Window.About.Title" xml:space="preserve"><value>Про програму</value></data>
   <data name="Window.Registered.Title" xml:space="preserve"><value>Зареєстровані файли, які не варто видаляти</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>Непотрібні файли, які можна безпечно видалити</value></data>
-  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Підтвердження переміщення</value></data>
-  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Підтвердження видалення</value></data>
-  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>Кошик недоступний</value></data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Products" xml:space="preserve"><value>ПРОДУКТИ</value></data>
@@ -253,7 +250,7 @@
        Automation.Section.MoveLocation in every language. -->
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Куди перемістити</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Перебіг операції</value></data>
-  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Просканувати C:\Windows\Installer ще раз</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Просканувати {InstallerFolder} ще раз</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Перебіг сканування</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Перебіг сканування під час запуску</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Деталі, непотрібні файли</value></data>
@@ -313,11 +310,11 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>Вони лежать у C:\Windows\Installer, лишившись після видалення програми ({0}), заміни старого патча новішим ({1}) чи відкликання видавцем ({2}). InstallerClean перелічує лише ті файли, які сама Windows позначає як завершені.</value>
+    <value>Вони лежать у {InstallerFolder}, лишившись після видалення програми ({0}), заміни старого патча новішим ({1}) чи відкликання видавцем ({2}). InstallerClean перелічує лише ті файли, які сама Windows позначає як завершені.</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Видаліть їх до Кошика, або скористайтеся натомість функцією «Перемістити», щоб зберегти резервну копію. Якщо повернути файли назад у C:\Windows\Installer, усе стане точно таким, як було.</value>
+    <value>Видаліть їх до Кошика, або скористайтеся натомість функцією «Перемістити», щоб зберегти резервну копію. Якщо повернути файли назад у {InstallerFolder}, усе стане точно таким, як було.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons. The second sentence covers BOTH buttons and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and both a Recycle Bin restore and a manual move back put the file at that same path under the same name. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -325,7 +322,7 @@
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>Натисніть «Повторити сканування», щоб переглянути C:\Windows\Installer і знайти файли інсталятора, яких уже не потребує жодна програма.</value>
+    <value>Натисніть «Повторити сканування», щоб переглянути {InstallerFolder} і знайти файли інсталятора, яких уже не потребує жодна програма.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
@@ -418,7 +415,7 @@
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>Усе чисто</value></data>
-  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>У C:\Windows\Installer немає чого прибирати</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>У {InstallerFolder} немає чого прибирати</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
        "less than a second"). The count is the receipt that a real
@@ -434,7 +431,7 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Скопіюйте їх назад у C:\Windows\Installer, якщо раптом щось зламається ([вкрай малоймовірно]).</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Скопіюйте їх назад у {InstallerFolder}, якщо раптом щось зламається ([вкрай малоймовірно]).</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>А поки що ви можете відновити їх, якщо раптом щось зламається ([вкрай малоймовірно]).</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
@@ -622,7 +619,7 @@ InstallerClean уже працював від імені адміністрат�
        "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Не вдалося прочитати записи інсталятора Windows</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Збій сканування</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Записи інсталятора Windows повернулися цілком порожніми: жодна встановлена програма й жодне оновлення не заявляє прав на кешований файл інсталятора. На робочому комп'ютері такого не буває (навіть у щойно встановленої Windows такі файли є), тож записи або пошкоджено, або їх не вдалося прочитати, і сканування, яке повірило б такій відповіді, помилково визнало б осиротілим кожен файл у C:\Windows\Installer. Замість цього InstallerClean зупинився. Нічого не було видалено.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Записи інсталятора Windows повернулися цілком порожніми: жодна встановлена програма й жодне оновлення не заявляє прав на кешований файл інсталятора. На робочому комп'ютері такого не буває (навіть у щойно встановленої Windows такі файли є), тож записи або пошкоджено, або їх не вдалося прочитати, і сканування, яке повірило б такій відповіді, помилково визнало б осиротілим кожен файл у {InstallerFolder}. Замість цього InstallerClean зупинився. Нічого не було видалено.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer не дозволив InstallerClean перелічити встановлене. InstallerClean уже працював від імені адміністратора, тож запуск від імені адміністратора ще раз нічого не змінить. Без цього списку немає безпечного способу визначити, які кешовані файли ще потрібні, тож InstallerClean зупинився. Нічого не було видалено.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
@@ -641,7 +638,7 @@ InstallerClean уже працював від імені адміністрат�
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean не зміг узгодити це сканування із записами інсталятора Windows: кожного файлу, який Windows досі вважає потрібним, немає в C:\Windows\Installer, а файли, що справді лежать у цій папці, не відповідають жодному запису. Жоден справжній комп'ютер так не виглядає, тож це вказує на проблему з читанням записів, а не на файли, які можна безпечно видалити. Для очищення нічого не запропоновано, і нічого не було видалено.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean не зміг узгодити це сканування із записами інсталятора Windows: кожного файлу, який Windows досі вважає потрібним, немає в {InstallerFolder}, а файли, що справді лежать у цій папці, не відповідають жодному запису. Жоден справжній комп'ютер так не виглядає, тож це вказує на проблему з читанням записів, а не на файли, які можна безпечно видалити. Для очищення нічого не запропоновано, і нічого не було видалено.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -899,7 +896,7 @@ InstallerClean уже працював від імені адміністрат�
        1 = crash log path. -->
   <data name="Cli.GenericError" xml:space="preserve"><value>Помилка: {0}. Деталі записано до {1}.</value></data>
   <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Помилка: {0}. Не вдалося записати журнал збоїв.</value></data>
-  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Сканування C:\Windows\Installer...</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Сканування {InstallerFolder}...</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>Знайдено {0} {1} для очищення ({2}).</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>Немає чого робити.</value></data>
@@ -994,7 +991,7 @@ InstallerClean уже працював від імені адміністрат�
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
-  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - очищення C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - очищення {InstallerFolder}</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Використання:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Показати цю довідку (також приймає /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Вивести версію (також приймає -v)</value></data>

@@ -86,6 +86,16 @@ internal static class DisplayHelpers
         }
     }
 
+    // An override key exists only in a satellite, so it has no typed accessor and
+    // is read by name. That route skips Strings.Get, which is where the
+    // installer-folder token is substituted, so the substitution is applied here
+    // as well: an override on a key naming the cache folder would otherwise put
+    // a raw token on screen in that language alone.
+    private static string? Override(string key) =>
+        Strings.ResourceManager.GetString(key, Localisation.UiCulture) is { } value
+            ? InstallerFolderToken.Resolve(value)
+            : null;
+
     /// <summary>
     /// Picks the count fragment for <paramref name="count"/> in the current UI
     /// language. <paramref name="singular"/>/<paramref name="plural"/> are the resx
@@ -100,9 +110,9 @@ internal static class DisplayHelpers
     internal static string Pluralise(int count, string singular, string plural, string keyPrefix) =>
         CategoryFor(Localisation.UiCulture, count) switch
         {
-            PluralCategory.One => Strings.ResourceManager.GetString($"{keyPrefix}.One", Localisation.UiCulture) ?? singular,
-            PluralCategory.Few => Strings.ResourceManager.GetString($"{keyPrefix}.Few", Localisation.UiCulture) ?? plural,
-            PluralCategory.Many => Strings.ResourceManager.GetString($"{keyPrefix}.Many", Localisation.UiCulture) ?? plural,
+            PluralCategory.One => Override($"{keyPrefix}.One") ?? singular,
+            PluralCategory.Few => Override($"{keyPrefix}.Few") ?? plural,
+            PluralCategory.Many => Override($"{keyPrefix}.Many") ?? plural,
             _ => plural,
         };
 

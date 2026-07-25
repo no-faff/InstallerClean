@@ -3,14 +3,15 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Markup;
+using InstallerClean.Helpers;
 using InstallerClean.Resources;
 
 namespace InstallerClean.Tests.Resources;
 
 /// <summary>
-/// The XAML string resolver, and specifically its one branch: a value bound for
-/// <c>C:\Windows\Installer</c> when it will be drawn, left alone when it will
-/// only ever be spoken. The word joiner is a line-breaking instruction and an
+/// The XAML string resolver, and specifically its one branch: a value naming the
+/// installer cache folder is bound when it will be drawn and left alone when it
+/// will only ever be spoken. The word joiner is a line-breaking instruction and an
 /// automation property is never laid out, so putting them there hands a speech
 /// engine four invisible format characters for nothing.
 ///
@@ -27,8 +28,14 @@ public class TranslateExtensionTests
 {
     private const char Wj = (char)0x2060;
 
-    // A key whose value names the installer folder in all sixteen languages, so
-    // the assertions below hold whatever culture the test run resolves against.
+    // Two keys whose value names the installer folder in all sixteen languages,
+    // so the assertions below hold whatever culture the test run resolves
+    // against. They name it through {InstallerFolder}, and the joiner work
+    // depends on the order the extension does its two jobs in: Strings.Get
+    // spends the token first, so KeepWhole is handed a real path to bind. A
+    // resolve that left the token standing would give these tests a template
+    // with no path in it and every assertion here would go quiet rather than
+    // red, which is why InstallerFolderTokenTests pins the substitution itself.
     private const string SpokenPathKey = "Automation.RescanInstaller";
     private const string DrawnPathKey = "Body.MainExplanation.Action";
 
@@ -94,6 +101,18 @@ public class TranslateExtensionTests
             Resolve("Automation.Minimise", TextBlock.TextProperty),
             Resolve("Automation.Minimise", AutomationProperties.NameProperty));
         Assert.DoesNotContain(Wj, Resolve("Automation.Minimise", TextBlock.TextProperty));
+    }
+
+    [Fact]
+    public void The_installer_folder_token_is_spent_on_the_xaml_path_too()
+    {
+        // XAML and C# resolve through one door for exactly this reason. A
+        // markup extension holding its own ResourceManager would put a raw
+        // {InstallerFolder} on screen wherever a string names the folder.
+        Assert.DoesNotContain(InstallerFolderToken.Token,
+            Resolve(DrawnPathKey, TextBlock.TextProperty), StringComparison.Ordinal);
+        Assert.DoesNotContain(InstallerFolderToken.Token,
+            Resolve(SpokenPathKey, AutomationProperties.NameProperty), StringComparison.Ordinal);
     }
 
     [Fact]

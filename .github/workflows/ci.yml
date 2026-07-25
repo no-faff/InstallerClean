@@ -80,6 +80,19 @@ jobs:
       - name: Check XAML resource keys
         run: node scripts/check-xaml-resources.mjs
 
+      # The rules that live BETWEEN two strings, or between a string and the
+      # code that shows it: a spoken name against its visible label, a sentence
+      # against the button it quotes, the installer-folder token, a window title
+      # whose only consumer overwrites it. Every other check here holds one key's
+      # structure or one key's sameness across files, so none of them can see a
+      # rule of that shape, and the About window's donate button consequently
+      # showed one phrase and spoke another in two languages across four
+      # releases. Placed ahead of the still-english gate below for the same
+      # reason the designer check is: that gate is red by design during a
+      # translation window and would otherwise hide this one.
+      - name: Check cross-key rules
+        run: node scripts/check-cross-key-rules.mjs
+
       # A required gate: a satellite shipping the English neutral for a
       # required key fails the build. It is red by design for the window
       # between a string's English landing and its translation round running,

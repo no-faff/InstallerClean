@@ -11,10 +11,10 @@ public partial class ConfirmDeleteWindow : Window
         InitializeComponent();
         var label = DisplayHelpers.PluraliseFile(fileCount);
         MessageText.Text = string.Format(Strings.Confirm_DeleteTitle, fileCount, label, sizeDisplay);
-        // The window title is what a screen reader announces when a
-        // dialog opens; the static "Confirm delete" left the question
-        // itself, the count and size, unspoken. ShowInTaskbar is false,
-        // so the title serves announcements only.
+        // The window title is what a screen reader announces when a dialog
+        // opens, and ShowInTaskbar is false under custom chrome, so it serves
+        // the announcement and nothing else. It carries the question itself: a
+        // title naming only the category leaves the count and the size unspoken.
         Title = MessageText.Text;
 
         // Sized to content; the clamp stops a very large text scale

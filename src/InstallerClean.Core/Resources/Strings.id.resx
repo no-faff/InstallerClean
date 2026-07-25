@@ -89,9 +89,6 @@
   <data name="Window.About.Title" xml:space="preserve"><value>Tentang</value></data>
   <data name="Window.Registered.Title" xml:space="preserve"><value>File terdaftar yang sebaiknya tidak dihapus</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>File tidak diperlukan yang aman dihapus</value></data>
-  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Konfirmasi pemindahan</value></data>
-  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Konfirmasi penghapusan</value></data>
-  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>Keranjang Sampah tidak tersedia</value></data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUK</value></data>
@@ -138,7 +135,7 @@
        keyboard shortcut. -->
   <data name="Action.Done" xml:space="preserve"><value>_Selesai</value></data>
   <data name="Action.Details" xml:space="preserve"><value>Detail</value></data>
-  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Traktir _kopi</value></data>
+  <data name="Action.BuyMeACuppa" xml:space="preserve"><value>Traktir saya secangkir _kopi</value></data>
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Beri _bintang di GitHub</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Lisensi Apache 2.0</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Pindahkan</value></data>
@@ -253,7 +250,7 @@
        Automation.Section.MoveLocation in every language. -->
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Lokasi pemindahan</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Kemajuan operasi</value></data>
-  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Pindai ulang C:\Windows\Installer</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Pindai ulang {InstallerFolder}</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Kemajuan pemindaian</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Kemajuan pemindaian awal</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Detail, file yang tidak diperlukan</value></data>
@@ -313,11 +310,11 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>File-file ini berada di C:\Windows\Installer, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mencantumkan file yang Windows sendiri laporkan sudah tidak terpakai.</value>
+    <value>File-file ini berada di {InstallerFolder}, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mencantumkan file yang Windows sendiri laporkan sudah tidak terpakai.</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Hapus ke Keranjang Sampah, atau gunakan Pindahkan sebagai gantinya untuk menyimpan salinan cadangan. Mengembalikan file ke C:\Windows\Installer akan membuat semuanya persis seperti semula.</value>
+    <value>Hapus ke Keranjang Sampah, atau gunakan Pindahkan sebagai gantinya untuk menyimpan salinan cadangan. Mengembalikan file ke {InstallerFolder} akan membuat semuanya persis seperti semula.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons. The second sentence covers BOTH buttons and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and both a Recycle Bin restore and a manual move back put the file at that same path under the same name. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -325,7 +322,7 @@
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>Tekan Pindai ulang untuk menelusuri C:\Windows\Installer mencari file penginstal yang tidak lagi diperlukan program mana pun.</value>
+    <value>Tekan Pindai ulang untuk menelusuri {InstallerFolder} mencari file penginstal yang tidak lagi diperlukan program mana pun.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
@@ -418,7 +415,7 @@
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>Semua bersih</value></data>
-  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Tidak ada yang perlu dibersihkan di C:\Windows\Installer</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Tidak ada yang perlu dibersihkan di {InstallerFolder}</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
        "less than a second"). The count is the receipt that a real
@@ -434,7 +431,7 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Salin kembali ke C:\Windows\Installer jika suatu saat ada yang rusak ([kemungkinannya sangat kecil]).</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Salin kembali ke {InstallerFolder} jika suatu saat ada yang rusak ([kemungkinannya sangat kecil]).</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Sampai saat itu, Anda bisa memulihkannya jika suatu saat ada yang rusak ([kemungkinannya sangat kecil]).</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
@@ -622,7 +619,7 @@ InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi de
        "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Catatan Windows Installer tidak bisa dibaca</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Pemindaian gagal</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Catatan Windows Installer kembali sepenuhnya kosong: tidak satu pun program terpasang atau pembaruan yang mengklaim file pemasang di cache. Itu tidak terjadi pada komputer yang berfungsi (bahkan pemasangan Windows yang baru pun punya beberapa), jadi catatannya rusak atau tidak bisa dibaca, dan pemindaian yang memercayai jawaban ini akan keliru menyebut setiap file di C:\Windows\Installer terisolasi. InstallerClean berhenti sebagai gantinya. Tidak ada yang dihapus.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Catatan Windows Installer kembali sepenuhnya kosong: tidak satu pun program terpasang atau pembaruan yang mengklaim file pemasang di cache. Itu tidak terjadi pada komputer yang berfungsi (bahkan pemasangan Windows yang baru pun punya beberapa), jadi catatannya rusak atau tidak bisa dibaca, dan pemindaian yang memercayai jawaban ini akan keliru menyebut setiap file di {InstallerFolder} terisolasi. InstallerClean berhenti sebagai gantinya. Tidak ada yang dihapus.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer tidak mengizinkan InstallerClean menampilkan daftar apa saja yang terpasang. InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi sebagai administrator tidak akan mengubah apa pun. Tanpa daftar itu tidak ada cara yang aman untuk mengetahui file cache mana yang masih diperlukan, jadi InstallerClean berhenti. Tidak ada yang dihapus.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
@@ -641,7 +638,7 @@ InstallerClean sudah berjalan sebagai administrator, jadi menjalankannya lagi de
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean tidak bisa mencocokkan pemindaian ini dengan catatan Windows Installer: setiap file yang masih didaftarkan Windows sebagai diperlukan tidak ada di C:\Windows\Installer, sementara file yang benar-benar ada di folder itu tidak cocok dengan catatan mana pun. Tidak ada komputer nyata yang seperti itu, jadi ini menunjukkan masalah dalam membaca catatan, bukan file yang aman Anda hapus. Tidak ada yang ditawarkan untuk dibersihkan dan tidak ada yang dihapus.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean tidak bisa mencocokkan pemindaian ini dengan catatan Windows Installer: setiap file yang masih didaftarkan Windows sebagai diperlukan tidak ada di {InstallerFolder}, sementara file yang benar-benar ada di folder itu tidak cocok dengan catatan mana pun. Tidak ada komputer nyata yang seperti itu, jadi ini menunjukkan masalah dalam membaca catatan, bukan file yang aman Anda hapus. Tidak ada yang ditawarkan untuk dibersihkan dan tidak ada yang dihapus.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -899,7 +896,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
        1 = crash log path. -->
   <data name="Cli.GenericError" xml:space="preserve"><value>Kesalahan: {0}. Detail ditulis ke {1}.</value></data>
   <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Kesalahan: {0}. Log kerusakan tidak bisa ditulis.</value></data>
-  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Memindai C:\Windows\Installer...</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Memindai {InstallerFolder}...</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>Ditemukan {0} {1} untuk dibersihkan ({2}).</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>Tidak ada yang perlu dilakukan.</value></data>
@@ -993,7 +990,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
-  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - pembersihan C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - pembersihan {InstallerFolder}</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Penggunaan:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Tampilkan bantuan ini (juga menerima /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Cetak versi (juga menerima -v)</value></data>

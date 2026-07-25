@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.ja.resx`](../../src/InstallerClean.Core/Resources/Strings.ja.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
+`{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
+
 ## Window titles
 
 | English | 日本語 |
@@ -12,9 +14,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | About | InstallerClean について |
 | Registered files that should not be deleted | 削除すべきでない登録済みファイル |
 | Unneeded files that are safe to delete | 削除しても安全な不要ファイル |
-| Confirm move | 移動の確認 |
-| Confirm delete | 削除の確認 |
-| Recycle Bin unavailable | ごみ箱が利用できません |
 
 ## Section headings
 
@@ -43,7 +42,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Delete permanently | 完全に削除(_D) |
 | _Done | 完了(_D) |
 | Details | 詳細 |
-| _Buy me a cuppa | コーヒーをおごる(_B) |
+| _Buy me a cuppa | コーヒーを一杯おごる(_B) |
 | Leave a _star on GitHub | GitHubでスターを付ける(_S) |
 | Apache 2.0 licence | Apache 2.0 ライセンス |
 | _Move | 移動(_M) |
@@ -121,10 +120,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | Any unneeded files below are safe to delete. | 以下の不要ファイルは削除しても安全です。 |
-| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | これらのファイルはC:\Windows\Installerにあり、プログラムがアンインストールされたとき ({0})、新しいパッチが置き換えたとき ({1})、または公開元が撤回したとき ({2})に取り残されます。InstallerClean は、Windows 自身が不要と報告したファイルのみをリストアップします。 |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | ごみ箱に削除するか、バックアップコピーを残すには代わりに「移動」を使用してください。ファイルをC:\Windows\Installerに戻せば、完全に元どおりになります。 |
+| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | これらのファイルは{InstallerFolder}にあり、プログラムがアンインストールされたとき ({0})、新しいパッチが置き換えたとき ({1})、または公開元が撤回したとき ({2})に取り残されます。InstallerClean は、Windows 自身が不要と報告したファイルのみをリストアップします。 |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | ごみ箱に削除するか、バックアップコピーを残すには代わりに「移動」を使用してください。ファイルを{InstallerFolder}に戻せば、完全に元どおりになります。 |
 | Nothing scanned yet. | まだ何もスキャンしていません。 |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | 「再スキャン」を押すと、C:\Windows\Installer を調べて、どのプログラムも必要としなくなったインストーラーファイルを探します。 |
+| Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | 「再スキャン」を押すと、{InstallerFolder} を調べて、どのプログラムも必要としなくなったインストーラーファイルを探します。 |
 | These files can't be cleaned up right now. | これらのファイルは今はクリーンアップできません。 |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | 現在 Windows Installer を使用しているものがあります。通常は Windows Update またはバックグラウンドでインストール中のプログラムです。その実行中は移動と削除が一時停止され、InstallerClean は変更中のインストーラーキャッシュに触れません。完了したら、再スキャンすると復元されます。 |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | このマシンで以前の Windows Installer トランザクションが中断されています。キャッシュをクリーンアップする前に、そのインストールを再開またはロールバックするか (または Windows を再起動してください)。 |
@@ -149,9 +148,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | All clean | すべてクリーン |
-| Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer にクリーンアップするものはありません |
+| Nothing to clean up in {InstallerFolder} | {InstallerFolder} にクリーンアップするものはありません |
 | Scanned {0} {1} in {2} | {0} 個の {1} を {2} でスキャンしました |
-| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | 万一何かが動作しなくなったら、C:\Windows\Installerにコピーを戻してください ([その可能性は極めて低いです])。 |
+| Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]). | 万一何かが動作しなくなったら、{InstallerFolder}にコピーを戻してください ([その可能性は極めて低いです])。 |
 | Until then, you can restore them if anything ever breaks ([extremely unlikely]). | それまでは、万一何かが動作しなくなったら復元できます ([その可能性は極めて低いです])。 |
 | Empty it to actually reclaim the space. | ごみ箱を空にすると、実際に空き容量が増えます。 |
 | {0} freed | {0} 解放 |
@@ -223,12 +222,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows が InstallerClean のアクセスを拒否したため、処理を中止しました。何も削除していません。<br><br>InstallerClean はすでに管理者として実行されていたため、同じように起動し直しても解決しません。Windows は何がアクセスを拒否したのかそれ以上説明しないため、具体的に試せることはありません。 |
 | Couldn't read the Windows Installer records | Windows Installer の登録情報を読み取れませんでした |
 | Scan failed | スキャンに失敗しました |
-| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed. | Windows Installer の登録情報が完全に空の状態で返されました。インストール済みのプログラムも更新プログラムも、キャッシュされたインストーラーファイルを一つも要求していません。正常に動作しているコンピューターでは起こらないこと (インストール直後の Windows にも該当するファイルはあります) なので、登録情報が破損しているか、読み取れなかったかのいずれかです。この答えを信じたスキャンは、C:\Windows\Installer 内のすべてのファイルを誤って孤立と判定してしまいます。InstallerClean はそうせずに中止しました。何も削除していません。 |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Windows Installer の登録情報が完全に空の状態で返されました。インストール済みのプログラムも更新プログラムも、キャッシュされたインストーラーファイルを一つも要求していません。正常に動作しているコンピューターでは起こらないこと (インストール直後の Windows にも該当するファイルはあります) なので、登録情報が破損しているか、読み取れなかったかのいずれかです。この答えを信じたスキャンは、{InstallerFolder} 内のすべてのファイルを誤って孤立と判定してしまいます。InstallerClean はそうせずに中止しました。何も削除していません。 |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer が InstallerClean にインストール済みの一覧表示を許可しませんでした。InstallerClean はすでに管理者として実行されていたため、管理者として実行し直しても何も変わりません。この一覧がなければ、キャッシュされたどのファイルがまだ必要なのかを安全に判断する方法はないため、InstallerClean は中止しました。何も削除していません。 |
 | Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer は InstallerClean に、読み取り可能なインストール済みプログラムの一覧を渡せませんでした。{0} 件の項目が連続して読み取り不能で返されました (最後のエラーコード{1})。一部しか読めていない一覧を使うのではなく、InstallerClean は中止しました。何も削除していません。 |
 | Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer がインストール済みプログラムの一覧の終わりを最後まで知らせませんでした。InstallerClean は {0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。何も削除していません。 |
 | Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer があるプログラムのパッチ一覧の終わりを最後まで知らせませんでした。InstallerClean は {0} 件で打ち切りました (最後のエラーコード{1})。終わりのない一覧は信頼できないため、InstallerClean は中止しました。何も削除していません。 |
-| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean は今回のスキャン結果を Windows Installer の登録情報と突き合わせられませんでした。Windows がまだ必要として挙げているファイルはすべて C:\Windows\Installer に見当たらず、一方でフォルダーに実際にあるファイルはどの登録情報とも一致しません。実在するコンピューターがこのような状態になることはないため、これは安全に削除できるファイルがあるということではなく、登録情報の読み取りに問題があることを示しています。クリーンアップ対象は何も表示しておらず、何も削除していません。 |
+| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean は今回のスキャン結果を Windows Installer の登録情報と突き合わせられませんでした。Windows がまだ必要として挙げているファイルはすべて {InstallerFolder} に見当たらず、一方でフォルダーに実際にあるファイルはどの登録情報とも一致しません。実在するコンピューターがこのような状態になることはないため、これは安全に削除できるファイルがあるということではなく、登録情報の読み取りに問題があることを示しています。クリーンアップ対象は何も表示しておらず、何も削除していません。 |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean は、何がまだ必要かを確かめられるだけの Windows Installer の登録情報を読み取れませんでした。インストール済みプログラムの一覧が不足した状態で返され、同じ登録情報をレジストリから直接読み取る方法でもエラーが発生しました。あるファイルを指し示す登録情報が読み取れなかったものの一つだったというだけで、そのファイルが孤立しているように見えてしまうことがあるため、InstallerClean は中止しました。何も削除していません。 |
 | Invalid destination | 無効な移動先 |
 | Could not write to destination | 移動先に書き込めませんでした |
@@ -339,7 +338,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | Donate | 寄付 |
-| Buy me a cuppa | 一杯おごる |
+| Buy me a cuppa | コーヒーを一杯おごる |
 | Cancel operation | 操作をキャンセル |
 | Cancel scan | スキャンをキャンセル |
 | Cancel startup scan | 起動時スキャンをキャンセル |
@@ -368,7 +367,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Product details | 製品詳細 |
 | Move location | 移動先 |
 | Operation progress | 操作の進捗 |
-| Scan C:\Windows\Installer again | C:\Windows\Installer を再スキャン |
+| Scan {InstallerFolder} again | {InstallerFolder} を再スキャン |
 | Scanning progress | スキャンの進捗 |
 | Startup scan progress | 起動時スキャンの進捗 |
 | Details, unneeded files | 詳細、不要ファイル |
@@ -438,7 +437,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cancelled. | キャンセルされました。 |
 | Error: {0}. Details written to {1}. | エラー：{0}。詳細は {1} に書き込まれました。 |
 | Error: {0}. The crash log could not be written. | エラー：{0}。クラッシュログを書き込めませんでした。 |
-| Scanning C:\Windows\Installer... | C:\Windows\Installer をスキャン中... |
+| Scanning {InstallerFolder}... | {InstallerFolder} をスキャン中... |
 | Found {0} {1} to clean up ({2}). | クリーンアップ対象の {0} 個の {1} が見つかりました ({2})。 |
 | Nothing to do. | 実行するものはありません。 |
 | Deleting {0} {1}... | {0} 個の {1} を削除中... |
@@ -455,7 +454,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moved {0} {1}. | {0} 個の {1} を移動しました。 |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | 別の InstallerClean プロセスが単一インスタンスロックを保持しています (GUIまたは別のCLI実行)。終了コード75 (一時的)。後で再試行しても安全です。 |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | 注意：イベントログの書き込みに失敗しました。Application チャネルのアクセス許可またはグループポリシーを確認してください。 |
-| InstallerClean - clean up C:\Windows\Installer | InstallerClean - C:\Windows\Installer をクリーンアップ |
+| InstallerClean - clean up {InstallerFolder} | InstallerClean - {InstallerFolder} をクリーンアップ |
 | Usage: | 使用方法： |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     このヘルプを表示 (/?、-hも受け付けます) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  バージョンを表示 (-vも受け付けます) |

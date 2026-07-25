@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.zh-Hans.resx`](../../src/InstallerClean.Core/Resources/Strings.zh-Hans.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
+`{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
+
 ## Window titles
 
 | English | 简体中文 |
@@ -12,9 +14,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | About | 关于 |
 | Registered files that should not be deleted | 不应删除的已注册文件 |
 | Unneeded files that are safe to delete | 不需要的文件，可安全删除 |
-| Confirm move | 确认移动 |
-| Confirm delete | 确认删除 |
-| Recycle Bin unavailable | 回收站不可用 |
 
 ## Section headings
 
@@ -121,10 +120,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | Any unneeded files below are safe to delete. | 下面任何不需要的文件都可以安全删除。 |
-| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 它们位于 C:\Windows\Installer，是在卸载程序（{0}）、新补丁取代旧补丁（{1}）或发布者撤回补丁（{2}）时遗留下来的。InstallerClean 只会列出 Windows 自己报告为不再需要的文件。 |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | 将它们删除到回收站，或者改用“移动”保留一份备份副本。把文件放回 C:\Windows\Installer，一切就完全恢复原状。 |
+| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 它们位于 {InstallerFolder}，是在卸载程序（{0}）、新补丁取代旧补丁（{1}）或发布者撤回补丁（{2}）时遗留下来的。InstallerClean 只会列出 Windows 自己报告为不再需要的文件。 |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | 将它们删除到回收站，或者改用“移动”保留一份备份副本。把文件放回 {InstallerFolder}，一切就完全恢复原状。 |
 | Nothing scanned yet. | 尚未扫描。 |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | 点击“重新扫描”，在 C:\Windows\Installer 中查找没有任何程序仍然需要的安装程序文件。 |
+| Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | 点击“重新扫描”，在 {InstallerFolder} 中查找没有任何程序仍然需要的安装程序文件。 |
 | These files can't be cleaned up right now. | 这些文件现在无法清理。 |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | 现在有程序正在使用 Windows Installer，通常是 Windows 更新或某个正在后台安装的程序。在此期间，移动和删除会暂停，这样 InstallerClean 就不会在安装程序缓存发生变化时去动它。等它完成后，重新扫描，这两项操作便会恢复。 |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | 此计算机上有一个先前的 Windows Installer 事务处于挂起状态。请先继续或回滚该安装（或重启 Windows），再清理缓存。 |
@@ -149,9 +148,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | All clean | 全部干净 |
-| Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer 中没有需要清理的内容 |
+| Nothing to clean up in {InstallerFolder} | {InstallerFolder} 中没有需要清理的内容 |
 | Scanned {0} {1} in {2} | 扫描了 {0} 个{1}，用时 {2} |
-| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | 万一哪天出了什么问题（[这种可能性极低]），把它们复制回 C:\Windows\Installer。 |
+| Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]). | 万一哪天出了什么问题（[这种可能性极低]），把它们复制回 {InstallerFolder}。 |
 | Until then, you can restore them if anything ever breaks ([extremely unlikely]). | 在那之前，万一哪天出了什么问题（[这种可能性极低]），您可以把它们还原。 |
 | Empty it to actually reclaim the space. | 清空回收站才能真正释放空间。 |
 | {0} freed | 已释放 {0} |
@@ -223,12 +222,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows 拒绝了 InstallerClean 的访问，因此已停止。没有删除任何内容。<br><br>InstallerClean 本来就以管理员身份运行，所以再那样启动一次也无济于事。Windows 没有进一步说明是什么拒绝了访问，因此没有具体可以尝试的办法。 |
 | Couldn't read the Windows Installer records | 无法读取 Windows Installer 记录 |
 | Scan failed | 扫描失败 |
-| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed. | Windows Installer 记录返回的内容完全为空：没有任何一个已安装的程序或更新声称拥有缓存的安装文件。在正常工作的电脑上不会出现这种情况（即使是刚装好的 Windows 也会有一些），所以要么记录已损坏，要么无法读取；而一次相信这个结果的扫描，会把 C:\Windows\Installer 中的每个文件都错误地判定为孤立。InstallerClean 没有那样做，而是停了下来。没有删除任何内容。 |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Windows Installer 记录返回的内容完全为空：没有任何一个已安装的程序或更新声称拥有缓存的安装文件。在正常工作的电脑上不会出现这种情况（即使是刚装好的 Windows 也会有一些），所以要么记录已损坏，要么无法读取；而一次相信这个结果的扫描，会把 {InstallerFolder} 中的每个文件都错误地判定为孤立。InstallerClean 没有那样做，而是停了下来。没有删除任何内容。 |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer 不允许 InstallerClean 列出已安装的内容。InstallerClean 本来就以管理员身份运行，所以再以管理员身份运行一次也不会有任何改变。没有这份清单，就无法安全地判断哪些缓存文件仍然需要，因此 InstallerClean 停了下来。没有删除任何内容。 |
 | Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer 无法向 InstallerClean 提供一份可读的已安装程序清单：连续 {0} 个条目返回时无法读取（最后的错误代码为 {1}）。InstallerClean 没有基于只读到一半的清单继续，而是停了下来。没有删除任何内容。 |
 | Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer 始终没有发出已安装程序清单结束的信号：InstallerClean 在 {0} 个条目后放弃（最后的错误代码为 {1}）。没有尽头的清单无法信任，因此 InstallerClean 停了下来。没有删除任何内容。 |
 | Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer 始终没有发出某个程序补丁清单结束的信号：InstallerClean 在 {0} 个条目后放弃（最后的错误代码为 {1}）。没有尽头的清单无法信任，因此 InstallerClean 停了下来。没有删除任何内容。 |
-| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean 无法把这次扫描与 Windows Installer 记录对上：Windows 仍然列为需要的每个文件都不在 C:\Windows\Installer 中，而文件夹里实际存在的文件又与任何记录都对不上。真实的电脑不会是这个样子，所以这说明读取记录时出了问题，而不是有文件可以安全删除。没有列出任何可清理的内容，也没有删除任何内容。 |
+| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean 无法把这次扫描与 Windows Installer 记录对上：Windows 仍然列为需要的每个文件都不在 {InstallerFolder} 中，而文件夹里实际存在的文件又与任何记录都对不上。真实的电脑不会是这个样子，所以这说明读取记录时出了问题，而不是有文件可以安全删除。没有列出任何可清理的内容，也没有删除任何内容。 |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean 未能读取到足够的 Windows Installer 记录，无法确定哪些内容仍然需要：已安装程序的清单返回时并不完整，而直接从注册表读取同样的记录也遇到了错误。一个文件可能仅仅因为指明它的那条记录属于读不到的记录之一，就显得像是孤立的，因此 InstallerClean 停了下来。没有删除任何内容。 |
 | Invalid destination | 目标无效 |
 | Could not write to destination | 无法写入目标 |
@@ -368,7 +367,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Product details | 产品详情 |
 | Move location | 移动位置 |
 | Operation progress | 操作进度 |
-| Scan C:\Windows\Installer again | 重新扫描 C:\Windows\Installer |
+| Scan {InstallerFolder} again | 重新扫描 {InstallerFolder} |
 | Scanning progress | 扫描进度 |
 | Startup scan progress | 启动扫描进度 |
 | Details, unneeded files | 详情，不需要的文件 |
@@ -438,7 +437,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cancelled. | 已取消。 |
 | Error: {0}. Details written to {1}. | 错误：{0}。详情已写入 {1}。 |
 | Error: {0}. The crash log could not be written. | 错误：{0}。无法写入崩溃日志。 |
-| Scanning C:\Windows\Installer... | 正在扫描 C:\Windows\Installer… |
+| Scanning {InstallerFolder}... | 正在扫描 {InstallerFolder}… |
 | Found {0} {1} to clean up ({2}). | 找到 {0} 个{1}，可清理（{2}）。 |
 | Nothing to do. | 无需任何操作。 |
 | Deleting {0} {1}... | 正在删除 {0} 个{1}… |
@@ -455,7 +454,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moved {0} {1}. | 已移动 {0} 个{1}。 |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | 另一个 InstallerClean 进程正持有单实例锁（GUI 或另一次 CLI 运行）。退出码 75（暂时性）；稍后可安全重试。 |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | 注意：事件日志写入失败。请检查应用程序日志的权限或组策略。 |
-| InstallerClean - clean up C:\Windows\Installer | InstallerClean - 清理 C:\Windows\Installer |
+| InstallerClean - clean up {InstallerFolder} | InstallerClean - 清理 {InstallerFolder} |
 | Usage: | 用法： |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     显示此帮助（也接受 /?、-h） |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  显示版本号（也接受 -v） |

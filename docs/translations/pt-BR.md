@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.pt-BR.resx`](../../src/InstallerClean.Core/Resources/Strings.pt-BR.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
+`{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
+
 ## Window titles
 
 | English | Português (Brasil) |
@@ -12,9 +14,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | About | Sobre |
 | Registered files that should not be deleted | Arquivos registrados que não deveriam ser excluídos |
 | Unneeded files that are safe to delete | Arquivos desnecessários que podem ser excluídos com segurança |
-| Confirm move | Confirmar movimentação |
-| Confirm delete | Confirmar exclusão |
-| Recycle Bin unavailable | Lixeira indisponível |
 
 ## Section headings
 
@@ -121,10 +120,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Português (Brasil) |
 | --- | --- |
 | Any unneeded files below are safe to delete. | Quaisquer arquivos desnecessários abaixo podem ser excluídos com segurança. |
-| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Eles ficam em C:\Windows\Installer, deixados para trás quando um programa foi desinstalado ({0}), um patch mais recente substituiu outro ({1}) ou o fabricante o retirou ({2}). O InstallerClean só lista arquivos que o próprio Windows informa ter terminado de usar. |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | Exclua-os para a Lixeira, ou use Mover em vez disso para manter uma cópia de backup. Colocar os arquivos de volta em C:\Windows\Installer deixa tudo exatamente como estava. |
+| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Eles ficam em {InstallerFolder}, deixados para trás quando um programa foi desinstalado ({0}), um patch mais recente substituiu outro ({1}) ou o fabricante o retirou ({2}). O InstallerClean só lista arquivos que o próprio Windows informa ter terminado de usar. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | Exclua-os para a Lixeira, ou use Mover em vez disso para manter uma cópia de backup. Colocar os arquivos de volta em {InstallerFolder} deixa tudo exatamente como estava. |
 | Nothing scanned yet. | Nada foi analisado ainda. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | Clique em Reanalisar para procurar em C:\Windows\Installer arquivos de instalação que nenhum programa ainda precisa. |
+| Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Clique em Reanalisar para procurar em {InstallerFolder} arquivos de instalação que nenhum programa ainda precisa. |
 | These files can't be cleaned up right now. | Estes arquivos não podem ser limpos agora. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Algo está usando o Windows Installer agora, normalmente uma atualização do Windows ou um programa se instalando em segundo plano. Mover e Excluir ficam pausados enquanto isso acontece, então o InstallerClean não mexe no cache de instalação enquanto ele está mudando. Quando terminar, analise de novo e eles voltam. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Uma transação anterior do Windows Installer está suspensa nesta máquina. Retome ou reverta essa instalação (ou reinicie o Windows) antes de limpar o cache. |
@@ -149,9 +148,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Português (Brasil) |
 | --- | --- |
 | All clean | Tudo limpo |
-| Nothing to clean up in C:\Windows\Installer | Nada para limpar em C:\Windows\Installer |
+| Nothing to clean up in {InstallerFolder} | Nada para limpar em {InstallerFolder} |
 | Scanned {0} {1} in {2} | Análise de {0} {1} em {2} |
-| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | Copie-os de volta para C:\Windows\Installer se algum dia algo quebrar ([extremamente improvável]). |
+| Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]). | Copie-os de volta para {InstallerFolder} se algum dia algo quebrar ([extremamente improvável]). |
 | Until then, you can restore them if anything ever breaks ([extremely unlikely]). | Até lá, você pode restaurá-los se algum dia algo quebrar ([extremamente improvável]). |
 | Empty it to actually reclaim the space. | Esvazie a Lixeira para realmente recuperar o espaço. |
 | {0} freed | {0} liberados |
@@ -223,12 +222,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | O Windows negou acesso ao InstallerClean, que por isso parou. Nada foi removido.<br><br>O InstallerClean já estava em execução como administrador, então iniciá-lo de novo dessa forma não vai ajudar. O Windows não diz mais nada sobre o que negou o acesso, então não há nada específico para tentar. |
 | Couldn't read the Windows Installer records | Não foi possível ler os registros do Windows Installer |
 | Scan failed | Falha na análise |
-| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed. | Os registros do Windows Installer voltaram completamente vazios: nenhum programa instalado e nenhuma atualização reivindica um arquivo de instalação em cache. Isso não acontece em uma máquina que funciona (até uma instalação nova do Windows tem alguns), então ou os registros estão danificados ou não puderam ser lidos, e uma análise que acreditasse nessa resposta chamaria erroneamente de órfão cada arquivo em C:\Windows\Installer. Em vez disso, o InstallerClean parou. Nada foi removido. |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Os registros do Windows Installer voltaram completamente vazios: nenhum programa instalado e nenhuma atualização reivindica um arquivo de instalação em cache. Isso não acontece em uma máquina que funciona (até uma instalação nova do Windows tem alguns), então ou os registros estão danificados ou não puderam ser lidos, e uma análise que acreditasse nessa resposta chamaria erroneamente de órfão cada arquivo em {InstallerFolder}. Em vez disso, o InstallerClean parou. Nada foi removido. |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | O Windows Installer não deixou o InstallerClean listar o que está instalado. O InstallerClean já estava em execução como administrador, então executá-lo de novo como administrador não muda nada. Sem essa lista não há como saber com segurança quais arquivos em cache ainda são necessários, então o InstallerClean parou. Nada foi removido. |
 | Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | O Windows Installer não conseguiu dar ao InstallerClean uma lista legível dos programas instalados: {0} entradas seguidas voltaram ilegíveis (último código de erro {1}). Em vez de trabalhar com uma lista lida pela metade, o InstallerClean parou. Nada foi removido. |
 | Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | O Windows Installer nunca sinalizou o fim da lista de programas instalados: o InstallerClean desistiu depois de {0} entradas (último código de erro {1}). Não dá para confiar em uma lista sem fim, então o InstallerClean parou. Nada foi removido. |
 | Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | O Windows Installer nunca sinalizou o fim da lista de patches de um programa: o InstallerClean desistiu depois de {0} entradas (último código de erro {1}). Não dá para confiar em uma lista sem fim, então o InstallerClean parou. Nada foi removido. |
-| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | O InstallerClean não conseguiu conciliar esta análise com os registros do Windows Installer: todo arquivo que o Windows ainda lista como necessário está ausente de C:\Windows\Installer, enquanto os arquivos que de fato estão na pasta não correspondem a nenhum registro. Nenhuma máquina real se parece com isso, então isso aponta para um problema na leitura dos registros, e não para arquivos que você possa remover com segurança. Nada foi oferecido para limpeza e nada foi removido. |
+| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | O InstallerClean não conseguiu conciliar esta análise com os registros do Windows Installer: todo arquivo que o Windows ainda lista como necessário está ausente de {InstallerFolder}, enquanto os arquivos que de fato estão na pasta não correspondem a nenhum registro. Nenhuma máquina real se parece com isso, então isso aponta para um problema na leitura dos registros, e não para arquivos que você possa remover com segurança. Nada foi oferecido para limpeza e nada foi removido. |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | O InstallerClean não conseguiu ler o suficiente dos registros do Windows Installer para ter certeza do que ainda é necessário: a lista de programas instalados voltou incompleta, e ler esses mesmos registros direto do registro do Windows também deu erros. Um arquivo poderia parecer órfão só porque o registro que o nomeia era um dos ilegíveis, então o InstallerClean parou. Nada foi removido. |
 | Invalid destination | Destino inválido |
 | Could not write to destination | Não foi possível gravar no destino |
@@ -353,7 +352,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Escolha o que fazer com os arquivos desnecessários: movê-los para um lugar seguro, excluí-los permanentemente ou cancelar. |
 | Move the unneeded files to a folder you choose | Mover os arquivos desnecessários para uma pasta que você escolher |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Excluir permanentemente os arquivos desnecessários porque a Lixeira está indisponível para esta unidade |
-| Say thanks | Agradecer |
+| Say thanks | Agradeça |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Enviar transmite ao No Faff o relatório exibido. Cancelar não envia nada. |
 | Check for updates | Verificar atualizações |
 | Checks github's releases page for a newer version. | Consulta a página de versões do github em busca de uma versão mais recente. |
@@ -368,7 +367,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Product details | Detalhes do produto |
 | Move location | Local de destino |
 | Operation progress | Progresso da operação |
-| Scan C:\Windows\Installer again | Analisar C:\Windows\Installer novamente |
+| Scan {InstallerFolder} again | Analisar {InstallerFolder} novamente |
 | Scanning progress | Progresso da análise |
 | Startup scan progress | Progresso da análise inicial |
 | Details, unneeded files | Detalhes, arquivos desnecessários |
@@ -438,7 +437,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cancelled. | Cancelado. |
 | Error: {0}. Details written to {1}. | Erro: {0}. Detalhes gravados em {1}. |
 | Error: {0}. The crash log could not be written. | Erro: {0}. Não foi possível gravar o crash.log. |
-| Scanning C:\Windows\Installer... | Analisando C:\Windows\Installer... |
+| Scanning {InstallerFolder}... | Analisando {InstallerFolder}... |
 | Found {0} {1} to clean up ({2}). | Encontrados {0} {1} para limpar ({2}). |
 | Nothing to do. | Nada a fazer. |
 | Deleting {0} {1}... | Excluindo {0} {1}... |
@@ -455,7 +454,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moved {0} {1}. | Movidos {0} {1}. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Outro processo do InstallerClean mantém o bloqueio de instância única (a GUI ou outra execução da CLI). Código de saída 75 (transitório); seguro tentar novamente mais tarde. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Observação: falha ao gravar no Log de Eventos. Verifique as permissões do log de Aplicativo ou a Diretiva de Grupo. |
-| InstallerClean - clean up C:\Windows\Installer | InstallerClean - limpeza de C:\Windows\Installer |
+| InstallerClean - clean up {InstallerFolder} | InstallerClean - limpeza de {InstallerFolder} |
 | Usage: | Uso: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help      Mostra esta ajuda (aceita também /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version   Mostra a versão (aceita também -v) |

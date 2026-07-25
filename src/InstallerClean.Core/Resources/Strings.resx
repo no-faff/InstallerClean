@@ -89,9 +89,6 @@
   <data name="Window.About.Title" xml:space="preserve"><value>About</value></data>
   <data name="Window.Registered.Title" xml:space="preserve"><value>Registered files that should not be deleted</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>Unneeded files that are safe to delete</value></data>
-  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>Confirm move</value></data>
-  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>Confirm delete</value></data>
-  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>Recycle Bin unavailable</value></data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUCTS</value></data>
@@ -253,7 +250,7 @@
        Automation.Section.MoveLocation in every language. -->
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Move location</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Operation progress</value></data>
-  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Scan C:\Windows\Installer again</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>Scan {InstallerFolder} again</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Scanning progress</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>Startup scan progress</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>Details, unneeded files</value></data>
@@ -313,11 +310,11 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with.</value>
+    <value>They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with.</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started.</value>
+    <value>Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons. The second sentence covers BOTH buttons and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and both a Recycle Bin restore and a manual move back put the file at that same path under the same name. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -325,7 +322,7 @@
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs.</value>
+    <value>Press Re-scan to look through {InstallerFolder} for installer files that no program still needs.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
@@ -418,7 +415,7 @@
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>All clean</value></data>
-  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in C:\Windows\Installer</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>Nothing to clean up in {InstallerFolder}</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
        "less than a second"). The count is the receipt that a real
@@ -434,7 +431,7 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]).</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]).</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Until then, you can restore them if anything ever breaks ([extremely unlikely]).</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
@@ -622,7 +619,7 @@ InstallerClean was already running as administrator, so starting it again that w
        "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Couldn't read the Windows Installer records</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Scan failed</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
@@ -641,7 +638,7 @@ InstallerClean was already running as administrator, so starting it again that w
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -899,7 +896,7 @@ The crash log could not be written.</value></data>
        1 = crash log path. -->
   <data name="Cli.GenericError" xml:space="preserve"><value>Error: {0}. Details written to {1}.</value></data>
   <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Error: {0}. The crash log could not be written.</value></data>
-  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Scanning C:\Windows\Installer...</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>Scanning {InstallerFolder}...</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>Found {0} {1} to clean up ({2}).</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>Nothing to do.</value></data>
@@ -924,7 +921,10 @@ The crash log could not be written.</value></data>
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Error: destination must be a fully qualified path. Got: {0}</value></data>
   <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%.</value></data>
   <!-- 0 = mode, 1 = destination -->
-  <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve"><value>{0} mode aborted: destination {1} is inside C:\Windows\Installer.</value></data>
+  <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve">
+    <value>{0} mode aborted: destination {1} is inside C:\Windows\Installer.</value>
+    <comment>Application event log, machine-read: RMM tooling greps these lines for a known English phrase, so MachineContract forces en-GB at the emit site and the wording is held still. It is the one string naming the installer folder that keeps the literal rather than the {InstallerFolder} token: a resolved path would vary the line by machine, which is the opposite of what a matched shape needs. The operator-facing lines that name the folder all carry the token.</comment>
+  </data>
   <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>{0} mode aborted: destination {1} is not a fully qualified path.</value></data>
   <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0} mode aborted: destination {1} resolves inside a Windows system folder.</value></data>
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes.</value></data>
@@ -1015,7 +1015,7 @@ The crash log could not be written.</value></data>
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
-  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - clean up C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - clean up {InstallerFolder}</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Usage:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Show this help (also accepts /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Print the version (also accepts -v)</value></data>

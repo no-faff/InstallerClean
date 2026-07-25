@@ -25,15 +25,23 @@ public static class Strings
 
     /// <summary>
     /// The cached ResourceManager backing every property below.
-    /// Exposed because TranslateExtension reuses this same instance
-    /// to resolve XAML keys; constructing a parallel ResourceManager
-    /// from the WPF host assembly would miss the resx embedded in
-    /// InstallerClean.Core.
+    /// Exposed for the two reads Get cannot serve: the plural override
+    /// keys DisplayHelpers builds by name at runtime, and the whole
+    /// resource sets the satellite parity tests enumerate. Anything
+    /// resolving a known key goes through Get, so the token
+    /// substitution below is not bypassed.
     /// </summary>
     public static ResourceManager ResourceManager => Manager;
 
-    private static string Get(string key) =>
-        Manager.GetString(key, Localisation.UiCulture) ?? key;
+    /// <summary>
+    /// The one door every resource lookup comes through, XAML included
+    /// (TranslateExtension calls this), which is why the installer-folder
+    /// token is substituted here: a string naming the cache folder is
+    /// correct everywhere by writing it. A missing key falls back to the
+    /// key itself, so a typo shows on screen rather than as a blank.
+    /// </summary>
+    internal static string Get(string key) =>
+        InstallerFolderToken.Resolve(Manager.GetString(key, Localisation.UiCulture) ?? key);
 
     public static string About_AutoUpdateCheck => Get("About.AutoUpdateCheck");
     public static string About_Link_Guide => Get("About.Link.Guide");
@@ -400,10 +408,7 @@ public static class Strings
     public static string UpdateCheck_UpdateAvailable_Title => Get("UpdateCheck.UpdateAvailable.Title");
     public static string Version_Display => Get("Version.Display");
     public static string Window_About_Title => Get("Window.About.Title");
-    public static string Window_ConfirmDelete_Title => Get("Window.ConfirmDelete.Title");
-    public static string Window_ConfirmMove_Title => Get("Window.ConfirmMove.Title");
     public static string Window_Main_Title => Get("Window.Main.Title");
     public static string Window_Orphaned_Title => Get("Window.Orphaned.Title");
-    public static string Window_RecycleUnavailable_Title => Get("Window.RecycleUnavailable.Title");
     public static string Window_Registered_Title => Get("Window.Registered.Title");
 }

@@ -4,6 +4,8 @@ The text of InstallerClean's interface and command-line tool in English on the l
 
 A few lines (the app name, version, file-size formats, and the command-line tool's flags and command names) are meant to stay the same in every language, so leave those as they are. The translation file itself is [`Strings.ko.resx`](../../src/InstallerClean.Core/Resources/Strings.ko.resx). This page is generated from it by `scripts/gen-translation-table.mjs`, so do not edit it by hand.
 
+`{InstallerFolder}` and the numbered slots (`{0}`, `{1}`) are filled in by the app when it runs, so keep them exactly as they are. `{InstallerFolder}` becomes the real installer folder on that machine, usually `C:\Windows\Installer`. Move them within the sentence if the grammar needs it; do not translate them.
+
 ## Window titles
 
 | English | 한국어 |
@@ -12,9 +14,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | About | 정보 |
 | Registered files that should not be deleted | 삭제하지 말아야 할 등록된 파일 |
 | Unneeded files that are safe to delete | 안전하게 삭제할 수 있는 불필요한 파일 |
-| Confirm move | 이동 확인 |
-| Confirm delete | 삭제 확인 |
-| Recycle Bin unavailable | 휴지통을 사용할 수 없음 |
 
 ## Section headings
 
@@ -121,10 +120,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 한국어 |
 | --- | --- |
 | Any unneeded files below are safe to delete. | 아래의 불필요한 파일은 안전하게 삭제할 수 있습니다. |
-| They sit in C:\Windows\Installer, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 이 파일들은 C:\Windows\Installer에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다. |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in C:\Windows\Installer returns you to exactly where you started. | 휴지통으로 삭제하거나, 백업 사본을 남기려면 대신 이동을 사용하세요. 파일을 C:\Windows\Installer에 다시 넣으면 정확히 원래 상태로 돌아갑니다. |
+| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 이 파일들은 {InstallerFolder}에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | 휴지통으로 삭제하거나, 백업 사본을 남기려면 대신 이동을 사용하세요. 파일을 {InstallerFolder}에 다시 넣으면 정확히 원래 상태로 돌아갑니다. |
 | Nothing scanned yet. | 아직 검사하지 않았습니다. |
-| Press Re-scan to look through C:\Windows\Installer for installer files that no program still needs. | 다시 검사를 눌러 C:\Windows\Installer에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요. |
+| Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | 다시 검사를 눌러 {InstallerFolder}에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요. |
 | These files can't be cleaned up right now. | 지금은 이 파일들을 정리할 수 없습니다. |
 | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | 지금 무언가가 Windows Installer를 사용하고 있습니다. 대개 Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램입니다. 그 작업이 실행되는 동안에는 이동과 삭제가 일시 중지되어, InstallerClean이 변경 중인 설치 관리자 캐시를 건드리지 않습니다. 작업이 끝난 뒤 다시 검사하면 두 기능이 돌아옵니다. |
 | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | 이 컴퓨터에 이전 Windows Installer 트랜잭션이 일시 중단되어 있습니다. 캐시를 정리하기 전에 그 설치를 다시 진행하거나 롤백하세요(또는 Windows를 다시 시작하세요). |
@@ -149,9 +148,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 한국어 |
 | --- | --- |
 | All clean | 모두 깨끗합니다 |
-| Nothing to clean up in C:\Windows\Installer | C:\Windows\Installer에 정리할 것이 없습니다 |
+| Nothing to clean up in {InstallerFolder} | {InstallerFolder}에 정리할 것이 없습니다 |
 | Scanned {0} {1} in {2} | {1} {0}개 검사, {2} 소요 |
-| Copy them back to C:\Windows\Installer if anything ever breaks ([extremely unlikely]). | 혹시라도 무언가 망가지면 C:\Windows\Installer에 다시 복사해 넣으면 됩니다 ([그럴 가능성은 극히 낮습니다]). |
+| Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]). | 혹시라도 무언가 망가지면 {InstallerFolder}에 다시 복사해 넣으면 됩니다 ([그럴 가능성은 극히 낮습니다]). |
 | Until then, you can restore them if anything ever breaks ([extremely unlikely]). | 그때까지는 혹시라도 무언가 망가지면 복원할 수 있습니다 ([그럴 가능성은 극히 낮습니다]). |
 | Empty it to actually reclaim the space. | 휴지통을 비워야 공간이 실제로 확보됩니다. |
 | {0} freed | {0} 확보 |
@@ -223,12 +222,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows가 InstallerClean의 접근을 거부해서 작업을 멈췄습니다. 아무것도 제거되지 않았습니다.<br><br>InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런 식으로 다시 시작해도 도움이 되지 않습니다. Windows는 무엇이 접근을 거부했는지 더 이상 알려주지 않으므로 구체적으로 시도해 볼 것이 없습니다. |
 | Couldn't read the Windows Installer records | Windows Installer 기록을 읽을 수 없습니다 |
 | Scan failed | 검사 실패 |
-| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in C:\Windows\Installer orphaned. InstallerClean stopped instead. Nothing has been removed. | Windows Installer 기록이 완전히 비어서 돌아왔습니다. 설치된 프로그램도, 업데이트도 캐시된 설치 파일을 하나도 요구하지 않습니다. 정상적으로 작동하는 컴퓨터에서는 이런 일이 없으므로(갓 설치한 Windows에도 그런 파일이 있습니다) 기록이 손상되었거나 읽을 수 없었던 것이고, 이 답을 그대로 믿은 검사는 C:\Windows\Installer의 모든 파일을 잘못 고립된 것으로 판단했을 것입니다. InstallerClean은 그러지 않고 멈췄습니다. 아무것도 제거되지 않았습니다. |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Windows Installer 기록이 완전히 비어서 돌아왔습니다. 설치된 프로그램도, 업데이트도 캐시된 설치 파일을 하나도 요구하지 않습니다. 정상적으로 작동하는 컴퓨터에서는 이런 일이 없으므로(갓 설치한 Windows에도 그런 파일이 있습니다) 기록이 손상되었거나 읽을 수 없었던 것이고, 이 답을 그대로 믿은 검사는 {InstallerFolder}의 모든 파일을 잘못 고립된 것으로 판단했을 것입니다. InstallerClean은 그러지 않고 멈췄습니다. 아무것도 제거되지 않았습니다. |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer가 InstallerClean에게 설치된 항목의 목록 표시를 허용하지 않았습니다. InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 관리자 권한으로 다시 실행해도 달라지는 것이 없습니다. 그 목록이 없으면 캐시된 파일 중 어느 것이 아직 필요한지 안전하게 알아낼 방법이 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
 | Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer가 InstallerClean에게 읽을 수 있는 설치된 프로그램 목록을 주지 못했습니다. {0}개 항목이 연속으로 읽을 수 없는 상태로 돌아왔습니다(마지막 오류 코드 {1}). 일부만 읽은 목록으로 작업하는 대신 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
 | Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer가 설치된 프로그램 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
 | Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer가 한 프로그램의 패치 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
-| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from C:\Windows\Installer, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean이 이번 검사를 Windows Installer 기록과 맞춰 볼 수 없었습니다. Windows가 여전히 필요하다고 올려 둔 파일은 모두 C:\Windows\Installer에 없고, 그 폴더에 실제로 있는 파일은 어떤 기록과도 일치하지 않습니다. 실제 컴퓨터가 이런 모습일 리 없으므로, 이는 안전하게 제거할 수 있는 파일이 아니라 기록을 읽는 데 생긴 문제를 가리킵니다. 정리 대상으로 아무것도 제시하지 않았고 아무것도 제거되지 않았습니다. |
+| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean이 이번 검사를 Windows Installer 기록과 맞춰 볼 수 없었습니다. Windows가 여전히 필요하다고 올려 둔 파일은 모두 {InstallerFolder}에 없고, 그 폴더에 실제로 있는 파일은 어떤 기록과도 일치하지 않습니다. 실제 컴퓨터가 이런 모습일 리 없으므로, 이는 안전하게 제거할 수 있는 파일이 아니라 기록을 읽는 데 생긴 문제를 가리킵니다. 정리 대상으로 아무것도 제시하지 않았고 아무것도 제거되지 않았습니다. |
 | InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean이 무엇이 아직 필요한지 확신할 만큼 Windows Installer 기록을 읽지 못했습니다. 설치된 프로그램 목록이 일부 빠진 채로 돌아왔고, 같은 기록을 레지스트리에서 직접 읽는 것도 오류를 만났습니다. 어떤 파일을 가리키는 기록이 읽을 수 없는 것 중 하나였다는 이유만으로 그 파일이 고립된 것처럼 보일 수 있으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다. |
 | Invalid destination | 잘못된 대상 |
 | Could not write to destination | 대상에 쓸 수 없음 |
@@ -368,7 +367,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Product details | 제품 세부 정보 |
 | Move location | 이동 위치 |
 | Operation progress | 작업 진행 상황 |
-| Scan C:\Windows\Installer again | C:\Windows\Installer 다시 검사 |
+| Scan {InstallerFolder} again | {InstallerFolder} 다시 검사 |
 | Scanning progress | 검사 진행 상황 |
 | Startup scan progress | 시작 검사 진행 상황 |
 | Details, unneeded files | 세부 정보, 불필요한 파일 |
@@ -438,7 +437,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Cancelled. | 취소되었습니다. |
 | Error: {0}. Details written to {1}. | 오류: {0}. 자세한 내용을 {1}에 기록했습니다. |
 | Error: {0}. The crash log could not be written. | 오류: {0}. 크래시 로그를 기록할 수 없었습니다. |
-| Scanning C:\Windows\Installer... | C:\Windows\Installer 검사 중... |
+| Scanning {InstallerFolder}... | {InstallerFolder} 검사 중... |
 | Found {0} {1} to clean up ({2}). | 정리할 {1} {0}개를 찾았습니다 ({2}). |
 | Nothing to do. | 수행할 작업이 없습니다. |
 | Deleting {0} {1}... | {1} {0}개를 삭제하는 중... |
@@ -455,7 +454,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Moved {0} {1}. | {1} {0}개를 이동했습니다. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | 다른 InstallerClean 프로세스가 단일 인스턴스 잠금을 보유하고 있습니다(GUI 또는 다른 CLI 실행). 종료 코드 75(일시적); 나중에 다시 시도해도 안전합니다. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | 참고: 이벤트 로그 쓰기에 실패했습니다. 응용 프로그램 로그 권한 또는 그룹 정책을 확인하세요. |
-| InstallerClean - clean up C:\Windows\Installer | InstallerClean - C:\Windows\Installer 정리 |
+| InstallerClean - clean up {InstallerFolder} | InstallerClean - {InstallerFolder} 정리 |
 | Usage: | 사용법: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     이 도움말 표시 (/?, -h도 사용 가능) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  버전 출력 (-v도 사용 가능) |

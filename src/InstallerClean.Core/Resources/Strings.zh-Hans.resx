@@ -89,9 +89,6 @@
   <data name="Window.About.Title" xml:space="preserve"><value>关于</value></data>
   <data name="Window.Registered.Title" xml:space="preserve"><value>不应删除的已注册文件</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>不需要的文件，可安全删除</value></data>
-  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>确认移动</value></data>
-  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>确认删除</value></data>
-  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>回收站不可用</value></data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Products" xml:space="preserve"><value>产品</value></data>
@@ -253,7 +250,7 @@
        Automation.Section.MoveLocation in every language. -->
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>移动位置</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>操作进度</value></data>
-  <data name="Automation.RescanInstaller" xml:space="preserve"><value>重新扫描 C:\Windows\Installer</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>重新扫描 {InstallerFolder}</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>扫描进度</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>启动扫描进度</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>详情，不需要的文件</value></data>
@@ -313,11 +310,11 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>它们位于 C:\Windows\Installer，是在卸载程序（{0}）、新补丁取代旧补丁（{1}）或发布者撤回补丁（{2}）时遗留下来的。InstallerClean 只会列出 Windows 自己报告为不再需要的文件。</value>
+    <value>它们位于 {InstallerFolder}，是在卸载程序（{0}）、新补丁取代旧补丁（{1}）或发布者撤回补丁（{2}）时遗留下来的。InstallerClean 只会列出 Windows 自己报告为不再需要的文件。</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>将它们删除到回收站，或者改用“移动”保留一份备份副本。把文件放回 C:\Windows\Installer，一切就完全恢复原状。</value>
+    <value>将它们删除到回收站，或者改用“移动”保留一份备份副本。把文件放回 {InstallerFolder}，一切就完全恢复原状。</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons. The second sentence covers BOTH buttons and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and both a Recycle Bin restore and a manual move back put the file at that same path under the same name. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -325,7 +322,7 @@
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>点击“重新扫描”，在 C:\Windows\Installer 中查找没有任何程序仍然需要的安装程序文件。</value>
+    <value>点击“重新扫描”，在 {InstallerFolder} 中查找没有任何程序仍然需要的安装程序文件。</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
@@ -418,7 +415,7 @@
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>全部干净</value></data>
-  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>C:\Windows\Installer 中没有需要清理的内容</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>{InstallerFolder} 中没有需要清理的内容</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
        "less than a second"). The count is the receipt that a real
@@ -434,7 +431,7 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>万一哪天出了什么问题（[这种可能性极低]），把它们复制回 C:\Windows\Installer。</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>万一哪天出了什么问题（[这种可能性极低]），把它们复制回 {InstallerFolder}。</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>在那之前，万一哪天出了什么问题（[这种可能性极低]），您可以把它们还原。</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
@@ -622,7 +619,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>无法读取 Windows Installer 记录</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>扫描失败</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer 记录返回的内容完全为空：没有任何一个已安装的程序或更新声称拥有缓存的安装文件。在正常工作的电脑上不会出现这种情况（即使是刚装好的 Windows 也会有一些），所以要么记录已损坏，要么无法读取；而一次相信这个结果的扫描，会把 C:\Windows\Installer 中的每个文件都错误地判定为孤立。InstallerClean 没有那样做，而是停了下来。没有删除任何内容。</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer 记录返回的内容完全为空：没有任何一个已安装的程序或更新声称拥有缓存的安装文件。在正常工作的电脑上不会出现这种情况（即使是刚装好的 Windows 也会有一些），所以要么记录已损坏，要么无法读取；而一次相信这个结果的扫描，会把 {InstallerFolder} 中的每个文件都错误地判定为孤立。InstallerClean 没有那样做，而是停了下来。没有删除任何内容。</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer 不允许 InstallerClean 列出已安装的内容。InstallerClean 本来就以管理员身份运行，所以再以管理员身份运行一次也不会有任何改变。没有这份清单，就无法安全地判断哪些缓存文件仍然需要，因此 InstallerClean 停了下来。没有删除任何内容。</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
@@ -641,7 +638,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean 无法把这次扫描与 Windows Installer 记录对上：Windows 仍然列为需要的每个文件都不在 C:\Windows\Installer 中，而文件夹里实际存在的文件又与任何记录都对不上。真实的电脑不会是这个样子，所以这说明读取记录时出了问题，而不是有文件可以安全删除。没有列出任何可清理的内容，也没有删除任何内容。</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean 无法把这次扫描与 Windows Installer 记录对上：Windows 仍然列为需要的每个文件都不在 {InstallerFolder} 中，而文件夹里实际存在的文件又与任何记录都对不上。真实的电脑不会是这个样子，所以这说明读取记录时出了问题，而不是有文件可以安全删除。没有列出任何可清理的内容，也没有删除任何内容。</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -899,7 +896,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        1 = crash log path. -->
   <data name="Cli.GenericError" xml:space="preserve"><value>错误：{0}。详情已写入 {1}。</value></data>
   <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>错误：{0}。无法写入崩溃日志。</value></data>
-  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>正在扫描 C:\Windows\Installer…</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>正在扫描 {InstallerFolder}…</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>找到 {0} 个{1}，可清理（{2}）。</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>无需任何操作。</value></data>
@@ -993,7 +990,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
-  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - 清理 C:\Windows\Installer</value></data>
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - 清理 {InstallerFolder}</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>用法：</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     显示此帮助（也接受 /?、-h）</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  显示版本号（也接受 -v）</value></data>

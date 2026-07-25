@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using InstallerClean.Helpers;
+using InstallerClean.Services;
 
 namespace InstallerClean.Tests.Helpers;
 
@@ -20,9 +21,19 @@ namespace InstallerClean.Tests.Helpers;
 public class InstallerPathTextTests
 {
     private const char Wj = (char)0x2060;
-    private const string Path = "C:\\Windows\\Installer";
-    private static readonly string BoundPath =
-        "C:" + Wj + "\\" + Wj + "Windows" + Wj + "\\" + Wj + "Installer";
+
+    // The resolved folder, read the same way the code under test reads it,
+    // rather than the C: literal: KeepWhole binds %SystemRoot%\Installer, so a
+    // hardcoded path would assert nothing on a machine whose Windows lives
+    // elsewhere and would fail there while the app was working correctly.
+    private static readonly string Path = InstallerCacheHelpers.InstallerFolder;
+
+    // Built from Path by the rule rather than written out again: a joiner
+    // either side of every backslash. That is all four seams, the drive colon
+    // included, because the seam after the colon and the seam before the first
+    // backslash are the same position. The drive letter's own colon takes none,
+    // which the assertions below pin separately.
+    private static readonly string BoundPath = Path.Replace("\\", Wj + "\\" + Wj);
 
     [Fact]
     public void KeepWhole_binds_the_backslash_seams_and_the_drive_colon_but_not_the_drive_letter()
@@ -60,20 +71,34 @@ public class InstallerPathTextTests
     [Fact]
     public void KeepWhole_matches_case_insensitively_and_keeps_the_case_it_found()
     {
-        var result = InstallerPathText.KeepWhole("c:\\windows\\installer");
+        var lowered = Path.ToLowerInvariant();
 
-        Assert.Equal("c:" + Wj + "\\" + Wj + "windows" + Wj + "\\" + Wj + "installer", result);
+        var result = InstallerPathText.KeepWhole(lowered);
+
+        Assert.Equal(lowered.Replace("\\", Wj + "\\" + Wj), result);
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("Nothing to clean up.")]
-    [InlineData("C:\\Windows")]
-    [InlineData("D:\\Backup\\Installer")]
     public void KeepWhole_returns_a_string_naming_no_installer_folder_unchanged(string text)
     {
         Assert.Equal(text, InstallerPathText.KeepWhole(text));
         Assert.DoesNotContain(Wj, InstallerPathText.KeepWhole(text));
+    }
+
+    [Fact]
+    public void KeepWhole_leaves_a_near_miss_alone()
+    {
+        // Both are derived from the real folder rather than written out, so the
+        // near miss stays a near miss on a machine whose Windows is not on C:.
+        // The parent on its own is a prefix of the folder and not the folder;
+        // the second is the same leaf under a different parent.
+        var parent = Path[..Path.LastIndexOf('\\')];
+        var elsewhere = "D:\\Backup" + Path[Path.LastIndexOf('\\')..];
+
+        Assert.Equal(parent, InstallerPathText.KeepWhole(parent));
+        Assert.Equal(elsewhere, InstallerPathText.KeepWhole(elsewhere));
     }
 
     [Fact]

@@ -89,9 +89,6 @@
   <data name="Window.About.Title" xml:space="preserve"><value>정보</value></data>
   <data name="Window.Registered.Title" xml:space="preserve"><value>삭제하지 말아야 할 등록된 파일</value></data>
   <data name="Window.Orphaned.Title" xml:space="preserve"><value>안전하게 삭제할 수 있는 불필요한 파일</value></data>
-  <data name="Window.ConfirmMove.Title" xml:space="preserve"><value>이동 확인</value></data>
-  <data name="Window.ConfirmDelete.Title" xml:space="preserve"><value>삭제 확인</value></data>
-  <data name="Window.RecycleUnavailable.Title" xml:space="preserve"><value>휴지통을 사용할 수 없음</value></data>
 
   <!-- Section headings -->
   <data name="Section.Registered.Products" xml:space="preserve"><value>제품</value></data>
@@ -253,7 +250,7 @@
        Automation.Section.MoveLocation in every language. -->
   <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>이동 위치</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>작업 진행 상황</value></data>
-  <data name="Automation.RescanInstaller" xml:space="preserve"><value>C:\Windows\Installer 다시 검사</value></data>
+  <data name="Automation.RescanInstaller" xml:space="preserve"><value>{InstallerFolder} 다시 검사</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>검사 진행 상황</value></data>
   <data name="Automation.StartupScanProgress" xml:space="preserve"><value>시작 검사 진행 상황</value></data>
   <data name="Automation.ViewOrphanedFiles" xml:space="preserve"><value>세부 정보, 불필요한 파일</value></data>
@@ -313,11 +310,11 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>이 파일들은 C:\Windows\Installer에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다.</value>
+    <value>이 파일들은 {InstallerFolder}에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다.</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>휴지통으로 삭제하거나, 백업 사본을 남기려면 대신 이동을 사용하세요. 파일을 C:\Windows\Installer에 다시 넣으면 정확히 원래 상태로 돌아갑니다.</value>
+    <value>휴지통으로 삭제하거나, 백업 사본을 남기려면 대신 이동을 사용하세요. 파일을 {InstallerFolder}에 다시 넣으면 정확히 원래 상태로 돌아갑니다.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons. The second sentence covers BOTH buttons and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and both a Recycle Bin restore and a manual move back put the file at that same path under the same name. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -325,7 +322,7 @@
     <comment>Main window intro (heading tier) before any scan has completed, which the user reaches by cancelling the scan the app runs at startup. It replaces the three-key intro above, which describes files a scan found. Keep it one short clause.</comment>
   </data>
   <data name="Body.NotScanned.Why" xml:space="preserve">
-    <value>다시 검사를 눌러 C:\Windows\Installer에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요.</value>
+    <value>다시 검사를 눌러 {InstallerFolder}에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요.</value>
     <comment>Main window intro (muted tier) before any scan has completed. Re-scan is the button's own label; keep whatever the Action.Rescan key says in this language, minus its accelerator underscore.</comment>
   </data>
   <data name="Body.PendingReboot.Lead" xml:space="preserve">
@@ -418,7 +415,7 @@
 
   <!-- Completion screen -->
   <data name="Completion.AllClean" xml:space="preserve"><value>모두 깨끗합니다</value></data>
-  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>C:\Windows\Installer에 정리할 것이 없습니다</value></data>
+  <data name="Completion.NothingToCleanUp" xml:space="preserve"><value>{InstallerFolder}에 정리할 것이 없습니다</value></data>
   <!-- 0 = installed product count, 1 = pluralised "product"/"products",
        2 = natural-phrasing duration ("1.4 seconds" / "850 ms" /
        "less than a second"). The count is the receipt that a real
@@ -434,7 +431,7 @@
        square brackets are the link delimiter and are NOT shown, only the
        phrase between them becomes the link, and the round brackets around it
        are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>혹시라도 무언가 망가지면 C:\Windows\Installer에 다시 복사해 넣으면 됩니다 ([그럴 가능성은 극히 낮습니다]).</value></data>
+  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>혹시라도 무언가 망가지면 {InstallerFolder}에 다시 복사해 넣으면 됩니다 ([그럴 가능성은 극히 낮습니다]).</value></data>
   <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>그때까지는 혹시라도 무언가 망가지면 복원할 수 있습니다 ([그럴 가능성은 극히 낮습니다]).</value></data>
   <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
        the Recycle Bin, which does not reclaim disk space until the bin is
@@ -622,7 +619,7 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Windows Installer 기록을 읽을 수 없습니다</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>검사 실패</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer 기록이 완전히 비어서 돌아왔습니다. 설치된 프로그램도, 업데이트도 캐시된 설치 파일을 하나도 요구하지 않습니다. 정상적으로 작동하는 컴퓨터에서는 이런 일이 없으므로(갓 설치한 Windows에도 그런 파일이 있습니다) 기록이 손상되었거나 읽을 수 없었던 것이고, 이 답을 그대로 믿은 검사는 C:\Windows\Installer의 모든 파일을 잘못 고립된 것으로 판단했을 것입니다. InstallerClean은 그러지 않고 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer 기록이 완전히 비어서 돌아왔습니다. 설치된 프로그램도, 업데이트도 캐시된 설치 파일을 하나도 요구하지 않습니다. 정상적으로 작동하는 컴퓨터에서는 이런 일이 없으므로(갓 설치한 Windows에도 그런 파일이 있습니다) 기록이 손상되었거나 읽을 수 없었던 것이고, 이 답을 그대로 믿은 검사는 {InstallerFolder}의 모든 파일을 잘못 고립된 것으로 판단했을 것입니다. InstallerClean은 그러지 않고 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer가 InstallerClean에게 설치된 항목의 목록 표시를 허용하지 않았습니다. InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 관리자 권한으로 다시 실행해도 달라지는 것이 없습니다. 그 목록이 없으면 캐시된 파일 중 어느 것이 아직 필요한지 안전하게 알아낼 방법이 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
@@ -641,7 +638,7 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean이 이번 검사를 Windows Installer 기록과 맞춰 볼 수 없었습니다. Windows가 여전히 필요하다고 올려 둔 파일은 모두 C:\Windows\Installer에 없고, 그 폴더에 실제로 있는 파일은 어떤 기록과도 일치하지 않습니다. 실제 컴퓨터가 이런 모습일 리 없으므로, 이는 안전하게 제거할 수 있는 파일이 아니라 기록을 읽는 데 생긴 문제를 가리킵니다. 정리 대상으로 아무것도 제시하지 않았고 아무것도 제거되지 않았습니다.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean이 이번 검사를 Windows Installer 기록과 맞춰 볼 수 없었습니다. Windows가 여전히 필요하다고 올려 둔 파일은 모두 {InstallerFolder}에 없고, 그 폴더에 실제로 있는 파일은 어떤 기록과도 일치하지 않습니다. 실제 컴퓨터가 이런 모습일 리 없으므로, 이는 안전하게 제거할 수 있는 파일이 아니라 기록을 읽는 데 생긴 문제를 가리킵니다. 정리 대상으로 아무것도 제시하지 않았고 아무것도 제거되지 않았습니다.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -899,7 +896,7 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        1 = crash log path. -->
   <data name="Cli.GenericError" xml:space="preserve"><value>오류: {0}. 자세한 내용을 {1}에 기록했습니다.</value></data>
   <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>오류: {0}. 크래시 로그를 기록할 수 없었습니다.</value></data>
-  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>C:\Windows\Installer 검사 중...</value></data>
+  <data name="Cli.ScanningInstaller" xml:space="preserve"><value>{InstallerFolder} 검사 중...</value></data>
   <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
   <data name="Cli.FoundOrphans" xml:space="preserve"><value>정리할 {1} {0}개를 찾았습니다 ({2}).</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>수행할 작업이 없습니다.</value></data>
@@ -994,7 +991,7 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
-  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - C:\Windows\Installer 정리</value></data>
+  <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - {InstallerFolder} 정리</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>사용법:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     이 도움말 표시 (/?, -h도 사용 가능)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  버전 출력 (-v도 사용 가능)</value></data>
