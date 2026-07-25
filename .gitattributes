@@ -11,7 +11,7 @@
 *.ico binary
 *.ttf binary
 # Bundled Inno Setup language files: keep each file's exact bytes so an
-# eol/charset normalisation pass cannot corrupt them on checkout. All three
-# are BOM-less UTF-8 with CRLF line endings (Vietnamese.isl declares
+# eol/charset normalisation pass cannot corrupt them on checkout. Each is
+# BOM-less UTF-8 with CRLF line endings (Vietnamese.isl declares
 # LanguageCodePage=1258 in its header while its bytes are UTF-8).
 *.isl binary
