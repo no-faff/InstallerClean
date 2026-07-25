@@ -6,9 +6,10 @@ namespace InstallerClean.Tests.Helpers;
 
 /// <summary>
 /// The display-time binding that stops <c>C:\Windows\Installer</c> splitting
-/// across two lines. Pure string work, so it is assertable without a UI thread;
-/// whether WPF's line breaker then honours the word joiner is not, and is an
-/// eye check on the running app.
+/// across two lines. Pure string work, so it is assertable without a UI thread.
+/// That WPF's line breaker then honours the word joiner is not assertable here
+/// at all; it was settled by eye on the running app, and the receipt is on
+/// <see cref="InstallerPathText"/> itself.
 ///
 /// The word joiner is referenced as <c>(char)0x2060</c> throughout, never as a
 /// literal character and never as an escape inside a string, for the reason
@@ -24,7 +25,7 @@ public class InstallerPathTextTests
         "C:" + Wj + "\\" + Wj + "Windows" + Wj + "\\" + Wj + "Installer";
 
     [Fact]
-    public void KeepWhole_binds_every_seam_of_the_path_and_no_letter_pair()
+    public void KeepWhole_binds_the_backslash_seams_and_the_drive_colon_but_not_the_drive_letter()
     {
         Assert.Equal(BoundPath, InstallerPathText.KeepWhole(Path));
     }

@@ -20,34 +20,51 @@ namespace InstallerClean.Helpers;
 /// strings from the generated <c>Strings</c> class in Core and never comes past
 /// this project's boundary.
 ///
-/// The joined seams, not just the one that was observed to break. Unicode's
-/// line-breaking algorithm (UAX #14) allows exactly one break inside the path,
-/// between the <c>:</c> (class IS) and the <c>\</c> (class PR, the backslash
-/// sharing a code point with the yen sign), everything else being letter to
-/// letter or covered by LB24; the reported break was at that exact point, which
-/// says WPF's breaker follows a current table rather than an approximation. A
-/// joiner at every non-letter seam costs four more invisible characters and
-/// makes the path safe against a table that differs anywhere else.
+/// Every seam a break can fall at, not just the one that was observed to break.
+/// Unicode's line-breaking algorithm (UAX #14) allows exactly one break inside
+/// the path, between the <c>:</c> (class IS) and the <c>\</c> (class PR, the
+/// backslash sharing a code point with the yen sign), everything else being
+/// letter to letter or covered by LB24; the reported break was at that exact
+/// point, which says WPF's breaker follows a current table rather than an
+/// approximation. Binding both sides of each backslash as well costs three more
+/// invisible characters and makes the path safe against a table that differs
+/// anywhere else. <see cref="AppendBound"/> has the seam list, and why the
+/// drive letter's own colon is left out of it.
 ///
-/// UNVERIFIED, and it is the whole mechanism: that WPF honours class WJ.
-/// U+2060 is the character Unicode defines for this (LB11 forbids a break
-/// either side of it), and the app already relies on WPF honouring the
-/// neighbouring class ZW, since <c>CompositionParsing.InsertPathWrapPoints</c>
-/// adds U+200B to make a long destination path break at its folders. But
-/// WPF breaks lines through the unmanaged LineServices layer, not through
-/// dotnet/wpf, so no source reading settles it and it needs a look at the
-/// running app. Where a TextBlock takes WPF's simple-text fast path instead,
-/// the question does not arise: that path has no break opportunity inside the
-/// path to suppress.
+/// VERIFIED, and it is the whole mechanism: WPF honours class WJ. Observed in
+/// the running app in Dutch, where the paragraph carrying the path breaks
+/// immediately BEFORE <c>C:\Windows\Installer</c> and takes the whole path onto
+/// the next line, leaving room at the end of the line above for the <c>C:</c> a
+/// breaker following the table alone would have put there. The break
+/// opportunity existed and was declined, which is LB11 (no break either side of
+/// U+2060) being honoured. The app already relied on the neighbouring class ZW,
+/// since <c>CompositionParsing.InsertPathWrapPoints</c> adds U+200B to make a
+/// long destination path break at its folders.
 ///
-/// Applied wherever this project turns a resource string into text on a
-/// control, drawn or spoken: <c>TranslateExtension</c> for everything XAML
-/// resolves, the converter below for the main window's intro line, and by hand
-/// in the completion overlay's two inline builders, the message dialog and the
-/// scan announcer. Drawn and spoken are not separated, because a drawn
-/// TextBlock's automation peer reports its Text as its name, so the joiners
-/// reach a screen reader through the visible strings whatever is done with the
-/// automation-only ones.
+/// No source reading could have settled that, and the same reading settles the
+/// question it raises. WPF formats every line with <c>LineFlags.None</c>
+/// (TextFormatterImp) and takes the breaking classes themselves from an
+/// unmanaged LineServices callback with no managed counterpart, so the table is
+/// out of reach. But it is also not language-tagged: the two culture-flavoured
+/// break knobs WPF declares, BreakClassWide and BreakClassStrict, are never
+/// set, and the one culture-sensitive break input it does supply is the
+/// hyphenator, which needs IsHyphenationEnabled. So the tag
+/// <c>App.OnStartup</c> puts on every element cannot move a break either way,
+/// and what was seen under one language holds under all sixteen. Where a
+/// TextBlock takes WPF's simple-text fast path instead, the question does not
+/// arise: that path has no break opportunity inside the path to suppress.
+///
+/// Applied wherever this project turns a resource string into text that gets
+/// drawn: <c>TranslateExtension</c> for everything XAML resolves, the converter
+/// below for the main window's intro line, and by hand in the completion
+/// overlay's two inline builders and the message dialog's body. A drawn string
+/// keeps its joiners even where it is also the spoken one, a TextBlock's
+/// automation peer reporting its Text as its name. A string that is only ever
+/// spoken does not get them, having no layout to protect and nothing to hand a
+/// speech engine but invisible format characters: the message dialog's title
+/// and the main window's invisible scan announcer are the two hand-written
+/// sites on that side of the line, and <c>TranslateExtension</c> draws it for
+/// every automation property XAML resolves.
 /// </summary>
 internal static class InstallerPathText
 {

@@ -96,10 +96,14 @@ public partial class MainWindow : Window
 
             // A failed startup scan opens the window with the tailored error in the
             // intro instead of exiting. A newly shown window speaks only its title
-            // and the focused Re-scan button, so announce the diagnosis too.
+            // and the focused Re-scan button, so announce the diagnosis too. Two
+            // of the diagnoses name C:\Windows\Installer and the announcer takes
+            // them unbound: it is never drawn, so it has no line break to protect
+            // and a word joiner there would only ever reach a speech engine. The
+            // same split TranslateExtension makes for an automation property.
             if (!_vm.Scan.HasScanned && _vm.Scan.HasScanError)
                 Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
-                    ScanResultAnnouncer.Text = InstallerPathText.KeepWhole(_vm.Scan.LastScanError));
+                    ScanResultAnnouncer.Text = _vm.Scan.LastScanError);
         }
 
         CompletionDonateToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;

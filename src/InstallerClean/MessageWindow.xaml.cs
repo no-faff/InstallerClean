@@ -15,12 +15,13 @@ public partial class MessageWindow : Window
     {
         InitializeComponent();
 
-        // Both the body and the announced title below draw from it, and two of
-        // the scan diagnoses name C:\Windows\Installer mid-paragraph.
-        message = InstallerPathText.KeepWhole(message);
-
         CaptionText.Text = caption;
-        MessageText.Text = message;
+        // Bound here and nowhere else. Two of the scan diagnoses name
+        // C:\Windows\Installer mid-paragraph, and of the two places the message
+        // goes this is the one that gets laid out, so it is the one with a line
+        // break to protect; the announced title takes the message as it came. The
+        // same split TranslateExtension makes for an automation property.
+        MessageText.Text = InstallerPathText.KeepWhole(message);
         if (kind != MessageKind.Information)
             WarningIcon.Visibility = Visibility.Visible;
 
@@ -29,7 +30,8 @@ public partial class MessageWindow : Window
         // rides on it: left in the body alone it would go unheard, which is how
         // the stock message box (which announces its text) behaved. ShowInTaskbar
         // is false and the chrome paints no caption, so the title is never
-        // rendered and this is announcement-only.
+        // rendered and this is announcement-only, which is why it takes the
+        // unbound message rather than the one above it.
         Title = caption + ". " + message;
 
         // Sized to content; the clamp stops a very large text scale pushing the
