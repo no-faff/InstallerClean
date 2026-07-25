@@ -13,6 +13,9 @@ OUT=$ROOT/src/InstallerClean.Core/Resources/Strings.Designer.cs
 KEYS=$(grep -oE '<data name="[A-Za-z][A-Za-z0-9._]+' "$RESX" \
          | sed 's|<data name="||' | sort -u)
 
+# The program below is all BEGIN and END, but awk given no input file reads stdin
+# whatever its program looks like, so stdin is closed explicitly here: left open by
+# the caller, awk blocks there and $OUT is left truncated with no error.
 awk -v keys="$KEYS" '
 BEGIN {
     print "//------------------------------------------------------------------------------"
@@ -87,6 +90,6 @@ BEGIN {
 END {
     print "}"
 }
-' > "$OUT"
+' </dev/null > "$OUT"
 
 echo "Wrote $OUT ($(wc -l < "$OUT") lines)"

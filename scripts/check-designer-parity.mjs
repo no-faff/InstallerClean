@@ -72,8 +72,8 @@ if (problems.length > 0) {
     for (const p of problems.sort()) console.error(`  ${p}`);
     console.error(
         '\nRegenerate with: bash scripts/regenerate-strings-designer.sh' +
-        '\nIt takes over two minutes; wait for its "Wrote ... (N lines)" line, because' +
-        '\na run cut short leaves a truncated file that breaks the build.',
+        '\nIt finishes in well under a second and says so, printing "Wrote ... (N lines)".' +
+        '\nA run that ends any other way leaves a truncated file that breaks the build.',
     );
     process.exit(1);
 }
