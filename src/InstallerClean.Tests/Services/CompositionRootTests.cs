@@ -14,8 +14,8 @@ namespace InstallerClean.Tests.Services;
 /// without its registration passes every other gate. The solution compiles,
 /// the suite passes (subjects are assembled by hand with NSubstitute rather
 /// than through the container), the publishes succeed because publishing never
-/// runs the app, and the installer compiles. The first thing to notice was a
-/// user's machine, where the single <c>GetRequiredService&lt;MainViewModel&gt;</c>
+/// runs the app, and the installer compiles. The first thing to notice would be
+/// a user's machine, where the single <c>GetRequiredService&lt;MainViewModel&gt;</c>
 /// throws and the startup catch paints a failure with only an exception type
 /// name in it.
 ///

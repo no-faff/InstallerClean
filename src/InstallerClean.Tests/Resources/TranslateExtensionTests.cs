@@ -90,7 +90,9 @@ public class TranslateExtensionTests
     public void A_shared_value_with_no_target_property_keeps_the_joiners()
     {
         // A Setter or a template resolves once for every instance, so WPF hands
-        // over no target property. That path is unchanged from before the split.
+        // over no target property and the value cannot be shown to be
+        // spoken-only. It takes the drawn treatment, for the reason
+        // TranslateExtension gives.
         Assert.Contains(Wj, Resolve(DrawnPathKey, targetProperty: null));
     }
 
@@ -120,7 +122,7 @@ public class TranslateExtensionTests
     {
         // The documented fallback: a misspelled key shows on screen as the key
         // rather than as a blank, so the typo is visible. Asserted on both
-        // branches because the resolve now happens before they diverge.
+        // branches because the resolve happens before they diverge.
         Assert.Equal("Window.Main.Titel", Resolve("Window.Main.Titel", TextBlock.TextProperty));
         Assert.Equal("Window.Main.Titel", Resolve("Window.Main.Titel", AutomationProperties.NameProperty));
     }
