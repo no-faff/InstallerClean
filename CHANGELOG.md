@@ -1,16 +1,48 @@
 # Changelog
 
-Every change to InstallerClean, logged in full (not just the user-facing highlights). Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [2.3.0] - Unreleased
 
+### Added
+
+- RijckAlex contributed, entirely unprompted, a complete Dutch translation of InstallerClean (#54): every window, dialog, tooltip, button and screen-reader label, plus the command-line tool's text. Wiring it into the app took a pass over every string for the je/u register and for Dutch count agreement rather than a calque of the English, then the installer's Dutch wizard text and a full Dutch README to go with it. InstallerClean can now be displayed in Dutch, its sixteenth language, applied automatically on a Dutch-language Windows or picked from the main-window language menu. Where the languages stand:
+
+  | Natively done | Live machine-translated | README only \* |
+  | --- | --- | --- |
+  | English · Italian · Japanese · Dutch | Simplified Chinese · Russian · Spanish · Brazilian Portuguese · Polish · Turkish · Korean · French · German · Indonesian · Vietnamese · Ukrainian | Arabic |
+
+  \* README only means the README is translated while the interface stays English. Arabic is here on that basis, because a right-to-left interface is a separate piece of work I might tackle later.
+
 ### Changed
 
-- The installer's Italian wizard text is refreshed to Inno Setup's current official Italian translation (6.5.0+), which bovirus maintains upstream and flagged as out of date (#53). It is now bundled with InstallerClean and pinned, as the Simplified Chinese, Vietnamese and Indonesian installer languages already are, so the current wording ships regardless of which Inno Setup version compiles the setup.
+- The installer's Italian wizard text is refreshed to Inno Setup's current official Italian translation (6.5.0+), which bovirus maintains upstream and flagged as out of date (#53). InstallerClean now carries that file itself rather than using whichever version the compiler happens to have, so the current wording ships every time. Three other installer languages were already carried this way, Simplified Chinese, Vietnamese and Indonesian, though for a different reason: Inno Setup does not ship those at all.
+- The About window's licence link no longer carries a separate screen-reader name duplicating its visible text: the link's own text is the name, matching the window's other links, so the spoken words can never drift from the shown words in any language.
+- The three small 28px buttons (the language globe, the completion screen's donate heart and the splash screen's Cancel) now share one named style instead of each assembling the same geometry inline, so the small height and its matching focus ring can never drift apart. No visual change.
+- The About window's Close button takes the accent colour, the same reading that gives the completion screen's Done its fill: the one finishing action a window leads with. It was a grey pill that did not quite read as a button.
+- Four more buttons take the accent colour with it: Send on the report confirmation, the button that opens the releases page when an update is found, and Close on both Details windows. Each is the one thing its window is asking you to do, and each was a grey that read as hesitant rather than quiet. The main window's Move keeps the grey on purpose, because it is meant to sit second to Delete, and so does the Close on a warning, where an inviting button would sit badly with bad news.
+- The delete confirmation's own Delete button is no longer red. The app tells you these files are safe to remove and the dialog tells you they go to the Recycle Bin, so a red button there was arguing with both. Red is now kept for the one delete that genuinely cannot be undone, the permanent delete offered when the Recycle Bin is unavailable.
+- Four things a screen reader reads out now write GitHub in lower case, the descriptions of "Check for updates", the automatic update-check tick box and the About window's guide link, plus the name of the "Leave a star on GitHub" button, because with the capital a speech engine breaks the word there and spells the first half, so it arrives as "G. I. T. hub". Every visible label is untouched, the protocol name has gone from the update description and the brackets from "the guide (README)", and all fifteen translations were rewritten to match.
+- The screen-reader names of the About window's two thank-you buttons no longer end with "(About window)", which was there to tell them apart from a star and a cuppa the main window has not had for some time. It was being read out to somebody who could only be in that window to hear it.
 
 ### Fixed
 
 - A single installed program whose patch list Windows refuses to return no longer stops the whole scan. This can happen with an unusual but valid registration (a per-user program recorded under a system account, as some corporate DisplayLink deployments are), where Windows rejects every entry in that one program's patch list: the scan now sets that program aside and keeps all of its cached files, reporting it through the existing "N installed programs could not be read during this scan, so superseded patches have been kept" notice, instead of failing with "Scan failed" and cleaning nothing. Orphaned-file cleanup, the app's main job, is unaffected.
+- Tabbing from "Check for updates" to the language globe no longer takes two presses. The update-available link, hidden until a check finds a newer version, still sat in the keyboard's tab order while invisible, so the first press landed on nothing; it is now skipped until it is actually shown.
+- The keyboard focus ring on links now has the same weight and breathing room as on every other control, rather than the thinner, tighter outline links used to draw.
+- The About window's "Buy me a cuppa" button no longer disappears under the Close button in the languages whose labels run long, Dutch and German among them. Close now has its own space in the row, and the two thank-you buttons take a second line where they need one.
+- Column headers in both Details windows now sort the list when you press Space or Enter on one, not only when you click it. A focused header was throwing the keystroke away unless the mouse pointer happened to be resting on that same header, so sorting from the keyboard did nothing at all.
+- `C:\Windows\Installer` stays on one line wherever the app shows it, instead of breaking after the "C:" and carrying the rest onto the next line. Dutch is where it showed up, but where a line breaks depends on the words around it, so any language could land on it.
+- The arrow that shows which column a Details window is sorted by no longer runs out of room. In the languages with a longer word for size the heading filled the column and pushed the arrow out, so Italian lost it altogether and Vietnamese showed half of it. The size and patch-count columns are wider now, taking the space from the file and product-name columns, which had it going spare.
+- The scrollbar handle in both Details windows no longer runs past the pane's rounded corners onto the window background, where at each end of the scroll it left the panel it belongs to. The registered-files patch list did the same thing and is fixed with it, as is the horizontal scrollbar that appears at very large Windows text sizes, which sat half below the panel's bottom edge.
+- Delete, Move and Send report showed one explanation on hover and read a differently worded one out to a screen reader; each now uses a single piece of text for both. Move gains a detail with it: when no destination is set, its spoken description says a folder browser opens first.
+- The About window's "Leave a star" and "Buy me a cuppa" buttons explained themselves in a tooltip and said nothing to a screen reader, so the reason for either ask reached only the people who could see it. Both now read out what the tooltip shows.
+- The note that a signing certificate is the name a file claims rather than a verified one sat in a tooltip in both Details windows, so it never reached a screen reader. It is now part of what the certificate value reads out.
+- The main window's "Re-scan" button had no spoken description, while "Scan again" on the finished screen, which runs the same scan, had one. Both explain themselves now.
+- The warning shown when the Recycle Bin is unavailable was read out from halfway through its own sentence, opening on "So these files haven't been deleted" with nothing before it. It now leads with the heading, so the first thing said is that the bin could not be used.
+- The confirmation shown before a move read out the file count and size but not the destination folder, the one thing it exists to confirm, and there was no way to reach that folder name from the keyboard either. It now reads the destination as part of the confirmation.
+- The version number in the About window was read out twice by a screen reader, once as the label and once as the content. It is read once now, introduced by the app name above it.
+- Invisible characters that keep `C:\Windows\Installer` on one line are no longer put into text that is only ever spoken and never drawn, where they did nothing and left a speech engine to make sense of them.
 
 ## [2.2.0] - 2026-07-23
 
