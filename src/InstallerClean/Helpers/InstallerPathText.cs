@@ -92,15 +92,17 @@ internal static class InstallerPathText
         return joined.ToString();
     }
 
-    // A joiner goes at every seam except letter-to-letter, where no
-    // line-breaking algorithm has ever offered a break. In C:\Windows\Installer
-    // that is five seams, not four: both sides of the colon, both sides of each
-    // backslash, with the colon and the first backslash sharing one.
+    // A joiner goes either side of each backslash and after the drive colon:
+    // four seams, the only places in C:\Windows\Installer a line breaker will
+    // offer a break. Not between the drive letter and its colon, because UAX #14
+    // forbids a break before ':' regardless, so a joiner there is one more
+    // invisible character for a screen reader and a braille display to carry
+    // for nothing.
     private static void AppendBound(StringBuilder joined, ReadOnlySpan<char> path)
     {
         for (int i = 0; i < path.Length; i++)
         {
-            if (i > 0 && !(char.IsLetter(path[i - 1]) && char.IsLetter(path[i])))
+            if (i > 0 && (path[i - 1] is ':' or '\\' || path[i] == '\\'))
                 joined.Append(WordJoiner);
             joined.Append(path[i]);
         }
