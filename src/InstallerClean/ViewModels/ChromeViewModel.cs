@@ -130,7 +130,9 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
     /// "no link" and never "a link", which is the case the plain line has
     /// to hide itself in.
     /// </summary>
-    [ObservableProperty] private bool _hasUpdateLink;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(OpenUpdatePageCommand))]
+    private bool _hasUpdateLink;
 
     /// <summary>
     /// Starts the once-per-session automatic check. Called by the App as
@@ -240,8 +242,20 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
             UpdateStatusText = string.Empty;
     }
 
-    /// <summary>Opens the releases page; bound to the status hyperlink.</summary>
-    [RelayCommand]
+    /// <summary>
+    /// Opens the releases page; bound to the status hyperlink. The CanExecute
+    /// is the hyperlink's tab-order gate, not politeness: WPF's keyboard
+    /// navigation descends into the collapsed status TextBlock regardless of
+    /// visibility (a TextBlock is an IContentHost) and admits a content
+    /// element on Focusable, IsTabStop and IsEnabled alone, content elements
+    /// having no IsVisible to test, so an always-executable command leaves
+    /// the hidden hyperlink an invisible extra Tab stop between the update
+    /// button and the globe. Disabled while there is no link, it drops out of
+    /// the walk; once the link is shown it is enabled and a real stop. The
+    /// body's guard stays because ICommand.Execute does not consult
+    /// CanExecute.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(HasUpdateLink))]
     private void OpenUpdatePage()
     {
         if (HasUpdateLink)

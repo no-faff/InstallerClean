@@ -339,32 +339,28 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Tiếng Việt |
 | --- | --- |
 | Donate | Ủng hộ |
-| Buy me a cuppa (About window) | Mời tôi một ly cà phê (cửa sổ Giới thiệu) |
+| Buy me a cuppa | Mời tôi một ly cà phê |
 | Cancel operation | Hủy thao tác |
 | Cancel scan | Hủy quét |
 | Cancel startup scan | Hủy quét khi khởi động |
 | Close | Đóng |
 | Close window | Đóng cửa sổ |
 | Close result and return to main window | Đóng kết quả và quay lại cửa sổ chính |
-| Leave a star on GitHub (About window) | Gắn sao trên GitHub (cửa sổ Giới thiệu) |
+| Leave a star on github | Gắn sao trên github |
 | Minimise | Thu nhỏ |
-| Move all unneeded installer files to the Move location | Chuyển tất cả các tệp cài đặt không cần thiết tới Nơi chuyển đến |
-| Move all unneeded installer files to the Recycle Bin | Di chuyển tất cả các tệp cài đặt không cần thiết vào Thùng rác |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Xóa sẽ di chuyển các tệp không cần thiết vào Thùng rác. Hủy sẽ đóng lại mà không xóa. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Chuyển sẽ đặt các tệp không cần thiết vào thư mục đích đã chọn. Hủy sẽ để chúng nguyên chỗ cũ. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Chọn cách xử lý các tệp không cần thiết: chuyển chúng tới nơi an toàn, xóa vĩnh viễn hoặc hủy. |
 | Move the unneeded files to a folder you choose | Chuyển các tệp không cần thiết tới một thư mục bạn chọn |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Xóa vĩnh viễn các tệp không cần thiết vì Thùng rác không khả dụng cho ổ đĩa này |
-| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | Gửi tới nofaff.netlify.app. Chỉ gồm số liệu và nhãn. Bạn sẽ thấy nội dung chính xác trước khi gửi. |
 | Say thanks | Gửi lời cảm ơn |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì. |
 | Check for updates | Kiểm tra cập nhật |
-| Checks GitHub's releases page over HTTPS for a newer version. | Kiểm tra trang phát hành của GitHub qua HTTPS để tìm phiên bản mới hơn. |
-| Opens the guide (README) on github.com in your browser. | Mở hướng dẫn (README) trên github.com trong trình duyệt của bạn. |
+| Checks github's releases page for a newer version. | Kiểm tra trang phát hành của github xem có phiên bản mới hơn không. |
+| Opens the readme on github in your browser. | Mở readme trên github trong trình duyệt của bạn. |
 | Opens the issue tracker on github.com in your browser. | Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn. |
-| When ticked, InstallerClean checks GitHub for a newer version when you run it. | Khi được đánh dấu, mỗi lần bạn chạy InstallerClean, ứng dụng sẽ kiểm tra GitHub xem có phiên bản mới hơn không. |
+| If ticked, InstallerClean checks github for a newer version when you run it. | Nếu được đánh dấu, InstallerClean sẽ kiểm tra github xem có phiên bản mới hơn không khi bạn chạy nó. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Mở trang phát hành để tải phiên bản mới hơn, hoặc hủy để giữ phiên bản hiện tại. |
-| Apache 2.0 licence | Giấy phép Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Mở tệp giấy phép trên github.com trong trình duyệt của bạn. |
 | Move location | Nơi chuyển đến |
 | Products | Sản phẩm |

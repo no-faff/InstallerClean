@@ -64,7 +64,17 @@
                         Click="OnCancel" IsCancel="True" IsDefault="True"
                         AutomationProperties.HelpText="{loc:Translate Automation.ConfirmDelete}"
                         Margin="{StaticResource GapRight.Sm}"/>
-                <Button x:Name="DeleteButton" Style="{StaticResource DangerPill}"
+                <!-- Accent, not DangerPill, and deliberately so. The main
+                     window states the files are safe to remove and this
+                     dialog's own body says they go to the Recycle Bin, so a
+                     red confirm would contradict both a sentence above it
+                     and the mechanism behind it. Red is reserved for the one
+                     delete that really is irreversible, RecycleUnavailable's
+                     "Delete permanently", which is the app's only DangerPill.
+                     Matching the accent of the button that opened this dialog
+                     also reads as the same action continuing rather than a
+                     fresh warning. -->
+                <Button x:Name="DeleteButton" Style="{StaticResource AccentPill}"
                         Content="{loc:Translate Action.Delete}" Click="OnDelete"/>
             </StackPanel>
         </Grid>

@@ -87,10 +87,9 @@
                     Content="{loc:Translate Action.Cancel}"
                     Click="CancelClick"
                     IsCancel="True"
-                    Style="{StaticResource GhostPill}"
-                    MinHeight="28" Padding="16,0" FontSize="{DynamicResource Type.Body}"
+                    Style="{StaticResource SmallGhostPill}"
+                    Padding="16,0"
                     HorizontalAlignment="Center"
-                    FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     AutomationProperties.Name="{loc:Translate Automation.CancelStartupScan}"/>
 
             <!-- Version (bottom right, overlaid) -->

@@ -339,32 +339,28 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 简体中文 |
 | --- | --- |
 | Donate | 捐赠 |
-| Buy me a cuppa (About window) | 请我喝杯茶（关于窗口） |
+| Buy me a cuppa | 请我喝杯茶 |
 | Cancel operation | 取消操作 |
 | Cancel scan | 取消扫描 |
 | Cancel startup scan | 取消启动扫描 |
 | Close | 关闭 |
 | Close window | 关闭窗口 |
 | Close result and return to main window | 关闭结果并返回主窗口 |
-| Leave a star on GitHub (About window) | 在 GitHub 上点个星（关于窗口） |
+| Leave a star on github | 在 github 上点个星 |
 | Minimise | 最小化 |
-| Move all unneeded installer files to the Move location | 将所有不需要的安装程序文件移动到移动位置 |
-| Move all unneeded installer files to the Recycle Bin | 将所有不需要的安装程序文件移到回收站 |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | 删除会将不需要的文件移到回收站。取消则关闭且不删除。 |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 移动会将不需要的文件放入所选的目标文件夹。取消则让它们留在原处。 |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | 选择如何处理这些不需要的文件：移动到安全的位置、永久删除或取消。 |
 | Move the unneeded files to a folder you choose | 将不需要的文件移动到您选择的文件夹 |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | 由于此驱动器的回收站不可用，永久删除这些不需要的文件 |
-| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | 发送到 nofaff.netlify.app。仅包含计数和标签。发送前您会看到完整的内容。 |
 | Say thanks | 道声谢 |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 发送会将所示报告提交给 No Faff。取消则不发送任何内容。 |
 | Check for updates | 检查更新 |
-| Checks GitHub's releases page over HTTPS for a newer version. | 通过 HTTPS 查询 GitHub 发布页面，检查是否有更新版本。 |
-| Opens the guide (README) on github.com in your browser. | 在浏览器中打开 github.com 上的指南（README）。 |
+| Checks github's releases page for a newer version. | 在 github 的发布页面上检查是否有更新版本。 |
+| Opens the readme on github in your browser. | 在浏览器中打开 github 上的 readme。 |
 | Opens the issue tracker on github.com in your browser. | 在浏览器中打开 github.com 上的问题追踪页面（Issues）。 |
-| When ticked, InstallerClean checks GitHub for a newer version when you run it. | 勾选后，InstallerClean 每次运行时都会在 GitHub 上检查是否有更新版本。 |
+| If ticked, InstallerClean checks github for a newer version when you run it. | 勾选后，InstallerClean 运行时会在 github 上检查是否有更新版本。 |
 | Open the release page to download the newer version, or cancel to keep the current version. | 打开发布页面以下载更新版本，或取消以保留当前版本。 |
-| Apache 2.0 licence | Apache 2.0 许可证 |
 | Opens the licence file on github.com in your browser. | 在浏览器中打开 github.com 上的许可证文件。 |
 | Move location | 移动位置 |
 | Products | 产品 |

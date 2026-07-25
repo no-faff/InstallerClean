@@ -32,7 +32,14 @@ public partial class RecycleUnavailableWindow : Window
         // dialog opens, matching the Confirm dialogs' Title = on-card text.
         // ShowInTaskbar=false and the custom chrome mean the Title is never
         // rendered, so this is announcement-only, not a visible change.
-        Title = BodyText.Text;
+        //
+        // The heading leads it, in the order the card reads. The body is
+        // written as the second half of that sentence and opens on "So", so
+        // announced alone it began mid-thought with nothing to refer back to,
+        // and the one fact the user needs first (the bin is unavailable, which
+        // is why they are being asked at all) went unsaid. Joined with ". " as
+        // MessageWindow joins its caption to its message.
+        Title = Strings.RecycleUnavailable_Heading + ". " + BodyText.Text;
 
         // Sized to content; the clamp stops a very large text scale
         // pushing the card past the work area, at which point the body

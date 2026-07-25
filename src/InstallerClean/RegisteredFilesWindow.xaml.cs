@@ -4,6 +4,7 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Input;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
 using InstallerClean.Models;
@@ -148,8 +149,47 @@ public partial class RegisteredFilesWindow : Window
 
     private void ColumnHeader_Click(object sender, RoutedEventArgs e)
     {
-        if (e.OriginalSource is not GridViewColumnHeader header || header.Column is null)
-            return;
+        if (e.OriginalSource is GridViewColumnHeader header)
+            SortByColumn(header);
+    }
+
+    /// <summary>
+    /// Space and Enter on a focused column header, which WPF does not wire up on
+    /// its own. GridViewColumnHeader.OnClick raises the Click event only for an
+    /// access-key or automation invoke, or while the mouse pointer sits inside
+    /// the header's own bounds (dotnet/wpf, GridViewColumnHeader.cs, guarding on
+    /// <c>IsAccessKeyOrAutomation || !IsMouseOutside()</c>), so ButtonBase's own
+    /// Space and Enter handling reaches OnClick and has its Click dropped there
+    /// with the pointer anywhere else on screen. The framework is consistent
+    /// about it rather than broken: a header is not focusable by default, so it
+    /// has no keyboard path to wire. The app's header style makes it focusable,
+    /// which leaves this the missing half.
+    ///
+    /// Preview, not the bubbling KeyDown: ButtonBase marks both keys handled at
+    /// the header, so a handler on the list would never be called. Focus stays on
+    /// the header afterwards, where the mouse path would have forwarded it to the
+    /// list, because UpdateSortIndicators announces the new sort state by
+    /// renaming the header that has focus.
+    /// </summary>
+    private void ColumnHeader_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key is not (Key.Space or Key.Enter)) return;
+        if (Keyboard.Modifiers != ModifierKeys.None) return;
+        if (e.OriginalSource is not GridViewColumnHeader header) return;
+
+        if (SortByColumn(header))
+            e.Handled = true;
+    }
+
+    /// <summary>
+    /// Sorts by the clicked or activated column, toggling to descending when it
+    /// is already the ascending sort. Returns false for a header with no sortable
+    /// column behind it, which is the filler header WPF generates past the last
+    /// column.
+    /// </summary>
+    private bool SortByColumn(GridViewColumnHeader header)
+    {
+        if (header.Column is null) return false;
 
         string? sortProperty = null;
         if (ReferenceEquals(header.Column, ColProductName)) sortProperty = nameof(ProductRow.ProductName);
@@ -157,7 +197,7 @@ public partial class RegisteredFilesWindow : Window
         else if (ReferenceEquals(header.Column, ColSizeBytes)) sortProperty = nameof(ProductRow.SizeBytes);
         else if (ReferenceEquals(header.Column, ColPatchCount)) sortProperty = nameof(ProductRow.PatchCount);
 
-        if (sortProperty is null) return;
+        if (sortProperty is null) return false;
 
         var direction = sortProperty == _lastSortProperty && _lastSortDirection == ListSortDirection.Ascending
             ? ListSortDirection.Descending
@@ -171,6 +211,7 @@ public partial class RegisteredFilesWindow : Window
         _lastSortDirection = direction;
         _lastSortColumn = header.Column;
         UpdateSortIndicators();
+        return true;
     }
 
     private void UpdateSortIndicators()
@@ -192,8 +233,8 @@ public partial class RegisteredFilesWindow : Window
 
         // The sorted column's header carries the sort state as its
         // accessible name. A name change on the focused element is
-        // announced, so activating a header with Space speaks the new
-        // state, and the name override keeps the sort-arrow glyph
+        // announced, so activating a header with Space or Enter speaks the
+        // new state, and the name override keeps the sort-arrow glyph
         // appended to the visible header text out of speech. ItemStatus on the
         // ListView alone is not enough: it is only surfaced for the
         // element with focus, and during a keyboard sort focus sits on

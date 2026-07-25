@@ -339,32 +339,28 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Bahasa Indonesia |
 | --- | --- |
 | Donate | Donasi |
-| Buy me a cuppa (About window) | Traktir saya secangkir kopi (jendela Tentang) |
+| Buy me a cuppa | Traktir saya secangkir kopi |
 | Cancel operation | Batalkan operasi |
 | Cancel scan | Batalkan pemindaian |
 | Cancel startup scan | Batalkan pemindaian awal |
 | Close | Tutup |
 | Close window | Tutup jendela |
 | Close result and return to main window | Tutup hasil dan kembali ke jendela utama |
-| Leave a star on GitHub (About window) | Beri bintang di GitHub (jendela Tentang) |
+| Leave a star on github | Beri bintang di github |
 | Minimise | Kecilkan |
-| Move all unneeded installer files to the Move location | Pindahkan semua file penginstal yang tidak diperlukan ke lokasi pemindahan |
-| Move all unneeded installer files to the Recycle Bin | Pindahkan semua file penginstal yang tidak diperlukan ke Keranjang Sampah |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Hapus memindahkan file yang tidak diperlukan ke Keranjang Sampah. Batal menutup tanpa menghapus. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Pindahkan menaruh file yang tidak diperlukan di folder tujuan yang dipilih. Batal membiarkannya di tempatnya. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Pilih cara menangani file yang tidak diperlukan: pindahkan ke tempat aman, hapus permanen, atau batalkan. |
 | Move the unneeded files to a folder you choose | Pindahkan file yang tidak diperlukan ke folder pilihan Anda |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Hapus permanen file yang tidak diperlukan karena Keranjang Sampah tidak tersedia untuk drive ini |
-| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | Dikirim ke nofaff.netlify.app. Hanya jumlah dan label. Anda akan melihat data persis yang akan dikirim sebelum mengirim. |
 | Say thanks | Ucapkan terima kasih |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Kirim mengirimkan laporan yang ditampilkan ke No Faff. Batal tidak mengirim apa pun. |
 | Check for updates | Periksa pembaruan |
-| Checks GitHub's releases page over HTTPS for a newer version. | Memeriksa halaman rilis GitHub melalui HTTPS untuk versi yang lebih baru. |
-| Opens the guide (README) on github.com in your browser. | Membuka panduan (README) di github.com melalui peramban Anda. |
+| Checks github's releases page for a newer version. | Memeriksa halaman rilis github untuk mencari versi yang lebih baru. |
+| Opens the readme on github in your browser. | Membuka readme di github melalui peramban Anda. |
 | Opens the issue tracker on github.com in your browser. | Membuka pelacak masalah (Issues) di github.com melalui peramban Anda. |
-| When ticked, InstallerClean checks GitHub for a newer version when you run it. | Jika dicentang, InstallerClean memeriksa GitHub untuk versi yang lebih baru setiap kali Anda menjalankannya. |
+| If ticked, InstallerClean checks github for a newer version when you run it. | Jika dicentang, InstallerClean memeriksa github apakah ada versi yang lebih baru saat Anda menjalankannya. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini. |
-| Apache 2.0 licence | Lisensi Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Membuka file lisensi di github.com melalui peramban Anda. |
 | Move location | Lokasi pemindahan |
 | Products | Produk |

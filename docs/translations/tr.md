@@ -339,32 +339,28 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Türkçe |
 | --- | --- |
 | Donate | Bağış yap |
-| Buy me a cuppa (About window) | Bana bir çay ısmarla (Hakkında penceresi) |
+| Buy me a cuppa | Bana bir çay ısmarla |
 | Cancel operation | İşlemi iptal et |
 | Cancel scan | Taramayı iptal et |
 | Cancel startup scan | Başlangıç taramasını iptal et |
 | Close | Kapat |
 | Close window | Pencereyi kapat |
 | Close result and return to main window | Sonucu kapat ve ana pencereye dön |
-| Leave a star on GitHub (About window) | GitHub'da yıldız bırak (Hakkında penceresi) |
+| Leave a star on github | github'da yıldız bırak |
 | Minimise | Simge durumuna küçült |
-| Move all unneeded installer files to the Move location | Gereksiz tüm yükleyici dosyalarını Taşıma konumuna taşı |
-| Move all unneeded installer files to the Recycle Bin | Gereksiz tüm yükleyici dosyalarını Geri Dönüşüm Kutusu'na taşı |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Sil, gereksiz dosyaları Geri Dönüşüm Kutusu'na taşır. İptal, silmeden kapatır. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Taşı, gereksiz dosyaları seçilen hedef klasöre koyar. İptal, onları olduğu yerde bırakır. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Gereksiz dosyaları nasıl ele alacağınızı seçin: güvenli bir yere taşıyın, kalıcı olarak silin ya da iptal edin. |
 | Move the unneeded files to a folder you choose | Gereksiz dosyaları seçtiğiniz bir klasöre taşı |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Bu sürücü için Geri Dönüşüm Kutusu kullanılamadığından gereksiz dosyaları kalıcı olarak sil |
-| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | nofaff.netlify.app adresine gönderir. Yalnızca sayılar ve etiketler. Göndermeden önce tam olarak ne gönderileceğini göreceksiniz. |
 | Say thanks | Teşekkür etmek için |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Gönder, gösterilen raporu No Faff'a iletir. İptal hiçbir şey göndermez. |
 | Check for updates | Güncellemeleri denetle |
-| Checks GitHub's releases page over HTTPS for a newer version. | Daha yeni bir sürüm için GitHub'ın sürümler sayfasını HTTPS üzerinden denetler. |
-| Opens the guide (README) on github.com in your browser. | github.com üzerindeki kılavuzu (README) tarayıcınızda açar. |
+| Checks github's releases page for a newer version. | github üzerindeki sürümler sayfasında daha yeni bir sürüm olup olmadığını denetler. |
+| Opens the readme on github in your browser. | github üzerindeki readme'yi tarayıcınızda açar. |
 | Opens the issue tracker on github.com in your browser. | github.com üzerindeki sorun izleyiciyi (Issues) tarayıcınızda açar. |
-| When ticked, InstallerClean checks GitHub for a newer version when you run it. | İşaretliyse InstallerClean, her çalıştırdığınızda GitHub'da daha yeni bir sürüm olup olmadığını denetler. |
+| If ticked, InstallerClean checks github for a newer version when you run it. | İşaretliyse InstallerClean, çalıştırdığınızda github üzerinde daha yeni bir sürüm olup olmadığını denetler. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Daha yeni sürümü indirmek için sürüm sayfasını açın ya da geçerli sürümü korumak için iptal edin. |
-| Apache 2.0 licence | Apache 2.0 lisansı |
 | Opens the licence file on github.com in your browser. | github.com üzerindeki lisans dosyasını tarayıcınızda açar. |
 | Move location | Taşıma konumu |
 | Products | Ürünler |

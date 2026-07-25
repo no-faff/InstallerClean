@@ -339,32 +339,28 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 日本語 |
 | --- | --- |
 | Donate | 寄付 |
-| Buy me a cuppa (About window) | 一杯おごる (バージョン情報ウィンドウ) |
+| Buy me a cuppa | 一杯おごる |
 | Cancel operation | 操作をキャンセル |
 | Cancel scan | スキャンをキャンセル |
 | Cancel startup scan | 起動時スキャンをキャンセル |
 | Close | 閉じる |
 | Close window | ウィンドウを閉じる |
 | Close result and return to main window | 結果を閉じてメインウィンドウに戻る |
-| Leave a star on GitHub (About window) | GitHub でスターを付ける (バージョン情報ウィンドウ) |
+| Leave a star on github | github でスターを付ける |
 | Minimise | 最小化 |
-| Move all unneeded installer files to the Move location | 不要なインストーラーファイルをすべて移動先に移動 |
-| Move all unneeded installer files to the Recycle Bin | 不要なインストーラーファイルをすべてごみ箱に移動 |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | 削除を実行すると不要ファイルがごみ箱に移動されます。キャンセルは削除せずに閉じます。 |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 移動を実行すると不要ファイルが選択した移動先フォルダーに移動されます。キャンセルはそのままの場所に残します。 |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | 不要ファイルの処理方法を選択：安全な場所に移動するか、完全に削除するか、キャンセルするか。 |
 | Move the unneeded files to a folder you choose | 不要ファイルを選択したフォルダーに移動 |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | このドライブではごみ箱が利用できないため、不要ファイルを完全に削除 |
-| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | nofaff.netlify.app に投稿します。カウントとラベルのみです。送信前に正確なペイロードを確認できます。 |
 | Say thanks | 謝意を伝える |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 送信を実行すると表示されたレポートが No Faff に投稿されます。キャンセルは何も送信しません。 |
 | Check for updates | 更新の確認 |
-| Checks GitHub's releases page over HTTPS for a newer version. | HTTPS 経由で GitHub のリリースページをチェックし、新しいバージョンがないか確認します。 |
-| Opens the guide (README) on github.com in your browser. | ブラウザで github.com のガイド (README) を開きます。 |
+| Checks github's releases page for a newer version. | github のリリースページで新しいバージョンがあるかどうかを確認します。 |
+| Opens the readme on github in your browser. | ブラウザで github の readme を開きます。 |
 | Opens the issue tracker on github.com in your browser. | ブラウザで github.com の Issue トラッカーを開きます。 |
-| When ticked, InstallerClean checks GitHub for a newer version when you run it. | チェックを入れると、InstallerClean は起動のたびに GitHub で新しいバージョンを確認します。 |
+| If ticked, InstallerClean checks github for a newer version when you run it. | チェックを入れると、InstallerClean は起動時に github で新しいバージョンを確認します。 |
 | Open the release page to download the newer version, or cancel to keep the current version. | リリースページを開いて新しいバージョンをダウンロードするか、キャンセルして現在のバージョンを維持します。 |
-| Apache 2.0 licence | Apache 2.0 ライセンス |
 | Opens the licence file on github.com in your browser. | ブラウザで github.com のライセンスファイルを開きます。 |
 | Move location | 移動先 |
 | Products | 製品 |

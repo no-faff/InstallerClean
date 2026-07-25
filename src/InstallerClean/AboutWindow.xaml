@@ -65,9 +65,31 @@
         <TextBlock Grid.Row="1" Text="{loc:Translate Window.Main.Title}"
                    Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Md}" FontWeight="SemiBold"/>
 
+        <!-- The version sits in a read-only TextBox so it can be selected and
+             copied, and it takes its accessible name from the app-name heading
+             directly above it, so the stop reads as a labelled value the way
+             every metadata row in the detail windows does.
+
+             It needs a name that is NOT its own text, and leaving the name off
+             would not have given it one. A WPF TextBox with no
+             AutomationProperties.Name and no LabeledBy reports its own text as
+             its UIA name: FrameworkElementAutomationPeer.GetNameCore falls
+             through to FrameworkElement.GetPlainText, which TextBox overrides
+             to return Text. A screen reader then says the version twice, once
+             as the name and once as the content it reads for a focused edit
+             control. NVDA is the readable case: it drops the UIA value for
+             anything with navigable text and speaks the caret line instead
+             (speech.py, _objectSpeech_calculateAllowedProps), after the name,
+             the role and the states. This once set the name to the version
+             explicitly, on the belief that an unnamed edit announces its
+             control type first; that call was inert, since it supplied the
+             string WPF was supplying anyway, and taking it away on its own
+             would have changed nothing. Only a name that is not the content
+             fixes it. -->
         <TextBox Grid.Row="3" x:Name="VersionText" HorizontalAlignment="Left"
                  Style="{StaticResource SelectableText}" Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
-                 VerticalAlignment="Center" Margin="-2,0,0,0"/>
+                 VerticalAlignment="Center" Margin="-2,0,0,0"
+                 AutomationProperties.Name="{loc:Translate Window.Main.Title}"/>
 
         <!-- The guide link. Each supported language has its own README file,
              so the target is resolved in code-behind (ReadmeLinks.Home)
@@ -95,7 +117,6 @@
             <Hyperlink NavigateUri="https://github.com/no-faff/InstallerClean/blob/main/LICENSE"
                        Click="Hyperlink_Click"
                        Style="{StaticResource SubtleLink}"
-                       AutomationProperties.Name="{loc:Translate Automation.Licence}"
                        AutomationProperties.HelpText="{loc:Translate Automation.Licence.HelpText}"><Run Text="{loc:Translate Action.Licence}"/></Hyperlink>
         </TextBlock>
 
@@ -124,11 +145,40 @@
                    Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                    AutomationProperties.Name="{loc:Translate Automation.SayThanks}"/>
 
+        <!-- Say-thanks row: the two quiet asks on the left, Close on the right.
+             Two columns rather than one cell holding a left-aligned panel and a
+             right-aligned button: in a single cell neither child reserves width
+             from the other, so once the ask labels are long they simply ran on
+             under Close. German is the worst pair ("Einen Stern auf GitHub
+             hinterlassen" beside "Spendier mir einen Kaffee"), Dutch the next.
+             The window cannot widen to absorb it, its Width being the scaled 500
+             ApplyScaledBounds clamps to the work area, so the asks give way
+             instead: the WrapPanel drops the cuppa onto a second line in the
+             languages that need it and leaves the shorter ones, English among
+             them, on one. The extra line comes out of the star spacer row above,
+             which gives up its slack before the window grows at all.
+
+             Two details the layout depends on. The -12 left bleed sits on the
+             panel, not on the star, so a wrapped second line starts at the same
+             left edge as the first; and the panel's -6 bottom cancels the bottom
+             margin of the last (or only) line, so an unwrapped row is exactly as
+             tall as it was before. Tab order is untouched: a WrapPanel lays out
+             in tree order, so star, cuppa, Close still runs across then down. -->
         <Grid Grid.Row="15">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <!-- Both asks carry their own tooltip as HelpText. Hover text
+                 reaches no screen reader, so the reason for the ask (what a
+                 star is for, that it is thirsty work) was on screen and
+                 nowhere else; the completion overlay's donate heart already
+                 pairs the two this way. Same key, so they cannot drift. -->
+            <WrapPanel Grid.Column="0" Margin="-12,0,0,-6">
                 <Button Style="{StaticResource CompactGhostPill}"
                         Click="StarClick" AutomationProperties.Name="{loc:Translate Automation.LeaveStarOnGitHub.About}"
-                        Margin="-12,0,0,0"
+                        AutomationProperties.HelpText="{loc:Translate Tooltip.LeaveStarOnGitHub.About}"
+                        Margin="0,0,8,6"
                         ToolTipService.InitialShowDelay="0">
                     <Button.ToolTip>
                         <ToolTip Style="{StaticResource AccentTooltip}" Content="{loc:Translate Tooltip.LeaveStarOnGitHub.About}"/>
@@ -142,7 +192,8 @@
                 </Button>
                 <Button Style="{StaticResource CompactGhostPill}"
                         Click="DonateClick" AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa.About}"
-                        Margin="8,0,0,0"
+                        AutomationProperties.HelpText="{loc:Translate Tooltip.BuyMeACuppa.About}"
+                        Margin="0,0,0,6"
                         ToolTipService.InitialShowDelay="0">
                     <Button.ToolTip>
                         <ToolTip Style="{StaticResource AccentTooltip}" Content="{loc:Translate Tooltip.BuyMeACuppa.About}"/>
@@ -154,11 +205,13 @@
                         <AccessText Text="{loc:Translate Action.BuyMeACuppa}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
-            </StackPanel>
-            <Button x:Name="CloseButton" Style="{StaticResource CompactPill}"
+            </WrapPanel>
+            <!-- Bottom, not centred: where the asks take two lines, Close sits
+                 level with the lower one, on the same bottom edge as the rest of
+                 the window's content. On one line the three alignments coincide. -->
+            <Button x:Name="CloseButton" Grid.Column="1" Style="{StaticResource CompactAccentPill}"
                     Content="{loc:Translate Action.Close}" IsCancel="True"
-                    HorizontalAlignment="Right"
-                    AutomationProperties.Name="{loc:Translate Automation.Close}"/>
+                    Margin="{StaticResource GapLeft.Md}" VerticalAlignment="Bottom"/>
         </Grid>
     </Grid>
 </Window>

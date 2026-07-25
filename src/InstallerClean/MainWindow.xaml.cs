@@ -99,7 +99,7 @@ public partial class MainWindow : Window
             // and the focused Re-scan button, so announce the diagnosis too.
             if (!_vm.Scan.HasScanned && _vm.Scan.HasScanError)
                 Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
-                    ScanResultAnnouncer.Text = _vm.Scan.LastScanError);
+                    ScanResultAnnouncer.Text = InstallerPathText.KeepWhole(_vm.Scan.LastScanError));
         }
 
         CompletionDonateToolTip.CustomPopupPlacementCallback = PlaceAboveRightAligned;
@@ -644,7 +644,12 @@ public partial class MainWindow : Window
     /// </summary>
     private void BuildCompletionSummaryLine()
     {
-        var raw = _vm.Completion.Summary;
+        // Bound before the split, not per Run: KeepWhole only ever inserts
+        // between the installer path's own characters, so the destination
+        // search below still finds its substring. A destination cannot be
+        // inside C:\Windows\Installer, MoveFilesService refusing one that
+        // resolves there, so the two can never overlap.
+        var raw = InstallerPathText.KeepWhole(_vm.Completion.Summary);
         var destination = _vm.Completion.SummaryDestination;
         CompletionSummaryText.Inlines.Clear();
 
@@ -686,6 +691,10 @@ public partial class MainWindow : Window
         // on its own line even when the pane had room to carry it up.
         var spaceHint = _vm.Completion.SpaceHint;
         var raw = spaceHint.Length > 0 ? $"{spaceHint} {_vm.Completion.Restore}" : _vm.Completion.Restore;
+        // The post-Move hint names C:\Windows\Installer. Bound before the
+        // split: KeepWhole inserts only between the path's own characters, so
+        // the [ ] pair the split looks for is untouched.
+        raw = InstallerPathText.KeepWhole(raw);
         CompletionRestoreText.Inlines.Clear();
 
         // Where the sentence splits around its [ ]-delimited link is pure string
@@ -775,6 +784,7 @@ public partial class MainWindow : Window
         ("es", "Español"),
         ("fr", "Français"),
         ("it", "Italiano"),
+        ("nl", "Nederlands"),
         ("pl", "Polski"),
         ("pt-BR", "Português (BR)"),
         ("vi", "Tiếng Việt"),

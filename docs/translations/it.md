@@ -339,32 +339,28 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Italiano |
 | --- | --- |
 | Donate | Dona |
-| Buy me a cuppa (About window) | Offrimi un caffè (finestra Informazioni) |
+| Buy me a cuppa | Offrimi un caffè |
 | Cancel operation | Annulla operazione |
 | Cancel scan | Annulla scansione |
 | Cancel startup scan | Annulla scansione all'avvio |
 | Close | Chiudi |
 | Close window | Chiudi finestra |
 | Close result and return to main window | Chiudi finestra risultato e torna alla finestra principale |
-| Leave a star on GitHub (About window) | Lascia una stella su GitHub (finestra Informazioni) |
+| Leave a star on github | Lascia una stella su github |
 | Minimise | Riduci a icona |
-| Move all unneeded installer files to the Move location | Sposta tutti i file di installazione non necessari nella destinazione spostamento |
-| Move all unneeded installer files to the Recycle Bin | Sposta tutti i file di installazione non necessari nel Cestino |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Elimina sposta i file non necessari nel Cestino. Annulla chiude senza eliminare. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 'Sposta' colloca i file non necessari nella cartella destinazione scelta. 'Annulla' li lascia dove sono. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Scegli come gestire i file non necessari: spostarli in un luogo sicuro, eliminarli definitivamente o annullare. |
 | Move the unneeded files to a folder you choose | Sposta i file non necessari in una specifica cartella |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Elimina definitivamente i file non necessari perché per questa unità il Cestino non è disponibile |
-| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | Invia a nofaff.netlify.app. vengono inviati solo conteggi ed etichette. Prima dell'invio vedrai esattamente cosa viene inviato. |
 | Say thanks | Per ringraziarmi |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 'Invia' trasmette a No Faff il rapporto mostrato. Annulla non invia nulla. |
 | Check for updates | Controlla aggiornamenti |
-| Checks GitHub's releases page over HTTPS for a newer version. | Verifica sulla pagina delle release di GitHub, via HTTPS, se è disponibile una versione più recente. |
-| Opens the guide (README) on github.com in your browser. | Apre guida (README) in github.com nel browser. |
+| Checks github's releases page for a newer version. | Verifica in pagina release di github se esiste una versione più recente. |
+| Opens the readme on github in your browser. | Apre readme in github nel browser. |
 | Opens the issue tracker on github.com in your browser. | Apre elenco problemi (issue) in github.com nel browser. |
-| When ticked, InstallerClean checks GitHub for a newer version when you run it. | Se selezionata, InstallerClean verifica su GitHub se è disponibile una versione più recente a ogni avvio. |
+| If ticked, InstallerClean checks github for a newer version when you run it. | Se selezionata, InstallerClean verifica in github se è disponibile una versione più recente all'avvio. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Apri pagina release per scaricare la versione più recente, o scegli 'Annulla' per mantenere quella attuale. |
-| Apache 2.0 licence | Licenza Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Apre file licenza in github.com nel browser. |
 | Move location | Destinazione spostamento |
 | Products | Prodotti |

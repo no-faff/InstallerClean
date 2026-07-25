@@ -168,20 +168,20 @@
 
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>寄付</value></data>
-  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>一杯おごる (バージョン情報ウィンドウ)</value></data>
+  <!-- The About window's own star and cuppa buttons. The .About suffix on the
+       key survives from a footer pair that no longer exists; it is the key
+       name only, and the value says what the button says on screen, because a
+       window name in the spoken one was an internal note being read out to
+       somebody who can only be in that window to hear it. -->
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>一杯おごる</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>操作をキャンセル</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>スキャンをキャンセル</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>起動時スキャンをキャンセル</value></data>
   <data name="Automation.Close" xml:space="preserve"><value>閉じる</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>ウィンドウを閉じる</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>結果を閉じてメインウィンドウに戻る</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>GitHub でスターを付ける (バージョン情報ウィンドウ)</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>github でスターを付ける</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>最小化</value></data>
-  <!-- Names the destination the way the Move button's own tooltip does
-       (Tooltip.Move), so the spoken help and the hover text agree on what
-       the folder is called. -->
-  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>不要なインストーラーファイルをすべて移動先に移動</value></data>
-  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>不要なインストーラーファイルをすべてごみ箱に移動</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
        straight after "Cancel, button": the window-level alternative is
@@ -192,29 +192,50 @@
   <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>不要ファイルの処理方法を選択：安全な場所に移動するか、完全に削除するか、キャンセルするか。</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>不要ファイルを選択したフォルダーに移動</value></data>
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>このドライブではごみ箱が利用できないため、不要ファイルを完全に削除</value></data>
-  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>nofaff.netlify.app に投稿します。カウントとラベルのみです。送信前に正確なペイロードを確認できます。</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>謝意を伝える</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>送信を実行すると表示されたレポートが No Faff に投稿されます。キャンセルは何も送信しません。</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>更新の確認</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>HTTPS 経由で GitHub のリリースページをチェックし、新しいバージョンがないか確認します。</value></data>
+  <!-- Heard, never read: the update button carries no tooltip, so this help
+       text is the only description it has, and it is written for a speech
+       engine rather than for a page.
+
+       It names the destination on purpose. The standing question about this
+       app is whether it is safe to run, and somebody who can only hear it has
+       the same claim on knowing where it looks as a reader of the README has.
+       The protocol is left out because a sighted user is never told that
+       either.
+
+       Lower case is deliberate, here and in Automation.About.Guide.HelpText
+       and Automation.AutoUpdateCheck.HelpText below it. A speech
+       engine splits a token at an internal capital and reads the halves as
+       separate words, and spells a short all-caps token out letter by letter
+       (eSpeak NG does both: translate.c's CamelCase branch and
+       translateword.c's abbreviation branch). "GitHub" has been heard split
+       that way by Narrator, on this very string. Lower case triggers
+       neither, and none of it is on screen, so the spelling costs nothing. -->
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>github のリリースページで新しいバージョンがあるかどうかを確認します。</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
-    <value>ブラウザで github.com のガイド (README) を開きます。</value>
-    <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
+    <value>ブラウザで github の readme を開きます。</value>
+    <comment>Screen-reader help on the About window's "Guide and FAQ" link.
+    Names the document rather than repeating the link's own label, so the
+    description adds what the name has not already said. Cased for speech for
+    the reason Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
     <value>ブラウザで github.com の Issue トラッカーを開きます。</value>
     <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
   </data>
   <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
-    <value>チェックを入れると、InstallerClean は起動のたびに GitHub で新しいバージョンを確認します。</value>
-    <comment>Screen-reader help on the About window's auto-update checkbox.</comment>
+    <value>チェックを入れると、InstallerClean は起動時に github で新しいバージョンを確認します。</value>
+    <comment>Screen-reader help on the About window's auto-update checkbox.
+    Names the destination and is cased for speech for the reasons
+    Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <!-- Window-level description for the update-available modal, read by a
        screen reader on open, mirroring the RecycleUnavailable and
        ConfirmSendResultLog windows. The version numbers are in the body
        text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>リリースページを開いて新しいバージョンをダウンロードするか、キャンセルして現在のバージョンを維持します。</value></data>
-  <data name="Automation.Licence" xml:space="preserve"><value>Apache 2.0 ライセンス</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>ブラウザで github.com のライセンスファイルを開きます。</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT

@@ -339,32 +339,28 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Polski |
 | --- | --- |
 | Donate | Wesprzyj |
-| Buy me a cuppa (About window) | Postaw mi kawę (okno O programie) |
+| Buy me a cuppa | Postaw mi kawę |
 | Cancel operation | Anuluj operację |
 | Cancel scan | Anuluj skanowanie |
 | Cancel startup scan | Anuluj skanowanie startowe |
 | Close | Zamknij |
 | Close window | Zamknij okno |
 | Close result and return to main window | Zamknij wynik i wróć do okna głównego |
-| Leave a star on GitHub (About window) | Zostaw gwiazdkę na GitHubie (okno O programie) |
+| Leave a star on github | Zostaw gwiazdkę na githubie |
 | Minimise | Minimalizuj |
-| Move all unneeded installer files to the Move location | Przenieś wszystkie niepotrzebne pliki instalatora do lokalizacji przenoszenia |
-| Move all unneeded installer files to the Recycle Bin | Przenieś wszystkie niepotrzebne pliki instalatora do Kosza |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Usuń przenosi niepotrzebne pliki do Kosza. Anuluj zamyka okno bez usuwania. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Przenieś umieszcza niepotrzebne pliki w wybranym folderze docelowym. Anuluj zostawia je na miejscu. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Wybierz, co zrobić z niepotrzebnymi plikami: przenieść je w bezpieczne miejsce, usunąć trwale lub anulować. |
 | Move the unneeded files to a folder you choose | Przenieś niepotrzebne pliki do wybranego folderu |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Usuń niepotrzebne pliki trwale, ponieważ Kosz jest niedostępny dla tego dysku |
-| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | Wysyłane do nofaff.netlify.app. Tylko liczniki i etykiety. Przed wysłaniem zobaczysz dokładną treść. |
 | Say thanks | Podziękuj |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Wyślij przekazuje pokazany raport do No Faff. Anuluj nie wysyła niczego. |
 | Check for updates | Sprawdź aktualizacje |
-| Checks GitHub's releases page over HTTPS for a newer version. | Sprawdza na stronie wydań GitHuba przez HTTPS, czy jest nowsza wersja. |
-| Opens the guide (README) on github.com in your browser. | Otwiera przewodnik (README) na github.com w twojej przeglądarce. |
+| Checks github's releases page for a newer version. | Sprawdza na stronie wydań github, czy jest nowsza wersja. |
+| Opens the readme on github in your browser. | Otwiera readme na github w twojej przeglądarce. |
 | Opens the issue tracker on github.com in your browser. | Otwiera listę zgłoszeń (Issues) na github.com w twojej przeglądarce. |
-| When ticked, InstallerClean checks GitHub for a newer version when you run it. | Gdy zaznaczone, InstallerClean sprawdza na GitHubie przy każdym uruchomieniu, czy jest nowsza wersja. |
+| If ticked, InstallerClean checks github for a newer version when you run it. | Jeśli zaznaczone, InstallerClean przy uruchomieniu sprawdza na github, czy jest nowsza wersja. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Otwórz stronę wydania, aby pobrać nowszą wersję, lub anuluj, aby zachować bieżącą. |
-| Apache 2.0 licence | Licencja Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Otwiera plik licencji na github.com w twojej przeglądarce. |
 | Move location | Lokalizacja przenoszenia |
 | Products | Produkty |

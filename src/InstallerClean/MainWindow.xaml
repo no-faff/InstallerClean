@@ -21,6 +21,7 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <a11y:InstallerPathTextConverter x:Key="KeepInstallerPathWhole"/>
     </Window.Resources>
 
     <Grid x:Name="RootLayout">
@@ -149,9 +150,14 @@
                     <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Heading}"
                                FontSize="{DynamicResource Type.Heading.Sm}" Margin="{StaticResource GapBottom.Sm}"
                                Text="{Binding IntroLead}"/>
+                    <!-- The converter binds C:\Windows\Installer together so it
+                         cannot wrap mid-path; the line names the folder in
+                         three of its four states. The collapse trigger below
+                         reads the view-model value, not the converted one, so
+                         its empty test is unaffected. -->
                     <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Muted}"
                                FontSize="{DynamicResource Type.Body}" Margin="{StaticResource GapBottom.Sm}"
-                               Text="{Binding IntroDetail}">
+                               Text="{Binding IntroDetail, Converter={StaticResource KeepInstallerPathWhole}}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Visible"/>
@@ -405,18 +411,28 @@
                      Done pill and the confirm dialogs, which put their own
                      accent action rightmost, line up with Delete as the
                      default action. -->
+                <!-- Each button's help text is its own tooltip, not a second
+                     sentence written alongside it. Two sources for one
+                     explanation drift: they did, the pair here having grown
+                     apart into a screen saying one thing and a screen reader
+                     another. One value feeding both cannot, which is the same
+                     reasoning the move-destination box's placeholder carries
+                     above. Move's is the view-model property because its
+                     tooltip has two states, and the state a screen reader
+                     needs most is the one that warns a folder browser opens
+                     first. -->
                 <DockPanel Grid.Row="4" KeyboardNavigation.TabNavigation="Local">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
                             KeyboardNavigation.TabIndex="0"
                             Content="{loc:Translate Action.Delete}" Command="{Binding Cleanup.DeleteAllCommand}"
-                            AutomationProperties.HelpText="{loc:Translate Automation.DeleteAllFiles}"
+                            AutomationProperties.HelpText="{loc:Translate Tooltip.Delete}"
                             ToolTip="{loc:Translate Tooltip.Delete}"
                             ToolTipService.ShowOnDisabled="True"/>
 
                     <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
                             KeyboardNavigation.TabIndex="1"
                             Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
-                            AutomationProperties.HelpText="{loc:Translate Automation.MoveAllFiles}"
+                            AutomationProperties.HelpText="{Binding Cleanup.MoveButtonTooltip}"
                             ToolTip="{Binding Cleanup.MoveButtonTooltip}"
                             ToolTipService.ShowOnDisabled="True"
                             Margin="{StaticResource GapRight.Sm}"/>
@@ -444,9 +460,13 @@
         <DockPanel Grid.Row="2" LastChildFill="False" Margin="4,8,24,8"
                    KeyboardNavigation.TabNavigation="Local"
                    IsEnabled="{Binding IsMainContentInteractive}">
+            <!-- Help text matches the completion overlay's "Scan again", which
+                 runs the same command: the two are one action with two labels,
+                 so an explanation on only one of them is drift. -->
             <Button x:Name="RescanButton" DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     KeyboardNavigation.TabIndex="0"
-                    Content="{loc:Translate Action.Rescan}" Command="{Binding Scan.ScanCommand}"/>
+                    Content="{loc:Translate Action.Rescan}" Command="{Binding Scan.ScanCommand}"
+                    AutomationProperties.HelpText="{loc:Translate Automation.RescanInstaller}"/>
             <Button DockPanel.Dock="Left" Style="{StaticResource GhostPill}"
                     KeyboardNavigation.TabIndex="1"
                     Content="{loc:Translate Action.About}" Command="{Binding Chrome.ShowAboutCommand}" Margin="4,0,0,0"/>
@@ -476,16 +496,14 @@
                  against. TabIndex 4 puts it last in the bar's reading order,
                  after the status hyperlink at 3, rather than at its
                  declaration position. -->
-            <Button DockPanel.Dock="Right" Style="{StaticResource GhostPill}"
+            <Button DockPanel.Dock="Right" Style="{StaticResource SmallGhostPill}"
                     x:Name="LanguageButton"
                     KeyboardNavigation.TabIndex="4"
                     Click="LanguageButton_Click"
                     AutomationProperties.Name="{loc:Translate Automation.ChangeLanguage}"
                     AutomationProperties.HelpText="{loc:Translate Automation.ChangeLanguage.HelpText}"
-                    FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                     ToolTipService.InitialShowDelay="0"
-                    ToolTip="{loc:Translate Tooltip.ChangeLanguage}"
-                    Padding="6,0" MinHeight="28">
+                    ToolTip="{loc:Translate Tooltip.ChangeLanguage}">
                 <Path Data="M2 12 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0 M12 2 a4.2 10 0 1 0 0 20 a4.2 10 0 1 0 0 -20 M2 12 h20"
                       Stroke="{StaticResource Text.Muted}" StrokeThickness="2" Fill="{x:Null}"
                       Width="18" Height="18" Stretch="Uniform"/>
@@ -962,7 +980,7 @@
                             Margin="{StaticResource GapBottom.Sm}"
                             FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             ToolTip="{Binding Completion.SendResultLogTooltip}"
-                            AutomationProperties.HelpText="{loc:Translate Automation.SendResultLog.HelpText}"/>
+                            AutomationProperties.HelpText="{Binding Completion.SendResultLogTooltip}"/>
 
                     <!-- Result-log status line. Shows "Sending..." while
                          the POST is in flight, "Thanks!" after a success,
@@ -1020,12 +1038,10 @@
                          why the same sentence is also the HelpText; the Name
                          says what the control does and the HelpText carries
                          the ask. -->
-                    <Button Grid.Row="0" Grid.RowSpan="7" Style="{StaticResource GhostPill}"
+                    <Button Grid.Row="0" Grid.RowSpan="7" Style="{StaticResource SmallGhostPill}"
                             HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                            Padding="6,0" MinHeight="28"
                             Visibility="{Binding Completion.ShowDonate, Converter={StaticResource BoolToVis}}"
                             Command="{Binding Chrome.DonateCommand}"
-                            FocusVisualStyle="{StaticResource SmallPillFocusVisual}"
                             ToolTipService.InitialShowDelay="0"
                             AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa}"
                             AutomationProperties.HelpText="{loc:Translate Completion.DonateAsk}">

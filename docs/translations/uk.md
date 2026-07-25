@@ -339,32 +339,28 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Українська |
 | --- | --- |
 | Donate | Підтримати |
-| Buy me a cuppa (About window) | Пригостіть мене кавою (вікно «Про програму») |
+| Buy me a cuppa | Пригостіть мене кавою |
 | Cancel operation | Скасувати операцію |
 | Cancel scan | Скасувати сканування |
 | Cancel startup scan | Скасувати сканування під час запуску |
 | Close | Закрити |
 | Close window | Закрити вікно |
 | Close result and return to main window | Закрити результат і повернутися до головного вікна |
-| Leave a star on GitHub (About window) | Лишити зірку на GitHub (вікно «Про програму») |
+| Leave a star on github | Лишити зірку на github |
 | Minimise | Згорнути |
-| Move all unneeded installer files to the Move location | Перемістити всі непотрібні файли інсталятора до вказаного розташування |
-| Move all unneeded installer files to the Recycle Bin | Перемістити всі непотрібні файли інсталятора до Кошика |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | «Видалити» переміщує непотрібні файли до Кошика. «Скасувати» закриває вікно без видалення. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | «Перемістити» кладе непотрібні файли до обраної папки призначення. «Скасувати» лишає їх там, де вони є. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Виберіть, що робити з непотрібними файлами: перемістити їх у безпечне місце, видалити назавжди або скасувати. |
 | Move the unneeded files to a folder you choose | Перемістити непотрібні файли до обраної вами папки |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Видалити непотрібні файли назавжди, бо Кошик недоступний для цього диска |
-| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | Надсилається на nofaff.netlify.app. Лише лічильники та позначки. Ви побачите точний вміст перед надсиланням. |
 | Say thanks | Подякувати |
 | Send posts the report shown to No Faff. Cancel sends nothing. | «Надіслати» надсилає показаний звіт до No Faff. «Скасувати» не надсилає нічого. |
 | Check for updates | Перевірити оновлення |
-| Checks GitHub's releases page over HTTPS for a newer version. | Перевіряє сторінку випусків GitHub через HTTPS на наявність новішої версії. |
-| Opens the guide (README) on github.com in your browser. | Відкриває посібник (README) на github.com у вашому браузері. |
+| Checks github's releases page for a newer version. | Перевіряє на сторінці випусків github, чи є новіша версія. |
+| Opens the readme on github in your browser. | Відкриває readme на github у вашому браузері. |
 | Opens the issue tracker on github.com in your browser. | Відкриває список проблем (Issues) на github.com у вашому браузері. |
-| When ticked, InstallerClean checks GitHub for a newer version when you run it. | Якщо позначено, InstallerClean під час кожного запуску перевіряє на GitHub наявність новішої версії. |
+| If ticked, InstallerClean checks github for a newer version when you run it. | Якщо позначено, InstallerClean під час запуску перевіряє на github наявність новішої версії. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Відкрийте сторінку випуску, щоб завантажити новішу версію, або скасуйте, щоб лишити поточну версію. |
-| Apache 2.0 licence | Ліцензія Apache 2.0 |
 | Opens the licence file on github.com in your browser. | Відкриває файл ліцензії на github.com у вашому браузері. |
 | Move location | Куди перемістити |
 | Products | Продукти |

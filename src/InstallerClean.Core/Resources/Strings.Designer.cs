@@ -81,12 +81,9 @@ public static class Strings
     public static string Automation_ConfirmDelete => Get("Automation.ConfirmDelete");
     public static string Automation_ConfirmMove => Get("Automation.ConfirmMove");
     public static string Automation_ConfirmSendResultLog => Get("Automation.ConfirmSendResultLog");
-    public static string Automation_DeleteAllFiles => Get("Automation.DeleteAllFiles");
     public static string Automation_LeaveStarOnGitHub_About => Get("Automation.LeaveStarOnGitHub.About");
-    public static string Automation_Licence => Get("Automation.Licence");
     public static string Automation_Licence_HelpText => Get("Automation.Licence.HelpText");
     public static string Automation_Minimise => Get("Automation.Minimise");
-    public static string Automation_MoveAllFiles => Get("Automation.MoveAllFiles");
     public static string Automation_MoveDestinationFolder => Get("Automation.MoveDestinationFolder");
     public static string Automation_OperationProgress => Get("Automation.OperationProgress");
     public static string Automation_RecycleUnavailable => Get("Automation.RecycleUnavailable");
@@ -106,7 +103,6 @@ public static class Strings
     public static string Automation_Section_Patches => Get("Automation.Section.Patches");
     public static string Automation_Section_ProductDetails => Get("Automation.Section.ProductDetails");
     public static string Automation_Section_Products => Get("Automation.Section.Products");
-    public static string Automation_SendResultLog_HelpText => Get("Automation.SendResultLog.HelpText");
     public static string Automation_SortStatus_Ascending => Get("Automation.SortStatus.Ascending");
     public static string Automation_SortStatus_Descending => Get("Automation.SortStatus.Descending");
     public static string Automation_StartupScanProgress => Get("Automation.StartupScanProgress");

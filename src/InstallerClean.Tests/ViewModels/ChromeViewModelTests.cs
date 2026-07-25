@@ -220,6 +220,30 @@ public class ChromeViewModelTests
         _windowService.DidNotReceive().OpenUrl(Arg.Any<string>());
     }
 
+    /// <summary>
+    /// The CanExecute coupling is what keeps the hidden status hyperlink out
+    /// of the main window's Tab order while there is no update (the why is on
+    /// OpenUpdatePage itself), and the CanExecuteChanged raise is how the
+    /// hyperlink learns to re-query it, so both are contract rather than
+    /// convenience.
+    /// </summary>
+    [Fact]
+    public async Task OpenUpdatePage_cannot_execute_until_a_check_has_found_one()
+    {
+        _updateCheckService.CheckAsync(Arg.Any<UpdateCheckOrigin>(), Arg.Any<CancellationToken>())
+            .Returns(new UpdateAvailable("2.1.0", "9.9.9"));
+        var vm = CreateViewModel();
+        var raised = 0;
+        vm.OpenUpdatePageCommand.CanExecuteChanged += (_, _) => raised++;
+
+        Assert.False(vm.OpenUpdatePageCommand.CanExecute(null));
+
+        await vm.RunAutomaticUpdateCheckAsync();
+
+        Assert.True(vm.OpenUpdatePageCommand.CanExecute(null));
+        Assert.True(raised > 0);
+    }
+
     [Fact]
     public async Task OpenUpdatePage_opens_the_releases_page_after_the_automatic_check()
     {

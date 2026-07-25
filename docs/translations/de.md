@@ -339,32 +339,28 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Deutsch |
 | --- | --- |
 | Donate | Spenden |
-| Buy me a cuppa (About window) | Spendier mir einen Kaffee (Fenster Über) |
+| Buy me a cuppa | Spendier mir einen Kaffee |
 | Cancel operation | Vorgang abbrechen |
 | Cancel scan | Scan abbrechen |
 | Cancel startup scan | Start-Scan abbrechen |
 | Close | Schließen |
 | Close window | Fenster schließen |
 | Close result and return to main window | Ergebnis schließen und zum Hauptfenster zurückkehren |
-| Leave a star on GitHub (About window) | Einen Stern auf GitHub hinterlassen (Fenster Über) |
+| Leave a star on github | Einen Stern auf github hinterlassen |
 | Minimise | Minimieren |
-| Move all unneeded installer files to the Move location | Alle nicht benötigten Installer-Dateien an den Zielort verschieben |
-| Move all unneeded installer files to the Recycle Bin | Alle nicht benötigten Installer-Dateien in den Papierkorb verschieben |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Löschen verschiebt die nicht benötigten Dateien in den Papierkorb. Abbrechen schließt, ohne zu löschen. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Verschieben legt die nicht benötigten Dateien in den gewählten Zielordner. Abbrechen lässt sie, wo sie sind. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Wähle, wie mit den nicht benötigten Dateien verfahren werden soll: an einen sicheren Ort verschieben, endgültig löschen oder abbrechen. |
 | Move the unneeded files to a folder you choose | Die nicht benötigten Dateien in einen von dir gewählten Ordner verschieben |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Die nicht benötigten Dateien endgültig löschen, weil der Papierkorb für dieses Laufwerk nicht verfügbar ist |
-| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | Sendet an nofaff.netlify.app. Nur Zählwerte und Bezeichnungen. Du siehst die genauen Daten vor dem Senden. |
 | Say thanks | Danke sagen |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Senden übermittelt den angezeigten Bericht an No Faff. Abbrechen sendet nichts. |
 | Check for updates | Nach Updates suchen |
-| Checks GitHub's releases page over HTTPS for a newer version. | Prüft die GitHub-Releases-Seite über HTTPS auf eine neuere Version. |
-| Opens the guide (README) on github.com in your browser. | Öffnet die Anleitung (README) auf github.com in deinem Browser. |
+| Checks github's releases page for a newer version. | Sucht auf der Release-Seite von github nach einer neueren Version. |
+| Opens the readme on github in your browser. | Öffnet das readme auf github in deinem Browser. |
 | Opens the issue tracker on github.com in your browser. | Öffnet den Issue-Tracker auf github.com in deinem Browser. |
-| When ticked, InstallerClean checks GitHub for a newer version when you run it. | Wenn aktiviert, sucht InstallerClean bei jedem Start auf GitHub nach einer neueren Version. |
+| If ticked, InstallerClean checks github for a newer version when you run it. | Wenn aktiviert, sucht InstallerClean beim Start auf github nach einer neueren Version. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Öffne die Release-Seite, um die neuere Version herunterzuladen, oder brich ab, um die aktuelle Version zu behalten. |
-| Apache 2.0 licence | Apache-2.0-Lizenz |
 | Opens the licence file on github.com in your browser. | Öffnet die Lizenzdatei auf github.com in deinem Browser. |
 | Move location | Zielort |
 | Products | Produkte |

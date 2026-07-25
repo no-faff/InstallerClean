@@ -14,7 +14,7 @@
     Naming: <category>.<role>[.<state>].
         Surface.*, Text.*, Action.<intent>.<state>, Status.*,
         Decoration.*, Link.*, Scrollbar.*, Type.*,
-        Radius.*, StrokeThickness.*, BorderThickness.*, Margin.*,
+        Radius.*, BorderThickness.*, Margin.*,
         Padding.*, Gap.*, GapBottom.*, GapTop.*, GapRight.*,
         GapLeft.*, GapX.*.
 -->
@@ -161,17 +161,31 @@
     <CornerRadius x:Key="Radius.CompactPillFocus">17</CornerRadius>
     <CornerRadius x:Key="Radius.SmallPillFocus">16</CornerRadius>
 
-    <!-- Line thickness. Each token's category names the property it may
-         satisfy: StrokeThickness.* for the scalar properties
-         (Shape.StrokeThickness), BorderThickness.* for the ones taking a
-         Thickness struct (Border.BorderThickness,
-         Control.BorderThickness). The split is not stylistic. XAML
-         resource lookups don't run the ThicknessConverter, so a Double
-         resource cannot satisfy a Thickness setter; the mismatched key
-         raises a XamlParseException the first time the consuming
-         template is realised at runtime. Hairline exists as both types
-         because both kinds of property want a 1px line. -->
-    <sys:Double x:Key="StrokeThickness.Hairline">1</sys:Double>
+    <!-- Scrollbar end-insets for a bar living flush against the edge of a
+         Radius.Pill card (the Details list panes). Derived geometry like
+         the focus radii above: each end inset equals Radius.Pill, so the
+         thumb's travel ends where the corner curve begins and the thumb
+         stays on the straight run of the edge. Without the inset the
+         thumb at either end of travel sits in the corner zone: a rounded
+         Border paints only inside its curve while ClipToBounds clips at
+         the rectangular layout bounds, so the thumb lands inside the
+         rectangle but outside the pane, drawn on the window background.
+         Thickness twins of a CornerRadius value because a resource
+         lookup runs no TypeConverter (the line-thickness note below);
+         ScrollBarCardInsetTests holds both equal to Radius.Pill. -->
+    <Thickness x:Key="Padding.ScrollBarCardEnds">0,20,0,20</Thickness>
+    <Thickness x:Key="Padding.ScrollBarCardEndsHorizontal">20,0,20,0</Thickness>
+
+    <!-- Line thickness. BorderThickness.* satisfies the properties taking
+         a Thickness struct (Border.BorderThickness,
+         Control.BorderThickness). The scalar Shape.StrokeThickness
+         cannot share these, and the split is not stylistic: XAML
+         resource lookups don't run the ThicknessConverter, so a
+         Thickness resource cannot satisfy a Double property; the
+         mismatched key raises a XamlParseException the first time the
+         consuming template is realised at runtime. A Shape consumer
+         therefore needs a parallel sys:Double StrokeThickness.<role>
+         token; none exists while nothing consumes one. -->
     <Thickness x:Key="BorderThickness.Hairline">1</Thickness>
     <!-- The focus ring's weight, and the only thing drawn at 2: a border
          a reader means to be ordinary is Hairline. -->

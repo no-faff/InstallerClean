@@ -68,9 +68,38 @@
                           BorderThickness="0" Background="Transparent"
                           Padding="0" Margin="0,-1,0,-6"
                           GridViewColumnHeader.Click="ColumnHeader_Click"
+                          PreviewKeyDown="ColumnHeader_PreviewKeyDown"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto"
                           VirtualizingStackPanel.IsVirtualizing="True"
                           VirtualizingStackPanel.VirtualizationMode="Recycling">
+                    <ListView.Resources>
+                        <!-- The card's scrollbars, kept clear of the corner
+                             curves (CardScrollBar) and unbled: the margins
+                             mirror the 0,-1,0,-6 bleed above so the end
+                             insets measure from the true card edge, and the
+                             horizontal bar, which appears when the
+                             text-scaled columns outgrow the pane, sits whole
+                             on the bottom edge instead of 6px into the clip.
+                             The Orphaned and Registered lists share these
+                             values as a pair, like the bleed itself;
+                             ScrollBarCardInsetTests holds margin and bleed
+                             in step. -->
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource CardScrollBar}">
+                            <Setter Property="Margin" Value="0,1,0,6"/>
+                            <Style.Triggers>
+                                <Trigger Property="Orientation" Value="Horizontal">
+                                    <Setter Property="Margin" Value="0,0,0,6"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                        <!-- The corner Rectangle between two visible bars
+                             fills with this system brush in the stock
+                             ScrollViewer template; left alone it paints
+                             light grey over the card's bottom-right corner
+                             zone. Transparent keeps the corner cell
+                             invisible. -->
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
+                    </ListView.Resources>
                     <!-- Spoken row name from the visible cells. Without the
                          override, the item automation peer falls back to the
                          bound record's generated ToString and a screen reader
@@ -97,7 +126,10 @@
                                  default window no scrollbar shows.
                                  Installer-cache names are short random hex
                                  (8.3 style), so 270 shows them whole. -->
-                            <GridViewColumn Header="{loc:Translate Field.File}" Width="{a11y:TextScaled 270}"
+                            <!-- File gives 20 to Size, which needs it for the sort
+                                 arrow: the file names here are all of the form
+                                 157a6ea.msi and never approach 250. -->
+                            <GridViewColumn Header="{loc:Translate Field.File}" Width="{a11y:TextScaled 250}"
                                             x:Name="ColFileName">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
@@ -133,7 +165,15 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="{loc:Translate Field.Size}" Width="{a11y:TextScaled 90}"
+                            <!-- 110, not 90. UpdateSortIndicators appends two spaces
+                                 and an arrow to the sorted header, and the header
+                                 template spends 16 on padding, so the widest
+                                 translation ("Dimensione", 84 at Type.Caption in
+                                 Poppins Medium) overflowed 90 and dropped its arrow
+                                 entirely in Italian, clipping it in Vietnamese. Any
+                                 column can be sorted, so a header must fit its own
+                                 width plus that suffix in every language. -->
+                            <GridViewColumn Header="{loc:Translate Field.Size}" Width="{a11y:TextScaled 110}"
                                             x:Name="ColSize"
                                             HeaderContainerStyle="{StaticResource NumericColumnHeader}">
                                 <GridViewColumn.CellTemplate>
@@ -211,10 +251,17 @@
                             <TextBlock Grid.Row="10" Grid.Column="0" Text="{loc:Translate Field.Keywords}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
                             <TextBox Grid.Row="10" Grid.Column="2" Text="{Binding SelectedDetails.Keywords, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                      AutomationProperties.Name="{loc:Translate Field.Keywords}"/>
+                            <!-- The caveat on the label (a subject name, not a
+                                 verified chain) is hover text, so it reaches no
+                                 screen reader. The value box carries it as help
+                                 text from the same key: this is the one metadata
+                                 row where the value can be read for more than it
+                                 says. -->
                             <TextBlock Grid.Row="12" Grid.Column="0" Text="{loc:Translate Field.SigningCertificate}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"
                                        ToolTip="{loc:Translate Tooltip.SigningCertificate}"/>
                             <TextBox Grid.Row="12" Grid.Column="2" Text="{Binding SelectedDetails.DigitalSignature, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
-                                     AutomationProperties.Name="{loc:Translate Field.SigningCertificate}"/>
+                                     AutomationProperties.Name="{loc:Translate Field.SigningCertificate}"
+                                     AutomationProperties.HelpText="{loc:Translate Tooltip.SigningCertificate}"/>
                             <TextBlock Grid.Row="14" Grid.Column="0" Text="{loc:Translate Field.FileSize}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
                             <TextBox Grid.Row="14" Grid.Column="2" Text="{Binding SelectedFile.SizeDisplay, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                      AutomationProperties.Name="{loc:Translate Field.FileSize}"/>
@@ -230,7 +277,7 @@
         <DockPanel Grid.Row="3" LastChildFill="False">
             <TextBlock DockPanel.Dock="Left" Text="{Binding Summary}"
                        Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}" VerticalAlignment="Center"/>
-            <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
+            <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
                     Content="{loc:Translate Action.Close}" IsCancel="True"/>
         </DockPanel>
     </Grid>

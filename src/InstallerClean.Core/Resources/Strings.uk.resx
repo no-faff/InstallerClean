@@ -168,20 +168,20 @@
 
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Підтримати</value></data>
-  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Пригостіть мене кавою (вікно «Про програму»)</value></data>
+  <!-- The About window's own star and cuppa buttons. The .About suffix on the
+       key survives from a footer pair that no longer exists; it is the key
+       name only, and the value says what the button says on screen, because a
+       window name in the spoken one was an internal note being read out to
+       somebody who can only be in that window to hear it. -->
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Пригостіть мене кавою</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Скасувати операцію</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Скасувати сканування</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Скасувати сканування під час запуску</value></data>
   <data name="Automation.Close" xml:space="preserve"><value>Закрити</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Закрити вікно</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Закрити результат і повернутися до головного вікна</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Лишити зірку на GitHub (вікно «Про програму»)</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Лишити зірку на github</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Згорнути</value></data>
-  <!-- Names the destination the way the Move button's own tooltip does
-       (Tooltip.Move), so the spoken help and the hover text agree on what
-       the folder is called. -->
-  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Перемістити всі непотрібні файли інсталятора до вказаного розташування</value></data>
-  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Перемістити всі непотрібні файли інсталятора до Кошика</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
        straight after "Cancel, button": the window-level alternative is
@@ -192,29 +192,50 @@
   <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Виберіть, що робити з непотрібними файлами: перемістити їх у безпечне місце, видалити назавжди або скасувати.</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Перемістити непотрібні файли до обраної вами папки</value></data>
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Видалити непотрібні файли назавжди, бо Кошик недоступний для цього диска</value></data>
-  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Надсилається на nofaff.netlify.app. Лише лічильники та позначки. Ви побачите точний вміст перед надсиланням.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Подякувати</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>«Надіслати» надсилає показаний звіт до No Faff. «Скасувати» не надсилає нічого.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Перевірити оновлення</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Перевіряє сторінку випусків GitHub через HTTPS на наявність новішої версії.</value></data>
+  <!-- Heard, never read: the update button carries no tooltip, so this help
+       text is the only description it has, and it is written for a speech
+       engine rather than for a page.
+
+       It names the destination on purpose. The standing question about this
+       app is whether it is safe to run, and somebody who can only hear it has
+       the same claim on knowing where it looks as a reader of the README has.
+       The protocol is left out because a sighted user is never told that
+       either.
+
+       Lower case is deliberate, here and in Automation.About.Guide.HelpText
+       and Automation.AutoUpdateCheck.HelpText below it. A speech
+       engine splits a token at an internal capital and reads the halves as
+       separate words, and spells a short all-caps token out letter by letter
+       (eSpeak NG does both: translate.c's CamelCase branch and
+       translateword.c's abbreviation branch). "GitHub" has been heard split
+       that way by Narrator, on this very string. Lower case triggers
+       neither, and none of it is on screen, so the spelling costs nothing. -->
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Перевіряє на сторінці випусків github, чи є новіша версія.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
-    <value>Відкриває посібник (README) на github.com у вашому браузері.</value>
-    <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
+    <value>Відкриває readme на github у вашому браузері.</value>
+    <comment>Screen-reader help on the About window's "Guide and FAQ" link.
+    Names the document rather than repeating the link's own label, so the
+    description adds what the name has not already said. Cased for speech for
+    the reason Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
     <value>Відкриває список проблем (Issues) на github.com у вашому браузері.</value>
     <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
   </data>
   <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
-    <value>Якщо позначено, InstallerClean під час кожного запуску перевіряє на GitHub наявність новішої версії.</value>
-    <comment>Screen-reader help on the About window's auto-update checkbox.</comment>
+    <value>Якщо позначено, InstallerClean під час запуску перевіряє на github наявність новішої версії.</value>
+    <comment>Screen-reader help on the About window's auto-update checkbox.
+    Names the destination and is cased for speech for the reasons
+    Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <!-- Window-level description for the update-available modal, read by a
        screen reader on open, mirroring the RecycleUnavailable and
        ConfirmSendResultLog windows. The version numbers are in the body
        text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Відкрийте сторінку випуску, щоб завантажити новішу версію, або скасуйте, щоб лишити поточну версію.</value></data>
-  <data name="Automation.Licence" xml:space="preserve"><value>Ліцензія Apache 2.0</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Відкриває файл ліцензії на github.com у вашому браузері.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT

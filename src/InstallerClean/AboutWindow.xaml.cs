@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Automation;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
 using InstallerClean.Services;
@@ -20,14 +19,7 @@ public partial class AboutWindow : Window
     {
         InitializeComponent();
         _settings = settings;
-        var version = DisplayHelpers.GetVersionString();
-        VersionText.Text = version;
-        // The version sits in a read-only TextBox so it can be selected
-        // and copied, and an UNNAMED edit control is announced
-        // control-type first ("edit, read-only" before the version).
-        // Naming the box with its own text puts the content first; there
-        // is no visible label to use instead.
-        AutomationProperties.SetName(VersionText, version);
+        VersionText.Text = DisplayHelpers.GetVersionString();
 
         // Resolved here, not in XAML: each supported language has its own
         // README file, and the link has to follow the one on screen.

@@ -123,13 +123,15 @@
     </Style>
 
     <!-- Focus ring for flat, rectangular controls: the read-only JSON
-         preview TextBox in ConfirmSendResultLogWindow, and the checkbox
+         preview TextBox in ConfirmSendResultLogWindow, the checkbox
          row further down (whose focusable extent is the box plus its
-         label, a rectangle). The pill visuals above sit around rounded
-         controls and paint a 16 to 22 px rounded ring, which outside a
-         sharp-cornered edge traces a shape the control does not have.
-         This one uses a 2px corner radius so the ring tracks the
-         underlying rectangle. -->
+         label, a rectangle) and, through the app-default focus visual
+         near the end of this file, in-body Hyperlinks and anything
+         else with no override of its own. The pill visuals above sit
+         around rounded controls and paint a 16 to 22 px rounded ring,
+         which outside a sharp-cornered edge traces a shape the control
+         does not have. This one uses a 2px corner radius so the ring
+         tracks the underlying rectangle. -->
     <Style x:Key="FlatTextBoxFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
@@ -148,9 +150,23 @@
          minimum height, fully rounded, a Type.Heading.Sm label at
          Medium weight):
            AccentPill   - the accent fill, for the one action a screen leads with.
-           StandardPill - the default filled action.
-           DangerPill   - destructive confirm (Delete, Delete permanently).
+           StandardPill - the quieter fill, for a filled action that must read
+                          as secondary to a louder one beside it (the main
+                          window's Move, against Delete). Its other use is the
+                          way out of a window carrying bad news, where the
+                          accent would read as encouragement.
+           DangerPill   - the one action with no way back: deleting without a
+                          Recycle Bin. Not for deleting to the bin, which the
+                          app states plainly is safe and reversible; red on
+                          that would argue against the app's own text and
+                          spend the alarm on the routine path.
            GhostPill    - text-only action with no fill (Cancel / Details / About).
+
+         A window whose only button is a way out still takes the accent: with
+         nothing beside it to be quieter than, the standard fill reads as
+         hesitant rather than secondary, and the accent-versus-standard
+         distinction only ever has to work where both appear together, which
+         is the main window's Delete and Move row alone.
 
          Which action a screen leads with is that screen's decision, taken
          where its Button names a style. A pill is a look, not a rank, so
@@ -299,9 +315,14 @@
     </Style>
 
     <!-- Compact pill buttons (30 px minimum height). Compact variants
-         for the About dialog's rows. -->
+         for the About dialog's rows: CompactAccentPill mirrors
+         AccentPill for the row's one leading action (the window's
+         Close, its natural finishing act, the same reading that puts
+         the accent on the completion overlay's Done), and
+         CompactGhostPill mirrors GhostPill for the quiet asks beside
+         it. -->
 
-    <Style x:Key="CompactPill" TargetType="Button">
+    <Style x:Key="CompactAccentPill" TargetType="Button">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
         <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
         <Setter Property="FontWeight" Value="Medium"/>
@@ -312,7 +333,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bg" Background="{StaticResource Action.Standard.Background}"
+                    <Border x:Name="Bg" Background="{StaticResource Action.Accent.Background}"
                             CornerRadius="{StaticResource Radius.CompactPill}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -320,10 +341,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Standard.Hover}"/>
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Accent.Hover}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Standard.Pressed}"/>
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource Action.Accent.Pressed}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Bg" Property="Opacity" Value="0.5"/>
@@ -332,6 +353,21 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- The 28px small ghost pill: wordless icon buttons sitting inside
+         busy rows (the bottom-bar language globe, the completion card's
+         donate heart) and the splash Cancel. BasedOn GhostPill so the
+         look stays the ghost's; what changes is the tighter geometry
+         and, with it, the ring: Radius.SmallPillFocus's derivation pins
+         the 28px height to its 16 ring, so the height and the focus
+         visual must move together, which is why this is a named style
+         rather than per-site setters. -->
+    <Style x:Key="SmallGhostPill" TargetType="Button" BasedOn="{StaticResource GhostPill}">
+        <Setter Property="MinHeight" Value="28"/>
+        <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
+        <Setter Property="Padding" Value="6,0"/>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource SmallPillFocusVisual}"/>
     </Style>
 
     <Style x:Key="CompactGhostPill" TargetType="Button">
@@ -570,12 +606,21 @@
     </Style>
 
     <!-- Detail-window column headers. Made keyboard-focusable so column sort
-         works without a mouse: GridViewColumnHeader derives from ButtonBase,
-         so Space/Enter on a focused header fires the Click the detail windows
-         already handle. The Role=Padding trigger keeps the filler header WPF
-         generates past the last column out of the tab order, where it would
-         otherwise be a focusable stop with no column behind it. The
-         IsKeyboardFocused fill gives the focused header a visible cue on the
+         works without a mouse; WPF assumes a header is only ever clicked, and
+         GridViewColumnHeader's static constructor sets Focusable false.
+         Deriving from ButtonBase is NOT enough to get the activation with it.
+         Its OnClick raises the Click event only for an access-key or automation
+         invoke, or while the mouse pointer is inside the header's own bounds
+         (dotnet/wpf, GridViewColumnHeader.cs: OnClick guards on
+         `IsAccessKeyOrAutomation || !IsMouseOutside()`), so ButtonBase's Space
+         and Enter handling does run and then has its Click dropped whenever the
+         pointer is anywhere else on screen. Each detail window therefore wires
+         Space and Enter itself, in ColumnHeader_PreviewKeyDown; preview,
+         because ButtonBase marks both keys handled at the header before a
+         bubbling handler further up could see them. The Role=Padding trigger
+         keeps the filler header WPF generates past the last column out of the
+         tab order, where it would otherwise be a focusable stop with no column
+         behind it. The IsKeyboardFocused fill gives the focused header a visible cue on the
          dark surface; the sort direction itself reaches a screen reader as the
          sorted header's AutomationProperties.Name (set in UpdateSortIndicators),
          which also keeps the ▲/▼ glyph appended to the visible header text out
@@ -724,12 +769,16 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Width" Value="8"/>
         <Setter Property="MinWidth" Value="8"/>
+        <!-- Padding reaches the template Border and insets the Track, and
+             with it the ends of the thumb's travel. Zero here; CardScrollBar
+             below sets it for bars that run flush along a rounded card edge. -->
+        <Setter Property="Padding" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ScrollBar">
                     <Border Background="Transparent"
                             CornerRadius="{StaticResource Radius.Chip}"
-                            Padding="0">
+                            Padding="{TemplateBinding Padding}">
                         <Track x:Name="PART_Track" IsDirectionReversed="True">
                             <Track.DecreaseRepeatButton>
                                 <RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="{x:Static ScrollBar.PageUpCommand}"/>
@@ -755,7 +804,7 @@
                         <ControlTemplate TargetType="ScrollBar">
                             <Border Background="Transparent"
                                     CornerRadius="{StaticResource Radius.Chip}"
-                                    Padding="0">
+                                    Padding="{TemplateBinding Padding}">
                                 <Track x:Name="PART_Track">
                                     <Track.DecreaseRepeatButton>
                                         <RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="{x:Static ScrollBar.PageLeftCommand}"/>
@@ -771,6 +820,27 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- A scrollbar running flush along the edge of a Radius.Pill card
+         (the Details list panes). The card paints only inside its corner
+         curve while ClipToBounds clips at the rectangular layout bounds,
+         so a thumb allowed to the end of an un-inset track sits in the
+         corner zone: inside the rectangle, outside the pane, drawn on the
+         window background. The end padding equals the corner radius
+         (Padding.ScrollBarCardEnds, tied to Radius.Pill in Tokens.xaml)
+         so travel stays on the straight run of the edge. A list's
+         template-internal bars pick this up through a style scoped in the
+         list's own Resources: ScrollBar derives from Control, and a
+         tree-scoped implicit style reaches Control-derived elements
+         inside templates. -->
+    <Style x:Key="CardScrollBar" TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
+        <Setter Property="Padding" Value="{StaticResource Padding.ScrollBarCardEnds}"/>
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="Padding" Value="{StaticResource Padding.ScrollBarCardEndsHorizontal}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -941,21 +1011,14 @@
 
     <!-- Default focus visual. Catches anything that takes focus but
          has no FocusVisualStyle override (plain Buttons, Hyperlinks).
-         Pill buttons opt out via their own *FocusVisual styles
-         above. -->
-    <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
-        <Setter Property="Control.Template">
-            <Setter.Value>
-                <ControlTemplate>
-                    <Rectangle RadiusX="2" RadiusY="2"
-                               Stroke="{DynamicResource Text.Body}"
-                               StrokeThickness="{StaticResource StrokeThickness.Hairline}"
-                               SnapsToDevicePixels="True"
-                               Margin="-1"/>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+         Pill buttons opt out via their own *FocusVisual styles above.
+         BasedOn the flat ring rather than carrying a template of its
+         own so the catch-all cannot drift from the app's one focus
+         weight (BorderThickness.Focus): a ring drawn thinner here
+         would make links look less focused than every other
+         control. -->
+    <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}"
+           BasedOn="{StaticResource FlatTextBoxFocusVisual}"/>
 
     <!-- Progress bar. Slim dark bar. Determinate uses PART_Indicator
          (WPF stock). Indeterminate has two presentations: a sweeping

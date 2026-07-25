@@ -1,5 +1,7 @@
 using System;
 using System.Resources;
+using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Markup;
 using InstallerClean.Helpers;
 
@@ -46,7 +48,29 @@ public sealed class TranslateExtension : MarkupExtension
         if (string.IsNullOrEmpty(Key))
             return string.Empty;
 
-        return ResourceManager.GetString(Key, Localisation.UiCulture)
-            ?? Key;
+        var value = ResourceManager.GetString(Key, Localisation.UiCulture) ?? Key;
+
+        // Every XAML-resolved string passes through KeepWhole, which is a no-op
+        // unless the value names C:\Windows\Installer and then binds it so it
+        // cannot break across two lines. Doing it here rather than per site
+        // means a new string naming the folder is covered by writing it.
+        //
+        // Except where the string is only ever spoken. KeepWhole's word joiners
+        // are a line-breaking instruction, and an automation property is never
+        // laid out, so there they buy nothing and hand a speech engine four
+        // invisible format characters to make of what it will. A drawn string
+        // still carries them wherever it is also the spoken one, a TextBlock's
+        // peer reporting its Text as its name; this only declines to add them to
+        // a string that has no rendering to protect.
+        return IsSpokenOnly(serviceProvider) ? value : InstallerPathText.KeepWhole(value);
     }
+
+    // The target property is unavailable inside a Setter or a template, where
+    // ProvideValue runs once for a value shared across instances; those keep the
+    // transform, which is the behaviour every site had before this split.
+    private static bool IsSpokenOnly(IServiceProvider serviceProvider) =>
+        serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget target
+        && target.TargetProperty is DependencyProperty property
+        && (property == AutomationProperties.NameProperty
+            || property == AutomationProperties.HelpTextProperty);
 }

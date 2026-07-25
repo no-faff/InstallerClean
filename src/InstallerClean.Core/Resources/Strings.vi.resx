@@ -168,20 +168,20 @@
 
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Ủng hộ</value></data>
-  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Mời tôi một ly cà phê (cửa sổ Giới thiệu)</value></data>
+  <!-- The About window's own star and cuppa buttons. The .About suffix on the
+       key survives from a footer pair that no longer exists; it is the key
+       name only, and the value says what the button says on screen, because a
+       window name in the spoken one was an internal note being read out to
+       somebody who can only be in that window to hear it. -->
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Mời tôi một ly cà phê</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Hủy thao tác</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Hủy quét</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Hủy quét khi khởi động</value></data>
   <data name="Automation.Close" xml:space="preserve"><value>Đóng</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Đóng cửa sổ</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Đóng kết quả và quay lại cửa sổ chính</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Gắn sao trên GitHub (cửa sổ Giới thiệu)</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Gắn sao trên github</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Thu nhỏ</value></data>
-  <!-- Names the destination the way the Move button's own tooltip does
-       (Tooltip.Move), so the spoken help and the hover text agree on what
-       the folder is called. -->
-  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Chuyển tất cả các tệp cài đặt không cần thiết tới Nơi chuyển đến</value></data>
-  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Di chuyển tất cả các tệp cài đặt không cần thiết vào Thùng rác</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
        straight after "Cancel, button": the window-level alternative is
@@ -192,29 +192,50 @@
   <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Chọn cách xử lý các tệp không cần thiết: chuyển chúng tới nơi an toàn, xóa vĩnh viễn hoặc hủy.</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Chuyển các tệp không cần thiết tới một thư mục bạn chọn</value></data>
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Xóa vĩnh viễn các tệp không cần thiết vì Thùng rác không khả dụng cho ổ đĩa này</value></data>
-  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Gửi tới nofaff.netlify.app. Chỉ gồm số liệu và nhãn. Bạn sẽ thấy nội dung chính xác trước khi gửi.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Gửi lời cảm ơn</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Kiểm tra cập nhật</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Kiểm tra trang phát hành của GitHub qua HTTPS để tìm phiên bản mới hơn.</value></data>
+  <!-- Heard, never read: the update button carries no tooltip, so this help
+       text is the only description it has, and it is written for a speech
+       engine rather than for a page.
+
+       It names the destination on purpose. The standing question about this
+       app is whether it is safe to run, and somebody who can only hear it has
+       the same claim on knowing where it looks as a reader of the README has.
+       The protocol is left out because a sighted user is never told that
+       either.
+
+       Lower case is deliberate, here and in Automation.About.Guide.HelpText
+       and Automation.AutoUpdateCheck.HelpText below it. A speech
+       engine splits a token at an internal capital and reads the halves as
+       separate words, and spells a short all-caps token out letter by letter
+       (eSpeak NG does both: translate.c's CamelCase branch and
+       translateword.c's abbreviation branch). "GitHub" has been heard split
+       that way by Narrator, on this very string. Lower case triggers
+       neither, and none of it is on screen, so the spelling costs nothing. -->
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Kiểm tra trang phát hành của github xem có phiên bản mới hơn không.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
-    <value>Mở hướng dẫn (README) trên github.com trong trình duyệt của bạn.</value>
-    <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
+    <value>Mở readme trên github trong trình duyệt của bạn.</value>
+    <comment>Screen-reader help on the About window's "Guide and FAQ" link.
+    Names the document rather than repeating the link's own label, so the
+    description adds what the name has not already said. Cased for speech for
+    the reason Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
     <value>Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn.</value>
     <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
   </data>
   <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
-    <value>Khi được đánh dấu, mỗi lần bạn chạy InstallerClean, ứng dụng sẽ kiểm tra GitHub xem có phiên bản mới hơn không.</value>
-    <comment>Screen-reader help on the About window's auto-update checkbox.</comment>
+    <value>Nếu được đánh dấu, InstallerClean sẽ kiểm tra github xem có phiên bản mới hơn không khi bạn chạy nó.</value>
+    <comment>Screen-reader help on the About window's auto-update checkbox.
+    Names the destination and is cased for speech for the reasons
+    Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <!-- Window-level description for the update-available modal, read by a
        screen reader on open, mirroring the RecycleUnavailable and
        ConfirmSendResultLog windows. The version numbers are in the body
        text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Mở trang phát hành để tải phiên bản mới hơn, hoặc hủy để giữ phiên bản hiện tại.</value></data>
-  <data name="Automation.Licence" xml:space="preserve"><value>Giấy phép Apache 2.0</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Mở tệp giấy phép trên github.com trong trình duyệt của bạn.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT

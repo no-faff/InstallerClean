@@ -168,20 +168,20 @@
 
   <!-- Automation names (screen reader / accessibility) -->
   <data name="Automation.BuyMeACuppa" xml:space="preserve"><value>Spenden</value></data>
-  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Spendier mir einen Kaffee (Fenster Über)</value></data>
+  <!-- The About window's own star and cuppa buttons. The .About suffix on the
+       key survives from a footer pair that no longer exists; it is the key
+       name only, and the value says what the button says on screen, because a
+       window name in the spoken one was an internal note being read out to
+       somebody who can only be in that window to hear it. -->
+  <data name="Automation.BuyMeACuppa.About" xml:space="preserve"><value>Spendier mir einen Kaffee</value></data>
   <data name="Automation.CancelOperation" xml:space="preserve"><value>Vorgang abbrechen</value></data>
   <data name="Automation.CancelScan" xml:space="preserve"><value>Scan abbrechen</value></data>
   <data name="Automation.CancelStartupScan" xml:space="preserve"><value>Start-Scan abbrechen</value></data>
   <data name="Automation.Close" xml:space="preserve"><value>Schließen</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Fenster schließen</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Ergebnis schließen und zum Hauptfenster zurückkehren</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Einen Stern auf GitHub hinterlassen (Fenster Über)</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Einen Stern auf github hinterlassen</value></data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimieren</value></data>
-  <!-- Names the destination the way the Move button's own tooltip does
-       (Tooltip.Move), so the spoken help and the hover text agree on what
-       the folder is called. -->
-  <data name="Automation.MoveAllFiles" xml:space="preserve"><value>Alle nicht benötigten Installer-Dateien an den Zielort verschieben</value></data>
-  <data name="Automation.DeleteAllFiles" xml:space="preserve"><value>Alle nicht benötigten Installer-Dateien in den Papierkorb verschieben</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
        straight after "Cancel, button": the window-level alternative is
@@ -192,29 +192,50 @@
   <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Wähle, wie mit den nicht benötigten Dateien verfahren werden soll: an einen sicheren Ort verschieben, endgültig löschen oder abbrechen.</value></data>
   <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Die nicht benötigten Dateien in einen von dir gewählten Ordner verschieben</value></data>
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Die nicht benötigten Dateien endgültig löschen, weil der Papierkorb für dieses Laufwerk nicht verfügbar ist</value></data>
-  <data name="Automation.SendResultLog.HelpText" xml:space="preserve"><value>Sendet an nofaff.netlify.app. Nur Zählwerte und Bezeichnungen. Du siehst die genauen Daten vor dem Senden.</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Danke sagen</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Senden übermittelt den angezeigten Bericht an No Faff. Abbrechen sendet nichts.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Nach Updates suchen</value></data>
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Prüft die GitHub-Releases-Seite über HTTPS auf eine neuere Version.</value></data>
+  <!-- Heard, never read: the update button carries no tooltip, so this help
+       text is the only description it has, and it is written for a speech
+       engine rather than for a page.
+
+       It names the destination on purpose. The standing question about this
+       app is whether it is safe to run, and somebody who can only hear it has
+       the same claim on knowing where it looks as a reader of the README has.
+       The protocol is left out because a sighted user is never told that
+       either.
+
+       Lower case is deliberate, here and in Automation.About.Guide.HelpText
+       and Automation.AutoUpdateCheck.HelpText below it. A speech
+       engine splits a token at an internal capital and reads the halves as
+       separate words, and spells a short all-caps token out letter by letter
+       (eSpeak NG does both: translate.c's CamelCase branch and
+       translateword.c's abbreviation branch). "GitHub" has been heard split
+       that way by Narrator, on this very string. Lower case triggers
+       neither, and none of it is on screen, so the spelling costs nothing. -->
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Sucht auf der Release-Seite von github nach einer neueren Version.</value></data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
-    <value>Öffnet die Anleitung (README) auf github.com in deinem Browser.</value>
-    <comment>Screen-reader help on the About window's "Guide and FAQ" link.</comment>
+    <value>Öffnet das readme auf github in deinem Browser.</value>
+    <comment>Screen-reader help on the About window's "Guide and FAQ" link.
+    Names the document rather than repeating the link's own label, so the
+    description adds what the name has not already said. Cased for speech for
+    the reason Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
     <value>Öffnet den Issue-Tracker auf github.com in deinem Browser.</value>
     <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
   </data>
   <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
-    <value>Wenn aktiviert, sucht InstallerClean bei jedem Start auf GitHub nach einer neueren Version.</value>
-    <comment>Screen-reader help on the About window's auto-update checkbox.</comment>
+    <value>Wenn aktiviert, sucht InstallerClean beim Start auf github nach einer neueren Version.</value>
+    <comment>Screen-reader help on the About window's auto-update checkbox.
+    Names the destination and is cased for speech for the reasons
+    Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <!-- Window-level description for the update-available modal, read by a
        screen reader on open, mirroring the RecycleUnavailable and
        ConfirmSendResultLog windows. The version numbers are in the body
        text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Öffne die Release-Seite, um die neuere Version herunterzuladen, oder brich ab, um die aktuelle Version zu behalten.</value></data>
-  <data name="Automation.Licence" xml:space="preserve"><value>Apache-2.0-Lizenz</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Öffnet die Lizenzdatei auf github.com in deinem Browser.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT

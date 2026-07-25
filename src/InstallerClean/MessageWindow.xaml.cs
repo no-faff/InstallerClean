@@ -15,6 +15,10 @@ public partial class MessageWindow : Window
     {
         InitializeComponent();
 
+        // Both the body and the announced title below draw from it, and two of
+        // the scan diagnoses name C:\Windows\Installer mid-paragraph.
+        message = InstallerPathText.KeepWhole(message);
+
         CaptionText.Text = caption;
         MessageText.Text = message;
         if (kind != MessageKind.Information)

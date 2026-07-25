@@ -71,12 +71,39 @@
                  window the columns fit and no scrollbar shows. -->
             <ListView x:Name="ProductsList" ItemsSource="{Binding Products}"
                       GridViewColumnHeader.Click="ColumnHeader_Click"
+                      PreviewKeyDown="ColumnHeader_PreviewKeyDown"
                       SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
                       BorderThickness="0" Background="Transparent"
                       Padding="0" Margin="0,-1,0,-6"
                       ScrollViewer.HorizontalScrollBarVisibility="Auto"
                       VirtualizingStackPanel.IsVirtualizing="True"
                       VirtualizingStackPanel.VirtualizationMode="Recycling">
+                <ListView.Resources>
+                    <!-- The card's scrollbars, kept clear of the corner
+                         curves (CardScrollBar) and unbled: the margins
+                         mirror the 0,-1,0,-6 bleed above so the end insets
+                         measure from the true card edge, and the horizontal
+                         bar, which appears when the text-scaled columns
+                         outgrow the pane, sits whole on the bottom edge
+                         instead of 6px into the clip. The Orphaned and
+                         Registered lists share these values as a pair, like
+                         the bleed itself; ScrollBarCardInsetTests holds
+                         margin and bleed in step. -->
+                    <Style TargetType="ScrollBar" BasedOn="{StaticResource CardScrollBar}">
+                        <Setter Property="Margin" Value="0,1,0,6"/>
+                        <Style.Triggers>
+                            <Trigger Property="Orientation" Value="Horizontal">
+                                <Setter Property="Margin" Value="0,0,0,6"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                    <!-- The corner Rectangle between two visible bars fills
+                         with this system brush in the stock ScrollViewer
+                         template; left alone it paints light grey over the
+                         card's bottom-right corner zone. Transparent keeps
+                         the corner cell invisible. -->
+                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
+                </ListView.Resources>
                 <!-- Spoken row name from the visible cells. Without the
                      override, the item automation peer falls back to the
                      bound record's generated ToString and a screen reader
@@ -88,7 +115,11 @@
                 </ListView.ItemContainerStyle>
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="{loc:Translate Field.ProductName}" Width="{a11y:TextScaled 520}"
+                        <!-- Product name gives 40 to Size and Patches, which need it
+                             for the sort arrow; the widest translated header here is
+                             about 142 against 480, and product names wrap. The four
+                             widths still total 860. -->
+                        <GridViewColumn Header="{loc:Translate Field.ProductName}" Width="{a11y:TextScaled 480}"
                                         x:Name="ColProductName">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -118,7 +149,12 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="{loc:Translate Field.Size}" Width="{a11y:TextScaled 90}"
+                        <!-- 110 and 100, not 90 and 80: the sorted header carries two
+                             spaces and an arrow and the header template spends 16 on
+                             padding, so "Dimensione" (84) and "Correctifs" (71)
+                             overflowed and lost or clipped their arrows. Matches the
+                             orphaned-files window, which has the same Size column. -->
+                        <GridViewColumn Header="{loc:Translate Field.Size}" Width="{a11y:TextScaled 110}"
                                         x:Name="ColSizeBytes"
                                         HeaderContainerStyle="{StaticResource NumericColumnHeader}">
                             <GridViewColumn.CellTemplate>
@@ -146,7 +182,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="{loc:Translate Field.Patches}" Width="{a11y:TextScaled 80}"
+                        <GridViewColumn Header="{loc:Translate Field.Patches}" Width="{a11y:TextScaled 100}"
                                         x:Name="ColPatchCount"
                                         HeaderContainerStyle="{StaticResource NumericColumnHeader}">
                             <GridViewColumn.CellTemplate>
@@ -196,6 +232,15 @@
                         <ListBox ItemsSource="{Binding SelectedPatches}"
                                  BorderThickness="0" Background="Transparent"
                                  Padding="12,8" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.Resources>
+                                <!-- Same corner-curve inset as the products
+                                     list above: the ListBox padding lands on
+                                     the content, not the bar, so the bar runs
+                                     the card's full height at its edge. No
+                                     bleed to mirror here, the ListBox sits on
+                                     the card rect itself. -->
+                                <Style TargetType="ScrollBar" BasedOn="{StaticResource CardScrollBar}"/>
+                            </ListBox.Resources>
                             <!-- Same spoken-name override as the products list:
                                  the fallback is the PatchRow record's ToString
                                  dump. -->
@@ -345,10 +390,16 @@
                                 <TextBlock Grid.Row="8" Grid.Column="0" Text="{loc:Translate Field.Keywords}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
                                 <TextBox Grid.Row="8" Grid.Column="2" Text="{Binding SelectedDetails.Keywords, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                          AutomationProperties.Name="{loc:Translate Field.Keywords}"/>
+                                <!-- The caveat on the label (a subject name, not a
+                                     verified chain) is hover text, so it reaches
+                                     no screen reader. The value box carries it as
+                                     help text from the same key, as the orphaned
+                                     window's matching row does. -->
                                 <TextBlock Grid.Row="10" Grid.Column="0" Text="{loc:Translate Field.SigningCertificate}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"
                                            ToolTip="{loc:Translate Tooltip.SigningCertificate}"/>
                                 <TextBox Grid.Row="10" Grid.Column="2" Text="{Binding SelectedDetails.DigitalSignature, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
-                                         AutomationProperties.Name="{loc:Translate Field.SigningCertificate}"/>
+                                         AutomationProperties.Name="{loc:Translate Field.SigningCertificate}"
+                                         AutomationProperties.HelpText="{loc:Translate Tooltip.SigningCertificate}"/>
                                 <TextBlock Grid.Row="12" Grid.Column="0" Text="{loc:Translate Field.FileSize}" Foreground="{StaticResource Text.Dim}" FontSize="{DynamicResource Type.Caption}"/>
                                 <TextBox Grid.Row="12" Grid.Column="2" Text="{Binding SelectedProduct.SizeDisplay, Mode=OneWay}" Style="{StaticResource MetadataValueText}"
                                          AutomationProperties.Name="{loc:Translate Field.FileSize}"/>
@@ -365,7 +416,7 @@
         <DockPanel Grid.Row="7" LastChildFill="False">
             <TextBlock DockPanel.Dock="Left" Text="{Binding Summary}"
                        Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}" VerticalAlignment="Center"/>
-            <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
+            <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
                     Content="{loc:Translate Action.Close}" IsCancel="True"/>
         </DockPanel>
     </Grid>

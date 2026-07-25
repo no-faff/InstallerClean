@@ -339,32 +339,28 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | 한국어 |
 | --- | --- |
 | Donate | 후원 |
-| Buy me a cuppa (About window) | 커피 한 잔 사주기 (정보 창) |
+| Buy me a cuppa | 커피 한 잔 사주기 |
 | Cancel operation | 작업 취소 |
 | Cancel scan | 검사 취소 |
 | Cancel startup scan | 시작 검사 취소 |
 | Close | 닫기 |
 | Close window | 창 닫기 |
 | Close result and return to main window | 결과를 닫고 메인 창으로 돌아가기 |
-| Leave a star on GitHub (About window) | GitHub에 별 남기기 (정보 창) |
+| Leave a star on github | github에 별 남기기 |
 | Minimise | 최소화 |
-| Move all unneeded installer files to the Move location | 불필요한 설치 관리자 파일을 모두 이동 위치로 옮기기 |
-| Move all unneeded installer files to the Recycle Bin | 불필요한 설치 관리자 파일을 모두 휴지통으로 이동 |
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | 삭제하면 불필요한 파일이 휴지통으로 이동됩니다. 취소하면 삭제하지 않고 닫습니다. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 이동하면 불필요한 파일이 선택한 대상 폴더에 들어갑니다. 취소하면 파일은 있던 자리에 그대로 남습니다. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | 불필요한 파일을 어떻게 처리할지 선택하세요. 안전한 곳으로 이동하거나, 영구 삭제하거나, 취소합니다. |
 | Move the unneeded files to a folder you choose | 불필요한 파일을 직접 고른 폴더로 이동 |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | 이 드라이브에서 휴지통을 사용할 수 없으므로 불필요한 파일을 영구 삭제 |
-| Posts to nofaff.netlify.app. Counts and labels only. You will see the exact payload before sending. | nofaff.netlify.app으로 전송됩니다. 개수와 라벨만 포함됩니다. 보내기 전에 보낼 내용을 정확히 확인할 수 있습니다. |
 | Say thanks | 감사 인사 |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 보내기를 누르면 표시된 보고서가 No Faff에 전송됩니다. 취소하면 아무것도 보내지 않습니다. |
 | Check for updates | 업데이트 확인 |
-| Checks GitHub's releases page over HTTPS for a newer version. | GitHub 릴리스 페이지를 HTTPS로 조회해 새 버전이 있는지 확인합니다. |
-| Opens the guide (README) on github.com in your browser. | 브라우저에서 github.com의 안내서(README)를 엽니다. |
+| Checks github's releases page for a newer version. | github의 릴리스 페이지에서 새 버전이 있는지 확인합니다. |
+| Opens the readme on github in your browser. | 브라우저에서 github의 readme를 엽니다. |
 | Opens the issue tracker on github.com in your browser. | 브라우저에서 github.com의 이슈 트래커를 엽니다. |
-| When ticked, InstallerClean checks GitHub for a newer version when you run it. | 선택하면 InstallerClean이 실행할 때마다 GitHub에서 새 버전이 있는지 확인합니다. |
+| If ticked, InstallerClean checks github for a newer version when you run it. | 선택하면 InstallerClean이 실행할 때 github에서 새 버전이 있는지 확인합니다. |
 | Open the release page to download the newer version, or cancel to keep the current version. | 새 버전을 내려받으려면 릴리스 페이지를 열고, 현재 버전을 유지하려면 취소하세요. |
-| Apache 2.0 licence | Apache 2.0 라이선스 |
 | Opens the licence file on github.com in your browser. | 브라우저에서 github.com의 라이선스 파일을 엽니다. |
 | Move location | 이동 위치 |
 | Products | 제품 |

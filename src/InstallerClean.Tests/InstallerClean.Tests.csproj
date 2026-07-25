@@ -41,4 +41,16 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Raw XAML sources for ScrollBarCardInsetTests, which asserts
+         cross-file numeric ties (scrollbar end insets against the card
+         radius, scrollbar margins against the list bleed) that XAML
+         cannot express and a build cannot check. Embedded as plain
+         bytes, not compiled: this project has no UseWPF, so no Page
+         processing applies. -->
+    <EmbeddedResource Include="..\InstallerClean\Themes\Tokens.xaml" LogicalName="ThemeXaml.Tokens.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\OrphanedFilesWindow.xaml" LogicalName="ThemeXaml.OrphanedFilesWindow.xaml" />
+    <EmbeddedResource Include="..\InstallerClean\RegisteredFilesWindow.xaml" LogicalName="ThemeXaml.RegisteredFilesWindow.xaml" />
+  </ItemGroup>
+
 </Project>

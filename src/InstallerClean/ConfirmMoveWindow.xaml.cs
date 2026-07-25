@@ -36,9 +36,18 @@ public partial class ConfirmMoveWindow : Window
         // along with it: on open, only the title and the focused button are
         // spoken, so a note left in the body alone would never be heard by the
         // user deciding whether to press Move.
+        //
+        // The destination rides along for the same reason, and it is the fact
+        // this dialog exists to confirm: where the files are going was on the
+        // card and in no announcement, and the body sits in a scroll region
+        // that is not even a tab stop until it overflows, so there was no
+        // route to it either. Label then value, the order the card reads, so
+        // the join holds in every language. The raw path, not the wrapped
+        // DestinationText, whose zero-width spaces are for the line breaker.
+        var destinationLine = DestinationLabel.Text + " " + destination;
         Title = sameDrive
-            ? MessageText.Text + " " + Strings.Confirm_MoveSameDrive
-            : MessageText.Text;
+            ? MessageText.Text + " " + destinationLine + " " + Strings.Confirm_MoveSameDrive
+            : MessageText.Text + " " + destinationLine;
 
         // Sized to content; the clamp stops a very large text scale
         // pushing the card past the work area, at which point the
