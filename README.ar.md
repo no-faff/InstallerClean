@@ -25,7 +25,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-44k-brightgreen" alt="إجمالي التنزيلات"></a>
 </p>
 
-![لقطة شاشة لـ InstallerClean بعد تنظيف ناجح: تنظيف 1.28 GB ونقل 69 ملفاً إلى سلة المحذوفات](docs/screenshots/en/07-success-done.webp)
+![لقطة شاشة لـ InstallerClean بعد تنظيف ناجح: تنظيف 1.28 GB ونقل 68 ملفاً إلى سلة المحذوفات](docs/screenshots/en/07-success-done.webp)
 
 - **ما هو:** يفعل InstallerClean شيئاً واحداً: يزيل الملفات غير الضرورية من `C:\Windows\Installer`، وهو مجلد مخفي لا ينظفه Windows أبداً. بعد فحص شبه فوري يخبرك إن كان لديك أي منها، ويعرض مزيداً من التفاصيل للفضوليين، ويتيح لك حذفها لتحرير مساحة على قرص C:. تستخدمه مرة واحدة ثم تمضي في طريقك.
 - **قد تكون هنا لأنك:** استخدمت [WinDirStat](https://github.com/windirstat/windirstat) أو WizTree أو TreeSize، فرأيت `C:\Windows\Installer` يشغل مساحة كبيرة ولم تعرف ما بداخله. وInstallerClean هو ما تحتاج إليه تماماً. فهو يعرف ما بداخل تلك الملفات ذات الأسماء التي تبدو عشوائية مثل `9f05cba.msi`، ويخبرك بسرعة أيّها يمكنك حذفه بأمان.
@@ -95,7 +95,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/en/02-main-window.webp" alt="النافذة الرئيسية تُظهر 141 ملفاً لا تزال مطلوبة (3.60 GB) و69 ملفاً غير ضروري للتنظيف (1.28 GB)، مع مربع لموقع النقل وزرّي الحذف والنقل" width="900"><br>
+  <img src="docs/screenshots/en/02-main-window.webp" alt="النافذة الرئيسية تُظهر 138 ملفاً لا تزال مطلوبة (2.93 GB) و68 ملفاً غير ضروري للتنظيف (1.28 GB)، مع مربع لموقع النقل وزرّي الحذف والنقل" width="900"><br>
   <em>النتائج: كم لا يزال مطلوباً، وكم يمكن إزالته.</em>
   <br><br>
 </p>
@@ -113,19 +113,19 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/en/05-delete-dialog.webp" alt="تأكيد الحذف يسأل عن حذف 69 ملفاً (1.28 GB)، مع الإشارة إلى أن الملفات ستُنقل إلى سلة المحذوفات" width="900"><br>
+  <img src="docs/screenshots/en/05-delete-dialog.webp" alt="تأكيد الحذف يسأل عن حذف 68 ملفاً (1.28 GB)، مع الإشارة إلى أن الملفات ستُنقل إلى سلة المحذوفات" width="900"><br>
   <em>تأكيد قبل أي من الإجراءين. الحذف ينقل إلى سلة المحذوفات؛ والنقل يضع الملفات في مكان تختاره.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/en/06-deleting.webp" alt="طبقة تقدّم أثناء الحذف: اكتمل 50 من 69 ملفاً (72%)، والملف الجاري حذفه، وزر الإلغاء" width="900"><br>
+  <img src="docs/screenshots/en/06-deleting.webp" alt="طبقة تقدّم أثناء الحذف: اكتمل 51 من 68 ملفاً (75%)، والملف الجاري حذفه، وزر الإلغاء" width="900"><br>
   <em>أثناء تنفيذ الحذف. يمكن إلغاؤه في منتصف الطريق.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/en/07-success-done.webp" alt="طبقة نجاح تُظهر تنظيف 1.28 GB، مع نقل 69 ملفاً إلى سلة المحذوفات" width="900"><br>
+  <img src="docs/screenshots/en/07-success-done.webp" alt="طبقة نجاح تُظهر تنظيف 1.28 GB، مع نقل 68 ملفاً إلى سلة المحذوفات" width="900"><br>
   <em>بعد عملية حذف ناجحة.</em>
   <br><br>
 </p>

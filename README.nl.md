@@ -117,7 +117,7 @@ Het standaardadvies haalt twee dingen door elkaar: lukraak bestanden verwijderen
 </p>
 
 <p>
-  <img src="docs/screenshots/nl/06-deleting.webp" alt="Voortgangsvenster tijdens het verwijderen: 47 van de 68 bestanden gedaan (69%), het bestand dat op dat moment wordt verwijderd en een knop Annuleren" width="900"><br>
+  <img src="docs/screenshots/nl/06-deleting.webp" alt="Voortgangsvenster tijdens het verwijderen: 32 van de 68 bestanden gedaan (47%), het bestand dat op dat moment wordt verwijderd en een knop Annuleren" width="900"><br>
   <em>Het verwijderen loopt. Annuleren stopt het halverwege.</em>
   <br><br>
 </p>

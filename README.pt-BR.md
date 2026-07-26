@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-44k-brightgreen" alt="Total de downloads"></a>
 </p>
 
-![Captura de tela do InstallerClean após uma limpeza bem-sucedida: 1,28 GB limpos, 69 arquivos movidos para a Lixeira](docs/screenshots/pt/07-success-done.webp)
+![Captura de tela do InstallerClean após uma limpeza bem-sucedida: 1,28 GB limpos, 68 arquivos movidos para a Lixeira](docs/screenshots/pt/07-success-done.webp)
 
 - **O que faz:** O InstallerClean faz uma coisa só: remove arquivos desnecessários de `C:\Windows\Installer`, uma pasta oculta que o Windows nunca limpa. Depois de uma análise quase instantânea, ele te diz se você tem algum, mostra mais detalhes para os curiosos e deixa você excluí-los para liberar espaço no disco C:. Você usa uma vez e segue em frente.
 - **Talvez você esteja aqui porque:** Você usou o [WinDirStat](https://github.com/windirstat/windirstat), o WizTree ou o TreeSize, viu que o `C:\Windows\Installer` estava ocupando muito espaço e não sabia o que tinha ali dentro. O InstallerClean é exatamente o que você precisa. Ele sabe o que há naqueles arquivos com nomes que parecem aleatórios, como `9f05cba.msi`, e te diz rapidamente quais você pode excluir com segurança.
@@ -93,7 +93,7 @@ O conselho padrão confunde apagar arquivos a esmo (o que é de fato perigoso) c
 </p>
 
 <p>
-  <img src="docs/screenshots/pt/02-main-window.webp" alt="Janela principal mostrando 141 arquivos ainda necessários (3,60 GB) e 69 arquivos desnecessários para limpar (1,28 GB), com uma caixa de local de destino e os botões Excluir e Mover" width="900"><br>
+  <img src="docs/screenshots/pt/02-main-window.webp" alt="Janela principal mostrando 138 arquivos ainda necessários (2,93 GB) e 68 arquivos desnecessários para limpar (1,28 GB), com uma caixa de local de destino e os botões Excluir e Mover" width="900"><br>
   <em>Resultados: quanto ainda é necessário, quanto é removível.</em>
   <br><br>
 </p>
@@ -111,19 +111,19 @@ O conselho padrão confunde apagar arquivos a esmo (o que é de fato perigoso) c
 </p>
 
 <p>
-  <img src="docs/screenshots/pt/05-delete-dialog.webp" alt="Confirmação de exclusão perguntando se deve excluir 69 arquivos (1,28 GB), avisando que os arquivos serão movidos para a Lixeira" width="900"><br>
+  <img src="docs/screenshots/pt/05-delete-dialog.webp" alt="Confirmação de exclusão perguntando se deve excluir 68 arquivos (1,28 GB), avisando que os arquivos serão movidos para a Lixeira" width="900"><br>
   <em>Confirmação antes de cada ação. Excluir move para a Lixeira; Mover coloca os arquivos onde você quiser.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/pt/06-deleting.webp" alt="Sobreposição de progresso durante a exclusão: 47 de 69 arquivos concluídos (68%), o arquivo sendo excluído e um botão Cancelar" width="900"><br>
+  <img src="docs/screenshots/pt/06-deleting.webp" alt="Sobreposição de progresso durante a exclusão: 53 de 68 arquivos concluídos (78%), o arquivo sendo excluído e um botão Cancelar" width="900"><br>
   <em>A exclusão em andamento. Cancelar a interrompe no meio.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/pt/07-success-done.webp" alt="Sobreposição de sucesso mostrando 1,28 GB limpos, com 69 arquivos movidos para a Lixeira" width="900"><br>
+  <img src="docs/screenshots/pt/07-success-done.webp" alt="Sobreposição de sucesso mostrando 1,28 GB limpos, com 68 arquivos movidos para a Lixeira" width="900"><br>
   <em>Depois de uma exclusão bem-sucedida.</em>
   <br><br>
 </p>

@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-44k-brightgreen" alt="총 다운로드 수"></a>
 </p>
 
-![성공적으로 정리를 마친 뒤의 InstallerClean 화면: 1.28 GB 정리, 69개 파일을 휴지통으로 이동함](docs/screenshots/ko/07-success-done.webp)
+![성공적으로 정리를 마친 뒤의 InstallerClean 화면: 1.28 GB 정리, 68개 파일을 휴지통으로 이동함](docs/screenshots/ko/07-success-done.webp)
 
 - **개요:** InstallerClean은 한 가지 일만 합니다. Windows가 한 번도 정리하지 않는 숨겨진 폴더 `C:\Windows\Installer`에서 불필요한 파일을 제거합니다. 거의 즉시 끝나는 검사 후, 그런 파일이 있는지 알려 주고, 궁금한 분께는 더 자세한 내용을 보여 주며, 그 파일을 삭제해 C: 드라이브 공간을 확보할 수 있게 합니다. 한 번 쓰고 나면 그걸로 끝입니다.
 - **이래서 오셨을지도 모릅니다:** [WinDirStat](https://github.com/windirstat/windirstat)나 WizTree, TreeSize를 써 보니 `C:\Windows\Installer`가 공간을 많이 차지하고 있는데, 그 안에 무엇이 들어 있는지는 알 수 없으셨을 겁니다. InstallerClean이 바로 필요한 도구입니다. `9f05cba.msi`처럼 알 수 없는 이름의 파일 안에 무엇이 들어 있는지 파악해, 어느 것을 안전하게 삭제할 수 있는지 빠르게 알려 줍니다.
@@ -93,7 +93,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/ko/02-main-window.webp" alt="아직 필요한 141개 파일(3.60 GB)과 정리할 불필요한 69개 파일(1.28 GB)을 보여 주는 메인 창. 이동 위치 입력란과 삭제, 이동 버튼이 있음" width="900"><br>
+  <img src="docs/screenshots/ko/02-main-window.webp" alt="아직 필요한 138개 파일(2.93 GB)과 정리할 불필요한 68개 파일(1.28 GB)을 보여 주는 메인 창. 이동 위치 입력란과 삭제, 이동 버튼이 있음" width="900"><br>
   <em>결과: 얼마가 아직 필요하고 얼마를 제거할 수 있는지.</em>
   <br><br>
 </p>
@@ -111,19 +111,19 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/ko/05-delete-dialog.webp" alt="69개 파일(1.28 GB) 삭제를 확인하며, 파일이 휴지통으로 이동된다는 점을 알리는 삭제 확인 대화상자" width="900"><br>
+  <img src="docs/screenshots/ko/05-delete-dialog.webp" alt="68개 파일(1.28 GB) 삭제를 확인하며, 파일이 휴지통으로 이동된다는 점을 알리는 삭제 확인 대화상자" width="900"><br>
   <em>어느 작업이든 실행 전에 확인을 거칩니다. 삭제는 휴지통으로 이동하고, 이동은 직접 고른 위치에 파일을 둡니다.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/ko/06-deleting.webp" alt="삭제가 진행 중인 화면. 69개 중 55개(80%)가 완료되었고, 삭제 중인 파일과 취소 버튼이 보임" width="900"><br>
+  <img src="docs/screenshots/ko/06-deleting.webp" alt="삭제가 진행 중인 화면. 68개 중 43개(63%)가 완료되었고, 삭제 중인 파일과 취소 버튼이 보임" width="900"><br>
   <em>삭제가 진행 중일 때. 취소로 도중에 멈출 수 있습니다.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/ko/07-success-done.webp" alt="1.28 GB를 정리하고 69개 파일을 휴지통으로 이동했음을 보여 주는 성공 화면" width="900"><br>
+  <img src="docs/screenshots/ko/07-success-done.webp" alt="1.28 GB를 정리하고 68개 파일을 휴지통으로 이동했음을 보여 주는 성공 화면" width="900"><br>
   <em>삭제에 성공한 뒤.</em>
   <br><br>
 </p>

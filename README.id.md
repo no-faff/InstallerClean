@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-44k-brightgreen" alt="Total unduhan"></a>
 </p>
 
-![Tangkapan layar InstallerClean setelah pembersihan berhasil: 1,28 GB dibersihkan, 69 file dipindahkan ke Keranjang Sampah](docs/screenshots/id/07-success-done.webp)
+![Tangkapan layar InstallerClean setelah pembersihan berhasil: 1,28 GB dibersihkan, 68 file dipindahkan ke Keranjang Sampah](docs/screenshots/id/07-success-done.webp)
 
 - **Apa:** InstallerClean melakukan satu hal: menghapus file yang tidak diperlukan dari `C:\Windows\Installer`, folder tersembunyi yang tidak pernah dibersihkan Windows. Setelah pemindaian yang hampir seketika, aplikasi memberi tahu Anda apakah ada file seperti itu, menampilkan detail lebih lanjut bagi yang penasaran, dan memungkinkan Anda menghapusnya untuk mengosongkan ruang di drive C: Anda. Anda cukup memakainya sekali lalu lanjut.
 - **Mungkin Anda di sini karena:** Anda memakai [WinDirStat](https://github.com/windirstat/windirstat), WizTree, atau TreeSize, melihat `C:\Windows\Installer` memakan banyak ruang, dan tidak tahu apa isinya. InstallerClean justru yang Anda butuhkan. Aplikasi ini tahu isi file dengan nama yang tampak acak seperti `9f05cba.msi` dan dengan cepat memberi tahu Anda mana yang aman dihapus.
@@ -93,7 +93,7 @@ Nasihat standar mencampuradukkan penghapusan file secara sembarangan (yang meman
 </p>
 
 <p>
-  <img src="docs/screenshots/id/02-main-window.webp" alt="Jendela utama yang menampilkan 141 file yang masih diperlukan (3,60 GB) dan 69 file tidak diperlukan untuk dibersihkan (1,28 GB), dengan kotak lokasi pemindahan serta tombol Hapus dan Pindahkan" width="900"><br>
+  <img src="docs/screenshots/id/02-main-window.webp" alt="Jendela utama yang menampilkan 138 file yang masih diperlukan (2,93 GB) dan 68 file tidak diperlukan untuk dibersihkan (1,28 GB), dengan kotak lokasi pemindahan serta tombol Hapus dan Pindahkan" width="900"><br>
   <em>Hasil: berapa banyak yang masih diperlukan, berapa banyak yang bisa dihapus.</em>
   <br><br>
 </p>
@@ -111,19 +111,19 @@ Nasihat standar mencampuradukkan penghapusan file secara sembarangan (yang meman
 </p>
 
 <p>
-  <img src="docs/screenshots/id/05-delete-dialog.webp" alt="Konfirmasi penghapusan yang menanyakan apakah akan menghapus 69 file (1,28 GB), dengan catatan bahwa file akan dipindahkan ke Keranjang Sampah" width="900"><br>
+  <img src="docs/screenshots/id/05-delete-dialog.webp" alt="Konfirmasi penghapusan yang menanyakan apakah akan menghapus 68 file (1,28 GB), dengan catatan bahwa file akan dipindahkan ke Keranjang Sampah" width="900"><br>
   <em>Konfirmasi sebelum kedua tindakan. Hapus memindahkan ke Keranjang Sampah; Pindahkan menaruh file di tempat pilihan Anda.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/id/06-deleting.webp" alt="Overlay kemajuan saat penghapusan berjalan: 46 dari 69 file selesai (67%), file yang sedang dihapus, dan tombol Batal" width="900"><br>
+  <img src="docs/screenshots/id/06-deleting.webp" alt="Overlay kemajuan saat penghapusan berjalan: 45 dari 68 file selesai (66%), file yang sedang dihapus, dan tombol Batal" width="900"><br>
   <em>Penghapusan sedang berjalan. Batal menghentikannya di tengah jalan.</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/id/07-success-done.webp" alt="Overlay keberhasilan yang menampilkan 1,28 GB dibersihkan, dengan 69 file dipindahkan ke Keranjang Sampah" width="900"><br>
+  <img src="docs/screenshots/id/07-success-done.webp" alt="Overlay keberhasilan yang menampilkan 1,28 GB dibersihkan, dengan 68 file dipindahkan ke Keranjang Sampah" width="900"><br>
   <em>Setelah Hapus yang berhasil.</em>
   <br><br>
 </p>

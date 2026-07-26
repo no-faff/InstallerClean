@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-44k-brightgreen" alt="総ダウンロード数"></a>
 </p>
 
-![クリーンアップ成功後の InstallerClean の画面：1.28 GB をクリーンアップし、69 個のファイルをごみ箱へ移動したところ](docs/screenshots/ja/07-success-done.webp)
+![クリーンアップ成功後の InstallerClean の画面：1.28 GB をクリーンアップし、68 個のファイルをごみ箱へ移動したところ](docs/screenshots/ja/07-success-done.webp)
 
 - **概要：** InstallerClean がすることは 1 つだけです。Windows が一切クリーンアップしない隠しフォルダー `C:\Windows\Installer` から、不要なファイルを取り除きます。ほぼ一瞬で終わるスキャンのあと、不要なファイルがあるかどうかを知らせ、詳しく見たい人にはさらに詳細を示し、それらを削除して C: ドライブの空き容量を増やせるようにします。一度使ったら、それで終わりです。
 - **こんな覚えはありませんか：** [WinDirStat](https://github.com/windirstat/windirstat)、WizTree、TreeSize などでディスクを調べていて、`C:\Windows\Installer` が大量の容量を占めているのに気づいたものの、中に何が入っているのか分からなかった。InstallerClean は、まさにそんなあなたのためのツールです。`9f05cba.msi` のような一見ランダムな名前のファイルの中身を把握していて、どれなら安全に削除できるのかをすぐに教えてくれます。
@@ -93,7 +93,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/ja/02-main-window.webp" alt="まだ必要な 141 個のファイル（3.60 GB）と、クリーンアップ対象の不要な 69 個のファイル（1.28 GB）を示すメイン画面。移動先の入力欄と、「削除」「移動」ボタンがある" width="900"><br>
+  <img src="docs/screenshots/ja/02-main-window.webp" alt="まだ必要な 138 個のファイル（2.93 GB）と、クリーンアップ対象の不要な 68 個のファイル（1.28 GB）を示すメイン画面。移動先の入力欄と、「削除」「移動」ボタンがある" width="900"><br>
   <em>結果の画面。どれだけがまだ必要で、どれだけが削除できるかがわかります。</em>
   <br><br>
 </p>
@@ -111,19 +111,19 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/ja/05-delete-dialog.webp" alt="69 個のファイル（1.28 GB）の削除を確認し、ファイルがごみ箱へ移動されることを伝える削除確認ダイアログ" width="900"><br>
+  <img src="docs/screenshots/ja/05-delete-dialog.webp" alt="68 個のファイル（1.28 GB）の削除を確認し、ファイルがごみ箱へ移動されることを伝える削除確認ダイアログ" width="900"><br>
   <em>どちらの操作の前にも確認があります。「削除」はごみ箱へ移動し、「移動」はファイルをお好みの場所に置きます。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/ja/06-deleting.webp" alt="削除の進行中を示す画面。69 個中 62 個（90%）が完了し、削除中のファイルと「キャンセル」ボタンが表示されている" width="900"><br>
+  <img src="docs/screenshots/ja/06-deleting.webp" alt="削除の進行中を示す画面。68 個中 35 個（51%）が完了し、削除中のファイルと「キャンセル」ボタンが表示されている" width="900"><br>
   <em>削除の実行中。「キャンセル」で途中で止められます。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/ja/07-success-done.webp" alt="1.28 GB をクリーンアップし、69 個のファイルをごみ箱へ移動したことを示す成功画面" width="900"><br>
+  <img src="docs/screenshots/ja/07-success-done.webp" alt="1.28 GB をクリーンアップし、68 個のファイルをごみ箱へ移動したことを示す成功画面" width="900"><br>
   <em>削除が成功した後の画面。</em>
   <br><br>
 </p>

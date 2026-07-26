@@ -23,7 +23,7 @@
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-44k-brightgreen" alt="总下载量"></a>
 </p>
 
-![InstallerClean 成功清理后的截图：已清理 1.28 GB，69 个文件已移到回收站](docs/screenshots/zh/07-success-done.webp)
+![InstallerClean 成功清理后的截图：已清理 1.28 GB，68 个文件已移到回收站](docs/screenshots/zh/07-success-done.webp)
 
 - **简介：** InstallerClean 只做一件事：清除 `C:\Windows\Installer` 里不需要的文件，这是个 Windows 从不清理的隐藏文件夹。它几乎瞬间扫描完，告诉您有没有这类文件，想细看的还能查看更多细节，并让您删掉它们，给 C: 盘腾出空间。用上一次，就可以不再惦记了。
 - **您可能正是为此而来：** 您用 [WinDirStat](https://github.com/windirstat/windirstat)、WizTree 或 TreeSize 时，看到 `C:\Windows\Installer` 占了很大空间，却不知道里面都是些什么。InstallerClean 正是您需要的工具。像 `9f05cba.msi` 这样名字看起来毫无规律的文件，它清楚里面装的是什么，并很快告诉您哪些可以安全删除。
@@ -93,7 +93,7 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/zh/02-main-window.webp" alt="主窗口，显示 141 个文件仍需保留（3.60 GB），69 个不需要的文件可以清理（1.28 GB），还有一个移动位置输入框，以及“删除”和“移动”按钮" width="900"><br>
+  <img src="docs/screenshots/zh/02-main-window.webp" alt="主窗口，显示 138 个文件仍需保留（2.93 GB），68 个不需要的文件可以清理（1.28 GB），还有一个移动位置输入框，以及“删除”和“移动”按钮" width="900"><br>
   <em>结果：还需要多少，能清理多少。</em>
   <br><br>
 </p>
@@ -111,19 +111,19 @@
 </p>
 
 <p>
-  <img src="docs/screenshots/zh/05-delete-dialog.webp" alt="删除确认对话框，询问是否删除 69 个文件（1.28 GB），并说明这些文件将被移到回收站" width="900"><br>
+  <img src="docs/screenshots/zh/05-delete-dialog.webp" alt="删除确认对话框，询问是否删除 68 个文件（1.28 GB），并说明这些文件将被移到回收站" width="900"><br>
   <em>每次操作前都会确认。删除会移到回收站；移动则把文件放到您选择的位置。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/zh/06-deleting.webp" alt="删除进行中的界面，显示 69 个文件中已完成 50 个（72%）、正在删除的文件，以及“取消”按钮" width="900"><br>
+  <img src="docs/screenshots/zh/06-deleting.webp" alt="删除进行中的界面，显示 68 个文件中已完成 56 个（82%）、正在删除的文件，以及“取消”按钮" width="900"><br>
   <em>删除进行中。可以中途取消。</em>
   <br><br>
 </p>
 
 <p>
-  <img src="docs/screenshots/zh/07-success-done.webp" alt="删除成功后的提示界面，显示已清理 1.28 GB，69 个文件已移到回收站" width="900"><br>
+  <img src="docs/screenshots/zh/07-success-done.webp" alt="删除成功后的提示界面，显示已清理 1.28 GB，68 个文件已移到回收站" width="900"><br>
   <em>一次成功的删除之后。</em>
   <br><br>
 </p>
