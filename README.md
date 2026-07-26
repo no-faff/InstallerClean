@@ -39,6 +39,7 @@
 - [Screenshots](#screenshots)
 - [How it works](#how-it-works)
 - [Is it safe?](#is-it-safe)
+- [Code signing policy](#code-signing-policy)
 - [If you do have a file missing from C:\Windows\Installer](#recovery)
 - [Accessibility](#accessibility)
 - [What it doesn't do](#what-it-doesnt-do)
@@ -179,6 +180,19 @@ The scan, query, move, delete, settings and pending-reboot services are covered 
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) tests each submission in a virtual machine and lists it only if it passes their review.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks certified 100% clean" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) tests each release for viruses, spyware and adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
+## Code signing policy
+
+InstallerClean has applied to [SignPath Foundation](https://signpath.org) for free code signing, a programme that signs open source software so it stops arriving on your machine from an unknown publisher. The application is pending, so for now the downloads here are unsigned and Windows will warn about them.
+
+If it's approved, releases will carry the line SignPath ask for: free code signing provided by SignPath.io, certificate by SignPath Foundation. The certificate belongs to the foundation rather than to me, because a certificate has to be issued to a legal entity and a one-person project isn't one. It doesn't mean InstallerClean is theirs, or that they're involved in it beyond the signing.
+
+**Roles.** InstallerClean is maintained by one person, me, [FarmLox](https://github.com/no-faff), and I hold all of them:
+
+- Committers and reviewers, meaning who can put code into the project: me. Every pull request is reviewed before it's merged.
+- Approvers, meaning who can authorise a release to be signed: me.
+
+**Privacy.** There are no accounts, no analytics and no tracking, because I don't want any of that. The only thing InstallerClean does on its own is check GitHub for a newer version when it starts, and you can turn that off in About. Nothing else leaves your machine unless you ask it to. The [privacy policy](PRIVACY.md) sets out the lot.
+
 <a id="recovery"></a>
 ## If you do have a file missing from `C:\Windows\Installer`
 
@@ -257,7 +271,7 @@ Across the 153 reports people have sent in (thanks 🙏) since v1.8.0 added the 
 
 <a id="unknown-publisher"></a>
 
-**Why does Windows say "Unknown publisher"?** InstallerClean isn't code-signed, and Windows marks files downloaded from the internet, so on first run SmartScreen usually shows "Windows protected your PC" with the publisher listed as unknown. A signing certificate costs money every year, and I'd rather keep the app free than pay for one. Click **More info**, then **Run anyway**. It's safe to do: the source code is public, and every release has VirusTotal links and SHA-256 hashes you can check first.
+**Why does Windows say "Unknown publisher"?** InstallerClean isn't code-signed, and Windows marks files downloaded from the internet, so on first run SmartScreen usually shows "Windows protected your PC" with the publisher listed as unknown. A paid signing certificate costs money every year and I'd rather keep the app free than pay for one, so I've applied to SignPath Foundation, who sign open source software for nothing (see [Code signing policy](#code-signing-policy)). Until that comes through, click **More info**, then **Run anyway**. It's safe to do: the source code is public, and every release has VirusTotal links and SHA-256 hashes you can check first.
 
 **Can I undo a Delete?** Usually, yes. When the Recycle Bin is available for the drive, Delete moves files there and you can restore them from the bin. If the bin isn't available, the app never deletes for good on its own (see [Is it safe?](#is-it-safe)). And if you'd rather have a way back you control, Move puts the files in a folder you choose; delete them from there whenever you're satisfied.
 

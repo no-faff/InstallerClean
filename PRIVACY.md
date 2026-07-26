@@ -2,7 +2,7 @@
 
 Last updated 26 July 2026.
 
-InstallerClean has no analytics, no tracking and no accounts. It runs on your machine and keeps to itself. Here is every time it touches the network or writes anything down.
+There are no accounts, no analytics and no tracking, because I don't want any of that. InstallerClean runs on your machine and keeps to itself. Here is every time it touches the network or writes anything down.
 
 **Update check.** When you launch it, InstallerClean asks GitHub's releases page whether a newer version exists. That is one web request to github.com. It sends nothing about you or your machine beyond what any web request tells the server it contacts, which here means your IP address reaches GitHub, and it downloads nothing. If a newer version exists you get a line on screen with a link, and your browser opens only if you click it. You can turn the check off in the About screen, and it stays off.
 
