@@ -21,8 +21,8 @@
 //     (ALSO_KEEP). Nothing half-translated reaches GENERATION OK.
 //   - Everything else is preserved byte-for-byte from the neutral: schema,
 //     resheaders, the per-key <comment> children (English context, kept), `&#10;`
-//     entities, literal newlines, the backslashes in a Windows path, and any
-//     leading/trailing spaces in a value. Output is LF, UTF-8.
+//     entities, literal newlines, and any leading/trailing spaces in a value.
+//     Output is LF, UTF-8.
 //
 // FOR A NEW LANGUAGE
 //   1. Copy this file to scripts/translations/gen-strings-<code>.mjs.
@@ -33,12 +33,14 @@
 //   4. Run from the repo root: node scripts/translations/gen-strings-<code>.mjs
 //      Chase it to GENERATION OK.
 //
-// MAP escaping (template literals): \\ is one backslash (the paths), \n is a real
-// newline (the multi-line values), {0}/{1} are .NET placeholders left verbatim,
-// and &#10; is written literally where the neutral uses the XML entity.
-// {InstallerFolder} is a token the app substitutes at runtime, never a word: it may
-// move within a sentence, but a language that renders it ships a wrong path, which
-// is what scripts/check-cross-key-rules.mjs fails on.
+// MAP escaping (template literals): \\ is one backslash, \n is a real newline (the
+// multi-line values), {0}/{1} are .NET placeholders left verbatim, and &#10; is
+// written literally where the neutral uses the XML entity. The backslashes are the
+// EXAMPLE paths a couple of values show the user (`D:\\Backup`, `\\\\server\\backup`),
+// which a language may localise; the app's own installer folder is never spelled out
+// in a value. {InstallerFolder} carries it, a token the app substitutes at runtime and
+// never a word: it may move within a sentence, but a language that renders it ships a
+// wrong path, which is what scripts/check-cross-key-rules.mjs fails on.
 //
 // TEMPLATE MODE (this file, OUT left at its default): the MAP is the English source
 // rather than a translation, so the untranslated gate would fire on every line and
