@@ -138,12 +138,21 @@ jobs:
       # release script puts there and the shape the shipped setup embeds. The
       # framework-dependent publish above parks beside it and exercises the
       # lighter build without deciding what the compile step below bundles.
+      #
+      # Compression OFF, matching the release script rather than the GUI publish
+      # above. The compressed CLI drew a machine-learning verdict from one engine
+      # on two separate hashes across a substantial code change, and the
+      # uncompressed build of the same source scanned clean, so that is the shape
+      # the download now ships in. The README tells readers they can rebuild a
+      # tag and compare hashes against the published ones, and this file is the
+      # only public statement of how; a flag that disagrees with the release
+      # script makes that promise fail for the one binary it is easiest to check.
       - name: Smoke-publish CLI self-contained
-        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/cli
+        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=false -o publish/cli
 
       # The setup is the artefact CI could not build: ISCC is the only thing
       # that reads installer/*.iss, so a typo there, a message missing from one
-      # of the three bundled community .isl files, or an #include that lost its
+      # of the four bundled community .isl files, or an #include that lost its
       # UTF-8 BOM used to surface for the first time mid-release, on the one
       # machine that compiles it. The self-contained GUI and CLI publishes above
       # put the exes exactly where the [Files] section looks for them, in the
