@@ -177,7 +177,12 @@
   <data name="Automation.Close" xml:space="preserve"><value>Close</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Close window</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Close result and return to main window</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Leave a star on github</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>Leave a star on github</value>
+    <comment>Screen-reader name for the About window's star link. Cased for
+    speech for the reason Automation.CheckForUpdates.HelpText carries; the
+    visible label keeps the proper capitalisation.</comment>
+  </data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimise</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -210,7 +215,17 @@
        translateword.c's abbreviation branch). "GitHub" has been heard split
        that way by Narrator, on this very string. Lower case triggers
        neither, and none of it is on screen, so the spelling costs nothing. -->
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Checks github's releases page for a newer version.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve">
+    <value>Checks github's releases page for a newer version.</value>
+    <comment>Screen-reader help on the main window's "Check for updates" button.
+    "github" is lower case on purpose, here and in every other spoken string: a
+    screen reader treats the mid-word capital in "GitHub" as an abbreviation and
+    spells it out, "G, I, T, hub", where the lower-case form is read as one word.
+    Verified against a real screen reader. Visible labels keep the proper
+    capitalisation, so the About window's button says GitHub while its Automation
+    twin does not. The two keys naming github.com are lower case for a different
+    reason: that one is a domain.</comment>
+  </data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Opens the readme on github in your browser.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.
