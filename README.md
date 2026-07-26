@@ -191,7 +191,7 @@ If it's approved, releases will carry the line SignPath ask for: free code signi
 - Committers and reviewers, meaning who can put code into the project: me. Every pull request is reviewed before it's merged.
 - Approvers, meaning who can authorise a release to be signed: me.
 
-**Privacy.** I'd like to know whether this helps people. Who those people are is none of my business. InstallerClean checks GitHub for a newer version when it starts, which you can turn off in About. At the end of a scan you can press Send report, and it sends counts of what was found and what was done with it, with no names, no paths and nothing pointing at you or your machine. That's everything it sends. The other buttons hand a web address to your browser, which takes it from there. The [privacy policy](PRIVACY.md) has the lot.
+**Privacy.** I don't find out anything about you or your files - unless you choose to send the totally optional anonymous report, which just lets me know it's working. No ads, no telemetry. The only other connections are a version check when the app starts (one request to GitHub which you can turn off in the About window) and buttons linking to GitHub and a page where you can donate if you're feeling generous. Full [privacy policy](PRIVACY.md).
 
 <a id="recovery"></a>
 ## If you do have a file missing from `C:\Windows\Installer`

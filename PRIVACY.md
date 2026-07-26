@@ -2,7 +2,7 @@
 
 Last updated 26 July 2026.
 
-I'd like to know whether this helps people. Who those people are is none of my business. Here is every time InstallerClean touches the network or writes anything down.
+I don't find out anything about you or your files - unless you choose to send the totally optional anonymous report, which just lets me know it's working. No ads, no telemetry. Here is every time InstallerClean touches the network or writes anything down.
 
 **Update check.** When you launch it, InstallerClean asks GitHub's releases page whether a newer version exists. That is one web request to github.com. It sends nothing about you or your machine beyond what any web request tells the server it contacts, which here means your IP address reaches GitHub, and it downloads nothing. If a newer version exists you get a line on screen with a link, and your browser opens only if you click it. You can turn the check off in the About screen, and it stays off.
 
