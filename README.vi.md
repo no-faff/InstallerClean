@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.3.0-blue" alt="Bản phát hành GitHub"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-42k-brightgreen" alt="Tổng lượt tải"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-44k-brightgreen" alt="Tổng lượt tải"></a>
 </p>
 
 ![Ảnh chụp màn hình InstallerClean sau khi dọn dẹp thành công: đã dọn 1,28 GB, 69 tệp đã được chuyển vào Thùng rác](docs/screenshots/vi/07-success-done.webp)
@@ -163,7 +163,7 @@ Có. InstallerClean truy vấn chính cơ sở dữ liệu API Windows Installer
 
 **Về Xóa và Chuyển.** Những tệp InstallerClean xóa có thể xóa vĩnh viễn một cách an toàn. **Xóa** sẽ di chuyển chúng vào Thùng rác (bạn sẽ được cảnh báo nếu Thùng rác không khả dụng); bạn lấy lại dung lượng trên ổ C: khi dọn sạch Thùng rác.
 
-Tuy nhiên, bạn không cần phải tin lời tôi rằng các tệp đó an toàn để xóa. Khi chúng còn trong Thùng rác, bạn có cơ hội kiểm tra xem những ứng dụng dùng thư mục này, như Office, Acrobat, Visual Studio và tương tự, vẫn cập nhật và gỡ cài đặt bình thường hay không. Nếu bạn phát hiện có gì đó hỏng (cực kỳ khó xảy ra, và cho đến nay chưa có báo cáo nào sau <!-- downloads-start -->42.000+<!-- downloads-end --> lượt tải), hãy khôi phục các tệp từ Thùng rác để khắc phục. Để cho thật chắc, bạn có thể dùng **Chuyển** thay vào đó, để sao lưu các tệp vào một thư mục bạn chọn (tất nhiên hãy chọn thư mục trên một phân vùng/ổ đĩa khác nếu bạn muốn giải phóng dung lượng trên C:). Chỉ cần chép các tệp trở lại `C:\Windows\Installer` là mọi thứ về như cũ (dù gần như chắc chắn bạn sẽ không bao giờ cần đến). Nếu tên một tệp bị thêm “(1)” (điều đó xảy ra nếu bạn chuyển tệp vào cùng một thư mục hai lần), hãy bỏ phần đó đi trước khi chép tệp trở lại.
+Tuy nhiên, bạn không cần phải tin lời tôi rằng các tệp đó an toàn để xóa. Khi chúng còn trong Thùng rác, bạn có cơ hội kiểm tra xem những ứng dụng dùng thư mục này, như Office, Acrobat, Visual Studio và tương tự, vẫn cập nhật và gỡ cài đặt bình thường hay không. Nếu bạn phát hiện có gì đó hỏng (cực kỳ khó xảy ra, và cho đến nay chưa có báo cáo nào sau <!-- downloads-start -->44.000+<!-- downloads-end --> lượt tải), hãy khôi phục các tệp từ Thùng rác để khắc phục. Để cho thật chắc, bạn có thể dùng **Chuyển** thay vào đó, để sao lưu các tệp vào một thư mục bạn chọn (tất nhiên hãy chọn thư mục trên một phân vùng/ổ đĩa khác nếu bạn muốn giải phóng dung lượng trên C:). Chỉ cần chép các tệp trở lại `C:\Windows\Installer` là mọi thứ về như cũ (dù gần như chắc chắn bạn sẽ không bao giờ cần đến). Nếu tên một tệp bị thêm “(1)” (điều đó xảy ra nếu bạn chuyển tệp vào cùng một thư mục hai lần), hãy bỏ phần đó đi trước khi chép tệp trở lại.
 
 Nếu Windows Installer đang ghi vào bộ nhớ đệm, có một giao dịch trước đó đang bị tạm dừng, hoặc có một thao tác đổi tên sau khi khởi động lại đang xếp hàng nhắm vào bộ nhớ đệm, thì Chuyển và Xóa bị vô hiệu hóa và lý do cụ thể sẽ được hiển thị.
 
@@ -175,7 +175,7 @@ Các dịch vụ quét, truy vấn, chuyển, xóa, cài đặt và kiểm tra k
 - VirusTotal: mỗi bản dựng đều được quét, với kết quả đầy đủ theo từng công cụ được liên kết trên trang phát hành của bản đó, để bạn có thể xem từng tệp được chấm điểm ra sao và tự quét lại. Một báo động giả còn hiệu lực vào lúc một bản phát hành ra mắt sẽ được nêu đích danh và giải thích trên trang của bản phát hành đó, và trang đó được cập nhật ngay khi hãng gỡ bỏ nó.
 - Mã nguồn nằm tại [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) và CI biên dịch và kiểm thử mọi lần commit (xem huy hiệu CI màu xanh ở trên).
 - Các bản dựng phát hành có tính tất định: thiết lập của trình biên dịch khiến cùng một mã nguồn và cùng một SDK luôn cho ra đúng những byte như nhau, còn quy trình phát hành thì từ chối gắn tag cho một phiên bản nếu các tệp exe phát hành không được dựng từ một cây làm việc sạch đúng tại tag đó. Vậy nên bạn có thể checkout tag đó, tự dựng lấy rồi đối chiếu mã băm với mã băm đã công bố: có thể chứng minh được rằng tệp bạn tải về khớp với mã nguồn công khai. Trước hết hãy dùng đúng phiên bản SDK (ghi chú của mỗi bản phát hành cho biết nó được dựng bằng SDK nào); một bản vá SDK khác sẽ cho ra byte khác, trông như không khớp nhưng thực ra không phải vậy.
-- <!-- downloads-start -->42.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
+- <!-- downloads-start -->44.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) kiểm tra mỗi lần gửi trong một máy ảo và chỉ đăng nếu nó vượt qua được phần đánh giá của họ.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Được MajorGeeks chứng nhận 100% sạch" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) kiểm tra mỗi bản phát hành để phát hiện virus, phần mềm gián điệp và phần mềm quảng cáo.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Được Softpedia chứng nhận 100% sạch" width="190"></a>
 
@@ -238,7 +238,7 @@ Nếu có điều gì ở đây cản trở bạn, hãy [mở một issue](../..
 **Tôi có thật sự giải phóng được hàng GB dung lượng không?** Còn tùy máy của bạn. Một bản Windows 11 cài mới không có phần mềm nào thêm thì chẳng có gì để loại bỏ. Một máy trạm của lập trình viên dùng lâu năm, hoặc bất kỳ máy nào có nhiều phần mềm dựa trên MSI (Acrobat, Office, LibreOffice, các công cụ phát triển lớn), có thể có hàng chục GB. Dù sao đi nữa, bạn sẽ thấy chính xác là bao nhiêu ngay khi chạy nó.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Trong số 151 báo cáo mọi người đã gửi về (cảm ơn 🙏) kể từ khi v1.8.0 thêm tùy chọn này:
+Trong số 153 báo cáo mọi người đã gửi về (cảm ơn 🙏) kể từ khi v1.8.0 thêm tùy chọn này:
 
 | Kết quả | Tỷ lệ | Nhỏ nhất | Trung vị | Lớn nhất |
 |---|---|---|---|---|

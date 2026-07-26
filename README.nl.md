@@ -20,7 +20,7 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.3.0-blue" alt="GitHub-release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-42k-brightgreen" alt="Totaal aantal downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-44k-brightgreen" alt="Totaal aantal downloads"></a>
 </p>
 
 ![Screenshot van InstallerClean na een geslaagde opschoonbeurt: 1,28 GB opgeruimd, 68 bestanden naar de Prullenbak verplaatst](docs/screenshots/nl/07-success-done.webp)
@@ -163,7 +163,7 @@ Ja. InstallerClean raadpleegt dezelfde Windows Installer-database die Windows ze
 
 **Over Verwijderen en Verplaatsen.** De bestanden die InstallerClean verwijdert, kunnen veilig definitief weg. **Verwijderen** stuurt ze naar de Prullenbak (je krijgt een waarschuwing als die niet beschikbaar is); de ruimte op je C:-schijf krijg je terug zodra je de Prullenbak leegt.
 
-Maar je hoeft mij niet te geloven dat de bestanden veilig weg kunnen. Zolang ze in je Prullenbak zitten, kun je controleren of de apps die deze map gebruiken, Office, Acrobat, Visual Studio en dergelijke, nog gewoon bijwerken en deïnstalleren. Vind je toch iets kapot (uiterst onwaarschijnlijk, en na <!-- downloads-start -->42.000+<!-- downloads-end --> downloads is er nog niets gemeld), dan zet je de bestanden terug vanuit de Prullenbak en is het opgelost. Wil je het extra zeker spelen, gebruik dan **Verplaatsen** om de bestanden als back-up in een map naar keuze te zetten (kies uiteraard een map op een andere schijf of partitie als je ruimte op C: wilt vrijmaken). Kopieer de bestanden gewoon terug naar `C:\Windows\Installer` om alles terug te zetten zoals het was (al zul je dat vrijwel zeker nooit nodig hebben). Heeft een bestand een “(1)” in zijn naam gekregen (dat gebeurt als je twee keer bestanden naar dezelfde map hebt verplaatst), haal dat er dan af voordat je het bestand terugkopieert.
+Maar je hoeft mij niet te geloven dat de bestanden veilig weg kunnen. Zolang ze in je Prullenbak zitten, kun je controleren of de apps die deze map gebruiken, Office, Acrobat, Visual Studio en dergelijke, nog gewoon bijwerken en deïnstalleren. Vind je toch iets kapot (uiterst onwaarschijnlijk, en na <!-- downloads-start -->44.000+<!-- downloads-end --> downloads is er nog niets gemeld), dan zet je de bestanden terug vanuit de Prullenbak en is het opgelost. Wil je het extra zeker spelen, gebruik dan **Verplaatsen** om de bestanden als back-up in een map naar keuze te zetten (kies uiteraard een map op een andere schijf of partitie als je ruimte op C: wilt vrijmaken). Kopieer de bestanden gewoon terug naar `C:\Windows\Installer` om alles terug te zetten zoals het was (al zul je dat vrijwel zeker nooit nodig hebben). Heeft een bestand een “(1)” in zijn naam gekregen (dat gebeurt als je twee keer bestanden naar dezelfde map hebt verplaatst), haal dat er dan af voordat je het bestand terugkopieert.
 
 Als Windows Installer op dat moment naar de cache schrijft, een eerdere transactie heeft openstaan of een hernoeming voor na de herstart op de cache heeft klaarstaan, zijn Verplaatsen en Verwijderen uitgeschakeld en zie je de precieze reden.
 
@@ -175,7 +175,7 @@ De services voor scannen, opvragen, verplaatsen, verwijderen, instellingen en ee
 - VirusTotal: elke build wordt gescand, met de volledige resultaten per engine gelinkt op de bijbehorende releasepagina, zodat je kunt zien hoe elk bestand scoorde en het zelf opnieuw kunt scannen. Een vals alarm dat nog actief is wanneer een release uitkomt, wordt op de pagina van die release benoemd en uitgelegd, en de pagina wordt bijgewerkt zodra de leverancier het intrekt.
 - De broncode staat op [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) en CI bouwt en test elke commit (zie de groene CI-badge hierboven).
 - Release-builds zijn deterministisch: door de compilerinstellingen leveren dezelfde broncode en dezelfde SDK dezelfde bytes op, en het releaseproces weigert een versie te taggen tenzij de geleverde exe's uit een schone werkkopie op precies die tag zijn gebouwd. Je kunt de tag dus uitchecken, zelf bouwen en de hashes vergelijken met de gepubliceerde: de download komt aantoonbaar overeen met de openbare broncode. Stem eerst de SDK-versie af (in de release-notes van elke versie staat waarmee is gebouwd); een andere SDK-patch levert andere bytes op, wat op een verschil lijkt maar het niet is.
-- <!-- downloads-start -->42.000+<!-- downloads-end --> downloads via GitHub, MajorGeeks en Softpedia.
+- <!-- downloads-start -->44.000+<!-- downloads-end --> downloads via GitHub, MajorGeeks en Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) test elke inzending in een virtuele machine en neemt haar alleen op als ze hun beoordeling doorstaat.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Door MajorGeeks gecertificeerd: 100% schoon" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) test elke release op virussen, spyware en adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Door Softpedia gecertificeerd: 100% schoon" width="190"></a>
 
@@ -238,7 +238,7 @@ Zit iets je hier in de weg, [open dan een issue](../../issues). Toegankelijkheid
 **Ga ik echt GB's aan ruimte vrijmaken?** Dat hangt van je machine af. Een schone Windows 11-installatie zonder extra software heeft niets te verwijderen. Een ontwikkelwerkstation dat al jaren meegaat, of elke machine met veel MSI-software (Acrobat, Office, LibreOffice, grote ontwikkeltools), kan tientallen GB's hebben. Hoe dan ook zie je precies hoeveel op het moment dat je het draait.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Uit de 151 rapporten die mensen zo vriendelijk zijn geweest in te sturen (dank 🙏) sinds v1.8.0 de optie toevoegde:
+Uit de 153 rapporten die mensen zo vriendelijk zijn geweest in te sturen (dank 🙏) sinds v1.8.0 de optie toevoegde:
 
 | Uitkomst | Aandeel | Kleinste | Mediaan | Grootste |
 |---|---|---|---|---|
