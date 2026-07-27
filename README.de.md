@@ -20,14 +20,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.3.0-blue" alt="GitHub-Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-44k-brightgreen" alt="Downloads insgesamt"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-46k-brightgreen" alt="Downloads insgesamt"></a>
 </p>
 
 ![Screenshot von InstallerClean nach einem erfolgreichen Aufräumen: 1,28 GB aufgeräumt, 68 Dateien in den Papierkorb verschoben](docs/screenshots/de/07-success-done.webp)
 
 - **Was:** InstallerClean tut eine Sache: Es entfernt nicht benötigte Dateien aus `C:\Windows\Installer`, einem versteckten Ordner, den Windows nie aufräumt. Nach einem fast augenblicklichen Scan sagt es dir, ob du welche hast, zeigt Neugierigen mehr Details und lässt dich die Dateien löschen, um Platz auf deiner C:-Festplatte freizugeben. Du benutzt es einmal und machst weiter.
 - **Warum du vielleicht hier bist:** Du hast [WinDirStat](https://github.com/windirstat/windirstat), WizTree oder TreeSize benutzt, gesehen, dass `C:\Windows\Installer` viel Platz belegt, und nicht gewusst, was darin steckt. InstallerClean ist genau das Richtige. Es weiß, was in diesen Dateien mit ihren zufällig wirkenden Namen wie `9f05cba.msi` steckt, und sagt dir schnell, welche du bedenkenlos löschen kannst.
-- **Wie viel Platz:** Die (optionalen) bisher eingesandten Berichte zeigen, dass bei <!-- reports-freedpct-start -->52 %<!-- reports-freedpct-end --> der Rechner nicht benötigte Dateien zum Aufräumen vorhanden waren. Bei diesen wurden im Median <!-- reports-median-start -->22 GB<!-- reports-median-end --> freigegeben. Einige haben Hunderte GB freigeräumt. Bei mir waren es 1,28 GB. Die übrigen <!-- reports-nothingpct-start -->48 %<!-- reports-nothingpct-end --> fanden nichts zu entfernen, was einfach heißt, dass ihr Installer-Ordner bereits sauber war. Mehr Details in den [FAQ](#faq) weiter unten.
+- **Wie viel Platz:** Die (optionalen) bisher eingesandten Berichte zeigen, dass bei <!-- reports-freedpct-start -->53 %<!-- reports-freedpct-end --> der Rechner nicht benötigte Dateien zum Aufräumen vorhanden waren. Bei diesen wurden im Median <!-- reports-median-start -->21 GB<!-- reports-median-end --> freigegeben. Einige haben Hunderte GB freigeräumt. Bei mir waren es 1,28 GB. Die übrigen <!-- reports-nothingpct-start -->47 %<!-- reports-nothingpct-end --> fanden nichts zu entfernen, was einfach heißt, dass ihr Installer-Ordner bereits sauber war. Mehr Details in den [FAQ](#faq) weiter unten.
 - **Ist es sicher:** Ja. Es fragt die Windows-Installer-API selbst, welche Dateien noch benötigt werden, und listet nur die auf, die Windows als erledigt meldet. Es ist quelloffen (Apache 2.0) und fragt nichts über dich ab: kein Konto, keine Werbung, kein Tracking, keine Telemetrie, nichts, was im Hintergrund läuft. Das Einzige, was es von sich aus online tut, ist bei jedem Start auf GitHub nach einer neueren Version zu sehen, und das kannst du abschalten.
 - **Holen:** [Lade die neueste Version herunter](../../releases/latest). Führe sie aus; klicke dich durch [die Warnung „Unbekannter Herausgeber“](#unknown-publisher) und [die Administrator-Abfrage](#admin). Lösche alle nicht benötigten Dateien. Fertig.
 
@@ -163,7 +163,7 @@ Ja. InstallerClean fragt dieselbe Windows-Installer-API-Datenbank ab, die Window
 
 **Zu Löschen und Verschieben.** Die Dateien, die InstallerClean löscht, können bedenkenlos dauerhaft gelöscht werden. **Löschen** verschiebt sie in den Papierkorb (du wirst gewarnt, falls er nicht verfügbar ist); den Speicherplatz auf deiner C:-Festplatte bekommst du zurück, wenn du den Papierkorb leerst.
 
-Du musst mir aber nicht glauben, dass die Dateien bedenkenlos gelöscht werden können. Solange sie im Papierkorb liegen, kannst du prüfen, ob die Programme, die diesen Ordner nutzen, Office, Acrobat, Visual Studio und Ähnliches, sich weiterhin problemlos aktualisieren und deinstallieren lassen. Falls du etwas kaputt findest (äußerst unwahrscheinlich, und nach <!-- downloads-start -->44.000+<!-- downloads-end --> Downloads wurde bislang nichts gemeldet), stell die Dateien aus dem Papierkorb wieder her, um es zu beheben. Ganz auf Nummer sicher gehst du mit **Verschieben**, um die Dateien in einem Ordner deiner Wahl zu sichern (wähle natürlich einen Ordner auf einer anderen Partition/Festplatte, wenn du Platz auf C: freigeben willst). Kopier die Dateien einfach zurück nach `C:\Windows\Installer`, um alles wieder so herzustellen, wie es war (auch wenn du das mit ziemlicher Sicherheit nie brauchen wirst). Hat eine Datei ein „(1)“ im Namen bekommen (das passiert, wenn du Dateien zweimal in denselben Ordner verschoben hast), entferne es, bevor du die Datei zurückkopierst.
+Du musst mir aber nicht glauben, dass die Dateien bedenkenlos gelöscht werden können. Solange sie im Papierkorb liegen, kannst du prüfen, ob die Programme, die diesen Ordner nutzen, Office, Acrobat, Visual Studio und Ähnliches, sich weiterhin problemlos aktualisieren und deinstallieren lassen. Falls du etwas kaputt findest (äußerst unwahrscheinlich, und nach <!-- downloads-start -->46.000+<!-- downloads-end --> Downloads wurde bislang nichts gemeldet), stell die Dateien aus dem Papierkorb wieder her, um es zu beheben. Ganz auf Nummer sicher gehst du mit **Verschieben**, um die Dateien in einem Ordner deiner Wahl zu sichern (wähle natürlich einen Ordner auf einer anderen Partition/Festplatte, wenn du Platz auf C: freigeben willst). Kopier die Dateien einfach zurück nach `C:\Windows\Installer`, um alles wieder so herzustellen, wie es war (auch wenn du das mit ziemlicher Sicherheit nie brauchen wirst). Hat eine Datei ein „(1)“ im Namen bekommen (das passiert, wenn du Dateien zweimal in denselben Ordner verschoben hast), entferne es, bevor du die Datei zurückkopierst.
 
 Wenn Windows Installer gerade in den Cache schreibt, eine frühere Transaktion ausgesetzt ist oder eine nach dem Neustart auszuführende Umbenennung den Cache betrifft, sind Verschieben und Löschen deaktiviert und der konkrete Grund wird angezeigt.
 
@@ -175,7 +175,7 @@ Die Dienste für Scan, Abfrage, Verschieben, Löschen, Einstellungen und aussteh
 - VirusTotal: Jeder Build wird gescannt; die vollständigen Ergebnisse pro Engine sind auf der jeweiligen Release-Seite verlinkt, damit du sehen kannst, wie jede Datei abgeschnitten hat, und sie selbst erneut scannen kannst. Ein Fehlalarm, der beim Erscheinen einer Version noch aktiv ist, wird auf der Seite dieser Version benannt und erklärt, und die Seite wird aktualisiert, sobald der Hersteller ihn zurückzieht.
 - Der Quellcode liegt auf [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean), und die CI baut und testet jeden Commit (siehe das grüne CI-Badge oben).
 - Release-Builds sind deterministisch: Die Compiler-Einstellungen sorgen dafür, dass derselbe Quellcode und dasselbe SDK exakt dieselben Bytes ergeben, und der Release-Prozess weigert sich, eine Version zu taggen, wenn die ausgelieferten exe-Dateien nicht aus einem sauberen Arbeitsbaum genau auf diesem Tag gebaut wurden. Du kannst also den Tag auschecken, selbst bauen und die Hashes mit den veröffentlichten vergleichen: Der Download stimmt damit nachweislich mit dem öffentlichen Quellcode überein. Gleiche zuerst die SDK-Version ab (in den Release-Notes jeder Version steht, mit welchem gebaut wurde); ein anderer SDK-Patch erzeugt andere Bytes, was wie eine Abweichung aussieht und keine ist.
-- <!-- downloads-start -->44.000+<!-- downloads-end --> Downloads über GitHub, MajorGeeks und Softpedia.
+- <!-- downloads-start -->46.000+<!-- downloads-end --> Downloads über GitHub, MajorGeeks und Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testet jede Einreichung in einer virtuellen Maschine und listet sie nur, wenn sie die Prüfung besteht.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Von MajorGeeks als 100 % sauber zertifiziert" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) prüft jede Version auf Viren, Spyware und Adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Von Softpedia als 100 % sauber zertifiziert" width="190"></a>
 
@@ -238,12 +238,12 @@ Wenn dir hier etwas im Weg ist, [erstelle ein Issue](../../issues). Barrierefrei
 **Werde ich wirklich GB an Speicher freigeben?** Das hängt von deinem Rechner ab. Eine saubere Windows-11-Installation ohne zusätzliche Software hat nichts zu entfernen. Eine lange genutzte Entwickler-Workstation oder jeder Rechner mit viel MSI-basierter Software (Acrobat, Office, LibreOffice, große Entwicklungswerkzeuge) kann zig GB haben. So oder so siehst du genau wie viel, sobald du es ausführst.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Von den 153 Berichten, die seit der Einführung der Option in v1.8.0 freundlicherweise eingesandt wurden (danke 🙏):
+Von den 156 Berichten, die seit der Einführung der Option in v1.8.0 freundlicherweise eingesandt wurden (danke 🙏):
 
 | Ergebnis | Anteil | Minimum | Median | Maximum |
 |---|---|---|---|---|
-| Nichts zu entfernen | 48 % | - | - | - |
-| Freigegebener Speicher | 52 % | 0,1 GB | 22 GB | 327 GB |
+| Nichts zu entfernen | 47 % | - | - | - |
+| Freigegebener Speicher | 53 % | 0,1 GB | 21 GB | 327 GB |
 <!-- reports-stats-end -->
 
 <details>

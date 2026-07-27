@@ -20,14 +20,14 @@
   <a href="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml"><img src="https://github.com/no-faff/InstallerClean/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4.svg" alt="Windows 10/11"></a>
   <a href="https://github.com/no-faff/InstallerClean/releases/latest"><img src="https://img.shields.io/badge/release-v2.3.0-blue" alt="GitHub Release"></a>
-  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-44k-brightgreen" alt="Total downloads"></a>
+  <a href="https://github.com/no-faff/InstallerClean/releases"><img src="https://img.shields.io/badge/downloads-46k-brightgreen" alt="Total downloads"></a>
 </p>
 
 ![Screenshot of InstallerClean after a successful clean-up: 1.28 GB cleaned up, 68 files moved to the Recycle Bin](docs/screenshots/en/07-success-done.webp)
 
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
 - **You might be here because:** You used [WinDirStat](https://github.com/windirstat/windirstat), WizTree or TreeSize, saw `C:\Windows\Installer` taking up a lot of space and didn't know what was in there. InstallerClean is just what you need. It knows what's in those files with random-looking names like `9f05cba.msi` and quickly tells you which ones you can safely delete.
-- **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->52%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->22 GB<!-- reports-median-end -->. A few cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->48%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean. More detail in the [FAQ](#faq) below.
+- **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->53%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->21 GB<!-- reports-median-end -->. A few cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->47%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean. More detail in the [FAQ](#faq) below.
 - **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (Apache 2.0) and asks nothing about you: no account, no ads, no tracking, no telemetry, nothing running in the background. The only thing it does online by itself is check GitHub for a newer version when you run it, and you can turn that off.
 - **Get it:** [Download the latest release](../../releases/latest). Run it; click through [the unknown-publisher warning](#unknown-publisher) and [the admin prompt](#admin). Delete any unneeded files. Done.
 
@@ -164,7 +164,7 @@ Yes. InstallerClean queries the same Windows Installer API database that Windows
 
 **About Delete and Move.** The files InstallerClean deletes are safe to delete permanently. **Delete** moves them to the Recycle Bin (you'll be warned if it's not available); you gain the space back on your C: drive when you empty your Recycle Bin.
 
-You don't have to trust me that the files are safe to delete, though. While they're in your Recycle Bin, you have a chance to check that the apps that use this folder, Office, Acrobat, Visual Studio and the like, still update and uninstall without trouble. If you find something broken (extremely unlikely and nothing has been reported so far after <!-- downloads-start -->44,000+<!-- downloads-end --> downloads), restore the files from the Recycle Bin to fix it. To be extra safe, you can instead use **Move** to back up the files to a folder of your choice (obviously choose a folder on another drive/partition if you're looking to free space on C:). Simply copy the files back to `C:\Windows\Installer` to restore things back to how they were (though you almost certainly won't ever need to). If a file picked up a "(1)" in its name (that happens if you moved files into the same folder twice), remove it before copying the file back.
+You don't have to trust me that the files are safe to delete, though. While they're in your Recycle Bin, you have a chance to check that the apps that use this folder, Office, Acrobat, Visual Studio and the like, still update and uninstall without trouble. If you find something broken (extremely unlikely and nothing has been reported so far after <!-- downloads-start -->46,000+<!-- downloads-end --> downloads), restore the files from the Recycle Bin to fix it. To be extra safe, you can instead use **Move** to back up the files to a folder of your choice (obviously choose a folder on another drive/partition if you're looking to free space on C:). Simply copy the files back to `C:\Windows\Installer` to restore things back to how they were (though you almost certainly won't ever need to). If a file picked up a "(1)" in its name (that happens if you moved files into the same folder twice), remove it before copying the file back.
 
 If Windows Installer is currently writing to the cache, has a previous transaction suspended or has a queued post-reboot rename targeting the cache, Move and Delete are disabled and the specific reason is shown.
 
@@ -176,7 +176,7 @@ The scan, query, move, delete, settings and pending-reboot services are covered 
 - VirusTotal: every build is scanned, with the full per-engine results linked on its release page so you can see how each file scored and re-scan it yourself. A false positive that's live when a release goes out is named and explained on that release's page, and the page is updated once the vendor clears it.
 - Source is at [github.com/no-faff/InstallerClean](https://github.com/no-faff/InstallerClean) and CI builds and tests every commit (see the green CI badge above).
 - Release builds are deterministic: the compiler settings make the same source and SDK produce the same bytes, and the release process refuses to tag a version unless the shipped exes were built from a clean tree at exactly that tag. So you can check out the tag, build it yourself and compare hashes with the published ones: the download provably matches the public source. Match the SDK version first (each release's notes say which it was built with); a different SDK patch produces different bytes, which looks like a mismatch and isn't.
-- <!-- downloads-start -->44,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
+- <!-- downloads-start -->46,000+<!-- downloads-end --> downloads across GitHub, MajorGeeks and Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) tests each submission in a virtual machine and lists it only if it passes their review.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks certified 100% clean" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) tests each release for viruses, spyware and adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia certified 100% clean" width="190"></a>
 
@@ -250,12 +250,12 @@ If anything here gets in your way, [open an issue](../../issues). Accessibility 
 **Will I actually free up GBs of space?** It depends on your machine. A clean Windows 11 install with no extra software has nothing to remove. A long-running developer workstation, or any machine with heavy MSI-based software (Acrobat, Office, LibreOffice, large dev tools), can have tens of GB. Either way, you'll see exactly how much the moment you run it.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Across the 153 reports people have sent in (thanks 🙏) since v1.8.0 added the option:
+Across the 156 reports people have sent in (thanks 🙏) since v1.8.0 added the option:
 
 | Outcome | Share | Smallest | Median | Largest |
 |---|---|---|---|---|
-| Nothing to remove | 48% | - | - | - |
-| Freed space | 52% | 0.1 GB | 22 GB | 327 GB |
+| Nothing to remove | 47% | - | - | - |
+| Freed space | 53% | 0.1 GB | 21 GB | 327 GB |
 <!-- reports-stats-end -->
 
 <details>
