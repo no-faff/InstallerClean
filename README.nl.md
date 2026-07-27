@@ -140,7 +140,7 @@ InstallerClean herkent drie soorten overbodige bestanden.
 
 **Verweesde bestanden** zijn de `.msi`-installers (en eventuele `.msp`-patches) die achterblijven nadat je software hebt verwijderd. Windows verwijst er niet meer naar, maar de bestanden staan in de map en nemen ruimte in.
 
-**Vervangen patches** zijn oude `.msp`-patches waar nieuwere voor in de plaats zijn gekomen. Windows markeert ze in zijn eigen database als vervangen, maar verwijdert ze nooit. Leveranciers die vaak patches uitbrengen (Acrobat, Office, grote ontwikkeltools) stapelen vervangen patches eindeloos op.
+**Vervangen patches** zijn oude `.msp`-patches waar nieuwere voor in de plaats zijn gekomen. Windows markeert ze in zijn eigen database als vervangen, maar verwijdert ze nooit. Dat dit zo vaak voorkomt, komt door Adobe: elke Acrobat-update verschijnt als een patch op dezelfde oorspronkelijke installer en niet als een eigen nieuwe installer, dus bewaart een machine uiteindelijk één patch voor elke update die hij ooit heeft gehad. Office en grote ontwikkeltools stapelen zich op dezelfde manier op, alleen langzamer.
 
 **Verouderde patches** zijn `.msp`-patches die de uitgever heeft teruggetrokken of afgeschreven in plaats van vervangen door een nieuwere versie. Windows legt ook die status vast en laat het bestand net zo goed in de map staan.
 

@@ -140,7 +140,7 @@ InstallerClean mengenali tiga jenis file yang tidak diperlukan.
 
 **File yatim** adalah penginstal `.msi` (dan patch `.msp` apa pun) yang tertinggal setelah Anda menghapus instalasi perangkat lunak. Windows tidak lagi merujuknya, tetapi file-file itu tetap berada di folder dan memakan ruang.
 
-**Patch yang digantikan** adalah patch `.msp` lama yang telah diganti oleh yang lebih baru. Windows menandainya sebagai digantikan di basis datanya sendiri tetapi tidak pernah menghapusnya. Vendor yang sering merilis patch (Acrobat, Office, alat pengembangan besar) menumpuk patch yang digantikan tanpa henti.
+**Patch yang digantikan** adalah patch `.msp` lama yang telah diganti oleh yang lebih baru. Windows menandainya sebagai digantikan di basis datanya sendiri tetapi tidak pernah menghapusnya. Adobe-lah alasan hal ini begitu sering muncul: setiap pembaruan Acrobat dirilis sebagai patch atas penginstal asli yang sama, bukan sebagai penginstal baru tersendiri, sehingga sebuah mesin akhirnya menyimpan satu patch untuk setiap pembaruan yang pernah diterimanya. Office dan alat pengembangan besar menumpuk dengan cara yang sama, hanya lebih lambat.
 
 **Patch usang** adalah patch `.msp` yang telah ditarik atau ditinggalkan oleh penerbitnya alih-alih diganti dengan versi yang lebih baru. Windows mencatat keadaan itu juga, dan sama-sama membiarkan file-nya di folder.
 

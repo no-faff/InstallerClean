@@ -140,7 +140,7 @@ InstallerClean nhận diện ba loại tệp không cần thiết.
 
 **Tệp mồ côi** là các trình cài đặt `.msi` (và những bản vá `.msp` nếu có) còn sót lại sau khi bạn gỡ phần mềm. Windows không còn tham chiếu tới chúng, nhưng các tệp vẫn nằm trong thư mục và chiếm chỗ.
 
-**Bản vá bị thay thế** là những bản vá `.msp` cũ đã bị bản mới hơn thay thế. Windows đánh dấu chúng là đã bị thay thế trong cơ sở dữ liệu của mình nhưng không bao giờ xóa. Những nhà cung cấp phát hành bản vá thường xuyên (Acrobat, Office, các công cụ phát triển lớn) tích tụ bản vá bị thay thế vô tận.
+**Bản vá bị thay thế** là những bản vá `.msp` cũ đã bị bản mới hơn thay thế. Windows đánh dấu chúng là đã bị thay thế trong cơ sở dữ liệu của mình nhưng không bao giờ xóa. Chuyện này hay gặp đến thế là vì Adobe: mỗi bản cập nhật Acrobat đều ra dưới dạng một bản vá cho cùng một trình cài đặt gốc, chứ không phải một trình cài đặt mới của riêng nó, nên máy rốt cuộc giữ lại một bản vá cho mỗi bản cập nhật từng nhận. Office và các công cụ phát triển lớn cũng tích tụ theo đúng cách đó, chỉ là chậm hơn.
 
 **Bản vá đã lỗi thời** là những bản vá `.msp` mà nhà phát hành đã thu hồi hoặc ngừng dùng thay vì thay thế bằng phiên bản mới hơn. Windows cũng ghi nhận trạng thái đó, và cũng để tệp lại trong thư mục.
 

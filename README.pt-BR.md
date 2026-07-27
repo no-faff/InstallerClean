@@ -140,7 +140,7 @@ O InstallerClean identifica três tipos de arquivos desnecessários.
 
 **Arquivos órfãos** são os instaladores `.msi` (e quaisquer patches `.msp`) deixados para trás depois que você desinstala um programa. O Windows não os referencia mais, mas os arquivos continuam na pasta ocupando espaço.
 
-**Patches substituídos** são patches `.msp` antigos que foram trocados por outros mais novos. O Windows os marca como substituídos no próprio banco de dados, mas nunca os exclui. Fornecedores que lançam patches com frequência (Acrobat, Office, ferramentas de desenvolvimento grandes) acumulam patches substituídos indefinidamente.
+**Patches substituídos** são patches `.msp` antigos que foram trocados por outros mais novos. O Windows os marca como substituídos no próprio banco de dados, mas nunca os exclui. Isso aparece tanto por causa da Adobe: cada atualização do Acrobat sai como um patch aplicado ao mesmo instalador original, e não como um instalador novo próprio, então a máquina acaba guardando um para cada atualização que já recebeu desde o começo. O Office e as ferramentas de desenvolvimento grandes se acumulam do mesmo jeito, só que mais devagar.
 
 **Patches obsoletos** são patches `.msp` que o fabricante retirou ou descontinuou em vez de substituir por uma versão mais nova. O Windows registra esse estado também e, da mesma forma, deixa o arquivo na pasta.
 

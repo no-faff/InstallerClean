@@ -140,7 +140,7 @@ InstallerClean individua tre tipi di file non necessari.
 
 **I file orfani** sono gli installer `.msi` (e le eventuali patch `.msp`) lasciati indietro dopo aver disinstallato un software. Windows non li referenzia più, ma i file restano nella cartella a occupare spazio.
 
-**Le patch sostituite** sono vecchie patch `.msp` che sono state rimpiazzate da altre più recenti. Windows le contrassegna come sostituite nel proprio database, ma non le elimina mai. I produttori che pubblicano patch di frequente (Acrobat, Office, grandi strumenti di sviluppo) accumulano patch sostituite all'infinito.
+**Le patch sostituite** sono vecchie patch `.msp` che sono state rimpiazzate da altre più recenti. Windows le contrassegna come sostituite nel proprio database, ma non le elimina mai. Se la cosa salta fuori così spesso è per colpa di Adobe: ogni aggiornamento di Acrobat esce come patch applicata allo stesso installer originale e non come nuovo installer a sé, così un computer finisce per conservarne una per ogni aggiornamento ricevuto fino a oggi. Office e i grandi strumenti di sviluppo si accumulano allo stesso modo, solo più lentamente.
 
 **Le patch obsolete** sono patch `.msp` che l'editore ha ritirato o dichiarato obsolete invece di sostituirle con una versione più recente. Windows registra anche questo stato e, allo stesso modo, lascia il file nella cartella.
 

@@ -140,7 +140,7 @@ InstallerClean identifica tres tipos de archivos innecesarios.
 
 **Los archivos huérfanos** son los instaladores `.msi` (y cualquier parche `.msp`) que quedan tras desinstalar un programa. Windows ya no los referencia, pero siguen en la carpeta ocupando espacio.
 
-**Los parches sustituidos** son parches `.msp` antiguos que han sido reemplazados por otros más nuevos. Windows los marca como sustituidos en su propia base de datos, pero nunca los borra. Los proveedores que publican parches con frecuencia (Acrobat, Office, grandes herramientas de desarrollo) van acumulando parches sustituidos de forma indefinida.
+**Los parches sustituidos** son parches `.msp` antiguos que han sido reemplazados por otros más nuevos. Windows los marca como sustituidos en su propia base de datos, pero nunca los borra. Si esto sale tanto es por Adobe: cada actualización de Acrobat se publica como un parche sobre el mismo instalador original, y no como un instalador nuevo propio, así que un equipo acaba guardando uno por cada actualización que ha recibido desde el principio. Office y las grandes herramientas de desarrollo se acumulan igual, solo que más despacio.
 
 **Los parches obsoletos** son parches `.msp` que el fabricante ha retirado o dado de baja en lugar de reemplazarlos por una versión más reciente. Windows también registra ese estado y, de igual modo, deja el archivo en la carpeta.
 

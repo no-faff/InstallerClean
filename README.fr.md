@@ -140,7 +140,7 @@ InstallerClean identifie trois catégories de fichiers inutiles.
 
 **Les fichiers orphelins** sont les programmes d'installation `.msi` (et les éventuels correctifs `.msp`) laissés derrière eux après la désinstallation d'un logiciel. Windows ne les référence plus, mais les fichiers occupent toujours de la place dans le dossier.
 
-**Les correctifs remplacés** sont d'anciens correctifs `.msp` qui ont cédé la place à de plus récents. Windows les marque comme remplacés dans sa propre base de données, mais ne les supprime jamais. Les éditeurs qui publient des correctifs fréquents (Acrobat, Office, gros outils de développement) en accumulent indéfiniment.
+**Les correctifs remplacés** sont d'anciens correctifs `.msp` qui ont cédé la place à de plus récents. Windows les marque comme remplacés dans sa propre base de données, mais ne les supprime jamais. Si le sujet revient si souvent, c'est à cause d'Adobe : chaque mise à jour d'Acrobat est livrée sous forme de correctif appliqué au même programme d'installation d'origine, et non sous forme de nouveau programme d'installation à part entière, si bien qu'une machine finit par en conserver un pour chacune des mises à jour qu'elle a reçues depuis le début. Office et les gros outils de développement s'accumulent de la même façon, mais plus lentement.
 
 **Les correctifs obsolètes** sont des correctifs `.msp` que l'éditeur a retirés ou abandonnés au lieu de les remplacer par une version plus récente. Windows enregistre cet état lui aussi, et laisse de même le fichier dans le dossier.
 

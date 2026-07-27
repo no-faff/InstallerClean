@@ -140,7 +140,7 @@ InstallerClean erkennt drei Arten von nicht benötigten Dateien.
 
 **Verwaiste Dateien** sind die `.msi`-Installer (und etwaige `.msp`-Patches), die nach dem Deinstallieren von Software zurückbleiben. Windows verweist nicht mehr auf sie, aber die Dateien liegen im Ordner und belegen Platz.
 
-**Ersetzte Patches** sind alte `.msp`-Patches, die durch neuere ersetzt wurden. Windows markiert sie in seiner eigenen Datenbank als ersetzt, löscht sie aber nie. Anbieter, die häufig Patches veröffentlichen (Acrobat, Office, große Entwicklungswerkzeuge), sammeln ersetzte Patches endlos an.
+**Ersetzte Patches** sind alte `.msp`-Patches, die durch neuere ersetzt wurden. Windows markiert sie in seiner eigenen Datenbank als ersetzt, löscht sie aber nie. Dass das so oft vorkommt, liegt an Adobe: Jedes Acrobat-Update erscheint als Patch auf denselben ursprünglichen Installer und nicht als eigener neuer Installer, also behält ein Rechner am Ende für jedes Update, das er je bekommen hat, einen davon. Office und große Entwicklungswerkzeuge sammeln sich genauso an, nur langsamer.
 
 **Veraltete Patches** sind `.msp`-Patches, die der Herausgeber zurückgezogen oder für überholt erklärt hat, statt sie durch eine neuere Version zu ersetzen. Windows erfasst auch diesen Zustand und lässt die Datei ebenfalls im Ordner.
 

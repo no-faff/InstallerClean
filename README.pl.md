@@ -140,7 +140,7 @@ InstallerClean rozpoznaje trzy rodzaje niepotrzebnych plików.
 
 **Osierocone pliki** to instalatory `.msi` (oraz ewentualne poprawki `.msp`) pozostawione po odinstalowaniu oprogramowania. Windows już się do nich nie odwołuje, ale pliki leżą w folderze i zajmują miejsce.
 
-**Zastąpione poprawki** to stare poprawki `.msp`, które zostały zastąpione nowszymi. Windows oznacza je w swojej bazie danych jako zastąpione, ale nigdy ich nie usuwa. Dostawcy, którzy często wydają poprawki (Acrobat, Office, duże narzędzia deweloperskie), gromadzą zastąpione poprawki bez końca.
+**Zastąpione poprawki** to stare poprawki `.msp`, które zostały zastąpione nowszymi. Windows oznacza je w swojej bazie danych jako zastąpione, ale nigdy ich nie usuwa. To przez Adobe sprawa wraca tak często: każda aktualizacja Acrobata wychodzi jako poprawka do tego samego pierwotnego instalatora, a nie jako osobny nowy instalator, więc na maszynie zostaje po jednej na każdą aktualizację, jaką kiedykolwiek dostała. Office i duże narzędzia deweloperskie narastają tak samo, tylko wolniej.
 
 **Wycofane poprawki** to poprawki `.msp`, które wydawca wycofał lub uznał za przestarzałe, zamiast zastąpić je nowszą wersją. Windows zapisuje także ten stan i również pozostawia plik w folderze.
 

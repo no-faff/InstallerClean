@@ -140,7 +140,7 @@ InstallerClean üç tür gereksiz dosya tanır.
 
 **Yetim dosyalar**, bir yazılımı kaldırdıktan sonra geride kalan `.msi` yükleyicileridir (ve varsa `.msp` yamalarıdır). Windows artık onlara başvurmaz, ama dosyalar klasörde durup yer kaplar.
 
-**Yerine yenisi gelen yamalar**, daha yenileri tarafından değiştirilmiş eski `.msp` yamalarıdır. Windows bunları kendi veritabanında yerine yenisi gelmiş olarak işaretler, ama hiç silmez. Sık yama yayımlayan üreticiler (Acrobat, Office, büyük geliştirme araçları) bu tür yamaları sınırsızca biriktirir.
+**Yerine yenisi gelen yamalar**, daha yenileri tarafından değiştirilmiş eski `.msp` yamalarıdır. Windows bunları kendi veritabanında yerine yenisi gelmiş olarak işaretler, ama hiç silmez. Bunun bu kadar sık karşımıza çıkmasının sebebi Adobe: her Acrobat güncellemesi kendi başına yeni bir yükleyici olarak değil, hep aynı asıl yükleyiciye uygulanan bir yama olarak çıkar; böylece makinede bugüne dek gelmiş her güncelleme için bir yama birikir. Office ve büyük geliştirme araçları da aynı şekilde birikir, sadece daha yavaş.
 
 **Geçersiz kılınan yamalar**, yayımcının daha yeni bir sürümle değiştirmek yerine geri çektiği ya da kullanımdan kaldırdığı `.msp` yamalarıdır. Windows bu durumu da kaydeder ve dosyayı yine klasörde bırakır.
 
