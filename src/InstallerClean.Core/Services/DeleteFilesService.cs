@@ -109,7 +109,8 @@ public sealed class DeleteFilesService : IDeleteFilesService
             {
             int deleted = 0;
             var errors = new List<FileOperationError>();
-            var failureLog = new PerFileFailureLog("Delete");
+            var failureLog = new PerFileFailureLog("Delete",
+                "The per-file list is on the completion screen and in the result log.");
             bool cancelled = false;
 
             try

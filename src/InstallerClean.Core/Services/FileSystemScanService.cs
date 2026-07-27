@@ -96,6 +96,40 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         var removable = new List<OrphanedFile>();
 
+        // Budgeted, because a refusal is a per-file event on a loop whose length
+        // is the size of C:\Windows\Installer. The guard's every input is a
+        // machine-wide condition, so what refuses one candidate usually refuses
+        // the lot: the cache root's own resolution degrading leaves every path
+        // measured against an unexpanded root, and a filter driver refusing
+        // CreateFile, or an attribute read failing across the folder, leaves
+        // every verdict unproven. One full CrashLog.Write each is then a
+        // self-inflicted denial of the log: driven at 100,000 refusals it wrote
+        // 19 MB across 37 rotations, and crash.log holds 512 KB with one
+        // archive, so nothing that was in the file before the scan survived. The
+        // refusals are also the least informative entries possible, being
+        // near-identical restatements of one condition.
+        // Cause strings, rather than the bare exception, because both sites
+        // synthesise an InvalidOperationException: all four kinds carry the same
+        // type and HRESULT, so without them the budget's novel-cause escape
+        // hatch would fire once and swallow the other three.
+        var refusalLog = new PerFileFailureLog("Scan",
+            "There is no other record of which files these were: a refused candidate is left off the "
+            + "list offered for removal and nothing else about it is kept. Fewer files are offered, "
+            + "never more.");
+
+        long stillUsedBytes = 0;
+        int missingNonRemovable = 0;
+        int missingRemovable = 0;
+        int nonRemovablePresent = 0;
+        var sizedPackages = new List<RegisteredPackage>(registered.Count);
+
+        // The closing entry is owed on every exit, not just the clean one: a
+        // cancel and the correlation gate both leave through here, and the gate
+        // in particular fires on exactly the kind of broken machine that makes
+        // the guard refuse wholesale, so its run is the one whose suppressed
+        // count is worth having.
+        try
+        {
         foreach (var filePath in diskFiles)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -118,10 +152,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
             var walkSafety = CandidateGuard.CheckSafeToRemove(filePath, _installerFolderOverride);
             if (walkSafety != CandidateGuard.RemovalSafety.Safe)
             {
-                CrashLog.Write(new InvalidOperationException(
+                refusalLog.Record(new InvalidOperationException(
                     walkSafety == CandidateGuard.RemovalSafety.Refused
                         ? $"Removal candidate refused (not directly in the Installer cache, or a reparse point): {filePath}"
-                        : $"Removal candidate not offered (its symlink status or location could not be read): {filePath}"));
+                        : $"Removal candidate not offered (its symlink status or location could not be read): {filePath}"),
+                    cause: $"walk/{walkSafety}");
                 continue;
             }
 
@@ -146,11 +181,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         // Stat every registered package once here so the Details window
         // doesn't have to hit disk on the UI thread when it opens.
-        long stillUsedBytes = 0;
-        int missingNonRemovable = 0;
-        int missingRemovable = 0;
-        int nonRemovablePresent = 0;
-        var sizedPackages = new List<RegisteredPackage>(registered.Count);
         foreach (var pkg in registered)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -223,10 +253,11 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 {
                     // In-bounds check failed on an existing removable file: drop
                     // it (do not offer, do not count as missing) and log.
-                    CrashLog.Write(new InvalidOperationException(
+                    refusalLog.Record(new InvalidOperationException(
                         patchSafety == CandidateGuard.RemovalSafety.Refused
                             ? $"Removable-patch candidate refused (not directly in the Installer cache, or a reparse point): {pkg.LocalPackagePath}"
-                            : $"Removable-patch candidate not offered (its symlink status or location could not be read): {pkg.LocalPackagePath}"));
+                            : $"Removable-patch candidate not offered (its symlink status or location could not be read): {pkg.LocalPackagePath}"),
+                        cause: $"removable-patch/{patchSafety}");
                 }
                 else
                 {
@@ -247,6 +278,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 missingNonRemovable++;
             }
         }
+        }
+        finally
+        {
+            refusalLog.WriteClosingEntry();
+        }
+
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
 
         // Correlation sanity gate. On any real machine at least some registered

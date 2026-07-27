@@ -134,7 +134,8 @@ public sealed class MoveFilesService : IMoveFilesService
 
             int moved = 0;
             var errors = new List<FileOperationError>();
-            var failureLog = new PerFileFailureLog("Move");
+            var failureLog = new PerFileFailureLog("Move",
+                "The per-file list is on the completion screen and in the result log.");
             var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
             var total = pathList.Count;
             bool cancelled = false;
