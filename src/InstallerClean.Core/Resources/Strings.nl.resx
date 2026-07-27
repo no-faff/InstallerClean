@@ -177,7 +177,12 @@
   <data name="Automation.Close" xml:space="preserve"><value>Sluiten</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Venster sluiten</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Resultaat sluiten en terug naar het hoofdvenster</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Geef een ster op github</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>Geef een ster op github</value>
+    <comment>Screen-reader name for the About window's star link. Cased for
+    speech for the reason Automation.CheckForUpdates.HelpText carries; the
+    visible label keeps the proper capitalisation.</comment>
+  </data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimaliseren</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -210,7 +215,17 @@
        translateword.c's abbreviation branch). "GitHub" has been heard split
        that way by Narrator, on this very string. Lower case triggers
        neither, and none of it is on screen, so the spelling costs nothing. -->
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Kijkt op de releasepagina van github of er een nieuwere versie is.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve">
+    <value>Kijkt op de releasepagina van github of er een nieuwere versie is.</value>
+    <comment>Screen-reader help on the main window's "Check for updates" button.
+    "github" is lower case on purpose, here and in every other spoken string: a
+    screen reader treats the mid-word capital in "GitHub" as an abbreviation and
+    spells it out, "G, I, T, hub", where the lower-case form is read as one word.
+    Verified against a real screen reader. Visible labels keep the proper
+    capitalisation, so the About window's button says GitHub while its Automation
+    twin does not. The two keys naming github.com are lower case for a different
+    reason: that one is a domain.</comment>
+  </data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Opent het readme-bestand op github in je browser.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.
@@ -282,7 +297,7 @@
        screen reader tabbing onto the link needs a self-contained purpose;
        it must still contain the visible phrase so voice control can click
        it by its on-screen words. -->
-  <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Legt in het README-bestand uit wat deze map is en hoe je een bestand terugzet</value></data>
+  <data name="Automation.RegisteredMissingSeeAlso" xml:space="preserve"><value>Legt uit wat deze map is en hoe je een bestand terugzet, in het README-bestand</value></data>
 
   <!-- Tooltips -->
   <data name="Tooltip.BuyMeACuppa.About" xml:space="preserve"><value>Het is dorstig werk!</value></data>
@@ -489,7 +504,12 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
+       The English names no pronoun for the files on purpose. One flat string
+       serves every count here, and the neutral carries no .One form for the
+       English to fall back on, so a "them" read wrongly at a count of one; the
+       eight satellites whose grammar forced the issue had each added an override
+       for it. "What the scan flagged" is number-blind and needs none. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} behouden, omdat een programma ze na de scan weer nodig bleek te hebben.</value></data>
   <!-- The other reason the pre-action re-check keeps files back: its own read of
        the Windows Installer records came up short, so it withheld every
@@ -995,19 +1015,19 @@ Het crashlog kon niet worden geschreven.</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Gebruik:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Deze hulp tonen (ook /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  De versie tonen (ook -v)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Alleen scannen - verwijderbare bestanden tonen</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Verwijderbare bestanden verwijderen (Prullenbak)</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Verplaatsen naar de opgeslagen standaardlocatie</value></data>
-  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PAD     Verplaatsen naar het opgegeven pad</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Alleen scannen - verwijderbare bestanden</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Verwijderbare bestanden (Prullenbak)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Naar de opgeslagen standaardlocatie</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PAD     Naar het opgegeven pad</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli is een echt consoleproces en blokkeert de prompt</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>tot het klaar is; leid de uitvoer om of door (pipe) zoals bij elke</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>andere console-exe. De GUI zit ernaast, in InstallerClean.exe.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>De opgeslagen standaard is per gebruiker; geplande of SYSTEM-runs hebben /m PAD nodig.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>De opgeslagen standaard is per gebruiker; geplande of SYSTEM-runs: /m PAD.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Afsluitcodes:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   gelukt: elk aangemerkt bestand is verwerkt</value></data>
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   mislukt: niets verwerkt (foute argumenten, scan mislukt, alle bestanden mislukt)</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   mislukt: niets verwerkt (foute argumenten, scan of alle bestanden)</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   gedeeltelijk: sommige bestanden verwerkt, sommige mislukt</value></data>
-  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  tijdelijk: een tijdelijke situatie blokkeerde de run (zie de melding)</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  tijdelijk: iets blokkeerde de run (zie de melding)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 geannuleerd (Ctrl+C)</value></data>
   <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Taal wijzigen. Het programma start opnieuw.</value></data>
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Taal wijzigen</value></data>

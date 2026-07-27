@@ -177,7 +177,12 @@
   <data name="Automation.Close" xml:space="preserve"><value>Fermer</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Fermer la fenêtre</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Fermer le résultat et revenir à la fenêtre principale</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Laisser une étoile sur github</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>Laisser une étoile sur github</value>
+    <comment>Screen-reader name for the About window's star link. Cased for
+    speech for the reason Automation.CheckForUpdates.HelpText carries; the
+    visible label keeps the proper capitalisation.</comment>
+  </data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Réduire</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -210,7 +215,17 @@
        translateword.c's abbreviation branch). "GitHub" has been heard split
        that way by Narrator, on this very string. Lower case triggers
        neither, and none of it is on screen, so the spelling costs nothing. -->
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Vérifie sur la page des versions de github s'il existe une version plus récente.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve">
+    <value>Vérifie sur la page des versions de github s'il existe une version plus récente.</value>
+    <comment>Screen-reader help on the main window's "Check for updates" button.
+    "github" is lower case on purpose, here and in every other spoken string: a
+    screen reader treats the mid-word capital in "GitHub" as an abbreviation and
+    spells it out, "G, I, T, hub", where the lower-case form is read as one word.
+    Verified against a real screen reader. Visible labels keep the proper
+    capitalisation, so the About window's button says GitHub while its Automation
+    twin does not. The two keys naming github.com are lower case for a different
+    reason: that one is a domain.</comment>
+  </data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Ouvre le readme sur github dans votre navigateur.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.
@@ -489,7 +504,12 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
+       The English names no pronoun for the files on purpose. One flat string
+       serves every count here, and the neutral carries no .One form for the
+       English to fall back on, so a "them" read wrongly at a count of one; the
+       eight satellites whose grammar forced the issue had each added an override
+       for it. "What the scan flagged" is number-blind and needs none. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} laissés en place, redevenus nécessaires à un programme après l'analyse.</value></data>
   <!-- The other reason the pre-action re-check keeps files back: its own read of
        the Windows Installer records came up short, so it withheld every
@@ -994,21 +1014,21 @@ Le crash.log n'a pas pu être écrit.</value></data>
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - nettoyage de {InstallerFolder}</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Utilisation :</value></data>
-  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help      Affiche cette aide (accepte aussi /?, -h)</value></data>
-  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version   Affiche la version (accepte aussi -v)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s          Analyse seule - liste les fichiers inutiles</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d          Supprime les fichiers inutiles (Corbeille)</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m          Déplace vers l'emplacement par défaut enregistré</value></data>
-  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m CHEMIN   Déplace vers le chemin spécifié</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Affiche cette aide (accepte aussi /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Affiche la version (accepte aussi -v)</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Analyse seule - fichiers inutiles</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Supprime les fichiers inutiles (Corbeille)</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Déplace vers l'emplacement enregistré</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m CHEMIN  Déplace vers le chemin spécifié</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli est un vrai processus de console et bloque l'invite</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>jusqu'à la fin ; redirigez ou acheminez sa sortie comme vous le feriez</value></data>
-  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>pour tout autre exécutable de console. L'interface se trouve dans InstallerClean.exe.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>La valeur par défaut enregistrée est propre à chaque utilisateur ; les exécutions planifiées ou sous le compte SYSTEM nécessitent /m CHEMIN.</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>pour tout autre exécutable de console. L'interface est InstallerClean.exe.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Emplacement enregistré : par utilisateur ; planifié ou SYSTEM : /m CHEMIN.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Codes de sortie :</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   succès : tous les fichiers signalés ont été traités</value></data>
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   échec : rien de traité (arguments incorrects, échec de l'analyse, tous les fichiers ont échoué)</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   échec : rien de traité (arguments, analyse ou fichiers en échec)</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partiel : certains fichiers traités, d'autres ont échoué</value></data>
-  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transitoire : une condition temporaire a bloqué l'exécution (voir le message)</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  transitoire : quelque chose a bloqué l'exécution (voir le message)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 annulé (Ctrl+C)</value></data>
   <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Changer la langue. Le programme redémarrera.</value></data>
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Changer la langue</value></data>

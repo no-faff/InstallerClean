@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {1} {0}개를 다음 위치로 이동함: {2} |
 | {0} {1} moved to the Recycle Bin | {1} {0}개를 휴지통으로 이동함 |
 | {0} {1} moved to the Recycle Bin | {1} {0}개를 휴지통으로 이동함 |
-| {0} {1} kept in place, because a program started needing them again after the scan. | {1} {0}개는 검사 이후 어떤 프로그램이 다시 필요로 하게 되어 그대로 두었습니다. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | {1} {0}개는 검사 이후 어떤 프로그램이 다시 필요로 하게 되어 그대로 두었습니다. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {1} {0}개는 확인을 다시 했을 때 Windows Installer 기록을 완전히 읽을 수 없어 그대로 두었습니다. |
 | Moved {0} of {1} {2} before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 이동했습니다. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | 취소하기 전까지 {2} {1}개 중 {0}개를 휴지통으로 이동했습니다. |
@@ -461,14 +461,14 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         검사만 - 불필요한 파일 나열 |
 |   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         불필요한 파일 삭제 (휴지통) |
 |   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         저장된 기본 위치로 이동 |
-|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m 경로      지정한 경로로 이동 |
+|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m 경로    지정한 경로로 이동 |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli는 실제 콘솔 프로세스로, 명령 프롬프트를 점유하며, |
-| until it finishes; redirect or pipe its output as you would any | 실행이 끝날 때까지 기다립니다. 다른 콘솔 실행 파일처럼 출력을 리디렉션하거나 |
-| other console exe. The GUI lives in InstallerClean.exe alongside it. | 파이프로 넘길 수 있습니다. GUI는 바로 옆 InstallerClean.exe에 들어 있습니다. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | 저장된 기본값은 사용자별로 적용되므로, 예약된 작업이나 SYSTEM 계정 실행에는 /m 경로가 필요합니다. |
+| until it finishes; redirect or pipe its output as you would any | 실행이 끝날 때까지 기다립니다. 다른 콘솔 앱처럼 출력을 리디렉션하거나 |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | 파이프로 넘길 수 있습니다. GUI는 옆의 InstallerClean.exe입니다. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | 기본 위치는 사용자별입니다. 예약 작업이나 SYSTEM은 /m 경로가 필요합니다. |
 | Exit codes: | 종료 코드: |
 |   0   success: every flagged file was processed |   0   성공: 표시된 모든 파일을 처리함 |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   실패: 아무것도 처리하지 못함 (잘못된 인수, 검사 실패, 모든 파일 실패) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   실패: 처리된 파일 없음 (잘못된 인수, 검사 실패, 모든 파일 실패) |
 |   2   partial: some files processed, some failed |   2   부분 처리: 일부 파일은 처리됨, 일부는 실패 |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  일시적: 일시적인 상황으로 실행이 차단됨 (메시지 참고) |
 |   130 cancelled (Ctrl+C) |   130 취소됨 (Ctrl+C) |

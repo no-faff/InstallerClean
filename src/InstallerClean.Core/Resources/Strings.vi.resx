@@ -177,7 +177,12 @@
   <data name="Automation.Close" xml:space="preserve"><value>Đóng</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Đóng cửa sổ</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Đóng kết quả và quay lại cửa sổ chính</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Gắn sao trên github</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>Gắn sao trên github</value>
+    <comment>Screen-reader name for the About window's star link. Cased for
+    speech for the reason Automation.CheckForUpdates.HelpText carries; the
+    visible label keeps the proper capitalisation.</comment>
+  </data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Thu nhỏ</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -210,7 +215,17 @@
        translateword.c's abbreviation branch). "GitHub" has been heard split
        that way by Narrator, on this very string. Lower case triggers
        neither, and none of it is on screen, so the spelling costs nothing. -->
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Kiểm tra trang phát hành của github xem có phiên bản mới hơn không.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve">
+    <value>Kiểm tra trang phát hành của github xem có phiên bản mới hơn không.</value>
+    <comment>Screen-reader help on the main window's "Check for updates" button.
+    "github" is lower case on purpose, here and in every other spoken string: a
+    screen reader treats the mid-word capital in "GitHub" as an abbreviation and
+    spells it out, "G, I, T, hub", where the lower-case form is read as one word.
+    Verified against a real screen reader. Visible labels keep the proper
+    capitalisation, so the About window's button says GitHub while its Automation
+    twin does not. The two keys naming github.com are lower case for a different
+    reason: that one is a domain.</comment>
+  </data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Mở readme trên github trong trình duyệt của bạn.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.
@@ -489,7 +504,12 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
+       The English names no pronoun for the files on purpose. One flat string
+       serves every count here, and the neutral carries no .One form for the
+       English to fall back on, so a "them" read wrongly at a count of one; the
+       eight satellites whose grammar forced the issue had each added an override
+       for it. "What the scan flagged" is number-blind and needs none. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Đã giữ nguyên {0} {1} vì sau lần quét, một chương trình lại cần đến chúng.</value></data>
   <!-- The other reason the pre-action re-check keeps files back: its own read of
        the Windows Installer records came up short, so it withheld every
@@ -993,19 +1013,19 @@ Không thể ghi nhật ký sự cố.</value></data>
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - dọn dẹp {InstallerFolder}</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Cách dùng:</value></data>
-  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help        Hiển thị trợ giúp này (cũng nhận /?, -h)</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help        Hiển thị trợ giúp (cũng nhận /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version     In ra phiên bản (cũng nhận -v)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s            Chỉ quét - liệt kê các tệp không cần thiết</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s            Chỉ quét - tệp không cần thiết</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d            Xóa các tệp không cần thiết (Thùng rác)</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m            Chuyển tới vị trí mặc định đã lưu</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m ĐƯỜNG_DẪN  Chuyển tới đường dẫn được chỉ định</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli là một tiến trình console thật và chặn dấu nhắc</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>cho đến khi xong; hãy chuyển hướng hoặc nối ống đầu ra của nó như</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>với mọi tệp console khác. GUI nằm trong InstallerClean.exe cùng chỗ.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Mặc định đã lưu là theo từng người dùng; các lần chạy theo lịch hoặc bằng tài khoản SYSTEM cần /m ĐƯỜNG_DẪN.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Mặc định đã lưu theo người dùng; chạy theo lịch hoặc SYSTEM: /m ĐƯỜNG_DẪN.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Mã thoát:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   thành công: mọi tệp được đánh dấu đều đã được xử lý</value></data>
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   thất bại: không xử lý được gì (sai đối số, quét thất bại, mọi tệp đều thất bại)</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   thất bại: không xử lý được gì (đối số, quét hoặc mọi tệp)</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   một phần: một số tệp được xử lý, một số thất bại</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  tạm thời: một điều kiện tạm thời đã chặn lần chạy (xem thông báo)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 đã hủy (Ctrl+C)</value></data>

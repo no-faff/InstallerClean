@@ -177,7 +177,12 @@
   <data name="Automation.Close" xml:space="preserve"><value>닫기</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>창 닫기</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>결과를 닫고 메인 창으로 돌아가기</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>github에 별 남기기</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>github에 별 남기기</value>
+    <comment>Screen-reader name for the About window's star link. Cased for
+    speech for the reason Automation.CheckForUpdates.HelpText carries; the
+    visible label keeps the proper capitalisation.</comment>
+  </data>
   <data name="Automation.Minimise" xml:space="preserve"><value>최소화</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -210,7 +215,17 @@
        translateword.c's abbreviation branch). "GitHub" has been heard split
        that way by Narrator, on this very string. Lower case triggers
        neither, and none of it is on screen, so the spelling costs nothing. -->
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>github의 릴리스 페이지에서 새 버전이 있는지 확인합니다.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve">
+    <value>github의 릴리스 페이지에서 새 버전이 있는지 확인합니다.</value>
+    <comment>Screen-reader help on the main window's "Check for updates" button.
+    "github" is lower case on purpose, here and in every other spoken string: a
+    screen reader treats the mid-word capital in "GitHub" as an abbreviation and
+    spells it out, "G, I, T, hub", where the lower-case form is read as one word.
+    Verified against a real screen reader. Visible labels keep the proper
+    capitalisation, so the About window's button says GitHub while its Automation
+    twin does not. The two keys naming github.com are lower case for a different
+    reason: that one is a domain.</comment>
+  </data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>브라우저에서 github의 readme를 엽니다.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.
@@ -489,7 +504,12 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
+       The English names no pronoun for the files on purpose. One flat string
+       serves every count here, and the neutral carries no .One form for the
+       English to fall back on, so a "them" read wrongly at a count of one; the
+       eight satellites whose grammar forced the issue had each added an override
+       for it. "What the scan flagged" is number-blind and needs none. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{1} {0}개는 검사 이후 어떤 프로그램이 다시 필요로 하게 되어 그대로 두었습니다.</value></data>
   <!-- The other reason the pre-action re-check keeps files back: its own read of
        the Windows Installer records came up short, so it withheld every
@@ -998,14 +1018,14 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         검사만 - 불필요한 파일 나열</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         불필요한 파일 삭제 (휴지통)</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         저장된 기본 위치로 이동</value></data>
-  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 경로      지정한 경로로 이동</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 경로    지정한 경로로 이동</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli는 실제 콘솔 프로세스로, 명령 프롬프트를 점유하며,</value></data>
-  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>실행이 끝날 때까지 기다립니다. 다른 콘솔 실행 파일처럼 출력을 리디렉션하거나</value></data>
-  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>파이프로 넘길 수 있습니다. GUI는 바로 옆 InstallerClean.exe에 들어 있습니다.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>저장된 기본값은 사용자별로 적용되므로, 예약된 작업이나 SYSTEM 계정 실행에는 /m 경로가 필요합니다.</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>실행이 끝날 때까지 기다립니다. 다른 콘솔 앱처럼 출력을 리디렉션하거나</value></data>
+  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>파이프로 넘길 수 있습니다. GUI는 옆의 InstallerClean.exe입니다.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>기본 위치는 사용자별입니다. 예약 작업이나 SYSTEM은 /m 경로가 필요합니다.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>종료 코드:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   성공: 표시된 모든 파일을 처리함</value></data>
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   실패: 아무것도 처리하지 못함 (잘못된 인수, 검사 실패, 모든 파일 실패)</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   실패: 처리된 파일 없음 (잘못된 인수, 검사 실패, 모든 파일 실패)</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   부분 처리: 일부 파일은 처리됨, 일부는 실패</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  일시적: 일시적인 상황으로 실행이 차단됨 (메시지 참고)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 취소됨 (Ctrl+C)</value></data>

@@ -177,7 +177,12 @@
   <data name="Automation.Close" xml:space="preserve"><value>Tutup</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Tutup jendela</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Tutup hasil dan kembali ke jendela utama</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Beri bintang di github</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>Beri bintang di github</value>
+    <comment>Screen-reader name for the About window's star link. Cased for
+    speech for the reason Automation.CheckForUpdates.HelpText carries; the
+    visible label keeps the proper capitalisation.</comment>
+  </data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Kecilkan</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -210,7 +215,17 @@
        translateword.c's abbreviation branch). "GitHub" has been heard split
        that way by Narrator, on this very string. Lower case triggers
        neither, and none of it is on screen, so the spelling costs nothing. -->
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Memeriksa halaman rilis github untuk mencari versi yang lebih baru.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve">
+    <value>Memeriksa halaman rilis github untuk mencari versi yang lebih baru.</value>
+    <comment>Screen-reader help on the main window's "Check for updates" button.
+    "github" is lower case on purpose, here and in every other spoken string: a
+    screen reader treats the mid-word capital in "GitHub" as an abbreviation and
+    spells it out, "G, I, T, hub", where the lower-case form is read as one word.
+    Verified against a real screen reader. Visible labels keep the proper
+    capitalisation, so the About window's button says GitHub while its Automation
+    twin does not. The two keys naming github.com are lower case for a different
+    reason: that one is a domain.</comment>
+  </data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>Membuka readme di github melalui peramban Anda.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.
@@ -223,7 +238,7 @@
     <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
   </data>
   <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
-    <value>Jika dicentang, InstallerClean memeriksa github apakah ada versi yang lebih baru saat Anda menjalankannya.</value>
+    <value>Jika dicentang, InstallerClean memeriksa apakah ada versi yang lebih baru di github saat Anda menjalankannya.</value>
     <comment>Screen-reader help on the About window's auto-update checkbox.
     Names the destination and is cased for speech for the reasons
     Automation.CheckForUpdates.HelpText carries.</comment>
@@ -489,7 +504,12 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
+       The English names no pronoun for the files on purpose. One flat string
+       serves every count here, and the neutral carries no .One form for the
+       English to fall back on, so a "them" read wrongly at a count of one; the
+       eight satellites whose grammar forced the issue had each added an override
+       for it. "What the scan flagged" is number-blind and needs none. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} {1} dibiarkan di tempatnya, karena sebuah program kembali membutuhkannya setelah pemindaian.</value></data>
   <!-- The other reason the pre-action re-check keeps files back: its own read of
        the Windows Installer records came up short, so it withheld every
@@ -992,19 +1012,19 @@ Log kerusakan tidak bisa ditulis.</value></data>
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - pembersihan {InstallerFolder}</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Penggunaan:</value></data>
-  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Tampilkan bantuan ini (juga menerima /?, -h)</value></data>
-  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Cetak versi (juga menerima -v)</value></data>
+  <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Tampilkan bantuan ini (juga /?, -h)</value></data>
+  <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Cetak versi (juga -v)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Pindai saja - daftar file tidak diperlukan</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Hapus file tidak diperlukan (Keranjang Sampah)</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Hapus file tidak diperlukan (Keranjang)</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Pindahkan ke lokasi default tersimpan</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m JALUR   Pindahkan ke jalur yang ditentukan</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli adalah proses konsol sungguhan dan memblokir prompt</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>sampai selesai; alihkan atau salurkan keluarannya seperti</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>file exe konsol lainnya. GUI ada di InstallerClean.exe di sebelahnya.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Lokasi default tersimpan bersifat per-pengguna; tugas terjadwal atau proses SYSTEM memerlukan /m JALUR.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Lokasi tersimpan per pengguna; tugas terjadwal atau SYSTEM: /m JALUR.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Kode keluar:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   berhasil: setiap file yang ditandai telah diproses</value></data>
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   gagal: tidak ada yang diproses (argumen salah, pemindaian gagal, semua file gagal)</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   gagal: tidak ada yang diproses (argumen, pemindaian, semua file)</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   sebagian: sebagian file diproses, sebagian gagal</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  sementara: kondisi sementara memblokir proses (lihat pesannya)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 dibatalkan (Ctrl+C)</value></data>

@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} {1} переміщено до: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} переміщено до Кошика |
 | {0} {1} moved to the Recycle Bin | {0} {1} переміщено до Кошика |
-| {0} {1} kept in place, because a program started needing them again after the scan. | {0} {1} залишено на місці: після сканування вони знову знадобилися програмі. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} залишено на місці: після сканування вони знову знадобилися програмі. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} залишено на місці: під час повторної перевірки не вдалося повністю прочитати записи інсталятора Windows. |
 | Moved {0} of {1} {2} before you cancelled. | Переміщено {0} з {1} {2}, перш ніж ви скасували. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Переміщено {0} з {1} {2} до Кошика, перш ніж ви скасували. |
@@ -458,17 +458,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Використання: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Показати цю довідку (також приймає /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Вивести версію (також приймає -v) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Лише сканувати, перелічити непотрібні файли |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Лише сканування - непотрібні файли |
 |   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Видалити непотрібні файли (Кошик) |
-|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         Перемістити в збережене типове розташування |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         Перемістити в збережену папку |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m ШЛЯХ    Перемістити за вказаним шляхом |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli — це консольний процес, що блокує командний рядок до |
 | until it finishes; redirect or pipe its output as you would any | завершення; перенаправляйте чи передавайте його вивід, як у будь-якого |
-| other console exe. The GUI lives in InstallerClean.exe alongside it. | іншого консольного exe. Графічний інтерфейс міститься поруч, у InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Збережене типове розташування діє лише для поточного користувача; для запусків за розкладом чи від імені SYSTEM потрібно вказати /m ШЛЯХ. |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | іншого консольного exe. Графічний інтерфейс у InstallerClean.exe. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Збережена папка своя в кожного користувача; розклад і SYSTEM: /m ШЛЯХ. |
 | Exit codes: | Коди виходу: |
 |   0   success: every flagged file was processed |   0   успіх: оброблено кожен позначений файл |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   невдача: нічого не оброблено (хибні аргументи, збій сканування, усі файли зазнали збою) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   невдача: нічого не оброблено (аргументи, сканування або файли) |
 |   2   partial: some files processed, some failed |   2   частково: частину файлів оброблено, частину ні |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  тимчасова: запуск заблокувала тимчасова умова (див. повідомлення) |
 |   130 cancelled (Ctrl+C) |   130 скасовано (Ctrl+C) |

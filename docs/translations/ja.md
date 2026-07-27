@@ -132,7 +132,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Select a product to view details. | 製品を選択して詳細を表示します。 |
 | No metadata available. | メタデータはありません。 |
 | This installer file has been deleted. InstallerClean didn't do it, it never removes a file a program still needs; something else deleted this one before you ran InstallerClean.<br><br>It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.<br><br>To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself. | このインストーラーファイルは削除されています。InstallerClean が削除したのではありません。プログラムがまだ必要とするファイルを削除することは決してありません。何か別のものが、InstallerClean を実行する前にこのファイルを削除しました。<br><br>今は問題を引き起こしませんが、それが属するプログラムの修復、更新、またはアンインストールを試みるまでは問題になりません。その時、Windowsがこのファイルを探して見つからないため、そのステップは失敗する可能性があります。<br><br>修正を試みるには、そのプログラムのインストーラーをメーカーからダウンロードし、既存のコピーに上書き実行してください (最初にアンインストールしないでください。アンインストール自体がこのファイルを必要とするステップです)。可能であればインストールされているバージョンを使用してください。Windows は異なるバージョンを拒否する可能性があります。これにより通常ファイルは復元され、設定は通常影響を受けませんが、Microsoft はそれを保証しておらず、最終手段はプログラム自体または Windows の再インストールです。 |
-| The README [explains this folder], and how to recover a file, in Microsoft's own words. | README には、このフォルダーについて、[Microsoft自身の言葉で]説明されており、ファイルの回復方法も記載されています。 |
+| The README [explains this folder], and how to recover a file, in Microsoft's own words. | README には、[このフォルダー]について、Microsoft自身の言葉で説明されており、ファイルの回復方法も記載されています。 |
 | (none) | (なし) |
 
 ## Reasons a file is unneeded
@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} 個の {1} を次の場所に移動しました：{2} |
 | {0} {1} moved to the Recycle Bin | {0} 個の {1} をごみ箱に移動しました |
 | {0} {1} moved to the Recycle Bin | {0} 個の {1} をごみ箱に移動しました |
-| {0} {1} kept in place, because a program started needing them again after the scan. | {0} 個の {1} はそのまま残しました。スキャン後にプログラムが再び必要としたためです。 |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} 個の {1} はそのまま残しました。スキャン後にプログラムが再び必要としたためです。 |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} 個の {1} はそのまま残しました。確認をやり直した際に Windows Installer の登録情報を完全に読み取れなかったためです。 |
 | Moved {0} of {1} {2} before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} を移動しました。 |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | キャンセルするまでに、{1} 個中 {0} 個の {2} をごみ箱に移動しました。 |
@@ -458,17 +458,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | 使用方法： |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     このヘルプを表示 (/?、-hも受け付けます) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  バージョンを表示 (-vも受け付けます) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         スキャンのみ - 削除可能なファイルを一覧表示 |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         スキャンのみ - 削除可能なファイルの一覧 |
 |   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         削除可能なファイルを削除 (ごみ箱) |
 |   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         保存されたデフォルトの場所に移動 |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PATH    指定されたパスに移動 |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cliは実際のコンソールプロセスであり、完了するまで |
-| until it finishes; redirect or pipe its output as you would any | プロンプトをブロックします。他のコンソール exe と同様に、出力をリダイレクト |
+| until it finishes; redirect or pipe its output as you would any | プロンプトをブロックします。他のコンソール exe と同様に出力をリダイレクト |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | またはパイプできます。GUI は同じ場所にある InstallerClean.exe にあります。 |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | 保存されたデフォルトはユーザーごとの設定です。スケジュール実行や SYSTEM 実行では /m PATH が必要です。 |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | 保存先はユーザー別です。スケジュール実行や SYSTEM は /m PATH が必要です。 |
 | Exit codes: | 終了コード： |
 |   0   success: every flagged file was processed |   0   成功：フラグが立てられたすべてのファイルが処理されました |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   失敗：何も処理されませんでした (不正な引数、スキャン失敗、すべてのファイルが失敗) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   失敗：処理なし (不正な引数、スキャン失敗、全ファイル失敗) |
 |   2   partial: some files processed, some failed |   2   部分完了：一部のファイルは処理され、一部は失敗しました |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  一時的：一時的な状態が実行をブロックしました (メッセージを参照) |
 |   130 cancelled (Ctrl+C) |   130 キャンセル (Ctrl+C) |

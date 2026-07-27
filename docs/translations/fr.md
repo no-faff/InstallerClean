@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | Déplacé {0} {1} vers : {2} |
 | {0} {1} moved to the Recycle Bin | Déplacé {0} {1} vers la Corbeille |
 | {0} {1} moved to the Recycle Bin | Déplacé {0} {1} vers la Corbeille |
-| {0} {1} kept in place, because a program started needing them again after the scan. | {0} {1} laissés en place, redevenus nécessaires à un programme après l'analyse. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} laissés en place, redevenus nécessaires à un programme après l'analyse. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} laissés en place, car les enregistrements de Windows Installer n'ont pas pu être entièrement lus lors de la nouvelle vérification. |
 | Moved {0} of {1} {2} before you cancelled. | Déplacé {0} sur {1} {2} avant votre annulation. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Déplacé {0} sur {1} {2} vers la Corbeille avant votre annulation. |
@@ -456,19 +456,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Remarque : l'écriture dans le journal des événements a échoué. Vérifiez les autorisations du journal Application ou la stratégie de groupe. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - nettoyage de {InstallerFolder} |
 | Usage: | Utilisation : |
-|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help      Affiche cette aide (accepte aussi /?, -h) |
-|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version   Affiche la version (accepte aussi -v) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s          Analyse seule - liste les fichiers inutiles |
-|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d          Supprime les fichiers inutiles (Corbeille) |
-|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m          Déplace vers l'emplacement par défaut enregistré |
-|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m CHEMIN   Déplace vers le chemin spécifié |
+|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Affiche cette aide (accepte aussi /?, -h) |
+|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Affiche la version (accepte aussi -v) |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Analyse seule - fichiers inutiles |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Supprime les fichiers inutiles (Corbeille) |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         Déplace vers l'emplacement enregistré |
+|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m CHEMIN  Déplace vers le chemin spécifié |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli est un vrai processus de console et bloque l'invite |
 | until it finishes; redirect or pipe its output as you would any | jusqu'à la fin ; redirigez ou acheminez sa sortie comme vous le feriez |
-| other console exe. The GUI lives in InstallerClean.exe alongside it. | pour tout autre exécutable de console. L'interface se trouve dans InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | La valeur par défaut enregistrée est propre à chaque utilisateur ; les exécutions planifiées ou sous le compte SYSTEM nécessitent /m CHEMIN. |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | pour tout autre exécutable de console. L'interface est InstallerClean.exe. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Emplacement enregistré : par utilisateur ; planifié ou SYSTEM : /m CHEMIN. |
 | Exit codes: | Codes de sortie : |
 |   0   success: every flagged file was processed |   0   succès : tous les fichiers signalés ont été traités |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   échec : rien de traité (arguments incorrects, échec de l'analyse, tous les fichiers ont échoué) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   échec : rien de traité (arguments, analyse ou fichiers en échec) |
 |   2   partial: some files processed, some failed |   2   partiel : certains fichiers traités, d'autres ont échoué |
-|   75  transient: a temporary condition blocked the run (see the message) |   75  transitoire : une condition temporaire a bloqué l'exécution (voir le message) |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  transitoire : quelque chose a bloqué l'exécution (voir le message) |
 |   130 cancelled (Ctrl+C) |   130 annulé (Ctrl+C) |

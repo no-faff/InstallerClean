@@ -360,7 +360,7 @@ const MAP = {
   'Cli.Help.ScanOnly': `  installerclean-cli /s         仅扫描 - 列出不需要的文件`,
   'Cli.Help.Delete': `  installerclean-cli /d         删除不需要的文件（回收站）`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         移动到已保存的默认位置`,
-  'Cli.Help.MovePath': `  installerclean-cli /m 路径      移动到指定路径`,
+  'Cli.Help.MovePath': `  installerclean-cli /m 路径    移动到指定路径`,
   'Cli.Help.NoteLine1': `installerclean-cli 是一个真正的控制台进程，在运行结束前会一直`,
   'Cli.Help.NoteLine2': `占用命令提示符；可像对待其他控制台程序那样重定向或通过管道处理其输出。`,
   'Cli.Help.NoteLine3': `GUI 就位于同目录下的 InstallerClean.exe 中。`,

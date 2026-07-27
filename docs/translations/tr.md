@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} {1} şu konuma taşındı: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} Geri Dönüşüm Kutusu'na taşındı |
 | {0} {1} moved to the Recycle Bin | {0} {1} Geri Dönüşüm Kutusu'na taşındı |
-| {0} {1} kept in place, because a program started needing them again after the scan. | Taramadan sonra bir programın yeniden ihtiyaç duymaya başladığı {0} {1} yerinde bırakıldı. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | Taramadan sonra bir programın yeniden ihtiyaç duymaya başladığı {0} {1} yerinde bırakıldı. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | Kontrol yinelendiğinde Windows Installer kayıtları tam olarak okunamadığı için {0} {1} yerinde bırakıldı. |
 | Moved {0} of {1} {2} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi taşındı. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi Geri Dönüşüm Kutusu'na taşındı. |
@@ -195,8 +195,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} files still needed | {0} dosya hâlâ gerekli |
 | {0} unneeded file to clean up | temizlenecek {0} gereksiz dosya |
 | {0} unneeded files to clean up | temizlenecek {0} gereksiz dosya |
-| {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride bir onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın. |
-| {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | {0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride bir onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın. |
+| {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | {0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride ilgili programı onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın. |
+| {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | {0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride ilgili programları onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın. |
 | {0} installed program could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | Bu taramada {0} yüklü program okunamadı, bu yüzden yerine geçilmiş yamalar korundu. Sahipsiz dosyalar bundan etkilenmez. |
 | {0} installed programs could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | Bu taramada {0} yüklü program okunamadı, bu yüzden yerine geçilmiş yamalar korundu. Sahipsiz dosyalar bundan etkilenmez. |
 | {0} of {1} {2} | {1} {2} içinden {0} |
@@ -459,16 +459,16 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Bu yardımı göster (/?, -h de kabul edilir) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Sürümü yazdır (-v de kabul edilir) |
 |   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Yalnızca tara - gereksiz dosyaları listele |
-|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Gereksiz dosyaları sil (Geri Dönüşüm Kutusu) |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Gereksizleri sil (Geri Dönüşüm Kutusu) |
 |   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         Kayıtlı varsayılan konuma taşı |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m YOL     Belirtilen yola taşı |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli gerçek bir konsol işlemidir ve bitene kadar istemi |
 | until it finishes; redirect or pipe its output as you would any | bloke eder; çıktısını başka herhangi bir konsol exe'sinde olduğu gibi |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | yönlendirin ya da boruya verin. GUI, yanındaki InstallerClean.exe'dedir. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Kaydedilen varsayılan kullanıcıya özeldir; zamanlanmış ya da SYSTEM çalıştırmaları /m YOL gerektirir. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Kaydedilen konum kullanıcıya özeldir; zamanlanmış veya SYSTEM için /m YOL. |
 | Exit codes: | Çıkış kodları: |
 |   0   success: every flagged file was processed |   0   başarılı: işaretlenen her dosya işlendi |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   hata: hiçbir şey işlenmedi (hatalı argümanlar, tarama başarısız, tüm dosyalar başarısız) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   hata: hiçbir şey işlenmedi (argümanlar, tarama ya da tüm dosyalar) |
 |   2   partial: some files processed, some failed |   2   kısmi: bazı dosyalar işlendi, bazıları başarısız |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  geçici: geçici bir durum çalıştırmayı engelledi (iletiye bakın) |
 |   130 cancelled (Ctrl+C) |   130 iptal edildi (Ctrl+C) |

@@ -177,7 +177,12 @@
   <data name="Automation.Close" xml:space="preserve"><value>Zamknij</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Zamknij okno</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Zamknij wynik i wróć do okna głównego</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>Zostaw gwiazdkę na githubie</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>Zostaw gwiazdkę na githubie</value>
+    <comment>Screen-reader name for the About window's star link. Cased for
+    speech for the reason Automation.CheckForUpdates.HelpText carries; the
+    visible label keeps the proper capitalisation.</comment>
+  </data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Minimalizuj</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -210,9 +215,19 @@
        translateword.c's abbreviation branch). "GitHub" has been heard split
        that way by Narrator, on this very string. Lower case triggers
        neither, and none of it is on screen, so the spelling costs nothing. -->
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>Sprawdza na stronie wydań github, czy jest nowsza wersja.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve">
+    <value>Sprawdza na stronie wydań githuba, czy jest nowsza wersja.</value>
+    <comment>Screen-reader help on the main window's "Check for updates" button.
+    "github" is lower case on purpose, here and in every other spoken string: a
+    screen reader treats the mid-word capital in "GitHub" as an abbreviation and
+    spells it out, "G, I, T, hub", where the lower-case form is read as one word.
+    Verified against a real screen reader. Visible labels keep the proper
+    capitalisation, so the About window's button says GitHub while its Automation
+    twin does not. The two keys naming github.com are lower case for a different
+    reason: that one is a domain.</comment>
+  </data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
-    <value>Otwiera readme na github w twojej przeglądarce.</value>
+    <value>Otwiera readme na githubie w twojej przeglądarce.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.
     Names the document rather than repeating the link's own label, so the
     description adds what the name has not already said. Cased for speech for
@@ -223,7 +238,7 @@
     <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
   </data>
   <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
-    <value>Jeśli zaznaczone, InstallerClean przy uruchomieniu sprawdza na github, czy jest nowsza wersja.</value>
+    <value>Jeśli zaznaczone, InstallerClean przy uruchomieniu sprawdza na githubie, czy jest nowsza wersja.</value>
     <comment>Screen-reader help on the About window's auto-update checkbox.
     Names the destination and is cased for speech for the reasons
     Automation.CheckForUpdates.HelpText carries.</comment>
@@ -489,7 +504,12 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
+       The English names no pronoun for the files on purpose. One flat string
+       serves every count here, and the neutral carries no .One form for the
+       English to fall back on, so a "them" read wrongly at a count of one; the
+       eight satellites whose grammar forced the issue had each added an override
+       for it. "What the scan flagged" is number-blind and needs none. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął ich potrzebować.</value></data>
   <!-- The other reason the pre-action re-check keeps files back: its own read of
        the Windows Installer records came up short, so it withheld every
@@ -995,19 +1015,19 @@ Nie udało się zapisać dziennika awarii.</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Sposób użycia:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help      Pokaż tę pomoc (akceptuje też /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version   Wypisz wersję (akceptuje też -v)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s          Tylko skanowanie - lista niepotrzebnych plików</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s          Tylko skanowanie - niepotrzebne pliki</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d          Usuń niepotrzebne pliki (Kosz)</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m          Przenieś do zapisanej lokalizacji domyślnej</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m          Przenieś do zapisanej lokalizacji</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m ŚCIEŻKA  Przenieś do wskazanej ścieżki</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli to prawdziwy proces konsolowy i blokuje wiersz poleceń,</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>dopóki się nie zakończy; przekieruj lub przekaż potokiem jego wyjście</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>jak każdy inny program konsolowy exe. GUI jest obok, w InstallerClean.exe.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Zapisana lokalizacja domyślna jest przypisana do użytkownika; uruchomienia zaplanowane lub na koncie SYSTEM wymagają /m ŚCIEŻKA.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Zapisana lokalizacja zależy od użytkownika; zadania i SYSTEM: /m ŚCIEŻKA.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Kody wyjścia:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   sukces: przetworzono każdy oznaczony plik</value></data>
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   błąd: nic nie przetworzono (złe argumenty, skanowanie nie powiodło się, wszystkie pliki zawiodły)</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   błąd: nic nie przetworzono (złe argumenty, skanowanie lub pliki)</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   częściowo: część plików przetworzono, część zawiodła</value></data>
-  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  stan przejściowy: tymczasowy warunek zablokował uruchomienie (zob. komunikat)</value></data>
+  <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  stan przejściowy: coś zablokowało uruchomienie (zob. komunikat)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 anulowano (Ctrl+C)</value></data>
   <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Zmień język. Program zostanie ponownie uruchomiony.</value></data>
   <data name="Automation.ChangeLanguage" xml:space="preserve"><value>Zmień język</value></data>

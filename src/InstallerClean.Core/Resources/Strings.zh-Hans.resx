@@ -177,7 +177,12 @@
   <data name="Automation.Close" xml:space="preserve"><value>关闭</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>关闭窗口</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>关闭结果并返回主窗口</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>在 github 上点个星</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>在 github 上点个星</value>
+    <comment>Screen-reader name for the About window's star link. Cased for
+    speech for the reason Automation.CheckForUpdates.HelpText carries; the
+    visible label keeps the proper capitalisation.</comment>
+  </data>
   <data name="Automation.Minimise" xml:space="preserve"><value>最小化</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -210,7 +215,17 @@
        translateword.c's abbreviation branch). "GitHub" has been heard split
        that way by Narrator, on this very string. Lower case triggers
        neither, and none of it is on screen, so the spelling costs nothing. -->
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>在 github 的发布页面上检查是否有更新版本。</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve">
+    <value>在 github 的发布页面上检查是否有更新版本。</value>
+    <comment>Screen-reader help on the main window's "Check for updates" button.
+    "github" is lower case on purpose, here and in every other spoken string: a
+    screen reader treats the mid-word capital in "GitHub" as an abbreviation and
+    spells it out, "G, I, T, hub", where the lower-case form is read as one word.
+    Verified against a real screen reader. Visible labels keep the proper
+    capitalisation, so the About window's button says GitHub while its Automation
+    twin does not. The two keys naming github.com are lower case for a different
+    reason: that one is a domain.</comment>
+  </data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>在浏览器中打开 github 上的 readme。</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.
@@ -489,7 +504,12 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
+       The English names no pronoun for the files on purpose. One flat string
+       serves every count here, and the neutral carries no .One form for the
+       English to fall back on, so a "them" read wrongly at a count of one; the
+       eight satellites whose grammar forced the issue had each added an override
+       for it. "What the scan flagged" is number-blind and needs none. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} 个{1}已保留在原处，因为这次扫描之后又有程序需要它们了。</value></data>
   <!-- The other reason the pre-action re-check keeps files back: its own read of
        the Windows Installer records came up short, so it withheld every
@@ -997,7 +1017,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         仅扫描 - 列出不需要的文件</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         删除不需要的文件（回收站）</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         移动到已保存的默认位置</value></data>
-  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 路径      移动到指定路径</value></data>
+  <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 路径    移动到指定路径</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli 是一个真正的控制台进程，在运行结束前会一直</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>占用命令提示符；可像对待其他控制台程序那样重定向或通过管道处理其输出。</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>GUI 就位于同目录下的 InstallerClean.exe 中。</value></data>

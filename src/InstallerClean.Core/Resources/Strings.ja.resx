@@ -177,7 +177,12 @@
   <data name="Automation.Close" xml:space="preserve"><value>閉じる</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>ウィンドウを閉じる</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>結果を閉じてメインウィンドウに戻る</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>github でスターを付ける</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>github でスターを付ける</value>
+    <comment>Screen-reader name for the About window's star link. Cased for
+    speech for the reason Automation.CheckForUpdates.HelpText carries; the
+    visible label keeps the proper capitalisation.</comment>
+  </data>
   <data name="Automation.Minimise" xml:space="preserve"><value>最小化</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -210,7 +215,17 @@
        translateword.c's abbreviation branch). "GitHub" has been heard split
        that way by Narrator, on this very string. Lower case triggers
        neither, and none of it is on screen, so the spelling costs nothing. -->
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>github のリリースページで新しいバージョンがあるかどうかを確認します。</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve">
+    <value>github のリリースページで新しいバージョンがあるかどうかを確認します。</value>
+    <comment>Screen-reader help on the main window's "Check for updates" button.
+    "github" is lower case on purpose, here and in every other spoken string: a
+    screen reader treats the mid-word capital in "GitHub" as an abbreviation and
+    spells it out, "G, I, T, hub", where the lower-case form is read as one word.
+    Verified against a real screen reader. Visible labels keep the proper
+    capitalisation, so the About window's button says GitHub while its Automation
+    twin does not. The two keys naming github.com are lower case for a different
+    reason: that one is a domain.</comment>
+  </data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>ブラウザで github の readme を開きます。</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.
@@ -346,7 +361,7 @@
        the first [ and ] into a prefix Run, the Hyperlink (to the README's
        recovery section), and a suffix Run. A string with no [ ] pair
        renders verbatim as one Run. -->
-  <data name="Body.RegisteredMissingFromDisk.SeeAlso" xml:space="preserve"><value>README には、このフォルダーについて、[Microsoft自身の言葉で]説明されており、ファイルの回復方法も記載されています。</value></data>
+  <data name="Body.RegisteredMissingFromDisk.SeeAlso" xml:space="preserve"><value>README には、[このフォルダー]について、Microsoft自身の言葉で説明されており、ファイルの回復方法も記載されています。</value></data>
   <data name="Body.NoPatches" xml:space="preserve"><value>(なし)</value></data>
 
   <!-- Reasons (Reason column in the orphaned-files list) -->
@@ -489,7 +504,12 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
+       The English names no pronoun for the files on purpose. One flat string
+       serves every count here, and the neutral carries no .One form for the
+       English to fall back on, so a "them" read wrongly at a count of one; the
+       eight satellites whose grammar forced the issue had each added an override
+       for it. "What the scan flagged" is number-blind and needs none. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>{0} 個の {1} はそのまま残しました。スキャン後にプログラムが再び必要としたためです。</value></data>
   <!-- The other reason the pre-action re-check keeps files back: its own read of
        the Windows Installer records came up short, so it withheld every
@@ -1019,17 +1039,17 @@ InstallerClean はすでに管理者として実行されていたため、同�
   <data name="Cli.Help.Usage" xml:space="preserve"><value>使用方法：</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     このヘルプを表示 (/?、-hも受け付けます)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  バージョンを表示 (-vも受け付けます)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         スキャンのみ - 削除可能なファイルを一覧表示</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         スキャンのみ - 削除可能なファイルの一覧</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         削除可能なファイルを削除 (ごみ箱)</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         保存されたデフォルトの場所に移動</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PATH    指定されたパスに移動</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cliは実際のコンソールプロセスであり、完了するまで</value></data>
-  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>プロンプトをブロックします。他のコンソール exe と同様に、出力をリダイレクト</value></data>
+  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>プロンプトをブロックします。他のコンソール exe と同様に出力をリダイレクト</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>またはパイプできます。GUI は同じ場所にある InstallerClean.exe にあります。</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>保存されたデフォルトはユーザーごとの設定です。スケジュール実行や SYSTEM 実行では /m PATH が必要です。</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>保存先はユーザー別です。スケジュール実行や SYSTEM は /m PATH が必要です。</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>終了コード：</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   成功：フラグが立てられたすべてのファイルが処理されました</value></data>
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   失敗：何も処理されませんでした (不正な引数、スキャン失敗、すべてのファイルが失敗)</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   失敗：処理なし (不正な引数、スキャン失敗、全ファイル失敗)</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   部分完了：一部のファイルは処理され、一部は失敗しました</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  一時的：一時的な状態が実行をブロックしました (メッセージを参照)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 キャンセル (Ctrl+C)</value></data>

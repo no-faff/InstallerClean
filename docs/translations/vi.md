@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | Đã chuyển {0} {1} tới: {2} |
 | {0} {1} moved to the Recycle Bin | Đã di chuyển {0} {1} vào Thùng rác |
 | {0} {1} moved to the Recycle Bin | Đã di chuyển {0} {1} vào Thùng rác |
-| {0} {1} kept in place, because a program started needing them again after the scan. | Đã giữ nguyên {0} {1} vì sau lần quét, một chương trình lại cần đến chúng. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | Đã giữ nguyên {0} {1} vì sau lần quét, một chương trình lại cần đến chúng. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | Đã giữ nguyên {0} {1} vì khi kiểm tra lại, không thể đọc đầy đủ các bản ghi trình cài đặt của Windows. |
 | Moved {0} of {1} {2} before you cancelled. | Đã chuyển {0}/{1} {2} trước khi bạn hủy. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Đã di chuyển {0}/{1} {2} vào Thùng rác trước khi bạn hủy. |
@@ -456,19 +456,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Lưu ý: ghi vào Nhật ký sự kiện thất bại. Hãy kiểm tra quyền của nhật ký Ứng dụng hoặc Chính sách nhóm. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - dọn dẹp {InstallerFolder} |
 | Usage: | Cách dùng: |
-|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help        Hiển thị trợ giúp này (cũng nhận /?, -h) |
+|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help        Hiển thị trợ giúp (cũng nhận /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version     In ra phiên bản (cũng nhận -v) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s            Chỉ quét - liệt kê các tệp không cần thiết |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s            Chỉ quét - tệp không cần thiết |
 |   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d            Xóa các tệp không cần thiết (Thùng rác) |
 |   installerclean-cli /m         Move to saved default location |   installerclean-cli /m            Chuyển tới vị trí mặc định đã lưu |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m ĐƯỜNG_DẪN  Chuyển tới đường dẫn được chỉ định |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli là một tiến trình console thật và chặn dấu nhắc |
 | until it finishes; redirect or pipe its output as you would any | cho đến khi xong; hãy chuyển hướng hoặc nối ống đầu ra của nó như |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | với mọi tệp console khác. GUI nằm trong InstallerClean.exe cùng chỗ. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Mặc định đã lưu là theo từng người dùng; các lần chạy theo lịch hoặc bằng tài khoản SYSTEM cần /m ĐƯỜNG_DẪN. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Mặc định đã lưu theo người dùng; chạy theo lịch hoặc SYSTEM: /m ĐƯỜNG_DẪN. |
 | Exit codes: | Mã thoát: |
 |   0   success: every flagged file was processed |   0   thành công: mọi tệp được đánh dấu đều đã được xử lý |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   thất bại: không xử lý được gì (sai đối số, quét thất bại, mọi tệp đều thất bại) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   thất bại: không xử lý được gì (đối số, quét hoặc mọi tệp) |
 |   2   partial: some files processed, some failed |   2   một phần: một số tệp được xử lý, một số thất bại |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  tạm thời: một điều kiện tạm thời đã chặn lần chạy (xem thông báo) |
 |   130 cancelled (Ctrl+C) |   130 đã hủy (Ctrl+C) |

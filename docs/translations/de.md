@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} {1} verschoben nach: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} in den Papierkorb verschoben |
 | {0} {1} moved to the Recycle Bin | {0} {1} in den Papierkorb verschoben |
-| {0} {1} kept in place, because a program started needing them again after the scan. | {0} {1} an Ort und Stelle belassen, weil ein Programm sie nach dem Scan wieder benötigt. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} an Ort und Stelle belassen, weil ein Programm sie nach dem Scan wieder benötigt. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} an Ort und Stelle belassen, weil die Einträge von Windows Installer bei der wiederholten Prüfung nicht vollständig gelesen werden konnten. |
 | Moved {0} of {1} {2} before you cancelled. | {0} von {1} {2} verschoben, bevor du abgebrochen hast. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | {0} von {1} {2} in den Papierkorb verschoben, bevor du abgebrochen hast. |
@@ -456,19 +456,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Hinweis: Das Schreiben in das Ereignisprotokoll ist fehlgeschlagen. Prüfe die Berechtigungen des Anwendungsprotokolls oder die Gruppenrichtlinie. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - {InstallerFolder} aufräumen |
 | Usage: | Verwendung: |
-|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Diese Hilfe anzeigen (akzeptiert auch /?, -h) |
-|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Die Version ausgeben (akzeptiert auch -v) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Nur scannen - nicht benötigte Dateien auflisten |
-|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Nicht benötigte Dateien löschen (Papierkorb) |
-|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         An den gespeicherten Standardort verschieben |
-|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PFAD    An den angegebenen Pfad verschieben |
+|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Diese Hilfe anzeigen (auch /?, -h) |
+|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Die Version ausgeben (auch -v) |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Nur scannen - nicht benötigte Dateien |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Nicht benötigte Dateien in den Papierkorb |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         An den gespeicherten Standardort |
+|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PFAD    An den angegebenen Pfad |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli ist ein echter Konsolenprozess und blockiert die |
-| until it finishes; redirect or pipe its output as you would any | Eingabeaufforderung, bis er fertig ist; leite seine Ausgabe wie bei jeder |
-| other console exe. The GUI lives in InstallerClean.exe alongside it. | anderen Konsolen-EXE um oder per Pipe weiter. Die GUI liegt in InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Das gespeicherte Standardziel gilt pro Benutzer; geplante oder SYSTEM-Läufe brauchen /m PFAD. |
+| until it finishes; redirect or pipe its output as you would any | Eingabeaufforderung, bis er fertig ist; leite die Ausgabe um oder per |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | Pipe weiter, wie bei jeder Konsolen-EXE. Die GUI ist InstallerClean.exe. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Das gespeicherte Ziel gilt pro Benutzer; geplante/SYSTEM-Läufe: /m PFAD. |
 | Exit codes: | Exit-Codes: |
 |   0   success: every flagged file was processed |   0   Erfolg: jede markierte Datei wurde verarbeitet |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   Fehler: nichts verarbeitet (ungültige Argumente, Scan fehlgeschlagen, alle Dateien fehlgeschlagen) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   Fehler: nichts verarbeitet (Argumentfehler, Scan- oder Dateifehler) |
 |   2   partial: some files processed, some failed |   2   teilweise: einige Dateien verarbeitet, einige fehlgeschlagen |
-|   75  transient: a temporary condition blocked the run (see the message) |   75  vorübergehend: ein vorübergehender Zustand hat den Lauf blockiert (siehe Meldung) |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  vorübergehend: etwas hat den Lauf blockiert (siehe Meldung) |
 |   130 cancelled (Ctrl+C) |   130 abgebrochen (Strg+C) |

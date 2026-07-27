@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} {1} verplaatst naar: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} naar de Prullenbak verplaatst |
 | {0} {1} moved to the Recycle Bin | {0} {1} naar de Prullenbak verplaatst |
-| {0} {1} kept in place, because a program started needing them again after the scan. | {0} {1} behouden, omdat een programma ze na de scan weer nodig bleek te hebben. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} behouden, omdat een programma ze na de scan weer nodig bleek te hebben. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} behouden, omdat de Windows Installer-records bij de herhaalde controle niet volledig konden worden gelezen. |
 | Moved {0} of {1} {2} before you cancelled. | {0} van {1} {2} verplaatst voordat je annuleerde. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | {0} van {1} {2} naar de Prullenbak verplaatst voordat je annuleerde. |
@@ -382,7 +382,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Dialog text | Dialoogtekst |
 | {0} ({1}) | {0} ({1}) |
 | Files that could not be processed | Bestanden die niet konden worden verwerkt |
-| Explains this folder, and how to recover a file, in the README | Legt in het README-bestand uit wat deze map is en hoe je een bestand terugzet |
+| Explains this folder, and how to recover a file, in the README | Legt uit wat deze map is en hoe je een bestand terugzet, in het README-bestand |
 | Report preview | Rapportvoorbeeld |
 | Change language | Taal wijzigen |
 | The program will restart. | Het programma start opnieuw. |
@@ -458,17 +458,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Gebruik: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Deze hulp tonen (ook /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  De versie tonen (ook -v) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Alleen scannen - verwijderbare bestanden tonen |
-|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Verwijderbare bestanden verwijderen (Prullenbak) |
-|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         Verplaatsen naar de opgeslagen standaardlocatie |
-|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PAD     Verplaatsen naar het opgegeven pad |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Alleen scannen - verwijderbare bestanden |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Verwijderbare bestanden (Prullenbak) |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         Naar de opgeslagen standaardlocatie |
+|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PAD     Naar het opgegeven pad |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli is een echt consoleproces en blokkeert de prompt |
 | until it finishes; redirect or pipe its output as you would any | tot het klaar is; leid de uitvoer om of door (pipe) zoals bij elke |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | andere console-exe. De GUI zit ernaast, in InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | De opgeslagen standaard is per gebruiker; geplande of SYSTEM-runs hebben /m PAD nodig. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | De opgeslagen standaard is per gebruiker; geplande of SYSTEM-runs: /m PAD. |
 | Exit codes: | Afsluitcodes: |
 |   0   success: every flagged file was processed |   0   gelukt: elk aangemerkt bestand is verwerkt |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   mislukt: niets verwerkt (foute argumenten, scan mislukt, alle bestanden mislukt) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   mislukt: niets verwerkt (foute argumenten, scan of alle bestanden) |
 |   2   partial: some files processed, some failed |   2   gedeeltelijk: sommige bestanden verwerkt, sommige mislukt |
-|   75  transient: a temporary condition blocked the run (see the message) |   75  tijdelijk: een tijdelijke situatie blokkeerde de run (zie de melding) |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  tijdelijk: iets blokkeerde de run (zie de melding) |
 |   130 cancelled (Ctrl+C) |   130 geannuleerd (Ctrl+C) |

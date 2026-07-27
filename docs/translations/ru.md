@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | Перемещено {0} {1} в: {2} |
 | {0} {1} moved to the Recycle Bin | Перемещено {0} {1} в Корзину |
 | {0} {1} moved to the Recycle Bin | Перемещено {0} {1} в Корзину |
-| {0} {1} kept in place, because a program started needing them again after the scan. | Оставлено {0} {1} на месте: после сканирования они снова понадобились программе. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | Оставлено {0} {1} на месте: после сканирования они снова понадобились программе. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | Оставлено {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи установщика Windows. |
 | Moved {0} of {1} {2} before you cancelled. | Перемещено {0}/{1} {2} до отмены. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Перемещено {0}/{1} {2} в Корзину до отмены. |
@@ -456,19 +456,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Примечание: не удалось выполнить запись в журнал событий. Проверьте разрешения журнала «Приложение» или групповую политику. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - очистка {InstallerFolder} |
 | Usage: | Использование: |
-|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help       Показать эту справку (также принимает /?, -h) |
-|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version    Показать версию (также принимает -v) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s           Только сканирование - список ненужных файлов |
+|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help       Показать эту справку (также /?, -h) |
+|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version    Показать версию (также -v) |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s           Только сканирование - ненужные файлы |
 |   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d           Удалить ненужные файлы (Корзина) |
-|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m           Переместить в сохранённую папку по умолчанию |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m           Переместить в сохранённую папку |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m ПУТЬ      Переместить в указанный путь |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli — это настоящий консольный процесс, он блокирует |
 | until it finishes; redirect or pipe its output as you would any | командную строку до завершения; перенаправляйте или передавайте его вывод |
-| other console exe. The GUI lives in InstallerClean.exe alongside it. | по конвейеру, как у любого консольного exe. GUI рядом, в InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Сохранённое значение по умолчанию задаётся отдельно для каждого пользователя; для запусков по расписанию или от имени SYSTEM нужно указывать /m ПУТЬ. |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | по конвейеру, как у любого консольного exe. GUI в InstallerClean.exe. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Сохранённая папка своя у пользователя; расписание и SYSTEM: /m ПУТЬ. |
 | Exit codes: | Коды выхода: |
 |   0   success: every flagged file was processed |   0   успех: обработаны все отмеченные файлы |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   ошибка: ничего не обработано (неверные аргументы, сбой сканирования, все файлы с ошибкой) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   ошибка: ничего не обработано (аргументы, сканирование или файлы) |
 |   2   partial: some files processed, some failed |   2   частично: часть файлов обработана, часть с ошибкой |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  временно: запуск заблокирован временным состоянием (см. сообщение) |
 |   130 cancelled (Ctrl+C) |   130 отменено (Ctrl+C) |

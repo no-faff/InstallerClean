@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | Przeniesiono {0} {1} do: {2} |
 | {0} {1} moved to the Recycle Bin | Przeniesiono {0} {1} do Kosza |
 | {0} {1} moved to the Recycle Bin | Przeniesiono {0} {1} do Kosza |
-| {0} {1} kept in place, because a program started needing them again after the scan. | Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął ich potrzebować. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął ich potrzebować. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | Pozostawiono na miejscu {0} {1}, ponieważ przy powtórzeniu sprawdzenia nie udało się w pełni odczytać rekordów Windows Installera. |
 | Moved {0} of {1} {2} before you cancelled. | Przed anulowaniem przeniesiono {0}/{1} {2}. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Przed anulowaniem przeniesiono {0}/{1} {2} do Kosza. |
@@ -355,10 +355,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Say thanks | Podziękuj |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Wyślij przekazuje pokazany raport do No Faff. Anuluj nie wysyła niczego. |
 | Check for updates | Sprawdź aktualizacje |
-| Checks github's releases page for a newer version. | Sprawdza na stronie wydań github, czy jest nowsza wersja. |
-| Opens the readme on github in your browser. | Otwiera readme na github w twojej przeglądarce. |
+| Checks github's releases page for a newer version. | Sprawdza na stronie wydań githuba, czy jest nowsza wersja. |
+| Opens the readme on github in your browser. | Otwiera readme na githubie w twojej przeglądarce. |
 | Opens the issue tracker on github.com in your browser. | Otwiera listę zgłoszeń (Issues) na github.com w twojej przeglądarce. |
-| If ticked, InstallerClean checks github for a newer version when you run it. | Jeśli zaznaczone, InstallerClean przy uruchomieniu sprawdza na github, czy jest nowsza wersja. |
+| If ticked, InstallerClean checks github for a newer version when you run it. | Jeśli zaznaczone, InstallerClean przy uruchomieniu sprawdza na githubie, czy jest nowsza wersja. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Otwórz stronę wydania, aby pobrać nowszą wersję, lub anuluj, aby zachować bieżącą. |
 | Opens the licence file on github.com in your browser. | Otwiera plik licencji na github.com w twojej przeglądarce. |
 | Move location | Lokalizacja przenoszenia |
@@ -458,17 +458,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Sposób użycia: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help      Pokaż tę pomoc (akceptuje też /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version   Wypisz wersję (akceptuje też -v) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s          Tylko skanowanie - lista niepotrzebnych plików |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s          Tylko skanowanie - niepotrzebne pliki |
 |   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d          Usuń niepotrzebne pliki (Kosz) |
-|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m          Przenieś do zapisanej lokalizacji domyślnej |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m          Przenieś do zapisanej lokalizacji |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m ŚCIEŻKA  Przenieś do wskazanej ścieżki |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli to prawdziwy proces konsolowy i blokuje wiersz poleceń, |
 | until it finishes; redirect or pipe its output as you would any | dopóki się nie zakończy; przekieruj lub przekaż potokiem jego wyjście |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | jak każdy inny program konsolowy exe. GUI jest obok, w InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Zapisana lokalizacja domyślna jest przypisana do użytkownika; uruchomienia zaplanowane lub na koncie SYSTEM wymagają /m ŚCIEŻKA. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Zapisana lokalizacja zależy od użytkownika; zadania i SYSTEM: /m ŚCIEŻKA. |
 | Exit codes: | Kody wyjścia: |
 |   0   success: every flagged file was processed |   0   sukces: przetworzono każdy oznaczony plik |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   błąd: nic nie przetworzono (złe argumenty, skanowanie nie powiodło się, wszystkie pliki zawiodły) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   błąd: nic nie przetworzono (złe argumenty, skanowanie lub pliki) |
 |   2   partial: some files processed, some failed |   2   częściowo: część plików przetworzono, część zawiodła |
-|   75  transient: a temporary condition blocked the run (see the message) |   75  stan przejściowy: tymczasowy warunek zablokował uruchomienie (zob. komunikat) |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  stan przejściowy: coś zablokowało uruchomienie (zob. komunikat) |
 |   130 cancelled (Ctrl+C) |   130 anulowano (Ctrl+C) |

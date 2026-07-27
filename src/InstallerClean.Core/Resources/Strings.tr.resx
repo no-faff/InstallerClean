@@ -177,7 +177,12 @@
   <data name="Automation.Close" xml:space="preserve"><value>Kapat</value></data>
   <data name="Automation.CloseWindow" xml:space="preserve"><value>Pencereyi kapat</value></data>
   <data name="Automation.CloseResult" xml:space="preserve"><value>Sonucu kapat ve ana pencereye dön</value></data>
-  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve"><value>github'da yıldız bırak</value></data>
+  <data name="Automation.LeaveStarOnGitHub.About" xml:space="preserve">
+    <value>github'da yıldız bırak</value>
+    <comment>Screen-reader name for the About window's star link. Cased for
+    speech for the reason Automation.CheckForUpdates.HelpText carries; the
+    visible label keeps the proper capitalisation.</comment>
+  </data>
   <data name="Automation.Minimise" xml:space="preserve"><value>Simge durumuna küçült</value></data>
   <!-- Help texts on the confirmation dialogs' focused Cancel buttons.
        They describe the dialog's choice, worded to read correctly
@@ -210,7 +215,17 @@
        translateword.c's abbreviation branch). "GitHub" has been heard split
        that way by Narrator, on this very string. Lower case triggers
        neither, and none of it is on screen, so the spelling costs nothing. -->
-  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve"><value>github üzerindeki sürümler sayfasında daha yeni bir sürüm olup olmadığını denetler.</value></data>
+  <data name="Automation.CheckForUpdates.HelpText" xml:space="preserve">
+    <value>github üzerindeki sürümler sayfasında daha yeni bir sürüm olup olmadığını denetler.</value>
+    <comment>Screen-reader help on the main window's "Check for updates" button.
+    "github" is lower case on purpose, here and in every other spoken string: a
+    screen reader treats the mid-word capital in "GitHub" as an abbreviation and
+    spells it out, "G, I, T, hub", where the lower-case form is read as one word.
+    Verified against a real screen reader. Visible labels keep the proper
+    capitalisation, so the About window's button says GitHub while its Automation
+    twin does not. The two keys naming github.com are lower case for a different
+    reason: that one is a domain.</comment>
+  </data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
     <value>github üzerindeki readme'yi tarayıcınızda açar.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.
@@ -489,7 +504,12 @@
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
        "file"/"files". Flat string; a language may add a satellite-only
-       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar. -->
+       Completion.ReverifySkipped.One/.Few/.Many override for its count grammar.
+       The English names no pronoun for the files on purpose. One flat string
+       serves every count here, and the neutral carries no .One form for the
+       English to fall back on, so a "them" read wrongly at a count of one; the
+       eight satellites whose grammar forced the issue had each added an override
+       for it. "What the scan flagged" is number-blind and needs none. -->
   <data name="Completion.ReverifySkipped" xml:space="preserve"><value>Taramadan sonra bir programın yeniden ihtiyaç duymaya başladığı {0} {1} yerinde bırakıldı.</value></data>
   <!-- The other reason the pre-action re-check keeps files back: its own read of
        the Windows Installer records came up short, so it withheld every
@@ -552,8 +572,8 @@
   <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} dosya hâlâ gerekli</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>temizlenecek {0} gereksiz dosya</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>temizlenecek {0} gereksiz dosya</value></data>
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride bir onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride bir onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride ilgili programı onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride ilgili programları onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın.</value></data>
   <!-- Informational line shown when the MSI database carries
        superseded-patch registrations whose files are already gone
        from disk. Distinct from the missing-from-disk warning
@@ -996,16 +1016,16 @@ Ayrıntılar şuraya yazıldı:
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Bu yardımı göster (/?, -h de kabul edilir)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Sürümü yazdır (-v de kabul edilir)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Yalnızca tara - gereksiz dosyaları listele</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Gereksiz dosyaları sil (Geri Dönüşüm Kutusu)</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Gereksizleri sil (Geri Dönüşüm Kutusu)</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Kayıtlı varsayılan konuma taşı</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m YOL     Belirtilen yola taşı</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli gerçek bir konsol işlemidir ve bitene kadar istemi</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>bloke eder; çıktısını başka herhangi bir konsol exe'sinde olduğu gibi</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>yönlendirin ya da boruya verin. GUI, yanındaki InstallerClean.exe'dedir.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Kaydedilen varsayılan kullanıcıya özeldir; zamanlanmış ya da SYSTEM çalıştırmaları /m YOL gerektirir.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Kaydedilen konum kullanıcıya özeldir; zamanlanmış veya SYSTEM için /m YOL.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Çıkış kodları:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   başarılı: işaretlenen her dosya işlendi</value></data>
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   hata: hiçbir şey işlenmedi (hatalı argümanlar, tarama başarısız, tüm dosyalar başarısız)</value></data>
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   hata: hiçbir şey işlenmedi (argümanlar, tarama ya da tüm dosyalar)</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   kısmi: bazı dosyalar işlendi, bazıları başarısız</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  geçici: geçici bir durum çalıştırmayı engelledi (iletiye bakın)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 iptal edildi (Ctrl+C)</value></data>

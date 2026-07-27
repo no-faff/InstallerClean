@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} {1} movidos para: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} movido para a Lixeira |
 | {0} {1} moved to the Recycle Bin | {0} {1} movidos para a Lixeira |
-| {0} {1} kept in place, because a program started needing them again after the scan. | {0} {1} mantidos no lugar: um programa voltou a precisar deles depois da análise. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} mantidos no lugar: um programa voltou a precisar deles depois da análise. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} mantidos no lugar: não foi possível ler por completo os registros do Windows Installer quando a verificação foi repetida. |
 | Moved {0} of {1} {2} before you cancelled. | Movimentação cancelada após mover {0} de {1} {2}. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Exclusão cancelada após mover {0} de {1} {2} para a Lixeira. |
@@ -356,7 +356,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send posts the report shown to No Faff. Cancel sends nothing. | Enviar transmite ao No Faff o relatório exibido. Cancelar não envia nada. |
 | Check for updates | Verificar atualizações |
 | Checks github's releases page for a newer version. | Consulta a página de versões do github em busca de uma versão mais recente. |
-| Opens the readme on github in your browser. | Abre o readme em github no seu navegador. |
+| Opens the readme on github in your browser. | Abre o readme no github no seu navegador. |
 | Opens the issue tracker on github.com in your browser. | Abre o rastreador de problemas (Issues) em github.com no seu navegador. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Se marcada, o InstallerClean consulta o github em busca de uma versão mais recente quando você o executa. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Abra a página da versão para baixar a versão mais recente, ou cancele para manter a versão atual. |
@@ -458,17 +458,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Uso: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help      Mostra esta ajuda (aceita também /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version   Mostra a versão (aceita também -v) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s          Apenas análise - lista os arquivos desnecessários |
-|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d          Exclui os arquivos desnecessários (Lixeira) |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s          Apenas análise - arquivos desnecessários |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d          Exclui arquivos desnecessários (Lixeira) |
 |   installerclean-cli /m         Move to saved default location |   installerclean-cli /m          Move para o local padrão salvo |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m CAMINHO  Move para o caminho especificado |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli é um processo de console real e bloqueia o prompt |
 | until it finishes; redirect or pipe its output as you would any | até terminar; redirecione ou encaminhe a saída por pipe como faria |
-| other console exe. The GUI lives in InstallerClean.exe alongside it. | com qualquer outro executável de console. A GUI fica no InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | O padrão salvo é por usuário; execuções agendadas ou como SYSTEM exigem /m CAMINHO. |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | com qualquer outro executável de console. A GUI é InstallerClean.exe. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | O padrão salvo é por usuário; execuções agendadas ou SYSTEM: /m CAMINHO. |
 | Exit codes: | Códigos de saída: |
 |   0   success: every flagged file was processed |   0   sucesso: todos os arquivos sinalizados foram processados |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   falha: nada processado (argumentos inválidos, falha na análise, todos os arquivos falharam) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   falha: nada processado (argumentos, análise ou todos os arquivos) |
 |   2   partial: some files processed, some failed |   2   parcial: alguns arquivos processados, outros falharam |
-|   75  transient: a temporary condition blocked the run (see the message) |   75  transitório: uma condição temporária bloqueou a execução (veja a mensagem) |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  transitório: algo temporário bloqueou a execução (veja a mensagem) |
 |   130 cancelled (Ctrl+C) |   130 cancelado (Ctrl+C) |

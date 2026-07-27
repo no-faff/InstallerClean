@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | 已将 {0} 个{1}移动到：{2} |
 | {0} {1} moved to the Recycle Bin | 已将 {0} 个{1}移到回收站 |
 | {0} {1} moved to the Recycle Bin | 已将 {0} 个{1}移到回收站 |
-| {0} {1} kept in place, because a program started needing them again after the scan. | {0} 个{1}已保留在原处，因为这次扫描之后又有程序需要它们了。 |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} 个{1}已保留在原处，因为这次扫描之后又有程序需要它们了。 |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} 个{1}已保留在原处，因为重新检查时无法完整读取 Windows Installer 记录。 |
 | Moved {0} of {1} {2} before you cancelled. | 在您取消前，已移动 {1} 个{2}中的 {0} 个。 |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | 在您取消前，已将 {1} 个{2}中的 {0} 个移到回收站。 |
@@ -461,7 +461,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         仅扫描 - 列出不需要的文件 |
 |   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         删除不需要的文件（回收站） |
 |   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         移动到已保存的默认位置 |
-|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m 路径      移动到指定路径 |
+|   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m 路径    移动到指定路径 |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli 是一个真正的控制台进程，在运行结束前会一直 |
 | until it finishes; redirect or pipe its output as you would any | 占用命令提示符；可像对待其他控制台程序那样重定向或通过管道处理其输出。 |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | GUI 就位于同目录下的 InstallerClean.exe 中。 |

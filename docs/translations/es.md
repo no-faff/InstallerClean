@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} {1} en: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} en la Papelera de reciclaje |
 | {0} {1} moved to the Recycle Bin | {0} {1} en la Papelera de reciclaje |
-| {0} {1} kept in place, because a program started needing them again after the scan. | {0} {1} conservados en su sitio: un programa ha vuelto a necesitarlos después del análisis. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} conservados en su sitio: un programa ha vuelto a necesitarlos después del análisis. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} conservados en su sitio: los registros de Windows Installer no se han podido leer por completo al repetir la comprobación. |
 | Moved {0} of {1} {2} before you cancelled. | Cancelaste tras mover {0} de {1} {2}. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Cancelaste tras mover {0} de {1} {2} a la Papelera de reciclaje. |
@@ -458,17 +458,17 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Uso: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Muestra esta ayuda (acepta también /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Muestra la versión (acepta también -v) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Solo análisis - enumera los archivos innecesarios |
-|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Elimina los archivos innecesarios (Papelera de reciclaje) |
-|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         Mueve a la ubicación predeterminada guardada |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Solo análisis - archivos innecesarios |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Elimina archivos innecesarios (Papelera) |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         Mueve a la ubicación guardada |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m RUTA    Mueve a la ruta especificada |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli es un verdadero proceso de consola y bloquea el |
 | until it finishes; redirect or pipe its output as you would any | símbolo del sistema hasta que termina; redirige o canaliza su salida como |
-| other console exe. The GUI lives in InstallerClean.exe alongside it. | con cualquier otro ejecutable de consola. La GUI está en InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | La ubicación predeterminada guardada es por usuario; las ejecuciones programadas o con la cuenta SYSTEM necesitan /m RUTA. |
+| other console exe. The GUI lives in InstallerClean.exe alongside it. | con cualquier otro ejecutable de consola. La GUI es InstallerClean.exe. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Ubicación guardada por usuario; tareas programadas o SYSTEM: /m RUTA. |
 | Exit codes: | Códigos de salida: |
 |   0   success: every flagged file was processed |   0   correcto: se procesó cada archivo señalado |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   error: no se procesó nada (argumentos incorrectos, análisis fallido, todos los archivos fallaron) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   error: no se procesó nada (argumentos, análisis o archivos fallidos) |
 |   2   partial: some files processed, some failed |   2   parcial: algunos archivos procesados, otros fallaron |
-|   75  transient: a temporary condition blocked the run (see the message) |   75  transitorio: una condición temporal bloqueó la ejecución (consulta el mensaje) |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  transitorio: algo temporal bloqueó la ejecución (ver el mensaje) |
 |   130 cancelled (Ctrl+C) |   130 cancelado (Ctrl+C) |

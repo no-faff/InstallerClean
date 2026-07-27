@@ -312,7 +312,7 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
   'Completion.DeleteSummary.Singular': `{0} {1} moved to the Recycle Bin`,
   'Completion.DeleteSummary.Plural': `{0} {1} moved to the Recycle Bin`,
-  'Completion.ReverifySkipped': `{0} {1} kept in place, because a program started needing them again after the scan.`,
+  'Completion.ReverifySkipped': `{0} {1} kept in place, because a program went back to needing what the scan flagged.`,
   'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated.`,
   'Completion.MoveCancelledSummary': `Moved {0} of {1} {2} before you cancelled.`,
   'Completion.DeleteCancelledSummary': `Moved {0} of {1} {2} to the Recycle Bin before you cancelled.`,

@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | {0} {1} dipindahkan ke: {2} |
 | {0} {1} moved to the Recycle Bin | {0} {1} dipindahkan ke Keranjang Sampah |
 | {0} {1} moved to the Recycle Bin | {0} {1} dipindahkan ke Keranjang Sampah |
-| {0} {1} kept in place, because a program started needing them again after the scan. | {0} {1} dibiarkan di tempatnya, karena sebuah program kembali membutuhkannya setelah pemindaian. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} dibiarkan di tempatnya, karena sebuah program kembali membutuhkannya setelah pemindaian. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} dibiarkan di tempatnya, karena catatan Windows Installer tidak dapat dibaca sepenuhnya saat pemeriksaan diulang. |
 | Moved {0} of {1} {2} before you cancelled. | {0} dari {1} {2} dipindahkan sebelum Anda membatalkan. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | {0} dari {1} {2} dipindahkan ke Keranjang Sampah sebelum Anda membatalkan. |
@@ -358,7 +358,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Checks github's releases page for a newer version. | Memeriksa halaman rilis github untuk mencari versi yang lebih baru. |
 | Opens the readme on github in your browser. | Membuka readme di github melalui peramban Anda. |
 | Opens the issue tracker on github.com in your browser. | Membuka pelacak masalah (Issues) di github.com melalui peramban Anda. |
-| If ticked, InstallerClean checks github for a newer version when you run it. | Jika dicentang, InstallerClean memeriksa github apakah ada versi yang lebih baru saat Anda menjalankannya. |
+| If ticked, InstallerClean checks github for a newer version when you run it. | Jika dicentang, InstallerClean memeriksa apakah ada versi yang lebih baru di github saat Anda menjalankannya. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini. |
 | Opens the licence file on github.com in your browser. | Membuka file lisensi di github.com melalui peramban Anda. |
 | Move location | Lokasi pemindahan |
@@ -456,19 +456,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Catatan: penulisan ke Log Peristiwa gagal. Periksa izin log Aplikasi atau Kebijakan Grup. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - pembersihan {InstallerFolder} |
 | Usage: | Penggunaan: |
-|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Tampilkan bantuan ini (juga menerima /?, -h) |
-|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Cetak versi (juga menerima -v) |
+|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Tampilkan bantuan ini (juga /?, -h) |
+|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Cetak versi (juga -v) |
 |   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Pindai saja - daftar file tidak diperlukan |
-|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Hapus file tidak diperlukan (Keranjang Sampah) |
+|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Hapus file tidak diperlukan (Keranjang) |
 |   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         Pindahkan ke lokasi default tersimpan |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m JALUR   Pindahkan ke jalur yang ditentukan |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli adalah proses konsol sungguhan dan memblokir prompt |
 | until it finishes; redirect or pipe its output as you would any | sampai selesai; alihkan atau salurkan keluarannya seperti |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | file exe konsol lainnya. GUI ada di InstallerClean.exe di sebelahnya. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Lokasi default tersimpan bersifat per-pengguna; tugas terjadwal atau proses SYSTEM memerlukan /m JALUR. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Lokasi tersimpan per pengguna; tugas terjadwal atau SYSTEM: /m JALUR. |
 | Exit codes: | Kode keluar: |
 |   0   success: every flagged file was processed |   0   berhasil: setiap file yang ditandai telah diproses |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   gagal: tidak ada yang diproses (argumen salah, pemindaian gagal, semua file gagal) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   gagal: tidak ada yang diproses (argumen, pemindaian, semua file) |
 |   2   partial: some files processed, some failed |   2   sebagian: sebagian file diproses, sebagian gagal |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  sementara: kondisi sementara memblokir proses (lihat pesannya) |
 |   130 cancelled (Ctrl+C) |   130 dibatalkan (Ctrl+C) |

@@ -60,7 +60,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Guide and FAQ | Guida e FAQ |
 | Report a problem | Segnala un problema |
-| Check for updates automatically | Controlla aggiornamenti automaticamente |
+| Check for updates automatically | Controlla automaticamente gli aggiornamenti |
 
 ## Field labels
 
@@ -166,7 +166,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to: {2} | Spostati {0} {1} in: {2} |
 | {0} {1} moved to the Recycle Bin | Spostato {0} {1} nel Cestino |
 | {0} {1} moved to the Recycle Bin | Spostati {0} {1} nel Cestino |
-| {0} {1} kept in place, because a program started needing them again after the scan. | {0} {1} lasciati al loro posto, perché un programma è tornato ad averne bisogno dopo la scansione. |
+| {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} lasciati al loro posto, perché un programma è tornato ad averne bisogno dopo la scansione. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} lasciati al loro posto, perché non è stato possibile leggere completamente i record di Windows Installer quando il controllo è stato ripetuto. |
 | Moved {0} of {1} {2} before you cancelled. | Spostati {0} di {1} {2} prima dell'annullamento. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Spostati {0} di {1} {2} nel Cestino prima dell'annullamento. |
@@ -350,15 +350,15 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Elimina sposta i file non necessari nel Cestino. Annulla chiude senza eliminare. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 'Sposta' colloca i file non necessari nella cartella destinazione scelta. 'Annulla' li lascia dove sono. |
 | Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Scegli come gestire i file non necessari: spostarli in un luogo sicuro, eliminarli definitivamente o annullare. |
-| Move the unneeded files to a folder you choose | Sposta i file non necessari in una specifica cartella |
+| Move the unneeded files to a folder you choose | Sposta i file non necessari in una cartella a tua scelta |
 | Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Elimina definitivamente i file non necessari perché per questa unità il Cestino non è disponibile |
 | Say thanks | Per ringraziarmi |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 'Invia' trasmette a No Faff il rapporto mostrato. Annulla non invia nulla. |
 | Check for updates | Controlla aggiornamenti |
-| Checks github's releases page for a newer version. | Verifica in pagina release di github se esiste una versione più recente. |
-| Opens the readme on github in your browser. | Apre readme in github nel browser. |
+| Checks github's releases page for a newer version. | Verifica sulla pagina release di github se esiste una versione più recente. |
+| Opens the readme on github in your browser. | Apre readme su github nel browser. |
 | Opens the issue tracker on github.com in your browser. | Apre elenco problemi (issue) in github.com nel browser. |
-| If ticked, InstallerClean checks github for a newer version when you run it. | Se selezionata, InstallerClean verifica in github se è disponibile una versione più recente all'avvio. |
+| If ticked, InstallerClean checks github for a newer version when you run it. | Se selezionata, all'avvio InstallerClean verifica su github se è disponibile una versione più recente. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Apri pagina release per scaricare la versione più recente, o scegli 'Annulla' per mantenere quella attuale. |
 | Opens the licence file on github.com in your browser. | Apre file licenza in github.com nel browser. |
 | Move location | Destinazione spostamento |
@@ -456,19 +456,19 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Nota: scrittura nel registro eventi non riuscita. Controlla i permessi del registro Applicazione o i Criteri di gruppo. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - pulizia di {InstallerFolder} |
 | Usage: | Utilizzo: |
-|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help       Mostra questa guida (accetta anche /?, -h) |
-|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version    Mostra la versione (accetta anche -v) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s           Solo scansione - elenca i file non necessari |
+|   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help       Mostra questa guida (anche /?, -h) |
+|   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version    Mostra la versione (anche -v) |
+|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s           Solo scansione - file non necessari |
 |   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d           Elimina i file non necessari (Cestino) |
-|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m           Sposta nella destinazione predefinita salvata |
+|   installerclean-cli /m         Move to saved default location |   installerclean-cli /m           Sposta nella destinazione salvata |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PERCORSO  Sposta nel percorso specificato |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli è un vero processo console e blocca il prompt |
 | until it finishes; redirect or pipe its output as you would any | finché non termina; reindirizza o usa una pipe sul suo output come |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | per qualsiasi altro eseguibile console. La GUI è in InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | La destinazione predefinita salvata è specifica per utente; le esecuzioni pianificate o come SYSTEM richiedono /m PERCORSO. |
+| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | La destinazione salvata è per utente; SYSTEM o pianificato: /m PERCORSO. |
 | Exit codes: | Codici di uscita: |
 |   0   success: every flagged file was processed |   0   successo: ogni file segnalato è stato elaborato |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   errore: nessuna elaborazione (argomenti errati, scansione non riuscita, tutti i file non riusciti) |
+|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   errore: nessuna elaborazione (argomenti, scansione o file) |
 |   2   partial: some files processed, some failed |   2   parziale: alcuni file elaborati, altri non riusciti |
-|   75  transient: a temporary condition blocked the run (see the message) |   75  transitorio: una condizione temporanea ha bloccato l'esecuzione (vedi il messaggio) |
+|   75  transient: a temporary condition blocked the run (see the message) |   75  transitorio: qualcosa ha bloccato l'esecuzione (vedi il messaggio) |
 |   130 cancelled (Ctrl+C) |   130 annullato (Ctrl+C) |
