@@ -964,7 +964,7 @@ Nie udało się zapisać dziennika awarii.</value></data>
        names the contending parties (GUI or another CLI run) and
        points at exit code 75 so an RMM operator parsing stdout
        knows it is transient and safe to retry. -->
-  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Inny proces InstallerClean trzyma blokadę pojedynczej instancji (GUI lub inne uruchomienie CLI). Kod wyjścia 75 (stan przejściowy); można bezpiecznie spróbować ponownie później.</value></data>
+  <data name="Cli.MutexBlocked" xml:space="preserve"><value>Inny proces InstallerClean trzyma blokadę pojedynczej instancji (GUI lub inne uruchomienie CLI). Kod zakończenia 75 (stan przejściowy); można bezpiecznie spróbować ponownie później.</value></data>
   <!-- 0 = mode arg ("/d" or "/m"). Audit entry written when the CLI
        can't acquire the single-instance mutex, so an RMM consumer of
        the Application channel sees a record of every scheduled-job
@@ -1023,7 +1023,7 @@ Nie udało się zapisać dziennika awarii.</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>dopóki się nie zakończy; przekieruj lub przekaż potokiem jego wyjście</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>jak każdy inny program konsolowy exe. GUI jest obok, w InstallerClean.exe.</value></data>
   <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Zapisana lokalizacja zależy od użytkownika; zadania i SYSTEM: /m ŚCIEŻKA.</value></data>
-  <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Kody wyjścia:</value></data>
+  <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Kody zakończenia:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   sukces: przetworzono każdy oznaczony plik</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   błąd: nic nie przetworzono (złe argumenty, skanowanie lub pliki)</value></data>
   <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   częściowo: część plików przetworzono, część zawiodła</value></data>

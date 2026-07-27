@@ -121,7 +121,7 @@
   <data name="Action.Copy" xml:space="preserve"><value>Copier</value></data>
   <data name="Action.Cut" xml:space="preserve"><value>Couper</value></data>
   <data name="Action.Paste" xml:space="preserve"><value>Coller</value></data>
-  <data name="Action.SelectAll" xml:space="preserve"><value>Tout sélectionner</value></data>
+  <data name="Action.SelectAll" xml:space="preserve"><value>Sélectionner tout</value></data>
   <data name="Action.Browse" xml:space="preserve"><value>_Parcourir...</value></data>
   <data name="Action.Cancel" xml:space="preserve"><value>_Annuler</value></data>
   <data name="Action.CheckForUpdates" xml:space="preserve"><value>Rechercher des _mises à jour</value></data>
@@ -689,7 +689,7 @@ InstallerClean s'exécutait déjà en tant qu'administrateur, le relancer ainsi 
 Nécessaire : {1}
 Disponible : {2}</value></data>
   <!-- 0 = destination -->
-  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>Vous n'avez pas la permission d'écrire dans {0}.
+  <data name="Error.AccessDeniedDestination" xml:space="preserve"><value>Vous n'avez pas l'autorisation d'écrire dans {0}.
 Essayez un dossier dans votre profil utilisateur ou sur un lecteur qui vous appartient.</value></data>
   <data name="Error.PathTooLong" xml:space="preserve"><value>Le chemin {0} est trop long pour Windows. Choisissez un chemin plus court.</value></data>
   <data name="Error.DestinationMissing" xml:space="preserve"><value>Le dossier {0} n'existe pas et n'a pas pu être créé. Vérifiez la lettre de lecteur ou le chemin réseau.</value></data>

@@ -20,7 +20,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Русский |
 | --- | --- |
 | PRODUCTS | ПРОДУКТЫ |
-| PATCHES | ПАТЧИ |
+| PATCHES | ИСПРАВЛЕНИЯ |
 | PRODUCT DETAILS | СВЕДЕНИЯ О ПРОДУКТЕ |
 | MOVE LOCATION | ПАПКА ДЛЯ ПЕРЕМЕЩЕНИЯ |
 | SAY THANKS | ПОБЛАГОДАРИТЬ |
@@ -78,9 +78,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Product name | Название продукта |
 | File | Файл |
 | Size | Размер |
-| Patches | Патчи |
+| Patches | Исправления |
 | (unknown) | (неизвестно) |
-| (patches only) | (только патчи) |
+| (patches only) | (только исправления) |
 | missing | отсутствует |
 
 ## Status and progress
@@ -109,7 +109,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Delete failed ({0}). Details in {1}. | Не удалось удалить ({0}). Подробности в {1}. |
 | Delete failed ({0}). The crash log could not be written. | Не удалось удалить ({0}). Не удалось записать журнал сбоев. |
 | Access denied. Windows refused the scan. | Доступ запрещён. Windows отклонил сканирование. |
-| Scan failed: couldn't read the Windows Installer records. | Сканирование не удалось: не удалось прочитать записи установщика Windows. |
+| Scan failed: couldn't read the Windows Installer records. | Сканирование не удалось: не удалось прочитать записи Windows Installer. |
 | Scan cancelled. | Сканирование отменено. |
 | Ready | Готово |
 | Scan failed ({0}). Details in {1}. | Сбой сканирования ({0}). Подробности в {1}. |
@@ -120,7 +120,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | English | Русский |
 | --- | --- |
 | Any unneeded files below are safe to delete. | Любые ненужные файлы ниже можно безопасно удалить. |
-| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Они лежат в {InstallerFolder} и остаются после того, как программа была удалена ({0}), более новый патч заменил один из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими. |
+| They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Они лежат в {InstallerFolder} и остаются после того, как программа была удалена ({0}), более новое исправление заменило одно из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими. |
 | Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | Удалите их в Корзину, или используйте вместо этого функцию «Переместить», чтобы сохранить резервную копию. Если вернуть файлы обратно в {InstallerFolder}, всё станет ровно так, как было. |
 | Nothing scanned yet. | Пока ничего не просканировано. |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Нажмите «Повторить сканирование», чтобы просмотреть {InstallerFolder} в поисках файлов установщика, которые больше не нужны ни одной программе. |
@@ -167,7 +167,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} {1} moved to the Recycle Bin | Перемещено {0} {1} в Корзину |
 | {0} {1} moved to the Recycle Bin | Перемещено {0} {1} в Корзину |
 | {0} {1} kept in place, because a program went back to needing what the scan flagged. | Оставлено {0} {1} на месте: после сканирования они снова понадобились программе. |
-| {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | Оставлено {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи установщика Windows. |
+| {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | Оставлено {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи Windows Installer. |
 | Moved {0} of {1} {2} before you cancelled. | Перемещено {0}/{1} {2} до отмены. |
 | Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Перемещено {0}/{1} {2} в Корзину до отмены. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Удалено безвозвратно {0}/{1} {2} до отмены. |
@@ -197,8 +197,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} unneeded files to clean up | {0} ненужных файлов для очистки |
 | {0} registered file is missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Open Details for what to do. | Отсутствует {0} зарегистрированный файл (InstallerClean его не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление той программы может не выполниться. Откройте «Подробности», чтобы узнать, что делать. |
 | {0} registered files are missing (not deleted by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Open Details for what to do. | Отсутствует {0} зарегистрированных файлов (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать. |
-| {0} installed program could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | При этом сканировании не удалось прочитать {0} установленную программу, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается. |
-| {0} installed programs could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | При этом сканировании не удалось прочитать {0} установленных программ, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается. |
+| {0} installed program could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | При этом сканировании не удалось прочитать {0} установленную программу, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается. |
+| {0} installed programs could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected. | При этом сканировании не удалось прочитать {0} установленных программ, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается. |
 | {0} of {1} {2} | {0}/{1} {2} |
 | {0} orphaned, {1} superseded, {2} obsoleted ({3}) | {0} бесхозных, {1} замещённых, {2} устаревших ({3}) |
 | {0} registered file that is still needed ({1}) | {0} зарегистрированный файл ещё нужен ({1}) |
@@ -220,15 +220,15 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Access denied | Доступ запрещён |
 | Windows refused InstallerClean access, so it stopped. Nothing has been removed.<br><br>InstallerClean was already running as administrator, so starting it again that way won't help. Windows doesn't say any more about what refused, so there's nothing specific to try. | Windows отказал InstallerClean в доступе, поэтому работа была остановлена. Ничего не было удалено.<br><br>InstallerClean уже был запущен от имени администратора, поэтому повторный запуск таким же образом не поможет. Windows не сообщает ничего больше о том, что именно отказало в доступе, поэтому пробовать что-то конкретное бессмысленно. |
-| Couldn't read the Windows Installer records | Не удалось прочитать записи установщика Windows |
+| Couldn't read the Windows Installer records | Не удалось прочитать записи Windows Installer |
 | Scan failed | Сбой сканирования |
-| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Записи установщика Windows вернулись совершенно пустыми: ни одна установленная программа и ни одно обновление не заявляет прав на кэшированный файл установщика. На работающем компьютере такого не бывает (даже у свежей установки Windows такие файлы есть), значит, записи либо повреждены, либо их не удалось прочитать, и сканирование, поверившее такому ответу, ошибочно сочло бы бесхозным каждый файл в {InstallerFolder}. Вместо этого InstallerClean остановился. Ничего не было удалено. |
+| The Windows Installer records came back completely empty: not one installed program or update claims a cached installer file. That doesn't happen on a working machine (even a fresh Windows install has some), so either the records are damaged or they couldn't be read, and a scan that believed this answer would wrongly call every file in {InstallerFolder} orphaned. InstallerClean stopped instead. Nothing has been removed. | Записи Windows Installer вернулись совершенно пустыми: ни одна установленная программа и ни одно обновление не заявляет прав на кэшированный файл установщика. На работающем компьютере такого не бывает (даже у свежей установки Windows такие файлы есть), значит, записи либо повреждены, либо их не удалось прочитать, и сканирование, поверившее такому ответу, ошибочно сочло бы бесхозным каждый файл в {InstallerFolder}. Вместо этого InstallerClean остановился. Ничего не было удалено. |
 | Windows Installer refused to let InstallerClean list what's installed. InstallerClean was already running as administrator, so running it again as administrator won't change anything. Without that list there is no safe way to tell which cached files are still needed, so InstallerClean stopped. Nothing has been removed. | Windows Installer не позволил InstallerClean перечислить установленное. InstallerClean уже был запущен от имени администратора, поэтому повторный запуск от имени администратора ничего не изменит. Без этого списка невозможно безопасно определить, какие кэшированные файлы ещё нужны, поэтому InstallerClean остановился. Ничего не было удалено. |
 | Windows Installer couldn't give InstallerClean a readable list of the installed programs: {0} entries in a row came back unreadable (last error code {1}). Rather than work from a part-read list, InstallerClean stopped. Nothing has been removed. | Windows Installer не смог предоставить InstallerClean читаемый список установленных программ: {0} записей подряд вернулись нечитаемыми (последний код ошибки {1}). Вместо того чтобы работать с прочитанным лишь частично списком, InstallerClean остановился. Ничего не было удалено. |
 | Windows Installer never signalled the end of the list of installed programs: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer так и не сообщил о конце списка установленных программ: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено. |
-| Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer так и не сообщил о конце списка патчей одной программы: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено. |
-| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean не смог сопоставить это сканирование с записями установщика Windows: каждый файл, который Windows всё ещё числит нужным, отсутствует в {InstallerFolder}, а файлы, реально лежащие в этой папке, не соответствуют ни одной записи. Ни один настоящий компьютер так не выглядит, поэтому это указывает на проблему с чтением записей, а не на файлы, которые можно безопасно удалить. Для очистки ничего не предложено, и ничего не было удалено. |
-| InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean не смог прочитать достаточно записей установщика Windows, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено. |
+| Windows Installer never signalled the end of one program's patch list: InstallerClean gave up after {0} entries (last error code {1}). A list with no end can't be trusted, so InstallerClean stopped. Nothing has been removed. | Windows Installer так и не сообщил о конце списка исправлений одной программы: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено. |
+| InstallerClean couldn't square this scan with the Windows Installer records: every file Windows still lists as needed is missing from {InstallerFolder}, while the files actually in the folder match nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed. | InstallerClean не смог сопоставить это сканирование с записями Windows Installer: каждый файл, который Windows всё ещё числит нужным, отсутствует в {InstallerFolder}, а файлы, реально лежащие в этой папке, не соответствуют ни одной записи. Ни один настоящий компьютер так не выглядит, поэтому это указывает на проблему с чтением записей, а не на файлы, которые можно безопасно удалить. Для очистки ничего не предложено, и ничего не было удалено. |
+| InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed. | InstallerClean не смог прочитать достаточно записей Windows Installer, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено. |
 | Invalid destination | Недопустимая папка назначения |
 | Could not write to destination | Не удалось записать в папку назначения |
 | Move failed | Сбой перемещения |
@@ -363,7 +363,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Opens the licence file on github.com in your browser. | Открывает файл лицензии на github.com в вашем браузере. |
 | Move location | Папка для перемещения |
 | Products | Продукты |
-| Patches | Патчи |
+| Patches | Исправления |
 | Product details | Сведения о продукте |
 | Move location | Папка для перемещения |
 | Operation progress | Ход операции |
@@ -411,8 +411,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | packages | пакетов |
 | product | продукт |
 | products | продуктов |
-| patch | патч |
-| patches | патчей |
+| patch | исправление |
+| patches | исправлений |
 
 ## Sizes and times
 
@@ -442,7 +442,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing to do. | Делать нечего. |
 | Deleting {0} {1}... | Удаление: {0} {1}... |
 | Deleted {0} {1}. | Удалено {0} {1}. |
-| Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Ошибка: Корзина недоступна для этого диска, поэтому ничего не удалено. Воспользуйтесь /m, чтобы переместить файлы, либо снова включите Корзину и запустите ещё раз. |
+| Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Ошибка: Корзина недоступна для этого тома, поэтому ничего не удалено. Воспользуйтесь /m, чтобы переместить файлы, либо снова включите Корзину и запустите ещё раз. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Ошибка: не указана папка назначения для перемещения. Используйте /m ПУТЬ. (Значение по умолчанию, заданное в графическом интерфейсе, действует только для текущего пользователя и не применяется при запуске по расписанию или от имени служебной учётной записи.) |
 | Error: destination cannot be inside the Windows Installer folder. | Ошибка: папка назначения не может находиться внутри папки Windows Installer. |
 | Error: destination must be a fully qualified path. Got: {0} | Ошибка: папка назначения должна быть полным путём. Получено: {0} |

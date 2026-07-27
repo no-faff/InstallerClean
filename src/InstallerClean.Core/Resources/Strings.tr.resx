@@ -122,9 +122,9 @@
   <data name="Action.Cut" xml:space="preserve"><value>Kes</value></data>
   <data name="Action.Paste" xml:space="preserve"><value>Yapıştır</value></data>
   <data name="Action.SelectAll" xml:space="preserve"><value>Tümünü seç</value></data>
-  <data name="Action.Browse" xml:space="preserve"><value>_Gözat...</value></data>
+  <data name="Action.Browse" xml:space="preserve"><value>_Göz at...</value></data>
   <data name="Action.Cancel" xml:space="preserve"><value>_İptal</value></data>
-  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Güncellemeleri _denetle</value></data>
+  <data name="Action.CheckForUpdates" xml:space="preserve"><value>Güncelleştirmeleri _denetle</value></data>
   <data name="Action.Close" xml:space="preserve"><value>_Kapat</value></data>
   <data name="Action.Delete" xml:space="preserve"><value>_Sil</value></data>
   <data name="Action.DeletePermanently" xml:space="preserve"><value>_Kalıcı olarak sil</value></data>
@@ -159,7 +159,7 @@
     <comment>About-window link to the GitHub issue tracker.</comment>
   </data>
   <data name="About.AutoUpdateCheck" xml:space="preserve">
-    <value>Güncellemeleri otomatik olarak denetle</value>
+    <value>Güncelleştirmeleri otomatik olarak denetle</value>
     <comment>Checkbox label in the About window.</comment>
   </data>
 
@@ -196,7 +196,7 @@
   <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Bu sürücü için Geri Dönüşüm Kutusu kullanılamadığından gereksiz dosyaları kalıcı olarak sil</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Teşekkür etmek için</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Gönder, gösterilen raporu No Faff'a iletir. İptal hiçbir şey göndermez.</value></data>
-  <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Güncellemeleri denetle</value></data>
+  <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Güncelleştirmeleri denetle</value></data>
   <!-- Heard, never read: the update button carries no tooltip, so this help
        text is the only description it has, and it is written for a speech
        engine rather than for a page.
@@ -351,7 +351,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Ayrıntıları görmek için bir ürün seçin.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Kullanılabilir meta veri yok.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>Bu yükleyici dosyası silinmiş. Bunu InstallerClean yapmadı; bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla kaldırmaz; bunu, siz InstallerClean'i çalıştırmadan önce başka bir şey silmiş.&#10;&#10;Şu anda bir soruna yol açmaz ve ait olduğu programı onarmaya, güncellemeye ya da kaldırmaya çalıştığınız güne kadar da açmaz. O adım o zaman başarısız olabilir, çünkü Windows bu dosyayı arar ama bulamaz.&#10;&#10;Düzeltmeyi denemek için o programın yükleyicisini üreticisinden indirin ve mevcut kopyanızın üzerine çalıştırın (önce kaldırmayın; kaldırma işlemi de bu dosyaya ihtiyaç duyan bir adımdır). Bulabiliyorsanız kurulu olan sürümü kullanın, çünkü Windows farklı bir sürümü reddedebilir. Bu genellikle dosyayı geri yükler ve ayarlarınıza normalde dokunulmaz, ama Microsoft bunu garanti etmez; onun son çaresi programı, hatta Windows'un kendisini yeniden yüklemektir.</value>
+    <value>Bu yükleyici dosyası silinmiş. Bunu InstallerClean yapmadı; bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla kaldırmaz; bunu, siz InstallerClean'i çalıştırmadan önce başka bir şey silmiş.&#10;&#10;Şu anda bir soruna yol açmaz ve ait olduğu programı onarmaya, güncelleştirmeye ya da kaldırmaya çalıştığınız güne kadar da açmaz. O adım o zaman başarısız olabilir, çünkü Windows bu dosyayı arar ama bulamaz.&#10;&#10;Düzeltmeyi denemek için o programın yükleyicisini üreticisinden indirin ve mevcut kopyanızın üzerine çalıştırın (önce kaldırmayın; kaldırma işlemi de bu dosyaya ihtiyaç duyan bir adımdır). Bulabiliyorsanız yüklü olan sürümü kullanın, çünkü Windows farklı bir sürümü reddedebilir. Bu genellikle dosyayı geri yükler ve ayarlarınıza normalde dokunulmaz, ama Microsoft bunu garanti etmez; onun son çaresi programı, hatta Windows'un kendisini yeniden yüklemektir.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -538,8 +538,8 @@
        did not go to the Recycle Bin" clause agrees with the count. -->
   <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi.</value></data>
   <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi.</value></data>
-  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
-  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleştiremez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
+  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleştiremez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
     <value>Yardımcı olabildiğime sevindim. Gönlünüzden koparsa, bir bahşiş kutusu var.</value>
     <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
@@ -556,8 +556,8 @@
   <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>Bu sürücü için Geri Dönüşüm Kutusu kullanılamıyor</value></data>
   <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>Bu yüzden bu {1} ({2}) silinmedi. Güvenli bir yere taşıyabilir ya da kalıcı olarak silebilirsiniz.</value></data>
   <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>Bu yüzden bu {0} {1} ({2}) silinmedi. Güvenli bir yere taşıyabilir ya da kalıcı olarak silebilirsiniz.</value></data>
-  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez; Geri Dönüşüm Kutusu ise yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
-  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez; Geri Dönüşüm Kutusu ise yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleyemez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez; Geri Dönüşüm Kutusu ise yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleştiremez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
+  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez; Geri Dönüşüm Kutusu ise yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleştiremez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez.</value></data>
 
   <!-- Summaries -->
   <!-- 0 = file count. Singular / plural pairs picked at the call
@@ -572,8 +572,8 @@
   <data name="Summary.RegisteredStillUsed.Plural" xml:space="preserve"><value>{0} dosya hâlâ gerekli</value></data>
   <data name="Summary.OrphanedToCleanUp.Singular" xml:space="preserve"><value>temizlenecek {0} gereksiz dosya</value></data>
   <data name="Summary.OrphanedToCleanUp.Plural" xml:space="preserve"><value>temizlenecek {0} gereksiz dosya</value></data>
-  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride ilgili programı onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın.</value></data>
-  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride ilgili programları onarma, güncelleme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın.</value></data>
+  <data name="Summary.MissingFromDisk.Singular" xml:space="preserve"><value>{0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride ilgili programı onarma, güncelleştirme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın.</value></data>
+  <data name="Summary.MissingFromDisk.Plural" xml:space="preserve"><value>{0} kayıtlı dosya eksik (InstallerClean tarafından silinmedi). Şu anda bir sorun yok, ama ileride ilgili programları onarma, güncelleştirme ya da kaldırma işlemi başarısız olabilir. Ne yapılacağını öğrenmek için Ayrıntılar'ı açın.</value></data>
   <!-- Informational line shown when the MSI database carries
        superseded-patch registrations whose files are already gone
        from disk. Distinct from the missing-from-disk warning
@@ -639,18 +639,18 @@ InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden
        "database" because that is the word every one of those bodies uses. -->
   <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Windows Installer kayıtları okunamadı</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Tarama başarısız</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer kayıtları tamamen boş döndü: tek bir kurulu program ya da güncelleme bile önbellekteki bir kurulum dosyasında hak iddia etmiyor. Çalışan bir makinede bu olmaz (yeni kurulmuş bir Windows'ta bile bunlardan vardır), yani kayıtlar ya bozuk ya da okunamadı, ve bu yanıta inanan bir tarama {InstallerFolder} içindeki her dosyayı yanlışlıkla sahipsiz sayardı. InstallerClean bunun yerine durdu. Hiçbir şey kaldırılmadı.</value></data>
-  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer, InstallerClean'in kurulu olanları listelemesine izin vermedi. InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden yönetici olarak çalıştırmak bir şey değiştirmez. Bu liste olmadan önbellekteki hangi dosyaların hâlâ gerekli olduğunu güvenle söylemenin yolu yok, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Windows Installer kayıtları tamamen boş döndü: tek bir yüklü program ya da güncelleştirme bile önbellekteki bir kurulum dosyasında hak iddia etmiyor. Çalışan bir makinede bu olmaz (yeni kurulmuş bir Windows'ta bile bunlardan vardır), yani kayıtlar ya bozuk ya da okunamadı, ve bu yanıta inanan bir tarama {InstallerFolder} içindeki her dosyayı yanlışlıkla sahipsiz sayardı. InstallerClean bunun yerine durdu. Hiçbir şey kaldırılmadı.</value></data>
+  <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer, InstallerClean'in yüklü olanları listelemesine izin vermedi. InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden yönetici olarak çalıştırmak bir şey değiştirmez. Bu liste olmadan önbellekteki hangi dosyaların hâlâ gerekli olduğunu güvenle söylemenin yolu yok, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
        to look it up). -->
-  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer, InstallerClean'e kurulu programların okunabilir bir listesini veremedi: arka arkaya {0} kayıt okunamaz döndü (son hata kodu {1}). InstallerClean, yalnızca kısmen okunmuş bir listeyle çalışmak yerine durdu. Hiçbir şey kaldırılmadı.</value></data>
+  <data name="Error.MsiNonSuccess" xml:space="preserve"><value>Windows Installer, InstallerClean'e yüklü programların okunabilir bir listesini veremedi: arka arkaya {0} kayıt okunamaz döndü (son hata kodu {1}). InstallerClean, yalnızca kısmen okunmuş bir listeyle çalışmak yerine durdu. Hiçbir şey kaldırılmadı.</value></data>
   <!-- The index cap, which is a different condition from the consecutive
        failures above and must not borrow that string: the enumeration ran out
        of budget rather than failing, so 0 = the cap reached (not a failure
        count) and 1 = the last row's error code, which here is Success (0) when
        every row read cleanly and the list simply never terminated. -->
-  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer, kurulu programlar listesinin sonunu hiç bildirmedi: InstallerClean {0} kayıttan sonra vazgeçti (son hata kodu {1}). Sonu gelmeyen bir listeye güvenilemez, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.</value></data>
+  <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer, yüklü programlar listesinin sonunu hiç bildirmedi: InstallerClean {0} kayıttan sonra vazgeçti (son hata kodu {1}). Sonu gelmeyen bir listeye güvenilemez, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same two placeholders. -->
   <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer, bir programın yama listesinin sonunu hiç bildirmedi: InstallerClean {0} kayıttan sonra vazgeçti (son hata kodu {1}). Sonu gelmeyen bir listeye güvenilemez, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.</value></data>
@@ -667,7 +667,7 @@ InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean, neyin hâlâ gerekli olduğundan emin olmaya yetecek kadar Windows Installer kaydını okuyamadı: kurulu programların listesi eksik döndü, aynı kayıtları doğrudan kayıt defterinden okumak da hatalarla karşılaştı. Bir dosya, yalnızca onu adlandıran kayıt okunamayanlardan biri olduğu için sahipsiz görünebilirdi, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean, neyin hâlâ gerekli olduğundan emin olmaya yetecek kadar Windows Installer kaydını okuyamadı: yüklü programların listesi eksik döndü, aynı kayıtları doğrudan kayıt defterinden okumak da hatalarla karşılaştı. Bir dosya, yalnızca onu adlandıran kayıt okunamayanlardan biri olduğu için sahipsiz görünebilirdi, bu yüzden InstallerClean durdu. Hiçbir şey kaldırılmadı.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Geçersiz hedef</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Hedefe yazılamadı</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Taşıma başarısız</value></data>
@@ -772,14 +772,14 @@ Ayrıntılar {1} içinde.</value></data>
        the user did, and belongs in the code, not in the dialog. -->
   <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Taşıma konumu, bir sürücü harfiyle ya da ağ paylaşımıyla başlayan ve bir klasöre giden tam bir yol olmalıdır (örneğin D:\Backup ya da \\server\backup). InstallerClean bunu kullanamaz: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Tarayıcınız açılamadı</value></data>
-  <data name="UpdateCheck.Title" xml:space="preserve"><value>Güncellemeleri denetle</value></data>
+  <data name="UpdateCheck.Title" xml:space="preserve"><value>Güncelleştirmeleri denetle</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Denetleniyor...</value></data>
   <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>Güncel.</value></data>
   <data name="UpdateCheck.Status.UpdateAvailable" xml:space="preserve">
     <value>{0} sürümü mevcut.</value>
     <comment>Status line and hyperlink on the main window once a check finds a newer version. {0} = the newer version number. Clicking opens that release's page.</comment>
   </data>
-  <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Güncelleme mevcut</value></data>
+  <data name="UpdateCheck.UpdateAvailable.Title" xml:space="preserve"><value>Güncelleştirme mevcut</value></data>
   <!-- 0 = installed version, 1 = latest version on GitHub -->
   <data name="UpdateCheck.UpdateAvailable.Body" xml:space="preserve"><value>{0} sürümünü çalıştırıyorsunuz.&#10;{1} sürümü mevcut.</value></data>
   <data name="UpdateCheck.Failed.NetworkUnavailable" xml:space="preserve"><value>GitHub'a ulaşılamadı. İnternet bağlantınızı kontrol edip yeniden deneyin.</value></data>
@@ -1003,7 +1003,7 @@ Ayrıntılar şuraya yazıldı:
   <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log, InstallerClean'in işlenmeyen özel durumlarını kaydeder.
 # Yükseltilmiş çalışmada framework'ün özel durum iletileri, çalışan
 # oturumdaki dosya yollarını içerebilir (Windows Installer sorgularıyla
-# sıralanan diğer kullanıcıların profilleri dahil). Güncelleme
+# sıralanan diğer kullanıcıların profilleri dahil). Güncelleştirme
 # denetiminden ya da sonuç günlüğü POST'undan gelen ağ hatası iletileri,
 # hedef URL'yi ve çözümlenen IP / proxy adresini içerebilir. Bu dosyayı
 # herkese açık bir hata bildirimine eklemeden önce her iki tür ayrıntıyı

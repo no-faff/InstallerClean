@@ -165,7 +165,7 @@ const MAP = {
   // Body copy
   'Body.MainExplanation.Lead': `아래의 불필요한 파일은 안전하게 삭제할 수 있습니다.`,
   'Body.MainExplanation.Why': `이 파일들은 {InstallerFolder}에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다.`,
-  'Body.MainExplanation.Action': `휴지통으로 삭제하거나, 백업 사본을 남기려면 대신 이동을 사용하세요. 파일을 {InstallerFolder}에 다시 넣으면 정확히 원래 상태로 돌아갑니다.`,
+  'Body.MainExplanation.Action': `휴지통으로 삭제하거나, 백업 복사본을 남기려면 대신 이동을 사용하세요. 파일을 {InstallerFolder}에 다시 넣으면 정확히 원래 상태로 돌아갑니다.`,
   'Body.PendingReboot.MsiExecuteMutex': `지금 무언가가 Windows Installer를 사용하고 있습니다. 대개 Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램입니다. 그 작업이 실행되는 동안에는 이동과 삭제가 일시 중지되어, InstallerClean이 변경 중인 설치 관리자 캐시를 건드리지 않습니다. 작업이 끝난 뒤 다시 검사하면 두 기능이 돌아옵니다.`,
   'Body.PendingReboot.InstallerInProgress': `이 컴퓨터에 이전 Windows Installer 트랜잭션이 일시 중단되어 있습니다. 캐시를 정리하기 전에 그 설치를 다시 진행하거나 롤백하세요(또는 Windows를 다시 시작하세요).`,
   'Body.PendingReboot.PendingRenameInCache': `Windows가 다음 다시 시작 때 실행할 파일 이름 바꾸기 작업을 예약해 두었고, 이는 설치 관리자 캐시에 영향을 줍니다. 정리하기 전에 Windows를 다시 시작하세요.`,
@@ -284,7 +284,7 @@ const MAP = {
   // 0 = destination path
   'Confirm.MoveDestination': `파일이 다음 위치로 이동됩니다:`,
   'Confirm.DeleteTitle': `{1} {0}개를 삭제하시겠습니까? ({2})`,
-  'Confirm.DeleteToRecycleBin': `파일이 휴지통으로 이동됩니다. 백업 사본을 원하시면 대신 이동 버튼을 사용하세요.`,
+  'Confirm.DeleteToRecycleBin': `파일이 휴지통으로 이동됩니다. 백업 복사본을 원하시면 대신 이동 버튼을 사용하세요.`,
 
   // Error messages
   'Error.AdminRequiredTitle': `액세스 거부됨`,

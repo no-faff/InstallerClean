@@ -92,7 +92,7 @@
 
   <!-- Section headings -->
   <data name="Section.Registered.Products" xml:space="preserve"><value>ПРОДУКТЫ</value></data>
-  <data name="Section.Registered.Patches" xml:space="preserve"><value>ПАТЧИ</value></data>
+  <data name="Section.Registered.Patches" xml:space="preserve"><value>ИСПРАВЛЕНИЯ</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>СВЕДЕНИЯ О ПРОДУКТЕ</value></data>
   <data name="Section.Move.Location" xml:space="preserve"><value>ПАПКА ДЛЯ ПЕРЕМЕЩЕНИЯ</value></data>
   <data name="Section.SayThanks" xml:space="preserve"><value>ПОБЛАГОДАРИТЬ</value></data>
@@ -110,10 +110,10 @@
   <data name="Field.ProductName" xml:space="preserve"><value>Название продукта</value></data>
   <data name="Field.File" xml:space="preserve"><value>Файл</value></data>
   <data name="Field.Size" xml:space="preserve"><value>Размер</value></data>
-  <data name="Field.Patches" xml:space="preserve"><value>Патчи</value></data>
+  <data name="Field.Patches" xml:space="preserve"><value>Исправления</value></data>
   <!-- Placeholder shown for a registered package whose API ProductName is empty. -->
   <data name="Field.UnknownProductName" xml:space="preserve"><value>(неизвестно)</value></data>
-  <data name="Field.PatchesOnly" xml:space="preserve"><value>(только патчи)</value></data>
+  <data name="Field.PatchesOnly" xml:space="preserve"><value>(только исправления)</value></data>
   <data name="Field.Missing" xml:space="preserve"><value>отсутствует</value></data>
 
   <!-- Actions (button labels; underscore prefixes are WPF mnemonics) -->
@@ -256,7 +256,7 @@
        while the visible text stays uppercased for SmallCaps. -->
   <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>Папка для перемещения</value></data>
   <data name="Automation.Section.Products" xml:space="preserve"><value>Продукты</value></data>
-  <data name="Automation.Section.Patches" xml:space="preserve"><value>Патчи</value></data>
+  <data name="Automation.Section.Patches" xml:space="preserve"><value>Исправления</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Сведения о продукте</value></data>
   <!-- Spoken name for the box the destination is typed into. It reads as
        the MOVE LOCATION label directly above it, so a screen reader names
@@ -325,7 +325,7 @@
     <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
-    <value>Они лежат в {InstallerFolder} и остаются после того, как программа была удалена ({0}), более новый патч заменил один из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими.</value>
+    <value>Они лежат в {InstallerFolder} и остаются после того, как программа была удалена ({0}), более новое исправление заменило одно из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими.</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
@@ -418,7 +418,7 @@
        Error.InstallerDbUnavailableTitle, passed together in one record, so the
        two are read together and must use one vocabulary: "records", not
        "database". -->
-  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Сканирование не удалось: не удалось прочитать записи установщика Windows.</value></data>
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Сканирование не удалось: не удалось прочитать записи Windows Installer.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Сканирование отменено.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Готово</value></data>
   <!-- 0 = exception type name. Full message + stack trace go only to
@@ -519,7 +519,7 @@
        kept, 1 = pluralised "file"/"files". Flat string; a language may add a
        satellite-only Completion.ReverifyIncomplete.One/.Few/.Many override for
        its count grammar. -->
-  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>Оставлено {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи установщика Windows.</value></data>
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>Оставлено {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи Windows Installer.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -586,8 +586,8 @@
        about every installed program and this scan could not ask them all. The
        second sentence is load-bearing: the main job (finding orphaned files) ran
        normally, so a shorter list is not a fault. 0 = the count of programs. -->
-  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>При этом сканировании не удалось прочитать {0} установленную программу, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается.</value></data>
-  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>При этом сканировании не удалось прочитать {0} установленных программ, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается.</value></data>
+  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>При этом сканировании не удалось прочитать {0} установленную программу, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается.</value></data>
+  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>При этом сканировании не удалось прочитать {0} установленных программ, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0}/{1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
@@ -637,9 +637,9 @@ InstallerClean уже был запущен от имени администра
        MsiEnumerationNeverEnded, MsiPatchEnumerationNeverEnded,
        ScanRecordsUnreadable and ScanCorrelationFailed. "Records" rather than
        "database" because that is the word every one of those bodies uses. -->
-  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Не удалось прочитать записи установщика Windows</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Не удалось прочитать записи Windows Installer</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Сбой сканирования</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Записи установщика Windows вернулись совершенно пустыми: ни одна установленная программа и ни одно обновление не заявляет прав на кэшированный файл установщика. На работающем компьютере такого не бывает (даже у свежей установки Windows такие файлы есть), значит, записи либо повреждены, либо их не удалось прочитать, и сканирование, поверившее такому ответу, ошибочно сочло бы бесхозным каждый файл в {InstallerFolder}. Вместо этого InstallerClean остановился. Ничего не было удалено.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Записи Windows Installer вернулись совершенно пустыми: ни одна установленная программа и ни одно обновление не заявляет прав на кэшированный файл установщика. На работающем компьютере такого не бывает (даже у свежей установки Windows такие файлы есть), значит, записи либо повреждены, либо их не удалось прочитать, и сканирование, поверившее такому ответу, ошибочно сочло бы бесхозным каждый файл в {InstallerFolder}. Вместо этого InstallerClean остановился. Ничего не было удалено.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer не позволил InstallerClean перечислить установленное. InstallerClean уже был запущен от имени администратора, поэтому повторный запуск от имени администратора ничего не изменит. Без этого списка невозможно безопасно определить, какие кэшированные файлы ещё нужны, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
@@ -653,12 +653,12 @@ InstallerClean уже был запущен от имени администра
   <data name="Error.MsiEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer так и не сообщил о конце списка установленных программ: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same two placeholders. -->
-  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer так и не сообщил о конце списка патчей одной программы: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>
+  <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer так и не сообщил о конце списка исправлений одной программы: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>
   <!-- Shown when the scan's two halves (what Windows still registers, and
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean не смог сопоставить это сканирование с записями установщика Windows: каждый файл, который Windows всё ещё числит нужным, отсутствует в {InstallerFolder}, а файлы, реально лежащие в этой папке, не соответствуют ни одной записи. Ни один настоящий компьютер так не выглядит, поэтому это указывает на проблему с чтением записей, а не на файлы, которые можно безопасно удалить. Для очистки ничего не предложено, и ничего не было удалено.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean не смог сопоставить это сканирование с записями Windows Installer: каждый файл, который Windows всё ещё числит нужным, отсутствует в {InstallerFolder}, а файлы, реально лежащие в этой папке, не соответствуют ни одной записи. Ни один настоящий компьютер так не выглядит, поэтому это указывает на проблему с чтением записей, а не на файлы, которые можно безопасно удалить. Для очистки ничего не предложено, и ничего не было удалено.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -667,7 +667,7 @@ InstallerClean уже был запущен от имени администра
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean не смог прочитать достаточно записей установщика Windows, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean не смог прочитать достаточно записей Windows Installer, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Недопустимая папка назначения</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Не удалось записать в папку назначения</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Сбой перемещения</value></data>
@@ -875,8 +875,8 @@ InstallerClean уже был запущен от имени администра
   <data name="Plural.Package.Plural" xml:space="preserve"><value>пакетов</value></data>
   <data name="Plural.Product.Singular" xml:space="preserve"><value>продукт</value></data>
   <data name="Plural.Product.Plural" xml:space="preserve"><value>продуктов</value></data>
-  <data name="Plural.Patch.Singular" xml:space="preserve"><value>патч</value></data>
-  <data name="Plural.Patch.Plural" xml:space="preserve"><value>патчей</value></data>
+  <data name="Plural.Patch.Singular" xml:space="preserve"><value>исправление</value></data>
+  <data name="Plural.Patch.Plural" xml:space="preserve"><value>исправлений</value></data>
 
   <!-- Display-format fragments used by DisplayHelpers.FormatSize /
        FormatElapsed / FormatElapsedLong. Number portion stays in
@@ -1000,15 +1000,15 @@ InstallerClean уже был запущен от имени администра
   <data name="Plural.Package.Few" xml:space="preserve"><value>пакета</value></data>
   <data name="Plural.Product.Few" xml:space="preserve"><value>продукта</value></data>
   <data name="Plural.Error.Few" xml:space="preserve"><value>ошибки</value></data>
-  <data name="Plural.Patch.Few" xml:space="preserve"><value>патча</value></data>
+  <data name="Plural.Patch.Few" xml:space="preserve"><value>исправления</value></data>
   <data name="Summary.RegisteredStillUsed.Few" xml:space="preserve"><value>{0} файла ещё нужны</value></data>
   <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} ненужных файла для очистки</value></data>
   <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>Отсутствует {0} зарегистрированных файла (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
-  <data name="Summary.ProgramsUnreadable.Few" xml:space="preserve"><value>При этом сканировании не удалось прочитать {0} установленные программы, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается.</value></data>
+  <data name="Summary.ProgramsUnreadable.Few" xml:space="preserve"><value>При этом сканировании не удалось прочитать {0} установленные программы, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается.</value></data>
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} зарегистрированных файла ещё нужны ({1})</value></data>
   <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину.</value></data>
   <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Оставлен {0} {1} на месте: после сканирования он снова понадобился программе.</value></data>
-  <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>Оставлен {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи установщика Windows.</value></data>
+  <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>Оставлен {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи Windows Installer.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Найдено {0} зарегистрированный {1}.</value></data>
   <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Найдено {0} зарегистрированных {1}.</value></data>
 
@@ -1023,7 +1023,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.NothingToDo" xml:space="preserve"><value>Делать нечего.</value></data>
   <data name="Cli.DeletingFiles" xml:space="preserve"><value>Удаление: {0} {1}...</value></data>
   <data name="Cli.DeletedFiles" xml:space="preserve"><value>Удалено {0} {1}.</value></data>
-  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Ошибка: Корзина недоступна для этого диска, поэтому ничего не удалено. Воспользуйтесь /m, чтобы переместить файлы, либо снова включите Корзину и запустите ещё раз.</value></data>
+  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Ошибка: Корзина недоступна для этого тома, поэтому ничего не удалено. Воспользуйтесь /m, чтобы переместить файлы, либо снова включите Корзину и запустите ещё раз.</value></data>
   <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Ошибка: не указана папка назначения для перемещения. Используйте /m ПУТЬ. (Значение по умолчанию, заданное в графическом интерфейсе, действует только для текущего пользователя и не применяется при запуске по расписанию или от имени служебной учётной записи.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Ошибка: папка назначения не может находиться внутри папки Windows Installer.</value></data>
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Ошибка: папка назначения должна быть полным путём. Получено: {0}</value></data>

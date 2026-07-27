@@ -383,7 +383,7 @@
   <data name="Status.QueryingApi" xml:space="preserve"><value>Đang hỏi Windows về phần mềm đã cài...</value></data>
   <data name="Status.ScanningCache" xml:space="preserve"><value>Đang quét thư mục bộ nhớ đệm trình cài đặt...</value></data>
   <data name="Status.EnumeratingProducts" xml:space="preserve"><value>Đang liệt kê các sản phẩm đã cài...</value></data>
-  <data name="Status.CheckingRegistry" xml:space="preserve"><value>Đang kiểm tra registry để tìm các gói bổ sung...</value></data>
+  <data name="Status.CheckingRegistry" xml:space="preserve"><value>Đang kiểm tra sổ đăng ký để tìm các gói bổ sung...</value></data>
   <!-- 0 = registered package count, 1 = pluralised "package"/"packages" -->
   <!-- Fires mid-scan as a step-progress update after the registry-
        fallback pass; not the end-of-scan pill (that's Status.ScanComplete).
@@ -418,7 +418,7 @@
        Error.InstallerDbUnavailableTitle, passed together in one record, so the
        two are read together and must use one vocabulary: "records", not
        "database". -->
-  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Quét thất bại: không thể đọc các bản ghi trình cài đặt của Windows.</value></data>
+  <data name="Status.ScanFailedDb" xml:space="preserve"><value>Quét thất bại: không thể đọc các bản ghi Windows Installer.</value></data>
   <data name="Status.ScanCancelled" xml:space="preserve"><value>Đã hủy quét.</value></data>
   <data name="Status.Done" xml:space="preserve"><value>Sẵn sàng</value></data>
   <!-- 0 = exception type name. Full message + stack trace go only to
@@ -519,7 +519,7 @@
        kept, 1 = pluralised "file"/"files". Flat string; a language may add a
        satellite-only Completion.ReverifyIncomplete.One/.Few/.Many override for
        its count grammar. -->
-  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>Đã giữ nguyên {0} {1} vì khi kiểm tra lại, không thể đọc đầy đủ các bản ghi trình cài đặt của Windows.</value></data>
+  <data name="Completion.ReverifyIncomplete" xml:space="preserve"><value>Đã giữ nguyên {0} {1} vì khi kiểm tra lại, không thể đọc đầy đủ các bản ghi Windows Installer.</value></data>
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
@@ -637,9 +637,9 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        MsiEnumerationNeverEnded, MsiPatchEnumerationNeverEnded,
        ScanRecordsUnreadable and ScanCorrelationFailed. "Records" rather than
        "database" because that is the word every one of those bodies uses. -->
-  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Không thể đọc các bản ghi trình cài đặt của Windows</value></data>
+  <data name="Error.InstallerDbUnavailableTitle" xml:space="preserve"><value>Không thể đọc các bản ghi Windows Installer</value></data>
   <data name="Error.ScanFailedTitle" xml:space="preserve"><value>Quét thất bại</value></data>
-  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Các bản ghi trình cài đặt của Windows trả về hoàn toàn trống: không một chương trình đã cài hay bản cập nhật nào nhận là chủ của một tệp cài đặt trong bộ nhớ đệm. Điều đó không xảy ra trên một máy hoạt động bình thường (ngay cả một bản Windows vừa cài cũng có vài tệp như vậy), nên hoặc các bản ghi đã hỏng, hoặc không đọc được, và một lần quét tin vào câu trả lời này sẽ nhầm lẫn coi mọi tệp trong {InstallerFolder} là bị bỏ lại. Thay vào đó InstallerClean đã dừng. Không có gì bị xóa.</value></data>
+  <data name="Error.InstallerDbEmpty" xml:space="preserve"><value>Các bản ghi Windows Installer trả về hoàn toàn trống: không một chương trình đã cài hay bản cập nhật nào nhận là chủ của một tệp cài đặt trong bộ nhớ đệm. Điều đó không xảy ra trên một máy hoạt động bình thường (ngay cả một bản Windows vừa cài cũng có vài tệp như vậy), nên hoặc các bản ghi đã hỏng, hoặc không đọc được, và một lần quét tin vào câu trả lời này sẽ nhầm lẫn coi mọi tệp trong {InstallerFolder} là bị bỏ lại. Thay vào đó InstallerClean đã dừng. Không có gì bị xóa.</value></data>
   <data name="Error.MsiAccessDenied" xml:space="preserve"><value>Windows Installer không cho phép InstallerClean liệt kê những gì đã được cài. InstallerClean vốn đã chạy với quyền quản trị viên, nên chạy lại với quyền quản trị viên cũng không thay đổi được gì. Không có danh sách đó thì không có cách nào an toàn để biết tệp nào trong bộ nhớ đệm vẫn còn cần, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
   <!-- 0 = consecutive failure count, 1 = last Win32 error code (kept
        in the message because a sysadmin reading the dialog may want
@@ -658,7 +658,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        what is on disk) cannot be reconciled at all: a sign the correlation
        broke, not a real list of removable files. Deliberately does not offer
        anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean không thể khớp lần quét này với các bản ghi trình cài đặt của Windows: mọi tệp mà Windows vẫn liệt kê là cần thiết đều không có trong {InstallerFolder}, trong khi các tệp thực sự nằm trong thư mục lại không khớp với bản ghi nào. Không có máy thật nào trông như vậy, nên điều này cho thấy có vấn đề khi đọc các bản ghi, chứ không phải là các tệp bạn có thể xóa an toàn. Chưa có gì được đưa ra để dọn dẹp và không có gì bị xóa.</value></data>
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean không thể khớp lần quét này với các bản ghi Windows Installer: mọi tệp mà Windows vẫn liệt kê là cần thiết đều không có trong {InstallerFolder}, trong khi các tệp thực sự nằm trong thư mục lại không khớp với bản ghi nào. Không có máy thật nào trông như vậy, nên điều này cho thấy có vấn đề khi đọc các bản ghi, chứ không phải là các tệp bạn có thể xóa an toàn. Chưa có gì được đưa ra để dọn dẹp và không có gì bị xóa.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -667,7 +667,7 @@ InstallerClean vốn đã chạy với quyền quản trị viên, nên khởi �
        Error.ScanCorrelationFailed, which names a specific mismatch between the
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
-  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean không đọc được đủ các bản ghi trình cài đặt của Windows để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ registry cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
+  <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean không đọc được đủ các bản ghi Windows Installer để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ sổ đăng ký cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng. Không có gì bị xóa.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Đích không hợp lệ</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Không thể ghi vào đích</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Chuyển thất bại</value></data>
@@ -792,8 +792,8 @@ Chi tiết trong {1}.</value></data>
        user's own medium-integrity shell, and that chain was unavailable) is
        an internal distinction with no name outside this codebase; the user
        gets what happened and what they can do about it. -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean không thể mở trình duyệt của bạn. Liên kết đã được sao chép vào bảng nhớ tạm, nên bạn có thể tự dán nó vào:&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean không thể mở trình duyệt của bạn, và cũng không thể sao chép liên kết vào bảng nhớ tạm. Liên kết là:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean không thể mở trình duyệt của bạn. Liên kết đã được sao chép vào bảng tạm, nên bạn có thể tự dán nó vào:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean không thể mở trình duyệt của bạn, và cũng không thể sao chép liên kết vào bảng tạm. Liên kết là:&#10;&#10;{0}</value></data>
   <!-- 0 = the destination folder whose canonical path changed mid-batch.
        Raised when the folder is replaced or redirected between two files of
        the same Move, so the copy must not claim where the files moved before

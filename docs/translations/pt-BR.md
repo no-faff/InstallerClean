@@ -374,8 +374,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Available for cleanup. | Disponíveis para limpeza. |
 | Details, registered files | Detalhes, arquivos registrados |
 | Read-only inventory. | Inventário somente leitura. |
-| Sorted by {0}, ascending | Ordenado por {0}, crescente |
-| Sorted by {0}, descending | Ordenado por {0}, decrescente |
+| Sorted by {0}, ascending | Classificado por {0}, crescente |
+| Sorted by {0}, descending | Classificado por {0}, decrescente |
 | Scan results | Resultados da análise |
 | Result details | Detalhes do resultado |
 | File details | Detalhes do arquivo |

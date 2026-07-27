@@ -94,7 +94,7 @@ turkish.WelcomeLabel1=InstallerClean kurulumuna hoş geldiniz
 turkish.WelcomeLabel2=Bu işlem InstallerClean'i bilgisayarınıza kuracak.
 turkish.FinishedHeadingLabel=Kurulum tamamlandı
 turkish.FinishedLabel=InstallerClean bilgisayarınıza kuruldu.
-turkish.ClickFinish=Kurulumu kapatmak için Son'a tıklayın.
+turkish.ClickFinish=Kurulumu kapatmak için Bitti'ye tıklayın.
 
 russian.WelcomeLabel1=Добро пожаловать в программу установки InstallerClean
 russian.WelcomeLabel2=Программа установит InstallerClean на ваш компьютер.
@@ -106,7 +106,7 @@ ukrainian.WelcomeLabel1=Ласкаво просимо до встановлен�
 ukrainian.WelcomeLabel2=InstallerClean буде встановлено на ваш комп'ютер.
 ukrainian.FinishedHeadingLabel=Встановлення завершено
 ukrainian.FinishedLabel=InstallerClean встановлено на ваш комп'ютер.
-ukrainian.ClickFinish=Натисніть «Завершити», щоб закрити майстер встановлення.
+ukrainian.ClickFinish=Натисніть «Готово», щоб закрити майстер встановлення.
 
 japanese.WelcomeLabel1=InstallerClean セットアップへようこそ
 japanese.WelcomeLabel2=InstallerClean をお使いのコンピューターにインストールします。
@@ -135,8 +135,8 @@ korean.ClickFinish=설치를 마치려면 '마침'을 클릭하세요.
 english.SetupAppRunningError=InstallerClean is still running, so Setup cannot continue.%n%nThis may be the app window, or a command-line or scheduled-task run working in the background. Close the window, or end InstallerClean.exe and installerclean-cli.exe in Task Manager, then click OK to continue, or Cancel to exit.
 english.UninstallAppRunningError=InstallerClean is still running, so it cannot be removed.%n%nThis may be the app window, or a command-line or scheduled-task run working in the background. Close the window, or end InstallerClean.exe and installerclean-cli.exe in Task Manager, then click OK to continue, or Cancel to exit.
 
-indonesian.SetupAppRunningError=InstallerClean masih berjalan, sehingga pemasangan tidak dapat diteruskan.%n%nIni bisa berupa jendela aplikasi, atau proses baris perintah atau tugas terjadwal yang berjalan di latar belakang. Tutup jendela tersebut, atau akhiri InstallerClean.exe dan installerclean-cli.exe di Task Manager, lalu klik OK untuk meneruskan, atau Cancel untuk keluar.
-indonesian.UninstallAppRunningError=InstallerClean masih berjalan, sehingga tidak dapat dihapus.%n%nIni bisa berupa jendela aplikasi, atau proses baris perintah atau tugas terjadwal yang berjalan di latar belakang. Tutup jendela tersebut, atau akhiri InstallerClean.exe dan installerclean-cli.exe di Task Manager, lalu klik OK untuk meneruskan, atau Cancel untuk keluar.
+indonesian.SetupAppRunningError=InstallerClean masih berjalan, sehingga pemasangan tidak dapat diteruskan.%n%nIni bisa berupa jendela aplikasi, atau proses baris perintah atau tugas terjadwal yang berjalan di latar belakang. Tutup jendela tersebut, atau akhiri InstallerClean.exe dan installerclean-cli.exe di Task Manager, lalu klik Oke untuk meneruskan, atau Batal untuk keluar.
+indonesian.UninstallAppRunningError=InstallerClean masih berjalan, sehingga tidak dapat dihapus.%n%nIni bisa berupa jendela aplikasi, atau proses baris perintah atau tugas terjadwal yang berjalan di latar belakang. Tutup jendela tersebut, atau akhiri InstallerClean.exe dan installerclean-cli.exe di Task Manager, lalu klik Oke untuk meneruskan, atau Batal untuk keluar.
 
 german.SetupAppRunningError=InstallerClean wird noch ausgeführt, daher kann das Setup nicht fortgesetzt werden.%n%nDies kann das App-Fenster sein oder ein im Hintergrund laufender Vorgang über die Befehlszeile oder eine geplante Aufgabe. Schließen Sie das Fenster oder beenden Sie InstallerClean.exe und installerclean-cli.exe im Task-Manager, und klicken Sie dann auf OK, um fortzufahren, oder auf Abbrechen, um zu beenden.
 german.UninstallAppRunningError=InstallerClean wird noch ausgeführt, daher kann es nicht deinstalliert werden.%n%nDies kann das App-Fenster sein oder ein im Hintergrund laufender Vorgang über die Befehlszeile oder eine geplante Aufgabe. Schließen Sie das Fenster oder beenden Sie InstallerClean.exe und installerclean-cli.exe im Task-Manager, und klicken Sie dann auf OK, um fortzufahren, oder auf Abbrechen, um zu beenden.

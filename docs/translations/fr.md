@@ -33,7 +33,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Copy | Copier |
 | Cut | Couper |
 | Paste | Coller |
-| Select all | Tout sélectionner |
+| Select all | Sélectionner tout |
 | _Browse... | _Parcourir... |
 | _Cancel | _Annuler |
 | Check for _updates | Rechercher des _mises à jour |
@@ -239,7 +239,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | La destination {0} se trouve dans un dossier système de Windows. Choisissez un chemin en dehors de %SystemRoot%, %ProgramFiles% et %ProgramData%. |
 | Not enough space | Espace insuffisant |
 | Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | Espace insuffisant dans {0}<br><br>Nécessaire : {1}<br>Disponible : {2} |
-| You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | Vous n'avez pas la permission d'écrire dans {0}.<br>Essayez un dossier dans votre profil utilisateur ou sur un lecteur qui vous appartient. |
+| You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | Vous n'avez pas l'autorisation d'écrire dans {0}.<br>Essayez un dossier dans votre profil utilisateur ou sur un lecteur qui vous appartient. |
 | The path {0} is too long for Windows. Pick a shorter path. | Le chemin {0} est trop long pour Windows. Choisissez un chemin plus court. |
 | The folder {0} does not exist and could not be created. Check the drive letter or network path. | Le dossier {0} n'existe pas et n'a pas pu être créé. Vérifiez la lettre de lecteur ou le chemin réseau. |
 | Windows cannot write to {0}.<br>Details in {1}. | Windows ne peut pas écrire dans {0}.<br>Détails dans {1}. |

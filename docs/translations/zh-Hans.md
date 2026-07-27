@@ -330,7 +330,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move the unneeded files to the Move location. | 将不需要的文件移动到移动位置。 |
 | Move the unneeded files somewhere safe. You'll choose the folder next. | 将不需要的文件移动到安全的位置。下一步再选择文件夹。 |
 | Move the unneeded files to the Recycle Bin. | 将不需要的文件移到回收站。 |
-| Subject name from the embedded Authenticode certificate. Not chain-verified. | 来自内嵌 Authenticode 证书的主题名称。未验证证书链。 |
+| Subject name from the embedded Authenticode certificate. Not chain-verified. | 来自内嵌 Authenticode 证书的使用者名称。未验证证书链。 |
 | Change language. The program will restart. | 更改语言。程序会重启。 |
 
 ## Screen reader labels
@@ -442,7 +442,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Nothing to do. | 无需任何操作。 |
 | Deleting {0} {1}... | 正在删除 {0} 个{1}… |
 | Deleted {0} {1}. | 已删除 {0} 个{1}。 |
-| Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | 错误：此驱动器的回收站不可用，因此未删除任何内容。请改用 /m 移动这些文件，或重新启用回收站后再次运行。 |
+| Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | 错误：此卷的回收站不可用，因此未删除任何内容。请改用 /m 移动这些文件，或重新启用回收站后再次运行。 |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | 错误：未指定移动目标位置。请使用 /m 路径。（在 GUI 中设置的默认位置是按用户保存的，不适用于计划任务或服务账户下的运行。） |
 | Error: destination cannot be inside the Windows Installer folder. | 错误：目标位置不能位于 Windows Installer 文件夹内。 |
 | Error: destination must be a fully qualified path. Got: {0} | 错误：目标位置必须是完整路径。收到：{0} |
@@ -452,7 +452,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | 错误：有一个排队等待重启后执行的文件操作指向安装程序缓存（{0}）。请先重启 Windows 完成该操作，然后再清理。 |
 | Moving {0} {1} to {2}... | 正在将 {0} 个{1}移动到 {2}… |
 | Moved {0} {1}. | 已移动 {0} 个{1}。 |
-| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | 另一个 InstallerClean 进程正持有单实例锁（GUI 或另一次 CLI 运行）。退出码 75（暂时性）；稍后可安全重试。 |
+| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | 另一个 InstallerClean 进程正持有单实例锁（GUI 或另一次 CLI 运行）。退出代码 75（暂时性）；稍后可安全重试。 |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | 注意：事件日志写入失败。请检查应用程序日志的权限或组策略。 |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - 清理 {InstallerFolder} |
 | Usage: | 用法： |
@@ -466,7 +466,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | until it finishes; redirect or pipe its output as you would any | 占用命令提示符；可像对待其他控制台程序那样重定向或通过管道处理其输出。 |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | GUI 就位于同目录下的 InstallerClean.exe 中。 |
 | The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | 保存的默认位置按用户存储；计划任务或 SYSTEM 账户运行需使用 /m 路径。 |
-| Exit codes: | 退出码： |
+| Exit codes: | 退出代码： |
 |   0   success: every flagged file was processed |   0   成功：已处理每个被标记的文件 |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   失败：未处理任何文件（参数错误、扫描失败或所有文件均失败） |
 |   2   partial: some files processed, some failed |   2   部分完成：部分文件已处理，部分失败 |

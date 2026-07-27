@@ -166,7 +166,7 @@ const MAP = {
   'Tooltip.Delete': `Mueve los archivos innecesarios a la Papelera de reciclaje.`,
   'Tooltip.SigningCertificate': `Nombre del firmante del certificado Authenticode incorporado. La cadena no está verificada.`,
   'Body.MainExplanation.Lead': `Los archivos innecesarios que haya abajo se pueden eliminar sin riesgo.`,
-  'Body.MainExplanation.Why': `Están en {InstallerFolder}, donde quedaron cuando se desinstaló un programa ({0}), un parche más reciente sustituyó a otro ({1}) o el fabricante lo retiró ({2}). InstallerClean solo enumera archivos que el propio Windows da por terminados.`,
+  'Body.MainExplanation.Why': `Están en {InstallerFolder}, donde quedaron cuando se desinstaló un programa ({0}), un parche más reciente sustituyó a otro ({1}) o el editor lo retiró ({2}). InstallerClean solo enumera archivos que el propio Windows da por terminados.`,
   'Body.MainExplanation.Action': `Elimínalos y se enviarán a la Papelera de reciclaje, o usa Mover en su lugar para conservar una copia de seguridad. Si vuelves a poner los archivos en {InstallerFolder}, todo queda exactamente como estaba.`,
   'Body.PendingReboot.MsiExecuteMutex': `Ahora mismo algo está usando Windows Installer, normalmente una actualización de Windows o un programa instalándose en segundo plano. Mover y Eliminar quedan en pausa mientras eso ocurre, de modo que InstallerClean no toca la caché de instalación mientras está cambiando. Cuando termine, vuelve a analizar y volverán a estar disponibles.`,
   'Body.PendingReboot.InstallerInProgress': `Hay una transacción anterior de Windows Installer suspendida en este equipo. Reanuda o revierte esa instalación (o reinicia Windows) antes de limpiar la caché.`,

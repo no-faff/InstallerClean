@@ -133,7 +133,7 @@ const MAP = {
   'Automation.CheckForUpdates': `Periksa pembaruan`,
   'Automation.CheckForUpdates.HelpText': `Memeriksa halaman rilis github untuk mencari versi yang lebih baru.`,
   'Automation.UpdateAvailable.HelpText': `Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini.`,
-  'Automation.Licence.HelpText': `Membuka file lisensi di github.com melalui peramban Anda.`,
+  'Automation.Licence.HelpText': `Membuka file lisensi di github.com melalui browser Anda.`,
   'Automation.Section.MoveLocation': `Lokasi pemindahan`,
   'Automation.Section.Products': `Produk`,
   'Automation.Section.Patches': `Patch`,
@@ -349,7 +349,7 @@ const MAP = {
 
   // 0 = the relative path the caller passed
   'Error.DestinationNotFullyQualified': `Lokasi pemindahan harus berupa jalur lengkap ke sebuah folder, yang dimulai dengan huruf drive atau jalur jaringan (misalnya D:\\Backup, atau \\\\server\\backup). InstallerClean tidak bisa memakai yang ini: {0}`,
-  'BrowserLaunch.FailedTitle': `Tidak bisa membuka peramban Anda`,
+  'BrowserLaunch.FailedTitle': `Tidak bisa membuka browser Anda`,
   'UpdateCheck.Title': `Periksa pembaruan`,
   'UpdateCheck.Status.Checking': `Memeriksa...`,
   'UpdateCheck.Status.UpToDate': `Sudah versi terbaru.`,
@@ -364,8 +364,8 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `Pemeriksaan gagal karena alasan yang tidak diketahui. Detailnya ada di crash.log jika Anda perlu melaporkannya.`,
 
   // 0 = the URL the user was trying to reach
-  'BrowserLaunch.ClipboardOk': `InstallerClean tidak bisa membuka peramban Anda. Tautannya sudah ada di papan klip, jadi Anda bisa menempelkannya sendiri:&#10;&#10;{0}`,
-  'BrowserLaunch.ClipboardFailed': `InstallerClean tidak bisa membuka peramban Anda, dan juga tidak bisa menyalin tautan ke papan klip. Tautannya:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardOk': `InstallerClean tidak bisa membuka browser Anda. Tautannya sudah ada di clipboard, jadi Anda bisa menempelkannya sendiri:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `InstallerClean tidak bisa membuka browser Anda, dan juga tidak bisa menyalin tautan ke clipboard. Tautannya:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
   'Error.DestinationChangedMidBatch': `Lokasi pemindahan berubah saat file sedang dipindahkan (ada sesuatu yang mengganti atau mengalihkan folder itu), jadi InstallerClean berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu Pindai ulang dan coba lagi.`,
@@ -494,8 +494,8 @@ const MAP = {
   'About.Link.Guide': `Panduan dan FAQ`,
   'About.Link.ReportProblem': `Laporkan masalah`,
   'About.AutoUpdateCheck': `Periksa pembaruan secara otomatis`,
-  'Automation.About.Guide.HelpText': `Membuka readme di github melalui peramban Anda.`,
-  'Automation.About.ReportProblem.HelpText': `Membuka pelacak masalah (Issues) di github.com melalui peramban Anda.`,
+  'Automation.About.Guide.HelpText': `Membuka readme di github melalui browser Anda.`,
+  'Automation.About.ReportProblem.HelpText': `Membuka pelacak masalah (Issues) di github.com melalui browser Anda.`,
   'Automation.AutoUpdateCheck.HelpText': `Jika dicentang, InstallerClean memeriksa apakah ada versi yang lebih baru di github saat Anda menjalankannya.`,
 };
 

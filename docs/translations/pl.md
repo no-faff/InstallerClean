@@ -452,7 +452,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | Błąd: zakolejkowana po ponownym uruchomieniu operacja na pliku dotyczy pamięci podręcznej instalatora ({0}). Przed czyszczeniem uruchom ponownie Windows, aby dokończyć tę operację. |
 | Moving {0} {1} to {2}... | Przenoszenie: {0} {1} do {2}... |
 | Moved {0} {1}. | Przeniesiono {0} {1}. |
-| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Inny proces InstallerClean trzyma blokadę pojedynczej instancji (GUI lub inne uruchomienie CLI). Kod wyjścia 75 (stan przejściowy); można bezpiecznie spróbować ponownie później. |
+| Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Inny proces InstallerClean trzyma blokadę pojedynczej instancji (GUI lub inne uruchomienie CLI). Kod zakończenia 75 (stan przejściowy); można bezpiecznie spróbować ponownie później. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Uwaga: zapis do dziennika zdarzeń nie powiódł się. Sprawdź uprawnienia dziennika „Aplikacja” lub zasady grupy. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - oczyszczanie {InstallerFolder} |
 | Usage: | Sposób użycia: |
@@ -466,7 +466,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | until it finishes; redirect or pipe its output as you would any | dopóki się nie zakończy; przekieruj lub przekaż potokiem jego wyjście |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | jak każdy inny program konsolowy exe. GUI jest obok, w InstallerClean.exe. |
 | The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Zapisana lokalizacja zależy od użytkownika; zadania i SYSTEM: /m ŚCIEŻKA. |
-| Exit codes: | Kody wyjścia: |
+| Exit codes: | Kody zakończenia: |
 |   0   success: every flagged file was processed |   0   sukces: przetworzono każdy oznaczony plik |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   błąd: nic nie przetworzono (złe argumenty, skanowanie lub pliki) |
 |   2   partial: some files processed, some failed |   2   częściowo: część plików przetworzono, część zawiodła |

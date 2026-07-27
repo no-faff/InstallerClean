@@ -278,8 +278,8 @@
        override keeps the ▲/▼ glyph out of speech) and mirrored into the
        list's ItemStatus as a queryable surface. 0 = the sorted column's
        name (a Field.* label). -->
-  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>Ordenado por {0}, crescente</value></data>
-  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>Ordenado por {0}, decrescente</value></data>
+  <data name="Automation.SortStatus.Ascending" xml:space="preserve"><value>Classificado por {0}, crescente</value></data>
+  <data name="Automation.SortStatus.Descending" xml:space="preserve"><value>Classificado por {0}, decrescente</value></data>
   <!-- Names for the scrollable text regions, spoken only once a region
        can actually scroll and so joins the tab order (the
        BodyScrollRegion style). -->

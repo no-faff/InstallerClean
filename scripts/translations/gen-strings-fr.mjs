@@ -103,7 +103,7 @@ const MAP = {
   'Action.Copy': `Copier`,
   'Action.Cut': `Couper`,
   'Action.Paste': `Coller`,
-  'Action.SelectAll': `Tout sélectionner`,
+  'Action.SelectAll': `Sélectionner tout`,
   'Action.Browse': `_Parcourir...`,
   'Action.Cancel': `_Annuler`,
   'Action.CheckForUpdates': `Rechercher des _mises à jour`,
@@ -329,7 +329,7 @@ const MAP = {
   'Error.NotEnoughSpaceBody': `Espace insuffisant dans {0}\n\nNécessaire : {1}\nDisponible : {2}`,
 
   // 0 = destination
-  'Error.AccessDeniedDestination': `Vous n'avez pas la permission d'écrire dans {0}.\nEssayez un dossier dans votre profil utilisateur ou sur un lecteur qui vous appartient.`,
+  'Error.AccessDeniedDestination': `Vous n'avez pas l'autorisation d'écrire dans {0}.\nEssayez un dossier dans votre profil utilisateur ou sur un lecteur qui vous appartient.`,
   'Error.PathTooLong': `Le chemin {0} est trop long pour Windows. Choisissez un chemin plus court.`,
   'Error.DestinationMissing': `Le dossier {0} n'existe pas et n'a pas pu être créé. Vérifiez la lettre de lecteur ou le chemin réseau.`,
   'Error.IOWriteDestination': `Windows ne peut pas écrire dans {0}.\nDétails dans {1}.`,

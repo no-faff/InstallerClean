@@ -190,7 +190,7 @@ const MAP = {
   'Status.QueryingApi': `Đang hỏi Windows về phần mềm đã cài...`,
   'Status.ScanningCache': `Đang quét thư mục bộ nhớ đệm trình cài đặt...`,
   'Status.EnumeratingProducts': `Đang liệt kê các sản phẩm đã cài...`,
-  'Status.CheckingRegistry': `Đang kiểm tra registry để tìm các gói bổ sung...`,
+  'Status.CheckingRegistry': `Đang kiểm tra sổ đăng ký để tìm các gói bổ sung...`,
 
   // 0 = registered package count, 1 = pluralised "package"/"packages"
   'Status.RegisteredPackagesFound': `Đã tìm thấy {0} {1} đã đăng ký.`,
@@ -213,7 +213,7 @@ const MAP = {
   'Status.DeleteFailed': `Xóa thất bại ({0}). Chi tiết trong {1}.`,
   'Status.DeleteFailed.NoLog': `Xóa thất bại ({0}). Không thể ghi nhật ký sự cố.`,
   'Status.ScanAccessDenied': `Truy cập bị từ chối. Windows đã từ chối lần quét.`,
-  'Status.ScanFailedDb': `Quét thất bại: không thể đọc các bản ghi trình cài đặt của Windows.`,
+  'Status.ScanFailedDb': `Quét thất bại: không thể đọc các bản ghi Windows Installer.`,
   'Status.ScanCancelled': `Đã hủy quét.`,
   'Status.Done': `Sẵn sàng`,
   'Status.ScanFailedDetails': `Quét thất bại ({0}). Chi tiết trong {1}.`,
@@ -294,9 +294,9 @@ const MAP = {
   // Error messages
   'Error.AdminRequiredTitle': `Truy cập bị từ chối`,
   'Error.AdminRequiredBody': `Windows đã từ chối quyền truy cập của InstallerClean, nên nó đã dừng lại. Không có gì bị xóa.\n\nInstallerClean vốn đã chạy với quyền quản trị viên, nên khởi động lại theo cách đó cũng không giúp được gì. Windows không nói gì thêm về thứ đã từ chối quyền truy cập, nên không có gì cụ thể để thử.`,
-  'Error.InstallerDbUnavailableTitle': `Không thể đọc các bản ghi trình cài đặt của Windows`,
+  'Error.InstallerDbUnavailableTitle': `Không thể đọc các bản ghi Windows Installer`,
   'Error.ScanFailedTitle': `Quét thất bại`,
-  'Error.InstallerDbEmpty': `Các bản ghi trình cài đặt của Windows trả về hoàn toàn trống: không một chương trình đã cài hay bản cập nhật nào nhận là chủ của một tệp cài đặt trong bộ nhớ đệm. Điều đó không xảy ra trên một máy hoạt động bình thường (ngay cả một bản Windows vừa cài cũng có vài tệp như vậy), nên hoặc các bản ghi đã hỏng, hoặc không đọc được, và một lần quét tin vào câu trả lời này sẽ nhầm lẫn coi mọi tệp trong {InstallerFolder} là bị bỏ lại. Thay vào đó InstallerClean đã dừng. Không có gì bị xóa.`,
+  'Error.InstallerDbEmpty': `Các bản ghi Windows Installer trả về hoàn toàn trống: không một chương trình đã cài hay bản cập nhật nào nhận là chủ của một tệp cài đặt trong bộ nhớ đệm. Điều đó không xảy ra trên một máy hoạt động bình thường (ngay cả một bản Windows vừa cài cũng có vài tệp như vậy), nên hoặc các bản ghi đã hỏng, hoặc không đọc được, và một lần quét tin vào câu trả lời này sẽ nhầm lẫn coi mọi tệp trong {InstallerFolder} là bị bỏ lại. Thay vào đó InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiAccessDenied': `Windows Installer không cho phép InstallerClean liệt kê những gì đã được cài. InstallerClean vốn đã chạy với quyền quản trị viên, nên chạy lại với quyền quản trị viên cũng không thay đổi được gì. Không có danh sách đó thì không có cách nào an toàn để biết tệp nào trong bộ nhớ đệm vẫn còn cần, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiNonSuccess': `Windows Installer không thể đưa cho InstallerClean một danh sách chương trình đã cài đọc được: {0} mục liên tiếp trả về không đọc được (mã lỗi cuối {1}). Thay vì làm việc với một danh sách chỉ đọc được một phần, InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.InvalidDestinationTitle': `Đích không hợp lệ`,
@@ -361,8 +361,8 @@ const MAP = {
   'UpdateCheck.Failed.Unknown': `Việc kiểm tra thất bại vì một lý do không xác định. Chi tiết nằm trong crash.log nếu bạn cần báo cáo.`,
 
   // 0 = the URL the user was trying to reach
-  'BrowserLaunch.ClipboardOk': `InstallerClean không thể mở trình duyệt của bạn. Liên kết đã được sao chép vào bảng nhớ tạm, nên bạn có thể tự dán nó vào:&#10;&#10;{0}`,
-  'BrowserLaunch.ClipboardFailed': `InstallerClean không thể mở trình duyệt của bạn, và cũng không thể sao chép liên kết vào bảng nhớ tạm. Liên kết là:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardOk': `InstallerClean không thể mở trình duyệt của bạn. Liên kết đã được sao chép vào bảng tạm, nên bạn có thể tự dán nó vào:&#10;&#10;{0}`,
+  'BrowserLaunch.ClipboardFailed': `InstallerClean không thể mở trình duyệt của bạn, và cũng không thể sao chép liên kết vào bảng tạm. Liên kết là:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
   'Error.DestinationChangedMidBatch': `Nơi chuyển đến đã thay đổi trong khi các tệp đang được chuyển (thứ gì đó đã thay thế hoặc chuyển hướng thư mục), nên InstallerClean đã dừng lại thay vì ghi vào nhầm chỗ. Hãy kiểm tra {0}, rồi Quét lại và thử lại.`,
@@ -467,7 +467,7 @@ const MAP = {
   'Body.NotScanned.Lead': `Chưa quét gì cả.`,
   'Body.NotScanned.Why': `Nhấn Quét lại để tìm trong {InstallerFolder} những tệp cài đặt mà không chương trình nào còn cần.`,
   'Confirm.MoveSameDrive': `Thư mục này nằm trên cùng ổ đĩa, nên bản thân việc chuyển sẽ không giải phóng dung lượng nào. Bạn sẽ lấy lại dung lượng khi xóa các tệp khỏi đó, hoặc bạn có thể chọn một thư mục trên ổ đĩa khác thay vào đó.`,
-  'Error.ScanCorrelationFailed': `InstallerClean không thể khớp lần quét này với các bản ghi trình cài đặt của Windows: mọi tệp mà Windows vẫn liệt kê là cần thiết đều không có trong {InstallerFolder}, trong khi các tệp thực sự nằm trong thư mục lại không khớp với bản ghi nào. Không có máy thật nào trông như vậy, nên điều này cho thấy có vấn đề khi đọc các bản ghi, chứ không phải là các tệp bạn có thể xóa an toàn. Chưa có gì được đưa ra để dọn dẹp và không có gì bị xóa.`,
+  'Error.ScanCorrelationFailed': `InstallerClean không thể khớp lần quét này với các bản ghi Windows Installer: mọi tệp mà Windows vẫn liệt kê là cần thiết đều không có trong {InstallerFolder}, trong khi các tệp thực sự nằm trong thư mục lại không khớp với bản ghi nào. Không có máy thật nào trông như vậy, nên điều này cho thấy có vấn đề khi đọc các bản ghi, chứ không phải là các tệp bạn có thể xóa an toàn. Chưa có gì được đưa ra để dọn dẹp và không có gì bị xóa.`,
   'Error.CandidateOutsideCache': `Tệp này không nằm trực tiếp trong thư mục Windows Installer; bị từ chối vì lý do an toàn.`,
   'Completion.ReverifySkipped': `Đã giữ nguyên {0} {1} vì sau lần quét, một chương trình lại cần đến chúng.`,
   'Completion.MoveCancelledSummary': `Đã chuyển {0}/{1} {2} trước khi bạn hủy.`,
@@ -476,10 +476,10 @@ const MAP = {
   'Body.PendingReboot.Lead': `Hiện chưa thể dọn những tệp này.`,
   'Cli.TooManyArguments': `Lỗi: có thêm đối số không mong đợi '{0}'. Nếu thư mục đích của bạn có dấu cách, hãy đặt cả đường dẫn trong dấu ngoặc kép: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `Mặc định đã lưu theo người dùng; chạy theo lịch hoặc SYSTEM: /m ĐƯỜNG_DẪN.`,
-  'Completion.ReverifyIncomplete': `Đã giữ nguyên {0} {1} vì khi kiểm tra lại, không thể đọc đầy đủ các bản ghi trình cài đặt của Windows.`,
+  'Completion.ReverifyIncomplete': `Đã giữ nguyên {0} {1} vì khi kiểm tra lại, không thể đọc đầy đủ các bản ghi Windows Installer.`,
   'Summary.ProgramsUnreadable.Singular': `Không thể đọc {0} chương trình đã cài trong lần quét này, nên các bản vá bị thay thế đã được giữ lại. Các tệp bị bỏ lại không bị ảnh hưởng.`,
   'Summary.ProgramsUnreadable.Plural': `Không thể đọc {0} chương trình đã cài trong lần quét này, nên các bản vá bị thay thế đã được giữ lại. Các tệp bị bỏ lại không bị ảnh hưởng.`,
-  'Error.ScanRecordsUnreadable': `InstallerClean không đọc được đủ các bản ghi trình cài đặt của Windows để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ registry cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng. Không có gì bị xóa.`,
+  'Error.ScanRecordsUnreadable': `InstallerClean không đọc được đủ các bản ghi Windows Installer để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ sổ đăng ký cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách chương trình đã cài: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách bản vá của một chương trình: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Status.CheckingRecycleBin': `Đang kiểm tra Thùng rác...`,

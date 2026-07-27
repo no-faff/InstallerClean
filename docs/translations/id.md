@@ -287,9 +287,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Bahasa Indonesia |
 | --- | --- |
-| Couldn't open your browser | Tidak bisa membuka peramban Anda |
-| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean tidak bisa membuka peramban Anda. Tautannya sudah ada di papan klip, jadi Anda bisa menempelkannya sendiri:<br><br>{0} |
-| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean tidak bisa membuka peramban Anda, dan juga tidak bisa menyalin tautan ke papan klip. Tautannya:<br><br>{0} |
+| Couldn't open your browser | Tidak bisa membuka browser Anda |
+| InstallerClean couldn't open your browser. The link is on your clipboard, so you can paste it in yourself:<br><br>{0} | InstallerClean tidak bisa membuka browser Anda. Tautannya sudah ada di clipboard, jadi Anda bisa menempelkannya sendiri:<br><br>{0} |
+| InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:<br><br>{0} | InstallerClean tidak bisa membuka browser Anda, dan juga tidak bisa menyalin tautan ke clipboard. Tautannya:<br><br>{0} |
 
 ## Sending the summary
 
@@ -356,11 +356,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Send posts the report shown to No Faff. Cancel sends nothing. | Kirim mengirimkan laporan yang ditampilkan ke No Faff. Batal tidak mengirim apa pun. |
 | Check for updates | Periksa pembaruan |
 | Checks github's releases page for a newer version. | Memeriksa halaman rilis github untuk mencari versi yang lebih baru. |
-| Opens the readme on github in your browser. | Membuka readme di github melalui peramban Anda. |
-| Opens the issue tracker on github.com in your browser. | Membuka pelacak masalah (Issues) di github.com melalui peramban Anda. |
+| Opens the readme on github in your browser. | Membuka readme di github melalui browser Anda. |
+| Opens the issue tracker on github.com in your browser. | Membuka pelacak masalah (Issues) di github.com melalui browser Anda. |
 | If ticked, InstallerClean checks github for a newer version when you run it. | Jika dicentang, InstallerClean memeriksa apakah ada versi yang lebih baru di github saat Anda menjalankannya. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini. |
-| Opens the licence file on github.com in your browser. | Membuka file lisensi di github.com melalui peramban Anda. |
+| Opens the licence file on github.com in your browser. | Membuka file lisensi di github.com melalui browser Anda. |
 | Move location | Lokasi pemindahan |
 | Products | Produk |
 | Patches | Patch |

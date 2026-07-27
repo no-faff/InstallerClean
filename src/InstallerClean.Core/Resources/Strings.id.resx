@@ -227,14 +227,14 @@
     reason: that one is a domain.</comment>
   </data>
   <data name="Automation.About.Guide.HelpText" xml:space="preserve">
-    <value>Membuka readme di github melalui peramban Anda.</value>
+    <value>Membuka readme di github melalui browser Anda.</value>
     <comment>Screen-reader help on the About window's "Guide and FAQ" link.
     Names the document rather than repeating the link's own label, so the
     description adds what the name has not already said. Cased for speech for
     the reason Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <data name="Automation.About.ReportProblem.HelpText" xml:space="preserve">
-    <value>Membuka pelacak masalah (Issues) di github.com melalui peramban Anda.</value>
+    <value>Membuka pelacak masalah (Issues) di github.com melalui browser Anda.</value>
     <comment>Screen-reader help on the About window's "Report a problem" link.</comment>
   </data>
   <data name="Automation.AutoUpdateCheck.HelpText" xml:space="preserve">
@@ -248,7 +248,7 @@
        ConfirmSendResultLog windows. The version numbers are in the body
        text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini.</value></data>
-  <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Membuka file lisensi di github.com melalui peramban Anda.</value></data>
+  <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Membuka file lisensi di github.com melalui browser Anda.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
        Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
        DETAILS). Narrator at default verbosity spells short uppercase
@@ -771,7 +771,7 @@ Detail di {1}.</value></data>
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
   <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Lokasi pemindahan harus berupa jalur lengkap ke sebuah folder, yang dimulai dengan huruf drive atau jalur jaringan (misalnya D:\Backup, atau \\server\backup). InstallerClean tidak bisa memakai yang ini: {0}</value></data>
-  <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Tidak bisa membuka peramban Anda</value></data>
+  <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Tidak bisa membuka browser Anda</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Periksa pembaruan</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Memeriksa...</value></data>
   <data name="UpdateCheck.Status.UpToDate" xml:space="preserve"><value>Sudah versi terbaru.</value></data>
@@ -792,8 +792,8 @@ Detail di {1}.</value></data>
        user's own medium-integrity shell, and that chain was unavailable) is
        an internal distinction with no name outside this codebase; the user
        gets what happened and what they can do about it. -->
-  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean tidak bisa membuka peramban Anda. Tautannya sudah ada di papan klip, jadi Anda bisa menempelkannya sendiri:&#10;&#10;{0}</value></data>
-  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean tidak bisa membuka peramban Anda, dan juga tidak bisa menyalin tautan ke papan klip. Tautannya:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardOk" xml:space="preserve"><value>InstallerClean tidak bisa membuka browser Anda. Tautannya sudah ada di clipboard, jadi Anda bisa menempelkannya sendiri:&#10;&#10;{0}</value></data>
+  <data name="BrowserLaunch.ClipboardFailed" xml:space="preserve"><value>InstallerClean tidak bisa membuka browser Anda, dan juga tidak bisa menyalin tautan ke clipboard. Tautannya:&#10;&#10;{0}</value></data>
   <!-- 0 = the destination folder whose canonical path changed mid-batch.
        Raised when the folder is replaced or redirected between two files of
        the same Move, so the copy must not claim where the files moved before

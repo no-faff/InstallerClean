@@ -121,7 +121,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | --- | --- |
 | Any unneeded files below are safe to delete. | 아래의 불필요한 파일은 안전하게 삭제할 수 있습니다. |
 | They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | 이 파일들은 {InstallerFolder}에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다. |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | 휴지통으로 삭제하거나, 백업 사본을 남기려면 대신 이동을 사용하세요. 파일을 {InstallerFolder}에 다시 넣으면 정확히 원래 상태로 돌아갑니다. |
+| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | 휴지통으로 삭제하거나, 백업 복사본을 남기려면 대신 이동을 사용하세요. 파일을 {InstallerFolder}에 다시 넣으면 정확히 원래 상태로 돌아갑니다. |
 | Nothing scanned yet. | 아직 검사하지 않았습니다. |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | 다시 검사를 눌러 {InstallerFolder}에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요. |
 | These files can't be cleaned up right now. | 지금은 이 파일들을 정리할 수 없습니다. |
@@ -211,7 +211,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | {1} {0}개를 이동하시겠습니까? ({2}) |
 | Files will be moved to: | 파일이 다음 위치로 이동됩니다: |
 | Delete {0} {1} ({2})? | {1} {0}개를 삭제하시겠습니까? ({2}) |
-| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | 파일이 휴지통으로 이동됩니다. 백업 사본을 원하시면 대신 이동 버튼을 사용하세요. |
+| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | 파일이 휴지통으로 이동됩니다. 백업 복사본을 원하시면 대신 이동 버튼을 사용하세요. |
 | This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | 이 폴더는 같은 드라이브에 있어, 이동만으로는 공간이 확보되지 않습니다. 옮긴 파일을 그 폴더에서 삭제하면 공간이 확보되고, 아니면 다른 드라이브에 있는 폴더를 대신 선택할 수도 있습니다. |
 
 ## Error messages

@@ -329,7 +329,7 @@
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>휴지통으로 삭제하거나, 백업 사본을 남기려면 대신 이동을 사용하세요. 파일을 {InstallerFolder}에 다시 넣으면 정확히 원래 상태로 돌아갑니다.</value>
+    <value>휴지통으로 삭제하거나, 백업 복사본을 남기려면 대신 이동을 사용하세요. 파일을 {InstallerFolder}에 다시 넣으면 정확히 원래 상태로 돌아갑니다.</value>
     <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons. The second sentence covers BOTH buttons and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and both a Recycle Bin restore and a manual move back put the file at that same path under the same name. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
@@ -612,7 +612,7 @@
        Bin" like the rest of the delete copy, and also points at the separate
        Move feature, so naming the button stops "moved ... use Move" reading as
        one action. -->
-  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>파일이 휴지통으로 이동됩니다. 백업 사본을 원하시면 대신 이동 버튼을 사용하세요.</value></data>
+  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>파일이 휴지통으로 이동됩니다. 백업 복사본을 원하시면 대신 이동 버튼을 사용하세요.</value></data>
   <!-- Shown on the Move confirmation only when the destination sits on the
        same drive as the installer cache. That move is a rename: it frees
        nothing until the user deletes the parked copies themselves, and the only

@@ -32,8 +32,9 @@ const KEEP_ENGLISH = new Set([
   'Display.Elapsed.S',                 // {0:F1}s
 ]);
 
-// Per-language keeps: Russian transliterates/declines every translatable token
-// (even "patch" -> "патч"), so nothing beyond KEEP_ENGLISH stays English.
+// Per-language keeps: Russian has a native rendering for every translatable
+// token (patch -> исправление, the term Microsoft's own Russian uses for an
+// .msp), so nothing beyond KEEP_ENGLISH stays English.
 const ALSO_KEEP = [];
 
 const MAP = {
@@ -45,7 +46,7 @@ const MAP = {
 
   // Section headings
   'Section.Registered.Products': `ПРОДУКТЫ`,
-  'Section.Registered.Patches': `ПАТЧИ`,
+  'Section.Registered.Patches': `ИСПРАВЛЕНИЯ`,
   'Section.Registered.Details': `СВЕДЕНИЯ О ПРОДУКТЕ`,
   'Section.Move.Location': `ПАПКА ДЛЯ ПЕРЕМЕЩЕНИЯ`,
   'Section.SayThanks': `ПОБЛАГОДАРИТЬ`,
@@ -63,11 +64,11 @@ const MAP = {
   'Field.ProductName': `Название продукта`,
   'Field.File': `Файл`,
   'Field.Size': `Размер`,
-  'Field.Patches': `Патчи`,
+  'Field.Patches': `Исправления`,
 
   // Placeholder shown for a registered package whose API ProductName is empty.
   'Field.UnknownProductName': `(неизвестно)`,
-  'Field.PatchesOnly': `(только патчи)`,
+  'Field.PatchesOnly': `(только исправления)`,
   'Field.Missing': `отсутствует`,
 
   // Actions (button labels; underscore prefixes are WPF mnemonics)
@@ -126,7 +127,7 @@ const MAP = {
   'Automation.Licence.HelpText': `Открывает файл лицензии на github.com в вашем браузере.`,
   'Automation.Section.MoveLocation': `Папка для перемещения`,
   'Automation.Section.Products': `Продукты`,
-  'Automation.Section.Patches': `Патчи`,
+  'Automation.Section.Patches': `Исправления`,
   'Automation.Section.ProductDetails': `Сведения о продукте`,
   'Automation.MoveDestinationFolder': `Папка для перемещения`,
   'Automation.OperationProgress': `Ход операции`,
@@ -162,7 +163,7 @@ const MAP = {
 
   // Body copy
   'Body.MainExplanation.Lead': `Любые ненужные файлы ниже можно безопасно удалить.`,
-  'Body.MainExplanation.Why': `Они лежат в {InstallerFolder} и остаются после того, как программа была удалена ({0}), более новый патч заменил один из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими.`,
+  'Body.MainExplanation.Why': `Они лежат в {InstallerFolder} и остаются после того, как программа была удалена ({0}), более новое исправление заменило одно из них ({1}) или издатель его отозвал ({2}). InstallerClean всегда перечисляет только те файлы, которые сам Windows объявляет отработавшими.`,
   'Body.MainExplanation.Action': `Удалите их в Корзину, или используйте вместо этого функцию «Переместить», чтобы сохранить резервную копию. Если вернуть файлы обратно в {InstallerFolder}, всё станет ровно так, как было.`,
   'Body.PendingReboot.MsiExecuteMutex': `Прямо сейчас что-то использует Windows Installer, обычно это обновление Windows или программа, устанавливающаяся в фоне. Пока это происходит, «Переместить» и «Удалить» приостановлены, чтобы InstallerClean не трогал кэш установки, пока тот меняется. Когда всё завершится, выполните повторное сканирование, и они снова станут доступны.`,
   'Body.PendingReboot.InstallerInProgress': `На этом компьютере приостановлена предыдущая транзакция Windows Installer. Прежде чем очищать кэш, продолжите или откатите ту установку (либо перезагрузите Windows).`,
@@ -209,7 +210,7 @@ const MAP = {
   'Status.DeleteFailed': `Не удалось удалить ({0}). Подробности в {1}.`,
   'Status.DeleteFailed.NoLog': `Не удалось удалить ({0}). Не удалось записать журнал сбоев.`,
   'Status.ScanAccessDenied': `Доступ запрещён. Windows отклонил сканирование.`,
-  'Status.ScanFailedDb': `Сканирование не удалось: не удалось прочитать записи установщика Windows.`,
+  'Status.ScanFailedDb': `Сканирование не удалось: не удалось прочитать записи Windows Installer.`,
   'Status.ScanCancelled': `Сканирование отменено.`,
   'Status.Done': `Готово`,
   'Status.ScanFailedDetails': `Сбой сканирования ({0}). Подробности в {1}.`,
@@ -289,9 +290,9 @@ const MAP = {
   // Error messages
   'Error.AdminRequiredTitle': `Доступ запрещён`,
   'Error.AdminRequiredBody': `Windows отказал InstallerClean в доступе, поэтому работа была остановлена. Ничего не было удалено.\n\nInstallerClean уже был запущен от имени администратора, поэтому повторный запуск таким же образом не поможет. Windows не сообщает ничего больше о том, что именно отказало в доступе, поэтому пробовать что-то конкретное бессмысленно.`,
-  'Error.InstallerDbUnavailableTitle': `Не удалось прочитать записи установщика Windows`,
+  'Error.InstallerDbUnavailableTitle': `Не удалось прочитать записи Windows Installer`,
   'Error.ScanFailedTitle': `Сбой сканирования`,
-  'Error.InstallerDbEmpty': `Записи установщика Windows вернулись совершенно пустыми: ни одна установленная программа и ни одно обновление не заявляет прав на кэшированный файл установщика. На работающем компьютере такого не бывает (даже у свежей установки Windows такие файлы есть), значит, записи либо повреждены, либо их не удалось прочитать, и сканирование, поверившее такому ответу, ошибочно сочло бы бесхозным каждый файл в {InstallerFolder}. Вместо этого InstallerClean остановился. Ничего не было удалено.`,
+  'Error.InstallerDbEmpty': `Записи Windows Installer вернулись совершенно пустыми: ни одна установленная программа и ни одно обновление не заявляет прав на кэшированный файл установщика. На работающем компьютере такого не бывает (даже у свежей установки Windows такие файлы есть), значит, записи либо повреждены, либо их не удалось прочитать, и сканирование, поверившее такому ответу, ошибочно сочло бы бесхозным каждый файл в {InstallerFolder}. Вместо этого InstallerClean остановился. Ничего не было удалено.`,
   'Error.MsiAccessDenied': `Windows Installer не позволил InstallerClean перечислить установленное. InstallerClean уже был запущен от имени администратора, поэтому повторный запуск от имени администратора ничего не изменит. Без этого списка невозможно безопасно определить, какие кэшированные файлы ещё нужны, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'Error.MsiNonSuccess': `Windows Installer не смог предоставить InstallerClean читаемый список установленных программ: {0} записей подряд вернулись нечитаемыми (последний код ошибки {1}). Вместо того чтобы работать с прочитанным лишь частично списком, InstallerClean остановился. Ничего не было удалено.`,
   'Error.InvalidDestinationTitle': `Недопустимая папка назначения`,
@@ -402,8 +403,8 @@ const MAP = {
   'Plural.Package.Plural': `пакетов`,
   'Plural.Product.Singular': `продукт`,
   'Plural.Product.Plural': `продуктов`,
-  'Plural.Patch.Singular': `патч`,
-  'Plural.Patch.Plural': `патчей`,
+  'Plural.Patch.Singular': `исправление`,
+  'Plural.Patch.Plural': `исправлений`,
   'Display.Size.GB': `{0:F2} GB`,
   'Display.Size.MB': `{0:F1} MB`,
   'Display.Size.KB': `{0:F1} KB`,
@@ -421,19 +422,19 @@ const MAP = {
   'Body.NotScanned.Lead': `Пока ничего не просканировано.`,
   'Body.NotScanned.Why': `Нажмите «Повторить сканирование», чтобы просмотреть {InstallerFolder} в поисках файлов установщика, которые больше не нужны ни одной программе.`,
   'Confirm.MoveSameDrive': `Эта папка находится на том же диске, поэтому само по себе перемещение места не освободит. Оно вернётся, когда вы удалите из неё файлы, либо вместо этого можно выбрать папку на другом диске.`,
-  'Error.ScanCorrelationFailed': `InstallerClean не смог сопоставить это сканирование с записями установщика Windows: каждый файл, который Windows всё ещё числит нужным, отсутствует в {InstallerFolder}, а файлы, реально лежащие в этой папке, не соответствуют ни одной записи. Ни один настоящий компьютер так не выглядит, поэтому это указывает на проблему с чтением записей, а не на файлы, которые можно безопасно удалить. Для очистки ничего не предложено, и ничего не было удалено.`,
+  'Error.ScanCorrelationFailed': `InstallerClean не смог сопоставить это сканирование с записями Windows Installer: каждый файл, который Windows всё ещё числит нужным, отсутствует в {InstallerFolder}, а файлы, реально лежащие в этой папке, не соответствуют ни одной записи. Ни один настоящий компьютер так не выглядит, поэтому это указывает на проблему с чтением записей, а не на файлы, которые можно безопасно удалить. Для очистки ничего не предложено, и ничего не было удалено.`,
   'Error.CandidateOutsideCache': `Этот файл находится не в самой папке Windows Installer; отклонено в целях безопасности.`,
   'Completion.ReverifySkipped': `Оставлено {0} {1} на месте: после сканирования они снова понадобились программе.`,
   'Completion.MoveCancelledSummary': `Перемещено {0}/{1} {2} до отмены.`,
   'Completion.DeleteCancelledSummary': `Перемещено {0}/{1} {2} в Корзину до отмены.`,
   'Completion.PermanentDeleteCancelledSummary': `Удалено безвозвратно {0}/{1} {2} до отмены.`,
   'Body.PendingReboot.Lead': `Эти файлы сейчас нельзя очистить.`,
-  'Completion.ReverifyIncomplete': `Оставлено {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи установщика Windows.`,
-  'Summary.ProgramsUnreadable.Singular': `При этом сканировании не удалось прочитать {0} установленную программу, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается.`,
-  'Summary.ProgramsUnreadable.Plural': `При этом сканировании не удалось прочитать {0} установленных программ, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается.`,
-  'Error.ScanRecordsUnreadable': `InstallerClean не смог прочитать достаточно записей установщика Windows, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено.`,
+  'Completion.ReverifyIncomplete': `Оставлено {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи Windows Installer.`,
+  'Summary.ProgramsUnreadable.Singular': `При этом сканировании не удалось прочитать {0} установленную программу, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается.`,
+  'Summary.ProgramsUnreadable.Plural': `При этом сканировании не удалось прочитать {0} установленных программ, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается.`,
+  'Error.ScanRecordsUnreadable': `InstallerClean не смог прочитать достаточно записей Windows Installer, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer так и не сообщил о конце списка установленных программ: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.`,
-  'Error.MsiPatchEnumerationNeverEnded': `Windows Installer так и не сообщил о конце списка патчей одной программы: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.`,
+  'Error.MsiPatchEnumerationNeverEnded': `Windows Installer так и не сообщил о конце списка исправлений одной программы: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'Status.CheckingRecycleBin': `Проверка Корзины...`,
   'UpdateCheck.Status.UpdateAvailable': `Доступна версия {0}.`,
   'Completion.DonateAsk': `Рад, что пригодилось. Если захочется проявить щедрость, есть куда оставить на чай.`,
@@ -465,13 +466,13 @@ const OVERRIDES = {
   'Plural.Package.Few': `пакета`,
   'Plural.Product.Few': `продукта`,
   'Plural.Error.Few': `ошибки`,
-  'Plural.Patch.Few': `патча`,
+  'Plural.Patch.Few': `исправления`,
   'Summary.RegisteredStillUsed.Few': `{0} файла ещё нужны`,
   'Summary.OrphanedToCleanUp.Few': `{0} ненужных файла для очистки`,
   'Summary.MissingFromDisk.Few': `Отсутствует {0} зарегистрированных файла (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.`,
   // 2-4 takes the accusative-plural "установленные программы"; the base Plural
   // key carries the 5+ genitive "установленных программ".
-  'Summary.ProgramsUnreadable.Few': `При этом сканировании не удалось прочитать {0} установленные программы, поэтому замещённые патчи оставлены на месте. Бесхозных файлов это не касается.`,
+  'Summary.ProgramsUnreadable.Few': `При этом сканировании не удалось прочитать {0} установленные программы, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается.`,
   'Summary.RegisteredWindow.Few': `{0} зарегистрированных файла ещё нужны ({1})`,
   'Completion.PermanentDeleteSummary.Few': `{0} {1} удалены безвозвратно. Они не попали в Корзину.`,
   // ReverifySkipped's flat base carries the 2-4/5+ agreement ("оставлено ... они
@@ -480,7 +481,7 @@ const OVERRIDES = {
   'Completion.ReverifySkipped.One': `Оставлен {0} {1} на месте: после сканирования он снова понадобился программе.`,
   // As ReverifySkipped.One: the base's "Оставлено" is the impersonal form that
   // 2-4 and 5+ both take; n==1 needs the masculine singular "Оставлен".
-  'Completion.ReverifyIncomplete.One': `Оставлен {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи установщика Windows.`,
+  'Completion.ReverifyIncomplete.One': `Оставлен {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи Windows Installer.`,
   // The flat template «Найдено зарегистрированных {1}: {0}.» mis-agrees for counts
   // where the numeral is not adjacent to the noun. .One restores nominative agreement
   // for the One category (1, 21, ...): {1} is nominative singular "пакет" while the
@@ -518,7 +519,7 @@ const CLI = {
   'Cli.NothingToDo': `Делать нечего.`,
   'Cli.DeletingFiles': `Удаление: {0} {1}...`,
   'Cli.DeletedFiles': `Удалено {0} {1}.`,
-  'Cli.RecycleUnavailable': `Ошибка: Корзина недоступна для этого диска, поэтому ничего не удалено. Воспользуйтесь /m, чтобы переместить файлы, либо снова включите Корзину и запустите ещё раз.`,
+  'Cli.RecycleUnavailable': `Ошибка: Корзина недоступна для этого тома, поэтому ничего не удалено. Воспользуйтесь /m, чтобы переместить файлы, либо снова включите Корзину и запустите ещё раз.`,
   'Cli.NoMoveDestination': `Ошибка: не указана папка назначения для перемещения. Используйте /m ПУТЬ. (Значение по умолчанию, заданное в графическом интерфейсе, действует только для текущего пользователя и не применяется при запуске по расписанию или от имени служебной учётной записи.)`,
   'Cli.MoveDestinationInsideInstaller': `Ошибка: папка назначения не может находиться внутри папки Windows Installer.`,
   'Cli.MoveDestinationRelative': `Ошибка: папка назначения должна быть полным путём. Получено: {0}`,
