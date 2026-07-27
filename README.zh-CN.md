@@ -407,13 +407,11 @@ InstallerClean 现已全面提供简体中文：应用、安装程序、命令�
 
 ## Star 历史
 
-<a href="https://www.star-history.com/?repos=no-faff%2FInstallerClean&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=no-faff/InstallerClean&type=date&theme=dark&legend=top-left&sealed_token=7D1Fri54rsFuVP6sq-i4JI66J9QrWFjG-UDL5a2ykn-JdMxGe7YPRYTFqGssqidsQkxS2-Cz1o5MtO2FDs99WFNqmT-_CEdf2wqx5ihAC3o05N-DJ1AQYr7oq8hu3lqeJ4Ow8LlPS900bddQ2W8mfeza8ezUQgEQFuH47pKSnWN70lgbBIiG-jy0hRMc" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=no-faff/InstallerClean&type=date&legend=top-left&sealed_token=7D1Fri54rsFuVP6sq-i4JI66J9QrWFjG-UDL5a2ykn-JdMxGe7YPRYTFqGssqidsQkxS2-Cz1o5MtO2FDs99WFNqmT-_CEdf2wqx5ihAC3o05N-DJ1AQYr7oq8hu3lqeJ4Ow8LlPS900bddQ2W8mfeza8ezUQgEQFuH47pKSnWN70lgbBIiG-jy0hRMc" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=no-faff/InstallerClean&type=date&legend=top-left&sealed_token=7D1Fri54rsFuVP6sq-i4JI66J9QrWFjG-UDL5a2ykn-JdMxGe7YPRYTFqGssqidsQkxS2-Cz1o5MtO2FDs99WFNqmT-_CEdf2wqx5ihAC3o05N-DJ1AQYr7oq8hu3lqeJ4Ow8LlPS900bddQ2W8mfeza8ezUQgEQFuH47pKSnWN70lgbBIiG-jy0hRMc" />
- </picture>
-</a>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/star-history-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="docs/star-history-light.svg" />
+  <img alt="Star History Chart" src="docs/star-history-light.svg" width="800" />
+</picture>
 
 ## 许可证
 
