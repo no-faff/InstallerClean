@@ -141,7 +141,7 @@ InstallerClean identifies three kinds of unneeded files.
 
 **Orphaned files** are the `.msi` installers (and any `.msp` patches) left behind after you uninstall software. Windows no longer references them, but the files sit in the folder taking up space.
 
-**Superseded patches** are old `.msp` patches that have been replaced by newer ones. Windows marks them as superseded in its own database but never deletes them. Vendors that ship frequent patches (Acrobat, Office, large dev tools) accumulate superseded ones indefinitely.
+**Superseded patches** are old `.msp` patches that have been replaced by newer ones. Windows marks them as superseded in its own database but never deletes them. Adobe is why this comes up so often: every Acrobat update ships as a patch against the same original installer rather than as a new installer of its own, so a machine ends up keeping one for every update it has ever had. Office and large dev tools build up the same way, more slowly.
 
 **Obsoleted patches** are `.msp` patches the publisher has withdrawn or deprecated rather than replaced with a newer version. Windows records that state too, and likewise leaves the file in the folder.
 
