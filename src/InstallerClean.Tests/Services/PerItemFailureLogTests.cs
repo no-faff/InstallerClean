@@ -3,15 +3,15 @@ using InstallerClean.Services;
 namespace InstallerClean.Tests.Services;
 
 /// <summary>
-/// Pins the crash-log budget a run spends on its per-file failures. The contract
-/// these protect: an ordinary partial failure is logged file by file, a storm of
+/// Pins the crash-log budget a run spends on its per-item failures. The contract
+/// these protect: an ordinary partial failure is logged item by item, a storm of
 /// one known cause cannot evict the crash history, a cause never seen before is
 /// logged however late in the run it arrives, and the closing entry says where
 /// the detail went in words true of the caller that wrote it.
 ///
 /// The sink is injected, so nothing here touches the real crash.log.
 /// </summary>
-public class PerFileFailureLogTests
+public class PerItemFailureLogTests
 {
     private const string MoveTrail = "The per-file list is on the completion screen and in the result log.";
     private const string ScanTrail = "There is no other record of which files these were.";
@@ -26,7 +26,7 @@ public class PerFileFailureLogTests
     public void Logs_every_failure_in_full_while_within_the_budget()
     {
         var written = new List<Exception>();
-        var log = new PerFileFailureLog("Move", MoveTrail, written.Add);
+        var log = new PerItemFailureLog("Move", MoveTrail, written.Add);
 
         for (int i = 0; i < 20; i++) log.Record(Io(unchecked((int)0x80070070)));
         log.WriteClosingEntry();
@@ -41,7 +41,7 @@ public class PerFileFailureLogTests
     public void Suppresses_repeats_of_a_known_cause_once_the_budget_is_spent()
     {
         var written = new List<Exception>();
-        var log = new PerFileFailureLog("Move", MoveTrail, written.Add);
+        var log = new PerItemFailureLog("Move", MoveTrail, written.Add);
 
         // The realistic storm: a destination volume that filled mid-batch fails
         // every remaining file with the same code.
@@ -51,14 +51,14 @@ public class PerFileFailureLogTests
         Assert.Equal(21, written.Count);                  // 20 in full + the closing entry
         var closing = Assert.IsType<InvalidOperationException>(written[^1]);
         Assert.Contains("Move", closing.Message);
-        Assert.Contains("5 further per-file failures", closing.Message);
+        Assert.Contains("5 further failures", closing.Message);
     }
 
     [Fact]
     public void Logs_a_cause_never_seen_before_even_past_the_budget()
     {
         var written = new List<Exception>();
-        var log = new PerFileFailureLog("Delete", MoveTrail, written.Add);
+        var log = new PerItemFailureLog("Delete", MoveTrail, written.Add);
 
         for (int i = 0; i < 30; i++) log.Record(Io(unchecked((int)0x80070070)));
         // Arrives long after the budget is spent, and is the one entry in this
@@ -74,7 +74,7 @@ public class PerFileFailureLogTests
     public void Distinguishes_causes_by_hresult_not_just_exception_type()
     {
         var written = new List<Exception>();
-        var log = new PerFileFailureLog("Move", MoveTrail, written.Add);
+        var log = new PerItemFailureLog("Move", MoveTrail, written.Add);
 
         for (int i = 0; i < 25; i++) log.Record(Io(unchecked((int)0x80070070)));
         // Same exception type, different Win32 code: a sharing violation
@@ -89,7 +89,7 @@ public class PerFileFailureLogTests
     public void Distinguishes_causes_a_synthesised_exception_cannot_tell_apart()
     {
         var written = new List<Exception>();
-        var log = new PerFileFailureLog("Scan", ScanTrail, written.Add);
+        var log = new PerItemFailureLog("Scan", ScanTrail, written.Add);
 
         // Every entry the scan writes is a synthesised InvalidOperationException,
         // so all four of its refusal kinds carry the same type AND the same
@@ -112,7 +112,7 @@ public class PerFileFailureLogTests
     public void Closing_entry_carries_the_callers_own_account_of_where_the_detail_went()
     {
         var written = new List<Exception>();
-        var log = new PerFileFailureLog("Scan", ScanTrail, written.Add);
+        var log = new PerItemFailureLog("Scan", ScanTrail, written.Add);
 
         for (int i = 0; i < 25; i++)
             log.Record(new InvalidOperationException($"refused {i}"), cause: "walk/Refused");
@@ -130,7 +130,7 @@ public class PerFileFailureLogTests
     public void Writes_nothing_at_all_for_a_batch_that_had_no_failures()
     {
         var written = new List<Exception>();
-        var log = new PerFileFailureLog("Move", MoveTrail, written.Add);
+        var log = new PerItemFailureLog("Move", MoveTrail, written.Add);
 
         log.WriteClosingEntry();
 

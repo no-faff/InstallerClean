@@ -479,6 +479,84 @@ public class InstallerQueryServiceUnitTests
         await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
     }
 
+    // ---- The abandonment breadcrumb is budgeted ----
+    //
+    // What makes it one entry per product is a property of the registration, not
+    // of a product: a SID the enumerator emits and then rejects as input refuses
+    // every index for every product recorded under it. crash.log holds 512 KB
+    // with a single archive, and each of these carries a message and a stack
+    // trace, so the machine that most needs its crash history is the one whose
+    // history this evicts.
+
+    /// <summary>
+    /// 200 products whose patch enumeration refuses at every index. Each one
+    /// abandons after the tolerance and each abandonment is worth recording, but
+    /// they are 200 restatements of one condition.
+    /// </summary>
+    [Fact]
+    public async Task Two_hundred_abandoned_patch_enumerations_do_not_write_two_hundred_entries()
+    {
+        var written = new List<Exception>();
+        var msi = new FakeMsiApi();
+        for (int i = 0; i < 200; i++)
+        {
+            msi.AddProduct($"{{p{i:D3}}}");
+            msi.SetProductProperty($"{{p{i:D3}}}", "LocalPackage", $@"C:\Windows\Installer\p{i:D3}.msi");
+            msi.PatchEnumResult[$"{{p{i:D3}}}"] = InvalidParameter;
+        }
+
+        var result = await new InstallerQueryService(msi, NoFallback, written.Add)
+            .GetRegisteredPackagesAsync();
+
+        Assert.Equal(200, result.UnreadableProductCount);
+
+        // Twenty in full plus the one closing entry, against the 200 the
+        // unbudgeted form wrote.
+        Assert.Equal(21, written.Count);
+        Assert.Equal(20, written.Count(e => e.Message.Contains("Patch enumeration abandoned", StringComparison.Ordinal)));
+
+        var closing = written[^1].Message;
+        Assert.Contains("Patch enumeration: 180 further failures were not logged individually",
+            closing, StringComparison.Ordinal);
+        // The trail has to be true of THIS caller: a suppressed abandonment
+        // takes the product's identity with it and the user-facing notice
+        // carries none.
+        Assert.Contains("recorded nowhere else", closing, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The same storm with one product failing the OTHER way, late. Both arms
+    /// synthesise an InvalidOperationException carrying the same HRESULT, so
+    /// without the cause strings the budget's escape hatch would see one cause
+    /// and swallow the second kind entirely.
+    /// </summary>
+    [Fact]
+    public async Task A_second_kind_of_abandonment_is_logged_however_late_it_arrives()
+    {
+        var written = new List<Exception>();
+        var msi = new FakeMsiApi();
+        for (int i = 0; i < 200; i++)
+        {
+            var code = $"{{p{i:D3}}}";
+            msi.AddProduct(code);
+            msi.SetProductProperty(code, "LocalPackage", $@"C:\Windows\Installer\p{i:D3}.msi");
+
+            if (i == 150)
+                // Rows the API returns as success carrying an empty GUID: the
+                // other abandonment arm, well past the budget.
+                msi.PatchCodes[code] = Enumerable.Repeat("", 20).ToList();
+            else
+                msi.PatchEnumResult[code] = InvalidParameter;
+        }
+
+        await new InstallerQueryService(msi, NoFallback, written.Add).GetRegisteredPackagesAsync();
+
+        // The empty-GUID arm reports Success as its last error, which is what
+        // separates the two in the entries themselves.
+        Assert.Contains(written, e => e.Message.Contains("{p150}", StringComparison.Ordinal));
+        Assert.Contains(written, e => e.Message.Contains("last error code 0,", StringComparison.Ordinal));
+    }
+
     // ---- An incomplete enumeration withholds the removable class ----
     //
     // A tolerated skip costs one product's patch claims, and a patch is cached

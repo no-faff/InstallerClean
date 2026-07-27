@@ -27,6 +27,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
     private readonly IMsiApi _msi;
     private readonly FallbackReader _readFallback;
+    private readonly Action<Exception>? _crashLogSink;
 
     /// <summary>
     /// Reads the registry fallback into <paramref name="claimed"/> and returns
@@ -63,10 +64,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// Full seam constructor, for the tests that drive both sources. See
     /// <see cref="FallbackReader"/>.
     /// </summary>
-    internal InstallerQueryService(IMsiApi msi, FallbackReader readFallback)
+    /// <param name="crashLogSink">
+    /// Where the run's budgeted breadcrumbs go; null is crash.log. A seam for
+    /// the same reason <see cref="FallbackReader"/> is one: what the budget does
+    /// on a machine whose registration refuses every product's patch list is
+    /// reachable only by driving it, and driving it against the real sink would
+    /// append two dozen entries to the crash log of whatever machine ran the
+    /// suite. The registry fallback owns its own budget, being a static this
+    /// never reaches.
+    /// </param>
+    internal InstallerQueryService(IMsiApi msi, FallbackReader readFallback,
+        Action<Exception>? crashLogSink = null)
     {
         _msi = msi;
         _readFallback = readFallback;
+        _crashLogSink = crashLogSink;
     }
 
     /// <inheritdoc />
@@ -101,6 +113,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         progress?.Report(new ScanProgressUpdate(Strings.Status_FoundProducts));
 
+        // Budgeted, because the abandonment breadcrumb is one full entry per
+        // product and its trigger is a property of the registration rather than
+        // of one product: a SID the enumerator emits and then rejects as input
+        // refuses every index for every product recorded under it. Each entry
+        // carries a real message and stack trace, so a machine in that state
+        // spends crash.log on near-identical copies of one already-recorded
+        // condition, which is the very history a report of it would need.
+        var abandonedLog = new PerItemFailureLog("Patch enumeration",
+            "The product identity in the ones not logged is recorded nowhere else. The user is "
+            + "told through the scan summary that some programs could not be read, and that "
+            + "notice names none of them.",
+            _crashLogSink);
+
+        // The closing entry is owed on every exit: the two gates below both
+        // throw, and the both-sources-degraded one in particular fires on
+        // exactly the broken registration that makes this storm.
+        try
+        {
         foreach (var (productCode, userSid, context) in products)
         {
             ct.ThrowIfCancellationRequested();
@@ -142,7 +172,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     ClaimSource.InstallerApi);
             }
 
-            var (patches, patchesIncomplete) = EnumeratePatches(productCode, userSid, context, ct);
+            var (patches, patchesIncomplete) = EnumeratePatches(productCode, userSid, context, ct, abandonedLog);
             if (patchesIncomplete) recordsShort = true;
 
             foreach (var (patchCode, patchUserSid, patchContext) in patches)
@@ -258,6 +288,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     packages[i] = packages[i] with { IsRemovable = false, RemovableWithheld = true };
 
         return new InstallerQueryResult(packages.AsReadOnly(), unreadableProducts);
+        }
+        finally
+        {
+            abandonedLog.WriteClosingEntry();
+        }
     }
 
     /// <summary>
@@ -410,6 +445,17 @@ public sealed class InstallerQueryService : IInstallerQueryService
     {
         var failures = 0;
 
+        // Budgeted, because every catch below sits inside a loop bounded by the
+        // machine's registered products and patches, and what fails one key read
+        // usually fails the subtree: a DACL or a hive problem across UserData is
+        // per-key, not per-machine-once. These are real caught exceptions with a
+        // stack trace each, so a patch-heavy machine's storm evicts crash.log
+        // faster per entry than the scan's synthesised refusals did.
+        var failureLog = new PerItemFailureLog("Registry fallback",
+            "These add up to the count the scan weighs against its other source: with the "
+            + "product enumeration also short of a record, the scan is refused rather than "
+            + "reported. Which keys they were is recorded nowhere else.");
+
         try
         {
             using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
@@ -422,7 +468,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 foreach (var sidName in udKey.GetSubKeyNames())
                 {
                     ct.ThrowIfCancellationRequested();
-                    failures += ReadFallbackSid(udKey, sidName, claimed, ct);
+                    failures += ReadFallbackSid(udKey, sidName, claimed, ct, failureLog);
                 }
             }
         }
@@ -436,7 +482,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
             // catch would log the user's own Cancel as a fault and swallow the
             // stop the caller is waiting on.
             failures++;
-            Helpers.CrashLog.Write(ex);
+            failureLog.Record(ex, cause: "userdata");
+        }
+        finally
+        {
+            // Owed on a cancelled run too, which leaves through the filters above.
+            failureLog.WriteClosingEntry();
         }
 
         return failures;
@@ -453,12 +504,21 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// to tell a clean fallback from one that read almost nothing, and the
     /// caller's other source may be short at the same time. The count is what
     /// makes that state visible; see the gate in GetRegisteredPackagesCore.
+    ///
+    /// The four catches carry a cause apiece. Two of them read a per-entry key
+    /// inside a loop and two read the loop's own parent key, and a subtree
+    /// problem hits all four with the same exception type and HRESULT, which is
+    /// what the budget keys on. Without the causes the first kind past the
+    /// budget would swallow the other three, and "the Products key would not
+    /// open" and "one patch's key would not read" are the two ends of a
+    /// diagnosis.
     /// </summary>
     private static int ReadFallbackSid(
         Microsoft.Win32.RegistryKey udKey,
         string sidName,
         Dictionary<string, RegisteredPackage> claimed,
-        CancellationToken ct)
+        CancellationToken ct,
+        PerItemFailureLog failureLog)
     {
         var failures = 0;
 
@@ -482,7 +542,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     catch (Exception ex) when (ex is not OperationCanceledException)
                     {
                         failures++;
-                        Helpers.CrashLog.Write(ex);
+                        failureLog.Record(ex, cause: "product-entry");
                     }
                 }
             }
@@ -490,7 +550,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             failures++;
-            Helpers.CrashLog.Write(ex);
+            failureLog.Record(ex, cause: "products-key");
         }
 
         try
@@ -513,7 +573,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     catch (Exception ex) when (ex is not OperationCanceledException)
                     {
                         failures++;
-                        Helpers.CrashLog.Write(ex);
+                        failureLog.Record(ex, cause: "patch-entry");
                     }
                 }
             }
@@ -521,7 +581,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             failures++;
-            Helpers.CrashLog.Write(ex);
+            failureLog.Record(ex, cause: "patches-key");
         }
 
         return failures;
@@ -733,12 +793,18 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// losing the whole scan over it. Only a machine-level breakdown stays
     /// scan-fatal (the AccessDenied and never-ended-cap throws below).
     /// </summary>
+    /// <param name="failureLog">
+    /// The run's budget for the abandonment breadcrumb, which is one entry per
+    /// product and so unbounded on a machine where the condition is general.
+    /// Owned by the caller because the run, not one product, is what it bounds.
+    /// </param>
     private (List<(string PatchCode, string? UserSid, MsiInstallContext Context)> Patches, bool Incomplete)
         EnumeratePatches(
         string productCode,
         string? userSid,
         MsiInstallContext context,
-        CancellationToken ct)
+        CancellationToken ct,
+        PerItemFailureLog failureLog)
     {
         var results = new List<(string, string?, MsiInstallContext)>();
         var patchCode = new char[Msi.GuidBufferLength];
@@ -814,7 +880,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                     // scan's).
                     if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                     {
-                        LogPatchEnumerationAbandoned(productCode, context, userSid, error, index);
+                        LogPatchEnumerationAbandoned(productCode, context, userSid, error, index,
+                            failureLog, cause: "empty-guid-run");
                         return (results, incomplete);
                     }
                     continue;
@@ -846,7 +913,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 // AccessDenied and never-ended-cap throws stay fatal.
                 if (consecutiveNonSuccess >= MaxConsecutiveNonSuccess)
                 {
-                    LogPatchEnumerationAbandoned(productCode, context, userSid, error, index);
+                    LogPatchEnumerationAbandoned(productCode, context, userSid, error, index,
+                        failureLog, cause: "unreadable-row-run");
                     return (results, incomplete);
                 }
             }
@@ -875,12 +943,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// is one the enumerator emits but rejects), the last error code, and the
     /// index reached.
     /// </summary>
+    /// <param name="cause">
+    /// Which arm abandoned: a run of rows the API returned as success with an
+    /// empty GUID, or a run of non-success returns. Two causes and not one per
+    /// product, on purpose. The budget keys on it, so per-product causes would
+    /// buy an entry each and leave no budget at all, where these two keep the
+    /// distinction that matters: a machine failing one way throughout does not
+    /// hide a single product failing the other way at product 400. The entries
+    /// themselves carry the product identity, and the first twenty of those are
+    /// logged in full whatever their cause.
+    /// </param>
     private static void LogPatchEnumerationAbandoned(
-        string productCode, MsiInstallContext context, string? userSid, uint lastError, uint index) =>
-        Helpers.CrashLog.Write(new InvalidOperationException(
+        string productCode, MsiInstallContext context, string? userSid, uint lastError, uint index,
+        PerItemFailureLog failureLog, string cause) =>
+        failureLog.Record(new InvalidOperationException(
             $"Patch enumeration abandoned for product {productCode} (context {context}, SID {userSid ?? "none"}) " +
             $"after {MaxConsecutiveNonSuccess} consecutive unreadable rows; last error code {lastError}, reached index {index}. " +
-            "Superseded-patch cleanup is withheld scan-wide; this product's cached files are kept via the registry fallback."));
+            "Superseded-patch cleanup is withheld scan-wide; this product's cached files are kept via the registry fallback."),
+            cause);
 
     /// <summary>
     /// One property read's outcome. The returned value alone cannot carry it:

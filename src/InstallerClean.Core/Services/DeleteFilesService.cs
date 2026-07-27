@@ -109,7 +109,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
             {
             int deleted = 0;
             var errors = new List<FileOperationError>();
-            var failureLog = new PerFileFailureLog("Delete",
+            var failureLog = new PerItemFailureLog("Delete",
                 "The per-file list is on the completion screen and in the result log.");
             // Resolved once for the batch; the guard resolves each SOURCE per
             // file against it (see InstallerCacheRoot).

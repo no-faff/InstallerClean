@@ -114,7 +114,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // synthesise an InvalidOperationException: all four kinds carry the same
         // type and HRESULT, so without them the budget's novel-cause escape
         // hatch would fire once and swallow the other three.
-        var refusalLog = new PerFileFailureLog("Scan",
+        var refusalLog = new PerItemFailureLog("Scan",
             "There is no other record of which files these were: a refused candidate is left off the "
             + "list offered for removal and nothing else about it is kept. Fewer files are offered, "
             + "never more.");
