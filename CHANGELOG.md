@@ -2,6 +2,27 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.1] - Unreleased
+
+### Added
+
+- A privacy policy, at `PRIVACY.md` in the repository and linked from the README. It sets out every time InstallerClean touches the network or writes anything down: the version check when it starts, the report you can choose to send and everything that is in it, the buttons that hand a web address to your browser, and the crash log, the settings and the command-line tool's event-log line, none of which leave the machine.
+- Every push now checks that the command-line help still fits an 80-column window in every language. See the entry below for what it found.
+
+### Changed
+
+- The command-line help fits an 80-column window in every language. The English had always been written to stay inside one, at most 74 characters to a line, but nothing anywhere said so, so twelve of the translations had grown past it and Russian reached 149: far enough to wrap in the middle of a column and read as broken in the one place a script writer looks. Eighty-seven lines are shortened across fifteen languages. The new check measures how wide the characters are rather than how many there are, because a Japanese or Chinese character takes up two columns, so a Japanese line of 59 characters had been 101 columns wide and a count of characters would have passed it.
+- The installer's Italian wizard text is refreshed again, from bovirus, who maintains it upstream and pointed out that it had moved on since the copy taken for 2.3.0 (#53). Three lines change and all three were worth changing: two now name the installer as the thing that noticed a program still running, and all three had been telling Italian users to choose "OK" or "Annulla" to exit, when OK continues and only Cancel exits.
+- The standalone command-line download is compressed again, which roughly halves it. 2.3.0 shipped it uncompressed because one scanner had returned a verdict on the compressed build twice over, on two different builds, while the uncompressed build of the same code scanned clean. That was the right call for that release and the wrong thing to leave in place: compressed is the starting point again, and going uncompressed is a decision taken per release on what the scanners actually say rather than a change that quietly stays for good.
+
+### Fixed
+
+- Turkish no longer overstates what a missing installer file could affect. The warning says a future repair, update or uninstall could fail, and the Turkish had lost which programs it meant, so it read as any repair on the machine rather than only the programs whose files have gone. The app is deliberately careful about this one, because the honest position is that a missing file will not bite day to day and only matters the next time you update or repair that particular program.
+- The name a screen reader reads for the Italian Move button, in the dialog shown when the Recycle Bin is unavailable, says the folder is yours to choose again. It had described "a specific folder", which is precisely the thing a listener cannot afford to have wrong: in the one dialog where the alternative is a permanent delete, the whole point of that button is that you pick where the files go.
+- Voice control can click the recovery link again in Japanese and Dutch. The app gives a screen reader a fuller description of that link than the few words shown on screen, and the description has to contain those words, so that somebody who says them is understood. In Japanese the two had drifted onto entirely different phrases and in Dutch the phrase had been split down the middle, so in both the words on screen could be read but not spoken. All sixteen languages are now checked against the rule.
+- The `/m` row of the command-line help lines up with the others in Korean and Chinese. Its placeholder had been padded as though every character were one column wide, which left the description two columns out of step with the rows above and below it.
+- One line of English no longer says "them" about a single file. When a program reclaims a file between the scan finishing and the button being pressed, the app keeps that file where it is and says so; at exactly one file the sentence disagreed with its own count. Eight of the translations had already worked round it in their own grammar.
+
 ## [2.3.0] - 2026-07-25
 
 ### Added
