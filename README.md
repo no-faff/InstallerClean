@@ -254,7 +254,7 @@ Across the 156 reports people have sent in (thanks 🙏) since v1.8.0 added the 
 
 | Freed | Reports | |
 |---|---|---|
-| Under 1 GB | 13 | █████████████ |
+| Less than 1 GB | 13 | █████████████ |
 | 1 to 5 GB | 9 | █████████ |
 | 5 to 10 GB | 9 | █████████ |
 | 10 to 25 GB | 21 | █████████████████████ |
