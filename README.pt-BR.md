@@ -240,11 +240,13 @@ Se algo aqui atrapalhar você, [abra uma issue](../../issues). Problemas de aces
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 Entre os 156 relatórios que as pessoas tiveram a gentileza de enviar (obrigado 🙏) desde que a v1.8.0 adicionou a opção, 54% das máquinas tinham algo a limpar. Veja quanto:
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+  </picture>
+</p>
 <!-- reports-stats-end -->
 
 <details>

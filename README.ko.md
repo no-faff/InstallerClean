@@ -240,11 +240,13 @@ InstallerClean은 키보드만으로도, 스크린 리더와 함께도 완전히
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 v1.8.0에서 이 옵션이 추가된 이후 보내 주신 156건의 보고서(감사합니다 🙏)에서, 54%의 컴퓨터에 정리할 것이 있었습니다. 그 양은 다음과 같습니다:
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+  </picture>
+</p>
 <!-- reports-stats-end -->
 
 <details>

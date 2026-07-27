@@ -240,11 +240,13 @@ Burada bir şey size engel oluyorsa, [bir konu açın](../../issues). Erişilebi
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 v1.8.0'da seçenek eklendiğinden bu yana gönderilen 156 rapora göre (teşekkürler 🙏), temizlenecek bir şeyler bulunan makinelerin oranı %54. İşte ne kadar:
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+  </picture>
+</p>
 <!-- reports-stats-end -->
 
 <details>

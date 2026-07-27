@@ -252,11 +252,13 @@ If anything here gets in your way, [open an issue](../../issues). Accessibility 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 Since v1.8.0 there's been an option to send in a brief anonymous report of the outcome. 156 have come in so far (thanks everyone 🙏) and of the 54% of people who had something to clear, the median freed is 19.9 GB. One person reclaimed a pretty staggering 327 GB. Here's a summary of the results.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+  </picture>
+</p>
 
 Sending a report is a totally optional click of a button in the app. Nothing personal is included and it shows you exactly what will be sent, like this:
 

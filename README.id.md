@@ -240,11 +240,13 @@ Jika ada sesuatu di sini yang menghalangi Anda, [buka sebuah issue](../../issues
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 Dari 156 laporan yang dikirimkan orang-orang (terima kasih 🙏) sejak opsi ini ditambahkan di v1.8.0, 54% mesin punya sesuatu untuk dibersihkan. Ini rinciannya:
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+  </picture>
+</p>
 <!-- reports-stats-end -->
 
 <details>

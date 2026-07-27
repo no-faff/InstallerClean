@@ -240,11 +240,13 @@ InstallerClean 在设计上力求完全能用键盘和屏幕阅读器操作。
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 自 v1.8.0 加入这个选项以来，热心的用户已经发来 156 份报告（谢谢 🙏），其中 54% 的机器有东西可清理，清出的量如下：
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+  </picture>
+</p>
 <!-- reports-stats-end -->
 
 <details>

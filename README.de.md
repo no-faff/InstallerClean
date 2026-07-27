@@ -240,11 +240,13 @@ Wenn dir hier etwas im Weg ist, [erstelle ein Issue](../../issues). Barrierefrei
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 Von den 156 Berichten, die seit der Einführung der Option in v1.8.0 freundlicherweise eingesandt wurden (danke 🙏), hatten 54 % der Rechner etwas aufzuräumen. So viel war es:
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+  </picture>
+</p>
 <!-- reports-stats-end -->
 
 <details>

@@ -240,11 +240,13 @@ Si algo aquí te estorba, [abre un issue](../../issues). Los problemas de accesi
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 De los 156 informes que me han enviado amablemente (gracias 🙏) desde que la v1.8.0 añadió la opción, el 54 % de los equipos tenía algo que limpiar. Esto es cuánto:
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+  </picture>
+</p>
 <!-- reports-stats-end -->
 
 <details>

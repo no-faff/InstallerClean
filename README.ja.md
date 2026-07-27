@@ -240,11 +240,13 @@ InstallerClean は、キーボードだけでも、スクリーンリーダー�
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 v1.8.0 でこのオプションが追加されて以来、ご厚意で送っていただいた 156 件のレポート（ありがとうございます🙏）では、54% のマシンに片づけられるものがありました。その内訳です。
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+  </picture>
+</p>
 <!-- reports-stats-end -->
 
 <details>

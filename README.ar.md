@@ -242,11 +242,13 @@
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 بناءً على 156 من التقارير التي شاركها الناس (شكراً 🙏) منذ أن أضافت v1.8.0 هذا الخيار، كان لدى 54% من الأجهزة ما يمكن تنظيفه. وهذا مقداره:
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+  </picture>
+</p>
 <!-- reports-stats-end -->
 
 <details>
