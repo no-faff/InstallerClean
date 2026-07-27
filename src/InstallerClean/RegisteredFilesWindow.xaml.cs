@@ -114,14 +114,28 @@ public partial class RegisteredFilesWindow : Window
     /// several caches), a size or a patch count resolve the same way every time
     /// rather than however WPF's comparer happened to leave them. That is also
     /// where the view model's own path tiebreaker went.
+    ///
+    /// SortDescriptions and not a CustomSort comparer, for the reason set out on
+    /// OrphanedFilesWindow.SortByColumn: WPF caches the sort value per item for a
+    /// SortFieldComparer and for nothing else, so a typed comparer would be a
+    /// step backwards rather than forwards.
     /// </summary>
     private void ApplySort(string sortProperty, ListSortDirection direction, GridViewColumn column)
     {
+        // One rebuild, not three. Every SortDescriptions mutation raises a
+        // CollectionChanged that ListCollectionView turns into its own
+        // RefreshOrDefer, and Clear raises one even when the collection is
+        // already empty, so undeferred this sorts the whole list TWICE per
+        // header click: once by the primary key alone, which the second Add then
+        // throws away and redoes with the tiebreaker attached.
         var view = CollectionViewSource.GetDefaultView(ProductsList.ItemsSource);
-        view.SortDescriptions.Clear();
-        view.SortDescriptions.Add(new SortDescription(sortProperty, direction));
-        view.SortDescriptions.Add(
-            new SortDescription(nameof(ProductRow.FullPath), ListSortDirection.Ascending));
+        using (view.DeferRefresh())
+        {
+            view.SortDescriptions.Clear();
+            view.SortDescriptions.Add(new SortDescription(sortProperty, direction));
+            view.SortDescriptions.Add(
+                new SortDescription(nameof(ProductRow.FullPath), ListSortDirection.Ascending));
+        }
 
         _lastSortProperty = sortProperty;
         _lastSortDirection = direction;
