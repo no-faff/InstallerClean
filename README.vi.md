@@ -27,7 +27,7 @@
 
 - **Là gì:** InstallerClean chỉ làm một việc: nó loại bỏ những tệp không cần thiết khỏi `C:\Windows\Installer`, một thư mục ẩn mà Windows không bao giờ dọn dẹp. Sau một lần quét gần như tức thì, nó cho bạn biết bạn có tệp như vậy hay không, hiển thị thêm chi tiết cho ai tò mò, và cho phép bạn xóa chúng để giải phóng dung lượng trên ổ C:. Bạn dùng một lần rồi thôi.
 - **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. InstallerClean chính là thứ bạn cần. Nó biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và nhanh chóng cho bạn biết tệp nào có thể xóa an toàn.
-- **Giải phóng được bao nhiêu:** Các báo cáo (tùy chọn và ẩn danh) gửi về cho đến nay cho thấy <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> số máy có tệp không cần thiết để dọn. Trong số đó, trung vị giải phóng được là <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> và bốn máy dọn được nhiều nhất là 327, 228, 162 và 152 GB<!-- reports-biggest-end -->. Với tôi thì được 1,28 GB. <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> còn lại không tìm thấy gì để loại bỏ, điều đó chỉ có nghĩa là thư mục Installer của họ vốn đã sạch. Xem thêm chi tiết trong phần [FAQ](#faq) bên dưới.
+- **Giải phóng được bao nhiêu:** Các báo cáo (tùy chọn và ẩn danh) gửi về cho đến nay cho thấy <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> số máy có tệp không cần thiết để dọn. Trong số đó, trung vị giải phóng được là <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> và máy dọn được nhiều nhất là 327 GB<!-- reports-biggest-end -->. Với tôi thì được 1,28 GB. <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> còn lại không tìm thấy gì để loại bỏ, điều đó chỉ có nghĩa là thư mục Installer của họ vốn đã sạch. Xem thêm chi tiết trong phần [FAQ](#faq) bên dưới.
 - **Có an toàn không:** Có. Nó hỏi chính API Windows Installer xem những tệp nào vẫn còn cần, và chỉ liệt kê những tệp Windows báo là đã dùng xong. Nó là mã nguồn mở (Apache 2.0) và không hỏi gì về bạn: không tài khoản, không quảng cáo, không theo dõi, không thu thập dữ liệu, không có gì chạy ngầm. Việc duy nhất nó tự mình làm trên mạng là kiểm tra GitHub xem có phiên bản mới hơn không mỗi khi bạn chạy nó, và bạn có thể tắt việc đó.
 - **Tải về:** [Tải bản phát hành mới nhất](../../releases/latest). Chạy nó; bấm qua [cảnh báo “Nhà phát hành không xác định”](#unknown-publisher) và [lời nhắc quyền quản trị](#admin). Xóa mọi tệp không cần thiết. Xong.
 
@@ -240,15 +240,11 @@ Nếu có điều gì ở đây cản trở bạn, hãy [mở một issue](../..
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 Trong số 156 báo cáo mọi người đã gửi về (cảm ơn 🙏) kể từ khi v1.8.0 thêm tùy chọn này, 54% số máy có thứ để dọn. Cụ thể là bao nhiêu:
 
-| Dung lượng giải phóng | Báo cáo | |
-|---|---|---|
-| Dưới 1 GB | 13 | █████████████ |
-| 1 đến 5 GB | 9 | █████████ |
-| 5 đến 10 GB | 9 | █████████ |
-| 10 đến 25 GB | 21 | █████████████████████ |
-| 25 đến 50 GB | 24 | ████████████████████████ |
-| 50 đến 100 GB | 5 | █████ |
-| Trên 100 GB | 4 | ████ |
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+</picture>
 <!-- reports-stats-end -->
 
 <details>

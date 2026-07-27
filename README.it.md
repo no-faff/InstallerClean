@@ -27,7 +27,7 @@
 
 - **Cosa fa:** InstallerClean fa una cosa sola: rimuove i file non necessari da `C:\Windows\Installer`, una cartella nascosta che Windows non pulisce mai. Dopo una scansione quasi istantanea ti dice se ne hai, mostra qualche dettaglio in più per i curiosi e ti lascia eliminarli per liberare spazio sull'unità C:. La usi una volta e passi oltre.
 - **Forse sei qui perché:** Hai usato [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, hai visto che `C:\Windows\Installer` occupava un sacco di spazio e non sapevi cosa ci fosse dentro. InstallerClean è proprio quello che ti serve. Sa cosa contengono quei file dai nomi all'apparenza casuali come `9f05cba.msi` e ti dice rapidamente quali puoi eliminare in sicurezza.
-- **Quanto spazio:** I report (opzionali e anonimi) inviati finora mostrano che il <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> dei computer aveva file non necessari da pulire. Di questi, la mediana liberata è di <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> e i quattro maggiori sono stati di 327, 228, 162 e 152 GB<!-- reports-biggest-end -->. Nel mio caso, 1,28 GB. Il restante <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> non ha trovato nulla da rimuovere, il che significa solo che la loro cartella Installer era già pulita. Più dettagli nelle [Domande frequenti](#domande-frequenti) più sotto.
+- **Quanto spazio:** I report (opzionali e anonimi) inviati finora mostrano che il <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> dei computer aveva file non necessari da pulire. Di questi, la mediana liberata è di <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> e il maggiore è stato di 327 GB<!-- reports-biggest-end -->. Nel mio caso, 1,28 GB. Il restante <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> non ha trovato nulla da rimuovere, il che significa solo che la loro cartella Installer era già pulita. Più dettagli nelle [Domande frequenti](#domande-frequenti) più sotto.
 - **È sicuro:** Sì. Chiede alla stessa API di Windows Installer quali file servono ancora ed elenca solo quelli che Windows segnala come non più necessari. È open source (Apache 2.0) e non chiede nulla su di te: nessun account, nessuna pubblicità, nessun tracciamento, nessuna telemetria, niente che giri in background. L'unica cosa che fa online di sua iniziativa è controllare su GitHub se c'è una versione più recente quando lo avvii, e puoi disattivarla.
 - **Come ottenerla:** [Scarica l'ultima versione](../../releases/latest). Eseguila; supera [l'avviso di «autore sconosciuto»](#unknown-publisher) e [la richiesta di amministratore](#admin). Elimina i file non necessari. Fatto.
 
@@ -240,15 +240,11 @@ Se qualcosa qui ti ostacola, [apri un issue](../../issues). I problemi di access
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 Su 156 report che mi sono stati inviati (grazie 🙏) da quando la v1.8.0 ha aggiunto l'opzione, il 54% dei computer aveva qualcosa da pulire. Ecco quanto:
 
-| Spazio liberato | Report | |
-|---|---|---|
-| Meno di 1 GB | 13 | █████████████ |
-| Da 1 a 5 GB | 9 | █████████ |
-| Da 5 a 10 GB | 9 | █████████ |
-| Da 10 a 25 GB | 21 | █████████████████████ |
-| Da 25 a 50 GB | 24 | ████████████████████████ |
-| Da 50 a 100 GB | 5 | █████ |
-| Più di 100 GB | 4 | ████ |
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+</picture>
 <!-- reports-stats-end -->
 
 <details>

@@ -27,7 +27,7 @@
 
 - **概要：** InstallerClean がすることは 1 つだけです。Windows が一切クリーンアップしない隠しフォルダー `C:\Windows\Installer` から、不要なファイルを取り除きます。ほぼ一瞬で終わるスキャンのあと、不要なファイルがあるかどうかを知らせ、詳しく見たい人にはさらに詳細を示し、それらを削除して C: ドライブの空き容量を増やせるようにします。一度使ったら、それで終わりです。
 - **こんな覚えはありませんか：** [WinDirStat](https://github.com/windirstat/windirstat)、WizTree、TreeSize などでディスクを調べていて、`C:\Windows\Installer` が大量の容量を占めているのに気づいたものの、中に何が入っているのか分からなかった。InstallerClean は、まさにそんなあなたのためのツールです。`9f05cba.msi` のような一見ランダムな名前のファイルの中身を把握していて、どれなら安全に削除できるのかをすぐに教えてくれます。
-- **どれくらい空くか：** これまでに（任意・匿名で）送られてきたレポートでは、<!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> のマシンに掃除できる不要なファイルがありました。そのうち、解放できた容量の中央値は <!-- reports-median-start -->19.9 GB<!-- reports-median-end --><!-- reports-biggest-start --> で、最も多かった 4 件は 327、228、162、152 GB です<!-- reports-biggest-end -->。私の場合は 1.28 GB でした。残りの <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> は削除するものが見つからず、これは単に Installer フォルダーがすでにきれいだったというだけのことです。詳しくは下の [よくある質問](#よくある質問) をご覧ください。
+- **どれくらい空くか：** これまでに（任意・匿名で）送られてきたレポートでは、<!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> のマシンに掃除できる不要なファイルがありました。そのうち、解放できた容量の中央値は <!-- reports-median-start -->19.9 GB<!-- reports-median-end --><!-- reports-biggest-start --> で、最も多かった 1 件は 327 GB です<!-- reports-biggest-end -->。私の場合は 1.28 GB でした。残りの <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> は削除するものが見つからず、これは単に Installer フォルダーがすでにきれいだったというだけのことです。詳しくは下の [よくある質問](#よくある質問) をご覧ください。
 - **安全性：** はい。どのファイルがまだ必要かを Windows インストーラー API 自身に問い合わせ、Windows が「用済み」と報告したファイルだけを一覧に出します。オープンソース（Apache 2.0）で、あなたについて何も尋ねません。アカウントも、広告も、追跡も、テレメトリもなく、バックグラウンドで動くものもありません。自分からオンラインで行うのは、起動時に GitHub で新しいバージョンがないか確認することだけで、これはオフにできます。
 - **入手方法：** [最新リリースをダウンロード](../../releases/latest)してください。実行し、[「不明な発行元」の警告](#unknown-publisher)と[管理者権限の確認](#admin)をクリックして進みます。不要なファイルがあれば削除します。これで完了です。
 
@@ -240,15 +240,11 @@ InstallerClean は、キーボードだけでも、スクリーンリーダー�
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 v1.8.0 でこのオプションが追加されて以来、ご厚意で送っていただいた 156 件のレポート（ありがとうございます🙏）では、54% のマシンに片づけられるものがありました。その内訳です。
 
-| 解放できた容量 | レポート数 | |
-|---|---|---|
-| 1 GB 未満 | 13 | █████████████ |
-| 1〜5 GB | 9 | █████████ |
-| 5〜10 GB | 9 | █████████ |
-| 10〜25 GB | 21 | █████████████████████ |
-| 25〜50 GB | 24 | ████████████████████████ |
-| 50〜100 GB | 5 | █████ |
-| 100 GB 以上 | 4 | ████ |
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+</picture>
 <!-- reports-stats-end -->
 
 <details>

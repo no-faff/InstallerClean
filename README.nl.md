@@ -27,7 +27,7 @@
 
 - **Wat:** InstallerClean doet één ding: het verwijdert overbodige bestanden uit `C:\Windows\Installer`, een verborgen map die Windows nooit opruimt. Na een vrijwel onmiddellijke scan vertelt het je of je die hebt, laat het wie nieuwsgierig is meer detail zien en kun je ze verwijderen om ruimte vrij te maken op je C:-schijf. Je gebruikt het één keer en gaat weer verder.
 - **Je bent hier misschien omdat:** Je hebt [WinDirStat](https://github.com/windirstat/windirstat), WizTree of TreeSize gebruikt, zag dat `C:\Windows\Installer` veel ruimte innam en wist niet wat erin zat. InstallerClean is precies wat je nodig hebt. Het weet wat er in die bestanden met willekeurig ogende namen als `9f05cba.msi` zit en vertelt je snel welke je veilig kunt verwijderen.
-- **Hoeveel ruimte:** De (optionele en anonieme) rapporten die tot nu toe zijn ingestuurd laten zien dat <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> van de machines overbodige bestanden had om op te ruimen. Daarvan is de mediaan van de vrijgemaakte ruimte <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> en de vier grootste waren 327, 228, 162 en 152 GB<!-- reports-biggest-end -->. Bij mij was het 1,28 GB. De overige <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> vond niets om te verwijderen, wat alleen maar betekent dat hun Installer-map al schoon was. Meer detail in de [FAQ](#faq) hieronder.
+- **Hoeveel ruimte:** De (optionele en anonieme) rapporten die tot nu toe zijn ingestuurd laten zien dat <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> van de machines overbodige bestanden had om op te ruimen. Daarvan is de mediaan van de vrijgemaakte ruimte <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> en de grootste was 327 GB<!-- reports-biggest-end -->. Bij mij was het 1,28 GB. De overige <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> vond niets om te verwijderen, wat alleen maar betekent dat hun Installer-map al schoon was. Meer detail in de [FAQ](#faq) hieronder.
 - **Is het veilig:** Ja. Het vraagt de Windows Installer-API zelf welke bestanden nog nodig zijn en toont alleen de bestanden waarvan Windows aangeeft dat het ermee klaar is. Het is open source (Apache 2.0) en vraagt niets over jou: geen account, geen advertenties, geen tracking, geen telemetrie, niets dat op de achtergrond draait. Het enige wat het uit zichzelf online doet, is bij het starten op GitHub kijken of er een nieuwere versie is, en dat kun je uitzetten.
 - **Downloaden:** [Download de nieuwste versie](../../releases/latest). Voer hem uit; klik je door [de melding over een onbekende uitgever](#unknown-publisher) en [de beheerdersvraag](#admin) heen. Verwijder eventuele overbodige bestanden. Klaar.
 
@@ -240,15 +240,11 @@ Zit iets je hier in de weg, [open dan een issue](../../issues). Toegankelijkheid
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 Uit de 156 rapporten die mensen zo vriendelijk zijn geweest in te sturen (dank 🙏) sinds v1.8.0 de optie toevoegde, had 54% van de machines iets op te ruimen. Zo veel was dat:
 
-| Vrijgemaakt | Rapporten | |
-|---|---|---|
-| Minder dan 1 GB | 13 | █████████████ |
-| 1 tot 5 GB | 9 | █████████ |
-| 5 tot 10 GB | 9 | █████████ |
-| 10 tot 25 GB | 21 | █████████████████████ |
-| 25 tot 50 GB | 24 | ████████████████████████ |
-| 50 tot 100 GB | 5 | █████ |
-| Meer dan 100 GB | 4 | ████ |
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+</picture>
 <!-- reports-stats-end -->
 
 <details>

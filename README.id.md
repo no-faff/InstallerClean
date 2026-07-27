@@ -27,7 +27,7 @@
 
 - **Apa:** InstallerClean melakukan satu hal: menghapus file yang tidak diperlukan dari `C:\Windows\Installer`, folder tersembunyi yang tidak pernah dibersihkan Windows. Setelah pemindaian yang hampir seketika, aplikasi memberi tahu Anda apakah ada file seperti itu, menampilkan detail lebih lanjut bagi yang penasaran, dan memungkinkan Anda menghapusnya untuk mengosongkan ruang di drive C: Anda. Anda cukup memakainya sekali lalu lanjut.
 - **Mungkin Anda di sini karena:** Anda memakai [WinDirStat](https://github.com/windirstat/windirstat), WizTree, atau TreeSize, melihat `C:\Windows\Installer` memakan banyak ruang, dan tidak tahu apa isinya. InstallerClean justru yang Anda butuhkan. Aplikasi ini tahu isi file dengan nama yang tampak acak seperti `9f05cba.msi` dan dengan cepat memberi tahu Anda mana yang aman dihapus.
-- **Berapa banyak ruang:** Laporan (opsional dan anonim) yang masuk sejauh ini menunjukkan bahwa <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> mesin memiliki file tidak diperlukan untuk dibersihkan. Dari mesin-mesin itu, median yang dikosongkan adalah <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> dan empat yang terbesar adalah 327, 228, 162, dan 152 GB<!-- reports-biggest-end -->. Bagi saya jumlahnya 1,28 GB. Sisanya, <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end -->, tidak menemukan apa pun untuk dihapus, yang berarti folder Installer mereka memang sudah bersih. Detail lebih lanjut ada di [FAQ](#faq) di bawah.
+- **Berapa banyak ruang:** Laporan (opsional dan anonim) yang masuk sejauh ini menunjukkan bahwa <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> mesin memiliki file tidak diperlukan untuk dibersihkan. Dari mesin-mesin itu, median yang dikosongkan adalah <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> dan yang terbesar adalah 327 GB<!-- reports-biggest-end -->. Bagi saya jumlahnya 1,28 GB. Sisanya, <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end -->, tidak menemukan apa pun untuk dihapus, yang berarti folder Installer mereka memang sudah bersih. Detail lebih lanjut ada di [FAQ](#faq) di bawah.
 - **Apakah aman:** Ya. Aplikasi menanyakan langsung ke Windows Installer API sendiri file mana yang masih diperlukan dan hanya pernah mendaftar file yang dilaporkan Windows sudah tidak terpakai. Aplikasi ini sumber terbuka (Apache 2.0) dan tidak menanyakan apa pun tentang Anda: tanpa akun, tanpa iklan, tanpa pelacakan, tanpa telemetri, tidak ada yang berjalan di latar belakang. Satu-satunya hal yang dilakukannya secara daring atas inisiatifnya sendiri adalah memeriksa GitHub untuk versi yang lebih baru saat Anda menjalankannya, dan itu bisa Anda matikan.
 - **Dapatkan:** [Unduh rilis terbaru](../../releases/latest). Jalankan; lewati [peringatan "unknown publisher"](#unknown-publisher) dan [permintaan administrator](#admin). Hapus file yang tidak diperlukan. Selesai.
 
@@ -240,15 +240,11 @@ Jika ada sesuatu di sini yang menghalangi Anda, [buka sebuah issue](../../issues
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 Dari 156 laporan yang dikirimkan orang-orang (terima kasih 🙏) sejak opsi ini ditambahkan di v1.8.0, 54% mesin punya sesuatu untuk dibersihkan. Ini rinciannya:
 
-| Ruang yang dikosongkan | Laporan | |
-|---|---|---|
-| Di bawah 1 GB | 13 | █████████████ |
-| 1 sampai 5 GB | 9 | █████████ |
-| 5 sampai 10 GB | 9 | █████████ |
-| 10 sampai 25 GB | 21 | █████████████████████ |
-| 25 sampai 50 GB | 24 | ████████████████████████ |
-| 50 sampai 100 GB | 5 | █████ |
-| Lebih dari 100 GB | 4 | ████ |
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+</picture>
 <!-- reports-stats-end -->
 
 <details>

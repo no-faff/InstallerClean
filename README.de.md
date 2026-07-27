@@ -27,7 +27,7 @@
 
 - **Was:** InstallerClean tut eine Sache: Es entfernt nicht benötigte Dateien aus `C:\Windows\Installer`, einem versteckten Ordner, den Windows nie aufräumt. Nach einem fast augenblicklichen Scan sagt es dir, ob du welche hast, zeigt Neugierigen mehr Details und lässt dich die Dateien löschen, um Platz auf deiner C:-Festplatte freizugeben. Du benutzt es einmal und machst weiter.
 - **Warum du vielleicht hier bist:** Du hast [WinDirStat](https://github.com/windirstat/windirstat), WizTree oder TreeSize benutzt, gesehen, dass `C:\Windows\Installer` viel Platz belegt, und nicht gewusst, was darin steckt. InstallerClean ist genau das Richtige. Es weiß, was in diesen Dateien mit ihren zufällig wirkenden Namen wie `9f05cba.msi` steckt, und sagt dir schnell, welche du bedenkenlos löschen kannst.
-- **Wie viel Platz:** Die (optionalen und anonymen) bisher eingesandten Berichte zeigen, dass bei <!-- reports-freedpct-start -->54 %<!-- reports-freedpct-end --> der Rechner nicht benötigte Dateien zum Aufräumen vorhanden waren. Bei diesen wurden im Median <!-- reports-median-start -->19,9 GB<!-- reports-median-end --> freigegeben<!-- reports-biggest-start --> und die vier größten Ergebnisse waren 327, 228, 162 und 152 GB<!-- reports-biggest-end -->. Bei mir waren es 1,28 GB. Die übrigen <!-- reports-nothingpct-start -->46 %<!-- reports-nothingpct-end --> fanden nichts zu entfernen, was einfach heißt, dass ihr Installer-Ordner bereits sauber war. Mehr Details in den [FAQ](#faq) weiter unten.
+- **Wie viel Platz:** Die (optionalen und anonymen) bisher eingesandten Berichte zeigen, dass bei <!-- reports-freedpct-start -->54 %<!-- reports-freedpct-end --> der Rechner nicht benötigte Dateien zum Aufräumen vorhanden waren. Bei diesen wurden im Median <!-- reports-median-start -->19,9 GB<!-- reports-median-end --> freigegeben<!-- reports-biggest-start --> und das größte Ergebnis waren 327 GB<!-- reports-biggest-end -->. Bei mir waren es 1,28 GB. Die übrigen <!-- reports-nothingpct-start -->46 %<!-- reports-nothingpct-end --> fanden nichts zu entfernen, was einfach heißt, dass ihr Installer-Ordner bereits sauber war. Mehr Details in den [FAQ](#faq) weiter unten.
 - **Ist es sicher:** Ja. Es fragt die Windows-Installer-API selbst, welche Dateien noch benötigt werden, und listet nur die auf, die Windows als erledigt meldet. Es ist quelloffen (Apache 2.0) und fragt nichts über dich ab: kein Konto, keine Werbung, kein Tracking, keine Telemetrie, nichts, was im Hintergrund läuft. Das Einzige, was es von sich aus online tut, ist bei jedem Start auf GitHub nach einer neueren Version zu sehen, und das kannst du abschalten.
 - **Holen:** [Lade die neueste Version herunter](../../releases/latest). Führe sie aus; klicke dich durch [die Warnung „Unbekannter Herausgeber“](#unknown-publisher) und [die Administrator-Abfrage](#admin). Lösche alle nicht benötigten Dateien. Fertig.
 
@@ -240,15 +240,11 @@ Wenn dir hier etwas im Weg ist, [erstelle ein Issue](../../issues). Barrierefrei
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 Von den 156 Berichten, die seit der Einführung der Option in v1.8.0 freundlicherweise eingesandt wurden (danke 🙏), hatten 54 % der Rechner etwas aufzuräumen. So viel war es:
 
-| Freigegeben | Berichte | |
-|---|---|---|
-| Unter 1 GB | 13 | █████████████ |
-| 1 bis 5 GB | 9 | █████████ |
-| 5 bis 10 GB | 9 | █████████ |
-| 10 bis 25 GB | 21 | █████████████████████ |
-| 25 bis 50 GB | 24 | ████████████████████████ |
-| 50 bis 100 GB | 5 | █████ |
-| Mehr als 100 GB | 4 | ████ |
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+</picture>
 <!-- reports-stats-end -->
 
 <details>

@@ -27,7 +27,7 @@
 
 - **Ne yapar:** InstallerClean tek bir iş yapar: Windows'un hiç temizlemediği gizli bir klasör olan `C:\Windows\Installer` içindeki gereksiz dosyaları kaldırır. Neredeyse anında biten bir taramanın ardından böyle dosyalarınız olup olmadığını size söyler, merak edenler için daha fazla ayrıntı gösterir ve C: sürücünüzde yer açmak için bunları silmenize olanak tanır. Bir kez kullanır, yolunuza devam edersiniz.
 - **Buraya gelme nedeniniz belki de şu:** [WinDirStat](https://github.com/windirstat/windirstat), WizTree ya da TreeSize kullandınız, `C:\Windows\Installer`'ın çok yer kapladığını gördünüz ama içinde ne olduğunu bilmiyordunuz. InstallerClean tam da ihtiyacınız olan şey. `9f05cba.msi` gibi rastgele görünen adlı o dosyaların içinde ne olduğunu bilir ve hangilerini güvenle silebileceğinizi size hızlıca söyler.
-- **Ne kadar yer:** Şimdiye dek gönderilen (isteğe bağlı ve anonim) raporlara göre, temizlenecek gereksiz dosyası bulunan makinelerin oranı <!-- reports-freedpct-start -->%54<!-- reports-freedpct-end -->. Bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start -->, en büyük dört sonuç ise 327, 228, 162 ve 152 GB<!-- reports-biggest-end -->. Bende 1,28 GB çıktı. Geri kalan <!-- reports-nothingpct-start -->%46<!-- reports-nothingpct-end --> ise kaldıracak bir şey bulamadı; bu da yalnızca Installer klasörlerinin zaten temiz olduğu anlamına geliyor. Daha fazla ayrıntı aşağıdaki [SSS](#sss) bölümünde.
+- **Ne kadar yer:** Şimdiye dek gönderilen (isteğe bağlı ve anonim) raporlara göre, temizlenecek gereksiz dosyası bulunan makinelerin oranı <!-- reports-freedpct-start -->%54<!-- reports-freedpct-end -->. Bunlarda kurtarılan alanın ortancası <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start -->, en büyüğü ise 327 GB<!-- reports-biggest-end -->. Bende 1,28 GB çıktı. Geri kalan <!-- reports-nothingpct-start -->%46<!-- reports-nothingpct-end --> ise kaldıracak bir şey bulamadı; bu da yalnızca Installer klasörlerinin zaten temiz olduğu anlamına geliyor. Daha fazla ayrıntı aşağıdaki [SSS](#sss) bölümünde.
 - **Güvenli mi:** Evet. Hangi dosyaların hâlâ gerekli olduğunu doğrudan Windows Installer API'sine sorar ve yalnızca Windows'un işi bittiğini bildirdiği dosyaları listeler. Açık kaynaklıdır (Apache 2.0) ve sizinle ilgili hiçbir şey sormaz: hesap yok, reklam yok, takip yok, telemetri yok, arka planda çalışan hiçbir şey yok. Kendiliğinden çevrimiçi olarak yaptığı tek şey, siz çalıştırdığınızda GitHub'da daha yeni bir sürüm olup olmadığına bakmaktır; bunu da kapatabilirsiniz.
 - **Edinme:** [En son sürümü indirin](../../releases/latest). Çalıştırın; [“bilinmeyen yayımcı” uyarısına](#unknown-publisher) ve [yönetici istemine](#admin) tıklayıp geçin. Gereksiz dosyaları silin. Tamam.
 
@@ -240,15 +240,11 @@ Burada bir şey size engel oluyorsa, [bir konu açın](../../issues). Erişilebi
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
 v1.8.0'da seçenek eklendiğinden bu yana gönderilen 156 rapora göre (teşekkürler 🙏), temizlenecek bir şeyler bulunan makinelerin oranı %54. İşte ne kadar:
 
-| Açılan alan | Rapor | |
-|---|---|---|
-| 1 GB altı | 13 | █████████████ |
-| 1 ila 5 GB | 9 | █████████ |
-| 5 ila 10 GB | 9 | █████████ |
-| 10 ila 25 GB | 21 | █████████████████████ |
-| 25 ila 50 GB | 24 | ████████████████████████ |
-| 50 ila 100 GB | 5 | █████ |
-| 100 GB üstü | 4 | ████ |
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
+  <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+</picture>
 <!-- reports-stats-end -->
 
 <details>
