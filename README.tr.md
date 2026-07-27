@@ -411,7 +411,7 @@ InstallerClean işinize yaradıysa, [No Faff'ı desteklemeyi](https://nofaff.net
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/star-history-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="docs/star-history-light.svg" />
-  <img alt="Star History Chart" src="docs/star-history-light.svg" width="800" />
+  <img alt="InstallerClean'in GitHub yıldızlarının zaman içindeki değişimini gösteren çizgi grafik" src="docs/star-history-light.svg" width="800" />
 </picture>
 
 ## Lisans

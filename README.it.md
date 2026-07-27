@@ -410,7 +410,7 @@ Se InstallerClean ti è stato utile, valuta di [sostenere No Faff](https://nofaf
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/star-history-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="docs/star-history-light.svg" />
-  <img alt="Star History Chart" src="docs/star-history-light.svg" width="800" />
+  <img alt="Grafico a linee delle stelle di InstallerClean su GitHub nel tempo" src="docs/star-history-light.svg" width="800" />
 </picture>
 
 ## Licenza

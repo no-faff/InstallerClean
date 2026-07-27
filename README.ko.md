@@ -410,7 +410,7 @@ InstallerClean이 도움이 됐다면, [No Faff 후원](https://nofaff.netlify.a
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/star-history-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="docs/star-history-light.svg" />
-  <img alt="Star History Chart" src="docs/star-history-light.svg" width="800" />
+  <img alt="시간에 따른 InstallerClean의 GitHub 스타 수 꺾은선 그래프" src="docs/star-history-light.svg" width="800" />
 </picture>
 
 ## 라이선스

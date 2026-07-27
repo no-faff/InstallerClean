@@ -412,7 +412,7 @@ InstallerClean が役に立ったなら、[No Faff を応援](https://nofaff.net
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/star-history-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="docs/star-history-light.svg" />
-  <img alt="Star History Chart" src="docs/star-history-light.svg" width="800" />
+  <img alt="InstallerClean の GitHub スター数の推移を示す折れ線グラフ" src="docs/star-history-light.svg" width="800" />
 </picture>
 
 ## ライセンス

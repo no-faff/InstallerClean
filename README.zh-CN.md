@@ -410,7 +410,7 @@ InstallerClean 现已全面提供简体中文：应用、安装程序、命令�
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/star-history-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="docs/star-history-light.svg" />
-  <img alt="Star History Chart" src="docs/star-history-light.svg" width="800" />
+  <img alt="InstallerClean 在 GitHub 上 Star 数随时间变化的折线图" src="docs/star-history-light.svg" width="800" />
 </picture>
 
 ## 许可证

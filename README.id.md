@@ -410,7 +410,7 @@ Jika InstallerClean membantu, pertimbangkan untuk [mendukung No Faff](https://no
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/star-history-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="docs/star-history-light.svg" />
-  <img alt="Star History Chart" src="docs/star-history-light.svg" width="800" />
+  <img alt="Grafik garis jumlah bintang GitHub InstallerClean dari waktu ke waktu" src="docs/star-history-light.svg" width="800" />
 </picture>
 
 ## Lisensi

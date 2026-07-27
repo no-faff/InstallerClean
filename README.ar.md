@@ -414,7 +414,7 @@ dotnet test src/InstallerClean.Tests/
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/star-history-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="docs/star-history-light.svg" />
-  <img alt="Star History Chart" src="docs/star-history-light.svg" width="800" />
+  <img alt="رسم بياني خطي لعدد نجوم InstallerClean على GitHub بمرور الوقت" src="docs/star-history-light.svg" width="800" />
 </picture>
 
 ## الترخيص

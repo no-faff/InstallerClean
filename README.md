@@ -422,7 +422,7 @@ If InstallerClean helped, consider [supporting No Faff](https://nofaff.netlify.a
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/star-history-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="docs/star-history-light.svg" />
-  <img alt="Star History Chart" src="docs/star-history-light.svg" width="800" />
+  <img alt="Line chart of InstallerClean's GitHub stars over time" src="docs/star-history-light.svg" width="800" />
 </picture>
 
 ## Licence

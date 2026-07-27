@@ -410,7 +410,7 @@ Jeśli InstallerClean pomógł, rozważ [wsparcie No Faff](https://nofaff.netlif
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/star-history-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="docs/star-history-light.svg" />
-  <img alt="Star History Chart" src="docs/star-history-light.svg" width="800" />
+  <img alt="Wykres liniowy liczby gwiazdek InstallerClean na GitHubie w czasie" src="docs/star-history-light.svg" width="800" />
 </picture>
 
 ## Licencja
