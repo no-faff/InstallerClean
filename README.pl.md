@@ -27,7 +27,7 @@
 
 - **Co:** InstallerClean robi jedną rzecz: usuwa niepotrzebne pliki z `C:\Windows\Installer`, ukrytego folderu, którego Windows nigdy nie czyści. Po niemal natychmiastowym skanowaniu mówi ci, czy w ogóle jakieś masz, pokazuje więcej szczegółów ciekawskim i pozwala je usunąć, by zwolnić miejsce na dysku C:. Uruchamiasz go raz i ruszasz dalej.
 - **Może jesteś tu, bo:** Użyłeś [WinDirStat](https://github.com/windirstat/windirstat), WizTree albo TreeSize, zobaczyłeś, że `C:\Windows\Installer` zajmuje mnóstwo miejsca, i nie wiedziałeś, co w nim siedzi. InstallerClean to dokładnie to, czego potrzebujesz. Wie, co kryje się w tych plikach o pozornie przypadkowych nazwach, jak `9f05cba.msi`, i szybko mówi ci, które z nich możesz bezpiecznie usunąć.
-- **Ile miejsca:** Nadesłane jak dotąd (opcjonalne) raporty pokazują, że <!-- reports-freedpct-start -->53%<!-- reports-freedpct-end --> maszyn miało niepotrzebne pliki do wyczyszczenia. Na tych maszynach mediana zwolnionego miejsca to <!-- reports-median-start -->21 GB<!-- reports-median-end -->. Kilka osób odzyskało setki GB. U mnie było to 1,28 GB. Pozostałe <!-- reports-nothingpct-start -->47%<!-- reports-nothingpct-end --> nie znalazły nic do usunięcia, co po prostu oznacza, że ich folder Installer był już czysty. Więcej szczegółów w [FAQ](#faq) poniżej.
+- **Ile miejsca:** Nadesłane jak dotąd (opcjonalne i anonimowe) raporty pokazują, że <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> maszyn miało niepotrzebne pliki do wyczyszczenia. Na tych maszynach mediana zwolnionego miejsca to <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start -->, a cztery największe wyniki to 327, 228, 162 i 152 GB<!-- reports-biggest-end -->. U mnie było to 1,28 GB. Pozostałe <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> nie znalazły nic do usunięcia, co po prostu oznacza, że ich folder Installer był już czysty. Więcej szczegółów w [FAQ](#faq) poniżej.
 - **Czy to bezpieczne:** Tak. Pyta samo API Windows Installer, które pliki są nadal potrzebne, i wymienia wyłącznie te, które Windows zgłasza jako już niepotrzebne. Jest otwartoźródłowy (Apache 2.0) i o nic cię nie pyta: bez konta, bez reklam, bez śledzenia, bez telemetrii, bez niczego działającego w tle. Jedyne, co robi w sieci z własnej inicjatywy, to sprawdza przy uruchomieniu, czy na GitHubie jest nowsza wersja, a to możesz wyłączyć.
 - **Pobierz:** [Pobierz najnowszą wersję](../../releases/latest). Uruchom; przeklikaj się przez [ostrzeżenie o „nieznanym wydawcy”](#unknown-publisher) i [monit administratora](#admin). Usuń wszelkie niepotrzebne pliki. Gotowe.
 
@@ -238,12 +238,17 @@ Jeśli cokolwiek tutaj ci przeszkadza, [zgłoś problem](../../issues). Problemy
 **Czy naprawdę zwolnię GB miejsca?** To zależy od twojej maszyny. Czysta instalacja Windows 11 bez dodatkowego oprogramowania nie ma nic do usunięcia. Długo używana stacja robocza dewelopera albo dowolna maszyna z dużą ilością oprogramowania opartego na MSI (Acrobat, Office, LibreOffice, duże narzędzia deweloperskie) może mieć dziesiątki GB. Tak czy inaczej, dokładnie zobaczysz ile, w chwili gdy ją uruchomisz.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Spośród 156 raportów, które nadesłano (dziękuję 🙏) od czasu, gdy opcję tę dodano w v1.8.0:
+Spośród 156 raportów, które nadesłano (dziękuję 🙏) od czasu, gdy opcję tę dodano w v1.8.0, 54% maszyn miało coś do wyczyszczenia. Oto ile:
 
-| Wynik | Udział | Najmniej | Mediana | Najwięcej |
-|---|---|---|---|---|
-| Nic do usunięcia | 47% | - | - | - |
-| Zwolnione miejsce | 53% | 0,1 GB | 21 GB | 327 GB |
+| Zwolnione miejsce | Raporty | |
+|---|---|---|
+| Poniżej 1 GB | 13 | █████████████ |
+| Od 1 do 5 GB | 9 | █████████ |
+| Od 5 do 10 GB | 9 | █████████ |
+| Od 10 do 25 GB | 21 | █████████████████████ |
+| Od 25 do 50 GB | 24 | ████████████████████████ |
+| Od 50 do 100 GB | 5 | █████ |
+| Powyżej 100 GB | 4 | ████ |
 <!-- reports-stats-end -->
 
 <details>

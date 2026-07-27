@@ -27,7 +27,7 @@
 
 - **O que faz:** O InstallerClean faz uma coisa só: remove arquivos desnecessários de `C:\Windows\Installer`, uma pasta oculta que o Windows nunca limpa. Depois de uma análise quase instantânea, ele te diz se você tem algum, mostra mais detalhes para os curiosos e deixa você excluí-los para liberar espaço no disco C:. Você usa uma vez e segue em frente.
 - **Talvez você esteja aqui porque:** Você usou o [WinDirStat](https://github.com/windirstat/windirstat), o WizTree ou o TreeSize, viu que o `C:\Windows\Installer` estava ocupando muito espaço e não sabia o que tinha ali dentro. O InstallerClean é exatamente o que você precisa. Ele sabe o que há naqueles arquivos com nomes que parecem aleatórios, como `9f05cba.msi`, e te diz rapidamente quais você pode excluir com segurança.
-- **Quanto espaço:** Os relatórios (opcionais) enviados até agora mostram que <!-- reports-freedpct-start -->53%<!-- reports-freedpct-end --> das máquinas tinham arquivos desnecessários para limpar. Dessas, a mediana liberada é <!-- reports-median-start -->21 GB<!-- reports-median-end -->. Algumas liberaram centenas de GB. Para mim, foram 1,28 GB. As outras <!-- reports-nothingpct-start -->47%<!-- reports-nothingpct-end --> não acharam nada para remover, o que só significa que a pasta Installer delas já estava limpa. Mais detalhes nas [Perguntas frequentes](#perguntas-frequentes) abaixo.
+- **Quanto espaço:** Os relatórios (opcionais e anônimos) enviados até agora mostram que <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> das máquinas tinham arquivos desnecessários para limpar. Dessas, a mediana liberada é <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> e as quatro maiores foram de 327, 228, 162 e 152 GB<!-- reports-biggest-end -->. Para mim, foram 1,28 GB. As outras <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> não acharam nada para remover, o que só significa que a pasta Installer delas já estava limpa. Mais detalhes nas [Perguntas frequentes](#perguntas-frequentes) abaixo.
 - **É seguro:** Sim. Ele pergunta à própria API do Windows Installer quais arquivos ainda são necessários e só lista aqueles que o Windows informa ter terminado de usar. É de código aberto (Apache 2.0) e não pergunta nada sobre você: sem conta, sem anúncios, sem rastreamento, sem telemetria, nada rodando em segundo plano. A única coisa que ele faz na internet por conta própria é consultar o GitHub em busca de uma versão mais recente quando você o executa, e isso você pode desligar.
 - **Como obter:** [Baixe a versão mais recente](../../releases/latest). Execute; passe [pelo aviso de "editor desconhecido"](#unknown-publisher) e [pelo prompt de administrador](#admin). Exclua os arquivos desnecessários. Pronto.
 
@@ -238,12 +238,17 @@ Se algo aqui atrapalhar você, [abra uma issue](../../issues). Problemas de aces
 **Vou realmente liberar vários GB de espaço?** Depende da sua máquina. Uma instalação limpa do Windows 11 sem programas extras não tem nada para remover. Uma estação de trabalho de desenvolvimento usada há muito tempo, ou qualquer máquina com muito programa baseado em MSI (Acrobat, Office, LibreOffice, ferramentas de desenvolvimento grandes), pode ter dezenas de GB. De um jeito ou de outro, você vê exatamente quanto no momento em que executa.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Entre os 156 relatórios que as pessoas tiveram a gentileza de enviar (obrigado 🙏) desde que a v1.8.0 adicionou a opção:
+Entre os 156 relatórios que as pessoas tiveram a gentileza de enviar (obrigado 🙏) desde que a v1.8.0 adicionou a opção, 54% das máquinas tinham algo a limpar. Veja quanto:
 
-| Resultado | Proporção | Menor | Mediana | Maior |
-|---|---|---|---|---|
-| Nada para remover | 47% | - | - | - |
-| Espaço liberado | 53% | 0,1 GB | 21 GB | 327 GB |
+| Espaço liberado | Relatórios | |
+|---|---|---|
+| Menos de 1 GB | 13 | █████████████ |
+| De 1 a 5 GB | 9 | █████████ |
+| De 5 a 10 GB | 9 | █████████ |
+| De 10 a 25 GB | 21 | █████████████████████ |
+| De 25 a 50 GB | 24 | ████████████████████████ |
+| De 50 a 100 GB | 5 | █████ |
+| Mais de 100 GB | 4 | ████ |
 <!-- reports-stats-end -->
 
 <details>

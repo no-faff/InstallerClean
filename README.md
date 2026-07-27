@@ -27,7 +27,7 @@
 
 - **What:** InstallerClean does one thing: it removes unneeded files from `C:\Windows\Installer`, a hidden folder Windows never cleans up. After a nearly instant scan it tells you whether you have any, shows more detail for the curious, and lets you delete them to free up space on your C: drive. You use it once and move on.
 - **You might be here because:** You used [WinDirStat](https://github.com/windirstat/windirstat), WizTree or TreeSize, saw `C:\Windows\Installer` taking up a lot of space and didn't know what was in there. InstallerClean is just what you need. It knows what's in those files with random-looking names like `9f05cba.msi` and quickly tells you which ones you can safely delete.
-- **How much space:** The (optional) reports sent in so far show <!-- reports-freedpct-start -->53%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->21 GB<!-- reports-median-end -->. A few cleared hundreds of GB. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->47%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean. More detail in the [FAQ](#faq) below.
+- **How much space:** The (optional and anonymous) reports sent in so far show <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> of machines had unneeded files to clean. Of those, the median freed is <!-- reports-median-start -->19.9 GB<!-- reports-median-end --><!-- reports-biggest-start --> and the four biggest were 327, 228, 162 and 152 GB<!-- reports-biggest-end -->. For me it was 1.28 GB. The other <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> found nothing to remove, which just means their Installer folder was already clean. More detail in the [FAQ](#faq) below.
 - **Is it safe:** Yes. It asks the Windows Installer API itself which files are still needed and only ever lists the ones Windows reports as finished with. It's open source (Apache 2.0) and asks nothing about you: no account, no ads, no tracking, no telemetry, nothing running in the background. The only thing it does online by itself is check GitHub for a newer version when you run it, and you can turn that off.
 - **Get it:** [Download the latest release](../../releases/latest). Run it; click through [the unknown-publisher warning](#unknown-publisher) and [the admin prompt](#admin). Delete any unneeded files. Done.
 
@@ -250,12 +250,17 @@ If anything here gets in your way, [open an issue](../../issues). Accessibility 
 **Will I actually free up GBs of space?** It depends on your machine. A clean Windows 11 install with no extra software has nothing to remove. A long-running developer workstation, or any machine with heavy MSI-based software (Acrobat, Office, LibreOffice, large dev tools), can have tens of GB. Either way, you'll see exactly how much the moment you run it.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Across the 156 reports people have sent in (thanks 🙏) since v1.8.0 added the option:
+Across the 156 reports people have sent in (thanks 🙏) since v1.8.0 added the option, 54% of machines had something to clear. Here is how much:
 
-| Outcome | Share | Smallest | Median | Largest |
-|---|---|---|---|---|
-| Nothing to remove | 47% | - | - | - |
-| Freed space | 53% | 0.1 GB | 21 GB | 327 GB |
+| Freed | Reports | |
+|---|---|---|
+| Under 1 GB | 13 | █████████████ |
+| 1 to 5 GB | 9 | █████████ |
+| 5 to 10 GB | 9 | █████████ |
+| 10 to 25 GB | 21 | █████████████████████ |
+| 25 to 50 GB | 24 | ████████████████████████ |
+| 50 to 100 GB | 5 | █████ |
+| More than 100 GB | 4 | ████ |
 <!-- reports-stats-end -->
 
 <details>
