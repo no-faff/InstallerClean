@@ -136,6 +136,11 @@ public sealed class MoveFilesService : IMoveFilesService
             var errors = new List<FileOperationError>();
             var failureLog = new PerFileFailureLog("Move",
                 "The per-file list is on the completion screen and in the result log.");
+            // Resolved once for the batch; the guard resolves each SOURCE per
+            // file against it (see InstallerCacheRoot). Separate from
+            // canonicalDestination above, which guards the other end and is
+            // re-resolved per iteration for a reason of its own.
+            var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
             var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
             var total = pathList.Count;
             bool cancelled = false;
@@ -198,7 +203,7 @@ public sealed class MoveFilesService : IMoveFilesService
                     // CandidateOutsideCache says so; an Unproven one is a path
                     // that could not be resolved at all, which is the same
                     // refusal without the same claim.
-                    var safety = CandidateGuard.CheckSafeToRemove(sourcePath, _installerFolderOverride);
+                    var safety = CandidateGuard.CheckSafeToRemove(sourcePath, cacheRoot);
                     if (safety == CandidateGuard.RemovalSafety.Refused)
                     {
                         errors.Add(new CandidateOutsideCache(sourcePath));

@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.IO.Abstractions;
 using System.Security;
 using InstallerClean.Interop.Native;
@@ -81,20 +82,22 @@ internal static class InstallerCacheHelpers
     ///
     /// The root itself answers false: a candidate is a file, and the folder is
     /// not one.
+    ///
+    /// The root arrives already resolved, as an <see cref="InstallerCacheRoot"/>
+    /// the caller made once for the whole run; the destination form above still
+    /// resolves its own, being asked once per batch rather than once per file.
     /// </summary>
-    internal static bool ResolvesDirectlyInInstallerFolder(string resolvedInput, string? installerFolderRoot = null)
+    internal static bool ResolvesDirectlyInInstallerFolder(string resolvedInput, InstallerCacheRoot root)
     {
         if (string.IsNullOrWhiteSpace(resolvedInput)) return false;
 
         var input = resolvedInput
             .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        var installer = ResolveFinalPath(installerFolderRoot ?? InstallerFolder)
-            .TrimEnd(Path.DirectorySeparatorChar);
 
         var parent = Path.GetDirectoryName(input);
         return parent is not null
             && parent.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                .Equals(installer, StringComparison.OrdinalIgnoreCase);
+                .Equals(root.Resolved, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -183,6 +186,10 @@ internal static class InstallerCacheHelpers
             probe = parent;
         }
 
+        // Rented, not allocated: this runs twice per file over a folder that
+        // reaches 800,000 of them, and a fresh 520-char array each time was the
+        // single largest thing the containment guard put through gen0.
+        var buffer = ArrayPool<char>.Shared.Rent(PathBufferLength);
         try
         {
             using var handle = Kernel32.CreateFile(
@@ -196,16 +203,19 @@ internal static class InstallerCacheHelpers
 
             if (handle.IsInvalid) return false;
 
-            var buffer = new char[PathBufferLength];
             var length = Kernel32.GetFinalPathNameByHandle(
                 handle, buffer, (uint)buffer.Length, Kernel32.VOLUME_NAME_DOS);
             if (length == 0) return false;
             if (length >= buffer.Length)
             {
                 // Buffer too small. The returned length includes the
-                // null terminator in the required-size case, so allocate
-                // exactly that many chars and retry.
-                buffer = new char[length];
+                // null terminator in the required-size case, so ask for
+                // exactly that many chars and retry. A rented array can come
+                // back larger than the request, which is why the retry passes
+                // the array's own length rather than the requested one.
+                var larger = ArrayPool<char>.Shared.Rent((int)length);
+                ArrayPool<char>.Shared.Return(buffer);
+                buffer = larger;
                 length = Kernel32.GetFinalPathNameByHandle(
                     handle, buffer, (uint)buffer.Length, Kernel32.VOLUME_NAME_DOS);
                 if (length == 0) return false;
@@ -230,6 +240,10 @@ internal static class InstallerCacheHelpers
         {
             resolved = normalised;
             return false;
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(buffer);
         }
     }
 

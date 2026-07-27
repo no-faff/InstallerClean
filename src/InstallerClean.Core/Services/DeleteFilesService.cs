@@ -111,6 +111,9 @@ public sealed class DeleteFilesService : IDeleteFilesService
             var errors = new List<FileOperationError>();
             var failureLog = new PerFileFailureLog("Delete",
                 "The per-file list is on the completion screen and in the result log.");
+            // Resolved once for the batch; the guard resolves each SOURCE per
+            // file against it (see InstallerCacheRoot).
+            var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
             bool cancelled = false;
 
             try
@@ -160,7 +163,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     // refused the same way and reported without the
                     // out-of-bounds claim; see the matching block in
                     // MoveFilesService.
-                    var safety = CandidateGuard.CheckSafeToRemove(filePath, _installerFolderOverride);
+                    var safety = CandidateGuard.CheckSafeToRemove(filePath, cacheRoot);
                     if (safety == CandidateGuard.RemovalSafety.Refused)
                     {
                         errors.Add(new CandidateOutsideCache(filePath));

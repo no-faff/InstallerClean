@@ -147,6 +147,50 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
+    public async Task ScanAsync_does_not_offer_a_reparse_point_at_the_cache_root()
+    {
+        // A symlink or junction sitting at the root, which the walk drops before
+        // anything else looks at it: following one would pull an OS file out of
+        // System32. The walk used to say this through
+        // EnumerationOptions.AttributesToSkip, which MockFileSystem ignores, so
+        // this could not be asserted until the test moved into managed code.
+        var mockQuery = QueryReturning(new InstallerQueryResult(new List<RegisteredPackage>().AsReadOnly()));
+
+        var fs = new MockFileSystem(new Dictionary<string, MockFileData>
+        {
+            [@"C:\Windows\Installer\plain.msi"] = new("x"),
+            [@"C:\Windows\Installer\link.msi"] = new("x")
+            {
+                Attributes = FileAttributes.Normal | FileAttributes.ReparsePoint,
+            },
+        });
+
+        var result = await new FileSystemScanService(mockQuery, fs).ScanAsync();
+
+        Assert.Single(result.RemovableFiles);
+        Assert.Equal(@"C:\Windows\Installer\plain.msi", result.RemovableFiles[0].FullPath);
+    }
+
+    [Fact]
+    public async Task ScanAsync_still_offers_hidden_and_system_cache_files()
+    {
+        // The other half of the same change. Real cache entries sometimes carry
+        // Hidden or System, and .NET's default AttributesToSkip is exactly those
+        // two, so a walk that took the default would quietly stop offering them.
+        var mockQuery = QueryReturning(new InstallerQueryResult(new List<RegisteredPackage>().AsReadOnly()));
+
+        var fs = new MockFileSystem(new Dictionary<string, MockFileData>
+        {
+            [@"C:\Windows\Installer\hidden.msi"] = new("x") { Attributes = FileAttributes.Hidden },
+            [@"C:\Windows\Installer\system.msp"] = new("x") { Attributes = FileAttributes.System },
+        });
+
+        var result = await new FileSystemScanService(mockQuery, fs).ScanAsync();
+
+        Assert.Equal(2, result.RemovableFiles.Count);
+    }
+
+    [Fact]
     public async Task ScanAsync_path_comparison_is_case_insensitive()
     {
         var registered = new List<RegisteredPackage>

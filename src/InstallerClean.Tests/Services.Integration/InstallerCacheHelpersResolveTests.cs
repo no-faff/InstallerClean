@@ -148,7 +148,7 @@ public class InstallerCacheHelpersResolveTests
         // symlink" nor "it is outside the cache" was established, and neither
         // may be reported.
         Assert.Equal(CandidateGuard.RemovalSafety.Unproven,
-            CandidateGuard.CheckSafeToRemove("C:\\Windows\\Installer\\bad\0name.msi"));
+            CandidateGuard.CheckSafeToRemove("C:\\Windows\\Installer\\bad\0name.msi", InstallerCacheRoot.Resolve()));
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public class InstallerCacheHelpersResolveTests
         // The other arm, so the test above is not passing merely because
         // everything answers Unproven.
         Assert.Equal(CandidateGuard.RemovalSafety.Refused,
-            CandidateGuard.CheckSafeToRemove(Path.Combine(Path.GetTempPath(), "outside.msi")));
+            CandidateGuard.CheckSafeToRemove(Path.Combine(Path.GetTempPath(), "outside.msi"), InstallerCacheRoot.Resolve()));
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class InstallerCacheHelpersResolveTests
         // the walk or from a LocalPackage value, is a bare filename at the root.
         WithCacheSandbox(root =>
             Assert.Equal(CandidateGuard.RemovalSafety.Safe,
-                CandidateGuard.CheckSafeToRemove(Path.Combine(root, "12ab34.msi"), root)));
+                CandidateGuard.CheckSafeToRemove(Path.Combine(root, "12ab34.msi"), InstallerCacheRoot.Resolve(root))));
     }
 
     [Fact]
@@ -179,7 +179,7 @@ public class InstallerCacheHelpersResolveTests
         // source guard exists for.
         WithCacheSandbox(root =>
             Assert.Equal(CandidateGuard.RemovalSafety.Refused,
-                CandidateGuard.CheckSafeToRemove(Path.Combine(root, "sub", "12ab34.msi"), root)));
+                CandidateGuard.CheckSafeToRemove(Path.Combine(root, "sub", "12ab34.msi"), InstallerCacheRoot.Resolve(root))));
     }
 
     [Fact]
@@ -191,7 +191,8 @@ public class InstallerCacheHelpersResolveTests
         WithCacheSandbox(root =>
             Assert.Equal(CandidateGuard.RemovalSafety.Refused,
                 CandidateGuard.CheckSafeToRemove(
-                    Path.Combine(root, "$PatchCache$", "Managed", "0AB", "1.0.0", "patch.msp"), root)));
+                    Path.Combine(root, "$PatchCache$", "Managed", "0AB", "1.0.0", "patch.msp"),
+                    InstallerCacheRoot.Resolve(root))));
     }
 
     [Fact]
@@ -201,7 +202,7 @@ public class InstallerCacheHelpersResolveTests
         // guard's own name a lie, whatever the services do with it afterwards.
         WithCacheSandbox(root =>
             Assert.Equal(CandidateGuard.RemovalSafety.Refused,
-                CandidateGuard.CheckSafeToRemove(root, root)));
+                CandidateGuard.CheckSafeToRemove(root, InstallerCacheRoot.Resolve(root))));
     }
 
     [Fact]
@@ -212,7 +213,8 @@ public class InstallerCacheHelpersResolveTests
         // so the trap cannot fire, and this is here to keep it that way.
         WithCacheSandbox(root =>
             Assert.Equal(CandidateGuard.RemovalSafety.Refused,
-                CandidateGuard.CheckSafeToRemove(root + "-notreally" + Path.DirectorySeparatorChar + "x.msi", root)));
+                CandidateGuard.CheckSafeToRemove(root + "-notreally" + Path.DirectorySeparatorChar + "x.msi",
+                    InstallerCacheRoot.Resolve(root))));
     }
 
     /// <summary>

@@ -54,7 +54,9 @@ internal static class CandidateGuard
     /// <c>IFileSystem</c> (see
     /// <see cref="InstallerCacheHelpers.TryResolveFinalPath"/> and
     /// <see cref="Helpers.StorageHelpers.CheckReparsePoint"/>), so a test's
-    /// MockFileSystem cannot make an out-of-bounds path look safe.
+    /// MockFileSystem cannot make an out-of-bounds path look safe. Both are
+    /// per file: what a run resolves once up front is the cache ROOT, and only
+    /// the root (<see cref="InstallerCacheRoot"/>).
     ///
     /// Unproven exists because the two kinds of caller want different words for
     /// it. At candidate creation it simply keeps the file off the list, and a
@@ -63,11 +65,13 @@ internal static class CandidateGuard
     /// naming a cause ("this file is a symlink", "this file is outside the
     /// cache") would each be asserting something no check here demonstrated.
     /// </summary>
-    /// <param name="installerFolderRoot">
-    /// Test-only real-folder override for the cache root (null in production).
-    /// See <see cref="InstallerCacheHelpers.IsInstallerFolderOrChild"/>.
+    /// <param name="root">
+    /// The cache root, resolved once for the whole run by the caller. It is a
+    /// parameter with no default so every caller has to say where its
+    /// resolution happens; see <see cref="InstallerCacheRoot"/> for why the
+    /// candidate's resolution stays per file while the root's does not.
     /// </param>
-    internal static RemovalSafety CheckSafeToRemove(string path, string? installerFolderRoot = null)
+    internal static RemovalSafety CheckSafeToRemove(string path, InstallerCacheRoot root)
     {
         if (string.IsNullOrWhiteSpace(path)) return RemovalSafety.Refused;
 
@@ -81,7 +85,7 @@ internal static class CandidateGuard
         if (!InstallerCacheHelpers.TryResolveFinalPath(path, out var resolved))
             return RemovalSafety.Unproven;
 
-        return InstallerCacheHelpers.ResolvesDirectlyInInstallerFolder(resolved, installerFolderRoot)
+        return InstallerCacheHelpers.ResolvesDirectlyInInstallerFolder(resolved, root)
             ? RemovalSafety.Safe
             : RemovalSafety.Refused;
     }

@@ -59,6 +59,51 @@ public class FileSystemScanServiceIntegrationTests : IDisposable
         Assert.Equal("orphan.msi", result.RemovableFiles[0].FileName);
     }
 
+    [Fact]
+    public async Task Real_directory_walk_matches_the_two_patterns_it_replaced()
+    {
+        // The walk is one pass over the folder filtered on the extension, where
+        // it used to be a "*.msi" pass concatenated with a "*.msp" one. This is
+        // the equivalence that swap rests on, asserted against the real matcher
+        // rather than argued: the names below are the ones where a pattern and
+        // an extension test could plausibly disagree.
+        var names = new[]
+        {
+            "a.msi", "b.msp", "UPPER.MSI", "MiXeD.MsP", ".msi",
+            "x.msix", "y.msi_old", "z.msi.bak", "readme.txt", "noext",
+        };
+        for (int i = 0; i < names.Length; i++)
+            File.WriteAllBytes(Path.Combine(_fakeInstallerDir, names[i]), new byte[i + 1]);
+
+        var options = new EnumerationOptions
+        {
+            RecurseSubdirectories = false,
+            AttributesToSkip = FileAttributes.ReparsePoint,
+            IgnoreInaccessible = true,
+        };
+        var byPattern = Directory.EnumerateFiles(_fakeInstallerDir, "*.msi", options)
+            .Concat(Directory.EnumerateFiles(_fakeInstallerDir, "*.msp", options))
+            .OrderBy(p => p, StringComparer.Ordinal)
+            .ToList();
+
+        var query = Substitute.For<IInstallerQueryService>();
+        query.GetRegisteredPackagesAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(new InstallerQueryResult(new List<RegisteredPackage>().AsReadOnly()));
+
+        var result = await new FileSystemScanService(query, null, _fakeInstallerDir).ScanAsync();
+        var walked = result.RemovableFiles
+            .Select(f => f.FullPath)
+            .OrderBy(p => p, StringComparer.Ordinal)
+            .ToList();
+
+        Assert.Equal(byPattern, walked);
+
+        // And the size on each row is the file's own, now that it is carried
+        // through from the directory entry instead of being read again.
+        foreach (var f in result.RemovableFiles)
+            Assert.Equal(new FileInfo(f.FullPath).Length, f.SizeBytes);
+    }
+
     public void Dispose()
     {
         try { if (Directory.Exists(_fakeInstallerDir)) Directory.Delete(_fakeInstallerDir, recursive: true); }

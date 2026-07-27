@@ -72,10 +72,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // window the scan keeps free.
         // ConfigureAwait(false): Core services do not bind to a caller's
         // SynchronizationContext.
-        List<string> diskFiles;
+        List<WalkedFile> diskFiles;
         if (_overrideFiles is not null)
         {
-            diskFiles = _overrideFiles as List<string> ?? _overrideFiles.ToList();
+            // An injected list has no directory entry behind it, so the size is
+            // asked for here. Test-only, which is why it is not worth a Task.Run.
+            diskFiles = _overrideFiles.Select(p => new WalkedFile(p, StatSize(p))).ToList();
         }
         else
         {
@@ -117,6 +119,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
             + "list offered for removal and nothing else about it is kept. Fewer files are offered, "
             + "never more.");
 
+        // Resolved once for the scan; both guard sites below resolve their own
+        // candidate per file against it (see InstallerCacheRoot).
+        var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
+
         long stillUsedBytes = 0;
         int missingNonRemovable = 0;
         int missingRemovable = 0;
@@ -130,16 +136,18 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // count is worth having.
         try
         {
-        foreach (var filePath in diskFiles)
+        foreach (var walked in diskFiles)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            var filePath = walked.FullPath;
             if (registeredPaths.Contains(filePath))
                 continue;
 
+            // Re-checked rather than trusted from the walk: the walk filters on
+            // the same test, but an override file list does not go through it.
             var ext = _fs.Path.GetExtension(filePath);
-            if (!ext.Equals(".msi", StringComparison.OrdinalIgnoreCase)
-                && !ext.Equals(".msp", StringComparison.OrdinalIgnoreCase))
+            if (!IsCacheExtension(ext))
                 continue;
 
             // Containment guard at candidate creation. A walk file is normally
@@ -149,7 +157,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             // unproven one is kept off the list under words that do not claim
             // more than the check showed, and a transient read failure
             // self-heals on the next scan.
-            var walkSafety = CandidateGuard.CheckSafeToRemove(filePath, _installerFolderOverride);
+            var walkSafety = CandidateGuard.CheckSafeToRemove(filePath, cacheRoot);
             if (walkSafety != CandidateGuard.RemovalSafety.Safe)
             {
                 refusalLog.Record(new InvalidOperationException(
@@ -160,19 +168,9 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 continue;
             }
 
-            long size = 0;
-            // IOException covers locked / vanished files; UnauthorizedAccess
-            // covers payload subfolders the elevated process still can't
-            // read (deeply ACL'd MSI directories); SecurityException covers
-            // the rare CAS-policy path. OOM and the like propagate.
-            try { size = _fs.FileInfo.New(filePath).Length; }
-            catch (IOException) { /* file vanished or locked */ }
-            catch (UnauthorizedAccessException) { /* unreadable subfolder */ }
-            catch (SecurityException) { /* CAS policy denies the FileInfo construction */ }
-
             removable.Add(new OrphanedFile(
                 FullPath: filePath,
-                SizeBytes: size,
+                SizeBytes: walked.SizeBytes,
                 IsPatch: ext.Equals(".msp", StringComparison.OrdinalIgnoreCase),
                 IsRemovablePatch: false,
                 IsObsoleted: false,
@@ -228,7 +226,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 // never descends. An unproven answer drops it too, logged under
                 // words that do not claim more than the check showed.
                 var patchSafety = exists
-                    ? CandidateGuard.CheckSafeToRemove(pkg.LocalPackagePath, _installerFolderOverride)
+                    ? CandidateGuard.CheckSafeToRemove(pkg.LocalPackagePath, cacheRoot)
                     : CandidateGuard.RemovalSafety.Refused;
                 if (exists && patchSafety == CandidateGuard.RemovalSafety.Safe)
                 {
@@ -310,47 +308,138 @@ public sealed class FileSystemScanService : IFileSystemScanService
     }
 
     /// <summary>
+    /// One file the walk found, carrying the size its directory entry already
+    /// held. Windows fills the size in as part of enumerating the folder, so
+    /// asking for it again per candidate was a second metadata read of a figure
+    /// already in hand: on an 800,000-entry cache folder, 776,000 of them.
+    ///
+    /// A directory entry's size can in principle lag a fresh read, for a file
+    /// with a writer still holding it open. Nothing decides anything on this
+    /// figure: it is the size column, the totals on the main screen and in the
+    /// confirmation dialog, and the freed-bytes figure the completion screen and
+    /// the opt-in result log carry. Which files are offered does not depend on
+    /// it, and a file being written is one the walk-before-query ordering, the
+    /// removable re-verify and the action-time gates already govern.
+    /// </summary>
+    private readonly record struct WalkedFile(string FullPath, long SizeBytes);
+
+    /// <summary>
     /// Enumerates the walk into a list, checking the cancellation token per
     /// file. Runs inside a <c>Task.Run</c> so the directory walk stays off the
     /// caller's thread (the GUI's dispatcher).
     /// </summary>
-    private List<string> MaterialiseInstallerFiles(string folder, CancellationToken cancellationToken)
+    private List<WalkedFile> MaterialiseInstallerFiles(string folder, CancellationToken cancellationToken)
     {
-        var list = new List<string>();
-        foreach (var filePath in GetInstallerFiles(folder))
+        var list = new List<WalkedFile>();
+        foreach (var file in GetInstallerFiles(folder))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            list.Add(filePath);
+            list.Add(file);
         }
         return list;
     }
 
-    private IEnumerable<string> GetInstallerFiles(string folder)
+    /// <summary>
+    /// The walk. One pass over the folder ROOT, yielding each cache file with
+    /// the size its directory entry already carried.
+    ///
+    /// Root only. A registered LocalPackage path only ever sits at the root, so
+    /// for any file in a subdirectory the API correlation carries no signal at
+    /// all: calling such a file orphaned would be asking Windows about a file it
+    /// was never told to track. Root-only makes the candidate set "files at the
+    /// root that no registered package claims", which cannot acquire a new blind
+    /// spot. Recursing instead needs a denylist ($PatchCache$, the patch
+    /// engine's baseline payload copies), and a denylist can only ever exclude a
+    /// subtree after it has already bitten someone; root-only puts that whole
+    /// subtree out of scope to begin with.
+    ///
+    /// One pass, not a pass for "*.msi" concatenated with a pass for "*.msp":
+    /// each pattern is a complete traversal of the folder's index, and the
+    /// second bought only the tenth of the entries that are patches. Filtering
+    /// here matches what .NET's own matcher does for those two patterns, which
+    /// runs in managed code against the long name (so neither form ever matched
+    /// an 8.3 short name), and it is the test the classification loop applies to
+    /// every candidate anyway.
+    ///
+    /// The three things the enumeration options used to say, said here instead,
+    /// because the entry's own metadata is wanted and only the
+    /// <see cref="IDirectoryInfo"/> form carries it, and that form rejects a
+    /// changed AttributesToSkip under the test double (System.IO.Abstractions
+    /// 22.2.0 raises NotSupportedException). SearchOption.TopDirectoryOnly maps
+    /// to AttributesToSkip = 0 and IgnoreInaccessible = false, so:
+    /// reparse points are skipped by the same test the option applied, keeping a
+    /// junction planted at the root from redirecting the walk outside it, and
+    /// now assertable against a MockFileSystem where the option never was;
+    /// Hidden and System stay included, because real cache entries sometimes
+    /// carry those attributes; and a folder the process cannot read yields
+    /// nothing rather than throwing, which is what IgnoreInaccessible bought and
+    /// is the only place this scan drops anything quietly. It drops in the safe
+    /// direction: fewer files offered, never more.
+    /// </summary>
+    private IEnumerable<WalkedFile> GetInstallerFiles(string folder)
     {
         if (!_fs.Directory.Exists(folder))
-            return Enumerable.Empty<string>();
+            yield break;
 
-        // Scan the folder ROOT only. A registered LocalPackage path only ever
-        // sits at the root, so for any file in a subdirectory the API
-        // correlation carries no signal at all: calling such a file orphaned
-        // would be asking Windows about a file it was never told to track.
-        // Root-only makes the candidate set "files at the root that no
-        // registered package claims", which cannot acquire a new blind spot.
-        // Recursing instead needs a denylist ($PatchCache$, the patch engine's
-        // baseline payload copies), and a denylist can only ever exclude a
-        // subtree after it has already bitten someone; root-only puts that whole
-        // subtree out of scope to begin with.
-        // Reparse points are skipped so a junction planted at the root cannot
-        // redirect enumeration outside it; Hidden and System stay included
-        // because real cache entries sometimes carry those attributes.
-        var options = new EnumerationOptions
+        using var entries = _fs.DirectoryInfo.New(folder)
+            .EnumerateFiles("*", SearchOption.TopDirectoryOnly)
+            .GetEnumerator();
+
+        while (true)
         {
-            RecurseSubdirectories = false,
-            AttributesToSkip = FileAttributes.ReparsePoint,
-            IgnoreInaccessible = true,
-        };
+            IFileInfo entry;
+            try
+            {
+                if (!entries.MoveNext()) yield break;
+                entry = entries.Current;
+            }
+            // The enumerator opens the folder on the first move, so a DACL that
+            // refuses the elevated process surfaces here. Access-denied only,
+            // matching what IgnoreInaccessible itself continued past.
+            catch (UnauthorizedAccessException) { yield break; }
 
-        return _fs.Directory.EnumerateFiles(folder, "*.msi", options)
-            .Concat(_fs.Directory.EnumerateFiles(folder, "*.msp", options));
+            if ((entry.Attributes & FileAttributes.ReparsePoint) != 0) continue;
+            if (!IsCacheExtension(entry.Extension)) continue;
+
+            yield return new WalkedFile(entry.FullName, SafeLength(entry));
+        }
+    }
+
+    private static bool IsCacheExtension(string extension) =>
+        extension.Equals(".msi", StringComparison.OrdinalIgnoreCase)
+        || extension.Equals(".msp", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// The size off an enumerated entry. On Windows the directory read already
+    /// returned it, so this costs nothing.
+    ///
+    /// IOException covers locked / vanished files; UnauthorizedAccess covers
+    /// payload subfolders the elevated process still can't read (deeply ACL'd
+    /// MSI directories); SecurityException covers the rare CAS-policy path. OOM
+    /// and the like propagate. A size that could not be read is 0, leaving the
+    /// file offered with a zero-byte row rather than dropped: what is offered
+    /// must not turn on whether its size could be read. Written out rather than
+    /// shared through a delegate, which would put a closure on the heap per
+    /// file over a loop this change exists to take allocation out of.
+    /// </summary>
+    private static long SafeLength(IFileInfo file)
+    {
+        try { return file.Length; }
+        catch (IOException) { return 0; }
+        catch (UnauthorizedAccessException) { return 0; }
+        catch (SecurityException) { return 0; }
+    }
+
+    /// <summary>
+    /// The same figure for a path the walk did not produce, so it has to be
+    /// asked for. The construction is inside the guard because that is what can
+    /// fail on the CAS-policy path. See <see cref="SafeLength"/> for the rest.
+    /// </summary>
+    private long StatSize(string path)
+    {
+        try { return _fs.FileInfo.New(path).Length; }
+        catch (IOException) { return 0; }
+        catch (UnauthorizedAccessException) { return 0; }
+        catch (SecurityException) { return 0; }
     }
 }
