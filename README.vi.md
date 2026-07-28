@@ -27,7 +27,7 @@
 
 - **Là gì:** InstallerClean chỉ làm một việc: nó loại bỏ những tệp không cần thiết khỏi `C:\Windows\Installer`, một thư mục ẩn mà Windows không bao giờ dọn dẹp. Sau một lần quét gần như tức thì, nó cho bạn biết bạn có tệp như vậy hay không, hiển thị thêm chi tiết cho ai tò mò, và cho phép bạn xóa chúng để giải phóng dung lượng trên ổ C:. Bạn dùng một lần rồi thôi.
 - **Có lẽ bạn đến đây vì:** Bạn đã dùng [WinDirStat](https://github.com/windirstat/windirstat), WizTree hoặc TreeSize, thấy `C:\Windows\Installer` chiếm rất nhiều dung lượng mà không biết bên trong có gì. InstallerClean chính là thứ bạn cần. Nó biết những tệp có tên trông ngẫu nhiên như `9f05cba.msi` chứa gì, và nhanh chóng cho bạn biết tệp nào có thể xóa an toàn.
-- **Giải phóng được bao nhiêu:** Các báo cáo (tùy chọn và ẩn danh) gửi về cho đến nay cho thấy <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> số máy có tệp không cần thiết để dọn. Trong số đó, trung vị giải phóng được là <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> và máy dọn được nhiều nhất là 327 GB<!-- reports-biggest-end -->. Với tôi thì được 1,28 GB. <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> còn lại không tìm thấy gì để loại bỏ, điều đó chỉ có nghĩa là thư mục Installer của họ vốn đã sạch. Xem thêm chi tiết trong phần [FAQ](#faq) bên dưới.
+- **Giải phóng được bao nhiêu:** Các báo cáo (tùy chọn và ẩn danh) gửi về cho đến nay cho thấy <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> số máy có tệp không cần thiết để dọn. Trong số đó, trung vị giải phóng được là <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> và một máy dọn được những 327 GB<!-- reports-biggest-end -->. Với tôi thì được 1,28 GB. <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> còn lại không tìm thấy gì để loại bỏ, điều đó chỉ có nghĩa là thư mục Installer của họ vốn đã sạch. Xem thêm chi tiết trong phần [FAQ](#faq) bên dưới.
 - **Có an toàn không:** Có. Nó hỏi chính API Windows Installer xem những tệp nào vẫn còn cần, và chỉ liệt kê những tệp Windows báo là đã dùng xong. Nó là mã nguồn mở (Apache 2.0) và không hỏi gì về bạn: không tài khoản, không quảng cáo, không theo dõi, không thu thập dữ liệu, không có gì chạy ngầm. Việc duy nhất nó tự mình làm trên mạng là kiểm tra GitHub xem có phiên bản mới hơn không mỗi khi bạn chạy nó, và bạn có thể tắt việc đó.
 - **Tải về:** [Tải bản phát hành mới nhất](../../releases/latest). Chạy nó; bấm qua [cảnh báo “Nhà phát hành không xác định”](#unknown-publisher) và [lời nhắc quyền quản trị](#admin). Xóa mọi tệp không cần thiết. Xong.
 
@@ -238,23 +238,20 @@ Nếu có điều gì ở đây cản trở bạn, hãy [mở một issue](../..
 **Tôi có thật sự giải phóng được hàng GB dung lượng không?** Còn tùy máy của bạn. Một bản Windows 11 cài mới không có phần mềm nào thêm thì chẳng có gì để loại bỏ. Một máy trạm của lập trình viên dùng lâu năm, hoặc bất kỳ máy nào có nhiều phần mềm dựa trên MSI (Acrobat, Office, LibreOffice, các công cụ phát triển lớn), có thể có hàng chục GB. Dù sao đi nữa, bạn sẽ thấy chính xác là bao nhiêu ngay khi chạy nó.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Trong số 156 báo cáo mọi người đã gửi về (cảm ơn 🙏) kể từ khi v1.8.0 thêm tùy chọn này, 54% số máy có thứ để dọn. Cụ thể là bao nhiêu:
+Từ v1.8.0 đã có tùy chọn gửi về một báo cáo ẩn danh ngắn gọn về kết quả. Đến nay đã nhận được 156 báo cáo (cảm ơn mọi người 🙏), và trong 54% số máy có thứ để dọn, trung vị giải phóng được là 19,9 GB. Một máy đã thu hồi tận 327 GB. Dưới đây là tóm tắt kết quả.
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-vi-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-vi-light.svg" />
+    <img alt="Biểu đồ cột cho biết bao nhiêu máy có thứ để dọn và mỗi máy giải phóng được bao nhiêu" src="docs/reports-vi-light.svg" width="800" />
   </picture>
 </p>
-<!-- reports-stats-end -->
 
-<details>
-<summary>Những báo cáo đó đến từ nút “Gửi báo cáo” tùy chọn. Đây là những gì bạn thấy trước khi có bất cứ thứ gì được gửi đi.</summary>
+Gửi báo cáo chỉ là một cú nhấp nút trong ứng dụng và hoàn toàn tùy bạn. Trong đó không có gì riêng tư, và bạn được xem đúng những gì sẽ gửi đi, như thế này:
 
 ![Hộp thoại xác nhận với tiêu đề “Gửi cái này?” hiển thị toàn bộ báo cáo sẽ được gửi: phiên bản ứng dụng, phiên bản Windows, số liệu quét, số tệp đã xử lý và số byte đã giải phóng, không có đường dẫn tệp, tên tệp hay mã định danh máy, kèm ghi chú rằng không có gì nhận dạng bạn hay máy của bạn, chỉ cho biết ứng dụng có hoạt động hay không và đã giải phóng được bao nhiêu dung lượng, với các nút Hủy và Gửi.](docs/screenshots/vi/optional-send-report-confirmation-dialog.webp)
-
-</details>
+<!-- reports-stats-end -->
 
 <a id="admin"></a>
 

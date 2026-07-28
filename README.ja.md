@@ -27,7 +27,7 @@
 
 - **概要：** InstallerClean がすることは 1 つだけです。Windows が一切クリーンアップしない隠しフォルダー `C:\Windows\Installer` から、不要なファイルを取り除きます。ほぼ一瞬で終わるスキャンのあと、不要なファイルがあるかどうかを知らせ、詳しく見たい人にはさらに詳細を示し、それらを削除して C: ドライブの空き容量を増やせるようにします。一度使ったら、それで終わりです。
 - **こんな覚えはありませんか：** [WinDirStat](https://github.com/windirstat/windirstat)、WizTree、TreeSize などでディスクを調べていて、`C:\Windows\Installer` が大量の容量を占めているのに気づいたものの、中に何が入っているのか分からなかった。InstallerClean は、まさにそんなあなたのためのツールです。`9f05cba.msi` のような一見ランダムな名前のファイルの中身を把握していて、どれなら安全に削除できるのかをすぐに教えてくれます。
-- **どれくらい空くか：** これまでに（任意・匿名で）送られてきたレポートでは、<!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> のマシンに掃除できる不要なファイルがありました。そのうち、解放できた容量の中央値は <!-- reports-median-start -->19.9 GB<!-- reports-median-end --><!-- reports-biggest-start --> で、最も多かった 1 件は 327 GB です<!-- reports-biggest-end -->。私の場合は 1.28 GB でした。残りの <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> は削除するものが見つからず、これは単に Installer フォルダーがすでにきれいだったというだけのことです。詳しくは下の [よくある質問](#よくある質問) をご覧ください。
+- **どれくらい空くか：** これまでに（任意・匿名で）送られてきたレポートでは、<!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> のマシンに掃除できる不要なファイルがありました。そのうち、解放できた容量の中央値は <!-- reports-median-start -->19.9 GB<!-- reports-median-end --><!-- reports-biggest-start --> で、1 台はなんと 327 GB を取り戻しています<!-- reports-biggest-end -->。私の場合は 1.28 GB でした。残りの <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> は削除するものが見つからず、これは単に Installer フォルダーがすでにきれいだったというだけのことです。詳しくは下の [よくある質問](#よくある質問) をご覧ください。
 - **安全性：** はい。どのファイルがまだ必要かを Windows インストーラー API 自身に問い合わせ、Windows が「用済み」と報告したファイルだけを一覧に出します。オープンソース（Apache 2.0）で、あなたについて何も尋ねません。アカウントも、広告も、追跡も、テレメトリもなく、バックグラウンドで動くものもありません。自分からオンラインで行うのは、起動時に GitHub で新しいバージョンがないか確認することだけで、これはオフにできます。
 - **入手方法：** [最新リリースをダウンロード](../../releases/latest)してください。実行し、[「不明な発行元」の警告](#unknown-publisher)と[管理者権限の確認](#admin)をクリックして進みます。不要なファイルがあれば削除します。これで完了です。
 
@@ -238,23 +238,20 @@ InstallerClean は、キーボードだけでも、スクリーンリーダー�
 **本当に数 GB も空きますか？** お使いのマシン次第です。追加ソフトを入れていないまっさらな Windows 11 では、削除するものは何もありません。長く使い込んだ開発用ワークステーションや、MSI ベースのソフトを多く入れたマシン（Acrobat、Office、LibreOffice、大規模な開発ツールなど）では、数十 GB になることもあります。いずれにせよ、実行した瞬間に、どれだけ空くかが正確にわかります。
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-v1.8.0 でこのオプションが追加されて以来、ご厚意で送っていただいた 156 件のレポート（ありがとうございます🙏）では、54% のマシンに片づけられるものがありました。その内訳です。
+v1.8.0 から、結果を短い匿名のレポートとして送れるオプションがあります。これまでに 156 件が届いていて（みなさんありがとうございます🙏）、片づけるものがあった 54% のマシンでは、解放できた容量の中央値は 19.9 GB でした。なんと 327 GB を取り戻したマシンも 1 台あります。結果をまとめると次のとおりです。
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-ja-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-ja-light.svg" />
+    <img alt="片づけるものがあったマシンの数と、解放できた容量を示す棒グラフ" src="docs/reports-ja-light.svg" width="800" />
   </picture>
 </p>
-<!-- reports-stats-end -->
 
-<details>
-<summary>こうしたレポートは、任意で押せる「レポートを送信」ボタンから送られます。送信前に表示される内容は次のとおりです。</summary>
+レポートの送信は、アプリでボタンを押すだけの、まったく任意のものです。個人的な情報は一切含まれず、送信される内容がそのまま次のように表示されます。
 
 ![「これを送信しますか？」と題された確認ダイアログ。送信される内容の全体が表示されている。アプリのバージョン、Windows のバージョン、スキャンの各件数、処理したファイル数、解放したバイト数。ファイルパスや名前、マシン ID は含まれず、あなたやマシンを特定するものは一切なく、アプリが動作したかどうかと解放した容量だけだという注記、そして「キャンセル」と「送信」のボタンがある。](docs/screenshots/ja/optional-send-report-confirmation-dialog.webp)
-
-</details>
+<!-- reports-stats-end -->
 
 <a id="admin"></a>
 

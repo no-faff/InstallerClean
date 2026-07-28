@@ -27,7 +27,7 @@
 
 - **En bref :** InstallerClean fait une seule chose : il supprime les fichiers inutiles de `C:\Windows\Installer`, un dossier caché que Windows ne nettoie jamais. Après une analyse quasi instantanée, il vous dit si vous en avez, donne plus de détails pour les curieux, et vous permet de les supprimer pour libérer de l'espace sur votre disque C:. Vous l'utilisez une fois, puis vous passez à autre chose.
 - **Vous êtes peut-être ici parce que :** vous avez utilisé [WinDirStat](https://github.com/windirstat/windirstat), WizTree ou TreeSize, vous avez vu que `C:\Windows\Installer` occupait beaucoup de place et vous ne saviez pas ce qu'il y avait dedans. InstallerClean est exactement ce qu'il vous faut. Il sait ce que contiennent ces fichiers aux noms apparemment aléatoires comme `9f05cba.msi` et vous dit rapidement lesquels vous pouvez supprimer sans risque.
-- **Combien d'espace :** Les rapports (facultatifs et anonymes) reçus jusqu'ici montrent que <!-- reports-freedpct-start -->54 %<!-- reports-freedpct-end --> des machines avaient des fichiers inutiles à nettoyer. Pour celles-ci, la médiane libérée est de <!-- reports-median-start -->19,9 Go<!-- reports-median-end --><!-- reports-biggest-start --> et le plus gros gain est de 327 Go<!-- reports-biggest-end -->. Pour moi, c'était 1,28 Go. Les <!-- reports-nothingpct-start -->46 %<!-- reports-nothingpct-end --> restants n'avaient rien à supprimer, ce qui veut simplement dire que leur dossier Installer était déjà propre. Plus de détails dans la [FAQ](#faq) ci-dessous.
+- **Combien d'espace :** Les rapports (facultatifs et anonymes) reçus jusqu'ici montrent que <!-- reports-freedpct-start -->54 %<!-- reports-freedpct-end --> des machines avaient des fichiers inutiles à nettoyer. Pour celles-ci, la médiane libérée est de <!-- reports-median-start -->19,9 Go<!-- reports-median-end --><!-- reports-biggest-start --> et une machine a récupéré pas moins de 327 Go<!-- reports-biggest-end -->. Pour moi, c'était 1,28 Go. Les <!-- reports-nothingpct-start -->46 %<!-- reports-nothingpct-end --> restants n'avaient rien à supprimer, ce qui veut simplement dire que leur dossier Installer était déjà propre. Plus de détails dans la [FAQ](#faq) ci-dessous.
 - **Est-ce sûr :** Oui. Il demande à l'API Windows Installer elle-même quels fichiers sont encore nécessaires et ne liste jamais que ceux dont Windows déclare avoir fini de se servir. C'est un logiciel open source (Apache 2.0) qui ne demande rien sur vous : pas de compte, pas de publicité, pas de pistage, pas de télémétrie, rien qui tourne en arrière-plan. La seule chose qu'il fait en ligne de lui-même, c'est vérifier sur GitHub s'il existe une version plus récente quand vous le lancez, et cela peut se désactiver.
 - **Comment l'obtenir :** [Téléchargez la dernière version](../../releases/latest). Lancez-la ; cliquez pour passer [l'avertissement « Éditeur inconnu »](#unknown-publisher) et [l'invite d'administrateur](#admin). Supprimez les fichiers inutiles. C'est tout.
 
@@ -238,23 +238,20 @@ Si quelque chose ici vous gêne, [ouvrez un ticket](../../issues). Les problème
 **Vais-je vraiment libérer des Go d'espace ?** Ça dépend de votre machine. Une installation neuve de Windows 11 sans logiciel supplémentaire n'a rien à supprimer. Une station de développement utilisée de longue date, ou toute machine chargée de logiciels basés sur MSI (Acrobat, Office, LibreOffice, gros outils de développement), peut en contenir des dizaines de Go. Dans tous les cas, vous verrez exactement combien dès que vous la lancez.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Sur les 156 rapports que des utilisateurs nous ont gentiment envoyés (merci 🙏) depuis que la v1.8.0 a ajouté l'option, 54 % des machines avaient quelque chose à nettoyer. Voici combien :
+Depuis la v1.8.0, il est possible d'envoyer un bref rapport anonyme du résultat. 156 nous sont parvenus jusqu'ici (merci à tous 🙏) et, sur les 54 % de machines qui avaient quelque chose à nettoyer, la médiane libérée est de 19,9 Go. Une machine a récupéré la bagatelle de 327 Go. Voici un résumé des résultats.
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-fr-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-fr-light.svg" />
+    <img alt="Diagramme en barres du nombre de machines qui avaient quelque chose à nettoyer et de l'espace libéré" src="docs/reports-fr-light.svg" width="800" />
   </picture>
 </p>
-<!-- reports-stats-end -->
 
-<details>
-<summary>Ces rapports proviennent du bouton facultatif « Envoyer le rapport ». Voici ce que vous verrez avant que quoi que ce soit ne soit envoyé.</summary>
+Envoyer un rapport, c'est un clic sur un bouton dans l'application, entièrement facultatif. Rien de personnel n'y figure et vous voyez exactement ce qui sera envoyé, comme ceci :
 
 ![Boîte de dialogue de confirmation intitulée « Envoyer ceci ? », montrant l'intégralité du rapport qui serait envoyé : version de l'application, version de Windows, compteurs d'analyse, fichiers traités et octets libérés, sans aucun chemin de fichier, nom ou identifiant de machine, et une note précisant que rien ne vous identifie, vous ou votre machine, seulement si l'application a fonctionné et combien d'espace a été libéré, avec les boutons Annuler et Envoyer.](docs/screenshots/fr/optional-send-report-confirmation-dialog.webp)
-
-</details>
+<!-- reports-stats-end -->
 
 <a id="admin"></a>
 

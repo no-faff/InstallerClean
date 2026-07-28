@@ -27,7 +27,7 @@
 
 - **Qué hace:** InstallerClean hace una sola cosa: elimina archivos innecesarios de `C:\Windows\Installer`, una carpeta oculta que Windows nunca limpia. Tras un análisis casi instantáneo te dice si tienes alguno, muestra más detalle para los curiosos y te deja eliminarlos para liberar espacio en tu unidad C:. Lo usas una vez y a otra cosa.
 - **Quizá estés aquí porque:** Usaste [WinDirStat](https://github.com/windirstat/windirstat), WizTree o TreeSize, viste que `C:\Windows\Installer` ocupaba mucho espacio y no sabías qué había dentro. InstallerClean es justo lo que necesitas. Sabe qué contienen esos archivos con nombres que parecen aleatorios como `9f05cba.msi` y te dice enseguida cuáles puedes eliminar sin riesgo.
-- **Cuánto espacio:** Los informes (opcionales y anónimos) enviados hasta ahora muestran que el <!-- reports-freedpct-start -->54 %<!-- reports-freedpct-end --> de los equipos tenían archivos innecesarios que limpiar. De esos, la mediana liberada es de <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> y el mayor fue de 327 GB<!-- reports-biggest-end -->. En mi caso fue de 1,28 GB. El otro <!-- reports-nothingpct-start -->46 %<!-- reports-nothingpct-end --> no encontró nada que eliminar, lo que solo significa que su carpeta Installer ya estaba limpia. Más detalle en las [Preguntas frecuentes](#preguntas-frecuentes) más abajo.
+- **Cuánto espacio:** Los informes (opcionales y anónimos) enviados hasta ahora muestran que el <!-- reports-freedpct-start -->54 %<!-- reports-freedpct-end --> de los equipos tenían archivos innecesarios que limpiar. De esos, la mediana liberada es de <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> y un equipo llegó a liberar la friolera de 327 GB<!-- reports-biggest-end -->. En mi caso fue de 1,28 GB. El otro <!-- reports-nothingpct-start -->46 %<!-- reports-nothingpct-end --> no encontró nada que eliminar, lo que solo significa que su carpeta Installer ya estaba limpia. Más detalle en las [Preguntas frecuentes](#preguntas-frecuentes) más abajo.
 - **¿Es seguro?** Sí. Le pregunta a la propia API de Windows Installer qué archivos siguen haciendo falta y solo enumera los que Windows da por terminados. Es de código abierto (Apache 2.0) y no pregunta nada sobre ti: sin cuenta, sin anuncios, sin seguimiento, sin telemetría, nada corriendo en segundo plano. Lo único que hace en línea por su cuenta es comprobar en GitHub si hay una versión más reciente cuando lo ejecutas, y eso puedes desactivarlo.
 - **Cómo obtenerlo:** [Descarga la última versión](../../releases/latest). Ejecútala; pasa [el aviso de «editor desconocido»](#unknown-publisher) y [la solicitud de permisos de administrador](#admin). Elimina los archivos innecesarios. Listo.
 
@@ -238,23 +238,20 @@ Si algo aquí te estorba, [abre un issue](../../issues). Los problemas de accesi
 **¿Realmente voy a liberar GB de espacio?** Depende de tu equipo. Una instalación limpia de Windows 11 sin software adicional no tiene nada que eliminar. Una estación de trabajo de desarrollo de larga vida, o cualquier equipo con mucho software basado en MSI (Acrobat, Office, LibreOffice, grandes herramientas de desarrollo), puede tener decenas de GB. En cualquier caso, verás exactamente cuánto en cuanto lo ejecutes.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-De los 156 informes que me han enviado amablemente (gracias 🙏) desde que la v1.8.0 añadió la opción, el 54 % de los equipos tenía algo que limpiar. Esto es cuánto:
+Desde la v1.8.0 se puede enviar un breve informe anónimo del resultado. Han llegado 156 hasta ahora (gracias a todos 🙏) y, del 54 % de equipos que tenían algo que limpiar, la mediana liberada es de 19,9 GB. Un equipo recuperó nada menos que 327 GB. Este es el resumen de los resultados.
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-es-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-es-light.svg" />
+    <img alt="Gráfico de barras del número de equipos que tenían algo que limpiar y del espacio que liberaron" src="docs/reports-es-light.svg" width="800" />
   </picture>
 </p>
-<!-- reports-stats-end -->
 
-<details>
-<summary>Esos informes provienen del botón opcional «Enviar informe». Esto es lo que verás antes de que se envíe nada.</summary>
+Enviar un informe es pulsar un botón en la aplicación, del todo opcional. No incluye nada personal y te muestra exactamente lo que se enviará, así:
 
 ![Diálogo de confirmación titulado «¿Enviar esto?» que muestra el informe completo que se enviaría: la versión de la aplicación, la versión de Windows, los recuentos del análisis, los archivos procesados y los bytes liberados, sin rutas de archivo, sin nombres ni identificadores de equipo, y con una nota de que nada te identifica a ti ni a tu equipo, solo si la aplicación funcionó y cuánto espacio se liberó, con los botones Cancelar y Enviar.](docs/screenshots/es/optional-send-report-confirmation-dialog.webp)
-
-</details>
+<!-- reports-stats-end -->
 
 <a id="admin"></a>
 

@@ -27,7 +27,7 @@
 
 - **Co:** InstallerClean robi jedną rzecz: usuwa niepotrzebne pliki z `C:\Windows\Installer`, ukrytego folderu, którego Windows nigdy nie czyści. Po niemal natychmiastowym skanowaniu mówi ci, czy w ogóle jakieś masz, pokazuje więcej szczegółów ciekawskim i pozwala je usunąć, by zwolnić miejsce na dysku C:. Uruchamiasz go raz i ruszasz dalej.
 - **Może jesteś tu, bo:** Użyłeś [WinDirStat](https://github.com/windirstat/windirstat), WizTree albo TreeSize, zobaczyłeś, że `C:\Windows\Installer` zajmuje mnóstwo miejsca, i nie wiedziałeś, co w nim siedzi. InstallerClean to dokładnie to, czego potrzebujesz. Wie, co kryje się w tych plikach o pozornie przypadkowych nazwach, jak `9f05cba.msi`, i szybko mówi ci, które z nich możesz bezpiecznie usunąć.
-- **Ile miejsca:** Nadesłane jak dotąd (opcjonalne i anonimowe) raporty pokazują, że <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> maszyn miało niepotrzebne pliki do wyczyszczenia. Na tych maszynach mediana zwolnionego miejsca to <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start -->, a największy wynik to 327 GB<!-- reports-biggest-end -->. U mnie było to 1,28 GB. Pozostałe <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> nie znalazły nic do usunięcia, co po prostu oznacza, że ich folder Installer był już czysty. Więcej szczegółów w [FAQ](#faq) poniżej.
+- **Ile miejsca:** Nadesłane jak dotąd (opcjonalne i anonimowe) raporty pokazują, że <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> maszyn miało niepotrzebne pliki do wyczyszczenia. Na tych maszynach mediana zwolnionego miejsca to <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start -->, a jedna maszyna odzyskała bagatela 327 GB<!-- reports-biggest-end -->. U mnie było to 1,28 GB. Pozostałe <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> nie znalazły nic do usunięcia, co po prostu oznacza, że ich folder Installer był już czysty. Więcej szczegółów w [FAQ](#faq) poniżej.
 - **Czy to bezpieczne:** Tak. Pyta samo API Windows Installer, które pliki są nadal potrzebne, i wymienia wyłącznie te, które Windows zgłasza jako już niepotrzebne. Jest otwartoźródłowy (Apache 2.0) i o nic cię nie pyta: bez konta, bez reklam, bez śledzenia, bez telemetrii, bez niczego działającego w tle. Jedyne, co robi w sieci z własnej inicjatywy, to sprawdza przy uruchomieniu, czy na GitHubie jest nowsza wersja, a to możesz wyłączyć.
 - **Pobierz:** [Pobierz najnowszą wersję](../../releases/latest). Uruchom; przeklikaj się przez [ostrzeżenie o „nieznanym wydawcy”](#unknown-publisher) i [monit administratora](#admin). Usuń wszelkie niepotrzebne pliki. Gotowe.
 
@@ -238,23 +238,20 @@ Jeśli cokolwiek tutaj ci przeszkadza, [zgłoś problem](../../issues). Problemy
 **Czy naprawdę zwolnię GB miejsca?** To zależy od twojej maszyny. Czysta instalacja Windows 11 bez dodatkowego oprogramowania nie ma nic do usunięcia. Długo używana stacja robocza dewelopera albo dowolna maszyna z dużą ilością oprogramowania opartego na MSI (Acrobat, Office, LibreOffice, duże narzędzia deweloperskie) może mieć dziesiątki GB. Tak czy inaczej, dokładnie zobaczysz ile, w chwili gdy ją uruchomisz.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Spośród 156 raportów, które nadesłano (dziękuję 🙏) od czasu, gdy opcję tę dodano w v1.8.0, 54% maszyn miało coś do wyczyszczenia. Oto ile:
+Od wersji v1.8.0 można przysłać krótki anonimowy raport z wyniku. Do tej pory przyszło ich 156 (dzięki wszystkim 🙏), a na tych 54% maszyn, które miały coś do wyczyszczenia, mediana zwolnionego miejsca to 19,9 GB. Jedna maszyna odzyskała aż 327 GB. Oto podsumowanie wyników.
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-pl-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-pl-light.svg" />
+    <img alt="Wykres słupkowy pokazujący, ile maszyn miało coś do wyczyszczenia i ile miejsca zwolniły" src="docs/reports-pl-light.svg" width="800" />
   </picture>
 </p>
-<!-- reports-stats-end -->
 
-<details>
-<summary>Te raporty pochodzą z opcjonalnego przycisku „Wyślij raport”. Oto co zobaczysz, zanim cokolwiek zostanie wysłane.</summary>
+Wysłanie raportu to jedno kliknięcie przycisku w aplikacji i jest całkowicie dobrowolne. Nie ma w nim nic osobistego, a przed wysłaniem widzisz dokładnie to, co zostanie wysłane, o tak:
 
 ![Okno potwierdzenia zatytułowane „Wysłać to?” pokazujące pełny raport, który zostałby wysłany: wersja aplikacji, wersja Windows, liczniki skanowania, przetworzone pliki i zwolnione bajty, bez ścieżek plików, nazw czy identyfikatorów maszyny, z informacją, że nic nie identyfikuje ciebie ani twojej maszyny, a jedynie to, czy aplikacja zadziałała i ile miejsca zwolniono, z przyciskami Anuluj i Wyślij.](docs/screenshots/pl/optional-send-report-confirmation-dialog.webp)
-
-</details>
+<!-- reports-stats-end -->
 
 <a id="admin"></a>
 

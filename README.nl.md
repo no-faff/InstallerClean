@@ -27,7 +27,7 @@
 
 - **Wat:** InstallerClean doet één ding: het verwijdert overbodige bestanden uit `C:\Windows\Installer`, een verborgen map die Windows nooit opruimt. Na een vrijwel onmiddellijke scan vertelt het je of je die hebt, laat het wie nieuwsgierig is meer detail zien en kun je ze verwijderen om ruimte vrij te maken op je C:-schijf. Je gebruikt het één keer en gaat weer verder.
 - **Je bent hier misschien omdat:** Je hebt [WinDirStat](https://github.com/windirstat/windirstat), WizTree of TreeSize gebruikt, zag dat `C:\Windows\Installer` veel ruimte innam en wist niet wat erin zat. InstallerClean is precies wat je nodig hebt. Het weet wat er in die bestanden met willekeurig ogende namen als `9f05cba.msi` zit en vertelt je snel welke je veilig kunt verwijderen.
-- **Hoeveel ruimte:** De (optionele en anonieme) rapporten die tot nu toe zijn ingestuurd laten zien dat <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> van de machines overbodige bestanden had om op te ruimen. Daarvan is de mediaan van de vrijgemaakte ruimte <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> en de grootste was 327 GB<!-- reports-biggest-end -->. Bij mij was het 1,28 GB. De overige <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> vond niets om te verwijderen, wat alleen maar betekent dat hun Installer-map al schoon was. Meer detail in de [FAQ](#faq) hieronder.
+- **Hoeveel ruimte:** De (optionele en anonieme) rapporten die tot nu toe zijn ingestuurd laten zien dat <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end --> van de machines overbodige bestanden had om op te ruimen. Daarvan is de mediaan van de vrijgemaakte ruimte <!-- reports-median-start -->19,9 GB<!-- reports-median-end --><!-- reports-biggest-start --> en één machine haalde er een slordige 327 GB uit<!-- reports-biggest-end -->. Bij mij was het 1,28 GB. De overige <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end --> vond niets om te verwijderen, wat alleen maar betekent dat hun Installer-map al schoon was. Meer detail in de [FAQ](#faq) hieronder.
 - **Is het veilig:** Ja. Het vraagt de Windows Installer-API zelf welke bestanden nog nodig zijn en toont alleen de bestanden waarvan Windows aangeeft dat het ermee klaar is. Het is open source (Apache 2.0) en vraagt niets over jou: geen account, geen advertenties, geen tracking, geen telemetrie, niets dat op de achtergrond draait. Het enige wat het uit zichzelf online doet, is bij het starten op GitHub kijken of er een nieuwere versie is, en dat kun je uitzetten.
 - **Downloaden:** [Download de nieuwste versie](../../releases/latest). Voer hem uit; klik je door [de melding over een onbekende uitgever](#unknown-publisher) en [de beheerdersvraag](#admin) heen. Verwijder eventuele overbodige bestanden. Klaar.
 
@@ -238,23 +238,20 @@ Zit iets je hier in de weg, [open dan een issue](../../issues). Toegankelijkheid
 **Ga ik echt GB's aan ruimte vrijmaken?** Dat hangt van je machine af. Een schone Windows 11-installatie zonder extra software heeft niets te verwijderen. Een ontwikkelwerkstation dat al jaren meegaat, of elke machine met veel MSI-software (Acrobat, Office, LibreOffice, grote ontwikkeltools), kan tientallen GB's hebben. Hoe dan ook zie je precies hoeveel op het moment dat je het draait.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Uit de 156 rapporten die mensen zo vriendelijk zijn geweest in te sturen (dank 🙏) sinds v1.8.0 de optie toevoegde, had 54% van de machines iets op te ruimen. Zo veel was dat:
+Sinds v1.8.0 kun je een kort anoniem rapport over de uitkomst insturen. Er zijn er tot nu toe 156 binnengekomen (dank jullie wel 🙏) en van de 54% machines die iets op te ruimen hadden, is de mediaan van de vrijgemaakte ruimte 19,9 GB. Eén machine haalde er maar liefst 327 GB uit. Hier is een samenvatting van de resultaten.
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-nl-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-nl-light.svg" />
+    <img alt="Staafdiagram van hoeveel machines iets op te ruimen hadden en hoeveel ze hebben vrijgemaakt" src="docs/reports-nl-light.svg" width="800" />
   </picture>
 </p>
-<!-- reports-stats-end -->
 
-<details>
-<summary>Die rapporten komen van de optionele knop “Rapport verzenden”. Dit zie je voordat er iets wordt verstuurd.</summary>
+Een rapport insturen is één klik op een knop in de app en helemaal vrijwillig. Er staat niets persoonlijks in en je krijgt precies te zien wat er verstuurd wordt, zo:
 
 ![Bevestigingsvenster met de titel “Dit versturen?” dat het volledige rapport toont dat verstuurd zou worden: appversie, Windows-versie, scantellingen, verwerkte bestanden en vrijgemaakte bytes, zonder bestandspaden, namen of machine-ID's, met de melding dat niets jou of je machine identificeert, alleen of de app werkte en hoeveel ruimte er is vrijgemaakt, en met de knoppen Annuleren en Verzenden.](docs/screenshots/nl/optional-send-report-confirmation-dialog.webp)
-
-</details>
+<!-- reports-stats-end -->
 
 <a id="admin"></a>
 

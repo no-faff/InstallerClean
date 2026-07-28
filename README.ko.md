@@ -27,7 +27,7 @@
 
 - **개요:** InstallerClean은 한 가지 일만 합니다. Windows가 한 번도 정리하지 않는 숨겨진 폴더 `C:\Windows\Installer`에서 불필요한 파일을 제거합니다. 거의 즉시 끝나는 검사 후, 그런 파일이 있는지 알려 주고, 궁금한 분께는 더 자세한 내용을 보여 주며, 그 파일을 삭제해 C: 드라이브 공간을 확보할 수 있게 합니다. 한 번 쓰고 나면 그걸로 끝입니다.
 - **이래서 오셨을지도 모릅니다:** [WinDirStat](https://github.com/windirstat/windirstat)나 WizTree, TreeSize를 써 보니 `C:\Windows\Installer`가 공간을 많이 차지하고 있는데, 그 안에 무엇이 들어 있는지는 알 수 없으셨을 겁니다. InstallerClean이 바로 필요한 도구입니다. `9f05cba.msi`처럼 알 수 없는 이름의 파일 안에 무엇이 들어 있는지 파악해, 어느 것을 안전하게 삭제할 수 있는지 빠르게 알려 줍니다.
-- **얼마나 비워지나:** 지금까지 (자발적으로, 익명으로) 보내 주신 보고서에 따르면, <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end -->의 컴퓨터에 정리할 불필요한 파일이 있었습니다. 그중 확보된 공간의 중앙값은 <!-- reports-median-start -->19.9GB<!-- reports-median-end --><!-- reports-biggest-start -->이고, 가장 많이 확보한 한 대는 327GB였습니다<!-- reports-biggest-end -->. 제 경우에는 1.28 GB였습니다. 나머지 <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end -->는 제거할 것을 찾지 못했는데, 이는 그저 Installer 폴더가 이미 깨끗했다는 뜻일 뿐입니다. 자세한 내용은 아래 [자주 묻는 질문](#자주-묻는-질문)을 참고하세요.
+- **얼마나 비워지나:** 지금까지 (자발적으로, 익명으로) 보내 주신 보고서에 따르면, <!-- reports-freedpct-start -->54%<!-- reports-freedpct-end -->의 컴퓨터에 정리할 불필요한 파일이 있었습니다. 그중 확보된 공간의 중앙값은 <!-- reports-median-start -->19.9GB<!-- reports-median-end --><!-- reports-biggest-start -->이고, 가장 많이 확보한 한 대는 자그마치 327GB였습니다<!-- reports-biggest-end -->. 제 경우에는 1.28 GB였습니다. 나머지 <!-- reports-nothingpct-start -->46%<!-- reports-nothingpct-end -->는 제거할 것을 찾지 못했는데, 이는 그저 Installer 폴더가 이미 깨끗했다는 뜻일 뿐입니다. 자세한 내용은 아래 [자주 묻는 질문](#자주-묻는-질문)을 참고하세요.
 - **안전한가요:** 네. 어떤 파일이 아직 필요한지를 Windows Installer API에 직접 물어보고, Windows가 다 썼다고 보고한 파일만 목록에 올립니다. 오픈 소스(Apache 2.0)이며 사용자에 대해 아무것도 묻지 않습니다. 계정도, 광고도, 추적도, 텔레메트리도 없고, 백그라운드에서 도는 것도 없습니다. 스스로 온라인으로 하는 일은 실행할 때 GitHub에 새 버전이 있는지 확인하는 것 하나뿐이고, 그마저도 끌 수 있습니다.
 - **받기:** [최신 릴리스를 다운로드하세요](../../releases/latest). 실행하고, [“알 수 없는 게시자” 경고](#unknown-publisher)와 [관리자 권한 요청](#admin)을 클릭해서 넘어가세요. 불필요한 파일을 삭제하세요. 끝입니다.
 
@@ -238,23 +238,20 @@ InstallerClean은 키보드만으로도, 스크린 리더와 함께도 완전히
 **정말 몇 GB씩 공간이 비워질까요?** 컴퓨터에 따라 다릅니다. 추가 소프트웨어 없이 갓 설치한 Windows 11에는 제거할 것이 없습니다. 오래 써 온 개발자 워크스테이션이나, MSI 기반 소프트웨어를 많이 쓰는 컴퓨터(Acrobat, Office, LibreOffice, 대형 개발 도구)라면 수십 GB가 나올 수도 있습니다. 어느 쪽이든, 실행하는 순간 정확히 얼마인지 보게 됩니다.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-v1.8.0에서 이 옵션이 추가된 이후 보내 주신 156건의 보고서(감사합니다 🙏)에서, 54%의 컴퓨터에 정리할 것이 있었습니다. 그 양은 다음과 같습니다:
+v1.8.0부터 결과를 짧은 익명 보고서로 보내 주실 수 있게 되었습니다. 지금까지 156건이 들어왔고(모두 감사합니다 🙏), 정리할 것이 있었던 54%의 컴퓨터에서 확보된 공간의 중앙값은 19.9GB입니다. 한 대는 무려 327GB를 되찾았습니다. 결과를 정리하면 다음과 같습니다.
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/reports-ko-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/reports-ko-light.svg" />
+    <img alt="정리할 것이 있었던 컴퓨터가 몇 대인지와 각각 얼마나 확보했는지를 보여 주는 막대그래프" src="docs/reports-ko-light.svg" width="800" />
   </picture>
 </p>
-<!-- reports-stats-end -->
 
-<details>
-<summary>이 보고서는 선택 사항인 ‘보고서 보내기’ 버튼을 통해 전송됩니다. 무언가 전송되기 전에 보게 될 내용은 다음과 같습니다.</summary>
+보고서 보내기는 앱에서 버튼 한 번 누르는 것뿐이고, 전적으로 선택 사항입니다. 개인적인 내용은 전혀 들어가지 않으며, 보내질 내용을 그대로 이렇게 보여 줍니다:
 
 ![제목이 "이 내용을 보내시겠습니까?"인 확인 대화상자. 전송될 보고서 전체가 표시됨: 앱 버전, Windows 버전, 검사 횟수, 처리된 파일 수, 확보된 바이트 수. 파일 경로나 이름, 컴퓨터 ID는 포함되지 않으며, 사용자나 컴퓨터를 식별하는 것은 전혀 없고 앱이 동작했는지와 공간이 얼마나 확보됐는지만 담긴다는 안내, 그리고 취소와 보내기 버튼이 있음.](docs/screenshots/ko/optional-send-report-confirmation-dialog.webp)
-
-</details>
+<!-- reports-stats-end -->
 
 <a id="admin"></a>
 
