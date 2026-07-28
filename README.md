@@ -250,13 +250,13 @@ If anything here gets in your way, [open an issue](../../issues). Accessibility 
 **Will I actually free up GBs of space?** It depends on your machine. A clean Windows 11 install with no extra software has nothing to remove. A long-running developer workstation, or any machine with heavy MSI-based software (Acrobat, Office, LibreOffice, large dev tools), can have tens of GB. Either way, you'll see exactly how much the moment you run it.
 
 <!-- reports-stats-start (generated; do not hand-edit between these markers) -->
-Since v1.8.0 there's been an option to send in a brief anonymous report of the outcome. 156 have come in so far (thanks everyone 🙏) and of the 54% of machines that had something to clear, the median freed is 19.9 GB. One machine reclaimed a pretty staggering 327 GB. Here's a summary of the results.
+Since v1.8.0 there's been an option to send in a brief anonymous report of the outcome. 156 have come in so far (thanks everyone 🙏) and of the 54% of machines that had something to clean up, the median freed is 19.9 GB. One machine reclaimed a pretty staggering 327 GB. Here's a summary of the results.
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/reports-en-dark.svg" />
     <source media="(prefers-color-scheme: light)" srcset="docs/reports-en-light.svg" />
-    <img alt="Bar chart of how many machines had something to clear and how much they freed" src="docs/reports-en-light.svg" width="800" />
+    <img alt="Bar chart of how many machines had something to clean up and how much they freed" src="docs/reports-en-light.svg" width="800" />
   </picture>
 </p>
 
