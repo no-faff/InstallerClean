@@ -39,6 +39,7 @@
 - [스크린샷](#스크린샷)
 - [작동 방식](#작동-방식)
 - [안전한가요?](#안전한가요)
+- [코드 서명 정책](#코드-서명-정책)
 - [C:\Windows\Installer에서 파일이 사라졌다면](#recovery)
 - [접근성](#접근성)
 - [하지 않는 일](#하지-않는-일)
@@ -178,6 +179,19 @@ Windows Installer가 지금 캐시에 쓰고 있거나, 이전 트랜잭션이 �
 - GitHub, MajorGeeks, Softpedia를 통틀어 <!-- downloads-start -->47,000+<!-- downloads-end --> 회 다운로드되었습니다.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html)는 제출된 각 파일을 가상 머신에서 테스트하고, 자체 검토를 통과한 경우에만 목록에 올립니다.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 인증 100% 클린" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml)는 각 릴리스를 바이러스, 스파이웨어, 애드웨어에 대해 검사합니다.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 인증 100% 클린" width="190"></a>
+
+## 코드 서명 정책
+
+InstallerClean은 [SignPath Foundation](https://signpath.org)에 무료 코드 서명을 신청해 두었습니다. 오픈 소스 소프트웨어에 서명을 해 주어, 그 소프트웨어가 알 수 없는 게시자로부터 여러분의 PC에 도착하는 일이 없도록 해 주는 프로그램입니다. 신청은 아직 심사 중이라, 지금 여기 있는 파일들은 서명되어 있지 않고 Windows가 경고를 냅니다.
+
+승인되면 각 릴리스에는 SignPath가 요청하는 문구인 “free code signing provided by SignPath.io, certificate by SignPath Foundation”이 붙습니다. 인증서는 제 것이 아니라 재단의 것입니다. 인증서는 법인에 발급되어야 하는데, 한 사람이 만드는 프로젝트는 법인이 아니기 때문입니다. 그렇다고 InstallerClean이 재단의 것이 되는 것도 아니고, 서명 말고 다른 부분에 재단이 관여하는 것도 아닙니다.
+
+**역할.** InstallerClean은 한 사람, 곧 제가 관리하며, 역할은 모두 제가 맡고 있습니다.
+
+- 커밋하는 사람과 검토하는 사람, 곧 프로젝트에 코드를 넣을 수 있는 사람: 접니다. 모든 풀 리퀘스트는 병합하기 전에 검토합니다.
+- 승인하는 사람, 곧 릴리스에 서명하도록 허가할 수 있는 사람: 접니다.
+
+**개인정보.** 저는 여러분에 대해서도, 여러분의 파일에 대해서도 아무것도 알지 못합니다. 전적으로 선택 사항인 익명 보고서를 직접 보내기로 하신 경우만 예외이고, 그마저도 앱이 잘 돌아간다고 제게 알려 줄 뿐입니다. 광고도, 텔레메트리도 없습니다. 그 밖의 연결은 앱을 실행할 때의 버전 확인(GitHub에 보내는 요청 한 번으로, 정보 창에서 끌 수 있습니다), 그리고 GitHub과 마음이 내키면 후원할 수 있는 페이지로 이어지는 버튼뿐입니다. 전체 [개인정보 처리방침](PRIVACY.md)은 여기 있습니다(영어).
 
 <a id="recovery"></a>
 ## `C:\Windows\Installer`에서 파일이 사라졌다면

@@ -39,6 +39,7 @@
 - [Zrzuty ekranu](#zrzuty-ekranu)
 - [Jak to działa](#jak-to-działa)
 - [Czy to bezpieczne?](#czy-to-bezpieczne)
+- [Polityka podpisywania kodu](#polityka-podpisywania-kodu)
 - [Jeśli jednak brakuje ci pliku w C:\Windows\Installer](#recovery)
 - [Dostępność](#dostępność)
 - [Czego nie robi](#czego-nie-robi)
@@ -178,6 +179,19 @@ Usługi skanowania, odpytywania, przenoszenia, usuwania, ustawień i oczekujące
 - <!-- downloads-start -->47 000+<!-- downloads-end --> pobrań w GitHub, MajorGeeks i Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) testuje każde zgłoszenie w maszynie wirtualnej i umieszcza je na liście tylko wtedy, gdy przejdzie ich kontrolę.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks: certyfikat 100% czystości" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) testuje każde wydanie pod kątem wirusów, programów szpiegujących i adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia: certyfikat 100% czystości" width="190"></a>
+
+## Polityka podpisywania kodu
+
+InstallerClean złożył wniosek do [SignPath Foundation](https://signpath.org) o bezpłatne podpisywanie kodu. To program, który podpisuje oprogramowanie open source, żeby przestało trafiać na twój komputer od nieznanego wydawcy. Wniosek czeka na rozpatrzenie, więc na razie pliki do pobrania nie są podpisane, a Windows będzie przed nimi ostrzegał.
+
+Jeśli zostanie przyjęty, każde wydanie będzie opatrzone wierszem, o który prosi SignPath: „free code signing provided by SignPath.io, certificate by SignPath Foundation”. Certyfikat należy do fundacji, a nie do mnie, bo certyfikat musi zostać wystawiony na podmiot prawny, a jednoosobowy projekt nim nie jest. Nie znaczy to, że InstallerClean jest ich ani że mają z nim coś wspólnego poza podpisem.
+
+**Role.** InstallerClean utrzymuje jedna osoba, czyli ja, i wszystkie należą do mnie:
+
+- Autorzy commitów i recenzenci, czyli kto może wprowadzać kod do projektu: ja. Każdy pull request jest sprawdzany przed scaleniem.
+- Zatwierdzający, czyli kto może zezwolić na podpisanie wydania: ja.
+
+**Prywatność.** Nie dowiaduję się niczego o tobie ani o twoich plikach, chyba że sam zdecydujesz się wysłać ten całkowicie opcjonalny anonimowy raport, który daje mi tylko znać, że wszystko działa. Bez reklam, bez telemetrii. Poza tym z siecią łączy się tylko po to, żeby przy uruchomieniu sprawdzić wersję (jedno zapytanie do GitHuba, które możesz wyłączyć w oknie O programie); są jeszcze przyciski z odnośnikami do GitHuba i do strony, na której możesz przekazać darowiznę, jeśli masz ochotę. Pełna [polityka prywatności](PRIVACY.md) (po angielsku).
 
 <a id="recovery"></a>
 ## Jeśli jednak brakuje ci pliku w `C:\Windows\Installer`

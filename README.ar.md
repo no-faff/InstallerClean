@@ -41,6 +41,7 @@
 - [لقطات الشاشة](#لقطات-الشاشة)
 - [كيف يعمل](#كيف-يعمل)
 - [هل هو آمن؟](#هل-هو-آمن)
+- [سياسة توقيع الشيفرة البرمجية](#سياسة-توقيع-الشيفرة-البرمجية)
 - [إذا فقدت بالفعل ملفاً من C:\Windows\Installer](#recovery)
 - [إمكانية الوصول](#إمكانية-الوصول)
 - [ما الذي لا يفعله](#ما-الذي-لا-يفعله)
@@ -180,6 +181,19 @@
 - <!-- downloads-start -->47,000+<!-- downloads-end --> عملية تنزيل عبر GitHub وMajorGeeks وSoftpedia.
 - يختبر [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) كل إصدار مُرسَل في جهاز افتراضي ولا يدرجه إلا إذا اجتاز مراجعتهم.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="شهادة MajorGeeks بنظافة 100%" width="263"></a>
 - يفحص [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) كل إصدار بحثاً عن الفيروسات وبرامج التجسس والإعلانات.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="شهادة Softpedia بنظافة 100%" width="190"></a>
+
+## سياسة توقيع الشيفرة البرمجية
+
+قدّم InstallerClean طلباً إلى [SignPath Foundation](https://signpath.org) للحصول على توقيع مجاني للشيفرة، وهو برنامج يوقّع البرمجيات مفتوحة المصدر حتى تكفّ عن الوصول إلى جهازك من ناشر غير معروف. والطلب قيد النظر، فالتنزيلات هنا غير موقّعة في الوقت الحالي وسينبّهك Windows بشأنها.
+
+وإن قُبل الطلب، فسيحمل كل إصدار السطر الذي تطلبه SignPath: «free code signing provided by SignPath.io, certificate by SignPath Foundation». والشهادة ملك للمؤسسة لا لي، لأن الشهادة لا بد أن تُصدر باسم كيان قانوني، ومشروع يديره شخص واحد ليس كذلك. وهذا لا يعني أن InstallerClean ملكهم، ولا أنهم يشاركون فيه بما يتجاوز التوقيع.
+
+**الأدوار.** يتولّى InstallerClean شخص واحد، هو أنا، وكلها بيدي:
+
+- المساهمون بالشيفرة ومراجعوها، أي من يمكنه إدخال شيفرة إلى المشروع: أنا. ويُراجَع كل طلب سحب قبل دمجه.
+- المعتمِدون، أي من يمكنه الإذن بتوقيع إصدار: أنا.
+
+**الخصوصية.** لا أعرف عنك ولا عن ملفاتك شيئاً، إلا أن تختار أنت إرسال ذلك التقرير المجهول الاختياري تماماً، وهو لا يفعل سوى أن يخبرني بأن التطبيق يعمل. لا إعلانات ولا قياس عن بُعد. والاتصالات الأخرى الوحيدة هي فحص الإصدار عند تشغيل التطبيق (طلب واحد إلى GitHub يمكنك إيقافه من نافذة «حول») وأزرار تحيل إلى GitHub وإلى صفحة يمكنك التبرع فيها إن طابت نفسك بذلك. [سياسة الخصوصية](PRIVACY.md) كاملةً (بالإنجليزية).
 
 <a id="recovery"></a>
 ## إذا فقدت بالفعل ملفاً من `C:\Windows\Installer`

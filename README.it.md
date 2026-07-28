@@ -39,6 +39,7 @@
 - [Schermate](#schermate)
 - [Come funziona](#come-funziona)
 - [È sicuro?](#è-sicuro)
+- [Politica di firma del codice](#politica-di-firma-del-codice)
 - [Se ti manca un file da C:\Windows\Installer](#recovery)
 - [Accessibilità](#accessibilità)
 - [Cosa non fa](#cosa-non-fa)
@@ -178,6 +179,19 @@ I servizi di scansione, interrogazione, spostamento, eliminazione, impostazioni 
 - <!-- downloads-start -->47.000+<!-- downloads-end --> download tra GitHub, MajorGeeks e Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) prova ogni invio in una macchina virtuale e lo pubblica solo se supera la loro revisione.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certificato 100% pulito da MajorGeeks" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analizza ogni versione alla ricerca di virus, spyware e adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificato 100% pulito da Softpedia" width="190"></a>
+
+## Politica di firma del codice
+
+InstallerClean ha fatto domanda alla [SignPath Foundation](https://signpath.org) per la firma del codice gratuita, un programma che firma il software open source perché smetta di arrivare sul tuo computer da un autore sconosciuto. La domanda è in attesa di risposta, quindi per ora i file scaricabili qui non sono firmati e Windows ti avviserà a riguardo.
+
+Se verrà accolta, ogni versione porterà la riga che SignPath chiede di riportare: «free code signing provided by SignPath.io, certificate by SignPath Foundation». Il certificato appartiene alla fondazione e non a me, perché un certificato deve essere intestato a un soggetto giuridico e un progetto di una persona sola non lo è. Questo non significa che InstallerClean sia loro, né che partecipino al progetto oltre alla firma.
+
+**Ruoli.** InstallerClean è mantenuto da una persona sola, io, e li ricopro tutti:
+
+- Chi scrive il codice e chi lo revisiona, cioè chi può inserire codice nel progetto: io. Ogni pull request viene revisionata prima di essere unita.
+- Chi approva, cioè chi può autorizzare la firma di una versione: io.
+
+**Privacy.** Non vengo a sapere nulla su di te né sui tuoi file, a meno che non scelga tu di inviare quel rapporto anonimo del tutto facoltativo, che serve solo a farmi sapere che funziona. Nessuna pubblicità, nessuna telemetria. Le uniche altre connessioni sono il controllo della versione all'avvio dell'app (una sola richiesta a GitHub, che puoi disattivare in Informazioni) e i pulsanti che rimandano a GitHub e a una pagina dove puoi fare una donazione, se ti va. L'[informativa sulla privacy](PRIVACY.md) completa (in inglese).
 
 <a id="recovery"></a>
 ## Se ti manca un file da `C:\Windows\Installer`

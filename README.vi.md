@@ -39,6 +39,7 @@
 - [Ảnh chụp màn hình](#ảnh-chụp-màn-hình)
 - [Cách hoạt động](#cách-hoạt-động)
 - [Có an toàn không?](#có-an-toàn-không)
+- [Chính sách ký số phần mềm](#chính-sách-ký-số-phần-mềm)
 - [Nếu bạn thật sự thiếu một tệp trong C:\Windows\Installer](#recovery)
 - [Khả năng tiếp cận](#khả-năng-tiếp-cận)
 - [Những gì nó không làm](#những-gì-nó-không-làm)
@@ -178,6 +179,19 @@ Các dịch vụ quét, truy vấn, chuyển, xóa, cài đặt và kiểm tra k
 - <!-- downloads-start -->47.000+<!-- downloads-end --> lượt tải trên GitHub, MajorGeeks và Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) kiểm tra mỗi lần gửi trong một máy ảo và chỉ đăng nếu nó vượt qua được phần đánh giá của họ.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Được MajorGeeks chứng nhận 100% sạch" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) kiểm tra mỗi bản phát hành để phát hiện virus, phần mềm gián điệp và phần mềm quảng cáo.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Được Softpedia chứng nhận 100% sạch" width="190"></a>
+
+## Chính sách ký số phần mềm
+
+InstallerClean đã nộp đơn xin [SignPath Foundation](https://signpath.org) ký số miễn phí. Đây là một chương trình ký số cho phần mềm mã nguồn mở, để phần mềm không còn đến máy bạn từ một nhà phát hành không xác định nữa. Đơn vẫn đang chờ xét, nên hiện tại các tệp tải về ở đây chưa được ký số và Windows sẽ cảnh báo về chúng.
+
+Nếu được chấp thuận, mỗi bản phát hành sẽ mang dòng chữ mà SignPath yêu cầu: “free code signing provided by SignPath.io, certificate by SignPath Foundation”. Chứng chỉ thuộc về quỹ chứ không thuộc về tôi, bởi chứng chỉ bắt buộc phải được cấp cho một pháp nhân, mà một dự án của một người thì không phải. Điều đó không có nghĩa là InstallerClean thuộc về họ, hay là họ tham gia vào nó ngoài việc ký số.
+
+**Các vai trò.** InstallerClean do một người duy nhất duy trì, là tôi, và tôi giữ tất cả:
+
+- Người commit và người rà soát, tức là ai được đưa mã vào dự án: tôi. Mọi pull request đều được rà soát trước khi hợp nhất.
+- Người phê duyệt, tức là ai được cho phép ký số một bản phát hành: tôi.
+
+**Quyền riêng tư.** Tôi không biết được gì về bạn hay về các tệp của bạn, trừ khi chính bạn chọn gửi bản báo cáo ẩn danh hoàn toàn tùy chọn kia, thứ chỉ cho tôi biết rằng ứng dụng đang chạy tốt. Không quảng cáo, không thu thập dữ liệu. Những kết nối duy nhất còn lại là lần kiểm tra phiên bản khi ứng dụng khởi động (một yêu cầu tới GitHub mà bạn có thể tắt trong cửa sổ Giới thiệu) và các nút dẫn tới GitHub cùng một trang bạn có thể quyên góp nếu thấy rộng lòng. [Chính sách quyền riêng tư](PRIVACY.md) đầy đủ (bằng tiếng Anh).
 
 <a id="recovery"></a>
 ## Nếu bạn thật sự thiếu một tệp trong `C:\Windows\Installer`

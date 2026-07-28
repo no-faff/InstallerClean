@@ -39,6 +39,7 @@
 - [Tangkapan layar](#tangkapan-layar)
 - [Cara kerjanya](#cara-kerjanya)
 - [Apakah aman?](#apakah-aman)
+- [Kebijakan penandatanganan kode](#kebijakan-penandatanganan-kode)
 - [Jika Anda memang punya file yang hilang dari C:\Windows\Installer](#recovery)
 - [Aksesibilitas](#aksesibilitas)
 - [Apa yang tidak dilakukannya](#apa-yang-tidak-dilakukannya)
@@ -178,6 +179,19 @@ Layanan pemindaian, kueri, pemindahan, penghapusan, pengaturan, dan mulai-ulang-
 - <!-- downloads-start -->47.000+<!-- downloads-end --> unduhan di GitHub, MajorGeeks, dan Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) menguji tiap kiriman di mesin virtual dan hanya mendaftarkannya jika lolos tinjauan mereka.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Disertifikasi MajorGeeks 100% bersih" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) menguji tiap rilis dari virus, spyware, dan adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Disertifikasi Softpedia 100% bersih" width="190"></a>
+
+## Kebijakan penandatanganan kode
+
+InstallerClean sudah mengajukan permohonan ke [SignPath Foundation](https://signpath.org) untuk penandatanganan kode gratis, sebuah program yang menandatangani perangkat lunak sumber terbuka supaya perangkat lunak itu tidak lagi sampai ke mesin Anda dari penerbit yang tidak dikenal. Permohonannya masih diproses, jadi untuk sekarang file unduhan di sini belum ditandatangani dan Windows akan memperingatkan Anda soal itu.
+
+Kalau disetujui, tiap rilis akan mencantumkan baris yang diminta SignPath: "free code signing provided by SignPath.io, certificate by SignPath Foundation". Sertifikatnya milik yayasan, bukan milik saya, karena sertifikat harus diterbitkan atas nama badan hukum, dan proyek satu orang bukan badan hukum. Ini bukan berarti InstallerClean milik mereka, atau bahwa mereka terlibat di dalamnya lebih jauh dari sekadar penandatanganan.
+
+**Peran.** InstallerClean dikelola satu orang, yaitu saya, dan semua peran ada di tangan saya:
+
+- Yang melakukan commit dan yang meninjau, yaitu siapa yang bisa memasukkan kode ke proyek: saya. Setiap pull request ditinjau sebelum digabungkan.
+- Yang menyetujui, yaitu siapa yang bisa mengizinkan sebuah rilis ditandatangani: saya.
+
+**Privasi.** Saya tidak tahu apa pun tentang Anda maupun file Anda, kecuali kalau Anda sendiri memilih mengirim laporan anonim yang sepenuhnya opsional itu, yang cuma memberi tahu saya bahwa aplikasinya berfungsi. Tanpa iklan, tanpa telemetri. Sambungan lainnya hanya pemeriksaan versi saat aplikasi dijalankan (satu permintaan ke GitHub yang bisa Anda matikan di jendela Tentang) dan tombol-tombol yang menautkan ke GitHub dan ke halaman tempat Anda bisa berdonasi kalau sedang berbaik hati. [Kebijakan privasi](PRIVACY.md) selengkapnya (dalam bahasa Inggris).
 
 <a id="recovery"></a>
 ## Jika Anda memang punya file yang hilang dari `C:\Windows\Installer`

@@ -39,6 +39,7 @@
 - [Screenshots](#screenshots)
 - [Hoe het werkt](#hoe-het-werkt)
 - [Is het veilig?](#is-het-veilig)
+- [Beleid voor code-ondertekening](#beleid-voor-code-ondertekening)
 - [Als er toch een bestand uit C:\Windows\Installer ontbreekt](#recovery)
 - [Toegankelijkheid](#toegankelijkheid)
 - [Wat het niet doet](#wat-het-niet-doet)
@@ -178,6 +179,19 @@ De services voor scannen, opvragen, verplaatsen, verwijderen, instellingen en ee
 - <!-- downloads-start -->47.000+<!-- downloads-end --> downloads via GitHub, MajorGeeks en Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) test elke inzending in een virtuele machine en neemt haar alleen op als ze hun beoordeling doorstaat.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Door MajorGeeks gecertificeerd: 100% schoon" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) test elke release op virussen, spyware en adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Door Softpedia gecertificeerd: 100% schoon" width="190"></a>
+
+## Beleid voor code-ondertekening
+
+InstallerClean heeft zich aangemeld bij de [SignPath Foundation](https://signpath.org) voor gratis code-ondertekening, een programma dat opensourcesoftware ondertekent zodat ze niet langer van een onbekende uitgever op je machine aankomt. De aanmelding loopt nog, dus voorlopig zijn de downloads hier niet ondertekend en waarschuwt Windows ervoor.
+
+Wordt ze goedgekeurd, dan draagt elke release de regel waar SignPath om vraagt: “free code signing provided by SignPath.io, certificate by SignPath Foundation”. Het certificaat is van de stichting en niet van mij, want een certificaat moet op naam van een rechtspersoon staan, en een project van één persoon is dat niet. Dat betekent niet dat InstallerClean van hen is, of dat ze er verder iets mee te maken hebben dan het ondertekenen.
+
+**Rollen.** InstallerClean wordt door één persoon onderhouden, door mij, en ik vervul ze allemaal:
+
+- Wie commit en wie nakijkt, oftewel wie er code in het project mag zetten: ik. Elke pull request wordt nagekeken voordat hij wordt samengevoegd.
+- Wie goedkeurt, oftewel wie toestemming mag geven om een release te ondertekenen: ik.
+
+**Privacy.** Ik kom niets te weten over jou of over je bestanden, tenzij je er zelf voor kiest dat volledig optionele anonieme rapport te sturen, dat me alleen laat weten dat het werkt. Geen advertenties, geen telemetrie. De enige andere verbindingen zijn de versiecontrole bij het starten van de app (één verzoek aan GitHub, dat je in het venster Over kunt uitzetten) en knoppen met links naar GitHub en naar een pagina waar je kunt doneren als je je gul voelt. Het volledige [privacybeleid](PRIVACY.md) (in het Engels).
 
 <a id="recovery"></a>
 ## Als er toch een bestand uit `C:\Windows\Installer` ontbreekt

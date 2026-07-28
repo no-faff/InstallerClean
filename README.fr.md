@@ -39,6 +39,7 @@
 - [Captures d'écran](#captures-décran)
 - [Comment ça marche](#comment-ça-marche)
 - [Est-ce sûr ?](#est-ce-sûr-)
+- [Politique de signature de code](#politique-de-signature-de-code)
 - [Si un fichier manque bel et bien dans C:\Windows\Installer](#recovery)
 - [Accessibilité](#accessibilité)
 - [Ce qu'il ne fait pas](#ce-quil-ne-fait-pas)
@@ -178,6 +179,19 @@ Les services d'analyse, de requête, de déplacement, de suppression, de réglag
 - <!-- downloads-start -->47 000+<!-- downloads-end --> téléchargements sur GitHub, MajorGeeks et Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) teste chaque soumission dans une machine virtuelle et ne la référence que si elle passe son contrôle.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certifié 100 % propre par MajorGeeks" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analyse chaque version à la recherche de virus, logiciels espions et publiciels.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certifié 100 % propre par Softpedia" width="190"></a>
+
+## Politique de signature de code
+
+InstallerClean a déposé une demande auprès de la [SignPath Foundation](https://signpath.org) pour une signature de code gratuite, un programme qui signe les logiciels open source afin qu'ils cessent d'arriver sur votre machine avec un éditeur inconnu. La demande est en cours d'examen, donc pour l'instant les téléchargements proposés ici ne sont pas signés et Windows vous mettra en garde à leur sujet.
+
+Si elle est acceptée, chaque version portera la ligne que SignPath demande : « free code signing provided by SignPath.io, certificate by SignPath Foundation ». Le certificat appartient à la fondation et non à moi, parce qu'un certificat doit être délivré à une personne morale, et un projet d'une seule personne n'en est pas une. Cela ne veut pas dire qu'InstallerClean leur appartient, ni qu'ils y participent au-delà de la signature.
+
+**Rôles.** InstallerClean est maintenu par une seule personne, moi, et je les cumule tous :
+
+- Ceux qui écrivent le code et ceux qui le relisent, c'est-à-dire qui peut faire entrer du code dans le projet : moi. Chaque pull request est relue avant d'être fusionnée.
+- Ceux qui approuvent, c'est-à-dire qui peut autoriser la signature d'une version : moi.
+
+**Confidentialité.** Je n'apprends rien sur vous ni sur vos fichiers, sauf si vous choisissez d'envoyer ce rapport anonyme entièrement facultatif, qui me signale simplement que ça fonctionne. Pas de publicité, pas de télémétrie. Les seules autres connexions sont la vérification de version au démarrage de l'application (une requête vers GitHub, que vous pouvez désactiver dans À propos) et des boutons renvoyant vers GitHub et vers une page où vous pouvez faire un don si le cœur vous en dit. [Politique de confidentialité](PRIVACY.md) complète (en anglais).
 
 <a id="recovery"></a>
 ## Si un fichier manque bel et bien dans `C:\Windows\Installer`

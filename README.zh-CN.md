@@ -39,6 +39,7 @@
 - [截图](#截图)
 - [工作原理](#工作原理)
 - [是否安全？](#是否安全)
+- [代码签名政策](#代码签名政策)
 - [万一您真的丢了 C:\Windows\Installer 里的文件](#recovery)
 - [无障碍](#无障碍)
 - [它不做什么](#它不做什么)
@@ -178,6 +179,19 @@ InstallerClean 会识别三类不需要的文件。
 - 在 GitHub、MajorGeeks 和 Softpedia 上累计 <!-- downloads-start -->47,000+<!-- downloads-end --> 次下载。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) 会在虚拟机中测试每一个提交上来的版本，只有通过审核才会收录。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 认证 100% 干净" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) 会对每个版本做病毒、间谍软件和广告软件检测。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 认证 100% 干净" width="190"></a>
+
+## 代码签名政策
+
+InstallerClean 已向 [SignPath Foundation](https://signpath.org) 申请免费的代码签名。这是一项为开源软件签名的计划，签过之后，软件到您机器上时就不再是来路不明的发布者了。申请还在审核中，所以这里的下载暂时都没有签名，Windows 会对它们发出警告。
+
+如果申请通过，每个发布版本都会带上 SignPath 要求的那行字：“free code signing provided by SignPath.io, certificate by SignPath Foundation”。证书属于基金会而不是我，因为证书必须签发给一个法律实体，而一个人的项目算不上。这并不表示 InstallerClean 是他们的，也不表示除了签名之外他们还参与了什么。
+
+**角色。** InstallerClean 由一个人维护，就是我，所有角色都在我身上：
+
+- 提交者与审核者，也就是谁能把代码放进项目：我。每一个 pull request 合并之前都会先经过审核。
+- 批准者，也就是谁能授权给一个发布版本签名：我。
+
+**隐私。** 关于您和您的文件，我什么都不会知道，除非您自己选择发送那份完全自愿的匿名报告，而它只是让我知道程序运转正常。没有广告，没有遥测。除此之外的联网只有两处：应用启动时的版本检查（向 GitHub 发一个请求，可以在“关于”窗口里关掉），以及指向 GitHub 和捐赠页面的按钮，捐赠全凭您的心意。完整的[隐私政策](PRIVACY.md)（英文）。
 
 <a id="recovery"></a>
 ## 万一您真的丢了 `C:\Windows\Installer` 里的文件

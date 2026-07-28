@@ -39,6 +39,7 @@
 - [スクリーンショット](#スクリーンショット)
 - [仕組み](#仕組み)
 - [安全ですか？](#安全ですか)
+- [コード署名のポリシー](#コード署名のポリシー)
 - [万一 C:\Windows\Installer のファイルが失われてしまったら](#recovery)
 - [アクセシビリティ](#アクセシビリティ)
 - [このアプリがしないこと](#このアプリがしないこと)
@@ -178,6 +179,19 @@ Windows インストーラーが今まさにキャッシュへ書き込んでい
 - GitHub、MajorGeeks、Softpedia を合わせて <!-- downloads-start -->47,000+<!-- downloads-end --> 回ダウンロードされています。
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) は各提出物を仮想マシンでテストし、審査を通過したものだけを掲載します。<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks 認証済み 100% クリーン" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) は各リリースをウイルス・スパイウェア・アドウェアについて検査しています。<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia 認証済み 100% クリーン" width="190"></a>
+
+## コード署名のポリシー
+
+InstallerClean は [SignPath Foundation](https://signpath.org) に無償のコード署名を申請しています。オープンソースソフトウェアに署名して、それが発行元不明のままあなたのマシンに届くことをなくす取り組みです。申請は審査中なので、ここにあるダウンロードは今のところ署名されておらず、Windows は警告を出します。
+
+承認されれば、各リリースには SignPath が求めている一文「free code signing provided by SignPath.io, certificate by SignPath Foundation」が入ります。証明書は私ではなく財団のものです。証明書は法人に対して発行しなければならず、一人だけのプロジェクトは法人ではないからです。だからといって InstallerClean が財団のものになるわけではありませんし、署名以外の部分で財団が関わっているわけでもありません。
+
+**役割。** InstallerClean を保守しているのは一人、私だけで、役割はすべて私が担っています。
+
+- コミットする人とレビューする人、つまりプロジェクトにコードを入れられるのは誰か：私です。プルリクエストはマージ前に必ずレビューします。
+- 承認する人、つまりリリースへの署名を許可できるのは誰か：私です。
+
+**プライバシー。** あなたのことも、あなたのファイルのことも、私には何も分かりません。分かるのは、まったく任意の匿名レポートを送ることをあなたが選んだ場合だけで、それも「ちゃんと動いています」と私に伝えるだけのものです。広告もテレメトリもありません。ほかに通信するのは、アプリ起動時のバージョン確認（GitHub への 1 回のリクエストで、「バージョン情報」からオフにできます）と、GitHub や、気が向いたら寄付できるページへのリンクになっているボタンだけです。[プライバシーポリシー](PRIVACY.md)の全文はこちらです（英語）。
 
 <a id="recovery"></a>
 ## 万一 `C:\Windows\Installer` のファイルが失われてしまったら

@@ -39,6 +39,7 @@
 - [Ekran görüntüleri](#ekran-görüntüleri)
 - [Nasıl çalışır](#nasıl-çalışır)
 - [Güvenli mi?](#güvenli-mi)
+- [Kod imzalama politikası](#kod-imzalama-politikası)
 - [C:\Windows\Installer'da eksik bir dosyanız varsa](#recovery)
 - [Erişilebilirlik](#erişilebilirlik)
 - [Neleri yapmaz](#neleri-yapmaz)
@@ -178,6 +179,19 @@ Tarama, sorgulama, taşıma, silme, ayarlar ve bekleyen yeniden başlatma hizmet
 - GitHub, MajorGeeks ve Softpedia üzerinden <!-- downloads-start -->47.000+<!-- downloads-end --> indirme.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) her gönderimi bir sanal makinede test eder ve yalnızca incelemelerinden geçerse listeler.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="MajorGeeks tarafından %100 temiz olarak onaylandı" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) her sürümü virüs, casus yazılım ve reklam yazılımı için test eder.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Softpedia tarafından %100 temiz olarak onaylandı" width="190"></a>
+
+## Kod imzalama politikası
+
+InstallerClean, ücretsiz kod imzalama için [SignPath Foundation](https://signpath.org)'a başvurdu; bu, açık kaynak yazılımları imzalayarak onların makinenize bilinmeyen bir yayımcıdan gelmesine son veren bir program. Başvuru henüz sonuçlanmadı, dolayısıyla buradaki indirmeler şimdilik imzasız ve Windows bunlar için uyarı verecek.
+
+Kabul edilirse her sürüm, SignPath'in istediği şu satırı taşıyacak: “free code signing provided by SignPath.io, certificate by SignPath Foundation”. Sertifika bana değil vakfa ait, çünkü bir sertifikanın tüzel bir kişiliğe düzenlenmesi gerekir ve tek kişilik bir proje tüzel kişilik değildir. Bu, InstallerClean'in onlara ait olduğu ya da imzalamanın ötesinde projeye karıştıkları anlamına gelmez.
+
+**Roller.** InstallerClean'i tek bir kişi, yani ben sürdürüyorum ve rollerin hepsi bende:
+
+- Commit edenler ve gözden geçirenler, yani projeye kimin kod ekleyebileceği: ben. Her çekme isteği birleştirilmeden önce gözden geçirilir.
+- Onaylayanlar, yani bir sürümün imzalanmasına kimin izin verebileceği: ben.
+
+**Gizlilik.** Ne sizin hakkınızda ne de dosyalarınız hakkında hiçbir şey öğrenmiyorum; tamamen isteğe bağlı olan o anonim raporu göndermeyi kendiniz seçmediğiniz sürece, ki o rapor da bana yalnızca uygulamanın çalıştığını bildiriyor. Reklam yok, telemetri yok. Bunun dışındaki tek bağlantılar, uygulama açılırken yapılan sürüm denetimi (GitHub'a tek bir istek; Hakkında penceresinden kapatabilirsiniz) ve GitHub'a ve cömert hissederseniz bağış yapabileceğiniz bir sayfaya götüren düğmeler. [Gizlilik politikasının](PRIVACY.md) tamamı (İngilizce).
 
 <a id="recovery"></a>
 ## C:\Windows\Installer'da eksik bir dosyanız varsa

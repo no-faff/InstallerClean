@@ -39,6 +39,7 @@
 - [Capturas de pantalla](#capturas-de-pantalla)
 - [Cómo funciona](#cómo-funciona)
 - [¿Es seguro?](#es-seguro)
+- [Política de firma de código](#política-de-firma-de-código)
 - [Si te llega a faltar un archivo de C:\Windows\Installer](#recovery)
 - [Accesibilidad](#accesibilidad)
 - [Lo que no hace](#lo-que-no-hace)
@@ -178,6 +179,19 @@ Los servicios de análisis, consulta, movimiento, eliminación, configuración y
 - <!-- downloads-start -->47.000+<!-- downloads-end --> descargas entre GitHub, MajorGeeks y Softpedia.
 - [MajorGeeks](https://www.majorgeeks.com/files/details/installerclean.html) prueba cada envío en una máquina virtual y solo lo publica si pasa su revisión.<br><a href="https://www.majorgeeks.com/files/details/installerclean.html"><img src="docs/badges/majorgeeks-certified.webp" alt="Certificado 100 % limpio por MajorGeeks" width="263"></a>
 - [Softpedia](https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml) analiza cada versión en busca de virus, spyware y adware.<br><a href="https://www.softpedia.com/get/System/Hard-Disk-Utils/InstallerClean.shtml"><img src="docs/badges/softpedia-100-free2.webp" alt="Certificado 100 % limpio por Softpedia" width="190"></a>
+
+## Política de firma de código
+
+InstallerClean ha solicitado la firma de código gratuita a la [SignPath Foundation](https://signpath.org), un programa que firma software de código abierto para que deje de llegar a tu equipo de un editor desconocido. La solicitud está pendiente, así que por ahora las descargas de aquí no están firmadas y Windows te avisará de ello.
+
+Si la aprueban, cada versión llevará la línea que pide SignPath: «free code signing provided by SignPath.io, certificate by SignPath Foundation». El certificado es de la fundación y no mío, porque un certificado tiene que emitirse a nombre de una entidad jurídica y un proyecto de una sola persona no lo es. Eso no significa que InstallerClean sea suyo, ni que participen en él más allá de la firma.
+
+**Roles.** InstallerClean lo mantiene una sola persona, yo, y los tengo todos:
+
+- Quienes hacen commits y quienes revisan, es decir, quién puede meter código en el proyecto: yo. Toda pull request se revisa antes de fusionarse.
+- Quienes aprueban, es decir, quién puede autorizar que se firme una versión: yo.
+
+**Privacidad.** No me entero de nada sobre ti ni sobre tus archivos, salvo que decidas enviar ese informe anónimo, que es totalmente opcional y solo sirve para que yo sepa que funciona. Sin anuncios, sin telemetría. Las únicas conexiones aparte de esa son la comprobación de versión al arrancar la aplicación (una petición a GitHub que puedes desactivar en Acerca de) y los botones que enlazan a GitHub y a una página donde puedes donar si te sientes generoso. La [política de privacidad](PRIVACY.md) completa (en inglés).
 
 <a id="recovery"></a>
 ## Si te llega a faltar un archivo de `C:\Windows\Installer`
