@@ -186,7 +186,7 @@ InstallerClean has applied to [SignPath Foundation](https://signpath.org) for fr
 
 If it's approved, releases will carry the line SignPath ask for: free code signing provided by SignPath.io, certificate by SignPath Foundation. The certificate belongs to the foundation rather than to me, because a certificate has to be issued to a legal entity and a one-person project isn't one. It doesn't mean InstallerClean is theirs, or that they're involved in it beyond the signing.
 
-**Roles.** InstallerClean is maintained by one person, me, [FarmLox](https://github.com/no-faff), and I hold all of them:
+**Roles.** InstallerClean is maintained by one person, me, and I hold all of them:
 
 - Committers and reviewers, meaning who can put code into the project: me. Every pull request is reviewed before it's merged.
 - Approvers, meaning who can authorise a release to be signed: me.
