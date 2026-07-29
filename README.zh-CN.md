@@ -428,4 +428,4 @@ InstallerClean 现已全面提供简体中文：应用、安装程序、命令�
 
 ---
 
-🎶 [George Formby - When I'm Cleaning Windows](https://www.youtube.com/watch?v=sfmAeijj5cM). 点开看看吧！
+🎶 [George Formby - When I'm Cleaning Windows](https://www.youtube.com/watch?v=P183Uo5Ust4). 点开看看吧！

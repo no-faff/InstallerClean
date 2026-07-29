@@ -429,4 +429,4 @@ Si InstallerClean vous a été utile, vous pouvez [soutenir No Faff](https://nof
 
 ---
 
-🎶 [George Formby - When I'm Cleaning Windows](https://www.youtube.com/watch?v=sfmAeijj5cM). Régalez-vous !
+🎶 [George Formby - When I'm Cleaning Windows](https://www.youtube.com/watch?v=P183Uo5Ust4). Régalez-vous !

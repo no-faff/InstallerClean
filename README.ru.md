@@ -428,4 +428,4 @@ dotnet test src/InstallerClean.Tests/
 
 ---
 
-🎶 [George Formby - When I'm Cleaning Windows](https://www.youtube.com/watch?v=sfmAeijj5cM). Приятного просмотра!
+🎶 [George Formby - When I'm Cleaning Windows](https://www.youtube.com/watch?v=P183Uo5Ust4). Приятного просмотра!
