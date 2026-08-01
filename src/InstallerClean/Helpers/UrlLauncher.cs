@@ -1,5 +1,4 @@
 using System.Windows;
-using InstallerClean.Helpers;
 using InstallerClean.Resources;
 
 namespace InstallerClean.Helpers;
@@ -14,11 +13,39 @@ namespace InstallerClean.Helpers;
 /// </summary>
 internal static class UrlLauncher
 {
+    /// <summary>
+    /// Starts the launch and returns at once. Every caller is a click handler
+    /// on the dispatcher thread and the chain underneath is six cross-process
+    /// COM calls into Explorer bounded at ten seconds, so run synchronously it
+    /// is up to ten seconds of a window that cannot repaint, which Windows
+    /// relabels "(Not Responding)" after five. It is quick while the shell is
+    /// healthy and slow exactly when it is not, and the links it serves are
+    /// the donate heart, the update link, the About links and the "Is it
+    /// safe?" hyperlink: the moments the app is asking to be trusted.
+    /// </summary>
     public static void OpenUrl(string url)
     {
-        var result = UnelevatedLauncher.OpenUrl(url);
-        if (result.Launched) return;
+        // Captured here rather than read on the worker: Application.Current is
+        // a static the worker would race with shutdown for.
+        var dispatcher = Application.Current?.Dispatcher;
 
+        Task.Run(() =>
+        {
+            // Returns a result for every outcome, exceptions included, so
+            // there is nothing here for the unobserved-task handler to catch.
+            if (UnelevatedLauncher.OpenUrl(url).Launched) return;
+
+            // Only the fallback comes back, and it has to: the clipboard needs
+            // an STA thread and the dialog is a window. Dropped if the app is
+            // going away, which is a user who clicked a link and closed the
+            // window inside the same second.
+            if (dispatcher is null || dispatcher.HasShutdownStarted) return;
+            dispatcher.InvokeAsync(() => ShowClipboardFallback(url));
+        });
+    }
+
+    private static void ShowClipboardFallback(string url)
+    {
         // Clipboard copy may itself fail on a session without an active
         // window station (Server Core, scheduled tasks, locked sessions).
         // Show the URL in the dialog body either way so the user has a
