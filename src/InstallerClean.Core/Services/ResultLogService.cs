@@ -70,7 +70,19 @@ public sealed class ResultLogService : IResultLogService
 
     public bool HasFreshLog => File.Exists(_logFile);
 
-    public async Task<bool> WriteAsync(ResultLogEntry entry, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Runs off the caller's thread from its first line, not from its first
+    /// await. The GUI awaits this on the dispatcher immediately after a Move or
+    /// a Delete, and the folder create, the serialise and the atomic open all
+    /// sit before the first await: on a roaming or redirected profile that is
+    /// network I/O on the UI thread. The token is deliberately not passed to
+    /// Task.Run, so a run cancelled before this starts still comes back as a
+    /// false rather than as a throw, which is what the caller handles.
+    /// </summary>
+    public Task<bool> WriteAsync(ResultLogEntry entry, CancellationToken cancellationToken = default) =>
+        Task.Run(() => WriteCoreAsync(entry, cancellationToken));
+
+    private async Task<bool> WriteCoreAsync(ResultLogEntry entry, CancellationToken cancellationToken)
     {
         // Named outside the try so every failure path below can remove it,
         // matching SettingsService.TrySave. A refused open, a cancelled token, a
@@ -168,7 +180,18 @@ public sealed class ResultLogService : IResultLogService
         }
     }
 
-    public async Task<string?> ReadLastLogAsync(CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Off the caller's thread from its first line, for the same reason as
+    /// <see cref="WriteAsync"/>: the existence check, the atomic open and the
+    /// length read all precede the first await, and this one is awaited on the
+    /// dispatcher with the send dialog about to open. The token is not passed to
+    /// Task.Run, so a cancellation still arrives as the rethrow below rather
+    /// than from the scheduler.
+    /// </summary>
+    public Task<string?> ReadLastLogAsync(CancellationToken cancellationToken = default) =>
+        Task.Run(() => ReadLastLogCoreAsync(cancellationToken));
+
+    private async Task<string?> ReadLastLogCoreAsync(CancellationToken cancellationToken)
     {
         if (!File.Exists(_logFile))
             return null;

@@ -106,6 +106,48 @@ public class SettingsServiceTests : IDisposable
     }
 
     [Fact]
+    public void A_file_that_cannot_be_read_is_not_renamed_aside()
+    {
+        // A lock is the everyday shape of a transient read failure, and the
+        // codebase names roaming and OneDrive-redirected profiles as where it
+        // bites. It is not corruption, and treating it as corruption costs the
+        // user the language, the backup folder, the update opt-out and the
+        // already-sent record in one step. Real filesystem, because sharing
+        // modes are a Windows behaviour.
+        var written = new AppSettings { MoveDestination = @"D:\backup" };
+        Assert.True(new SettingsService(_tempFile).TrySave(written));
+
+        using (File.Open(_tempFile, FileMode.Open, FileAccess.Read, FileShare.None))
+        {
+            var settings = new SettingsService(_tempFile).Load();
+            Assert.Equal(string.Empty, settings.MoveDestination);
+        }
+
+        Assert.True(File.Exists(_tempFile), "A file that could not be read must still be there");
+        Assert.False(File.Exists(_tempFile + ".bad"), "An unreadable file is not a corrupt one");
+        Assert.Equal(@"D:\backup", new SettingsService(_tempFile).Load().MoveDestination);
+    }
+
+    [Fact]
+    public void Update_refuses_to_write_over_a_file_it_could_not_read()
+    {
+        // The worse half of the same fault: Update is a read-modify-write, so a
+        // read that answered with defaults would write every other field back
+        // at its default. Refusing is what the bool return has always been for.
+        var written = new AppSettings { MoveDestination = @"D:\backup", Language = "fr-FR" };
+        Assert.True(new SettingsService(_tempFile).TrySave(written));
+
+        using (File.Open(_tempFile, FileMode.Open, FileAccess.Read, FileShare.None))
+        {
+            Assert.False(new SettingsService(_tempFile).Update(s => s.AutoUpdateCheck = false));
+        }
+
+        var after = new SettingsService(_tempFile).Load();
+        Assert.Equal(@"D:\backup", after.MoveDestination);
+        Assert.Equal("fr-FR", after.Language);
+    }
+
+    [Fact]
     public void TrySave_returns_true_on_success()
     {
         var svc = new SettingsService(_tempFile);

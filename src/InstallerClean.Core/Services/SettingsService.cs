@@ -48,14 +48,37 @@ public sealed class SettingsService : ISettingsService
 
     public AppSettings Load()
     {
+        TryLoad(out var settings);
+        return settings;
+    }
+
+    /// <summary>
+    /// Loads the settings, and separately reports whether the file was actually
+    /// read. False means the answer is defaults because the file could not be
+    /// read, not because there was nothing in it to read, and a caller about to
+    /// write must not write.
+    ///
+    /// The distinction is the difference between recovering a corrupt file and
+    /// destroying a good one. A settings.json that is locked, momentarily
+    /// unreadable, or on a profile a roaming or OneDrive-redirected setup has
+    /// taken away throws IOException or UnauthorizedAccessException, which is
+    /// not evidence of corruption; treating it as corruption loses the chosen
+    /// language, the backup folder, the update opt-out and the record that a
+    /// report has already been sent, and the last of those re-asks a user who
+    /// has already answered. Only a file that parsed as something other than
+    /// this schema is corrupt, and only that is renamed aside.
+    /// </summary>
+    private bool TryLoad(out AppSettings settings)
+    {
         try
         {
-            // OpenAtomic returns null if the file is missing or a
-            // symlink; both cases fall back to defaults.
             using var handle = StorageHelpers.OpenAtomic(
                 _settingsFile, FileAccess.Read, StorageHelpers.AtomicOpenMode.OpenExisting);
             if (handle is null)
-                return new AppSettings();
+            {
+                settings = new AppSettings();
+                return !RefusedRatherThanAbsent(_settingsFile);
+            }
 
             using var fs = new FileStream(handle, FileAccess.Read);
             if (fs.Length > MaxReadBytes)
@@ -63,26 +86,47 @@ public sealed class SettingsService : ISettingsService
 
             using var reader = new StreamReader(fs);
             var json = reader.ReadToEnd();
-            return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
+            settings = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
+            return true;
         }
-        catch (Exception ex) when (
-            ex is JsonException
-                or InvalidDataException
-                or IOException
-                or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is JsonException or InvalidDataException)
         {
-            // Recovery is scoped to JSON / IO / access-control failures
-            // because those are the only modes a settings.json should
-            // produce. Other types (OutOfMemoryException, StackOverflow)
-            // propagate; .bad-renaming on those would destroy a
-            // recoverable settings file in response to a system-wide
-            // problem.
+            // Corrupt: the bytes are there and are not this schema, so keeping
+            // them costs the user every future save. Renamed rather than
+            // deleted so the evidence survives one round, and the run carries
+            // on with defaults, which is the only thing left to carry on with.
+            // Other types (OutOfMemoryException, StackOverflow) propagate:
+            // renaming on those would destroy a recoverable file in response to
+            // a system-wide problem.
             var badFile = _settingsFile + ".bad";
             try { File.Move(_settingsFile, badFile, overwrite: true); }
             catch { }
-            return new AppSettings();
+            settings = new AppSettings();
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            settings = new AppSettings();
+            return false;
         }
     }
+
+    /// <summary>
+    /// Whether an open that came back null was refused rather than answering
+    /// that there is nothing there.
+    ///
+    /// <see cref="StorageHelpers.OpenAtomic"/> returns null for three states and
+    /// only one of them is a read failure: the file is missing, so defaults ARE
+    /// the settings; a reparse point sits at the name, which
+    /// <see cref="TrySave"/> deliberately replaces rather than follows, so a
+    /// save must still go ahead; or the open was refused, which is the
+    /// transient case a save would write over. Attributes that cannot be read
+    /// answer the same way as a refusal, a question that could not be put
+    /// having no better answer than the cautious one.
+    /// </summary>
+    private static bool RefusedRatherThanAbsent(string path) =>
+        File.Exists(path)
+        && StorageHelpers.CheckReparsePoint(path, out _) != StorageHelpers.ReparseCheck.Yes;
 
     /// <summary>Persists settings via write-temp-then-rename. Returns true on
     /// success. Never throws (disk full / OneDrive lock / read-only profile
@@ -132,7 +176,12 @@ public sealed class SettingsService : ISettingsService
     {
         lock (_ioGate)
         {
-            var settings = Load();
+            // A read that failed makes this a read-modify-write with no read in
+            // it: every field but the one being set would be written back at its
+            // default, which is the same loss as deleting the file and is why
+            // the load's success is asked for here. Reporting the save as failed
+            // is the truth and every caller already handles it.
+            if (!TryLoad(out var settings)) return false;
             mutate(settings);
             return TrySave(settings);
         }

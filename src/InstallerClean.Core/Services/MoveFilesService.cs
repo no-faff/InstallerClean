@@ -48,33 +48,42 @@ public sealed class MoveFilesService : IMoveFilesService
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        // Reject relative destinations: Path.GetFullPath would otherwise
-        // resolve them against the process CWD, and the CLI host's CWD
-        // is whatever the caller invoked it from.
-        if (!Path.IsPathFullyQualified(destinationFolder))
-            throw new LocalisedInvalidOperationException(
-                string.Format(Strings.Error_DestinationNotFullyQualified, destinationFolder));
-
-        // Destination must not resolve inside C:\Windows\Installer;
-        // ResolveFinalPath expands junctions so a reparse-point
-        // destination cannot smuggle the batch into the cache folder.
-        if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
-            throw new LocalisedInvalidOperationException(
-                string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
-
-        // System-folder gate at the service boundary, not just at the
-        // call sites: %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)%
-        // and %ProgramData% sit on the Win32 DLL search path and the
-        // SxS resolution path. Anchoring the check inside MoveFilesAsync
-        // means any future caller (integration test, new automation
-        // entry point) that bypasses the GUI/CLI validation block still
-        // hits the same gate.
-        if (InstallerCacheHelpers.IsSystemFolderOrChild(destinationFolder))
-            throw new LocalisedInvalidOperationException(
-                string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
-
         return Task.Run(() =>
         {
+            // The three destination gates are inside the worker, not on the
+            // caller's thread, which for the GUI is the dispatcher: two of them
+            // resolve a user-chosen path through CreateFile and
+            // GetFinalPathNameByHandle, twice over, and a mapped drive or a UNC
+            // share that has gone away stalls each one for the SMB timeout with
+            // the operating overlay already up and its Cancel button
+            // unpressable. They throw rather than returning, so the exception
+            // surfaces at the caller's await, where both callers catch it.
+
+            // Reject relative destinations: Path.GetFullPath would otherwise
+            // resolve them against the process CWD, and the CLI host's CWD
+            // is whatever the caller invoked it from.
+            if (!Path.IsPathFullyQualified(destinationFolder))
+                throw new LocalisedInvalidOperationException(
+                    string.Format(Strings.Error_DestinationNotFullyQualified, destinationFolder));
+
+            // Destination must not resolve inside C:\Windows\Installer;
+            // ResolveFinalPath expands junctions so a reparse-point
+            // destination cannot smuggle the batch into the cache folder.
+            if (InstallerCacheHelpers.IsInstallerFolderOrChild(destinationFolder))
+                throw new LocalisedInvalidOperationException(
+                    string.Format(Strings.Error_MoveIntoInstaller, destinationFolder));
+
+            // System-folder gate at the service boundary, not just at the
+            // call sites: %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)%
+            // and %ProgramData% sit on the Win32 DLL search path and the
+            // SxS resolution path. Anchoring the check inside MoveFilesAsync
+            // means any future caller (integration test, new automation
+            // entry point) that bypasses the GUI/CLI validation block still
+            // hits the same gate.
+            if (InstallerCacheHelpers.IsSystemFolderOrChild(destinationFolder))
+                throw new LocalisedInvalidOperationException(
+                    string.Format(Strings.Error_DestinationInSystemFolder, destinationFolder));
+
             // Hold Global\_MSIExecute for the batch on this worker thread so a
             // msiexec starting mid-move waits on the mutex instead of racing the
             // cache. Acquired here (not on the dispatcher) and released in the
