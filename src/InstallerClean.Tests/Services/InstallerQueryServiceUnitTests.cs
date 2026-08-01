@@ -413,6 +413,44 @@ public class InstallerQueryServiceUnitTests
         Assert.Contains(result.Packages, r => r.LocalPackagePath == ppath);
     }
 
+    // ---- Nothing claims a cached file at all ----
+
+    [Fact]
+    public async Task A_product_set_that_claims_nothing_refuses_the_scan()
+    {
+        // The single catastrophic-failure backstop, and the one refusal in this
+        // file that had no test: even a fresh Windows install has OS-level MSI
+        // products, so no claim at all means the records are damaged or
+        // unreadable, and a scan that believed the answer would call every file
+        // in C:\Windows\Installer orphaned.
+        var msi = new FakeMsiApi();
+
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() => Run(msi));
+
+        Assert.Equal(Strings.Error_InstallerDbEmpty, ex.Message);
+    }
+
+    [Fact]
+    public async Task A_claim_from_the_fallback_alone_is_enough_to_scan()
+    {
+        // Worth as much as the refusal above and easier to break: the count is
+        // tested AFTER the fallback has run, so an API that returns no product
+        // while the registry still names a cached file is a scan, not a
+        // refusal. Reordering the gate would turn that machine's ordinary run
+        // into "the installer database is empty".
+        const string fromRegistry = @"C:\Windows\Installer\registry-only.msi";
+        var msi = new FakeMsiApi();
+
+        var result = await new InstallerQueryService(msi, (claimed, _) =>
+        {
+            claimed[fromRegistry] = new RegisteredPackage(fromRegistry, "", "");
+            return 0;
+        }).GetRegisteredPackagesAsync();
+
+        Assert.Equal(fromRegistry, Assert.Single(result.Packages).LocalPackagePath);
+        Assert.Equal(0, result.UnreadableProductCount);
+    }
+
     // ---- The index cap ends enumeration loudly, not silently ----
 
     // The message is asserted, not just the type, because the cap and the

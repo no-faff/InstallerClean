@@ -71,6 +71,88 @@ public class DisplayHelpersTests
     }
 
     [Theory]
+    [InlineData(1, "One")]
+    [InlineData(2, "Few")]
+    [InlineData(4, "Few")]
+    [InlineData(22, "Few")]
+    [InlineData(24, "Few")]
+    [InlineData(0, "Many")]
+    [InlineData(5, "Many")]
+    [InlineData(11, "Many")]
+    [InlineData(14, "Many")]
+    [InlineData(25, "Many")]
+    public void CategoryFor_polish_selects_one_few_many(int n, string expected)
+    {
+        Assert.Equal(expected, DisplayHelpers.CategoryFor(new CultureInfo("pl"), n).ToString());
+    }
+
+    [Theory]
+    [InlineData(21)]
+    [InlineData(101)]
+    [InlineData(31)]
+    public void CategoryFor_polish_parts_company_with_east_slavic_above_twenty(int n)
+    {
+        // The one this file exists for. Polish "one" is strictly n == 1, where
+        // Russian and Ukrainian also take 21, 31 and 101, and the two branches
+        // sit next to each other reading almost alike: folding Polish into the
+        // one above it would make every Polish count ending in 1 read as a
+        // singular, and nothing but the code's own comment stood in the way.
+        Assert.Equal("Many", DisplayHelpers.CategoryFor(new CultureInfo("pl"), n).ToString());
+        Assert.Equal("One", DisplayHelpers.CategoryFor(new CultureInfo("ru"), n).ToString());
+        Assert.Equal("One", DisplayHelpers.CategoryFor(new CultureInfo("uk"), n).ToString());
+    }
+
+    [Theory]
+    [InlineData("fr", 0, "One")]
+    [InlineData("fr", 1, "One")]
+    [InlineData("fr", 2, "Other")]
+    [InlineData("pt", 0, "One")]
+    [InlineData("pt", 1, "One")]
+    [InlineData("pt", 2, "Other")]
+    public void CategoryFor_french_and_portuguese_take_zero_as_singular(string culture, int n, string expected)
+    {
+        Assert.Equal(expected, DisplayHelpers.CategoryFor(new CultureInfo(culture), n).ToString());
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(5)]
+    public void CategoryFor_turkish_never_inflects(int n)
+    {
+        // A Turkish noun stays singular after a numeral, so the count sentence
+        // does not inflect at all and "one" would be the wrong fragment even at
+        // one.
+        Assert.Equal("Other", DisplayHelpers.CategoryFor(new CultureInfo("tr"), n).ToString());
+    }
+
+    [Theory]
+    [InlineData("ja")]
+    [InlineData("ko")]
+    [InlineData("zh")]
+    [InlineData("id")]
+    [InlineData("vi")]
+    public void CategoryFor_uninflected_languages_are_always_other(string culture)
+    {
+        foreach (var n in new[] { 0, 1, 2, 5, 21 })
+            Assert.Equal("Other", DisplayHelpers.CategoryFor(new CultureInfo(culture), n).ToString());
+    }
+
+    [Theory]
+    [InlineData("en")]
+    [InlineData("de")]
+    [InlineData("es")]
+    [InlineData("it")]
+    [InlineData("nl")]
+    public void CategoryFor_defaults_to_singular_only_at_one(string culture)
+    {
+        Assert.Equal("One", DisplayHelpers.CategoryFor(new CultureInfo(culture), 1).ToString());
+        foreach (var n in new[] { 0, 2, 5, 21 })
+            Assert.Equal("Other", DisplayHelpers.CategoryFor(new CultureInfo(culture), n).ToString());
+    }
+
+    [Theory]
     [InlineData("de-DE", "1,0 KB")]
     [InlineData("fr-FR", "1,0 KB")]
     [InlineData("en-GB", "1.0 KB")]
