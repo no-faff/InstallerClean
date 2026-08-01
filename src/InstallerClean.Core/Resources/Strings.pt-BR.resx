@@ -1060,7 +1060,7 @@ Não foi possível gravar o crash.log.</value></data>
 
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Foi encontrado {0} {1} registrado.</value></data>
   <data name="Cli.FoundOrphans.One" xml:space="preserve"><value>Encontrado {0} {1} para limpar ({2}).</value></data>
-  <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Excluído {0} {1}.</value></data>
+  <data name="Cli.DeletedFiles.One" xml:space="preserve"><value>Permanently deleted {0} {1}.</value></data>
   <data name="Cli.MovedFiles.One" xml:space="preserve"><value>Movido {0} {1}.</value></data>
   <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>{0} {1} mantido no lugar: um programa voltou a precisar dele depois da análise.</value></data>
   <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>{0} {1} mantido no lugar: não foi possível ler por completo os registros do Windows Installer quando a verificação foi repetida.</value></data>

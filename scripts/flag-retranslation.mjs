@@ -16,6 +16,16 @@
 // the arity matches. Setting the value back to English converts that silent
 // staleness into a hard generation failure that cannot be missed.
 //
+// A key's satellite-only CLDR plural overrides (Key.One/.Few/.Many, which exist
+// in no neutral file) are reset with it, because they are the same sentence in
+// another count form and go stale by the same edit. Nine languages carry 70 of
+// them and one release rewrote the base of five, in five languages, leaving copy
+// on screen that the neutral had just had cut. Every guard was blind to it by
+// construction, an override having no neutral counterpart to be compared with;
+// check-still-english.mjs now compares one against the neutral value it
+// overrides, which is what makes this half of the pair enforceable rather than
+// merely intended.
+//
 // Usage (from the repo root):
 //   node scripts/flag-retranslation.mjs Completion.CleanedUp Completion.DeleteRestoreHint ...
 //
@@ -49,6 +59,18 @@ if (unknown.length) {
   process.exit(2);
 }
 
+// The prefix whose .One/.Few/.Many overrides take THIS key as their base,
+// inverting the rule the generators' own self-check resolves an override with
+// (base = the <Prefix>.Plural sibling if the neutral has one, else the flat
+// key). A .Singular is never that base, so flagging one drives no override; its
+// .Plural sibling, flagged in the same run, is what does.
+const overridePrefix = (key) => {
+  if (key.endsWith('.Plural')) return key.slice(0, -'.Plural'.length);
+  if (key.endsWith('.Singular')) return null;
+  return neutralValue(`${key}.Plural`) === null ? key : null;
+};
+const CATEGORIES = ['One', 'Few', 'Many'];
+
 // Escape a raw value for a single-line JS template literal (backslash first so
 // the escapes added for $, CR and LF are not doubled).
 const esc = (v) => v
@@ -67,14 +89,30 @@ if (files.length === 0) {
   process.exit(1);
 }
 
-let totalReset = 0, totalAdded = 0;
+let totalReset = 0, totalAdded = 0, totalOverrides = 0;
 for (const file of files) {
   const path = `${GENDIR}/${file}`;
   let text = readFileSync(path, 'utf8');
-  const reset = [], added = [];
+  const reset = [], added = [], overrides = [];
 
   for (const key of keys) {
     const english = esc(neutralValue(key));
+
+    // Overrides first, and RESET ONLY: an override is a form the language chose
+    // to declare, so a language that declared none for this key must not gain
+    // one here. The base's English is what goes in, that being what the
+    // override overrides and the only English there is for it.
+    const prefix = overridePrefix(key);
+    if (prefix !== null) {
+      for (const category of CATEGORIES) {
+        const name = `${prefix}.${category}`;
+        const re = new RegExp("('" + reEsc(name) + "':\\s*`)((?:\\\\.|[^`\\\\])*)(`)");
+        if (!re.test(text)) continue;
+        text = text.replace(re, (_m, p1, _body, p3) => p1 + english + p3);
+        overrides.push(name);
+      }
+    }
+
     // An existing 'Key': `template-literal`, entry (the inner group tolerates
     // escaped chars so a value containing \` or \\ does not end the match early).
     const entryRe = new RegExp("('" + reEsc(key) + "':\\s*`)((?:\\\\.|[^`\\\\])*)(`)");
@@ -105,14 +143,16 @@ for (const file of files) {
   writeFileSync(path, text, 'utf8');
   totalReset += reset.length;
   totalAdded += added.length;
+  totalOverrides += overrides.length;
   const parts = [];
   if (reset.length) parts.push(`reset ${reset.length}`);
   if (added.length) parts.push(`appended ${added.length}`);
+  if (overrides.length) parts.push(`reset ${overrides.length} override (${overrides.join(', ')})`);
   console.log(`${file}: ${parts.join(', ') || 'no change'}`);
 }
 
 console.log(`\nFlagged ${keys.length} key(s) across ${files.length} generator(s): ` +
-  `${totalReset} reset in place, ${totalAdded} appended.`);
+  `${totalReset} reset in place, ${totalAdded} appended, ${totalOverrides} plural override(s) reset.`);
 console.log('Each is now the English neutral value, so every generator will report it as ' +
   '"still English (untranslated)" until translated.');
 // This script writes to the generators and nothing else, so the sign-off says
@@ -121,5 +161,5 @@ console.log('Each is now the English neutral value, so every generator will repo
 // unrecorded.
 console.log('Next: log the key(s) in PENDING-RETRANSLATION.md by hand (this script does not),');
 console.log('then translate each in the gen MAPs and regenerate.');
-console.log('Satellite-only plural overrides (Key.One/.Few/.Many) are NOT touched here and');
-console.log('the still-English gate cannot see them: find and rewrite any by hand.');
+console.log('Any plural override listed above needs translating too, and has no neutral key of');
+console.log('its own to appear under: log it by language as well as by key.');

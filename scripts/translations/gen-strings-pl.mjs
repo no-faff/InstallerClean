@@ -60,7 +60,7 @@ const OVERRIDES = {
   'Summary.RegisteredStillUsed.Few': `{0} pliki nadal potrzebne`,
   'Summary.OrphanedToCleanUp.Few': `{0} niepotrzebne pliki do wyczyszczenia`,
   'Summary.RegisteredWindow.Few': `{0} zarejestrowane pliki nadal potrzebne ({1})`,
-  'Completion.PermanentDeleteSummary.Few': `Usunięto trwale {0} {1}. Nie trafiły do Kosza.`,
+  'Completion.PermanentDeleteSummary.Few': `{0} {1} permanently deleted`,
   'Completion.ReverifySkipped.One': `Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął go potrzebować.`,
   'Status.RegisteredPackagesFound.One': `Znaleziono {0} zarejestrowany {1}.`,
   'Status.RegisteredPackagesFound.Few': `Znaleziono {0} zarejestrowane {1}.`,

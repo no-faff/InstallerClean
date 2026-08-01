@@ -491,7 +491,7 @@ const MAP = {
 const OVERRIDES = {
   'Status.RegisteredPackagesFound.One': `Foi encontrado {0} {1} registrado.`,
   'Cli.FoundOrphans.One': `Encontrado {0} {1} para limpar ({2}).`,
-  'Cli.DeletedFiles.One': `Excluído {0} {1}.`,
+  'Cli.DeletedFiles.One': `Permanently deleted {0} {1}.`,
   'Cli.MovedFiles.One': `Movido {0} {1}.`,
   'Completion.ReverifySkipped.One': `{0} {1} mantido no lugar: um programa voltou a precisar dele depois da análise.`,
   // Participle agreement only: "mantido" for a single file.

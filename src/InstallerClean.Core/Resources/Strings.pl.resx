@@ -1066,7 +1066,7 @@ Nie udało się zapisać dziennika awarii.</value></data>
   <data name="Summary.RegisteredStillUsed.Few" xml:space="preserve"><value>{0} pliki nadal potrzebne</value></data>
   <data name="Summary.OrphanedToCleanUp.Few" xml:space="preserve"><value>{0} niepotrzebne pliki do wyczyszczenia</value></data>
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} zarejestrowane pliki nadal potrzebne ({1})</value></data>
-  <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>Usunięto trwale {0} {1}. Nie trafiły do Kosza.</value></data>
+  <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
   <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął go potrzebować.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Znaleziono {0} zarejestrowany {1}.</value></data>
   <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Znaleziono {0} zarejestrowane {1}.</value></data>

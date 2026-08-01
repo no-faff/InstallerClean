@@ -456,7 +456,7 @@ const OVERRIDES = {
   // key carries the 5+ genitive "установленных программ".
   'Summary.ProgramsUnreadable.Few': `При этом сканировании не удалось прочитать {0} установленные программы, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается.`,
   'Summary.RegisteredWindow.Few': `{0} зарегистрированных файла ещё нужны ({1})`,
-  'Completion.PermanentDeleteSummary.Few': `{0} {1} удалены безвозвратно. Они не попали в Корзину.`,
+  'Completion.PermanentDeleteSummary.Few': `{0} {1} permanently deleted`,
   // ReverifySkipped's flat base carries the 2-4/5+ agreement ("оставлено ... они
   // ... понадобились"); .One restores the singular-masculine agreement a single
   // file needs ("Оставлен 1 файл ... он ... понадобился").

@@ -1032,7 +1032,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Summary.MissingFromDisk.Few" xml:space="preserve"><value>Отсутствует {0} зарегистрированных файла (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.</value></data>
   <data name="Summary.ProgramsUnreadable.Few" xml:space="preserve"><value>При этом сканировании не удалось прочитать {0} установленные программы, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается.</value></data>
   <data name="Summary.RegisteredWindow.Few" xml:space="preserve"><value>{0} зарегистрированных файла ещё нужны ({1})</value></data>
-  <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} удалены безвозвратно. Они не попали в Корзину.</value></data>
+  <data name="Completion.PermanentDeleteSummary.Few" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
   <data name="Completion.ReverifySkipped.One" xml:space="preserve"><value>Оставлен {0} {1} на месте: после сканирования он снова понадобился программе.</value></data>
   <data name="Completion.ReverifyIncomplete.One" xml:space="preserve"><value>Оставлен {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи Windows Installer.</value></data>
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Найдено {0} зарегистрированный {1}.</value></data>

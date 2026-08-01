@@ -48,7 +48,7 @@ const ALSO_KEEP = [
 const OVERRIDES = {
   'Status.RegisteredPackagesFound.One': `Trovato {0} {1} registrato.`,
   'Cli.FoundOrphans.One': `Trovato {0} {1} da eliminare ({2}).`,
-  'Cli.DeletedFiles.One': `Eliminato {0} {1}.`,
+  'Cli.DeletedFiles.One': `Permanently deleted {0} {1}.`,
   'Cli.MovedFiles.One': `Spostato {0} {1}.`,
   'Completion.ReverifySkipped.One': `{0} {1} lasciato al suo posto, perché un programma è tornato ad averne bisogno dopo la scansione.`,
   // Participle and possessive agreement: "lasciato al suo posto" for one file.
