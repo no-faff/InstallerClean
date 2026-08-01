@@ -1009,6 +1009,13 @@ The crash log could not be written.</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.</value></data>
+  <!-- What a blocking reason with no line of its own gets, so a reason added
+       later cannot leave the command line reporting an unexpected crash for a
+       run that was merely held. The command-line twin of Body.PendingReboot.Other,
+       adapted the way its three siblings are: the flags rather than the window's
+       button names, "blocked" rather than "paused" to match them, and no Re-scan,
+       there being nothing to re-scan on a command line. -->
+  <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -1028,6 +1035,13 @@ The crash log could not be written.</value></data>
   <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
   <data name="Cli.EventLogMoveSummary" xml:space="preserve"><value>{0} mode: {1} of {2} {3} moved to {4}, {5} relocated, {6} {7}.</value></data>
+  <!-- Same eight slots as Cli.EventLogMoveSummary, for a batch one of the
+       service's own destination guards stopped part way. It is a separate entry
+       rather than the summary above because the counts mean something different:
+       the files not in {1} were never attempted, where in the summary they
+       failed. The files in {1} have left C:\Windows\Installer and are in {4},
+       which is the fact this entry exists to record. -->
+  <data name="Cli.EventLogMoveAborted" xml:space="preserve"><value>{0} mode stopped: the destination changed while the move was running. {1} of {2} {3} had already moved to {4}, {5} relocated, {6} {7}.</value></data>
   <data name="Cli.EventLogCancelledPartial" xml:space="preserve"><value>{0} mode interrupted by Ctrl+C: {1} of {2} {3} processed before cancellation. See progress output for the per-file detail.</value></data>
   <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
        processed (a cancel during the scan, or before the first delete or

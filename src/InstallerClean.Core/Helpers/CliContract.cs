@@ -201,6 +201,21 @@ internal static class CliContract
     }
 
     /// <summary>
+    /// Maps a Move that one of the service's own destination guards stopped part
+    /// way to its exit code and Event-log class.
+    ///
+    /// Never Ok, however few files failed: the batch did not finish, so a
+    /// scheduled task must not read the run as clean. It is decided on the moved
+    /// count alone rather than through
+    /// <see cref="ClassifyFileOperation(int, int)"/>, which would answer Ok for a
+    /// stopped batch that happened to collect no per-file error.
+    /// </summary>
+    internal static CliOperationOutcome ClassifyAbortedMove(int movedCount) =>
+        movedCount > 0
+            ? new CliOperationOutcome(CliExitCode.Partial, CliEventClass.Partial)
+            : new CliOperationOutcome(CliExitCode.Error, CliEventClass.HardError);
+
+    /// <summary>
     /// The stable Application-channel Event ID for an outcome class. The
     /// 1000 band is "work happened" (success and partial), 2000 a
     /// transient skip, 4000 a hard failure, so an RMM filter can select an

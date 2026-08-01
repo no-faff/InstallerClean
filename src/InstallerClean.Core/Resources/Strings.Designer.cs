@@ -160,6 +160,7 @@ public static class Strings
     public static string Cli_EventLogDeleteSummary => Get("Cli.EventLogDeleteSummary");
     public static string Cli_EventLogHardError => Get("Cli.EventLogHardError");
     public static string Cli_EventLogHardError_NoLog => Get("Cli.EventLogHardError.NoLog");
+    public static string Cli_EventLogMoveAborted => Get("Cli.EventLogMoveAborted");
     public static string Cli_EventLogMoveDestinationInsideInstaller => Get("Cli.EventLogMoveDestinationInsideInstaller");
     public static string Cli_EventLogMoveDestinationInSystemFolder => Get("Cli.EventLogMoveDestinationInSystemFolder");
     public static string Cli_EventLogMoveDestinationRelative => Get("Cli.EventLogMoveDestinationRelative");
@@ -208,6 +209,7 @@ public static class Strings
     public static string Cli_NothingToDo => Get("Cli.NothingToDo");
     public static string Cli_PendingRebootBlocked_InstallerInProgress => Get("Cli.PendingRebootBlocked.InstallerInProgress");
     public static string Cli_PendingRebootBlocked_MsiExecuteMutex => Get("Cli.PendingRebootBlocked.MsiExecuteMutex");
+    public static string Cli_PendingRebootBlocked_Other => Get("Cli.PendingRebootBlocked.Other");
     public static string Cli_PendingRebootBlocked_PendingRenameInCache => Get("Cli.PendingRebootBlocked.PendingRenameInCache");
     public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_TooManyArguments => Get("Cli.TooManyArguments");

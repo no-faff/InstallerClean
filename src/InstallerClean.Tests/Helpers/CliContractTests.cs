@@ -155,6 +155,33 @@ public class CliContractTests
         Assert.Equal(CliEventClass.HardError, CliContract.ClassifyFileOperation(0, 5).EventClass);
     }
 
+    [Theory]
+    // A batch that had moved something before its destination guard stopped it:
+    // partial, never Ok, because the run did not finish and the files it did
+    // move have left C:\Windows\Installer for a folder the operator has to be
+    // told about.
+    [InlineData(1, 2)]
+    [InlineData(500, 2)]
+    // The guard tripped before the first file, so nothing was committed and
+    // nothing is anywhere new.
+    [InlineData(0, 1)]
+    public void ClassifyAbortedMove_never_reports_a_stopped_batch_as_clean(int moved, int expectedExit)
+    {
+        Assert.Equal(expectedExit, CliContract.ClassifyAbortedMove(moved).ExitCode);
+    }
+
+    [Fact]
+    public void ClassifyAbortedMove_does_not_follow_the_finished_batch_rule()
+    {
+        // The distinction this exists for: a stopped batch with no per-file
+        // error would be Ok under ClassifyFileOperation, which reads a zero
+        // error count as "every file completed".
+        Assert.Equal(CliExitCode.Ok, CliContract.ClassifyFileOperation(3, 0).ExitCode);
+        Assert.Equal(CliExitCode.Partial, CliContract.ClassifyAbortedMove(3).ExitCode);
+        Assert.Equal(CliEventClass.Partial, CliContract.ClassifyAbortedMove(3).EventClass);
+        Assert.Equal(CliEventClass.HardError, CliContract.ClassifyAbortedMove(0).EventClass);
+    }
+
     [Fact]
     public void EventId_ok_is_1000() => Assert.Equal(1000, CliContract.EventIdFor(CliEventClass.Ok));
 

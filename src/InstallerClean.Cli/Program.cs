@@ -294,12 +294,14 @@ internal static class Program
 
     private static async Task<int> RunWorkAsync(string arg, CliInvocation invocation, CancellationToken token)
     {
-        // Carries the last CurrentFile reported by the move/delete progress
-        // reporter, which is also the highest: SynchronousProgress runs the
-        // handler inline on the producing thread, so the reports arrive in
-        // loop order. On a Ctrl+C mid-loop the OCE catch reads this to write
-        // an EventLog summary and pick ExitPartial vs ExitCancelled.
-        int processedCount = 0;
+        // What a cancelled batch had actually committed, read by the OCE catch to
+        // write its EventLog summary and to pick ExitPartial over ExitCancelled.
+        // Taken from the service's own DeletedCount / MovedCount, never from the
+        // progress reporter: both services report BEFORE they touch the file, so a
+        // Ctrl+C between the first report and the first delete leaves the reporter
+        // saying one and the batch having done none, and exit 2 is defined as work
+        // committed.
+        int committedCount = 0;
         int totalToProcess = 0;
 
         try
@@ -432,15 +434,10 @@ internal static class Program
             // SynchronizationContext, so Progress<T> would marshal each
             // report through the thread pool and let a "[i/total]" line
             // print after the post-await summary ("Deleted N files."),
-            // breaking the stdout line order an RMM scrapes. Report also
-            // advances processedCount so the OCE catch can attribute a
-            // cancellation to the right file count.
+            // breaking the stdout line order an RMM scrapes.
             totalToProcess = count;
             var progress = new SynchronousProgress<OperationProgress>(p =>
-            {
-                processedCount = p.CurrentFile;
-                Console.WriteLine($"  [{p.CurrentFile}/{p.TotalFiles}] {p.CurrentFileName}");
-            });
+                Console.WriteLine($"  [{p.CurrentFile}/{p.TotalFiles}] {p.CurrentFileName}"));
 
             if (arg == "/d")
             {
@@ -469,10 +466,13 @@ internal static class Program
                 // rather than throwing, so re-enter the OCE catch by hand: a
                 // cancelled run gets one cancelled-run event-log entry and a
                 // Partial or Cancelled exit code whichever way the cancellation
-                // reached the host (processedCount is already tracked by the
-                // progress reporter).
+                // reached the host. The service's own count is what the catch
+                // attributes on, and this is the only place it can be read.
                 if (result.Cancelled)
+                {
+                    committedCount = result.DeletedCount;
                     token.ThrowIfCancellationRequested();
+                }
 
                 Console.WriteLine(string.Format(
                     DisplayHelpers.Pluralise(result.DeletedCount, Strings.Cli_DeletedFiles, "Cli.DeletedFiles"),
@@ -543,9 +543,22 @@ internal static class Program
             // destination-folder create + probe) when nothing survived the
             // re-verify; synthesize the empty result so the summary path still fires
             // with 0 and exit Ok.
-            var moveResult = filePaths.Count == 0
-                ? new MoveResult(0, Array.Empty<FileOperationError>())
-                : await moveService.MoveFilesAsync(filePaths, moveDest, progress, token);
+            MoveResult moveResult;
+            try
+            {
+                moveResult = filePaths.Count == 0
+                    ? new MoveResult(0, Array.Empty<FileOperationError>())
+                    : await moveService.MoveFilesAsync(filePaths, moveDest, progress, token);
+            }
+            catch (MoveAbortedException ex)
+            {
+                // Caught at the call site rather than at the method's own arms,
+                // where survivingFiles and moveDest are out of scope, which is
+                // also where the window catches its copy. Without this the base
+                // type's arm below prints the destination problem and nothing
+                // about the files already sitting in the destination folder.
+                return ReportAbortedMove(arg, ex, moveDest, count, survivingFiles);
+            }
 
             // Global\_MSIExecute found held at the service boundary: same outcome
             // as a gate block.
@@ -556,7 +569,10 @@ internal static class Program
             // so the machine contract matches a thrown cancellation. See the /d
             // branch above.
             if (moveResult.Cancelled)
+            {
+                committedCount = moveResult.MovedCount;
                 token.ThrowIfCancellationRequested();
+            }
 
             Console.WriteLine(string.Format(
                 DisplayHelpers.Pluralise(moveResult.MovedCount, Strings.Cli_MovedFiles, "Cli.MovedFiles"),
@@ -591,11 +607,11 @@ internal static class Program
             // EventLog the cancellation so a Task Scheduler audit can
             // see how far the run got, and pick ExitPartial when work
             // committed before the Ctrl+C arrived.
-            if (processedCount > 0)
+            if (committedCount > 0)
             {
                 MachineContract.WriteEventLog(CliEventClass.Partial,
                     () => string.Format(Strings.Cli_EventLogCancelledPartial,
-                        arg, processedCount, totalToProcess,
+                        arg, committedCount, totalToProcess,
                         DisplayHelpers.PluraliseFile(totalToProcess)));
                 return ExitPartial;
             }
@@ -726,6 +742,74 @@ internal static class Program
     }
 
     /// <summary>
+    /// Bytes of the files a batch that stopped part way actually moved. The
+    /// action services take their input in order and stop where they stop, so the
+    /// files they reached are the first (<paramref name="completedCount"/> plus
+    /// the errors); of those, the ones that did not error are what moved.
+    /// <see cref="SumBytesExcludingErrors"/> can lean on "no errors means every
+    /// file completed" instead, which a batch that stopped cannot.
+    /// Matches CleanupViewModel's own CompletedBytes so a fleet of GUI and CLI
+    /// machines produces telemetry on the same axis.
+    /// </summary>
+    private static long CompletedBytes(
+        IReadOnlyList<OrphanedFile> files, int completedCount,
+        IReadOnlyList<FileOperationError> errors)
+    {
+        var reached = completedCount + errors.Count;
+        if (errors.Count == 0)
+            return files.Take(reached).Sum(f => f.SizeBytes);
+
+        var errorPaths = new HashSet<string>(
+            errors.Select(e => e.FilePath), StringComparer.OrdinalIgnoreCase);
+        return files.Take(reached).Where(f => !errorPaths.Contains(f.FullPath)).Sum(f => f.SizeBytes);
+    }
+
+    /// <summary>
+    /// Reports a Move that one of the service's own destination guards stopped
+    /// part way, and returns the exit code for it. What makes it owed is that
+    /// files have already left <c>C:\Windows\Installer</c> and are in the
+    /// destination folder: without it a scheduled task's log records the
+    /// destination problem and not where those files went.
+    /// </summary>
+    /// <remarks>
+    /// The summary and the error block come first, in the shape an ordinary
+    /// <c>/m</c> prints them, so a script's <c>\d+ errors:</c> scrape lands where
+    /// it always does; the guard's reason follows.
+    /// </remarks>
+    private static int ReportAbortedMove(
+        string arg, MoveAbortedException ex, string moveDest, int count,
+        IReadOnlyList<OrphanedFile> survivingFiles)
+    {
+        var partial = ex.Partial;
+        Console.WriteLine(string.Format(
+            DisplayHelpers.Pluralise(partial.MovedCount, Strings.Cli_MovedFiles, "Cli.MovedFiles"),
+            partial.MovedCount, DisplayHelpers.PluraliseFile(partial.MovedCount)));
+        if (partial.Errors.Count > 0)
+        {
+            // See the /d branch for the always-plural rationale and the
+            // English-forced noun.
+            Console.WriteLine(MachineContract.English(
+                () => $"{partial.Errors.Count} {Strings.Plural_Error_Plural}:"));
+            foreach (var err in partial.Errors)
+                Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
+        }
+        // The guard's own resx sentence, built in the OS language and safe to
+        // echo under elevation: that is what deriving from
+        // LocalisedInvalidOperationException asserts.
+        Console.WriteLine(ex.Message);
+
+        var outcome = CliContract.ClassifyAbortedMove(partial.MovedCount);
+        // Sizes and nouns recomputed inside the en-GB scope; see the /d summary
+        // for why the stdout copies are not reused.
+        MachineContract.WriteEventLog(outcome.EventClass,
+            () => string.Format(Strings.Cli_EventLogMoveAborted,
+                arg, partial.MovedCount, count, DisplayHelpers.PluraliseFile(count), moveDest,
+                DisplayHelpers.FormatSize(CompletedBytes(survivingFiles, partial.MovedCount, partial.Errors)),
+                partial.Errors.Count, DisplayHelpers.PluraliseError(partial.Errors.Count)));
+        return outcome.ExitCode;
+    }
+
+    /// <summary>
     /// Emits the pending-reboot-blocked outcome: the localised stdout reason
     /// sentence, the English Application-log entry, and <see cref="ExitTransient"/>.
     /// Shared by the pre-act gate check and the action services' own boundary
@@ -751,9 +835,13 @@ internal static class Program
                 string.Format(
                     Strings.Cli_PendingRebootBlocked_PendingRenameInCache,
                     detail ?? string.Empty),
-            _ => throw new InvalidOperationException(
-                $"Unhandled PendingRebootReason: {reason}. " +
-                "A new enum value was added without updating the CLI message switch."),
+            // What a reason with no line of its own gets. It threw before, which
+            // landed in the generic catch and reported an unexpected crash with
+            // exit 1, where a blocked run wants the 75 a scheduler retries on.
+            // Unreachable while the enum has three members, all handled above, and
+            // it cannot fire for a null reason either: PendingRebootResult.Block
+            // takes a non-nullable one.
+            _ => Strings.Cli_PendingRebootBlocked_Other,
         };
         Console.WriteLine(stdoutMessage);
         // The reason label and template are built English: the
