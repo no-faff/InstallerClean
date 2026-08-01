@@ -166,6 +166,41 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 // nowhere else once the category has been filed.
                 catch (UnauthorizedAccessException ex)
                 {
+                    // File.Delete throws this for a READ-ONLY file as well as
+                    // for a permissions refusal, and the two are not the same
+                    // problem. The shell delete this replaced cleared the
+                    // attribute and carried on, so leaving it here would be a
+                    // regression wearing the costume of a permissions error:
+                    // the user is told Windows refused access, cannot tell a
+                    // read-only bit from an ACL, and can act on neither.
+                    //
+                    // Safe HERE and nowhere else, which is why it is inline
+                    // rather than a helper anything could call. By this line the
+                    // file has passed the reparse refusal and the containment
+                    // guard, both reading the real filesystem, so it is a real
+                    // file inside C:\Windows\Installer; and the user has
+                    // confirmed the deletion. Only the read-only attribute is
+                    // cleared, only once, and any throw from clearing it or from
+                    // the retry fails closed exactly as before.
+                    if (TryClearReadOnly(filePath, failureLog))
+                    {
+                        try
+                        {
+                            _fs.File.Delete(filePath);
+                            deleted++;
+                            continue;
+                        }
+                        catch (Exception retry)
+                        {
+                            // Both are recorded: without the first the crash log
+                            // would not show a retry was attempted, and without
+                            // the second it would not show what beat it.
+                            failureLog.Record(ex);
+                            failureLog.Record(retry);
+                            errors.Add(new AccessDenied(filePath));
+                            continue;
+                        }
+                    }
                     failureLog.Record(ex);
                     errors.Add(new AccessDenied(filePath));
                 }
@@ -214,5 +249,28 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 lease?.Dispose();
             }
         }, cancellationToken);
+    }
+
+    /// <summary>
+    /// Clears the read-only attribute so the delete can be retried, and reports
+    /// whether it is worth retrying. False for a file that was not read-only in
+    /// the first place, which is the ordinary permissions refusal and has
+    /// nothing here to fix, and false if the attributes cannot be read or
+    /// written, which is a second refusal and is recorded rather than chased.
+    /// </summary>
+    private bool TryClearReadOnly(string filePath, PerItemFailureLog failureLog)
+    {
+        try
+        {
+            var attributes = _fs.File.GetAttributes(filePath);
+            if (!attributes.HasFlag(FileAttributes.ReadOnly)) return false;
+            _fs.File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            failureLog.Record(ex);
+            return false;
+        }
     }
 }

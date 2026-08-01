@@ -1,3 +1,5 @@
+using System.IO.Abstractions.TestingHelpers;
+using InstallerClean.Helpers;
 using InstallerClean.Models;
 using InstallerClean.Services;
 using InstallerClean.Tests.Helpers;
@@ -131,6 +133,59 @@ public class DeleteFilesServiceTests : IDisposable
         Assert.True(result.Cancelled);
         var remaining = Directory.GetFiles(_tempDir).Length;
         Assert.True(remaining > 0, "Cancellation should have stopped before deleting all files");
+    }
+
+    [Fact]
+    public async Task DeleteFilesAsync_deletes_a_read_only_file()
+    {
+        // Windows refuses File.Delete on a read-only file, and the shell delete
+        // this replaced cleared the attribute and carried on, so without the
+        // retry a read-only file in the cache is reported as a permissions
+        // problem the user can do nothing about. Needs a real filesystem: the
+        // attribute is a Windows one and MockFileSystem does not enforce it.
+        var file = Path.Combine(_tempDir, "readonly.msi");
+        await File.WriteAllTextAsync(file, "content");
+        File.SetAttributes(file, File.GetAttributes(file) | FileAttributes.ReadOnly);
+
+        var result = await NewService().DeleteFilesAsync(new[] { file });
+
+        Assert.Equal(1, result.DeletedCount);
+        Assert.Empty(result.Errors);
+        Assert.False(File.Exists(file));
+    }
+
+    [Fact]
+    public async Task DeleteFilesAsync_records_a_batch_that_ran_without_the_installer_mutex()
+    {
+        // A skipped hold is not a refusal and the batch is right to carry on,
+        // but it is the one window in which the act-time re-verify's proof can
+        // go stale underneath the batch, so a report of a needed file going
+        // could never otherwise be attributed to it. Real filesystem because the
+        // record is a real crash-log write, which is the behaviour under test.
+        var logPath = CrashLog.Write(
+            new InvalidOperationException("baseline for the mutex fall-back record"));
+        var baseline = new FileInfo(logPath).Length;
+
+        var fs = new MockFileSystem();
+        var source = @"C:\Windows\Installer\never-reached.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        var mutex = new FakeMutexProbe(FakeMutexProbe.Mode.FallBack);
+
+        var result = await new DeleteFilesService(fs, mutex, null).DeleteFilesAsync(new[] { source });
+
+        // The fall-back proceeds rather than refusing, and takes no lease.
+        Assert.False(result.InstallerBusy);
+        Assert.Equal(1, mutex.AcquireAttempts);
+        Assert.Equal(0, mutex.Acquired);
+
+        // Read from the baseline on, so a note left by an earlier run cannot
+        // pass for this one's. A rotation between the two reads shortens the
+        // file, and starting at 0 is then still right.
+        using var stream = new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var reader = new StreamReader(stream);
+        var written = await reader.ReadToEndAsync();
+        var appended = written.Length >= baseline ? written[(int)baseline..] : written;
+        Assert.Contains("without the Windows Installer mutex", appended);
     }
 
     public void Dispose()

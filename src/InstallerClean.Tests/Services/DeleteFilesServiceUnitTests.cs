@@ -152,6 +152,87 @@ public class DeleteFilesServiceUnitTests
         return fs;
     }
 
+    /// <summary>
+    /// The same filesystem posing as one holding a READ-ONLY file: the first
+    /// Delete refuses, and a Delete after the attribute has been cleared
+    /// succeeds. <paramref name="clearThrows"/> makes SetAttributes refuse too,
+    /// which is the fail-closed leg.
+    /// </summary>
+    private static IFileSystem FileSystemHoldingAReadOnlyFile(
+        string source, out IFile file, Exception? clearThrows = null)
+    {
+        var fs = FileSystemReporting(source);
+        file = fs.File;
+        // Archive as well as ReadOnly, which is what a real file in the cache
+        // carries, so the clear has something to preserve and the assertion can
+        // say it did.
+        var attributes = FileAttributes.ReadOnly | FileAttributes.Archive;
+        file.GetAttributes(source).Returns(_ => attributes);
+        file.When(f => f.SetAttributes(source, Arg.Any<FileAttributes>())).Do(ci =>
+        {
+            if (clearThrows is not null) throw clearThrows;
+            attributes = ci.Arg<FileAttributes>();
+        });
+        file.When(f => f.Delete(source)).Do(_ =>
+        {
+            if (attributes.HasFlag(FileAttributes.ReadOnly))
+                throw new UnauthorizedAccessException("read-only");
+        });
+        return fs;
+    }
+
+    [Fact]
+    public async Task A_read_only_file_has_the_attribute_cleared_and_the_delete_retried()
+    {
+        // The shell delete this replaced cleared the attribute and carried on,
+        // so a read-only file in the cache went. Without the retry it comes back
+        // as "Windows refused access to this file", which is true, useless and
+        // indistinguishable from a permissions problem.
+        var source = $@"{Dir}\readonly.msi";
+        var fs = FileSystemHoldingAReadOnlyFile(source, out var file);
+
+        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source });
+
+        Assert.Equal(1, result.DeletedCount);
+        Assert.Empty(result.Errors);
+        // Cleared, and cleared to exactly that: only the read-only bit comes
+        // off, and the retry hands the file no attribute it did not have.
+        file.Received(1).SetAttributes(source, FileAttributes.Archive);
+    }
+
+    [Fact]
+    public async Task A_permissions_refusal_is_still_access_denied_and_is_not_retried()
+    {
+        // Not read-only, so there is nothing for the clear to fix and the retry
+        // is not attempted. The narrowness is the point: this must not become a
+        // second try at every refused delete.
+        var source = $@"{Dir}\refused.msi";
+        var fs = FileSystemReporting(source, new UnauthorizedAccessException("refused"));
+        fs.File.GetAttributes(source).Returns(FileAttributes.Normal);
+
+        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source });
+
+        Assert.Equal(0, result.DeletedCount);
+        Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
+        fs.File.DidNotReceive().SetAttributes(source, Arg.Any<FileAttributes>());
+    }
+
+    [Fact]
+    public async Task A_read_only_file_whose_attribute_cannot_be_cleared_fails_closed()
+    {
+        var source = $@"{Dir}\stuck.msi";
+        var fs = FileSystemHoldingAReadOnlyFile(
+            source, out var file, clearThrows: new UnauthorizedAccessException("refused"));
+
+        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source });
+
+        Assert.Equal(0, result.DeletedCount);
+        Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
+        // One attempt, then the same error as before: a clear that throws leaves
+        // the file exactly where a delete that throws leaves it.
+        file.Received(1).Delete(source);
+    }
+
     [Fact]
     public async Task Refuses_a_source_whose_attributes_cannot_be_read()
     {
