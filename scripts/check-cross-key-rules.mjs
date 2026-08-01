@@ -156,6 +156,27 @@ const GITHUB_DRAWN = [
 const FOLDER_TOKEN = '{InstallerFolder}';
 
 // ---------------------------------------------------------------------------
+// Rule 9. A bracketed link phrase survives translation.
+//
+// Three screens link into the README's safety section, and each link is a
+// phrase inside a sentence rather than a line of its own. The resx marks it
+// with [square brackets] and CompositionParsing.SplitAtBracketedPhrase turns
+// the pair into a Hyperlink as the window is built. A value with no pair
+// renders as plain prose, which is the right fallback and is also completely
+// silent: a translator who drops the brackets takes a link off a screen and
+// nothing anywhere says so. The delete confirmation's is the one that matters
+// most, being the reason a modal carries its own at all.
+//
+// Which keys carry a pair is the neutral's decision, as with rule 6, so there
+// is no list here to go stale as screens gain and lose links. Both directions
+// are faulted: a satellite that has LOST its pair silently drops a link, and
+// one that has GAINED brackets on a key nothing splits paints the brackets.
+const bracketCounts = (value) => ({
+  pairs: (value.match(/\[[^[\]]*\]/g) ?? []).length,
+  chars: (value.match(/[[\]]/g) ?? []).length,
+});
+
+// ---------------------------------------------------------------------------
 // Rule 7. A window title resolved in XAML is not overwritten before first use.
 //
 // Every dialog here is ShowInTaskbar=False under custom chrome, so Title is
@@ -420,6 +441,12 @@ for (const key of [...new Set(declaredKeys)].sort())
 // has gained or lost one has drifted from it.
 const tokenKeys = [...neutral].filter(([, v]) => v.includes(FOLDER_TOKEN)).map(([k]) => k);
 
+// The same for the link phrase. Membership is any bracket at all rather than a
+// well-formed pair, so an unbalanced neutral is a finding here and not a key
+// that quietly leaves the rule.
+const linkKeys = new Set(
+  [...neutral].filter(([, v]) => v.includes('[') || v.includes(']')).map(([k]) => k));
+
 if (stale.length) {
   console.error(`Cross-key rules FAILED (${stale.length}): the declarations in this file are stale.`);
   for (const s of stale) console.error(`  ${s}`);
@@ -487,6 +514,18 @@ for (const lang of LANGS) {
       failures.push(`${key} has lost its ${FOLDER_TOKEN} token, so the sentence names no folder`);
   }
 
+  for (const [key, value] of map) {
+    const { pairs, chars } = bracketCounts(value);
+    if (linkKeys.has(key)) {
+      if (pairs !== 1 || chars !== 2)
+        failures.push(`${key} carries ${pairs} balanced [phrase] in ${chars} bracket(s); `
+          + 'exactly one pair is what becomes the link, and none renders the sentence plain');
+    } else if (chars > 0) {
+      failures.push(`${key} carries a square bracket and nothing splits this key, `
+        + 'so the bracket is painted rather than turned into a link');
+    }
+  }
+
   if (failures.length) {
     console.error(`FAIL  ${lang.padEnd(7)} ${failures.join('; ')}`);
     problems.push(...failures.map((f) => `${lang}: ${f}`));
@@ -506,5 +545,6 @@ if (problems.length) {
 }
 
 console.log(`\nCross-key rules OK: ${LANGS.length} languages, ${MUST_AGREE.length} label/name pairs, `
-  + `${tokenKeys.length} keys carrying ${FOLDER_TOKEN}, ${namedInXaml.size} automation names classified, `
+  + `${tokenKeys.length} keys carrying ${FOLDER_TOKEN}, ${linkKeys.size} carrying a [link phrase], `
+  + `${namedInXaml.size} automation names classified, `
   + `${csFiles.length} C# files read through Strings bar ${rawAllowed.size} allowed direct.`);
