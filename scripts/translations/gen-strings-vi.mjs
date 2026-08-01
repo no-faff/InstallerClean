@@ -2,7 +2,7 @@
 // Vietnamese (vi) satellite generator for InstallerClean. Copied from
 // gen-strings-template.mjs; only OUT and the MAP values differ. Works FROM THE
 // ENGLISH SOURCE (Strings.resx): replaces each key's inner <value>, strips the
-// 20 machine-contract Cli.EventLog* keys, keeps the human Cli keys, and
+// machine-contract Cli.EventLog* keys, keeps the human Cli keys, and
 // self-verifies against the neutral. Output is LF, UTF-8. See the template for
 // the whole of how the body works.
 //
@@ -484,7 +484,7 @@ const MAP = {
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME (the
+// Remove ONLY the machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable): each is matched non-greedy to
 // its own </data>. The human-facing Cli keys are KEPT, and their value is
 // replaced from the MAP like any other key. Same predicate as
@@ -537,10 +537,14 @@ const parse = (xml) => {
   return map;
 };
 const neutral = parse(readFileSync(BASE, 'utf8'));
+// Derived, never pinned: the machine set grows whenever the command line
+// gains an event-log string, and a literal here would fail every generator
+// at once while asserting nothing about what was actually stripped.
+const cliMachineExpected = [...neutral.keys()].filter(isMachineCliKey).length;
 const written = readFileSync(OUT, 'utf8');
 const output = parse(written);
 // Required = everything a satellite must carry: the non-Cli keys plus the
-// human-facing Cli keys. The 20 machine Cli keys are the complement; they must be
+// human-facing Cli keys. The machine Cli keys are the complement; they must be
 // absent from the output (isMachineCliKey is defined up in the strip section).
 const neutralRequired = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
 
@@ -582,7 +586,7 @@ console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length + overrideKeys.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli +',
   overrideKeys.length, 'override)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, `(expect ${cliMachineExpected})`);
 console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| CRLF:', crlf, '(expect 0)');
 
 // ALSO_KEEP audit roster, so a lazy "force it green" dump is visible at a glance.
@@ -615,6 +619,6 @@ if (untranslated.length) {
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
   !overrideMissing.length && !overrideArityMismatch.length &&
-  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 20 && crlf === 0;
+  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === cliMachineExpected && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

@@ -2,7 +2,7 @@
 // Brazilian Portuguese (pt-BR) satellite generator for InstallerClean. Forked from
 // gen-strings-template.mjs and reconciled to the CLI-aware pattern (model:
 // gen-strings-de.mjs). It works FROM THE ENGLISH SOURCE (Strings.resx): it reads
-// the neutral as the structural base, strips ONLY the 20 machine-contract Cli.*
+// the neutral as the structural base, strips ONLY the machine-contract Cli.*
 // keys, replaces the inner <value> of every other key (the non-Cli set plus the human Cli set)
 // from the MAP, appends the satellite-only .One override(s), writes LF/UTF-8 and
 // self-verifies against the neutral.
@@ -402,7 +402,7 @@ const MAP = {
   'Automation.ChangeLanguage.HelpText': `O programa será reiniciado.`,
 
   // Command-line tool (installerclean-cli): the HUMAN-facing Cli.* keys.
-  // The 20 machine-contract Cli.EventLog* keys (bar EventLogUnavailable) are
+  // The machine-contract Cli.EventLog* keys (bar EventLogUnavailable) are
   // stripped and stay English at the emit site; they are not in this MAP.
   'Cli.UnknownArgument': `Argumento desconhecido: '{0}'`,
   'Cli.Cancelling': `Cancelando...`,
@@ -508,7 +508,7 @@ const OVERRIDES = {
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME (the
+// Remove ONLY the machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable). The human Cli keys stay and
 // are translated from MAP. Same predicate as scripts/check-resx-parity.mjs.
 const isMachineCliKey = (k) =>
@@ -551,6 +551,10 @@ const parse = (xml) => {
   return map;
 };
 const neutral = parse(readFileSync(BASE, 'utf8'));
+// Derived, never pinned: the machine set grows whenever the command line
+// gains an event-log string, and a literal here would fail every generator
+// at once while asserting nothing about what was actually stripped.
+const cliMachineExpected = [...neutral.keys()].filter(isMachineCliKey).length;
 const written = readFileSync(OUT, 'utf8');
 const output = parse(written);
 // Required = the non-Cli keys plus the human-facing Cli keys.
@@ -595,7 +599,7 @@ console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length + overrideKeys.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli +',
   overrideKeys.length, 'override)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, `(expect ${cliMachineExpected})`);
 console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| CRLF:', crlf, '(expect 0)');
 
 // ALSO_KEEP audit roster, so a lazy "force it green" dump is visible at a glance.
@@ -628,6 +632,6 @@ if (untranslated.length) {
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
   !overrideMissing.length && !overrideArityMismatch.length &&
-  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 20 && crlf === 0;
+  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === cliMachineExpected && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

@@ -478,8 +478,8 @@ const OVERRIDES = {
   'Status.RegisteredPackagesFound.Few': `Найдено {0} зарегистрированных {1}.`,
 };
 
-// The 41 human-facing CLI keys (progress, argument/path errors, the pending-reboot
-// sentences, the --help screen, the count lines). The 20 machine-read Cli.EventLog*
+// The human-facing CLI keys (progress, argument/path errors, the pending-reboot
+// sentences, the --help screen, the count lines). The machine-read Cli.EventLog*
 // keys (every EventLog* bar EventLogUnavailable) are deliberately OMITTED: they are
 // forced English at the emit site so an RMM/monitoring grep matches a fixed phrase
 // regardless of OS language, so they must not appear in a satellite. Appended as a
@@ -572,7 +572,7 @@ text = text.replace('</root>', overrideBlock + '</root>');
 // Append the human CLI keys before </root>, same verbatim emission as OVERRIDES
 // (no CLI value carries an XML-special character: guillemets not <>, no &). The
 // machine Cli.EventLog* keys are not in CLI, so they stay out of the satellite.
-const cliBlock = '\n  <!-- Human-facing CLI keys (the 39 non-machine Cli.* keys); the machine Cli.EventLog* keys are forced English at the emit site and omitted -->\n' +
+const cliBlock = '\n  <!-- Human-facing CLI keys; the machine Cli.EventLog* keys are forced English at the emit site and omitted -->\n' +
   Object.entries(CLI).map(([k, v]) => `  <data name="${k}" xml:space="preserve"><value>${v}</value></data>`).join('\n') + '\n';
 text = text.replace('</root>', cliBlock + '</root>');
 
@@ -627,7 +627,7 @@ const overrideArityMismatch = overrideKeys.filter((k) => {
   return a.size !== b.size || [...a].some((i) => !b.has(i));
 });
 
-// CLI surface: the satellite ships the human Cli.* keys and OMITS the 20 machine
+// CLI surface: the satellite ships the human Cli.* keys and OMITS the machine
 // Cli.EventLog* keys (every EventLog* bar EventLogUnavailable), which stay English at
 // the emit site for RMM greps. Mirror check-resx-parity.mjs's split. The CLI map must
 // hold exactly the human keys (no machine key, no stray), every human key must reach
@@ -636,6 +636,11 @@ const overrideArityMismatch = overrideKeys.filter((k) => {
 const isMachineCli = (k) => k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
 const isHumanCli = (k) => k.startsWith('Cli.') && !isMachineCli(k);
 const neutralHumanCli = [...neutral.keys()].filter(isHumanCli);
+// Derived, never pinned: this file strips every Cli.* element and re-adds the
+// human ones from CLI, so what it removes is however many the neutral holds.
+// A literal here goes stale the moment the command line gains a string, and it
+// asserts nothing about what was actually stripped.
+const cliExpected = [...neutral.keys()].filter((k) => k.startsWith('Cli.')).length;
 const cliKeys = Object.keys(CLI);
 const cliStrayMap = cliKeys.filter((k) => !neutral.has(k) || isMachineCli(k));
 const cliMissingFromMap = neutralHumanCli.filter((k) => !(k in CLI));
@@ -649,8 +654,8 @@ const cliArityMismatch = cliKeys.filter((k) => {
 const cliUntranslated = neutralHumanCli.filter((k) => output.has(k) && output.get(k) === neutral.get(k));
 
 console.log('<data> in output:', output.size, '(expect', (neutralNonCli.length + overrideKeys.length + cliKeys.length) + ')');
-console.log('Cli <data> removed:', cliRemoved, '(expect 62)');
-console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| human Cli keys:', cliKeys.length, '(expect 41) | CRLF:', crlf, '(expect 0)');
+console.log('Cli <data> removed:', cliRemoved, `(expect ${cliExpected})`);
+console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| human Cli keys:', cliKeys.length, `(expect ${neutralHumanCli.length}) | CRLF:`, crlf, '(expect 0)');
 
 if (alsoKeep.size) {
   console.log('ALSO_KEEP (' + alsoKeep.size + '), kept identical to English:');
@@ -689,6 +694,6 @@ const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKe
   !cliStrayMap.length && !cliMissingFromMap.length && !cliMissingFromOutput.length &&
   !cliMachineLeaked.length && !cliArityMismatch.length && !cliUntranslated.length &&
   output.size === neutralNonCli.length + overrideKeys.length + cliKeys.length &&
-  cliRemoved === 62 && crlf === 0;
+  cliRemoved === cliExpected && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

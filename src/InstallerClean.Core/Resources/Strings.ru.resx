@@ -1105,7 +1105,7 @@ InstallerClean уже был запущен от имени администра
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>Найдено {0} зарегистрированный {1}.</value></data>
   <data name="Status.RegisteredPackagesFound.Few" xml:space="preserve"><value>Найдено {0} зарегистрированных {1}.</value></data>
 
-  <!-- Human-facing CLI keys (the 39 non-machine Cli.* keys); the machine Cli.EventLog* keys are forced English at the emit site and omitted -->
+  <!-- Human-facing CLI keys; the machine Cli.EventLog* keys are forced English at the emit site and omitted -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Неизвестный аргумент: «{0}»</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Отмена...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Отменено.</value></data>

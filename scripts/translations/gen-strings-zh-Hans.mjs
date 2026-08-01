@@ -2,7 +2,7 @@
 // Simplified Chinese (zh-Hans) satellite generator for InstallerClean. Copied
 // from gen-strings-template.mjs (ko new pattern); only OUT and the MAP values
 // differ. Works FROM THE ENGLISH SOURCE (Strings.resx): replaces each key's
-// inner <value>, strips the 20 machine-contract Cli.EventLog* keys, keeps the 39
+// inner <value>, strips the machine-contract Cli.EventLog* keys, keeps the 39
 // human Cli keys, and self-verifies against the neutral. Output is LF, UTF-8.
 //
 // Chinese plural rule (DisplayHelpers.CategoryFor, case "zh"): PluralCategory
@@ -395,7 +395,7 @@ const MAP = {
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME (the
+// Remove ONLY the machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable).
 const isMachineCliKey = (k) =>
   k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
@@ -429,6 +429,10 @@ const parse = (xml) => {
   return map;
 };
 const neutral = parse(readFileSync(BASE, 'utf8'));
+// Derived, never pinned: the machine set grows whenever the command line
+// gains an event-log string, and a literal here would fail every generator
+// at once while asserting nothing about what was actually stripped.
+const cliMachineExpected = [...neutral.keys()].filter(isMachineCliKey).length;
 const written = readFileSync(OUT, 'utf8');
 const output = parse(written);
 const neutralRequired = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
@@ -455,7 +459,7 @@ const nonCliRequired = neutralRequired.filter((k) => !k.startsWith('Cli.')).leng
 console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, `(expect ${cliMachineExpected})`);
 console.log('MAP entries:', Object.keys(MAP).length, '| CRLF:', crlf, '(expect 0)');
 
 if (alsoKeep.size) {
@@ -484,6 +488,6 @@ if (untranslated.length) {
 
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
-  output.size === neutralRequired.length && cliMachineRemoved === 20 && crlf === 0;
+  output.size === neutralRequired.length && cliMachineRemoved === cliMachineExpected && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

@@ -9,20 +9,21 @@
 //
 // Structure: UNLIKE the other satellites, ja carries the machine-contract
 // Cli.EventLog* keys, which coolvitto translated along with everything else and
-// which the other fourteen strip. They are forced to English at the emit site at
-// runtime (MachineContract.cs), so a translated copy is inert rather than
-// wrong, and keeping his work costs nothing. Japanese has no count plurals, so
-// there are no satellite-only overrides.
+// which the other fourteen omit. They are forced to English at the emit site at
+// runtime (MachineContract.cs), so a translated copy is inert rather than wrong,
+// and keeping his work costs nothing. Japanese has no count plurals, so there
+// are no satellite-only overrides.
 //
-// ONE of the twenty is stripped, and the exception earns its keep. A machine key
-// whose English CHANGES leaves a translated copy saying what the app used to do,
-// in a string no user can ever reach and no gate can measure: the still-English
-// gate skips machine keys by contract and nothing else compares them. That
-// happened when the Recycle Bin went, and Cli.EventLogDeleteSummary sat here for
-// a while saying the files had been sent to it. Correcting it would have bought
-// a sentence that reads as maintained and is inert, which is the fossil this
-// project spends most of its comment effort on. So it goes, and any machine key
-// that outlives its English should follow it.
+// The file is a MIXTURE on purpose and must not be harmonised in either
+// direction: nineteen machine keys stay because they are a contributor's
+// translation, five are stripped because they are not his and never were. Two
+// ways a key earns the strip. Cli.EventLogDeleteSummary outlived its English
+// when the Recycle Bin went and sat here saying the files had been sent to it,
+// which is a fossil no user can reach and no gate can measure, the still-English
+// gate skipping machine keys by contract and nothing else comparing them. The
+// other four arrived after his PR and sit in English inside a Japanese file;
+// translating them would buy correct Japanese that can never be read, and any
+// machine key that outlives its English or postdates his work joins them.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';
@@ -414,13 +415,21 @@ const MAP = {
 
 let text = readFileSync(BASE, 'utf8');
 
-// The one stripped key, by name (see the header). Everything else, machine Cli
-// included, stays and is translated from MAP.
-const STRIPPED = 'Cli.EventLogDeleteSummary';
+// The stripped keys, by name (see the header). Everything else, coolvitto's
+// machine Cli values included, stays and is translated from MAP. A named set
+// rather than a predicate, because no predicate can separate these from the
+// nineteen that stay: the difference is who wrote them, which is not a property
+// of the key.
+const STRIPPED = new Set([
+  'Cli.EventLogDeleteSummary',
+  'Cli.EventLogScanWithheld',
+  'Cli.EventLogMissingFromDisk',
+  'Cli.EventLogMoveNotEnoughSpace',
+  'Cli.EventLogMoveAborted',
+]);
 let stripped = 0;
-text = text.replace(
-  new RegExp('[^\\S\\n]*<data name="' + STRIPPED + '"[\\s\\S]*?</data>\\n?', 'g'),
-  () => { stripped++; return ''; });
+text = text.replace(/[^\S\n]*<data name="(Cli\.[^"]*)"[\s\S]*?<\/data>\n?/g,
+  (m, name) => { if (STRIPPED.has(name)) { stripped++; return ''; } return m; });
 
 // Replace each key's inner <value> from MAP.
 const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -451,8 +460,8 @@ const neutral = parse(readFileSync(BASE, 'utf8'));
 const written = readFileSync(OUT, 'utf8');
 const output = parse(written);
 // ja ships every neutral key, machine Cli included, bar the one stripped above.
-const neutralRequired = [...neutral.keys()].filter((k) => k !== STRIPPED);
-const strippedLeaked = output.has(STRIPPED);
+const neutralRequired = [...neutral.keys()].filter((k) => !STRIPPED.has(k));
+const strippedLeaked = [...STRIPPED].filter((k) => output.has(k));
 
 const missingFromMap = neutralRequired.filter((k) => !(k in MAP));
 const strayMapKeys = Object.keys(MAP).filter((k) => !neutral.has(k));
@@ -476,7 +485,7 @@ console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli)');
 console.log('MAP entries:', Object.keys(MAP).length, '| CRLF:', crlf, '(expect 0)');
-console.log('machine Cli <data> removed:', stripped, '(expect 1,', STRIPPED + ')');
+console.log('machine Cli <data> removed:', stripped, `(expect ${STRIPPED.size}:`, [...STRIPPED].join(', ') + ')');
 
 if (alsoKeep.size) {
   console.log('ALSO_KEEP (' + alsoKeep.size + '), kept identical to English:');
@@ -488,10 +497,10 @@ if (strayMapKeys.length) console.log('!! in MAP but not in neutral:', strayMapKe
 if (missingFromOutput.length) console.log('!! required key missing from output:', missingFromOutput);
 if (arityMismatch.length) console.log('!! placeholder arity differs from neutral:', arityMismatch);
 if (untranslated.length) console.log('!! still English (untranslated), ' + untranslated.length + ': ' + untranslated.slice(0, 40).join(', '));
-if (strippedLeaked) console.log('!! ' + STRIPPED + ' is still in the output; the strip regex missed it.');
+if (strippedLeaked.length) console.log('!! still in the output; the strip regex missed them:', strippedLeaked);
 
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
-  !missingFromOutput.length && !arityMismatch.length && !strippedLeaked && stripped === 1 &&
+  !missingFromOutput.length && !arityMismatch.length && !strippedLeaked.length && stripped === STRIPPED.size &&
   output.size === neutralRequired.length && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

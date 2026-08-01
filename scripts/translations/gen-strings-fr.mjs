@@ -498,7 +498,7 @@ const MAP = {
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME.
+// Remove ONLY the machine-contract Cli.* <data> elements BY NAME.
 const isMachineCliKey = (k) =>
   k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
 let cliMachineRemoved = 0;
@@ -539,6 +539,10 @@ const parse = (xml) => {
   return map;
 };
 const neutral = parse(readFileSync(BASE, 'utf8'));
+// Derived, never pinned: the machine set grows whenever the command line
+// gains an event-log string, and a literal here would fail every generator
+// at once while asserting nothing about what was actually stripped.
+const cliMachineExpected = [...neutral.keys()].filter(isMachineCliKey).length;
 const written = readFileSync(OUT, 'utf8');
 const output = parse(written);
 const neutralRequired = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
@@ -579,7 +583,7 @@ console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length + overrideKeys.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli +',
   overrideKeys.length, 'override)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, `(expect ${cliMachineExpected})`);
 console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| CRLF:', crlf, '(expect 0)');
 
 if (alsoKeep.size) {
@@ -609,6 +613,6 @@ if (untranslated.length) {
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
   !overrideMissing.length && !overrideArityMismatch.length &&
-  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 20 && crlf === 0;
+  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === cliMachineExpected && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');
