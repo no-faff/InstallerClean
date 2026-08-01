@@ -309,8 +309,9 @@ public partial class ChromeViewModel : ObservableObject, IDisposable
 
     // The orphaned-files window lists what the scan found. With nothing found
     // there is nothing to list, and a live button onto an empty list is a dead
-    // end; the registered window, which always has content after a scan, keeps
-    // the plain has-a-result gate.
+    // end; the registered window, which after any scan the app will accept has
+    // content, keeps the plain has-a-result gate; the window itself no longer
+    // depends on that.
     private bool HasOrphansToShow => HasScanResult && _scan.HasOrphans;
 
     [RelayCommand(CanExecute = nameof(HasOrphansToShow))]

@@ -333,7 +333,7 @@
                              docks top-left, beside the first line. -->
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                                       Style="{StaticResource BodyScrollRegion}"
-                                      AutomationProperties.Name="{loc:Translate Automation.Section.ProductDetails}"
+                                      AutomationProperties.Name="{loc:Translate Automation.Scroll.ProductDetails}"
                                       Visibility="{Binding ShowMissing, Converter={StaticResource BoolToVis}}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -361,7 +361,7 @@
                         </ScrollViewer>
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                                       Style="{StaticResource BodyScrollRegion}"
-                                      AutomationProperties.Name="{loc:Translate Automation.Section.ProductDetails}"
+                                      AutomationProperties.Name="{loc:Translate Automation.Scroll.ProductDetails}"
                                       Visibility="{Binding ShowDetails, Converter={StaticResource BoolToVis}}">
                             <Grid>
                                 <Grid.ColumnDefinitions>

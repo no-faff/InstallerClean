@@ -288,6 +288,12 @@
   <data name="Automation.Scroll.ScanResults" xml:space="preserve"><value>Scan results</value></data>
   <data name="Automation.Scroll.ResultDetails" xml:space="preserve"><value>Result details</value></data>
   <data name="Automation.Scroll.FileDetails" xml:space="preserve"><value>File details</value></data>
+  <!-- The registered window's scrolling pane, carrying the same words as the
+       section heading above it because it is the same region: it exists as its
+       own key so that a screen reader does not meet one string twice, once as
+       static text and once as a pane. Its pair in the orphaned window is
+       Automation.Scroll.FileDetails. -->
+  <data name="Automation.Scroll.ProductDetails" xml:space="preserve"><value>Product details</value></data>
   <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>Dialog text</value></data>
   <!-- Composes the announced outcome of a scan that found files:
        0 = the "N unneeded files to clean up" line, 1 = the total size. -->

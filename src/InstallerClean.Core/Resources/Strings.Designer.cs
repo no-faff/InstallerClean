@@ -116,6 +116,7 @@ public static class Strings
     public static string Automation_ScanResultAnnouncement => Get("Automation.ScanResultAnnouncement");
     public static string Automation_Scroll_DialogBody => Get("Automation.Scroll.DialogBody");
     public static string Automation_Scroll_FileDetails => Get("Automation.Scroll.FileDetails");
+    public static string Automation_Scroll_ProductDetails => Get("Automation.Scroll.ProductDetails");
     public static string Automation_Scroll_ResultDetails => Get("Automation.Scroll.ResultDetails");
     public static string Automation_Scroll_ScanResults => Get("Automation.Scroll.ScanResults");
     public static string Automation_Section_BackupFolder => Get("Automation.Section.BackupFolder");
