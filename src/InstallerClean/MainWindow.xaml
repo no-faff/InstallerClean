@@ -419,8 +419,18 @@
                      Dock="Right" gives the first declared child the
                      furthest-right slot, so Move is declared first and Delete
                      takes the one to its left, carrying the gap between the
-                     two. TabIndex pins Delete first, which now agrees with
-                     visual order rather than overriding it as it used to. -->
+                     two.
+
+                     TabIndex pins MOVE first, and the principle behind it is
+                     older than this arrangement: the primary action is the one
+                     a keyboard reaches first. Delete held that place while
+                     Delete was the emphasised button, so moving it to Move
+                     keeps the principle rather than dropping it. The cost was
+                     weighed and taken: tab order no longer agrees with
+                     left-to-right visual order, so a sighted keyboard user sees
+                     focus land on the right-hand button first. Against that, a
+                     screen-reader user meets the recommended action first,
+                     which is the emphasis this screen now carries on purpose. -->
                 <!-- Each button's help text is its own tooltip, not a second
                      sentence written alongside it. Two sources for one
                      explanation drift: they did, the pair here having grown
@@ -433,14 +443,14 @@
                      first. -->
                 <DockPanel Grid.Row="4" KeyboardNavigation.TabNavigation="Local">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
-                            KeyboardNavigation.TabIndex="1"
+                            KeyboardNavigation.TabIndex="0"
                             Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
                             AutomationProperties.HelpText="{Binding Cleanup.MoveButtonTooltip}"
                             ToolTip="{Binding Cleanup.MoveButtonTooltip}"
                             ToolTipService.ShowOnDisabled="True"/>
 
                     <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
-                            KeyboardNavigation.TabIndex="0"
+                            KeyboardNavigation.TabIndex="1"
                             Content="{loc:Translate Action.DeletePermanently}" Command="{Binding Cleanup.DeleteAllCommand}"
                             AutomationProperties.HelpText="{loc:Translate Tooltip.Delete}"
                             ToolTip="{loc:Translate Tooltip.Delete}"
