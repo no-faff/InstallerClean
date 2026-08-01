@@ -1152,7 +1152,10 @@
 
          The sweep translates the 80 px bar from X=-80 to X=320 (max bar
          width 240 px). DoubleAnimation can't template-bind ActualWidth,
-         so a wider indeterminate consumer needs the To value raised. -->
+         so a wider indeterminate consumer needs the To value raised, and
+         those two lengths are the reason this bar is not among the ones
+         that take the OS text-scale factor: the travel is a literal, so a
+         bar that grew would leave its own sweep behind. -->
     <Style TargetType="ProgressBar">
         <Setter Property="Background" Value="{StaticResource Surface.Sidebar}"/>
         <!-- Progress.Fill, not the accent fill the buttons wear: a bar is read

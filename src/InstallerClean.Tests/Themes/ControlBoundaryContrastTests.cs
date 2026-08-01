@@ -2,8 +2,8 @@ namespace InstallerClean.Tests.Themes;
 
 // Four controls in the app say what they are with a fill and nothing else: the
 // About window's auto-update checkbox, a selected row in each of the two detail
-// lists, and the backup-folder box. Every one of those fills is under 2:1
-// against what it is drawn on, and no repaint fixes that, because the theme's
+// lists, and the backup-folder box. Those fills run from 1.22:1 to 2.33:1
+// against what they are drawn on, and no repaint fixes that, because the theme's
 // five opaque structural surfaces span 2.36:1 between the widest pair: there is
 // no such thing as a quiet visible fill here, and the next step up the ramp is a
 // body-text brightness. A LINE can clear the floor where a fill cannot, being
