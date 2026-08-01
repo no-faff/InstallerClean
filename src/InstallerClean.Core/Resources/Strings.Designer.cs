@@ -160,6 +160,7 @@ public static class Strings
     public static string Cli_EventLogDeleteSummary => Get("Cli.EventLogDeleteSummary");
     public static string Cli_EventLogHardError => Get("Cli.EventLogHardError");
     public static string Cli_EventLogHardError_NoLog => Get("Cli.EventLogHardError.NoLog");
+    public static string Cli_EventLogMissingFromDisk => Get("Cli.EventLogMissingFromDisk");
     public static string Cli_EventLogMoveAborted => Get("Cli.EventLogMoveAborted");
     public static string Cli_EventLogMoveDestinationInsideInstaller => Get("Cli.EventLogMoveDestinationInsideInstaller");
     public static string Cli_EventLogMoveDestinationInSystemFolder => Get("Cli.EventLogMoveDestinationInSystemFolder");
@@ -175,6 +176,7 @@ public static class Strings
     public static string Cli_EventLogReason_PendingRenameInCache => Get("Cli.EventLogReason.PendingRenameInCache");
     public static string Cli_EventLogScanFound => Get("Cli.EventLogScanFound");
     public static string Cli_EventLogScanNoOrphans => Get("Cli.EventLogScanNoOrphans");
+    public static string Cli_EventLogScanWithheld => Get("Cli.EventLogScanWithheld");
     public static string Cli_EventLogUnavailable => Get("Cli.EventLogUnavailable");
     public static string Cli_EventLogValidationFailed => Get("Cli.EventLogValidationFailed");
     public static string Cli_FoundOrphans => Get("Cli.FoundOrphans");
@@ -198,6 +200,8 @@ public static class Strings
     public static string Cli_Help_ScanOnly => Get("Cli.Help.ScanOnly");
     public static string Cli_Help_Usage => Get("Cli.Help.Usage");
     public static string Cli_Help_Version => Get("Cli.Help.Version");
+    public static string Cli_MissingFromDisk_Plural => Get("Cli.MissingFromDisk.Plural");
+    public static string Cli_MissingFromDisk_Singular => Get("Cli.MissingFromDisk.Singular");
     public static string Cli_MoveDestinationInsideInstaller => Get("Cli.MoveDestinationInsideInstaller");
     public static string Cli_MoveDestinationInSystemFolder => Get("Cli.MoveDestinationInSystemFolder");
     public static string Cli_MoveDestinationRelative => Get("Cli.MoveDestinationRelative");

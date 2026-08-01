@@ -101,12 +101,17 @@ internal static class CliExitCode
 }
 
 /// <summary>
-/// The outcome class of a CLI run. Each value carries a stable Windows
-/// Event ID and entry type (see <see cref="CliContract.EventIdFor"/> /
-/// <see cref="CliContract.EntryTypeFor"/>) so a consumer can classify a run
+/// The class of one Application-channel entry. Each value carries a stable
+/// Windows Event ID and entry type (see <see cref="CliContract.EventIdFor"/> /
+/// <see cref="CliContract.EntryTypeFor"/>) so a consumer can classify an entry
 /// by Event ID, which is language-independent, instead of string-matching
 /// the English summary the entry carries (the Application channel is
 /// English-only by deliberate design).
+///
+/// The first four are outcome classes and one of them is the run's single
+/// summary entry. The last two are notices, which sit BESIDE that summary and
+/// never replace it: they report a condition of the machine the scan found
+/// rather than the outcome of the run, which is why they have IDs of their own.
 /// </summary>
 internal enum CliEventClass
 {
@@ -121,6 +126,20 @@ internal enum CliEventClass
 
     /// <summary>The run failed outright: a bad invocation, a scan that threw, or a whole batch that failed.</summary>
     HardError,
+
+    /// <summary>
+    /// Notice: the scan could not read every installed product's records, so it
+    /// withheld the superseded and obsoleted class wholesale and this run's list
+    /// is shorter than the same machine would normally give.
+    /// </summary>
+    ScanWithheldNotice,
+
+    /// <summary>
+    /// Notice: packages Windows still references have no file on disk. Nothing
+    /// this tool did, and nothing that bites today, but a future repair, update
+    /// or uninstall of those programs can fail on it.
+    /// </summary>
+    ScanMissingFilesNotice,
 }
 
 /// <summary>The exit code and Event-log class chosen for a finished file operation.</summary>
@@ -216,10 +235,13 @@ internal static class CliContract
             : new CliOperationOutcome(CliExitCode.Error, CliEventClass.HardError);
 
     /// <summary>
-    /// The stable Application-channel Event ID for an outcome class. The
+    /// The stable Application-channel Event ID for an entry class. The
     /// 1000 band is "work happened" (success and partial), 2000 a
     /// transient skip, 4000 a hard failure, so an RMM filter can select an
-    /// outcome by number without reading the English message.
+    /// outcome by number without reading the English message. The 3000 band is
+    /// the notices, which are not outcomes: a run emits exactly one ID from the
+    /// other three bands and any number of these beside it, so a consumer
+    /// counting runs by ID counts the summary bands and never this one.
     /// </summary>
     internal static int EventIdFor(CliEventClass outcome) => outcome switch
     {
@@ -227,14 +249,20 @@ internal static class CliContract
         CliEventClass.Partial => 1002,
         CliEventClass.TransientSkip => 2000,
         CliEventClass.HardError => 4000,
+        CliEventClass.ScanWithheldNotice => 3000,
+        CliEventClass.ScanMissingFilesNotice => 3001,
         _ => 0,
     };
 
     /// <summary>
-    /// The Application-channel entry type for an outcome class. Only a clean
+    /// The Application-channel entry type for an entry class. Only a clean
     /// success is Information; partial, transient-skip and hard-error are
     /// Warning so a "Warning and above" filter catches every run that did
-    /// not fully do its job.
+    /// not fully do its job. The two notices are Warning for the same reason
+    /// read the other way round: a withheld class means the run's list was
+    /// short, and a missing registered file is the one thing this tool reports
+    /// that somebody has to act on, so neither may be filtered out by an
+    /// operator who is watching for trouble.
     /// </summary>
     internal static EventLogEntryType EntryTypeFor(CliEventClass outcome) =>
         outcome == CliEventClass.Ok ? EventLogEntryType.Information : EventLogEntryType.Warning;

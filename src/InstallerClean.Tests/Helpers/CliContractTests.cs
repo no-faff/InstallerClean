@@ -217,4 +217,50 @@ public class CliContractTests
     {
         Assert.Equal(EventLogEntryType.Warning, CliContract.EntryTypeFor(CliEventClass.HardError));
     }
+
+    [Fact]
+    public void EventId_notices_have_a_band_of_their_own()
+    {
+        Assert.Equal(3000, CliContract.EventIdFor(CliEventClass.ScanWithheldNotice));
+        Assert.Equal(3001, CliContract.EventIdFor(CliEventClass.ScanMissingFilesNotice));
+    }
+
+    [Fact]
+    public void EventId_no_notice_collides_with_an_outcome()
+    {
+        // The whole reason the notices have IDs of their own: they are written
+        // beside a run's single summary entry, so a consumer counting runs by
+        // the summary's ID must not be able to match one of these by accident.
+        var outcomes = new[]
+        {
+            CliEventClass.Ok, CliEventClass.Partial,
+            CliEventClass.TransientSkip, CliEventClass.HardError,
+        }.Select(CliContract.EventIdFor).ToHashSet();
+
+        Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanWithheldNotice), outcomes);
+        Assert.DoesNotContain(CliContract.EventIdFor(CliEventClass.ScanMissingFilesNotice), outcomes);
+    }
+
+    [Fact]
+    public void EventId_is_assigned_for_every_class()
+    {
+        // 0 is the switch's unmapped default, so a class added without an ID
+        // would ship entries no filter can select. Nothing else enumerates the
+        // enum.
+        Assert.All(Enum.GetValues<CliEventClass>(),
+            c => Assert.NotEqual(0, CliContract.EventIdFor(c)));
+    }
+
+    [Fact]
+    public void EntryType_notices_are_warning()
+    {
+        // A withheld class means the run's list was short, and a missing
+        // registered file is the one thing this tool reports that somebody has
+        // to act on. Neither may be filtered out by an operator watching at
+        // "Warning and above".
+        Assert.Equal(EventLogEntryType.Warning,
+            CliContract.EntryTypeFor(CliEventClass.ScanWithheldNotice));
+        Assert.Equal(EventLogEntryType.Warning,
+            CliContract.EntryTypeFor(CliEventClass.ScanMissingFilesNotice));
+    }
 }

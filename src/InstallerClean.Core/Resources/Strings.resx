@@ -969,6 +969,26 @@ The crash log could not be written.</value></data>
   <data name="Cli.EventLogScanNoOrphans" xml:space="preserve"><value>Scan mode ({0}): no unneeded files. Installer database has {1} registered {2}.</value></data>
   <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
   <data name="Cli.EventLogScanFound" xml:space="preserve"><value>Scan mode ({0}): {1} unneeded {2} found, {3}. No action taken.</value></data>
+  <!-- 0 = count of registered files missing from disk, and this is the
+       non-removable count only: a superseded patch whose file has already gone
+       is the expected end state, not an alarm. The window says the same thing in
+       Summary.MissingFromDisk.*, which closes on "Open Details for what to do";
+       there is no Details window here, so the last sentence carries the recovery
+       step itself. "Could fail" and "usually restores" are the verified
+       positions and neither may harden: Microsoft guarantees nothing here. -->
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, the same version, usually restores it.</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.</value></data>
+  <!-- 0 = mode arg, 1 = files the scan held back, 2 = installed products it
+       could not read. A notice beside the run's summary, not a summary itself
+       (Event ID 3000; see MachineContract). Deliberately unpluralised, matching
+       the always-plural "errors:" header the same audience scrapes: a machine
+       surface holds one shape, and the grammar is the price of it. -->
+  <data name="Cli.EventLogScanWithheld" xml:space="preserve"><value>{0} mode: {1} superseded and obsoleted files were withheld; the records for {2} installed products could not be read.</value></data>
+  <!-- 0 = mode arg, 1 = registered files missing from disk. The second notice
+       (Event ID 3001), and the actionable one: it says outright that this tool
+       did not cause it, because the entry sits in a log beside that tool's name
+       and nothing else there would. Unpluralised, as above. -->
+  <data name="Cli.EventLogMissingFromDisk" xml:space="preserve"><value>{0} mode: {1} registered files are missing from the Installer cache and were not removed by InstallerClean. A future repair, update or uninstall of those programs could fail.</value></data>
   <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
   <data name="Cli.DeletingFiles" xml:space="preserve"><value>Deleting {0} {1}...</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun. It says "permanently" because

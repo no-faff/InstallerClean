@@ -337,21 +337,7 @@ internal static class Program
                 DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
                 count, DisplayHelpers.PluraliseFile(count), size));
 
-            // A scan that could not read every program's records withheld its
-            // superseded-patch verdicts, so this run's list is shorter than the
-            // same machine would normally give. Reported for the same reason the
-            // GUI reports it: the only other symptom is a quietly shorter list,
-            // and a weekly figure that drops with no cause stated is worse than
-            // the extra line. Human stdout, in the OS language, like the
-            // re-verify's kept-back line below; the event log's machine contract
-            // is unchanged.
-            if (scanResult.UnreadableProductCount > 0)
-                Console.WriteLine(string.Format(
-                    DisplayHelpers.Pluralise(scanResult.UnreadableProductCount,
-                        Strings.Summary_ProgramsUnreadable_Singular,
-                        Strings.Summary_ProgramsUnreadable_Plural,
-                        "Summary.ProgramsUnreadable"),
-                    scanResult.UnreadableProductCount));
+            ReportScanSignals(arg, scanResult);
 
             if (count == 0)
             {
@@ -664,6 +650,56 @@ internal static class Program
             // (Main's guard routes here too) report identically: crash.log, one
             // HardError audit entry, ExitError, and never ex.Message.
             return ReportUnexpectedError(arg, ex);
+        }
+    }
+
+    /// <summary>
+    /// Reports the two scan-level conditions that are facts about the machine
+    /// rather than about this run: a scan that had to withhold its superseded and
+    /// obsoleted verdicts, and registered files missing from disk. Each goes to
+    /// stdout in the operator's language and to the Application log in English,
+    /// because scheduled tasks and RMM tools discard the first and read the second.
+    /// </summary>
+    /// <remarks>
+    /// Called before every return the work loop can take, the nothing-to-do one
+    /// included, which is the point: a fleet whose superseded-patch cleanup has
+    /// been withheld every night for a month looks, on the only surface anybody
+    /// watches, exactly like a fleet with nothing to clean.
+    /// <para>
+    /// Each entry carries an Event ID of its own (the 3000 band, see
+    /// <see cref="CliContract.EventIdFor"/>) so a consumer counting runs off the
+    /// summary's ID cannot match one by accident. Neither is a summary and neither
+    /// replaces one.
+    /// </para>
+    /// </remarks>
+    private static void ReportScanSignals(string arg, ScanResult scanResult)
+    {
+        if (scanResult.UnreadableProductCount > 0)
+        {
+            Console.WriteLine(string.Format(
+                DisplayHelpers.Pluralise(scanResult.UnreadableProductCount,
+                    Strings.Summary_ProgramsUnreadable_Singular,
+                    Strings.Summary_ProgramsUnreadable_Plural,
+                    "Summary.ProgramsUnreadable"),
+                scanResult.UnreadableProductCount));
+            MachineContract.WriteEventLog(CliEventClass.ScanWithheldNotice,
+                () => string.Format(Strings.Cli_EventLogScanWithheld,
+                    arg, scanResult.WithheldCount, scanResult.UnreadableProductCount));
+        }
+
+        // MissingNonRemovableCount, never MissingFromDiskCount: a superseded patch
+        // whose file has already gone is the expected end state, not an alarm.
+        if (scanResult.MissingNonRemovableCount > 0)
+        {
+            Console.WriteLine(string.Format(
+                DisplayHelpers.Pluralise(scanResult.MissingNonRemovableCount,
+                    Strings.Cli_MissingFromDisk_Singular,
+                    Strings.Cli_MissingFromDisk_Plural,
+                    "Cli.MissingFromDisk"),
+                scanResult.MissingNonRemovableCount));
+            MachineContract.WriteEventLog(CliEventClass.ScanMissingFilesNotice,
+                () => string.Format(Strings.Cli_EventLogMissingFromDisk,
+                    arg, scanResult.MissingNonRemovableCount));
         }
     }
 

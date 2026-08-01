@@ -682,18 +682,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             catch (MoveAbortedException ex)
             {
                 // The destination was swapped part-way through, so the service
-                // stopped and handed back what it had done. Files are in the
-                // folder, and the ordinary summary states what moved and where,
-                // which is true of a batch that stopped as much as of one that
-                // finished; the warning over it carries the reason, its own text
-                // saying the move was stopped. Caught here rather than at the
-                // method's own arms so the surviving list and the destination
-                // kind are still in scope to report with.
-                //
-                // No result-log entry, which is not a new call: the cancel arm
-                // below returns before the write for the same reason, recorded
-                // there as the owner's decision that a run which stopped part
-                // way stays out of the public figures.
+                // stopped and handed back what it had done. Caught here rather
+                // than at the method's own arms so the surviving list and the
+                // destination kind are still in scope to report with; the warning
+                // over the summary carries the reason. No result-log entry, for
+                // the reason recorded on the cancel arm below.
                 await _scan.RefreshAsync();
                 if (ex.Partial.MovedCount > 0 || ex.Partial.Errors.Count > 0)
                 {
@@ -1083,6 +1076,15 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// inside the per-file loop, and the unaccounted-for catch that can fire at
     /// any point in the batch. Removing a folder there could take a moved file
     /// with it, which is the one outcome worse than a stray empty folder.
+    ///
+    /// One path does not call this and is not one of those, so the rule above
+    /// does not reach it and reading from the rule alone would make it look like
+    /// a defect: the destination-gate arm, where nothing was placed and the
+    /// folder is still left alone. Two of the five gates that reach it fire
+    /// precisely because the destination has just been shown to resolve into
+    /// C:\Windows\Installer or a system folder, and deleting a directory at a
+    /// path just proven to land somewhere unexpected is the operation those
+    /// gates exist to prevent.
     ///
     /// The caller checks its createdDestination local first, so a folder that
     /// was already there is never a candidate.

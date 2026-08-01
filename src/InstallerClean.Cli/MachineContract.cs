@@ -61,11 +61,24 @@ internal static class MachineContract
     }
 
     /// <summary>
-    /// Writes one Application-channel summary, built in English via
+    /// Writes one Application-channel entry, built in English via
     /// <see cref="English"/>. The sanctioned path for every event-log write:
     /// routing them all through here keeps a localised noun or size out of the
     /// line RMM greps for a known English phrase.
     /// </summary>
+    /// <remarks>
+    /// What a consumer may rely on, because two of these entries are newer than
+    /// most tooling watching for them. Every <c>/s</c>, <c>/d</c> or <c>/m</c>
+    /// run writes exactly ONE summary entry, and its Event ID is in the 1000,
+    /// 2000 or 4000 band (<see cref="CliContract.EventIdFor"/>). Beside it a run
+    /// may write NOTICES, in the 3000 band, which report a condition of the
+    /// machine the scan found rather than the outcome of the run: 3000 that the
+    /// scan withheld its superseded and obsoleted verdicts, 3001 that packages
+    /// Windows still references have no file on disk. A notice never replaces the
+    /// summary and never stands in for one, so counting runs means counting the
+    /// summary bands; and a machine can emit a notice on every run for weeks,
+    /// both conditions being properties of the machine rather than of the run.
+    /// </remarks>
     internal static void WriteEventLog(CliEventClass outcome, Func<string> build) =>
         EventLogWriter.Write(outcome, English(build));
 }
