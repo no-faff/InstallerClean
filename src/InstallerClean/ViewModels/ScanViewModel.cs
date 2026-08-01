@@ -96,16 +96,25 @@ public partial class ScanViewModel : ObservableObject
         _ => PendingRebootLabels.Clean,
     };
 
-    /// <summary>Localised banner text for the current Block reason; empty otherwise.</summary>
+    /// <summary>
+    /// Localised banner text for the current Block reason; empty otherwise.
+    ///
+    /// The last arm is what a reason with no line of its own gets, and it is a
+    /// string rather than a throw because of where this is read from: WPF calls
+    /// it through a binding and swallows anything it throws as a binding error,
+    /// so the user would meet a blank banner over greyed buttons with nothing on
+    /// screen saying why. A generic sentence that is true of the whole family
+    /// beats that. It is unreachable while the enum has three members, all of
+    /// which are handled above, and PendingRebootBannerCoversEveryReason is what
+    /// makes adding a fourth a failing test rather than a silent gap.
+    /// </summary>
     public string PendingRebootBannerText => PendingRebootResult?.Reason switch
     {
         PendingRebootReason.MsiExecuteMutexHeld => Strings.Body_PendingReboot_MsiExecuteMutex,
         PendingRebootReason.InstallerInProgress => Strings.Body_PendingReboot_InstallerInProgress,
         PendingRebootReason.PendingRenameInCache => Strings.Body_PendingReboot_PendingRenameInCache,
         null => string.Empty,
-        _ => throw new InvalidOperationException(
-            $"Unhandled PendingRebootReason: {PendingRebootResult?.Reason}. " +
-            "A new enum value was added without updating PendingRebootBannerText."),
+        _ => Strings.Body_PendingReboot_Other,
     };
 
     /// <summary>
