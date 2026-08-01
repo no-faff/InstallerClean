@@ -79,6 +79,20 @@ public class ScanViewModelPendingRebootTests
     }
 
     [Fact]
+    public void A_reason_with_no_label_of_its_own_is_not_recorded_as_clean()
+    {
+        // The label half of the arm above, and the two must agree about the same
+        // moment: this state paints the generic banner and disables both
+        // buttons, so a payload calling it clean says the opposite of the screen
+        // about a machine that was blocked.
+        var vm = NewViewModel();
+        vm.PendingRebootResult = PendingRebootResult.Block((PendingRebootReason)99);
+
+        Assert.Equal(PendingRebootLabels.BlockedOther, vm.PendingRebootLabel);
+        Assert.True(vm.HasPendingReboot);
+    }
+
+    [Fact]
     public void No_block_leaves_the_banner_empty_and_the_label_clean()
     {
         var vm = NewViewModel();

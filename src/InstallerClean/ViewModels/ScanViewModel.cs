@@ -84,16 +84,27 @@ public partial class ScanViewModel : ObservableObject
     public bool HasPendingReboot => PendingRebootResult?.IsBlocked == true;
 
     /// <summary>
-    /// Stable, non-localised label for the current pending-reboot state.
-    /// Drives the diagnostic log so a non-en-GB user's report still
-    /// matches a developer's filter on <c>"installerInProgress"</c>.
+    /// Stable, non-localised label for the current pending-reboot state, and
+    /// the only thing this property feeds is the result-log payload, so a
+    /// non-en-GB user's report still matches a developer's filter on
+    /// <c>"installerInProgress"</c>.
+    ///
+    /// The null arm is both states that genuinely are clean, no probe yet and a
+    /// Clean verdict, <c>PendingRebootResult.Block</c> being unable to exist
+    /// without a reason. The arm under it is a reason with no label of its own,
+    /// which paints the generic banner and disables both buttons: recording
+    /// that run as clean would have the payload disagree with the screen about
+    /// the same moment. Unreachable while the enum has three members, and it is
+    /// two lines against the payload shipping a false statement if a fourth
+    /// arrives before the field leaves.
     /// </summary>
     public string PendingRebootLabel => PendingRebootResult?.Reason switch
     {
         PendingRebootReason.MsiExecuteMutexHeld => PendingRebootLabels.MsiExecuteMutexHeld,
         PendingRebootReason.InstallerInProgress => PendingRebootLabels.InstallerInProgress,
         PendingRebootReason.PendingRenameInCache => PendingRebootLabels.PendingRenameInCache,
-        _ => PendingRebootLabels.Clean,
+        null => PendingRebootLabels.Clean,
+        _ => PendingRebootLabels.BlockedOther,
     };
 
     /// <summary>
@@ -105,8 +116,10 @@ public partial class ScanViewModel : ObservableObject
     /// so the user would meet a blank banner over greyed buttons with nothing on
     /// screen saying why. A generic sentence that is true of the whole family
     /// beats that. It is unreachable while the enum has three members, all of
-    /// which are handled above, and PendingRebootBannerCoversEveryReason is what
-    /// makes adding a fourth a failing test rather than a silent gap.
+    /// which are handled above. Adding a fourth is a failing test rather than a
+    /// silent gap because Every_reason_has_a_banner_of_its_own walks the enum,
+    /// and A_reason_with_no_banner_of_its_own_still_says_something covers this
+    /// arm (ScanViewModelPendingRebootTests).
     /// </summary>
     public string PendingRebootBannerText => PendingRebootResult?.Reason switch
     {

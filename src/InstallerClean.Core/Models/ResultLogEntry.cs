@@ -256,4 +256,12 @@ public static class PendingRebootLabels
     public const string MsiExecuteMutexHeld = "msiExecuteMutexHeld";
     public const string InstallerInProgress = "installerInProgress";
     public const string PendingRenameInCache = "pendingRenameInCache";
+
+    /// <summary>
+    /// A machine the probe blocked for a reason with no label of its own, which
+    /// is what a fourth <c>PendingRebootReason</c> would arrive as. It exists so
+    /// that state cannot be recorded as <see cref="Clean"/>, which is the one
+    /// answer that would send a reader past the run rather than to it.
+    /// </summary>
+    public const string BlockedOther = "blockedOther";
 }
