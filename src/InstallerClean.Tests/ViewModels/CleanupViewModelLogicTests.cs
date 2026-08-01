@@ -4,12 +4,14 @@ using InstallerClean.ViewModels;
 namespace InstallerClean.Tests.ViewModels;
 
 /// <summary>
-/// The two static answers <see cref="CleanupViewModel"/> gives about a
-/// destination, both of them pure path or string work with no service behind
-/// them. <see cref="CompletionViewModelTests"/> covers what the completion
-/// screen does with a <see cref="MoveSpaceOutcome"/>; this covers the half that
-/// decides which one it gets, which is the half that can be got wrong without
-/// anything looking different until somebody moves files to a share.
+/// The static answer <see cref="CleanupViewModel"/> gives about a destination,
+/// pure string work with no service behind it.
+/// <see cref="CompletionViewModelTests"/> covers what the completion screen does
+/// with a <see cref="MoveSpaceOutcome"/>; this covers the half that decides
+/// which one it gets, which is the half that can be got wrong without anything
+/// looking different until somebody moves files to a share. The same-drive
+/// predicate underneath it is Core's and is covered by
+/// <c>MoveSpaceCheckTests</c>.
 /// </summary>
 public class CleanupViewModelLogicTests
 {
@@ -30,27 +32,4 @@ public class CleanupViewModelLogicTests
     [InlineData("a kind nothing has ever emitted", MoveSpaceOutcome.Unclassified)]
     public void ClassifySpaceOutcome_maps_every_destination_kind(string kind, MoveSpaceOutcome expected) =>
         Assert.Equal(expected, CleanupViewModel.ClassifySpaceOutcome(kind));
-
-    [Fact]
-    public void IsOnInstallerCacheDrive_is_true_only_for_the_system_drive()
-    {
-        var systemRoot = Path.GetPathRoot(
-            Environment.GetFolderPath(Environment.SpecialFolder.System))!;
-
-        Assert.True(CleanupViewModel.IsOnInstallerCacheDrive(Path.Combine(systemRoot, "backup")));
-        // Case and separator shape must not change the answer: the box takes
-        // whatever the user typed.
-        Assert.True(CleanupViewModel.IsOnInstallerCacheDrive(
-            Path.Combine(systemRoot.ToLowerInvariant(), "backup") + Path.DirectorySeparatorChar));
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    // A share has no drive letter to compare with, so it has not been shown to
-    // be the system drive. False is the safe way round: the tooltip then omits
-    // a claim rather than making a wrong one.
-    [InlineData(@"\\server\backup")]
-    public void IsOnInstallerCacheDrive_is_false_when_it_cannot_prove_otherwise(string destination) =>
-        Assert.False(CleanupViewModel.IsOnInstallerCacheDrive(destination));
 }

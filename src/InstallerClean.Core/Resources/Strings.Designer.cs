@@ -164,6 +164,7 @@ public static class Strings
     public static string Cli_EventLogMoveDestinationInSystemFolder => Get("Cli.EventLogMoveDestinationInSystemFolder");
     public static string Cli_EventLogMoveDestinationRelative => Get("Cli.EventLogMoveDestinationRelative");
     public static string Cli_EventLogMoveNoDestination => Get("Cli.EventLogMoveNoDestination");
+    public static string Cli_EventLogMoveNotEnoughSpace => Get("Cli.EventLogMoveNotEnoughSpace");
     public static string Cli_EventLogMoveSummary => Get("Cli.EventLogMoveSummary");
     public static string Cli_EventLogMutexBlocked => Get("Cli.EventLogMutexBlocked");
     public static string Cli_EventLogNoArguments => Get("Cli.EventLogNoArguments");
@@ -200,6 +201,7 @@ public static class Strings
     public static string Cli_MoveDestinationInSystemFolder => Get("Cli.MoveDestinationInSystemFolder");
     public static string Cli_MoveDestinationRelative => Get("Cli.MoveDestinationRelative");
     public static string Cli_MovedFiles => Get("Cli.MovedFiles");
+    public static string Cli_MoveNotEnoughSpace => Get("Cli.MoveNotEnoughSpace");
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_MutexBlocked => Get("Cli.MutexBlocked");
     public static string Cli_NoMoveDestination => Get("Cli.NoMoveDestination");

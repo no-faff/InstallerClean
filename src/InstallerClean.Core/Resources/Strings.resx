@@ -987,6 +987,12 @@ The crash log could not be written.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Error: destination must be a fully qualified path. Got: {0}</value></data>
   <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%.</value></data>
+  <!-- 0 = destination, 1 = size the move needs, 2 = size free there. The window
+       refuses the same move with Error.NotEnoughSpaceBody; this says it in one
+       sentence because a command line has no dialog to lay out. The last clause
+       is the one a scheduled task's log needs: the refusal happens before the
+       destination folder is created, so the cache is untouched. -->
+  <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.</value></data>
   <!-- 0 = mode, 1 = destination -->
   <data name="Cli.EventLogMoveDestinationInsideInstaller" xml:space="preserve">
     <value>{0} mode aborted: destination {1} is inside C:\Windows\Installer.</value>
@@ -994,6 +1000,8 @@ The crash log could not be written.</value></data>
   </data>
   <data name="Cli.EventLogMoveDestinationRelative" xml:space="preserve"><value>{0} mode aborted: destination {1} is not a fully qualified path.</value></data>
   <data name="Cli.EventLogMoveDestinationInSystemFolder" xml:space="preserve"><value>{0} mode aborted: destination {1} resolves inside a Windows system folder.</value></data>
+  <!-- 0 = mode, 1 = destination, 2 = size free there, 3 = size the move needs -->
+  <data name="Cli.EventLogMoveNotEnoughSpace" xml:space="preserve"><value>{0} mode aborted: destination {1} has {2} free and the move needs {3}.</value></data>
   <!-- Names the flags rather than the GUI's button labels: there are no
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->

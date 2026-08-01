@@ -429,6 +429,27 @@ internal static class Program
             // (see ResolveAndValidateMoveDestination); moveDest is non-empty,
             // fully qualified and outside the Installer and system folders.
             var moveService = services.GetRequiredService<IMoveFilesService>();
+
+            // Room at the destination, decided by the Core rule the window
+            // applies, which refused a Move it had no room for while this ran it
+            // and filled the volume. Asked here rather than in the pre-scan
+            // destination validation because only the surviving set's size says
+            // how much room is needed, and asked before the folder is created so a
+            // refusal leaves nothing behind.
+            if (MoveSpaceCheck.RefusalFreeSpace(moveDest, totalBytes) is long freeAtDestination)
+            {
+                Console.WriteLine(string.Format(Strings.Cli_MoveNotEnoughSpace,
+                    moveDest, DisplayHelpers.FormatSize(totalBytes),
+                    DisplayHelpers.FormatSize(freeAtDestination)));
+                // Sizes recomputed inside the en-GB scope; see the summary lines
+                // below for why the stdout copies are not reused.
+                MachineContract.WriteEventLog(CliEventClass.HardError,
+                    () => string.Format(Strings.Cli_EventLogMoveNotEnoughSpace,
+                        arg, moveDest, DisplayHelpers.FormatSize(freeAtDestination),
+                        DisplayHelpers.FormatSize(totalBytes)));
+                return ExitError;
+            }
+
             Console.WriteLine(string.Format(
                 DisplayHelpers.Pluralise(count, Strings.Cli_MovingFiles, "Cli.MovingFiles"),
                 count, DisplayHelpers.PluraliseFile(count), moveDest));

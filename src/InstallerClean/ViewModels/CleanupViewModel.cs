@@ -217,37 +217,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     // question is answered.
     public string MoveButtonTooltip =>
         string.IsNullOrWhiteSpace(MoveDestination) ? Strings.Tooltip_MoveNeedsDestination
-        : IsOnInstallerCacheDrive(MoveDestination) ? Strings.Tooltip_MoveSameDrive
+        : MoveSpaceCheck.IsOnInstallerCacheDrive(MoveDestination) ? Strings.Tooltip_MoveSameDrive
         : Strings.Tooltip_Move;
-
-    /// <summary>
-    /// Whether <paramref name="dest"/> resolves to the same drive as the
-    /// installer cache, which is the system drive. Extracted so the Move
-    /// button's tooltip and <see cref="ClassifyMoveDestination"/> answer the
-    /// question the same way: a move there is a rename, so it frees nothing
-    /// until the folder itself goes.
-    ///
-    /// Path work only, no drive query, because the tooltip re-reads it on every
-    /// keystroke. Anything it cannot resolve is not the same drive, which is
-    /// the safe way round: the tooltip then omits a claim rather than making a
-    /// wrong one.
-    /// </summary>
-    internal static bool IsOnInstallerCacheDrive(string dest)
-    {
-        if (string.IsNullOrWhiteSpace(dest)) return false;
-        try
-        {
-            var destRoot = Path.GetPathRoot(Path.GetFullPath(dest));
-            if (string.IsNullOrEmpty(destRoot)) return false;
-            var systemRoot = Path.GetPathRoot(
-                Environment.GetFolderPath(Environment.SpecialFolder.System));
-            return string.Equals(destRoot, systemRoot, StringComparison.OrdinalIgnoreCase);
-        }
-        catch
-        {
-            return false;
-        }
-    }
 
     partial void OnMoveDestinationChanged(string value)
     {
@@ -586,11 +557,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         var destinationKind = preFlight.Kind;
 
-        // Free-space check. Skipped for a same-drive move (a rename frees
-        // nothing and needs nothing) and silently for paths the API can't
-        // measure (UNC shares where the caller lacks query rights, etc).
-        if (destinationKind != MoveDestinationKinds.SameDrive
-            && preFlight.AvailableFreeSpace is long free && free < totalBytes)
+        // Free-space check, decided in Core so the command line refuses the same
+        // moves this does. The measurement is the pre-flight's, taken off the
+        // dispatcher with the rest of the destination work; what MoveSpaceCheck
+        // adds is which measurements are worth acting on.
+        if (MoveSpaceCheck.RefusalFreeSpace(dest, totalBytes, preFlight.AvailableFreeSpace)
+            is long free)
         {
             // Pre-flight CTS no longer needed; dispose before returning.
             DisposeOperationCts();
@@ -824,13 +796,20 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (LocalisedInvalidOperationException ex)
         {
-            // Refresh before the dialog: Error_DestinationChangedMidBatch is
-            // thrown from inside the per-file loop (MoveFilesService, the
-            // per-iteration junction re-resolve), so files may already have
-            // left the cache. Without this the window keeps the pre-move count
-            // and size behind the modal, and the orphaned Details window lists
-            // files that are no longer there, until the next scan.
-            await _scan.RefreshAsync();
+            // Everything reaching here is one of MoveFilesService's five
+            // destination gates, all of which run before the per-file loop, so
+            // no file has moved and the counts on screen are still right. The
+            // mid-batch abort landed here once and no longer does, being a
+            // MoveAbortedException caught at the call site where the batch's own
+            // tally is still in scope; a rescan here would now be a full folder
+            // walk and API enumeration for nothing.
+            //
+            // No RemoveCreatedDestinationAsync either, and that is a ruling
+            // rather than an oversight: two of the five fire precisely because
+            // the destination has just been shown to resolve into
+            // C:\Windows\Installer or a system folder, and deleting a directory
+            // at a path just proven to land somewhere unexpected is the
+            // operation those guards exist to prevent.
             _dialogService.ShowWarning(ex.Message, Strings.Error_InvalidDestinationTitle);
             OperationProgress = string.Empty;
         }
@@ -848,10 +827,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            // Refresh for the same reason as the mid-batch arm above: this is
-            // the unforeseen-failure arm, so whether any file moved before it
-            // is by definition unknown, and stale counts are the wrong thing to
-            // leave on screen either way.
+            // The unforeseen-failure arm, so whether any file moved before it is
+            // by definition unknown, and stale counts are the wrong thing to
+            // leave on screen either way. That is what the two arms above can
+            // say and this one cannot, which is why only this one refreshes.
             await _scan.RefreshAsync();
             // A mid-move crash is surfaced the way every other failure in the
             // app is: a dialog naming the exception type and the crash-log
@@ -1377,7 +1356,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             !dest.StartsWith(@"\\?\", StringComparison.Ordinal))
             return MoveDestinationKinds.UncShare;
 
-        if (IsOnInstallerCacheDrive(dest))
+        if (MoveSpaceCheck.IsOnInstallerCacheDrive(dest))
             return MoveDestinationKinds.SameDrive;
 
         try
