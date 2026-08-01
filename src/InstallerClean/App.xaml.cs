@@ -348,24 +348,34 @@ public partial class App : Application
             window.Show();
             splash.Close();
         }
+        // Both arms show the dialog BEFORE closing the splash, and the order is
+        // load-bearing. ShutdownMode is never set, so it is the default
+        // OnLastWindowClose; at this point the splash is the only window the
+        // app has, and closing it queues Application.Shutdown as a dispatcher
+        // operation. The modal that follows pumps the dispatcher, runs that
+        // queued shutdown from inside its own frame, and the only diagnosis a
+        // user ever gets for a failed start flashes and vanishes. Anything the
+        // composition build, the view-model resolve or new MainWindow() throws
+        // lands here, XAML resource-type mismatches among them, so it is the
+        // arm that has to survive a broken app.
         catch (UnauthorizedAccessException)
         {
-            splash?.Close();
             MessageDialog.Show(
                 Strings.Error_AdminRequiredBody,
                 Strings.Error_AdminRequiredTitle,
                 MessageKind.Warning);
+            splash?.Close();
             Shutdown();
         }
         catch (Exception ex)
         {
-            splash?.Close();
             var crash = CrashLog.TryWrite(ex);
             var typeName = ex.GetType().Name;
             var body = crash.Written
                 ? string.Format(Strings.Startup_FailedToStart, typeName, crash.Path)
                 : string.Format(Strings.Startup_FailedToStart_NoLog, typeName);
             MessageDialog.Show(body, Strings.Startup_ErrorTitle, MessageKind.Error);
+            splash?.Close();
             Shutdown();
         }
     }
