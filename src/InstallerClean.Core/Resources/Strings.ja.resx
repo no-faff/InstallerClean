@@ -951,7 +951,6 @@ InstallerClean はすでに管理者として実行されていたため、同�
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
        "Recovered" is accurate here now and was not before: the space comes
        back at the moment of the delete rather than when a bin is emptied. -->
-  <data name="Cli.EventLogDeleteSummary" xml:space="preserve"><value>{0}モード：{2} 個中 {1} 個の {3} をごみ箱に送信、{4}を解放、{5}個の{6}。</value></data>
   <data name="Cli.NoMoveDestination" xml:space="preserve"><value>エラー：移動先が指定されていません。/m PATH を使用してください (GUI で設定したデフォルトはユーザーごとのもので、スケジュール実行やサービスアカウントでの実行には適用されません)。</value></data>
   <data name="Cli.EventLogMoveNoDestination" xml:space="preserve"><value>{0}モードは中止されました：移動先が指定されていません。</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>エラー：移動先を Windows Installer フォルダー内にすることはできません。</value></data>

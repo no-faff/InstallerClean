@@ -57,10 +57,10 @@ public class SatelliteResxParityTests
     // some in English. Every shipped satellite carries the CLI surface; the
     // no-Cli.-key skip stays for a future language that lands GUI-first (the
     // CLI falls back to neutral English until its first Cli. key arrives).
-    // The machine-read event-log keys are exempt either way: the CLI forces
-    // en-GB at the emit site (MachineContract), so a satellite may carry them
-    // (coolvitto's ja does) or omit them (the generated satellites strip
-    // them), and either is correct.
+    // The machine-read event-log keys are exempt key by key: the CLI forces
+    // en-GB at the emit site (MachineContract), so a satellite may carry one
+    // (coolvitto's ja carries all but one) or omit it (the generated satellites
+    // strip the lot), and either is correct.
     [Theory]
     [MemberData(nameof(SatelliteCultures))]
     public void Every_human_facing_cli_key_is_translated_when_a_satellite_ships_the_cli(string cultureName)

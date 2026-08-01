@@ -7,12 +7,22 @@
 // regenerating reproduces Strings.ja.resx. Treat the MAP values as the native
 // author's work, not a machine draft.
 //
-// Structure: UNLIKE the other satellites, ja carries the full neutral key set,
-// including the 20 machine-contract Cli.EventLog* keys (coolvitto translated
-// those too). They are forced to English at the emit site at runtime
-// (MachineContract.cs), so carrying translated copies is harmless. This
-// generator therefore does NOT strip the machine keys. Japanese has no count
-// plurals, so there are no satellite-only overrides.
+// Structure: UNLIKE the other satellites, ja carries the machine-contract
+// Cli.EventLog* keys, which coolvitto translated along with everything else and
+// which the other fourteen strip. They are forced to English at the emit site at
+// runtime (MachineContract.cs), so a translated copy is inert rather than
+// wrong, and keeping his work costs nothing. Japanese has no count plurals, so
+// there are no satellite-only overrides.
+//
+// ONE of the twenty is stripped, and the exception earns its keep. A machine key
+// whose English CHANGES leaves a translated copy saying what the app used to do,
+// in a string no user can ever reach and no gate can measure: the still-English
+// gate skips machine keys by contract and nothing else compares them. That
+// happened when the Recycle Bin went, and Cli.EventLogDeleteSummary sat here for
+// a while saying the files had been sent to it. Correcting it would have bought
+// a sentence that reads as maintained and is inert, which is the fossil this
+// project spends most of its comment effort on. So it goes, and any machine key
+// that outlives its English should follow it.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';
@@ -311,7 +321,6 @@ const MAP = {
   'Cli.EventLogScanFound': `スキャンモード ({0})：{1} 個の不要な {2} が見つかりました ({3})。アクションは実行されていません。`,
   'Cli.DeletingFiles': `{0} 個の {1} を削除中...`,
   'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
-  'Cli.EventLogDeleteSummary': `{0}モード：{2} 個中 {1} 個の {3} をごみ箱に送信、{4}を解放、{5}個の{6}。`,
   'Cli.NoMoveDestination': `エラー：移動先が指定されていません。/m PATH を使用してください (GUI で設定したデフォルトはユーザーごとのもので、スケジュール実行やサービスアカウントでの実行には適用されません)。`,
   'Cli.EventLogMoveNoDestination': `{0}モードは中止されました：移動先が指定されていません。`,
   'Cli.MoveDestinationInsideInstaller': `エラー：移動先を Windows Installer フォルダー内にすることはできません。`,
@@ -397,8 +406,15 @@ const MAP = {
 
 let text = readFileSync(BASE, 'utf8');
 
-// Replace each key's inner <value> from MAP. No machine-key removal: ja keeps
-// the full set, so every neutral key (machine Cli included) is translated here.
+// The one stripped key, by name (see the header). Everything else, machine Cli
+// included, stays and is translated from MAP.
+const STRIPPED = 'Cli.EventLogDeleteSummary';
+let stripped = 0;
+text = text.replace(
+  new RegExp('[^\\S\\n]*<data name="' + STRIPPED + '"[\\s\\S]*?</data>\\n?', 'g'),
+  () => { stripped++; return ''; });
+
+// Replace each key's inner <value> from MAP.
 const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const notApplied = [];
 for (const [key, val] of Object.entries(MAP)) {
@@ -426,8 +442,9 @@ const parse = (xml) => {
 const neutral = parse(readFileSync(BASE, 'utf8'));
 const written = readFileSync(OUT, 'utf8');
 const output = parse(written);
-// ja ships every neutral key, machine Cli included.
-const neutralRequired = [...neutral.keys()];
+// ja ships every neutral key, machine Cli included, bar the one stripped above.
+const neutralRequired = [...neutral.keys()].filter((k) => k !== STRIPPED);
+const strippedLeaked = output.has(STRIPPED);
 
 const missingFromMap = neutralRequired.filter((k) => !(k in MAP));
 const strayMapKeys = Object.keys(MAP).filter((k) => !neutral.has(k));
@@ -451,6 +468,7 @@ console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli)');
 console.log('MAP entries:', Object.keys(MAP).length, '| CRLF:', crlf, '(expect 0)');
+console.log('machine Cli <data> removed:', stripped, '(expect 1,', STRIPPED + ')');
 
 if (alsoKeep.size) {
   console.log('ALSO_KEEP (' + alsoKeep.size + '), kept identical to English:');
@@ -462,9 +480,10 @@ if (strayMapKeys.length) console.log('!! in MAP but not in neutral:', strayMapKe
 if (missingFromOutput.length) console.log('!! required key missing from output:', missingFromOutput);
 if (arityMismatch.length) console.log('!! placeholder arity differs from neutral:', arityMismatch);
 if (untranslated.length) console.log('!! still English (untranslated), ' + untranslated.length + ': ' + untranslated.slice(0, 40).join(', '));
+if (strippedLeaked) console.log('!! ' + STRIPPED + ' is still in the output; the strip regex missed it.');
 
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
-  !missingFromOutput.length && !arityMismatch.length &&
+  !missingFromOutput.length && !arityMismatch.length && !strippedLeaked && stripped === 1 &&
   output.size === neutralRequired.length && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

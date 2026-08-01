@@ -12,8 +12,8 @@
 // lines in the OS language and some in English). The MACHINE-read keys, the
 // Application-channel event-log lines an RMM tool greps for fixed English
 // phrases, stay English at runtime via a culture scope at the emit site, so a
-// satellite may carry them (ja does, from coolvitto's contribution) or omit them
-// (it.resx does); either is correct. The machine set is exactly the Cli.EventLog*
+// satellite may carry one (ja carries all but one, from coolvitto's
+// contribution) or omit it (it.resx omits the lot); either is correct. The machine set is exactly the Cli.EventLog*
 // keys minus Cli.EventLogUnavailable, which despite its prefix is an operator-
 // facing stdout warning and so is human.
 //
