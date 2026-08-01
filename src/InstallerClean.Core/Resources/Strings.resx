@@ -434,10 +434,12 @@
        the two disagree, and the card read "Deleting 39 files..." above
        "1 of 34 files". The heading is assigned before the overlay is revealed
        so it is announced exactly once, which rules out re-composing it later,
-       so it names the operation and leaves the counting to the line that can
-       be right. No placeholder: do not reintroduce one. -->
-  <data name="Status.Moving" xml:space="preserve"><value>Moving files...</value></data>
-  <data name="Status.Deleting" xml:space="preserve"><value>Deleting files...</value></data>
+       so it names the operation and the files and leaves the counting to the
+       line that can be right. "Unneeded" is the app's own word for them and is
+       what makes the heading say something once the count has gone.
+       No placeholder: do not reintroduce one. -->
+  <data name="Status.Moving" xml:space="preserve"><value>Moving unneeded files...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Deleting unneeded files...</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Move cancelled. {0} of {1} {2} processed.</value></data>
@@ -956,7 +958,7 @@ The crash log could not be written.</value></data>
        an operator who upgraded without reading the release notes gets no other
        warning that /d stopped using the Recycle Bin, and because the GUI's
        completion screen says the same words about the same act. -->
-  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Permanently deleted {0} {1}.</value></data>
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Permanently deleted {0} unneeded {1}.</value></data>
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
        "Recovered" is accurate here now and was not before: the space comes
