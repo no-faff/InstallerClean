@@ -791,7 +791,7 @@ Ayrıntılar {1} içinde.</value></data>
        named file and must not end on a colon of its own. The plural is the
        heading the completion overlay puts over a bucket of filenames, so it
        introduces a list. Neither ends with a colon, which is why the
-       indented "  - name" lines beneath carry the relationship instead.
+       "- name" lines beneath carry the relationship instead.
 
        Move and Delete share this whole set, which is why FileInUse says
        "remove" rather than "move": both discriminate a sharing or lock
