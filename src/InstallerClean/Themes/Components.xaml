@@ -152,9 +152,9 @@
            AccentPill   - the accent fill, for the one action a screen leads with.
            StandardPill - the quieter fill, for a filled action that must read
                           as secondary to a louder one beside it (the main
-                          window's Move, against Delete). Its other use is the
-                          way out of a window carrying bad news, where the
-                          accent would read as encouragement.
+                          window's Delete permanently, against Move). Its other
+                          use is the way out of a window carrying bad news,
+                          where the accent would read as encouragement.
            DangerPill   - the one action with no way back: deleting without a
                           Recycle Bin. Not for deleting to the bin, which the
                           app states plainly is safe and reversible; red on

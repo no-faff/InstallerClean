@@ -202,7 +202,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public bool ShowMainAction => Scan.HasScanned && !Scan.HasScanError && !Scan.HasPendingReboot;
 
     /// <summary>
-    /// Whether the separator, the Move location box and the two action buttons
+    /// Whether the separator, the backup-folder box and the two action buttons
     /// are in the window. True for every completed scan, zero files included:
     /// at zero the buttons disable through their commands, and during a Windows
     /// Installer hold the zone stays while the banner explains the greyed

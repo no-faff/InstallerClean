@@ -26,8 +26,8 @@ public enum MoveSpaceOutcome
     SameDrive,
 
     /// <summary>
-    /// A share, or a volume the classification could not read. The heading
-    /// claims no freed space and the body makes no claim about the drive.
+    /// A volume the classification could not read. The heading claims no
+    /// freed space and the body makes no claim about the drive.
     /// </summary>
     Unclassified,
 }
@@ -359,7 +359,7 @@ public partial class CompletionViewModel : ObservableObject
         // part of the destination folder's name. Suppressed entirely when
         // nothing moved, because "0 files moved to: D:\Backup" describes files
         // arriving somewhere none of them reached; the destination is still on
-        // screen in the Move location box behind the overlay.
+        // screen in the backup-folder box behind the overlay.
         Summary = HeadingIsWarning
             ? string.Empty
             : string.Format(DisplayHelpers.Pluralise(movedCount,
@@ -689,9 +689,8 @@ public partial class CompletionViewModel : ObservableObject
             // reference number.
             var count = bucket.Count();
             sb.Append(bucket.First().LocalisedGroupHeading(count)).AppendLine();
-            // The hyphen is what separates a filename from the sentence above
-            // it: leading spaces alone vanish in a proportional font (Poppins)
-            // and the list ran on as prose.
+            // Leading spaces alone vanish in a proportional font (Poppins), so
+            // the hyphen is what separates a filename from the sentence above it.
             foreach (var err in bucket)
                 sb.Append("- ").Append(Path.GetFileName(err.FilePath)).AppendLine();
         }

@@ -27,7 +27,7 @@ public interface IConfirmationService
     bool ConfirmSendResultLog(string jsonContent);
 
     /// <summary>
-    /// Shows the folder browser for the Move location. Returns the chosen
+    /// Shows the folder browser for the backup folder. Returns the chosen
     /// folder, or <c>null</c> if the user cancelled or there is no host
     /// window to own the dialog.
     ///

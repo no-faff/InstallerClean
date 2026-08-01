@@ -200,7 +200,7 @@ public partial class ScanViewModel : ObservableObject
 
     /// <summary>
     /// True when the last scan found files to clean up. The main window's
-    /// action zone (the Move location, Move and Delete) hangs off this: with
+    /// action zone (the backup folder, Move and Delete) hangs off this: with
     /// nothing found there is nothing for it to act on, and a greyed-out pair
     /// of buttons under copy that tells the user to press them reads as a
     /// broken app rather than a clean machine.
