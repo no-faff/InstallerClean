@@ -45,23 +45,29 @@ public partial class OrphanedFilesWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        // Size descending, matching OrphanedFilesViewModel.ctor's
+        // OrderByDescending(f => f.SizeBytes) so the list does not visibly
+        // reorder as it opens. Both sites must move together; the
+        // cross-reference comment on the VM constructor names the dependency.
+        //
+        // Sorted before the selection, not after: the view's order is what
+        // decides which row index 0 is, and the scroll and the container focus
+        // below are both taken from that index.
+        ApplySort(nameof(OrphanedFile.SizeBytes), ListSortDirection.Descending, ColSize);
+
         if (FilesList.Items.Count > 0)
         {
             FilesList.SelectedIndex = 0;
             FilesList.ScrollIntoView(FilesList.Items[0]);
+            // The sort above regenerates the containers and the layout pass
+            // that realises them has not run yet, so without this the row has
+            // nothing to take focus and the window opens with focus on its
+            // root: no ring, and Tab restarting from the first stop.
+            FilesList.UpdateLayout();
             var container = (ListViewItem?)FilesList.ItemContainerGenerator
                 .ContainerFromIndex(0);
             container?.Focus();
         }
-
-        // Initial state mirrors OrphanedFilesViewModel.ctor's
-        // OrderByDescending(f => f.SizeBytes). Both sites must move
-        // together; the cross-reference comment on the VM constructor
-        // names this dependency.
-        _lastSortProperty = nameof(OrphanedFile.SizeBytes);
-        _lastSortDirection = ListSortDirection.Descending;
-        _lastSortColumn = ColSize;
-        UpdateSortIndicators();
     }
 
     private (string Plain, GridViewColumn Col)[] SortableColumns => new[]
@@ -151,6 +157,29 @@ public partial class OrphanedFilesWindow : Window
             ? ListSortDirection.Descending
             : ListSortDirection.Ascending;
 
+        ApplySort(sortProperty, direction, header.Column);
+        return true;
+    }
+
+    /// <summary>
+    /// Puts the view in the given order and repaints the indicators to match.
+    /// The order the window opens in comes through here too, so the arrow the
+    /// user sees always has a SortDescription behind it; mirroring the view
+    /// model's LINQ order into the _lastSort* fields instead left the first
+    /// click back onto that column reordering the rows rather than reversing
+    /// them, the view never having been sorted at all.
+    ///
+    /// Every sort ends on the full path, which is unique per row, so the order
+    /// is total. This list needs that more than its sibling does: the Reason
+    /// column takes exactly three values, so sorting by it puts every row into
+    /// one of three ties, and without a tiebreaker Reason, File, Reason
+    /// reshuffles rows inside a group for no reason a user can see.
+    /// RegisteredFilesWindow.ApplySort is the same three lines and says why
+    /// SortDescriptions beat a CustomSort comparer, which is not the obvious
+    /// way round.
+    /// </summary>
+    private void ApplySort(string sortProperty, ListSortDirection direction, GridViewColumn column)
+    {
         // Deferred, so the pair below is one rebuild rather than two. Every
         // SortDescriptions mutation raises a CollectionChanged that
         // ListCollectionView turns into its own RefreshOrDefer, and Clear raises
@@ -162,13 +191,14 @@ public partial class OrphanedFilesWindow : Window
         {
             view.SortDescriptions.Clear();
             view.SortDescriptions.Add(new SortDescription(sortProperty, direction));
+            view.SortDescriptions.Add(
+                new SortDescription(nameof(OrphanedFile.FullPath), ListSortDirection.Ascending));
         }
 
         _lastSortProperty = sortProperty;
         _lastSortDirection = direction;
-        _lastSortColumn = header.Column;
+        _lastSortColumn = column;
         UpdateSortIndicators();
-        return true;
     }
 
     private void UpdateSortIndicators()
