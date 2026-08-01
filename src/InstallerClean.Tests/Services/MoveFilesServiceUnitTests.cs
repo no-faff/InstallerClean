@@ -382,7 +382,7 @@ public class MoveFilesServiceUnitTests
         Assert.IsType<IOFailure>(error);
     }
 
-    // The three below drive the state Win32 documents and nothing else in the
+    // The five below drive the state Win32 documents and nothing else in the
     // suite can reach: a File.Move that returns success having copied the file
     // and left the original where it was. See HalfMoveFileSystem.
 
@@ -448,5 +448,52 @@ public class MoveFilesServiceUnitTests
         Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
         Assert.Equal(0, result.MovedCount);
         Assert.True(fs.File.Exists(source));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_removes_a_read_only_copy_of_a_source_it_could_not_delete()
+    {
+        var fs = new Helpers.HalfMoveFileSystem();
+        var source = $@"{SourceDir}\readonly-locked.msi";
+        var destPath = $@"{DestDir}\readonly-locked.msi";
+        fs.AddFile(source, new MockFileData("payload") { Attributes = FileAttributes.ReadOnly });
+        fs.AddDirectory(DestDir);
+        fs.DeleteFailures[source] =
+            new IOException("held open") { HResult = unchecked((int)0x80070020) };
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        // CopyFile carries the source's attributes to the copy, so the copy of
+        // a read-only source is read-only and the discard's own delete is
+        // refused unless the attribute comes off first. Without that, the file
+        // is in both places under an error saying it was left in place.
+        Assert.IsType<FileInUse>(Assert.Single(result.Errors));
+        Assert.Equal(0, result.MovedCount);
+        Assert.True(fs.File.Exists(source));
+        Assert.False(fs.File.Exists(destPath));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_keeps_the_copy_when_the_source_goes_mid_reconcile()
+    {
+        var fs = new Helpers.HalfMoveFileSystem();
+        var source = $@"{SourceDir}\quarantined.msi";
+        var destPath = $@"{DestDir}\quarantined.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+        fs.VanishOnAttributeRead.Add(source);
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        // Source gone and the copy in place is what a completed move leaves, so
+        // this is one, however it got there. Treating the attribute read's
+        // failure as the move's would discard the copy and file the result as
+        // "still in the cache", leaving the user with no copy at all.
+        Assert.Equal(1, result.MovedCount);
+        Assert.Empty(result.Errors);
+        Assert.False(fs.File.Exists(source));
+        Assert.True(fs.File.Exists(destPath));
     }
 }

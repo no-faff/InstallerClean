@@ -361,6 +361,13 @@ public sealed class MoveFilesService : IMoveFilesService
         }
         catch (Exception ex)
         {
+            // An antivirus quarantining the file it has just watched being
+            // copied takes the source out between the Exists above and this
+            // throw. Source gone with the copy in place is the end state a
+            // completed move produces, so that is a success; discarding the
+            // copy would leave the user with neither.
+            if (!_fs.File.Exists(sourcePath)) return null;
+
             failureLog.Record(ex);
             DiscardDestinationCopy(destPath, failureLog);
             return Categorise(ex, sourcePath);
@@ -376,11 +383,22 @@ public sealed class MoveFilesService : IMoveFilesService
     /// and does not mention the copy. It is recorded rather than surfaced
     /// because it needs a destination that accepts a create and refuses a
     /// delete, which the write probe has already had to pass.
+    ///
+    /// The copy of a read-only source is read-only too, CopyFile carrying the
+    /// attributes across, so it is cleared before the delete or this leaves the
+    /// duplicate it exists to prevent. Safe on this file above any other: this
+    /// process wrote it seconds ago at a name it chose.
+    ///
+    /// Nothing checks that what sits at destPath is still that file, and the
+    /// absence is deliberate: any identity check is itself racy, the window is
+    /// milliseconds, and the folder is the one the user nominated for this
+    /// operation.
     /// </summary>
     private void DiscardDestinationCopy(string destPath, PerItemFailureLog failureLog)
     {
         try
         {
+            ClearReadOnly(destPath);
             _fs.File.Delete(destPath);
         }
         catch (Exception ex)

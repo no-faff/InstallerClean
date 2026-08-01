@@ -26,12 +26,24 @@ internal sealed class HalfMoveFileSystem : MockFileSystem
 
     /// <summary>
     /// Paths whose deletion throws instead of happening, keyed by path. Stands
-    /// in for the two conditions that leave a real source behind after the copy
-    /// (a read-only attribute, another program holding the file open), which
-    /// MockFileSystem does not enforce, and for a destination folder that
-    /// accepts a create and refuses a delete.
+    /// in for another program holding the source open, which nothing in the
+    /// mock models, and for a destination folder that accepts a create and
+    /// refuses a delete. The other condition that leaves a real source behind,
+    /// a read-only attribute, needs no entry here: the base implementation
+    /// refuses that delete on its own.
     /// </summary>
     internal Dictionary<string, Exception> DeleteFailures { get; } =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Paths that are gone by the time their attributes are read, and answer
+    /// the read as missing. Models a third party removing the source in the
+    /// window between the reconcile's existence check and its attribute read,
+    /// an antivirus quarantining the file it has just watched being copied
+    /// being the nameable cause. Nothing else can pose that interleaving: the
+    /// window is inside one method and both calls are the framework's.
+    /// </summary>
+    internal HashSet<string> VanishOnAttributeRead { get; } =
         new(StringComparer.OrdinalIgnoreCase);
 
     private sealed class HalfMoveFile : MockFile
@@ -43,15 +55,29 @@ internal sealed class HalfMoveFileSystem : MockFileSystem
         public override void Move(string sourceFileName, string destFileName) =>
             Copy(sourceFileName, destFileName);
 
+        public override FileAttributes GetAttributes(string path)
+        {
+            if (_fs.VanishOnAttributeRead.Remove(path))
+            {
+                _fs.RemoveFile(path);
+                throw new FileNotFoundException($"vanished before the attribute read: {path}", path);
+            }
+
+            return base.GetAttributes(path);
+        }
+
         public override void Delete(string path)
         {
             if (_fs.DeleteFailures.TryGetValue(path, out var failure)) throw failure;
 
             // Win32 documents DeleteFile as failing with ERROR_ACCESS_DENIED on
             // a read-only file and says the attribute has to be removed first.
-            // MockFileSystem does not enforce it, so a service that never
-            // cleared the attribute would pass a test written against the mock
-            // alone and fail on a user's machine.
+            // TestingHelpers 22.2.0, the pinned version, enforces it as well
+            // (checked by running it), so this branch sits dead behind the base
+            // implementation and is kept as insurance rather than as cover: the
+            // enforcement is not part of the library's published contract, and
+            // an upgrade that dropped it would leave this double unable to tell
+            // a service that clears the attribute from one that never did.
             if (base.Exists(path) && base.GetAttributes(path).HasFlag(FileAttributes.ReadOnly))
                 throw new UnauthorizedAccessException($"read-only: {path}");
 
