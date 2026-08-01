@@ -709,6 +709,13 @@ InstallerClean was already running as administrator, so starting it again that w
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
   <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean couldn't read enough of the Windows Installer records to be sure what's still needed: the list of installed programs came back short, and reading the same records straight from the registry hit errors too. A file could look orphaned just because the record naming it was one of the unreadable ones, so InstallerClean stopped. Nothing has been removed.</value></data>
+  <!-- Shown when the kernel would not expand the cache folder's own path, so
+       the containment guard had nothing proven to measure a candidate against
+       and refused every one of them. Without it that scan reports "nothing to
+       clean up", which is the one answer a user has no way to question. Names
+       the folder through the {InstallerFolder} token like its two siblings
+       above. No placeholders. -->
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>Invalid destination</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>Could not write to destination</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>Move failed</value></data>

@@ -124,6 +124,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
 
         long stillUsedBytes = 0;
+        int refusedCandidates = 0;
         int missingNonRemovable = 0;
         int missingRemovable = 0;
         int nonRemovablePresent = 0;
@@ -160,6 +161,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
             var walkSafety = CandidateGuard.CheckSafeToRemove(filePath, cacheRoot);
             if (walkSafety != CandidateGuard.RemovalSafety.Safe)
             {
+                refusedCandidates++;
                 refusalLog.Record(new InvalidOperationException(
                     walkSafety == CandidateGuard.RemovalSafety.Refused
                         ? $"Removal candidate refused (not directly in the Installer cache, or a reparse point): {filePath}"
@@ -251,6 +253,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
                 {
                     // In-bounds check failed on an existing removable file: drop
                     // it (do not offer, do not count as missing) and log.
+                    refusedCandidates++;
                     refusalLog.Record(new InvalidOperationException(
                         patchSafety == CandidateGuard.RemovalSafety.Refused
                             ? $"Removable-patch candidate refused (not directly in the Installer cache, or a reparse point): {pkg.LocalPackagePath}"
@@ -281,6 +284,27 @@ public sealed class FileSystemScanService : IFileSystemScanService
         {
             refusalLog.WriteClosingEntry();
         }
+
+        // The guard refused everything it was asked about, and the root it
+        // measured against was never expanded by the kernel. Those two together
+        // are not a clean folder: they are a scan that could not put a single
+        // file inside the folder it was scanning, and the empty list it produces
+        // is indistinguishable from a machine with nothing to clean. On a folder
+        // that has grown to tens of gigabytes, "nothing to clean up" is the one
+        // answer a user has no way to question.
+        //
+        // Both halves are needed. An unproven root alone refuses nothing on a
+        // machine with no reparse point in the path, the best-effort spelling
+        // and the resolved one being the same string; refusals alone are a real
+        // answer about real files, one candidate at a time. The pair is the
+        // signature of a run whose comparison never worked.
+        //
+        // Refusing rather than reporting an empty list, because there is nothing
+        // to report: no candidate was judged, so there is no shorter answer to
+        // give. This is the one gate here whose input is the app's own machinery
+        // rather than the machine's records.
+        if (!cacheRoot.Proven && refusedCandidates > 0 && removable.Count == 0)
+            throw new LocalisedInvalidOperationException(Strings.Error_ScanCacheRootUnresolved);
 
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
 

@@ -34,6 +34,55 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
+    public async Task ScanAsync_refuses_when_the_root_never_resolved_and_nothing_survived_the_guard()
+    {
+        // A path on a drive letter nothing is mounted on gives the resolver no
+        // existing ancestor to open, which is the degraded root: every candidate
+        // is then measured against a spelling rather than a location, every one
+        // is refused, and the run would otherwise report the folder as clean.
+        var unmounted = Helpers.TestHost.FirstUnmountedDriveLetter();
+        if (unmounted is null)
+            return; // every letter is in use on this host
+
+        var root = $@"{unmounted}:\Windows\Installer";
+        var orphan = $@"{root}\orphan.msi";
+        var needed = $@"{root}\needed.msi";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { Registered(needed) }.AsReadOnly()));
+
+        var fs = new MockFileSystem();
+        fs.AddFile(orphan, new MockFileData("x"));
+        fs.AddFile(needed, new MockFileData("x"));
+
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            new FileSystemScanService(query, fs, new[] { orphan }, root).ScanAsync());
+
+        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCacheRootUnresolved, ex.Message);
+    }
+
+    [Fact]
+    public async Task ScanAsync_does_not_refuse_when_a_resolved_root_simply_refused_a_candidate()
+    {
+        // The other half of the pair, and the reason the gate needs both: a
+        // refusal against a root the kernel did expand is a real answer about a
+        // real file, however many of them there are. %TEMP% stands in for the
+        // cache root because it exists, so it resolves; the candidate sits
+        // somewhere else, so it is refused.
+        var root = Path.GetTempPath().TrimEnd(Path.DirectorySeparatorChar);
+        const string elsewhere = @"C:\Windows\Installer\elsewhere.msi";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { Registered(Path.Combine(root, "needed.msi")) }.AsReadOnly()));
+
+        var fs = new MockFileSystem();
+        fs.AddFile(elsewhere, new MockFileData("x"));
+        fs.AddFile(Path.Combine(root, "needed.msi"), new MockFileData("x"));
+
+        var result = await new FileSystemScanService(query, fs, new[] { elsewhere }, root).ScanAsync();
+
+        Assert.Empty(result.RemovableFiles);
+    }
+
+    [Fact]
     public async Task ScanAsync_never_offers_a_withheld_patch_for_removal()
     {
         const string patch = @"C:\Windows\Installer\withheld.msp";

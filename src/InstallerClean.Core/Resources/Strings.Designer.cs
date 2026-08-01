@@ -283,6 +283,7 @@ public static class Strings
     public static string Error_NotEnoughSpaceTitle => Get("Error.NotEnoughSpaceTitle");
     public static string Error_NoUniqueFilename => Get("Error.NoUniqueFilename");
     public static string Error_PathTooLong => Get("Error.PathTooLong");
+    public static string Error_ScanCacheRootUnresolved => Get("Error.ScanCacheRootUnresolved");
     public static string Error_ScanCorrelationFailed => Get("Error.ScanCorrelationFailed");
     public static string Error_ScanFailedTitle => Get("Error.ScanFailedTitle");
     public static string Error_ScanRecordsUnreadable => Get("Error.ScanRecordsUnreadable");

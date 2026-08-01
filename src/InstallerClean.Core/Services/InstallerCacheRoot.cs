@@ -28,13 +28,32 @@ namespace InstallerClean.Services;
 /// </summary>
 internal sealed class InstallerCacheRoot
 {
-    private InstallerCacheRoot(string resolved) => Resolved = resolved;
+    private InstallerCacheRoot(string resolved, bool proven)
+    {
+        Resolved = resolved;
+        Proven = proven;
+    }
 
     /// <summary>
     /// The resolved root with any trailing separator removed, so a caller
     /// comparing a candidate's parent directory can compare it directly.
     /// </summary>
     internal string Resolved { get; }
+
+    /// <summary>
+    /// False when the kernel never expanded this path, so
+    /// <see cref="Resolved"/> is the best-effort spelling rather than a proven
+    /// location.
+    ///
+    /// It is carried because of what a degraded root does to a whole run rather
+    /// than to one file: every candidate is measured against a root that names
+    /// itself instead of resolving, so every candidate is refused, and a caller
+    /// that only counts what survived reads that as a folder with nothing in it
+    /// worth removing. The comparison is still safe in the direction that
+    /// matters, fewer files being offered and never more; what is not safe is
+    /// reporting the result as an all-clear.
+    /// </summary>
+    internal bool Proven { get; }
 
     /// <summary>
     /// Resolves the root against the real filesystem. Call it once, immediately
@@ -47,8 +66,10 @@ internal sealed class InstallerCacheRoot
     /// to a sandbox directory for the integration tests; it does NOT let a
     /// MockFileSystem bypass the gate.
     /// </param>
-    internal static InstallerCacheRoot Resolve(string? installerFolderRoot = null) =>
-        new(InstallerCacheHelpers
-            .ResolveFinalPath(installerFolderRoot ?? InstallerCacheHelpers.InstallerFolder)
-            .TrimEnd(Path.DirectorySeparatorChar));
+    internal static InstallerCacheRoot Resolve(string? installerFolderRoot = null)
+    {
+        var proven = InstallerCacheHelpers.TryResolveFinalPath(
+            installerFolderRoot ?? InstallerCacheHelpers.InstallerFolder, out var resolved);
+        return new(resolved.TrimEnd(Path.DirectorySeparatorChar), proven);
+    }
 }
