@@ -494,10 +494,14 @@
                         </MultiTrigger>
                         <!-- The focus ring is the edge while it is drawn, so the
                              hairline stands down rather than adding a second
-                             boundary beside it. The brush goes, never the
-                             thickness: dropping the thickness would resize the
-                             box's inside and move the tick. -->
-                        <Trigger Property="IsKeyboardFocused" Value="True">
+                             boundary beside it. FocusRing.IsShowing and not
+                             IsKeyboardFocused: a mouse click takes keyboard
+                             focus and draws no ring, so keying on focus would
+                             leave the box with no edge at all exactly when
+                             somebody had just clicked it. The brush goes, never
+                             the thickness: dropping the thickness would resize
+                             the box's inside and move the tick. -->
+                        <Trigger Property="a11y:FocusRing.IsShowing" Value="True">
                             <Setter TargetName="Box" Property="BorderBrush" Value="Transparent"/>
                         </Trigger>
                         <!-- Same disabled treatment as the pills: half opacity
@@ -586,9 +590,13 @@
                         <!-- The ring sits 2px outside this edge and says the same
                              thing louder, so the hairline stands down while it is
                              there rather than drawing a second concentric line.
-                             Brush only: dropping the thickness would shift the
-                             text by a pixel on every focus change. -->
-                        <Trigger Property="IsKeyboardFocused" Value="True">
+                             While it is THERE, not while the box has focus: a
+                             click into the box takes keyboard focus and draws no
+                             ring, and that is the state the outline is for, an
+                             input somebody has already typed a path into. Brush
+                             only: dropping the thickness would shift the text by
+                             a pixel on every focus change. -->
+                        <Trigger Property="a11y:FocusRing.IsShowing" Value="True">
                             <Setter TargetName="Bg" Property="BorderBrush" Value="Transparent"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -662,13 +670,18 @@
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Hover}"/>
                         </MultiTrigger>
                         <!-- Declared last so it wins over the selection rule
-                             above. A focused row already carries the 2px ring,
-                             and a rule immediately inside it is a second
-                             boundary doing the first one's job. -->
+                             above. A row wearing the 2px ring does not also want
+                             a rule immediately inside it, two boundaries doing
+                             one job. The condition is FocusRing.IsShowing rather
+                             than IsKeyboardFocused because those are not the
+                             same state: a clicked row has keyboard focus and no
+                             ring, and keying on focus would leave it with
+                             neither cue, which is the case this whole rule
+                             exists for. -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsSelected" Value="True"/>
-                                <Condition Property="IsKeyboardFocused" Value="True"/>
+                                <Condition Property="a11y:FocusRing.IsShowing" Value="True"/>
                             </MultiTrigger.Conditions>
                             <Setter TargetName="Bd" Property="BorderBrush" Value="Transparent"/>
                         </MultiTrigger>
@@ -711,7 +724,7 @@
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsSelected" Value="True"/>
-                                <Condition Property="IsKeyboardFocused" Value="True"/>
+                                <Condition Property="a11y:FocusRing.IsShowing" Value="True"/>
                             </MultiTrigger.Conditions>
                             <Setter TargetName="Bd" Property="BorderBrush" Value="Transparent"/>
                         </MultiTrigger>

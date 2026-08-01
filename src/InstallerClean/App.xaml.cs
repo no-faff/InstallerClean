@@ -249,6 +249,10 @@ public partial class App : Application
             ToolTipService.ShowDurationProperty.OverrideMetadata(
                 typeof(FrameworkElement), new FrameworkPropertyMetadata(60000));
 
+            // Before any window is shown, so no element can take focus without
+            // being tracked. What it is for is on FocusRing itself.
+            FocusRing.Track();
+
             // Title-bar Window.Icon assignment in the class handler
             // below degrades to WPF's default icon on a pack-URI load
             // failure (resource renamed, embed step broken). XAML

@@ -21,9 +21,10 @@ namespace InstallerClean.Tests.Themes;
 //
 // The second is the pair of conditions the arrangement was accepted under: top
 // and bottom only, no vertical caps, so the row reads as picked out rather than
-// fenced in; and the rule stands down while the row has keyboard focus, because
-// the 2px focus ring is already an edge and two boundaries doing one job is
-// noise.
+// fenced in; and the rule stands down while the focus ring is drawn, because
+// the ring is already an edge and two boundaries doing one job is noise. While
+// the ring is DRAWN, which is not the same as while the row has focus:
+// FocusRingSuppressionTests holds that distinction and says why it matters.
 public class ListRowBoundaryTests
 {
     [Theory]
@@ -69,7 +70,7 @@ public class ListRowBoundaryTests
     [Theory]
     [InlineData("ListViewItem")]
     [InlineData("ListBoxItem")]
-    public void Selection_draws_the_rule_and_keyboard_focus_takes_it_away_again(string itemType)
+    public void Selection_draws_the_rule_and_the_focus_ring_takes_it_away_again(string itemType)
     {
         var triggers = TemplateTriggers(itemType);
 
@@ -83,7 +84,7 @@ public class ListRowBoundaryTests
 
         var focused = triggers
             .Where(t => t.Name == ThemeXaml.Presentation + "MultiTrigger")
-            .Single(t => Conditions(t).SetEquals(new[] { "IsSelected", "IsKeyboardFocused" }));
+            .Single(t => Conditions(t).SetEquals(new[] { "IsSelected", "a11y:FocusRing.IsShowing" }));
         var cleared = focused.Elements(ThemeXaml.Presentation + "Setter")
             .Single(s => (string?)s.Attribute("Property") == "BorderBrush");
 
