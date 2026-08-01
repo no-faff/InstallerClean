@@ -948,11 +948,16 @@ The crash log could not be written.</value></data>
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Unknown argument: '{0}'</value></data>
-  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
-       than it accepts, most often an unquoted move path with a space, so the
-       message names the quoting fix. The literal " quotes and the \ in the
-       example are part of the sentence the user copies. -->
+  <!-- 0 = the extra (unexpected) token. Shown for /m only, where the extra
+       token is most often an unquoted move path with a space, so the message
+       names the quoting fix. The literal " quotes and the \ in the example are
+       part of the sentence the user copies. -->
   <data name="Cli.TooManyArguments" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup"</value></data>
+  <!-- 0 = the extra (unexpected) token. The same condition for /s and /d, which
+       take no path at all, so the quoting advice above would answer about a flag
+       the user did not type. The way in is combining flags ("/s /d"), which is
+       what the second sentence addresses. -->
+  <data name="Cli.TooManyArgumentsNoPath" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Cancelling...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Cancelled.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the

@@ -217,6 +217,7 @@ public static class Strings
     public static string Cli_PendingRebootBlocked_PendingRenameInCache => Get("Cli.PendingRebootBlocked.PendingRenameInCache");
     public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_TooManyArguments => Get("Cli.TooManyArguments");
+    public static string Cli_TooManyArgumentsNoPath => Get("Cli.TooManyArgumentsNoPath");
     public static string Cli_UnknownArgument => Get("Cli.UnknownArgument");
     public static string Completion_AllClean => Get("Completion.AllClean");
     public static string Completion_DonateAsk => Get("Completion.DonateAsk");

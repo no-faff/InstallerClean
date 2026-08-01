@@ -7,9 +7,11 @@ namespace InstallerClean.Cli;
 /// Builds the CLI's machine-read output in English whatever the OS UI culture.
 /// Two consumers match InstallerClean's output on exact English phrases
 /// regardless of the machine's language: RMM tooling greps the Application
-/// event-log entries, and scripts match the "\d+ errors:" stdout header. Those
-/// lines are built through here; everything else the operator reads follows the
-/// ambient (OS) culture and is localised.
+/// event-log entries, and scripts match the "\d+ errors:" stdout header, whose
+/// always-plural shape is held for exactly that (the emit site carries the
+/// reasoning, and what is and is not published about it). Those lines are built
+/// through here; everything else the operator reads follows the ambient (OS)
+/// culture and is localised.
 /// </summary>
 /// <remarks>
 /// The mechanism is a thread-culture swap, and it is load-bearing that it

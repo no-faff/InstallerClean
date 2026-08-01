@@ -124,11 +124,11 @@ internal static class Program
         // left untouched, so sizes format in the OS region ("3,2 GB"). The lines
         // other software reads stay English regardless: the Application-channel
         // Event Log (RMM greps it for known English phrases) and the
-        // "\d+ errors:" stdout header (a documented script scrape) are built
-        // through MachineContract, which forces en-GB at the emit site. The
-        // count in that header and the "[i/total]" progress lines are plain
-        // integers that group in no culture, so only the "errors" noun needs
-        // forcing, not the numbers.
+        // "\d+ errors:" stdout header, whose shape is held for a script scrape,
+        // are built through MachineContract, which forces en-GB at the emit
+        // site. The count in that header and the "[i/total]" progress lines are
+        // plain integers that group in no culture, so only the "errors" noun
+        // needs forcing, not the numbers.
 
         var invocation = CliContract.ParseArguments(args);
         switch (invocation.Command)
@@ -152,15 +152,20 @@ internal static class Program
                 return ReportBadArguments(invocation,
                     string.Format(Strings.Cli_UnknownArgument, invocation.OffendingArgument));
             case CliCommand.TooManyArguments:
-                // A recognised flag carried an extra token. The commonest cause is
-                // an unquoted move path with a space ("/m D:\My Backup" arrives
-                // split into three tokens, leaving "Backup" over), so this names
-                // the quoting fix rather than calling the user's own path fragment
-                // an unknown flag. The audit entry and exit code are identical to
-                // the unknown-flag case (the machine contract does not distinguish
-                // the two); only the stdout hint differs.
-                return ReportBadArguments(invocation,
-                    string.Format(Strings.Cli_TooManyArguments, invocation.OffendingArgument));
+            {
+                // A recognised flag carried an extra token, and which flag decides
+                // the answer. /m takes a path, so the extra token is usually an
+                // unquoted one with a space ("/m D:\My Backup" splits into three,
+                // leaving "Backup" over) and the hint names the quoting fix rather
+                // than calling the user's own path fragment an unknown flag. /s and
+                // /d take no path, so the way in is combining flags, which the
+                // quoting advice answers about a flag they did not type. The audit
+                // entry and exit code are identical either way; only the hint moves.
+                var takesAPath = args[0].Equals("/m", StringComparison.OrdinalIgnoreCase);
+                return ReportBadArguments(invocation, string.Format(
+                    takesAPath ? Strings.Cli_TooManyArguments : Strings.Cli_TooManyArgumentsNoPath,
+                    invocation.OffendingArgument));
+            }
         }
 
         // Only the work commands (/s, /d, /m) remain. The lower-cased flag
@@ -465,14 +470,16 @@ internal static class Program
                     result.DeletedCount, DisplayHelpers.PluraliseFile(result.DeletedCount)));
                 if (result.Errors.Count > 0)
                 {
-                    // Plural "errors:" emitted regardless of count: the
-                    // documented RMM-scrape contract is \d+ errors: on
-                    // stdout; the one-error case must keep the same
-                    // shape so a `grep -E '[0-9]+ errors:'` matches.
-                    // English-grammar oddity ("1 errors:") is the cost
-                    // of a stable machine-parseable surface. The noun is forced
-                    // English (MachineContract) so it stays "errors", not the
-                    // localised plural, on a non-English machine.
+                    // Plural "errors:" whatever the count, so that
+                    // `grep -E '[0-9]+ errors:'` matches a one-error run too. The
+                    // grammar ("1 errors:") is the price and is paid on purpose,
+                    // and the noun is forced English (MachineContract) so it stays
+                    // "errors" on a non-English machine.
+                    //
+                    // The shape is held; it is not published. Neither the README's
+                    // "## Command line" section nor --help names it, and the
+                    // README tells scripters to key off the exit code rather than
+                    // parse the text.
                     Console.WriteLine(MachineContract.English(
                         () => $"{result.Errors.Count} {Strings.Plural_Error_Plural}:"));
                     foreach (var err in result.Errors)
@@ -565,9 +572,9 @@ internal static class Program
                 moveResult.MovedCount, DisplayHelpers.PluraliseFile(moveResult.MovedCount)));
             if (moveResult.Errors.Count > 0)
             {
-                // See the matching block in the /d branch for the
-                // always-plural rationale and the English-forced noun: the
-                // RMM-scrape contract on stdout requires "\d+ errors:".
+                // See the matching block in the /d branch for the always-plural
+                // rationale, the English-forced noun, and what is and is not
+                // published about the "\d+ errors:" shape.
                 Console.WriteLine(MachineContract.English(
                     () => $"{moveResult.Errors.Count} {Strings.Plural_Error_Plural}:"));
                 foreach (var err in moveResult.Errors)
