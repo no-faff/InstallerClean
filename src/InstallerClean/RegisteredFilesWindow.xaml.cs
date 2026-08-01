@@ -92,6 +92,20 @@ public partial class RegisteredFilesWindow : Window
                 .ContainerFromIndex(index);
             container?.Focus();
         }
+        else
+        {
+            // With no rows there is no container to focus, and focus left on
+            // the window root shows no ring, restarts Tab from the first stop
+            // and gives a screen reader nothing but the window title. The
+            // command behind the button gates on having a scan result rather
+            // than on having rows, unlike the Orphaned window's, so this is
+            // reachable in a way its sibling is not. A scan that claimed no
+            // package at all throws before it can produce a result
+            // (InstallerQueryService, Error.InstallerDbEmpty), so the state
+            // looks unreachable through a successful scan; this costs nothing
+            // and settles it rather than resting on that reading.
+            CloseButton.Focus();
+        }
 
         BuildSeeAlsoLine();
     }

@@ -419,7 +419,10 @@
         <DockPanel Grid.Row="7" LastChildFill="False">
             <TextBlock DockPanel.Dock="Left" Text="{Binding Summary}"
                        Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}" VerticalAlignment="Center"/>
-            <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
+            <!-- Named so Window_Loaded can land focus here when the list opens
+                 with no rows, the one state that has no row container to
+                 focus. Same name as the About and message windows' own. -->
+            <Button x:Name="CloseButton" DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
                     Content="{loc:Translate Action.Close}" IsCancel="True"/>
         </DockPanel>
     </Grid>
