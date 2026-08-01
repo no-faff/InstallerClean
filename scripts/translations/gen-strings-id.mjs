@@ -2,7 +2,7 @@
 // Indonesian (id) satellite generator for InstallerClean. Copied from
 // gen-strings-template.mjs / gen-strings-ko.mjs; only OUT, ALSO_KEEP and the MAP
 // values differ. Works FROM THE ENGLISH SOURCE (Strings.resx): replaces each
-// key's inner <value>, strips the 21 machine-contract Cli.EventLog* keys, keeps
+// key's inner <value>, strips the 20 machine-contract Cli.EventLog* keys, keeps
 // the human Cli keys, and self-verifies against the neutral. Output is LF,
 // UTF-8.
 //
@@ -63,7 +63,7 @@ const MAP = {
   'Section.Registered.Products': `PRODUK`,
   'Section.Registered.Patches': `PATCH`,
   'Section.Registered.Details': `DETAIL PRODUK`,
-  'Section.Backup.Folder': `LOKASI PEMINDAHAN`,
+  'Section.Backup.Folder': `BACKUP FOLDER`,
   'Section.SayThanks': `UCAPKAN TERIMA KASIH`,
 
   // Field labels (used in detail panels)
@@ -103,7 +103,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Beri _bintang di GitHub`,
   'Action.Licence': `Lisensi Apache 2.0`,
   'Action.Move': `_Pindahkan`,
-  'Action.BackupFolderPlaceholder': `Jalur folder jika Anda memilih Pindahkan, bukan Hapus`,
+  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
   'Action.OpenReleasePage': `Buka halaman _rilis`,
   'Action.Rescan': `Pindai _ulang`,
   'Action.ScanAgain': `Pindai _lagi`,
@@ -121,7 +121,7 @@ const MAP = {
   'Automation.CloseResult': `Tutup hasil dan kembali ke jendela utama`,
   'Automation.LeaveStarOnGitHub.About': `Beri bintang di github`,
   'Automation.Minimise': `Kecilkan`,
-  'Automation.ConfirmDelete': `Hapus memindahkan file yang tidak diperlukan ke Keranjang Sampah. Batal menutup tanpa menghapus.`,
+  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
   'Automation.ConfirmMove': `Pindahkan menaruh file yang tidak diperlukan di folder tujuan yang dipilih. Batal membiarkannya di tempatnya.`,
   'Automation.SayThanks': `Ucapkan terima kasih`,
   'Automation.ConfirmSendResultLog': `Kirim mengirimkan laporan yang ditampilkan ke No Faff. Batal tidak mengirim apa pun.`,
@@ -129,11 +129,11 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Memeriksa halaman rilis github untuk mencari versi yang lebih baru.`,
   'Automation.UpdateAvailable.HelpText': `Buka halaman rilis untuk mengunduh versi yang lebih baru, atau batalkan untuk tetap memakai versi saat ini.`,
   'Automation.Licence.HelpText': `Membuka file lisensi di github.com melalui browser Anda.`,
-  'Automation.Section.BackupFolder': `Lokasi pemindahan`,
+  'Automation.Section.BackupFolder': `Backup folder`,
   'Automation.Section.Products': `Produk`,
   'Automation.Section.Patches': `Patch`,
   'Automation.Section.ProductDetails': `Detail produk`,
-  'Automation.BackupFolder': `Lokasi pemindahan`,
+  'Automation.BackupFolder': `Backup folder`,
   'Automation.OperationProgress': `Kemajuan operasi`,
   'Automation.RescanInstaller': `Pindai ulang {InstallerFolder}`,
   'Automation.ScanningProgress': `Kemajuan pemindaian`,
@@ -160,18 +160,18 @@ const MAP = {
   'Tooltip.Minimise': `Kecilkan`,
   'Tooltip.SendResultLog': `Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi dan berapa banyak ruang yang dikosongkan orang-orang. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi.`,
   'Tooltip.SendResultLog.NothingFound': `Terserah Anda, tapi sangat dihargai. Mengirim ringkasan anonim yang sekadar memberi tahu saya apakah aplikasi berfungsi. Layar berikutnya memperlihatkan apa yang akan dikirim sebelum Anda mengonfirmasi.`,
-  'Tooltip.Move': `Pindahkan file yang tidak diperlukan ke lokasi pemindahan.`,
-  'Tooltip.MoveNeedsDestination': `Pindahkan file yang tidak diperlukan ke tempat aman. Anda akan memilih foldernya setelah ini.`,
-  'Tooltip.Delete': `Pindahkan file yang tidak diperlukan ke Keranjang Sampah.`,
+  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `Nama subjek dari sertifikat Authenticode yang disematkan. Rantai sertifikat tidak diverifikasi.`,
 
   // Body copy
-  'Body.MainExplanation.Lead': `File yang tidak diperlukan di bawah ini aman dihapus.`,
+  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
   'Body.MainExplanation.Why': `File-file ini berada di {InstallerFolder}, tertinggal saat sebuah program dihapus instalasinya ({0}), patch yang lebih baru menggantikan yang lama ({1}), atau penerbitnya menariknya ({2}). InstallerClean hanya pernah mencantumkan file yang Windows sendiri laporkan sudah tidak terpakai.`,
-  'Body.MainExplanation.Action': `Hapus ke Keranjang Sampah, atau gunakan Pindahkan sebagai gantinya untuk menyimpan salinan cadangan. Mengembalikan file ke {InstallerFolder} akan membuat semuanya persis seperti semula.`,
-  'Body.PendingReboot.MsiExecuteMutex': `Ada sesuatu yang sedang menggunakan Windows Installer saat ini, biasanya Windows Update atau program yang memasang di latar belakang. Pindahkan dan Hapus dijeda selama itu berjalan, sehingga InstallerClean tidak menyentuh cache penginstal saat sedang berubah. Setelah selesai, Pindai ulang dan keduanya kembali.`,
-  'Body.PendingReboot.InstallerInProgress': `Ada transaksi Windows Installer sebelumnya yang ditangguhkan di komputer ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache.`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows memiliki antrean penggantian nama file untuk mulai ulang berikutnya yang memengaruhi cache Installer. Mulai ulang Windows sebelum membersihkan.`,
+  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
+  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
   'Body.NoFileSelected': `Pilih file untuk melihat detail.`,
   'Body.NoProductSelected': `Pilih produk untuk melihat detail.`,
   'Body.NoMetadata': `Tidak ada metadata yang tersedia.`,
@@ -246,8 +246,8 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.PermanentDeleteSummary.Singular': `{0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah.`,
-  'Completion.PermanentDeleteSummary.Plural': `{0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah.`,
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} file masih diperlukan`,
@@ -314,8 +314,8 @@ const MAP = {
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows menolak akses ke file ini; file dibiarkan di tempatnya.`,
   'Error.AccessDenied.Plural': `Windows menolak akses ke file-file ini; semuanya dibiarkan di tempatnya.`,
-  'Error.FileInUse.Singular': `File ini sedang dibuka atau dikunci oleh program lain, jadi saat ini tidak ada yang bisa memindahkannya. File dibiarkan di tempatnya; coba lagi nanti.`,
-  'Error.FileInUse.Plural': `File-file ini sedang dibuka atau dikunci oleh program lain, jadi saat ini tidak ada yang bisa memindahkannya. Semuanya dibiarkan di tempatnya; coba lagi nanti.`,
+  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
+  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
   'Error.IOFailure.Singular': `Windows melaporkan kesalahan file; file dibiarkan di tempatnya.`,
   'Error.IOFailure.Plural': `Windows melaporkan kesalahan file; file-file ini dibiarkan di tempatnya.`,
   'Error.UnknownError.Singular': `Ada yang tidak beres dengan file ini; file dibiarkan di tempatnya.`,
@@ -399,7 +399,7 @@ const MAP = {
   'Display.Elapsed.S': `{0:F1}s`,
   'Display.ElapsedLong.LessThanASecond': `kurang dari satu detik`,
   'Display.ElapsedLong.Seconds': `{0:F1} detik`,
-  'CrashLog.PrivacyHeader': `# crash.log menangkap pengecualian tak tertangani dari InstallerClean.\n# Dalam mode dengan hak akses tinggi, pesan pengecualian framework bisa\n# memuat jalur file dari sesi yang berjalan (termasuk profil pengguna\n# lain yang didata oleh kueri Windows Installer). Pesan kegagalan\n# jaringan dari pemeriksaan pembaruan atau POST log hasil bisa memuat\n# URL tujuan dan alamat IP / proksi yang teresolusi. Hapus kedua jenis\n# detail ini sebelum melampirkan file ini ke laporan bug publik.\n`,
+  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
   'Tooltip.ChangeLanguage': `Ganti bahasa. Program akan dimulai ulang.`,
   'Automation.ChangeLanguage': `Ganti bahasa`,
   'Automation.ChangeLanguage.HelpText': `Program akan dimulai ulang.`,
@@ -417,12 +417,12 @@ const MAP = {
   'Cli.FoundOrphans': `Ditemukan {0} {1} untuk dibersihkan ({2}).`,
   'Cli.NothingToDo': `Tidak ada yang perlu dilakukan.`,
   'Cli.DeletingFiles': `Menghapus {0} {1}...`,
-  'Cli.DeletedFiles': `{0} {1} dihapus.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
   'Cli.NoMoveDestination': `Kesalahan: tujuan pemindahan tidak ditentukan. Gunakan /m JALUR. (Default yang diatur di GUI bersifat per-pengguna dan tidak berlaku untuk tugas terjadwal atau proses akun layanan.)`,
   'Cli.MoveDestinationInsideInstaller': `Kesalahan: tujuan tidak boleh berada di dalam folder Windows Installer.`,
   'Cli.MoveDestinationRelative': `Kesalahan: tujuan harus berupa jalur absolut lengkap. Diterima: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Kesalahan: tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, dan %ProgramData%.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Kesalahan: ada sesuatu yang sedang menggunakan Windows Installer saat ini, biasanya Windows Update atau program yang memasang di latar belakang. Pindahkan dan Hapus diblokir selama itu berjalan. Coba lagi setelah selesai.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Kesalahan: ada transaksi Windows Installer sebelumnya yang ditangguhkan di komputer ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache.`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Kesalahan: operasi file yang diantrekan setelah mulai ulang menyasar cache Installer ({0}). Mulai ulang Windows untuk menyelesaikan operasi itu sebelum membersihkan.`,
   'Cli.MovingFiles': `Memindahkan {0} {1} ke {2}...`,
@@ -433,8 +433,8 @@ const MAP = {
   'Cli.Help.Usage': `Penggunaan:`,
   'Cli.Help.Help': `  installerclean-cli --help     Tampilkan bantuan ini (juga /?, -h)`,
   'Cli.Help.Version': `  installerclean-cli --version  Cetak versi (juga -v)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s         Pindai saja - daftar file tidak diperlukan`,
-  'Cli.Help.Delete': `  installerclean-cli /d         Hapus file tidak diperlukan (Keranjang)`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Pindahkan ke lokasi default tersimpan`,
   'Cli.Help.MovePath': `  installerclean-cli /m JALUR   Pindahkan ke jalur yang ditentukan`,
   'Cli.Help.NoteLine1': `installerclean-cli adalah proses konsol sungguhan dan memblokir prompt`,
@@ -448,7 +448,7 @@ const MAP = {
   'Cli.Help.ExitCodeCancelled': `  130 dibatalkan (Ctrl+C)`,
   'Body.NotScanned.Lead': `Belum ada yang dipindai.`,
   'Body.NotScanned.Why': `Tekan Pindai ulang untuk menelusuri {InstallerFolder} mencari file penginstal yang tidak lagi diperlukan program mana pun.`,
-  'Confirm.MoveSameDrive': `Folder ini berada di drive yang sama, jadi pemindahan itu sendiri tidak akan mengosongkan ruang apa pun. Ruangnya akan kembali saat Anda menghapus file di dalamnya, atau Anda bisa memilih folder di drive lain.`,
+  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
   'Error.ScanCorrelationFailed': `InstallerClean tidak bisa mencocokkan pemindaian ini dengan catatan Windows Installer: setiap file yang masih didaftarkan Windows sebagai diperlukan tidak ada di {InstallerFolder}, sementara file yang benar-benar ada di folder itu tidak cocok dengan catatan mana pun. Tidak ada komputer nyata yang seperti itu, jadi ini menunjukkan masalah dalam membaca catatan, bukan file yang aman Anda hapus. Tidak ada yang ditawarkan untuk dibersihkan dan tidak ada yang dihapus.`,
   'Error.CandidateOutsideCache': `File ini tidak berada langsung di dalam folder Windows Installer; ditolak demi keamanan.`,
   'Completion.ReverifySkipped': `{0} {1} dibiarkan di tempatnya, karena sebuah program kembali membutuhkannya setelah pemindaian.`,
@@ -471,11 +471,18 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Membuka readme di github melalui browser Anda.`,
   'Automation.About.ReportProblem.HelpText': `Membuka pelacak masalah (Issues) di github.com melalui browser Anda.`,
   'Automation.AutoUpdateCheck.HelpText': `Jika dicentang, InstallerClean memeriksa apakah ada versi yang lebih baru di github saat Anda menjalankannya.`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 21 machine-contract Cli.* <data> elements BY NAME (the
+// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable).
 const isMachineCliKey = (k) =>
   k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
@@ -535,7 +542,7 @@ const nonCliRequired = neutralRequired.filter((k) => !k.startsWith('Cli.')).leng
 console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 21)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
 console.log('MAP entries:', Object.keys(MAP).length, '| CRLF:', crlf, '(expect 0)');
 
 if (alsoKeep.size) {
@@ -564,6 +571,6 @@ if (untranslated.length) {
 
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
-  output.size === neutralRequired.length && cliMachineRemoved === 21 && crlf === 0;
+  output.size === neutralRequired.length && cliMachineRemoved === 20 && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

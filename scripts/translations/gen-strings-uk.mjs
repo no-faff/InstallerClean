@@ -72,7 +72,7 @@ const MAP = {
   'Section.Registered.Products': `ПРОДУКТИ`,
   'Section.Registered.Patches': `ВИПРАВЛЕННЯ`,
   'Section.Registered.Details': `ДЕТАЛІ ПРОДУКТУ`,
-  'Section.Backup.Folder': `КУДИ ПЕРЕМІСТИТИ`,
+  'Section.Backup.Folder': `BACKUP FOLDER`,
   'Section.SayThanks': `ПОДЯКУВАТИ`,
 
   // Field labels (used in detail panels)
@@ -112,7 +112,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Лишити зірку на _GitHub`,
   'Action.Licence': `Ліцензія Apache 2.0`,
   'Action.Move': `Пере_містити`,
-  'Action.BackupFolderPlaceholder': `Шлях до папки, якщо ви переміщуєте замість видалення`,
+  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
   'Action.OpenReleasePage': `_Відкрити сторінку випуску`,
   'Action.Rescan': `Пов_торити сканування`,
   'Action.ScanAgain': `_Сканувати знову`,
@@ -130,7 +130,7 @@ const MAP = {
   'Automation.CloseResult': `Закрити результат і повернутися до головного вікна`,
   'Automation.LeaveStarOnGitHub.About': `Лишити зірку на github`,
   'Automation.Minimise': `Згорнути`,
-  'Automation.ConfirmDelete': `«Видалити» переміщує непотрібні файли до Кошика. «Скасувати» закриває вікно без видалення.`,
+  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
   'Automation.ConfirmMove': `«Перемістити» кладе непотрібні файли до обраної папки призначення. «Скасувати» лишає їх там, де вони є.`,
   'Automation.SayThanks': `Подякувати`,
   'Automation.ConfirmSendResultLog': `«Надіслати» надсилає показаний звіт до No Faff. «Скасувати» не надсилає нічого.`,
@@ -138,11 +138,11 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Перевіряє на сторінці випусків github, чи є новіша версія.`,
   'Automation.UpdateAvailable.HelpText': `Відкрийте сторінку випуску, щоб завантажити новішу версію, або скасуйте, щоб лишити поточну версію.`,
   'Automation.Licence.HelpText': `Відкриває файл ліцензії на github.com у вашому браузері.`,
-  'Automation.Section.BackupFolder': `Куди перемістити`,
+  'Automation.Section.BackupFolder': `Backup folder`,
   'Automation.Section.Products': `Продукти`,
   'Automation.Section.Patches': `Виправлення`,
   'Automation.Section.ProductDetails': `Деталі продукту`,
-  'Automation.BackupFolder': `Куди перемістити`,
+  'Automation.BackupFolder': `Backup folder`,
   'Automation.OperationProgress': `Перебіг операції`,
   'Automation.RescanInstaller': `Просканувати {InstallerFolder} ще раз`,
   'Automation.ScanningProgress': `Перебіг сканування`,
@@ -169,18 +169,18 @@ const MAP = {
   'Tooltip.Minimise': `Згорнути`,
   'Tooltip.SendResultLog': `На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма і скільки місця люди звільняють. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити.`,
   'Tooltip.SendResultLog.NothingFound': `На ваш розсуд, але буду вдячний. Надсилає анонімний підсумок, який лише дає мені знати, чи працює програма. На наступному екрані ви побачите, що буде надіслано, перш ніж підтвердити.`,
-  'Tooltip.Move': `Перемістити непотрібні файли до вказаного розташування.`,
-  'Tooltip.MoveNeedsDestination': `Перемістити непотрібні файли в безпечне місце. Папку ви виберете на наступному кроці.`,
-  'Tooltip.Delete': `Перемістити непотрібні файли до Кошика.`,
+  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `Назва суб'єкта з вбудованого сертифіката Authenticode. Ланцюжок не перевірено.`,
 
   // Body copy
-  'Body.MainExplanation.Lead': `Будь-які непотрібні файли нижче можна безпечно видалити.`,
+  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
   'Body.MainExplanation.Why': `Вони лежать у {InstallerFolder}, лишившись після видалення програми ({0}), заміни старого виправлення новішим ({1}) чи відкликання видавцем ({2}). InstallerClean перелічує лише ті файли, які сама Windows позначає як завершені.`,
-  'Body.MainExplanation.Action': `Видаліть їх до Кошика, або скористайтеся натомість функцією «Перемістити», щоб зберегти резервну копію. Якщо повернути файли назад у {InstallerFolder}, усе стане точно таким, як було.`,
-  'Body.PendingReboot.MsiExecuteMutex': `Щось саме зараз використовує Windows Installer, зазвичай це Windows Update або програма, що встановлюється у фоні. Переміщення та видалення призупинено, доки це триває, тож InstallerClean не чіпатиме кеш інсталятора, поки той змінюється. Коли це завершиться, виконайте повторне сканування, і вони повернуться.`,
-  'Body.PendingReboot.InstallerInProgress': `На цій машині призупинено попередню транзакцію Windows Installer. Поновіть або відкотіть те встановлення (чи перезавантажте Windows), перш ніж очищати кеш.`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows має перейменування файлу, поставлене в чергу на наступне перезавантаження, яке стосується кешу інсталятора. Перезавантажте Windows, перш ніж очищати.`,
+  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
+  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
   'Body.NoFileSelected': `Виберіть файл, щоб переглянути деталі.`,
   'Body.NoProductSelected': `Виберіть продукт, щоб переглянути деталі.`,
   'Body.NoMetadata': `Метадані недоступні.`,
@@ -255,8 +255,8 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.PermanentDeleteSummary.Singular': `{0} {1} безповоротно видалено. Він не потрапив до Кошика.`,
-  'Completion.PermanentDeleteSummary.Plural': `{0} {1} безповоротно видалено. Вони не потрапили до Кошика.`,
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} файл ще потрібен`,
@@ -323,8 +323,8 @@ const MAP = {
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows відмовив у доступі до цього файлу; його залишено на місці.`,
   'Error.AccessDenied.Plural': `Windows відмовив у доступі до цих файлів; їх залишено на місці.`,
-  'Error.FileInUse.Singular': `Цей файл відкритий або заблокований іншою програмою, тож зараз його ніщо не може перемістити. Його залишено на місці; спробуйте ще раз пізніше.`,
-  'Error.FileInUse.Plural': `Ці файли відкриті або заблоковані іншою програмою, тож зараз їх ніщо не може перемістити. Їх залишено на місці; спробуйте ще раз пізніше.`,
+  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
+  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
   'Error.IOFailure.Singular': `Windows повідомив про помилку файлу; файл залишено на місці.`,
   'Error.IOFailure.Plural': `Windows повідомив про помилки файлів; ці файли залишено на місці.`,
   'Error.UnknownError.Singular': `З цим файлом щось пішло не так; його залишено на місці.`,
@@ -408,7 +408,7 @@ const MAP = {
   'Display.Elapsed.S': `{0:F1}s`,
   'Display.ElapsedLong.LessThanASecond': `менш ніж секунду`,
   'Display.ElapsedLong.Seconds': `{0:F1} секунди`,
-  'CrashLog.PrivacyHeader': `# crash.log фіксує необроблені винятки InstallerClean.\n# Під час підвищення прав повідомлення про винятки фреймворку\n# можуть містити шляхи до файлів із поточного сеансу (зокрема\n# профілі інших користувачів, перелічені запитами Windows\n# Installer). Повідомлення про збій мережі від перевірки оновлень\n# чи надсилання звіту можуть містити URL призначення та\n# розв'язану IP-адресу / адресу проксі. Відредагуйте обидва види\n# даних, перш ніж додавати цей файл до публічного звіту про ваду.\n`,
+  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
   'Tooltip.ChangeLanguage': `Змінити мову. Програму буде перезапущено.`,
   'Automation.ChangeLanguage': `Змінити мову`,
   'Automation.ChangeLanguage.HelpText': `Програму буде перезапущено.`,
@@ -423,12 +423,12 @@ const MAP = {
   'Cli.FoundOrphans': `Знайдено {0} {1} для очищення ({2}).`,
   'Cli.NothingToDo': `Немає чого робити.`,
   'Cli.DeletingFiles': `Видалення: {0} {1}...`,
-  'Cli.DeletedFiles': `Видалено {0} {1}.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
   'Cli.NoMoveDestination': `Помилка: не вказано розташування для переміщення. Скористайтеся /m ШЛЯХ. (Типове значення, задане в графічному інтерфейсі, діє лише для поточного користувача і не застосовується до запусків за розкладом чи від імені службового облікового запису.)`,
   'Cli.MoveDestinationInsideInstaller': `Помилка: призначення не може бути всередині папки Windows Installer.`,
   'Cli.MoveDestinationRelative': `Помилка: призначення має бути повним шляхом. Отримано: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Помилка: призначення {0} вказує всередину системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles% та %ProgramData%.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Помилка: щось саме зараз використовує Windows Installer, зазвичай це Windows Update або програма, що встановлюється у фоні. Переміщення та видалення заблоковано, доки це триває. Спробуйте ще раз, коли воно завершиться.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Помилка: на цій машині призупинено попередню транзакцію Windows Installer. Поновіть або відкотіть те встановлення (чи перезавантажте Windows), перш ніж очищати кеш.`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Помилка: поставлена в чергу після перезавантаження файлова операція націлена на кеш інсталятора ({0}). Перезавантажте Windows, щоб завершити ту операцію, перш ніж очищати.`,
   'Cli.MovingFiles': `Переміщення: {0} {1} до {2}...`,
@@ -439,8 +439,8 @@ const MAP = {
   'Cli.Help.Usage': `Використання:`,
   'Cli.Help.Help': `  installerclean-cli --help     Показати цю довідку (також приймає /?, -h)`,
   'Cli.Help.Version': `  installerclean-cli --version  Вивести версію (також приймає -v)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s         Лише сканування - непотрібні файли`,
-  'Cli.Help.Delete': `  installerclean-cli /d         Видалити непотрібні файли (Кошик)`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Перемістити в збережену папку`,
   'Cli.Help.MovePath': `  installerclean-cli /m ШЛЯХ    Перемістити за вказаним шляхом`,
   'Cli.Help.NoteLine1': `installerclean-cli — це консольний процес, що блокує командний рядок до`,
@@ -454,7 +454,7 @@ const MAP = {
   'Cli.Help.ExitCodeCancelled': `  130 скасовано (Ctrl+C)`,
   'Body.NotScanned.Lead': `Ще нічого не проскановано.`,
   'Body.NotScanned.Why': `Натисніть «Повторити сканування», щоб переглянути {InstallerFolder} і знайти файли інсталятора, яких уже не потребує жодна програма.`,
-  'Confirm.MoveSameDrive': `Ця папка на тому самому диску, тож саме переміщення не звільнить місця. Місце повернеться, коли ви видалите з неї файли, або ж можете натомість вибрати папку на іншому диску.`,
+  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
   'Error.ScanCorrelationFailed': `InstallerClean не зміг узгодити це сканування із записами Windows Installer: кожного файлу, який Windows досі вважає потрібним, немає в {InstallerFolder}, а файли, що справді лежать у цій папці, не відповідають жодному запису. Жоден справжній комп'ютер так не виглядає, тож це вказує на проблему з читанням записів, а не на файли, які можна безпечно видалити. Для очищення нічого не запропоновано, і нічого не було видалено.`,
   'Error.CandidateOutsideCache': `Цей файл не міститься безпосередньо в папці Windows Installer; відмовлено з міркувань безпеки.`,
   'Completion.ReverifySkipped': `{0} {1} залишено на місці: після сканування вони знову знадобилися програмі.`,
@@ -477,6 +477,13 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Відкриває readme на github у вашому браузері.`,
   'Automation.About.ReportProblem.HelpText': `Відкриває список проблем (Issues) на github.com у вашому браузері.`,
   'Automation.AutoUpdateCheck.HelpText': `Якщо позначено, InstallerClean під час запуску перевіряє на github наявність новішої версії.`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
@@ -554,7 +561,7 @@ console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length + overrideKeys.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli +',
   overrideKeys.length, 'override)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 21)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
 console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| CRLF:', crlf, '(expect 0)');
 
 if (alsoKeep.size) {
@@ -586,6 +593,6 @@ if (untranslated.length) {
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
   !overrideMissing.length && !overrideArityMismatch.length &&
-  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 21 && crlf === 0;
+  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 20 && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

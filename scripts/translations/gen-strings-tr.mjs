@@ -2,7 +2,7 @@
 // Turkish (tr) satellite generator for InstallerClean. Copied from
 // gen-strings-template.mjs; only OUT and the MAP values differ. Works FROM THE
 // ENGLISH SOURCE (Strings.resx): replaces each key's inner <value>, strips the
-// 21 machine-contract Cli.EventLog* keys, keeps the human Cli keys, and
+// 20 machine-contract Cli.EventLog* keys, keeps the human Cli keys, and
 // self-verifies against the neutral. Output is LF, UTF-8. See the template for
 // the whole of how the body works.
 //
@@ -54,7 +54,7 @@ const MAP = {
   'Section.Registered.Products': `ÜRÜNLER`,
   'Section.Registered.Patches': `YAMALAR`,
   'Section.Registered.Details': `ÜRÜN AYRINTILARI`,
-  'Section.Backup.Folder': `TAŞIMA KONUMU`,
+  'Section.Backup.Folder': `BACKUP FOLDER`,
   'Section.SayThanks': `TEŞEKKÜR ETMEK İÇİN`,
   'Field.Reason': `Neden`,
   'Field.Author': `Yazar`,
@@ -88,7 +88,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `GitHub'da _yıldız bırak`,
   'Action.Licence': `Apache 2.0 lisansı`,
   'Action.Move': `_Taşı`,
-  'Action.BackupFolderPlaceholder': `Silmek yerine taşıyacaksanız klasör yolu`,
+  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
   'Action.OpenReleasePage': `_Sürüm sayfasını aç`,
   'Action.Rescan': `_Yeniden tara`,
   'Action.ScanAgain': `Te_krar tara`,
@@ -104,7 +104,7 @@ const MAP = {
   'Automation.CloseResult': `Sonucu kapat ve ana pencereye dön`,
   'Automation.LeaveStarOnGitHub.About': `github'da yıldız bırak`,
   'Automation.Minimise': `Simge durumuna küçült`,
-  'Automation.ConfirmDelete': `Sil, gereksiz dosyaları Geri Dönüşüm Kutusu'na taşır. İptal, silmeden kapatır.`,
+  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
   'Automation.ConfirmMove': `Taşı, gereksiz dosyaları seçilen hedef klasöre koyar. İptal, onları olduğu yerde bırakır.`,
   'Automation.SayThanks': `Teşekkür etmek için`,
   'Automation.ConfirmSendResultLog': `Gönder, gösterilen raporu No Faff'a iletir. İptal hiçbir şey göndermez.`,
@@ -112,11 +112,11 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `github üzerindeki sürümler sayfasında daha yeni bir sürüm olup olmadığını denetler.`,
   'Automation.UpdateAvailable.HelpText': `Daha yeni sürümü indirmek için sürüm sayfasını açın ya da geçerli sürümü korumak için iptal edin.`,
   'Automation.Licence.HelpText': `github.com üzerindeki lisans dosyasını tarayıcınızda açar.`,
-  'Automation.Section.BackupFolder': `Taşıma konumu`,
+  'Automation.Section.BackupFolder': `Backup folder`,
   'Automation.Section.Products': `Ürünler`,
   'Automation.Section.Patches': `Yamalar`,
   'Automation.Section.ProductDetails': `Ürün ayrıntıları`,
-  'Automation.BackupFolder': `Taşıma konumu`,
+  'Automation.BackupFolder': `Backup folder`,
   'Automation.OperationProgress': `İşlem ilerlemesi`,
   'Automation.RescanInstaller': `{InstallerFolder}'ı yeniden tara`,
   'Automation.ScanningProgress': `Tarama ilerlemesi`,
@@ -141,16 +141,16 @@ const MAP = {
   'Tooltip.Minimise': `Simge durumuna küçült`,
   'Tooltip.SendResultLog': `Size kalmış ama makbule geçer. Yalnızca uygulamanın çalışıp çalışmadığını ve insanların ne kadar yer açtığını bana bildiren anonim bir özet gönderir. Sonraki ekran, onaylamadan önce ne gönderileceğini görmenizi sağlar.`,
   'Tooltip.SendResultLog.NothingFound': `Size kalmış ama makbule geçer. Yalnızca uygulamanın çalışıp çalışmadığını bana bildiren anonim bir özet gönderir. Sonraki ekran, onaylamadan önce ne gönderileceğini görmenizi sağlar.`,
-  'Tooltip.Move': `Gereksiz dosyaları Taşıma konumuna taşır.`,
-  'Tooltip.MoveNeedsDestination': `Gereksiz dosyaları güvenli bir yere taşır. Klasörü sonraki adımda seçeceksiniz.`,
-  'Tooltip.Delete': `Gereksiz dosyaları Geri Dönüşüm Kutusu'na taşır.`,
+  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `Gömülü Authenticode sertifikasındaki konu adı. Zincir doğrulaması yapılmadı.`,
-  'Body.MainExplanation.Lead': `Aşağıdaki gereksiz dosyalar güvenle silinebilir.`,
+  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
   'Body.MainExplanation.Why': `Bu dosyalar {InstallerFolder} içinde yer alır; bir program kaldırıldığında ({0}), daha yeni bir yama bir öncekinin yerini aldığında ({1}) ya da yayımcı onu geri çektiğinde ({2}) geride kalır. InstallerClean her zaman yalnızca Windows'un kendisinin işi bittiğini bildirdiği dosyaları listeler.`,
-  'Body.MainExplanation.Action': `Onları Geri Dönüşüm Kutusu'na silin ya da yedek kopya saklamak için bunun yerine Taşı'yı kullanın. Dosyaları {InstallerFolder} içine geri koyduğunuzda her şey tam olarak başladığınız noktaya döner.`,
-  'Body.PendingReboot.MsiExecuteMutex': `Şu anda bir şey Windows Installer'ı kullanıyor; genellikle bir Windows Update ya da arka planda kurulan bir program. Bu sürerken Taşı ve Sil duraklatılır, böylece InstallerClean değişmekte olan yükleyici önbelleğine dokunmaz. İşlem bittiğinde Yeniden tara'yı kullanın, geri gelirler.`,
-  'Body.PendingReboot.InstallerInProgress': `Bu makinede önceki bir Windows Installer işlemi askıya alınmış durumda. Önbelleği temizlemeden önce o kurulumu sürdürün ya da geri alın (veya Windows'u yeniden başlatın).`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows, bir sonraki yeniden başlatmada yükleyici önbelleğini etkileyen bir dosya yeniden adlandırması sıraya almış. Temizlemeden önce Windows'u yeniden başlatın.`,
+  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
+  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
   'Body.NoFileSelected': `Ayrıntıları görmek için bir dosya seçin.`,
   'Body.NoProductSelected': `Ayrıntıları görmek için bir ürün seçin.`,
   'Body.NoMetadata': `Kullanılabilir meta veri yok.`,
@@ -203,8 +203,8 @@ const MAP = {
   'Completion.FailedCountDelete.Plural': `{1} dosya içinden {0} tanesi silinemedi.`,
   'Completion.MoveSummary.Singular': `{0} {1} şu konuma taşındı: {2}`,
   'Completion.MoveSummary.Plural': `{0} {1} şu konuma taşındı: {2}`,
-  'Completion.PermanentDeleteSummary.Singular': `{0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi.`,
-  'Completion.PermanentDeleteSummary.Plural': `{0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi.`,
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
   'Summary.RegisteredStillUsed.Singular': `{0} dosya hâlâ gerekli`,
   'Summary.RegisteredStillUsed.Plural': `{0} dosya hâlâ gerekli`,
   'Summary.OrphanedToCleanUp.Singular': `temizlenecek {0} gereksiz dosya`,
@@ -254,8 +254,8 @@ Ayrıntılar {1} içinde.`,
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows bu dosyaya erişimi reddetti; dosya yerinde bırakıldı.`,
   'Error.AccessDenied.Plural': `Windows bu dosyalara erişimi reddetti; dosyalar yerinde bırakıldı.`,
-  'Error.FileInUse.Singular': `Bu dosya başka bir program tarafından açık ya da kilitli, bu yüzden şu anda onu hiçbir şey taşıyamaz. Dosya yerinde bırakıldı; daha sonra yeniden deneyin.`,
-  'Error.FileInUse.Plural': `Bu dosyalar başka bir program tarafından açık ya da kilitli, bu yüzden şu anda onları hiçbir şey taşıyamaz. Dosyalar yerinde bırakıldı; daha sonra yeniden deneyin.`,
+  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
+  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
   'Error.IOFailure.Singular': `Windows bir dosya hatası bildirdi; dosya yerinde bırakıldı.`,
   'Error.IOFailure.Plural': `Windows dosya hataları bildirdi; bu dosyalar yerinde bırakıldı.`,
   'Error.UnknownError.Singular': `Bu dosyada bir şeyler ters gitti; dosya yerinde bırakıldı.`,
@@ -323,15 +323,7 @@ Ayrıntılar şuraya yazıldı:
   'Display.Elapsed.S': `{0:F1}s`,
   'Display.ElapsedLong.LessThanASecond': `bir saniyeden az`,
   'Display.ElapsedLong.Seconds': `{0:F1} saniye`,
-  'CrashLog.PrivacyHeader': `# crash.log, InstallerClean'in işlenmeyen özel durumlarını kaydeder.
-# Yükseltilmiş çalışmada framework'ün özel durum iletileri, çalışan
-# oturumdaki dosya yollarını içerebilir (Windows Installer sorgularıyla
-# sıralanan diğer kullanıcıların profilleri dahil). Güncelleştirme
-# denetiminden ya da sonuç günlüğü POST'undan gelen ağ hatası iletileri,
-# hedef URL'yi ve çözümlenen IP / proxy adresini içerebilir. Bu dosyayı
-# herkese açık bir hata bildirimine eklemeden önce her iki tür ayrıntıyı
-# da çıkarın.
-`,
+  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
   'Tooltip.ChangeLanguage': `Dili değiştir. Program yeniden başlatılacak.`,
   'Automation.ChangeLanguage': `Dili değiştir`,
   'Automation.ChangeLanguage.HelpText': `Program yeniden başlatılacak.`,
@@ -344,12 +336,12 @@ Ayrıntılar şuraya yazıldı:
   'Cli.FoundOrphans': `Temizlenecek {0} {1} bulundu ({2}).`,
   'Cli.NothingToDo': `Yapılacak bir şey yok.`,
   'Cli.DeletingFiles': `{0} {1} siliniyor...`,
-  'Cli.DeletedFiles': `{0} {1} silindi.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
   'Cli.NoMoveDestination': `Hata: taşıma hedefi belirtilmedi. /m YOL kullanın. (GUI'de ayarlanan bir varsayılan, kullanıcıya özeldir ve zamanlanmış ya da hizmet hesabı çalıştırmaları için geçerli değildir.)`,
   'Cli.MoveDestinationInsideInstaller': `Hata: hedef, Windows Installer klasörünün içinde olamaz.`,
   'Cli.MoveDestinationRelative': `Hata: hedef, tam nitelenmiş bir yol olmalıdır. Alınan: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Hata: {0} hedefi bir Windows sistem klasörünün altına çözümleniyor. %SystemRoot%, %ProgramFiles% ve %ProgramData% dışında bir yol seçin.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Hata: şu anda bir şey Windows Installer'ı kullanıyor; genellikle bir Windows Update ya da arka planda kurulan bir program. Bu sürerken Taşı ve Sil engellenir. İşlem bittiğinde yeniden deneyin.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Hata: bu makinede önceki bir Windows Installer işlemi askıya alınmış durumda. Önbelleği temizlemeden önce o kurulumu sürdürün ya da geri alın (veya Windows'u yeniden başlatın).`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Hata: bir sonraki yeniden başlatma için sıraya alınmış bir dosya işlemi yükleyici önbelleğini hedefliyor ({0}). Temizlemeden önce bu işlemi tamamlamak için Windows'u yeniden başlatın.`,
   'Cli.MovingFiles': `{0} {1}, {2} konumuna taşınıyor...`,
@@ -360,8 +352,8 @@ Ayrıntılar şuraya yazıldı:
   'Cli.Help.Usage': `Kullanım:`,
   'Cli.Help.Help': `  installerclean-cli --help     Bu yardımı göster (/?, -h de kabul edilir)`,
   'Cli.Help.Version': `  installerclean-cli --version  Sürümü yazdır (-v de kabul edilir)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s         Yalnızca tara - gereksiz dosyaları listele`,
-  'Cli.Help.Delete': `  installerclean-cli /d         Gereksizleri sil (Geri Dönüşüm Kutusu)`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Kayıtlı varsayılan konuma taşı`,
   'Cli.Help.MovePath': `  installerclean-cli /m YOL     Belirtilen yola taşı`,
   'Cli.Help.NoteLine1': `installerclean-cli gerçek bir konsol işlemidir ve bitene kadar istemi`,
@@ -375,7 +367,7 @@ Ayrıntılar şuraya yazıldı:
   'Cli.Help.ExitCodeCancelled': `  130 iptal edildi (Ctrl+C)`,
   'Body.NotScanned.Lead': `Henüz tarama yapılmadı.`,
   'Body.NotScanned.Why': `Hiçbir programın hâlâ ihtiyaç duymadığı yükleyici dosyaları için {InstallerFolder} klasörüne bakmak üzere Yeniden tara'ya basın.`,
-  'Confirm.MoveSameDrive': `Bu klasör aynı sürücüde olduğu için taşımak tek başına yer açmaz. Dosyaları oradan sildiğinizde yeri geri kazanırsınız ya da bunun yerine başka bir sürücüde bir klasör seçebilirsiniz.`,
+  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
   'Error.ScanCorrelationFailed': `InstallerClean bu taramayı Windows Installer kayıtlarıyla bağdaştıramadı: Windows'un hâlâ gerekli olarak listelediği her dosya {InstallerFolder} içinde yok, klasörde gerçekten bulunan dosyalar ise hiçbir kayıtla eşleşmiyor. Hiçbir gerçek makine böyle görünmez, dolayısıyla bu, güvenle kaldırabileceğiniz dosyalara değil, kayıtları okumakta bir soruna işaret ediyor. Temizlik için hiçbir şey sunulmadı ve hiçbir şey kaldırılmadı.`,
   'Error.CandidateOutsideCache': `Bu dosya doğrudan Windows Installer klasörünün içinde değil; güvenlik için reddedildi.`,
   'Completion.ReverifySkipped': `Taramadan sonra bir programın yeniden ihtiyaç duymaya başladığı {0} {1} yerinde bırakıldı.`,
@@ -398,11 +390,18 @@ Ayrıntılar şuraya yazıldı:
   'Automation.About.Guide.HelpText': `github üzerindeki readme'yi tarayıcınızda açar.`,
   'Automation.About.ReportProblem.HelpText': `github.com üzerindeki sorun izleyiciyi (Issues) tarayıcınızda açar.`,
   'Automation.AutoUpdateCheck.HelpText': `İşaretliyse InstallerClean, çalıştırdığınızda github üzerinde daha yeni bir sürüm olup olmadığını denetler.`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 21 machine-contract Cli.* <data> elements BY NAME (the
+// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable): each is matched non-greedy to
 // its own </data>. The human-facing Cli keys are KEPT, and their value is
 // replaced from the MAP like any other key. Same predicate as
@@ -458,7 +457,7 @@ const neutral = parse(readFileSync(BASE, 'utf8'));
 const written = readFileSync(OUT, 'utf8');
 const output = parse(written);
 // Required = everything a satellite must carry: the non-Cli keys plus the
-// human-facing Cli keys. The 21 machine Cli keys are the complement; they must be
+// human-facing Cli keys. The 20 machine Cli keys are the complement; they must be
 // absent from the output (isMachineCliKey is defined up in the strip section).
 const neutralRequired = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
 
@@ -500,7 +499,7 @@ console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length + overrideKeys.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli +',
   overrideKeys.length, 'override)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 21)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
 console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| CRLF:', crlf, '(expect 0)');
 
 // ALSO_KEEP audit roster, so a lazy "force it green" dump is visible at a glance.
@@ -533,6 +532,6 @@ if (untranslated.length) {
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
   !overrideMissing.length && !overrideArityMismatch.length &&
-  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 21 && crlf === 0;
+  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 20 && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

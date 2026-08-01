@@ -15,7 +15,7 @@
 //   tr, id, vi, uk, nl.
 // It reads the English neutral Strings.resx and Strings.<code>.resx, pairs them by
 // key, and writes docs/translations/<code>.md (LF). The human-facing Cli.* keys are
-// translated and shown in their own group; the 21 machine-contract Cli.EventLog*
+// translated and shown in their own group; the 20 machine-contract Cli.EventLog*
 // keys (bar Cli.EventLogUnavailable) stay English by contract, so they are skipped
 // here whether or not the satellite carries them (ja does). Only the machine set
 // is counted, because it is closed by that contract while the human set grows
@@ -117,7 +117,7 @@ const cell = (raw) => raw
   .replace(/\r\n|\r|\n/g, '<br>')    // a literal newline in a multi-line value
   .replace(/\|/g, '\\|');
 
-// Drop only the 21 machine-contract CLI keys (the Cli.EventLog* set bar
+// Drop only the 20 machine-contract CLI keys (the Cli.EventLog* set bar
 // Cli.EventLogUnavailable, the one operator-facing warning); every other Cli.*
 // key is translated and belongs in the table.
 const isMachineCliKey = (k) => k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';

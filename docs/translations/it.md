@@ -22,7 +22,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | PRODUCTS | PRODOTTI |
 | PATCHES | PATCH |
 | PRODUCT DETAILS | DETTAGLI PRODOTTO |
-| MOVE LOCATION | DESTINAZIONE SPOSTAMENTO |
+| BACKUP FOLDER | BACKUP FOLDER |
 | SAY THANKS | PER RINGRAZIARMI |
 
 ## Buttons and actions
@@ -38,7 +38,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Cancel | _Annulla |
 | Check for _updates | Controlla _aggiornamenti |
 | _Close | _Chiudi |
-| _Delete | _Elimina |
 | _Delete permanently | _Elimina definitivamente |
 | _Done | _Fatto |
 | Details | Dettagli |
@@ -46,8 +45,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a _star on GitHub | Lascia una _stella su GitHub |
 | Apache 2.0 licence | Licenza Apache 2.0 |
 | _Move | _Sposta |
-| _Move instead | _Sposta invece |
-| Path to folder if you Move instead of Delete | Percorso cartella, se scegli 'Sposta' anziché 'Elimina' |
+| Path to folder if you move rather than delete. | Path to folder if you move rather than delete. |
 | Open _release page | Apri pagina _release |
 | _Re-scan | _Ripeti scansione |
 | _Scan again | _Nuova scansione |
@@ -99,7 +97,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Scansione pacchetti locali... |
 | Found {0} {1} you can safely delete. | {0} {1} che puoi eliminare in sicurezza. |
 | Preparing destination folder... | Preparazione cartella destinazione... |
-| Checking the Recycle Bin... | Controllo del Cestino... |
 | Moving {0} {1}... | Spostamento di {0} {1}... |
 | Deleting {0} {1}... | Eliminazione di {0} {1}... |
 | Move cancelled. {0} of {1} {2} processed. | Spostamento annullato dopo {0} di {1} {2}. |
@@ -119,15 +116,15 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Italiano |
 | --- | --- |
-| Any unneeded files below are safe to delete. | Eventuali file non necessari qui sotto si possono eliminare senza rischi. |
+| Any unneeded files below are [safe to delete]. | Any unneeded files below are [safe to delete]. |
 | They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Si trovano in {InstallerFolder}, lasciati indietro quando un programma è stato disinstallato ({0}), una patch più recente ne ha sostituito uno ({1}) o l'editore lo ha ritirato ({2}). InstallerClean elenca sempre e solo i file che Windows stesso segnala come non più necessari. |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | Eliminali nel Cestino, oppure usa invece Sposta per tenerne una copia di backup. Rimettere i file in {InstallerFolder} riporta tutto esattamente com'era. |
+| Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored. | Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored. |
 | Nothing scanned yet. | Ancora nessuna scansione. |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Premi Ripeti scansione per cercare in {InstallerFolder} i file di installazione che nessun programma usa più. |
 | These files can't be cleaned up right now. | Al momento questi file non si possono ripulire. |
-| Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | In questo momento qualcosa sta usando Windows Installer, di solito un aggiornamento di Windows o un programma che si sta installando in background. Mentre questo avviene 'Sposta' ed 'Elimina' sono in pausa, così InstallerClean non tocca la cache di installazione quando ci sono modifiche in corso. Ad attività completate ripeti la scansione e torneranno disponibili. |
-| A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | In questo computer è in sospeso una precedente transazione di Windows Installer. Prima di pulire la cache riprendi o annulla quell'installazione (o riavvia Windows). |
-| Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows ha in coda, per il prossimo riavvio, la ridenominazione di un file che riguarda la cache di installazione. Prima di pulire riavvia Windows. |
+| Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back. | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back. |
+| A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. |
+| Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. |
 | Select a file to view details. | Seleziona un file per vederne i dettagli. |
 | Select a product to view details. | Seleziona un prodotto per vederne i dettagli. |
 | No metadata available. | Nessun metadato disponibile. |
@@ -150,11 +147,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Tutto pulito |
 | Nothing to clean up in {InstallerFolder} | Niente da eliminare in {InstallerFolder} |
 | Scanned {0} {1} in {2} | Analizzati {0} {1} in {2} |
-| Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]). | Riportali in {InstallerFolder} se mai qualcosa smettesse di funzionare ([estremamente improbabile]). |
-| Until then, you can restore them if anything ever breaks ([extremely unlikely]). | Fino ad allora, puoi ripristinarli se mai qualcosa smettesse di funzionare ([estremamente improbabile]). |
-| Empty it to actually reclaim the space. | Svuotalo per recuperare davvero lo spazio. |
+| The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). |
+| The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). |
+| The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). |
+| The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). |
 | {0} freed | Liberati {0} |
-| {0} cleaned up | Ripuliti {0} |
 | {0} moved | Spostati {0} |
 | Nothing was moved | Nessun file spostato |
 | Nothing was deleted | Nessun file eliminato |
@@ -164,28 +161,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} of {1} could not be deleted. | {0} di {1} file non sono stati eliminati. |
 | {0} {1} moved to: {2} | Spostato {0} {1} in: {2} |
 | {0} {1} moved to: {2} | Spostati {0} {1} in: {2} |
-| {0} {1} moved to the Recycle Bin | Spostato {0} {1} nel Cestino |
-| {0} {1} moved to the Recycle Bin | Spostati {0} {1} nel Cestino |
 | {0} {1} kept in place, because a program went back to needing what the scan flagged. | {0} {1} lasciati al loro posto, perché un programma è tornato ad averne bisogno dopo la scansione. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | {0} {1} lasciati al loro posto, perché non è stato possibile leggere completamente i record di Windows Installer quando il controllo è stato ripetuto. |
 | Moved {0} of {1} {2} before you cancelled. | Spostati {0} di {1} {2} prima dell'annullamento. |
-| Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | Spostati {0} di {1} {2} nel Cestino prima dell'annullamento. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | Eliminati definitivamente {0} di {1} {2} prima dell'annullamento. |
-| {0} {1} permanently deleted. It did not go to the Recycle Bin. | Eliminato definitivamente {0} {1}. Non è stato spostato nel Cestino. |
-| {0} {1} permanently deleted. They did not go to the Recycle Bin. | Eliminati definitivamente {0} {1}. Non sono finiti nel Cestino. |
-| That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Va bene così, si poteva rimuovere senza rischi. InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora. Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce. |
-| That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Va bene così, si potevano rimuovere senza rischi. InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora. Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce. |
+| {0} {1} permanently deleted | {0} {1} permanently deleted |
+| {0} {1} permanently deleted | {0} {1} permanently deleted |
 | Glad to help. There's a tip jar if you're feeling kind. | Felice di esserti stato utile. Un caffè è sempre bene accetto, se ti viene dal cuore. |
-
-## Recycle Bin unavailable
-
-| English | Italiano |
-| --- | --- |
-| The Recycle Bin isn't available for this drive | Per questa unità il Cestino non è disponibile |
-| So this {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently. | Quindi questo {1} ({2}) non è stato eliminato. Puoi spostarlo in un luogo sicuro, oppure eliminarlo definitivamente. |
-| So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently. | Quindi questi {0} {1} ({2}) non sono stati eliminati. Puoi spostarli in un luogo sicuro, oppure eliminarli definitivamente. |
-| Deleting it is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Eliminarlo è sicuro. InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora, e il Cestino è soltanto una garanzia in più. Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce. |
-| Deleting them is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Eliminarli è sicuro. InstallerClean elimina solo i file che Windows segnala come non più in uso, mai uno che un programma usa ancora, e il Cestino è soltanto una garanzia in più. Nell'improbabile caso in cui un'eliminazione lasciasse un programma incapace di ripararsi, aggiornarsi o disinstallarsi, reinstallarlo dal produttore di solito ripristina il file, anche se Microsoft non lo garantisce. |
 
 ## Summaries and counts
 
@@ -211,8 +193,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | Vuoi spostare {0} {1} ({2})? |
 | Files will be moved to: | I file verranno spostati in: |
 | Delete {0} {1} ({2})? | Vuoi eliminare {0} {1} ({2})? |
-| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | I file verranno spostati nel Cestino. Se vuoi fare delle copie di backup, usa invece il pulsante Sposta. |
-| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | Questa cartella è sulla stessa unità, quindi lo spostamento da solo non libera spazio. Recupererai lo spazio quando eliminerai i file da lì, oppure puoi scegliere una cartella su un'altra unità. |
+| This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead. | This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead. |
+| Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead. | Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead. |
+| That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away. | That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away. |
 
 ## Error messages
 
@@ -251,16 +234,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is not directly inside the Windows Installer folder; refused for safety. | Questo file non si trova direttamente all'interno della cartella di Windows Installer; rifiutato per sicurezza. |
 | Windows refused access to this file; it was left in place. | Windows ha negato l'accesso a questo file; è stato lasciato al suo posto. |
 | Windows refused access to these files; they were left in place. | Windows ha negato l'accesso a questi file; sono stati lasciati al loro posto. |
-| This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | Questo file è aperto o bloccato da un altro programma, quindi al momento nulla può spostarlo. È stato lasciato al suo posto; riprova più tardi. |
-| These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later. | Questi file sono aperti o bloccati da un altro programma, quindi al momento nulla può spostarli. Sono stati lasciati al loro posto; riprova più tardi. |
+| This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later. | This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later. |
+| These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later. | These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later. |
 | Windows reported a file error; the file was left in place. | Windows ha segnalato un errore sul file; il file è stato lasciato al suo posto. |
 | Windows reported file errors; these files were left in place. | Windows ha segnalato errori sui file; questi file sono stati lasciati al loro posto. |
 | Something went wrong with this file; it was left in place. | Qualcosa è andato storto con questo file; è stato lasciato al suo posto. |
 | Something went wrong with these files; they were left in place. | Qualcosa è andato storto con questi file; sono stati lasciati al loro posto. |
-| Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | Impossibile spostare questo file nel Cestino (errore {0}), e da quel codice InstallerClean non può dirti perché. Il file è stato lasciato al suo posto. Prova invece il pulsante Sposta, che non usa il Cestino. |
-| Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | Windows ha negato l'accesso anche con i diritti di amministratore (errore {0}), e InstallerClean non può stabilire se il problema sia il file o il Cestino. Il file è stato lasciato al suo posto. Il pulsante Sposta funziona se il problema è il Cestino, ma non se è il file. |
-| This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | Questo file è aperto o bloccato da un altro programma (errore {0}), quindi al momento nulla può rimuoverlo. È stato lasciato al suo posto; riprova più tardi. |
-| Windows deleted this file outright rather than moving it to the Recycle Bin. InstallerClean asked for the Recycle Bin, and Windows did this instead. The file is gone. | Windows ha eliminato definitivamente questo file invece di spostarlo nel Cestino. InstallerClean aveva chiesto il Cestino, e Windows ha fatto altrimenti. Il file non c'è più. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Spostamento dei file nella cartella di Windows Installer rifiutato (destinazione: {0}). |
 | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | La destinazione dello spostamento deve essere un percorso completo verso una cartella, che inizia con una lettera di unità o una condivisione di rete (per esempio D:\Backup oppure \\server\backup). InstallerClean non può usare questo: {0} |
 | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | La destinazione dello spostamento è cambiata mentre i file venivano spostati (qualcosa ha sostituito o reindirizzato la cartella), quindi InstallerClean si è fermato invece di scrivere nel posto sbagliato. Controlla {0}, poi ripeti la scansione e riprova. |
@@ -314,7 +293,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Startup error | Errore in avvio |
 | Failed to start ({0}). Details written to:<br>{1} | Avvio non riuscito ({0}). Dettagli salvati in:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Avvio non riuscito ({0}). Non è stato possibile scrivere il file crash.log. |
-| # crash.log captures unhandled exceptions from InstallerClean.<br># Under elevation the framework's exception messages can include<br># file paths from the running session (including other users'<br># profiles enumerated by Windows Installer queries). Network-<br># failure messages from the update check or result-log POST can<br># include the destination URL and the resolved IP / proxy address.<br># Redact both classes of detail before attaching this file to a<br># public bug report.<br> | # crash.log registra le eccezioni non gestite di InstallerClean.<br># In esecuzione con privilegi elevati, i messaggi di eccezione del<br># framework possono includere percorsi di file della sessione in<br># corso (compresi i profili di altri utenti enumerati dalle query<br># di Windows Installer). I messaggi di errore di rete del controllo<br># aggiornamenti o dell'invio del log dei risultati possono<br># includere l'URL di destinazione e l'indirizzo IP / proxy<br># risolto. Rimuovi entrambi i tipi di dettaglio prima di allegare<br># questo file a una segnalazione di bug pubblica.<br> |
+| # crash.log captures unhandled exceptions from InstallerClean.<br># Under elevation the framework's exception messages can include<br># file paths from the running session (including other users'<br># profiles enumerated by Windows Installer queries). Network-<br># failure messages from the update check or result-log POST can<br># include the destination URL and the resolved IP / proxy address.<br># Entries about unreadable Windows Installer records can include a<br># Windows account SID (S-1-5-21-...) and the product codes of<br># installed software.<br># Redact all three classes of detail before attaching this file to<br># a public bug report.<br> | # crash.log captures unhandled exceptions from InstallerClean.<br># Under elevation the framework's exception messages can include<br># file paths from the running session (including other users'<br># profiles enumerated by Windows Installer queries). Network-<br># failure messages from the update check or result-log POST can<br># include the destination URL and the resolved IP / proxy address.<br># Entries about unreadable Windows Installer records can include a<br># Windows account SID (S-1-5-21-...) and the product codes of<br># installed software.<br># Redact all three classes of detail before attaching this file to<br># a public bug report.<br> |
 
 ## Tooltips (hover text)
 
@@ -327,9 +306,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Minimise | Riduci a icona |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Come preferisci, ma è apprezzato. Invia un riepilogo anonimo che mi fa solo sapere se funziona e quanto spazio le persone stanno liberando. La schermata successiva visualizza cosa verrà inviato prima di confermare. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Come preferisci, ma è apprezzato. Invia un riepilogo anonimo che mi fa solo sapere se funziona. La schermata successiva ti mostra cosa verrà inviato prima di confermare. |
-| Move the unneeded files to the Move location. | Sposta i file non necessari nella destinazione spostamento. |
-| Move the unneeded files somewhere safe. You'll choose the folder next. | Sposta i file non necessari in un luogo sicuro. Sceglierai la cartella subito dopo. |
-| Move the unneeded files to the Recycle Bin. | Sposta i file non necessari nel Cestino. |
+| Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them. | Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them. |
+| Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them. | Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them. |
+| Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them. | Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them. |
+| Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away. | Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Nome soggetto dal certificato Authenticode incorporato. Catena non verificata. |
 | Change language. The program will restart. | Cambia lingua. Il programma verrà riavviato. |
 
@@ -347,11 +327,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close result and return to main window | Chiudi finestra risultato e torna alla finestra principale |
 | Leave a star on github | Lascia una stella su github |
 | Minimise | Riduci a icona |
-| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Elimina sposta i file non necessari nel Cestino. Annulla chiude senza eliminare. |
+| Delete permanently removes the unneeded files. Cancel closes without deleting. | Delete permanently removes the unneeded files. Cancel closes without deleting. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | 'Sposta' colloca i file non necessari nella cartella destinazione scelta. 'Annulla' li lascia dove sono. |
-| Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Scegli come gestire i file non necessari: spostarli in un luogo sicuro, eliminarli definitivamente o annullare. |
-| Move the unneeded files to a folder you choose | Sposta i file non necessari in una cartella a tua scelta |
-| Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Elimina definitivamente i file non necessari perché per questa unità il Cestino non è disponibile |
 | Say thanks | Per ringraziarmi |
 | Send posts the report shown to No Faff. Cancel sends nothing. | 'Invia' trasmette a No Faff il rapporto mostrato. Annulla non invia nulla. |
 | Check for updates | Controlla aggiornamenti |
@@ -361,11 +338,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | If ticked, InstallerClean checks github for a newer version when you run it. | Se selezionata, all'avvio InstallerClean verifica su github se è disponibile una versione più recente. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Apri pagina release per scaricare la versione più recente, o scegli 'Annulla' per mantenere quella attuale. |
 | Opens the licence file on github.com in your browser. | Apre file licenza in github.com nel browser. |
-| Move location | Destinazione spostamento |
+| Backup folder | Backup folder |
 | Products | Prodotti |
 | Patches | Patch |
 | Product details | Dettagli prodotto |
-| Move location | Destinazione spostamento |
+| Backup folder | Backup folder |
 | Operation progress | Avanzamento operazione |
 | Scan {InstallerFolder} again | Nuova scansione di {InstallerFolder} |
 | Scanning progress | Avanzamento scansione |
@@ -441,13 +418,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Found {0} {1} to clean up ({2}). | Trovati {0} {1} da eliminare ({2}). |
 | Nothing to do. | Nessuna operazione necessaria. |
 | Deleting {0} {1}... | Eliminazione di {0} {1}... |
-| Deleted {0} {1}. | Eliminati {0} {1}. |
-| Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Errore: per questa unità il Cestino non è disponibile, quindi non è stato eliminato nulla. Usa /m per spostare i file oppure riattiva il Cestino e riprova. |
+| Permanently deleted {0} {1}. | Permanently deleted {0} {1}. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Errore: nessuna destinazione di spostamento specificata. Usa /m PERCORSO. (Una destinazione predefinita impostata nella GUI è specifica per utente e non si applica alle esecuzioni pianificate o con account di servizio.) |
 | Error: destination cannot be inside the Windows Installer folder. | Errore: la destinazione non può trovarsi all'interno della cartella di Windows Installer. |
 | Error: destination must be a fully qualified path. Got: {0} | Errore: la destinazione deve essere un percorso completo. Ricevuto: {0} |
 | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Errore: la destinazione {0} si trova in una cartella di sistema di Windows. Scegli un percorso al di fuori di %SystemRoot%, %ProgramFiles% e %ProgramData%. |
-| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | Errore: in questo momento qualcosa sta usando Windows Installer, di solito un aggiornamento di Windows o un programma che si sta installando in background. Lo spostamento e l'eliminazione sono bloccati mentre questo avviene. Riprova una volta terminato. |
+| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. | Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. |
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Errore: in questo computer è in sospeso una precedente transazione di Windows Installer. Prima di pulire la cache riprendi o annulla quell'installazione (o riavvia Windows). |
 | Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | Errore: un'operazione su file in coda per il prossimo riavvio riguarda la cache di installazione ({0}). Per completare l'operazione prima della pulizia riavvia Windows. |
 | Moving {0} {1} to {2}... | Spostamento di {0} {1} in {2}... |
@@ -458,8 +434,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Utilizzo: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help       Mostra questa guida (anche /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version    Mostra la versione (anche -v) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s           Solo scansione - file non necessari |
-|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d           Elimina i file non necessari (Cestino) |
+|   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         Scan only - list unneeded files |
+|   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         Delete unneeded files permanently |
 |   installerclean-cli /m         Move to saved default location |   installerclean-cli /m           Sposta nella destinazione salvata |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m PERCORSO  Sposta nel percorso specificato |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli è un vero processo console e blocca il prompt |

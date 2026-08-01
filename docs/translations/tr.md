@@ -22,7 +22,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | PRODUCTS | ÜRÜNLER |
 | PATCHES | YAMALAR |
 | PRODUCT DETAILS | ÜRÜN AYRINTILARI |
-| MOVE LOCATION | TAŞIMA KONUMU |
+| BACKUP FOLDER | BACKUP FOLDER |
 | SAY THANKS | TEŞEKKÜR ETMEK İÇİN |
 
 ## Buttons and actions
@@ -38,7 +38,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | _Cancel | _İptal |
 | Check for _updates | Güncelleştirmeleri _denetle |
 | _Close | _Kapat |
-| _Delete | _Sil |
 | _Delete permanently | _Kalıcı olarak sil |
 | _Done | _Tamam |
 | Details | Ayrıntılar |
@@ -46,8 +45,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Leave a _star on GitHub | GitHub'da _yıldız bırak |
 | Apache 2.0 licence | Apache 2.0 lisansı |
 | _Move | _Taşı |
-| _Move instead | Bunun yerine _taşı |
-| Path to folder if you Move instead of Delete | Silmek yerine taşıyacaksanız klasör yolu |
+| Path to folder if you move rather than delete. | Path to folder if you move rather than delete. |
 | Open _release page | _Sürüm sayfasını aç |
 | _Re-scan | _Yeniden tara |
 | _Scan again | Te_krar tara |
@@ -99,7 +97,6 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Scanning local packages... | Yerel paketler taranıyor... |
 | Found {0} {1} you can safely delete. | Güvenle silebileceğiniz {0} {1} bulundu. |
 | Preparing destination folder... | Hedef klasör hazırlanıyor... |
-| Checking the Recycle Bin... | Geri Dönüşüm Kutusu kontrol ediliyor... |
 | Moving {0} {1}... | {0} {1} taşınıyor... |
 | Deleting {0} {1}... | {0} {1} siliniyor... |
 | Move cancelled. {0} of {1} {2} processed. | Taşıma iptal edildi. {1} {2} içinden {0} tanesi işlendi. |
@@ -119,15 +116,15 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Türkçe |
 | --- | --- |
-| Any unneeded files below are safe to delete. | Aşağıdaki gereksiz dosyalar güvenle silinebilir. |
+| Any unneeded files below are [safe to delete]. | Any unneeded files below are [safe to delete]. |
 | They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with. | Bu dosyalar {InstallerFolder} içinde yer alır; bir program kaldırıldığında ({0}), daha yeni bir yama bir öncekinin yerini aldığında ({1}) ya da yayımcı onu geri çektiğinde ({2}) geride kalır. InstallerClean her zaman yalnızca Windows'un kendisinin işi bittiğini bildirdiği dosyaları listeler. |
-| Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started. | Onları Geri Dönüşüm Kutusu'na silin ya da yedek kopya saklamak için bunun yerine Taşı'yı kullanın. Dosyaları {InstallerFolder} içine geri koyduğunuzda her şey tam olarak başladığınız noktaya döner. |
+| Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored. | Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored. |
 | Nothing scanned yet. | Henüz tarama yapılmadı. |
 | Press Re-scan to look through {InstallerFolder} for installer files that no program still needs. | Hiçbir programın hâlâ ihtiyaç duymadığı yükleyici dosyaları için {InstallerFolder} klasörüne bakmak üzere Yeniden tara'ya basın. |
 | These files can't be cleaned up right now. | Bu dosyalar şu anda temizlenemez. |
-| Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back. | Şu anda bir şey Windows Installer'ı kullanıyor; genellikle bir Windows Update ya da arka planda kurulan bir program. Bu sürerken Taşı ve Sil duraklatılır, böylece InstallerClean değişmekte olan yükleyici önbelleğine dokunmaz. İşlem bittiğinde Yeniden tara'yı kullanın, geri gelirler. |
-| A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Bu makinede önceki bir Windows Installer işlemi askıya alınmış durumda. Önbelleği temizlemeden önce o kurulumu sürdürün ya da geri alın (veya Windows'u yeniden başlatın). |
-| Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning. | Windows, bir sonraki yeniden başlatmada yükleyici önbelleğini etkileyen bir dosya yeniden adlandırması sıraya almış. Temizlemeden önce Windows'u yeniden başlatın. |
+| Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back. | Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back. |
+| A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. |
+| Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. | Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning. |
 | Select a file to view details. | Ayrıntıları görmek için bir dosya seçin. |
 | Select a product to view details. | Ayrıntıları görmek için bir ürün seçin. |
 | No metadata available. | Kullanılabilir meta veri yok. |
@@ -150,11 +147,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | All clean | Her şey temiz |
 | Nothing to clean up in {InstallerFolder} | {InstallerFolder} içinde temizlenecek bir şey yok |
 | Scanned {0} {1} in {2} | {2} içinde {0} {1} tarandı |
-| Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]). | Bir gün bir şey bozulursa onları {InstallerFolder} içine geri kopyalayın ([ihtimali son derece düşük]). |
-| Until then, you can restore them if anything ever breaks ([extremely unlikely]). | O zamana kadar, bir gün bir şey bozulursa onları geri yükleyebilirsiniz ([ihtimali son derece düşük]). |
-| Empty it to actually reclaim the space. | Alanı gerçekten geri kazanmak için onu boşaltın. |
+| The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). |
+| The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). |
+| The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). | The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely). |
+| The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). | The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely). |
 | {0} freed | {0} yer açıldı |
-| {0} cleaned up | {0} temizlendi |
 | {0} moved | {0} taşındı |
 | Nothing was moved | Hiçbir dosya taşınmadı |
 | Nothing was deleted | Hiçbir dosya silinmedi |
@@ -164,28 +161,13 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | {0} of {1} could not be deleted. | {1} dosya içinden {0} tanesi silinemedi. |
 | {0} {1} moved to: {2} | {0} {1} şu konuma taşındı: {2} |
 | {0} {1} moved to: {2} | {0} {1} şu konuma taşındı: {2} |
-| {0} {1} moved to the Recycle Bin | {0} {1} Geri Dönüşüm Kutusu'na taşındı |
-| {0} {1} moved to the Recycle Bin | {0} {1} Geri Dönüşüm Kutusu'na taşındı |
 | {0} {1} kept in place, because a program went back to needing what the scan flagged. | Taramadan sonra bir programın yeniden ihtiyaç duymaya başladığı {0} {1} yerinde bırakıldı. |
 | {0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated. | Kontrol yinelendiğinde Windows Installer kayıtları tam olarak okunamadığı için {0} {1} yerinde bırakıldı. |
 | Moved {0} of {1} {2} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi taşındı. |
-| Moved {0} of {1} {2} to the Recycle Bin before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi Geri Dönüşüm Kutusu'na taşındı. |
 | Permanently deleted {0} of {1} {2} before you cancelled. | İptal etmeden önce {1} {2} içinden {0} tanesi kalıcı olarak silindi. |
-| {0} {1} permanently deleted. It did not go to the Recycle Bin. | {0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. |
-| {0} {1} permanently deleted. They did not go to the Recycle Bin. | {0} {1} kalıcı olarak silindi. Geri Dönüşüm Kutusu'na gitmedi. |
-| That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleştiremez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
-| That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Sorun değil, kaldırılması güvenliydi. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleştiremez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
+| {0} {1} permanently deleted | {0} {1} permanently deleted |
+| {0} {1} permanently deleted | {0} {1} permanently deleted |
 | Glad to help. There's a tip jar if you're feeling kind. | Yardımcı olabildiğime sevindim. Gönlünüzden koparsa, bir bahşiş kutusu var. |
-
-## Recycle Bin unavailable
-
-| English | Türkçe |
-| --- | --- |
-| The Recycle Bin isn't available for this drive | Bu sürücü için Geri Dönüşüm Kutusu kullanılamıyor |
-| So this {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently. | Bu yüzden bu {1} ({2}) silinmedi. Güvenli bir yere taşıyabilir ya da kalıcı olarak silebilirsiniz. |
-| So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently. | Bu yüzden bu {0} {1} ({2}) silinmedi. Güvenli bir yere taşıyabilir ya da kalıcı olarak silebilirsiniz. |
-| Deleting it is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez; Geri Dönüşüm Kutusu ise yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleştiremez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
-| Deleting them is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it. | Silmek güvenli. InstallerClean yalnızca Windows'un işi bittiğini bildirdiği dosyaları temizler, bir programın hâlâ ihtiyaç duyduğu bir dosyayı asla temizlemez; Geri Dönüşüm Kutusu ise yalnızca fazladan bir güvencedir. Olası olmasa da bir silme işlemi bir programı onaramaz, güncelleştiremez ya da kaldıramaz hale getirirse, onu üreticisinden yeniden yüklemek genellikle dosyayı geri yükler, ama Microsoft bunu garanti etmez. |
 
 ## Summaries and counts
 
@@ -211,8 +193,9 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Move {0} {1} ({2})? | {0} {1} ({2}) taşınsın mı? |
 | Files will be moved to: | Dosyalar şu konuma taşınacak: |
 | Delete {0} {1} ({2})? | {0} {1} ({2}) silinsin mi? |
-| Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead. | Dosyalar Geri Dönüşüm Kutusu'na taşınacak. Yedek kopya isterseniz bunun yerine Taşı düğmesini kullanın. |
-| This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead. | Bu klasör aynı sürücüde olduğu için taşımak tek başına yer açmaz. Dosyaları oradan sildiğinizde yeri geri kazanırsınız ya da bunun yerine başka bir sürücüde bir klasör seçebilirsiniz. |
+| This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead. | This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead. |
+| Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead. | Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead. |
+| That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away. | That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away. |
 
 ## Error messages
 
@@ -251,16 +234,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | This file is not directly inside the Windows Installer folder; refused for safety. | Bu dosya doğrudan Windows Installer klasörünün içinde değil; güvenlik için reddedildi. |
 | Windows refused access to this file; it was left in place. | Windows bu dosyaya erişimi reddetti; dosya yerinde bırakıldı. |
 | Windows refused access to these files; they were left in place. | Windows bu dosyalara erişimi reddetti; dosyalar yerinde bırakıldı. |
-| This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later. | Bu dosya başka bir program tarafından açık ya da kilitli, bu yüzden şu anda onu hiçbir şey taşıyamaz. Dosya yerinde bırakıldı; daha sonra yeniden deneyin. |
-| These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later. | Bu dosyalar başka bir program tarafından açık ya da kilitli, bu yüzden şu anda onları hiçbir şey taşıyamaz. Dosyalar yerinde bırakıldı; daha sonra yeniden deneyin. |
+| This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later. | This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later. |
+| These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later. | These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later. |
 | Windows reported a file error; the file was left in place. | Windows bir dosya hatası bildirdi; dosya yerinde bırakıldı. |
 | Windows reported file errors; these files were left in place. | Windows dosya hataları bildirdi; bu dosyalar yerinde bırakıldı. |
 | Something went wrong with this file; it was left in place. | Bu dosyada bir şeyler ters gitti; dosya yerinde bırakıldı. |
 | Something went wrong with these files; they were left in place. | Bu dosyalarda bir şeyler ters gitti; dosyalar yerinde bırakıldı. |
-| Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin. | Bu dosya Geri Dönüşüm Kutusu'na taşınamadı (hata {0}) ve InstallerClean bu koda bakarak size nedenini söyleyemiyor. Dosya yerinde bırakıldı. Bunun yerine Taşı düğmesini deneyin, çünkü o Geri Dönüşüm Kutusu'nu kullanmıyor. |
-| Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file. | Windows yönetici haklarıyla bile erişimi reddetti (hata {0}) ve InstallerClean sorunun dosyada mı yoksa Geri Dönüşüm Kutusu'nda mı olduğunu ayırt edemiyor. Dosya yerinde bırakıldı. Sorun Geri Dönüşüm Kutusu'ndaysa Taşı düğmesi işe yarar, ama sorun dosyadaysa yaramaz. |
-| This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later. | Bu dosya başka bir program tarafından açık ya da kilitli (hata {0}), bu yüzden şu anda onu hiçbir şey kaldıramaz. Dosya yerinde bırakıldı; daha sonra yeniden deneyin. |
-| Windows deleted this file outright rather than moving it to the Recycle Bin. InstallerClean asked for the Recycle Bin, and Windows did this instead. The file is gone. | Windows bu dosyayı Geri Dönüşüm Kutusu'na taşımak yerine doğrudan sildi. InstallerClean Geri Dönüşüm Kutusu'nu istedi, Windows ise farklı davrandı. Dosya gitti. |
 | Refusing to move files into the Windows Installer folder (destination: {0}). | Dosyaların Windows Installer klasörüne taşınması reddediliyor (hedef: {0}). |
 | The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0} | Taşıma konumu, bir sürücü harfiyle ya da ağ paylaşımıyla başlayan ve bir klasöre giden tam bir yol olmalıdır (örneğin D:\Backup ya da \\server\backup). InstallerClean bunu kullanamaz: {0} |
 | The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again. | Dosyalar taşınırken Taşıma konumu değişti (bir şey klasörü değiştirdi ya da başka bir yere yönlendirdi), bu yüzden InstallerClean yanlış yere yazmaktansa durdu. {0} konumunu kontrol edin, ardından Yeniden tara ile tekrar deneyin. |
@@ -314,7 +293,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Startup error | Başlangıç hatası |
 | Failed to start ({0}). Details written to:<br>{1} | Başlatılamadı ({0}). Ayrıntılar şuraya yazıldı:<br>{1} |
 | Failed to start ({0}). The crash log could not be written. | Başlatılamadı ({0}). Çökme günlüğü yazılamadı. |
-| # crash.log captures unhandled exceptions from InstallerClean.<br># Under elevation the framework's exception messages can include<br># file paths from the running session (including other users'<br># profiles enumerated by Windows Installer queries). Network-<br># failure messages from the update check or result-log POST can<br># include the destination URL and the resolved IP / proxy address.<br># Redact both classes of detail before attaching this file to a<br># public bug report.<br> | # crash.log, InstallerClean'in işlenmeyen özel durumlarını kaydeder.<br># Yükseltilmiş çalışmada framework'ün özel durum iletileri, çalışan<br># oturumdaki dosya yollarını içerebilir (Windows Installer sorgularıyla<br># sıralanan diğer kullanıcıların profilleri dahil). Güncelleştirme<br># denetiminden ya da sonuç günlüğü POST'undan gelen ağ hatası iletileri,<br># hedef URL'yi ve çözümlenen IP / proxy adresini içerebilir. Bu dosyayı<br># herkese açık bir hata bildirimine eklemeden önce her iki tür ayrıntıyı<br># da çıkarın.<br> |
+| # crash.log captures unhandled exceptions from InstallerClean.<br># Under elevation the framework's exception messages can include<br># file paths from the running session (including other users'<br># profiles enumerated by Windows Installer queries). Network-<br># failure messages from the update check or result-log POST can<br># include the destination URL and the resolved IP / proxy address.<br># Entries about unreadable Windows Installer records can include a<br># Windows account SID (S-1-5-21-...) and the product codes of<br># installed software.<br># Redact all three classes of detail before attaching this file to<br># a public bug report.<br> | # crash.log captures unhandled exceptions from InstallerClean.<br># Under elevation the framework's exception messages can include<br># file paths from the running session (including other users'<br># profiles enumerated by Windows Installer queries). Network-<br># failure messages from the update check or result-log POST can<br># include the destination URL and the resolved IP / proxy address.<br># Entries about unreadable Windows Installer records can include a<br># Windows account SID (S-1-5-21-...) and the product codes of<br># installed software.<br># Redact all three classes of detail before attaching this file to<br># a public bug report.<br> |
 
 ## Tooltips (hover text)
 
@@ -327,9 +306,10 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Minimise | Simge durumuna küçült |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm. | Size kalmış ama makbule geçer. Yalnızca uygulamanın çalışıp çalışmadığını ve insanların ne kadar yer açtığını bana bildiren anonim bir özet gönderir. Sonraki ekran, onaylamadan önce ne gönderileceğini görmenizi sağlar. |
 | Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm. | Size kalmış ama makbule geçer. Yalnızca uygulamanın çalışıp çalışmadığını bana bildiren anonim bir özet gönderir. Sonraki ekran, onaylamadan önce ne gönderileceğini görmenizi sağlar. |
-| Move the unneeded files to the Move location. | Gereksiz dosyaları Taşıma konumuna taşır. |
-| Move the unneeded files somewhere safe. You'll choose the folder next. | Gereksiz dosyaları güvenli bir yere taşır. Klasörü sonraki adımda seçeceksiniz. |
-| Move the unneeded files to the Recycle Bin. | Gereksiz dosyaları Geri Dönüşüm Kutusu'na taşır. |
+| Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them. | Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them. |
+| Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them. | Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them. |
+| Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them. | Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them. |
+| Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away. | Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away. |
 | Subject name from the embedded Authenticode certificate. Not chain-verified. | Gömülü Authenticode sertifikasındaki konu adı. Zincir doğrulaması yapılmadı. |
 | Change language. The program will restart. | Dili değiştir. Program yeniden başlatılacak. |
 
@@ -347,11 +327,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Close result and return to main window | Sonucu kapat ve ana pencereye dön |
 | Leave a star on github | github'da yıldız bırak |
 | Minimise | Simge durumuna küçült |
-| Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting. | Sil, gereksiz dosyaları Geri Dönüşüm Kutusu'na taşır. İptal, silmeden kapatır. |
+| Delete permanently removes the unneeded files. Cancel closes without deleting. | Delete permanently removes the unneeded files. Cancel closes without deleting. |
 | Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are. | Taşı, gereksiz dosyaları seçilen hedef klasöre koyar. İptal, onları olduğu yerde bırakır. |
-| Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel. | Gereksiz dosyaları nasıl ele alacağınızı seçin: güvenli bir yere taşıyın, kalıcı olarak silin ya da iptal edin. |
-| Move the unneeded files to a folder you choose | Gereksiz dosyaları seçtiğiniz bir klasöre taşı |
-| Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive | Bu sürücü için Geri Dönüşüm Kutusu kullanılamadığından gereksiz dosyaları kalıcı olarak sil |
 | Say thanks | Teşekkür etmek için |
 | Send posts the report shown to No Faff. Cancel sends nothing. | Gönder, gösterilen raporu No Faff'a iletir. İptal hiçbir şey göndermez. |
 | Check for updates | Güncelleştirmeleri denetle |
@@ -361,11 +338,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | If ticked, InstallerClean checks github for a newer version when you run it. | İşaretliyse InstallerClean, çalıştırdığınızda github üzerinde daha yeni bir sürüm olup olmadığını denetler. |
 | Open the release page to download the newer version, or cancel to keep the current version. | Daha yeni sürümü indirmek için sürüm sayfasını açın ya da geçerli sürümü korumak için iptal edin. |
 | Opens the licence file on github.com in your browser. | github.com üzerindeki lisans dosyasını tarayıcınızda açar. |
-| Move location | Taşıma konumu |
+| Backup folder | Backup folder |
 | Products | Ürünler |
 | Patches | Yamalar |
 | Product details | Ürün ayrıntıları |
-| Move location | Taşıma konumu |
+| Backup folder | Backup folder |
 | Operation progress | İşlem ilerlemesi |
 | Scan {InstallerFolder} again | {InstallerFolder}'ı yeniden tara |
 | Scanning progress | Tarama ilerlemesi |
@@ -441,13 +418,12 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Found {0} {1} to clean up ({2}). | Temizlenecek {0} {1} bulundu ({2}). |
 | Nothing to do. | Yapılacak bir şey yok. |
 | Deleting {0} {1}... | {0} {1} siliniyor... |
-| Deleted {0} {1}. | {0} {1} silindi. |
-| Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again. | Hata: bu birim için Geri Dönüşüm Kutusu kullanılamıyor, bu yüzden hiçbir şey silinmedi. Dosyaları taşımak için /m kullanın ya da Geri Dönüşüm Kutusu'nu yeniden etkinleştirip tekrar çalıştırın. |
+| Permanently deleted {0} {1}. | Permanently deleted {0} {1}. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Hata: taşıma hedefi belirtilmedi. /m YOL kullanın. (GUI'de ayarlanan bir varsayılan, kullanıcıya özeldir ve zamanlanmış ya da hizmet hesabı çalıştırmaları için geçerli değildir.) |
 | Error: destination cannot be inside the Windows Installer folder. | Hata: hedef, Windows Installer klasörünün içinde olamaz. |
 | Error: destination must be a fully qualified path. Got: {0} | Hata: hedef, tam nitelenmiş bir yol olmalıdır. Alınan: {0} |
 | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Hata: {0} hedefi bir Windows sistem klasörünün altına çözümleniyor. %SystemRoot%, %ProgramFiles% ve %ProgramData% dışında bir yol seçin. |
-| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes. | Hata: şu anda bir şey Windows Installer'ı kullanıyor; genellikle bir Windows Update ya da arka planda kurulan bir program. Bu sürerken Taşı ve Sil engellenir. İşlem bittiğinde yeniden deneyin. |
+| Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. | Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. |
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache. | Hata: bu makinede önceki bir Windows Installer işlemi askıya alınmış durumda. Önbelleği temizlemeden önce o kurulumu sürdürün ya da geri alın (veya Windows'u yeniden başlatın). |
 | Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning. | Hata: bir sonraki yeniden başlatma için sıraya alınmış bir dosya işlemi yükleyici önbelleğini hedefliyor ({0}). Temizlemeden önce bu işlemi tamamlamak için Windows'u yeniden başlatın. |
 | Moving {0} {1} to {2}... | {0} {1}, {2} konumuna taşınıyor... |
@@ -458,8 +434,8 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Usage: | Kullanım: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Bu yardımı göster (/?, -h de kabul edilir) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Sürümü yazdır (-v de kabul edilir) |
-|   installerclean-cli /s         Scan only - list removable files |   installerclean-cli /s         Yalnızca tara - gereksiz dosyaları listele |
-|   installerclean-cli /d         Delete removable files (Recycle Bin) |   installerclean-cli /d         Gereksizleri sil (Geri Dönüşüm Kutusu) |
+|   installerclean-cli /s         Scan only - list unneeded files |   installerclean-cli /s         Scan only - list unneeded files |
+|   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         Delete unneeded files permanently |
 |   installerclean-cli /m         Move to saved default location |   installerclean-cli /m         Kayıtlı varsayılan konuma taşı |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m YOL     Belirtilen yola taşı |
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli gerçek bir konsol işlemidir ve bitene kadar istemi |

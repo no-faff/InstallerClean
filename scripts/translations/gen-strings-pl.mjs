@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Polish (pl) satellite generator for InstallerClean. Copied from
 // gen-strings-template.mjs; only OUT, OVERRIDES and the MAP values changed. Works
-// FROM THE ENGLISH SOURCE Strings.resx: strips the 21 machine-contract Cli.* keys
+// FROM THE ENGLISH SOURCE Strings.resx: strips the 20 machine-contract Cli.* keys
 // by name, swaps each remaining <value> for its Polish translation, keeps schema/
 // resheaders/<comment> children/&#10; entities/Windows-path backslashes/
 // whitespace byte-identical to the neutral, writes LF/UTF-8, then self-checks. Run
@@ -77,7 +77,7 @@ const MAP = {
   'Section.Registered.Products': `PRODUKTY`,
   'Section.Registered.Patches': `POPRAWKI`,
   'Section.Registered.Details': `SZCZEGÓŁY PRODUKTU`,
-  'Section.Backup.Folder': `LOKALIZACJA PRZENOSZENIA`,
+  'Section.Backup.Folder': `BACKUP FOLDER`,
   'Section.SayThanks': `PODZIĘKUJ`,
 
   // Field labels (used in detail panels)
@@ -117,7 +117,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Zostaw _gwiazdkę na GitHubie`,
   'Action.Licence': `Licencja Apache 2.0`,
   'Action.Move': `_Przenieś`,
-  'Action.BackupFolderPlaceholder': `Ścieżka do folderu, jeśli zamiast usuwać wybierzesz Przenieś`,
+  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
   'Action.OpenReleasePage': `Otwórz stronę _wydania`,
   'Action.Rescan': `_Skanuj ponownie`,
   'Action.ScanAgain': `Skanuj _ponownie`,
@@ -135,7 +135,7 @@ const MAP = {
   'Automation.CloseResult': `Zamknij wynik i wróć do okna głównego`,
   'Automation.LeaveStarOnGitHub.About': `Zostaw gwiazdkę na githubie`,
   'Automation.Minimise': `Minimalizuj`,
-  'Automation.ConfirmDelete': `Usuń przenosi niepotrzebne pliki do Kosza. Anuluj zamyka okno bez usuwania.`,
+  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
   'Automation.ConfirmMove': `Przenieś umieszcza niepotrzebne pliki w wybranym folderze docelowym. Anuluj zostawia je na miejscu.`,
   'Automation.SayThanks': `Podziękuj`,
   'Automation.ConfirmSendResultLog': `Wyślij przekazuje pokazany raport do No Faff. Anuluj nie wysyła niczego.`,
@@ -143,11 +143,11 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Sprawdza na stronie wydań githuba, czy jest nowsza wersja.`,
   'Automation.UpdateAvailable.HelpText': `Otwórz stronę wydania, aby pobrać nowszą wersję, lub anuluj, aby zachować bieżącą.`,
   'Automation.Licence.HelpText': `Otwiera plik licencji na github.com w twojej przeglądarce.`,
-  'Automation.Section.BackupFolder': `Lokalizacja przenoszenia`,
+  'Automation.Section.BackupFolder': `Backup folder`,
   'Automation.Section.Products': `Produkty`,
   'Automation.Section.Patches': `Poprawki`,
   'Automation.Section.ProductDetails': `Szczegóły produktu`,
-  'Automation.BackupFolder': `Lokalizacja przenoszenia`,
+  'Automation.BackupFolder': `Backup folder`,
   'Automation.OperationProgress': `Postęp operacji`,
   'Automation.RescanInstaller': `Skanuj ponownie {InstallerFolder}`,
   'Automation.ScanningProgress': `Postęp skanowania`,
@@ -174,18 +174,18 @@ const MAP = {
   'Tooltip.Minimise': `Minimalizuj`,
   'Tooltip.SendResultLog': `Twoja decyzja, ale będzie miło. Wysyła anonimowe podsumowanie, które po prostu daje mi znać, czy działa i ile miejsca ludzie zwalniają. Na następnym ekranie zobaczysz, co zostanie wysłane, zanim potwierdzisz.`,
   'Tooltip.SendResultLog.NothingFound': `Twoja decyzja, ale będzie miło. Wysyła anonimowe podsumowanie, które po prostu daje mi znać, czy działa. Na następnym ekranie zobaczysz, co zostanie wysłane, zanim potwierdzisz.`,
-  'Tooltip.Move': `Przenieś niepotrzebne pliki do lokalizacji przenoszenia.`,
-  'Tooltip.MoveNeedsDestination': `Przenieś niepotrzebne pliki w bezpieczne miejsce. Folder wybierzesz w następnym kroku.`,
-  'Tooltip.Delete': `Przenieś niepotrzebne pliki do Kosza.`,
+  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `Nazwa podmiotu z osadzonego certyfikatu Authenticode. Łańcuch nie został zweryfikowany.`,
 
   // Body copy
-  'Body.MainExplanation.Lead': `Wszelkie niepotrzebne pliki poniżej można bezpiecznie usunąć.`,
+  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
   'Body.MainExplanation.Why': `Leżą w {InstallerFolder}, pozostawione po odinstalowaniu programu ({0}), gdy nowsza poprawka zastąpiła jedną z nich ({1}) lub gdy wydawca ją wycofał ({2}). InstallerClean wymienia wyłącznie pliki, które sam Windows zgłasza jako już niepotrzebne.`,
-  'Body.MainExplanation.Action': `Usuń je do Kosza albo użyj zamiast tego Przenieś, aby zachować kopię zapasową. Umieszczenie plików z powrotem w {InstallerFolder} cofa wszystko dokładnie do punktu wyjścia.`,
-  'Body.PendingReboot.MsiExecuteMutex': `Coś właśnie korzysta z Windows Installer, zwykle aktualizacja Windows albo program instalujący się w tle. Na ten czas Przenieś i Usuń są wstrzymane, aby InstallerClean nie ruszał pamięci podręcznej instalatora, gdy ta się zmienia. Gdy to się zakończy, skanuj ponownie, a wrócą.`,
-  'Body.PendingReboot.InstallerInProgress': `Na tym komputerze zawieszona jest wcześniejsza transakcja Windows Installer. Przed wyczyszczeniem pamięci podręcznej dokończ lub wycofaj tamtą instalację (albo uruchom ponownie Windows).`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows ma w kolejce na następne uruchomienie zmianę nazwy pliku, która dotyczy pamięci podręcznej instalatora. Przed czyszczeniem uruchom ponownie Windows.`,
+  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
+  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
   'Body.NoFileSelected': `Wybierz plik, aby zobaczyć szczegóły.`,
   'Body.NoProductSelected': `Wybierz produkt, aby zobaczyć szczegóły.`,
   'Body.NoMetadata': `Brak dostępnych metadanych.`,
@@ -260,8 +260,8 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.PermanentDeleteSummary.Singular': `Usunięto trwale {0} {1}. Nie trafił do Kosza.`,
-  'Completion.PermanentDeleteSummary.Plural': `Usunięto trwale {0} {1}. Nie trafiło do Kosza.`,
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} plik nadal potrzebny`,
@@ -328,8 +328,8 @@ const MAP = {
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows odmówił dostępu do tego pliku; został pozostawiony na miejscu.`,
   'Error.AccessDenied.Plural': `Windows odmówił dostępu do tych plików; zostały pozostawione na miejscu.`,
-  'Error.FileInUse.Singular': `Ten plik jest otwarty lub zablokowany przez inny program, więc nic nie może go teraz przenieść. Został pozostawiony na miejscu; spróbuj ponownie później.`,
-  'Error.FileInUse.Plural': `Te pliki są otwarte lub zablokowane przez inny program, więc nic nie może ich teraz przenieść. Zostały pozostawione na miejscu; spróbuj ponownie później.`,
+  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
+  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
   'Error.IOFailure.Singular': `Windows zgłosił błąd pliku; plik został pozostawiony na miejscu.`,
   'Error.IOFailure.Plural': `Windows zgłosił błędy plików; te pliki zostały pozostawione na miejscu.`,
   'Error.UnknownError.Singular': `Coś poszło nie tak z tym plikiem; został pozostawiony na miejscu.`,
@@ -413,13 +413,13 @@ const MAP = {
   'Display.Elapsed.S': `{0:F1}s`,
   'Display.ElapsedLong.LessThanASecond': `mniej niż sekunda`,
   'Display.ElapsedLong.Seconds': `{0:F1} sekundy`,
-  'CrashLog.PrivacyHeader': `# crash.log rejestruje nieobsłużone wyjątki InstallerClean.\n# Przy podwyższonych uprawnieniach komunikaty wyjątków platformy\n# mogą zawierać ścieżki plików z bieżącej sesji (w tym profile\n# innych użytkowników wyliczone przez zapytania Windows Installer).\n# Komunikaty o błędach sieci ze sprawdzania aktualizacji lub\n# wysyłania dziennika wyników mogą zawierać docelowy adres URL\n# oraz rozwiązany adres IP / proxy. Usuń oba rodzaje danych przed\n# dołączeniem tego pliku do publicznego zgłoszenia błędu.\n`,
+  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
   'Tooltip.ChangeLanguage': `Zmień język. Program zostanie ponownie uruchomiony.`,
   'Automation.ChangeLanguage': `Zmień język`,
   'Automation.ChangeLanguage.HelpText': `Program zostanie ponownie uruchomiony.`,
 
   // Command-line tool (installerclean-cli): the HUMAN-facing Cli.* keys. The
-  // 21 machine-contract Cli.EventLog* keys (bar Cli.EventLogUnavailable) are NOT
+  // 20 machine-contract Cli.EventLog* keys (bar Cli.EventLogUnavailable) are NOT
   // here and are stripped from the output; they stay English at runtime. In the
   // help lines translate the DESCRIPTION only: keep the command tokens, flags,
   // the {InstallerFolder} token and the exit-code numbers verbatim, keep the
@@ -434,12 +434,12 @@ const MAP = {
   'Cli.FoundOrphans': `Znaleziono {0} {1} do wyczyszczenia ({2}).`,
   'Cli.NothingToDo': `Nie ma nic do zrobienia.`,
   'Cli.DeletingFiles': `Usuwanie: {0} {1}...`,
-  'Cli.DeletedFiles': `Usunięto {0} {1}.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
   'Cli.NoMoveDestination': `Błąd: nie podano folderu docelowego przenoszenia. Użyj /m ŚCIEŻKA. (Lokalizacja domyślna ustawiona w GUI jest przypisana do użytkownika i nie dotyczy uruchomień zaplanowanych ani na koncie usługi.)`,
   'Cli.MoveDestinationInsideInstaller': `Błąd: folder docelowy nie może znajdować się wewnątrz folderu Windows Installer.`,
   'Cli.MoveDestinationRelative': `Błąd: folder docelowy musi być pełną ścieżką. Otrzymano: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Błąd: folder docelowy {0} prowadzi do folderu systemowego Windows. Wybierz ścieżkę poza %SystemRoot%, %ProgramFiles% i %ProgramData%.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Błąd: coś właśnie korzysta z Windows Installer, zwykle aktualizacja Windows albo program instalujący się w tle. Przenoszenie i usuwanie są zablokowane, dopóki to trwa. Spróbuj ponownie, gdy się zakończy.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Błąd: na tym komputerze zawieszona jest wcześniejsza transakcja Windows Installer. Przed wyczyszczeniem pamięci podręcznej dokończ lub wycofaj tamtą instalację (albo uruchom ponownie Windows).`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Błąd: zakolejkowana po ponownym uruchomieniu operacja na pliku dotyczy pamięci podręcznej instalatora ({0}). Przed czyszczeniem uruchom ponownie Windows, aby dokończyć tę operację.`,
   'Cli.MovingFiles': `Przenoszenie: {0} {1} do {2}...`,
@@ -450,8 +450,8 @@ const MAP = {
   'Cli.Help.Usage': `Sposób użycia:`,
   'Cli.Help.Help': `  installerclean-cli --help      Pokaż tę pomoc (akceptuje też /?, -h)`,
   'Cli.Help.Version': `  installerclean-cli --version   Wypisz wersję (akceptuje też -v)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s          Tylko skanowanie - niepotrzebne pliki`,
-  'Cli.Help.Delete': `  installerclean-cli /d          Usuń niepotrzebne pliki (Kosz)`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m          Przenieś do zapisanej lokalizacji`,
   'Cli.Help.MovePath': `  installerclean-cli /m ŚCIEŻKA  Przenieś do wskazanej ścieżki`,
   'Cli.Help.NoteLine1': `installerclean-cli to prawdziwy proces konsolowy i blokuje wiersz poleceń,`,
@@ -465,7 +465,7 @@ const MAP = {
   'Cli.Help.ExitCodeCancelled': `  130 anulowano (Ctrl+C)`,
   'Body.NotScanned.Lead': `Jeszcze nic nie przeskanowano.`,
   'Body.NotScanned.Why': `Naciśnij przycisk Skanuj ponownie, aby przejrzeć {InstallerFolder} w poszukiwaniu plików instalatora, których żaden program już nie potrzebuje.`,
-  'Confirm.MoveSameDrive': `Ten folder jest na tym samym dysku, więc samo przeniesienie nie zwolni miejsca. Odzyskasz je, gdy usuniesz z niego pliki, albo możesz zamiast tego wybrać folder na innym dysku.`,
+  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
   'Error.ScanCorrelationFailed': `InstallerClean nie zdołał pogodzić tego skanowania z rekordami Windows Installera: każdego pliku, który Windows nadal wymienia jako potrzebny, brakuje w {InstallerFolder}, a pliki faktycznie leżące w tym folderze nie pasują do żadnego rekordu. Żaden prawdziwy komputer tak nie wygląda, więc wskazuje to na problem z odczytem rekordów, a nie na pliki, które można bezpiecznie usunąć. Nie zaproponowano niczego do wyczyszczenia i nic nie zostało usunięte.`,
   'Error.CandidateOutsideCache': `Ten plik nie znajduje się bezpośrednio w folderze Windows Installer; odrzucono ze względów bezpieczeństwa.`,
   'Completion.ReverifySkipped': `Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął ich potrzebować.`,
@@ -488,11 +488,18 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Otwiera readme na githubie w twojej przeglądarce.`,
   'Automation.About.ReportProblem.HelpText': `Otwiera listę zgłoszeń (Issues) na github.com w twojej przeglądarce.`,
   'Automation.AutoUpdateCheck.HelpText': `Jeśli zaznaczone, InstallerClean przy uruchomieniu sprawdza na githubie, czy jest nowsza wersja.`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 21 machine-contract Cli.* <data> elements BY NAME (the
+// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable): each is matched non-greedy to
 // its own </data>. The human-facing Cli keys are KEPT, and their value is
 // replaced from the MAP like any other key. Same predicate as
@@ -578,7 +585,7 @@ console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length + overrideKeys.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli +',
   overrideKeys.length, 'override)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 21)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
 console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| CRLF:', crlf, '(expect 0)');
 
 if (alsoKeep.size) {
@@ -610,6 +617,6 @@ if (untranslated.length) {
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
   !overrideMissing.length && !overrideArityMismatch.length &&
-  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 21 && crlf === 0;
+  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 20 && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

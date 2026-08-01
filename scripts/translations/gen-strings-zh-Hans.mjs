@@ -2,7 +2,7 @@
 // Simplified Chinese (zh-Hans) satellite generator for InstallerClean. Copied
 // from gen-strings-template.mjs (ko new pattern); only OUT and the MAP values
 // differ. Works FROM THE ENGLISH SOURCE (Strings.resx): replaces each key's
-// inner <value>, strips the 21 machine-contract Cli.EventLog* keys, keeps the 39
+// inner <value>, strips the 20 machine-contract Cli.EventLog* keys, keeps the 39
 // human Cli keys, and self-verifies against the neutral. Output is LF, UTF-8.
 //
 // Chinese plural rule (DisplayHelpers.CategoryFor, case "zh"): PluralCategory
@@ -56,7 +56,7 @@ const MAP = {
   'Section.Registered.Products': `产品`,
   'Section.Registered.Patches': `补丁`,
   'Section.Registered.Details': `产品详情`,
-  'Section.Backup.Folder': `移动位置`,
+  'Section.Backup.Folder': `BACKUP FOLDER`,
   'Section.SayThanks': `道声谢`,
   'Field.Reason': `原因`,
   'Field.Author': `作者`,
@@ -90,7 +90,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `在 GitHub 上点个星(_S)`,
   'Action.Licence': `Apache 2.0 许可证`,
   'Action.Move': `移动(_M)`,
-  'Action.BackupFolderPlaceholder': `文件夹路径（若选择移动而非删除）`,
+  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
   'Action.OpenReleasePage': `打开发布页面(_R)`,
   'Action.Rescan': `重新扫描(_R)`,
   'Action.ScanAgain': `再次扫描(_S)`,
@@ -106,7 +106,7 @@ const MAP = {
   'Automation.CloseResult': `关闭结果并返回主窗口`,
   'Automation.LeaveStarOnGitHub.About': `在 github 上点个星`,
   'Automation.Minimise': `最小化`,
-  'Automation.ConfirmDelete': `删除会将不需要的文件移到回收站。取消则关闭且不删除。`,
+  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
   'Automation.ConfirmMove': `移动会将不需要的文件放入所选的目标文件夹。取消则让它们留在原处。`,
   'Automation.SayThanks': `道声谢`,
   'Automation.ConfirmSendResultLog': `发送会将所示报告提交给 No Faff。取消则不发送任何内容。`,
@@ -114,11 +114,11 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `在 github 的发布页面上检查是否有更新版本。`,
   'Automation.UpdateAvailable.HelpText': `打开发布页面以下载更新版本，或取消以保留当前版本。`,
   'Automation.Licence.HelpText': `在浏览器中打开 github.com 上的许可证文件。`,
-  'Automation.Section.BackupFolder': `移动位置`,
+  'Automation.Section.BackupFolder': `Backup folder`,
   'Automation.Section.Products': `产品`,
   'Automation.Section.Patches': `补丁`,
   'Automation.Section.ProductDetails': `产品详情`,
-  'Automation.BackupFolder': `移动位置`,
+  'Automation.BackupFolder': `Backup folder`,
   'Automation.OperationProgress': `操作进度`,
   'Automation.RescanInstaller': `重新扫描 {InstallerFolder}`,
   'Automation.ScanningProgress': `扫描进度`,
@@ -143,16 +143,16 @@ const MAP = {
   'Tooltip.Minimise': `最小化`,
   'Tooltip.SendResultLog': `由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作，以及大家释放了多少空间。下一个界面会让您在确认前先看到将要发送的内容。`,
   'Tooltip.SendResultLog.NothingFound': `由您决定，但非常感谢。会发送一份匿名摘要，只是让我知道它是否正常工作。下一个界面会让您在确认前先看到将要发送的内容。`,
-  'Tooltip.Move': `将不需要的文件移动到移动位置。`,
-  'Tooltip.MoveNeedsDestination': `将不需要的文件移动到安全的位置。下一步再选择文件夹。`,
-  'Tooltip.Delete': `将不需要的文件移到回收站。`,
+  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `来自内嵌 Authenticode 证书的使用者名称。未验证证书链。`,
-  'Body.MainExplanation.Lead': `下面任何不需要的文件都可以安全删除。`,
+  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
   'Body.MainExplanation.Why': `它们位于 {InstallerFolder}，是在卸载程序（{0}）、新补丁取代旧补丁（{1}）或发布者撤回补丁（{2}）时遗留下来的。InstallerClean 只会列出 Windows 自己报告为不再需要的文件。`,
-  'Body.MainExplanation.Action': `将它们删除到回收站，或者改用“移动”保留一份备份副本。把文件放回 {InstallerFolder}，一切就完全恢复原状。`,
-  'Body.PendingReboot.MsiExecuteMutex': `现在有程序正在使用 Windows Installer，通常是 Windows 更新或某个正在后台安装的程序。在此期间，移动和删除会暂停，这样 InstallerClean 就不会在安装程序缓存发生变化时去动它。等它完成后，重新扫描，这两项操作便会恢复。`,
-  'Body.PendingReboot.InstallerInProgress': `此计算机上有一个先前的 Windows Installer 事务处于挂起状态。请先继续或回滚该安装（或重启 Windows），再清理缓存。`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows 已排队一项将在下次重启时执行的文件重命名操作，会影响安装程序缓存。请先重启 Windows，再进行清理。`,
+  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
+  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
   'Body.NoFileSelected': `选择一个文件以查看详情。`,
   'Body.NoProductSelected': `选择一个产品以查看详情。`,
   'Body.NoMetadata': `没有可用的元数据。`,
@@ -205,8 +205,8 @@ const MAP = {
   'Completion.FailedCountDelete.Plural': `{1} 个文件中有 {0} 个无法删除。`,
   'Completion.MoveSummary.Singular': `已将 {0} 个{1}移动到：{2}`,
   'Completion.MoveSummary.Plural': `已将 {0} 个{1}移动到：{2}`,
-  'Completion.PermanentDeleteSummary.Singular': `已永久删除 {0} 个{1}。它没有进入回收站。`,
-  'Completion.PermanentDeleteSummary.Plural': `已永久删除 {0} 个{1}。它们没有进入回收站。`,
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
   'Summary.RegisteredStillUsed.Singular': `仍需要 {0} 个文件`,
   'Summary.RegisteredStillUsed.Plural': `仍需要 {0} 个文件`,
   'Summary.OrphanedToCleanUp.Singular': `{0} 个不需要的文件可清理`,
@@ -250,8 +250,8 @@ const MAP = {
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows 拒绝了对此文件的访问；该文件已留在原处。`,
   'Error.AccessDenied.Plural': `Windows 拒绝了对这些文件的访问；这些文件已留在原处。`,
-  'Error.FileInUse.Singular': `此文件正被另一个程序打开或锁定，因此目前没有任何方式能移动它。该文件已留在原处；请稍后再试。`,
-  'Error.FileInUse.Plural': `这些文件正被另一个程序打开或锁定，因此目前没有任何方式能移动它们。这些文件已留在原处；请稍后再试。`,
+  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
+  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
   'Error.IOFailure.Singular': `Windows 报告了一个文件错误；该文件已留在原处。`,
   'Error.IOFailure.Plural': `Windows 报告了文件错误；这些文件已留在原处。`,
   'Error.UnknownError.Singular': `此文件出了点问题；该文件已留在原处。`,
@@ -318,25 +318,25 @@ const MAP = {
   'Cli.FoundOrphans': `找到 {0} 个{1}，可清理（{2}）。`,
   'Cli.NothingToDo': `无需任何操作。`,
   'Cli.DeletingFiles': `正在删除 {0} 个{1}…`,
-  'Cli.DeletedFiles': `已删除 {0} 个{1}。`,
+  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
   'Cli.NoMoveDestination': `错误：未指定移动目标位置。请使用 /m 路径。（在 GUI 中设置的默认位置是按用户保存的，不适用于计划任务或服务账户下的运行。）`,
   'Cli.MoveDestinationInsideInstaller': `错误：目标位置不能位于 Windows Installer 文件夹内。`,
   'Cli.MoveDestinationRelative': `错误：目标位置必须是完整路径。收到：{0}`,
   'Cli.MoveDestinationInSystemFolder': `错误：目标位置 {0} 解析到 Windows 系统文件夹下。请选择 %SystemRoot%、%ProgramFiles% 和 %ProgramData% 之外的路径。`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `错误：当前有程序正在使用 Windows Installer，通常是 Windows 更新或正在后台安装的程序。在其运行期间，移动和删除均被阻止。请在它完成后重试。`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `错误：本机有一个先前的 Windows Installer 事务处于挂起状态。请在清理缓存前，恢复或回滚该安装（或重启 Windows）。`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `错误：有一个排队等待重启后执行的文件操作指向安装程序缓存（{0}）。请先重启 Windows 完成该操作，然后再清理。`,
   'Cli.MovingFiles': `正在将 {0} 个{1}移动到 {2}…`,
   'Cli.MovedFiles': `已移动 {0} 个{1}。`,
   'Cli.MutexBlocked': `另一个 InstallerClean 进程正持有单实例锁（GUI 或另一次 CLI 运行）。退出代码 75（暂时性）；稍后可安全重试。`,
   'Cli.EventLogUnavailable': `注意：事件日志写入失败。请检查应用程序日志的权限或组策略。`,
-  'CrashLog.PrivacyHeader': `# crash.log 记录 InstallerClean 未处理的异常。\n# 在提权运行时，框架的异常消息可能包含当前会话的文件\n# 路径（包括 Windows Installer 查询所枚举到的其他用户的\n# 配置文件）。来自检查更新或结果日志 POST 的网络失败\n# 消息，可能包含目标 URL 以及解析出的 IP / 代理地址。\n# 在将此文件附加到公开的错误报告之前，请先删除这两类\n# 细节。\n`,
+  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
   'Cli.Help.Header': `InstallerClean - 清理 {InstallerFolder}`,
   'Cli.Help.Usage': `用法：`,
   'Cli.Help.Help': `  installerclean-cli --help     显示此帮助（也接受 /?、-h）`,
   'Cli.Help.Version': `  installerclean-cli --version  显示版本号（也接受 -v）`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s         仅扫描 - 列出不需要的文件`,
-  'Cli.Help.Delete': `  installerclean-cli /d         删除不需要的文件（回收站）`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         移动到已保存的默认位置`,
   'Cli.Help.MovePath': `  installerclean-cli /m 路径    移动到指定路径`,
   'Cli.Help.NoteLine1': `installerclean-cli 是一个真正的控制台进程，在运行结束前会一直`,
@@ -353,7 +353,7 @@ const MAP = {
   'Automation.ChangeLanguage.HelpText': `程序会重启。`,
   'Body.NotScanned.Lead': `尚未扫描。`,
   'Body.NotScanned.Why': `点击“重新扫描”，在 {InstallerFolder} 中查找没有任何程序仍然需要的安装程序文件。`,
-  'Confirm.MoveSameDrive': `此文件夹位于同一驱动器上，因此移动本身不会释放任何空间。等您把移动过去的文件删除后，空间才会释放出来；您也可以改为选择另一个驱动器上的文件夹。`,
+  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
   'Error.ScanCorrelationFailed': `InstallerClean 无法把这次扫描与 Windows Installer 记录对上：Windows 仍然列为需要的每个文件都不在 {InstallerFolder} 中，而文件夹里实际存在的文件又与任何记录都对不上。真实的电脑不会是这个样子，所以这说明读取记录时出了问题，而不是有文件可以安全删除。没有列出任何可清理的内容，也没有删除任何内容。`,
   'Error.CandidateOutsideCache': `此文件不直接位于 Windows Installer 文件夹内；为安全起见已拒绝。`,
   'Completion.ReverifySkipped': `{0} 个{1}已保留在原处，因为这次扫描之后又有程序需要它们了。`,
@@ -376,11 +376,18 @@ const MAP = {
   'Automation.About.Guide.HelpText': `在浏览器中打开 github 上的 readme。`,
   'Automation.About.ReportProblem.HelpText': `在浏览器中打开 github.com 上的问题追踪页面（Issues）。`,
   'Automation.AutoUpdateCheck.HelpText': `勾选后，InstallerClean 运行时会在 github 上检查是否有更新版本。`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 21 machine-contract Cli.* <data> elements BY NAME (the
+// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable).
 const isMachineCliKey = (k) =>
   k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
@@ -440,7 +447,7 @@ const nonCliRequired = neutralRequired.filter((k) => !k.startsWith('Cli.')).leng
 console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 21)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
 console.log('MAP entries:', Object.keys(MAP).length, '| CRLF:', crlf, '(expect 0)');
 
 if (alsoKeep.size) {
@@ -469,6 +476,6 @@ if (untranslated.length) {
 
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
-  output.size === neutralRequired.length && cliMachineRemoved === 21 && crlf === 0;
+  output.size === neutralRequired.length && cliMachineRemoved === 20 && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

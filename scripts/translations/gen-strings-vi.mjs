@@ -2,7 +2,7 @@
 // Vietnamese (vi) satellite generator for InstallerClean. Copied from
 // gen-strings-template.mjs; only OUT and the MAP values differ. Works FROM THE
 // ENGLISH SOURCE (Strings.resx): replaces each key's inner <value>, strips the
-// 21 machine-contract Cli.EventLog* keys, keeps the human Cli keys, and
+// 20 machine-contract Cli.EventLog* keys, keeps the human Cli keys, and
 // self-verifies against the neutral. Output is LF, UTF-8. See the template for
 // the whole of how the body works.
 //
@@ -57,7 +57,7 @@ const MAP = {
   'Section.Registered.Products': `SẢN PHẨM`,
   'Section.Registered.Patches': `BẢN VÁ`,
   'Section.Registered.Details': `CHI TIẾT SẢN PHẨM`,
-  'Section.Backup.Folder': `NƠI CHUYỂN ĐẾN`,
+  'Section.Backup.Folder': `BACKUP FOLDER`,
   'Section.SayThanks': `LỜI CẢM ƠN`,
 
   // Field labels (used in detail panels)
@@ -97,7 +97,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Gắn _sao trên GitHub`,
   'Action.Licence': `Giấy phép Apache 2.0`,
   'Action.Move': `_Chuyển`,
-  'Action.BackupFolderPlaceholder': `Đường dẫn thư mục nếu bạn Chuyển thay vì Xóa`,
+  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
   'Action.OpenReleasePage': `_Mở trang phát hành`,
   'Action.Rescan': `_Quét lại`,
   'Action.ScanAgain': `Quét _lại`,
@@ -115,7 +115,7 @@ const MAP = {
   'Automation.CloseResult': `Đóng kết quả và quay lại cửa sổ chính`,
   'Automation.LeaveStarOnGitHub.About': `Gắn sao trên github`,
   'Automation.Minimise': `Thu nhỏ`,
-  'Automation.ConfirmDelete': `Xóa sẽ di chuyển các tệp không cần thiết vào Thùng rác. Hủy sẽ đóng lại mà không xóa.`,
+  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
   'Automation.ConfirmMove': `Chuyển sẽ đặt các tệp không cần thiết vào thư mục đích đã chọn. Hủy sẽ để chúng nguyên chỗ cũ.`,
   'Automation.SayThanks': `Lời cảm ơn`,
   'Automation.ConfirmSendResultLog': `Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì.`,
@@ -123,11 +123,11 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Kiểm tra trang phát hành của github xem có phiên bản mới hơn không.`,
   'Automation.UpdateAvailable.HelpText': `Mở trang phát hành để tải phiên bản mới hơn, hoặc hủy để giữ phiên bản hiện tại.`,
   'Automation.Licence.HelpText': `Mở tệp giấy phép trên github.com trong trình duyệt của bạn.`,
-  'Automation.Section.BackupFolder': `Nơi chuyển đến`,
+  'Automation.Section.BackupFolder': `Backup folder`,
   'Automation.Section.Products': `Sản phẩm`,
   'Automation.Section.Patches': `Bản vá`,
   'Automation.Section.ProductDetails': `Chi tiết sản phẩm`,
-  'Automation.BackupFolder': `Nơi chuyển đến`,
+  'Automation.BackupFolder': `Backup folder`,
   'Automation.OperationProgress': `Tiến trình thao tác`,
   'Automation.RescanInstaller': `Quét lại {InstallerFolder}`,
   'Automation.ScanningProgress': `Tiến trình quét`,
@@ -154,18 +154,18 @@ const MAP = {
   'Tooltip.Minimise': `Thu nhỏ`,
   'Tooltip.SendResultLog': `Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không và mọi người đang giải phóng được bao nhiêu dung lượng. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.`,
   'Tooltip.SendResultLog.NothingFound': `Tùy bạn, nhưng rất được trân trọng. Gửi một bản tóm tắt ẩn danh chỉ để cho tôi biết nó có hoạt động không. Màn hình tiếp theo cho bạn xem những gì sẽ được gửi trước khi bạn xác nhận.`,
-  'Tooltip.Move': `Chuyển các tệp không cần thiết tới Nơi chuyển đến.`,
-  'Tooltip.MoveNeedsDestination': `Chuyển các tệp không cần thiết tới nơi an toàn. Bạn sẽ chọn thư mục ở bước tiếp theo.`,
-  'Tooltip.Delete': `Di chuyển các tệp không cần thiết vào Thùng rác.`,
+  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `Tên chủ thể từ chứng chỉ Authenticode được nhúng. Chưa xác minh chuỗi.`,
 
   // Body copy
-  'Body.MainExplanation.Lead': `Mọi tệp không cần thiết bên dưới đều có thể xóa an toàn.`,
+  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
   'Body.MainExplanation.Why': `Chúng nằm trong {InstallerFolder}, còn sót lại khi một chương trình bị gỡ cài đặt ({0}), khi một bản vá mới hơn thay thế một bản ({1}) hoặc khi nhà phát hành thu hồi nó ({2}). InstallerClean chỉ liệt kê những tệp mà chính Windows báo là đã dùng xong.`,
-  'Body.MainExplanation.Action': `Xóa chúng vào Thùng rác, hoặc dùng Chuyển thay vào đó để giữ một bản sao lưu. Đặt các tệp trở lại {InstallerFolder} sẽ đưa mọi thứ về đúng như lúc ban đầu.`,
-  'Body.PendingReboot.MsiExecuteMutex': `Có thứ gì đó đang dùng Windows Installer ngay lúc này, thường là Windows Update hoặc một chương trình đang cài đặt ở chế độ nền. Chuyển và Xóa được tạm dừng trong khi việc đó chạy, nên InstallerClean sẽ không đụng tới bộ nhớ đệm trình cài đặt khi nó đang thay đổi. Khi việc đó xong, hãy Quét lại và chúng sẽ quay lại.`,
-  'Body.PendingReboot.InstallerInProgress': `Một giao dịch Windows Installer trước đó đang bị tạm dừng trên máy này. Hãy tiếp tục hoặc hoàn tác lần cài đặt đó (hoặc khởi động lại Windows) trước khi dọn bộ nhớ đệm.`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows có một thao tác đổi tên tệp được xếp hàng cho lần khởi động lại tới, ảnh hưởng tới bộ nhớ đệm Installer. Hãy khởi động lại Windows trước khi dọn.`,
+  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
+  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
   'Body.NoFileSelected': `Chọn một tệp để xem chi tiết.`,
   'Body.NoProductSelected': `Chọn một sản phẩm để xem chi tiết.`,
   'Body.NoMetadata': `Không có siêu dữ liệu.`,
@@ -240,8 +240,8 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.PermanentDeleteSummary.Singular': `Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác.`,
-  'Completion.PermanentDeleteSummary.Plural': `Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác.`,
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} tệp vẫn cần thiết`,
@@ -311,8 +311,8 @@ const MAP = {
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows từ chối truy cập tệp này; tệp được giữ nguyên tại chỗ.`,
   'Error.AccessDenied.Plural': `Windows từ chối truy cập các tệp này; các tệp được giữ nguyên tại chỗ.`,
-  'Error.FileInUse.Singular': `Tệp này đang được mở hoặc bị khóa bởi một chương trình khác, nên hiện không gì có thể chuyển nó. Tệp được giữ nguyên tại chỗ; hãy thử lại sau.`,
-  'Error.FileInUse.Plural': `Các tệp này đang được mở hoặc bị khóa bởi một chương trình khác, nên hiện không gì có thể chuyển chúng. Các tệp được giữ nguyên tại chỗ; hãy thử lại sau.`,
+  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
+  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
   'Error.IOFailure.Singular': `Windows báo một lỗi tệp; tệp được giữ nguyên tại chỗ.`,
   'Error.IOFailure.Plural': `Windows báo lỗi tệp; các tệp này được giữ nguyên tại chỗ.`,
   'Error.UnknownError.Singular': `Đã có trục trặc với tệp này; tệp được giữ nguyên tại chỗ.`,
@@ -396,7 +396,7 @@ const MAP = {
   'Display.Elapsed.S': `{0:F1}s`,
   'Display.ElapsedLong.LessThanASecond': `chưa đến một giây`,
   'Display.ElapsedLong.Seconds': `{0:F1} giây`,
-  'CrashLog.PrivacyHeader': `# crash.log ghi lại các ngoại lệ chưa được xử lý từ InstallerClean.\n# Khi chạy nâng quyền, thông báo ngoại lệ của framework có thể chứa\n# đường dẫn tệp từ phiên đang chạy (bao gồm hồ sơ của những người\n# dùng khác do truy vấn Windows Installer liệt kê). Thông báo lỗi\n# mạng từ lần kiểm tra cập nhật hoặc POST nhật ký kết quả có thể\n# chứa URL đích và địa chỉ IP / proxy đã phân giải. Hãy che cả hai\n# loại chi tiết này trước khi đính kèm tệp này vào một báo cáo lỗi\n# công khai.\n`,
+  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
   'Tooltip.ChangeLanguage': `Thay đổi ngôn ngữ. Chương trình sẽ khởi động lại.`,
   'Automation.ChangeLanguage': `Thay đổi ngôn ngữ`,
   'Automation.ChangeLanguage.HelpText': `Chương trình sẽ khởi động lại.`,
@@ -411,12 +411,12 @@ const MAP = {
   'Cli.FoundOrphans': `Đã tìm thấy {0} {1} để dọn ({2}).`,
   'Cli.NothingToDo': `Không có gì để làm.`,
   'Cli.DeletingFiles': `Đang xóa {0} {1}...`,
-  'Cli.DeletedFiles': `Đã xóa {0} {1}.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
   'Cli.NoMoveDestination': `Lỗi: chưa chỉ định đích để chuyển. Dùng /m ĐƯỜNG_DẪN. (Mặc định đặt trong GUI là theo từng người dùng và không áp dụng cho các lần chạy theo lịch hoặc bằng tài khoản dịch vụ.)`,
   'Cli.MoveDestinationInsideInstaller': `Lỗi: đích không thể nằm bên trong thư mục Windows Installer.`,
   'Cli.MoveDestinationRelative': `Lỗi: đích phải là một đường dẫn đầy đủ. Nhận được: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Lỗi: đích {0} nằm dưới một thư mục hệ thống của Windows. Hãy chọn một đường dẫn ngoài %SystemRoot%, %ProgramFiles% và %ProgramData%.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Lỗi: có thứ gì đó đang dùng Windows Installer ngay lúc này, thường là Windows Update hoặc một chương trình đang cài đặt ở chế độ nền. Chuyển và Xóa bị chặn trong khi việc đó chạy. Hãy thử lại khi nó xong.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Lỗi: một giao dịch Windows Installer trước đó đang bị tạm dừng trên máy này. Hãy tiếp tục hoặc hoàn tác lần cài đặt đó (hoặc khởi động lại Windows) trước khi dọn bộ nhớ đệm.`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Lỗi: một thao tác trên tệp được xếp hàng cho lần khởi động lại tới nhắm vào bộ nhớ đệm Installer ({0}). Hãy khởi động lại Windows để hoàn tất thao tác đó trước khi dọn.`,
   'Cli.MovingFiles': `Đang chuyển {0} {1} tới {2}...`,
@@ -427,8 +427,8 @@ const MAP = {
   'Cli.Help.Usage': `Cách dùng:`,
   'Cli.Help.Help': `  installerclean-cli --help        Hiển thị trợ giúp (cũng nhận /?, -h)`,
   'Cli.Help.Version': `  installerclean-cli --version     In ra phiên bản (cũng nhận -v)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s            Chỉ quét - tệp không cần thiết`,
-  'Cli.Help.Delete': `  installerclean-cli /d            Xóa các tệp không cần thiết (Thùng rác)`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m            Chuyển tới vị trí mặc định đã lưu`,
   'Cli.Help.MovePath': `  installerclean-cli /m ĐƯỜNG_DẪN  Chuyển tới đường dẫn được chỉ định`,
   'Cli.Help.NoteLine1': `installerclean-cli là một tiến trình console thật và chặn dấu nhắc`,
@@ -442,7 +442,7 @@ const MAP = {
   'Cli.Help.ExitCodeCancelled': `  130 đã hủy (Ctrl+C)`,
   'Body.NotScanned.Lead': `Chưa quét gì cả.`,
   'Body.NotScanned.Why': `Nhấn Quét lại để tìm trong {InstallerFolder} những tệp cài đặt mà không chương trình nào còn cần.`,
-  'Confirm.MoveSameDrive': `Thư mục này nằm trên cùng ổ đĩa, nên bản thân việc chuyển sẽ không giải phóng dung lượng nào. Bạn sẽ lấy lại dung lượng khi xóa các tệp khỏi đó, hoặc bạn có thể chọn một thư mục trên ổ đĩa khác thay vào đó.`,
+  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
   'Error.ScanCorrelationFailed': `InstallerClean không thể khớp lần quét này với các bản ghi Windows Installer: mọi tệp mà Windows vẫn liệt kê là cần thiết đều không có trong {InstallerFolder}, trong khi các tệp thực sự nằm trong thư mục lại không khớp với bản ghi nào. Không có máy thật nào trông như vậy, nên điều này cho thấy có vấn đề khi đọc các bản ghi, chứ không phải là các tệp bạn có thể xóa an toàn. Chưa có gì được đưa ra để dọn dẹp và không có gì bị xóa.`,
   'Error.CandidateOutsideCache': `Tệp này không nằm trực tiếp trong thư mục Windows Installer; bị từ chối vì lý do an toàn.`,
   'Completion.ReverifySkipped': `Đã giữ nguyên {0} {1} vì sau lần quét, một chương trình lại cần đến chúng.`,
@@ -465,11 +465,18 @@ const MAP = {
   'Automation.About.Guide.HelpText': `Mở readme trên github trong trình duyệt của bạn.`,
   'Automation.About.ReportProblem.HelpText': `Mở trình theo dõi vấn đề (Issues) trên github.com trong trình duyệt của bạn.`,
   'Automation.AutoUpdateCheck.HelpText': `Nếu được đánh dấu, InstallerClean sẽ kiểm tra github xem có phiên bản mới hơn không khi bạn chạy nó.`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 21 machine-contract Cli.* <data> elements BY NAME (the
+// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable): each is matched non-greedy to
 // its own </data>. The human-facing Cli keys are KEPT, and their value is
 // replaced from the MAP like any other key. Same predicate as
@@ -525,7 +532,7 @@ const neutral = parse(readFileSync(BASE, 'utf8'));
 const written = readFileSync(OUT, 'utf8');
 const output = parse(written);
 // Required = everything a satellite must carry: the non-Cli keys plus the
-// human-facing Cli keys. The 21 machine Cli keys are the complement; they must be
+// human-facing Cli keys. The 20 machine Cli keys are the complement; they must be
 // absent from the output (isMachineCliKey is defined up in the strip section).
 const neutralRequired = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
 
@@ -567,7 +574,7 @@ console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length + overrideKeys.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli +',
   overrideKeys.length, 'override)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 21)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
 console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| CRLF:', crlf, '(expect 0)');
 
 // ALSO_KEEP audit roster, so a lazy "force it green" dump is visible at a glance.
@@ -600,6 +607,6 @@ if (untranslated.length) {
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
   !overrideMissing.length && !overrideArityMismatch.length &&
-  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 21 && crlf === 0;
+  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 20 && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

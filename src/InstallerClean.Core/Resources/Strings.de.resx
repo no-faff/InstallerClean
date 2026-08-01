@@ -22,7 +22,6 @@
       FilePicker.*           folder-browser dialog labels
       Plural.*               singular/plural fragments used by DisplayHelpers
       Reason.*               Reason column values in the unneeded files list
-      RecycleUnavailable.*   recycle-bin-unavailable choice dialog
       ResultLog.*            send-report states (Sending / Sent / Failed)
       Section.*              heading text inside windows
       Startup.*              splash + already-running messages
@@ -94,7 +93,7 @@
   <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUKTE</value></data>
   <data name="Section.Registered.Patches" xml:space="preserve"><value>PATCHES</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>PRODUKTDETAILS</value></data>
-  <data name="Section.Move.Location" xml:space="preserve"><value>ZIELORT</value></data>
+  <data name="Section.Backup.Folder" xml:space="preserve"><value>BACKUP FOLDER</value></data>
   <data name="Section.SayThanks" xml:space="preserve"><value>DANKE SAGEN</value></data>
 
   <!-- Field labels (used in detail panels) -->
@@ -126,7 +125,10 @@
   <data name="Action.Cancel" xml:space="preserve"><value>_Abbrechen</value></data>
   <data name="Action.CheckForUpdates" xml:space="preserve"><value>Nach _Updates suchen</value></data>
   <data name="Action.Close" xml:space="preserve"><value>_Schließen</value></data>
-  <data name="Action.Delete" xml:space="preserve"><value>_Löschen</value></data>
+  <!-- The label on both delete surfaces: the main window's button and the
+       confirmation dialog's. It says "permanently" because Delete here does
+       not mean what Delete means elsewhere in Windows, and the label is the
+       only place that difference can be carried. -->
   <data name="Action.DeletePermanently" xml:space="preserve"><value>Endgültig _löschen</value></data>
   <!-- Alt+D safe here because the Delete button under the overlay is
        disabled while Completion.IsComplete is true (IsMainContentInteractive
@@ -139,8 +141,12 @@
   <data name="Action.LeaveStarOnGitHub" xml:space="preserve"><value>Einen Stern auf _GitHub hinterlassen</value></data>
   <data name="Action.Licence" xml:space="preserve"><value>Apache-2.0-Lizenz</value></data>
   <data name="Action.Move" xml:space="preserve"><value>_Verschieben</value></data>
-  <data name="Action.MoveInstead" xml:space="preserve"><value>Stattdessen _verschieben</value></data>
-  <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Ordnerpfad, falls du verschiebst statt löschst</value></data>
+  <!-- "rather than" and not "instead of": "instead of" takes the -ing form,
+       so "instead of delete" is ungrammatical and only read as English
+       because the capitals made the two words button names. "Rather than"
+       takes both verbs in the same form, so they stay parallel. The button
+       carries "permanently"; repeating it here would dangle on the clause. -->
+  <data name="Action.BackupFolderPlaceholder" xml:space="preserve"><value>Path to folder if you move rather than delete.</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>_Release-Seite öffnen</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Neu scannen</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>Erneut _scannen</value></data>
@@ -189,11 +195,8 @@
        straight after "Cancel, button": the window-level alternative is
        never read, because help text is only spoken for the element with
        focus and the window itself never has it. -->
-  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Löschen verschiebt die nicht benötigten Dateien in den Papierkorb. Abbrechen schließt, ohne zu löschen.</value></data>
+  <data name="Automation.ConfirmDelete" xml:space="preserve"><value>Delete permanently removes the unneeded files. Cancel closes without deleting.</value></data>
   <data name="Automation.ConfirmMove" xml:space="preserve"><value>Verschieben legt die nicht benötigten Dateien in den gewählten Zielordner. Abbrechen lässt sie, wo sie sind.</value></data>
-  <data name="Automation.RecycleUnavailable" xml:space="preserve"><value>Wähle, wie mit den nicht benötigten Dateien verfahren werden soll: an einen sicheren Ort verschieben, endgültig löschen oder abbrechen.</value></data>
-  <data name="Automation.RecycleUnavailableMove" xml:space="preserve"><value>Die nicht benötigten Dateien in einen von dir gewählten Ordner verschieben</value></data>
-  <data name="Automation.RecycleUnavailableDeletePermanently" xml:space="preserve"><value>Die nicht benötigten Dateien endgültig löschen, weil der Papierkorb für dieses Laufwerk nicht verfügbar ist</value></data>
   <data name="Automation.SayThanks" xml:space="preserve"><value>Danke sagen</value></data>
   <data name="Automation.ConfirmSendResultLog" xml:space="preserve"><value>Senden übermittelt den angezeigten Bericht an No Faff. Abbrechen sendet nichts.</value></data>
   <data name="Automation.CheckForUpdates" xml:space="preserve"><value>Nach Updates suchen</value></data>
@@ -250,20 +253,20 @@
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Öffne die Release-Seite, um die neuere Version herunterzuladen, oder brich ab, um die aktuelle Version zu behalten.</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Öffnet die Lizenzdatei auf github.com in deinem Browser.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
-       Section.* labels (MOVE LOCATION / PRODUCTS / PATCHES / PRODUCT
+       Section.* labels (BACKUP FOLDER / PRODUCTS / PATCHES / PRODUCT
        DETAILS). Narrator at default verbosity spells short uppercase
        tokens letter-by-letter; the override gives it a phrase to read
        while the visible text stays uppercased for SmallCaps. -->
-  <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>Zielort</value></data>
+  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Backup folder</value></data>
   <data name="Automation.Section.Products" xml:space="preserve"><value>Produkte</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>Patches</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Produktdetails</value></data>
   <!-- Spoken name for the box the destination is typed into. It reads as
-       the MOVE LOCATION label directly above it, so a screen reader names
+       the BACKUP FOLDER label directly above it, so a screen reader names
        the field the way the label does and voice control can reach it by
        the words on screen; it stays identical to
-       Automation.Section.MoveLocation in every language. -->
-  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Zielort</value></data>
+       Automation.Section.BackupFolder in every language. -->
+  <data name="Automation.BackupFolder" xml:space="preserve"><value>Backup folder</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Vorgangsfortschritt</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>{InstallerFolder} erneut scannen</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Scan-Fortschritt</value></data>
@@ -310,27 +313,52 @@
   <data name="Tooltip.Minimise" xml:space="preserve"><value>Minimieren</value></data>
   <data name="Tooltip.SendResultLog" xml:space="preserve"><value>Ganz wie du magst, aber ich freue mich darüber. Sendet eine anonyme Zusammenfassung, die mir nur zeigt, ob es funktioniert und wie viel Platz die Leute freigeben. Auf dem nächsten Bildschirm siehst du vor dem Bestätigen, was gesendet wird.</value></data>
   <data name="Tooltip.SendResultLog.NothingFound" xml:space="preserve"><value>Ganz wie du magst, aber ich freue mich darüber. Sendet eine anonyme Zusammenfassung, die mir nur zeigt, ob es funktioniert. Auf dem nächsten Bildschirm siehst du vor dem Bestätigen, was gesendet wird.</value></data>
-  <data name="Tooltip.Move" xml:space="preserve"><value>Verschiebt die nicht benötigten Dateien an den Zielort.</value></data>
-  <!-- The Move button's tooltip while the Move location box is empty. The
+  <!-- The Move button's three tooltip states, chosen by whether the backup
+       folder is set and whether it sits on the drive the files are already
+       on. Each is also the button's screen-reader help text, one value
+       feeding both, so it has to work spoken as well as hovered.
+
+       "The backup folder", not "your backup folder": one "you're" in the
+       sentence is enough and "the" has its referent in the field label
+       directly above. All three end on the same instruction, that deleting
+       the folder is what finishes the job, because the screen never said so
+       and a real user moved his files, watched nothing break for weeks and
+       still did not know he was done. -->
+  <data name="Tooltip.Move" xml:space="preserve"><value>Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.</value></data>
+  <!-- The Move button's tooltip while the backup folder box is empty. The
        button still works from here: pressing it opens the folder browser
        and then moves, so this says a folder is coming rather than asking
-       for one to be set first. -->
-  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Verschiebt die nicht benötigten Dateien an einen sicheren Ort. Den Ordner wählst du als Nächstes.</value></data>
-  <data name="Tooltip.Delete" xml:space="preserve"><value>Verschiebt die nicht benötigten Dateien in den Papierkorb.</value></data>
+       for one to be set first. "A" and not "the" because there is no folder
+       yet, and the browser is named early because that is what a
+       screen-reader user most needs to know before pressing. -->
+  <data name="Tooltip.MoveNeedsDestination" xml:space="preserve"><value>Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.</value></data>
+  <!-- The same-drive state. It exists to give a matched pair with
+       Tooltip.Delete on the one trade the user is actually making: hover
+       Delete and the space comes back at once, hover Move with a folder on
+       the same drive and it comes back when that folder goes. Same verb,
+       same promise, different timing, both readable before either button is
+       pressed. Distinct from Confirm.MoveSameDrive, which says a related
+       thing after the choice has been made. -->
+  <data name="Tooltip.MoveSameDrive" xml:space="preserve"><value>Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.</value></data>
+  <!-- The Delete button's tooltip and its screen-reader help text, one
+       value feeding both. "Reclaim" rather than a synonym because it is
+       already the app's word for this: the reports chart says "Space
+       reclaimed from C:\Windows\Installer". -->
+  <data name="Tooltip.Delete" xml:space="preserve"><value>Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.</value></data>
   <data name="Tooltip.SigningCertificate" xml:space="preserve"><value>Antragstellername aus dem eingebetteten Authenticode-Zertifikat. Die Zertifikatskette wurde nicht geprüft.</value></data>
 
   <!-- Body copy -->
   <data name="Body.MainExplanation.Lead" xml:space="preserve">
-    <value>Etwaige nicht benötigte Dateien unten können bedenkenlos gelöscht werden.</value>
-    <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause.</comment>
+    <value>Any unneeded files below are [safe to delete].</value>
+    <comment>Main window intro, key 1 of 3 (the lead). Rendered prominent (heading tier): the reassurance the window opens on. "Any" and not "The": the same sentence shows over a count of zero, so it must read correctly with no files below it. Keep it one short clause. The bracketed phrase becomes a hyperlink into the README's "Is it safe?" section (rendered in MainWindow.xaml.cs BuildIntroLeadLine); the brackets are the delimiter and are not shown. This is the screen's strongest safety claim and the only link on it, so keep the brackets on whatever phrase carries that claim in this language.</comment>
   </data>
   <data name="Body.MainExplanation.Why" xml:space="preserve">
     <value>Sie liegen in {InstallerFolder} und blieben zurück, als ein Programm deinstalliert wurde ({0}), ein neuerer Patch einen älteren ersetzt hat ({1}) oder der Herausgeber ihn zurückgezogen hat ({2}). InstallerClean listet nur Dateien auf, die Windows selbst als erledigt meldet.</value>
     <comment>Main window intro, key 2 of 3 (the why, rendered muted). {0} = Reason.Orphaned, {1} = Reason.Superseded, {2} = Reason.Obsoleted. Keep the parenthetical structure so all three column-Reason labels stay reachable from the body copy after translation.</comment>
   </data>
   <data name="Body.MainExplanation.Action" xml:space="preserve">
-    <value>Lösche sie in den Papierkorb, oder nutze stattdessen Verschieben, um eine Sicherungskopie zu behalten. Wenn du die Dateien zurück in {InstallerFolder} legst, ist alles wieder genau wie vorher.</value>
-    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). Mirrors the Delete and Move buttons. The second sentence covers BOTH buttons and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and both a Recycle Bin restore and a manual move back put the file at that same path under the same name. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README.</comment>
+    <value>Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.</value>
+    <comment>Main window intro, key 3 of 3 (the action, rendered in the body tier). It names delete first because the tier above says these files are safe to delete and this line carries straight on from that claim; the button order is a separate matter and does not govern it. The second sentence covers BOTH actions and is literally true of each: a cached package counts as present if and only if its recorded LocalPackage path exists, and putting a file back at that path under the same name is what restores it. Keep the folder named rather than "back where they were": it is the whole instruction, and it is the one thing the window never said before, leaving people to find it in the README. "Until", not "while": the point is that there is a finish to reach.</comment>
   </data>
   <data name="Body.NotScanned.Lead" xml:space="preserve">
     <value>Noch nichts gescannt.</value>
@@ -344,9 +372,14 @@
     <value>Diese Dateien können gerade nicht aufgeräumt werden.</value>
     <comment>Main window intro (heading tier) when a scan found files but a Windows Installer operation is in progress, so Move and Delete are held. Replaces the "safe to delete" lead, which reads wrong above dead buttons. The reason-specific banner below it (Body.PendingReboot.*) carries the why; keep this one short.</comment>
   </data>
-  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Gerade benutzt etwas Windows Installer, normalerweise ein Windows-Update oder ein Programm, das im Hintergrund installiert wird. Verschieben und Löschen pausieren, solange das läuft, damit InstallerClean den Installer-Cache nicht anrührt, während er sich ändert. Wenn es fertig ist, scanne erneut, und sie sind wieder verfügbar.</value></data>
-  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>Eine frühere Windows-Installer-Transaktion ist auf diesem Rechner ausgesetzt. Setze diese Installation fort oder mach sie rückgängig (oder starte Windows neu), bevor du den Cache aufräumst.</value></data>
-  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows hat für den nächsten Neustart eine Dateiumbenennung in der Warteschlange, die den Installer-Cache betrifft. Starte Windows neu, bevor du aufräumst.</value></data>
+  <!-- The three reason-specific banners. Each names the folder with the
+       {InstallerFolder} token, like every other line in the app that names it:
+       they are read at the one moment the buttons are dead, by somebody who
+       may not know what an MSI is, so "the cache" was a term the app used here
+       and introduced nowhere. -->
+  <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.</value></data>
+  <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
+  <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>Wähle eine Datei, um Details anzuzeigen.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Wähle ein Produkt, um Details anzuzeigen.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Keine Metadaten verfügbar.</value></data>
@@ -395,10 +428,6 @@
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
   <data name="Status.FoundUnused" xml:space="preserve"><value>{0} {1} gefunden, die du bedenkenlos löschen kannst.</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>Zielordner wird vorbereitet...</value></data>
-  <!-- Overlay heading while the pre-delete probe checks the volume's Recycle
-       Bin. Shown only when that probe is slow, which is the case where the bin
-       is unhealthy, so it must name the wait without predicting its outcome. -->
-  <data name="Status.CheckingRecycleBin" xml:space="preserve"><value>Papierkorb wird geprüft...</value></data>
   <!-- 0 = file count, 1 = pluralised noun -->
   <data name="Status.Moving" xml:space="preserve"><value>{0} {1} werden verschoben...</value></data>
   <data name="Status.Deleting" xml:space="preserve"><value>{0} {1} werden gelöscht...</value></data>
@@ -440,28 +469,42 @@
        + smaller-receipt shape as the post-Move and post-Delete
        states. -->
   <data name="Completion.NothingToCleanUpReceipt" xml:space="preserve"><value>{0} {1} in {2} gescannt</value></data>
-  <!-- Restore hints under the post-Move / post-Delete summary. The
-       "[it won't!]" phrase becomes a hyperlink to the README's "Is it safe?"
+  <!-- The line under the post-Move summary, in its four forms: the backup
+       folder is on another drive or on the same one, at one file or at more.
+       Delete has no counterpart, and deliberately: it makes no safety claim on
+       its completion screen, so there is nothing there for a link to hang on.
+
+       The bracketed phrase becomes a hyperlink to the README's "Is it safe?"
        section (rendered in MainWindow.xaml.cs BuildCompletionRestoreLine); the
        square brackets are the link delimiter and are NOT shown, only the
-       phrase between them becomes the link, and the round brackets around it
-       are shown. Keep the brackets in place and translate the phrase. -->
-  <data name="Completion.MoveRestoreHint" xml:space="preserve"><value>Kopier sie zurück in {InstallerFolder}, falls jemals etwas kaputtgeht ([äußerst unwahrscheinlich]).</value></data>
-  <data name="Completion.DeleteRestoreHint" xml:space="preserve"><value>Bis dahin kannst du sie wiederherstellen, falls jemals etwas kaputtgeht ([äußerst unwahrscheinlich]).</value></data>
-  <!-- Delete-only line shown ABOVE the restore hint. A Delete sends files to
-       the Recycle Bin, which does not reclaim disk space until the bin is
-       emptied; this line names that step. "actually" carries "this is what
-       genuinely frees the disk" (cf. French "vraiment"); translate for that
-       sense, not a rote calque. -->
-  <data name="Completion.DeleteSpaceHint" xml:space="preserve"><value>Leere den Papierkorb, um den Speicherplatz wirklich freizugeben.</value></data>
-  <!-- Headline size figures. "freed" is used only where space is genuinely
-       reclaimed at that instant: a cross-volume Move (frees the system drive)
-       and a consented permanent delete. A Delete to the Recycle Bin reclaims
-       nothing until the bin is emptied, so the delete paths read "cleaned up"
-       (true at that instant: the junk is out of the cache). A same-volume Move
-       reads "moved" (a rename frees nothing yet). 0 = size (e.g. "120.5 MB"). -->
+       phrase between them becomes the link. Keep the brackets in place and
+       translate the phrase. Quoting the phrase itself here is what let an
+       earlier version of this comment go stale against the values.
+
+       "Until then" is the load-bearing part and the reason the line was
+       rewritten: a real user moved his files, watched nothing break for weeks,
+       and still wrote "at some point I could probably delete those files".
+       The backup exists for as long as the folder does, and deleting the
+       folder is what finishes the job.
+
+       The singular is a recast rather than a mechanical de-pluralising. In the
+       plural, "delete it" can only mean the folder, because "the files" cannot
+       be "it"; at one file that disambiguation is gone, so the singular names
+       the folder outright. -->
+  <data name="Completion.MoveRestoreHint.Singular" xml:space="preserve"><value>The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).</value></data>
+  <data name="Completion.MoveRestoreHint.Plural" xml:space="preserve"><value>The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).</value></data>
+  <!-- The same line where the backup folder is on the drive the files came
+       from. A same-drive move is a rename, so it reclaims nothing until the
+       folder goes or moves; that is the one fact this variant adds, and it is
+       the only completion line in the app that has to explain why the disk did
+       not get emptier. -->
+  <data name="Completion.MoveRestoreHintSameDrive.Singular" xml:space="preserve"><value>The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).</value></data>
+  <data name="Completion.MoveRestoreHintSameDrive.Plural" xml:space="preserve"><value>The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).</value></data>
+  <!-- Headline size figures. "freed" is used where space is genuinely
+       reclaimed at that instant: a Delete, and a Move to another volume, which
+       frees the system drive. A same-volume Move reads "moved", a rename
+       having freed nothing yet. 0 = size (e.g. "120.5 MB"). -->
   <data name="Completion.Freed" xml:space="preserve"><value>{0} freigegeben</value></data>
-  <data name="Completion.CleanedUp" xml:space="preserve"><value>{0} aufgeräumt</value></data>
   <data name="Completion.Moved" xml:space="preserve"><value>{0} verschoben</value></data>
   <!-- Heading for the one outcome a size figure cannot state: every file the
        operation tried failed, so there is nothing to report a size for and
@@ -485,8 +528,7 @@
        rendered "1 of 1 files could not be moved" whenever a single-file batch
        failed, and English cannot move it beside {0} without "1 file of 1",
        which reads worse. A language whose noun sits beside {0} inflects
-       correctly at every count and needs no such surgery. The Delete variant
-       covers both a Recycle Bin delete and a consented permanent one. -->
+       correctly at every count and needs no such surgery. -->
   <data name="Completion.FailedCount.Singular" xml:space="preserve"><value>{0} Datei von {1} konnte nicht verschoben werden.</value></data>
   <data name="Completion.FailedCount.Plural" xml:space="preserve"><value>{0} Dateien von {1} konnten nicht verschoben werden.</value></data>
   <data name="Completion.FailedCountDelete.Singular" xml:space="preserve"><value>{0} Datei von {1} konnte nicht gelöscht werden.</value></data>
@@ -497,9 +539,6 @@
        same technique the move-confirmation dialog uses. -->
   <data name="Completion.MoveSummary.Singular" xml:space="preserve"><value>{0} {1} verschoben nach: {2}</value></data>
   <data name="Completion.MoveSummary.Plural" xml:space="preserve"><value>{0} {1} verschoben nach: {2}</value></data>
-  <!-- 0 = deleted count, 1 = pluralised noun -->
-  <data name="Completion.DeleteSummary.Singular" xml:space="preserve"><value>{0} {1} in den Papierkorb verschoben</value></data>
-  <data name="Completion.DeleteSummary.Plural" xml:space="preserve"><value>{0} {1} in den Papierkorb verschoben</value></data>
   <!-- Shown when the pre-action re-check found some candidates are needed again
        (a superseded patch reverted to Applied between the scan and the click),
        so they were left out of the batch. 0 = the count kept, 1 = pluralised
@@ -523,41 +562,23 @@
   <!-- Completion-overlay summaries for a Move or Delete the user cancelled
        part-way through. 0 = the count that completed before the stop, 1 = the
        total that was being processed, 2 = pluralised "file"/"files" for the
-       total. Distinct from the Status.*Cancelled.Partial keys, which are the
-       body-row status line; these are the overlay's own summary sentence. The
-       permanent variant never claims the Recycle Bin: those files did not reach
-       it. -->
+       total. These are the overlay's own summary sentence, not a body-row
+       status line. -->
   <data name="Completion.MoveCancelledSummary" xml:space="preserve"><value>{0} von {1} {2} verschoben, bevor du abgebrochen hast.</value></data>
-  <data name="Completion.DeleteCancelledSummary" xml:space="preserve"><value>{0} von {1} {2} in den Papierkorb verschoben, bevor du abgebrochen hast.</value></data>
   <data name="Completion.PermanentDeleteCancelledSummary" xml:space="preserve"><value>{0} von {1} {2} endgültig gelöscht, bevor du abgebrochen hast.</value></data>
-  <!-- Completion copy for a consented permanent delete (the Recycle Bin
-       was unavailable for the volume and the user chose to delete anyway).
-       Distinct from DeleteSummary so it never claims the bin: these files
-       did not reach it and cannot be restored from it. 0 = deleted count,
-       1 = pluralised noun. The copy splits singular/plural so the "It"/"They
-       did not go to the Recycle Bin" clause agrees with the count. -->
-  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} endgültig gelöscht. Sie ist nicht in den Papierkorb gewandert.</value></data>
-  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} endgültig gelöscht. Sie sind nicht in den Papierkorb gewandert.</value></data>
-  <data name="Completion.PermanentDeleteRestoreHint.Singular" xml:space="preserve"><value>Das ist in Ordnung, sie konnte bedenkenlos entfernt werden. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.</value></data>
-  <data name="Completion.PermanentDeleteRestoreHint.Plural" xml:space="preserve"><value>Das ist in Ordnung, sie konnten bedenkenlos entfernt werden. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.</value></data>
+  <!-- The post-Delete summary. 0 = deleted count, 1 = pluralised noun. It
+       states the act and stops there: the screen carries no safety claim and
+       no recovery advice, because the app's position is not that a delete can
+       be undone but that these files do not need undoing, and telling somebody
+       how to reinstall a program would be the app hedging against the thing it
+       has just said will not happen. Split singular/plural for the languages
+       that inflect the noun and the participle. -->
+  <data name="Completion.PermanentDeleteSummary.Singular" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
+  <data name="Completion.PermanentDeleteSummary.Plural" xml:space="preserve"><value>{0} {1} permanently deleted</value></data>
   <data name="Completion.DonateAsk" xml:space="preserve">
     <value>Freut mich, dass es geholfen hat. Die Kaffeekasse steht bereit, falls dir großzügig zumute ist.</value>
     <comment>Tooltip and screen-reader help on the small heart shown on the completion screen after a run that actually freed space. Light and low-pressure; translate the spirit, not the words. "Tip jar" is an idiom with no counterpart in most of these languages, so each renders the offer whatever way it naturally would.</comment>
   </data>
-  <!-- The choice offered when Delete finds the Recycle Bin unavailable for
-       the files' volume: Move (the safe default), delete permanently with
-       consent, or cancel. Wording states only the confirmed fact (the probe
-       found the bin unavailable for the drive); it never asserts an
-       unconfirmed cause (off vs corrupt vs full). 0 = file count,
-       1 = pluralised noun, 2 = size display. The singular text omits
-       {0}: "this file" reads better than "this 1 file". The call site
-       passes all three args either way, so the singular's {1} and {2}
-       still resolve. -->
-  <data name="RecycleUnavailable.Heading" xml:space="preserve"><value>Der Papierkorb ist für dieses Laufwerk nicht verfügbar</value></data>
-  <data name="RecycleUnavailable.Body.Singular" xml:space="preserve"><value>Daher wurde diese {1} ({2}) nicht gelöscht. Du kannst sie an einen sicheren Ort verschieben oder endgültig löschen.</value></data>
-  <data name="RecycleUnavailable.Body.Plural" xml:space="preserve"><value>Daher wurden diese {0} {1} ({2}) nicht gelöscht. Du kannst sie an einen sicheren Ort verschieben oder endgültig löschen.</value></data>
-  <data name="RecycleUnavailable.Reassurance.Singular" xml:space="preserve"><value>Sie zu löschen ist sicher. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht, und der Papierkorb ist nur eine zusätzliche Absicherung. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.</value></data>
-  <data name="RecycleUnavailable.Reassurance.Plural" xml:space="preserve"><value>Sie zu löschen ist sicher. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht, und der Papierkorb ist nur eine zusätzliche Absicherung. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.</value></data>
 
   <!-- Summaries -->
   <!-- 0 = file count. Singular / plural pairs picked at the call
@@ -608,18 +629,31 @@
   <data name="Confirm.MoveTitle" xml:space="preserve"><value>{0} {1} verschieben ({2})?</value></data>
   <data name="Confirm.MoveDestination" xml:space="preserve"><value>Die Dateien werden verschoben nach:</value></data>
   <data name="Confirm.DeleteTitle" xml:space="preserve"><value>{0} {1} löschen ({2})?</value></data>
-  <!-- "the Move button", not bare "Move": this line says "moved to the Recycle
-       Bin" like the rest of the delete copy, and also points at the separate
-       Move feature, so naming the button stops "moved ... use Move" reading as
-       one action. -->
-  <data name="Confirm.DeleteToRecycleBin" xml:space="preserve"><value>Die Dateien werden in den Papierkorb verschoben. Wenn du Sicherungskopien möchtest, nutze stattdessen die Schaltfläche „Verschieben“.</value></data>
+  <!-- The delete confirmation's body, split singular/plural like every other
+       count-bearing line in the app.
+
+       It carries the bracketed link even though no confirmation dialog did
+       before, and for a reason particular to this one: the dialog is modal, so
+       the main window's own "safe to delete" link is visible behind it and
+       cannot be clicked. Without a link here the claim is unreachable at the
+       one moment it is load-bearing.
+
+       "But" and not "and": offering the backup concedes something to the
+       sentence before it. "The Move button", not bare "Move", so "use Move"
+       is read as a button and not as a second verb in the same sentence. -->
+  <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
+  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
   <!-- Shown on the Move confirmation only when the destination sits on the
        same drive as the installer cache. That move is a rename: it frees
        nothing until the user deletes the parked copies themselves, and the only
        signal they get otherwise is the absence of the word "freed" on the
        completion screen, which nobody reads as a warning. This is a free-space
-       tool, so the one moment it knows the answer is the moment to say it. -->
-  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>Dieser Ordner liegt auf demselben Laufwerk, das Verschieben allein gibt also keinen Speicherplatz frei. Den Platz bekommst du zurück, wenn du die Dateien dort löschst, oder du wählst stattdessen einen Ordner auf einem anderen Laufwerk.</value></data>
+       tool, so the one moment it knows the answer is the moment to say it.
+
+       Flat at any count, unlike its neighbours: it talks about the folder and
+       the space rather than about files, so it has no count-dependent noun to
+       agree. -->
+  <data name="Confirm.MoveSameDrive" xml:space="preserve"><value>That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.</value></data>
 
   <!-- Error messages -->
   <!-- Both manifests declare requireAdministrator, so the process is
@@ -723,45 +757,19 @@ Details in {1}.</value></data>
        introduces a list. Neither ends with a colon, which is why the
        indented "  - name" lines beneath carry the relationship instead.
 
-       FileInUse is Move's counterpart to Error.RecycleInUse on the Delete
-       side, minus the shell error code: Move discriminates a sharing or lock
-       violation from the IOException HResult, so there is no code worth
-       showing and the detail goes to crash.log. -->
+       Move and Delete share this whole set, which is why FileInUse says
+       "remove" rather than "move": both discriminate a sharing or lock
+       violation from the IOException HResult and both leave the file where it
+       is, so one sentence covers the pair and neither has a code worth showing
+       (the detail goes to crash.log). -->
   <data name="Error.AccessDenied.Singular" xml:space="preserve"><value>Windows hat den Zugriff auf diese Datei verweigert; sie wurde an ihrem Platz belassen.</value></data>
   <data name="Error.AccessDenied.Plural" xml:space="preserve"><value>Windows hat den Zugriff auf diese Dateien verweigert; sie wurden an ihrem Platz belassen.</value></data>
-  <data name="Error.FileInUse.Singular" xml:space="preserve"><value>Diese Datei ist von einem anderen Programm geöffnet oder gesperrt, deshalb kann sie im Moment von nichts verschoben werden. Sie wurde an ihrem Platz belassen; versuch es später noch einmal.</value></data>
-  <data name="Error.FileInUse.Plural" xml:space="preserve"><value>Diese Dateien sind von einem anderen Programm geöffnet oder gesperrt, deshalb können sie im Moment von nichts verschoben werden. Sie wurden an ihrem Platz belassen; versuch es später noch einmal.</value></data>
+  <data name="Error.FileInUse.Singular" xml:space="preserve"><value>This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.</value></data>
+  <data name="Error.FileInUse.Plural" xml:space="preserve"><value>These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.</value></data>
   <data name="Error.IOFailure.Singular" xml:space="preserve"><value>Windows hat einen Dateifehler gemeldet; die Datei wurde an ihrem Platz belassen.</value></data>
   <data name="Error.IOFailure.Plural" xml:space="preserve"><value>Windows hat Dateifehler gemeldet; diese Dateien wurden an ihrem Platz belassen.</value></data>
   <data name="Error.UnknownError.Singular" xml:space="preserve"><value>Bei dieser Datei ist etwas schiefgelaufen; sie wurde an ihrem Platz belassen.</value></data>
   <data name="Error.UnknownError.Plural" xml:space="preserve"><value>Bei diesen Dateien ist etwas schiefgelaufen; sie wurden an ihrem Platz belassen.</value></data>
-  <!-- 0 = shell error code -->
-  <!-- These recovery errors point at the Move feature by its button name ("the
-       Move button") so the suggestion isn't taken as the delete verb, which now
-       also says "moved to the Recycle Bin". -->
-  <!-- The three recycle failures differ in how strongly they point at Move, and
-       that difference is load-bearing. Move is a plain filesystem move that
-       never touches the shell or the bin (MoveFilesService), so: a sharing or
-       lock violation holds the file itself and a move fails identically, so
-       RecycleInUse suggests Move not at all; an access refusal could sit on
-       either the file or the bin, so RecycleAccessDenied says exactly that;
-       and the fallthrough is the codes that are neither, where the pre-delete
-       probe has already recycled a real throwaway file seconds earlier, so the
-       bin demonstrably worked and Move is worth offering. Do not level them. -->
-  <data name="Error.ShellRecycleFailed" xml:space="preserve"><value>Diese Datei konnte nicht in den Papierkorb verschoben werden (Fehler {0}), und InstallerClean kann dir anhand dieses Codes nicht sagen, warum. Die Datei wurde an ihrem Platz belassen. Versuch stattdessen die Schaltfläche „Verschieben“, die den Papierkorb nicht benutzt.</value></data>
-  <data name="Error.RecycleAccessDenied" xml:space="preserve"><value>Windows hat den Zugriff selbst mit Administratorrechten verweigert (Fehler {0}), und InstallerClean kann nicht erkennen, ob das Problem bei der Datei oder beim Papierkorb liegt. Die Datei wurde an ihrem Platz belassen. Die Schaltfläche „Verschieben“ hilft, wenn es am Papierkorb liegt, aber nicht, wenn es an der Datei liegt.</value></data>
-  <data name="Error.RecycleInUse" xml:space="preserve"><value>Diese Datei ist von einem anderen Programm geöffnet oder gesperrt (Fehler {0}), deshalb kann sie im Moment von nichts entfernt werden. Sie wurde an ihrem Platz belassen; versuch es später noch einmal.</value></data>
-  <!-- Shown only when the user did NOT consent to permanent deletion: with
-       consent the file counts as deleted and never reaches the errors list
-       (DeleteFilesService, the PermanentlyDeleted arms). So the reader here
-       never agreed to lose the file, which is why the sentence does not
-       soften. It names Windows as the actor because the app asked the shell
-       to recycle and the shell reported success while psiNewlyCreated came
-       back null, meaning nothing arrived in the bin. No cause is offered: the
-       likely one is the bin's per-drive size limit, but the code cannot tell
-       whether that was it in any given case, and a guessed reason after the
-       file is gone gives the reader nothing to act on. -->
-  <data name="Error.DeletedNotRecycled" xml:space="preserve"><value>Windows hat diese Datei endgültig gelöscht, statt sie in den Papierkorb zu verschieben. InstallerClean hatte den Papierkorb angefordert, Windows hat es anders gemacht. Die Datei ist weg.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Das Verschieben von Dateien in den Windows-Installer-Ordner wird abgelehnt (Ziel: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a
@@ -821,7 +829,8 @@ Details in {1}.</value></data>
        language), then the no-PII property and purpose. The bracketed phrase
        becomes a hyperlink into the README's reports-stats FAQ answer (built
        in ConfirmSendResultLogWindow.xaml.cs), the same [ ]-delimited pattern
-       as MainWindow's "[it won't!]". -->
+       as the main window's completion card uses for its own bracketed
+       phrase. -->
   <data name="ConfirmSendResultLog.Reassurance" xml:space="preserve"><value>Es geht an nofaff.netlify.app/api/result-log. Nichts identifiziert dich oder deinen Rechner; es zeigt mir nur, dass InstallerClean funktioniert und [wie viel Platz die Leute freigeben].</value></data>
   <!-- AutomationProperties.Name on the JSON preview TextBox so screen
        readers announce its content rather than "edit, read-only". The
@@ -924,19 +933,25 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
   <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
   <data name="Cli.DeletingFiles" xml:space="preserve"><value>{0} {1} werden gelöscht...</value></data>
-  <!-- 0 = deleted count, 1 = pluralised noun -->
-  <data name="Cli.DeletedFiles" xml:space="preserve"><value>{0} {1} gelöscht.</value></data>
+  <!-- 0 = deleted count, 1 = pluralised noun. It says "permanently" because
+       an operator who upgraded without reading the release notes gets no other
+       warning that /d stopped using the Recycle Bin, and because the GUI's
+       completion screen says the same words about the same act. -->
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Permanently deleted {0} {1}.</value></data>
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
-       4 = size display, 5 = error count, 6 = pluralised "error"/"errors" -->
-  <data name="Cli.RecycleUnavailable" xml:space="preserve"><value>Fehler: Der Papierkorb ist für dieses Volume nicht verfügbar, daher wurde nichts gelöscht. Nutze /m, um die Dateien stattdessen zu verschieben, oder aktiviere den Papierkorb wieder und führe den Vorgang erneut aus.</value></data>
-  <!-- 0 = mode arg ("/d") -->
+       4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
+       "Recovered" is accurate here now and was not before: the space comes
+       back at the moment of the delete rather than when a bin is emptied. -->
   <data name="Cli.NoMoveDestination" xml:space="preserve"><value>Fehler: Kein Zielordner zum Verschieben angegeben. Nutze /m PFAD. (Ein in der GUI gesetztes Standardziel gilt pro Benutzer und greift nicht bei geplanten oder Dienstkonto-Läufen.)</value></data>
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Fehler: Das Ziel darf nicht im Windows-Installer-Ordner liegen.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Fehler: Das Ziel muss ein vollständig qualifizierter Pfad sein. Erhalten: {0}</value></data>
   <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Fehler: Das Ziel {0} liegt unter einem Windows-Systemordner. Wähle einen Pfad außerhalb von %SystemRoot%, %ProgramFiles% und %ProgramData%.</value></data>
   <!-- 0 = mode, 1 = destination -->
-  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Fehler: Gerade benutzt etwas Windows Installer, normalerweise ein Windows-Update oder ein Programm, das im Hintergrund installiert wird. Verschieben und Löschen sind blockiert, solange das läuft. Versuch es erneut, sobald es fertig ist.</value></data>
+  <!-- Names the flags rather than the GUI's button labels: there are no
+       buttons on a command line, and the reader is looking at the two switches
+       they just typed. -->
+  <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Fehler: Eine frühere Windows-Installer-Transaktion ist auf diesem Rechner ausgesetzt. Setze diese Installation fort oder mach sie rückgängig (oder starte Windows neu), bevor du den Cache aufräumst.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Fehler: Ein für nach dem Neustart eingeplanter Dateivorgang betrifft den Installer-Cache ({0}). Starte Windows neu, um diesen Vorgang abzuschließen, bevor du aufräumst.</value></data>
@@ -1000,14 +1015,17 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        that skip comment lines (less, grep -v, jq pipelines) skip
        the header. Stored as one multi-line block; the C# side reads
        it verbatim and normalises line endings to the host platform. -->
-  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log erfasst unbehandelte Ausnahmen von InstallerClean.
-# Bei erhöhten Rechten können die Ausnahmemeldungen des Frameworks
-# Dateipfade aus der laufenden Sitzung enthalten (einschließlich der
-# von Windows-Installer-Abfragen aufgezählten Profile anderer
-# Benutzer). Netzwerkfehlermeldungen der Update-Prüfung oder des
-# Ergebnisprotokoll-POSTs können die Ziel-URL und die aufgelöste
-# IP-/Proxy-Adresse enthalten. Entferne beide Arten von Details,
-# bevor du diese Datei an einen öffentlichen Fehlerbericht anhängst.
+  <data name="CrashLog.PrivacyHeader" xml:space="preserve"><value># crash.log captures unhandled exceptions from InstallerClean.
+# Under elevation the framework's exception messages can include
+# file paths from the running session (including other users'
+# profiles enumerated by Windows Installer queries). Network-
+# failure messages from the update check or result-log POST can
+# include the destination URL and the resolved IP / proxy address.
+# Entries about unreadable Windows Installer records can include a
+# Windows account SID (S-1-5-21-...) and the product codes of
+# installed software.
+# Redact all three classes of detail before attaching this file to
+# a public bug report.
 </value></data>
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
@@ -1015,8 +1033,8 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Verwendung:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Diese Hilfe anzeigen (auch /?, -h)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Die Version ausgeben (auch -v)</value></data>
-  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Nur scannen - nicht benötigte Dateien</value></data>
-  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Nicht benötigte Dateien in den Papierkorb</value></data>
+  <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Scan only - list unneeded files</value></data>
+  <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Delete unneeded files permanently</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         An den gespeicherten Standardort</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PFAD    An den angegebenen Pfad</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli ist ein echter Konsolenprozess und blockiert die</value></data>

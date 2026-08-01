@@ -2,7 +2,7 @@
 // Dutch (nl) satellite generator for InstallerClean. Copied from
 // gen-strings-template.mjs (the full-resx template) and filled with Dutch.
 // It works FROM THE ENGLISH SOURCE (Strings.resx): it reads the neutral as the
-// structural base, strips ONLY the 21 machine-contract Cli.* keys, replaces the
+// structural base, strips ONLY the 20 machine-contract Cli.* keys, replaces the
 // inner <value> of every other key from the MAP below, appends the satellite-only
 // .One override(s), writes LF/UTF-8 and self-verifies against the neutral.
 //
@@ -78,7 +78,7 @@ const MAP = {
   'Section.Registered.Products': `PRODUCTEN`,
   'Section.Registered.Patches': `PATCHES`,
   'Section.Registered.Details': `PRODUCTGEGEVENS`,
-  'Section.Backup.Folder': `VERPLAATSLOCATIE`,
+  'Section.Backup.Folder': `BACKUP FOLDER`,
   'Section.SayThanks': `ZEG BEDANKT`,
 
   // Field labels
@@ -116,7 +116,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Geef een s_ter op GitHub`,
   'Action.Licence': `Apache 2.0-licentie`,
   'Action.Move': `Ver_plaatsen`,
-  'Action.BackupFolderPlaceholder': `Pad naar de map als je kiest voor Verplaatsen in plaats van Verwijderen`,
+  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
   'Action.OpenReleasePage': `_Releasepagina openen`,
   'Action.Rescan': `Opnieuw _scannen`,
   'Action.ScanAgain': `_Opnieuw scannen`,
@@ -137,7 +137,7 @@ const MAP = {
   'Automation.CloseResult': `Resultaat sluiten en terug naar het hoofdvenster`,
   'Automation.LeaveStarOnGitHub.About': `Geef een ster op github`,
   'Automation.Minimise': `Minimaliseren`,
-  'Automation.ConfirmDelete': `Verwijderen verplaatst de overbodige bestanden naar de Prullenbak. Annuleren sluit het venster zonder te verwijderen.`,
+  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
   'Automation.ConfirmMove': `Verplaatsen zet de overbodige bestanden in de gekozen doelmap. Annuleren laat ze staan waar ze staan.`,
   'Automation.SayThanks': `Zeg bedankt`,
   'Automation.ConfirmSendResultLog': `Verzenden stuurt het getoonde rapport naar No Faff. Annuleren verstuurt niets.`,
@@ -148,11 +148,11 @@ const MAP = {
   'Automation.AutoUpdateCheck.HelpText': `Als dit is aangevinkt, kijkt InstallerClean bij het starten op github of er een nieuwere versie is.`,
   'Automation.UpdateAvailable.HelpText': `Open de releasepagina om de nieuwere versie te downloaden, of annuleer om de huidige versie te houden.`,
   'Automation.Licence.HelpText': `Opent het licentiebestand op github.com in je browser.`,
-  'Automation.Section.BackupFolder': `Verplaatslocatie`,
+  'Automation.Section.BackupFolder': `Backup folder`,
   'Automation.Section.Products': `Producten`,
   'Automation.Section.Patches': `Patches`,
   'Automation.Section.ProductDetails': `Productgegevens`,
-  'Automation.BackupFolder': `Verplaatslocatie`,
+  'Automation.BackupFolder': `Backup folder`,
   'Automation.OperationProgress': `Voortgang van de bewerking`,
   'Automation.RescanInstaller': `{InstallerFolder} opnieuw scannen`,
   'Automation.ScanningProgress': `Voortgang van de scan`,
@@ -179,21 +179,21 @@ const MAP = {
   'Tooltip.Minimise': `Minimaliseren`,
   'Tooltip.SendResultLog': `Dat is aan jou, maar ik zou het op prijs stellen. Er wordt een anonieme samenvatting verstuurd die me alleen laat weten of het werkt en hoeveel ruimte mensen vrijmaken. Op het volgende scherm zie je precies wat er wordt verstuurd voordat je bevestigt.`,
   'Tooltip.SendResultLog.NothingFound': `Dat is aan jou, maar ik zou het op prijs stellen. Er wordt een anonieme samenvatting verstuurd die me alleen laat weten of het werkt. Op het volgende scherm zie je precies wat er wordt verstuurd voordat je bevestigt.`,
-  'Tooltip.Move': `Verplaatst de overbodige bestanden naar de verplaatslocatie.`,
-  'Tooltip.MoveNeedsDestination': `Zet de overbodige bestanden op een veilige plek. De map kies je hierna.`,
-  'Tooltip.Delete': `Verplaatst de overbodige bestanden naar de Prullenbak.`,
+  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `Naam van het onderwerp uit het ingesloten Authenticode-certificaat. Niet gecontroleerd via de certificaatketen.`,
 
   // Body copy
-  'Body.MainExplanation.Lead': `Overbodige bestanden hieronder kun je veilig verwijderen.`,
+  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
   'Body.MainExplanation.Why': `Ze staan in {InstallerFolder}, achtergebleven toen een programma werd verwijderd ({0}), een nieuwere patch een oudere verving ({1}) of de uitgever hem introk ({2}). InstallerClean toont alleen bestanden waarvan Windows zelf aangeeft dat het ermee klaar is.`,
-  'Body.MainExplanation.Action': `Verwijder ze naar de Prullenbak, of gebruik Verplaatsen om een back-up te houden. Zet je de bestanden terug in {InstallerFolder}, dan is alles weer precies zoals het was.`,
+  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
   'Body.NotScanned.Lead': `Nog niets gescand.`,
   'Body.NotScanned.Why': `Klik op Opnieuw scannen om {InstallerFolder} te doorzoeken op installatiebestanden die geen enkel programma nog nodig heeft.`,
   'Body.PendingReboot.Lead': `Deze bestanden kunnen nu niet worden opgeruimd.`,
-  'Body.PendingReboot.MsiExecuteMutex': `Er is op dit moment iets met Windows Installer bezig, meestal een Windows-update of een programma dat op de achtergrond wordt geïnstalleerd. Verplaatsen en Verwijderen staan zolang stil, zodat InstallerClean niet aan de installatiecache komt terwijl die verandert. Zodra het klaar is: opnieuw scannen en ze zijn er weer.`,
-  'Body.PendingReboot.InstallerInProgress': `Een eerdere Windows Installer-transactie is op deze computer opgeschort. Hervat die installatie of draai haar terug (of herstart Windows) voordat je de cache opschoont.`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows heeft voor de volgende herstart een bestandshernoeming in de wachtrij staan die de installatiecache raakt. Herstart Windows voordat je opschoont.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
+  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
   'Body.NoFileSelected': `Selecteer een bestand om de details te zien.`,
   'Body.NoProductSelected': `Selecteer een product om de details te zien.`,
   'Body.NoMetadata': `Geen metadata beschikbaar.`,
@@ -252,8 +252,8 @@ const MAP = {
   'Completion.ReverifyIncomplete': `{0} {1} behouden, omdat de Windows Installer-records bij de herhaalde controle niet volledig konden worden gelezen.`,
   'Completion.MoveCancelledSummary': `{0} van {1} {2} verplaatst voordat je annuleerde.`,
   'Completion.PermanentDeleteCancelledSummary': `{0} van {1} {2} definitief verwijderd voordat je annuleerde.`,
-  'Completion.PermanentDeleteSummary.Singular': `{0} {1} definitief verwijderd. Het is niet in de Prullenbak beland.`,
-  'Completion.PermanentDeleteSummary.Plural': `{0} {1} definitief verwijderd. Ze zijn niet in de Prullenbak beland.`,
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
   'Completion.DonateAsk': `Graag gedaan. Er staat een fooienpot klaar, mocht je je gul voelen.`,
 
   // Summaries
@@ -274,7 +274,7 @@ const MAP = {
   'Confirm.MoveTitle': `{0} {1} verplaatsen ({2})?`,
   'Confirm.MoveDestination': `De bestanden gaan naar:`,
   'Confirm.DeleteTitle': `{0} {1} verwijderen ({2})?`,
-  'Confirm.MoveSameDrive': `Deze map staat op dezelfde schijf, dus het verplaatsen maakt op zichzelf geen ruimte vrij. De ruimte komt terug zodra je de bestanden daaruit verwijdert, of kies een map op een andere schijf.`,
+  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
 
   // Error messages
   'Error.AdminRequiredTitle': `Toegang geweigerd`,
@@ -310,8 +310,8 @@ const MAP = {
   'Error.CandidateOutsideCache': `Dit bestand staat niet direct in de Windows Installer-map; voor de veiligheid geweigerd.`,
   'Error.AccessDenied.Singular': `Windows heeft de toegang tot dit bestand geweigerd; het is blijven staan.`,
   'Error.AccessDenied.Plural': `Windows heeft de toegang tot deze bestanden geweigerd; ze zijn blijven staan.`,
-  'Error.FileInUse.Singular': `Dit bestand is geopend of vergrendeld door een ander programma, dus niets kan het nu verplaatsen. Het is blijven staan; probeer het later opnieuw.`,
-  'Error.FileInUse.Plural': `Deze bestanden zijn geopend of vergrendeld door een ander programma, dus niets kan ze nu verplaatsen. Ze zijn blijven staan; probeer het later opnieuw.`,
+  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
+  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
   'Error.IOFailure.Singular': `Windows meldde een bestandsfout; het bestand is blijven staan.`,
   'Error.IOFailure.Plural': `Windows meldde bestandsfouten; deze bestanden zijn blijven staan.`,
   'Error.UnknownError.Singular': `Er ging iets mis met dit bestand; het is blijven staan.`,
@@ -378,13 +378,13 @@ const MAP = {
   'Display.Elapsed.S': `{0:F1}s`,
   'Display.ElapsedLong.LessThanASecond': `minder dan een seconde`,
   'Display.ElapsedLong.Seconds': `{0:F1} seconden`,
-  'CrashLog.PrivacyHeader': `# crash.log legt onafgevangen fouten van InstallerClean vast.\n# Met verhoogde rechten kunnen de foutmeldingen van het framework\n# bestandspaden uit de lopende sessie bevatten (ook uit profielen van\n# andere gebruikers die Windows Installer-query's doorlopen). Meldingen\n# over netwerkfouten van de updatecontrole of de rapport-POST kunnen de\n# bestemmings-URL en het opgeloste IP-adres of proxyadres bevatten.\n# Haal beide soorten details weg voordat je dit bestand bij een openbaar\n# bugrapport voegt.\n`,
+  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
   'Tooltip.ChangeLanguage': `Taal wijzigen. Het programma start opnieuw.`,
   'Automation.ChangeLanguage': `Taal wijzigen`,
   'Automation.ChangeLanguage.HelpText': `Het programma start opnieuw.`,
 
   // Command-line tool (installerclean-cli): the HUMAN-facing Cli.* keys. The
-  // 21 machine-contract Cli.EventLog* keys (bar Cli.EventLogUnavailable) are NOT
+  // 20 machine-contract Cli.EventLog* keys (bar Cli.EventLogUnavailable) are NOT
   // here and are stripped from the output; they stay English at runtime. In the
   // help lines translate the DESCRIPTION only: keep the command tokens, flags,
   // the {InstallerFolder} token and the exit-code numbers verbatim, keep the
@@ -402,12 +402,12 @@ const MAP = {
   'Cli.FoundOrphans': `{0} {1} gevonden om op te ruimen ({2}).`,
   'Cli.NothingToDo': `Niets te doen.`,
   'Cli.DeletingFiles': `Bezig met verwijderen van {0} {1}...`,
-  'Cli.DeletedFiles': `{0} {1} verwijderd.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
   'Cli.NoMoveDestination': `Fout: geen verplaatsbestemming opgegeven. Gebruik /m PAD. (Een standaard die in de GUI is ingesteld, geldt per gebruiker en niet voor geplande taken of serviceaccounts.)`,
   'Cli.MoveDestinationInsideInstaller': `Fout: de bestemming mag niet in de Windows Installer-map liggen.`,
   'Cli.MoveDestinationRelative': `Fout: de bestemming moet een volledig gekwalificeerd pad zijn. Gekregen: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Fout: de bestemming {0} komt uit onder een Windows-systeemmap. Kies een pad buiten %SystemRoot%, %ProgramFiles% en %ProgramData%.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Fout: er is op dit moment iets met Windows Installer bezig, meestal een Windows-update of een programma dat op de achtergrond wordt geïnstalleerd. Verplaatsen en Verwijderen zijn zolang geblokkeerd. Probeer het opnieuw zodra het klaar is.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Fout: een eerdere Windows Installer-transactie is op deze computer opgeschort. Hervat die installatie of draai haar terug (of herstart Windows) voordat je de cache opschoont.`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Fout: een bestandsbewerking die na de herstart in de wachtrij staat, richt zich op de installatiecache ({0}). Herstart Windows om die bewerking te voltooien voordat je opschoont.`,
   'Cli.MovingFiles': `Bezig met verplaatsen van {0} {1} naar {2}...`,
@@ -418,8 +418,8 @@ const MAP = {
   'Cli.Help.Usage': `Gebruik:`,
   'Cli.Help.Help': `  installerclean-cli --help     Deze hulp tonen (ook /?, -h)`,
   'Cli.Help.Version': `  installerclean-cli --version  De versie tonen (ook -v)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s         Alleen scannen - verwijderbare bestanden`,
-  'Cli.Help.Delete': `  installerclean-cli /d         Verwijderbare bestanden (Prullenbak)`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Naar de opgeslagen standaardlocatie`,
   'Cli.Help.MovePath': `  installerclean-cli /m PAD     Naar het opgegeven pad`,
   'Cli.Help.NoteLine1': `installerclean-cli is een echt consoleproces en blokkeert de prompt`,
@@ -432,11 +432,18 @@ const MAP = {
   'Cli.Help.ExitCodePartial': `  2   gedeeltelijk: sommige bestanden verwerkt, sommige mislukt`,
   'Cli.Help.ExitCodeTransient': `  75  tijdelijk: iets blokkeerde de run (zie de melding)`,
   'Cli.Help.ExitCodeCancelled': `  130 geannuleerd (Ctrl+C)`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 21 machine-contract Cli.* <data> elements BY NAME (the
+// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable): each is matched non-greedy to
 // its own </data>. The human-facing Cli keys are KEPT, and their value is
 // replaced from the MAP like any other key. Same predicate as
@@ -491,7 +498,7 @@ const neutral = parse(readFileSync(BASE, 'utf8'));
 const written = readFileSync(OUT, 'utf8');
 const output = parse(written);
 // Required = everything a satellite must carry: the non-Cli keys plus the
-// human-facing Cli keys. The 21 machine Cli keys are the complement; they must be
+// human-facing Cli keys. The 20 machine Cli keys are the complement; they must be
 // absent from the output (isMachineCliKey is defined up in the strip section).
 const neutralRequired = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
 
@@ -533,7 +540,7 @@ console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length + overrideKeys.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli +',
   overrideKeys.length, 'override)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 21)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
 console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| CRLF:', crlf, '(expect 0)');
 
 // ALSO_KEEP audit roster, so a lazy "force it green" dump is visible at a glance.
@@ -566,6 +573,6 @@ if (untranslated.length) {
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
   !overrideMissing.length && !overrideArityMismatch.length &&
-  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 21 && crlf === 0;
+  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 20 && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

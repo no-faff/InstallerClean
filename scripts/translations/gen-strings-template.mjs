@@ -109,7 +109,7 @@ const MAP = {
   'Section.Registered.Products': `PRODUCTS`,
   'Section.Registered.Patches': `PATCHES`,
   'Section.Registered.Details': `PRODUCT DETAILS`,
-  'Section.Backup.Folder': `MOVE LOCATION`,
+  'Section.Backup.Folder': `BACKUP FOLDER`,
   'Section.SayThanks': `SAY THANKS`,
 
   // Field labels (used in detail panels)
@@ -149,7 +149,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Leave a _star on GitHub`,
   'Action.Licence': `Apache 2.0 licence`,
   'Action.Move': `_Move`,
-  'Action.BackupFolderPlaceholder': `Path to folder if you Move instead of Delete`,
+  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
   'Action.OpenReleasePage': `Open _release page`,
   'Action.Rescan': `_Re-scan`,
   'Action.ScanAgain': `_Scan again`,
@@ -170,7 +170,7 @@ const MAP = {
   'Automation.CloseResult': `Close result and return to main window`,
   'Automation.LeaveStarOnGitHub.About': `Leave a star on github`,
   'Automation.Minimise': `Minimise`,
-  'Automation.ConfirmDelete': `Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting.`,
+  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
   'Automation.ConfirmMove': `Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are.`,
   'Automation.SayThanks': `Say thanks`,
   'Automation.ConfirmSendResultLog': `Send posts the report shown to No Faff. Cancel sends nothing.`,
@@ -181,11 +181,11 @@ const MAP = {
   'Automation.AutoUpdateCheck.HelpText': `If ticked, InstallerClean checks github for a newer version when you run it.`,
   'Automation.UpdateAvailable.HelpText': `Open the release page to download the newer version, or cancel to keep the current version.`,
   'Automation.Licence.HelpText': `Opens the licence file on github.com in your browser.`,
-  'Automation.Section.BackupFolder': `Move location`,
+  'Automation.Section.BackupFolder': `Backup folder`,
   'Automation.Section.Products': `Products`,
   'Automation.Section.Patches': `Patches`,
   'Automation.Section.ProductDetails': `Product details`,
-  'Automation.BackupFolder': `Move location`,
+  'Automation.BackupFolder': `Backup folder`,
   'Automation.OperationProgress': `Operation progress`,
   'Automation.RescanInstaller': `Scan {InstallerFolder} again`,
   'Automation.ScanningProgress': `Scanning progress`,
@@ -212,21 +212,21 @@ const MAP = {
   'Tooltip.Minimise': `Minimise`,
   'Tooltip.SendResultLog': `Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working and how much space people are freeing. The next screen lets you see what will be sent before you confirm.`,
   'Tooltip.SendResultLog.NothingFound': `Up to you but appreciated. Sends an anonymous summary that just lets me know if it's working. The next screen lets you see what will be sent before you confirm.`,
-  'Tooltip.Move': `Move the unneeded files to the Move location.`,
-  'Tooltip.MoveNeedsDestination': `Move the unneeded files somewhere safe. You'll choose the folder next.`,
-  'Tooltip.Delete': `Move the unneeded files to the Recycle Bin.`,
+  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `Subject name from the embedded Authenticode certificate. Not chain-verified.`,
 
   // Body copy
-  'Body.MainExplanation.Lead': `Any unneeded files below are safe to delete.`,
+  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
   'Body.MainExplanation.Why': `They sit in {InstallerFolder}, left behind when a program was uninstalled ({0}), a newer patch replaced one ({1}) or the publisher withdrew it ({2}). InstallerClean only ever lists files Windows itself reports as finished with.`,
-  'Body.MainExplanation.Action': `Delete them to the Recycle Bin, or use Move instead to keep a backup. Putting the files back in {InstallerFolder} returns you to exactly where you started.`,
+  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
   'Body.NotScanned.Lead': `Nothing scanned yet.`,
   'Body.NotScanned.Why': `Press Re-scan to look through {InstallerFolder} for installer files that no program still needs.`,
   'Body.PendingReboot.Lead': `These files can't be cleaned up right now.`,
-  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch the installer cache while it's changing. Once it's done, Re-scan and they come back.`,
-  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache.`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects the Installer cache. Restart Windows before cleaning.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
+  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
   'Body.NoFileSelected': `Select a file to view details.`,
   'Body.NoProductSelected': `Select a product to view details.`,
   'Body.NoMetadata': `No metadata available.`,
@@ -306,8 +306,8 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `Permanently deleted {0} of {1} {2} before you cancelled.`,
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted. It did not go to the Recycle Bin.`,
-  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted. They did not go to the Recycle Bin.`,
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
   'Completion.DonateAsk': `Glad to help. There's a tip jar if you're feeling kind.`,
 
   // Summaries
@@ -342,7 +342,7 @@ const MAP = {
   // 0 = destination path
   'Confirm.MoveDestination': `Files will be moved to:`,
   'Confirm.DeleteTitle': `Delete {0} {1} ({2})?`,
-  'Confirm.MoveSameDrive': `This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead.`,
+  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
 
   // Error messages
   'Error.AdminRequiredTitle': `Access denied`,
@@ -387,8 +387,8 @@ const MAP = {
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows refused access to this file; it was left in place.`,
   'Error.AccessDenied.Plural': `Windows refused access to these files; they were left in place.`,
-  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can move it just now. It was left in place; try again later.`,
-  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can move them just now. They were left in place; try again later.`,
+  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
+  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
   'Error.IOFailure.Singular': `Windows reported a file error; the file was left in place.`,
   'Error.IOFailure.Plural': `Windows reported file errors; these files were left in place.`,
   'Error.UnknownError.Singular': `Something went wrong with this file; it was left in place.`,
@@ -475,7 +475,7 @@ const MAP = {
   'Display.ElapsedLong.Seconds': `{0:F1} seconds`,
 
   // Command-line tool (installerclean-cli): the HUMAN-facing Cli.* keys. The
-  // 21 machine-contract Cli.EventLog* keys (bar Cli.EventLogUnavailable) are NOT
+  // 20 machine-contract Cli.EventLog* keys (bar Cli.EventLogUnavailable) are NOT
   // here and are stripped from the output; they stay English at runtime. In the
   // help lines translate the DESCRIPTION only: keep the command tokens, flags,
   // the {InstallerFolder} token and the exit-code numbers verbatim, keep the
@@ -491,25 +491,25 @@ const MAP = {
   'Cli.FoundOrphans': `Found {0} {1} to clean up ({2}).`,
   'Cli.NothingToDo': `Nothing to do.`,
   'Cli.DeletingFiles': `Deleting {0} {1}...`,
-  'Cli.DeletedFiles': `Deleted {0} {1}.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
   'Cli.NoMoveDestination': `Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)`,
   'Cli.MoveDestinationInsideInstaller': `Error: destination cannot be inside the Windows Installer folder.`,
   'Cli.MoveDestinationRelative': `Error: destination must be a fully qualified path. Got: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are blocked while that runs. Try again once it finishes.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache.`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning.`,
   'Cli.MovingFiles': `Moving {0} {1} to {2}...`,
   'Cli.MovedFiles': `Moved {0} {1}.`,
   'Cli.MutexBlocked': `Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later.`,
   'Cli.EventLogUnavailable': `Note: Event Log writing failed. Check Application log permissions or Group Policy.`,
-  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Redact both classes of detail before attaching this file to a\n# public bug report.\n`,
+  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
   'Cli.Help.Header': `InstallerClean - clean up {InstallerFolder}`,
   'Cli.Help.Usage': `Usage:`,
   'Cli.Help.Help': `  installerclean-cli --help     Show this help (also accepts /?, -h)`,
   'Cli.Help.Version': `  installerclean-cli --version  Print the version (also accepts -v)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list removable files`,
-  'Cli.Help.Delete': `  installerclean-cli /d         Delete removable files (Recycle Bin)`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to saved default location`,
   'Cli.Help.MovePath': `  installerclean-cli /m PATH    Move to specified path`,
   'Cli.Help.NoteLine1': `installerclean-cli is a real console process and blocks the prompt`,
@@ -525,11 +525,18 @@ const MAP = {
   'Tooltip.ChangeLanguage': `Change language. The program will restart.`,
   'Automation.ChangeLanguage': `Change language`,
   'Automation.ChangeLanguage.HelpText': `The program will restart.`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 21 machine-contract Cli.* <data> elements BY NAME (the
+// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable): each is matched non-greedy to
 // its own </data>. The human-facing Cli keys are KEPT, and their value is
 // replaced from the MAP like any other key. Same predicate as
@@ -585,7 +592,7 @@ const neutral = parse(readFileSync(BASE, 'utf8'));
 const written = readFileSync(OUT, 'utf8');
 const output = parse(written);
 // Required = everything a satellite must carry: the non-Cli keys plus the
-// human-facing Cli keys. The 21 machine Cli keys are the complement; they must be
+// human-facing Cli keys. The 20 machine Cli keys are the complement; they must be
 // absent from the output (isMachineCliKey is defined up in the strip section).
 const neutralRequired = [...neutral.keys()].filter((k) => !isMachineCliKey(k));
 
@@ -638,7 +645,7 @@ console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length + overrideKeys.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli +',
   overrideKeys.length, 'override)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 21)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
 console.log('MAP entries:', Object.keys(MAP).length, '| override keys:', overrideKeys.length, '| CRLF:', crlf, '(expect 0)');
 
 // ALSO_KEEP audit roster, so a lazy "force it green" dump is visible at a glance.
@@ -683,7 +690,7 @@ if (IS_TEMPLATE) {
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
   !overrideMissing.length && !overrideArityMismatch.length &&
-  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 21 && crlf === 0;
+  output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === 20 && crlf === 0;
 const ok = structuralOk && (IS_TEMPLATE
   ? !templateDrift.length && !templateLanguageState.length
   : !untranslated.length);

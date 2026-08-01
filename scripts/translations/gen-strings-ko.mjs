@@ -2,7 +2,7 @@
 // Korean (ko) satellite generator for InstallerClean. Copied from
 // gen-strings-template.mjs; only OUT and the MAP values differ. Works FROM THE
 // ENGLISH SOURCE (Strings.resx): replaces each key's inner <value>, strips the
-// 21 machine-contract Cli.EventLog* keys, keeps the human Cli keys, and
+// 20 machine-contract Cli.EventLog* keys, keeps the human Cli keys, and
 // self-verifies against the neutral. Output is LF, UTF-8.
 //
 // Korean plural rule (DisplayHelpers.CategoryFor, case "ko"): PluralCategory
@@ -55,7 +55,7 @@ const MAP = {
   'Section.Registered.Products': `제품`,
   'Section.Registered.Patches': `패치`,
   'Section.Registered.Details': `제품 세부 정보`,
-  'Section.Backup.Folder': `이동 위치`,
+  'Section.Backup.Folder': `BACKUP FOLDER`,
   'Section.SayThanks': `감사 인사`,
 
   // Field labels (used in detail panels)
@@ -95,7 +95,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `GitHub에 별 남기기(_S)`,
   'Action.Licence': `Apache 2.0 라이선스`,
   'Action.Move': `이동(_M)`,
-  'Action.BackupFolderPlaceholder': `삭제 대신 이동할 경우의 폴더 경로`,
+  'Action.BackupFolderPlaceholder': `Path to folder if you move rather than delete.`,
   'Action.OpenReleasePage': `릴리스 페이지 열기(_R)`,
   'Action.Rescan': `다시 검사(_R)`,
   'Action.ScanAgain': `다시 검사(_S)`,
@@ -113,7 +113,7 @@ const MAP = {
   'Automation.CloseResult': `결과를 닫고 메인 창으로 돌아가기`,
   'Automation.LeaveStarOnGitHub.About': `github에 별 남기기`,
   'Automation.Minimise': `최소화`,
-  'Automation.ConfirmDelete': `삭제하면 불필요한 파일이 휴지통으로 이동됩니다. 취소하면 삭제하지 않고 닫습니다.`,
+  'Automation.ConfirmDelete': `Delete permanently removes the unneeded files. Cancel closes without deleting.`,
   'Automation.ConfirmMove': `이동하면 불필요한 파일이 선택한 대상 폴더에 들어갑니다. 취소하면 파일은 있던 자리에 그대로 남습니다.`,
   'Automation.SayThanks': `감사 인사`,
   'Automation.ConfirmSendResultLog': `보내기를 누르면 표시된 보고서가 No Faff에 전송됩니다. 취소하면 아무것도 보내지 않습니다.`,
@@ -121,11 +121,11 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `github의 릴리스 페이지에서 새 버전이 있는지 확인합니다.`,
   'Automation.UpdateAvailable.HelpText': `새 버전을 내려받으려면 릴리스 페이지를 열고, 현재 버전을 유지하려면 취소하세요.`,
   'Automation.Licence.HelpText': `브라우저에서 github.com의 라이선스 파일을 엽니다.`,
-  'Automation.Section.BackupFolder': `이동 위치`,
+  'Automation.Section.BackupFolder': `Backup folder`,
   'Automation.Section.Products': `제품`,
   'Automation.Section.Patches': `패치`,
   'Automation.Section.ProductDetails': `제품 세부 정보`,
-  'Automation.BackupFolder': `이동 위치`,
+  'Automation.BackupFolder': `Backup folder`,
   'Automation.OperationProgress': `작업 진행 상황`,
   'Automation.RescanInstaller': `{InstallerFolder} 다시 검사`,
   'Automation.ScanningProgress': `검사 진행 상황`,
@@ -152,18 +152,18 @@ const MAP = {
   'Tooltip.Minimise': `최소화`,
   'Tooltip.SendResultLog': `보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지와 사람들이 공간을 얼마나 확보하고 있는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.`,
   'Tooltip.SendResultLog.NothingFound': `보내실지는 자유지만 보내 주시면 정말 감사합니다. 익명 요약을 전송하며, 이는 프로그램이 잘 작동하는지 제가 알 수 있게 해 줍니다. 다음 화면에서 확인 전에 보낼 내용을 미리 볼 수 있습니다.`,
-  'Tooltip.Move': `불필요한 파일을 이동 위치로 옮깁니다.`,
-  'Tooltip.MoveNeedsDestination': `불필요한 파일을 안전한 곳으로 옮깁니다. 폴더는 다음 단계에서 선택합니다.`,
-  'Tooltip.Delete': `불필요한 파일을 휴지통으로 이동합니다.`,
+  'Tooltip.Move': `Move the unneeded files to the backup folder. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.MoveNeedsDestination': `Move the unneeded files to a backup folder. You'll choose it next. Delete that folder whenever you're satisfied nothing needs them.`,
+  'Tooltip.Delete': `Delete the unneeded files permanently. They're safe to remove, and you'll reclaim the space straight away.`,
   'Tooltip.SigningCertificate': `내장된 Authenticode 인증서의 주체 이름입니다. 인증서 체인은 검증하지 않았습니다.`,
 
   // Body copy
-  'Body.MainExplanation.Lead': `아래의 불필요한 파일은 안전하게 삭제할 수 있습니다.`,
+  'Body.MainExplanation.Lead': `Any unneeded files below are [safe to delete].`,
   'Body.MainExplanation.Why': `이 파일들은 {InstallerFolder}에 있으며, 프로그램을 제거했거나({0}), 새 패치가 옛 패치를 대체했거나({1}), 게시자가 철회했을 때({2}) 남겨진 것입니다. InstallerClean은 Windows 자체가 다 썼다고 보고하는 파일만 나열합니다.`,
-  'Body.MainExplanation.Action': `휴지통으로 삭제하거나, 백업 복사본을 남기려면 대신 이동을 사용하세요. 파일을 {InstallerFolder}에 다시 넣으면 정확히 원래 상태로 돌아갑니다.`,
-  'Body.PendingReboot.MsiExecuteMutex': `지금 무언가가 Windows Installer를 사용하고 있습니다. 대개 Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램입니다. 그 작업이 실행되는 동안에는 이동과 삭제가 일시 중지되어, InstallerClean이 변경 중인 설치 관리자 캐시를 건드리지 않습니다. 작업이 끝난 뒤 다시 검사하면 두 기능이 돌아옵니다.`,
-  'Body.PendingReboot.InstallerInProgress': `이 컴퓨터에 이전 Windows Installer 트랜잭션이 일시 중단되어 있습니다. 캐시를 정리하기 전에 그 설치를 다시 진행하거나 롤백하세요(또는 Windows를 다시 시작하세요).`,
-  'Body.PendingReboot.PendingRenameInCache': `Windows가 다음 다시 시작 때 실행할 파일 이름 바꾸기 작업을 예약해 두었고, 이는 설치 관리자 캐시에 영향을 줍니다. 정리하기 전에 Windows를 다시 시작하세요.`,
+  'Body.MainExplanation.Action': `Delete them permanently, or move them to a backup folder until you're satisfied nothing needs them. Put them back into {InstallerFolder} and everything is restored.`,
+  'Body.PendingReboot.MsiExecuteMutex': `Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.`,
+  'Body.PendingReboot.InstallerInProgress': `A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Body.PendingReboot.PendingRenameInCache': `Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.`,
   'Body.NoFileSelected': `세부 정보를 보려면 파일을 선택하세요.`,
   'Body.NoProductSelected': `세부 정보를 보려면 제품을 선택하세요.`,
   'Body.NoMetadata': `사용할 수 있는 메타데이터가 없습니다.`,
@@ -238,8 +238,8 @@ const MAP = {
   // 0 = deleted count, 1 = pluralised noun
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.PermanentDeleteSummary.Singular': `{1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다.`,
-  'Completion.PermanentDeleteSummary.Plural': `{1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다.`,
+  'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted`,
+  'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `아직 필요한 파일 {0}개`,
@@ -306,8 +306,8 @@ const MAP = {
   // plural = the heading the completion overlay puts over a list of filenames.
   'Error.AccessDenied.Singular': `Windows가 이 파일에 대한 접근을 거부했습니다. 파일은 그대로 두었습니다.`,
   'Error.AccessDenied.Plural': `Windows가 이 파일들에 대한 접근을 거부했습니다. 파일은 그대로 두었습니다.`,
-  'Error.FileInUse.Singular': `이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다. 그래서 지금은 무엇으로도 이동할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도해 보세요.`,
-  'Error.FileInUse.Plural': `이 파일들이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다. 그래서 지금은 무엇으로도 이동할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도해 보세요.`,
+  'Error.FileInUse.Singular': `This file is open or locked by another program, so nothing can remove it just now. It was left in place; try again later.`,
+  'Error.FileInUse.Plural': `These files are open or locked by another program, so nothing can remove them just now. They were left in place; try again later.`,
   'Error.IOFailure.Singular': `Windows가 파일 오류를 알렸습니다. 파일은 그대로 두었습니다.`,
   'Error.IOFailure.Plural': `Windows가 파일 오류를 알렸습니다. 이 파일들은 그대로 두었습니다.`,
   'Error.UnknownError.Singular': `이 파일에서 문제가 발생했습니다. 파일은 그대로 두었습니다.`,
@@ -391,7 +391,7 @@ const MAP = {
   'Display.Elapsed.S': `{0:F1}s`,
   'Display.ElapsedLong.LessThanASecond': `1초 미만`,
   'Display.ElapsedLong.Seconds': `{0:F1}초`,
-  'CrashLog.PrivacyHeader': `# crash.log는 InstallerClean의 처리되지 않은 예외를 기록합니다.\n# 권한 상승 상태에서는 프레임워크의 예외 메시지에 현재\n# 세션의 파일 경로(Windows Installer 쿼리로 열거된 다른\n# 사용자의 프로필 포함)가 들어갈 수 있습니다. 업데이트 확인\n# 이나 결과 로그 POST의 네트워크 실패 메시지에는 대상 URL과\n# 확인된 IP / 프록시 주소가 포함될 수 있습니다. 이 파일을\n# 공개 버그 신고에 첨부하기 전에 두 종류의 정보를 모두\n# 삭제하세요.\n`,
+  'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
   'Tooltip.ChangeLanguage': `언어를 변경합니다. 프로그램이 다시 시작됩니다.`,
   'Automation.ChangeLanguage': `언어 변경`,
   'Automation.ChangeLanguage.HelpText': `프로그램이 다시 시작됩니다.`,
@@ -409,12 +409,12 @@ const MAP = {
   'Cli.FoundOrphans': `정리할 {1} {0}개를 찾았습니다 ({2}).`,
   'Cli.NothingToDo': `수행할 작업이 없습니다.`,
   'Cli.DeletingFiles': `{1} {0}개를 삭제하는 중...`,
-  'Cli.DeletedFiles': `{1} {0}개를 삭제했습니다.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
   'Cli.NoMoveDestination': `오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하세요. (GUI에서 설정한 기본값은 사용자별로 저장되므로, 예약된 작업이나 서비스 계정 실행에는 적용되지 않습니다.)`,
   'Cli.MoveDestinationInsideInstaller': `오류: 대상은 Windows Installer 폴더 안에 있을 수 없습니다.`,
   'Cli.MoveDestinationRelative': `오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0}`,
   'Cli.MoveDestinationInSystemFolder': `오류: 지정한 대상이 Windows 시스템 폴더 아래로 해석됩니다 ({0}). %SystemRoot%, %ProgramFiles%, %ProgramData% 밖의 경로를 선택하세요.`,
-  'Cli.PendingRebootBlocked.MsiExecuteMutex': `오류: 지금 무언가가 Windows Installer를 사용하고 있습니다. 대개 Windows 업데이트이거나 백그라운드에서 설치 중인 프로그램입니다. 그 작업이 실행되는 동안에는 이동과 삭제가 차단됩니다. 작업이 끝나면 다시 시도하세요.`,
+  'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `오류: 이 컴퓨터에 이전 Windows Installer 트랜잭션이 일시 중단되어 있습니다. 캐시를 정리하기 전에 그 설치를 다시 진행하거나 롤백하세요(또는 Windows를 다시 시작하세요).`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `오류: 다시 시작 후 실행되도록 예약된 파일 작업이 설치 관리자 캐시를 대상으로 합니다 ({0}). 정리하기 전에 Windows를 다시 시작하여 그 작업을 완료하세요.`,
   'Cli.MovingFiles': `{1} {0}개를 {2}(으)로 이동하는 중...`,
@@ -425,8 +425,8 @@ const MAP = {
   'Cli.Help.Usage': `사용법:`,
   'Cli.Help.Help': `  installerclean-cli --help     이 도움말 표시 (/?, -h도 사용 가능)`,
   'Cli.Help.Version': `  installerclean-cli --version  버전 출력 (-v도 사용 가능)`,
-  'Cli.Help.ScanOnly': `  installerclean-cli /s         검사만 - 불필요한 파일 나열`,
-  'Cli.Help.Delete': `  installerclean-cli /d         불필요한 파일 삭제 (휴지통)`,
+  'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
+  'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         저장된 기본 위치로 이동`,
   'Cli.Help.MovePath': `  installerclean-cli /m 경로    지정한 경로로 이동`,
   'Cli.Help.NoteLine1': `installerclean-cli는 실제 콘솔 프로세스로, 명령 프롬프트를 점유하며,`,
@@ -440,7 +440,7 @@ const MAP = {
   'Cli.Help.ExitCodeCancelled': `  130 취소됨 (Ctrl+C)`,
   'Body.NotScanned.Lead': `아직 검사하지 않았습니다.`,
   'Body.NotScanned.Why': `다시 검사를 눌러 {InstallerFolder}에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요.`,
-  'Confirm.MoveSameDrive': `이 폴더는 같은 드라이브에 있어, 이동만으로는 공간이 확보되지 않습니다. 옮긴 파일을 그 폴더에서 삭제하면 공간이 확보되고, 아니면 다른 드라이브에 있는 폴더를 대신 선택할 수도 있습니다.`,
+  'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
   'Error.ScanCorrelationFailed': `InstallerClean이 이번 검사를 Windows Installer 기록과 맞춰 볼 수 없었습니다. Windows가 여전히 필요하다고 올려 둔 파일은 모두 {InstallerFolder}에 없고, 그 폴더에 실제로 있는 파일은 어떤 기록과도 일치하지 않습니다. 실제 컴퓨터가 이런 모습일 리 없으므로, 이는 안전하게 제거할 수 있는 파일이 아니라 기록을 읽는 데 생긴 문제를 가리킵니다. 정리 대상으로 아무것도 제시하지 않았고 아무것도 제거되지 않았습니다.`,
   'Error.CandidateOutsideCache': `이 파일은 Windows Installer 폴더 바로 아래에 있지 않습니다. 안전을 위해 거부했습니다.`,
   'Completion.ReverifySkipped': `{1} {0}개는 검사 이후 어떤 프로그램이 다시 필요로 하게 되어 그대로 두었습니다.`,
@@ -463,11 +463,18 @@ const MAP = {
   'Automation.About.Guide.HelpText': `브라우저에서 github의 readme를 엽니다.`,
   'Automation.About.ReportProblem.HelpText': `브라우저에서 github.com의 이슈 트래커를 엽니다.`,
   'Automation.AutoUpdateCheck.HelpText': `선택하면 InstallerClean이 실행할 때 github에서 새 버전이 있는지 확인합니다.`,
+  'Tooltip.MoveSameDrive': `Move the unneeded files to the backup folder. It's on the same drive, so you won't reclaim the space until you delete that folder or move it to another drive. You can do that whenever you're satisfied nothing needs them.`,
+  'Completion.MoveRestoreHint.Singular': `The file in that folder is [safe to remove], so delete the folder whenever you want. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHint.Plural': `The files in that folder are [safe to remove], so delete it whenever you want. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Singular': `The file in that folder is [safe to remove], so delete the folder or move it to another drive whenever you want to actually reclaim the space. Until then, you can put it back into {InstallerFolder} if a program ever turns out to need it (extremely unlikely).`,
+  'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
+  'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
 
-// Remove ONLY the 21 machine-contract Cli.* <data> elements BY NAME (the
+// Remove ONLY the 20 machine-contract Cli.* <data> elements BY NAME (the
 // Cli.EventLog* set bar Cli.EventLogUnavailable).
 const isMachineCliKey = (k) =>
   k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
@@ -527,7 +534,7 @@ const nonCliRequired = neutralRequired.filter((k) => !k.startsWith('Cli.')).leng
 console.log('translatable <data> in output:', output.size,
   '(expect', neutralRequired.length,
   '=', nonCliRequired, 'non-Cli +', neutralRequired.length - nonCliRequired, 'Cli)');
-console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 21)');
+console.log('machine Cli <data> removed:', cliMachineRemoved, '(expect 20)');
 console.log('MAP entries:', Object.keys(MAP).length, '| CRLF:', crlf, '(expect 0)');
 
 if (alsoKeep.size) {
@@ -556,6 +563,6 @@ if (untranslated.length) {
 
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
-  output.size === neutralRequired.length && cliMachineRemoved === 21 && crlf === 0;
+  output.size === neutralRequired.length && cliMachineRemoved === 20 && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');
