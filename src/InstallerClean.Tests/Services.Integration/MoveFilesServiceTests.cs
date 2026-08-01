@@ -39,6 +39,31 @@ public class MoveFilesServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task MoveFilesAsync_keeps_a_file_it_cannot_place_and_does_not_say_where_it_is()
+    {
+        // The file must still be kept: this is the containment invariant
+        // SECURITY.md is written against, and Refused and Unproven both refuse
+        // to touch the file. What changes is the sentence, because with a root
+        // the kernel never expanded, "this file is not directly inside the
+        // Windows Installer folder" states the outcome of a comparison that
+        // could not be made.
+        var unmounted = Helpers.TestHost.FirstUnmountedDriveLetter();
+        if (unmounted is null)
+            return; // every letter is in use on this host
+
+        var file = Path.Combine(_sourceDir, "resolves-fine.msi");
+        await File.WriteAllTextAsync(file, "content");
+
+        var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(),
+            $@"{unmounted}:\Windows\Installer");
+        var result = await svc.MoveFilesAsync(new[] { file }, _destDir);
+
+        Assert.Equal(0, result.MovedCount);
+        Assert.True(File.Exists(file), "An unproven verdict keeps the file exactly as a refusal does");
+        Assert.IsType<InstallerClean.Models.UnknownError>(Assert.Single(result.Errors));
+    }
+
+    [Fact]
     public async Task MoveFilesAsync_reports_what_it_moved_when_the_destination_is_swapped()
     {
         // The per-iteration re-resolve exists to catch a destination relabelled

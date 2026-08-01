@@ -85,9 +85,19 @@ internal static class CandidateGuard
         if (!InstallerCacheHelpers.TryResolveFinalPath(path, out var resolved))
             return RemovalSafety.Unproven;
 
-        return InstallerCacheHelpers.ResolvesDirectlyInInstallerFolder(resolved, root)
-            ? RemovalSafety.Safe
-            : RemovalSafety.Refused;
+        if (InstallerCacheHelpers.ResolvesDirectlyInInstallerFolder(resolved, root))
+            return RemovalSafety.Safe;
+
+        // The file is kept either way, and that is not what this decides. It
+        // decides which sentence the user is shown for keeping it, and a
+        // mismatch against a root the kernel never expanded has not shown the
+        // file to be anywhere: a fully resolved candidate cannot match an
+        // unexpanded root however legitimately it sits in the folder, so
+        // "refused, this file is not directly inside the Windows Installer
+        // folder" would name a cause from a comparison that never happened. The
+        // root's own resolution is the only thing that failed, so Unproven says
+        // what is true and the user is told the check could not be made.
+        return root.Proven ? RemovalSafety.Refused : RemovalSafety.Unproven;
     }
 
 }

@@ -152,6 +152,25 @@ public class InstallerCacheHelpersResolveTests
     }
 
     [Fact]
+    public void CheckSafeToRemove_reports_Unproven_when_the_ROOT_could_not_be_resolved()
+    {
+        // Nothing about the file is in doubt here: it resolves. The ROOT does
+        // not, and a fully resolved candidate cannot match an unexpanded root
+        // however legitimately it sits in the folder, so the comparison never
+        // took place and "this file is outside the cache" would be a cause
+        // nothing showed. The file is kept either way, which is the invariant
+        // this must not touch; only the sentence the user reads changes.
+        var unmounted = TestHost.FirstUnmountedDriveLetter();
+        if (unmounted is null)
+            return; // every letter is in use on this host
+
+        var root = InstallerCacheRoot.Resolve($@"{unmounted}:\Windows\Installer");
+
+        Assert.Equal(CandidateGuard.RemovalSafety.Unproven,
+            CandidateGuard.CheckSafeToRemove(Path.Combine(Path.GetTempPath(), "resolves-fine.msi"), root));
+    }
+
+    [Fact]
     public void CheckSafeToRemove_reports_Refused_for_a_path_outside_the_cache()
     {
         // The other arm, so the test above is not passing merely because
