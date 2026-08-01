@@ -48,7 +48,7 @@ const MAP = {
   'Section.Registered.Products': `ПРОДУКТЫ`,
   'Section.Registered.Patches': `ИСПРАВЛЕНИЯ`,
   'Section.Registered.Details': `СВЕДЕНИЯ О ПРОДУКТЕ`,
-  'Section.Move.Location': `ПАПКА ДЛЯ ПЕРЕМЕЩЕНИЯ`,
+  'Section.Backup.Folder': `ПАПКА ДЛЯ ПЕРЕМЕЩЕНИЯ`,
   'Section.SayThanks': `ПОБЛАГОДАРИТЬ`,
 
   // Field labels (used in detail panels)
@@ -91,7 +91,7 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Поставить з_везду на GitHub`,
   'Action.Licence': `Лицензия Apache 2.0`,
   'Action.Move': `_Переместить`,
-  'Action.MoveDestinationPlaceholder': `Путь к папке, если вы выберете «Переместить» вместо «Удалить»`,
+  'Action.BackupFolderPlaceholder': `Путь к папке, если вы выберете «Переместить» вместо «Удалить»`,
   'Action.OpenReleasePage': `Открыть страницу _выпуска`,
   // Rescan takes Alt+в (not the natural Alt+П): П collides with Move (Переместить) in the
   // results view, where Move is the primary action and keeps П; С is taken by ScanAgain
@@ -120,11 +120,11 @@ const MAP = {
   'Automation.CheckForUpdates.HelpText': `Проверяет на странице выпусков github, есть ли более новая версия.`,
   'Automation.UpdateAvailable.HelpText': `Откройте страницу выпуска, чтобы скачать более новую версию, или нажмите «Отмена», чтобы оставить текущую.`,
   'Automation.Licence.HelpText': `Открывает файл лицензии на github.com в вашем браузере.`,
-  'Automation.Section.MoveLocation': `Папка для перемещения`,
+  'Automation.Section.BackupFolder': `Папка для перемещения`,
   'Automation.Section.Products': `Продукты`,
   'Automation.Section.Patches': `Исправления`,
   'Automation.Section.ProductDetails': `Сведения о продукте`,
-  'Automation.MoveDestinationFolder': `Папка для перемещения`,
+  'Automation.BackupFolder': `Папка для перемещения`,
   'Automation.OperationProgress': `Ход операции`,
   'Automation.RescanInstaller': `Сканировать {InstallerFolder} заново`,
   'Automation.ScanningProgress': `Ход сканирования`,

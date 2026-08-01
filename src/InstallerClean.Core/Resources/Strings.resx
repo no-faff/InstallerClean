@@ -93,7 +93,7 @@
   <data name="Section.Registered.Products" xml:space="preserve"><value>PRODUCTS</value></data>
   <data name="Section.Registered.Patches" xml:space="preserve"><value>PATCHES</value></data>
   <data name="Section.Registered.Details" xml:space="preserve"><value>PRODUCT DETAILS</value></data>
-  <data name="Section.Move.Location" xml:space="preserve"><value>BACKUP FOLDER</value></data>
+  <data name="Section.Backup.Folder" xml:space="preserve"><value>BACKUP FOLDER</value></data>
   <data name="Section.SayThanks" xml:space="preserve"><value>SAY THANKS</value></data>
 
   <!-- Field labels (used in detail panels) -->
@@ -146,7 +146,7 @@
        because the capitals made the two words button names. "Rather than"
        takes both verbs in the same form, so they stay parallel. The button
        carries "permanently"; repeating it here would dangle on the clause. -->
-  <data name="Action.MoveDestinationPlaceholder" xml:space="preserve"><value>Path to folder if you move rather than delete.</value></data>
+  <data name="Action.BackupFolderPlaceholder" xml:space="preserve"><value>Path to folder if you move rather than delete.</value></data>
   <data name="Action.OpenReleasePage" xml:space="preserve"><value>Open _release page</value></data>
   <data name="Action.Rescan" xml:space="preserve"><value>_Re-scan</value></data>
   <data name="Action.ScanAgain" xml:space="preserve"><value>_Scan again</value></data>
@@ -257,7 +257,7 @@
        DETAILS). Narrator at default verbosity spells short uppercase
        tokens letter-by-letter; the override gives it a phrase to read
        while the visible text stays uppercased for SmallCaps. -->
-  <data name="Automation.Section.MoveLocation" xml:space="preserve"><value>Backup folder</value></data>
+  <data name="Automation.Section.BackupFolder" xml:space="preserve"><value>Backup folder</value></data>
   <data name="Automation.Section.Products" xml:space="preserve"><value>Products</value></data>
   <data name="Automation.Section.Patches" xml:space="preserve"><value>Patches</value></data>
   <data name="Automation.Section.ProductDetails" xml:space="preserve"><value>Product details</value></data>
@@ -265,8 +265,8 @@
        the BACKUP FOLDER label directly above it, so a screen reader names
        the field the way the label does and voice control can reach it by
        the words on screen; it stays identical to
-       Automation.Section.MoveLocation in every language. -->
-  <data name="Automation.MoveDestinationFolder" xml:space="preserve"><value>Backup folder</value></data>
+       Automation.Section.BackupFolder in every language. -->
+  <data name="Automation.BackupFolder" xml:space="preserve"><value>Backup folder</value></data>
   <data name="Automation.OperationProgress" xml:space="preserve"><value>Operation progress</value></data>
   <data name="Automation.RescanInstaller" xml:space="preserve"><value>Scan {InstallerFolder} again</value></data>
   <data name="Automation.ScanningProgress" xml:space="preserve"><value>Scanning progress</value></data>
@@ -641,8 +641,8 @@
        "But" and not "and": offering the backup concedes something to the
        sentence before it. "The Move button", not bare "Move", so "use Move"
        is read as a button and not as a second verb in the same sentence. -->
-  <data name="Confirm.DeleteToRecycleBin.Singular" xml:space="preserve"><value>This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
-  <data name="Confirm.DeleteToRecycleBin.Plural" xml:space="preserve"><value>Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
+  <data name="Confirm.DeletePermanently.Singular" xml:space="preserve"><value>This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
+  <data name="Confirm.DeletePermanently.Plural" xml:space="preserve"><value>Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.</value></data>
   <!-- Shown on the Move confirmation only when the destination sits on the
        same drive as the installer cache. That move is a rename: it frees
        nothing until the user deletes the parked copies themselves, and the only

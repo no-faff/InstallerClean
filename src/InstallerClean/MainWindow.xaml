@@ -366,9 +366,9 @@
                 </Grid.RowDefinitions>
 
                 <!-- Move location label -->
-                <TextBlock Grid.Row="0" Text="{loc:Translate Section.Move.Location}"
+                <TextBlock Grid.Row="0" Text="{loc:Translate Section.Backup.Folder}"
                            Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
-                           AutomationProperties.Name="{loc:Translate Automation.Section.MoveLocation}"/>
+                           AutomationProperties.Name="{loc:Translate Automation.Section.BackupFolder}"/>
 
                 <!-- Move destination -->
                 <Grid Grid.Row="2">
@@ -394,9 +394,9 @@
                              Text="{Binding Cleanup.MoveDestination, Mode=TwoWay,
                                             UpdateSourceTrigger=PropertyChanged}"
                              MaxLength="8192"
-                             Tag="{loc:Translate Action.MoveDestinationPlaceholder}"
-                             AutomationProperties.Name="{loc:Translate Automation.MoveDestinationFolder}"
-                             AutomationProperties.HelpText="{loc:Translate Action.MoveDestinationPlaceholder}"/>
+                             Tag="{loc:Translate Action.BackupFolderPlaceholder}"
+                             AutomationProperties.Name="{loc:Translate Automation.BackupFolder}"
+                             AutomationProperties.HelpText="{loc:Translate Action.BackupFolderPlaceholder}"/>
 
                     <Button Grid.Column="2" Style="{StaticResource GhostPill}" Padding="12,8"
                             Content="{loc:Translate Action.Browse}" Command="{Binding Cleanup.BrowseDestinationCommand}"/>

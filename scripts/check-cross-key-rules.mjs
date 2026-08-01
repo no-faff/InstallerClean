@@ -49,7 +49,7 @@ const MUST_AGREE = [
   { label: 'Section.Registered.Products', name: 'Automation.Section.Products' },
   { label: 'Section.Registered.Patches', name: 'Automation.Section.Patches' },
   { label: 'Section.Registered.Details', name: 'Automation.Section.ProductDetails' },
-  { label: 'Section.Move.Location', name: 'Automation.Section.MoveLocation' },
+  { label: 'Section.Backup.Folder', name: 'Automation.Section.BackupFolder' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -74,7 +74,7 @@ const DIFFERS_ON_PURPOSE = new Set([
   // A field whose visible text is a value, named for the field it holds. The
   // Field.* keys label the details panes' values; Window.Main.Title names the
   // About window's version box, whose text is the version.
-  'Automation.MoveDestinationFolder',
+  'Automation.BackupFolder',
   'Automation.CompletionErrors',
   'Window.Main.Title',
   'Field.Application', 'Field.Author', 'Field.Comment', 'Field.FileSize',

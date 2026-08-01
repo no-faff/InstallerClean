@@ -63,6 +63,7 @@ public static class Strings
     public static string About_Link_Guide => Get("About.Link.Guide");
     public static string About_Link_ReportProblem => Get("About.Link.ReportProblem");
     public static string Action_About => Get("Action.About");
+    public static string Action_BackupFolderPlaceholder => Get("Action.BackupFolderPlaceholder");
     public static string Action_Browse => Get("Action.Browse");
     public static string Action_BuyMeACuppa => Get("Action.BuyMeACuppa");
     public static string Action_Cancel => Get("Action.Cancel");
@@ -76,7 +77,6 @@ public static class Strings
     public static string Action_LeaveStarOnGitHub => Get("Action.LeaveStarOnGitHub");
     public static string Action_Licence => Get("Action.Licence");
     public static string Action_Move => Get("Action.Move");
-    public static string Action_MoveDestinationPlaceholder => Get("Action.MoveDestinationPlaceholder");
     public static string Action_OpenReleasePage => Get("Action.OpenReleasePage");
     public static string Action_Paste => Get("Action.Paste");
     public static string Action_Rescan => Get("Action.Rescan");
@@ -87,6 +87,7 @@ public static class Strings
     public static string Automation_About_Guide_HelpText => Get("Automation.About.Guide.HelpText");
     public static string Automation_About_ReportProblem_HelpText => Get("Automation.About.ReportProblem.HelpText");
     public static string Automation_AutoUpdateCheck_HelpText => Get("Automation.AutoUpdateCheck.HelpText");
+    public static string Automation_BackupFolder => Get("Automation.BackupFolder");
     public static string Automation_BuyMeACuppa => Get("Automation.BuyMeACuppa");
     public static string Automation_BuyMeACuppa_About => Get("Automation.BuyMeACuppa.About");
     public static string Automation_CancelOperation => Get("Automation.CancelOperation");
@@ -106,7 +107,6 @@ public static class Strings
     public static string Automation_LeaveStarOnGitHub_About => Get("Automation.LeaveStarOnGitHub.About");
     public static string Automation_Licence_HelpText => Get("Automation.Licence.HelpText");
     public static string Automation_Minimise => Get("Automation.Minimise");
-    public static string Automation_MoveDestinationFolder => Get("Automation.MoveDestinationFolder");
     public static string Automation_OperationProgress => Get("Automation.OperationProgress");
     public static string Automation_RegisteredMissingSeeAlso => Get("Automation.RegisteredMissingSeeAlso");
     public static string Automation_RescanInstaller => Get("Automation.RescanInstaller");
@@ -118,7 +118,7 @@ public static class Strings
     public static string Automation_Scroll_FileDetails => Get("Automation.Scroll.FileDetails");
     public static string Automation_Scroll_ResultDetails => Get("Automation.Scroll.ResultDetails");
     public static string Automation_Scroll_ScanResults => Get("Automation.Scroll.ScanResults");
-    public static string Automation_Section_MoveLocation => Get("Automation.Section.MoveLocation");
+    public static string Automation_Section_BackupFolder => Get("Automation.Section.BackupFolder");
     public static string Automation_Section_Patches => Get("Automation.Section.Patches");
     public static string Automation_Section_ProductDetails => Get("Automation.Section.ProductDetails");
     public static string Automation_Section_Products => Get("Automation.Section.Products");
@@ -232,9 +232,9 @@ public static class Strings
     public static string Completion_PermanentDeleteSummary_Singular => Get("Completion.PermanentDeleteSummary.Singular");
     public static string Completion_ReverifyIncomplete => Get("Completion.ReverifyIncomplete");
     public static string Completion_ReverifySkipped => Get("Completion.ReverifySkipped");
+    public static string Confirm_DeletePermanently_Plural => Get("Confirm.DeletePermanently.Plural");
+    public static string Confirm_DeletePermanently_Singular => Get("Confirm.DeletePermanently.Singular");
     public static string Confirm_DeleteTitle => Get("Confirm.DeleteTitle");
-    public static string Confirm_DeleteToRecycleBin_Plural => Get("Confirm.DeleteToRecycleBin.Plural");
-    public static string Confirm_DeleteToRecycleBin_Singular => Get("Confirm.DeleteToRecycleBin.Singular");
     public static string Confirm_MoveDestination => Get("Confirm.MoveDestination");
     public static string Confirm_MoveSameDrive => Get("Confirm.MoveSameDrive");
     public static string Confirm_MoveTitle => Get("Confirm.MoveTitle");
@@ -327,7 +327,7 @@ public static class Strings
     public static string ResultLog_NothingToSend => Get("ResultLog.NothingToSend");
     public static string ResultLog_Sending => Get("ResultLog.Sending");
     public static string ResultLog_Sent => Get("ResultLog.Sent");
-    public static string Section_Move_Location => Get("Section.Move.Location");
+    public static string Section_Backup_Folder => Get("Section.Backup.Folder");
     public static string Section_Registered_Details => Get("Section.Registered.Details");
     public static string Section_Registered_Patches => Get("Section.Registered.Patches");
     public static string Section_Registered_Products => Get("Section.Registered.Products");

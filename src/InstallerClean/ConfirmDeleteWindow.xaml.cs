@@ -44,9 +44,9 @@ public partial class ConfirmDeleteWindow : Window
     private void BuildBodyLine(int fileCount)
     {
         var raw = DisplayHelpers.Pluralise(fileCount,
-            Strings.Confirm_DeleteToRecycleBin_Singular,
-            Strings.Confirm_DeleteToRecycleBin_Plural,
-            "Confirm.DeleteToRecycleBin");
+            Strings.Confirm_DeletePermanently_Singular,
+            Strings.Confirm_DeletePermanently_Plural,
+            "Confirm.DeletePermanently");
         BodyText.Inlines.Clear();
 
         if (CompositionParsing.SplitAtBracketedPhrase(raw) is not { } split)
