@@ -56,8 +56,7 @@ public sealed class MoveFilesService : IMoveFilesService
             // GetFinalPathNameByHandle, twice over, and a mapped drive or a UNC
             // share that has gone away stalls each one for the SMB timeout with
             // the operating overlay already up and its Cancel button
-            // unpressable. They throw rather than returning, so the exception
-            // surfaces at the caller's await, where both callers catch it.
+            // unpressable.
 
             // Reject relative destinations: Path.GetFullPath would otherwise
             // resolve them against the process CWD, and the CLI host's CWD
@@ -333,21 +332,17 @@ public sealed class MoveFilesService : IMoveFilesService
     /// file is unable to be deleted, the function succeeds leaving the source
     /// file intact." A read-only source is exactly that case, DeleteFile being
     /// documented to fail with ERROR_ACCESS_DENIED on one, and a file another
-    /// program holds open without FILE_SHARE_DELETE is a second. So the batch
-    /// counts a file as moved while the user has the original in
-    /// C:\Windows\Installer and a copy in their backup folder, and is told it
-    /// worked. Same-drive moves never reach this state: a rename either
-    /// happens or throws.
+    /// program holds open without FILE_SHARE_DELETE is a second. Same-drive
+    /// moves never reach this state: a rename either happens or throws.
     ///
     /// Checked after the fact rather than pre-empted, because pre-clearing the
     /// attribute would mutate sources that never needed it and would need a
     /// same-volume test that cannot be had: a mount point inside one drive
     /// letter falls back to copy-and-delete like any other volume boundary.
     ///
-    /// Clearing the read-only bit is safe here for the same reasons it is on the
-    /// delete path: the file has passed the reparse refusal and the containment
-    /// guard, and the user has confirmed the move. Finishing the delete gives
-    /// them what they asked for rather than the duplicate this exists to prevent.
+    /// Clearing the read-only bit is safe here for the reasons the delete path's
+    /// own comment sets out: the same two gates passed, the same confirmed
+    /// intent.
     /// </summary>
     private FileOperationError? ReconcileMove(string sourcePath, string destPath, PerItemFailureLog failureLog)
     {
@@ -384,15 +379,13 @@ public sealed class MoveFilesService : IMoveFilesService
     /// because it needs a destination that accepts a create and refuses a
     /// delete, which the write probe has already had to pass.
     ///
-    /// The copy of a read-only source is read-only too, CopyFile carrying the
-    /// attributes across, so it is cleared before the delete or this leaves the
-    /// duplicate it exists to prevent. Safe on this file above any other: this
-    /// process wrote it seconds ago at a name it chose.
+    /// CopyFile carries the source's attributes across, so the copy of a
+    /// read-only source is read-only and the attribute has to come off before
+    /// the delete. Safe on this file above any other: this process wrote it
+    /// seconds ago at a name it chose.
     ///
-    /// Nothing checks that what sits at destPath is still that file, and the
-    /// absence is deliberate: any identity check is itself racy, the window is
-    /// milliseconds, and the folder is the one the user nominated for this
-    /// operation.
+    /// No check that what sits at destPath is still that file, deliberately:
+    /// any identity check is itself racy and the window is milliseconds.
     /// </summary>
     private void DiscardDestinationCopy(string destPath, PerItemFailureLog failureLog)
     {
@@ -410,9 +403,6 @@ public sealed class MoveFilesService : IMoveFilesService
     }
 
     /// <summary>
-    /// Clears the read-only attribute, and only that attribute, on a file whose
-    /// deletion has to go through. Does nothing to a file that is not read-only,
-    /// which is the ordinary permissions refusal and has nothing here to fix.
     /// Throws are the caller's: this is one step of an operation that fails
     /// closed as a whole.
     /// </summary>
@@ -424,8 +414,8 @@ public sealed class MoveFilesService : IMoveFilesService
     }
 
     /// <summary>
-    /// The one place a framework exception becomes a user-visible category, so
-    /// the loop's own failures and the reconciliation's are named the same way.
+    /// Shared so the loop's own failures and the reconciliation's are named the
+    /// same way.
     ///
     /// ERROR_SHARING_VIOLATION and ERROR_LOCK_VIOLATION as HRESULTs: another
     /// program holds the file open, which is the one IO failure here with a

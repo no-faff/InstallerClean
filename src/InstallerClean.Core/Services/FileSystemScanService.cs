@@ -292,13 +292,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
             refusalLog.WriteClosingEntry();
         }
 
-        // The guard refused everything it was asked about, and the root it
-        // measured against was never expanded by the kernel. Those two together
-        // are not a clean folder: they are a scan that could not put a single
-        // file inside the folder it was scanning, and the empty list it produces
-        // is indistinguishable from a machine with nothing to clean. On a folder
-        // that has grown to tens of gigabytes, "nothing to clean up" is the one
-        // answer a user has no way to question.
+        // A scan that could not put one file inside the folder it was scanning,
+        // and whose empty list is indistinguishable from a machine with nothing
+        // to clean. On a folder grown to tens of gigabytes, "nothing to clean
+        // up" is the one answer a user has no way to question.
         //
         // Both halves are needed. An unproven root alone refuses nothing on a
         // machine with no reparse point in the path, the best-effort spelling
@@ -308,8 +305,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         //
         // Refusing rather than reporting an empty list, because there is nothing
         // to report: no candidate was judged, so there is no shorter answer to
-        // give. This is the one gate here whose input is the app's own machinery
-        // rather than the machine's records.
+        // give.
         if (!cacheRoot.Proven && refusedCandidates > 0 && removable.Count == 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCacheRootUnresolved);
 
@@ -349,13 +345,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // that could reach this gate at all, not one would have been refused by
         // these bounds, taking each run at the worst reading its figures allow.
         //
-        // The proportional clause reduces to 19P < M, which already requires at
-        // least one missing row at P = 0 and twenty at P = 1, so no separate
-        // missingNonRemovable > 0 stands here: it read as load-bearing and
-        // changed no answer. Its denominator is presentRegistered plus
-        // missingNonRemovable, which excludes the superseded rows whose file
-        // Windows has already removed, so the gate fires on less than the
-        // registrations and the four boundary rows in the tests pin where.
+        // The proportional clause is 19P < M: one missing row is enough at
+        // P = 0 and twenty at P = 1. Its denominator excludes the superseded
+        // rows whose file Windows has already removed, so it is not a fifth of
+        // the registrations, and the tests pin both sides of both bounds.
         var presentRegistered = nonRemovablePresent + removablePresent;
         if (presentRegistered <= 2
             && presentRegistered * 20 < presentRegistered + missingNonRemovable

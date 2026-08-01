@@ -47,11 +47,12 @@ internal sealed class InstallerCacheRoot
     ///
     /// It is carried because of what a degraded root does to a whole run rather
     /// than to one file: every candidate is measured against a root that names
-    /// itself instead of resolving, so every candidate is refused, and a caller
-    /// that only counts what survived reads that as a folder with nothing in it
-    /// worth removing. The comparison is still safe in the direction that
-    /// matters, fewer files being offered and never more; what is not safe is
-    /// reporting the result as an all-clear.
+    /// itself instead of resolving, so what survives is whatever the two
+    /// spellings happen to agree on, and a caller that counts only survivors
+    /// reads an empty list as a folder with nothing in it worth removing. The
+    /// comparison is still safe in the direction that matters, fewer files being
+    /// offered and never more; what is not safe is reporting the result as an
+    /// all-clear.
     /// </summary>
     internal bool Proven { get; }
 

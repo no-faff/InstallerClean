@@ -108,12 +108,10 @@ public class SettingsServiceTests : IDisposable
     [Fact]
     public void A_file_that_cannot_be_read_is_not_renamed_aside()
     {
-        // A lock is the everyday shape of a transient read failure, and the
-        // codebase names roaming and OneDrive-redirected profiles as where it
-        // bites. It is not corruption, and treating it as corruption costs the
-        // user the language, the backup folder, the update opt-out and the
-        // already-sent record in one step. Real filesystem, because sharing
-        // modes are a Windows behaviour.
+        // A lock is the everyday shape of a transient read failure, and it is
+        // not corruption. What treating it as corruption costs is on TryLoad,
+        // where the branch that has to keep them apart is. Real filesystem,
+        // because sharing modes are a Windows behaviour.
         var written = new AppSettings { MoveDestination = @"D:\backup" };
         Assert.True(new SettingsService(_tempFile).TrySave(written));
 

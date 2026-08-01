@@ -37,11 +37,10 @@ internal sealed class HalfMoveFileSystem : MockFileSystem
 
     /// <summary>
     /// Paths that are gone by the time their attributes are read, and answer
-    /// the read as missing. Models a third party removing the source in the
-    /// window between the reconcile's existence check and its attribute read,
-    /// an antivirus quarantining the file it has just watched being copied
-    /// being the nameable cause. Nothing else can pose that interleaving: the
-    /// window is inside one method and both calls are the framework's.
+    /// that read as missing. Poses the one interleaving nothing else can, a
+    /// third party taking the source away between the reconcile's existence
+    /// check and its attribute read: both calls are the framework's and the
+    /// window between them is inside one method.
     /// </summary>
     internal HashSet<string> VanishOnAttributeRead { get; } =
         new(StringComparer.OrdinalIgnoreCase);
@@ -71,13 +70,12 @@ internal sealed class HalfMoveFileSystem : MockFileSystem
             if (_fs.DeleteFailures.TryGetValue(path, out var failure)) throw failure;
 
             // Win32 documents DeleteFile as failing with ERROR_ACCESS_DENIED on
-            // a read-only file and says the attribute has to be removed first.
-            // TestingHelpers 22.2.0, the pinned version, enforces it as well
-            // (checked by running it), so this branch sits dead behind the base
-            // implementation and is kept as insurance rather than as cover: the
-            // enforcement is not part of the library's published contract, and
-            // an upgrade that dropped it would leave this double unable to tell
-            // a service that clears the attribute from one that never did.
+            // a read-only file. TestingHelpers 22.2.0, the pinned version,
+            // enforces it too (checked by running it), so this sits dead behind
+            // the base implementation and is insurance rather than cover: the
+            // enforcement is not in the library's published contract, and an
+            // upgrade dropping it would leave the double unable to tell a
+            // service that clears the attribute from one that never did.
             if (base.Exists(path) && base.GetAttributes(path).HasFlag(FileAttributes.ReadOnly))
                 throw new UnauthorizedAccessException($"read-only: {path}");
 

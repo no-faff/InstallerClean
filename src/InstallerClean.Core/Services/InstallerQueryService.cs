@@ -303,13 +303,10 @@ public sealed class InstallerQueryService : IInstallerQueryService
         var enumerationLooksShort =
             productShortfall > 2 && products.Count * 5 < fallback.ProductKeys * 4;
 
-        // The two counts overlap by exactly unreadableRows and the number the
-        // user reads is programs, so the overlap is subtracted rather than
-        // added twice. A row the enumeration skipped is already one product in
-        // unreadableProducts, and it is missing from products.Count as well, so
-        // it is inside productShortfall too: 30 skipped rows out of 100
-        // registrations reported as 60 programs unread. Only the shortfall
-        // BEYOND the rows the enumeration owned up to is new information.
+        // A skipped row is inside both counts: one product in
+        // unreadableProducts, and absent from products.Count so inside
+        // productShortfall as well. Thirty skipped rows out of a hundred
+        // registrations read as sixty programs unread before the subtraction.
         var withheldProducts = unreadableProducts
             + (enumerationLooksShort ? Math.Max(0, productShortfall - unreadableRows) : 0);
 

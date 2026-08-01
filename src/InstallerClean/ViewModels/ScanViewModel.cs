@@ -84,19 +84,15 @@ public partial class ScanViewModel : ObservableObject
     public bool HasPendingReboot => PendingRebootResult?.IsBlocked == true;
 
     /// <summary>
-    /// Stable, non-localised label for the current pending-reboot state, and
-    /// the only thing this property feeds is the result-log payload, so a
-    /// non-en-GB user's report still matches a developer's filter on
-    /// <c>"installerInProgress"</c>.
+    /// Stable, non-localised label for the current pending-reboot state, read
+    /// by the result-log payload and nothing else, so a non-en-GB user's report
+    /// still matches a developer's filter on <c>"installerInProgress"</c>.
     ///
-    /// The null arm is both states that genuinely are clean, no probe yet and a
-    /// Clean verdict, <c>PendingRebootResult.Block</c> being unable to exist
-    /// without a reason. The arm under it is a reason with no label of its own,
-    /// which paints the generic banner and disables both buttons: recording
-    /// that run as clean would have the payload disagree with the screen about
-    /// the same moment. Unreachable while the enum has three members, and it is
-    /// two lines against the payload shipping a false statement if a fourth
-    /// arrives before the field leaves.
+    /// Null is both states that genuinely are clean, no probe yet and a Clean
+    /// verdict, <c>Block</c> being unable to exist without a reason. The arm
+    /// under it is a Block whose reason has no label, which paints the generic
+    /// banner and disables both buttons: calling that clean would have the
+    /// payload contradict the screen about the same moment.
     /// </summary>
     public string PendingRebootLabel => PendingRebootResult?.Reason switch
     {

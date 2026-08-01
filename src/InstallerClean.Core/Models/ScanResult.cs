@@ -53,16 +53,17 @@ namespace InstallerClean.Models;
 /// on any healthy machine, which is why nothing else keys off it.
 /// </param>
 /// <param name="WithheldCount">
-/// Files this scan held back: superseded or obsoleted packages whose file is on
-/// disk and which the scan would have offered, had it been able to say that no
-/// installed product still needs them. It is what the withholding cost this run,
-/// where <see cref="UnreadableProductCount"/> is the reason for it, and it is
-/// zero on any scan that read every product's records.
+/// What the withholding cost this run: superseded or obsoleted packages whose
+/// file is on disk and which the scan would have offered, had it been able to
+/// say that no installed product still needs them.
+/// <see cref="UnreadableProductCount"/> is the reason, this is the price, and
+/// both are zero on a scan that read every product's records.
 ///
-/// NOT the same thing as the act-time re-verify's held-back count, and the two
-/// will eventually sit in one result-log payload: this one counts what was kept
-/// off the list before the user saw anything, that one counts what stopped
-/// qualifying between the list and the button.
+/// Its consumer is the schema 4 result-log payload, where it sits beside the
+/// act-time re-verify's own held-back count, which is a different number: this
+/// one is what never reached the user, that one is what stopped qualifying
+/// between the list and the button. If schema 4 does not land in 2.4.0 this
+/// field comes out with it rather than shipping with no reader.
 /// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
