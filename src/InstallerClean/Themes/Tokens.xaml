@@ -13,8 +13,8 @@
 
     Naming: <category>.<role>[.<state>].
         Surface.*, Text.*, Action.<intent>.<state>, Status.*,
-        Decoration.*, Link.*, Scrollbar.*, Type.*,
-        Radius.*, BorderThickness.*, Margin.*,
+        Decoration.*, Link.*, Scrollbar.*, Border.*, Progress.*,
+        Type.*, Radius.*, BorderThickness.*, Margin.*,
         Padding.*, Gap.*, GapBottom.*, GapTop.*, GapRight.*,
         GapLeft.*, GapX.*.
 -->
@@ -116,6 +116,41 @@
          there is still a plain brightening between the two states. -->
     <SolidColorBrush x:Key="Scrollbar.Thumb"        Color="{StaticResource Primitive.Slate.50.Alpha38}"/>
     <SolidColorBrush x:Key="Scrollbar.Thumb.Hover"  Color="{StaticResource Primitive.Slate.50.Alpha50}"/>
+
+    <!-- Border. The edge that gives a control a visible extent: the About
+         window's checkbox, a selected row in either details list, and the
+         backup-folder box. No FILL can do that job here. The five opaque
+         structural surfaces span 2.36:1 between the widest pair and under
+         1.75:1 between every adjacent one, so a control painted out of that
+         set cannot reach the 3:1 WCAG 1.4.11 asks of the visual information
+         identifying a control, and the next step up the ramp is a body-text
+         brightness. A line can, being drawn against a surface rather than
+         being one: 4.72:1 on Surface.Sidebar, 5.76:1 on Surface.Card, and
+         3.34:1 against Action.Standard.Background, which is the quietest
+         pairing there is (a selected row's own fill, on the side away from
+         the window).
+
+         Slate.500 is also what Text.Dim resolves to, and consuming that here
+         instead would be a text tier doing an edge's job: the layering rule
+         is that a new role gets a new token, so a later change to either
+         moves one and not the other.
+
+         NOT the app's every hairline. The tooltip and context-menu edges keep
+         their own quieter brushes, argued at those templates: they separate a
+         popup from what it is drawn over, where this one has to be findable. -->
+    <SolidColorBrush x:Key="Border.Control" Color="{StaticResource Primitive.Slate.500}"/>
+
+    <!-- Progress. Its own role rather than the accent fill it used to share,
+         because a progress bar is measured against its own track and the
+         accent is 2.33:1 there. Indigo.400 is 4.90:1 on the Surface.Sidebar
+         track the three bars sit in and 5.98:1 on the card behind the
+         operating overlay's. Neither is dimmed by the overlay: that card is
+         opaque over the dim and the track is opaque over the card.
+
+         So the bar no longer matches the accent buttons, and that was seen
+         side by side at true size and accepted rather than overlooked. Same
+         colour as Link.Rest, separate token for the reason above. -->
+    <SolidColorBrush x:Key="Progress.Fill" Color="{StaticResource Primitive.Indigo.400}"/>
 
     <!-- Typography. Six scaled steps, Display down to Caption, which are
          exactly the set App scales with the OS text-size slider, plus the

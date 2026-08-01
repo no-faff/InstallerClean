@@ -411,14 +411,28 @@
          auto-update switch), the control type has a single house look,
          and a second one should inherit it without opting in.
 
+         The box and its tick take the OS text-scale factor, as the label
+         beside them does through Type.Body. An icon left at a fixed pixel
+         size next to text that grows does not stay the same size, it gets
+         smaller: at 225% an 18px box beside a 29px label is half the
+         target it was and reads as an afterthought, for the user who asked
+         for everything to be bigger.
+
          The tick is a FILLED Path, not a stroked one. The theme's only
          stroke weights are Hairline (1) and the focus ring's 2, and a
-         1px tick inside an 18px box reads as a scratch; a fill needs no
-         new token to be legible.
+         1px tick inside the box reads as a scratch; a fill needs no new
+         token to be legible.
 
          The row's whole extent takes the click (the transparent
          StackPanel background), so the label toggles the box, which is
-         what a checkbox label is for. -->
+         what a checkbox label is for.
+
+         The box carries a Border.Control hairline because its fill is the
+         only thing that says whether the setting is on, and the two fills
+         are 1.41:1 and 2.33:1 against the window behind them: a reader can
+         see the label perfectly and not the answer. The hairline gives the
+         box an extent at 4.72:1 whatever it is filled with. It is inside the
+         explicit 18x18, so nothing moves when it is drawn or hidden. -->
     <Style TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource Text.Body}"/>
         <Setter Property="FontSize" Value="{DynamicResource Type.Body}"/>
@@ -429,16 +443,19 @@
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
                     <StackPanel x:Name="Root" Orientation="Horizontal" Background="Transparent">
-                        <Border x:Name="Box" Width="18" Height="18"
+                        <Border x:Name="Box"
+                                Width="{a11y:TextScaled 18}" Height="{a11y:TextScaled 18}"
                                 CornerRadius="{StaticResource Radius.Chip}"
                                 Background="{StaticResource Action.Standard.Background}"
+                                BorderBrush="{StaticResource Border.Control}"
+                                BorderThickness="{StaticResource BorderThickness.Hairline}"
                                 Margin="{StaticResource GapRight.Sm}"
                                 VerticalAlignment="Center"
                                 SnapsToDevicePixels="True">
                             <Path x:Name="Tick"
                                   Data="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
                                   Fill="{StaticResource Text.Heading}"
-                                  Width="11" Height="11" Stretch="Uniform"
+                                  Width="{a11y:TextScaled 11}" Height="{a11y:TextScaled 11}" Stretch="Uniform"
                                   HorizontalAlignment="Center" VerticalAlignment="Center"
                                   Visibility="Collapsed"/>
                         </Border>
@@ -475,6 +492,14 @@
                             </MultiTrigger.Conditions>
                             <Setter TargetName="Box" Property="Background" Value="{StaticResource Action.Accent.Pressed}"/>
                         </MultiTrigger>
+                        <!-- The focus ring is the edge while it is drawn, so the
+                             hairline stands down rather than adding a second
+                             boundary beside it. The brush goes, never the
+                             thickness: dropping the thickness would resize the
+                             box's inside and move the tick. -->
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Box" Property="BorderBrush" Value="Transparent"/>
+                        </Trigger>
                         <!-- Same disabled treatment as the pills: half opacity
                              on the whole control, box and label together. -->
                         <Trigger Property="IsEnabled" Value="False">
@@ -514,7 +539,18 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
+                    <!-- The hairline is this box's only extent. Its fill is
+                         1.22:1 against the panel behind it, so an input the user
+                         has already typed a path into has no visible edge to
+                         come back to: the placeholder that roughly marked it is
+                         gone by then, and the focus ring only says where it is
+                         while they are in it. Border.Control puts it at 4.72:1
+                         against the panel. The 1px is inside the 40px minimum
+                         and insets the text and the placeholder together, so
+                         they stay aligned with each other. -->
                     <Border x:Name="Bg" Background="{TemplateBinding Background}"
+                            BorderBrush="{StaticResource Border.Control}"
+                            BorderThickness="{StaticResource BorderThickness.Hairline}"
                             CornerRadius="{StaticResource Radius.Pill}">
                         <Grid>
                             <!-- No Margin here. WPF's TextBoxView applies
@@ -547,6 +583,14 @@
                         <Trigger Property="Text" Value="">
                             <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
                         </Trigger>
+                        <!-- The ring sits 2px outside this edge and says the same
+                             thing louder, so the hairline stands down while it is
+                             there rather than drawing a second concentric line.
+                             Brush only: dropping the thickness would shift the
+                             text by a pixel on every focus change. -->
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="Transparent"/>
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -556,7 +600,24 @@
     <!-- List items. ListView and ListBox row styles. Selection
          highlight uses the standard action background rather than the
          indigo accent fill, so a selected row reads as "active
-         selection" rather than "brand-flavoured". -->
+         selection" rather than "brand-flavoured".
+
+         That fill is 1.72:1 against the card behind it, and in the
+         Registered products list it is the only thing saying which row the
+         whole right-hand pane is describing, so selection also draws a
+         Border.Control rule at 3.34:1 against the fill and 5.76:1 against
+         the card. Top and bottom only: a rule reads as the row being picked
+         out where a full box reads as it being fenced in, and it is the
+         normal list-selection idiom.
+
+         THE THICKNESS IS ON EVERY ROW IN EVERY STATE and only the brush
+         changes, so the rule cannot alter a row's height. A WPF Border
+         allocates BorderThickness and then Padding inside it, so the
+         vertical box is 1 + 5 + 5 + 1 where it was 0 + 6 + 6 + 0: the same
+         12 px, on the selected row and its neighbours alike. Set the
+         thickness in the trigger instead and a selected row grows 2 px, so
+         the list shuffles under the selection as it moves. -->
+
 
     <Style TargetType="ListViewItem">
         <Setter Property="Foreground" Value="{StaticResource Text.Heading}"/>
@@ -569,7 +630,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListViewItem">
-                    <Border x:Name="Bd" Background="Transparent" Padding="4,6">
+                    <Border x:Name="Bd" Background="Transparent" Padding="4,5"
+                            BorderBrush="Transparent" BorderThickness="0,1,0,1"
+                            SnapsToDevicePixels="True">
                         <GridViewRowPresenter/>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -589,6 +652,7 @@
                              IsSelected alone and so hold through both. -->
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Background}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Border.Control}"/>
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
@@ -596,6 +660,17 @@
                                 <Condition Property="IsMouseOver" Value="True"/>
                             </MultiTrigger.Conditions>
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Hover}"/>
+                        </MultiTrigger>
+                        <!-- Declared last so it wins over the selection rule
+                             above. A focused row already carries the 2px ring,
+                             and a rule immediately inside it is a second
+                             boundary doing the first one's job. -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True"/>
+                                <Condition Property="IsKeyboardFocused" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="Transparent"/>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -608,19 +683,23 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                    <Border x:Name="Bd" Background="Transparent" Padding="2,2">
+                    <Border x:Name="Bd" Background="Transparent" Padding="2,1"
+                            BorderBrush="Transparent" BorderThickness="0,1,0,1"
+                            SnapsToDevicePixels="True">
                         <ContentPresenter/>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <!-- Trigger order and the MultiTrigger are the ListViewItem
-                             style's above, for the same reason and with the same
-                             fills; the patch list is a ListBox and had the same
-                             disappearing selection. -->
+                        <!-- Trigger order, the MultiTriggers and the always-present
+                             thickness are the ListViewItem style's above, for the
+                             same reasons and with the same fills; the patch list is
+                             a ListBox and had the same disappearing selection. Its
+                             own arithmetic: 1 + 1 + 1 + 1 where it was 0 + 2 + 2 + 0. -->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Surface.Sidebar}"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Background}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Border.Control}"/>
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
@@ -628,6 +707,13 @@
                                 <Condition Property="IsMouseOver" Value="True"/>
                             </MultiTrigger.Conditions>
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource Action.Standard.Hover}"/>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True"/>
+                                <Condition Property="IsKeyboardFocused" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="Transparent"/>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -1069,7 +1155,12 @@
          so a wider indeterminate consumer needs the To value raised. -->
     <Style TargetType="ProgressBar">
         <Setter Property="Background" Value="{StaticResource Surface.Sidebar}"/>
-        <Setter Property="Foreground" Value="{StaticResource Action.Accent.Background}"/>
+        <!-- Progress.Fill, not the accent fill the buttons wear: a bar is read
+             against its own track and the accent is 2.33:1 there, where this is
+             4.90:1. All three bars (splash, scanning overlay, operating
+             overlay) share this style and this track colour, so one change
+             moves all three and none of them keeps the button's indigo. -->
+        <Setter Property="Foreground" Value="{StaticResource Progress.Fill}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>

@@ -9,11 +9,12 @@ namespace InstallerClean.Tests.Themes;
 // Thumb template fails here with the measured number, which is not something the
 // XAML, the build or a screenshot can report.
 //
-// Scoped deliberately to this one token. The other non-text ratios in the theme
-// sit below 3:1 by decision, not by oversight (the About checkbox's box, whose
-// state is conveyed by a 6.01:1 tick inside it, and the move-destination field,
-// which is identified by its label and placeholder), so a sweep asserting 3:1
-// across the palette would encode the opposite of what was decided.
+// Scoped deliberately to this one token, and it is no longer the only one: the
+// checkbox, both list selections and the backup-folder box reach the same floor
+// through a boundary rather than a fill, which ControlBoundaryContrastTests
+// holds. A sweep asserting 3:1 across the whole palette would still be wrong.
+// The fills themselves stay where they are, deliberately, and the layered
+// surfaces they are drawn from cannot reach 3:1 against each other at all.
 public class ScrollBarThumbContrastTests
 {
     // WCAG 2.1 SC 1.4.11 Non-text Contrast.

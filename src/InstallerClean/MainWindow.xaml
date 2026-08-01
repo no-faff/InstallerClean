@@ -219,7 +219,8 @@
                 <DockPanel Margin="{StaticResource GapBottom.Lg}"
                            Visibility="{Binding Scan.HasPendingReboot, Converter={StaticResource BoolToVis}}">
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
-                          Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
+                          Fill="{StaticResource Status.Warning}" Stretch="Uniform"
+                          Width="{a11y:TextScaled 16}" Height="{a11y:TextScaled 16}"
                           DockPanel.Dock="Left" VerticalAlignment="Top" Margin="{StaticResource GapRight.Icon}"/>
                     <!-- LiveSetting=Polite + code-behind RaiseAutomationEvent
                          on the false→true HasPendingReboot transition.
@@ -319,7 +320,8 @@
                 <DockPanel Margin="{StaticResource GapTop.Sm}"
                            Visibility="{Binding Scan.HasMissingFromDisk, Converter={StaticResource BoolToVis}}">
                     <Path Data="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM118,98a10,10,0,0,1,20,0v46a10,10,0,0,1,-20,0Zm10,96a14,14,0,1,1,14,-14A14,14,0,0,1,128,194Z"
-                          Fill="{StaticResource Status.Warning}" Width="16" Height="16" Stretch="Uniform"
+                          Fill="{StaticResource Status.Warning}" Stretch="Uniform"
+                          Width="{a11y:TextScaled 16}" Height="{a11y:TextScaled 16}"
                           DockPanel.Dock="Left" VerticalAlignment="Top" Margin="{StaticResource GapRight.Icon}"/>
                     <TextBlock x:Name="MissingFromDiskBannerText"
                                Text="{Binding Scan.MissingFromDiskSummaryText}"
@@ -524,9 +526,18 @@
                     AutomationProperties.HelpText="{loc:Translate Automation.ChangeLanguage.HelpText}"
                     ToolTipService.InitialShowDelay="0"
                     ToolTip="{loc:Translate Tooltip.ChangeLanguage}">
+                <!-- The globe is the whole button, so it is what carries the OS
+                     text size here: SmallGhostPill's 28 is a minimum height and
+                     a wordless button has no label to push past it, which left
+                     this and the completion heart the two smallest targets in
+                     the app at exactly the scale where everything else had
+                     doubled. The stroke stays 2: Shape applies Stretch to the
+                     geometry and the pen after it, so the outline holds its
+                     weight as the circle grows, which is what a line drawing
+                     wants. -->
                 <Path Data="M2 12 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0 M12 2 a4.2 10 0 1 0 0 20 a4.2 10 0 1 0 0 -20 M2 12 h20"
                       Stroke="{StaticResource Text.Muted}" StrokeThickness="2" Fill="{x:Null}"
-                      Width="18" Height="18" Stretch="Uniform"/>
+                      Width="{a11y:TextScaled 18}" Height="{a11y:TextScaled 18}" Stretch="Uniform"/>
             </Button>
             <!-- Update status line, in two mutually exclusive
                  presentations of the same sentence. Both dock Left after the
@@ -1075,8 +1086,12 @@
                             ToolTipService.InitialShowDelay="0"
                             AutomationProperties.Name="{loc:Translate Automation.BuyMeACuppa}"
                             AutomationProperties.HelpText="{loc:Translate Completion.DonateAsk}">
+                        <!-- Scaled for the reason the language globe is: the
+                             heart is all this button has, so without it the ask
+                             shrinks against everything around it. -->
                         <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                              Fill="{StaticResource Decoration.Heart}" Width="18" Height="18" Stretch="Uniform"
+                              Fill="{StaticResource Decoration.Heart}" Stretch="Uniform"
+                              Width="{a11y:TextScaled 18}" Height="{a11y:TextScaled 18}"
                               RenderTransformOrigin="0.5,0.5">
                             <Path.RenderTransform>
                                 <ScaleTransform ScaleX="1" ScaleY="1"/>
