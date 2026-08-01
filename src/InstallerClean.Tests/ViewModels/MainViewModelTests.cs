@@ -672,6 +672,90 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public void MoveButtonTooltip_answers_from_the_box_and_changes_as_it_is_typed_in()
+    {
+        var vm = CreateViewModel();
+        var systemRoot = Path.GetPathRoot(
+            Environment.GetFolderPath(Environment.SpecialFolder.System))!;
+
+        // Empty box: the browser opens first, so the tooltip warns of it rather
+        // than naming a step that is missing.
+        Assert.Equal(Strings.Tooltip_MoveNeedsDestination, vm.Cleanup.MoveButtonTooltip);
+
+        // A folder on the drive the files are already on: a rename, so it says
+        // when the space actually comes back. This is the state that pairs the
+        // button with Delete beside it.
+        vm.Cleanup.MoveDestination = Path.Combine(systemRoot, "ic-test-backup");
+        Assert.Equal(Strings.Tooltip_MoveSameDrive, vm.Cleanup.MoveButtonTooltip);
+
+        // Anywhere else, including a share, takes the plain wording.
+        vm.Cleanup.MoveDestination = @"\\server\backup";
+        Assert.Equal(Strings.Tooltip_Move, vm.Cleanup.MoveButtonTooltip);
+
+        // Back to empty, because the box is a TextBox and a user can clear it.
+        vm.Cleanup.MoveDestination = string.Empty;
+        Assert.Equal(Strings.Tooltip_MoveNeedsDestination, vm.Cleanup.MoveButtonTooltip);
+    }
+
+    [Fact]
+    public async Task DeleteAllAsync_cancelled_rearms_cancel_and_stops_describing_the_batch_it_stopped()
+    {
+        var vm = CreateViewModel();
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ScanResultWithOrphans(3));
+        _deleteService.DeleteFilesAsync(
+                Arg.Any<IEnumerable<string>>(),
+                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
+            .Returns(ci =>
+            {
+                // The overlay as the user left it: a batch stopped at file 1 of
+                // 3, with a filename and a part-filled bar on screen.
+                ((IProgress<OperationProgress>?)ci[1])?.Report(new OperationProgress(1, 3, "orphan0.msi"));
+                vm.Cleanup.CancelOperationCommand.Execute(null);
+                return new DeleteResult(1, Array.Empty<FileOperationError>(), Cancelled: true);
+            });
+        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
+
+        await vm.Scan.ScanWithProgressAsync(null);
+        Assert.Equal("orphan0.msi", vm.Cleanup.OperationCurrentFileName);
+
+        // Sampled from inside the post-cancel rescan, which is the only moment
+        // any of this is on screen: the caller's finally clears it all again,
+        // and it runs after the rescan has finished.
+        bool cancelLive = false, indeterminate = false, detailShown = true;
+        string headingDuringRefresh = string.Empty, fileNameDuringRefresh = "not sampled";
+        int totalDuringRefresh = -1;
+        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
+            .Returns(ci =>
+            {
+                cancelLive = vm.Cleanup.CancelOperationCommand.CanExecute(null);
+                indeterminate = vm.Cleanup.IsOperationProgressIndeterminate;
+                detailShown = vm.Cleanup.ShowOperationProgressDetail;
+                headingDuringRefresh = vm.Cleanup.OperationProgress;
+                fileNameDuringRefresh = vm.Cleanup.OperationCurrentFileName;
+                totalDuringRefresh = vm.Cleanup.OperationTotalFiles;
+                return ScanResultWithOrphans(2);
+            });
+
+        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
+
+        // The button is live again, which is the whole of the fix it belongs to:
+        // the rescan is a full folder walk plus a full API enumeration, and held
+        // behind a dead button it is the shape people report as a hang.
+        Assert.True(cancelLive);
+        // And the card no longer describes the batch that stopped. The heading
+        // says scanning, so the bar runs indeterminate and the count row and
+        // filename come off rather than freezing at "1 of 3".
+        Assert.Equal(Strings.Status_Scanning, headingDuringRefresh);
+        Assert.True(indeterminate);
+        Assert.False(detailShown);
+        Assert.Equal(string.Empty, fileNameDuringRefresh);
+        Assert.Equal(0, totalDuringRefresh);
+        // Back to a measured bar for the next operation.
+        Assert.False(vm.Cleanup.IsOperationProgressIndeterminate);
+    }
+
+    [Fact]
     public async Task MoveAllAsync_reboot_gate_flipping_blocked_at_action_time_refuses_and_paints_the_banner()
     {
         var vm = CreateViewModel();

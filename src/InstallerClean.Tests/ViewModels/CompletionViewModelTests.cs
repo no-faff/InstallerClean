@@ -6,6 +6,42 @@ namespace InstallerClean.Tests.ViewModels;
 
 public class CompletionViewModelTests
 {
+    /// <summary>
+    /// A category whose sentence varies with the file. No shipped category does
+    /// that today, which is why this is declared here rather than borrowed:
+    /// RecycleFailed was the one that did, and it went with the Recycle Bin.
+    /// The behaviour it stands for did not go, so it is held from here.
+    /// </summary>
+    private sealed record VaryingMessage(string FilePath, string Message)
+        : FileOperationError(FilePath)
+    {
+        public override string LocalisedMessage => Message;
+    }
+
+    [Fact]
+    public void FormatErrorBreakdown_splits_one_type_whose_sentence_varies_by_file()
+    {
+        // The grouping key is (type, message) rather than type alone, and this
+        // is what that buys: a bucket's heading is taken from its FIRST member,
+        // so a type that ever tailors its wording would otherwise print one
+        // file's sentence over files that failed differently. Nothing shipped
+        // tailors one today; the comment on FormatErrorBreakdown keeps the key
+        // that way for the category that will, and this is the test that says
+        // what "that way" means.
+        var errors = new List<FileOperationError>
+        {
+            new VaryingMessage(@"C:\Windows\Installer\a.msi", "One thing went wrong."),
+            new VaryingMessage(@"C:\Windows\Installer\b.msi", "A different thing went wrong."),
+        };
+
+        var text = CompletionViewModel.FormatErrorBreakdown(errors);
+
+        Assert.Contains("One thing went wrong.", text);
+        Assert.Contains("A different thing went wrong.", text);
+        Assert.Contains("- a.msi", text);
+        Assert.Contains("- b.msi", text);
+    }
+
     [Fact]
     public void FormatErrorBreakdown_heads_a_bucket_with_its_pluralised_sentence()
     {
@@ -45,9 +81,8 @@ public class CompletionViewModelTests
 
         var text = CompletionViewModel.FormatErrorBreakdown(errors);
 
-        // Leading spaces alone are invisible in a proportional font, which left
-        // the filenames reading as a run-on of the sentence above them. The
-        // hyphen is what separates them, and it does the whole job.
+        // Leading spaces alone vanish in a proportional font, so the hyphen is
+        // what separates a filename from the sentence above it.
         Assert.Contains("- a.msi", text);
         Assert.Contains("- b.msi", text);
         // Filenames only: the full path can name another user's profile under
@@ -87,9 +122,11 @@ public class CompletionViewModelTests
         Assert.DoesNotContain("freed", vm.Heading);
         Assert.Equal(Strings.Completion_MoveRestoreHintSameDrive_Singular, vm.Restore);
 
-        // An unreadable destination claims nothing either way, so it takes the
-        // same verb but the line that names no drive.
-        vm.ShowMoveSummary(movedCount: 2, movedBytes: 1024 * 1024, destination: @"\\server\share",
+        // A volume the classification could not read claims nothing either way,
+        // so it takes the same verb but the line that names no drive. The
+        // destination is not what selects this and is never read here: the
+        // outcome arrives already decided (a share is FreedSpace, not this).
+        vm.ShowMoveSummary(movedCount: 2, movedBytes: 1024 * 1024, destination: @"D:\backup",
             errors: [], space: MoveSpaceOutcome.Unclassified);
         Assert.DoesNotContain("freed", vm.Heading);
         Assert.Equal(Strings.Completion_MoveRestoreHint_Plural, vm.Restore);
