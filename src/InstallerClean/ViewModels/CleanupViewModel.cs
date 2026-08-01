@@ -83,6 +83,25 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     [ObservableProperty] private double _operationProgressPercent;
 
     /// <summary>
+    /// True while the overlay is up over work that reports no per-file
+    /// progress, which today is the rescan after a cancel. The bar runs
+    /// indeterminate and <see cref="ShowOperationProgressDetail"/> takes the
+    /// count row and the filename off, because a bar and a count are a claim
+    /// about how far through something is and there is no answer to give.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowOperationProgressDetail))]
+    private bool _isOperationProgressIndeterminate;
+
+    /// <summary>
+    /// Whether the overlay shows its "X of Y files", percentage and filename
+    /// block. Positive so the XAML binds it through BooleanToVisibilityConverter
+    /// like every other visibility in the window; there is no inverting
+    /// converter and this is one property rather than one converter.
+    /// </summary>
+    public bool ShowOperationProgressDetail => !IsOperationProgressIndeterminate;
+
+    /// <summary>
     /// Throttled copy of <see cref="OperationProgressDetail"/> for the
     /// screen-reader live region: updated on the first file, the last
     /// file and each time the batch crosses a tenth, never per file. A
@@ -834,6 +853,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             OperationCurrentFileName = string.Empty;
             OperationProgressAnnouncement = string.Empty;
             _lastAnnouncedDecile = -1;
+            // Back to a measured bar: RefreshAfterCancelAsync sets this on the
+            // cancel paths and the next operation reports per-file progress.
+            IsOperationProgressIndeterminate = false;
         }
     }
 
@@ -1029,6 +1051,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             OperationCurrentFileName = string.Empty;
             OperationProgressAnnouncement = string.Empty;
             _lastAnnouncedDecile = -1;
+            // Back to a measured bar: RefreshAfterCancelAsync sets this on the
+            // cancel paths and the next operation reports per-file progress.
+            IsOperationProgressIndeterminate = false;
         }
     }
 
@@ -1162,7 +1187,12 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// <see cref="_operationCts"/>, then clear <see cref="IsCancellationRequested"/>
     /// (that CTS's UI mirror) and <see cref="IsOperationInFlight"/>. Every exit
     /// path of a Move or a Delete calls this, including the pre-flight's early
-    /// returns, so it is the one place the operation's state is torn down.
+    /// returns, so the operation's state is torn down in one place.
+    ///
+    /// <see cref="RefreshAfterCancelAsync"/> is the one caller that hands over a
+    /// source of its own: it disposes the operation's and installs a fresh one
+    /// for the rescan, so on the two cancel paths this finds the field already
+    /// null and the flags are all it clears.
     ///
     /// Order matters on two fronts: the null happens before Dispose so a
     /// concurrent CancelOperationCommand reading the field sees no CTS
@@ -1209,9 +1239,38 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// here, and the overlay's own finally clears both). A second Cancel then
     /// stops the refresh too, and the counts stay stale until the next scan,
     /// which is what RefreshAsync already does on any other failure.
+    ///
+    /// The overlay's numbers go with the heading, and that is the point rather
+    /// than tidiness: they belong to the batch that has just stopped, the rescan
+    /// reports no progress of its own, and left in place they read as a scan
+    /// stalled at file 34 of 71 for as long as the walk takes, which on the
+    /// folders this fix exists for is the whole point. The caller's finally
+    /// clears them too, and far too late: it runs after the refresh has
+    /// finished.
     /// </summary>
     private async Task RefreshAfterCancelAsync()
     {
+        OperationCurrentFile = 0;
+        OperationTotalFiles = 0;
+        OperationCurrentFileName = string.Empty;
+        OperationProgressAnnouncement = string.Empty;
+        _lastAnnouncedDecile = -1;
+        OperationProgressPercent = 0;
+        // An indeterminate bar over no count, matching the scanning overlay:
+        // "0 of 0 files" against a 0% bar would swap one wrong statement for
+        // another, both of them claims about progress nothing here can measure.
+        IsOperationProgressIndeterminate = true;
+
+        // The operation's own source is finished with, and this is the one path
+        // that takes the field away from DisposeOperationCts before it runs.
+        // Dropping it undisposed cost nothing at run time and made the teardown
+        // invariant false, which the next person to reason from it would pay
+        // for. No Cancel first: the worker has returned, so nothing holds the
+        // token, and every path that reaches here has cancelled it anyway.
+        var finished = _operationCts;
+        _operationCts = null;
+        finished?.Dispose();
+
         var cts = new CancellationTokenSource();
         _operationCts = cts;
         IsCancellationRequested = false;
@@ -1261,7 +1320,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// system drive being genuinely emptier once the files are on it; only an
     /// unreadable destination declines to say either way.
     /// </summary>
-    private static MoveSpaceOutcome ClassifySpaceOutcome(string destinationKind) => destinationKind switch
+    internal static MoveSpaceOutcome ClassifySpaceOutcome(string destinationKind) => destinationKind switch
     {
         MoveDestinationKinds.DifferentFixedDrive or
         MoveDestinationKinds.RemovableDrive or

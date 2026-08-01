@@ -365,7 +365,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Move location label -->
+                <!-- Backup folder label -->
                 <TextBlock Grid.Row="0" Text="{loc:Translate Section.Backup.Folder}"
                            Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Heading.Sm}"
                            AutomationProperties.Name="{loc:Translate Automation.Section.BackupFolder}"/>
@@ -654,7 +654,14 @@
                                FontSize="{DynamicResource Type.Heading.Sm}" FontWeight="SemiBold"
                                HorizontalAlignment="Center" Margin="{StaticResource GapBottom.Lg}"
                                AutomationProperties.LiveSetting="Polite"/>
+                    <!-- Indeterminate for the rescan after a cancel, where there
+                         is no per-file progress to report and a filled bar would
+                         be describing the batch that has just stopped. The count
+                         row and the filename below go with it, on the same
+                         binding, so the card is a heading and a moving bar,
+                         which is what the scanning overlay above already is. -->
                     <ProgressBar Value="{Binding Cleanup.OperationProgressPercent}"
+                                 IsIndeterminate="{Binding Cleanup.IsOperationProgressIndeterminate}"
                                  Minimum="0" Maximum="100"
                                  Width="200" Height="8" Margin="{StaticResource GapBottom.Sm}"
                                  AutomationProperties.Name="{loc:Translate Automation.OperationProgress}"/>
@@ -663,7 +670,8 @@
                          the "X of Y" / percentage row and the filename into one
                          compact block under the progress bar, where the scale's
                          8px would loosen the grouping. -->
-                    <DockPanel Margin="0,0,0,2">
+                    <DockPanel Margin="0,0,0,2"
+                               Visibility="{Binding Cleanup.ShowOperationProgressDetail, Converter={StaticResource BoolToVis}}">
                         <TextBlock DockPanel.Dock="Right" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Caption}">
                             <Run Text="{Binding Cleanup.OperationProgressPercent, Mode=OneWay, StringFormat='{}{0:F0}%'}"/>
                         </TextBlock>
@@ -699,7 +707,8 @@
                     <TextBlock Text="{Binding Cleanup.OperationCurrentFileName}"
                                Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Caption}"
                                HorizontalAlignment="Center" Margin="0,4,0,0"
-                               TextTrimming="CharacterEllipsis" MaxWidth="{a11y:TextScaled 240}"/>
+                               TextTrimming="CharacterEllipsis" MaxWidth="{a11y:TextScaled 240}"
+                               Visibility="{Binding Cleanup.ShowOperationProgressDetail, Converter={StaticResource BoolToVis}}"/>
                     <!-- Cancel button binds IsEnabled via the
                          CanCancelOperation predicate so a second click
                          after the cancel-in-flight is dropped. The
