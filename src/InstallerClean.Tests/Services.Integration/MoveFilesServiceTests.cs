@@ -125,6 +125,44 @@ public class MoveFilesServiceTests : IDisposable
         }
     }
 
+    [Fact]
+    public async Task MoveFilesAsync_records_a_batch_that_ran_without_the_installer_mutex()
+    {
+        // The sibling of DeleteFilesServiceTests' own record test, and the
+        // reasoning is that file's: a skipped hold is not a refusal, and it is
+        // the one window in which the act-time re-verify's proof can go stale
+        // underneath the batch. Real filesystem because the record is a real
+        // crash-log write, which is the behaviour under test; the move itself
+        // runs against a mock so nothing on disk is touched.
+        var logPath = InstallerClean.Helpers.CrashLog.Write(
+            new InvalidOperationException("baseline for the move mutex fall-back record"));
+        var baseline = new FileInfo(logPath).Length;
+
+        var fs = new System.IO.Abstractions.TestingHelpers.MockFileSystem();
+        var source = @"C:\Windows\Installer\never-reached.msi";
+        fs.AddFile(source, new System.IO.Abstractions.TestingHelpers.MockFileData("payload"));
+        fs.AddDirectory(_destDir);
+        var mutex = new Tests.Helpers.FakeMutexProbe(Tests.Helpers.FakeMutexProbe.Mode.FallBack);
+
+        var result = await new MoveFilesService(fs, mutex, null)
+            .MoveFilesAsync(new[] { source }, _destDir);
+
+        // The fall-back proceeds rather than refusing, and takes no lease.
+        Assert.False(result.InstallerBusy);
+        Assert.Equal(1, mutex.AcquireAttempts);
+        Assert.Equal(0, mutex.Acquired);
+
+        // Read from the baseline on, so a note left by an earlier run cannot
+        // pass for this one's. A rotation between the two reads shortens the
+        // file, and starting at 0 is then still right.
+        using var stream = new System.IO.FileStream(
+            logPath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
+        using var reader = new StreamReader(stream);
+        var written = await reader.ReadToEndAsync();
+        var appended = written.Length >= baseline ? written[(int)baseline..] : written;
+        Assert.Contains("Move ran without the Windows Installer mutex", appended);
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_sourceDir)) Directory.Delete(_sourceDir, recursive: true);

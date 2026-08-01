@@ -144,7 +144,18 @@ public sealed class MoveFilesService : IMoveFilesService
             int moved = 0;
             var errors = new List<FileOperationError>();
             var failureLog = new PerItemFailureLog("Move",
-                "The per-file list is on the completion screen and in the result log.");
+                "The per-file list is on the completion screen.");
+            // A skipped hold is not a refusal: TryAcquire returns null with
+            // heldByAnother false on a DACL refusal or any other non-fatal
+            // failure, and running on is the right call. It is recorded because
+            // the hold is the only thing stopping a msiexec registering a package
+            // mid-batch, so a run without it is the one window in which the
+            // act-time re-verify's proof can go stale under the batch, and a
+            // report of a needed file being removed could never be attributed to
+            // it. Once per batch, so it costs nothing at any file count.
+            if (lease is null)
+                Helpers.CrashLog.TryWrite(new InvalidOperationException(
+                    "Move ran without the Windows Installer mutex: it could not be acquired and was not held by another process."));
             // Resolved once for the batch; the guard resolves each SOURCE per
             // file against it (see InstallerCacheRoot). Separate from
             // canonicalDestination above, which guards the other end and is
