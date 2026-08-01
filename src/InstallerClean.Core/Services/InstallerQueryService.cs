@@ -289,28 +289,22 @@ public sealed class InstallerQueryService : IInstallerQueryService
         //
         // The registry walk is the only independent count of how many products
         // this machine has, so a shortfall against it is the signal. It is an
-        // inference, not a measurement, and the tolerance is what keeps it
-        // honest in both directions: UserData product keys survive a failed
-        // uninstall, so the registry legitimately runs ahead of the API on a
-        // healthy machine, while a truncation loses whatever the enumeration did
-        // not reach, which is unbounded. A fifth of a machine's registrations
-        // being residue is not the ordinary case; losing a fifth of them to a
-        // truncation is a single event.
+        // inference and not a measurement, which is what the tolerance is for:
+        // UserData product keys survive a failed uninstall, so the registry
+        // legitimately runs ahead on a healthy machine, and a fifth of a
+        // machine's registrations being residue is not the ordinary case where
+        // losing a fifth of them to a truncation is one event. Two products'
+        // difference is absorbed outright, so a machine with a handful of
+        // registrations cannot trip on one stale key.
         //
-        // What it cannot do is see a small truncation, and it is not made
-        // stricter to try: the cost of firing is a scan with no superseded
-        // patches on it and a line saying so, which is paid by every user whose
-        // machine trips it, and the orphan half of the list is unaffected either
-        // way. Two products' difference is absorbed outright so a machine with a
-        // handful of registrations cannot trip on one stale key.
+        // A small truncation stays invisible and it is not made stricter to
+        // chase one: firing costs a user their superseded-patch cleanup, and it
+        // withholds rather than refuses precisely because the inference is not
+        // strong enough to take a scan away.
         var productShortfall = fallback.ProductKeys - products.Count;
         var enumerationLooksShort =
             productShortfall > 2 && products.Count * 5 < fallback.ProductKeys * 4;
 
-        // Withheld, never refused. A scan that offers fewer candidates is one
-        // the user can still act on, and the class being held back is the one
-        // the loss bears on: orphan detection is unaffected, the fallback having
-        // contributed the lost products' paths as claims of their own.
         var withheldProducts = unreadableProducts + (enumerationLooksShort ? productShortfall : 0);
 
         progress?.Report(new ScanProgressUpdate(string.Format(

@@ -18,12 +18,6 @@ public interface IResultLogService
     /// </summary>
     public const long MaxLogBytes = 64 * 1024;
 
-    /// <summary>Absolute path to <c>last-run.json</c> on the local profile.</summary>
-    string LastLogPath { get; }
-
-    /// <summary>True when a fresh log file exists on disk.</summary>
-    bool HasFreshLog { get; }
-
     /// <summary>
     /// Serialises <paramref name="entry"/> to JSON and replaces the
     /// previous <c>last-run.json</c> atomically. Never throws; a disk-
@@ -47,7 +41,7 @@ public interface IResultLogService
     Task<ResultLogSendOutcome> SendAsync(string body, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Reads <see cref="LastLogPath"/> as UTF-8 text and returns the
+    /// Reads <c>last-run.json</c> as UTF-8 text and returns the
     /// raw content for display in the confirmation window. Returns null
     /// when the file doesn't exist, exceeds the <see cref="MaxLogBytes"/>
     /// cap, or fails to read; oversize and read-failure cases write a

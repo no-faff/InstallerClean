@@ -190,11 +190,13 @@ public sealed class MoveFilesService : IMoveFilesService
                         continue;
                     }
 
-                    // Refuse a source that's a symlink or junction:
-                    // moving the symlink would pull an OS file out of
-                    // System32. Real-FS check (MockFileSystem cannot
-                    // bypass). An attribute read that FAILS refuses the file
-                    // too, but as UnknownError: SourceIsReparsePoint tells the
+                    // Refuse a source that's a symlink or junction: a move can
+                    // read through one and copy the target's contents into the
+                    // user's folder, the receipts being with the check itself
+                    // (StorageHelpers.CheckReparsePoint). Real-FS check
+                    // (MockFileSystem cannot bypass). An attribute read that
+                    // FAILS refuses the file too, but as UnknownError:
+                    // SourceIsReparsePoint tells the
                     // user the file is a symlink, and a read that could not be
                     // made has not shown that.
                     var reparse = Helpers.StorageHelpers.CheckReparsePoint(sourcePath, out var reparseError);
@@ -331,12 +333,10 @@ public sealed class MoveFilesService : IMoveFilesService
     /// same-volume test that cannot be had: a mount point inside one drive
     /// letter falls back to copy-and-delete like any other volume boundary.
     ///
-    /// Clearing the read-only bit here is the delete path's shape and is safe
-    /// for the same reasons: by this line the file has passed the reparse
-    /// refusal and the containment guard, both of which read the real
-    /// filesystem whatever is injected, and the user has confirmed the move.
-    /// Finishing the delete completes what the user asked for; abandoning it
-    /// would leave them the duplicate this method exists to prevent.
+    /// Clearing the read-only bit is safe here for the same reasons it is on the
+    /// delete path: the file has passed the reparse refusal and the containment
+    /// guard, and the user has confirmed the move. Finishing the delete gives
+    /// them what they asked for rather than the duplicate this exists to prevent.
     /// </summary>
     private FileOperationError? ReconcileMove(string sourcePath, string destPath, PerItemFailureLog failureLog)
     {

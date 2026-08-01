@@ -197,10 +197,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     size = _fs.FileInfo.New(pkg.LocalPackagePath).Length;
                 }
             }
-            // Same narrowed set as the orphan-file stat block above:
-            // IOException for locked / vanished, UnauthorizedAccessException
-            // for the deeply ACL'd payload subfolder case, SecurityException
-            // for the rare CAS-policy path. OOM / SOH propagate.
+            // Same narrowed set as SafeLength: IOException for locked /
+            // vanished, UnauthorizedAccessException for the deeply ACL'd payload
+            // subfolder case, SecurityException for the rare CAS-policy path.
+            // OOM / SOH propagate.
             catch (IOException) { /* file vanished or locked between Exists and Length */ }
             catch (UnauthorizedAccessException) { /* unreadable payload subfolder */ }
             catch (SecurityException) { /* CAS policy denies the FileInfo construction */ }

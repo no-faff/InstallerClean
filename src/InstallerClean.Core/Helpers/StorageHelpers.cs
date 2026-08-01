@@ -15,7 +15,6 @@ internal static class StorageHelpers
     /// <param name="mode">Caller picks the FileMode:
     /// <list type="bullet">
     ///   <item>OpenExisting: read or read/write an existing real file.</item>
-    ///   <item>OpenAlways: open existing, create if missing (e.g. append-only log).</item>
     ///   <item>CreateAlways: create a fresh real file, truncating any
     ///   pre-existing content (e.g. write to a freshly-named temp file).</item>
     /// </list>
@@ -33,7 +32,6 @@ internal static class StorageHelpers
         uint disposition = mode switch
         {
             AtomicOpenMode.OpenExisting => Kernel32.OPEN_EXISTING,
-            AtomicOpenMode.OpenAlways   => Kernel32.OPEN_ALWAYS,
             AtomicOpenMode.CreateAlways => Kernel32.CREATE_ALWAYS,
             _ => Kernel32.OPEN_EXISTING,
         };
@@ -87,9 +85,6 @@ internal static class StorageHelpers
     {
         /// <summary>Fail if the file does not exist.</summary>
         OpenExisting,
-        /// <summary>Open existing or create empty if missing. Existing
-        /// content is preserved (typical for append-only logs).</summary>
-        OpenAlways,
         /// <summary>Always create a fresh file, truncating any
         /// pre-existing content.</summary>
         CreateAlways,
@@ -162,9 +157,24 @@ internal static class StorageHelpers
 
     /// <summary>
     /// Reads <paramref name="path"/>'s attributes to decide whether it is a
-    /// junction or symlink. Move and Delete refuse source files in
-    /// C:\Windows\Installer that have been replaced with a symlink because
-    /// following the link would silently relocate an OS file out of System32.
+    /// junction or symlink. Move and Delete refuse a source in
+    /// C:\Windows\Installer that has been replaced with one.
+    ///
+    /// A move can read straight through a link. .NET calls MoveFileEx with
+    /// MOVEFILE_COPY_ALLOWED (dotnet/runtime, Interop.MoveFileEx.cs), Win32
+    /// documents that flag as simulating a cross-volume move with CopyFile plus
+    /// DeleteFile, and CopyFile documents that "if the source file is a symbolic
+    /// link, the actual file copied is the target of the symbolic link". So a
+    /// link planted in the cache and pointing anywhere this elevated process can
+    /// read copies THAT file's contents into a folder the user picked, which is
+    /// an arbitrary read wearing the shape of a relocation. Whether a same-volume
+    /// rename would follow the link is documented neither way and does not need
+    /// to be: the flag is always set, so the copy path is always available.
+    ///
+    /// Delete has no equivalent, DeleteFile being documented to remove the link
+    /// and not the target, and refuses on the plainer ground that a link is not
+    /// the file the app was told about.
+    ///
     /// The check is best-effort against a TOCTOU swap; <see cref="OpenAtomic"/>
     /// is the race-free path for the write side.
     ///

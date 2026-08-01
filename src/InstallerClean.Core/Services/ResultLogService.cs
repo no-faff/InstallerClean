@@ -66,10 +66,6 @@ public sealed class ResultLogService : IResultLogService
         _logFile = logFile;
     }
 
-    public string LastLogPath => _logFile;
-
-    public bool HasFreshLog => File.Exists(_logFile);
-
     /// <summary>
     /// Runs off the caller's thread from its first line, not from its first
     /// await. The GUI awaits this on the dispatcher immediately after a Move or

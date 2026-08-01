@@ -186,8 +186,8 @@ internal static class InstallerCacheHelpers
             probe = parent;
         }
 
-        // Rented, not allocated: this runs twice per file over a folder that
-        // reaches 800,000 of them, and a fresh 520-char array each time was the
+        // Rented, not allocated: this runs once per candidate over a folder that
+        // reaches 800,000 files, and a fresh 520-char array each time was the
         // single largest thing the containment guard put through gen0.
         var buffer = ArrayPool<char>.Shared.Rent(PathBufferLength);
         try

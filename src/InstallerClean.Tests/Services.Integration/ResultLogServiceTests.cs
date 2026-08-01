@@ -51,12 +51,9 @@ public class ResultLogServiceTests : IDisposable
     {
         var svc = new ResultLogService(_logFile);
 
-        Assert.False(svc.HasFreshLog);
         Assert.True(await svc.WriteAsync(SampleEntry()));
 
         Assert.True(File.Exists(_logFile));
-        Assert.True(svc.HasFreshLog);
-        Assert.Equal(_logFile, svc.LastLogPath);
     }
 
     [Fact]
