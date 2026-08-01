@@ -41,6 +41,11 @@ internal static class Program
         // thread (acquire and release both here, per the Win32 owner-thread rule)
         // and RunWorkAsync owns its own catch-all, so the work itself never lands
         // here: only Run's pre-flight and its cleanup can.
+        //
+        // The code page is set and restored around all of that, the catch-all
+        // included, so the crash line still goes out in UTF-8 and the console is
+        // handed back last.
+        var previousOutputEncoding = TrySetUtf8Output();
         try
         {
             return Run(args);
@@ -49,31 +54,70 @@ internal static class Program
         {
             return ReportUnexpectedError(args.Length > 0 ? args[0].ToLowerInvariant() : "(none)", ex);
         }
+        finally
+        {
+            RestoreOutputEncoding(previousOutputEncoding);
+        }
+    }
+
+    /// <summary>
+    /// Pins stdout to UTF-8 so a <c>Cli.*</c> translation into a non-ASCII
+    /// language does not mojibake under redirected output
+    /// (<c>cmd /c installerclean-cli /s > out.txt</c>) or PowerShell 5's OEM
+    /// default code page. Returns the encoding that was in force, for
+    /// <see cref="RestoreOutputEncoding"/>, or null when nothing was changed.
+    /// </summary>
+    /// <remarks>
+    /// Failure is swallowed, and that asymmetry with the rest of the pre-flight is
+    /// the point: the setter calls SetConsoleOutputCP, which fails when the process
+    /// has no console at all (a DETACHED_PROCESS launcher, a session-0 service
+    /// wrapper), and the BCL surfaces that as an IOException. What is lost is
+    /// cosmetic, correct glyphs in non-ASCII stdout nobody is reading on a headless
+    /// run; what letting it escape would cost is the whole run, every run, with the
+    /// cache never cleaned.
+    /// </remarks>
+    private static Encoding? TrySetUtf8Output()
+    {
+        try
+        {
+            var previous = Console.OutputEncoding;
+            Console.OutputEncoding = Encoding.UTF8;
+            return previous;
+        }
+        catch (Exception)
+        {
+            // Either the read or the write failed, so nothing was changed and
+            // there is nothing to give back. Carry on in the inherited code page.
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Puts the console output code page back the way this process found it.
+    /// </summary>
+    /// <remarks>
+    /// The code page belongs to the console, and a child process shares the
+    /// console of the shell that launched it, so a run that leaves it on 65001
+    /// leaves every later command in that window there too. It costs nothing on
+    /// the path the UTF-8 setting exists for, a scheduled task getting a console
+    /// of its own; interactive use is what was paying for it.
+    /// </remarks>
+    private static void RestoreOutputEncoding(Encoding? previous)
+    {
+        if (previous is null) return;
+        try
+        {
+            Console.OutputEncoding = previous;
+        }
+        catch (Exception)
+        {
+            // The console went away under us (the parent shell closed). Nothing
+            // left to restore it to, and nothing left to tell.
+        }
     }
 
     private static int Run(string[] args)
     {
-        // Pin to UTF-8 so a Cli.* translation into a non-ASCII language
-        // doesn't mojibake under redirected output (cmd /c
-        // installerclean-cli /s > out.txt) or PowerShell 5's OEM
-        // default code page.
-        //
-        // Swallowed locally, and that asymmetry with the rest of the pre-flight is
-        // the point: the setter calls SetConsoleOutputCP, which fails when the
-        // process has no console at all (a DETACHED_PROCESS launcher, a session-0
-        // service wrapper), and the BCL surfaces that as an IOException. What is
-        // lost is cosmetic, correct glyphs in non-ASCII stdout nobody is reading on
-        // a headless run; what letting it escape would cost is the whole run, every
-        // run, with the cache never cleaned. Nothing below reads the encoding back.
-        try
-        {
-            Console.OutputEncoding = Encoding.UTF8;
-        }
-        catch (Exception)
-        {
-            // Deliberately empty: see above. Carry on in the inherited code page.
-        }
-
         // Human-facing stdout follows the OS UI culture: Italian on an Italian
         // machine, Japanese on a Japanese one; a locale with no satellite falls
         // back through the resx hierarchy to neutral English. CurrentCulture is
@@ -102,8 +146,7 @@ internal static class Program
                 // instead of a silent "success" that did nothing.
                 PrintUsage();
                 MachineContract.WriteEventLog(CliEventClass.HardError, () => Strings.Cli_EventLogNoArguments);
-                if (EventLogWriter.EventLogUnavailable)
-                    Console.WriteLine(Strings.Cli_EventLogUnavailable);
+                NoteEventLogUnavailable();
                 return ExitError;
             case CliCommand.UnknownArgument:
                 return ReportBadArguments(invocation,
@@ -131,15 +174,31 @@ internal static class Program
         ConsoleCancelEventHandler cancelHandler = (_, cancelArgs) =>
         {
             cancelArgs.Cancel = true; // keep the process running long enough to stop gracefully
-            // A second Ctrl+C arriving while the first is still unwinding must
-            // not print the notice again. CancellationTokenSource.Cancel is
-            // already idempotent, so this guard earns its place for the stdout
-            // line alone: the CLI's output is a scraped surface, and one run
-            // reports its cancellation once.
-            if (cts.IsCancellationRequested) return;
-            Console.WriteLine();
-            Console.WriteLine(Strings.Cli_Cancelling);
-            cts.Cancel();
+            // Nothing in here may throw. It runs on the console's own
+            // control-handler thread, which Main's try/catch does not cover, so an
+            // escape is unhandled: a runtime abort and a stack trace on stderr in
+            // place of the documented exit code and the single Application-log
+            // entry, on a surface that deliberately keeps ex.Message out. Cancel
+            // raises ObjectDisposedException once the run has disposed the source,
+            // which it can do mid-invocation, unsubscribing a multicast delegate
+            // not waiting for a handler already running. IsCancellationRequested
+            // stays readable after Dispose, so the guard below is not the hazard.
+            try
+            {
+                // A second Ctrl+C arriving while the first is still unwinding must
+                // not print the notice again. CancellationTokenSource.Cancel is
+                // already idempotent, so this guard earns its place for the stdout
+                // line alone: the CLI's output is a scraped surface, and one run
+                // reports its cancellation once.
+                if (cts.IsCancellationRequested) return;
+                Console.WriteLine();
+                Console.WriteLine(Strings.Cli_Cancelling);
+                cts.Cancel();
+            }
+            catch (Exception ex)
+            {
+                Helpers.CrashLog.TryWrite(ex);
+            }
         };
         Console.CancelKeyPress += cancelHandler;
 
@@ -171,8 +230,7 @@ internal static class Program
                 // fired".
                 MachineContract.WriteEventLog(CliEventClass.TransientSkip,
                     () => string.Format(Strings.Cli_EventLogMutexBlocked, arg));
-                if (EventLogWriter.EventLogUnavailable)
-                    Console.WriteLine(Strings.Cli_EventLogUnavailable);
+                NoteEventLogUnavailable();
                 mutex.Dispose();
                 Console.CancelKeyPress -= cancelHandler;
                 return ExitTransient;
@@ -195,14 +253,42 @@ internal static class Program
         }
         finally
         {
-            // One stdout audit line per run: if any Write fell into the
-            // unavailable path, RMM consumers polling the Application
-            // channel see a record that the channel was unwritable.
-            if (EventLogWriter.EventLogUnavailable)
-                Console.WriteLine(Strings.Cli_EventLogUnavailable);
+            // RunWorkAsync has already written this run's one Application-log
+            // entry by the time it returns, so nothing in this cleanup may reach
+            // Main's catch-all: that writes a second, and one entry per run is
+            // what an RMM counts runs by. Each hazard is guarded on its own so
+            // that a dead stdout cannot skip the mutex release beneath it.
+            NoteEventLogUnavailable();
             Console.CancelKeyPress -= cancelHandler;
-            if (holdsMutex) mutex!.ReleaseMutex();
-            mutex?.Dispose();
+            try
+            {
+                if (holdsMutex) mutex!.ReleaseMutex();
+                mutex?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Helpers.CrashLog.TryWrite(ex);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Prints the one stdout audit line saying the Application channel was
+    /// unwritable, so an RMM consumer polling for entries that never arrived has
+    /// a record of why. Guarded, and every caller relies on that: each has
+    /// already written this run's Application-log entry, and a throw from a dead
+    /// stdout would reach <see cref="Main"/>'s catch-all and produce a second.
+    /// </summary>
+    private static void NoteEventLogUnavailable()
+    {
+        if (!EventLogWriter.EventLogUnavailable) return;
+        try
+        {
+            Console.WriteLine(Strings.Cli_EventLogUnavailable);
+        }
+        catch (Exception ex)
+        {
+            Helpers.CrashLog.TryWrite(ex);
         }
     }
 
@@ -582,8 +668,7 @@ internal static class Program
         PrintUsage();
         MachineContract.WriteEventLog(CliEventClass.HardError,
             () => string.Format(Strings.Cli_EventLogBadArguments, invocation.OffendingArgument));
-        if (EventLogWriter.EventLogUnavailable)
-            Console.WriteLine(Strings.Cli_EventLogUnavailable);
+        NoteEventLogUnavailable();
         return ExitError;
     }
 
