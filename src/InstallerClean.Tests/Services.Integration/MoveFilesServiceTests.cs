@@ -38,6 +38,68 @@ public class MoveFilesServiceTests : IDisposable
         Assert.True(File.Exists(Path.Combine(_destDir, "test.msi")));
     }
 
+    [Fact]
+    public async Task MoveFilesAsync_reports_what_it_moved_when_the_destination_is_swapped()
+    {
+        // The per-iteration re-resolve exists to catch a destination relabelled
+        // under the batch, and files have already left C:\Windows\Installer by
+        // the time it fires: the user is owed the count and the line saying they
+        // can put those files back. Needs a real reparse point, so it is
+        // best-effort like the symlink tests next door, a directory symlink
+        // needing SeCreateSymbolicLinkPrivilege that not every host grants.
+        var first = Path.Combine(_sourceDir, "first.msi");
+        var second = Path.Combine(_sourceDir, "second.msi");
+        await File.WriteAllTextAsync(first, "one");
+        await File.WriteAllTextAsync(second, "two");
+        var decoy = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(decoy);
+
+        // Asked before the batch, not during it: the swap happens inside a
+        // progress callback the service calls outside its per-file catch, so a
+        // host that refuses the link there would fail this test rather than
+        // stand aside from it.
+        var probe = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        try
+        {
+            Directory.CreateSymbolicLink(probe, decoy);
+            Directory.Delete(probe);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Directory.Delete(decoy, recursive: true);
+            return; // this host cannot create a directory symlink
+        }
+
+        var swapped = false;
+        var progress = new Helpers.SyncProgress<InstallerClean.Models.OperationProgress>(p =>
+        {
+            // Fires before each file's move. On the second, put a link to
+            // somewhere else where the folder the batch resolved was.
+            if (p.CurrentFile != 2 || swapped) return;
+            foreach (var moved in Directory.GetFiles(_destDir))
+                File.Move(moved, Path.Combine(decoy, Path.GetFileName(moved)));
+            Directory.Delete(_destDir);
+            Directory.CreateSymbolicLink(_destDir, decoy);
+            swapped = true;
+        });
+
+        var svc = new MoveFilesService(new System.IO.Abstractions.FileSystem(), _sourceDir);
+        try
+        {
+            var ex = await Assert.ThrowsAsync<MoveAbortedException>(() =>
+                svc.MoveFilesAsync(new[] { first, second }, _destDir, progress));
+
+            Assert.Equal(1, ex.Partial.MovedCount);
+            Assert.Empty(ex.Partial.Errors);
+            Assert.False(File.Exists(first), "The first file moved before the swap was caught");
+            Assert.True(File.Exists(second), "The batch stopped rather than writing into the wrong place");
+        }
+        finally
+        {
+            if (Directory.Exists(decoy)) Directory.Delete(decoy, recursive: true);
+        }
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_sourceDir)) Directory.Delete(_sourceDir, recursive: true);

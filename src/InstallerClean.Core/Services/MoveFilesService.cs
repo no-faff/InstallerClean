@@ -153,6 +153,7 @@ public sealed class MoveFilesService : IMoveFilesService
             var pathList = filePaths as IReadOnlyList<string> ?? filePaths.ToList();
             var total = pathList.Count;
             bool cancelled = false;
+            bool destinationChanged = false;
 
             try
             {
@@ -170,8 +171,16 @@ public sealed class MoveFilesService : IMoveFilesService
                 var currentResolved = InstallerCacheHelpers.ResolveFinalPath(destinationFolder)
                     .TrimEnd(Path.DirectorySeparatorChar);
                 if (!currentResolved.Equals(canonicalDestination, StringComparison.OrdinalIgnoreCase))
-                    throw new LocalisedInvalidOperationException(
-                        string.Format(Strings.Error_DestinationChangedMidBatch, destinationFolder));
+                {
+                    // Out through the one exit below rather than straight up the
+                    // stack: everything a stopped batch still owes is under this
+                    // frame. Files have already left C:\Windows\Installer, so the
+                    // count, the size and the line telling the user they can put
+                    // them back are all real, and the failure log's closing entry
+                    // accounts for what the batch's failures cost it.
+                    destinationChanged = true;
+                    break;
+                }
 
                 try
                 {
@@ -276,7 +285,18 @@ public sealed class MoveFilesService : IMoveFilesService
             // batch that actually succeeded - the caller would re-label
             // the run as "Move cancelled" even though every file moved.
             InstallerCacheHelpers.PruneEmptySubdirectories(_fs, CancellationToken.None);
-            return new MoveResult(moved, errors.AsReadOnly(), cancelled);
+
+            var result = new MoveResult(moved, errors.AsReadOnly(), cancelled);
+
+            // A guard that trips mid-flight throws, like this service's other
+            // guards and unlike a cancel, which is the user's own choice. What it
+            // must not do is take the batch's account of itself with it, which is
+            // why the result is built first and travels on the exception.
+            if (destinationChanged)
+                throw new MoveAbortedException(
+                    string.Format(Strings.Error_DestinationChangedMidBatch, destinationFolder), result);
+
+            return result;
             }
             finally
             {

@@ -702,7 +702,37 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // through the move so a single Cancel signal covers the pre-flight, the
             // re-verify and the move loop.
             var progress = new Progress<OperationProgress>(OnOperationProgressUpdate);
-            var result = await _moveService.MoveFilesAsync(survivingPaths, dest, progress, _operationCts!.Token);
+            MoveResult result;
+            try
+            {
+                result = await _moveService.MoveFilesAsync(survivingPaths, dest, progress, _operationCts!.Token);
+            }
+            catch (MoveAbortedException ex)
+            {
+                // The destination was swapped part-way through, so the service
+                // stopped and handed back what it had done. Files are in the
+                // folder, and the ordinary summary states what moved and where,
+                // which is true of a batch that stopped as much as of one that
+                // finished; the warning over it carries the reason, its own text
+                // saying the move was stopped. Caught here rather than at the
+                // method's own arms so the surviving list and the destination
+                // kind are still in scope to report with.
+                //
+                // No result-log entry, which is not a new call: the cancel arm
+                // below returns before the write for the same reason, recorded
+                // there as the owner's decision that a run which stopped part
+                // way stays out of the public figures.
+                await _scan.RefreshAsync();
+                if (ex.Partial.MovedCount > 0 || ex.Partial.Errors.Count > 0)
+                {
+                    _completion.ShowMoveSummary(ex.Partial.MovedCount,
+                        CompletedBytes(survivingFiles, ex.Partial.MovedCount, ex.Partial.Errors),
+                        dest, ex.Partial.Errors, ClassifySpaceOutcome(destinationKind), reverify);
+                }
+                _dialogService.ShowWarning(ex.Message, Strings.Error_InvalidDestinationTitle);
+                OperationProgress = string.Empty;
+                return;
+            }
 
             if (result.InstallerBusy)
             {

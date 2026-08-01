@@ -16,7 +16,7 @@ namespace InstallerClean.Models;
 /// for UnauthorizedAccessException. Pattern matches against
 /// <see cref="InvalidOperationException"/> still bind via inheritance.
 /// </summary>
-public sealed class LocalisedInvalidOperationException : InvalidOperationException
+public class LocalisedInvalidOperationException : InvalidOperationException
 {
     public LocalisedInvalidOperationException(string message) : base(message) { }
 
