@@ -33,6 +33,68 @@ public class FileSystemScanServiceTests
         return q;
     }
 
+    /// <summary>
+    /// A scan of one orphan against <paramref name="present"/> registered files
+    /// on disk and <paramref name="missing"/> that Windows still names but are
+    /// gone: the two numbers the correlation gate weighs against each other.
+    /// </summary>
+    private static Task<ScanResult> ScanWithRegisteredSplit(int present, int missing)
+    {
+        const string orphan = @"C:\Windows\Installer\orphan.msi";
+        var packages = new List<RegisteredPackage>();
+        var fs = new MockFileSystem();
+        fs.AddFile(orphan, new MockFileData("x"));
+
+        for (var i = 0; i < present; i++)
+        {
+            var path = $@"C:\Windows\Installer\present{i}.msi";
+            packages.Add(Registered(path));
+            fs.AddFile(path, new MockFileData("x"));
+        }
+        for (var i = 0; i < missing; i++)
+            packages.Add(Registered($@"C:\Windows\Installer\gone{i}.msi"));
+
+        var query = QueryReturning(new InstallerQueryResult(packages.AsReadOnly()));
+        return new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync();
+    }
+
+    [Fact]
+    public async Task ScanAsync_refuses_a_correlation_that_one_surviving_package_would_have_disarmed()
+    {
+        // The finding: testing for a total collapse meant a single registered
+        // file still on disk disarmed the gate entirely, and a mismatch that
+        // spares one path in two hundred is the same fault as one that spares
+        // none.
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            ScanWithRegisteredSplit(present: 1, missing: 30));
+
+        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+    }
+
+    [Fact]
+    public async Task ScanAsync_does_not_refuse_a_machine_that_has_merely_lost_most_of_its_cache()
+    {
+        // Machines with most of their registered files gone are real: another
+        // tool emptying the folder is exactly what the missing-from-disk banner
+        // exists for, and refusing that scan would take away a list they can act
+        // on. Three survivors is past the absolute bound and stays a scan.
+        var result = await ScanWithRegisteredSplit(present: 3, missing: 30);
+
+        Assert.Single(result.RemovableFiles);
+        Assert.Equal(30, result.MissingNonRemovableCount);
+    }
+
+    [Fact]
+    public async Task ScanAsync_does_not_refuse_a_small_machine_where_two_survivors_are_a_tenth_of_it()
+    {
+        // The proportional bound doing its own work: two present out of twenty
+        // is a fifth of the registrations, which is nothing like a collapse, and
+        // without it the absolute bound alone would refuse this scan.
+        var result = await ScanWithRegisteredSplit(present: 2, missing: 18);
+
+        Assert.Single(result.RemovableFiles);
+    }
+
     [Fact]
     public async Task ScanAsync_refuses_when_the_root_never_resolved_and_nothing_survived_the_guard()
     {
@@ -97,6 +159,28 @@ public class FileSystemScanServiceTests
         Assert.Empty(result.RemovableFiles);
         Assert.Single(result.RegisteredPackages);
         Assert.Equal(1, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task ScanAsync_counts_only_the_withheld_files_it_could_have_offered()
+    {
+        // What the withholding COST this run, which is not the same as how many
+        // rows carried the flag: a withheld patch whose file is already gone had
+        // nothing to offer either way, so counting it would overstate what the
+        // user did not get.
+        const string present = @"C:\Windows\Installer\withheld-present.msp";
+        const string gone = @"C:\Windows\Installer\withheld-gone.msp";
+        var query = QueryReturning(new InstallerQueryResult(
+            new List<RegisteredPackage> { Withheld(present), Withheld(gone) }.AsReadOnly(),
+            UnreadableProductCount: 2));
+
+        var fs = new MockFileSystem();
+        fs.AddFile(present, new MockFileData("x"));
+
+        var result = await new FileSystemScanService(query, fs, Array.Empty<string>(), null).ScanAsync();
+
+        Assert.Equal(1, result.WithheldCount);
+        Assert.Equal(2, result.UnreadableProductCount);
     }
 
     [Fact]

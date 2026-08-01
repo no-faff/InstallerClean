@@ -125,6 +125,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         long stillUsedBytes = 0;
         int refusedCandidates = 0;
+        int withheld = 0;
         int missingNonRemovable = 0;
         int missingRemovable = 0;
         int nonRemovablePresent = 0;
@@ -269,6 +270,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
             {
                 stillUsedBytes += size;
                 nonRemovablePresent++;
+                // Counted only where the file is on disk, because the count is
+                // what the withholding COST this run: a withheld row whose file
+                // is already gone had nothing to offer either way.
+                if (pkg.RemovableWithheld) withheld++;
             }
             else if (pkg.RemovableWithheld)
             {
@@ -308,27 +313,45 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
 
-        // Correlation sanity gate. On any real machine at least some registered
-        // package's cached file is present on disk. If NOT ONE is (every
-        // non-removable registered package looks missing) yet the walk still
+        // Correlation sanity gate. On any real machine most registered packages'
+        // cached files are on disk. If next to none are, yet the walk still
         // yielded files to offer for removal, the two halves have not
         // correlated: a path-form mismatch between the API's LocalPackage values
         // and the walked paths, a collapsed enumeration, or the wrong folder all
-        // produce exactly this signature (Windows referencing files that are all
-        // "gone" while every file on disk is "orphaned"), and no healthy machine
+        // produce exactly this signature (Windows referencing files that are
+        // "gone" while the files on disk are "orphaned"), and no healthy machine
         // does. A tool that genuinely wiped the cache would leave no files to be
         // orphans, so removable.Count > 0 rules that benign case out. Refuse the
         // scan rather than offer the whole cache for deletion on a broken
-        // correlation. No absolute floor is used on purpose: Windows always has
-        // many machine-context products, so "every one missing" is the collapse
-        // signature at any real count, and a floor would only mask a smaller one.
-        if (nonRemovablePresent == 0 && missingNonRemovable > 0 && removable.Count > 0)
+        // correlation.
+        //
+        // A survivor or two must not disarm it, which testing for a total
+        // collapse did: the causes above are indifferent to whether one
+        // registration happens to survive them, and a mismatch that spares one
+        // path in two hundred is the same fault as one that spares none.
+        //
+        // Both bounds earn their place and the pair is deliberately narrow. The
+        // absolute one answers the finding and no more, which is why it is two
+        // rather than a round number; the proportional one stops it becoming a
+        // floor on a small machine, where two survivors out of twenty are a
+        // fifth of the registrations and no collapse at all. Machines with most
+        // of their cache missing are real, another tool having emptied the
+        // folder being exactly what the missing-from-disk banner is for, and 90
+        // of the 92 result-log runs that could reach this gate have at most an
+        // eighth of their registered files missing. Refusing one of those runs
+        // would take away a list they can act on to protect them from a fault
+        // nobody has reported.
+        var nonRemovableTotal = nonRemovablePresent + missingNonRemovable;
+        if (nonRemovablePresent <= 2
+            && nonRemovablePresent * 20 < nonRemovableTotal
+            && missingNonRemovable > 0
+            && removable.Count > 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);
 
         progress?.Report(new ScanProgressUpdate(string.Format(Strings.Status_FoundUnused,
             removable.Count, DisplayHelpers.PluraliseFile(removable.Count))));
         return new ScanResult(removable.AsReadOnly(), stillUsed, stillUsedBytes, missingNonRemovable, missingRemovable,
-            query.UnreadableProductCount);
+            query.UnreadableProductCount, withheld);
     }
 
     /// <summary>

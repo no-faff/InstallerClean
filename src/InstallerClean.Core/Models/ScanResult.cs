@@ -52,13 +52,26 @@ namespace InstallerClean.Models;
 /// <see cref="RemovableFiles"/> carries orphans only; the summary says so. Zero
 /// on any healthy machine, which is why nothing else keys off it.
 /// </param>
+/// <param name="WithheldCount">
+/// Files this scan held back: superseded or obsoleted packages whose file is on
+/// disk and which the scan would have offered, had it been able to say that no
+/// installed product still needs them. It is what the withholding cost this run,
+/// where <see cref="UnreadableProductCount"/> is the reason for it, and it is
+/// zero on any scan that read every product's records.
+///
+/// NOT the same thing as the act-time re-verify's held-back count, and the two
+/// will eventually sit in one result-log payload: this one counts what was kept
+/// off the list before the user saw anything, that one counts what stopped
+/// qualifying between the list and the button.
+/// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
     IReadOnlyList<RegisteredPackage> RegisteredPackages,
     long RegisteredTotalBytes,
     int MissingNonRemovableCount = 0,
     int MissingRemovableCount = 0,
-    int UnreadableProductCount = 0)
+    int UnreadableProductCount = 0,
+    int WithheldCount = 0)
 {
     /// <summary>Total registered packages missing on disk; sum of the two sub-counts.</summary>
     public int MissingFromDiskCount => MissingNonRemovableCount + MissingRemovableCount;

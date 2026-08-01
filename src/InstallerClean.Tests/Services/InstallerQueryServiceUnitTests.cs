@@ -19,10 +19,11 @@ namespace InstallerClean.Tests.Services;
 /// a run's outcome depends on the scripted API alone. Letting it read the live
 /// UserData keys of whatever host the suite ran on would be tolerable if the
 /// fallback could only ADD rows (the assertions filter to the paths the fake
-/// produces), but the degraded-sources gate reads its failure count, so a CI
-/// machine with one unreadable key would decide the outcome of every test that
-/// scripts a short enumeration. The merge rules the fallback participates
-/// in are pinned by calling <c>MergeClaim</c> directly.
+/// produces), but the degraded-sources gate reads its failure count and the
+/// enumeration cross-check reads how many products it walked, so a CI machine's
+/// own registry would decide the outcome of every test that scripts a short
+/// enumeration. The merge rules the fallback participates in are pinned by
+/// calling <c>MergeClaim</c> directly.
 /// </summary>
 public class InstallerQueryServiceUnitTests
 {
@@ -46,10 +47,14 @@ public class InstallerQueryServiceUnitTests
     private const uint InvalidParameter = 87;
 
     /// <summary>
-    /// A registry fallback that contributes nothing and fails at nothing: the
-    /// healthy-second-source baseline every test but the degraded ones wants.
+    /// A registry fallback that contributes nothing, fails at nothing and names
+    /// no products: the healthy-second-source baseline every test but the
+    /// degraded ones wants. Naming no products keeps it out of the
+    /// enumeration-shortfall cross-check as well, which weighs the API's count
+    /// against the registry's and cannot find the API short of nothing.
     /// </summary>
-    private static int NoFallback(Dictionary<string, RegisteredPackage> claimed, CancellationToken ct) => 0;
+    private static InstallerQueryService.FallbackRead NoFallback(
+        Dictionary<string, RegisteredPackage> claimed, CancellationToken ct) => new(0, 0);
 
     private static async Task<InstallerQueryResult> Run(FakeMsiApi msi) =>
         await new InstallerQueryService(msi, NoFallback).GetRegisteredPackagesAsync();
@@ -59,7 +64,17 @@ public class InstallerQueryServiceUnitTests
     /// failed key reads, the second half of the degraded-sources gate.
     /// </summary>
     private static async Task<InstallerQueryResult> Run(FakeMsiApi msi, int fallbackFailures) =>
-        await new InstallerQueryService(msi, (_, _) => fallbackFailures).GetRegisteredPackagesAsync();
+        await new InstallerQueryService(msi, (_, _) => new InstallerQueryService.FallbackRead(fallbackFailures, 0))
+            .GetRegisteredPackagesAsync();
+
+    /// <summary>
+    /// Runs with a healthy fallback that names <paramref name="registryProducts"/>
+    /// product keys, which is the count the enumeration cross-check weighs the
+    /// API's own against.
+    /// </summary>
+    private static async Task<InstallerQueryResult> RunAgainstRegistry(FakeMsiApi msi, int registryProducts) =>
+        await new InstallerQueryService(msi, (_, _) => new InstallerQueryService.FallbackRead(0, registryProducts))
+            .GetRegisteredPackagesAsync();
 
     // ---- Shared-patch verdict merge ----
 
@@ -413,6 +428,92 @@ public class InstallerQueryServiceUnitTests
         Assert.Contains(result.Packages, r => r.LocalPackagePath == ppath);
     }
 
+    // ---- An enumeration that ended early, seen from the registry's side ----
+    //
+    // The API cannot report this about itself: NoMoreItems at index 3 of 200
+    // reads exactly like the end of a 3-product machine, so the only evidence is
+    // that the registry knows about products the enumeration never mentioned.
+
+    /// <summary>
+    /// A machine with one product, one superseded patch of its own, and nothing
+    /// else. Whether that patch is offered is the whole subject of the four
+    /// tests below.
+    /// </summary>
+    private static FakeMsiApi OneProductWithASupersededPatch(string patch)
+    {
+        var msi = new FakeMsiApi();
+        msi.AddProduct("{A}");
+        msi.AddPatch("{A}", "{P}", localPackage: patch, state: "2", uninstallable: "0");
+        return msi;
+    }
+
+    [Fact]
+    public async Task An_enumeration_far_short_of_the_registrys_product_count_withholds_the_removable_class()
+    {
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+
+        var result = await RunAgainstRegistry(OneProductWithASupersededPatch(patch), registryProducts: 40);
+
+        // Withheld, not refused: the orphan half of the scan is unaffected and
+        // the user still has a list to act on.
+        var row = Assert.Single(result.Packages, r => r.LocalPackagePath == patch);
+        Assert.False(row.IsRemovable);
+        Assert.True(row.RemovableWithheld);
+        Assert.Equal(39, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task A_registry_two_products_ahead_of_the_api_withholds_nothing()
+    {
+        // UserData product keys outlive a failed uninstall, so the registry
+        // legitimately runs a little ahead on a healthy machine. Two is absorbed
+        // outright, which is what stops a machine with a handful of
+        // registrations tripping on one piece of residue.
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+        var msi = OneProductWithASupersededPatch(patch);
+        msi.AddProduct("{B}");
+        msi.AddProduct("{C}");
+
+        var result = await RunAgainstRegistry(msi, registryProducts: 5);
+
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).IsRemovable);
+        Assert.Equal(0, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task A_registry_a_tenth_ahead_of_the_api_withholds_nothing()
+    {
+        // The proportional half, which is what keeps the absolute one from
+        // becoming a rule about big machines: nine products of residue on a
+        // ninety-product machine is not an enumeration that gave up early.
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+        var msi = OneProductWithASupersededPatch(patch);
+        for (var i = 0; i < 89; i++) msi.AddProduct($"{{P{i}}}");
+
+        var result = await RunAgainstRegistry(msi, registryProducts: 100);
+
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).IsRemovable);
+        Assert.Equal(0, result.UnreadableProductCount);
+    }
+
+    [Fact]
+    public async Task A_short_enumeration_beside_a_failing_fallback_still_withholds_rather_than_refusing()
+    {
+        // The refusal above it stays keyed on what the API said about ITSELF. A
+        // shortfall is inferred from two counts that can differ innocently, and
+        // inference is sound enough to hold a class back and not sound enough to
+        // take a machine's scan away: this run has both a short count and a
+        // failed key read and still comes back with a list.
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+        var msi = OneProductWithASupersededPatch(patch);
+
+        var result = await new InstallerQueryService(msi,
+            (_, _) => new InstallerQueryService.FallbackRead(Failures: 3, ProductKeys: 40))
+            .GetRegisteredPackagesAsync();
+
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
+    }
+
     // ---- Nothing claims a cached file at all ----
 
     [Fact]
@@ -444,7 +545,7 @@ public class InstallerQueryServiceUnitTests
         var result = await new InstallerQueryService(msi, (claimed, _) =>
         {
             claimed[fromRegistry] = new RegisteredPackage(fromRegistry, "", "");
-            return 0;
+            return new InstallerQueryService.FallbackRead(0, 1);
         }).GetRegisteredPackagesAsync();
 
         Assert.Equal(fromRegistry, Assert.Single(result.Packages).LocalPackagePath);

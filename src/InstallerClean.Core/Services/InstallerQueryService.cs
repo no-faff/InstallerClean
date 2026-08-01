@@ -30,8 +30,8 @@ public sealed class InstallerQueryService : IInstallerQueryService
     private readonly Action<Exception>? _crashLogSink;
 
     /// <summary>
-    /// Reads the registry fallback into <paramref name="claimed"/> and returns
-    /// how many key reads failed.
+    /// Reads the registry fallback into <paramref name="claimed"/> and reports
+    /// what it saw on the way.
     ///
     /// A seam rather than a direct call because the fallback is one half of the
     /// degraded-sources gate below, and the other half is already drivable
@@ -42,7 +42,24 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// varying only one of them. Production wiring is unchanged; both public
     /// constructors bind the real reader.
     /// </summary>
-    internal delegate int FallbackReader(Dictionary<string, RegisteredPackage> claimed, CancellationToken ct);
+    internal delegate FallbackRead FallbackReader(Dictionary<string, RegisteredPackage> claimed, CancellationToken ct);
+
+    /// <summary>
+    /// What one pass of the registry fallback found.
+    /// </summary>
+    /// <param name="Failures">
+    /// Key reads that failed. Half of the degraded-sources gate: a fallback that
+    /// read almost nothing cannot be the recovery a short API enumeration is
+    /// allowed to lean on.
+    /// </param>
+    /// <param name="ProductKeys">
+    /// Product subkeys walked under <c>UserData</c>, whether or not the entry
+    /// inside carried a package path. It is the app's only independent count of
+    /// how many products this machine has, which is what makes an enumeration
+    /// that ended early visible at all; see the cross-check in
+    /// <see cref="GetRegisteredPackagesCore"/> for what it can and cannot say.
+    /// </param>
+    internal readonly record struct FallbackRead(int Failures, int ProductKeys);
 
     /// <summary>
     /// Production constructor: talks to the real msi.dll through
@@ -222,7 +239,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
 
         progress?.Report(new ScanProgressUpdate(Strings.Status_CheckingRegistry));
 
-        var fallbackReadFailures = _readFallback(claimed, ct);
+        var fallback = _readFallback(claimed, ct);
 
         // Even a fresh Windows install has OS-level MSI products. Zero
         // here means the database is corrupt or inaccessible; silently
@@ -252,8 +269,49 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // lost, so nothing here can be salvaged into a narrower rule.
         //
         // On any healthy machine both counters are zero and this is dead code.
-        if (unreadableProducts > 0 && fallbackReadFailures > 0)
+        //
+        // Keyed on what the API said about itself, never on the cross-check
+        // below: this gate REFUSES, and a refusal must rest on a product the
+        // enumeration itself reported it could not read. The cross-check infers
+        // a loss from two counts that can differ for innocent reasons, which is
+        // sound enough to withhold on and not to refuse on.
+        if (unreadableProducts > 0 && fallback.Failures > 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanRecordsUnreadable);
+
+        // An enumeration that ends EARLY says nothing about itself: a
+        // NoMoreItems at index 3 of 200 sets reachedEnd, leaves unreadableRows
+        // at 0, and the scan reports itself complete while 197 products' patch
+        // claims never reached the merge. The downgrade-only merge is what stops
+        // a patch that is Superseded under one product and Applied under another
+        // being offered, and it can only fire for a product the loop reached, so
+        // a truncation puts a still-needed patch on the removal list under a
+        // scan that believes it is whole. Nothing inside the API can see it.
+        //
+        // The registry walk is the only independent count of how many products
+        // this machine has, so a shortfall against it is the signal. It is an
+        // inference, not a measurement, and the tolerance is what keeps it
+        // honest in both directions: UserData product keys survive a failed
+        // uninstall, so the registry legitimately runs ahead of the API on a
+        // healthy machine, while a truncation loses whatever the enumeration did
+        // not reach, which is unbounded. A fifth of a machine's registrations
+        // being residue is not the ordinary case; losing a fifth of them to a
+        // truncation is a single event.
+        //
+        // What it cannot do is see a small truncation, and it is not made
+        // stricter to try: the cost of firing is a scan with no superseded
+        // patches on it and a line saying so, which is paid by every user whose
+        // machine trips it, and the orphan half of the list is unaffected either
+        // way. Two products' difference is absorbed outright so a machine with a
+        // handful of registrations cannot trip on one stale key.
+        var productShortfall = fallback.ProductKeys - products.Count;
+        var enumerationLooksShort =
+            productShortfall > 2 && products.Count * 5 < fallback.ProductKeys * 4;
+
+        // Withheld, never refused. A scan that offers fewer candidates is one
+        // the user can still act on, and the class being held back is the one
+        // the loss bears on: orphan detection is unaffected, the fallback having
+        // contributed the lost products' paths as claims of their own.
+        var withheldProducts = unreadableProducts + (enumerationLooksShort ? productShortfall : 0);
 
         progress?.Report(new ScanProgressUpdate(string.Format(
             Helpers.DisplayHelpers.Pluralise(claimed.Count, Strings.Status_RegisteredPackagesFound, "Status.RegisteredPackagesFound"),
@@ -281,13 +339,13 @@ public sealed class InstallerQueryService : IInstallerQueryService
         //
         // Only the removable class moves, and the cost is bounded by that: this
         // withholds superseded-patch cleanup, not orphan cleanup, and only on a
-        // scan that demonstrably lost a row.
-        if (unreadableProducts > 0)
+        // scan that lost a row or is short against the registry's own count.
+        if (withheldProducts > 0)
             for (var i = 0; i < packages.Count; i++)
                 if (packages[i].IsRemovable)
                     packages[i] = packages[i] with { IsRemovable = false, RemovableWithheld = true };
 
-        return new InstallerQueryResult(packages.AsReadOnly(), unreadableProducts);
+        return new InstallerQueryResult(packages.AsReadOnly(), withheldProducts);
         }
         finally
         {
@@ -439,11 +497,12 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// contributed into an orphan candidate. Scoping the catch to each key read
     /// costs one entry per bad key, never the net.
     /// </summary>
-    private static int ReadRegistryFallback(
+    private static FallbackRead ReadRegistryFallback(
         Dictionary<string, RegisteredPackage> claimed,
         CancellationToken ct)
     {
         var failures = 0;
+        var productKeys = 0;
 
         // Budgeted, because every catch below sits inside a loop bounded by the
         // machine's registered products and patches, and what fails one key read
@@ -468,7 +527,9 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 foreach (var sidName in udKey.GetSubKeyNames())
                 {
                     ct.ThrowIfCancellationRequested();
-                    failures += ReadFallbackSid(udKey, sidName, claimed, ct, failureLog);
+                    var sidRead = ReadFallbackSid(udKey, sidName, claimed, ct, failureLog);
+                    failures += sidRead.Failures;
+                    productKeys += sidRead.ProductKeys;
                 }
             }
         }
@@ -490,7 +551,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             failureLog.WriteClosingEntry();
         }
 
-        return failures;
+        return new FallbackRead(failures, productKeys);
     }
 
     /// <summary>
@@ -513,7 +574,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
     /// open" and "one patch's key would not read" are the two ends of a
     /// diagnosis.
     /// </summary>
-    private static int ReadFallbackSid(
+    private static FallbackRead ReadFallbackSid(
         Microsoft.Win32.RegistryKey udKey,
         string sidName,
         Dictionary<string, RegisteredPackage> claimed,
@@ -521,6 +582,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
         PerItemFailureLog failureLog)
     {
         var failures = 0;
+        var productKeys = 0;
 
         try
         {
@@ -530,6 +592,11 @@ public sealed class InstallerQueryService : IInstallerQueryService
                 foreach (var prodGuid in productsKey.GetSubKeyNames())
                 {
                     ct.ThrowIfCancellationRequested();
+                    // Counted from the key list, before anything inside it is
+                    // read: a product whose InstallProperties cannot be opened
+                    // is still a product this machine has, and the count exists
+                    // to be weighed against how many the API enumerated.
+                    productKeys++;
                     try
                     {
                         using var ipKey = productsKey.OpenSubKey($@"{prodGuid}\InstallProperties");
@@ -584,7 +651,7 @@ public sealed class InstallerQueryService : IInstallerQueryService
             failureLog.Record(ex, cause: "patches-key");
         }
 
-        return failures;
+        return new FallbackRead(failures, productKeys);
     }
 
     private const int MaxProductIndex = 10_000;

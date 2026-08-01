@@ -609,13 +609,16 @@
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
   <!-- Informational line shown when the scan could not read every installed
-       program's Windows Installer records. Superseded patches are then kept
-       rather than offered, because whether one is still needed is a question
-       about every installed program and this scan could not ask them all. The
-       second sentence is load-bearing: the main job (finding orphaned files) ran
-       normally, so a shorter list is not a fault. 0 = the count of programs. -->
-  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>{0} installed program could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected.</value></data>
-  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>{0} installed programs could not be read during this scan, so superseded patches have been kept. Orphaned files are not affected.</value></data>
+       program's Windows Installer records, or found fewer of them than the
+       machine's own registrations account for. Superseded and obsoleted patches
+       are then kept rather than offered, because whether one is still needed is
+       a question about every installed program and this scan could not ask them
+       all. Nothing is wrong with the machine and there is nothing to do about
+       it, so the line says what to expect rather than warning: everything on the
+       list is still safe to remove, there may be more that are not shown, and a
+       re-scan may read them. 0 = the count of programs. -->
+  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.</value></data>
+  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{0} of {1} {2}</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
