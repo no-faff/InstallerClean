@@ -129,6 +129,7 @@ public sealed class FileSystemScanService : IFileSystemScanService
         int missingNonRemovable = 0;
         int missingRemovable = 0;
         int nonRemovablePresent = 0;
+        int removablePresent = 0;
         var sizedPackages = new List<RegisteredPackage>(registered.Count);
 
         // The closing entry is owed on every exit, not just the clean one: a
@@ -238,6 +239,12 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     // PatchState 4 = obsoleted (publisher-withdrawn);
                     // distinct API state, distinct Reason label, same
                     // user-visible outcome (the patch is removable).
+                    // A registered path that resolved to a real file, which is
+                    // the same evidence nonRemovablePresent carries and is
+                    // weighed with it by the correlation gate. That it is
+                    // removable says nothing about whether the two halves of
+                    // the scan line up.
+                    removablePresent++;
                     var isObsoleted = pkg.PatchState == 4;
                     var reason = isObsoleted
                         ? Strings.Reason_Obsoleted
@@ -330,20 +337,27 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // registration happens to survive them, and a mismatch that spares one
         // path in two hundred is the same fault as one that spares none.
         //
+        // Every registered file found on disk counts as one, superseded ones
+        // included. What the gate is asking is whether any registered path
+        // resolved to a real file, and a superseded patch's does exactly as much
+        // as a needed package's; leaving those out would refuse a machine that
+        // had ten of them sitting in the folder about to be offered.
+        //
         // Both bounds earn their place and the pair is deliberately narrow. The
         // absolute one answers the finding and no more, which is why it is two
         // rather than a round number; the proportional one stops it becoming a
         // floor on a small machine, where two survivors out of twenty are a
         // fifth of the registrations and no collapse at all. Machines with most
         // of their cache missing are real, another tool having emptied the
-        // folder being exactly what the missing-from-disk banner is for, and 90
-        // of the 92 result-log runs that could reach this gate have at most an
-        // eighth of their registered files missing. Refusing one of those runs
-        // would take away a list they can act on to protect them from a fault
-        // nobody has reported.
-        var nonRemovableTotal = nonRemovablePresent + missingNonRemovable;
-        if (nonRemovablePresent <= 2
-            && nonRemovablePresent * 20 < nonRemovableTotal
+        // folder being exactly what the missing-from-disk banner is for.
+        // Measured against the result logs rather than judged: of the 92 runs
+        // that could reach this gate at all, not one would have been refused by
+        // these bounds, taking each run at the worst reading its figures allow.
+        // Refusing any of them would take away a list they can act on to protect
+        // them from a fault nobody has reported.
+        var presentRegistered = nonRemovablePresent + removablePresent;
+        if (presentRegistered <= 2
+            && presentRegistered * 20 < presentRegistered + missingNonRemovable
             && missingNonRemovable > 0
             && removable.Count > 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);

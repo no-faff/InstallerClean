@@ -85,6 +85,34 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
+    public async Task ScanAsync_counts_a_superseded_file_on_disk_as_a_registered_file_on_disk()
+    {
+        // A real run in the result logs sits exactly here: 52 registered files,
+        // more missing than registered once the superseded ones are counted, and
+        // ten superseded patches found on disk and offered. Those ten are
+        // registered paths that resolved to real files, so the two halves of
+        // the scan demonstrably line up, and a gate that only looked at the
+        // non-removable rows would have refused that machine its scan.
+        const string orphan = @"C:\Windows\Installer\orphan.msi";
+        const string needed = @"C:\Windows\Installer\needed.msi";
+        const string superseded = @"C:\Windows\Installer\superseded.msp";
+        var packages = new List<RegisteredPackage> { Registered(needed), Superseded(superseded) };
+        for (var i = 0; i < 30; i++)
+            packages.Add(Registered($@"C:\Windows\Installer\gone{i}.msi"));
+
+        var fs = new MockFileSystem();
+        fs.AddFile(orphan, new MockFileData("x"));
+        fs.AddFile(needed, new MockFileData("x"));
+        fs.AddFile(superseded, new MockFileData("x"));
+
+        var query = QueryReturning(new InstallerQueryResult(packages.AsReadOnly()));
+        var result = await new FileSystemScanService(query, fs, new[] { orphan }, null).ScanAsync();
+
+        Assert.Equal(2, result.RemovableFiles.Count);
+        Assert.Equal(30, result.MissingNonRemovableCount);
+    }
+
+    [Fact]
     public async Task ScanAsync_does_not_refuse_a_small_machine_where_two_survivors_are_a_tenth_of_it()
     {
         // The proportional bound doing its own work: two present out of twenty
