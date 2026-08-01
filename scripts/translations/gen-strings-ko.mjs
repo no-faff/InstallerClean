@@ -88,7 +88,6 @@ const MAP = {
   'Action.Cancel': `취소(_C)`,
   'Action.CheckForUpdates': `업데이트 확인(_U)`,
   'Action.Close': `닫기(_C)`,
-  'Action.Delete': `삭제(_D)`,
   'Action.DeletePermanently': `영구 삭제(_D)`,
   'Action.Done': `완료(_D)`,
   'Action.Details': `세부 정보`,
@@ -96,7 +95,6 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `GitHub에 별 남기기(_S)`,
   'Action.Licence': `Apache 2.0 라이선스`,
   'Action.Move': `이동(_M)`,
-  'Action.MoveInstead': `대신 이동(_M)`,
   'Action.MoveDestinationPlaceholder': `삭제 대신 이동할 경우의 폴더 경로`,
   'Action.OpenReleasePage': `릴리스 페이지 열기(_R)`,
   'Action.Rescan': `다시 검사(_R)`,
@@ -117,9 +115,6 @@ const MAP = {
   'Automation.Minimise': `최소화`,
   'Automation.ConfirmDelete': `삭제하면 불필요한 파일이 휴지통으로 이동됩니다. 취소하면 삭제하지 않고 닫습니다.`,
   'Automation.ConfirmMove': `이동하면 불필요한 파일이 선택한 대상 폴더에 들어갑니다. 취소하면 파일은 있던 자리에 그대로 남습니다.`,
-  'Automation.RecycleUnavailable': `불필요한 파일을 어떻게 처리할지 선택하세요. 안전한 곳으로 이동하거나, 영구 삭제하거나, 취소합니다.`,
-  'Automation.RecycleUnavailableMove': `불필요한 파일을 직접 고른 폴더로 이동`,
-  'Automation.RecycleUnavailableDeletePermanently': `이 드라이브에서 휴지통을 사용할 수 없으므로 불필요한 파일을 영구 삭제`,
   'Automation.SayThanks': `감사 인사`,
   'Automation.ConfirmSendResultLog': `보내기를 누르면 표시된 보고서가 No Faff에 전송됩니다. 취소하면 아무것도 보내지 않습니다.`,
   'Automation.CheckForUpdates': `업데이트 확인`,
@@ -221,8 +216,6 @@ const MAP = {
   'Completion.AllClean': `모두 깨끗합니다`,
   'Completion.NothingToCleanUp': `{InstallerFolder}에 정리할 것이 없습니다`,
   'Completion.NothingToCleanUpReceipt': `{1} {0}개 검사, {2} 소요`,
-  'Completion.MoveRestoreHint': `혹시라도 무언가 망가지면 {InstallerFolder}에 다시 복사해 넣으면 됩니다 ([그럴 가능성은 극히 낮습니다]).`,
-  'Completion.DeleteRestoreHint': `그때까지는 혹시라도 무언가 망가지면 복원할 수 있습니다 ([그럴 가능성은 극히 낮습니다]).`,
 
   // 0 = size freed (e.g. "120.5 MB")
   'Completion.Freed': `{0} 확보`,
@@ -243,19 +236,10 @@ const MAP = {
   'Completion.MoveSummary.Plural': `{1} {0}개를 다음 위치로 이동함: {2}`,
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.DeleteSummary.Singular': `{1} {0}개를 휴지통으로 이동함`,
-  'Completion.DeleteSummary.Plural': `{1} {0}개를 휴지통으로 이동함`,
 
   // 0 = deleted count, 1 = pluralised noun
   'Completion.PermanentDeleteSummary.Singular': `{1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다.`,
   'Completion.PermanentDeleteSummary.Plural': `{1} {0}개를 영구 삭제함. 휴지통으로 가지 않았습니다.`,
-  'Completion.PermanentDeleteRestoreHint.Singular': `괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다.`,
-  'Completion.PermanentDeleteRestoreHint.Plural': `괜찮습니다. 본래 안전하게 제거할 수 있는 파일이었습니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다.`,
-  'RecycleUnavailable.Heading': `이 드라이브에서는 휴지통을 사용할 수 없습니다`,
-  'RecycleUnavailable.Body.Singular': `그래서 이 {1}은 아직 삭제되지 않았습니다 ({2}). 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다.`,
-  'RecycleUnavailable.Body.Plural': `그래서 이 {1} {0}개는 아직 삭제되지 않았습니다 ({2}). 안전한 곳으로 옮기거나 영구 삭제할 수 있습니다.`,
-  'RecycleUnavailable.Reassurance.Singular': `삭제해도 안전합니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 휴지통은 추가 안전장치일 뿐입니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다.`,
-  'RecycleUnavailable.Reassurance.Plural': `삭제해도 안전합니다. InstallerClean은 Windows가 다 썼다고 보고한 파일만 정리하며, 프로그램이 아직 필요로 하는 파일은 절대 삭제하지 않습니다. 휴지통은 추가 안전장치일 뿐입니다. 만에 하나 어떤 삭제로 인해 프로그램을 복구, 업데이트 또는 제거할 수 없게 되더라도, 제조사에서 다시 설치하면 대개 파일이 복구됩니다. 다만 Microsoft가 이를 보장하지는 않습니다.`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `아직 필요한 파일 {0}개`,
@@ -284,7 +268,6 @@ const MAP = {
   // 0 = destination path
   'Confirm.MoveDestination': `파일이 다음 위치로 이동됩니다:`,
   'Confirm.DeleteTitle': `{1} {0}개를 삭제하시겠습니까? ({2})`,
-  'Confirm.DeleteToRecycleBin': `파일이 휴지통으로 이동됩니다. 백업 복사본을 원하시면 대신 이동 버튼을 사용하세요.`,
 
   // Error messages
   'Error.AdminRequiredTitle': `액세스 거부됨`,
@@ -331,10 +314,6 @@ const MAP = {
   'Error.UnknownError.Plural': `이 파일들에서 문제가 발생했습니다. 파일은 그대로 두었습니다.`,
 
   // 0 = shell error code
-  'Error.ShellRecycleFailed': `이 파일을 휴지통으로 이동할 수 없습니다(오류 {0}). 그 코드만으로는 InstallerClean이 이유를 알려 드릴 수 없습니다. 파일은 그대로 두었습니다. 대신 이동 버튼을 사용해 보세요. 이동은 휴지통을 쓰지 않습니다.`,
-  'Error.RecycleAccessDenied': `관리자 권한으로도 Windows가 접근을 거부했습니다(오류 {0}). InstallerClean은 문제가 파일에 있는지 휴지통에 있는지 구분할 수 없습니다. 파일은 그대로 두었습니다. 문제가 휴지통이라면 이동 버튼이 통하지만, 문제가 파일이라면 통하지 않습니다.`,
-  'Error.RecycleInUse': `이 파일이 다른 프로그램에 의해 열려 있거나 잠겨 있습니다(오류 {0}). 그래서 지금은 무엇으로도 제거할 수 없습니다. 파일은 그대로 두었습니다. 나중에 다시 시도해 보세요.`,
-  'Error.DeletedNotRecycled': `Windows가 이 파일을 휴지통으로 옮기지 않고 곧바로 삭제했습니다. InstallerClean은 휴지통으로 보내 달라고 요청했지만, Windows가 대신 이렇게 처리했습니다. 파일은 사라졌습니다.`,
 
   // 0 = destination
   'Error.MoveIntoInstaller': `파일을 Windows Installer 폴더로 이동하는 것을 거부합니다(대상: {0}).`,
@@ -431,7 +410,6 @@ const MAP = {
   'Cli.NothingToDo': `수행할 작업이 없습니다.`,
   'Cli.DeletingFiles': `{1} {0}개를 삭제하는 중...`,
   'Cli.DeletedFiles': `{1} {0}개를 삭제했습니다.`,
-  'Cli.RecycleUnavailable': `오류: 이 볼륨에서 휴지통을 사용할 수 없어 아무것도 삭제하지 않았습니다. /m으로 파일을 대신 이동하거나, 휴지통을 다시 활성화한 후 다시 실행하세요.`,
   'Cli.NoMoveDestination': `오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하세요. (GUI에서 설정한 기본값은 사용자별로 저장되므로, 예약된 작업이나 서비스 계정 실행에는 적용되지 않습니다.)`,
   'Cli.MoveDestinationInsideInstaller': `오류: 대상은 Windows Installer 폴더 안에 있을 수 없습니다.`,
   'Cli.MoveDestinationRelative': `오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0}`,
@@ -460,8 +438,6 @@ const MAP = {
   'Cli.Help.ExitCodePartial': `  2   부분 처리: 일부 파일은 처리됨, 일부는 실패`,
   'Cli.Help.ExitCodeTransient': `  75  일시적: 일시적인 상황으로 실행이 차단됨 (메시지 참고)`,
   'Cli.Help.ExitCodeCancelled': `  130 취소됨 (Ctrl+C)`,
-  'Completion.CleanedUp': `{0} 정리`,
-  'Completion.DeleteSpaceHint': `휴지통을 비워야 공간이 실제로 확보됩니다.`,
   'Body.NotScanned.Lead': `아직 검사하지 않았습니다.`,
   'Body.NotScanned.Why': `다시 검사를 눌러 {InstallerFolder}에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요.`,
   'Confirm.MoveSameDrive': `이 폴더는 같은 드라이브에 있어, 이동만으로는 공간이 확보되지 않습니다. 옮긴 파일을 그 폴더에서 삭제하면 공간이 확보되고, 아니면 다른 드라이브에 있는 폴더를 대신 선택할 수도 있습니다.`,
@@ -469,7 +445,6 @@ const MAP = {
   'Error.CandidateOutsideCache': `이 파일은 Windows Installer 폴더 바로 아래에 있지 않습니다. 안전을 위해 거부했습니다.`,
   'Completion.ReverifySkipped': `{1} {0}개는 검사 이후 어떤 프로그램이 다시 필요로 하게 되어 그대로 두었습니다.`,
   'Completion.MoveCancelledSummary': `취소하기 전까지 {2} {1}개 중 {0}개를 이동했습니다.`,
-  'Completion.DeleteCancelledSummary': `취소하기 전까지 {2} {1}개 중 {0}개를 휴지통으로 이동했습니다.`,
   'Completion.PermanentDeleteCancelledSummary': `취소하기 전까지 {2} {1}개 중 {0}개를 영구 삭제했습니다.`,
   'Body.PendingReboot.Lead': `지금은 이 파일들을 정리할 수 없습니다.`,
   'Cli.TooManyArguments': `오류: 예상치 못한 추가 인수 '{0}'. 이동 폴더 경로에 공백이 있으면 전체 경로를 큰따옴표로 묶으세요: /m "D:\\My Backup"`,
@@ -480,7 +455,6 @@ const MAP = {
   'Error.ScanRecordsUnreadable': `InstallerClean이 무엇이 아직 필요한지 확신할 만큼 Windows Installer 기록을 읽지 못했습니다. 설치된 프로그램 목록이 일부 빠진 채로 돌아왔고, 같은 기록을 레지스트리에서 직접 읽는 것도 오류를 만났습니다. 어떤 파일을 가리키는 기록이 읽을 수 없는 것 중 하나였다는 이유만으로 그 파일이 고립된 것처럼 보일 수 있으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer가 설치된 프로그램 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer가 한 프로그램의 패치 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
-  'Status.CheckingRecycleBin': `휴지통을 확인하는 중...`,
   'UpdateCheck.Status.UpdateAvailable': `{0} 버전을 사용할 수 있습니다.`,
   'Completion.DonateAsk': `도움이 되어 기쁩니다. 너그러운 마음이 있으시면 작은 성의도 반갑습니다.`,
   'About.Link.Guide': `안내서 및 자주 묻는 질문`,

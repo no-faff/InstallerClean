@@ -6,11 +6,14 @@ namespace InstallerClean.Helpers;
 /// Culture names the app ships a UI translation for. <see cref="Neutral"/>
 /// (English) is the neutral resx; every other entry has a
 /// <c>Strings.&lt;name&gt;.resx</c> satellite. Adding a language: ship the
-/// satellite resx, add its name here, and add its endonym to the bottom-bar
-/// language menu (MainWindow's LanguageChoices). This is the validation list
-/// the language preference is checked against, so an unsupported value in
+/// satellite resx and add its name here. That is the whole step. This list is
+/// what the bottom-bar language menu is built from, so a language added here
+/// is selectable without touching the menu, and it is the validation list the
+/// saved language preference is checked against, so an unsupported value in
 /// settings.json falls back to Automatic rather than selecting a culture the
-/// app has no translation for.
+/// app has no translation for. The menu carries a hand-written endonym per
+/// language and falls back to the framework's own name for one it does not
+/// know, which is a cosmetic gap rather than a missing entry.
 /// </summary>
 public static class SupportedLanguages
 {

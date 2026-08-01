@@ -147,9 +147,17 @@
                      where it collapses. Its 8 plus the 8 on the last visible
                      line is the 16 the intro has always had under it. -->
                 <StackPanel Margin="{StaticResource GapBottom.Sm}">
-                    <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Text.Heading}"
-                               FontSize="{DynamicResource Type.Heading.Sm}" Margin="{StaticResource GapBottom.Sm}"
-                               Text="{Binding IntroLead}"/>
+                    <!-- Inlines are composed in code-behind (BuildIntroLeadLine)
+                         so the bracketed phrase in the scanned state's lead
+                         renders as a hyperlink into the README's "Is it safe?"
+                         section; a TextBlock cannot bind Text and host an
+                         inline Hyperlink at once, so there is no Text binding
+                         here. The other three leads (not scanned, scan failed,
+                         Windows Installer hold) carry no brackets and render
+                         verbatim. This is the screen's one link, on its
+                         strongest safety claim. -->
+                    <TextBlock x:Name="IntroLeadText" TextWrapping="Wrap" Foreground="{StaticResource Text.Heading}"
+                               FontSize="{DynamicResource Type.Heading.Sm}" Margin="{StaticResource GapBottom.Sm}"/>
                     <!-- The converter binds the installer cache folder's path
                          together so it cannot wrap mid-path; the line names the
                          folder in three of its four states. The collapse
@@ -394,23 +402,25 @@
                             Content="{loc:Translate Action.Browse}" Command="{Binding Cleanup.BrowseDestinationCommand}"/>
                 </Grid>
 
-                <!-- Buttons row. Delete is the emphasised action and carries
-                     both signals, the loud accent pill and the rightmost slot:
-                     InstallerClean only ever offers files that are safe to
-                     remove, and only to the Recycle Bin, so removing them is
-                     the main path. Move is the quieter reassurance, on the
-                     standard pill, for anyone who would rather park a copy
-                     somewhere first. Dock="Right" gives the first declared
-                     child the furthest-right slot, so Delete is declared first
-                     and Move takes the one to its left, carrying the gap
-                     between the two. Tab deliberately does not follow visual
-                     order here: TabIndex pins Delete first whatever the
-                     declaration order, reaching the emphasised action before
-                     the quiet one to its left, which was judged to matter more
-                     than left-to-right reading order. The completion overlay's
-                     Done pill and the confirm dialogs, which put their own
-                     accent action rightmost, line up with Delete as the
-                     default action. -->
+                <!-- Buttons row. Move is the emphasised action, on the accent
+                     pill in the rightmost slot; Delete permanently is the quiet
+                     one to its left, on the standard pill.
+
+                     The emphasis is not a warning and there is no red anywhere
+                     on this screen. The window's first line says these files are
+                     safe to delete, and red would be the one element arguing
+                     with it. What emphasising Move does carry is a nudge
+                     towards prudence, and that was weighed and accepted rather
+                     than arrived at: move if you can, for peace of mind, delete
+                     if you would rather take the app at its word or are in a
+                     hurry. Both are ordinary outcomes and the screen treats
+                     them as such.
+
+                     Dock="Right" gives the first declared child the
+                     furthest-right slot, so Move is declared first and Delete
+                     takes the one to its left, carrying the gap between the
+                     two. TabIndex pins Delete first, which now agrees with
+                     visual order rather than overriding it as it used to. -->
                 <!-- Each button's help text is its own tooltip, not a second
                      sentence written alongside it. Two sources for one
                      explanation drift: they did, the pair here having grown
@@ -423,17 +433,17 @@
                      first. -->
                 <DockPanel Grid.Row="4" KeyboardNavigation.TabNavigation="Local">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentPill}"
-                            KeyboardNavigation.TabIndex="0"
-                            Content="{loc:Translate Action.Delete}" Command="{Binding Cleanup.DeleteAllCommand}"
-                            AutomationProperties.HelpText="{loc:Translate Tooltip.Delete}"
-                            ToolTip="{loc:Translate Tooltip.Delete}"
-                            ToolTipService.ShowOnDisabled="True"/>
-
-                    <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
                             KeyboardNavigation.TabIndex="1"
                             Content="{loc:Translate Action.Move}" Command="{Binding Cleanup.MoveAllCommand}"
                             AutomationProperties.HelpText="{Binding Cleanup.MoveButtonTooltip}"
                             ToolTip="{Binding Cleanup.MoveButtonTooltip}"
+                            ToolTipService.ShowOnDisabled="True"/>
+
+                    <Button DockPanel.Dock="Right" Style="{StaticResource StandardPill}"
+                            KeyboardNavigation.TabIndex="0"
+                            Content="{loc:Translate Action.DeletePermanently}" Command="{Binding Cleanup.DeleteAllCommand}"
+                            AutomationProperties.HelpText="{loc:Translate Tooltip.Delete}"
+                            ToolTip="{loc:Translate Tooltip.Delete}"
                             ToolTipService.ShowOnDisabled="True"
                             Margin="{StaticResource GapRight.Sm}"/>
 
@@ -708,8 +718,15 @@
                             <Style TargetType="Button" BasedOn="{StaticResource GhostPill}">
                                 <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
                                 <Style.Triggers>
+                                    <!-- HelpText alongside the ToolTip, from
+                                         the same key: a WPF ToolTip opens on
+                                         hover and never on keyboard focus, so
+                                         without it the one sentence explaining
+                                         a button that has just gone dead
+                                         reaches a mouse user only. -->
                                     <DataTrigger Binding="{Binding Cleanup.IsCancellationRequested}" Value="True">
                                         <Setter Property="ToolTip" Value="{loc:Translate Tooltip.CancellingPending}"/>
+                                        <Setter Property="AutomationProperties.HelpText" Value="{loc:Translate Tooltip.CancellingPending}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -856,28 +873,22 @@
                         </TextBlock.Style>
                     </TextBlock>
 
-                    <!-- Restore guidance. On a recycle-delete this leads with
-                         Completion.SpaceHint ("Empty it to actually reclaim the
-                         space.") folded into the same flowing text by
-                         BuildCompletionRestoreLine, rather than a separate
-                         TextBlock, so the sentence wraps naturally as one
-                         paragraph (a fixed line break there left a lone word
-                         stranded on its own line in longer languages, French's
-                         "sera pas le cas !" among them). Collapses when empty so the
-                         all-clear overlay (which has no restore hint)
-                         doesn't carry a phantom 30+ pixel gap from the
-                         bottom margin plus line-height of an empty
-                         TextBlock. Pattern matches the Errors Border
-                         below. LiveSetting + the code-behind raise on
-                         reveal: this line is the second half of the
-                         outcome (where the files went after a Move or
-                         Delete; the scan receipt on an all-clear).
+                    <!-- Restore guidance, after a Move and on the all-clear
+                         receipt. Collapses when empty, which is every delete
+                         (that screen makes no safety claim and so carries no
+                         line here) and the all-clear before its receipt lands,
+                         so the card does not carry a phantom 30+ pixel gap from
+                         the bottom margin plus line-height of an empty
+                         TextBlock. Pattern matches the Errors Border below.
+                         LiveSetting + the code-behind raise on reveal: this
+                         line is the second half of the outcome (where the files
+                         went after a Move; the scan receipt on an all-clear).
                          Inlines are composed in code-behind
-                         (BuildCompletionRestoreLine) so the "[it won't!]"
-                         phrase renders as a hyperlink to the README's "Is it
-                         safe?" section; a TextBlock cannot bind Text and host
-                         an inline Hyperlink at once, so there is no Text
-                         binding here. The collapse trigger still reads
+                         (BuildCompletionRestoreLine) so the bracketed phrase
+                         renders as a hyperlink to the README's "Is it safe?"
+                         section; a TextBlock cannot bind Text and host an
+                         inline Hyperlink at once, so there is no Text binding
+                         here. The collapse trigger still reads
                          Completion.Restore. -->
                     <TextBlock x:Name="CompletionRestoreText"
                                AutomationProperties.LiveSetting="Polite"

@@ -53,9 +53,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
     // Reveals the operating overlay. It is not the "work is underway" flag:
     // it goes false during the confirm-dialog window between the pre-flight
-    // and the move call (so the modal owns the foreground state), it is set
-    // only after 200 ms during the Move pre-flight, and the recycle probe
-    // deliberately never sets it. IsOperationInFlight is the execution gate.
+    // and the move call (so the modal owns the foreground state), and it is set
+    // only after 200 ms during the Move pre-flight. IsOperationInFlight is the
+    // execution gate.
     [ObservableProperty] private bool _isOperating;
 
     /// <summary>
@@ -63,14 +63,14 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// pre-flight included, whether or not <see cref="IsOperating"/> ever
     /// raised the overlay. This is what the commands gate on.
     ///
-    /// The pre-flights are the reason it exists. Both hop off the dispatcher
-    /// (a Win32 path resolve or a shell recycle probe against a mapped drive
-    /// can stall for the SMB timeout, and on the dispatcher that freezes the
-    /// window), and while one is awaited the message loop pumps with no
-    /// overlay up. Without this flag the other destructive command is still
-    /// clickable in that window, and a Delete started during a Move pre-flight
-    /// would overwrite <see cref="_operationCts"/> while the Move was still
-    /// using it, leaving the Move's Cancel button wired to the Delete's token.
+    /// The Move pre-flight is the reason it exists. It hops off the dispatcher
+    /// (a Win32 path resolve against a mapped drive can stall for the SMB
+    /// timeout, and on the dispatcher that freezes the window), and while it is
+    /// awaited the message loop pumps with no overlay up. Without this flag
+    /// Delete is still clickable in that window, and a Delete started during a
+    /// Move pre-flight would overwrite <see cref="_operationCts"/> while the
+    /// Move was still using it, leaving the Move's Cancel button wired to the
+    /// Delete's token.
     /// </summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(MoveAllCommand))]
@@ -178,14 +178,57 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     partial void OnIsOperatingChanged(bool value) =>
         CancelOperationCommand.NotifyCanExecuteChanged();
 
-    // The Move button works from either state, so this says what pressing it
-    // will do rather than naming a missing step: with no destination set it
-    // warns that a folder browser opens first, so the browser is expected
-    // rather than a surprise.
+    // The Move button works from any of the three states, so this says what
+    // pressing it will do rather than naming a missing step: with no folder set
+    // it warns that a browser opens first, so the browser is expected rather
+    // than a surprise, and with a folder on the drive the files are already on
+    // it says when the space actually comes back.
+    //
+    // The same-drive state is what pairs this with the Delete button's tooltip:
+    // one says the space returns straight away, the other says when. Both are
+    // readable before either button is pressed, which is the point, and neither
+    // is the Move confirmation's same-drive warning, which arrives after the
+    // choice is made.
+    //
+    // Recomputed on every keystroke in the box (NotifyPropertyChangedFor on
+    // MoveDestination), so the same-drive test has to be cheap: it is a string
+    // comparison of two path roots and touches no drive. The fuller
+    // classification in ClassifyMoveDestination queries DriveInfo and belongs
+    // off the dispatcher, which is where the confirmation dialog's copy of this
+    // question is answered.
     public string MoveButtonTooltip =>
-        string.IsNullOrWhiteSpace(MoveDestination)
-            ? Strings.Tooltip_MoveNeedsDestination
-            : Strings.Tooltip_Move;
+        string.IsNullOrWhiteSpace(MoveDestination) ? Strings.Tooltip_MoveNeedsDestination
+        : IsOnInstallerCacheDrive(MoveDestination) ? Strings.Tooltip_MoveSameDrive
+        : Strings.Tooltip_Move;
+
+    /// <summary>
+    /// Whether <paramref name="dest"/> resolves to the same drive as the
+    /// installer cache, which is the system drive. Extracted so the Move
+    /// button's tooltip and <see cref="ClassifyMoveDestination"/> answer the
+    /// question the same way: a move there is a rename, so it frees nothing
+    /// until the folder itself goes.
+    ///
+    /// Path work only, no drive query, because the tooltip re-reads it on every
+    /// keystroke. Anything it cannot resolve is not the same drive, which is
+    /// the safe way round: the tooltip then omits a claim rather than making a
+    /// wrong one.
+    /// </summary>
+    internal static bool IsOnInstallerCacheDrive(string dest)
+    {
+        if (string.IsNullOrWhiteSpace(dest)) return false;
+        try
+        {
+            var destRoot = Path.GetPathRoot(Path.GetFullPath(dest));
+            if (string.IsNullOrEmpty(destRoot)) return false;
+            var systemRoot = Path.GetPathRoot(
+                Environment.GetFolderPath(Environment.SpecialFolder.System));
+            return string.Equals(destRoot, systemRoot, StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     partial void OnMoveDestinationChanged(string value)
     {
@@ -245,13 +288,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // No token on this Task.Run, deliberately. The debounce is the
         // cancellable part and it is already over; the body has nothing to
         // interrupt (one Update call, which serialises on its own lock) and
-        // nothing to gain by being skipped. Passing the token hands back a
-        // Canceled task whenever a keystroke cancels the CTS between the delay
-        // completing and the run starting, an interleaving both continuations
-        // queue on the dispatcher for; its TaskCanceledException then escapes
-        // this fire-and-forget method into
-        // TaskScheduler.UnobservedTaskException, writing a phantom crash.log
-        // entry at whatever later GC observes it.
+        // nothing to gain by being skipped.
         var destinationSnapshot = _settings.MoveDestination;
         await Task.Run(() =>
         {
@@ -575,8 +612,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         // transaction started would otherwise move files against a live install,
         // the one condition the gate exists to block. Blocked => the banner paints
         // via HasPendingReboot and both commands drop out; refuse without calling
-        // the service. (MoveInsteadAsync routes through MoveAllCommand, so it
-        // inherits this check.)
+        // the service.
         if (await _scan.RecheckPendingRebootAsync())
         {
             DisposeOperationCts();
@@ -673,16 +709,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // stats meaning what they mean). Only raise the overlay when
                 // something actually moved or errored; a cancel that reached no
                 // file just clears.
-                await _scan.RefreshAsync();
+                await RefreshAfterCancelAsync();
                 if (result.MovedCount > 0 || result.Errors.Count > 0)
                 {
-                    var cancelledFreesSpace = destinationKind is MoveDestinationKinds.DifferentFixedDrive
-                        or MoveDestinationKinds.RemovableDrive
-                        or MoveDestinationKinds.UncShare;
                     _completion.ShowMoveCancelledSummary(
                         result.MovedCount, survivingFiles.Count,
                         CompletedBytes(survivingFiles, result.MovedCount, result.Errors),
-                        result.Errors, cancelledFreesSpace, reverify);
+                        result.Errors, ClassifySpaceOutcome(destinationKind), reverify);
                 }
                 OperationProgress = string.Empty;
                 return;
@@ -707,12 +740,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // this finally block clears it.
             await _scan.RefreshAsync();
 
-            // "Freed" only when the move left the cache's volume; a
-            // same-volume or unclassifiable destination claims "moved".
-            var freesSpace = destinationKind is MoveDestinationKinds.DifferentFixedDrive
-                or MoveDestinationKinds.RemovableDrive
-                or MoveDestinationKinds.UncShare;
-            _completion.ShowMoveSummary(movedCount, movedBytes, movedDest, result.Errors, freesSpace, reverify);
+            _completion.ShowMoveSummary(movedCount, movedBytes, movedDest, result.Errors,
+                ClassifySpaceOutcome(destinationKind), reverify);
 
             // Skip the last-run.json write once the result-log surface
             // is locked. Nothing will ever read the file from this point
@@ -739,7 +768,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             // comes back as result.Cancelled above rather than as a throw, and is
             // reported on the overlay there. Nothing reached a file here, so just
             // refresh the counts and clear.
-            await _scan.RefreshAsync();
+            await RefreshAfterCancelAsync();
             OperationProgress = string.Empty;
             if (createdDestination) await RemoveCreatedDestinationAsync(dest);
         }
@@ -820,9 +849,8 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         // Snapshot the pre-operation scan state once, after the confirm so a
         // cancel costs nothing. RefreshAsync (inside RunDeleteAsync) replaces
-        // _scan.LastScanResult with the post-delete state, and the
-        // permanent-delete retry reuses this same context; the recycle-first
-        // pass touches nothing if it refuses, so the snapshot still matches it.
+        // _scan.LastScanResult with the post-delete state, so the diagnostic
+        // record needs the pre-delete result captured here.
         var ctx = new DeleteContext(
             removableFiles,
             removableFiles.Select(f => f.FullPath).ToList(),
@@ -831,122 +859,26 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             _scan.LastScanDurationMs,
             _scan.PendingRebootLabel);
 
-        // Recycle-first. The service probes the files' volume and, rather than
-        // silently permanently deleting when the bin is unavailable, refuses
-        // the batch and touches nothing. That refusal comes back as true here.
-        var recycleUnavailable = await RunDeleteAsync(ctx, permitPermanentDelete: false);
-        if (!recycleUnavailable) return;
-
-        // The bin is unavailable for the volume and nothing has been deleted.
-        // Offer the safe Move path (primary), a consented permanent delete, or
-        // cancel. The dialog names only the confirmed fact, not a cause.
-        switch (_confirmationService.ConfirmRecycleUnavailable(count, sizeDisplay))
-        {
-            case RecycleUnavailableChoice.MoveInstead:
-                await MoveInsteadAsync();
-                break;
-            case RecycleUnavailableChoice.DeletePermanently:
-                await RunDeleteAsync(ctx, permitPermanentDelete: true);
-                break;
-            // Cancel: nothing was deleted and there is nothing more to do.
-        }
+        await RunDeleteAsync(ctx);
     }
 
     /// <summary>
-    /// Runs one delete pass and reports it on the completion overlay. Owns the
-    /// operating overlay, the cancellation source and the per-run state reset,
-    /// so the recycle-first attempt and the consented permanent-delete retry
-    /// each get a clean lifecycle.
+    /// Runs the delete and reports it on the completion overlay. Owns the
+    /// operating overlay, the cancellation source and the per-run state reset.
     /// </summary>
-    /// <returns>
-    /// <c>true</c> only when the Recycle Bin was unavailable for the volume and
-    /// <paramref name="permitPermanentDelete"/> was <c>false</c>: the service
-    /// refused and touched nothing, so <see cref="DeleteAllAsync"/> offers the
-    /// Move / permanent / cancel choice instead of reporting a result. Every
-    /// other outcome (completed, cancelled, failed) reports on the overlay and
-    /// returns <c>false</c>. The permanent retry passes
-    /// <paramref name="permitPermanentDelete"/> = <c>true</c>, which skips the
-    /// probe, so it can never return <c>true</c>.
-    /// </returns>
-    private async Task<bool> RunDeleteAsync(DeleteContext ctx, bool permitPermanentDelete)
+    private async Task RunDeleteAsync(DeleteContext ctx)
     {
         _operationCts = new CancellationTokenSource();
         IsOperationInFlight = true;
 
-        // Re-check the pending-reboot gate at the moment of action. One site here
-        // covers both passes: the recycle-first pass (after ConfirmDelete) and the
-        // consented permanent retry (after ConfirmRecycleUnavailable), each of
-        // which routes through here. Blocked => paint the banner and refuse; there
-        // is nothing to offer, so return false rather than the bin-unavailable
-        // true. A transaction that starts while the user reads a dialog is caught
-        // on whichever pass follows it.
+        // Re-check the pending-reboot gate at the moment of action: a
+        // transaction can start while the user is reading the confirmation
+        // dialog. Blocked => paint the banner and refuse.
         if (await _scan.RecheckPendingRebootAsync())
         {
             DisposeOperationCts();
             OperationProgress = string.Empty;
-            return false;
-        }
-
-        // Probe the volume before raising the "Deleting N files..." overlay on
-        // the recycle-first pass: when the bin is unavailable the service
-        // deletes nothing, so that heading (and its screen-reader
-        // announcement) would describe an operation that never happens. Hand
-        // straight back so DeleteAllAsync offers the Move / permanent / cancel
-        // choice. The permanent-retry pass (permitPermanentDelete) skips this
-        // and always runs. DeleteFilesAsync re-checks the same volume and
-        // still fails closed, so this only governs which heading shows.
-        //
-        // Task.Run because the probe is a full shell IFileOperation round trip
-        // (write a file, recycle it, then permanently delete the bin entry it
-        // created), plus the recycle thread's creation and CoInitializeEx on
-        // the session's first Delete. It is slowest exactly when the bin is
-        // sick, which is the only case it exists to detect. On the dispatcher
-        // it freezes the window between the confirmation dialog closing and
-        // the delete starting.
-        if (!permitPermanentDelete && ctx.FilePaths.Count > 0)
-        {
-            var probeToken = _operationCts.Token;
-            var probeTask = Task.Run(() => _deleteService.CanRecycleToVolume(ctx.FilePaths[0]), probeToken);
-
-            bool canRecycle;
-            try
-            {
-                // Reveal an overlay only if the probe is slow, the way the scan
-                // and the Move pre-flight do. A healthy bin answers in well
-                // under 200 ms, so neither the overlay nor its announcement
-                // flashes in the instant before the delete's own heading
-                // replaces it; a sick bin, the case that is slow, gets an
-                // overlay saying what is being waited on. Heading before
-                // IsOperating keeps the start announced exactly once.
-                if (await Task.WhenAny(probeTask, Task.Delay(200, probeToken)) != probeTask)
-                {
-                    OperationProgress = Strings.Status_CheckingRecycleBin;
-                    IsOperating = true;
-                }
-                canRecycle = await probeTask;
-                // The shell round trip takes no cancellation token and cannot
-                // be interrupted, so Cancel here means "do not go on to delete"
-                // rather than "stop the probe": it is honoured the moment the
-                // probe returns, before anything is touched. Without this check
-                // the click would be swallowed and the delete would run.
-                probeToken.ThrowIfCancellationRequested();
-            }
-            catch (OperationCanceledException)
-            {
-                IsOperating = false;
-                OperationProgress = string.Empty;
-                DisposeOperationCts();
-                return false;
-            }
-
-            IsOperating = false;
-            OperationProgress = string.Empty;
-
-            if (!canRecycle)
-            {
-                DisposeOperationCts();
-                return true;
-            }
+            return;
         }
 
         // Heading before IsOperating: a heading assigned after the reveal
@@ -980,7 +912,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     _dialogService.ShowError(failure.Message, failure.Title);
                 else
                     _dialogService.ShowWarning(failure.Message, failure.Title);
-                return false;
+                return;
             }
 
             var survivingSet = new HashSet<string>(reverify.Surviving, StringComparer.OrdinalIgnoreCase);
@@ -993,7 +925,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 await _scan.RefreshAsync();
                 _completion.ShowReverifyAllSkipped(reverify);
                 OperationProgress = string.Empty;
-                return false;
+                return;
             }
 
             var survivingPaths = survivingFiles.Select(f => f.FullPath).ToList();
@@ -1001,7 +933,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
             var progress = new Progress<OperationProgress>(OnOperationProgressUpdate);
             var result = await _deleteService.DeleteFilesAsync(
-                survivingPaths, permitPermanentDelete, progress, _operationCts.Token);
+                survivingPaths, progress, _operationCts.Token);
 
             if (result.InstallerBusy)
             {
@@ -1011,44 +943,23 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                 // report no completed operation.
                 await _scan.RecheckPendingRebootAsync();
                 OperationProgress = string.Empty;
-                return false;
-            }
-
-            // Bin unavailable for the volume and no consent to permanently
-            // delete: the service refused the batch and touched nothing. Hand
-            // control back so DeleteAllAsync can offer the choice; the finally
-            // below tears the overlay down so the modal owns the foreground.
-            // Returning here also skips the bytes calculation that would
-            // otherwise read the empty error list as full success and claim the
-            // whole size was freed while every orphan is still on disk. Only
-            // the recycle-first pass reaches this; the permanent retry skips the
-            // probe.
-            if (result.RecycleUnavailable)
-            {
-                OperationProgress = string.Empty;
-                return true;
+                return;
             }
 
             if (result.Cancelled)
             {
                 // Cancelled mid-batch: report the partial on the completion
-                // overlay (no result-log entry for a cancelled run). The permanent
-                // retry gets its own summary so it never claims the Recycle Bin;
-                // the files it deleted did not reach it. Only raise the overlay
-                // when something actually happened.
-                await _scan.RefreshAsync();
+                // overlay (no result-log entry for a cancelled run). Only raise
+                // the overlay when something actually happened.
+                await RefreshAfterCancelAsync();
                 if (result.DeletedCount > 0 || result.Errors.Count > 0)
                 {
                     var cancelledBytes = CompletedBytes(survivingFiles, result.DeletedCount, result.Errors);
-                    if (permitPermanentDelete)
-                        _completion.ShowPermanentDeleteCancelledSummary(
-                            result.DeletedCount, survivingFiles.Count, cancelledBytes, result.Errors, reverify);
-                    else
-                        _completion.ShowDeleteCancelledSummary(
-                            result.DeletedCount, survivingFiles.Count, cancelledBytes, result.Errors, reverify);
+                    _completion.ShowDeleteCancelledSummary(
+                        result.DeletedCount, survivingFiles.Count, cancelledBytes, result.Errors, reverify);
                 }
                 OperationProgress = string.Empty;
-                return false;
+                return;
             }
 
             var deletedCount = result.DeletedCount;
@@ -1065,19 +976,11 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
             await _scan.RefreshAsync();
 
-            // A consented permanent delete did not reach the Recycle Bin, so it
-            // gets its own summary copy rather than reusing the recycle-bin one.
-            if (permitPermanentDelete)
-                _completion.ShowPermanentDeleteSummary(deletedCount, deletedBytes, result.Errors, reverify);
-            else
-                _completion.ShowDeleteSummary(deletedCount, deletedBytes, result.Errors, reverify);
+            _completion.ShowDeleteSummary(deletedCount, deletedBytes, result.Errors, reverify);
 
             // Same lock-aware gate as MoveAllAsync: skip the write once the
             // result-log surface is closed for the rest of the session and
-            // across future sessions. Both the recycled and the consented-
-            // permanent path log a delete entry of the same shape: the
-            // operation freed real bytes either way and the result-log schema
-            // carries no recycled-vs-permanent distinction.
+            // across future sessions.
             if (!_completion.IsResultLogLocked)
             {
                 var entry = ResultLogEntry.ForDelete(
@@ -1087,16 +990,18 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     _completion.MarkResultLogReady();
             }
             OperationProgress = string.Empty;
-            return false;
+            return;
         }
         catch (OperationCanceledException)
         {
-            // A cancel before the worker starts moves nothing; a mid-batch cancel
-            // now returns as result.Cancelled above and is reported on the overlay
-            // there. Refresh the counts and clear.
-            await _scan.RefreshAsync();
+            // A cancel before the worker starts deletes nothing; a mid-batch
+            // cancel returns as result.Cancelled above and is reported on the
+            // overlay there. Refresh the counts and clear. The refresh takes no
+            // token here: the token it would take is the cancelled one, and
+            // this is the path that has to leave the window showing a true
+            // count. It is bounded by the same rescan every other path runs.
+            await RefreshAfterCancelAsync();
             OperationProgress = string.Empty;
-            return false;
         }
         catch (Exception ex)
         {
@@ -1110,7 +1015,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
                     ? string.Format(Strings.Status_DeleteFailed, typeName, crash.Path)
                     : string.Format(Strings.Status_DeleteFailed_NoLog, typeName),
                 Strings.Error_DeleteFailedTitle);
-            return false;
         }
         finally
         {
@@ -1175,20 +1079,6 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         }
     });
 
-    /// <summary>
-    /// Routes the recycle-unavailable "Move instead" choice into the standard
-    /// Move flow so its destination validation, free-space and write-probe
-    /// checks and the Move confirmation all apply. Asking for a destination is
-    /// the Move flow's own job, so an unset one is not handled here; backing
-    /// out of that browser abandons the move and deletes nothing.
-    /// </summary>
-    private async Task MoveInsteadAsync()
-    {
-        // The guard covers the rare case where the move became unavailable
-        // between the two dialogs (for example the scan emptied).
-        if (MoveAllCommand.CanExecute(null))
-            await MoveAllCommand.ExecuteAsync(null);
-    }
 
     /// <summary>
     /// What one off-thread pass over a Move destination found: whether it is
@@ -1302,6 +1192,48 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
         IsOperationInFlight = false;
     }
 
+    /// <summary>
+    /// The post-cancel refresh, run under a FRESH cancellation source with the
+    /// overlay's Cancel button live again.
+    ///
+    /// It cannot reuse the operation's own token, which is cancelled by
+    /// definition on this path and would abandon the refresh at its first
+    /// checkpoint, leaving the window showing counts from before the batch. Nor
+    /// can it run without one: this is a full folder walk plus a full API
+    /// enumeration, the folder has been measured at 6.4 million files, and the
+    /// user has just pressed Cancel to stop something. Held behind a greyed
+    /// Cancel button with a "Cancelling..." label and nothing advancing, that
+    /// wait is the shape people report as a hang.
+    ///
+    /// So the button is re-armed rather than left dead: clearing
+    /// IsCancellationRequested is what re-enables it (IsOperating is still true
+    /// here, and the overlay's own finally clears both). A second Cancel then
+    /// stops the refresh too, and the counts stay stale until the next scan,
+    /// which is what RefreshAsync already does on any other failure.
+    /// </summary>
+    private async Task RefreshAfterCancelAsync()
+    {
+        var cts = new CancellationTokenSource();
+        _operationCts = cts;
+        IsCancellationRequested = false;
+        OperationProgress = Strings.Status_Scanning;
+        try
+        {
+            await _scan.RefreshAsync(cts.Token);
+        }
+        finally
+        {
+            // Cleared here rather than left to the caller's finally so a second
+            // Cancel arriving after the refresh returns cannot cancel a source
+            // the next operation is about to install.
+            if (ReferenceEquals(_operationCts, cts))
+            {
+                _operationCts = null;
+                cts.Dispose();
+            }
+        }
+    }
+
     private void OnOperationProgressUpdate(OperationProgress p)
     {
         OperationCurrentFile = p.CurrentFile;
@@ -1324,6 +1256,22 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>
+    /// Turns the diagnostic-log classification into the two things the
+    /// completion card needs: whether to claim freed space, and whether to tell
+    /// the user how to get it back. A UNC share counts as freeing space, the
+    /// system drive being genuinely emptier once the files are on it; only an
+    /// unreadable destination declines to say either way.
+    /// </summary>
+    private static MoveSpaceOutcome ClassifySpaceOutcome(string destinationKind) => destinationKind switch
+    {
+        MoveDestinationKinds.DifferentFixedDrive or
+        MoveDestinationKinds.RemovableDrive or
+        MoveDestinationKinds.UncShare => MoveSpaceOutcome.FreedSpace,
+        MoveDestinationKinds.SameDrive => MoveSpaceOutcome.SameDrive,
+        _ => MoveSpaceOutcome.Unclassified,
+    };
+
+    /// <summary>
     /// Classifies the move destination for the diagnostic log. Returns
     /// one of <see cref="MoveDestinationKinds"/>: <c>uncShare</c> for
     /// <c>\\server\share</c>, <c>sameDrive</c> when the destination
@@ -1341,15 +1289,13 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             !dest.StartsWith(@"\\?\", StringComparison.Ordinal))
             return MoveDestinationKinds.UncShare;
 
+        if (IsOnInstallerCacheDrive(dest))
+            return MoveDestinationKinds.SameDrive;
+
         try
         {
             var destRoot = Path.GetPathRoot(Path.GetFullPath(dest));
             if (string.IsNullOrEmpty(destRoot)) return MoveDestinationKinds.Unknown;
-
-            var systemRoot = Path.GetPathRoot(
-                Environment.GetFolderPath(Environment.SpecialFolder.System));
-            if (string.Equals(destRoot, systemRoot, StringComparison.OrdinalIgnoreCase))
-                return MoveDestinationKinds.SameDrive;
 
             var info = new DriveInfo(destRoot);
             return info.DriveType switch

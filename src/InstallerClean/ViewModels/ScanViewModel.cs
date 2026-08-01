@@ -544,13 +544,29 @@ public partial class ScanViewModel : ObservableObject
     /// Silent refresh used by Cleanup after a Move or Delete completes.
     /// Skips the scan overlay (IsScanning stays false) so the operating
     /// overlay can stay visible until its own finally block clears it.
+    ///
+    /// <paramref name="cancellationToken"/> is what makes it interruptible, and
+    /// it is not optional in practice: this is a full folder walk plus a full
+    /// API enumeration, the folder has been measured at 6.4 million files, and
+    /// the caller runs it behind an overlay the user has usually just pressed
+    /// Cancel on. Without a token every checkpoint inside the scan is unreachable
+    /// and the wait reads as a hang. A cancellation is swallowed like any other
+    /// failure below: the counts stay as they were, which is the same outcome a
+    /// failed refresh already has.
     /// </summary>
-    public async Task RefreshAsync()
+    public async Task RefreshAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            await RunScanCoreAsync(null);
+            await RunScanCoreAsync(null, cancellationToken);
             ScanCompleted?.Invoke(this, EventArgs.Empty);
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancelled refresh: the completion screen renders from the cached
+            // pre-operation result and the counts behind it are stale until the
+            // next scan. Not written to crash.log, unlike the failure below,
+            // because the user asked for it.
         }
         catch (Exception ex)
         {

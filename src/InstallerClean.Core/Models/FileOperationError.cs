@@ -31,26 +31,12 @@ public abstract record FileOperationError(string FilePath)
     /// <paramref name="count"/> filenames that all failed this way. The default
     /// is the singular sentence, which is right for the categories that are
     /// either rare or already read as a complete statement whatever the count
-    /// (a missing source, a reparse point, an out-of-cache candidate, the
-    /// recycle family, which carries a shell code per file). A category that
-    /// reads wrong over a list overrides this with a properly pluralised
-    /// introducer, which also gives an inflecting language the satellite-only
-    /// .One/.Few/.Many override slot it needs.
+    /// (a missing source, a reparse point, an out-of-cache candidate). A
+    /// category that reads wrong over a list overrides this with a properly
+    /// pluralised introducer, which also gives an inflecting language the
+    /// satellite-only .One/.Few/.Many override slot it needs.
     /// </summary>
     public virtual string LocalisedGroupHeading(int count) => LocalisedMessage;
-}
-
-/// <summary>
-/// Implemented by error categories that carry a shell HRESULT worth
-/// keeping for telemetry. The result-log projection reads it to build a
-/// per-code count map on the error bucket, so a category that holds
-/// files which failed with different codes keeps the whole distribution
-/// instead of collapsing to one. The value is a raw COM HRESULT; turning
-/// it into a string is the consumer's concern.
-/// </summary>
-public interface IHasShellHResult
-{
-    int HResult { get; }
 }
 
 /// <summary>The source file disappeared between the scan and the operation.</summary>
@@ -91,56 +77,6 @@ public sealed record DestinationCollision(string FilePath, string FileName)
 }
 
 /// <summary>
-/// The shell IFileOperation API returned a failure HRESULT while
-/// recycling the file, and the file was left in place. Delete only.
-/// <see cref="HResult"/> is the raw shell code, retained for telemetry;
-/// the displayed sentence stays category-level for the same path-leak
-/// reason as <see cref="AccessDenied"/>.
-/// </summary>
-public sealed record RecycleFailed(string FilePath, int HResult)
-    : FileOperationError(FilePath), IHasShellHResult
-{
-    public override string LocalisedMessage =>
-        // HResult is a COM HRESULT; hex keeps a top-bit-set code
-        // recognisable (E_FAIL as 0x80004005, not the signed decimal
-        // -2147467259 the bare {0} would render). Only the well-documented
-        // Win32 codes are tailored to a cause; the shell copy engine's own
-        // codes (FACILITY_SHELL, 0x8027xxxx) are not publicly enumerated, so
-        // they take the generic line rather than a guessed cause.
-        HResult switch
-        {
-            // E_ACCESSDENIED: blocked by permissions or ownership, not a lock.
-            unchecked((int)0x80070005) =>
-                string.Format(Strings.Error_RecycleAccessDenied, $"0x{HResult:X8}"),
-            // ERROR_SHARING_VIOLATION / ERROR_LOCK_VIOLATION: the file is held open.
-            unchecked((int)0x80070020) or unchecked((int)0x80070021) =>
-                string.Format(Strings.Error_RecycleInUse, $"0x{HResult:X8}"),
-            _ => string.Format(Strings.Error_ShellRecycleFailed, $"0x{HResult:X8}"),
-        };
-}
-
-/// <summary>
-/// The file was deleted but could not be sent to the Recycle Bin, so it
-/// is gone permanently. The shell IFileOperation recycle is
-/// recycle-or-permanently-delete: when the bin is unavailable a file is
-/// nuked while every HRESULT still reports success. This category
-/// records that honestly when it happens without the user having
-/// consented to permanent deletion. Delete only.
-///
-/// <see cref="HResult"/> is the per-item hrDelete the shell reported:
-/// a SUCCESS code (the operation "succeeded" while skipping the bin),
-/// not the failure code <see cref="RecycleFailed"/> carries. It is
-/// retained for telemetry for the same reason, kept off the displayed
-/// sentence (category-level) for the same path-leak reason as
-/// <see cref="AccessDenied"/>.
-/// </summary>
-public sealed record PermanentlyDeleted(string FilePath, int HResult)
-    : FileOperationError(FilePath), IHasShellHResult
-{
-    public override string LocalisedMessage => Strings.Error_DeletedNotRecycled;
-}
-
-/// <summary>
 /// Source file is a symlink or junction. Move and Delete refuse these so the
 /// operation can't follow a reparse point out of C:\Windows\Installer.
 /// </summary>
@@ -168,9 +104,9 @@ public sealed record CandidateOutsideCache(string FilePath)
 
 /// <summary>
 /// The file is open or locked by another program, so it could not be
-/// moved and was left in place. Move only: the Delete path reaches the
-/// same condition through the shell's own HRESULT and reports it as
-/// <see cref="RecycleFailed"/> with <c>Error.RecycleInUse</c>.
+/// removed and was left in place. Move and Delete both reach it, both
+/// discriminating the same two HRESULTs off an IOException, which is why the
+/// sentence says "remove" rather than naming either verb.
 ///
 /// Split out of <see cref="IOFailure"/> because it is the one IO failure
 /// with a cause the user can act on, and the only one that is not a fault:

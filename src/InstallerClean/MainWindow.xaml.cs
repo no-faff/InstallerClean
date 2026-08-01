@@ -24,9 +24,16 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = _vm = viewModel;
+        // The lead has no Text binding, hosting inlines composed in code, so it
+        // is built once here for the state the window opens in and rebuilt from
+        // PropertyChanged after that.
+        BuildIntroLeadLine();
         // Each child VM raises its own PropertyChanged stream. Listen
         // on all three so the window can move keyboard focus to the
-        // most-relevant Cancel button as overlays appear.
+        // most-relevant Cancel button as overlays appear. The parent VM is
+        // listened to as well, for the one property that reaches a TextBlock
+        // hosting inlines rather than a Text binding.
+        _vm.PropertyChanged += OnMainPropertyChanged;
         _vm.Completion.PropertyChanged += OnCompletionPropertyChanged;
         _vm.Cleanup.PropertyChanged += OnCleanupPropertyChanged;
         _vm.Scan.PropertyChanged += OnScanPropertyChanged;
@@ -203,11 +210,17 @@ public partial class MainWindow : Window
         // not the near-miss it looks like. The hold is released by
         // OnCleanupPropertyChanged watching this same property go false, so a
         // hold taken on the other flag would never be released: nothing raises a
-        // change notification the close is waiting on. And the window where the
-        // two disagree costs nothing, because it is before any file is touched:
-        // IsOperationInFlight covers the pre-flights, both of which set
-        // IsOperating immediately before calling the service, so every moment a
-        // file is being moved or recycled is inside this flag.
+        // change notification the close is waiting on.
+        //
+        // The window where the two disagree is the Move pre-flight, and it is
+        // not free: the pre-flight creates the destination folder and writes a
+        // probe file into it. Every abandon path removes what it made; a
+        // process exit takes none of them, so a close there can leave an empty
+        // folder the user never made, or a zero-byte file inside it if the
+        // close lands between the probe write and its delete. That is the
+        // accepted cost of a hold that is guaranteed to be released, against a
+        // hold that could strand the window open forever. No file has left the
+        // installer cache in that window, which is the part that matters.
         if (!_vm.Cleanup.IsOperating) return;
 
         // A Move or a Delete is running. Letting this close through kills the
@@ -234,6 +247,7 @@ public partial class MainWindow : Window
 
     private void OnClosed(object? sender, EventArgs e)
     {
+        _vm.PropertyChanged -= OnMainPropertyChanged;
         _vm.Completion.PropertyChanged -= OnCompletionPropertyChanged;
         _vm.Cleanup.PropertyChanged -= OnCleanupPropertyChanged;
         _vm.Scan.PropertyChanged -= OnScanPropertyChanged;
@@ -246,6 +260,12 @@ public partial class MainWindow : Window
         SizeChanged -= OnWindowSizeChanged;
         Closing -= OnClosing;
         Closed -= OnClosed;
+    }
+
+    private void OnMainPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainViewModel.IntroLead))
+            BuildIntroLeadLine();
     }
 
     /// <summary>
@@ -642,13 +662,22 @@ public partial class MainWindow : Window
         });
     }
 
-    // The error list stays unraised: the summary already speaks the
-    // error count, and the per-file breakdown is scan-mode reading. The
-    // restore line carries the second half of the outcome (how to reclaim
-    // the space and undo it after a Delete, where the files went after a
-    // Move, the scan receipt on an all-clear).
+    // Every zone of the card that states an outcome, in visual order. The
+    // failure count and the kept-back count are in the list because they are
+    // assigned once, before IsComplete reveals the overlay, and never touched
+    // again: unlike the progress lines, which are rewritten repeatedly and so
+    // announce themselves eventually, a region that is written once before its
+    // element exists has no second chance. Without them a blind user finished a
+    // run and was never told that four files had failed. Both are empty on a
+    // clean run, which collapses the element and speaks nothing, the same no-op
+    // the other three already rely on.
+    //
+    // The per-file error list stays unraised, and that is a separate decision:
+    // it is a list to read at leisure rather than an outcome, and it is reached
+    // in scan mode. The count above it is what has to be spoken.
     private void AnnounceCompletionOutcome() =>
-        AnnounceLiveRegions(CompletionHeadingText, CompletionSummaryText, CompletionRestoreText);
+        AnnounceLiveRegions(CompletionHeadingText, CompletionFailedCountText,
+            CompletionSummaryText, CompletionRestoreText, CompletionSkippedText);
 
     // Stable README anchor (an explicit <a id="is-it-safe"> before the
     // "Is it safe?" section of every README, so rewording a heading never
@@ -659,13 +688,53 @@ public partial class MainWindow : Window
     private static string SafetyUrl => ReadmeLinks.For("is-it-safe", Localisation.UiCulture);
 
     /// <summary>
+    /// Composes the main window's intro lead, rendering a phrase delimited by
+    /// <c>[ ]</c> as a hyperlink into the README's "Is it safe?" section. Only
+    /// the scanned state's lead carries a pair; the not-scanned, scan-failed
+    /// and Windows-Installer-hold leads have none and render verbatim as a
+    /// single Run, which is what the shared split already does with them.
+    ///
+    /// This is the window's only link and it sits on its strongest safety
+    /// claim, which is also the first thing on the screen. The delete
+    /// confirmation carries its own copy of the same link rather than relying
+    /// on this one, because that dialog is modal: this line stays visible
+    /// behind it and cannot be clicked.
+    /// </summary>
+    private void BuildIntroLeadLine()
+    {
+        var raw = InstallerPathText.KeepWhole(_vm.IntroLead);
+        IntroLeadText.Inlines.Clear();
+
+        if (CompositionParsing.SplitAtBracketedPhrase(raw) is not { } split)
+        {
+            IntroLeadText.Inlines.Add(new Run(raw));
+            return;
+        }
+
+        var link = new Hyperlink(new Run(split.LinkText))
+        {
+            NavigateUri = new Uri(SafetyUrl),
+            Style = (Style)FindResource("SubtleLink"),
+        };
+        link.Click += Hyperlink_Click;
+        // The bracketed phrase is part of the sentence rather than a
+        // destination, so the whole sentence with the brackets removed is the
+        // link's accessible name; see BuildCompletionRestoreLine.
+        AutomationProperties.SetName(link, split.Prefix + split.LinkText + split.Suffix);
+
+        if (split.Prefix.Length > 0) IntroLeadText.Inlines.Add(new Run(split.Prefix));
+        IntroLeadText.Inlines.Add(link);
+        if (split.Suffix.Length > 0) IntroLeadText.Inlines.Add(new Run(split.Suffix));
+    }
+
+    /// <summary>
     /// Composes the completion summary line from <see cref="CompletionViewModel.Summary"/>,
     /// forcing the destination path (<see cref="CompletionViewModel.SummaryDestination"/>)
     /// onto its own line at the exact point it substitutes into the formatted
     /// sentence, whatever word order the target language uses (mirrors
     /// ConfirmMoveWindow's destination-on-its-own-line treatment). A value with
-    /// no destination (the all-clear receipt, the delete-to-Recycle-Bin
-    /// summary) renders verbatim as a single Run. Locating the raw substring
+    /// no destination (the all-clear receipt, either delete summary) renders
+    /// verbatim as a single Run. Locating the raw substring
     /// rather than a bracket-delimited marker (as <see cref="BuildCompletionRestoreLine"/>
     /// uses for its hyperlink) is deliberate: the destination is a user-chosen
     /// folder path that could itself contain a literal '[' or ']'.
@@ -711,18 +780,10 @@ public partial class MainWindow : Window
     /// </summary>
     private void BuildCompletionRestoreLine()
     {
-        // SpaceHint (the recycle-delete-only "Empty it to actually reclaim
-        // the space.") is folded in as a leading sentence rather than its own
-        // TextBlock, so the whole thing wraps as one flowing paragraph. Two
-        // separately-wrapped TextBlocks each break independently, which could
-        // strand a short trailing phrase (French's "sera pas le cas !") alone
-        // on its own line even when the pane had room to carry it up.
-        var spaceHint = _vm.Completion.SpaceHint;
-        var raw = spaceHint.Length > 0 ? $"{spaceHint} {_vm.Completion.Restore}" : _vm.Completion.Restore;
-        // The post-Move hint names the installer cache folder. Bound before the
+        // The post-Move line names the installer cache folder. Bound before the
         // split: KeepWhole inserts only between the path's own characters, so
         // the [ ] pair the split looks for is untouched.
-        raw = InstallerPathText.KeepWhole(raw);
+        var raw = InstallerPathText.KeepWhole(_vm.Completion.Restore);
         CompletionRestoreText.Inlines.Clear();
 
         // Where the sentence splits around its [ ]-delimited link is pure string
@@ -800,29 +861,58 @@ public partial class MainWindow : Window
     // always reflects the displayed language.
     private static readonly System.Windows.Media.FontFamily SegoeMdl2 = new("Segoe MDL2 Assets");
 
-    // Listed alphabetically by each language's own name, the conventional picker
-    // order (so the non-Latin scripts group after the Latin names). The README
-    // language-switcher uses a different, priority order. Arabic is README-only
-    // (no satellite resx), so it is not offered here.
-    private static readonly (string Culture, string Endonym)[] LanguageChoices =
+    // Hand-written endonyms, because the framework's own NativeName is not what
+    // a picker wants: it lower-cases where the language does not ("français"),
+    // and it renders pt-BR as "português (Brasil)" where every other browser
+    // and OS picker shortens the region. Arabic is absent on purpose, being
+    // README-only with no satellite resx.
+    //
+    // This map does NOT decide which languages the menu offers. That comes from
+    // SupportedLanguages.CultureNames, the same list the app validates a saved
+    // language preference against, so the menu cannot fall out of step with
+    // what ships: a seventeenth language added there appears here whether or
+    // not anybody remembers this map, and the consequence of forgetting is a
+    // framework-cased name rather than a language the user cannot select. It
+    // was two hand-maintained lists that had to agree, with nothing checking
+    // that they did, and the failure was invisible: on a machine whose OS
+    // language was the new one the menu opened with no tick anywhere and
+    // keyboard focus on nothing.
+    private static readonly Dictionary<string, string> Endonyms = new(StringComparer.OrdinalIgnoreCase)
     {
-        ("id", "Bahasa Indonesia"),
-        ("de", "Deutsch"),
-        ("en-GB", "English"),
-        ("es", "Español"),
-        ("fr", "Français"),
-        ("it", "Italiano"),
-        ("nl", "Nederlands"),
-        ("pl", "Polski"),
-        ("pt-BR", "Português (BR)"),
-        ("vi", "Tiếng Việt"),
-        ("tr", "Türkçe"),
-        ("ru", "Русский"),
-        ("uk", "Українська"),
-        ("ja", "日本語"),
-        ("zh-Hans", "简体中文"),
-        ("ko", "한국어"),
+        ["id"] = "Bahasa Indonesia",
+        ["de"] = "Deutsch",
+        ["en-GB"] = "English",
+        ["es"] = "Español",
+        ["fr"] = "Français",
+        ["it"] = "Italiano",
+        ["nl"] = "Nederlands",
+        ["pl"] = "Polski",
+        ["pt-BR"] = "Português (BR)",
+        ["vi"] = "Tiếng Việt",
+        ["tr"] = "Türkçe",
+        ["ru"] = "Русский",
+        ["uk"] = "Українська",
+        ["ja"] = "日本語",
+        ["zh-Hans"] = "简体中文",
+        ["ko"] = "한국어",
     };
+
+    /// <summary>
+    /// Every shipped language paired with the name to show it under, ordered
+    /// alphabetically by that name: the conventional picker order, which groups
+    /// the non-Latin scripts after the Latin ones. The README's language
+    /// switcher uses a different, priority order.
+    ///
+    /// Sorted with the ordinal comparer so the order does not change with the
+    /// displayed language, a picker that reshuffles itself being harder to use
+    /// than one that does not.
+    /// </summary>
+    private static IEnumerable<(string Culture, string Endonym)> LanguageChoices =>
+        SupportedLanguages.CultureNames
+            .Select(c => (Culture: c, Endonym: Endonyms.TryGetValue(c, out var name)
+                ? name
+                : CultureInfo.GetCultureInfo(c).NativeName))
+            .OrderBy(x => x.Endonym, StringComparer.Ordinal);
 
     // Tracks whether the globe's menu is open, so a second click on the globe
     // closes it instead of reopening it. A ContextMenu auto-dismisses on the
@@ -875,7 +965,7 @@ public partial class MainWindow : Window
                 Command = _vm.Chrome.SetLanguageCommand,
                 CommandParameter = culture,
                 // Mark the active language as checked so a screen reader is told
-                // which of the fifteen is current through the UIA Toggle pattern,
+                // which of the sixteen is current through the UIA Toggle pattern,
                 // rather than only by the tick glyph in the header, which is a
                 // Segoe MDL2 private-use codepoint with no accessible text. The
                 // app's MenuItem template (Components.xaml) draws no check mark of

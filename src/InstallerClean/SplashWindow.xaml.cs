@@ -111,6 +111,12 @@ public partial class SplashWindow : Window
         // app from hung.
         ToolTipService.SetShowOnDisabled(CancelButton, true);
         CancelButton.ToolTip = Strings.Tooltip_CancellingPending;
+        // The same sentence as HelpText, from the same value, because a WPF
+        // ToolTip opens on hover and never on keyboard focus: without this the
+        // one explanation for a button that has just gone dead reaches a mouse
+        // user only, and the wait here sits inside an MSI API call and can be
+        // the longest in the app.
+        AutomationProperties.SetHelpText(CancelButton, Strings.Tooltip_CancellingPending);
         StepText.Text = Strings.Status_Cancelling;
         ProductTicker.Text = string.Empty;
         CancelRequested?.Invoke(this, EventArgs.Empty);

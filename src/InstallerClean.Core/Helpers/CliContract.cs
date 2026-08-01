@@ -22,7 +22,7 @@ internal enum CliCommand
     /// <summary><c>/s</c>: scan and list removable files, read-only.</summary>
     ScanOnly,
 
-    /// <summary><c>/d</c>: scan, then send removable files to the Recycle Bin.</summary>
+    /// <summary><c>/d</c>: scan, then delete removable files permanently.</summary>
     Delete,
 
     /// <summary><c>/m</c>: scan, then move removable files to a destination.</summary>
@@ -90,9 +90,8 @@ internal static class CliExitCode
 
     /// <summary>
     /// 75 (POSIX EX_TEMPFAIL): a temporary condition blocked the run, the
-    /// single-instance mutex was held, a pending Windows Installer
-    /// transaction blocks cache changes, or the Recycle Bin is unavailable
-    /// for the volume. Distinct from <see cref="Error"/> so a
+    /// single-instance mutex was held, or a pending Windows Installer
+    /// transaction blocks cache changes. Distinct from <see cref="Error"/> so a
     /// retry-on-transient policy can fire here and back off on hard failure.
     /// </summary>
     public const int Transient = 75;

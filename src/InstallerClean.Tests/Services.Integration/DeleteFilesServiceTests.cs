@@ -5,24 +5,20 @@ using InstallerClean.Tests.Helpers;
 namespace InstallerClean.Tests.Services.Integration;
 
 /// <summary>
-/// Real-filesystem, real-COM integration tests: a live
-/// <see cref="RecycleEngine"/> drives the Windows IFileOperation API
-/// against throwaway files under %TEMP%, so the full recycle pipeline
-/// (STA thread, activation, the progress sink) is exercised. The
-/// unit suite under InstallerClean.Tests.Services uses MockFileSystem
-/// and a fake IRecycleEngine for the outcome-mapping coverage instead.
-/// These run on Windows only (the engine's STA apartment is a Windows
-/// concept); the Linux pre-commit run filters the Integration namespace
-/// out.
+/// Real-filesystem integration tests: the service deletes throwaway files
+/// under %TEMP% through a real <c>FileSystem</c>, so the parts a
+/// MockFileSystem cannot reach are exercised. Those are the two safety gates,
+/// which read the real filesystem whatever is injected: the reparse-point
+/// refusal needs a real symlink, and the containment guard needs a real path
+/// to resolve. The unit suite under InstallerClean.Tests.Services covers the
+/// outcome mapping against a mock.
 ///
-/// xUnit constructs a fresh instance per test method, so each test gets
-/// its own engine, disposed in <see cref="Dispose"/> (which drains the
-/// queue and joins the STA thread).
+/// These run on Windows only; the Linux pre-commit run filters the Integration
+/// namespace out.
 /// </summary>
 public class DeleteFilesServiceTests : IDisposable
 {
     private readonly string _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-    private readonly RecycleEngine _engine = new();
 
     public DeleteFilesServiceTests()
     {
@@ -31,9 +27,9 @@ public class DeleteFilesServiceTests : IDisposable
 
     // The source-containment guard requires sources to resolve inside the cache
     // root; point that root at the %TEMP% sandbox so the real files these tests
-    // recycle are not refused as out-of-bounds, without touching the real cache.
+    // delete are not refused as out-of-bounds, without touching the real cache.
     private DeleteFilesService NewService() =>
-        new(new System.IO.Abstractions.FileSystem(), _engine, _tempDir);
+        new(new System.IO.Abstractions.FileSystem(), NullMutexProbe.Instance, _tempDir);
 
     [Fact]
     public async Task DeleteFilesAsync_deletes_file()
@@ -46,30 +42,7 @@ public class DeleteFilesServiceTests : IDisposable
 
         Assert.Equal(1, result.DeletedCount);
         Assert.Empty(result.Errors);
-        Assert.False(result.RecycleUnavailable);
         Assert.False(File.Exists(file));
-    }
-
-    [Fact]
-    public void A_disposed_engine_refuses_work_with_ObjectDisposedException()
-    {
-        // Both states matter: the engine that never started its worker (the
-        // app was closed before any delete) and the one that did. The second
-        // is the one that can bite: its queue is still there, just marked
-        // complete, and adding to a completed BlockingCollection throws
-        // InvalidOperationException. Callers, and DeleteFilesService's
-        // unwrapped CanRecycleToVolume in particular, are promised
-        // ObjectDisposedException.
-        var neverStarted = new RecycleEngine();
-        neverStarted.Dispose();
-        Assert.Throws<ObjectDisposedException>(
-            () => neverStarted.CanRecycleToVolume(_tempDir));
-
-        var started = new RecycleEngine();
-        started.CanRecycleToVolume(_tempDir);
-        started.Dispose();
-        Assert.Throws<ObjectDisposedException>(
-            () => started.RecycleFile(Path.Combine(_tempDir, "anything.msi")));
     }
 
     [Fact]
@@ -111,8 +84,8 @@ public class DeleteFilesServiceTests : IDisposable
     [Fact]
     public async Task DeleteFilesAsync_refuses_a_reparse_point_source()
     {
-        // A symlink source is refused, matching MoveFilesService: recycling it
-        // would send the link, not follow it out of the cache. Real reparse
+        // A symlink source is refused, matching MoveFilesService: deleting it
+        // would remove the link, not follow it out of the cache. Real reparse
         // points need a real filesystem, so this is an integration test; it is
         // best-effort because creating a symlink needs SeCreateSymbolicLinkPrivilege
         // (admin or Developer Mode), which not every host grants.
@@ -129,13 +102,11 @@ public class DeleteFilesServiceTests : IDisposable
         }
 
         var svc = NewService();
-        // permitPermanentDelete skips the recycle-bin probe so the outcome does
-        // not depend on the bin state of the %TEMP% volume.
-        var result = await svc.DeleteFilesAsync(new[] { link }, permitPermanentDelete: true);
+        var result = await svc.DeleteFilesAsync(new[] { link });
 
         Assert.Equal(0, result.DeletedCount);
         Assert.IsType<SourceIsReparsePoint>(Assert.Single(result.Errors));
-        Assert.True(File.Exists(link)); // refused, not recycled
+        Assert.True(File.Exists(link)); // refused, not deleted
     }
 
     [Fact]
@@ -164,7 +135,6 @@ public class DeleteFilesServiceTests : IDisposable
 
     public void Dispose()
     {
-        _engine.Dispose();
         if (Directory.Exists(_tempDir))
             Directory.Delete(_tempDir, recursive: true);
     }

@@ -106,7 +106,6 @@ const MAP = {
   'Action.Cancel': `_Abbrechen`,
   'Action.CheckForUpdates': `Nach _Updates suchen`,
   'Action.Close': `_Schließen`,
-  'Action.Delete': `_Löschen`,
   'Action.DeletePermanently': `Endgültig _löschen`,
   'Action.Done': `_Fertig`,
   'Action.Details': `Details`,
@@ -114,7 +113,6 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Einen Stern auf _GitHub hinterlassen`,
   'Action.Licence': `Apache-2.0-Lizenz`,
   'Action.Move': `_Verschieben`,
-  'Action.MoveInstead': `Stattdessen _verschieben`,
   'Action.MoveDestinationPlaceholder': `Ordnerpfad, falls du verschiebst statt löschst`,
   'Action.OpenReleasePage': `_Release-Seite öffnen`,
   'Action.Rescan': `_Neu scannen`,
@@ -135,9 +133,6 @@ const MAP = {
   'Automation.Minimise': `Minimieren`,
   'Automation.ConfirmDelete': `Löschen verschiebt die nicht benötigten Dateien in den Papierkorb. Abbrechen schließt, ohne zu löschen.`,
   'Automation.ConfirmMove': `Verschieben legt die nicht benötigten Dateien in den gewählten Zielordner. Abbrechen lässt sie, wo sie sind.`,
-  'Automation.RecycleUnavailable': `Wähle, wie mit den nicht benötigten Dateien verfahren werden soll: an einen sicheren Ort verschieben, endgültig löschen oder abbrechen.`,
-  'Automation.RecycleUnavailableMove': `Die nicht benötigten Dateien in einen von dir gewählten Ordner verschieben`,
-  'Automation.RecycleUnavailableDeletePermanently': `Die nicht benötigten Dateien endgültig löschen, weil der Papierkorb für dieses Laufwerk nicht verfügbar ist`,
   'Automation.SayThanks': `Danke sagen`,
   'Automation.ConfirmSendResultLog': `Senden übermittelt den angezeigten Bericht an No Faff. Abbrechen sendet nichts.`,
   'Automation.CheckForUpdates': `Nach Updates suchen`,
@@ -240,8 +235,6 @@ const MAP = {
   'Completion.AllClean': `Alles sauber`,
   'Completion.NothingToCleanUp': `Nichts aufzuräumen in {InstallerFolder}`,
   'Completion.NothingToCleanUpReceipt': `{0} {1} in {2} gescannt`,
-  'Completion.MoveRestoreHint': `Kopier sie zurück in {InstallerFolder}, falls jemals etwas kaputtgeht ([äußerst unwahrscheinlich]).`,
-  'Completion.DeleteRestoreHint': `Bis dahin kannst du sie wiederherstellen, falls jemals etwas kaputtgeht ([äußerst unwahrscheinlich]).`,
 
   // 0 = size freed (e.g. "120.5 MB")
   'Completion.Freed': `{0} freigegeben`,
@@ -262,19 +255,10 @@ const MAP = {
   'Completion.MoveSummary.Plural': `{0} {1} verschoben nach: {2}`,
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.DeleteSummary.Singular': `{0} {1} in den Papierkorb verschoben`,
-  'Completion.DeleteSummary.Plural': `{0} {1} in den Papierkorb verschoben`,
 
   // 0 = deleted count, 1 = pluralised noun
   'Completion.PermanentDeleteSummary.Singular': `{0} {1} endgültig gelöscht. Sie ist nicht in den Papierkorb gewandert.`,
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} endgültig gelöscht. Sie sind nicht in den Papierkorb gewandert.`,
-  'Completion.PermanentDeleteRestoreHint.Singular': `Das ist in Ordnung, sie konnte bedenkenlos entfernt werden. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.`,
-  'Completion.PermanentDeleteRestoreHint.Plural': `Das ist in Ordnung, sie konnten bedenkenlos entfernt werden. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.`,
-  'RecycleUnavailable.Heading': `Der Papierkorb ist für dieses Laufwerk nicht verfügbar`,
-  'RecycleUnavailable.Body.Singular': `Daher wurde diese {1} ({2}) nicht gelöscht. Du kannst sie an einen sicheren Ort verschieben oder endgültig löschen.`,
-  'RecycleUnavailable.Body.Plural': `Daher wurden diese {0} {1} ({2}) nicht gelöscht. Du kannst sie an einen sicheren Ort verschieben oder endgültig löschen.`,
-  'RecycleUnavailable.Reassurance.Singular': `Sie zu löschen ist sicher. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht, und der Papierkorb ist nur eine zusätzliche Absicherung. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.`,
-  'RecycleUnavailable.Reassurance.Plural': `Sie zu löschen ist sicher. InstallerClean entfernt nur Dateien, die Windows als erledigt meldet, nie eine, die ein Programm noch braucht, und der Papierkorb ist nur eine zusätzliche Absicherung. Sollte ein Löschen wider Erwarten je dazu führen, dass sich ein Programm nicht mehr reparieren, aktualisieren oder deinstallieren lässt, setzt eine Neuinstallation beim Hersteller die Datei meist wieder ein, auch wenn Microsoft das nicht garantiert.`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} Datei noch benötigt`,
@@ -303,7 +287,6 @@ const MAP = {
   // 0 = destination path
   'Confirm.MoveDestination': `Die Dateien werden verschoben nach:`,
   'Confirm.DeleteTitle': `{0} {1} löschen ({2})?`,
-  'Confirm.DeleteToRecycleBin': `Die Dateien werden in den Papierkorb verschoben. Wenn du Sicherungskopien möchtest, nutze stattdessen die Schaltfläche „Verschieben“.`,
 
   // Error messages
   'Error.AdminRequiredTitle': `Zugriff verweigert`,
@@ -350,10 +333,6 @@ const MAP = {
   'Error.UnknownError.Plural': `Bei diesen Dateien ist etwas schiefgelaufen; sie wurden an ihrem Platz belassen.`,
 
   // 0 = shell error code
-  'Error.ShellRecycleFailed': `Diese Datei konnte nicht in den Papierkorb verschoben werden (Fehler {0}), und InstallerClean kann dir anhand dieses Codes nicht sagen, warum. Die Datei wurde an ihrem Platz belassen. Versuch stattdessen die Schaltfläche „Verschieben“, die den Papierkorb nicht benutzt.`,
-  'Error.RecycleAccessDenied': `Windows hat den Zugriff selbst mit Administratorrechten verweigert (Fehler {0}), und InstallerClean kann nicht erkennen, ob das Problem bei der Datei oder beim Papierkorb liegt. Die Datei wurde an ihrem Platz belassen. Die Schaltfläche „Verschieben“ hilft, wenn es am Papierkorb liegt, aber nicht, wenn es an der Datei liegt.`,
-  'Error.RecycleInUse': `Diese Datei ist von einem anderen Programm geöffnet oder gesperrt (Fehler {0}), deshalb kann sie im Moment von nichts entfernt werden. Sie wurde an ihrem Platz belassen; versuch es später noch einmal.`,
-  'Error.DeletedNotRecycled': `Windows hat diese Datei endgültig gelöscht, statt sie in den Papierkorb zu verschieben. InstallerClean hatte den Papierkorb angefordert, Windows hat es anders gemacht. Die Datei ist weg.`,
 
   // 0 = destination
   'Error.MoveIntoInstaller': `Das Verschieben von Dateien in den Windows-Installer-Ordner wird abgelehnt (Ziel: {0}).`,
@@ -447,7 +426,6 @@ const MAP = {
   'Cli.NothingToDo': `Nichts zu tun.`,
   'Cli.DeletingFiles': `{0} {1} werden gelöscht...`,
   'Cli.DeletedFiles': `{0} {1} gelöscht.`,
-  'Cli.RecycleUnavailable': `Fehler: Der Papierkorb ist für dieses Volume nicht verfügbar, daher wurde nichts gelöscht. Nutze /m, um die Dateien stattdessen zu verschieben, oder aktiviere den Papierkorb wieder und führe den Vorgang erneut aus.`,
   'Cli.NoMoveDestination': `Fehler: Kein Zielordner zum Verschieben angegeben. Nutze /m PFAD. (Ein in der GUI gesetztes Standardziel gilt pro Benutzer und greift nicht bei geplanten oder Dienstkonto-Läufen.)`,
   'Cli.MoveDestinationInsideInstaller': `Fehler: Das Ziel darf nicht im Windows-Installer-Ordner liegen.`,
   'Cli.MoveDestinationRelative': `Fehler: Das Ziel muss ein vollständig qualifizierter Pfad sein. Erhalten: {0}`,
@@ -476,8 +454,6 @@ const MAP = {
   'Cli.Help.ExitCodePartial': `  2   teilweise: einige Dateien verarbeitet, einige fehlgeschlagen`,
   'Cli.Help.ExitCodeTransient': `  75  vorübergehend: etwas hat den Lauf blockiert (siehe Meldung)`,
   'Cli.Help.ExitCodeCancelled': `  130 abgebrochen (Strg+C)`,
-  'Completion.CleanedUp': `{0} aufgeräumt`,
-  'Completion.DeleteSpaceHint': `Leere den Papierkorb, um den Speicherplatz wirklich freizugeben.`,
   'Body.NotScanned.Lead': `Noch nichts gescannt.`,
   'Body.NotScanned.Why': `Klicke auf „Neu scannen“, um {InstallerFolder} nach Installer-Dateien zu durchsuchen, die kein Programm mehr braucht.`,
   'Confirm.MoveSameDrive': `Dieser Ordner liegt auf demselben Laufwerk, das Verschieben allein gibt also keinen Speicherplatz frei. Den Platz bekommst du zurück, wenn du die Dateien dort löschst, oder du wählst stattdessen einen Ordner auf einem anderen Laufwerk.`,
@@ -485,7 +461,6 @@ const MAP = {
   'Error.CandidateOutsideCache': `Diese Datei liegt nicht direkt im Windows-Installer-Ordner; aus Sicherheitsgründen abgelehnt.`,
   'Completion.ReverifySkipped': `{0} {1} an Ort und Stelle belassen, weil ein Programm sie nach dem Scan wieder benötigt.`,
   'Completion.MoveCancelledSummary': `{0} von {1} {2} verschoben, bevor du abgebrochen hast.`,
-  'Completion.DeleteCancelledSummary': `{0} von {1} {2} in den Papierkorb verschoben, bevor du abgebrochen hast.`,
   'Completion.PermanentDeleteCancelledSummary': `{0} von {1} {2} endgültig gelöscht, bevor du abgebrochen hast.`,
   'Body.PendingReboot.Lead': `Diese Dateien können gerade nicht aufgeräumt werden.`,
   'Cli.TooManyArguments': `Fehler: Unerwartetes zusätzliches Argument '{0}'. Wenn dein Zielordner ein Leerzeichen enthält, setze den ganzen Pfad in Anführungszeichen: /m "D:\\My Backup"`,
@@ -496,7 +471,6 @@ const MAP = {
   'Error.ScanRecordsUnreadable': `InstallerClean konnte nicht genug von den Einträgen von Windows Installer lesen, um sicher zu sein, was noch gebraucht wird: Die Liste der installierten Programme kam unvollständig zurück, und dieselben Einträge direkt aus der Registrierung zu lesen führte ebenfalls zu Fehlern. Eine Datei könnte allein deshalb verwaist wirken, weil der Eintrag, der sie nennt, zu den unlesbaren gehörte, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer hat das Ende der Liste der installierten Programme nie signalisiert: InstallerClean hat nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer hat das Ende der Patch-Liste eines Programms nie signalisiert: InstallerClean hat nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
-  'Status.CheckingRecycleBin': `Papierkorb wird geprüft...`,
   'UpdateCheck.Status.UpdateAvailable': `Version {0} ist verfügbar.`,
   'Completion.DonateAsk': `Freut mich, dass es geholfen hat. Die Kaffeekasse steht bereit, falls dir großzügig zumute ist.`,
   'About.Link.Guide': `Anleitung und FAQ`,

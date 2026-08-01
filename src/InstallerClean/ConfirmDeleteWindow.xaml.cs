@@ -1,4 +1,6 @@
 using System.Windows;
+using System.Windows.Automation;
+using System.Windows.Documents;
 using InstallerClean.Helpers;
 using InstallerClean.Resources;
 
@@ -11,6 +13,7 @@ public partial class ConfirmDeleteWindow : Window
         InitializeComponent();
         var label = DisplayHelpers.PluraliseFile(fileCount);
         MessageText.Text = string.Format(Strings.Confirm_DeleteTitle, fileCount, label, sizeDisplay);
+        BuildBodyLine(fileCount);
         // The window title is what a screen reader announces when a dialog
         // opens, and ShowInTaskbar is false under custom chrome, so it serves
         // the announcement and nothing else. It carries the question itself: a
@@ -29,6 +32,43 @@ public partial class ConfirmDeleteWindow : Window
         // and a reflexive Space cannot delete. Deferred to Loaded so the
         // visual tree exists when Focus runs.
         Loaded += (_, _) => CancelButton.Focus();
+    }
+
+    /// <summary>
+    /// Composes the body, rendering the <c>[ ]</c>-delimited phrase as a
+    /// hyperlink into the README's "Is it safe?" section. Mirrors the main
+    /// window's BuildCompletionRestoreLine, including the URL going through
+    /// <see cref="UrlLauncher"/> so this elevated process does not launch the
+    /// browser as Administrator.
+    /// </summary>
+    private void BuildBodyLine(int fileCount)
+    {
+        var raw = DisplayHelpers.Pluralise(fileCount,
+            Strings.Confirm_DeleteToRecycleBin_Singular,
+            Strings.Confirm_DeleteToRecycleBin_Plural,
+            "Confirm.DeleteToRecycleBin");
+        BodyText.Inlines.Clear();
+
+        if (CompositionParsing.SplitAtBracketedPhrase(raw) is not { } split)
+        {
+            BodyText.Inlines.Add(new Run(raw));
+            return;
+        }
+
+        var link = new Hyperlink(new Run(split.LinkText))
+        {
+            NavigateUri = new Uri(ReadmeLinks.For("is-it-safe", Localisation.UiCulture)),
+            Style = (Style)FindResource("SubtleLink"),
+        };
+        link.Click += (_, _) => UrlLauncher.OpenUrl(link.NavigateUri.AbsoluteUri);
+        // The bracketed phrase is part of the sentence rather than a
+        // destination, so the whole sentence with the brackets removed is the
+        // link's accessible name.
+        AutomationProperties.SetName(link, split.Prefix + split.LinkText + split.Suffix);
+
+        if (split.Prefix.Length > 0) BodyText.Inlines.Add(new Run(split.Prefix));
+        BodyText.Inlines.Add(link);
+        if (split.Suffix.Length > 0) BodyText.Inlines.Add(new Run(split.Suffix));
     }
 
     private void OnDelete(object sender, RoutedEventArgs e)

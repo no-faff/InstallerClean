@@ -90,7 +90,6 @@ const MAP = {
   'Action.Cancel': `_Hủy`,
   'Action.CheckForUpdates': `_Kiểm tra cập nhật`,
   'Action.Close': `Đón_g`,
-  'Action.Delete': `_Xóa`,
   'Action.DeletePermanently': `_Xóa vĩnh viễn`,
   'Action.Done': `_Xong`,
   'Action.Details': `Chi tiết`,
@@ -98,7 +97,6 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Gắn _sao trên GitHub`,
   'Action.Licence': `Giấy phép Apache 2.0`,
   'Action.Move': `_Chuyển`,
-  'Action.MoveInstead': `_Chuyển thay vào đó`,
   'Action.MoveDestinationPlaceholder': `Đường dẫn thư mục nếu bạn Chuyển thay vì Xóa`,
   'Action.OpenReleasePage': `_Mở trang phát hành`,
   'Action.Rescan': `_Quét lại`,
@@ -119,9 +117,6 @@ const MAP = {
   'Automation.Minimise': `Thu nhỏ`,
   'Automation.ConfirmDelete': `Xóa sẽ di chuyển các tệp không cần thiết vào Thùng rác. Hủy sẽ đóng lại mà không xóa.`,
   'Automation.ConfirmMove': `Chuyển sẽ đặt các tệp không cần thiết vào thư mục đích đã chọn. Hủy sẽ để chúng nguyên chỗ cũ.`,
-  'Automation.RecycleUnavailable': `Chọn cách xử lý các tệp không cần thiết: chuyển chúng tới nơi an toàn, xóa vĩnh viễn hoặc hủy.`,
-  'Automation.RecycleUnavailableMove': `Chuyển các tệp không cần thiết tới một thư mục bạn chọn`,
-  'Automation.RecycleUnavailableDeletePermanently': `Xóa vĩnh viễn các tệp không cần thiết vì Thùng rác không khả dụng cho ổ đĩa này`,
   'Automation.SayThanks': `Lời cảm ơn`,
   'Automation.ConfirmSendResultLog': `Gửi sẽ đăng báo cáo hiển thị tới No Faff. Hủy sẽ không gửi gì.`,
   'Automation.CheckForUpdates': `Kiểm tra cập nhật`,
@@ -223,8 +218,6 @@ const MAP = {
   'Completion.AllClean': `Đã sạch`,
   'Completion.NothingToCleanUp': `Không còn gì để dọn trong {InstallerFolder}`,
   'Completion.NothingToCleanUpReceipt': `Đã quét {0} {1} trong {2}`,
-  'Completion.MoveRestoreHint': `Sao chép chúng trở lại {InstallerFolder} nếu chẳng may có gì trục trặc ([cực kỳ khó xảy ra]).`,
-  'Completion.DeleteRestoreHint': `Cho đến lúc đó, bạn có thể khôi phục chúng nếu chẳng may có gì trục trặc ([cực kỳ khó xảy ra]).`,
 
   // 0 = size freed (e.g. "120.5 MB")
   'Completion.Freed': `Đã giải phóng {0}`,
@@ -245,19 +238,10 @@ const MAP = {
   'Completion.MoveSummary.Plural': `Đã chuyển {0} {1} tới: {2}`,
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.DeleteSummary.Singular': `Đã di chuyển {0} {1} vào Thùng rác`,
-  'Completion.DeleteSummary.Plural': `Đã di chuyển {0} {1} vào Thùng rác`,
 
   // 0 = deleted count, 1 = pluralised noun
   'Completion.PermanentDeleteSummary.Singular': `Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác.`,
   'Completion.PermanentDeleteSummary.Plural': `Đã xóa vĩnh viễn {0} {1}, không qua Thùng rác.`,
-  'Completion.PermanentDeleteRestoreHint.Singular': `Không sao, những tệp đó đều an toàn để loại bỏ. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó.`,
-  'Completion.PermanentDeleteRestoreHint.Plural': `Không sao, những tệp đó đều an toàn để loại bỏ. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó.`,
-  'RecycleUnavailable.Heading': `Thùng rác không khả dụng cho ổ đĩa này`,
-  'RecycleUnavailable.Body.Singular': `Vậy nên {1} này ({2}) chưa bị xóa. Bạn có thể chuyển nó tới nơi an toàn, hoặc xóa vĩnh viễn.`,
-  'RecycleUnavailable.Body.Plural': `Vậy nên {0} {1} này ({2}) chưa bị xóa. Bạn có thể chuyển chúng tới nơi an toàn, hoặc xóa vĩnh viễn.`,
-  'RecycleUnavailable.Reassurance.Singular': `Việc xóa là an toàn. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần, và Thùng rác chỉ là một lớp bảo vệ thêm. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó.`,
-  'RecycleUnavailable.Reassurance.Plural': `Việc xóa là an toàn. InstallerClean chỉ dọn những tệp Windows báo là đã dùng xong, không bao giờ là tệp mà chương trình vẫn cần, và Thùng rác chỉ là một lớp bảo vệ thêm. Trong trường hợp hiếm hoi một lần xóa từng khiến một chương trình không thể sửa chữa, cập nhật hoặc gỡ cài đặt, việc cài đặt lại chương trình đó từ nhà sản xuất thường khôi phục được tệp, dù Microsoft không bảo đảm điều đó.`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} tệp vẫn cần thiết`,
@@ -289,7 +273,6 @@ const MAP = {
   // 0 = destination path
   'Confirm.MoveDestination': `Các tệp sẽ được chuyển tới:`,
   'Confirm.DeleteTitle': `Xóa {0} {1} ({2})?`,
-  'Confirm.DeleteToRecycleBin': `Các tệp sẽ được di chuyển vào Thùng rác. Nếu bạn muốn có bản sao lưu, hãy dùng nút Chuyển thay vào đó.`,
 
   // Error messages
   'Error.AdminRequiredTitle': `Truy cập bị từ chối`,
@@ -336,10 +319,6 @@ const MAP = {
   'Error.UnknownError.Plural': `Đã có trục trặc với các tệp này; các tệp được giữ nguyên tại chỗ.`,
 
   // 0 = shell error code
-  'Error.ShellRecycleFailed': `Không thể chuyển tệp này vào Thùng rác (lỗi {0}), và từ mã đó InstallerClean không thể cho bạn biết lý do. Tệp được giữ nguyên tại chỗ. Hãy thử nút Chuyển, vì nút đó không dùng Thùng rác.`,
-  'Error.RecycleAccessDenied': `Windows đã từ chối truy cập ngay cả với quyền quản trị viên (lỗi {0}), và InstallerClean không thể biết vấn đề nằm ở tệp hay ở Thùng rác. Tệp được giữ nguyên tại chỗ. Nút Chuyển sẽ dùng được nếu vấn đề là Thùng rác, nhưng không dùng được nếu vấn đề là chính tệp đó.`,
-  'Error.RecycleInUse': `Tệp này đang được mở hoặc bị khóa bởi một chương trình khác (lỗi {0}), nên hiện không gì có thể xóa nó. Tệp được giữ nguyên tại chỗ; hãy thử lại sau.`,
-  'Error.DeletedNotRecycled': `Windows đã xóa thẳng tệp này thay vì chuyển nó vào Thùng rác. InstallerClean đã yêu cầu Thùng rác, còn Windows thì làm khác. Tệp không còn nữa.`,
 
   // 0 = destination
   'Error.MoveIntoInstaller': `Từ chối chuyển tệp vào thư mục Windows Installer (đích: {0}).`,
@@ -433,7 +412,6 @@ const MAP = {
   'Cli.NothingToDo': `Không có gì để làm.`,
   'Cli.DeletingFiles': `Đang xóa {0} {1}...`,
   'Cli.DeletedFiles': `Đã xóa {0} {1}.`,
-  'Cli.RecycleUnavailable': `Lỗi: Thùng rác không khả dụng cho ổ đĩa này, nên không có gì bị xóa. Hãy dùng /m để chuyển các tệp thay vào đó, hoặc bật lại Thùng rác rồi chạy lại.`,
   'Cli.NoMoveDestination': `Lỗi: chưa chỉ định đích để chuyển. Dùng /m ĐƯỜNG_DẪN. (Mặc định đặt trong GUI là theo từng người dùng và không áp dụng cho các lần chạy theo lịch hoặc bằng tài khoản dịch vụ.)`,
   'Cli.MoveDestinationInsideInstaller': `Lỗi: đích không thể nằm bên trong thư mục Windows Installer.`,
   'Cli.MoveDestinationRelative': `Lỗi: đích phải là một đường dẫn đầy đủ. Nhận được: {0}`,
@@ -462,8 +440,6 @@ const MAP = {
   'Cli.Help.ExitCodePartial': `  2   một phần: một số tệp được xử lý, một số thất bại`,
   'Cli.Help.ExitCodeTransient': `  75  tạm thời: một điều kiện tạm thời đã chặn lần chạy (xem thông báo)`,
   'Cli.Help.ExitCodeCancelled': `  130 đã hủy (Ctrl+C)`,
-  'Completion.CleanedUp': `Đã dọn {0}`,
-  'Completion.DeleteSpaceHint': `Dọn sạch Thùng rác để thực sự lấy lại dung lượng.`,
   'Body.NotScanned.Lead': `Chưa quét gì cả.`,
   'Body.NotScanned.Why': `Nhấn Quét lại để tìm trong {InstallerFolder} những tệp cài đặt mà không chương trình nào còn cần.`,
   'Confirm.MoveSameDrive': `Thư mục này nằm trên cùng ổ đĩa, nên bản thân việc chuyển sẽ không giải phóng dung lượng nào. Bạn sẽ lấy lại dung lượng khi xóa các tệp khỏi đó, hoặc bạn có thể chọn một thư mục trên ổ đĩa khác thay vào đó.`,
@@ -471,7 +447,6 @@ const MAP = {
   'Error.CandidateOutsideCache': `Tệp này không nằm trực tiếp trong thư mục Windows Installer; bị từ chối vì lý do an toàn.`,
   'Completion.ReverifySkipped': `Đã giữ nguyên {0} {1} vì sau lần quét, một chương trình lại cần đến chúng.`,
   'Completion.MoveCancelledSummary': `Đã chuyển {0}/{1} {2} trước khi bạn hủy.`,
-  'Completion.DeleteCancelledSummary': `Đã di chuyển {0}/{1} {2} vào Thùng rác trước khi bạn hủy.`,
   'Completion.PermanentDeleteCancelledSummary': `Đã xóa vĩnh viễn {0}/{1} {2} trước khi bạn hủy.`,
   'Body.PendingReboot.Lead': `Hiện chưa thể dọn những tệp này.`,
   'Cli.TooManyArguments': `Lỗi: có thêm đối số không mong đợi '{0}'. Nếu thư mục đích của bạn có dấu cách, hãy đặt cả đường dẫn trong dấu ngoặc kép: /m "D:\\My Backup"`,
@@ -482,7 +457,6 @@ const MAP = {
   'Error.ScanRecordsUnreadable': `InstallerClean không đọc được đủ các bản ghi Windows Installer để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ sổ đăng ký cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách chương trình đã cài: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách bản vá của một chương trình: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
-  'Status.CheckingRecycleBin': `Đang kiểm tra Thùng rác...`,
   'UpdateCheck.Status.UpdateAvailable': `Phiên bản {0} đã có.`,
   'Completion.DonateAsk': `Rất vui vì đã giúp được. Nếu bạn có lòng, một ly cà phê cũng quý.`,
   'About.Link.Guide': `Hướng dẫn và câu hỏi thường gặp`,

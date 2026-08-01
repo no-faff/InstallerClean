@@ -37,11 +37,6 @@ public class ScanMoveCompletionTests
     private MainViewModel CreateMain()
     {
         _settingsService.Load().Returns(new AppSettings());
-        // Default the recycle-volume probe to available so the delete flow
-        // reaches DeleteFilesAsync; the bin-unavailable path is exercised by
-        // returning RecycleUnavailable from DeleteFilesAsync (or stubbing this
-        // false) in the specific tests that cover it.
-        _deleteService.CanRecycleToVolume(Arg.Any<string>()).Returns(true);
         // Clean gate and a no-op re-verify, so the act-time re-checks proceed and
         // a Move/Delete acts on the full set.
         _rebootService.Check().Returns(PendingRebootResult.Clean);
@@ -110,7 +105,7 @@ public class ScanMoveCompletionTests
     }
 
     [Fact]
-    public async Task Scan_then_Delete_paints_completion_overlay_with_recycle_bin_summary()
+    public async Task Scan_then_Delete_paints_completion_overlay_with_the_delete_summary()
     {
         var orphans = new[]
         {
@@ -121,7 +116,7 @@ public class ScanMoveCompletionTests
         _confirmationService.ConfirmDelete(
             Arg.Any<int>(), Arg.Any<string>()).Returns(true);
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+                Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
 
@@ -130,7 +125,7 @@ public class ScanMoveCompletionTests
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         Assert.True(vm.Completion.IsComplete);
-        Assert.Contains("Recycle Bin", vm.Completion.Summary);
+        Assert.Contains("permanently deleted", vm.Completion.Summary);
     }
 
     [Fact]
@@ -181,9 +176,9 @@ public class ScanMoveCompletionTests
         var scanService = new FileSystemScanService(queryService, fs, null, installerFolder);
         // Real move service over the in-memory FS.
         var moveService = new MoveFilesService(fs);
-        // The delete path is not exercised in this move-focused journey;
-        // the engine only needs to satisfy the constructor.
-        var deleteService = new DeleteFilesService(fs, Substitute.For<IRecycleEngine>());
+        // The delete path is not exercised in this move-focused journey; the
+        // service is constructed only because the view-model graph needs one.
+        var deleteService = new DeleteFilesService(fs);
 
         // External concerns stay substituted.
         var settingsService = Substitute.For<ISettingsService>();

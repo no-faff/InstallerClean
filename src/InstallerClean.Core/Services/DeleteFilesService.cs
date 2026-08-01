@@ -6,7 +6,6 @@ namespace InstallerClean.Services;
 public sealed class DeleteFilesService : IDeleteFilesService
 {
     private readonly IFileSystem _fs;
-    private readonly IRecycleEngine _engine;
     private readonly IMutexProbe _mutex;
 
     /// <summary>
@@ -20,36 +19,27 @@ public sealed class DeleteFilesService : IDeleteFilesService
 
     /// <summary>
     /// Constructor. The DI container injects the registered
-    /// <see cref="IFileSystem"/>, <see cref="IRecycleEngine"/> and
-    /// <see cref="IMutexProbe"/> singletons in production; the mutex is held for
-    /// the batch so a msiexec starting mid-delete waits instead of racing the
-    /// cache.
+    /// <see cref="IFileSystem"/> and <see cref="IMutexProbe"/> singletons in
+    /// production; the mutex is held for the batch so a msiexec starting
+    /// mid-delete waits instead of racing the cache.
     /// </summary>
-    public DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine, IMutexProbe mutex)
-        : this(fileSystem, engine, mutex, null) { }
+    public DeleteFilesService(IFileSystem fileSystem, IMutexProbe mutex)
+        : this(fileSystem, mutex, null) { }
 
     /// <summary>Test constructor. No mutex hold (the hold is exercised via the seam constructor below).</summary>
-    internal DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine)
-        : this(fileSystem, engine, NullMutexProbe.Instance, null) { }
-
-    /// <summary>Test constructor. Points the source containment guard at a real sandbox folder; no mutex hold.</summary>
-    internal DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine, string? installerFolderOverride)
-        : this(fileSystem, engine, NullMutexProbe.Instance, installerFolderOverride) { }
+    internal DeleteFilesService(IFileSystem fileSystem)
+        : this(fileSystem, NullMutexProbe.Instance, null) { }
 
     /// <summary>Seam constructor: an injected <see cref="IMutexProbe"/> (real or fake) plus the sandbox override.</summary>
-    internal DeleteFilesService(IFileSystem fileSystem, IRecycleEngine engine, IMutexProbe mutex, string? installerFolderOverride)
+    internal DeleteFilesService(IFileSystem fileSystem, IMutexProbe mutex, string? installerFolderOverride)
     {
         _fs = fileSystem;
-        _engine = engine;
         _mutex = mutex;
         _installerFolderOverride = installerFolderOverride;
     }
 
-    public bool CanRecycleToVolume(string path) => _engine.CanRecycleToVolume(path);
-
     public Task<DeleteResult> DeleteFilesAsync(
         IEnumerable<string> filePaths,
-        bool permitPermanentDelete = false,
         IProgress<OperationProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -61,25 +51,6 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 return new DeleteResult(0, Array.Empty<FileOperationError>());
 
             cancellationToken.ThrowIfCancellationRequested();
-
-            // The shell recycle is recycle-or-permanently-delete: when the
-            // bin is unavailable a file is nuked while every HRESULT still
-            // reports success. So unless the caller has already consented
-            // to permanent deletion, probe the files' volume once and
-            // refuse the whole batch rather than silently deleting. Recycle
-            // behaviour is per-volume, so the probe rides on the volume the
-            // files actually sit on (orphans are all under the same one).
-            //
-            // Ahead of the mutex acquire below on purpose. The probe mutates
-            // nothing and can refuse the whole batch, so running it inside the
-            // hold would extend a machine-wide Windows Installer lock across
-            // work that may end in touching no file at all. It also decides
-            // which refusal a caller sees when both apply, and the bin winning
-            // is the accepted outcome: neither has touched a file, and a caller
-            // that answers the bin question meets the installer one on the very
-            // next call.
-            if (!permitPermanentDelete && !_engine.CanRecycleToVolume(pathList[0]))
-                return new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true);
 
             // Hold Global\_MSIExecute for the batch on this worker thread so a
             // msiexec starting mid-delete waits on the mutex instead of racing the
@@ -94,13 +65,12 @@ public sealed class DeleteFilesService : IDeleteFilesService
             // _MSIExecute is the machine-wide Windows Installer serialisation
             // mutex, so for as long as this batch runs, every installer on the
             // machine that wants it waits or fails with 1618. The batch is
-            // bounded by file count and each file is one shell call, but a single
-            // recycle that hangs (an unresponsive shell, a stalled network
-            // volume) holds the machine's installer lock until this process is
-            // killed. That is accepted because the alternative is msiexec writing
-            // the cache in the middle of a delete, which costs a needed file
-            // rather than a wait. Non-mutating pre-work stays outside the hold,
-            // which is why the volume probe above runs ahead of it.
+            // bounded by file count and each file is one delete, so it cannot
+            // stall the way a shell round trip could, but a delete against an
+            // unresponsive volume still holds the machine's installer lock until
+            // this process is killed. That is accepted because the alternative is
+            // msiexec writing the cache in the middle of a delete, which costs a
+            // needed file rather than a wait.
             var lease = _mutex.TryAcquire(PendingRebootService.MsiExecuteMutexName, out var heldByAnother);
             if (lease is null && heldByAnother)
                 return new DeleteResult(0, Array.Empty<FileOperationError>(), InstallerBusy: true);
@@ -110,7 +80,18 @@ public sealed class DeleteFilesService : IDeleteFilesService
             int deleted = 0;
             var errors = new List<FileOperationError>();
             var failureLog = new PerItemFailureLog("Delete",
-                "The per-file list is on the completion screen and in the result log.");
+                "The per-file list is on the completion screen.");
+            // A skipped hold is not a refusal: TryAcquire returns null with
+            // heldByAnother false on a DACL refusal or any other non-fatal
+            // failure, and running on is the right call. It is recorded because
+            // the hold is the only thing stopping a msiexec registering a package
+            // mid-batch, so a run without it is the one window in which the
+            // act-time re-verify's proof can go stale under the batch, and a
+            // report of a needed file being removed could never be attributed to
+            // it. Once per batch, so it costs nothing at any file count.
+            if (lease is null)
+                Helpers.CrashLog.TryWrite(new InvalidOperationException(
+                    "Delete ran without the Windows Installer mutex: it could not be acquired and was not held by another process."));
             // Resolved once for the batch; the guard resolves each SOURCE per
             // file against it (see InstallerCacheRoot).
             var cacheRoot = InstallerCacheRoot.Resolve(_installerFolderOverride);
@@ -136,12 +117,12 @@ public sealed class DeleteFilesService : IDeleteFilesService
                     }
 
                     // Refuse a reparse-point source, matching MoveFilesService:
-                    // a shell recycle of a symlink removes the link, so following
-                    // one out of the cache is refused. Real-FS check
-                    // (MockFileSystem cannot bypass). Reparse first, then the
-                    // containment check, so a symlink is reported as one. An
-                    // attribute read that FAILS refuses the file as UnknownError
-                    // rather than as a symlink, which it has not been shown to be.
+                    // deleting a symlink removes the link, so following one out
+                    // of the cache is refused. Real-FS check (MockFileSystem
+                    // cannot bypass). Reparse first, then the containment check,
+                    // so a symlink is reported as one. An attribute read that
+                    // FAILS refuses the file as UnknownError rather than as a
+                    // symlink, which it has not been shown to be.
                     var reparse = Helpers.StorageHelpers.CheckReparsePoint(filePath, out var reparseError);
                     if (reparse == Helpers.StorageHelpers.ReparseCheck.Yes)
                     {
@@ -155,7 +136,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                         continue;
                     }
 
-                    // Containment guard at the service boundary: never recycle a
+                    // Containment guard at the service boundary: never delete a
                     // file that does not resolve directly into
                     // C:\Windows\Installer, even if a corrupt candidate reached
                     // here. This is the source-side choke point matching the
@@ -177,34 +158,12 @@ public sealed class DeleteFilesService : IDeleteFilesService
                         continue;
                     }
 
-                    var outcome = _engine.RecycleFile(filePath);
-                    switch (outcome.Outcome)
-                    {
-                        case RecycleOutcome.Recycled:
-                            deleted++;
-                            break;
-                        // With consent a nuke counts as deleted; without it
-                        // the file is gone and that is recorded honestly so
-                        // the user is never told it reached the bin.
-                        case RecycleOutcome.PermanentlyDeleted when permitPermanentDelete:
-                            deleted++;
-                            break;
-                        case RecycleOutcome.PermanentlyDeleted:
-                            errors.Add(new PermanentlyDeleted(filePath, outcome.HResult));
-                            break;
-                        // Failed, and any future outcome, recorded with its
-                        // HRESULT for telemetry; the file was left in place.
-                        default:
-                            errors.Add(new RecycleFailed(filePath, outcome.HResult));
-                            break;
-                    }
+                    _fs.File.Delete(filePath);
+                    deleted++;
                 }
                 // Logged for the same reason as the matching block in
                 // MoveFilesService: the framework exception's detail exists
-                // nowhere else once the category has been filed. A recycle
-                // failure the shell reports through an HRESULT is not an
-                // exception and does not come through here; it carries its code
-                // on the RecycleFailed entry instead.
+                // nowhere else once the category has been filed.
                 catch (UnauthorizedAccessException ex)
                 {
                     failureLog.Record(ex);
@@ -213,7 +172,15 @@ public sealed class DeleteFilesService : IDeleteFilesService
                 catch (IOException ex)
                 {
                     failureLog.Record(ex);
-                    errors.Add(new IOFailure(filePath));
+                    // ERROR_SHARING_VIOLATION and ERROR_LOCK_VIOLATION as
+                    // HRESULTs: another program holds the file open, which is
+                    // the one IO failure here with a cause the user can act on
+                    // and the one that is not a fault. Discriminated exactly as
+                    // MoveFilesService does, off the same two codes, so both
+                    // halves of the app name the same condition the same way.
+                    errors.Add(ex.HResult is unchecked((int)0x80070020) or unchecked((int)0x80070021)
+                        ? new FileInUse(filePath)
+                        : new IOFailure(filePath));
                 }
                 catch (Exception ex)
                 {
@@ -224,7 +191,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
             }
             catch (OperationCanceledException)
             {
-                // Return what was recycled before the cancel rather than
+                // Return what was deleted before the cancel rather than
                 // throwing the tally away. The loop's ThrowIfCancellationRequested
                 // is the only cancellation source and sits outside the inner
                 // per-file catch, so only a real cancel lands here.

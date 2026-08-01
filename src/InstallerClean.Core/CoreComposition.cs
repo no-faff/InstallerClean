@@ -24,13 +24,11 @@ public static class CoreComposition
     /// process is the simplest correct choice.
     /// </summary>
     /// <remarks>
-    /// Every registration here is Singleton, which matters beyond tidiness
-    /// for <c>RecycleEngine</c>: it owns an STA thread, so a Transient one
-    /// would start a thread per resolve and the container would never join
-    /// them. Both hosts build with <c>ValidateScopes</c> and
-    /// <c>ValidateOnBuild</c> set, so a Scoped service captured by a
-    /// Singleton and a constructor parameter with no registration behind it
-    /// both fail at the container build rather than at first resolve.
+    /// Every registration here is Singleton. Both hosts build with
+    /// <c>ValidateScopes</c> and <c>ValidateOnBuild</c> set, so a Scoped
+    /// service captured by a Singleton and a constructor parameter with no
+    /// registration behind it both fail at the container build rather than at
+    /// first resolve.
     /// </remarks>
     public static IServiceCollection AddInstallerCleanCore(this IServiceCollection services)
     {
@@ -48,13 +46,9 @@ public static class CoreComposition
         // GUI and CLI call it just before a Move/Delete batch.
         services.AddSingleton<IRemovableReverifier, RemovableReverifier>();
 
-        // File-mutating services. The recycle engine owns the single
-        // STA thread the IFileOperation delete path runs on; as a
-        // singleton the container disposes it at shutdown, joining the
-        // thread. DeleteFilesService depends on it.
+        // File-mutating services.
         services.AddSingleton<IFileSystemScanService, FileSystemScanService>();
         services.AddSingleton<IMoveFilesService, MoveFilesService>();
-        services.AddSingleton<IRecycleEngine, RecycleEngine>();
         services.AddSingleton<IDeleteFilesService, DeleteFilesService>();
 
         // Persistence.

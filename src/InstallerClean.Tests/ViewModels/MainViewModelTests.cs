@@ -39,10 +39,6 @@ public class MainViewModelTests
     private MainViewModel CreateViewModel(AppSettings settings)
     {
         _settingsService.Load().Returns(settings);
-        // Default the recycle-volume probe to available so the delete flow
-        // reaches DeleteFilesAsync; tests covering the bin-unavailable path
-        // stub this false or return RecycleUnavailable from DeleteFilesAsync.
-        _deleteService.CanRecycleToVolume(Arg.Any<string>()).Returns(true);
         // Check() returns Clean or Block, never null (the interface contract);
         // default it Clean so the scan and the act-time re-check both proceed.
         // Tests covering the gate override with a Clean-then-Block sequence.
@@ -516,7 +512,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+                Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(
@@ -528,10 +524,10 @@ public class MainViewModelTests
 
         _confirmationService.Received(1).ConfirmDelete(1, Arg.Any<string>());
         await _deleteService.Received(1).DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+            Arg.Any<IEnumerable<string>>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
-        Assert.Contains("Recycle Bin", vm.Completion.Summary);
+        Assert.Contains("permanently deleted", vm.Completion.Summary);
     }
 
     [Fact]
@@ -574,7 +570,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+                Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new IOException("boom"));
         _confirmationService.ConfirmDelete(
@@ -602,7 +598,7 @@ public class MainViewModelTests
         await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
 
         await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+            Arg.Any<IEnumerable<string>>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
     }
 
@@ -656,7 +652,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+                Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>(), Cancelled: true));
         _confirmationService.ConfirmDelete(
@@ -668,9 +664,9 @@ public class MainViewModelTests
 
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains("1 of 2", vm.Completion.Summary);
-        // A recycle cancel names the Recycle Bin; it did reach the bin for the one
-        // that completed.
-        Assert.Contains("Recycle Bin", vm.Completion.Summary);
+        // The one file the cancel did reach is gone, so the summary says so
+        // rather than describing the batch it was given.
+        Assert.Contains("Permanently deleted", vm.Completion.Summary);
         await _resultLogService.DidNotReceive().WriteAsync(
             Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
     }
@@ -721,7 +717,7 @@ public class MainViewModelTests
 
         Assert.True(vm.Scan.HasPendingReboot);
         await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+            Arg.Any<IEnumerable<string>>(),
             Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.False(vm.Completion.IsComplete);
     }
@@ -935,7 +931,7 @@ public class MainViewModelTests
                 new[] { @"C:\Windows\Installer\x.msi" },
                 new[] { @"C:\Windows\Installer\y.msi" }));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+                Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
@@ -947,162 +943,9 @@ public class MainViewModelTests
         await _deleteService.Received(1).DeleteFilesAsync(
             Arg.Is<IEnumerable<string>>(paths =>
                 paths != null && paths.Count() == 1 && paths.Contains(@"C:\Windows\Installer\x.msi")),
-            Arg.Any<bool>(), Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
+            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
         Assert.True(vm.Completion.IsComplete);
         Assert.Contains("1", vm.Completion.Skipped);
-    }
-
-    [Fact]
-    public async Task DeleteAllAsync_recycle_unavailable_offers_choice_and_cancel_does_nothing()
-    {
-        // Bin unavailable for the volume: the recycle-first pass refuses
-        // (DeletedCount 0, no errors, RecycleUnavailable true) and touches
-        // nothing, so the VM offers the Move / permanent / cancel choice. On
-        // Cancel nothing more happens: no permanent retry, no completion
-        // overlay, and no telemetry write of a "deleted nothing" run.
-        var vm = CreateViewModel();
-        var orphans = new List<OrphanedFile>
-        {
-            new(@"C:\Windows\Installer\big.msi", 200_000_000, false, false, false, Orphaned),
-        };
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Is(false),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true));
-        _confirmationService.ConfirmDelete(
-            Arg.Any<int>(), Arg.Any<string>()).Returns(true);
-        _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
-            .Returns(RecycleUnavailableChoice.Cancel);
-
-        await vm.Scan.ScanWithProgressAsync(null);
-        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
-
-        _confirmationService.Received(1).ConfirmRecycleUnavailable(1, Arg.Any<string>());
-        await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Is(true),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
-        Assert.False(vm.Completion.IsComplete);
-        await _resultLogService.DidNotReceive().WriteAsync(
-            Arg.Any<ResultLogEntry>(), Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task DeleteAllAsync_recycle_unavailable_offers_choice_without_starting_the_delete()
-    {
-        // When the volume cannot recycle, the recycle-first pass presents no
-        // operation: the VM offers the Move / permanent / cancel choice
-        // without calling DeleteFilesAsync, so no "Deleting..." overlay (and
-        // no screen-reader announcement of it) appears for a pass that would
-        // delete nothing. DeleteFilesAsync still re-checks and fails closed;
-        // the probe here only governs whether the overlay shows.
-        var vm = CreateViewModel();
-        _deleteService.CanRecycleToVolume(Arg.Any<string>()).Returns(false);
-        var orphans = new List<OrphanedFile>
-        {
-            new(@"C:\Windows\Installer\big.msi", 200_000_000, false, false, false, Orphaned),
-        };
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
-        _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
-            .Returns(RecycleUnavailableChoice.Cancel);
-
-        await vm.Scan.ScanWithProgressAsync(null);
-        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
-
-        _confirmationService.Received(1).ConfirmRecycleUnavailable(1, Arg.Any<string>());
-        await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Is(false),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
-        Assert.False(vm.Cleanup.IsOperating);
-        Assert.False(vm.Completion.IsComplete);
-    }
-
-    [Fact]
-    public async Task DeleteAllAsync_recycle_unavailable_delete_permanently_redeletes_with_consent()
-    {
-        // Choosing "delete permanently" re-runs the delete with consent. The
-        // completion copy must say the files were permanently deleted, never
-        // that they were sent to the Recycle Bin.
-        var vm = CreateViewModel();
-        var orphans = new List<OrphanedFile>
-        {
-            new(@"C:\Windows\Installer\big.msi", 200_000_000, false, false, false, Orphaned),
-        };
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        // First (recycle) pass refuses; the consented retry succeeds.
-        _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Is(false),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true));
-        _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Is(true),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
-        _confirmationService.ConfirmDelete(
-            Arg.Any<int>(), Arg.Any<string>()).Returns(true);
-        _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
-            .Returns(RecycleUnavailableChoice.DeletePermanently);
-
-        await vm.Scan.ScanWithProgressAsync(null);
-        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
-
-        await _deleteService.Received(1).DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Is(true),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
-        Assert.True(vm.Completion.IsComplete);
-        Assert.Contains("permanently deleted", vm.Completion.Summary);
-        Assert.DoesNotContain("sent to the Recycle Bin", vm.Completion.Summary);
-        Assert.Equal(Strings.Completion_PermanentDeleteRestoreHint_Singular, vm.Completion.Restore);
-    }
-
-    [Fact]
-    public async Task DeleteAllAsync_recycle_unavailable_move_instead_routes_to_move_flow()
-    {
-        // Choosing "Move instead" routes into the standard Move flow (with a
-        // destination already set, so no folder picker is needed). The move
-        // service must be invoked and no permanent delete must happen.
-        var vm = CreateViewModel();
-        var orphans = new List<OrphanedFile>
-        {
-            new(@"C:\Windows\Installer\big.msi", 1_048_576, false, false, false, Orphaned),
-        };
-        _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
-            .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
-        _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Is(false),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new DeleteResult(0, Array.Empty<FileOperationError>(), RecycleUnavailable: true));
-        _confirmationService.ConfirmDelete(
-            Arg.Any<int>(), Arg.Any<string>()).Returns(true);
-        _confirmationService.ConfirmRecycleUnavailable(Arg.Any<int>(), Arg.Any<string>())
-            .Returns(RecycleUnavailableChoice.MoveInstead);
-        _confirmationService.ConfirmMove(
-            Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>()).Returns(true);
-        _moveService.MoveFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<string>(),
-                Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(new MoveResult(1, Array.Empty<FileOperationError>()));
-
-        await vm.Scan.ScanWithProgressAsync(null);
-        vm.Cleanup.MoveDestination = Path.Combine(Path.GetTempPath(), "ic-test-move-instead");
-        await vm.Cleanup.DeleteAllCommand.ExecuteAsync(null);
-
-        // The Move-instead choice routed into the standard Move flow.
-        await _moveService.Received(1).MoveFilesAsync(
-            Arg.Any<IEnumerable<string>>(), vm.Cleanup.MoveDestination,
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
-        // No permanent delete happened.
-        await _deleteService.DidNotReceive().DeleteFilesAsync(
-            Arg.Any<IEnumerable<string>>(), Arg.Is(true),
-            Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>());
-        Assert.True(vm.Completion.IsComplete);
-        // %TEMP% sits on the system drive, so the routed move is
-        // same-volume and the heading claims "moved", not "freed".
-        Assert.Contains("moved", vm.Completion.Heading);
     }
 
     [Fact]
@@ -1338,7 +1181,7 @@ public class MainViewModelTests
         _scanService.ScanAsync(Arg.Any<IProgress<ScanProgressUpdate>?>(), Arg.Any<CancellationToken>())
             .Returns(new ScanResult(orphans, Array.Empty<RegisteredPackage>(), 0));
         _deleteService.DeleteFilesAsync(
-                Arg.Any<IEnumerable<string>>(), Arg.Any<bool>(),
+                Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
             .Returns(new DeleteResult(1, Array.Empty<FileOperationError>()));
         _confirmationService.ConfirmDelete(

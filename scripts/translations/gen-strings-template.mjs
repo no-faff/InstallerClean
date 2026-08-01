@@ -142,7 +142,6 @@ const MAP = {
   'Action.Cancel': `_Cancel`,
   'Action.CheckForUpdates': `Check for _updates`,
   'Action.Close': `_Close`,
-  'Action.Delete': `_Delete`,
   'Action.DeletePermanently': `_Delete permanently`,
   'Action.Done': `_Done`,
   'Action.Details': `Details`,
@@ -150,7 +149,6 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Leave a _star on GitHub`,
   'Action.Licence': `Apache 2.0 licence`,
   'Action.Move': `_Move`,
-  'Action.MoveInstead': `_Move instead`,
   'Action.MoveDestinationPlaceholder': `Path to folder if you Move instead of Delete`,
   'Action.OpenReleasePage': `Open _release page`,
   'Action.Rescan': `_Re-scan`,
@@ -174,9 +172,6 @@ const MAP = {
   'Automation.Minimise': `Minimise`,
   'Automation.ConfirmDelete': `Delete moves the unneeded files to the Recycle Bin. Cancel closes without deleting.`,
   'Automation.ConfirmMove': `Move puts the unneeded files in the chosen destination folder. Cancel leaves them where they are.`,
-  'Automation.RecycleUnavailable': `Choose how to handle the unneeded files: move them somewhere safe, delete them permanently or cancel.`,
-  'Automation.RecycleUnavailableMove': `Move the unneeded files to a folder you choose`,
-  'Automation.RecycleUnavailableDeletePermanently': `Delete the unneeded files permanently because the Recycle Bin is unavailable for this drive`,
   'Automation.SayThanks': `Say thanks`,
   'Automation.ConfirmSendResultLog': `Send posts the report shown to No Faff. Cancel sends nothing.`,
   'Automation.CheckForUpdates': `Check for updates`,
@@ -263,7 +258,6 @@ const MAP = {
   // 0 = file count, 1 = pluralised noun ("file"/"files")
   'Status.FoundUnused': `Found {0} {1} you can safely delete.`,
   'Status.PreparingDestination': `Preparing destination folder...`,
-  'Status.CheckingRecycleBin': `Checking the Recycle Bin...`,
 
   // 0 = file count, 1 = pluralised noun
   'Status.Moving': `Moving {0} {1}...`,
@@ -285,13 +279,9 @@ const MAP = {
   'Completion.AllClean': `All clean`,
   'Completion.NothingToCleanUp': `Nothing to clean up in {InstallerFolder}`,
   'Completion.NothingToCleanUpReceipt': `Scanned {0} {1} in {2}`,
-  'Completion.MoveRestoreHint': `Copy them back to {InstallerFolder} if anything ever breaks ([extremely unlikely]).`,
-  'Completion.DeleteRestoreHint': `Until then, you can restore them if anything ever breaks ([extremely unlikely]).`,
-  'Completion.DeleteSpaceHint': `Empty it to actually reclaim the space.`,
 
   // 0 = size freed (e.g. "120.5 MB")
   'Completion.Freed': `{0} freed`,
-  'Completion.CleanedUp': `{0} cleaned up`,
   'Completion.Moved': `{0} moved`,
 
   // Heading for the outcome where the operation acted on no file at all, then
@@ -310,25 +300,15 @@ const MAP = {
   'Completion.MoveSummary.Plural': `{0} {1} moved to: {2}`,
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.DeleteSummary.Singular': `{0} {1} moved to the Recycle Bin`,
-  'Completion.DeleteSummary.Plural': `{0} {1} moved to the Recycle Bin`,
   'Completion.ReverifySkipped': `{0} {1} kept in place, because a program went back to needing what the scan flagged.`,
   'Completion.ReverifyIncomplete': `{0} {1} kept in place, because the Windows Installer records could not be fully read when the check was repeated.`,
   'Completion.MoveCancelledSummary': `Moved {0} of {1} {2} before you cancelled.`,
-  'Completion.DeleteCancelledSummary': `Moved {0} of {1} {2} to the Recycle Bin before you cancelled.`,
   'Completion.PermanentDeleteCancelledSummary': `Permanently deleted {0} of {1} {2} before you cancelled.`,
 
   // 0 = deleted count, 1 = pluralised noun
   'Completion.PermanentDeleteSummary.Singular': `{0} {1} permanently deleted. It did not go to the Recycle Bin.`,
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} permanently deleted. They did not go to the Recycle Bin.`,
-  'Completion.PermanentDeleteRestoreHint.Singular': `That's fine, it was safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.`,
-  'Completion.PermanentDeleteRestoreHint.Plural': `That's fine, they were safe to remove. InstallerClean only clears files Windows reports as finished with, never one a program still needs. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.`,
   'Completion.DonateAsk': `Glad to help. There's a tip jar if you're feeling kind.`,
-  'RecycleUnavailable.Heading': `The Recycle Bin isn't available for this drive`,
-  'RecycleUnavailable.Body.Singular': `So this {1} ({2}) hasn't been deleted. You can move it somewhere safe, or delete it permanently.`,
-  'RecycleUnavailable.Body.Plural': `So these {0} {1} ({2}) haven't been deleted. You can move them somewhere safe, or delete them permanently.`,
-  'RecycleUnavailable.Reassurance.Singular': `Deleting it is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.`,
-  'RecycleUnavailable.Reassurance.Plural': `Deleting them is safe. InstallerClean only clears files Windows reports as finished with, never one a program still needs, and the Recycle Bin is only an extra safeguard. In the unlikely event a deletion ever left a program unable to repair, update or uninstall, reinstalling it from its maker usually restores the file, though Microsoft doesn't guarantee it.`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} file still needed`,
@@ -362,7 +342,6 @@ const MAP = {
   // 0 = destination path
   'Confirm.MoveDestination': `Files will be moved to:`,
   'Confirm.DeleteTitle': `Delete {0} {1} ({2})?`,
-  'Confirm.DeleteToRecycleBin': `Files will be moved to the Recycle Bin. If you'd like backup copies, use the Move button instead.`,
   'Confirm.MoveSameDrive': `This folder is on the same drive, so the move won't free any space by itself. You'll get the space back when you delete the files from it, or you can pick a folder on another drive instead.`,
 
   // Error messages
@@ -416,10 +395,6 @@ const MAP = {
   'Error.UnknownError.Plural': `Something went wrong with these files; they were left in place.`,
 
   // 0 = shell error code
-  'Error.ShellRecycleFailed': `Couldn't move this file to the Recycle Bin (error {0}), and InstallerClean can't tell you why from that code. The file was left in place. Try the Move button instead, since it doesn't use the Recycle Bin.`,
-  'Error.RecycleAccessDenied': `Windows refused access even with administrator rights (error {0}), and InstallerClean can't tell whether the problem is the file or the Recycle Bin. The file was left in place. The Move button will work if it's the Recycle Bin, but not if it's the file.`,
-  'Error.RecycleInUse': `This file is open or locked by another program (error {0}), so nothing can remove it just now. It was left in place; try again later.`,
-  'Error.DeletedNotRecycled': `Windows deleted this file outright rather than moving it to the Recycle Bin. InstallerClean asked for the Recycle Bin, and Windows did this instead. The file is gone.`,
 
   // 0 = destination
   'Error.MoveIntoInstaller': `Refusing to move files into the Windows Installer folder (destination: {0}).`,
@@ -517,7 +492,6 @@ const MAP = {
   'Cli.NothingToDo': `Nothing to do.`,
   'Cli.DeletingFiles': `Deleting {0} {1}...`,
   'Cli.DeletedFiles': `Deleted {0} {1}.`,
-  'Cli.RecycleUnavailable': `Error: the Recycle Bin is unavailable for this volume, so nothing was deleted. Use /m to move the files instead, or re-enable the Recycle Bin and run again.`,
   'Cli.NoMoveDestination': `Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)`,
   'Cli.MoveDestinationInsideInstaller': `Error: destination cannot be inside the Windows Installer folder.`,
   'Cli.MoveDestinationRelative': `Error: destination must be a fully qualified path. Got: {0}`,

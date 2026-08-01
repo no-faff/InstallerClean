@@ -19,9 +19,13 @@
     </WindowChrome.WindowChrome>
 
     <!-- Card width scales with the OS text size so the copy keeps its
-         line length instead of wrapping into a tall sliver. -->
+         line length instead of wrapping into a tall sliver.
+
+         The 440 floor is shared with the delete dialog so the two match
+         whenever their content is short; this one still grows to 520, which a
+         long destination path or the same-drive note needs. -->
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.ModalCard}" Padding="{StaticResource Padding.ModalCard}"
-            MaxWidth="{a11y:TextScaled 520}" MinWidth="{a11y:TextScaled 320}"
+            MaxWidth="{a11y:TextScaled 520}" MinWidth="{a11y:TextScaled 440}"
             BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <!-- Grid, not a StackPanel: the destination (the one line that
              can run long) sits in a star row so it scrolls once the
@@ -36,13 +40,13 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock x:Name="MessageText" Grid.Row="0" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
-                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Sm}"/>
+                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
 
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
                           Style="{StaticResource BodyScrollRegion}"
                           AutomationProperties.Name="{loc:Translate Automation.Scroll.DialogBody}">
-                <StackPanel Margin="{StaticResource GapBottom.Lg}">
+                <StackPanel Margin="{StaticResource GapBottom.Xl}">
                     <TextBlock x:Name="DestinationLabel" Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
                                TextWrapping="Wrap"/>
                     <TextBlock x:Name="DestinationText" Foreground="{StaticResource Text.Body}" FontSize="{DynamicResource Type.Body}"
@@ -53,7 +57,7 @@
                          no space until the parked copies are deleted. The amber
                          triangle is the app's established "this is not what you
                          may be expecting" marker (pending reboot, missing from
-                         disk, bin unavailable). DockPanel, not a horizontal
+                         disk). DockPanel, not a horizontal
                          StackPanel, so the sentence wraps: a StackPanel gives
                          its child infinite width and TextWrapping never engages. -->
                     <DockPanel x:Name="SameDriveNote" Visibility="Collapsed"

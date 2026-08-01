@@ -193,8 +193,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         : MainExplanationWhyText;
 
     /// <summary>
-    /// Whether to show the "Delete them to the Recycle Bin, or use Move" action
-    /// line. True for every completed scan except during a Windows Installer
+    /// Whether to show the third intro tier, the line naming the two actions.
+    /// True for every completed scan except during a Windows Installer
     /// hold: the buttons are held then, so an instruction to press them is
     /// removed (the pending-reboot banner and lead explain the hold). At zero
     /// files the line stays: "them" reads with the implied "if there are any".

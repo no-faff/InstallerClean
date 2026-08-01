@@ -108,7 +108,6 @@ const MAP = {
   'Action.Cancel': `_Annuler`,
   'Action.CheckForUpdates': `Rechercher des _mises à jour`,
   'Action.Close': `_Fermer`,
-  'Action.Delete': `_Supprimer`,
   'Action.DeletePermanently': `_Supprimer définitivement`,
   'Action.Done': `_Terminé`,
   'Action.Details': `Détails`,
@@ -116,7 +115,6 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `_Laisser une étoile sur GitHub`,
   'Action.Licence': `Licence Apache 2.0`,
   'Action.Move': `_Déplacer`,
-  'Action.MoveInstead': `_Déplacer plutôt`,
   'Action.MoveDestinationPlaceholder': `Chemin du dossier si vous déplacez au lieu de supprimer`,
   'Action.OpenReleasePage': `Ouvrir la page de la _version`,
   'Action.Rescan': `_Réanalyser`,
@@ -137,9 +135,6 @@ const MAP = {
   'Automation.Minimise': `Réduire`,
   'Automation.ConfirmDelete': `Supprimer déplace les fichiers inutiles vers la Corbeille. Annuler ferme sans rien supprimer.`,
   'Automation.ConfirmMove': `Déplacer place les fichiers inutiles dans le dossier de destination choisi. Annuler les laisse où ils sont.`,
-  'Automation.RecycleUnavailable': `Choisissez quoi faire des fichiers inutiles : les déplacer en lieu sûr, les supprimer définitivement ou annuler.`,
-  'Automation.RecycleUnavailableMove': `Déplacer les fichiers inutiles vers un dossier que vous choisissez`,
-  'Automation.RecycleUnavailableDeletePermanently': `Supprimer définitivement les fichiers inutiles parce que la Corbeille est indisponible pour ce lecteur`,
   'Automation.SayThanks': `Dire merci`,
   'Automation.ConfirmSendResultLog': `Envoyer transmet à No Faff le rapport affiché. Annuler n'envoie rien.`,
   'Automation.CheckForUpdates': `Rechercher des mises à jour`,
@@ -241,8 +236,6 @@ const MAP = {
   'Completion.AllClean': `Tout est propre`,
   'Completion.NothingToCleanUp': `Rien à nettoyer dans {InstallerFolder}`,
   'Completion.NothingToCleanUpReceipt': `Analyse de {0} {1} en {2}`,
-  'Completion.MoveRestoreHint': `Recopiez-les dans {InstallerFolder} si jamais quelque chose ne fonctionne plus ([extrêmement improbable]).`,
-  'Completion.DeleteRestoreHint': `D'ici là, vous pouvez les restaurer si jamais quelque chose ne fonctionne plus ([extrêmement improbable]).`,
 
   // 0 = size freed (e.g. "120.5 MB")
   'Completion.Freed': `{0} libérés`,
@@ -263,19 +256,10 @@ const MAP = {
   'Completion.MoveSummary.Plural': `Déplacé {0} {1} vers : {2}`,
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.DeleteSummary.Singular': `Déplacé {0} {1} vers la Corbeille`,
-  'Completion.DeleteSummary.Plural': `Déplacé {0} {1} vers la Corbeille`,
 
   // 0 = deleted count, 1 = pluralised noun
   'Completion.PermanentDeleteSummary.Singular': `{0} {1} supprimé définitivement. Il n'est pas allé à la Corbeille.`,
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} supprimés définitivement. Ils ne sont pas allés à la Corbeille.`,
-  'Completion.PermanentDeleteRestoreHint.Singular': `C'est normal, il n'y avait aucun risque à le retirer. InstallerClean n'efface que les fichiers dont Windows déclare avoir fini de se servir, jamais un dont un programme a encore besoin. Dans le cas improbable où une suppression empêcherait un jour un programme de se réparer, se mettre à jour ou se désinstaller, le réinstaller depuis son éditeur rétablit en général le fichier, même si Microsoft ne le garantit pas.`,
-  'Completion.PermanentDeleteRestoreHint.Plural': `C'est normal, il n'y avait aucun risque à les retirer. InstallerClean n'efface que les fichiers dont Windows déclare avoir fini de se servir, jamais un dont un programme a encore besoin. Dans le cas improbable où une suppression empêcherait un jour un programme de se réparer, se mettre à jour ou se désinstaller, le réinstaller depuis son éditeur rétablit en général le fichier, même si Microsoft ne le garantit pas.`,
-  'RecycleUnavailable.Heading': `La Corbeille n'est pas disponible pour ce lecteur`,
-  'RecycleUnavailable.Body.Singular': `Donc ce {1} ({2}) n'a pas été supprimé. Vous pouvez le déplacer en lieu sûr, ou le supprimer définitivement.`,
-  'RecycleUnavailable.Body.Plural': `Donc ces {0} {1} ({2}) n'ont pas été supprimés. Vous pouvez les déplacer en lieu sûr, ou les supprimer définitivement.`,
-  'RecycleUnavailable.Reassurance.Singular': `Le supprimer ne présente aucun risque. InstallerClean n'efface que les fichiers dont Windows déclare avoir fini de se servir, jamais un dont un programme a encore besoin, et la Corbeille n'est qu'une protection supplémentaire. Dans le cas improbable où une suppression empêcherait un jour un programme de se réparer, se mettre à jour ou se désinstaller, le réinstaller depuis son éditeur rétablit en général le fichier, même si Microsoft ne le garantit pas.`,
-  'RecycleUnavailable.Reassurance.Plural': `Les supprimer ne présente aucun risque. InstallerClean n'efface que les fichiers dont Windows déclare avoir fini de se servir, jamais un dont un programme a encore besoin, et la Corbeille n'est qu'une protection supplémentaire. Dans le cas improbable où une suppression empêcherait un jour un programme de se réparer, se mettre à jour ou se désinstaller, le réinstaller depuis son éditeur rétablit en général le fichier, même si Microsoft ne le garantit pas.`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} fichier encore nécessaire`,
@@ -303,7 +287,6 @@ const MAP = {
   // 0 = destination path
   'Confirm.MoveDestination': `Les fichiers seront déplacés vers :`,
   'Confirm.DeleteTitle': `Supprimer {0} {1} ({2}) ?`,
-  'Confirm.DeleteToRecycleBin': `Les fichiers seront déplacés vers la Corbeille. Si vous voulez des copies de sauvegarde, utilisez plutôt le bouton Déplacer.`,
 
   // Error messages
   'Error.AdminRequiredTitle': `Accès refusé`,
@@ -350,10 +333,6 @@ const MAP = {
   'Error.UnknownError.Plural': `Un problème est survenu avec ces fichiers ; ils ont été laissés en place.`,
 
   // 0 = shell error code
-  'Error.ShellRecycleFailed': `Impossible de déplacer ce fichier vers la Corbeille (erreur {0}), et ce code ne permet pas à InstallerClean de vous dire pourquoi. Le fichier a été laissé en place. Essayez plutôt le bouton Déplacer, qui n'utilise pas la Corbeille.`,
-  'Error.RecycleAccessDenied': `Windows a refusé l'accès même avec des droits d'administrateur (erreur {0}), et InstallerClean ne peut pas déterminer si le problème vient du fichier ou de la Corbeille. Le fichier a été laissé en place. Le bouton Déplacer fonctionnera si le problème vient de la Corbeille, mais pas s'il vient du fichier.`,
-  'Error.RecycleInUse': `Ce fichier est ouvert ou verrouillé par un autre programme (erreur {0}), donc rien ne peut le supprimer pour l'instant. Il a été laissé en place ; réessayez plus tard.`,
-  'Error.DeletedNotRecycled': `Windows a supprimé ce fichier purement et simplement au lieu de le déplacer vers la Corbeille. InstallerClean avait demandé la Corbeille, et Windows a fait autrement. Le fichier n'existe plus.`,
 
   // 0 = destination
   'Error.MoveIntoInstaller': `Refus de déplacer des fichiers dans le dossier Windows Installer (destination : {0}).`,
@@ -447,7 +426,6 @@ const MAP = {
   'Cli.NothingToDo': `Rien à faire.`,
   'Cli.DeletingFiles': `Suppression de {0} {1}...`,
   'Cli.DeletedFiles': `Supprimé {0} {1}.`,
-  'Cli.RecycleUnavailable': `Erreur : la Corbeille est indisponible pour ce volume, donc rien n'a été supprimé. Utilisez /m pour déplacer les fichiers, ou réactivez la Corbeille et relancez.`,
   'Cli.NoMoveDestination': `Erreur : aucune destination de déplacement spécifiée. Utilisez /m CHEMIN. (Une valeur par défaut définie dans l'interface est propre à chaque utilisateur et ne s'applique pas aux exécutions planifiées ou par compte de service.)`,
   'Cli.MoveDestinationInsideInstaller': `Erreur : la destination ne peut pas se trouver dans le dossier Windows Installer.`,
   'Cli.MoveDestinationRelative': `Erreur : la destination doit être un chemin entièrement qualifié. Reçu : {0}`,
@@ -476,8 +454,6 @@ const MAP = {
   'Cli.Help.ExitCodePartial': `  2   partiel : certains fichiers traités, d'autres ont échoué`,
   'Cli.Help.ExitCodeTransient': `  75  transitoire : quelque chose a bloqué l'exécution (voir le message)`,
   'Cli.Help.ExitCodeCancelled': `  130 annulé (Ctrl+C)`,
-  'Completion.CleanedUp': `{0} nettoyés`,
-  'Completion.DeleteSpaceHint': `Videz la Corbeille pour vraiment récupérer l'espace.`,
   'Body.NotScanned.Lead': `Rien n'a encore été analysé.`,
   'Body.NotScanned.Why': `Cliquez sur Réanalyser pour parcourir {InstallerFolder} à la recherche de fichiers d'installation dont aucun programme n'a plus besoin.`,
   'Confirm.MoveSameDrive': `Ce dossier est sur le même lecteur, donc le déplacement ne libérera pas d'espace à lui seul. Vous récupérerez cet espace en supprimant les fichiers qui s'y trouvent, ou vous pouvez plutôt choisir un dossier sur un autre lecteur.`,
@@ -485,7 +461,6 @@ const MAP = {
   'Error.CandidateOutsideCache': `Ce fichier ne se trouve pas directement dans le dossier Windows Installer ; refusé par sécurité.`,
   'Completion.ReverifySkipped': `{0} {1} laissés en place, redevenus nécessaires à un programme après l'analyse.`,
   'Completion.MoveCancelledSummary': `Déplacé {0} sur {1} {2} avant votre annulation.`,
-  'Completion.DeleteCancelledSummary': `Déplacé {0} sur {1} {2} vers la Corbeille avant votre annulation.`,
   'Completion.PermanentDeleteCancelledSummary': `Supprimé définitivement {0} sur {1} {2} avant votre annulation.`,
   'Body.PendingReboot.Lead': `Ces fichiers ne peuvent pas être nettoyés pour le moment.`,
   'Cli.TooManyArguments': `Erreur : argument supplémentaire inattendu « {0} ». Si votre dossier de déplacement contient un espace, mettez le chemin entier entre guillemets : /m "D:\\My Backup"`,
@@ -496,7 +471,6 @@ const MAP = {
   'Error.ScanRecordsUnreadable': `InstallerClean n'a pas pu lire assez des enregistrements de Windows Installer pour savoir avec certitude ce qui sert encore : la liste des programmes installés est revenue incomplète, et lire ces mêmes enregistrements directement dans le registre a également donné des erreurs. Un fichier pourrait sembler orphelin uniquement parce que l'enregistrement qui le nomme faisait partie des illisibles, donc InstallerClean s'est arrêté. Rien n'a été supprimé.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer n'a jamais signalé la fin de la liste des programmes installés : InstallerClean a renoncé après {0} entrées (dernier code d'erreur {1}). Une liste sans fin n'est pas fiable, donc InstallerClean s'est arrêté. Rien n'a été supprimé.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer n'a jamais signalé la fin de la liste des correctifs d'un programme : InstallerClean a renoncé après {0} entrées (dernier code d'erreur {1}). Une liste sans fin n'est pas fiable, donc InstallerClean s'est arrêté. Rien n'a été supprimé.`,
-  'Status.CheckingRecycleBin': `Vérification de la Corbeille...`,
   'UpdateCheck.Status.UpdateAvailable': `La version {0} est disponible.`,
   'Completion.DonateAsk': `Content d'avoir pu aider. La cagnotte est là, si le cœur vous en dit.`,
   'About.Link.Guide': `Guide et FAQ`,

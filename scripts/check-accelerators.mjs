@@ -44,7 +44,7 @@ const SETS = {
   // first scan the whole action zone is absent), so only results can fail. They
   // are listed separately so a control that later appears in one state alone
   // has a set to be added to.
-  'MainWindow-results': ['Action.Details', 'Action.Browse', 'Action.Delete',
+  'MainWindow-results': ['Action.Details', 'Action.Browse', 'Action.DeletePermanently',
     'Action.Move', 'Action.Rescan', 'Action.About', 'Action.CheckForUpdates'],
   'MainWindow-notScanned': ['Action.Rescan', 'Action.About', 'Action.CheckForUpdates'],
   'MainWindow-pendingReboot': ['Action.Details', 'Action.Browse', 'Action.Rescan',
@@ -55,10 +55,9 @@ const SETS = {
 
   'About': ['About.AutoUpdateCheck', 'Action.Licence', 'Action.LeaveStarOnGitHub',
     'Action.BuyMeACuppa', 'Action.Close'],
-  'ConfirmDelete': ['Action.Cancel', 'Action.Delete'],
+  'ConfirmDelete': ['Action.Cancel', 'Action.DeletePermanently'],
   'ConfirmMove': ['Action.Cancel', 'Action.Move'],
   'ConfirmSendResultLog': ['Action.Cancel', 'Action.SendResultLogConfirm'],
-  'RecycleUnavailable': ['Action.MoveInstead', 'Action.DeletePermanently', 'Action.Cancel'],
   'UpdateAvailable': ['Action.Cancel', 'Action.OpenReleasePage'],
 };
 

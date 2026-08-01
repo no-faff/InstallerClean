@@ -8,6 +8,31 @@ using InstallerClean.Services;
 namespace InstallerClean.ViewModels;
 
 /// <summary>
+/// What a completed Move did to the disk. The completion card needs it in two
+/// places that do not answer the same question: the heading verb ("freed" only
+/// where the system drive is genuinely emptier) and the body's advice about
+/// when the space comes back. A same-drive move is not the only one that frees
+/// nothing at that instant, so the two cannot be derived from each other.
+/// </summary>
+public enum MoveSpaceOutcome
+{
+    /// <summary>Another volume: the system drive is genuinely emptier now.</summary>
+    FreedSpace,
+
+    /// <summary>
+    /// The drive the files came from. A rename, so nothing is reclaimed until
+    /// the backup folder is deleted or moved off the drive.
+    /// </summary>
+    SameDrive,
+
+    /// <summary>
+    /// A share, or a volume the classification could not read. The heading
+    /// claims no freed space and the body makes no claim about the drive.
+    /// </summary>
+    Unclassified,
+}
+
+/// <summary>
 /// Completion-screen slice. Holds the heading / summary / restore-hint
 /// / errors block shown after a scan-with-no-orphans, a successful
 /// move or a successful delete. The rescan command runs the
@@ -55,16 +80,6 @@ public partial class CompletionViewModel : ObservableObject
     /// else because the view-model instance is reused across operations.
     /// </summary>
     [ObservableProperty] private string _summaryDestination = string.Empty;
-
-    /// <summary>
-    /// Delete-only line shown above <see cref="Restore"/> ("Empty it to
-    /// actually reclaim the space."). Empty on every other completion path
-    /// (move, all-clear, permanent delete) so the bound TextBlock collapses
-    /// and only the recycle-delete summary carries it. Set in
-    /// <see cref="ShowDeleteSummary"/> and cleared everywhere else, because the
-    /// view-model instance is reused across operations.
-    /// </summary>
-    [ObservableProperty] private string _spaceHint = string.Empty;
 
     /// <summary>
     /// The failure count line ("2 of 71 could not be moved."), shown in
@@ -226,13 +241,6 @@ public partial class CompletionViewModel : ObservableObject
         FailedCount = string.Empty;
         SummaryDestination = string.Empty;
         Summary = Strings.Completion_NothingToCleanUp;
-        // SpaceHint must be set before Restore: the WPF host rebuilds the
-        // restore line's inlines (folding SpaceHint in as a leading sentence)
-        // from Restore's PropertyChanged, so SpaceHint needs its final value
-        // in place before that setter raises. Without this order a SpaceHint
-        // left over from an earlier Delete in the same session bleeds into
-        // the all-clear receipt.
-        SpaceHint = string.Empty;
         Restore = string.Format(
             Strings.Completion_NothingToCleanUpReceipt,
             installedProductCount,
@@ -299,15 +307,33 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
+    /// The line under a Move summary: the backup folder is safe to delete, and
+    /// what deleting it does about the space. Picks between four strings on the
+    /// two things that vary, whether the folder is on the drive the files came
+    /// from and whether it holds one file or several.
+    /// </summary>
+    private static string MoveRestoreText(int movedCount, MoveSpaceOutcome space) =>
+        space == MoveSpaceOutcome.SameDrive
+            ? DisplayHelpers.Pluralise(movedCount,
+                Strings.Completion_MoveRestoreHintSameDrive_Singular,
+                Strings.Completion_MoveRestoreHintSameDrive_Plural,
+                "Completion.MoveRestoreHintSameDrive")
+            : DisplayHelpers.Pluralise(movedCount,
+                Strings.Completion_MoveRestoreHint_Singular,
+                Strings.Completion_MoveRestoreHint_Plural,
+                "Completion.MoveRestoreHint");
+
+    /// <summary>
     /// Shows the post-Move summary including any per-file errors.
-    /// <paramref name="freesSpace"/> picks the heading verb: a move to
-    /// another volume genuinely frees space on the system drive, so it
-    /// reads "freed"; a same-volume move is a rename that frees nothing
-    /// until the parked folder is deleted, so it reads "moved" (the
-    /// claim-less verb also covers an unclassifiable destination).
+    /// <paramref name="space"/> picks the heading verb and the restore line: a
+    /// move to another volume genuinely frees space on the system drive, so it
+    /// reads "freed"; a same-volume move is a rename that frees nothing until
+    /// the parked folder is deleted, so it reads "moved" and its restore line
+    /// says how to get the space back. An unclassifiable destination takes the
+    /// claim-less verb and the restore line that names no drive.
     /// </summary>
     public void ShowMoveSummary(int movedCount, long movedBytes, string destination,
-        IReadOnlyList<FileOperationError> errors, bool freesSpace, ReverifyResult? reverify = null)
+        IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify = null)
     {
         // The heading states one outcome and only one. A partial failure still
         // freed what it freed, so it keeps the size heading and lets the count
@@ -318,7 +344,7 @@ public partial class CompletionViewModel : ObservableObject
         Heading = HeadingIsWarning
             ? Strings.Completion_NothingMoved
             : string.Format(
-                freesSpace ? Strings.Completion_Freed : Strings.Completion_Moved,
+                space == MoveSpaceOutcome.FreedSpace ? Strings.Completion_Freed : Strings.Completion_Moved,
                 DisplayHelpers.FormatSize(movedBytes));
         FailedCount = FailedCountText(movedCount, errors.Count, deleting: false);
         var movedLabel = DisplayHelpers.PluraliseFile(movedCount);
@@ -341,17 +367,9 @@ public partial class CompletionViewModel : ObservableObject
                     Strings.Completion_MoveSummary_Plural,
                     "Completion.MoveSummary"),
                 movedCount, movedLabel, destination);
-        // SpaceHint must be set before Restore: the WPF host rebuilds the
-        // restore line's inlines (folding SpaceHint in as a leading sentence)
-        // from Restore's PropertyChanged, so SpaceHint needs its final value
-        // in place before that setter raises. Without this order a SpaceHint
-        // left over from an earlier Delete in the same session bleeds into
-        // this move's restore hint.
-        SpaceHint = string.Empty;
-        // No restore reassurance when nothing moved: "copy them back if
-        // anything breaks" is about files sitting in the destination, and
-        // there are none.
-        Restore = HeadingIsWarning ? string.Empty : Strings.Completion_MoveRestoreHint;
+        // No restore line when nothing moved: it is about files sitting in the
+        // backup folder, and there are none.
+        Restore = HeadingIsWarning ? string.Empty : MoveRestoreText(movedCount, space);
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
@@ -360,7 +378,18 @@ public partial class CompletionViewModel : ObservableObject
         IsComplete = true;
     }
 
-    /// <summary>Shows the post-Delete summary including any per-file errors.</summary>
+    /// <summary>
+    /// Shows the post-Delete summary including any per-file errors. Two lines
+    /// and no third: the heading reads "freed", because a delete reclaims the
+    /// disk at the instant it happens, and the summary states what was done.
+    ///
+    /// <see cref="Restore"/> is deliberately left empty, which is the one thing
+    /// about this screen worth defending. The app's claim is not that a delete
+    /// can be undone, it is that these files do not need undoing, so a recovery
+    /// line here would be the app hedging against the thing it has just said
+    /// will not happen. That also leaves the screen with no safety claim on it,
+    /// which is why it is the one completion state carrying no link.
+    /// </summary>
     public void ShowDeleteSummary(int deletedCount, long deletedBytes,
         IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null)
     {
@@ -369,56 +398,12 @@ public partial class CompletionViewModel : ObservableObject
         HeadingIsWarning = errors.Count > 0 && deletedCount == 0;
         Heading = HeadingIsWarning
             ? Strings.Completion_NothingDeleted
-            : string.Format(Strings.Completion_CleanedUp, DisplayHelpers.FormatSize(deletedBytes));
+            : string.Format(Strings.Completion_Freed, DisplayHelpers.FormatSize(deletedBytes));
         FailedCount = FailedCountText(deletedCount, errors.Count, deleting: true);
         SummaryDestination = string.Empty;
         var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
         // Suppressed when nothing was deleted: see ShowMoveSummary. "0 files
-        // moved to the Recycle Bin" describes an arrival that did not happen.
-        Summary = HeadingIsWarning
-            ? string.Empty
-            : string.Format(DisplayHelpers.Pluralise(deletedCount,
-                    Strings.Completion_DeleteSummary_Singular,
-                    Strings.Completion_DeleteSummary_Plural,
-                    "Completion.DeleteSummary"),
-                deletedCount, deletedLabel);
-        // SpaceHint must be set before Restore: the WPF host rebuilds the
-        // restore line's inlines (folding SpaceHint in as a leading sentence)
-        // from Restore's PropertyChanged, so SpaceHint needs its final value
-        // in place before that setter raises.
-        // Both suppressed when nothing was deleted: the bin gained nothing, so
-        // there is neither anything to empty nor anything to restore.
-        SpaceHint = HeadingIsWarning ? string.Empty : Strings.Completion_DeleteSpaceHint;
-        Restore = HeadingIsWarning ? string.Empty : Strings.Completion_DeleteRestoreHint;
-        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
-        Skipped = SkippedText(reverify);
-        ResultLogStatusMessage = string.Empty;
-        LastResultFreedNothing = deletedBytes <= 0;
-        ShowDonate = deletedBytes > 0;
-        IsComplete = true;
-    }
-
-    /// <summary>
-    /// Shows the completion summary for a consented permanent delete: the
-    /// Recycle Bin was unavailable for the volume and the user chose to
-    /// delete anyway, so these files did NOT reach the bin. Kept distinct
-    /// from <see cref="ShowDeleteSummary"/> so the copy never claims the
-    /// bin and the restore hint points at reinstalling rather than at the
-    /// (empty) Recycle Bin.
-    /// </summary>
-    public void ShowPermanentDeleteSummary(int deletedCount, long deletedBytes,
-        IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null)
-    {
-        // See ShowMoveSummary for why a partial failure keeps the size heading
-        // and only a delete that reached no file at all swaps to the warning.
-        HeadingIsWarning = errors.Count > 0 && deletedCount == 0;
-        Heading = HeadingIsWarning
-            ? Strings.Completion_NothingDeleted
-            : string.Format(Strings.Completion_CleanedUp, DisplayHelpers.FormatSize(deletedBytes));
-        FailedCount = FailedCountText(deletedCount, errors.Count, deleting: true);
-        SummaryDestination = string.Empty;
-        var deletedLabel = DisplayHelpers.PluraliseFile(deletedCount);
-        // Suppressed when nothing was deleted: see ShowMoveSummary.
+        // permanently deleted" reports an act that did not happen.
         Summary = HeadingIsWarning
             ? string.Empty
             : string.Format(DisplayHelpers.Pluralise(deletedCount,
@@ -426,22 +411,7 @@ public partial class CompletionViewModel : ObservableObject
                     Strings.Completion_PermanentDeleteSummary_Plural,
                     "Completion.PermanentDeleteSummary"),
                 deletedCount, deletedLabel);
-        // No space hint: a permanent delete reclaims the disk at that instant
-        // (there is no bin to empty). The headline still reads "cleaned up"
-        // rather than "freed" to keep both delete paths consistent. Cleared
-        // before Restore: the WPF host rebuilds the restore line's inlines
-        // (folding SpaceHint in as a leading sentence) from Restore's
-        // PropertyChanged, so a SpaceHint left over from an earlier Delete in
-        // the same session would otherwise bleed into this reassurance.
-        SpaceHint = string.Empty;
-        // No reassurance when nothing was deleted: "that's fine, they were safe
-        // to remove" is about files that were removed, and none were.
-        Restore = HeadingIsWarning
-            ? string.Empty
-            : DisplayHelpers.Pluralise(deletedCount,
-                Strings.Completion_PermanentDeleteRestoreHint_Singular,
-                Strings.Completion_PermanentDeleteRestoreHint_Plural,
-                "Completion.PermanentDeleteRestoreHint");
+        Restore = string.Empty;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
@@ -461,23 +431,22 @@ public partial class CompletionViewModel : ObservableObject
     /// destination.
     /// </summary>
     public void ShowMoveCancelledSummary(int movedCount, int totalCount, long movedBytes,
-        IReadOnlyList<FileOperationError> errors, bool freesSpace, ReverifyResult? reverify = null)
+        IReadOnlyList<FileOperationError> errors, MoveSpaceOutcome space, ReverifyResult? reverify = null)
     {
         HeadingIsWarning = false;
         Heading = string.Format(
-            freesSpace ? Strings.Completion_Freed : Strings.Completion_Moved,
+            space == MoveSpaceOutcome.FreedSpace ? Strings.Completion_Freed : Strings.Completion_Moved,
             DisplayHelpers.FormatSize(movedBytes));
         FailedCount = FailedCountText(movedCount, errors.Count, deleting: false);
         SummaryDestination = string.Empty;
         Summary = string.Format(
             DisplayHelpers.Pluralise(totalCount, Strings.Completion_MoveCancelledSummary, "Completion.MoveCancelledSummary"),
             movedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
-        SpaceHint = string.Empty;
-        // Same rule as ShowMoveSummary: "copy them back if anything breaks" is
-        // about files sitting in the destination, and a cancel that came before
-        // the first file moved put none there. Reachable because a cancel with
-        // zero moved and a non-zero error count still raises a summary.
-        Restore = movedCount == 0 ? string.Empty : Strings.Completion_MoveRestoreHint;
+        // Same rule as ShowMoveSummary: the restore line is about files sitting
+        // in the backup folder, and a cancel that came before the first file
+        // moved put none there. Reachable because a cancel with zero moved and
+        // a non-zero error count still raises a summary.
+        Restore = movedCount == 0 ? string.Empty : MoveRestoreText(movedCount, space);
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
@@ -487,63 +456,24 @@ public partial class CompletionViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Shows the completion summary for a recycle Delete the user cancelled
-    /// part-way through: <paramref name="deletedCount"/> of
-    /// <paramref name="totalCount"/> files reached the Recycle Bin before the
-    /// stop. The consented permanent-delete cancel has its own method so it never
-    /// claims the bin.
+    /// Shows the completion summary for a Delete the user cancelled part-way
+    /// through: <paramref name="deletedCount"/> of <paramref name="totalCount"/>
+    /// files were deleted before the stop. The heading states what was
+    /// accomplished rather than reading as a failure, because a cancel is not
+    /// one, and the screen carries no restore line for the same reason
+    /// <see cref="ShowDeleteSummary"/> does not.
     /// </summary>
     public void ShowDeleteCancelledSummary(int deletedCount, int totalCount, long deletedBytes,
         IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null)
     {
         HeadingIsWarning = false;
-        Heading = string.Format(Strings.Completion_CleanedUp, DisplayHelpers.FormatSize(deletedBytes));
-        FailedCount = FailedCountText(deletedCount, errors.Count, deleting: true);
-        SummaryDestination = string.Empty;
-        Summary = string.Format(
-            DisplayHelpers.Pluralise(totalCount, Strings.Completion_DeleteCancelledSummary, "Completion.DeleteCancelledSummary"),
-            deletedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
-        // Same rule as ShowDeleteSummary: a cancel that came before the first
-        // file reached the bin left it holding nothing, so there is neither
-        // anything to empty nor anything to restore. The heading is the one
-        // thing that differs between the two, and deliberately: a cancel is not
-        // a failure, so it stays as it was.
-        SpaceHint = deletedCount == 0 ? string.Empty : Strings.Completion_DeleteSpaceHint;
-        Restore = deletedCount == 0 ? string.Empty : Strings.Completion_DeleteRestoreHint;
-        Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
-        Skipped = SkippedText(reverify);
-        ResultLogStatusMessage = string.Empty;
-        LastResultFreedNothing = deletedBytes <= 0;
-        ShowDonate = deletedBytes > 0;
-        IsComplete = true;
-    }
-
-    /// <summary>
-    /// Shows the completion summary for a consented permanent Delete the user
-    /// cancelled part-way through. These files did NOT reach the Recycle Bin, so
-    /// the copy never mentions it and the restore hint points at reinstalling
-    /// rather than at the (empty) bin, matching <see cref="ShowPermanentDeleteSummary"/>.
-    /// </summary>
-    public void ShowPermanentDeleteCancelledSummary(int deletedCount, int totalCount, long deletedBytes,
-        IReadOnlyList<FileOperationError> errors, ReverifyResult? reverify = null)
-    {
-        HeadingIsWarning = false;
-        Heading = string.Format(Strings.Completion_CleanedUp, DisplayHelpers.FormatSize(deletedBytes));
+        Heading = string.Format(Strings.Completion_Freed, DisplayHelpers.FormatSize(deletedBytes));
         FailedCount = FailedCountText(deletedCount, errors.Count, deleting: true);
         SummaryDestination = string.Empty;
         Summary = string.Format(
             DisplayHelpers.Pluralise(totalCount, Strings.Completion_PermanentDeleteCancelledSummary, "Completion.PermanentDeleteCancelledSummary"),
             deletedCount, totalCount, DisplayHelpers.PluraliseFile(totalCount));
-        SpaceHint = string.Empty;
-        // Same rule as ShowPermanentDeleteSummary: "that's fine, they were safe
-        // to remove" is about files that were removed, and a cancel that came
-        // before the first delete removed none.
-        Restore = deletedCount == 0
-            ? string.Empty
-            : DisplayHelpers.Pluralise(deletedCount,
-                Strings.Completion_PermanentDeleteRestoreHint_Singular,
-                Strings.Completion_PermanentDeleteRestoreHint_Plural,
-                "Completion.PermanentDeleteRestoreHint");
+        Restore = string.Empty;
         Errors = errors.Count > 0 ? FormatErrorBreakdown(errors) : string.Empty;
         Skipped = SkippedText(reverify);
         ResultLogStatusMessage = string.Empty;
@@ -565,7 +495,6 @@ public partial class CompletionViewModel : ObservableObject
         FailedCount = string.Empty;
         SummaryDestination = string.Empty;
         Summary = SkippedText(reverify);
-        SpaceHint = string.Empty;
         Restore = string.Empty;
         Errors = string.Empty;
         Skipped = string.Empty;
@@ -740,12 +669,12 @@ public partial class CompletionViewModel : ObservableObject
     {
         if (errors.Count == 0) return string.Empty;
 
-        // Group by type AND message, not type alone: one error type can
-        // carry different sentences (RecycleFailed tailors its message by
-        // HRESULT, access-denied vs in-use vs generic), and a type-keyed
-        // bucket would print the first file's sentence over files that
-        // failed differently. Within a bucket, list each file by name;
-        // the heading is shown once per bucket.
+        // Group by type AND message, not type alone. No category tailors its
+        // sentence to the file today, so the two keys agree, but the message is
+        // part of the key because a bucket's heading is taken from its first
+        // member: a type that ever varies its wording would otherwise print one
+        // file's sentence over files that failed differently. Within a bucket,
+        // list each file by name; the heading is shown once per bucket.
         var buckets = errors
             .GroupBy(e => (Type: e.GetType(), e.LocalisedMessage))
             .OrderByDescending(g => g.Count());
@@ -760,12 +689,11 @@ public partial class CompletionViewModel : ObservableObject
             // reference number.
             var count = bucket.Count();
             sb.Append(bucket.First().LocalisedGroupHeading(count)).AppendLine();
-            // Two spaces then a hyphen: the hyphen is what makes the indent
-            // visible. Leading spaces alone vanish in a proportional font
-            // (Poppins), so the filenames read as an unbroken run-on of the
-            // sentence above them.
+            // The hyphen is what separates a filename from the sentence above
+            // it: leading spaces alone vanish in a proportional font (Poppins)
+            // and the list ran on as prose.
             foreach (var err in bucket)
-                sb.Append("  - ").Append(Path.GetFileName(err.FilePath)).AppendLine();
+                sb.Append("- ").Append(Path.GetFileName(err.FilePath)).AppendLine();
         }
         return sb.ToString().TrimEnd();
     }

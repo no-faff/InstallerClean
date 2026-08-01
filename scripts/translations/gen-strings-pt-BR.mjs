@@ -95,7 +95,6 @@ const MAP = {
   'Action.Cancel': `_Cancelar`,
   'Action.CheckForUpdates': `Verificar _atualizações`,
   'Action.Close': `_Fechar`,
-  'Action.Delete': `_Excluir`,
   'Action.DeletePermanently': `_Excluir permanentemente`,
   'Action.Done': `_Concluído`,
   'Action.Details': `Detalhes`,
@@ -103,7 +102,6 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `_Deixe uma estrela no GitHub`,
   'Action.Licence': `Licença Apache 2.0`,
   'Action.Move': `_Mover`,
-  'Action.MoveInstead': `_Mover em vez disso`,
   'Action.MoveDestinationPlaceholder': `Caminho da pasta, se você Mover em vez de Excluir`,
   'Action.OpenReleasePage': `Abrir a página da _versão`,
   'Action.Rescan': `_Reanalisar`,
@@ -124,9 +122,6 @@ const MAP = {
   'Automation.Minimise': `Minimizar`,
   'Automation.ConfirmDelete': `Excluir move os arquivos desnecessários para a Lixeira. Cancelar fecha sem excluir.`,
   'Automation.ConfirmMove': `Mover coloca os arquivos desnecessários na pasta de destino escolhida. Cancelar os deixa onde estão.`,
-  'Automation.RecycleUnavailable': `Escolha o que fazer com os arquivos desnecessários: movê-los para um lugar seguro, excluí-los permanentemente ou cancelar.`,
-  'Automation.RecycleUnavailableMove': `Mover os arquivos desnecessários para uma pasta que você escolher`,
-  'Automation.RecycleUnavailableDeletePermanently': `Excluir permanentemente os arquivos desnecessários porque a Lixeira está indisponível para esta unidade`,
   'Automation.SayThanks': `Agradeça`,
   'Automation.ConfirmSendResultLog': `Enviar transmite ao No Faff o relatório exibido. Cancelar não envia nada.`,
   'Automation.CheckForUpdates': `Verificar atualizações`,
@@ -228,8 +223,6 @@ const MAP = {
   'Completion.AllClean': `Tudo limpo`,
   'Completion.NothingToCleanUp': `Nada para limpar em {InstallerFolder}`,
   'Completion.NothingToCleanUpReceipt': `Análise de {0} {1} em {2}`,
-  'Completion.MoveRestoreHint': `Copie-os de volta para {InstallerFolder} se algum dia algo quebrar ([extremamente improvável]).`,
-  'Completion.DeleteRestoreHint': `Até lá, você pode restaurá-los se algum dia algo quebrar ([extremamente improvável]).`,
 
   // 0 = size freed (e.g. "120.5 MB")
   'Completion.Freed': `{0} liberados`,
@@ -250,19 +243,10 @@ const MAP = {
   'Completion.MoveSummary.Plural': `{0} {1} movidos para: {2}`,
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.DeleteSummary.Singular': `{0} {1} movido para a Lixeira`,
-  'Completion.DeleteSummary.Plural': `{0} {1} movidos para a Lixeira`,
 
   // 0 = deleted count, 1 = pluralised noun
   'Completion.PermanentDeleteSummary.Singular': `{0} {1} excluído permanentemente. Não foi para a Lixeira.`,
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} excluídos permanentemente. Não foram para a Lixeira.`,
-  'Completion.PermanentDeleteRestoreHint.Singular': `Tudo bem, era seguro remover. O InstallerClean só remove os arquivos que o Windows informa ter terminado de usar, nunca um que um programa ainda precisa. No caso improvável de uma exclusão deixar um programa sem conseguir reparar, atualizar ou desinstalar, reinstalá-lo pelo site do fabricante normalmente recoloca o arquivo, embora a Microsoft não garanta.`,
-  'Completion.PermanentDeleteRestoreHint.Plural': `Tudo bem, eram seguros para remover. O InstallerClean só remove os arquivos que o Windows informa ter terminado de usar, nunca um que um programa ainda precisa. No caso improvável de uma exclusão deixar um programa sem conseguir reparar, atualizar ou desinstalar, reinstalá-lo pelo site do fabricante normalmente recoloca o arquivo, embora a Microsoft não garanta.`,
-  'RecycleUnavailable.Heading': `A Lixeira não está disponível para esta unidade`,
-  'RecycleUnavailable.Body.Singular': `Então este {1} ({2}) não foi excluído. Você pode movê-lo para um lugar seguro, ou excluí-lo permanentemente.`,
-  'RecycleUnavailable.Body.Plural': `Então estes {0} {1} ({2}) não foram excluídos. Você pode movê-los para um lugar seguro, ou excluí-los permanentemente.`,
-  'RecycleUnavailable.Reassurance.Singular': `Excluí-lo é seguro. O InstallerClean só remove os arquivos que o Windows informa ter terminado de usar, nunca um que um programa ainda precisa, e a Lixeira é apenas uma proteção extra. No caso improvável de uma exclusão deixar um programa sem conseguir reparar, atualizar ou desinstalar, reinstalá-lo pelo site do fabricante normalmente recoloca o arquivo, embora a Microsoft não garanta.`,
-  'RecycleUnavailable.Reassurance.Plural': `Excluí-los é seguro. O InstallerClean só remove os arquivos que o Windows informa ter terminado de usar, nunca um que um programa ainda precisa, e a Lixeira é apenas uma proteção extra. No caso improvável de uma exclusão deixar um programa sem conseguir reparar, atualizar ou desinstalar, reinstalá-lo pelo site do fabricante normalmente recoloca o arquivo, embora a Microsoft não garanta.`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} arquivo ainda necessário`,
@@ -289,7 +273,6 @@ const MAP = {
   // 0 = destination path
   'Confirm.MoveDestination': `Os arquivos serão movidos para:`,
   'Confirm.DeleteTitle': `Excluir {0} {1} ({2})?`,
-  'Confirm.DeleteToRecycleBin': `Os arquivos serão movidos para a Lixeira. Se quiser cópias de backup, use o botão Mover em vez disso.`,
 
   // Error messages
   'Error.AdminRequiredTitle': `Acesso negado`,
@@ -336,10 +319,6 @@ const MAP = {
   'Error.UnknownError.Plural': `Algo deu errado com estes arquivos; eles foram deixados onde estavam.`,
 
   // 0 = shell error code
-  'Error.ShellRecycleFailed': `Não foi possível mover este arquivo para a Lixeira (erro {0}), e por esse código o InstallerClean não tem como dizer o motivo. O arquivo foi deixado onde estava. Tente o botão Mover, que não usa a Lixeira.`,
-  'Error.RecycleAccessDenied': `O Windows negou o acesso mesmo com direitos de administrador (erro {0}), e o InstallerClean não tem como saber se o problema é o arquivo ou a Lixeira. O arquivo foi deixado onde estava. O botão Mover vai funcionar se o problema for a Lixeira, mas não se for o arquivo.`,
-  'Error.RecycleInUse': `Este arquivo está aberto ou bloqueado por outro programa (erro {0}), então nada consegue removê-lo agora. Ele foi deixado onde estava; tente de novo mais tarde.`,
-  'Error.DeletedNotRecycled': `O Windows excluiu este arquivo de vez, em vez de movê-lo para a Lixeira. O InstallerClean pediu a Lixeira, e o Windows fez diferente. O arquivo se foi.`,
 
   // 0 = destination
   'Error.MoveIntoInstaller': `Recusando mover arquivos para a pasta do Windows Installer (destino: {0}).`,
@@ -435,7 +414,6 @@ const MAP = {
   'Cli.NothingToDo': `Nada a fazer.`,
   'Cli.DeletingFiles': `Excluindo {0} {1}...`,
   'Cli.DeletedFiles': `Excluídos {0} {1}.`,
-  'Cli.RecycleUnavailable': `Erro: a Lixeira está indisponível para este volume, então nada foi excluído. Use /m para mover os arquivos, ou reative a Lixeira e execute novamente.`,
   'Cli.NoMoveDestination': `Erro: nenhum destino de movimentação especificado. Use /m CAMINHO. (Um padrão definido na GUI é por usuário e não se aplica a execuções agendadas ou em contas de serviço.)`,
   'Cli.MoveDestinationInsideInstaller': `Erro: o destino não pode estar dentro da pasta do Windows Installer.`,
   'Cli.MoveDestinationRelative': `Erro: o destino deve ser um caminho totalmente qualificado. Recebido: {0}`,
@@ -464,8 +442,6 @@ const MAP = {
   'Cli.Help.ExitCodePartial': `  2   parcial: alguns arquivos processados, outros falharam`,
   'Cli.Help.ExitCodeTransient': `  75  transitório: algo temporário bloqueou a execução (veja a mensagem)`,
   'Cli.Help.ExitCodeCancelled': `  130 cancelado (Ctrl+C)`,
-  'Completion.CleanedUp': `{0} limpos`,
-  'Completion.DeleteSpaceHint': `Esvazie a Lixeira para realmente recuperar o espaço.`,
   'Body.NotScanned.Lead': `Nada foi analisado ainda.`,
   'Body.NotScanned.Why': `Clique em Reanalisar para procurar em {InstallerFolder} arquivos de instalação que nenhum programa ainda precisa.`,
   'Confirm.MoveSameDrive': `Esta pasta está na mesma unidade, então mover não vai liberar espaço por si só. Você recupera o espaço quando excluir os arquivos de lá, ou pode escolher uma pasta em outra unidade.`,
@@ -473,7 +449,6 @@ const MAP = {
   'Error.CandidateOutsideCache': `Este arquivo não está diretamente dentro da pasta do Windows Installer; recusado por segurança.`,
   'Completion.ReverifySkipped': `{0} {1} mantidos no lugar: um programa voltou a precisar deles depois da análise.`,
   'Completion.MoveCancelledSummary': `Movimentação cancelada após mover {0} de {1} {2}.`,
-  'Completion.DeleteCancelledSummary': `Exclusão cancelada após mover {0} de {1} {2} para a Lixeira.`,
   'Completion.PermanentDeleteCancelledSummary': `Exclusão permanente cancelada após remover {0} de {1} {2}.`,
   'Body.PendingReboot.Lead': `Estes arquivos não podem ser limpos agora.`,
   'Cli.TooManyArguments': `Erro: argumento extra inesperado '{0}'. Se a sua pasta de destino tiver um espaço no nome, coloque aspas em todo o caminho: /m "D:\\My Backup"`,
@@ -484,7 +459,6 @@ const MAP = {
   'Error.ScanRecordsUnreadable': `O InstallerClean não conseguiu ler o suficiente dos registros do Windows Installer para ter certeza do que ainda é necessário: a lista de programas instalados voltou incompleta, e ler esses mesmos registros direto do registro do Windows também deu erros. Um arquivo poderia parecer órfão só porque o registro que o nomeia era um dos ilegíveis, então o InstallerClean parou. Nada foi removido.`,
   'Error.MsiEnumerationNeverEnded': `O Windows Installer nunca sinalizou o fim da lista de programas instalados: o InstallerClean desistiu depois de {0} entradas (último código de erro {1}). Não dá para confiar em uma lista sem fim, então o InstallerClean parou. Nada foi removido.`,
   'Error.MsiPatchEnumerationNeverEnded': `O Windows Installer nunca sinalizou o fim da lista de patches de um programa: o InstallerClean desistiu depois de {0} entradas (último código de erro {1}). Não dá para confiar em uma lista sem fim, então o InstallerClean parou. Nada foi removido.`,
-  'Status.CheckingRecycleBin': `Verificando a Lixeira...`,
   'UpdateCheck.Status.UpdateAvailable': `A versão {0} está disponível.`,
   'Completion.DonateAsk': `Que bom que ajudou. A caixinha está aqui, se vier do coração.`,
   'About.Link.Guide': `Guia e perguntas frequentes`,

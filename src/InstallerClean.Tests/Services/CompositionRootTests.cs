@@ -61,11 +61,9 @@ public class CompositionRootTests
     {
         // ValidateScopes catches only the Scoped-inside-Singleton case, so a
         // Transient registration would slip past both flags while breaking what
-        // CoreComposition's own remarks promise. RecycleEngine is why that
-        // matters rather than being tidiness: it owns the STA thread the
-        // IFileOperation delete path runs on and is joined by the container
-        // disposing it, so one instance per resolve would leak a thread per
-        // Delete and never join any of them.
+        // CoreComposition's own remarks promise. It matters most for the two
+        // services holding a pooled HttpClient: one instance per resolve opens a
+        // fresh connection pool each time and exhausts sockets under a retry.
         var services = new ServiceCollection().AddInstallerCleanCore();
 
         Assert.All(services, descriptor =>

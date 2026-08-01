@@ -371,7 +371,7 @@ internal static class Program
                 var result = filePaths.Count == 0
                     ? new DeleteResult(0, Array.Empty<FileOperationError>())
                     : await deleteService.DeleteFilesAsync(
-                        filePaths, permitPermanentDelete: false, progress: progress, cancellationToken: token);
+                        filePaths, progress: progress, cancellationToken: token);
 
                 // A Windows Installer transaction grabbed Global\_MSIExecute in the
                 // race after the gate check passed, so the service refused and
@@ -387,19 +387,6 @@ internal static class Program
                 // progress reporter).
                 if (result.Cancelled)
                     token.ThrowIfCancellationRequested();
-
-                // The shell recycle is recycle-or-permanently-delete. When the bin is
-                // unavailable for the volume the service refuses rather than nuking, and a
-                // non-interactive CLI cannot offer the Move/permanent/cancel choice the GUI
-                // will: surface guidance and exit transient (re-enabling the bin or a reboot
-                // clears it). There is deliberately no /force permanent-delete flag.
-                if (result.RecycleUnavailable)
-                {
-                    Console.WriteLine(Strings.Cli_RecycleUnavailable);
-                    MachineContract.WriteEventLog(CliEventClass.TransientSkip,
-                        () => string.Format(Strings.Cli_EventLogRecycleUnavailable, arg));
-                    return ExitTransient;
-                }
 
                 Console.WriteLine(string.Format(
                     DisplayHelpers.Pluralise(result.DeletedCount, Strings.Cli_DeletedFiles, "Cli.DeletedFiles"),

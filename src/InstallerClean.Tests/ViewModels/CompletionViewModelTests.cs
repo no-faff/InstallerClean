@@ -7,26 +7,6 @@ namespace InstallerClean.Tests.ViewModels;
 public class CompletionViewModelTests
 {
     [Fact]
-    public void FormatErrorBreakdown_splits_same_type_with_different_messages()
-    {
-        // RecycleFailed tailors its sentence by HRESULT (access denied vs
-        // file in use vs generic); a mixed batch must show each sentence
-        // over its own files, not the first file's sentence over all.
-        var errors = new List<FileOperationError>
-        {
-            new RecycleFailed(@"C:\Windows\Installer\a.msi", unchecked((int)0x80070005)),
-            new RecycleFailed(@"C:\Windows\Installer\b.msi", unchecked((int)0x80070020)),
-        };
-
-        var text = CompletionViewModel.FormatErrorBreakdown(errors);
-
-        Assert.Contains(errors[0].LocalisedMessage, text);
-        Assert.Contains(errors[1].LocalisedMessage, text);
-        Assert.Contains("a.msi", text);
-        Assert.Contains("b.msi", text);
-    }
-
-    [Fact]
     public void FormatErrorBreakdown_heads_a_bucket_with_its_pluralised_sentence()
     {
         var errors = new List<FileOperationError>
@@ -65,68 +45,54 @@ public class CompletionViewModelTests
 
         var text = CompletionViewModel.FormatErrorBreakdown(errors);
 
-        // Two spaces alone are invisible in a proportional font, which leaves the
-        // filenames reading as a run-on of the sentence above them. The hyphen
-        // is what makes the indent survive Poppins.
-        Assert.Contains("  - a.msi", text);
-        Assert.Contains("  - b.msi", text);
+        // Leading spaces alone are invisible in a proportional font, which left
+        // the filenames reading as a run-on of the sentence above them. The
+        // hyphen is what separates them, and it does the whole job.
+        Assert.Contains("- a.msi", text);
+        Assert.Contains("- b.msi", text);
         // Filenames only: the full path can name another user's profile under
         // elevation.
         Assert.DoesNotContain(@"C:\Windows\Installer", text);
     }
 
     [Fact]
-    public void ShowDeleteSummary_reads_cleaned_up_not_freed_and_sets_the_space_hint()
+    public void ShowDeleteSummary_reads_freed_and_carries_no_restore_line()
     {
         var vm = new CompletionViewModel();
         vm.ShowDeleteSummary(deletedCount: 2, deletedBytes: 3 * 1024 * 1024,
             errors: new List<FileOperationError>());
 
-        // A Recycle-Bin delete reclaims no disk until the bin is emptied, so
-        // the headline reads "cleaned up", and the space hint names the
-        // emptying step.
-        Assert.Contains("cleaned up", vm.Heading);
-        Assert.DoesNotContain("freed", vm.Heading);
-        Assert.Equal(Strings.Completion_DeleteSpaceHint, vm.SpaceHint);
-    }
-
-    [Fact]
-    public void ShowMoveSummary_keeps_freed_for_a_space_freeing_move_and_carries_no_space_hint()
-    {
-        var vm = new CompletionViewModel();
-        vm.ShowMoveSummary(movedCount: 1, movedBytes: 1024 * 1024, destination: @"D:\backup",
-            errors: new List<FileOperationError>(), freesSpace: true);
-
+        // A delete reclaims the disk at the instant it happens, so the headline
+        // says so. The screen makes no safety claim and offers no recovery
+        // advice, which is why it is the one completion state with no line
+        // under the summary and no link.
         Assert.Contains("freed", vm.Heading);
-        Assert.Equal(string.Empty, vm.SpaceHint);
+        Assert.Equal(string.Empty, vm.Restore);
     }
 
     [Fact]
-    public void ShowPermanentDeleteSummary_reads_cleaned_up_and_carries_no_space_hint()
+    public void ShowMoveSummary_reads_freed_only_when_the_folder_is_on_another_drive()
     {
         var vm = new CompletionViewModel();
-        vm.ShowPermanentDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
-            errors: new List<FileOperationError>());
 
-        // No bin to empty: the disk is reclaimed at that instant. The headline
-        // still reads "cleaned up" for consistency with the recycle path.
-        Assert.Contains("cleaned up", vm.Heading);
-        Assert.Equal(string.Empty, vm.SpaceHint);
-    }
+        vm.ShowMoveSummary(movedCount: 1, movedBytes: 1024 * 1024, destination: @"D:\backup",
+            errors: [], space: MoveSpaceOutcome.FreedSpace);
+        Assert.Contains("freed", vm.Heading);
 
-    [Fact]
-    public void Space_hint_from_a_delete_is_cleared_by_a_following_move()
-    {
-        // The view-model instance is reused across operations, so a stale space
-        // hint from a prior delete must not bleed into a later move.
-        var vm = new CompletionViewModel();
-        vm.ShowDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
-            errors: new List<FileOperationError>());
-        Assert.NotEqual(string.Empty, vm.SpaceHint);
+        // A same-drive move is a rename: nothing is reclaimed until the folder
+        // goes, so the claim-less verb is used and the line beneath says when
+        // the space comes back.
+        vm.ShowMoveSummary(movedCount: 1, movedBytes: 1024 * 1024, destination: @"C:\backup",
+            errors: [], space: MoveSpaceOutcome.SameDrive);
+        Assert.DoesNotContain("freed", vm.Heading);
+        Assert.Equal(Strings.Completion_MoveRestoreHintSameDrive_Singular, vm.Restore);
 
-        vm.ShowMoveSummary(movedCount: 1, movedBytes: 1024 * 1024, destination: @"D:\b",
-            errors: new List<FileOperationError>(), freesSpace: false);
-        Assert.Equal(string.Empty, vm.SpaceHint);
+        // An unreadable destination claims nothing either way, so it takes the
+        // same verb but the line that names no drive.
+        vm.ShowMoveSummary(movedCount: 2, movedBytes: 1024 * 1024, destination: @"\\server\share",
+            errors: [], space: MoveSpaceOutcome.Unclassified);
+        Assert.DoesNotContain("freed", vm.Heading);
+        Assert.Equal(Strings.Completion_MoveRestoreHint_Plural, vm.Restore);
     }
 
     [Fact]
@@ -137,7 +103,7 @@ public class CompletionViewModelTests
         // literal, unformatted path handed to ShowMoveSummary.
         var vm = new CompletionViewModel();
         vm.ShowMoveSummary(movedCount: 1, movedBytes: 1024 * 1024, destination: @"D:\backup",
-            errors: new List<FileOperationError>(), freesSpace: true);
+            errors: [], space: MoveSpaceOutcome.FreedSpace);
 
         Assert.Equal(@"D:\backup", vm.SummaryDestination);
         Assert.Contains(@"D:\backup", vm.Summary);
@@ -151,82 +117,12 @@ public class CompletionViewModelTests
         // delete summary (which has no destination placeholder at all).
         var vm = new CompletionViewModel();
         vm.ShowMoveSummary(movedCount: 1, movedBytes: 1024 * 1024, destination: @"D:\backup",
-            errors: new List<FileOperationError>(), freesSpace: true);
+            errors: [], space: MoveSpaceOutcome.FreedSpace);
         Assert.NotEqual(string.Empty, vm.SummaryDestination);
 
         vm.ShowDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
             errors: new List<FileOperationError>());
         Assert.Equal(string.Empty, vm.SummaryDestination);
-    }
-
-    // The WPF host's BuildCompletionRestoreLine rebuilds the restore line's
-    // inlines synchronously off Restore's PropertyChanged, reading SpaceHint
-    // at that instant and baking the result into TextBlock inlines. A Show*
-    // method that sets SpaceHint AFTER Restore lets a SpaceHint left over
-    // from an earlier Delete this session leak into the rebuild, even though
-    // the property's final value (asserted by the tests above) is correct.
-    // These three regressions shipped in 2.0.0 (all clear, a following move,
-    // a following permanent delete) and were invisible to final-state
-    // assertions; only capturing SpaceHint at the moment Restore's
-    // PropertyChanged fires catches them.
-
-    [Fact]
-    public void ShowAllClear_has_cleared_the_space_hint_by_the_time_Restore_changes()
-    {
-        var vm = new CompletionViewModel();
-        vm.ShowDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
-            errors: new List<FileOperationError>());
-
-        string? spaceHintDuringRestoreChange = "unset";
-        vm.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(CompletionViewModel.Restore))
-                spaceHintDuringRestoreChange = vm.SpaceHint;
-        };
-
-        vm.ShowAllClear(installedProductCount: 5, scanDurationMs: 10);
-
-        Assert.Equal(string.Empty, spaceHintDuringRestoreChange);
-    }
-
-    [Fact]
-    public void ShowMoveSummary_has_cleared_the_space_hint_by_the_time_Restore_changes()
-    {
-        var vm = new CompletionViewModel();
-        vm.ShowDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
-            errors: new List<FileOperationError>());
-
-        string? spaceHintDuringRestoreChange = "unset";
-        vm.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(CompletionViewModel.Restore))
-                spaceHintDuringRestoreChange = vm.SpaceHint;
-        };
-
-        vm.ShowMoveSummary(movedCount: 1, movedBytes: 1024 * 1024, destination: @"D:\backup",
-            errors: new List<FileOperationError>(), freesSpace: true);
-
-        Assert.Equal(string.Empty, spaceHintDuringRestoreChange);
-    }
-
-    [Fact]
-    public void ShowPermanentDeleteSummary_has_cleared_the_space_hint_by_the_time_Restore_changes()
-    {
-        var vm = new CompletionViewModel();
-        vm.ShowDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
-            errors: new List<FileOperationError>());
-
-        string? spaceHintDuringRestoreChange = "unset";
-        vm.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(CompletionViewModel.Restore))
-                spaceHintDuringRestoreChange = vm.SpaceHint;
-        };
-
-        vm.ShowPermanentDeleteSummary(deletedCount: 1, deletedBytes: 1024 * 1024,
-            errors: new List<FileOperationError>());
-
-        Assert.Equal(string.Empty, spaceHintDuringRestoreChange);
     }
 
     // The three heading states, the failure count line and the acted-on-nothing
@@ -243,7 +139,7 @@ public class CompletionViewModelTests
     {
         var vm = new CompletionViewModel();
         vm.ShowMoveSummary(movedCount: 3, movedBytes: 1024 * 1024, destination: @"D:\backup",
-            errors: [], freesSpace: true);
+            errors: [], space: MoveSpaceOutcome.FreedSpace);
 
         Assert.False(vm.HeadingIsWarning);
         Assert.Contains("freed", vm.Heading);
@@ -255,7 +151,7 @@ public class CompletionViewModelTests
     {
         var vm = new CompletionViewModel();
         vm.ShowMoveSummary(movedCount: 69, movedBytes: 1024 * 1024, destination: @"D:\backup",
-            errors: Failures(2), freesSpace: true);
+            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
 
         // Something really was freed, so the heading says so and the failures
         // get their own line. Carrying both in the heading makes one clause too
@@ -274,7 +170,7 @@ public class CompletionViewModelTests
     {
         var vm = new CompletionViewModel();
         vm.ShowMoveSummary(movedCount: 0, movedBytes: 0, destination: @"D:\backup",
-            errors: Failures(2), freesSpace: true);
+            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
 
         // Routing a total failure through the success heading renders
         // "0 B freed, some files could not be proce": wrong twice, reporting a
@@ -291,7 +187,7 @@ public class CompletionViewModelTests
     }
 
     [Fact]
-    public void A_delete_that_achieved_nothing_offers_neither_bin_nor_restore()
+    public void A_delete_that_achieved_nothing_says_so_and_claims_nothing()
     {
         var vm = new CompletionViewModel();
         vm.ShowDeleteSummary(deletedCount: 0, deletedBytes: 0, errors: Failures(3));
@@ -299,38 +195,22 @@ public class CompletionViewModelTests
         Assert.True(vm.HeadingIsWarning);
         Assert.Equal(Strings.Completion_NothingDeleted, vm.Heading);
         Assert.Equal("3 of 3 could not be deleted.", vm.FailedCount);
+        // Nothing was deleted, so nothing on screen may report a deletion.
         Assert.Equal(string.Empty, vm.Summary);
-        // The bin gained nothing, so there is nothing to empty and nothing to
-        // restore from it.
-        Assert.Equal(string.Empty, vm.SpaceHint);
         Assert.Equal(string.Empty, vm.Restore);
     }
 
     [Fact]
-    public void A_permanent_delete_that_achieved_nothing_drops_its_reassurance()
-    {
-        var vm = new CompletionViewModel();
-        vm.ShowPermanentDeleteSummary(deletedCount: 0, deletedBytes: 0, errors: Failures(1));
-
-        Assert.True(vm.HeadingIsWarning);
-        Assert.Equal(Strings.Completion_NothingDeleted, vm.Heading);
-        Assert.Equal("1 of 1 could not be deleted.", vm.FailedCount);
-        Assert.Equal(string.Empty, vm.Summary);
-        // "That's fine, it was safe to remove" is about a file that was
-        // removed. None was.
-        Assert.Equal(string.Empty, vm.Restore);
-    }
-
-    [Fact]
-    public void A_partly_failed_delete_keeps_its_bin_and_restore_copy()
+    public void A_partly_failed_delete_keeps_the_success_heading()
     {
         var vm = new CompletionViewModel();
         vm.ShowDeleteSummary(deletedCount: 5, deletedBytes: 1024, errors: Failures(1));
 
+        // Five files really were deleted and the space really did come back, so
+        // the heading says so and the count line carries the rest.
         Assert.False(vm.HeadingIsWarning);
-        Assert.Contains("cleaned up", vm.Heading);
-        Assert.Equal(Strings.Completion_DeleteSpaceHint, vm.SpaceHint);
-        Assert.Equal(Strings.Completion_DeleteRestoreHint, vm.Restore);
+        Assert.Contains("freed", vm.Heading);
+        Assert.Equal("1 of 6 could not be deleted.", vm.FailedCount);
     }
 
     [Fact]
@@ -338,7 +218,7 @@ public class CompletionViewModelTests
     {
         var vm = new CompletionViewModel();
         vm.ShowMoveCancelledSummary(movedCount: 3, totalCount: 71, movedBytes: 1024,
-            errors: Failures(2), freesSpace: true);
+            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
 
         // 5 tried, not 71 queued: the 66 the cancel never reached are not files
         // that could not be moved. The summary line below still names the whole
@@ -350,7 +230,7 @@ public class CompletionViewModelTests
     }
 
     [Fact]
-    public void A_cancelled_delete_that_moved_nothing_still_keeps_its_heading()
+    public void A_cancelled_delete_that_deleted_nothing_still_keeps_its_heading()
     {
         var vm = new CompletionViewModel();
         vm.ShowDeleteCancelledSummary(deletedCount: 0, totalCount: 40, deletedBytes: 0,
@@ -372,30 +252,9 @@ public class CompletionViewModelTests
     {
         var vm = new CompletionViewModel();
         vm.ShowMoveCancelledSummary(movedCount: 0, totalCount: 40, movedBytes: 0,
-            errors: Failures(2), freesSpace: true);
+            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
 
         // Nothing reached the destination, so nothing may invite copying it back.
-        Assert.Equal(string.Empty, vm.Restore);
-    }
-
-    [Fact]
-    public void A_cancelled_delete_that_deleted_nothing_offers_neither_bin_nor_restore()
-    {
-        var vm = new CompletionViewModel();
-        vm.ShowDeleteCancelledSummary(deletedCount: 0, totalCount: 40, deletedBytes: 0,
-            errors: Failures(3));
-
-        Assert.Equal(string.Empty, vm.SpaceHint);
-        Assert.Equal(string.Empty, vm.Restore);
-    }
-
-    [Fact]
-    public void A_cancelled_permanent_delete_that_deleted_nothing_drops_its_reassurance()
-    {
-        var vm = new CompletionViewModel();
-        vm.ShowPermanentDeleteCancelledSummary(deletedCount: 0, totalCount: 40, deletedBytes: 0,
-            errors: Failures(1));
-
         Assert.Equal(string.Empty, vm.Restore);
     }
 
@@ -404,30 +263,21 @@ public class CompletionViewModelTests
     {
         var vm = new CompletionViewModel();
         vm.ShowMoveCancelledSummary(movedCount: 3, totalCount: 40, movedBytes: 1024,
-            errors: Failures(2), freesSpace: true);
+            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
 
-        Assert.Equal(Strings.Completion_MoveRestoreHint, vm.Restore);
+        Assert.Equal(Strings.Completion_MoveRestoreHint_Plural, vm.Restore);
     }
 
     [Fact]
-    public void A_cancelled_delete_that_deleted_something_keeps_its_bin_and_restore_copy()
+    public void A_cancelled_delete_carries_no_restore_line_whatever_it_reached()
     {
+        // Same rule as the completed delete: the screen makes no safety claim,
+        // so there is nothing under the summary at any count.
         var vm = new CompletionViewModel();
         vm.ShowDeleteCancelledSummary(deletedCount: 3, totalCount: 40, deletedBytes: 1024,
             errors: Failures(2));
 
-        Assert.Equal(Strings.Completion_DeleteSpaceHint, vm.SpaceHint);
-        Assert.Equal(Strings.Completion_DeleteRestoreHint, vm.Restore);
-    }
-
-    [Fact]
-    public void A_cancelled_permanent_delete_that_deleted_something_keeps_its_reassurance()
-    {
-        var vm = new CompletionViewModel();
-        vm.ShowPermanentDeleteCancelledSummary(deletedCount: 3, totalCount: 40, deletedBytes: 1024,
-            errors: Failures(2));
-
-        Assert.NotEqual(string.Empty, vm.Restore);
+        Assert.Equal(string.Empty, vm.Restore);
     }
 
     [Fact]
@@ -438,7 +288,7 @@ public class CompletionViewModelTests
         // next run's green heading.
         var vm = new CompletionViewModel();
         vm.ShowMoveSummary(movedCount: 0, movedBytes: 0, destination: @"D:\backup",
-            errors: Failures(2), freesSpace: true);
+            errors: Failures(2), space: MoveSpaceOutcome.FreedSpace);
         Assert.True(vm.HeadingIsWarning);
         Assert.NotEqual(string.Empty, vm.FailedCount);
 

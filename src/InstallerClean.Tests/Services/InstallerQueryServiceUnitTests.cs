@@ -92,7 +92,7 @@ public class InstallerQueryServiceUnitTests
         // out-of-cache: patch X's LocalPackage is corrupt and names product B's
         // cached .msi instead of an .msp of its own. A enumerates first and claims
         // the path removable. B's product row must be able to take it back;
-        // first-writer-wins would decide it on enumeration order and recycle a
+        // first-writer-wins would decide it on enumeration order and remove a
         // package B still needs.
         const string productPackage = @"C:\Windows\Installer\product-b.msi";
         var msi = new FakeMsiApi();

@@ -62,7 +62,6 @@ const OVERRIDES = {
   'Summary.RegisteredWindow.Few': `{0} zarejestrowane pliki nadal potrzebne ({1})`,
   'Completion.PermanentDeleteSummary.Few': `Usunięto trwale {0} {1}. Nie trafiły do Kosza.`,
   'Completion.ReverifySkipped.One': `Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął go potrzebować.`,
-  'RecycleUnavailable.Body.Few': `Dlatego te {0} {1} ({2}) nie zostały usunięte. Możesz przenieść je w bezpieczne miejsce lub usunąć trwale.`,
   'Status.RegisteredPackagesFound.One': `Znaleziono {0} zarejestrowany {1}.`,
   'Status.RegisteredPackagesFound.Few': `Znaleziono {0} zarejestrowane {1}.`,
 };
@@ -111,7 +110,6 @@ const MAP = {
   'Action.Cancel': `_Anuluj`,
   'Action.CheckForUpdates': `Sprawdź _aktualizacje`,
   'Action.Close': `_Zamknij`,
-  'Action.Delete': `_Usuń`,
   'Action.DeletePermanently': `Usuń _trwale`,
   'Action.Done': `_Gotowe`,
   'Action.Details': `Szczegóły`,
@@ -119,7 +117,6 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Zostaw _gwiazdkę na GitHubie`,
   'Action.Licence': `Licencja Apache 2.0`,
   'Action.Move': `_Przenieś`,
-  'Action.MoveInstead': `_Przenieś zamiast tego`,
   'Action.MoveDestinationPlaceholder': `Ścieżka do folderu, jeśli zamiast usuwać wybierzesz Przenieś`,
   'Action.OpenReleasePage': `Otwórz stronę _wydania`,
   'Action.Rescan': `_Skanuj ponownie`,
@@ -140,9 +137,6 @@ const MAP = {
   'Automation.Minimise': `Minimalizuj`,
   'Automation.ConfirmDelete': `Usuń przenosi niepotrzebne pliki do Kosza. Anuluj zamyka okno bez usuwania.`,
   'Automation.ConfirmMove': `Przenieś umieszcza niepotrzebne pliki w wybranym folderze docelowym. Anuluj zostawia je na miejscu.`,
-  'Automation.RecycleUnavailable': `Wybierz, co zrobić z niepotrzebnymi plikami: przenieść je w bezpieczne miejsce, usunąć trwale lub anulować.`,
-  'Automation.RecycleUnavailableMove': `Przenieś niepotrzebne pliki do wybranego folderu`,
-  'Automation.RecycleUnavailableDeletePermanently': `Usuń niepotrzebne pliki trwale, ponieważ Kosz jest niedostępny dla tego dysku`,
   'Automation.SayThanks': `Podziękuj`,
   'Automation.ConfirmSendResultLog': `Wyślij przekazuje pokazany raport do No Faff. Anuluj nie wysyła niczego.`,
   'Automation.CheckForUpdates': `Sprawdź aktualizacje`,
@@ -244,8 +238,6 @@ const MAP = {
   'Completion.AllClean': `Wszystko czyste`,
   'Completion.NothingToCleanUp': `Nie ma czego czyścić w {InstallerFolder}`,
   'Completion.NothingToCleanUpReceipt': `Przeskanowano {0} {1} w {2}`,
-  'Completion.MoveRestoreHint': `Skopiuj je z powrotem do {InstallerFolder}, gdyby coś się kiedykolwiek zepsuło ([skrajnie mało prawdopodobne]).`,
-  'Completion.DeleteRestoreHint': `Do tego czasu możesz je przywrócić, gdyby coś się kiedykolwiek zepsuło ([skrajnie mało prawdopodobne]).`,
 
   // 0 = size freed (e.g. "120.5 MB")
   'Completion.Freed': `Zwolniono {0}`,
@@ -266,19 +258,10 @@ const MAP = {
   'Completion.MoveSummary.Plural': `Przeniesiono {0} {1} do: {2}`,
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.DeleteSummary.Singular': `Przeniesiono {0} {1} do Kosza`,
-  'Completion.DeleteSummary.Plural': `Przeniesiono {0} {1} do Kosza`,
 
   // 0 = deleted count, 1 = pluralised noun
   'Completion.PermanentDeleteSummary.Singular': `Usunięto trwale {0} {1}. Nie trafił do Kosza.`,
   'Completion.PermanentDeleteSummary.Plural': `Usunięto trwale {0} {1}. Nie trafiło do Kosza.`,
-  'Completion.PermanentDeleteRestoreHint.Singular': `W porządku, można go było bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje.`,
-  'Completion.PermanentDeleteRestoreHint.Plural': `W porządku, można je było bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje.`,
-  'RecycleUnavailable.Heading': `Kosz nie jest dostępny dla tego dysku`,
-  'RecycleUnavailable.Body.Singular': `Dlatego ten {1} ({2}) nie został usunięty. Możesz przenieść go w bezpieczne miejsce lub usunąć trwale.`,
-  'RecycleUnavailable.Body.Plural': `Dlatego te {0} {1} ({2}) nie zostało usuniętych. Możesz przenieść je w bezpieczne miejsce lub usunąć trwale.`,
-  'RecycleUnavailable.Reassurance.Singular': `Można go bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje, a Kosz to tylko dodatkowe zabezpieczenie. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje.`,
-  'RecycleUnavailable.Reassurance.Plural': `Można je bezpiecznie usunąć. InstallerClean usuwa tylko pliki, które Windows zgłasza jako już niepotrzebne, nigdy takiego, którego program wciąż potrzebuje, a Kosz to tylko dodatkowe zabezpieczenie. W mało prawdopodobnym przypadku, gdyby usunięcie kiedykolwiek pozbawiło program możliwości naprawy, aktualizacji lub odinstalowania, ponowna instalacja od producenta zwykle przywraca plik, choć Microsoft tego nie gwarantuje.`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} plik nadal potrzebny`,
@@ -307,7 +290,6 @@ const MAP = {
   // 0 = destination path
   'Confirm.MoveDestination': `Pliki zostaną przeniesione do:`,
   'Confirm.DeleteTitle': `Usunąć {0} {1} ({2})?`,
-  'Confirm.DeleteToRecycleBin': `Pliki zostaną przeniesione do Kosza. Jeśli chcesz mieć kopie zapasowe, użyj zamiast tego przycisku Przenieś.`,
 
   // Error messages
   'Error.AdminRequiredTitle': `Odmowa dostępu`,
@@ -354,10 +336,6 @@ const MAP = {
   'Error.UnknownError.Plural': `Coś poszło nie tak z tymi plikami; zostały pozostawione na miejscu.`,
 
   // 0 = shell error code
-  'Error.ShellRecycleFailed': `Nie udało się przenieść tego pliku do Kosza (błąd {0}), a na podstawie tego kodu InstallerClean nie potrafi powiedzieć dlaczego. Plik został pozostawiony na miejscu. Spróbuj zamiast tego przycisku Przenieś, który nie korzysta z Kosza.`,
-  'Error.RecycleAccessDenied': `Windows odmówił dostępu nawet z uprawnieniami administratora (błąd {0}), a InstallerClean nie potrafi stwierdzić, czy problemem jest plik, czy Kosz. Plik został pozostawiony na miejscu. Przycisk Przenieś zadziała, jeśli problemem jest Kosz, ale nie wtedy, gdy jest nim plik.`,
-  'Error.RecycleInUse': `Ten plik jest otwarty lub zablokowany przez inny program (błąd {0}), więc nic nie może go teraz usunąć. Został pozostawiony na miejscu; spróbuj ponownie później.`,
-  'Error.DeletedNotRecycled': `Windows usunął ten plik trwale, zamiast przenieść go do Kosza. InstallerClean poprosił o Kosz, a Windows zrobił co innego. Pliku już nie ma.`,
 
   // 0 = destination
   'Error.MoveIntoInstaller': `Odmowa przeniesienia plików do folderu Windows Installer (cel: {0}).`,
@@ -457,7 +435,6 @@ const MAP = {
   'Cli.NothingToDo': `Nie ma nic do zrobienia.`,
   'Cli.DeletingFiles': `Usuwanie: {0} {1}...`,
   'Cli.DeletedFiles': `Usunięto {0} {1}.`,
-  'Cli.RecycleUnavailable': `Błąd: Kosz jest niedostępny dla tego woluminu, więc nic nie usunięto. Użyj /m, aby zamiast tego przenieść pliki, albo ponownie włącz Kosz i uruchom jeszcze raz.`,
   'Cli.NoMoveDestination': `Błąd: nie podano folderu docelowego przenoszenia. Użyj /m ŚCIEŻKA. (Lokalizacja domyślna ustawiona w GUI jest przypisana do użytkownika i nie dotyczy uruchomień zaplanowanych ani na koncie usługi.)`,
   'Cli.MoveDestinationInsideInstaller': `Błąd: folder docelowy nie może znajdować się wewnątrz folderu Windows Installer.`,
   'Cli.MoveDestinationRelative': `Błąd: folder docelowy musi być pełną ścieżką. Otrzymano: {0}`,
@@ -486,8 +463,6 @@ const MAP = {
   'Cli.Help.ExitCodePartial': `  2   częściowo: część plików przetworzono, część zawiodła`,
   'Cli.Help.ExitCodeTransient': `  75  stan przejściowy: coś zablokowało uruchomienie (zob. komunikat)`,
   'Cli.Help.ExitCodeCancelled': `  130 anulowano (Ctrl+C)`,
-  'Completion.CleanedUp': `Wyczyszczono {0}`,
-  'Completion.DeleteSpaceHint': `Opróżnij go, aby naprawdę odzyskać miejsce.`,
   'Body.NotScanned.Lead': `Jeszcze nic nie przeskanowano.`,
   'Body.NotScanned.Why': `Naciśnij przycisk Skanuj ponownie, aby przejrzeć {InstallerFolder} w poszukiwaniu plików instalatora, których żaden program już nie potrzebuje.`,
   'Confirm.MoveSameDrive': `Ten folder jest na tym samym dysku, więc samo przeniesienie nie zwolni miejsca. Odzyskasz je, gdy usuniesz z niego pliki, albo możesz zamiast tego wybrać folder na innym dysku.`,
@@ -495,7 +470,6 @@ const MAP = {
   'Error.CandidateOutsideCache': `Ten plik nie znajduje się bezpośrednio w folderze Windows Installer; odrzucono ze względów bezpieczeństwa.`,
   'Completion.ReverifySkipped': `Pozostawiono na miejscu {0} {1}, ponieważ po skanowaniu program znów zaczął ich potrzebować.`,
   'Completion.MoveCancelledSummary': `Przed anulowaniem przeniesiono {0}/{1} {2}.`,
-  'Completion.DeleteCancelledSummary': `Przed anulowaniem przeniesiono {0}/{1} {2} do Kosza.`,
   'Completion.PermanentDeleteCancelledSummary': `Przed anulowaniem usunięto trwale {0}/{1} {2}.`,
   'Body.PendingReboot.Lead': `Tych plików nie można teraz wyczyścić.`,
   'Cli.TooManyArguments': `Błąd: nieoczekiwany dodatkowy argument „{0}”. Jeśli ścieżka folderu przenoszenia zawiera spację, ujmij całą ścieżkę w cudzysłów: /m "D:\\My Backup"`,
@@ -506,7 +480,6 @@ const MAP = {
   'Error.ScanRecordsUnreadable': `InstallerClean nie zdołał odczytać dość rekordów Windows Installera, by mieć pewność, co jest jeszcze potrzebne: lista zainstalowanych programów wróciła niepełna, a odczyt tych samych rekordów prosto z rejestru również napotkał błędy. Plik mógłby wyglądać na osierocony tylko dlatego, że rekord, który go wymienia, był jednym z nieczytelnych, więc InstallerClean się zatrzymał. Nic nie zostało usunięte.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer nigdy nie zasygnalizował końca listy zainstalowanych programów: InstallerClean poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał. Nic nie zostało usunięte.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer nigdy nie zasygnalizował końca listy poprawek jednego programu: InstallerClean poddał się po {0} wpisach (ostatni kod błędu {1}). Liście bez końca nie można ufać, więc InstallerClean się zatrzymał. Nic nie zostało usunięte.`,
-  'Status.CheckingRecycleBin': `Sprawdzanie Kosza...`,
   'UpdateCheck.Status.UpdateAvailable': `Dostępna jest wersja {0}.`,
   'Completion.DonateAsk': `Cieszę się, że pomogło. Jeśli masz dobre serce, jest miejsce na napiwek.`,
   'About.Link.Guide': `Przewodnik i FAQ`,

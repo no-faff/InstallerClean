@@ -96,7 +96,6 @@ const MAP = {
   'Action.Cancel': `_Batal`,
   'Action.CheckForUpdates': `Periksa pem_baruan`,
   'Action.Close': `_Tutup`,
-  'Action.Delete': `_Hapus`,
   'Action.DeletePermanently': `_Hapus permanen`,
   'Action.Done': `_Selesai`,
   'Action.Details': `Detail`,
@@ -104,7 +103,6 @@ const MAP = {
   'Action.LeaveStarOnGitHub': `Beri _bintang di GitHub`,
   'Action.Licence': `Lisensi Apache 2.0`,
   'Action.Move': `_Pindahkan`,
-  'Action.MoveInstead': `_Pindahkan saja`,
   'Action.MoveDestinationPlaceholder': `Jalur folder jika Anda memilih Pindahkan, bukan Hapus`,
   'Action.OpenReleasePage': `Buka halaman _rilis`,
   'Action.Rescan': `Pindai _ulang`,
@@ -125,9 +123,6 @@ const MAP = {
   'Automation.Minimise': `Kecilkan`,
   'Automation.ConfirmDelete': `Hapus memindahkan file yang tidak diperlukan ke Keranjang Sampah. Batal menutup tanpa menghapus.`,
   'Automation.ConfirmMove': `Pindahkan menaruh file yang tidak diperlukan di folder tujuan yang dipilih. Batal membiarkannya di tempatnya.`,
-  'Automation.RecycleUnavailable': `Pilih cara menangani file yang tidak diperlukan: pindahkan ke tempat aman, hapus permanen, atau batalkan.`,
-  'Automation.RecycleUnavailableMove': `Pindahkan file yang tidak diperlukan ke folder pilihan Anda`,
-  'Automation.RecycleUnavailableDeletePermanently': `Hapus permanen file yang tidak diperlukan karena Keranjang Sampah tidak tersedia untuk drive ini`,
   'Automation.SayThanks': `Ucapkan terima kasih`,
   'Automation.ConfirmSendResultLog': `Kirim mengirimkan laporan yang ditampilkan ke No Faff. Batal tidak mengirim apa pun.`,
   'Automation.CheckForUpdates': `Periksa pembaruan`,
@@ -229,8 +224,6 @@ const MAP = {
   'Completion.AllClean': `Semua bersih`,
   'Completion.NothingToCleanUp': `Tidak ada yang perlu dibersihkan di {InstallerFolder}`,
   'Completion.NothingToCleanUpReceipt': `{0} {1} dipindai dalam {2}`,
-  'Completion.MoveRestoreHint': `Salin kembali ke {InstallerFolder} jika suatu saat ada yang rusak ([kemungkinannya sangat kecil]).`,
-  'Completion.DeleteRestoreHint': `Sampai saat itu, Anda bisa memulihkannya jika suatu saat ada yang rusak ([kemungkinannya sangat kecil]).`,
 
   // 0 = size freed (e.g. "120.5 MB")
   'Completion.Freed': `{0} dikosongkan`,
@@ -251,19 +244,10 @@ const MAP = {
   'Completion.MoveSummary.Plural': `{0} {1} dipindahkan ke: {2}`,
 
   // 0 = deleted count, 1 = pluralised noun
-  'Completion.DeleteSummary.Singular': `{0} {1} dipindahkan ke Keranjang Sampah`,
-  'Completion.DeleteSummary.Plural': `{0} {1} dipindahkan ke Keranjang Sampah`,
 
   // 0 = deleted count, 1 = pluralised noun
   'Completion.PermanentDeleteSummary.Singular': `{0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah.`,
   'Completion.PermanentDeleteSummary.Plural': `{0} {1} dihapus permanen. File tidak masuk ke Keranjang Sampah.`,
-  'Completion.PermanentDeleteRestoreHint.Singular': `Tidak masalah, file itu memang aman dihapus. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya.`,
-  'Completion.PermanentDeleteRestoreHint.Plural': `Tidak masalah, file itu memang aman dihapus. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya.`,
-  'RecycleUnavailable.Heading': `Keranjang Sampah tidak tersedia untuk drive ini`,
-  'RecycleUnavailable.Body.Singular': `Jadi {1} ini ({2}) belum dihapus. Anda bisa memindahkannya ke tempat aman, atau menghapusnya permanen.`,
-  'RecycleUnavailable.Body.Plural': `Jadi {0} {1} ini ({2}) belum dihapus. Anda bisa memindahkannya ke tempat aman, atau menghapusnya permanen.`,
-  'RecycleUnavailable.Reassurance.Singular': `Menghapusnya aman. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program, dan Keranjang Sampah hanyalah pengaman tambahan. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya.`,
-  'RecycleUnavailable.Reassurance.Plural': `Menghapusnya aman. InstallerClean hanya membersihkan file yang Windows laporkan sudah tidak terpakai, tidak pernah file yang masih diperlukan sebuah program, dan Keranjang Sampah hanyalah pengaman tambahan. Pada kemungkinan kecil suatu penghapusan membuat sebuah program tidak bisa diperbaiki, diperbarui, atau dihapus instalasinya, memasangnya ulang dari pembuatnya biasanya memulihkan file tersebut, meski Microsoft tidak menjaminnya.`,
 
   // Summaries
   'Summary.RegisteredStillUsed.Singular': `{0} file masih diperlukan`,
@@ -292,7 +276,6 @@ const MAP = {
   // 0 = destination path
   'Confirm.MoveDestination': `File akan dipindahkan ke:`,
   'Confirm.DeleteTitle': `Hapus {0} {1} ({2})?`,
-  'Confirm.DeleteToRecycleBin': `File akan dipindahkan ke Keranjang Sampah. Jika Anda ingin salinan cadangan, gunakan tombol Pindahkan sebagai gantinya.`,
 
   // Error messages
   'Error.AdminRequiredTitle': `Akses ditolak`,
@@ -339,10 +322,6 @@ const MAP = {
   'Error.UnknownError.Plural': `Ada yang tidak beres dengan file-file ini; semuanya dibiarkan di tempatnya.`,
 
   // 0 = shell error code
-  'Error.ShellRecycleFailed': `Tidak bisa memindahkan file ini ke Keranjang Sampah (kesalahan {0}), dan dari kode itu InstallerClean tidak bisa memberi tahu Anda alasannya. File dibiarkan di tempatnya. Coba tombol Pindahkan saja, karena tombol itu tidak memakai Keranjang Sampah.`,
-  'Error.RecycleAccessDenied': `Windows menolak akses bahkan dengan hak administrator (kesalahan {0}), dan InstallerClean tidak bisa memastikan apakah masalahnya ada pada file atau pada Keranjang Sampah. File dibiarkan di tempatnya. Tombol Pindahkan akan berhasil jika masalahnya Keranjang Sampah, tetapi tidak jika masalahnya file itu sendiri.`,
-  'Error.RecycleInUse': `File ini sedang dibuka atau dikunci oleh program lain (kesalahan {0}), jadi saat ini tidak ada yang bisa menghapusnya. File dibiarkan di tempatnya; coba lagi nanti.`,
-  'Error.DeletedNotRecycled': `Windows menghapus file ini secara permanen alih-alih memindahkannya ke Keranjang Sampah. InstallerClean meminta Keranjang Sampah, dan Windows justru melakukan ini. File itu sudah hilang.`,
 
   // 0 = destination
   'Error.MoveIntoInstaller': `Menolak memindahkan file ke dalam folder Windows Installer (tujuan: {0}).`,
@@ -439,7 +418,6 @@ const MAP = {
   'Cli.NothingToDo': `Tidak ada yang perlu dilakukan.`,
   'Cli.DeletingFiles': `Menghapus {0} {1}...`,
   'Cli.DeletedFiles': `{0} {1} dihapus.`,
-  'Cli.RecycleUnavailable': `Kesalahan: Keranjang Sampah tidak tersedia untuk volume ini, jadi tidak ada yang dihapus. Gunakan /m untuk memindahkan file, atau aktifkan kembali Keranjang Sampah dan jalankan lagi.`,
   'Cli.NoMoveDestination': `Kesalahan: tujuan pemindahan tidak ditentukan. Gunakan /m JALUR. (Default yang diatur di GUI bersifat per-pengguna dan tidak berlaku untuk tugas terjadwal atau proses akun layanan.)`,
   'Cli.MoveDestinationInsideInstaller': `Kesalahan: tujuan tidak boleh berada di dalam folder Windows Installer.`,
   'Cli.MoveDestinationRelative': `Kesalahan: tujuan harus berupa jalur absolut lengkap. Diterima: {0}`,
@@ -468,8 +446,6 @@ const MAP = {
   'Cli.Help.ExitCodePartial': `  2   sebagian: sebagian file diproses, sebagian gagal`,
   'Cli.Help.ExitCodeTransient': `  75  sementara: kondisi sementara memblokir proses (lihat pesannya)`,
   'Cli.Help.ExitCodeCancelled': `  130 dibatalkan (Ctrl+C)`,
-  'Completion.CleanedUp': `{0} dibersihkan`,
-  'Completion.DeleteSpaceHint': `Kosongkan Keranjang Sampah untuk benar-benar membebaskan ruang.`,
   'Body.NotScanned.Lead': `Belum ada yang dipindai.`,
   'Body.NotScanned.Why': `Tekan Pindai ulang untuk menelusuri {InstallerFolder} mencari file penginstal yang tidak lagi diperlukan program mana pun.`,
   'Confirm.MoveSameDrive': `Folder ini berada di drive yang sama, jadi pemindahan itu sendiri tidak akan mengosongkan ruang apa pun. Ruangnya akan kembali saat Anda menghapus file di dalamnya, atau Anda bisa memilih folder di drive lain.`,
@@ -477,7 +453,6 @@ const MAP = {
   'Error.CandidateOutsideCache': `File ini tidak berada langsung di dalam folder Windows Installer; ditolak demi keamanan.`,
   'Completion.ReverifySkipped': `{0} {1} dibiarkan di tempatnya, karena sebuah program kembali membutuhkannya setelah pemindaian.`,
   'Completion.MoveCancelledSummary': `{0} dari {1} {2} dipindahkan sebelum Anda membatalkan.`,
-  'Completion.DeleteCancelledSummary': `{0} dari {1} {2} dipindahkan ke Keranjang Sampah sebelum Anda membatalkan.`,
   'Completion.PermanentDeleteCancelledSummary': `{0} dari {1} {2} dihapus permanen sebelum Anda membatalkan.`,
   'Body.PendingReboot.Lead': `File-file ini tidak bisa dibersihkan sekarang.`,
   'Cli.TooManyArguments': `Kesalahan: argumen tambahan yang tidak terduga '{0}'. Jika folder pemindahan Anda mengandung spasi, apit seluruh jalur dengan tanda kutip: /m "D:\\My Backup"`,
@@ -488,7 +463,6 @@ const MAP = {
   'Error.ScanRecordsUnreadable': `InstallerClean tidak bisa membaca cukup banyak catatan Windows Installer untuk memastikan apa yang masih diperlukan: daftar program terpasang kembali tidak lengkap, dan membaca catatan yang sama langsung dari registri juga menemui kesalahan. Sebuah file bisa tampak terisolasi hanya karena catatan yang menyebutkannya termasuk yang tidak terbaca, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer tidak pernah menandai akhir daftar program terpasang: InstallerClean menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer tidak pernah menandai akhir daftar patch sebuah program: InstallerClean menyerah setelah {0} entri (kode kesalahan terakhir {1}). Daftar yang tidak berujung tidak bisa dipercaya, jadi InstallerClean berhenti. Tidak ada yang dihapus.`,
-  'Status.CheckingRecycleBin': `Memeriksa Keranjang Sampah...`,
   'UpdateCheck.Status.UpdateAvailable': `Versi {0} tersedia.`,
   'Completion.DonateAsk': `Senang bisa membantu. Kalau Anda berbaik hati, secangkir kopi sangat saya hargai.`,
   'About.Link.Guide': `Panduan dan FAQ`,

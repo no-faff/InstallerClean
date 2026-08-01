@@ -71,7 +71,16 @@ const APP_XAML_CS = `${SRC}/InstallerClean/App.xaml.cs`;
 
 // Keys defined on purpose with no consumer in the source. Each earns its place
 // with a reason; an unconsumed key NOT listed here fails the guard.
-const UNCONSUMED_ALLOWLIST = new Set([]);
+const UNCONSUMED_ALLOWLIST = new Set([
+  // The red pill. Kept in the theme with nothing built on it, deliberately:
+  // the app's one irreversible-looking action stopped being framed as a hazard
+  // when Delete became an ordinary permanent delete, and the screen that offers
+  // it opens by saying the files are safe to delete, so red would be the single
+  // element arguing with that. It stays because the decision is about this
+  // screen rather than about the token, and a future screen with a genuine
+  // hazard on it should not have to reinvent the style.
+  'DangerPill',
+]);
 
 // Referenced keys that nothing in this repo defines: a resource WPF or the
 // system supplies. Each earns its place with a reason; a dangling reference NOT

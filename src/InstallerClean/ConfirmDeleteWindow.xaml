@@ -19,9 +19,14 @@
     </WindowChrome.WindowChrome>
 
     <!-- Card width scales with the OS text size so the copy keeps its
-         line length instead of wrapping into a tall sliver. -->
+         line length instead of wrapping into a tall sliver.
+
+         Fixed at 440, min and max, which is measured rather than chosen: at
+         420 the linked phrase splits across a line end, and at 460 and above
+         the card goes ragged. The move dialog shares the 440 floor so the two
+         match whenever their content is short. -->
     <Border Background="{StaticResource Surface.Card}" CornerRadius="{StaticResource Radius.ModalCard}" Padding="{StaticResource Padding.ModalCard}"
-            MaxWidth="{a11y:TextScaled 400}" MinWidth="{a11y:TextScaled 320}"
+            MaxWidth="{a11y:TextScaled 440}" MinWidth="{a11y:TextScaled 440}"
             BorderBrush="{StaticResource Action.Standard.Background}" BorderThickness="{StaticResource BorderThickness.Hairline}">
         <!-- Grid, not a StackPanel: the body sits in a star row so it
              scrolls once the window's work-area MaxHeight binds (very
@@ -34,21 +39,29 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <!-- No warning icon: a delete to the Recycle Bin is the normal,
-                 safe action InstallerClean exists for, not a hazard to flag.
-                 Standalone wrapping TextBlock so a long heading grows the
-                 SizeToContent card instead of clipping. -->
+            <!-- No warning icon: this is the normal, safe action InstallerClean
+                 exists for, not a hazard to flag. The window behind states that
+                 the files are safe to delete and this dialog repeats it, so an
+                 alarm glyph would contradict both. Standalone wrapping
+                 TextBlock so a long heading grows the SizeToContent card
+                 instead of clipping. -->
             <TextBlock x:Name="MessageText" Grid.Row="0" Foreground="{StaticResource Text.Heading}" FontSize="{DynamicResource Type.Heading.Sm}"
-                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Md}"/>
+                       TextWrapping="Wrap" Margin="{StaticResource GapBottom.Lg}"/>
 
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
                           Style="{StaticResource BodyScrollRegion}"
                           AutomationProperties.Name="{loc:Translate Automation.Scroll.DialogBody}">
-                <TextBlock
-                           Text="{loc:Translate Confirm.DeleteToRecycleBin}"
+                <!-- Inlines composed in code-behind (BuildBodyLine) so the
+                     bracketed phrase renders as a hyperlink into the README's
+                     "Is it safe?" section; a TextBlock cannot bind Text and
+                     host an inline Hyperlink at once, so there is no Text
+                     binding here. This dialog carries its own link rather than
+                     leaning on the main window's, because it is modal: that
+                     one is visible behind it and cannot be clicked. -->
+                <TextBlock x:Name="BodyText"
                            Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}" TextWrapping="Wrap"
-                           Margin="{StaticResource GapBottom.Lg}"/>
+                           Margin="{StaticResource GapBottom.Xl}"/>
             </ScrollViewer>
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -63,18 +76,13 @@
                         Click="OnCancel" IsCancel="True" IsDefault="True"
                         AutomationProperties.HelpText="{loc:Translate Automation.ConfirmDelete}"
                         Margin="{StaticResource GapRight.Sm}"/>
-                <!-- Accent, not DangerPill, and deliberately so. The main
-                     window states the files are safe to remove and this
-                     dialog's own body says they go to the Recycle Bin, so a
-                     red confirm would contradict both a sentence above it
-                     and the mechanism behind it. Red is reserved for the one
-                     delete that really is irreversible, RecycleUnavailable's
-                     "Delete permanently", which is the app's only DangerPill.
-                     Matching the accent of the button that opened this dialog
-                     also reads as the same action continuing rather than a
-                     fresh warning. -->
+                <!-- Accent, not DangerPill, and deliberately so. There is no
+                     red anywhere on this path: the sentence directly above
+                     says the files are safe to delete, and red would be the
+                     one element arguing with it. DangerPill stays in the theme
+                     unused. -->
                 <Button x:Name="DeleteButton" Style="{StaticResource AccentPill}"
-                        Content="{loc:Translate Action.Delete}" Click="OnDelete"/>
+                        Content="{loc:Translate Action.DeletePermanently}" Click="OnDelete"/>
             </StackPanel>
         </Grid>
     </Border>
