@@ -320,14 +320,26 @@ public sealed class FileSystemScanService : IFileSystemScanService
 
         var stillUsed = sizedPackages.Where(p => !p.IsRemovable).ToList().AsReadOnly();
 
-        // Correlation sanity gate. On any real machine most registered packages'
-        // cached files are on disk. If next to none are, yet the walk still
-        // yielded files to offer for removal, the two halves have not
-        // correlated: a path-form mismatch between the API's LocalPackage values
-        // and the walked paths, a collapsed enumeration, or the wrong folder all
-        // produce exactly this signature (Windows referencing files that are
-        // "gone" while the files on disk are "orphaned"), and no healthy machine
-        // does. A tool that genuinely wiped the cache would leave no files to be
+        // Correlation sanity gate. On any real machine some registered path
+        // resolves to a file that is actually there. If next to none do, yet the
+        // walk still yielded files to offer for removal, then what Windows says
+        // it has and what the folder holds have not correlated, and no healthy
+        // machine looks like that.
+        //
+        // What it catches is one thing and the claim is kept to it: an
+        // enumeration that came back with paths to files that are not on this
+        // machine at all. Presence is decided by File.Exists against the
+        // registered path itself, so it is indifferent to how that path is
+        // spelled and to which folder the walk read, and the two other ways the
+        // halves could fail to line up therefore never reach here. A spelling
+        // the walk does not produce leaves a file reading as present on this
+        // side while appearing orphaned on the other, which is why every claim
+        // is normalised before it is made (InstallerQueryService's
+        // NormaliseLocalPackagePath, whose own comment carries the argument for
+        // the one spelling it leaves alone), and a walk of the wrong folder
+        // leaves every registered file exactly where it was.
+        //
+        // A tool that genuinely wiped the cache would leave no files to be
         // orphans, so removable.Count > 0 rules that benign case out. Refuse the
         // scan rather than offer the whole cache for deletion on a broken
         // correlation.
