@@ -49,7 +49,7 @@ const OVERRIDES = {
   'Summary.MissingFromDisk.Few': `{0} зареєстровані файли відсутні (їх не видаляв InstallerClean). Зараз це не завдає клопоту, але в майбутньому відновлення, оновлення чи видалення тих програм може не вдатися. Відкрийте «Деталі», щоб дізнатися, що робити.`,
   // 2-4 takes "встановлені програми"; the base Plural key carries the 5+
   // genitive "встановлених програм".
-  'Summary.ProgramsUnreadable.Few': `Під час цього сканування не вдалося прочитати {0} встановлені програми, тому заміщені виправлення залишено на місці. Осиротілих файлів це не стосується.`,
+  'Summary.ProgramsUnreadable.Few': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Summary.RegisteredWindow.Few': `{0} зареєстровані файли, які ще потрібні ({1})`,
 
   // Flat key with an inflecting adjective: one / few / (base = many).
@@ -214,8 +214,8 @@ const MAP = {
   'Status.PreparingDestination': `Підготовка папки призначення...`,
 
   // 0 = file count, 1 = pluralised noun
-  'Status.Moving': `Moving files...`,
-  'Status.Deleting': `Deleting files...`,
+  'Status.Moving': `Moving unneeded files...`,
+  'Status.Deleting': `Deleting unneeded files...`,
   'Status.MoveCancelled.Partial': `Переміщення скасовано. Опрацьовано {0} з {1} {2}.`,
   'Status.DeleteCancelled.Partial': `Видалення скасовано. Опрацьовано {0} з {1} {2}.`,
   'Status.MoveFailed': `Не вдалося перемістити ({0}). Деталі у {1}.`,
@@ -423,7 +423,7 @@ const MAP = {
   'Cli.FoundOrphans': `Знайдено {0} {1} для очищення ({2}).`,
   'Cli.NothingToDo': `Немає чого робити.`,
   'Cli.DeletingFiles': `Видалення: {0} {1}...`,
-  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `Помилка: не вказано розташування для переміщення. Скористайтеся /m ШЛЯХ. (Типове значення, задане в графічному інтерфейсі, діє лише для поточного користувача і не застосовується до запусків за розкладом чи від імені службового облікового запису.)`,
   'Cli.MoveDestinationInsideInstaller': `Помилка: призначення не може бути всередині папки Windows Installer.`,
   'Cli.MoveDestinationRelative': `Помилка: призначення має бути повним шляхом. Отримано: {0}`,
@@ -455,7 +455,7 @@ const MAP = {
   'Body.NotScanned.Lead': `Ще нічого не проскановано.`,
   'Body.NotScanned.Why': `Натисніть «Повторити сканування», щоб переглянути {InstallerFolder} і знайти файли інсталятора, яких уже не потребує жодна програма.`,
   'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
-  'Error.ScanCorrelationFailed': `InstallerClean не зміг узгодити це сканування із записами Windows Installer: кожного файлу, який Windows досі вважає потрібним, немає в {InstallerFolder}, а файли, що справді лежать у цій папці, не відповідають жодному запису. Жоден справжній комп'ютер так не виглядає, тож це вказує на проблему з читанням записів, а не на файли, які можна безпечно видалити. Для очищення нічого не запропоновано, і нічого не було видалено.`,
+  'Error.ScanCorrelationFailed': `InstallerClean couldn't square this scan with the Windows Installer records: nearly every file Windows still lists as needed is missing from {InstallerFolder}, while what is actually in the folder matches almost nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.`,
   'Error.CandidateOutsideCache': `Цей файл не міститься безпосередньо в папці Windows Installer; відмовлено з міркувань безпеки.`,
   'Completion.ReverifySkipped': `{0} {1} залишено на місці: після сканування вони знову знадобилися програмі.`,
   'Completion.MoveCancelledSummary': `Переміщено {0} з {1} {2}, перш ніж ви скасували.`,
@@ -464,8 +464,8 @@ const MAP = {
   'Cli.TooManyArguments': `Помилка: неочікуваний зайвий аргумент «{0}». Якщо в назві папки для переміщення є пробіл, візьміть увесь шлях у лапки: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} {1} залишено на місці: під час повторної перевірки не вдалося повністю прочитати записи Windows Installer.`,
-  'Summary.ProgramsUnreadable.Singular': `Під час цього сканування не вдалося прочитати {0} встановлену програму, тому заміщені виправлення залишено на місці. Осиротілих файлів це не стосується.`,
-  'Summary.ProgramsUnreadable.Plural': `Під час цього сканування не вдалося прочитати {0} встановлених програм, тому заміщені виправлення залишено на місці. Осиротілих файлів це не стосується.`,
+  'Summary.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
+  'Summary.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Error.ScanRecordsUnreadable': `InstallerClean не зміг прочитати достатньо записів Windows Installer, щоб напевно знати, що ще потрібно: список встановлених програм повернувся неповним, а читання тих самих записів прямо з реєстру теж призвело до помилок. Файл міг видаватися осиротілим лише тому, що запис, який його називає, виявився одним із нечитабельних, тож InstallerClean зупинився. Нічого не було видалено.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer так і не повідомив про кінець списку встановлених програм: InstallerClean припинив спроби після {0} записів (останній код помилки {1}). Списку без кінця довіряти не можна, тож InstallerClean зупинився. Нічого не було видалено.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer так і не повідомив про кінець списку виправлень однієї програми: InstallerClean припинив спроби після {0} записів (останній код помилки {1}). Списку без кінця довіряти не можна, тож InstallerClean зупинився. Нічого не було видалено.`,
@@ -484,6 +484,9 @@ const MAP = {
   'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
+  'Automation.Scroll.ProductDetails': `Product details`,
+  'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

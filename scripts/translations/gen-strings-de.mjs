@@ -217,8 +217,8 @@ const MAP = {
 
   // 0 = file count, 1 = pluralised noun. Routed through Pluralise: base is the
   // werden-form (n != 1), the .One override carries the wird-form.
-  'Status.Moving': `Moving files...`,
-  'Status.Deleting': `Deleting files...`,
+  'Status.Moving': `Moving unneeded files...`,
+  'Status.Deleting': `Deleting unneeded files...`,
   'Status.MoveCancelled.Partial': `Verschieben abgebrochen. {0} von {1} {2} verarbeitet.`,
   'Status.DeleteCancelled.Partial': `Löschen abgebrochen. {0} von {1} {2} verarbeitet.`,
   'Status.MoveFailed': `Verschieben fehlgeschlagen ({0}). Details in {1}.`,
@@ -426,7 +426,7 @@ const MAP = {
   'Cli.FoundOrphans': `{0} {1} zum Aufräumen gefunden ({2}).`,
   'Cli.NothingToDo': `Nichts zu tun.`,
   'Cli.DeletingFiles': `{0} {1} werden gelöscht...`,
-  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `Fehler: Kein Zielordner zum Verschieben angegeben. Nutze /m PFAD. (Ein in der GUI gesetztes Standardziel gilt pro Benutzer und greift nicht bei geplanten oder Dienstkonto-Läufen.)`,
   'Cli.MoveDestinationInsideInstaller': `Fehler: Das Ziel darf nicht im Windows-Installer-Ordner liegen.`,
   'Cli.MoveDestinationRelative': `Fehler: Das Ziel muss ein vollständig qualifizierter Pfad sein. Erhalten: {0}`,
@@ -458,7 +458,7 @@ const MAP = {
   'Body.NotScanned.Lead': `Noch nichts gescannt.`,
   'Body.NotScanned.Why': `Klicke auf „Neu scannen“, um {InstallerFolder} nach Installer-Dateien zu durchsuchen, die kein Programm mehr braucht.`,
   'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
-  'Error.ScanCorrelationFailed': `InstallerClean konnte diesen Scan nicht mit den Einträgen von Windows Installer in Einklang bringen: Jede Datei, die Windows noch als benötigt führt, fehlt in {InstallerFolder}, während die Dateien, die tatsächlich im Ordner liegen, zu keinem der Einträge passen. So sieht kein reales System aus, das deutet also auf ein Problem beim Lesen der Einträge hin und nicht auf Dateien, die du bedenkenlos entfernen kannst. Es wurde nichts zum Aufräumen angeboten und nichts entfernt.`,
+  'Error.ScanCorrelationFailed': `InstallerClean couldn't square this scan with the Windows Installer records: nearly every file Windows still lists as needed is missing from {InstallerFolder}, while what is actually in the folder matches almost nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.`,
   'Error.CandidateOutsideCache': `Diese Datei liegt nicht direkt im Windows-Installer-Ordner; aus Sicherheitsgründen abgelehnt.`,
   'Completion.ReverifySkipped': `{0} {1} an Ort und Stelle belassen, weil ein Programm sie nach dem Scan wieder benötigt.`,
   'Completion.MoveCancelledSummary': `{0} von {1} {2} verschoben, bevor du abgebrochen hast.`,
@@ -467,8 +467,8 @@ const MAP = {
   'Cli.TooManyArguments': `Fehler: Unerwartetes zusätzliches Argument '{0}'. Wenn dein Zielordner ein Leerzeichen enthält, setze den ganzen Pfad in Anführungszeichen: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} {1} an Ort und Stelle belassen, weil die Einträge von Windows Installer bei der wiederholten Prüfung nicht vollständig gelesen werden konnten.`,
-  'Summary.ProgramsUnreadable.Singular': `{0} installiertes Programm konnte bei diesem Scan nicht gelesen werden, daher wurden ersetzte Patches behalten. Verwaiste Dateien sind nicht betroffen.`,
-  'Summary.ProgramsUnreadable.Plural': `{0} installierte Programme konnten bei diesem Scan nicht gelesen werden, daher wurden ersetzte Patches behalten. Verwaiste Dateien sind nicht betroffen.`,
+  'Summary.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
+  'Summary.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Error.ScanRecordsUnreadable': `InstallerClean konnte nicht genug von den Einträgen von Windows Installer lesen, um sicher zu sein, was noch gebraucht wird: Die Liste der installierten Programme kam unvollständig zurück, und dieselben Einträge direkt aus der Registrierung zu lesen führte ebenfalls zu Fehlern. Eine Datei könnte allein deshalb verwaist wirken, weil der Eintrag, der sie nennt, zu den unlesbaren gehörte, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer hat das Ende der Liste der installierten Programme nie signalisiert: InstallerClean hat nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer hat das Ende der Patch-Liste eines Programms nie signalisiert: InstallerClean hat nach {0} Einträgen aufgegeben (letzter Fehlercode {1}). Einer Liste ohne Ende ist nicht zu trauen, deshalb hat InstallerClean abgebrochen. Es wurde nichts entfernt.`,
@@ -487,6 +487,9 @@ const MAP = {
   'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
+  'Automation.Scroll.ProductDetails': `Product details`,
+  'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

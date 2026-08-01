@@ -199,8 +199,8 @@ const MAP = {
   'Status.PreparingDestination': `Đang chuẩn bị thư mục đích...`,
 
   // 0 = file count, 1 = pluralised noun
-  'Status.Moving': `Moving files...`,
-  'Status.Deleting': `Deleting files...`,
+  'Status.Moving': `Moving unneeded files...`,
+  'Status.Deleting': `Deleting unneeded files...`,
   'Status.MoveCancelled.Partial': `Đã hủy chuyển. Đã xử lý {0}/{1} {2}.`,
   'Status.DeleteCancelled.Partial': `Đã hủy xóa. Đã xử lý {0}/{1} {2}.`,
   'Status.MoveFailed': `Chuyển thất bại ({0}). Chi tiết trong {1}.`,
@@ -411,7 +411,7 @@ const MAP = {
   'Cli.FoundOrphans': `Đã tìm thấy {0} {1} để dọn ({2}).`,
   'Cli.NothingToDo': `Không có gì để làm.`,
   'Cli.DeletingFiles': `Đang xóa {0} {1}...`,
-  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `Lỗi: chưa chỉ định đích để chuyển. Dùng /m ĐƯỜNG_DẪN. (Mặc định đặt trong GUI là theo từng người dùng và không áp dụng cho các lần chạy theo lịch hoặc bằng tài khoản dịch vụ.)`,
   'Cli.MoveDestinationInsideInstaller': `Lỗi: đích không thể nằm bên trong thư mục Windows Installer.`,
   'Cli.MoveDestinationRelative': `Lỗi: đích phải là một đường dẫn đầy đủ. Nhận được: {0}`,
@@ -443,7 +443,7 @@ const MAP = {
   'Body.NotScanned.Lead': `Chưa quét gì cả.`,
   'Body.NotScanned.Why': `Nhấn Quét lại để tìm trong {InstallerFolder} những tệp cài đặt mà không chương trình nào còn cần.`,
   'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
-  'Error.ScanCorrelationFailed': `InstallerClean không thể khớp lần quét này với các bản ghi Windows Installer: mọi tệp mà Windows vẫn liệt kê là cần thiết đều không có trong {InstallerFolder}, trong khi các tệp thực sự nằm trong thư mục lại không khớp với bản ghi nào. Không có máy thật nào trông như vậy, nên điều này cho thấy có vấn đề khi đọc các bản ghi, chứ không phải là các tệp bạn có thể xóa an toàn. Chưa có gì được đưa ra để dọn dẹp và không có gì bị xóa.`,
+  'Error.ScanCorrelationFailed': `InstallerClean couldn't square this scan with the Windows Installer records: nearly every file Windows still lists as needed is missing from {InstallerFolder}, while what is actually in the folder matches almost nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.`,
   'Error.CandidateOutsideCache': `Tệp này không nằm trực tiếp trong thư mục Windows Installer; bị từ chối vì lý do an toàn.`,
   'Completion.ReverifySkipped': `Đã giữ nguyên {0} {1} vì sau lần quét, một chương trình lại cần đến chúng.`,
   'Completion.MoveCancelledSummary': `Đã chuyển {0}/{1} {2} trước khi bạn hủy.`,
@@ -452,8 +452,8 @@ const MAP = {
   'Cli.TooManyArguments': `Lỗi: có thêm đối số không mong đợi '{0}'. Nếu thư mục đích của bạn có dấu cách, hãy đặt cả đường dẫn trong dấu ngoặc kép: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `Đã giữ nguyên {0} {1} vì khi kiểm tra lại, không thể đọc đầy đủ các bản ghi Windows Installer.`,
-  'Summary.ProgramsUnreadable.Singular': `Không thể đọc {0} chương trình đã cài trong lần quét này, nên các bản vá bị thay thế đã được giữ lại. Các tệp bị bỏ lại không bị ảnh hưởng.`,
-  'Summary.ProgramsUnreadable.Plural': `Không thể đọc {0} chương trình đã cài trong lần quét này, nên các bản vá bị thay thế đã được giữ lại. Các tệp bị bỏ lại không bị ảnh hưởng.`,
+  'Summary.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
+  'Summary.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Error.ScanRecordsUnreadable': `InstallerClean không đọc được đủ các bản ghi Windows Installer để chắc chắn thứ gì vẫn còn cần: danh sách chương trình đã cài trả về thiếu, và việc đọc chính các bản ghi đó trực tiếp từ sổ đăng ký cũng gặp lỗi. Một tệp có thể trông như bị bỏ lại chỉ vì bản ghi nêu tên nó nằm trong số những bản ghi không đọc được, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách chương trình đã cài: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer chưa bao giờ báo hiệu kết thúc danh sách bản vá của một chương trình: InstallerClean đã bỏ cuộc sau {0} mục (mã lỗi cuối {1}). Không thể tin một danh sách không có điểm dừng, nên InstallerClean đã dừng. Không có gì bị xóa.`,
@@ -472,6 +472,9 @@ const MAP = {
   'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
+  'Automation.Scroll.ProductDetails': `Product details`,
+  'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

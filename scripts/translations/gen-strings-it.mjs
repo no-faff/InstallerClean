@@ -48,7 +48,7 @@ const ALSO_KEEP = [
 const OVERRIDES = {
   'Status.RegisteredPackagesFound.One': `Trovato {0} {1} registrato.`,
   'Cli.FoundOrphans.One': `Trovato {0} {1} da eliminare ({2}).`,
-  'Cli.DeletedFiles.One': `Permanently deleted {0} {1}.`,
+  'Cli.DeletedFiles.One': `Permanently deleted {0} unneeded {1}.`,
   'Cli.MovedFiles.One': `Spostato {0} {1}.`,
   'Completion.ReverifySkipped.One': `{0} {1} lasciato al suo posto, perché un programma è tornato ad averne bisogno dopo la scansione.`,
   // Participle and possessive agreement: "lasciato al suo posto" for one file.
@@ -181,8 +181,8 @@ const MAP = {
   'Status.FoundProducts': `Scansione pacchetti locali...`,
   'Status.FoundUnused': `{0} {1} che puoi eliminare in sicurezza.`,
   'Status.PreparingDestination': `Preparazione cartella destinazione...`,
-  'Status.Moving': `Moving files...`,
-  'Status.Deleting': `Deleting files...`,
+  'Status.Moving': `Moving unneeded files...`,
+  'Status.Deleting': `Deleting unneeded files...`,
   'Status.MoveCancelled.Partial': `Spostamento annullato dopo {0} di {1} {2}.`,
   'Status.DeleteCancelled.Partial': `Eliminazione annullata dopo {0} di {1} {2}.`,
   'Status.MoveFailed': `Spostamento non riuscito ({0}). Dettagli in {1}.`,
@@ -325,7 +325,7 @@ const MAP = {
   'Cli.FoundOrphans': `Trovati {0} {1} da eliminare ({2}).`,
   'Cli.NothingToDo': `Nessuna operazione necessaria.`,
   'Cli.DeletingFiles': `Eliminazione di {0} {1}...`,
-  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `Errore: nessuna destinazione di spostamento specificata. Usa /m PERCORSO. (Una destinazione predefinita impostata nella GUI è specifica per utente e non si applica alle esecuzioni pianificate o con account di servizio.)`,
   'Cli.MoveDestinationInsideInstaller': `Errore: la destinazione non può trovarsi all'interno della cartella di Windows Installer.`,
   'Cli.MoveDestinationRelative': `Errore: la destinazione deve essere un percorso completo. Ricevuto: {0}`,
@@ -361,7 +361,7 @@ const MAP = {
   'Body.NotScanned.Lead': `Ancora nessuna scansione.`,
   'Body.NotScanned.Why': `Premi Ripeti scansione per cercare in {InstallerFolder} i file di installazione che nessun programma usa più.`,
   'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
-  'Error.ScanCorrelationFailed': `InstallerClean non è riuscito a far quadrare questa scansione con i record di Windows Installer: ogni file che Windows elenca ancora come necessario manca da {InstallerFolder}, mentre i file effettivamente presenti nella cartella non corrispondono a nessun record. Nessuna macchina reale si presenta così, quindi questo indica un problema nella lettura dei record, non file che puoi rimuovere senza rischi. Non è stato proposto nulla da eliminare e non è stato rimosso nulla.`,
+  'Error.ScanCorrelationFailed': `InstallerClean couldn't square this scan with the Windows Installer records: nearly every file Windows still lists as needed is missing from {InstallerFolder}, while what is actually in the folder matches almost nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.`,
   'Error.CandidateOutsideCache': `Questo file non si trova direttamente all'interno della cartella di Windows Installer; rifiutato per sicurezza.`,
   'Completion.ReverifySkipped': `{0} {1} lasciati al loro posto, perché un programma è tornato ad averne bisogno dopo la scansione.`,
   'Completion.MoveCancelledSummary': `Spostati {0} di {1} {2} prima dell'annullamento.`,
@@ -370,8 +370,8 @@ const MAP = {
   'Cli.TooManyArguments': `Errore: argomento aggiuntivo imprevisto '{0}'. Se la cartella di destinazione contiene uno spazio, racchiudi l'intero percorso tra virgolette: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} {1} lasciati al loro posto, perché non è stato possibile leggere completamente i record di Windows Installer quando il controllo è stato ripetuto.`,
-  'Summary.ProgramsUnreadable.Singular': `Non è stato possibile leggere {0} programma installato durante questa scansione, quindi le patch sostituite sono state mantenute. I file orfani non sono interessati.`,
-  'Summary.ProgramsUnreadable.Plural': `Non è stato possibile leggere {0} programmi installati durante questa scansione, quindi le patch sostituite sono state mantenute. I file orfani non sono interessati.`,
+  'Summary.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
+  'Summary.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Error.ScanRecordsUnreadable': `InstallerClean non è riuscito a leggere abbastanza dei record di Windows Installer per essere sicuro di che cosa serva ancora: l'elenco dei programmi installati è tornato incompleto, e leggere gli stessi record direttamente dal registro di sistema ha dato errori a sua volta. Un file potrebbe sembrare orfano solo perché il record che lo nomina era fra quelli illeggibili, quindi InstallerClean si è fermato. Non è stato rimosso nulla.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer non ha mai segnalato la fine dell'elenco dei programmi installati: InstallerClean ha rinunciato dopo {0} voci (ultimo codice di errore {1}). Di un elenco senza fine non ci si può fidare, quindi InstallerClean si è fermato. Non è stato rimosso nulla.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer non ha mai segnalato la fine dell'elenco delle patch di un programma: InstallerClean ha rinunciato dopo {0} voci (ultimo codice di errore {1}). Di un elenco senza fine non ci si può fidare, quindi InstallerClean si è fermato. Non è stato rimosso nulla.`,
@@ -390,6 +390,9 @@ const MAP = {
   'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
+  'Automation.Scroll.ProductDetails': `Product details`,
+  'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

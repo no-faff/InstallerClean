@@ -195,8 +195,8 @@ const MAP = {
   'Status.PreparingDestination': `대상 폴더를 준비하는 중...`,
 
   // 0 = file count, 1 = pluralised noun
-  'Status.Moving': `Moving files...`,
-  'Status.Deleting': `Deleting files...`,
+  'Status.Moving': `Moving unneeded files...`,
+  'Status.Deleting': `Deleting unneeded files...`,
   'Status.MoveCancelled.Partial': `이동이 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다.`,
   'Status.DeleteCancelled.Partial': `삭제가 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다.`,
   'Status.MoveFailed': `이동 실패 ({0}). 자세한 내용은 {1}에 있습니다.`,
@@ -407,7 +407,7 @@ const MAP = {
   'Cli.FoundOrphans': `정리할 {1} {0}개를 찾았습니다 ({2}).`,
   'Cli.NothingToDo': `수행할 작업이 없습니다.`,
   'Cli.DeletingFiles': `{1} {0}개를 삭제하는 중...`,
-  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하세요. (GUI에서 설정한 기본값은 사용자별로 저장되므로, 예약된 작업이나 서비스 계정 실행에는 적용되지 않습니다.)`,
   'Cli.MoveDestinationInsideInstaller': `오류: 대상은 Windows Installer 폴더 안에 있을 수 없습니다.`,
   'Cli.MoveDestinationRelative': `오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0}`,
@@ -439,7 +439,7 @@ const MAP = {
   'Body.NotScanned.Lead': `아직 검사하지 않았습니다.`,
   'Body.NotScanned.Why': `다시 검사를 눌러 {InstallerFolder}에서 더 이상 어떤 프로그램도 필요로 하지 않는 설치 관리자 파일을 찾아보세요.`,
   'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
-  'Error.ScanCorrelationFailed': `InstallerClean이 이번 검사를 Windows Installer 기록과 맞춰 볼 수 없었습니다. Windows가 여전히 필요하다고 올려 둔 파일은 모두 {InstallerFolder}에 없고, 그 폴더에 실제로 있는 파일은 어떤 기록과도 일치하지 않습니다. 실제 컴퓨터가 이런 모습일 리 없으므로, 이는 안전하게 제거할 수 있는 파일이 아니라 기록을 읽는 데 생긴 문제를 가리킵니다. 정리 대상으로 아무것도 제시하지 않았고 아무것도 제거되지 않았습니다.`,
+  'Error.ScanCorrelationFailed': `InstallerClean couldn't square this scan with the Windows Installer records: nearly every file Windows still lists as needed is missing from {InstallerFolder}, while what is actually in the folder matches almost nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.`,
   'Error.CandidateOutsideCache': `이 파일은 Windows Installer 폴더 바로 아래에 있지 않습니다. 안전을 위해 거부했습니다.`,
   'Completion.ReverifySkipped': `{1} {0}개는 검사 이후 어떤 프로그램이 다시 필요로 하게 되어 그대로 두었습니다.`,
   'Completion.MoveCancelledSummary': `취소하기 전까지 {2} {1}개 중 {0}개를 이동했습니다.`,
@@ -448,8 +448,8 @@ const MAP = {
   'Cli.TooManyArguments': `오류: 예상치 못한 추가 인수 '{0}'. 이동 폴더 경로에 공백이 있으면 전체 경로를 큰따옴표로 묶으세요: /m "D:\\My Backup"`,
   'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{1} {0}개는 확인을 다시 했을 때 Windows Installer 기록을 완전히 읽을 수 없어 그대로 두었습니다.`,
-  'Summary.ProgramsUnreadable.Singular': `이번 검사에서 설치된 프로그램 {0}개를 읽을 수 없어 대체된 패치를 그대로 두었습니다. 고립된 파일은 영향을 받지 않습니다.`,
-  'Summary.ProgramsUnreadable.Plural': `이번 검사에서 설치된 프로그램 {0}개를 읽을 수 없어 대체된 패치를 그대로 두었습니다. 고립된 파일은 영향을 받지 않습니다.`,
+  'Summary.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
+  'Summary.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Error.ScanRecordsUnreadable': `InstallerClean이 무엇이 아직 필요한지 확신할 만큼 Windows Installer 기록을 읽지 못했습니다. 설치된 프로그램 목록이 일부 빠진 채로 돌아왔고, 같은 기록을 레지스트리에서 직접 읽는 것도 오류를 만났습니다. 어떤 파일을 가리키는 기록이 읽을 수 없는 것 중 하나였다는 이유만으로 그 파일이 고립된 것처럼 보일 수 있으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer가 설치된 프로그램 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer가 한 프로그램의 패치 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.`,
@@ -468,6 +468,9 @@ const MAP = {
   'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
+  'Automation.Scroll.ProductDetails': `Product details`,
+  'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

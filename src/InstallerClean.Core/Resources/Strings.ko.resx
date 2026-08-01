@@ -288,6 +288,12 @@
   <data name="Automation.Scroll.ScanResults" xml:space="preserve"><value>검사 결과</value></data>
   <data name="Automation.Scroll.ResultDetails" xml:space="preserve"><value>결과 세부 정보</value></data>
   <data name="Automation.Scroll.FileDetails" xml:space="preserve"><value>파일 세부 정보</value></data>
+  <!-- The registered window's scrolling pane, carrying the same words as the
+       section heading above it because it is the same region: it exists as its
+       own key so that a screen reader does not meet one string twice, once as
+       static text and once as a pane. Its pair in the orphaned window is
+       Automation.Scroll.FileDetails. -->
+  <data name="Automation.Scroll.ProductDetails" xml:space="preserve"><value>Product details</value></data>
   <data name="Automation.Scroll.DialogBody" xml:space="preserve"><value>대화 상자 텍스트</value></data>
   <!-- Composes the announced outcome of a scan that found files:
        0 = the "N unneeded files to clean up" line, 1 = the total size. -->
@@ -379,6 +385,15 @@
   <data name="Body.PendingReboot.MsiExecuteMutex" xml:space="preserve"><value>Something is using Windows Installer right now, usually a Windows Update or a program installing in the background. Move and Delete are paused while that runs, so InstallerClean won't touch {InstallerFolder} while it's changing. Once it's done, Re-scan and they come back.</value></data>
   <data name="Body.PendingReboot.InstallerInProgress" xml:space="preserve"><value>A previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <data name="Body.PendingReboot.PendingRenameInCache" xml:space="preserve"><value>Windows has a file rename queued for the next restart that affects {InstallerFolder}. Restart Windows before cleaning.</value></data>
+  <!-- The fourth arm, for a reason the app can detect but has no line of its
+       own for. It exists so that adding a reason to the enum cannot leave a
+       user reading a blank banner over dead buttons, which is what a bound
+       property throwing produces: WPF swallows it as a binding error and paints
+       nothing. It says what is true of every reason in that family, that
+       something is in progress and the buttons come back afterwards, and says
+       nothing it cannot know. Names the folder with the token like its three
+       siblings. -->
+  <data name="Body.PendingReboot.Other" xml:space="preserve"><value>Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.</value></data>
   <data name="Body.NoFileSelected" xml:space="preserve"><value>세부 정보를 보려면 파일을 선택하세요.</value></data>
   <data name="Body.NoProductSelected" xml:space="preserve"><value>세부 정보를 보려면 제품을 선택하세요.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>사용할 수 있는 메타데이터가 없습니다.</value></data>
@@ -434,10 +449,12 @@
        the two disagree, and the card read "Deleting 39 files..." above
        "1 of 34 files". The heading is assigned before the overlay is revealed
        so it is announced exactly once, which rules out re-composing it later,
-       so it names the operation and leaves the counting to the line that can
-       be right. No placeholder: do not reintroduce one. -->
-  <data name="Status.Moving" xml:space="preserve"><value>Moving files...</value></data>
-  <data name="Status.Deleting" xml:space="preserve"><value>Deleting files...</value></data>
+       so it names the operation and the files and leaves the counting to the
+       line that can be right. "Unneeded" is the app's own word for them and is
+       what makes the heading say something once the count has gone.
+       No placeholder: do not reintroduce one. -->
+  <data name="Status.Moving" xml:space="preserve"><value>Moving unneeded files...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Deleting unneeded files...</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>이동이 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다.</value></data>
@@ -609,13 +626,16 @@
        registration is stale. InstallerClean doesn't unregister
        anything, so this is purely diagnostic. -->
   <!-- Informational line shown when the scan could not read every installed
-       program's Windows Installer records. Superseded patches are then kept
-       rather than offered, because whether one is still needed is a question
-       about every installed program and this scan could not ask them all. The
-       second sentence is load-bearing: the main job (finding orphaned files) ran
-       normally, so a shorter list is not a fault. 0 = the count of programs. -->
-  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>이번 검사에서 설치된 프로그램 {0}개를 읽을 수 없어 대체된 패치를 그대로 두었습니다. 고립된 파일은 영향을 받지 않습니다.</value></data>
-  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>이번 검사에서 설치된 프로그램 {0}개를 읽을 수 없어 대체된 패치를 그대로 두었습니다. 고립된 파일은 영향을 받지 않습니다.</value></data>
+       program's Windows Installer records, or found fewer of them than the
+       machine's own registrations account for. Superseded and obsoleted patches
+       are then kept rather than offered, because whether one is still needed is
+       a question about every installed program and this scan could not ask them
+       all. Nothing is wrong with the machine and there is nothing to do about
+       it, so the line says what to expect rather than warning: everything on the
+       list is still safe to remove, there may be more that are not shown, and a
+       re-scan may read them. 0 = the count of programs. -->
+  <data name="Summary.ProgramsUnreadable.Singular" xml:space="preserve"><value>Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.</value></data>
+  <data name="Summary.ProgramsUnreadable.Plural" xml:space="preserve"><value>Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.</value></data>
   <!-- 0 = current file count, 1 = total count, 2 = pluralised noun. -->
   <data name="Summary.OperationFiles" xml:space="preserve"><value>{2} {1}개 중 {0}개</value></data>
   <!-- Orphaned-window footer summary. Unneeded files split into the three
@@ -695,11 +715,13 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
   <!-- The patch-loop sibling of Error.MsiEnumerationNeverEnded, same cap
        condition and the same two placeholders. -->
   <data name="Error.MsiPatchEnumerationNeverEnded" xml:space="preserve"><value>Windows Installer가 한 프로그램의 패치 목록의 끝을 끝내 알리지 않았습니다. InstallerClean은 {0}개 항목에서 포기했습니다(마지막 오류 코드 {1}). 끝이 없는 목록은 믿을 수 없으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
-  <!-- Shown when the scan's two halves (what Windows still registers, and
-       what is on disk) cannot be reconciled at all: a sign the correlation
-       broke, not a real list of removable files. Deliberately does not offer
-       anything for removal. No placeholders. -->
-  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean이 이번 검사를 Windows Installer 기록과 맞춰 볼 수 없었습니다. Windows가 여전히 필요하다고 올려 둔 파일은 모두 {InstallerFolder}에 없고, 그 폴더에 실제로 있는 파일은 어떤 기록과도 일치하지 않습니다. 실제 컴퓨터가 이런 모습일 리 없으므로, 이는 안전하게 제거할 수 있는 파일이 아니라 기록을 읽는 데 생긴 문제를 가리킵니다. 정리 대상으로 아무것도 제시하지 않았고 아무것도 제거되지 않았습니다.</value></data>
+  <!-- Shown when the scan's two halves (what Windows still registers, and what
+       is on disk) cannot be reconciled: a sign the correlation broke, not a real
+       list of removable files. "Nearly" and "almost" are what the gate actually
+       tests, a survivor or two no longer disarming it, and neither is a hedge to
+       be tightened back into an absolute. Deliberately does not offer anything
+       for removal. No placeholders. -->
+  <data name="Error.ScanCorrelationFailed" xml:space="preserve"><value>InstallerClean couldn't square this scan with the Windows Installer records: nearly every file Windows still lists as needed is missing from {InstallerFolder}, while what is actually in the folder matches almost nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.</value></data>
   <!-- Shown when BOTH of the app's sources for "what is still needed" came
        back short on the same scan: the Windows Installer enumeration lost at
        least one program's records, and reading the same registrations out of
@@ -709,6 +731,13 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        records and the folder; this one claims nothing about the folder. No
        placeholders. -->
   <data name="Error.ScanRecordsUnreadable" xml:space="preserve"><value>InstallerClean이 무엇이 아직 필요한지 확신할 만큼 Windows Installer 기록을 읽지 못했습니다. 설치된 프로그램 목록이 일부 빠진 채로 돌아왔고, 같은 기록을 레지스트리에서 직접 읽는 것도 오류를 만났습니다. 어떤 파일을 가리키는 기록이 읽을 수 없는 것 중 하나였다는 이유만으로 그 파일이 고립된 것처럼 보일 수 있으므로 InstallerClean은 멈췄습니다. 아무것도 제거되지 않았습니다.</value></data>
+  <!-- Shown when the kernel would not expand the cache folder's own path, so
+       the containment guard had nothing proven to measure a candidate against
+       and refused every one of them. Without it that scan reports "nothing to
+       clean up", which is the one answer a user has no way to question. Names
+       the folder through the {InstallerFolder} token like its two siblings
+       above. No placeholders. -->
+  <data name="Error.ScanCacheRootUnresolved" xml:space="preserve"><value>InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.</value></data>
   <data name="Error.InvalidDestinationTitle" xml:space="preserve"><value>잘못된 대상</value></data>
   <data name="Error.DestinationWriteFailedTitle" xml:space="preserve"><value>대상에 쓸 수 없음</value></data>
   <data name="Error.MoveFailedTitle" xml:space="preserve"><value>이동 실패</value></data>
@@ -944,7 +973,7 @@ InstallerClean은 이미 관리자 권한으로 실행 중이었으므로 그런
        an operator who upgraded without reading the release notes gets no other
        warning that /d stopped using the Recycle Bin, and because the GUI's
        completion screen says the same words about the same act. -->
-  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Permanently deleted {0} {1}.</value></data>
+  <data name="Cli.DeletedFiles" xml:space="preserve"><value>Permanently deleted {0} unneeded {1}.</value></data>
   <!-- 0 = mode arg ("/d"), 1 = deleted count, 2 = total count, 3 = pluralised noun,
        4 = size display, 5 = error count, 6 = pluralised "error"/"errors".
        "Recovered" is accurate here now and was not before: the space comes

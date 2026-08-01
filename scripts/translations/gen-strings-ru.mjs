@@ -196,8 +196,8 @@ const MAP = {
   'Status.PreparingDestination': `Подготовка папки назначения...`,
 
   // 0 = file count, 1 = pluralised noun
-  'Status.Moving': `Moving files...`,
-  'Status.Deleting': `Deleting files...`,
+  'Status.Moving': `Moving unneeded files...`,
+  'Status.Deleting': `Deleting unneeded files...`,
   'Status.MoveCancelled.Partial': `Перемещение отменено. Обработано {0}/{1} {2}.`,
   'Status.DeleteCancelled.Partial': `Удаление отменено. Обработано {0}/{1} {2}.`,
   'Status.MoveFailed': `Не удалось переместить ({0}). Подробности в {1}.`,
@@ -399,15 +399,15 @@ const MAP = {
   'Body.NotScanned.Lead': `Пока ничего не просканировано.`,
   'Body.NotScanned.Why': `Нажмите «Повторить сканирование», чтобы просмотреть {InstallerFolder} в поисках файлов установщика, которые больше не нужны ни одной программе.`,
   'Confirm.MoveSameDrive': `That folder is on the same drive, so the space won't come back until you delete it. Pick a folder on another drive instead if you want the space straight away.`,
-  'Error.ScanCorrelationFailed': `InstallerClean не смог сопоставить это сканирование с записями Windows Installer: каждый файл, который Windows всё ещё числит нужным, отсутствует в {InstallerFolder}, а файлы, реально лежащие в этой папке, не соответствуют ни одной записи. Ни один настоящий компьютер так не выглядит, поэтому это указывает на проблему с чтением записей, а не на файлы, которые можно безопасно удалить. Для очистки ничего не предложено, и ничего не было удалено.`,
+  'Error.ScanCorrelationFailed': `InstallerClean couldn't square this scan with the Windows Installer records: nearly every file Windows still lists as needed is missing from {InstallerFolder}, while what is actually in the folder matches almost nothing in the records. No real machine looks like that, so it points to a problem reading the records, not to files you can safely remove. Nothing has been offered for cleanup and nothing has been removed.`,
   'Error.CandidateOutsideCache': `Этот файл находится не в самой папке Windows Installer; отклонено в целях безопасности.`,
   'Completion.ReverifySkipped': `Оставлено {0} {1} на месте: после сканирования они снова понадобились программе.`,
   'Completion.MoveCancelledSummary': `Перемещено {0}/{1} {2} до отмены.`,
   'Completion.PermanentDeleteCancelledSummary': `Удалено безвозвратно {0}/{1} {2} до отмены.`,
   'Body.PendingReboot.Lead': `Эти файлы сейчас нельзя очистить.`,
   'Completion.ReverifyIncomplete': `Оставлено {0} {1} на месте: при повторной проверке не удалось полностью прочитать записи Windows Installer.`,
-  'Summary.ProgramsUnreadable.Singular': `При этом сканировании не удалось прочитать {0} установленную программу, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается.`,
-  'Summary.ProgramsUnreadable.Plural': `При этом сканировании не удалось прочитать {0} установленных программ, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается.`,
+  'Summary.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
+  'Summary.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Error.ScanRecordsUnreadable': `InstallerClean не смог прочитать достаточно записей Windows Installer, чтобы точно знать, что ещё нужно: список установленных программ вернулся неполным, а чтение тех же записей напрямую из реестра тоже привело к ошибкам. Файл мог выглядеть бесхозным лишь потому, что запись, которая его называет, оказалась одной из нечитаемых, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'Error.MsiEnumerationNeverEnded': `Windows Installer так и не сообщил о конце списка установленных программ: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.`,
   'Error.MsiPatchEnumerationNeverEnded': `Windows Installer так и не сообщил о конце списка исправлений одной программы: InstallerClean прекратил попытки после {0} записей (последний код ошибки {1}). Списку без конца доверять нельзя, поэтому InstallerClean остановился. Ничего не было удалено.`,
@@ -426,6 +426,9 @@ const MAP = {
   'Completion.MoveRestoreHintSameDrive.Plural': `The files in that folder are [safe to remove], so delete it or move it to another drive whenever you want to actually reclaim the space. Until then, you can put them back into {InstallerFolder} if a program ever turns out to need one (extremely unlikely).`,
   'Confirm.DeletePermanently.Singular': `This file will be deleted permanently. It's [safe to delete], but if you'd like a backup, use the Move button instead.`,
   'Confirm.DeletePermanently.Plural': `Files will be deleted permanently. They're [safe to delete], but if you'd like a backup, use the Move button instead.`,
+  'Error.ScanCacheRootUnresolved': `InstallerClean couldn't get Windows to resolve the true path of {InstallerFolder}, so no file could be shown to be inside it and none was offered for cleanup. This scan found nothing because that check failed, not because the folder is clean. Nothing has been removed.`,
+  'Automation.Scroll.ProductDetails': `Product details`,
+  'Body.PendingReboot.Other': `Windows Installer has something in progress, so Move and Delete are paused. InstallerClean won't touch {InstallerFolder} while it's changing. Once it's finished, Re-scan and they come back.`,
 };
 
 // Russian CLDR-category overrides beyond the neutral one/other split. They do NOT
@@ -454,7 +457,7 @@ const OVERRIDES = {
   'Summary.MissingFromDisk.Few': `Отсутствует {0} зарегистрированных файла (InstallerClean их не удалял). Сейчас это не доставляет хлопот, но в будущем восстановление, обновление или удаление тех программ может не выполниться. Откройте «Подробности», чтобы узнать, что делать.`,
   // 2-4 takes the accusative-plural "установленные программы"; the base Plural
   // key carries the 5+ genitive "установленных программ".
-  'Summary.ProgramsUnreadable.Few': `При этом сканировании не удалось прочитать {0} установленные программы, поэтому замещённые исправления оставлены на месте. Бесхозных файлов это не касается.`,
+  'Summary.ProgramsUnreadable.Few': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. Everything listed is still safe to remove, but there may be more that aren't shown. Re-scan to try again.`,
   'Summary.RegisteredWindow.Few': `{0} зарегистрированных файла ещё нужны ({1})`,
   'Completion.PermanentDeleteSummary.Few': `{0} {1} permanently deleted`,
   // ReverifySkipped's flat base carries the 2-4/5+ agreement ("оставлено ... они
@@ -500,7 +503,7 @@ const CLI = {
   'Cli.FoundOrphans': `Найдено {0} {1} для очистки ({2}).`,
   'Cli.NothingToDo': `Делать нечего.`,
   'Cli.DeletingFiles': `Удаление: {0} {1}...`,
-  'Cli.DeletedFiles': `Permanently deleted {0} {1}.`,
+  'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `Ошибка: не указана папка назначения для перемещения. Используйте /m ПУТЬ. (Значение по умолчанию, заданное в графическом интерфейсе, действует только для текущего пользователя и не применяется при запуске по расписанию или от имени служебной учётной записи.)`,
   'Cli.MoveDestinationInsideInstaller': `Ошибка: папка назначения не может находиться внутри папки Windows Installer.`,
   'Cli.MoveDestinationRelative': `Ошибка: папка назначения должна быть полным путём. Получено: {0}`,
