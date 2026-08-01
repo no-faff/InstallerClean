@@ -56,8 +56,6 @@ const ALSO_KEEP = [
 // the neutral. The value's {N} set matches the base key's set.
 const OVERRIDES = {
   'Status.RegisteredPackagesFound.One': `{0} registriertes {1} gefunden.`,
-  'Status.Moving.One': `{0} {1} wird verschoben...`,
-  'Status.Deleting.One': `{0} {1} wird gelöscht...`,
   'Cli.DeletingFiles.One': `{0} {1} wird gelöscht...`,
   'Cli.MovingFiles.One': `{0} {1} wird nach {2} verschoben...`,
 };
@@ -185,7 +183,7 @@ const MAP = {
   'Body.NoFileSelected': `Wähle eine Datei, um Details anzuzeigen.`,
   'Body.NoProductSelected': `Wähle ein Produkt, um Details anzuzeigen.`,
   'Body.NoMetadata': `Keine Metadaten verfügbar.`,
-  'Body.RegisteredMissingFromDisk': `Diese Installer-Datei wurde gelöscht. InstallerClean war es nicht, es entfernt nie eine Datei, die ein Programm noch braucht; etwas anderes hat diese hier gelöscht, bevor du InstallerClean ausgeführt hast.&#10;&#10;Im Moment macht das keine Probleme, und es wird auch keine geben, bis zu dem Tag, an dem du das Programm, zu dem sie gehört, reparieren, aktualisieren oder deinstallieren willst. Dieser Schritt kann dann fehlschlagen, weil Windows nach dieser Datei sucht und sie nicht da ist.&#10;&#10;Um es zu beheben, lade den Installer dieses Programms beim Hersteller herunter und führe ihn über deine vorhandene Installation aus (deinstalliere nicht zuerst, denn das Deinstallieren ist selbst ein Schritt, der diese Datei braucht). Verwende möglichst die Version, die du installiert hast, denn Windows lehnt eine andere unter Umständen ab. Das setzt die Datei in der Regel wieder ein, und deine Einstellungen bleiben normalerweise unangetastet, aber Microsoft garantiert es nicht; sein eigenes letztes Mittel ist, das Programm neu zu installieren, oder Windows selbst.`,
+  'Body.RegisteredMissingFromDisk': `This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `Das README [erklärt diesen Ordner], und wie sich eine Datei wiederherstellen lässt, mit Microsofts eigenen Worten.`,
   'Body.NoPatches': `(keine)`,
 
@@ -216,8 +214,8 @@ const MAP = {
 
   // 0 = file count, 1 = pluralised noun. Routed through Pluralise: base is the
   // werden-form (n != 1), the .One override carries the wird-form.
-  'Status.Moving': `{0} {1} werden verschoben...`,
-  'Status.Deleting': `{0} {1} werden gelöscht...`,
+  'Status.Moving': `Moving files...`,
+  'Status.Deleting': `Deleting files...`,
   'Status.MoveCancelled.Partial': `Verschieben abgebrochen. {0} von {1} {2} verarbeitet.`,
   'Status.DeleteCancelled.Partial': `Löschen abgebrochen. {0} von {1} {2} verarbeitet.`,
   'Status.MoveFailed': `Verschieben fehlgeschlagen ({0}). Details in {1}.`,
@@ -338,7 +336,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Das Verschieben von Dateien in den Windows-Installer-Ordner wird abgelehnt (Ziel: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `Der Zielort muss ein vollständiger Pfad zu einem Ordner sein, beginnend mit einem Laufwerkbuchstaben oder einer Netzwerkfreigabe (zum Beispiel D:\\Backup oder \\\\server\\backup). InstallerClean kann diesen hier nicht verwenden: {0}`,
+  'Error.DestinationNotFullyQualified': `The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\\Backup, or \\\\server\\backup). InstallerClean can't use this one: {0}`,
   'BrowserLaunch.FailedTitle': `Browser konnte nicht geöffnet werden`,
   'UpdateCheck.Title': `Nach Updates suchen`,
   'UpdateCheck.Status.Checking': `Wird geprüft...`,
@@ -358,7 +356,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean konnte deinen Browser nicht öffnen und den Link auch nicht in die Zwischenablage kopieren. Der Link lautet:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `Der Zielort hat sich geändert, während die Dateien verschoben wurden (etwas hat den Ordner ersetzt oder umgeleitet), deshalb hat InstallerClean gestoppt, statt an die falsche Stelle zu schreiben. Prüfe {0}, klicke dann auf „Neu scannen“ und versuch es erneut.`,
+  'Error.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
 
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Schreiben in {0} nicht möglich.`,
@@ -431,8 +429,8 @@ const MAP = {
   'Cli.MoveDestinationRelative': `Fehler: Das Ziel muss ein vollständig qualifizierter Pfad sein. Erhalten: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Fehler: Das Ziel {0} liegt unter einem Windows-Systemordner. Wähle einen Pfad außerhalb von %SystemRoot%, %ProgramFiles% und %ProgramData%.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
-  'Cli.PendingRebootBlocked.InstallerInProgress': `Fehler: Eine frühere Windows-Installer-Transaktion ist auf diesem Rechner ausgesetzt. Setze diese Installation fort oder mach sie rückgängig (oder starte Windows neu), bevor du den Cache aufräumst.`,
-  'Cli.PendingRebootBlocked.PendingRenameInCache': `Fehler: Ein für nach dem Neustart eingeplanter Dateivorgang betrifft den Installer-Cache ({0}). Starte Windows neu, um diesen Vorgang abzuschließen, bevor du aufräumst.`,
+  'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
   'Cli.MovingFiles': `{0} {1} werden nach {2} verschoben...`,
   'Cli.MovedFiles': `{0} {1} verschoben.`,
   'Cli.MutexBlocked': `Ein anderer InstallerClean-Prozess hält die Einzelinstanz-Sperre (die GUI oder ein anderer CLI-Lauf). Exit-Code 75 (vorübergehend); ein späterer Wiederholungsversuch ist sicher.`,
@@ -443,7 +441,7 @@ const MAP = {
   'Cli.Help.Version': `  installerclean-cli --version  Die Version ausgeben (auch -v)`,
   'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m         An den gespeicherten Standardort`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m PFAD    An den angegebenen Pfad`,
   'Cli.Help.NoteLine1': `installerclean-cli ist ein echter Konsolenprozess und blockiert die`,
   'Cli.Help.NoteLine2': `Eingabeaufforderung, bis er fertig ist; leite die Ausgabe um oder per`,

@@ -169,7 +169,7 @@ const MAP = {
   'Body.NoFileSelected': `Chọn một tệp để xem chi tiết.`,
   'Body.NoProductSelected': `Chọn một sản phẩm để xem chi tiết.`,
   'Body.NoMetadata': `Không có siêu dữ liệu.`,
-  'Body.RegisteredMissingFromDisk': `Tệp cài đặt này đã bị xóa. InstallerClean không làm việc đó, nó không bao giờ xóa một tệp mà chương trình vẫn cần; thứ gì đó khác đã xóa tệp này trước khi bạn chạy InstallerClean.&#10;&#10;Bây giờ nó không gây rắc rối gì, và sẽ không gây rắc rối cho tới ngày bạn cố sửa chữa, cập nhật hoặc gỡ cài đặt chương trình mà nó thuộc về. Khi đó bước này có thể thất bại, vì Windows tìm tệp này mà không thấy.&#10;&#10;Để thử khắc phục, hãy tải trình cài đặt của chương trình đó từ nhà sản xuất và chạy nó đè lên bản hiện có của bạn (đừng gỡ cài đặt trước, gỡ cài đặt bản thân nó là một bước cần tới tệp này). Hãy dùng đúng phiên bản bạn đã cài nếu có thể, vì Windows có thể từ chối một phiên bản khác. Cách này thường khôi phục được tệp, và cài đặt của bạn thường không bị động đến, nhưng Microsoft không bảo đảm điều đó, phương án cuối cùng của họ là cài đặt lại chương trình, hoặc chính Windows.`,
+  'Body.RegisteredMissingFromDisk': `This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `README [giải thích thư mục này], và cách khôi phục một tệp, bằng chính lời của Microsoft.`,
   'Body.NoPatches': `(không có)`,
 
@@ -199,8 +199,8 @@ const MAP = {
   'Status.PreparingDestination': `Đang chuẩn bị thư mục đích...`,
 
   // 0 = file count, 1 = pluralised noun
-  'Status.Moving': `Đang chuyển {0} {1}...`,
-  'Status.Deleting': `Đang xóa {0} {1}...`,
+  'Status.Moving': `Moving files...`,
+  'Status.Deleting': `Deleting files...`,
   'Status.MoveCancelled.Partial': `Đã hủy chuyển. Đã xử lý {0}/{1} {2}.`,
   'Status.DeleteCancelled.Partial': `Đã hủy xóa. Đã xử lý {0}/{1} {2}.`,
   'Status.MoveFailed': `Chuyển thất bại ({0}). Chi tiết trong {1}.`,
@@ -324,7 +324,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Từ chối chuyển tệp vào thư mục Windows Installer (đích: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `Nơi chuyển đến cần là đường dẫn đầy đủ tới một thư mục, bắt đầu bằng ký tự ổ đĩa hoặc một thư mục mạng dùng chung (ví dụ D:\\Backup, hoặc \\\\server\\backup). InstallerClean không dùng được đường dẫn này: {0}`,
+  'Error.DestinationNotFullyQualified': `The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\\Backup, or \\\\server\\backup). InstallerClean can't use this one: {0}`,
   'BrowserLaunch.FailedTitle': `Không thể mở trình duyệt của bạn`,
   'UpdateCheck.Title': `Kiểm tra cập nhật`,
   'UpdateCheck.Status.Checking': `Đang kiểm tra...`,
@@ -344,7 +344,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean không thể mở trình duyệt của bạn, và cũng không thể sao chép liên kết vào bảng tạm. Liên kết là:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `Nơi chuyển đến đã thay đổi trong khi các tệp đang được chuyển (thứ gì đó đã thay thế hoặc chuyển hướng thư mục), nên InstallerClean đã dừng lại thay vì ghi vào nhầm chỗ. Hãy kiểm tra {0}, rồi Quét lại và thử lại.`,
+  'Error.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
 
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Không thể ghi vào {0}.`,
@@ -417,8 +417,8 @@ const MAP = {
   'Cli.MoveDestinationRelative': `Lỗi: đích phải là một đường dẫn đầy đủ. Nhận được: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Lỗi: đích {0} nằm dưới một thư mục hệ thống của Windows. Hãy chọn một đường dẫn ngoài %SystemRoot%, %ProgramFiles% và %ProgramData%.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
-  'Cli.PendingRebootBlocked.InstallerInProgress': `Lỗi: một giao dịch Windows Installer trước đó đang bị tạm dừng trên máy này. Hãy tiếp tục hoặc hoàn tác lần cài đặt đó (hoặc khởi động lại Windows) trước khi dọn bộ nhớ đệm.`,
-  'Cli.PendingRebootBlocked.PendingRenameInCache': `Lỗi: một thao tác trên tệp được xếp hàng cho lần khởi động lại tới nhắm vào bộ nhớ đệm Installer ({0}). Hãy khởi động lại Windows để hoàn tất thao tác đó trước khi dọn.`,
+  'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
   'Cli.MovingFiles': `Đang chuyển {0} {1} tới {2}...`,
   'Cli.MovedFiles': `Đã chuyển {0} {1}.`,
   'Cli.MutexBlocked': `Một tiến trình InstallerClean khác đang giữ khóa một-thực-thể (GUI hoặc một lần chạy CLI khác). Mã thoát 75 (tạm thời); có thể thử lại sau.`,
@@ -429,7 +429,7 @@ const MAP = {
   'Cli.Help.Version': `  installerclean-cli --version     In ra phiên bản (cũng nhận -v)`,
   'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m            Chuyển tới vị trí mặc định đã lưu`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m ĐƯỜNG_DẪN  Chuyển tới đường dẫn được chỉ định`,
   'Cli.Help.NoteLine1': `installerclean-cli là một tiến trình console thật và chặn dấu nhắc`,
   'Cli.Help.NoteLine2': `cho đến khi xong; hãy chuyển hướng hoặc nối ống đầu ra của nó như`,

@@ -384,7 +384,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Wähle ein Produkt, um Details anzuzeigen.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Keine Metadaten verfügbar.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>Diese Installer-Datei wurde gelöscht. InstallerClean war es nicht, es entfernt nie eine Datei, die ein Programm noch braucht; etwas anderes hat diese hier gelöscht, bevor du InstallerClean ausgeführt hast.&#10;&#10;Im Moment macht das keine Probleme, und es wird auch keine geben, bis zu dem Tag, an dem du das Programm, zu dem sie gehört, reparieren, aktualisieren oder deinstallieren willst. Dieser Schritt kann dann fehlschlagen, weil Windows nach dieser Datei sucht und sie nicht da ist.&#10;&#10;Um es zu beheben, lade den Installer dieses Programms beim Hersteller herunter und führe ihn über deine vorhandene Installation aus (deinstalliere nicht zuerst, denn das Deinstallieren ist selbst ein Schritt, der diese Datei braucht). Verwende möglichst die Version, die du installiert hast, denn Windows lehnt eine andere unter Umständen ab. Das setzt die Datei in der Regel wieder ein, und deine Einstellungen bleiben normalerweise unangetastet, aber Microsoft garantiert es nicht; sein eigenes letztes Mittel ist, das Programm neu zu installieren, oder Windows selbst.</value>
+    <value>This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -428,9 +428,17 @@
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
   <data name="Status.FoundUnused" xml:space="preserve"><value>{0} {1} gefunden, die du bedenkenlos löschen kannst.</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>Zielordner wird vorbereitet...</value></data>
-  <!-- 0 = file count, 1 = pluralised noun -->
-  <data name="Status.Moving" xml:space="preserve"><value>{0} {1} werden verschoben...</value></data>
-  <data name="Status.Deleting" xml:space="preserve"><value>{0} {1} werden gelöscht...</value></data>
+  <!-- The operating overlay's heading. It carries no count, and that is the
+       point: the count it used to carry was the batch the scan found, while
+       the "X of Y" line directly beneath counts what the act-time re-verify
+       actually handed to the service. When the re-verify holds anything back
+       the two disagree, and the card read "Deleting 39 files..." above
+       "1 of 34 files". The heading is assigned before the overlay is revealed
+       so it is announced exactly once, which rules out re-composing it later,
+       so it names the operation and leaves the counting to the line that can
+       be right. No placeholder: do not reintroduce one. -->
+  <data name="Status.Moving" xml:space="preserve"><value>Moving files...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Deleting files...</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Verschieben abgebrochen. {0} von {1} {2} verarbeitet.</value></data>
@@ -778,7 +786,7 @@ Details in {1}.</value></data>
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Der Zielort muss ein vollständiger Pfad zu einem Ordner sein, beginnend mit einem Laufwerkbuchstaben oder einer Netzwerkfreigabe (zum Beispiel D:\Backup oder \\server\backup). InstallerClean kann diesen hier nicht verwenden: {0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Browser konnte nicht geöffnet werden</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Nach Updates suchen</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Wird geprüft...</value></data>
@@ -806,7 +814,7 @@ Details in {1}.</value></data>
        Raised when the folder is replaced or redirected between two files of
        the same Move, so the copy must not claim where the files moved before
        that point ended up: they went wherever the folder pointed then. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Der Zielort hat sich geändert, während die Dateien verschoben wurden (etwas hat den Ordner ersetzt oder umgeleitet), deshalb hat InstallerClean gestoppt, statt an die falsche Stelle zu schreiben. Prüfe {0}, klicke dann auf „Neu scannen“ und versuch es erneut.</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -952,9 +960,9 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.</value></data>
-  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Fehler: Eine frühere Windows-Installer-Transaktion ist auf diesem Rechner ausgesetzt. Setze diese Installation fort oder mach sie rückgängig (oder starte Windows neu), bevor du den Cache aufräumst.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
-  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Fehler: Ein für nach dem Neustart eingeplanter Dateivorgang betrifft den Installer-Cache ({0}). Starte Windows neu, um diesen Vorgang abzuschließen, bevor du aufräumst.</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -1035,7 +1043,7 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Die Version ausgeben (auch -v)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Scan only - list unneeded files</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Delete unneeded files permanently</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         An den gespeicherten Standardort</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Move to the saved backup folder</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PFAD    An den angegebenen Pfad</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli ist ein echter Konsolenprozess und blockiert die</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>Eingabeaufforderung, bis er fertig ist; leite die Ausgabe um oder per</value></data>
@@ -1052,8 +1060,6 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
   <data name="Automation.ChangeLanguage.HelpText" xml:space="preserve"><value>Das Programm wird neu gestartet.</value></data>
 
   <data name="Status.RegisteredPackagesFound.One" xml:space="preserve"><value>{0} registriertes {1} gefunden.</value></data>
-  <data name="Status.Moving.One" xml:space="preserve"><value>{0} {1} wird verschoben...</value></data>
-  <data name="Status.Deleting.One" xml:space="preserve"><value>{0} {1} wird gelöscht...</value></data>
   <data name="Cli.DeletingFiles.One" xml:space="preserve"><value>{0} {1} wird gelöscht...</value></data>
   <data name="Cli.MovingFiles.One" xml:space="preserve"><value>{0} {1} wird nach {2} verschoben...</value></data>
 </root>

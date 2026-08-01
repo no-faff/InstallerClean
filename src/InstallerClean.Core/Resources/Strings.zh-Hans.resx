@@ -384,7 +384,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>选择一个产品以查看详情。</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>没有可用的元数据。</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>这个安装程序文件已被删除。这不是 InstallerClean 干的，它从不删除程序仍然需要的文件；是在您运行 InstallerClean 之前，别的东西删掉了它。&#10;&#10;现在它不会造成任何麻烦，直到有一天您尝试修复、更新或卸载它所属的程序时才会显现。那一步可能会失败，因为 Windows 会去找这个文件，却找不到。&#10;&#10;要尝试修复，请从该程序的厂商处下载它的安装程序，在您现有的安装之上运行一遍（不要先卸载，卸载本身就是一个需要这个文件的步骤）。如果能找到，请使用您已安装的那个版本，因为 Windows 可能会拒绝其他版本。这通常会把文件恢复回来，您的设置一般也不受影响，但 Microsoft 并不保证，它自己的最后手段是重新安装该程序，或重装 Windows 本身。</value>
+    <value>This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -428,9 +428,17 @@
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
   <data name="Status.FoundUnused" xml:space="preserve"><value>找到 {0} 个{1}，可安全删除。</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>正在准备目标文件夹…</value></data>
-  <!-- 0 = file count, 1 = pluralised noun -->
-  <data name="Status.Moving" xml:space="preserve"><value>正在移动 {0} 个{1}…</value></data>
-  <data name="Status.Deleting" xml:space="preserve"><value>正在删除 {0} 个{1}…</value></data>
+  <!-- The operating overlay's heading. It carries no count, and that is the
+       point: the count it used to carry was the batch the scan found, while
+       the "X of Y" line directly beneath counts what the act-time re-verify
+       actually handed to the service. When the re-verify holds anything back
+       the two disagree, and the card read "Deleting 39 files..." above
+       "1 of 34 files". The heading is assigned before the overlay is revealed
+       so it is announced exactly once, which rules out re-composing it later,
+       so it names the operation and leaves the counting to the line that can
+       be right. No placeholder: do not reintroduce one. -->
+  <data name="Status.Moving" xml:space="preserve"><value>Moving files...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Deleting files...</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>移动已取消。{1} 个{2}中已处理 {0} 个。</value></data>
@@ -778,7 +786,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>移动位置需要是指向文件夹的完整路径，以驱动器盘符或网络共享开头（例如 D:\Backup，或 \\server\backup）。InstallerClean 无法使用这个：{0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>无法打开您的浏览器</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>检查更新</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>正在检查…</value></data>
@@ -806,7 +814,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        Raised when the folder is replaced or redirected between two files of
        the same Move, so the copy must not claim where the files moved before
        that point ended up: they went wherever the folder pointed then. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>文件移动过程中，移动位置发生了变化（有什么东西替换或重定向了该文件夹），因此 InstallerClean 已停止，以免写入错误的位置。请检查 {0}，然后重新扫描并再试一次。</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -952,9 +960,9 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.</value></data>
-  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>错误：本机有一个先前的 Windows Installer 事务处于挂起状态。请在清理缓存前，恢复或回滚该安装（或重启 Windows）。</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
-  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>错误：有一个排队等待重启后执行的文件操作指向安装程序缓存（{0}）。请先重启 Windows 完成该操作，然后再清理。</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -1035,7 +1043,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  显示版本号（也接受 -v）</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Scan only - list unneeded files</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Delete unneeded files permanently</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         移动到已保存的默认位置</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Move to the saved backup folder</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m 路径    移动到指定路径</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli 是一个真正的控制台进程，在运行结束前会一直</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>占用命令提示符；可像对待其他控制台程序那样重定向或通过管道处理其输出。</value></data>

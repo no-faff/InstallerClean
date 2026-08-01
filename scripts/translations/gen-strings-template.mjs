@@ -230,7 +230,7 @@ const MAP = {
   'Body.NoFileSelected': `Select a file to view details.`,
   'Body.NoProductSelected': `Select a product to view details.`,
   'Body.NoMetadata': `No metadata available.`,
-  'Body.RegisteredMissingFromDisk': `This installer file has been deleted. InstallerClean didn't do it, it never removes a file a program still needs; something else deleted this one before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.`,
+  'Body.RegisteredMissingFromDisk': `This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `The README [explains this folder], and how to recover a file, in Microsoft's own words.`,
   'Body.NoPatches': `(none)`,
 
@@ -260,8 +260,8 @@ const MAP = {
   'Status.PreparingDestination': `Preparing destination folder...`,
 
   // 0 = file count, 1 = pluralised noun
-  'Status.Moving': `Moving {0} {1}...`,
-  'Status.Deleting': `Deleting {0} {1}...`,
+  'Status.Moving': `Moving files...`,
+  'Status.Deleting': `Deleting files...`,
   'Status.MoveCancelled.Partial': `Move cancelled. {0} of {1} {2} processed.`,
   'Status.DeleteCancelled.Partial': `Delete cancelled. {0} of {1} {2} processed.`,
   'Status.MoveFailed': `Move failed ({0}). Details in {1}.`,
@@ -400,7 +400,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Refusing to move files into the Windows Installer folder (destination: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `The Move location needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\\Backup, or \\\\server\\backup). InstallerClean can't use this one: {0}`,
+  'Error.DestinationNotFullyQualified': `The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\\Backup, or \\\\server\\backup). InstallerClean can't use this one: {0}`,
   'BrowserLaunch.FailedTitle': `Couldn't open your browser`,
   'UpdateCheck.Title': `Check for updates`,
   'UpdateCheck.Status.Checking': `Checking...`,
@@ -421,7 +421,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean couldn't open your browser, and couldn't copy the link to your clipboard either. The link is:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `The Move location changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
+  'Error.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
 
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Cannot write to {0}.`,
@@ -497,8 +497,8 @@ const MAP = {
   'Cli.MoveDestinationRelative': `Error: destination must be a fully qualified path. Got: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
-  'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning the cache.`,
-  'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets the Installer cache ({0}). Restart Windows to complete that operation before cleaning.`,
+  'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
   'Cli.MovingFiles': `Moving {0} {1} to {2}...`,
   'Cli.MovedFiles': `Moved {0} {1}.`,
   'Cli.MutexBlocked': `Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later.`,
@@ -510,7 +510,7 @@ const MAP = {
   'Cli.Help.Version': `  installerclean-cli --version  Print the version (also accepts -v)`,
   'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to saved default location`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m PATH    Move to specified path`,
   'Cli.Help.NoteLine1': `installerclean-cli is a real console process and blocks the prompt`,
   'Cli.Help.NoteLine2': `until it finishes; redirect or pipe its output as you would any`,

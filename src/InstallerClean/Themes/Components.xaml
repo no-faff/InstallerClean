@@ -1018,8 +1018,14 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="HasDropShadow" Value="False"/>
-        <!-- Wrap width scales with the OS text size, as on AccentTooltip. -->
-        <Setter Property="MaxWidth" Value="{a11y:TextScaled 320}"/>
+        <!-- Wrap width scales with the OS text size, as on AccentTooltip. It is
+             a maximum, so a tooltip that already fitted is unmoved by the
+             number; what it changes is the tall ones. At 320 the longest of
+             these ran to five lines under the pointer, which is a paragraph
+             rather than a hint. 440 settles the button tooltips at two lines
+             each and the two longest at four, and matches the width the
+             confirmation cards were measured to. -->
+        <Setter Property="MaxWidth" Value="{a11y:TextScaled 440}"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>

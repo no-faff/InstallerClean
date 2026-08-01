@@ -384,7 +384,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>製品を選択して詳細を表示します。</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>メタデータはありません。</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>このインストーラーファイルは削除されています。InstallerClean が削除したのではありません。プログラムがまだ必要とするファイルを削除することは決してありません。何か別のものが、InstallerClean を実行する前にこのファイルを削除しました。&#10;&#10;今は問題を引き起こしませんが、それが属するプログラムの修復、更新、またはアンインストールを試みるまでは問題になりません。その時、Windowsがこのファイルを探して見つからないため、そのステップは失敗する可能性があります。&#10;&#10;修正を試みるには、そのプログラムのインストーラーをメーカーからダウンロードし、既存のコピーに上書き実行してください (最初にアンインストールしないでください。アンインストール自体がこのファイルを必要とするステップです)。可能であればインストールされているバージョンを使用してください。Windows は異なるバージョンを拒否する可能性があります。これにより通常ファイルは復元され、設定は通常影響を受けませんが、Microsoft はそれを保証しておらず、最終手段はプログラム自体または Windows の再インストールです。</value>
+    <value>This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -428,9 +428,17 @@
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
   <data name="Status.FoundUnused" xml:space="preserve"><value>安全に削除できる {0} 個の {1} が見つかりました。</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>移動先フォルダーを準備中...</value></data>
-  <!-- 0 = file count, 1 = pluralised noun -->
-  <data name="Status.Moving" xml:space="preserve"><value>{0} 個の {1} を移動中...</value></data>
-  <data name="Status.Deleting" xml:space="preserve"><value>{0} 個の {1} を削除中...</value></data>
+  <!-- The operating overlay's heading. It carries no count, and that is the
+       point: the count it used to carry was the batch the scan found, while
+       the "X of Y" line directly beneath counts what the act-time re-verify
+       actually handed to the service. When the re-verify holds anything back
+       the two disagree, and the card read "Deleting 39 files..." above
+       "1 of 34 files". The heading is assigned before the overlay is revealed
+       so it is announced exactly once, which rules out re-composing it later,
+       so it names the operation and leaves the counting to the line that can
+       be right. No placeholder: do not reintroduce one. -->
+  <data name="Status.Moving" xml:space="preserve"><value>Moving files...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Deleting files...</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>移動がキャンセルされました。{1} 個中 {0} 個の {2} を処理しました。</value></data>
@@ -778,7 +786,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>移動先には、ドライブ文字またはネットワーク共有から始まる、フォルダーへの完全なパスを指定してください (例：D:\Backup、\\server\backup)。InstallerClean はこのパスを使用できません：{0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>ブラウザを開けませんでした</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>更新の確認</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>確認中...</value></data>
@@ -806,7 +814,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
        Raised when the folder is replaced or redirected between two files of
        the same Move, so the copy must not claim where the files moved before
        that point ended up: they went wherever the folder pointed then. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>ファイルの移動中に移動先が変更されました (フォルダーが置き換えられたか、リダイレクトされました)。誤った場所に書き込まないよう、InstallerClean は処理を停止しました。{0} を確認してから、再スキャンしてもう一度お試しください。</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -962,9 +970,9 @@ InstallerClean はすでに管理者として実行されていたため、同�
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.</value></data>
-  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>エラー：このマシンで以前の Windows Installer トランザクションが中断されています。キャッシュをクリーンアップする前に、そのインストールを再開またはロールバックするか (または Windows を再起動してください)。</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
-  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>エラー：キューに入れられた再起動後のファイル操作がインストーラーキャッシュ ({0})を対象としています。クリーンアップ前にその操作を完了するために Windows を再起動してください。</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -1058,7 +1066,7 @@ InstallerClean はすでに管理者として実行されていたため、同�
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  バージョンを表示 (-vも受け付けます)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Scan only - list unneeded files</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Delete unneeded files permanently</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         保存されたデフォルトの場所に移動</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Move to the saved backup folder</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m PATH    指定されたパスに移動</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cliは実際のコンソールプロセスであり、完了するまで</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>プロンプトをブロックします。他のコンソール exe と同様に出力をリダイレクト</value></data>

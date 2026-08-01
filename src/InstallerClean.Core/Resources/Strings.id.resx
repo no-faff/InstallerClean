@@ -384,7 +384,7 @@
   <data name="Body.NoProductSelected" xml:space="preserve"><value>Pilih produk untuk melihat detail.</value></data>
   <data name="Body.NoMetadata" xml:space="preserve"><value>Tidak ada metadata yang tersedia.</value></data>
   <data name="Body.RegisteredMissingFromDisk" xml:space="preserve">
-    <value>File penginstal ini telah dihapus. InstallerClean tidak melakukannya, aplikasi ini tidak pernah menghapus file yang masih diperlukan sebuah program; sesuatu yang lain menghapus file ini sebelum Anda menjalankan InstallerClean.&#10;&#10;File ini tidak menimbulkan masalah sekarang, dan tidak akan menimbulkannya sampai suatu hari Anda mencoba memperbaiki, memperbarui, atau menghapus instalasi program pemiliknya. Langkah itu kemudian bisa gagal, karena Windows mencari file ini dan file-nya tidak ada.&#10;&#10;Untuk mencoba memperbaikinya, unduh penginstal program tersebut dari pembuatnya dan jalankan di atas salinan yang sudah ada (jangan menghapus instalasi terlebih dahulu, penghapusan instalasi sendiri adalah langkah yang memerlukan file ini). Gunakan versi yang Anda pasang jika bisa mendapatkannya, karena Windows mungkin menolak versi yang berbeda. Cara ini biasanya memulihkan file, dan pengaturan Anda umumnya tetap utuh, tetapi Microsoft tidak menjaminnya, langkah terakhir Microsoft sendiri adalah memasang ulang program itu, atau Windows itu sendiri.</value>
+    <value>This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.</value>
     <comment>Shown in the Registered Files details pane when a selected product's installer file is gone from disk. Generic with no product name interpolated: the recovery advice is identical for every program, and a possessive on a name ending in s reads wrongly.</comment>
   </data>
   <!-- The missing-file note's closing sentence, rendered as a TextBlock
@@ -428,9 +428,17 @@
   <!-- 0 = file count, 1 = pluralised noun ("file"/"files") -->
   <data name="Status.FoundUnused" xml:space="preserve"><value>Ditemukan {0} {1} yang aman Anda hapus.</value></data>
   <data name="Status.PreparingDestination" xml:space="preserve"><value>Menyiapkan folder tujuan...</value></data>
-  <!-- 0 = file count, 1 = pluralised noun -->
-  <data name="Status.Moving" xml:space="preserve"><value>Memindahkan {0} {1}...</value></data>
-  <data name="Status.Deleting" xml:space="preserve"><value>Menghapus {0} {1}...</value></data>
+  <!-- The operating overlay's heading. It carries no count, and that is the
+       point: the count it used to carry was the batch the scan found, while
+       the "X of Y" line directly beneath counts what the act-time re-verify
+       actually handed to the service. When the re-verify holds anything back
+       the two disagree, and the card read "Deleting 39 files..." above
+       "1 of 34 files". The heading is assigned before the overlay is revealed
+       so it is announced exactly once, which rules out re-composing it later,
+       so it names the operation and leaves the counting to the line that can
+       be right. No placeholder: do not reintroduce one. -->
+  <data name="Status.Moving" xml:space="preserve"><value>Moving files...</value></data>
+  <data name="Status.Deleting" xml:space="preserve"><value>Deleting files...</value></data>
   <!-- 0 = files processed before cancel, 1 = total files in the batch,
        2 = pluralised "file"/"files" agreeing with the total. -->
   <data name="Status.MoveCancelled.Partial" xml:space="preserve"><value>Pemindahan dibatalkan. {0} dari {1} {2} diproses.</value></data>
@@ -778,7 +786,7 @@ Detail di {1}.</value></data>
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
        the user did, and belongs in the code, not in the dialog. -->
-  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>Lokasi pemindahan harus berupa jalur lengkap ke sebuah folder, yang dimulai dengan huruf drive atau jalur jaringan (misalnya D:\Backup, atau \\server\backup). InstallerClean tidak bisa memakai yang ini: {0}</value></data>
+  <data name="Error.DestinationNotFullyQualified" xml:space="preserve"><value>The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\Backup, or \\server\backup). InstallerClean can't use this one: {0}</value></data>
   <data name="BrowserLaunch.FailedTitle" xml:space="preserve"><value>Tidak bisa membuka browser Anda</value></data>
   <data name="UpdateCheck.Title" xml:space="preserve"><value>Periksa pembaruan</value></data>
   <data name="UpdateCheck.Status.Checking" xml:space="preserve"><value>Memeriksa...</value></data>
@@ -806,7 +814,7 @@ Detail di {1}.</value></data>
        Raised when the folder is replaced or redirected between two files of
        the same Move, so the copy must not claim where the files moved before
        that point ended up: they went wherever the folder pointed then. -->
-  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>Lokasi pemindahan berubah saat file sedang dipindahkan (ada sesuatu yang mengganti atau mengalihkan folder itu), jadi InstallerClean berhenti daripada menulis ke tempat yang salah. Periksa {0}, lalu Pindai ulang dan coba lagi.</value></data>
+  <data name="Error.DestinationChangedMidBatch" xml:space="preserve"><value>The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.</value></data>
   <!-- 0 = folder, and nothing else. The framework's own message rides the
        thrown exception's InnerException to the crash log; formatting it in
        here would put an elevated framework message, which can carry a path
@@ -952,9 +960,9 @@ Log kerusakan tidak bisa ditulis.</value></data>
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->
   <data name="Cli.PendingRebootBlocked.MsiExecuteMutex" xml:space="preserve"><value>Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.</value></data>
-  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Kesalahan: ada transaksi Windows Installer sebelumnya yang ditangguhkan di komputer ini. Lanjutkan atau batalkan instalasi itu (atau mulai ulang Windows) sebelum membersihkan cache.</value></data>
+  <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
-  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Kesalahan: operasi file yang diantrekan setelah mulai ulang menyasar cache Installer ({0}). Mulai ulang Windows untuk menyelesaikan operasi itu sebelum membersihkan.</value></data>
+  <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -1035,7 +1043,7 @@ Log kerusakan tidak bisa ditulis.</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Cetak versi (juga -v)</value></data>
   <data name="Cli.Help.ScanOnly" xml:space="preserve"><value>  installerclean-cli /s         Scan only - list unneeded files</value></data>
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Delete unneeded files permanently</value></data>
-  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Pindahkan ke lokasi default tersimpan</value></data>
+  <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Move to the saved backup folder</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m JALUR   Pindahkan ke jalur yang ditentukan</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli adalah proses konsol sungguhan dan memblokir prompt</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>sampai selesai; alihkan atau salurkan keluarannya seperti</value></data>

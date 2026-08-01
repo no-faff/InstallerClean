@@ -184,7 +184,7 @@ const MAP = {
   'Body.NoFileSelected': `Виберіть файл, щоб переглянути деталі.`,
   'Body.NoProductSelected': `Виберіть продукт, щоб переглянути деталі.`,
   'Body.NoMetadata': `Метадані недоступні.`,
-  'Body.RegisteredMissingFromDisk': `Цей файл інсталятора видалено. InstallerClean цього не робив, він ніколи не видаляє файл, який ще потрібен програмі; цей видалило щось інше, перш ніж ви запустили InstallerClean.&#10;&#10;Зараз це не завдає клопоту і не завдаватиме аж до дня, коли ви спробуєте відновити, оновити чи видалити програму, якій він належить. Тоді цей крок може не вдатися, бо Windows шукатиме цей файл, а його там немає.&#10;&#10;Щоб спробувати це виправити, завантажте інсталятор тієї програми від її виробника та запустіть його поверх наявної копії (не видаляйте програму спершу, бо видалення саме по собі є кроком, який потребує цього файлу). Якщо можете дістати ту версію, яку ви встановили, використайте її, бо Windows може відхилити іншу. Зазвичай це відновлює файл, і ваші налаштування звичайно лишаються недоторканими, але Microsoft цього не гарантує, її власний останній засіб — це перевстановлення програми або самої Windows.`,
+  'Body.RegisteredMissingFromDisk': `This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `README [пояснює цю папку] і як відновити файл, словами самої Microsoft.`,
   'Body.NoPatches': `(немає)`,
 
@@ -214,8 +214,8 @@ const MAP = {
   'Status.PreparingDestination': `Підготовка папки призначення...`,
 
   // 0 = file count, 1 = pluralised noun
-  'Status.Moving': `Переміщення: {0} {1}...`,
-  'Status.Deleting': `Видалення: {0} {1}...`,
+  'Status.Moving': `Moving files...`,
+  'Status.Deleting': `Deleting files...`,
   'Status.MoveCancelled.Partial': `Переміщення скасовано. Опрацьовано {0} з {1} {2}.`,
   'Status.DeleteCancelled.Partial': `Видалення скасовано. Опрацьовано {0} з {1} {2}.`,
   'Status.MoveFailed': `Не вдалося перемістити ({0}). Деталі у {1}.`,
@@ -336,7 +336,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `Відмова перемістити файли до папки Windows Installer (призначення: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `Розташування для переміщення має бути повним шляхом до папки, що починається з літери диска або мережевої папки (наприклад, D:\\Backup чи \\\\server\\backup). InstallerClean не може використати такий шлях: {0}`,
+  'Error.DestinationNotFullyQualified': `The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\\Backup, or \\\\server\\backup). InstallerClean can't use this one: {0}`,
   'BrowserLaunch.FailedTitle': `Не вдалося відкрити ваш браузер`,
   'UpdateCheck.Title': `Перевірити оновлення`,
   'UpdateCheck.Status.Checking': `Перевірка...`,
@@ -356,7 +356,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean не зміг відкрити ваш браузер і не зміг скопіювати посилання до буфера обміну. Ось воно:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `Папка призначення змінилася, поки тривало переміщення (щось замінило чи перенаправило її), тож InstallerClean зупинився, щоб не записати файли не туди. Перевірте {0}, потім повторіть сканування і спробуйте ще раз.`,
+  'Error.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
 
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `Не вдається записати в {0}.`,
@@ -429,8 +429,8 @@ const MAP = {
   'Cli.MoveDestinationRelative': `Помилка: призначення має бути повним шляхом. Отримано: {0}`,
   'Cli.MoveDestinationInSystemFolder': `Помилка: призначення {0} вказує всередину системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles% та %ProgramData%.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
-  'Cli.PendingRebootBlocked.InstallerInProgress': `Помилка: на цій машині призупинено попередню транзакцію Windows Installer. Поновіть або відкотіть те встановлення (чи перезавантажте Windows), перш ніж очищати кеш.`,
-  'Cli.PendingRebootBlocked.PendingRenameInCache': `Помилка: поставлена в чергу після перезавантаження файлова операція націлена на кеш інсталятора ({0}). Перезавантажте Windows, щоб завершити ту операцію, перш ніж очищати.`,
+  'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
   'Cli.MovingFiles': `Переміщення: {0} {1} до {2}...`,
   'Cli.MovedFiles': `Переміщено {0} {1}.`,
   'Cli.MutexBlocked': `Інший процес InstallerClean утримує блокування єдиного екземпляра (графічний інтерфейс чи інший запуск CLI). Вихід 75 (тимчасовий); можна безпечно повторити пізніше.`,
@@ -441,7 +441,7 @@ const MAP = {
   'Cli.Help.Version': `  installerclean-cli --version  Вивести версію (також приймає -v)`,
   'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m         Перемістити в збережену папку`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m ШЛЯХ    Перемістити за вказаним шляхом`,
   'Cli.Help.NoteLine1': `installerclean-cli — це консольний процес, що блокує командний рядок до`,
   'Cli.Help.NoteLine2': `завершення; перенаправляйте чи передавайте його вивід, як у будь-якого`,

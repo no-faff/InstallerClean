@@ -167,7 +167,7 @@ const MAP = {
   'Body.NoFileSelected': `세부 정보를 보려면 파일을 선택하세요.`,
   'Body.NoProductSelected': `세부 정보를 보려면 제품을 선택하세요.`,
   'Body.NoMetadata': `사용할 수 있는 메타데이터가 없습니다.`,
-  'Body.RegisteredMissingFromDisk': `이 설치 관리자 파일은 삭제되었습니다. InstallerClean이 한 일이 아닙니다. InstallerClean은 프로그램이 아직 필요로 하는 파일을 절대 제거하지 않습니다. 이 파일은 InstallerClean을 실행하기 전에 다른 무언가가 삭제한 것입니다.&#10;&#10;지금은 아무 문제도 일으키지 않으며, 이 파일이 속한 프로그램을 복구, 업데이트 또는 제거하려는 날이 오기 전까지는 문제가 없습니다. 그 단계에서 Windows가 이 파일을 찾지만 파일이 없으므로 실패할 수 있습니다.&#10;&#10;복구를 시도하려면, 해당 프로그램의 설치 관리자를 제조사에서 내려받아 기존 설치본 위에 실행하세요(먼저 제거하지 마세요. 제거 역시 이 파일이 필요한 단계입니다). 가능하다면 현재 설치된 버전을 사용하세요. Windows가 다른 버전을 거부할 수 있기 때문입니다. 이렇게 하면 대개 파일이 복구되고 설정도 보통 그대로 유지되지만, Microsoft가 이를 보장하지는 않습니다. Microsoft의 마지막 수단은 그 프로그램을, 또는 Windows 자체를 다시 설치하는 것입니다.`,
+  'Body.RegisteredMissingFromDisk': `This installer file is missing. InstallerClean didn't remove it, it never removes a file a program still needs; it was already gone before you ran InstallerClean.&#10;&#10;It causes no trouble now, and won't until the day you try to repair, update or uninstall the program it belongs to. That step can then fail, because Windows looks for this file and it isn't there.&#10;&#10;To try and fix it, download that program's installer from its maker and run it over your existing copy (don't uninstall first, uninstalling is itself a step that needs this file). Use the version you have installed if you can get it, as Windows may reject a different one. This usually restores the file, and your settings are normally untouched, but Microsoft doesn't guarantee it, its own last resort is reinstalling the program, or Windows itself.`,
   'Body.RegisteredMissingFromDisk.SeeAlso': `README에는 Microsoft의 표현 그대로 [이 폴더에 대한 설명]과 파일을 복구하는 방법이 담겨 있습니다.`,
   'Body.NoPatches': `(없음)`,
 
@@ -197,8 +197,8 @@ const MAP = {
   'Status.PreparingDestination': `대상 폴더를 준비하는 중...`,
 
   // 0 = file count, 1 = pluralised noun
-  'Status.Moving': `{1} {0}개를 이동하는 중...`,
-  'Status.Deleting': `{1} {0}개를 삭제하는 중...`,
+  'Status.Moving': `Moving files...`,
+  'Status.Deleting': `Deleting files...`,
   'Status.MoveCancelled.Partial': `이동이 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다.`,
   'Status.DeleteCancelled.Partial': `삭제가 취소되었습니다. {2} {1}개 중 {0}개를 처리했습니다.`,
   'Status.MoveFailed': `이동 실패 ({0}). 자세한 내용은 {1}에 있습니다.`,
@@ -319,7 +319,7 @@ const MAP = {
   'Error.MoveIntoInstaller': `파일을 Windows Installer 폴더로 이동하는 것을 거부합니다(대상: {0}).`,
 
   // 0 = the relative path the caller passed
-  'Error.DestinationNotFullyQualified': `이동 위치는 드라이브 문자나 네트워크 공유로 시작하는, 폴더의 전체 경로여야 합니다(예: D:\\Backup 또는 \\\\server\\backup). InstallerClean은 이 경로를 사용할 수 없습니다: {0}`,
+  'Error.DestinationNotFullyQualified': `The backup folder needs to be a full path to a folder, starting with a drive letter or a network share (for example D:\\Backup, or \\\\server\\backup). InstallerClean can't use this one: {0}`,
   'BrowserLaunch.FailedTitle': `브라우저를 열 수 없음`,
   'UpdateCheck.Title': `업데이트 확인`,
   'UpdateCheck.Status.Checking': `확인 중...`,
@@ -339,7 +339,7 @@ const MAP = {
   'BrowserLaunch.ClipboardFailed': `InstallerClean이 브라우저를 열지 못했고, 링크를 클립보드에 복사하지도 못했습니다. 링크는 다음과 같습니다:&#10;&#10;{0}`,
 
   // 0 = the destination folder whose canonical path changed mid-batch
-  'Error.DestinationChangedMidBatch': `파일을 이동하는 도중에 이동 위치가 바뀌었습니다(무언가가 폴더를 교체했거나 다른 곳으로 연결했습니다). 그래서 InstallerClean은 엉뚱한 곳에 쓰지 않도록 작업을 멈췄습니다. {0} 폴더를 확인한 다음, 다시 검사한 뒤 다시 시도하세요.`,
+  'Error.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then Re-scan and try again.`,
 
   // 0 = folder, 1 = inner exception message
   'Error.CannotWriteFolder': `{0}에 쓸 수 없습니다.`,
@@ -415,8 +415,8 @@ const MAP = {
   'Cli.MoveDestinationRelative': `오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0}`,
   'Cli.MoveDestinationInSystemFolder': `오류: 지정한 대상이 Windows 시스템 폴더 아래로 해석됩니다 ({0}). %SystemRoot%, %ProgramFiles%, %ProgramData% 밖의 경로를 선택하세요.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
-  'Cli.PendingRebootBlocked.InstallerInProgress': `오류: 이 컴퓨터에 이전 Windows Installer 트랜잭션이 일시 중단되어 있습니다. 캐시를 정리하기 전에 그 설치를 다시 진행하거나 롤백하세요(또는 Windows를 다시 시작하세요).`,
-  'Cli.PendingRebootBlocked.PendingRenameInCache': `오류: 다시 시작 후 실행되도록 예약된 파일 작업이 설치 관리자 캐시를 대상으로 합니다 ({0}). 정리하기 전에 Windows를 다시 시작하여 그 작업을 완료하세요.`,
+  'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
+  'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
   'Cli.MovingFiles': `{1} {0}개를 {2}(으)로 이동하는 중...`,
   'Cli.MovedFiles': `{1} {0}개를 이동했습니다.`,
   'Cli.MutexBlocked': `다른 InstallerClean 프로세스가 단일 인스턴스 잠금을 보유하고 있습니다(GUI 또는 다른 CLI 실행). 종료 코드 75(일시적); 나중에 다시 시도해도 안전합니다.`,
@@ -427,7 +427,7 @@ const MAP = {
   'Cli.Help.Version': `  installerclean-cli --version  버전 출력 (-v도 사용 가능)`,
   'Cli.Help.ScanOnly': `  installerclean-cli /s         Scan only - list unneeded files`,
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
-  'Cli.Help.MoveDefault': `  installerclean-cli /m         저장된 기본 위치로 이동`,
+  'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m 경로    지정한 경로로 이동`,
   'Cli.Help.NoteLine1': `installerclean-cli는 실제 콘솔 프로세스로, 명령 프롬프트를 점유하며,`,
   'Cli.Help.NoteLine2': `실행이 끝날 때까지 기다립니다. 다른 콘솔 앱처럼 출력을 리디렉션하거나`,

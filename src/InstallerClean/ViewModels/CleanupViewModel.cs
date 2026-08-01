@@ -623,9 +623,10 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
 
         // Heading before IsOperating: a heading assigned after the reveal
         // can be spoken twice (see OperationHeadingText in MainWindow.xaml).
-        OperationProgress = string.Format(
-            DisplayHelpers.Pluralise(count, Strings.Status_Moving, "Status.Moving"),
-            count, DisplayHelpers.PluraliseFile(count));
+        // It names no count, so it needs neither formatting nor a plural form;
+        // the "X of Y" line beneath it is what counts, and it counts the batch
+        // the re-verify actually handed over rather than the one the scan found.
+        OperationProgress = Strings.Status_Moving;
         IsOperating = true;
 
         try
@@ -881,11 +882,9 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
             return;
         }
 
-        // Heading before IsOperating: a heading assigned after the reveal
-        // can be spoken twice (see OperationHeadingText in MainWindow.xaml).
-        OperationProgress = string.Format(
-            DisplayHelpers.Pluralise(ctx.Count, Strings.Status_Deleting, "Status.Deleting"),
-            ctx.Count, DisplayHelpers.PluraliseFile(ctx.Count));
+        // Heading before IsOperating: see the matching comment in the Move
+        // path for why it carries no count.
+        OperationProgress = Strings.Status_Deleting;
         IsOperating = true;
 
         try

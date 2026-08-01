@@ -2,7 +2,7 @@
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
-## [2.3.1] - Unreleased
+## [2.4.0] - Unreleased
 
 ### Added
 
