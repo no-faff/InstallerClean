@@ -19,7 +19,15 @@ public partial class ConfirmSendResultLogWindow : Window
     {
         InitializeComponent();
         JsonText.Text = jsonContent;
-        BuildReassuranceLine();
+        // The window title is what a screen reader announces when a dialog
+        // opens, and ShowInTaskbar is false under custom chrome, so it serves
+        // the announcement and nothing else. Composed from the heading AND the
+        // body, as the four sibling modals are: the heading alone is three
+        // words, and this is the one dialog whose body is the disclosure being
+        // consented to, so a title carrying only the question asks it without
+        // saying what is being agreed to. The sentence is reachable by tabbing
+        // to the link that names it, which is not the same as leading with it.
+        Title = Strings.ConfirmSendResultLog_Title + " " + BuildReassuranceLine();
 
         // Sized to content, so the whole report is visible with no
         // scrollbar; the clamp stops an error-heavy report or a very
@@ -44,8 +52,12 @@ public partial class ConfirmSendResultLogWindow : Window
     /// suffix Run. Mirrors MainWindow's BuildCompletionRestoreLine; the URL
     /// opens through <see cref="UrlLauncher"/> so this elevated process does
     /// not launch the browser as Administrator.
+    ///
+    /// Returns the same sentence as plain text, brackets removed, for the
+    /// window title to announce. Returned rather than recomputed there so the
+    /// spoken title and the painted line cannot drift apart.
     /// </summary>
-    private void BuildReassuranceLine()
+    private string BuildReassuranceLine()
     {
         var raw = Strings.ConfirmSendResultLog_Reassurance;
         ReassuranceText.Inlines.Clear();
@@ -55,8 +67,10 @@ public partial class ConfirmSendResultLogWindow : Window
         if (CompositionParsing.SplitAtBracketedPhrase(raw) is not { } split)
         {
             ReassuranceText.Inlines.Add(new Run(raw));
-            return;
+            return raw;
         }
+
+        var plain = split.Prefix + split.LinkText + split.Suffix;
 
         var link = new Hyperlink(new Run(split.LinkText))
         {
@@ -67,11 +81,13 @@ public partial class ConfirmSendResultLogWindow : Window
         // The link text alone ("how much space people are freeing") is not a
         // self-contained accessible name; the whole sentence (brackets
         // removed) is, already in the user's language.
-        AutomationProperties.SetName(link, split.Prefix + split.LinkText + split.Suffix);
+        AutomationProperties.SetName(link, plain);
 
         if (split.Prefix.Length > 0) ReassuranceText.Inlines.Add(new Run(split.Prefix));
         ReassuranceText.Inlines.Add(link);
         if (split.Suffix.Length > 0) ReassuranceText.Inlines.Add(new Run(split.Suffix));
+
+        return plain;
     }
 
     private void Hyperlink_Click(object sender, RoutedEventArgs e)
