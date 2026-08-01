@@ -462,7 +462,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `Безповоротно видалено {0} з {1} {2}, перш ніж ви скасували.`,
   'Body.PendingReboot.Lead': `Ці файли зараз не можна прибрати.`,
   'Cli.TooManyArguments': `Помилка: неочікуваний зайвий аргумент «{0}». Якщо в назві папки для переміщення є пробіл, візьміть увесь шлях у лапки: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `Збережена папка своя в кожного користувача; розклад і SYSTEM: /m ШЛЯХ.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} {1} залишено на місці: під час повторної перевірки не вдалося повністю прочитати записи Windows Installer.`,
   'Summary.ProgramsUnreadable.Singular': `Під час цього сканування не вдалося прочитати {0} встановлену програму, тому заміщені виправлення залишено на місці. Осиротілих файлів це не стосується.`,
   'Summary.ProgramsUnreadable.Plural': `Під час цього сканування не вдалося прочитати {0} встановлених програм, тому заміщені виправлення залишено на місці. Осиротілих файлів це не стосується.`,

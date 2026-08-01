@@ -441,7 +441,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cliは実際のコンソールプロセスであり、完了するまで |
 | until it finishes; redirect or pipe its output as you would any | プロンプトをブロックします。他のコンソール exe と同様に出力をリダイレクト |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | またはパイプできます。GUI は同じ場所にある InstallerClean.exe にあります。 |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | 保存先はユーザー別です。スケジュール実行や SYSTEM は /m PATH が必要です。 |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
 | Exit codes: | 終了コード： |
 |   0   success: every flagged file was processed |   0   成功：フラグが立てられたすべてのファイルが処理されました |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   失敗：処理なし (不正な引数、スキャン失敗、全ファイル失敗) |

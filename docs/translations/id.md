@@ -441,7 +441,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli adalah proses konsol sungguhan dan memblokir prompt |
 | until it finishes; redirect or pipe its output as you would any | sampai selesai; alihkan atau salurkan keluarannya seperti |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | file exe konsol lainnya. GUI ada di InstallerClean.exe di sebelahnya. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Lokasi tersimpan per pengguna; tugas terjadwal atau SYSTEM: /m JALUR. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
 | Exit codes: | Kode keluar: |
 |   0   success: every flagged file was processed |   0   berhasil: setiap file yang ditandai telah diproses |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   gagal: tidak ada yang diproses (argumen, pemindaian, semua file) |

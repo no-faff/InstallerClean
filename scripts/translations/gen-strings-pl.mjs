@@ -473,7 +473,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `Przed anulowaniem usunięto trwale {0}/{1} {2}.`,
   'Body.PendingReboot.Lead': `Tych plików nie można teraz wyczyścić.`,
   'Cli.TooManyArguments': `Błąd: nieoczekiwany dodatkowy argument „{0}”. Jeśli ścieżka folderu przenoszenia zawiera spację, ujmij całą ścieżkę w cudzysłów: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `Zapisana lokalizacja zależy od użytkownika; zadania i SYSTEM: /m ŚCIEŻKA.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `Pozostawiono na miejscu {0} {1}, ponieważ przy powtórzeniu sprawdzenia nie udało się w pełni odczytać rekordów Windows Installera.`,
   'Summary.ProgramsUnreadable.Singular': `Podczas tego skanowania nie udało się odczytać {0} zainstalowanego programu, więc zastąpione poprawki zostały zachowane. Nie dotyczy to plików osieroconych.`,
   'Summary.ProgramsUnreadable.Plural': `Podczas tego skanowania nie udało się odczytać {0} zainstalowanych programów, więc zastąpione poprawki zostały zachowane. Nie dotyczy to plików osieroconych.`,

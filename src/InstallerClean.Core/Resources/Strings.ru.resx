@@ -247,9 +247,8 @@
     Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <!-- Window-level description for the update-available modal, read by a
-       screen reader on open, mirroring the RecycleUnavailable and
-       ConfirmSendResultLog windows. The version numbers are in the body
-       text; this states the choice. -->
+       screen reader on open, mirroring the ConfirmSendResultLog window.
+       The version numbers are in the body text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Откройте страницу выпуска, чтобы скачать более новую версию, или нажмите «Отмена», чтобы оставить текущую.</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Открывает файл лицензии на github.com в вашем браузере.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
@@ -781,7 +780,7 @@ InstallerClean уже был запущен от имени администра
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Перемещение файлов в папку Windows Installer отклонено (назначение: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a
-       bare folder name into the Move location box, so it says what to type
+       bare folder name into the backup-folder box, so it says what to type
        instead. The reason a relative path is refused (it would resolve
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
@@ -1079,5 +1078,5 @@ InstallerClean уже был запущен от имени администра
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  временно: запуск заблокирован временным состоянием (см. сообщение)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 отменено (Ctrl+C)</value></data>
   <data name="Cli.TooManyArguments" xml:space="preserve"><value>Ошибка: неожиданный лишний аргумент «{0}». Если в пути к папке для перемещения есть пробел, возьмите весь путь в кавычки: /m "D:\My Backup"</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Сохранённая папка своя у пользователя; расписание и SYSTEM: /m ПУТЬ.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
 </root>

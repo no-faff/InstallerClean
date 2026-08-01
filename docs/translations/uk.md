@@ -441,7 +441,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli — це консольний процес, що блокує командний рядок до |
 | until it finishes; redirect or pipe its output as you would any | завершення; перенаправляйте чи передавайте його вивід, як у будь-якого |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | іншого консольного exe. Графічний інтерфейс у InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Збережена папка своя в кожного користувача; розклад і SYSTEM: /m ШЛЯХ. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
 | Exit codes: | Коди виходу: |
 |   0   success: every flagged file was processed |   0   успіх: оброблено кожен позначений файл |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   невдача: нічого не оброблено (аргументи, сканування або файли) |

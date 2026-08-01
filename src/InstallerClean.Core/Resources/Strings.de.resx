@@ -247,9 +247,8 @@
     Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <!-- Window-level description for the update-available modal, read by a
-       screen reader on open, mirroring the RecycleUnavailable and
-       ConfirmSendResultLog windows. The version numbers are in the body
-       text; this states the choice. -->
+       screen reader on open, mirroring the ConfirmSendResultLog window.
+       The version numbers are in the body text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Öffne die Release-Seite, um die neuere Version herunterzuladen, oder brich ab, um die aktuelle Version zu behalten.</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Öffnet die Lizenzdatei auf github.com in deinem Browser.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
@@ -781,7 +780,7 @@ Details in {1}.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Das Verschieben von Dateien in den Windows-Installer-Ordner wird abgelehnt (Ziel: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a
-       bare folder name into the Move location box, so it says what to type
+       bare folder name into the backup-folder box, so it says what to type
        instead. The reason a relative path is refused (it would resolve
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
@@ -1048,7 +1047,7 @@ Das Absturzprotokoll konnte nicht geschrieben werden.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli ist ein echter Konsolenprozess und blockiert die</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>Eingabeaufforderung, bis er fertig ist; leite die Ausgabe um oder per</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>Pipe weiter, wie bei jeder Konsolen-EXE. Die GUI ist InstallerClean.exe.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Das gespeicherte Ziel gilt pro Benutzer; geplante/SYSTEM-Läufe: /m PFAD.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Exit-Codes:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   Erfolg: jede markierte Datei wurde verarbeitet</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   Fehler: nichts verarbeitet (Argumentfehler, Scan- oder Dateifehler)</value></data>

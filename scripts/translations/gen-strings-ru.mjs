@@ -531,7 +531,7 @@ const CLI = {
   'Cli.Help.ExitCodeTransient': `  75  временно: запуск заблокирован временным состоянием (см. сообщение)`,
   'Cli.Help.ExitCodeCancelled': `  130 отменено (Ctrl+C)`,
   'Cli.TooManyArguments': `Ошибка: неожиданный лишний аргумент «{0}». Если в пути к папке для перемещения есть пробел, возьмите весь путь в кавычки: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `Сохранённая папка своя у пользователя; расписание и SYSTEM: /m ПУТЬ.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

@@ -425,7 +425,7 @@ const MAP = {
   'Cli.Help.NoteLine1': `installerclean-cli is een echt consoleproces en blokkeert de prompt`,
   'Cli.Help.NoteLine2': `tot het klaar is; leid de uitvoer om of door (pipe) zoals bij elke`,
   'Cli.Help.NoteLine3': `andere console-exe. De GUI zit ernaast, in InstallerClean.exe.`,
-  'Cli.Help.MoveScheduledNote': `De opgeslagen standaard is per gebruiker; geplande of SYSTEM-runs: /m PAD.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Cli.Help.ExitCodesHeader': `Afsluitcodes:`,
   'Cli.Help.ExitCodeOk': `  0   gelukt: elk aangemerkt bestand is verwerkt`,
   'Cli.Help.ExitCodeError': `  1   mislukt: niets verwerkt (foute argumenten, scan of alle bestanden)`,

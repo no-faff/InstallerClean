@@ -456,7 +456,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `{0} dari {1} {2} dihapus permanen sebelum Anda membatalkan.`,
   'Body.PendingReboot.Lead': `File-file ini tidak bisa dibersihkan sekarang.`,
   'Cli.TooManyArguments': `Kesalahan: argumen tambahan yang tidak terduga '{0}'. Jika folder pemindahan Anda mengandung spasi, apit seluruh jalur dengan tanda kutip: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `Lokasi tersimpan per pengguna; tugas terjadwal atau SYSTEM: /m JALUR.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} {1} dibiarkan di tempatnya, karena catatan Windows Installer tidak dapat dibaca sepenuhnya saat pemeriksaan diulang.`,
   'Summary.ProgramsUnreadable.Singular': `{0} program terpasang tidak dapat dibaca selama pemindaian ini, jadi patch yang digantikan tetap dipertahankan. File yang terisolasi tidak terpengaruh.`,
   'Summary.ProgramsUnreadable.Plural': `{0} program terpasang tidak dapat dibaca selama pemindaian ini, jadi patch yang digantikan tetap dipertahankan. File yang terisolasi tidak terpengaruh.`,

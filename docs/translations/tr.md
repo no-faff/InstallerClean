@@ -441,7 +441,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli gerçek bir konsol işlemidir ve bitene kadar istemi |
 | until it finishes; redirect or pipe its output as you would any | bloke eder; çıktısını başka herhangi bir konsol exe'sinde olduğu gibi |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | yönlendirin ya da boruya verin. GUI, yanındaki InstallerClean.exe'dedir. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Kaydedilen konum kullanıcıya özeldir; zamanlanmış veya SYSTEM için /m YOL. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
 | Exit codes: | Çıkış kodları: |
 |   0   success: every flagged file was processed |   0   başarılı: işaretlenen her dosya işlendi |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   hata: hiçbir şey işlenmedi (argümanlar, tarama ya da tüm dosyalar) |

@@ -452,7 +452,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `Exclusão permanente cancelada após remover {0} de {1} {2}.`,
   'Body.PendingReboot.Lead': `Estes arquivos não podem ser limpos agora.`,
   'Cli.TooManyArguments': `Erro: argumento extra inesperado '{0}'. Se a sua pasta de destino tiver um espaço no nome, coloque aspas em todo o caminho: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `O padrão salvo é por usuário; execuções agendadas ou SYSTEM: /m CAMINHO.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} {1} mantidos no lugar: não foi possível ler por completo os registros do Windows Installer quando a verificação foi repetida.`,
   'Summary.ProgramsUnreadable.Singular': `{0} programa instalado não pôde ser lido nesta análise, então os patches substituídos foram mantidos. Os arquivos órfãos não são afetados.`,
   'Summary.ProgramsUnreadable.Plural': `{0} programas instalados não puderam ser lidos nesta análise, então os patches substituídos foram mantidos. Os arquivos órfãos não são afetados.`,

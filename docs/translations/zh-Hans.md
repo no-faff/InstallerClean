@@ -441,7 +441,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli 是一个真正的控制台进程，在运行结束前会一直 |
 | until it finishes; redirect or pipe its output as you would any | 占用命令提示符；可像对待其他控制台程序那样重定向或通过管道处理其输出。 |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | GUI 就位于同目录下的 InstallerClean.exe 中。 |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | 保存的默认位置按用户存储；计划任务或 SYSTEM 账户运行需使用 /m 路径。 |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
 | Exit codes: | 退出代码： |
 |   0   success: every flagged file was processed |   0   成功：已处理每个被标记的文件 |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   失败：未处理任何文件（参数错误、扫描失败或所有文件均失败） |

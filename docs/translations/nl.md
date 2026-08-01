@@ -441,7 +441,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli is een echt consoleproces en blokkeert de prompt |
 | until it finishes; redirect or pipe its output as you would any | tot het klaar is; leid de uitvoer om of door (pipe) zoals bij elke |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | andere console-exe. De GUI zit ernaast, in InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | De opgeslagen standaard is per gebruiker; geplande of SYSTEM-runs: /m PAD. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
 | Exit codes: | Afsluitcodes: |
 |   0   success: every flagged file was processed |   0   gelukt: elk aangemerkt bestand is verwerkt |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   mislukt: niets verwerkt (foute argumenten, scan of alle bestanden) |

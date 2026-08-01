@@ -462,7 +462,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `{0} von {1} {2} endgültig gelöscht, bevor du abgebrochen hast.`,
   'Body.PendingReboot.Lead': `Diese Dateien können gerade nicht aufgeräumt werden.`,
   'Cli.TooManyArguments': `Fehler: Unerwartetes zusätzliches Argument '{0}'. Wenn dein Zielordner ein Leerzeichen enthält, setze den ganzen Pfad in Anführungszeichen: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `Das gespeicherte Ziel gilt pro Benutzer; geplante/SYSTEM-Läufe: /m PFAD.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} {1} an Ort und Stelle belassen, weil die Einträge von Windows Installer bei der wiederholten Prüfung nicht vollständig gelesen werden konnten.`,
   'Summary.ProgramsUnreadable.Singular': `{0} installiertes Programm konnte bei diesem Scan nicht gelesen werden, daher wurden ersetzte Patches behalten. Verwaiste Dateien sind nicht betroffen.`,
   'Summary.ProgramsUnreadable.Plural': `{0} installierte Programme konnten bei diesem Scan nicht gelesen werden, daher wurden ersetzte Patches behalten. Verwaiste Dateien sind nicht betroffen.`,

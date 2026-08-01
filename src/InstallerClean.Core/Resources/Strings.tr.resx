@@ -247,9 +247,8 @@
     Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <!-- Window-level description for the update-available modal, read by a
-       screen reader on open, mirroring the RecycleUnavailable and
-       ConfirmSendResultLog windows. The version numbers are in the body
-       text; this states the choice. -->
+       screen reader on open, mirroring the ConfirmSendResultLog window.
+       The version numbers are in the body text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Daha yeni sürümü indirmek için sürüm sayfasını açın ya da geçerli sürümü korumak için iptal edin.</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>github.com üzerindeki lisans dosyasını tarayıcınızda açar.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
@@ -781,7 +780,7 @@ Ayrıntılar {1} içinde.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Dosyaların Windows Installer klasörüne taşınması reddediliyor (hedef: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a
-       bare folder name into the Move location box, so it says what to type
+       bare folder name into the backup-folder box, so it says what to type
        instead. The reason a relative path is refused (it would resolve
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
@@ -1048,7 +1047,7 @@ Ayrıntılar şuraya yazıldı:
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli gerçek bir konsol işlemidir ve bitene kadar istemi</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>bloke eder; çıktısını başka herhangi bir konsol exe'sinde olduğu gibi</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>yönlendirin ya da boruya verin. GUI, yanındaki InstallerClean.exe'dedir.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Kaydedilen konum kullanıcıya özeldir; zamanlanmış veya SYSTEM için /m YOL.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Çıkış kodları:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   başarılı: işaretlenen her dosya işlendi</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   hata: hiçbir şey işlenmedi (argümanlar, tarama ya da tüm dosyalar)</value></data>

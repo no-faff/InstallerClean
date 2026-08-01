@@ -450,7 +450,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `Đã xóa vĩnh viễn {0}/{1} {2} trước khi bạn hủy.`,
   'Body.PendingReboot.Lead': `Hiện chưa thể dọn những tệp này.`,
   'Cli.TooManyArguments': `Lỗi: có thêm đối số không mong đợi '{0}'. Nếu thư mục đích của bạn có dấu cách, hãy đặt cả đường dẫn trong dấu ngoặc kép: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `Mặc định đã lưu theo người dùng; chạy theo lịch hoặc SYSTEM: /m ĐƯỜNG_DẪN.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `Đã giữ nguyên {0} {1} vì khi kiểm tra lại, không thể đọc đầy đủ các bản ghi Windows Installer.`,
   'Summary.ProgramsUnreadable.Singular': `Không thể đọc {0} chương trình đã cài trong lần quét này, nên các bản vá bị thay thế đã được giữ lại. Các tệp bị bỏ lại không bị ảnh hưởng.`,
   'Summary.ProgramsUnreadable.Plural': `Không thể đọc {0} chương trình đã cài trong lần quét này, nên các bản vá bị thay thế đã được giữ lại. Các tệp bị bỏ lại không bị ảnh hưởng.`,

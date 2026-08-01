@@ -464,7 +464,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `Supprimé définitivement {0} sur {1} {2} avant votre annulation.`,
   'Body.PendingReboot.Lead': `Ces fichiers ne peuvent pas être nettoyés pour le moment.`,
   'Cli.TooManyArguments': `Erreur : argument supplémentaire inattendu « {0} ». Si votre dossier de déplacement contient un espace, mettez le chemin entier entre guillemets : /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `Emplacement enregistré : par utilisateur ; planifié ou SYSTEM : /m CHEMIN.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} {1} laissés en place, car les enregistrements de Windows Installer n'ont pas pu être entièrement lus lors de la nouvelle vérification.`,
   'Summary.ProgramsUnreadable.Singular': `{0} programme installé n'a pas pu être lu lors de cette analyse, les correctifs remplacés ont donc été conservés. Les fichiers orphelins ne sont pas concernés.`,
   'Summary.ProgramsUnreadable.Plural': `{0} programmes installés n'ont pas pu être lus lors de cette analyse, les correctifs remplacés ont donc été conservés. Les fichiers orphelins ne sont pas concernés.`,

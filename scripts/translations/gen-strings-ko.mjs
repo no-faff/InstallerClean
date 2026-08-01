@@ -448,7 +448,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `취소하기 전까지 {2} {1}개 중 {0}개를 영구 삭제했습니다.`,
   'Body.PendingReboot.Lead': `지금은 이 파일들을 정리할 수 없습니다.`,
   'Cli.TooManyArguments': `오류: 예상치 못한 추가 인수 '{0}'. 이동 폴더 경로에 공백이 있으면 전체 경로를 큰따옴표로 묶으세요: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `기본 위치는 사용자별입니다. 예약 작업이나 SYSTEM은 /m 경로가 필요합니다.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{1} {0}개는 확인을 다시 했을 때 Windows Installer 기록을 완전히 읽을 수 없어 그대로 두었습니다.`,
   'Summary.ProgramsUnreadable.Singular': `이번 검사에서 설치된 프로그램 {0}개를 읽을 수 없어 대체된 패치를 그대로 두었습니다. 고립된 파일은 영향을 받지 않습니다.`,
   'Summary.ProgramsUnreadable.Plural': `이번 검사에서 설치된 프로그램 {0}개를 읽을 수 없어 대체된 패치를 그대로 두었습니다. 고립된 파일은 영향을 받지 않습니다.`,

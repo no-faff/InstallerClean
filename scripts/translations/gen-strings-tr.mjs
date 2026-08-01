@@ -375,7 +375,7 @@ Ayrıntılar şuraya yazıldı:
   'Completion.PermanentDeleteCancelledSummary': `İptal etmeden önce {1} {2} içinden {0} tanesi kalıcı olarak silindi.`,
   'Body.PendingReboot.Lead': `Bu dosyalar şu anda temizlenemez.`,
   'Cli.TooManyArguments': `Hata: beklenmeyen fazladan argüman '{0}'. Taşıma klasörünüzün adında boşluk varsa tüm yolu tırnak içine alın: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `Kaydedilen konum kullanıcıya özeldir; zamanlanmış veya SYSTEM için /m YOL.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `Kontrol yinelendiğinde Windows Installer kayıtları tam olarak okunamadığı için {0} {1} yerinde bırakıldı.`,
   'Summary.ProgramsUnreadable.Singular': `Bu taramada {0} yüklü program okunamadı, bu yüzden yerine geçilmiş yamalar korundu. Sahipsiz dosyalar bundan etkilenmez.`,
   'Summary.ProgramsUnreadable.Plural': `Bu taramada {0} yüklü program okunamadı, bu yüzden yerine geçilmiş yamalar korundu. Sahipsiz dosyalar bundan etkilenmez.`,

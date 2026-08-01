@@ -441,7 +441,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli는 실제 콘솔 프로세스로, 명령 프롬프트를 점유하며, |
 | until it finishes; redirect or pipe its output as you would any | 실행이 끝날 때까지 기다립니다. 다른 콘솔 앱처럼 출력을 리디렉션하거나 |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | 파이프로 넘길 수 있습니다. GUI는 옆의 InstallerClean.exe입니다. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | 기본 위치는 사용자별입니다. 예약 작업이나 SYSTEM은 /m 경로가 필요합니다. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
 | Exit codes: | 종료 코드: |
 |   0   success: every flagged file was processed |   0   성공: 표시된 모든 파일을 처리함 |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   실패: 처리된 파일 없음 (잘못된 인수, 검사 실패, 모든 파일 실패) |

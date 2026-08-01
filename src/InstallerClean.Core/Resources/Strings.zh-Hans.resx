@@ -247,9 +247,8 @@
     Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <!-- Window-level description for the update-available modal, read by a
-       screen reader on open, mirroring the RecycleUnavailable and
-       ConfirmSendResultLog windows. The version numbers are in the body
-       text; this states the choice. -->
+       screen reader on open, mirroring the ConfirmSendResultLog window.
+       The version numbers are in the body text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>打开发布页面以下载更新版本，或取消以保留当前版本。</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>在浏览器中打开 github.com 上的许可证文件。</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
@@ -781,7 +780,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>拒绝将文件移动到 Windows Installer 文件夹（目标：{0}）。</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a
-       bare folder name into the Move location box, so it says what to type
+       bare folder name into the backup-folder box, so it says what to type
        instead. The reason a relative path is refused (it would resolve
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
@@ -1048,7 +1047,7 @@ InstallerClean 本来就以管理员身份运行，所以再那样启动一次�
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli 是一个真正的控制台进程，在运行结束前会一直</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>占用命令提示符；可像对待其他控制台程序那样重定向或通过管道处理其输出。</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>GUI 就位于同目录下的 InstallerClean.exe 中。</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>保存的默认位置按用户存储；计划任务或 SYSTEM 账户运行需使用 /m 路径。</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>退出代码：</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   成功：已处理每个被标记的文件</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   失败：未处理任何文件（参数错误、扫描失败或所有文件均失败）</value></data>

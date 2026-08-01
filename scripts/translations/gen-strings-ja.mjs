@@ -371,7 +371,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `キャンセルするまでに、{1} 個中 {0} 個の {2} を完全に削除しました。`,
   'Body.PendingReboot.Lead': `これらのファイルは今はクリーンアップできません。`,
   'Cli.TooManyArguments': `エラー：予期しない余分な引数 '{0}' があります。移動先フォルダーにスペースが含まれる場合は、パス全体を引用符で囲んでください：/m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `保存先はユーザー別です。スケジュール実行や SYSTEM は /m PATH が必要です。`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} 個の {1} はそのまま残しました。確認をやり直した際に Windows Installer の登録情報を完全に読み取れなかったためです。`,
   'Summary.ProgramsUnreadable.Singular': `今回のスキャンでインストール済みプログラム {0} 個を読み取れなかったため、置換済みのパッチは残してあります。孤立ファイルには影響しません。`,
   'Summary.ProgramsUnreadable.Plural': `今回のスキャンでインストール済みプログラム {0} 個を読み取れなかったため、置換済みのパッチは残してあります。孤立ファイルには影響しません。`,

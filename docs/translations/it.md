@@ -441,7 +441,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli è un vero processo console e blocca il prompt |
 | until it finishes; redirect or pipe its output as you would any | finché non termina; reindirizza o usa una pipe sul suo output come |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | per qualsiasi altro eseguibile console. La GUI è in InstallerClean.exe. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | La destinazione salvata è per utente; SYSTEM o pianificato: /m PERCORSO. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
 | Exit codes: | Codici di uscita: |
 |   0   success: every flagged file was processed |   0   successo: ogni file segnalato è stato elaborato |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   errore: nessuna elaborazione (argomenti, scansione o file) |

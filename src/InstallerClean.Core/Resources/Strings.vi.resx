@@ -247,9 +247,8 @@
     Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <!-- Window-level description for the update-available modal, read by a
-       screen reader on open, mirroring the RecycleUnavailable and
-       ConfirmSendResultLog windows. The version numbers are in the body
-       text; this states the choice. -->
+       screen reader on open, mirroring the ConfirmSendResultLog window.
+       The version numbers are in the body text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Mở trang phát hành để tải phiên bản mới hơn, hoặc hủy để giữ phiên bản hiện tại.</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Mở tệp giấy phép trên github.com trong trình duyệt của bạn.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
@@ -781,7 +780,7 @@ Chi tiết trong {1}.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Từ chối chuyển tệp vào thư mục Windows Installer (đích: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a
-       bare folder name into the Move location box, so it says what to type
+       bare folder name into the backup-folder box, so it says what to type
        instead. The reason a relative path is refused (it would resolve
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
@@ -1048,7 +1047,7 @@ Không thể ghi nhật ký sự cố.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli là một tiến trình console thật và chặn dấu nhắc</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>cho đến khi xong; hãy chuyển hướng hoặc nối ống đầu ra của nó như</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>với mọi tệp console khác. GUI nằm trong InstallerClean.exe cùng chỗ.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>Mặc định đã lưu theo người dùng; chạy theo lịch hoặc SYSTEM: /m ĐƯỜNG_DẪN.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Mã thoát:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   thành công: mọi tệp được đánh dấu đều đã được xử lý</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   thất bại: không xử lý được gì (đối số, quét hoặc mọi tệp)</value></data>

@@ -368,7 +368,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `Eliminati definitivamente {0} di {1} {2} prima dell'annullamento.`,
   'Body.PendingReboot.Lead': `Al momento questi file non si possono ripulire.`,
   'Cli.TooManyArguments': `Errore: argomento aggiuntivo imprevisto '{0}'. Se la cartella di destinazione contiene uno spazio, racchiudi l'intero percorso tra virgolette: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `La destinazione salvata è per utente; SYSTEM o pianificato: /m PERCORSO.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} {1} lasciati al loro posto, perché non è stato possibile leggere completamente i record di Windows Installer quando il controllo è stato ripetuto.`,
   'Summary.ProgramsUnreadable.Singular': `Non è stato possibile leggere {0} programma installato durante questa scansione, quindi le patch sostituite sono state mantenute. I file orfani non sono interessati.`,
   'Summary.ProgramsUnreadable.Plural': `Non è stato possibile leggere {0} programmi installati durante questa scansione, quindi le patch sostituite sono state mantenute. I file orfani non sono interessati.`,

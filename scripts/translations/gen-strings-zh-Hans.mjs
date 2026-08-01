@@ -361,7 +361,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `在您取消前，已永久删除 {1} 个{2}中的 {0} 个。`,
   'Body.PendingReboot.Lead': `这些文件现在无法清理。`,
   'Cli.TooManyArguments': `错误：出现意外的多余参数“{0}”。如果移动文件夹的路径中含有空格，请给整个路径加上引号：/m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `保存的默认位置按用户存储；计划任务或 SYSTEM 账户运行需使用 /m 路径。`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} 个{1}已保留在原处，因为重新检查时无法完整读取 Windows Installer 记录。`,
   'Summary.ProgramsUnreadable.Singular': `本次扫描无法读取 {0} 个已安装的程序，因此被取代的补丁已保留。孤立文件不受影响。`,
   'Summary.ProgramsUnreadable.Plural': `本次扫描无法读取 {0} 个已安装的程序，因此被取代的补丁已保留。孤立文件不受影响。`,

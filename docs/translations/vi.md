@@ -441,7 +441,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | installerclean-cli is a real console process and blocks the prompt | installerclean-cli là một tiến trình console thật và chặn dấu nhắc |
 | until it finishes; redirect or pipe its output as you would any | cho đến khi xong; hãy chuyển hướng hoặc nối ống đầu ra của nó như |
 | other console exe. The GUI lives in InstallerClean.exe alongside it. | với mọi tệp console khác. GUI nằm trong InstallerClean.exe cùng chỗ. |
-| The saved default is per-user; scheduled or SYSTEM runs need /m PATH. | Mặc định đã lưu theo người dùng; chạy theo lịch hoặc SYSTEM: /m ĐƯỜNG_DẪN. |
+| That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
 | Exit codes: | Mã thoát: |
 |   0   success: every flagged file was processed |   0   thành công: mọi tệp được đánh dấu đều đã được xử lý |
 |   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   thất bại: không xử lý được gì (đối số, quét hoặc mọi tệp) |

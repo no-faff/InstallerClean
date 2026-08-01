@@ -374,7 +374,7 @@ const MAP = {
   'Completion.PermanentDeleteCancelledSummary': `Cancelaste tras eliminar definitivamente {0} de {1} {2}.`,
   'Body.PendingReboot.Lead': `Estos archivos no se pueden limpiar ahora mismo.`,
   'Cli.TooManyArguments': `Error: argumento extra inesperado '{0}'. Si la carpeta de destino tiene un espacio, escribe toda la ruta entre comillas: /m "D:\\My Backup"`,
-  'Cli.Help.MoveScheduledNote': `Ubicación guardada por usuario; tareas programadas o SYSTEM: /m RUTA.`,
+  'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Completion.ReverifyIncomplete': `{0} {1} conservados en su sitio: los registros de Windows Installer no se han podido leer por completo al repetir la comprobación.`,
   'Summary.ProgramsUnreadable.Singular': `{0} programa instalado no se ha podido leer durante este análisis, así que se han conservado los parches sustituidos. Los archivos huérfanos no se ven afectados.`,
   'Summary.ProgramsUnreadable.Plural': `{0} programas instalados no se han podido leer durante este análisis, así que se han conservado los parches sustituidos. Los archivos huérfanos no se ven afectados.`,

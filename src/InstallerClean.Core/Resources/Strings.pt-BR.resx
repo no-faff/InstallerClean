@@ -247,9 +247,8 @@
     Automation.CheckForUpdates.HelpText carries.</comment>
   </data>
   <!-- Window-level description for the update-available modal, read by a
-       screen reader on open, mirroring the RecycleUnavailable and
-       ConfirmSendResultLog windows. The version numbers are in the body
-       text; this states the choice. -->
+       screen reader on open, mirroring the ConfirmSendResultLog window.
+       The version numbers are in the body text; this states the choice. -->
   <data name="Automation.UpdateAvailable.HelpText" xml:space="preserve"><value>Abra a página da versão para baixar a versão mais recente, ou cancele para manter a versão atual.</value></data>
   <data name="Automation.Licence.HelpText" xml:space="preserve"><value>Abre o arquivo da licença em github.com no seu navegador.</value></data>
   <!-- Mixed-case AutomationProperties.Name overrides for the all-caps
@@ -781,7 +780,7 @@ Detalhes em {1}.</value></data>
   <!-- 0 = destination -->
   <data name="Error.MoveIntoInstaller" xml:space="preserve"><value>Recusando mover arquivos para a pasta do Windows Installer (destino: {0}).</value></data>
   <!-- 0 = the relative path the caller passed. Shown to a user who typed a
-       bare folder name into the Move location box, so it says what to type
+       bare folder name into the backup-folder box, so it says what to type
        instead. The reason a relative path is refused (it would resolve
        against the process working directory, which nothing constrains, and
        this process is elevated) is a fact about the app, not about anything
@@ -1048,7 +1047,7 @@ Não foi possível gravar o crash.log.</value></data>
   <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli é um processo de console real e bloqueia o prompt</value></data>
   <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>até terminar; redirecione ou encaminhe a saída por pipe como faria</value></data>
   <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>com qualquer outro executável de console. A GUI é InstallerClean.exe.</value></data>
-  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>O padrão salvo é por usuário; execuções agendadas ou SYSTEM: /m CAMINHO.</value></data>
+  <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Códigos de saída:</value></data>
   <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   sucesso: todos os arquivos sinalizados foram processados</value></data>
   <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   falha: nada processado (argumentos, análise ou todos os arquivos)</value></data>
