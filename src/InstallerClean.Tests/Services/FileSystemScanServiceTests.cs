@@ -706,11 +706,11 @@ public class FileSystemScanServiceTests
     }
 
     [Fact]
-    public async Task ScanAsync_does_not_refuse_when_some_registered_packages_are_present()
+    public async Task ScanAsync_classifies_the_orphans_when_the_registered_files_are_on_disk()
     {
-        // The same shape as the collapse test but with a single registered
-        // package present on disk: the correlation held for at least one, so the
-        // gate must not fire and the orphans are classified normally.
+        // The gate weighs whether Windows and the folder agree, not how much of
+        // the cache is missing: a machine whose registrations resolve to real
+        // files is scanned, and its orphans are judged on their own merits.
         var registered = Enumerable.Range(0, 30)
             .Select(i => Registered($@"C:\Windows\Installer\reg{i:D2}.msi"))
             .ToList();
@@ -721,13 +721,14 @@ public class FileSystemScanServiceTests
             .Returns(new InstallerQueryResult(registered.AsReadOnly()));
 
         var fs = new MockFileSystem();
-        fs.AddFile(@"C:\Windows\Installer\reg00.msi", new MockFileData("x")); // one present
+        for (var i = 0; i < 28; i++)
+            fs.AddFile($@"C:\Windows\Installer\reg{i:D2}.msi", new MockFileData("x"));
         var orphans = new[] { @"C:\Windows\Installer\o1.msi", @"C:\Windows\Installer\o2.msi" };
 
         var svc = new FileSystemScanService(mockQuery, fs, orphans, null);
         var result = await svc.ScanAsync();
 
         Assert.Equal(2, result.RemovableFiles.Count);
-        Assert.Equal(29, result.MissingNonRemovableCount);
+        Assert.Equal(2, result.MissingNonRemovableCount);
     }
 }
