@@ -514,6 +514,34 @@ public class InstallerQueryServiceUnitTests
         Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
     }
 
+    [Fact]
+    public async Task A_row_the_enumeration_skipped_is_not_counted_twice()
+    {
+        // A skipped row sits inside both counts: it is one product the
+        // enumeration owned up to losing, and it is also absent from the
+        // enumerated total the registry count is measured against. Twenty
+        // registrations, four read cleanly, four skipped and twelve the
+        // enumeration never mentioned is sixteen programs whose records this
+        // scan did not get. Adding the counts made it twenty, which is every
+        // product on the machine including the four it read perfectly well.
+        const string patch = @"C:\Windows\Installer\superseded.msp";
+        var msi = new FakeMsiApi();
+        for (var i = 0; i < 4; i++)
+        {
+            // Success with no product GUID: one row lost, counted once, and
+            // interleaved so the consecutive-failure cap is never approached.
+            msi.AddProduct("");
+            msi.AddProduct($"{{P{i}}}");
+            msi.SetProductProperty($"{{P{i}}}", "LocalPackage", $@"C:\Windows\Installer\p{i}.msi");
+        }
+        msi.AddPatch("{P0}", "{PATCH}", localPackage: patch, state: "2", uninstallable: "0");
+
+        var result = await RunAgainstRegistry(msi, registryProducts: 20);
+
+        Assert.Equal(16, result.UnreadableProductCount);
+        Assert.True(Assert.Single(result.Packages, r => r.LocalPackagePath == patch).RemovableWithheld);
+    }
+
     // ---- Nothing claims a cached file at all ----
 
     [Fact]

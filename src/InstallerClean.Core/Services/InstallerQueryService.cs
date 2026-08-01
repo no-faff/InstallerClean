@@ -298,14 +298,20 @@ public sealed class InstallerQueryService : IInstallerQueryService
         // registrations cannot trip on one stale key.
         //
         // A small truncation stays invisible and it is not made stricter to
-        // chase one: firing costs a user their superseded-patch cleanup, and it
-        // withholds rather than refuses precisely because the inference is not
-        // strong enough to take a scan away.
+        // chase one: firing costs a user their superseded-patch cleanup.
         var productShortfall = fallback.ProductKeys - products.Count;
         var enumerationLooksShort =
             productShortfall > 2 && products.Count * 5 < fallback.ProductKeys * 4;
 
-        var withheldProducts = unreadableProducts + (enumerationLooksShort ? productShortfall : 0);
+        // The two counts overlap by exactly unreadableRows and the number the
+        // user reads is programs, so the overlap is subtracted rather than
+        // added twice. A row the enumeration skipped is already one product in
+        // unreadableProducts, and it is missing from products.Count as well, so
+        // it is inside productShortfall too: 30 skipped rows out of 100
+        // registrations reported as 60 programs unread. Only the shortfall
+        // BEYOND the rows the enumeration owned up to is new information.
+        var withheldProducts = unreadableProducts
+            + (enumerationLooksShort ? Math.Max(0, productShortfall - unreadableRows) : 0);
 
         progress?.Report(new ScanProgressUpdate(string.Format(
             Helpers.DisplayHelpers.Pluralise(claimed.Count, Strings.Status_RegisteredPackagesFound, "Status.RegisteredPackagesFound"),
