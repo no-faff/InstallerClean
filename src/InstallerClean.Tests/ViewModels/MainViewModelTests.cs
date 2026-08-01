@@ -706,18 +706,24 @@ public class MainViewModelTests
         _deleteService.DeleteFilesAsync(
                 Arg.Any<IEnumerable<string>>(),
                 Arg.Any<IProgress<OperationProgress>?>(), Arg.Any<CancellationToken>())
-            .Returns(ci =>
+            .Returns(_ =>
             {
                 // The overlay as the user left it: a batch stopped at file 1 of
-                // 3, with a filename and a part-filled bar on screen.
-                ((IProgress<OperationProgress>?)ci[1])?.Report(new OperationProgress(1, 3, "orphan0.msi"));
+                // 3, with a filename and a part-filled bar on screen. Written
+                // straight onto the properties rather than through the progress
+                // reporter the view-model hands the service: Progress<T> POSTS
+                // its callback, and with no dispatcher under a test that lands
+                // on the thread pool and races everything below.
+                vm.Cleanup.OperationCurrentFile = 1;
+                vm.Cleanup.OperationTotalFiles = 3;
+                vm.Cleanup.OperationCurrentFileName = "orphan0.msi";
+                vm.Cleanup.OperationProgressPercent = 33;
                 vm.Cleanup.CancelOperationCommand.Execute(null);
                 return new DeleteResult(1, Array.Empty<FileOperationError>(), Cancelled: true);
             });
         _confirmationService.ConfirmDelete(Arg.Any<int>(), Arg.Any<string>()).Returns(true);
 
         await vm.Scan.ScanWithProgressAsync(null);
-        Assert.Equal("orphan0.msi", vm.Cleanup.OperationCurrentFileName);
 
         // Sampled from inside the post-cancel rescan, which is the only moment
         // any of this is on screen: the caller's finally clears it all again,
