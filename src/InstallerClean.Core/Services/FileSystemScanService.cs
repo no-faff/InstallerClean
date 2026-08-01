@@ -239,11 +239,6 @@ public sealed class FileSystemScanService : IFileSystemScanService
                     // PatchState 4 = obsoleted (publisher-withdrawn);
                     // distinct API state, distinct Reason label, same
                     // user-visible outcome (the patch is removable).
-                    // A registered path that resolved to a real file, which is
-                    // the same evidence nonRemovablePresent carries and is
-                    // weighed with it by the correlation gate. That it is
-                    // removable says nothing about whether the two halves of
-                    // the scan line up.
                     removablePresent++;
                     var isObsoleted = pkg.PatchState == 4;
                     var reason = isObsoleted
@@ -326,18 +321,10 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // it has and what the folder holds have not correlated, and no healthy
         // machine looks like that.
         //
-        // What it catches is one thing and the claim is kept to it: an
-        // enumeration that came back with paths to files that are not on this
-        // machine at all. Presence is decided by File.Exists against the
-        // registered path itself, so it is indifferent to how that path is
-        // spelled and to which folder the walk read, and the two other ways the
-        // halves could fail to line up therefore never reach here. A spelling
-        // the walk does not produce leaves a file reading as present on this
-        // side while appearing orphaned on the other, which is why every claim
-        // is normalised before it is made (InstallerQueryService's
-        // NormaliseLocalPackagePath, whose own comment carries the argument for
-        // the one spelling it leaves alone), and a walk of the wrong folder
-        // leaves every registered file exactly where it was.
+        // Present means File.Exists against the registered path, which for a
+        // superseded row also has to pass the containment guard to be counted
+        // (see the removable branch above). Both are normalised before they are
+        // claimed, in InstallerQueryService's NormaliseLocalPackagePath.
         //
         // A tool that genuinely wiped the cache would leave no files to be
         // orphans, so removable.Count > 0 rules that benign case out. Refuse the
@@ -345,9 +332,8 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // correlation.
         //
         // A survivor or two must not disarm it, which testing for a total
-        // collapse did: the causes above are indifferent to whether one
-        // registration happens to survive them, and a mismatch that spares one
-        // path in two hundred is the same fault as one that spares none.
+        // collapse did: a mismatch that spares one path in two hundred is the
+        // same fault as one that spares none.
         //
         // Every registered file found on disk counts as one, superseded ones
         // included. What the gate is asking is whether any registered path
@@ -355,22 +341,24 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // as a needed package's; leaving those out would refuse a machine that
         // had ten of them sitting in the folder about to be offered.
         //
-        // Both bounds earn their place and the pair is deliberately narrow. The
-        // absolute one answers the finding and no more, which is why it is two
-        // rather than a round number; the proportional one stops it becoming a
-        // floor on a small machine, where two survivors out of twenty are a
-        // fifth of the registrations and no collapse at all. Machines with most
-        // of their cache missing are real, another tool having emptied the
-        // folder being exactly what the missing-from-disk banner is for.
+        // Two rather than a round number, because the absolute bound answers the
+        // finding and no more; machines with most of their cache missing are
+        // real, another tool having emptied the folder being exactly what the
+        // missing-from-disk banner is for.
         // Measured against the result logs rather than judged: of the 92 runs
         // that could reach this gate at all, not one would have been refused by
         // these bounds, taking each run at the worst reading its figures allow.
-        // Refusing any of them would take away a list they can act on to protect
-        // them from a fault nobody has reported.
+        //
+        // The proportional clause reduces to 19P < M, which already requires at
+        // least one missing row at P = 0 and twenty at P = 1, so no separate
+        // missingNonRemovable > 0 stands here: it read as load-bearing and
+        // changed no answer. Its denominator is presentRegistered plus
+        // missingNonRemovable, which excludes the superseded rows whose file
+        // Windows has already removed, so the gate fires on less than the
+        // registrations and the four boundary rows in the tests pin where.
         var presentRegistered = nonRemovablePresent + removablePresent;
         if (presentRegistered <= 2
             && presentRegistered * 20 < presentRegistered + missingNonRemovable
-            && missingNonRemovable > 0
             && removable.Count > 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);
 

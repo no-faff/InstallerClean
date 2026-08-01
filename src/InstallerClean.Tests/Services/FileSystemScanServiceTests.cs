@@ -123,6 +123,29 @@ public class FileSystemScanServiceTests
         Assert.Single(result.RemovableFiles);
     }
 
+    // The proportional clause reduces to 19P < M, so for each P the absolute
+    // bound admits, the answer changes between M = 19P and one more than it.
+    // Both sides of both are pinned here because the clause is written as
+    // P * 20 < P + M, which invites being "simplified" into a percentage, and a
+    // percentage moves the bound by one without failing anything else.
+    [Theory]
+    [InlineData(1, 19, false)]
+    [InlineData(1, 20, true)]
+    [InlineData(2, 38, false)]
+    [InlineData(2, 39, true)]
+    public async Task The_proportional_bound_is_pinned_on_both_sides(int present, int missing, bool refuses)
+    {
+        if (!refuses)
+        {
+            Assert.Single((await ScanWithRegisteredSplit(present, missing)).RemovableFiles);
+            return;
+        }
+
+        var ex = await Assert.ThrowsAsync<LocalisedInvalidOperationException>(() =>
+            ScanWithRegisteredSplit(present, missing));
+        Assert.Equal(InstallerClean.Resources.Strings.Error_ScanCorrelationFailed, ex.Message);
+    }
+
     [Fact]
     public async Task ScanAsync_refuses_when_the_root_never_resolved_and_nothing_survived_the_guard()
     {
