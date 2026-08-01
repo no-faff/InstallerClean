@@ -26,7 +26,8 @@ public class FileOperationErrorTests
     /// The per-file sentence and the list heading are two different jobs. The
     /// CLI prints LocalisedMessage after "filename: " for every failed file, so
     /// it stays singular whatever the bucket size; the completion overlay puts
-    /// LocalisedGroupHeading over the indented list, so it inflects.
+    /// LocalisedGroupHeading over the list of filenames beneath it, so it
+    /// inflects.
     /// </summary>
     [Fact]
     public void LocalisedMessage_stays_singular_while_the_heading_inflects()

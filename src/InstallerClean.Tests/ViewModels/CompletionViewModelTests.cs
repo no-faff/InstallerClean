@@ -71,7 +71,7 @@ public class CompletionViewModelTests
     }
 
     [Fact]
-    public void FormatErrorBreakdown_indents_filenames_with_a_visible_marker()
+    public void FormatErrorBreakdown_marks_each_filename_with_a_hyphen()
     {
         var errors = new List<FileOperationError>
         {

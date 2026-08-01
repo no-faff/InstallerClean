@@ -661,9 +661,9 @@ public partial class CompletionViewModel : ObservableObject
 
     /// <summary>
     /// Renders the per-file error list shown on the completion screen: one
-    /// sentence per cause, each introducing the indented list of the files it
-    /// applies to. Internal so CompletionViewModelTests can verify the grouping
-    /// without going through the live UI binding.
+    /// sentence per cause, then each file it applies to on a line of its own
+    /// behind a hyphen. Internal so CompletionViewModelTests can verify the
+    /// grouping without going through the live UI binding.
     /// </summary>
     internal static string FormatErrorBreakdown(IReadOnlyList<FileOperationError> errors)
     {
