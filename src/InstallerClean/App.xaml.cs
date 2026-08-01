@@ -227,6 +227,28 @@ public partial class App : Application
             // paint, and tracks the slider if it moves at runtime.
             ApplyTextScaling();
 
+            // WPF hides a tooltip five seconds after it opens, whether or not
+            // the pointer is still on the control and whatever the tooltip
+            // says. The app's longest is the sentence explaining why Cancel
+            // has gone dead mid-operation: 160 characters in English, longer
+            // in German, and the one tooltip with no HelpText twin to reach
+            // by another route. Sixty seconds is a timeout rather than a
+            // reading pace, so what a user meets instead is a tooltip that
+            // lasts as long as they keep the pointer on it, which is one of
+            // WCAG 1.4.13's three requirements of hover content. The other
+            // two, hoverable and dismissable, would need a custom popup and
+            // are knowingly not met.
+            //
+            // A default rather than a Setter on the two ToolTip styles: this
+            // is an attached property, read from the element the tooltip
+            // hangs off, and those are Buttons, TextBlocks and Borders in
+            // every window of the app. Changing the default covers each of
+            // them without an opinion about which end the framework reads.
+            // Before any window exists, because OverrideMetadata is refused
+            // once the property has been used on the type.
+            ToolTipService.ShowDurationProperty.OverrideMetadata(
+                typeof(FrameworkElement), new FrameworkPropertyMetadata(60000));
+
             // Title-bar Window.Icon assignment in the class handler
             // below degrades to WPF's default icon on a pack-URI load
             // failure (resource renamed, embed step broken). XAML
