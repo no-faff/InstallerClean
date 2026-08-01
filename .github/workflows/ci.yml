@@ -115,6 +115,22 @@ jobs:
         with:
           global-json-file: global.json
 
+      # NuGet Audit runs during restore and reports a vulnerable package as a
+      # warning; -warnaserror is what turns that into a failed build. It is the
+      # gate because `dotnet list package --vulnerable` cannot be one: that
+      # command exits 0 even while printing a high-severity advisory (verified),
+      # so a step built on it stays green on a vulnerable package unless
+      # somebody opens the log. NuGetAuditMode=all is explicit rather than
+      # relied on: transitive packages are where an advisory actually arrives.
+      #
+      # It runs BEFORE anything that restores, and that ordering is the whole
+      # step. Restore is idempotent and silent on a second call: placed after a
+      # build, it printed "All projects are up-to-date for restore" and emitted
+      # no NU190x at all, so the gate stood green over an unaudited graph for as
+      # long as it sat there.
+      - name: Fail on a vulnerable package
+        run: dotnet restore src/InstallerClean.sln -p:RestoreLockedMode=true -p:NuGetAuditMode=all -warnaserror:NU1901,NU1902,NU1903,NU1904
+
       - name: Build
         run: dotnet build src/InstallerClean/InstallerClean.csproj -p:RestoreLockedMode=true
 
@@ -180,12 +196,3 @@ jobs:
           if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
           & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
 
-      # NuGet Audit runs during restore and reports a vulnerable package as a
-      # warning; -warnaserror is what turns that into a failed build. It is the
-      # gate because `dotnet list package --vulnerable` cannot be one: that
-      # command exits 0 even while printing a high-severity advisory (verified),
-      # so a step built on it stays green on a vulnerable package unless
-      # somebody opens the log. NuGetAuditMode=all is explicit rather than
-      # relied on: transitive packages are where an advisory actually arrives.
-      - name: Fail on a vulnerable package
-        run: dotnet restore src/InstallerClean.sln -p:RestoreLockedMode=true -p:NuGetAuditMode=all -warnaserror:NU1901,NU1902,NU1903,NU1904
