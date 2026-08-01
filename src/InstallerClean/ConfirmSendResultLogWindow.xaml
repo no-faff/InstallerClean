@@ -82,7 +82,8 @@
             <!-- Built up in code-behind (BuildReassuranceLine): the
                  [ ]-delimited phrase in ConfirmSendResultLog.Reassurance
                  becomes a Hyperlink into the README's reports-stats FAQ
-                 answer, mirroring MainWindow's "[it won't!]" restore line. -->
+                 answer, mirroring the bracketed-phrase links MainWindow
+                 builds on its intro and completion card. -->
             <TextBlock x:Name="ReassuranceText" Grid.Row="2"
                        Foreground="{StaticResource Text.Muted}" FontSize="{DynamicResource Type.Body}"
                        TextWrapping="Wrap"
