@@ -10,9 +10,8 @@
 // .Other at every count. Indonesian has no count inflection, so there are NO
 // .One/.Few/.Many override keys (OVERRIDES empty), and the Plural.* pairs are
 // identical (both "file" etc). The hardcoded .Singular/.Plural sentence pairs
-// are translated on both members and come out identical except
-// RecycleUnavailable.Body.Singular, which keeps the neutral's design of dropping
-// {0} ("this {1}" vs "these {0} {1}"); each placeholder set is preserved exactly.
+// are translated on both members and come out identical; each placeholder set
+// is preserved exactly.
 //
 // "file" and "patch" are byte-identical to the English .Singular, so they go in
 // ALSO_KEEP (deliberate single-token keeps); their .Plural values differ from the
@@ -21,9 +20,9 @@
 // Register: Anda (neutral-polite) throughout, the settled Indonesian software-UI
 // convention (Windows id uses it too; there is no natural informal UI "you"),
 // matching README.id.md. Platform terms sourced from Windows / Microsoft
-// Terminology: Recycle Bin = Keranjang Sampah, About = Tentang, Start menu =
-// menu Mulai, Event Log / Application log / Group Policy = Log Peristiwa /
-// log Aplikasi / Kebijakan Grup, display language = bahasa tampilan.
+// Terminology: About = Tentang, Start menu = menu Mulai, Event Log /
+// Application log / Group Policy = Log Peristiwa / log Aplikasi / Kebijakan
+// Grup, display language = bahasa tampilan.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';

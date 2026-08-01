@@ -9,14 +9,12 @@
 // .Other at every count. Korean nouns do not inflect for number, so there are
 // NO .One/.Few/.Many override keys, and the Plural.* pairs are identical
 // (both 파일 etc). The hardcoded .Singular/.Plural sentence pairs are
-// translated on both members and come out identical except
-// RecycleUnavailable.Body.Singular, which keeps the neutral's design of
-// dropping {0}.
+// translated on both members and come out identical.
 //
 // Register: 합니다체 (formal-polite) throughout, matching README.ko.md and the
 // Windows Korean UI convention; warmth carried by word choice. Platform terms
-// sourced from Windows: Recycle Bin = 휴지통, About = 정보, Event Log /
-// Application log / Group Policy = 이벤트 로그 / 응용 프로그램 로그 / 그룹 정책.
+// sourced from Windows: About = 정보, Event Log / Application log / Group
+// Policy = 이벤트 로그 / 응용 프로그램 로그 / 그룹 정책.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';

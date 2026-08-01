@@ -16,9 +16,9 @@
 // Dutch plural class: CategoryFor returns One only at n==1, else Other (the
 // "default" branch, same selector as de/es/it). Dutch past participles do NOT
 // inflect for number (gevonden / verwijderd / verplaatst are identical at 1 and
-// many), and the four count-bearing progress lines use the verbal-noun "Bezig
-// met ..." construction, which carries no number at all, so the four progress
-// overrides German needs (wird/werden) have no Dutch counterpart. Dutch DOES
+// many), and the progress lines use the verbal-noun "Bezig met ..."
+// construction, which carries no number at all, so the progress overrides
+// German needs for wird/werden have no Dutch counterpart. Dutch DOES
 // inflect the attributive adjective ("1 geregistreerd pakket" vs "120
 // geregistreerde pakketten": indefinite singular before a het-word drops the
 // -e, and both counted nouns, pakket and product, are het-words), and the

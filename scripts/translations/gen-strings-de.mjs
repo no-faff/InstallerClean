@@ -12,12 +12,15 @@
 // many), so the three CLI completion lines es/it overrode (Cli.FoundOrphans,
 // Cli.DeletedFiles, Cli.MovedFiles) need no override here. German DOES inflect
 // the finite verb (wird/werden) and the attributive adjective
-// ("1 registriertes Paket" vs "120 registrierte Pakete"), so there are FIVE
-// .One overrides: the attributive Status.RegisteredPackagesFound, and the four
-// count-bearing PROGRESS lines (Status.Moving/Deleting, Cli.DeletingFiles/
-// MovingFiles), whose base is the werden-form and whose .One is the wird-form.
-// Those four are routed through DisplayHelpers.Pluralise, so the .One keys fire
-// at n==1.
+// ("1 registriertes Paket" vs "120 registrierte Pakete"), so there are THREE
+// .One overrides: the attributive Status.RegisteredPackagesFound, and the two
+// count-bearing command-line PROGRESS lines (Cli.DeletingFiles,
+// Cli.MovingFiles), whose base is the werden-form and whose .One is the
+// wird-form. Both are routed through DisplayHelpers.Pluralise, so the .One keys
+// fire at n==1. The window's own progress headings needed the same pair until
+// they stopped carrying a count: with no number in the sentence there is
+// nothing for the verb to agree with, and German was the only language that had
+// overridden them.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';

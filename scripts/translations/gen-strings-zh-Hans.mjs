@@ -13,9 +13,9 @@
 //
 // Register: 您 (formal-polite) throughout, dropped on imperatives, matching
 // README.zh-CN.md and the Windows Chinese UI convention; warmth from word
-// choice, never 你. Platform terms from Windows: Recycle Bin = 回收站, About =
-// 关于, Run as administrator = 以管理员身份运行, registry = 注册表, Event Log /
-// Application log / Group Policy = 事件日志 / 应用程序日志 / 组策略.
+// choice, never 你. Platform terms from Windows: About = 关于, Run as
+// administrator = 以管理员身份运行, registry = 注册表, Event Log / Application
+// log / Group Policy = 事件日志 / 应用程序日志 / 组策略.
 //
 // MAP values are the committed Strings.zh-Hans.resx <value> bytes verbatim: \\
 // is one backslash (the paths), \n is a real newline (the multi-line values),

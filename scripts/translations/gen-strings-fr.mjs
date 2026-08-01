@@ -10,7 +10,7 @@
 //     guillemets « ... » with an inner U+202F for inline quotes,
 //     matching the README's "« ... »" style. Straight ' apostrophes
 //     (the README uses zero curly apostrophes).
-//   - Terms: Corbeille (Recycle Bin), À propos (About), correctif(s) (patch),
+//   - Terms: À propos (About), correctif(s) (patch),
 //     fichiers inutiles / encore nécessaires (unneeded / still needed), café
 //     (tip jar), journal des événements / journal Application / stratégie de
 //     groupe (Cli.EventLogUnavailable). All anchored to the README, the
