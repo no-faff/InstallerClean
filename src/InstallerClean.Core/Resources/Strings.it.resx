@@ -948,11 +948,16 @@ Non è stato possibile scrivere il file crash.log.</value></data>
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
   <data name="Cli.UnknownArgument" xml:space="preserve"><value>Argomento sconosciuto: '{0}'</value></data>
-  <!-- 0 = the extra (unexpected) token. A recognised flag carried more tokens
-       than it accepts, most often an unquoted move path with a space, so the
-       message names the quoting fix. The literal " quotes and the \ in the
-       example are part of the sentence the user copies. -->
+  <!-- 0 = the extra (unexpected) token. Shown for /m only, where the extra
+       token is most often an unquoted move path with a space, so the message
+       names the quoting fix. The literal " quotes and the \ in the example are
+       part of the sentence the user copies. -->
   <data name="Cli.TooManyArguments" xml:space="preserve"><value>Errore: argomento aggiuntivo imprevisto '{0}'. Se la cartella di destinazione contiene uno spazio, racchiudi l'intero percorso tra virgolette: /m "D:\My Backup"</value></data>
+  <!-- 0 = the extra (unexpected) token. The same condition for /s and /d, which
+       take no path at all, so the quoting advice above would answer about a flag
+       the user did not type. The way in is combining flags ("/s /d"), which is
+       what the second sentence addresses. -->
+  <data name="Cli.TooManyArgumentsNoPath" xml:space="preserve"><value>Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.</value></data>
   <data name="Cli.Cancelling" xml:space="preserve"><value>Annullamento...</value></data>
   <data name="Cli.Cancelled" xml:space="preserve"><value>Operazione annullata.</value></data>
   <!-- 0 = exception type name (full message + stack trace go to the
@@ -967,6 +972,24 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Cli.NothingToDo" xml:space="preserve"><value>Nessuna operazione necessaria.</value></data>
   <!-- 0 = mode arg ("/s"), 1 = registered package count, 2 = pluralised "package"/"packages" -->
   <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
+  <!-- 0 = count of registered files missing from disk, and this is the
+       non-removable count only: a superseded patch whose file has already gone
+       is the expected end state, not an alarm. The window says the same thing in
+       Summary.MissingFromDisk.*, which closes on "Open Details for what to do";
+       there is no Details window here, so the last sentence carries the recovery
+       step itself. "Could fail" and "usually restores" are the verified
+       positions and neither may harden: Microsoft guarantees nothing here. -->
+  <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, the same version, usually restores it.</value></data>
+  <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.</value></data>
+  <!-- 0 = mode arg, 1 = files the scan held back, 2 = installed products it
+       could not read. A notice beside the run's summary, not a summary itself
+       (Event ID 3000; see MachineContract). Deliberately unpluralised, matching
+       the always-plural "errors:" header the same audience scrapes: a machine
+       surface holds one shape, and the grammar is the price of it. -->
+  <!-- 0 = mode arg, 1 = registered files missing from disk. The second notice
+       (Event ID 3001), and the actionable one: it says outright that this tool
+       did not cause it, because the entry sits in a log beside that tool's name
+       and nothing else there would. Unpluralised, as above. -->
   <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
   <data name="Cli.DeletingFiles" xml:space="preserve"><value>Eliminazione di {0} {1}...</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun. It says "permanently" because
@@ -983,7 +1006,14 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Errore: la destinazione deve essere un percorso completo. Ricevuto: {0}</value></data>
   <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Errore: la destinazione {0} si trova in una cartella di sistema di Windows. Scegli un percorso al di fuori di %SystemRoot%, %ProgramFiles% e %ProgramData%.</value></data>
+  <!-- 0 = destination, 1 = size the move needs, 2 = size free there. The window
+       refuses the same move with Error.NotEnoughSpaceBody; this says it in one
+       sentence because a command line has no dialog to lay out. The last clause
+       is the one a scheduled task's log needs: the refusal happens before the
+       destination folder is created, so the cache is untouched. -->
+  <data name="Cli.MoveNotEnoughSpace" xml:space="preserve"><value>Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.</value></data>
   <!-- 0 = mode, 1 = destination -->
+  <!-- 0 = mode, 1 = destination, 2 = size free there, 3 = size the move needs -->
   <!-- Names the flags rather than the GUI's button labels: there are no
        buttons on a command line, and the reader is looking at the two switches
        they just typed. -->
@@ -991,6 +1021,13 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Cli.PendingRebootBlocked.InstallerInProgress" xml:space="preserve"><value>Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.</value></data>
   <!-- 0 = matched path under %SystemRoot%\Installer that triggered the gate -->
   <data name="Cli.PendingRebootBlocked.PendingRenameInCache" xml:space="preserve"><value>Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.</value></data>
+  <!-- What a blocking reason with no line of its own gets, so a reason added
+       later cannot leave the command line reporting an unexpected crash for a
+       run that was merely held. The command-line twin of Body.PendingReboot.Other,
+       adapted the way its three siblings are: the flags rather than the window's
+       button names, "blocked" rather than "paused" to match them, and no Re-scan,
+       there being nothing to re-scan on a command line. -->
+  <data name="Cli.PendingRebootBlocked.Other" xml:space="preserve"><value>Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.</value></data>
   <!-- Short human labels for the EventLog ({1} slot in
        Cli.EventLogPendingRebootBlocked). The stdout sentences in
        Cli.PendingRebootBlocked.* are full localised text; these short
@@ -1005,6 +1042,12 @@ Non è stato possibile scrivere il file crash.log.</value></data>
   <data name="Cli.MovedFiles" xml:space="preserve"><value>Spostati {0} {1}.</value></data>
   <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
+  <!-- Same eight slots as Cli.EventLogMoveSummary, for a batch one of the
+       service's own destination guards stopped part way. It is a separate entry
+       rather than the summary above because the counts mean something different:
+       the files not in {1} were never attempted, where in the summary they
+       failed. The files in {1} have left C:\Windows\Installer and are in {4},
+       which is the fact this entry exists to record. -->
   <!-- 0 = mode arg. Audit entry for a Ctrl+C that lands before any file is
        processed (a cancel during the scan, or before the first delete or
        move), so "each /s, /d or /m run writes one summary entry" holds for
