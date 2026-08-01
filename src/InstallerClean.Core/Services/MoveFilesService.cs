@@ -220,7 +220,14 @@ public sealed class MoveFilesService : IMoveFilesService
                     var fileName = _fs.Path.GetFileName(sourcePath);
                     var destPath = GetUniqueDestPath(destinationFolder, fileName);
                     _fs.File.Move(sourcePath, destPath);
-                    moved++;
+
+                    // A move that returned without throwing has not necessarily
+                    // happened: see ReconcileMove.
+                    var halfMove = ReconcileMove(sourcePath, destPath, failureLog);
+                    if (halfMove is null)
+                        moved++;
+                    else
+                        errors.Add(halfMove);
                 }
                 // DestinationCollisionException alone is not logged: it is this
                 // class's own control flow, thrown from one place, and its
@@ -232,29 +239,10 @@ public sealed class MoveFilesService : IMoveFilesService
                 {
                     errors.Add(new DestinationCollision(sourcePath, ex.FileName));
                 }
-                catch (UnauthorizedAccessException ex)
-                {
-                    failureLog.Record(ex);
-                    errors.Add(new AccessDenied(sourcePath));
-                }
-                catch (IOException ex)
-                {
-                    failureLog.Record(ex);
-                    // ERROR_SHARING_VIOLATION and ERROR_LOCK_VIOLATION as
-                    // HRESULTs: another program holds the file open, which is
-                    // the one IO failure here with a cause the user can act on
-                    // and the one that is not a fault. The Delete path
-                    // discriminates the same two codes off the shell's HRESULT
-                    // (FileOperationError.RecycleFailed), so both halves of the
-                    // app name the same condition the same way.
-                    errors.Add(ex.HResult is unchecked((int)0x80070020) or unchecked((int)0x80070021)
-                        ? new FileInUse(sourcePath)
-                        : new IOFailure(sourcePath));
-                }
                 catch (Exception ex)
                 {
                     failureLog.Record(ex);
-                    errors.Add(new UnknownError(sourcePath));
+                    errors.Add(Categorise(ex, sourcePath));
                 }
             }
             }
@@ -289,6 +277,113 @@ public sealed class MoveFilesService : IMoveFilesService
             }
         }, cancellationToken);
     }
+
+    /// <summary>
+    /// Settles what actually happened to a file <c>File.Move</c> reported as
+    /// moved, and returns null when the file really has gone or the error to
+    /// file when it has not.
+    ///
+    /// A move that returns without throwing is not proof the source is gone.
+    /// .NET calls MoveFileEx with MOVEFILE_COPY_ALLOWED (dotnet/runtime,
+    /// Interop.MoveFileEx.cs), and Win32 documents that flag as simulating a
+    /// cross-volume move with CopyFile plus DeleteFile, then says outright: "If
+    /// the file is successfully copied to a different volume and the original
+    /// file is unable to be deleted, the function succeeds leaving the source
+    /// file intact." A read-only source is exactly that case, DeleteFile being
+    /// documented to fail with ERROR_ACCESS_DENIED on one, and a file another
+    /// program holds open without FILE_SHARE_DELETE is a second. So the batch
+    /// counts a file as moved while the user has the original in
+    /// C:\Windows\Installer and a copy in their backup folder, and is told it
+    /// worked. Same-drive moves never reach this state: a rename either
+    /// happens or throws.
+    ///
+    /// Checked after the fact rather than pre-empted, because pre-clearing the
+    /// attribute would mutate sources that never needed it and would need a
+    /// same-volume test that cannot be had: a mount point inside one drive
+    /// letter falls back to copy-and-delete like any other volume boundary.
+    ///
+    /// Clearing the read-only bit here is the delete path's shape and is safe
+    /// for the same reasons: by this line the file has passed the reparse
+    /// refusal and the containment guard, both of which read the real
+    /// filesystem whatever is injected, and the user has confirmed the move.
+    /// Finishing the delete completes what the user asked for; abandoning it
+    /// would leave them the duplicate this method exists to prevent.
+    /// </summary>
+    private FileOperationError? ReconcileMove(string sourcePath, string destPath, PerItemFailureLog failureLog)
+    {
+        if (!_fs.File.Exists(sourcePath)) return null;
+
+        try
+        {
+            ClearReadOnly(sourcePath);
+            _fs.File.Delete(sourcePath);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            failureLog.Record(ex);
+            DiscardDestinationCopy(destPath, failureLog);
+            return Categorise(ex, sourcePath);
+        }
+    }
+
+    /// <summary>
+    /// Removes the copy a half-completed move left in the destination, so a
+    /// file reported as failed is a file the user still has exactly one of.
+    ///
+    /// A failure here is the one state with nothing to say for itself: the
+    /// error the caller files says the file was left in place, which is true,
+    /// and does not mention the copy. It is recorded rather than surfaced
+    /// because it needs a destination that accepts a create and refuses a
+    /// delete, which the write probe has already had to pass.
+    /// </summary>
+    private void DiscardDestinationCopy(string destPath, PerItemFailureLog failureLog)
+    {
+        try
+        {
+            _fs.File.Delete(destPath);
+        }
+        catch (Exception ex)
+        {
+            failureLog.Record(new InvalidOperationException(
+                $"A copy of {destPath} could not be removed after the move failed to remove its source, "
+                + "so that file now exists in both places.", ex));
+        }
+    }
+
+    /// <summary>
+    /// Clears the read-only attribute, and only that attribute, on a file whose
+    /// deletion has to go through. Does nothing to a file that is not read-only,
+    /// which is the ordinary permissions refusal and has nothing here to fix.
+    /// Throws are the caller's: this is one step of an operation that fails
+    /// closed as a whole.
+    /// </summary>
+    private void ClearReadOnly(string filePath)
+    {
+        var attributes = _fs.File.GetAttributes(filePath);
+        if (!attributes.HasFlag(FileAttributes.ReadOnly)) return;
+        _fs.File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
+    }
+
+    /// <summary>
+    /// The one place a framework exception becomes a user-visible category, so
+    /// the loop's own failures and the reconciliation's are named the same way.
+    ///
+    /// ERROR_SHARING_VIOLATION and ERROR_LOCK_VIOLATION as HRESULTs: another
+    /// program holds the file open, which is the one IO failure here with a
+    /// cause the user can act on and the one that is not a fault. The Delete
+    /// path discriminates the same two codes off the shell's HRESULT
+    /// (FileOperationError.RecycleFailed), so both halves of the app name the
+    /// same condition the same way.
+    /// </summary>
+    private static FileOperationError Categorise(Exception ex, string sourcePath) => ex switch
+    {
+        UnauthorizedAccessException => new AccessDenied(sourcePath),
+        IOException io when io.HResult is unchecked((int)0x80070020) or unchecked((int)0x80070021)
+            => new FileInUse(sourcePath),
+        IOException => new IOFailure(sourcePath),
+        _ => new UnknownError(sourcePath),
+    };
 
     /// <summary>
     /// Wraps <c>Directory.CreateDirectory</c> so framework-thrown

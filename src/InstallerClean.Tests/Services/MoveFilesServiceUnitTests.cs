@@ -381,4 +381,72 @@ public class MoveFilesServiceUnitTests
         var error = Assert.Single(result.Errors);
         Assert.IsType<IOFailure>(error);
     }
+
+    // The three below drive the state Win32 documents and nothing else in the
+    // suite can reach: a File.Move that returns success having copied the file
+    // and left the original where it was. See HalfMoveFileSystem.
+
+    [Fact]
+    public async Task MoveFilesAsync_finishes_a_move_whose_source_was_read_only()
+    {
+        var fs = new Helpers.HalfMoveFileSystem();
+        var source = $@"{SourceDir}\readonly.msi";
+        fs.AddFile(source, new MockFileData("payload") { Attributes = FileAttributes.ReadOnly });
+        fs.AddDirectory(DestDir);
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        // The file the user asked to move has moved: one copy, in the
+        // destination, and nothing left in the cache folder.
+        Assert.Equal(1, result.MovedCount);
+        Assert.Empty(result.Errors);
+        Assert.False(fs.File.Exists(source));
+        Assert.True(fs.File.Exists($@"{DestDir}\readonly.msi"));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_removes_the_copy_when_the_source_cannot_be_deleted()
+    {
+        var fs = new Helpers.HalfMoveFileSystem();
+        var source = $@"{SourceDir}\locked.msi";
+        var destPath = $@"{DestDir}\locked.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+        fs.DeleteFailures[source] =
+            new IOException("held open") { HResult = unchecked((int)0x80070020) };
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        // Reported as failed, and true: the user has exactly one copy of the
+        // file, where it started. A duplicate in the backup folder would be the
+        // worse outcome, being one the completion screen never mentions.
+        Assert.IsType<FileInUse>(Assert.Single(result.Errors));
+        Assert.Equal(0, result.MovedCount);
+        Assert.True(fs.File.Exists(source));
+        Assert.False(fs.File.Exists(destPath));
+    }
+
+    [Fact]
+    public async Task MoveFilesAsync_files_a_failure_when_even_the_copy_cannot_be_removed()
+    {
+        var fs = new Helpers.HalfMoveFileSystem();
+        var source = $@"{SourceDir}\stuck.msi";
+        var destPath = $@"{DestDir}\stuck.msi";
+        fs.AddFile(source, new MockFileData("payload"));
+        fs.AddDirectory(DestDir);
+        fs.DeleteFailures[source] = new UnauthorizedAccessException("source refused");
+        fs.DeleteFailures[destPath] = new UnauthorizedAccessException("destination refused");
+
+        var svc = new MoveFilesService(fs);
+        var result = await svc.MoveFilesAsync(new[] { source }, DestDir);
+
+        // Needs a destination that took a create and refuses a delete, which
+        // the write probe has already passed once. The file is still reported
+        // as failed rather than moved, which is the half that must hold.
+        Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
+        Assert.Equal(0, result.MovedCount);
+        Assert.True(fs.File.Exists(source));
+    }
 }
