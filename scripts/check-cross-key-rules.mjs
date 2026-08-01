@@ -96,6 +96,7 @@ const NO_VISIBLE_LABEL = new Set([
   'Automation.StartupScanProgress',
   'Automation.Scroll.DialogBody',
   'Automation.Scroll.FileDetails',
+  'Automation.Scroll.ProductDetails',
   'Automation.Scroll.ResultDetails',
   'Automation.Scroll.ScanResults',
 ]);

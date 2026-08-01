@@ -32,17 +32,15 @@ jobs:
       # Strings.Designer.cs is hand-regenerated, so it can drift from the neutral
       # resx silently: an accessor whose key has been removed still compiles, and
       # Get() falls back to returning the key, so the first sign is a raw key on
-      # screen. Placed ahead of the still-english gate below, which is red by
-      # design for the whole window between a string landing and its translation
-      # round and would otherwise hide this one.
+      # screen.
       - name: Check Strings.Designer.cs is in step
         run: node scripts/check-designer-parity.mjs
 
       # Source-level drift guards, each pinned to a concrete failure the app has
       # actually hit: a resx key left with no consumer; the installer language
       # set and SupportedLanguages diverging when a language is added to one and
-      # not the other. Every node check in this job runs before the build
-      # because it needs only the checkout, not the SDK.
+      # not the other. These need only the checkout, not the SDK, so they run
+      # before it and cost nothing when one fails.
       - name: Check for dead resx keys
         run: node scripts/check-dead-resx-keys.mjs
 
@@ -61,54 +59,12 @@ jobs:
       - name: Lint French spacing
         run: node scripts/check-french-spacing.mjs
 
-      # Two controls live on one window at one moment must not share an Alt
-      # access key: WPF answers a duplicate by cycling focus between the matches
-      # instead of invoking either, so a clash silently retires BOTH, in one
-      # language, on the route only a keyboard or screen-reader user takes. An
-      # eye-verify pass runs in a single language and reads the English
-      # accelerator, so nothing but this sees it. Placed ahead of the
-      # still-english gate below for the same reason the designer check is:
-      # that gate is red by design during a translation window and would
-      # otherwise hide this one.
-      - name: Check access keys do not clash
-        run: node scripts/check-accelerators.mjs
-
       # The only mechanical check on XAML resource keys. A {StaticResource} whose
       # key nothing defines compiles clean and throws a XamlParseException when
       # the window is first opened, so neither the build nor the test run below
       # can catch a rename that misses a consumer.
       - name: Check XAML resource keys
         run: node scripts/check-xaml-resources.mjs
-
-      # The rules that live BETWEEN two strings, or between a string and the
-      # code that shows it: a spoken name against its visible label, a sentence
-      # against the button it quotes, the installer-folder token, a window title
-      # whose only consumer overwrites it. Every other check here holds one key's
-      # structure or one key's sameness across files, so none of them can see a
-      # rule of that shape, and the About window's donate button consequently
-      # showed one phrase and spoke another in two languages across four
-      # releases. Placed ahead of the still-english gate below for the same
-      # reason the designer check is: that gate is red by design during a
-      # translation window and would otherwise hide this one.
-      - name: Check cross-key rules
-        run: node scripts/check-cross-key-rules.mjs
-
-      # A required gate: a satellite shipping the English neutral for a
-      # required key fails the build. It is red by design for the window
-      # between a string's English landing and its translation round running,
-      # so it is expected to fail on the commits in between rather than only
-      # on a mistake.
-      - name: Check every satellite is translated
-        run: node scripts/check-still-english.mjs
-
-      # docs/translations/*.md carry the same "generated, never hand-edited"
-      # contract as the resx guards above and had no guard at all, which is how
-      # all fourteen reached HEAD in 47a00f5 still quoting two strings that
-      # commit had removed from the app. They are the pages the README's
-      # Contributing section points native speakers at, so a stale one asks for
-      # corrections to text that no longer exists.
-      - name: Check translation review tables are in step
-        run: node scripts/gen-translation-table.mjs --check
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
@@ -195,4 +151,53 @@ jobs:
                      Where-Object { $_ } | Select-Object -First 1
           if (-not $version) { throw "Could not read <Version> from Directory.Build.props." }
           & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
+
+      # The four language gates run last, and each runs even when one before it
+      # has failed. All four are red BY DESIGN for the window between a string
+      # landing in English and its translation round, and from their old position
+      # ahead of the build one deliberate red took everything after it down: the
+      # whole 2.4.0 line of work was written against a suite that had not run
+      # anywhere, and ISCC is the only mechanical check the .iss ever gets.
+      # always() is what stops the same thing happening inside this block, one
+      # red gate hiding the three behind it. Nothing is softened by the move:
+      # a failure here fails the job exactly as it did from the top.
+      - name: Check access keys do not clash
+        if: always()
+        # Two controls live on one window at one moment must not share an Alt
+        # access key: WPF answers a duplicate by cycling focus between the
+        # matches instead of invoking either, so a clash silently retires BOTH,
+        # in one language, on the route only a keyboard or screen-reader user
+        # takes. An eye-verify pass runs in a single language and reads the
+        # English accelerator, so nothing but this sees it.
+        run: node scripts/check-accelerators.mjs
+
+      # The rules that live BETWEEN two strings, or between a string and the
+      # code that shows it: a spoken name against its visible label, a sentence
+      # against the button it quotes, the installer-folder token, a window title
+      # whose only consumer overwrites it. Every other check here holds one key's
+      # structure or one key's sameness across files, so none of them can see a
+      # rule of that shape, and the About window's donate button consequently
+      # showed one phrase and spoke another in two languages across four
+      # releases.
+      - name: Check cross-key rules
+        if: always()
+        run: node scripts/check-cross-key-rules.mjs
+
+      # A required gate: a satellite shipping the English neutral for a
+      # required key fails the build. Expected to fail on the commits between a
+      # string's English landing and its translation round running, rather than
+      # only on a mistake.
+      - name: Check every satellite is translated
+        if: always()
+        run: node scripts/check-still-english.mjs
+
+      # docs/translations/*.md carry the same "generated, never hand-edited"
+      # contract as the resx guards above and had no guard at all, which is how
+      # all fourteen reached HEAD in 47a00f5 still quoting two strings that
+      # commit had removed from the app. They are the pages the README's
+      # Contributing section points native speakers at, so a stale one asks for
+      # corrections to text that no longer exists.
+      - name: Check translation review tables are in step
+        if: always()
+        run: node scripts/gen-translation-table.mjs --check
 
