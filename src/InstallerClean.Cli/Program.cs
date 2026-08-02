@@ -690,16 +690,13 @@ internal static class Program
     /// because scheduled tasks and RMM tools discard the first and read the second.
     /// </summary>
     /// <remarks>
-    /// Called before every return the work loop can take, the nothing-to-do one
-    /// included, which is the point: a fleet whose superseded-patch cleanup has
-    /// been withheld every night for a month looks, on the only surface anybody
-    /// watches, exactly like a fleet with nothing to clean.
-    /// <para>
-    /// Each entry carries an Event ID of its own (the 3000 band, see
-    /// <see cref="CliContract.EventIdFor"/>) so a consumer counting runs off the
-    /// summary's ID cannot match one by accident. Neither is a summary and neither
-    /// replaces one.
-    /// </para>
+    /// Called once, immediately after the scan, so every return the work loop can
+    /// take from there on has reported these first, the nothing-to-do one included:
+    /// a fleet whose superseded-patch cleanup has been withheld every night for a
+    /// month otherwise looks, on the only surface anybody watches, exactly like a
+    /// fleet with nothing to clean. The four returns in
+    /// <see cref="ResolveAndValidateMoveDestination"/> come before the scan, so
+    /// there is nothing to report by the time they take it.
     /// </remarks>
     private static void ReportScanSignals(string arg, ScanResult scanResult)
     {

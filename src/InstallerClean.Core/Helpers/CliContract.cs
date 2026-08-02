@@ -108,10 +108,9 @@ internal static class CliExitCode
 /// the English summary the entry carries (the Application channel is
 /// English-only by deliberate design).
 ///
-/// The first four are outcome classes and one of them is the run's single
-/// summary entry. The last two are notices, which sit BESIDE that summary and
-/// never replace it: they report a condition of the machine the scan found
-/// rather than the outcome of the run, which is why they have IDs of their own.
+/// The first four are outcome classes, one of which is a run's single summary
+/// entry; the last two are notices. What a consumer may rely on about the two
+/// together is stated once, on the CLI host's MachineContract.WriteEventLog.
 /// </summary>
 internal enum CliEventClass
 {
@@ -235,13 +234,11 @@ internal static class CliContract
             : new CliOperationOutcome(CliExitCode.Error, CliEventClass.HardError);
 
     /// <summary>
-    /// The stable Application-channel Event ID for an entry class. The
-    /// 1000 band is "work happened" (success and partial), 2000 a
-    /// transient skip, 4000 a hard failure, so an RMM filter can select an
-    /// outcome by number without reading the English message. The 3000 band is
-    /// the notices, which are not outcomes: a run emits exactly one ID from the
-    /// other three bands and any number of these beside it, so a consumer
-    /// counting runs by ID counts the summary bands and never this one.
+    /// The stable Application-channel Event ID for an entry class. The 1000 band
+    /// is "work happened" (success and partial), 2000 a transient skip, 4000 a
+    /// hard failure, so an RMM filter can select an outcome by number without
+    /// reading the English message. The 3000 band is the notices, which are not
+    /// outcomes and are not counted as runs.
     /// </summary>
     internal static int EventIdFor(CliEventClass outcome) => outcome switch
     {

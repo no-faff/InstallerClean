@@ -1080,11 +1080,7 @@ public partial class CleanupViewModel : ObservableObject, IDisposable
     /// One path does not call this and is not one of those, so the rule above
     /// does not reach it and reading from the rule alone would make it look like
     /// a defect: the destination-gate arm, where nothing was placed and the
-    /// folder is still left alone. Two of the five gates that reach it fire
-    /// precisely because the destination has just been shown to resolve into
-    /// C:\Windows\Installer or a system folder, and deleting a directory at a
-    /// path just proven to land somewhere unexpected is the operation those
-    /// gates exist to prevent.
+    /// folder is still left alone. The arm itself carries the reason.
     ///
     /// The caller checks its createdDestination local first, so a folder that
     /// was already there is never a candidate.
