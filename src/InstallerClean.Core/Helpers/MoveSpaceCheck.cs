@@ -19,9 +19,20 @@ internal static class MoveSpaceCheck
     /// it consumes nothing and frees nothing.
     ///
     /// Path arithmetic with no drive query, because the Move button's tooltip
-    /// re-reads it on every keystroke. Anything it cannot resolve is not the same
-    /// drive, which is the safe way round: a caller then omits a claim rather than
-    /// making a wrong one.
+    /// re-reads it on every keystroke, and that is also the limit of it. A
+    /// destination under a mount point inside the system drive compares equal on
+    /// GetPathRoot while sitting on a separate volume, so this answers same-drive
+    /// for a move that is really a copy and a delete across a boundary, and
+    /// <see cref="RefusalFreeSpace(string, long, long?)"/> then passes it without
+    /// measuring anything. GetVolumePathName is what would settle it, at a volume
+    /// query per keystroke. The rest of the codebase already knows the case:
+    /// <see cref="AvailableFreeSpaceForDestination"/> walks from the destination
+    /// rather than the path root so a mount point answers for its own volume, and
+    /// MoveFilesService's ReconcileMove says a mount point falls back to
+    /// copy-and-delete like any other volume boundary.
+    ///
+    /// Anything it cannot resolve is not the same drive, which is the safe way
+    /// round: a caller then omits a claim rather than making a wrong one.
     /// </summary>
     internal static bool IsOnInstallerCacheDrive(string destination)
     {
@@ -48,11 +59,10 @@ internal static class MoveSpaceCheck
     /// </summary>
     /// <remarks>
     /// Two cases go ahead without the measurement being consulted. A same-drive
-    /// move is a rename, so refusing one on free space would refuse exactly the
-    /// nearly-full system drive this app exists for. And an unmeasurable
+    /// move needs no room, and refusing one on free space would refuse exactly
+    /// the nearly-full system drive this app exists for. An unmeasurable
     /// destination (a share whose caller lacks query rights) has established
-    /// nothing, so it makes no claim either way rather than blocking on a number
-    /// it does not have.
+    /// nothing, and the same rule covers it: no claim rather than a wrong one.
     /// </remarks>
     internal static long? RefusalFreeSpace(string destination, long totalBytes, long? availableFreeSpace)
     {
