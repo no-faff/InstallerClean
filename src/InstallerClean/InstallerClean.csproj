@@ -22,6 +22,14 @@
     <!-- Version comes from Directory.Build.props -->
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <Description>Safely clean up unused Windows Installer files</Description>
+    <!-- AssemblyTitle is what Windows shows as File description: Explorer's
+         Details tab and Description column, and Task Manager's process list.
+         Left unset it defaults to the assembly name, so the field repeated
+         "InstallerClean" beside a file called InstallerClean.exe and told a
+         reader nothing. That reader is the one who opens Properties on an
+         unsigned download before running it. Description above is a different
+         field, Comments. -->
+    <AssemblyTitle>Cleans up orphaned files in C:\Windows\Installer</AssemblyTitle>
     <Authors>No Faff</Authors>
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
