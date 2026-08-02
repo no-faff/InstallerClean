@@ -228,7 +228,20 @@ internal static class Program
             }
             if (!holdsMutex)
             {
-                Console.WriteLine(Strings.Cli_MutexBlocked);
+                // Nothing on this path may reach Main's catch-all, and the two
+                // halves of it fail differently. A throw before the write costs
+                // the run its class: a 2000 TransientSkip and exit 75, the one
+                // code a scheduler retries on, become a 4000 HardError and exit
+                // 1. A throw after it produces that 4000 as this run's SECOND
+                // entry, which is what an RMM counts runs by.
+                try
+                {
+                    Console.WriteLine(Strings.Cli_MutexBlocked);
+                }
+                catch (Exception ex)
+                {
+                    Helpers.CrashLog.TryWrite(ex);
+                }
                 // RMM consumer polling the Application channel for
                 // InstallerClean entries needs an audit record on the
                 // skipped path to distinguish it from "the task never
@@ -236,8 +249,15 @@ internal static class Program
                 MachineContract.WriteEventLog(CliEventClass.TransientSkip,
                     () => string.Format(Strings.Cli_EventLogMutexBlocked, arg));
                 NoteEventLogUnavailable();
-                mutex.Dispose();
-                Console.CancelKeyPress -= cancelHandler;
+                try
+                {
+                    mutex.Dispose();
+                    Console.CancelKeyPress -= cancelHandler;
+                }
+                catch (Exception ex)
+                {
+                    Helpers.CrashLog.TryWrite(ex);
+                }
                 return ExitTransient;
             }
         }
@@ -261,14 +281,16 @@ internal static class Program
             // RunWorkAsync has already written this run's one Application-log
             // entry by the time it returns, so nothing in this cleanup may reach
             // Main's catch-all: that writes a second, and one entry per run is
-            // what an RMM counts runs by. Each hazard is guarded on its own so
-            // that a dead stdout cannot skip the mutex release beneath it.
+            // what an RMM counts runs by. The stdout note carries a guard of its
+            // own so that a dead stream cannot skip the mutex release beneath it,
+            // and the unhook goes last inside that guard because nothing depends
+            // on it having happened.
             NoteEventLogUnavailable();
-            Console.CancelKeyPress -= cancelHandler;
             try
             {
                 if (holdsMutex) mutex!.ReleaseMutex();
                 mutex?.Dispose();
+                Console.CancelKeyPress -= cancelHandler;
             }
             catch (Exception ex)
             {
