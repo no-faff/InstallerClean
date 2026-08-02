@@ -105,10 +105,17 @@ jobs:
           log=$(for g in scripts/translations/gen-strings-*.mjs; do node "$g"; done)
           echo "$log"
           git diff --exit-code -- src/InstallerClean.Core/Resources
-          echo "$log" | grep -qx 'TEMPLATE OK' || {
-            echo "gen-strings-template.mjs did not report TEMPLATE OK; its output is above." >&2
-            exit 1
-          }
+          # A case rather than a pipe into grep: the runner sets pipefail, and a
+          # grep that exits on its first match can leave the echo feeding it
+          # killed by SIGPIPE, which would fail this step over a log that said
+          # the right thing.
+          case "$log" in
+            *"TEMPLATE OK"*) ;;
+            *)
+              echo "gen-strings-template.mjs did not report TEMPLATE OK; its output is above." >&2
+              exit 1
+              ;;
+          esac
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
