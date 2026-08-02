@@ -42,10 +42,17 @@ internal static class EventLogWriter
     /// log) is swallowed because the primary output channel is stdout, not
     /// the event log.
     /// </summary>
-    internal static void Write(CliEventClass outcome, string summary)
+    /// <param name="buildSummary">
+    /// Builds the entry text, and it is a callback rather than a built string so
+    /// the build runs inside the try below. C# evaluates an argument in the
+    /// caller's frame, so taking the text would leave the one part of the write
+    /// that formats a resx template outside the guard the rest of it has.
+    /// </param>
+    internal static void Write(CliEventClass outcome, Func<string> buildSummary)
     {
         try
         {
+            var summary = buildSummary();
             if (!EnsureSourceMappedToApplicationLog())
             {
                 EventLogUnavailable = true;

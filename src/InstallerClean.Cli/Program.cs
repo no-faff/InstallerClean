@@ -233,7 +233,10 @@ internal static class Program
                 // the run its class: a 2000 TransientSkip and exit 75, the one
                 // code a scheduler retries on, become a 4000 HardError and exit
                 // 1. A throw after it produces that 4000 as this run's SECOND
-                // entry, which is what an RMM counts runs by.
+                // entry, which is what an RMM counts runs by. So every statement
+                // below is guarded where it stands, and the write is guarded
+                // inside EventLogWriter.Write, which builds the summary there so
+                // that no part of the call is evaluated in this frame.
                 try
                 {
                     Console.WriteLine(Strings.Cli_MutexBlocked);

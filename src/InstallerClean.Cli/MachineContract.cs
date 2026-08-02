@@ -66,7 +66,10 @@ internal static class MachineContract
     /// Writes one Application-channel entry, built in English via
     /// <see cref="English"/>. The sanctioned path for every event-log write:
     /// routing them all through here keeps a localised noun or size out of the
-    /// line RMM greps for a known English phrase.
+    /// line RMM greps for a known English phrase. The culture swap and the build
+    /// are handed on as a callback rather than run here, so both sit inside
+    /// <see cref="EventLogWriter.Write"/>'s guard; run in this frame they would
+    /// throw past it to the caller.
     /// </summary>
     /// <remarks>
     /// What a consumer may rely on, because two of these entries are newer than
@@ -82,5 +85,5 @@ internal static class MachineContract
     /// both conditions being properties of the machine rather than of the run.
     /// </remarks>
     internal static void WriteEventLog(CliEventClass outcome, Func<string> build) =>
-        EventLogWriter.Write(outcome, English(build));
+        EventLogWriter.Write(outcome, () => English(build));
 }
