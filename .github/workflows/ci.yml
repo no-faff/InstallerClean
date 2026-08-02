@@ -85,6 +85,31 @@ jobs:
       - name: Check XAML resource keys
         run: node scripts/check-xaml-resources.mjs
 
+      # The premise every resx guard above rests on: each Strings.<code>.resx is
+      # a byte-reproducible artefact of its generator in scripts/translations/.
+      # All of them read the resx, so a value hand-edited there and not into its
+      # generator passes every one and is reverted by whoever next runs the
+      # loop. That has happened once. The generators are tracked now and
+      # CONTRIBUTING.md sends translators straight at them.
+      #
+      # The diff holds reproducibility. TEMPLATE OK holds the template, which
+      # writes no satellite for a diff to catch and which flag-retranslation.mjs
+      # skips by name, so a reworded neutral leaves it holding the old English.
+      # The satellites' own verdict lines are deliberately not read: they say
+      # "still English (untranslated)" for every key awaiting a translation
+      # round, which is what check-still-english holds at the end of this file,
+      # and they exit 0 whatever they find.
+      - name: Check every satellite reproduces from its generator
+        shell: bash
+        run: |
+          log=$(for g in scripts/translations/gen-strings-*.mjs; do node "$g"; done)
+          echo "$log"
+          git diff --exit-code -- src/InstallerClean.Core/Resources
+          echo "$log" | grep -qx 'TEMPLATE OK' || {
+            echo "gen-strings-template.mjs did not report TEMPLATE OK; its output is above." >&2
+            exit 1
+          }
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
