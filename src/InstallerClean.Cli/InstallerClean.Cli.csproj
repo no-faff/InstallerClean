@@ -23,7 +23,7 @@
     <Description>Command-line front-end for InstallerClean.</Description>
     <!-- See the GUI csproj for why this is set: unset, Windows shows the
          assembly name as the File description, which repeats the filename. -->
-    <AssemblyTitle>Cleans up orphaned files in C:\Windows\Installer (command line)</AssemblyTitle>
+    <AssemblyTitle>Cleans up unneeded files in C:\Windows\Installer (command line)</AssemblyTitle>
     <Authors>No Faff</Authors>
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

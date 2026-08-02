@@ -29,7 +29,7 @@
          reader nothing. That reader is the one who opens Properties on an
          unsigned download before running it. Description above is a different
          field, Comments. -->
-    <AssemblyTitle>Cleans up orphaned files in C:\Windows\Installer</AssemblyTitle>
+    <AssemblyTitle>Cleans up unneeded files in C:\Windows\Installer</AssemblyTitle>
     <Authors>No Faff</Authors>
     <RepositoryUrl>https://github.com/no-faff/InstallerClean</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
