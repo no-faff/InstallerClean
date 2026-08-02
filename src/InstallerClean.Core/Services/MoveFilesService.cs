@@ -348,9 +348,10 @@ public sealed class MoveFilesService : IMoveFilesService
     {
         if (!_fs.File.Exists(sourcePath)) return null;
 
+        var clearedReadOnly = false;
         try
         {
-            ClearReadOnly(sourcePath);
+            clearedReadOnly = ClearReadOnly(sourcePath);
             _fs.File.Delete(sourcePath);
             return null;
         }
@@ -364,6 +365,7 @@ public sealed class MoveFilesService : IMoveFilesService
             if (!_fs.File.Exists(sourcePath)) return null;
 
             failureLog.Record(ex);
+            RestoreReadOnly(sourcePath, clearedReadOnly, failureLog);
             DiscardDestinationCopy(destPath, failureLog);
             return Categorise(ex, sourcePath);
         }
@@ -403,14 +405,45 @@ public sealed class MoveFilesService : IMoveFilesService
     }
 
     /// <summary>
+    /// Clears the read-only attribute, reporting whether there was one to clear
+    /// so a caller that then fails can put it back.
+    ///
     /// Throws are the caller's: this is one step of an operation that fails
     /// closed as a whole.
     /// </summary>
-    private void ClearReadOnly(string filePath)
+    private bool ClearReadOnly(string filePath)
     {
         var attributes = _fs.File.GetAttributes(filePath);
-        if (!attributes.HasFlag(FileAttributes.ReadOnly)) return;
+        if (!attributes.HasFlag(FileAttributes.ReadOnly)) return false;
         _fs.File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
+        return true;
+    }
+
+    /// <summary>
+    /// Puts back a read-only attribute cleared from a source the delete then
+    /// refused. What this service says about a file it reports as failed is that
+    /// the user still has exactly one of it and exactly as it was, and a source
+    /// left writable is one step of that operation committed after the operation
+    /// gave up.
+    ///
+    /// Guarded where <see cref="ClearReadOnly"/> is not, because this runs inside
+    /// the failure arm: a throw here would replace the error the caller is about
+    /// to file with one about the tidying up after it.
+    /// </summary>
+    private void RestoreReadOnly(string filePath, bool wasCleared, PerItemFailureLog failureLog)
+    {
+        if (!wasCleared) return;
+        try
+        {
+            _fs.File.SetAttributes(filePath,
+                _fs.File.GetAttributes(filePath) | FileAttributes.ReadOnly);
+        }
+        catch (Exception ex)
+        {
+            failureLog.Record(new InvalidOperationException(
+                $"The read-only attribute cleared from {filePath} could not be put back after the "
+                + "move failed to remove it, so that file is no longer read-only.", ex));
+        }
     }
 
     /// <summary>

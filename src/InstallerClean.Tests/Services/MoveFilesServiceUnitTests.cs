@@ -472,6 +472,12 @@ public class MoveFilesServiceUnitTests
         Assert.Equal(0, result.MovedCount);
         Assert.True(fs.File.Exists(source));
         Assert.False(fs.File.Exists(destPath));
+
+        // "Left in place" has to hold of the file's attributes as well as of the
+        // file. The reconcile clears read-only so it can delete the source and
+        // the delete then fails, so without the restore the run ends with one
+        // step of an abandoned operation committed and nothing recording it.
+        Assert.True(fs.File.GetAttributes(source).HasFlag(FileAttributes.ReadOnly));
     }
 
     [Fact]
