@@ -384,7 +384,10 @@ public sealed class MoveFilesService : IMoveFilesService
     /// CopyFile carries the source's attributes across, so the copy of a
     /// read-only source is read-only and the attribute has to come off before
     /// the delete. Safe on this file above any other: this process wrote it
-    /// seconds ago at a name it chose.
+    /// seconds ago at a name it chose. Nothing puts it back on a failure here,
+    /// unlike the source's, because the copy is not a file the user has: the
+    /// record already says it exists in both places, and a read-only leftover is
+    /// only harder for them to remove by hand.
     ///
     /// No check that what sits at destPath is still that file, deliberately:
     /// any identity check is itself racy and the window is milliseconds.

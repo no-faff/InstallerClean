@@ -197,6 +197,7 @@ public sealed class DeleteFilesService : IDeleteFilesService
                             // the second it would not show what beat it.
                             failureLog.Record(ex);
                             failureLog.Record(retry);
+                            RestoreReadOnly(filePath, failureLog);
                             errors.Add(new AccessDenied(filePath));
                             continue;
                         }
@@ -271,6 +272,32 @@ public sealed class DeleteFilesService : IDeleteFilesService
         {
             failureLog.Record(ex);
             return false;
+        }
+    }
+
+    /// <summary>
+    /// Puts back the read-only attribute cleared for a retry that then failed.
+    /// The file is the user's, it is still in C:\Windows\Installer, and the run
+    /// has just told them it could not be deleted, which has to be true of the
+    /// file's attributes as well as of the file.
+    ///
+    /// Reached only from inside the branch where
+    /// <see cref="TryClearReadOnly"/> returned true, so there is always an
+    /// attribute to put back. Guarded, unlike the clear: a throw in the tidying
+    /// up must not replace the two errors already recorded for this file.
+    /// </summary>
+    private void RestoreReadOnly(string filePath, PerItemFailureLog failureLog)
+    {
+        try
+        {
+            _fs.File.SetAttributes(filePath,
+                _fs.File.GetAttributes(filePath) | FileAttributes.ReadOnly);
+        }
+        catch (Exception ex)
+        {
+            failureLog.Record(new InvalidOperationException(
+                $"The read-only attribute cleared from {filePath} could not be put back after the "
+                + "retried delete failed.", ex));
         }
     }
 }

@@ -156,10 +156,12 @@ public class DeleteFilesServiceUnitTests
     /// The same filesystem posing as one holding a READ-ONLY file: the first
     /// Delete refuses, and a Delete after the attribute has been cleared
     /// succeeds. <paramref name="clearThrows"/> makes SetAttributes refuse too,
-    /// which is the fail-closed leg.
+    /// which is the fail-closed leg. <paramref name="retryThrows"/> lets the
+    /// clear succeed and beats the retry anyway, which is the only way to reach
+    /// the arm that has an attribute to put back.
     /// </summary>
     private static IFileSystem FileSystemHoldingAReadOnlyFile(
-        string source, out IFile file, Exception? clearThrows = null)
+        string source, out IFile file, Exception? clearThrows = null, Exception? retryThrows = null)
     {
         var fs = FileSystemReporting(source);
         file = fs.File;
@@ -177,6 +179,7 @@ public class DeleteFilesServiceUnitTests
         {
             if (attributes.HasFlag(FileAttributes.ReadOnly))
                 throw new UnauthorizedAccessException("read-only");
+            if (retryThrows is not null) throw retryThrows;
         });
         return fs;
     }
@@ -231,6 +234,28 @@ public class DeleteFilesServiceUnitTests
         // One attempt, then the same error as before: a clear that throws leaves
         // the file exactly where a delete that throws leaves it.
         file.Received(1).Delete(source);
+    }
+
+    [Fact]
+    public async Task A_read_only_file_the_retry_could_not_delete_keeps_its_attribute()
+    {
+        // The clear succeeds and the retried delete is beaten anyway, which is
+        // the arm that was leaving one step of an abandoned operation committed:
+        // the file stays in the cache, the screen says it could not be deleted,
+        // and the read-only bit it arrived with had come off. Neither test above
+        // reaches this, one retrying successfully and the other never clearing.
+        var source = $@"{Dir}\readonly-refused.msi";
+        var fs = FileSystemHoldingAReadOnlyFile(source, out var file,
+            retryThrows: new UnauthorizedAccessException("refused after the clear"));
+
+        var result = await new DeleteFilesService(fs).DeleteFilesAsync(new[] { source });
+
+        Assert.Equal(0, result.DeletedCount);
+        Assert.IsType<AccessDenied>(Assert.Single(result.Errors));
+        // The clear happened, so the end state below is a restore rather than an
+        // attribute nothing ever touched.
+        file.Received(1).SetAttributes(source, FileAttributes.Archive);
+        Assert.Equal(FileAttributes.ReadOnly | FileAttributes.Archive, file.GetAttributes(source));
     }
 
     [Fact]
