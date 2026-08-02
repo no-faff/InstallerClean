@@ -274,3 +274,36 @@ jobs:
         if: '!cancelled()'
         run: node scripts/gen-translation-table.mjs --check
 
+  # The four packages.lock.json files are the project's only statement of what
+  # is in the shipped binary closure, and every restore in the job above is
+  # windows-2025, where System.Diagnostics.EventLog resolves out of the Desktop
+  # shared framework whether the lock lists it or not. A lock that has lost it
+  # therefore restores clean on Windows and fails NU1004 on Linux, which is the
+  # damage the Dependabot relock job did on its one live firing (750c680e).
+  # Nothing could see it, and this is the restore that can.
+  #
+  # A separate job rather than a step, because the one above is pinned to
+  # windows-2025 and this has to run somewhere else. It reads the same locks
+  # from the same checkout and writes nothing.
+  #
+  # It gates nothing on its own: branch protection requires build-and-test and
+  # Analyse C# by name, so this has to be added there before a red one can stop
+  # a merge. Until it is, the log is the whole of it.
+  lock-files:
+    name: Lock files (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      # EnableWindowsTargeting is what lets a Linux SDK resolve the Windows
+      # Desktop targeting packs the GUI needs; RestoreLockedMode is what makes
+      # the restore read the committed locks rather than rewrite them.
+      - name: Restore in locked mode
+        run: dotnet restore src/InstallerClean.sln -p:EnableWindowsTargeting=true -p:RestoreLockedMode=true
+
