@@ -54,13 +54,39 @@ const columns = (s) => {
   return n;
 };
 
+// The value as the console draws it rather than as the XML holds it, which are
+// two edits apart.
+//
+// The resx is XML, so &, <, >, " and the &#10; line break are entities in the
+// file and characters by the time ResourceManager hands the value over: an
+// &amp; measured raw counts five columns where the console draws one, and a
+// &#10; counted raw hides a line break from the split below. &amp; is decoded
+// last so that &amp;lt; stays &lt; rather than becoming <.
+//
+// And Strings.Get spends {InstallerFolder} on the way out (InstallerFolderToken
+// over InstallerCacheHelpers.InstallerFolder, which is SpecialFolder.Windows +
+// "Installer"), so Cli.Help.Header is three columns wider on screen than in the
+// file. A machine whose Windows lives somewhere else draws it wider again: the
+// widest of the sixteen headers is 56 columns substituted, so that path would
+// have to run 18 characters past C:\Windows\Installer before the budget bit.
+const FOLDER = 'C:\\Windows\\Installer';
+const printed = (value) => value
+  .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+  .replace(/&#x([0-9a-fA-F]+);/g, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+  .replace(/&lt;/g, '<')
+  .replace(/&gt;/g, '>')
+  .replace(/&quot;/g, '"')
+  .replace(/&apos;/g, "'")
+  .replace(/&amp;/g, '&')
+  .replaceAll('{InstallerFolder}', FOLDER);
+
 const parse = (file) => {
   const xml = readFileSync(`${dir}/${file}`, 'utf8');
   const re = /<data\s+name="([^"]+)"[^>]*>\s*<value>([\s\S]*?)<\/value>/g;
   const out = [];
   let m;
   while ((m = re.exec(xml)) !== null)
-    if (m[1].startsWith('Cli.Help.')) out.push([m[1], m[2]]);
+    if (m[1].startsWith('Cli.Help.')) out.push([m[1], printed(m[2])]);
   return out;
 };
 
