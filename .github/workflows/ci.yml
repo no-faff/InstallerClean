@@ -223,9 +223,12 @@ jobs:
 
       # The four language gates run last, and each runs even when one before it
       # has failed. TWO of them are red BY DESIGN for the window between a string
-      # landing in English and its translation round, check-accelerators and
-      # check-still-english. The other two are regeneration and rule guards whose
-      # red always means a mistake, and they sit here for the same reason rather
+      # landing in English and its translation round: check-accelerators and
+      # check-still-english. The other two, check-cross-key-rules and
+      # gen-translation-table --check, are expected green at all times and their
+      # red means a mistake. Naming all four is the point, because working the
+      # other two out by elimination is what once produced a note claiming every
+      # gate here was deliberate. They sit at the end for the same reason rather
       # than for one of their own: from the old position ahead of the build, one
       # deliberate red took everything after it down, and the whole 2.4.0 line of
       # work was written against a suite that had not run anywhere.
@@ -252,6 +255,13 @@ jobs:
       # rule of that shape, and the About window's donate button consequently
       # showed one phrase and spoke another in two languages across four
       # releases.
+      #
+      # Red for one known reason at 2.4.0, which is the rule working rather than
+      # an exception to the paragraph above: Russian labels three Cancel buttons
+      # "Отмена" and speaks "Отменить сканирование" and its two siblings over
+      # them, and the noun is not inside the verb form. The fix is one word in
+      # gen-strings-ru.mjs, so it belongs to the translation batch and the red
+      # stands until that runs.
       - name: Check cross-key rules
         if: '!cancelled()'
         run: node scripts/check-cross-key-rules.mjs
@@ -267,9 +277,9 @@ jobs:
       # docs/translations/*.md carry the same "generated, never hand-edited"
       # contract as the resx guards above and had no guard at all, which is how
       # all fourteen reached HEAD in 47a00f5 still quoting two strings that
-      # commit had removed from the app. They are the pages the README's
-      # Contributing section points native speakers at, so a stale one asks for
-      # corrections to text that no longer exists.
+      # commit had removed from the app. They are the pages the translation
+      # feedback issue template and CONTRIBUTING.md point native speakers at, so
+      # a stale one asks for corrections to text that no longer exists.
       - name: Check translation review tables are in step
         if: '!cancelled()'
         run: node scripts/gen-translation-table.mjs --check
