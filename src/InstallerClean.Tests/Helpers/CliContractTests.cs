@@ -252,15 +252,18 @@ public class CliContractTests
     }
 
     [Fact]
-    public void EntryType_notices_are_warning()
+    public void EntryType_the_withheld_notice_is_warning()
     {
-        // A withheld class means the run's list was short, and a missing
-        // registered file is the one thing this tool reports that somebody has
-        // to act on. Neither may be filtered out by an operator watching at
-        // "Warning and above".
         Assert.Equal(EventLogEntryType.Warning,
             CliContract.EntryTypeFor(CliEventClass.ScanWithheldNotice));
-        Assert.Equal(EventLogEntryType.Warning,
+    }
+
+    [Fact]
+    public void EntryType_the_missing_files_notice_is_information()
+    {
+        // The run-versus-machine split, which EntryTypeFor's own doc argues.
+        // Every other class is Warning, so this is the arm a tidy-up folds away.
+        Assert.Equal(EventLogEntryType.Information,
             CliContract.EntryTypeFor(CliEventClass.ScanMissingFilesNotice));
     }
 }

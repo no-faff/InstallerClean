@@ -255,15 +255,24 @@ internal static class CliContract
     };
 
     /// <summary>
-    /// The Application-channel entry type for an entry class. Only a clean
-    /// success is Information; partial, transient-skip and hard-error are
-    /// Warning so a "Warning and above" filter catches every run that did
-    /// not fully do its job. The two notices are Warning for the same reason
-    /// read the other way round: a withheld class means the run's list was
-    /// short, and a missing registered file is the one thing this tool reports
-    /// that somebody has to act on, so neither may be filtered out by an
-    /// operator who is watching for trouble.
+    /// The Application-channel entry type for an entry class. Warning means THIS
+    /// RUN fell short of its job; Information means a standing property of the
+    /// machine. That reading is not new: while one entry per run was the whole
+    /// contract, "source InstallerClean, level Warning" and "a run that did not
+    /// fully do its job" were the same statement, and every consumer written
+    /// before the notices existed was built on it.
+    ///
+    /// Hence a clean success Information, partial / transient-skip / hard-error
+    /// Warning, and the withheld notice Warning because that run's list genuinely
+    /// was short. The missing-files notice is the one that is not about the run:
+    /// it is true whether or not the run worked and repeats for as long as the
+    /// files are gone, so at Warning a machine with nothing wrong with it posts
+    /// one nightly for ever, and the operator's answer to that is a suppression
+    /// rule on Source = InstallerClean, which takes the 4000 band with it.
     /// </summary>
-    internal static EventLogEntryType EntryTypeFor(CliEventClass outcome) =>
-        outcome == CliEventClass.Ok ? EventLogEntryType.Information : EventLogEntryType.Warning;
+    internal static EventLogEntryType EntryTypeFor(CliEventClass outcome) => outcome switch
+    {
+        CliEventClass.Ok or CliEventClass.ScanMissingFilesNotice => EventLogEntryType.Information,
+        _ => EventLogEntryType.Warning,
+    };
 }
