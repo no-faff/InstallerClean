@@ -345,13 +345,21 @@ public sealed class FileSystemScanService : IFileSystemScanService
         // that could reach this gate at all, not one would have been refused by
         // these bounds, taking each run at the worst reading its figures allow.
         //
-        // The proportional clause is 19P < M: one missing row is enough at
-        // P = 0 and twenty at P = 1. Its denominator excludes the superseded
-        // rows whose file Windows has already removed, so it is not a fifth of
-        // the registrations, and the tests pin both sides of both bounds.
+        // The proportional clause is 19P < M, with P floored at one before it is
+        // applied. Unfloored it is 0 < M at P = 0, so one missing row refused the
+        // whole scan there: a machine with a single registered package whose file
+        // has gone, which is what the missing-from-disk banner exists to report
+        // and not the fault this gate was written for. Floored, a machine with no
+        // survivor has to show the same twenty missing rows a machine with one
+        // survivor already had to, and P = 1 and P = 2 are arithmetically
+        // untouched, which is why the measurement above stands as it was taken.
+        // Its denominator excludes the superseded rows whose file Windows has
+        // already removed, so it is not a fifth of the registrations, and the
+        // tests pin both sides at each P the absolute bound admits.
         var presentRegistered = nonRemovablePresent + removablePresent;
+        var survivorsForBound = Math.Max(presentRegistered, 1);
         if (presentRegistered <= 2
-            && presentRegistered * 20 < presentRegistered + missingNonRemovable
+            && survivorsForBound * 20 < survivorsForBound + missingNonRemovable
             && removable.Count > 0)
             throw new LocalisedInvalidOperationException(Strings.Error_ScanCorrelationFailed);
 

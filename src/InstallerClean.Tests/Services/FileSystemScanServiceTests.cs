@@ -123,12 +123,18 @@ public class FileSystemScanServiceTests
         Assert.Single(result.RemovableFiles);
     }
 
-    // The proportional clause reduces to 19P < M, so for each P the absolute
-    // bound admits, the answer changes between M = 19P and one more than it.
-    // Both sides of both are pinned here because the clause is written as
+    // The proportional clause reduces to 19P < M with P floored at one, so for
+    // each P the absolute bound admits, the answer changes between M = 19P and
+    // one more than it, and no survivors answers on one survivor's threshold.
+    // Both sides of each are pinned here because the clause is written as
     // P * 20 < P + M, which invites being "simplified" into a percentage, and a
-    // percentage moves the bound by one without failing anything else.
+    // percentage moves the bound by one without failing anything else. The
+    // (0, 1) row is the floor's own: without it a single registered file missing
+    // from a machine with one orphan in the folder refused the entire scan.
     [Theory]
+    [InlineData(0, 1, false)]
+    [InlineData(0, 19, false)]
+    [InlineData(0, 20, true)]
     [InlineData(1, 19, false)]
     [InlineData(1, 20, true)]
     [InlineData(2, 38, false)]
