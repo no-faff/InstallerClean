@@ -446,8 +446,6 @@ if (!text.endsWith('\n')) text += '\n';
 writeFileSync(OUT, text, 'utf8');
 
 // ---------------- self-check the written file against the neutral ----------------
-const isMachineCliKey = (k) =>
-  k.startsWith('Cli.') && k.includes('EventLog') && k !== 'Cli.EventLogUnavailable';
 const placeholders = (s) => new Set([...s.matchAll(/\{(\d+)(?::[^}]*)?\}/g)].map((p) => p[1]));
 const parse = (xml) => {
   const map = new Map();
@@ -462,6 +460,12 @@ const output = parse(written);
 // ja ships every neutral key, machine Cli included, bar the one stripped above.
 const neutralRequired = [...neutral.keys()].filter((k) => !STRIPPED.has(k));
 const strippedLeaked = [...STRIPPED].filter((k) => output.has(k));
+
+// The one human-facing Cli.EventLog* key, asserted present rather than left to
+// the counts: a hand edit adding it to the named set above takes it out of the
+// output AND out of the required set, so every figure above still agrees. The
+// MAP substitution notices today only through the order the two run in.
+const humanCliStripped = !output.has('Cli.EventLogUnavailable');
 
 const missingFromMap = neutralRequired.filter((k) => !(k in MAP));
 const strayMapKeys = Object.keys(MAP).filter((k) => !neutral.has(k));
@@ -498,9 +502,11 @@ if (missingFromOutput.length) console.log('!! required key missing from output:'
 if (arityMismatch.length) console.log('!! placeholder arity differs from neutral:', arityMismatch);
 if (untranslated.length) console.log('!! still English (untranslated), ' + untranslated.length + ': ' + untranslated.slice(0, 40).join(', '));
 if (strippedLeaked.length) console.log('!! still in the output; the strip regex missed them:', strippedLeaked);
+if (humanCliStripped) console.log('!! Cli.EventLogUnavailable stripped: that key is human-facing and must stay');
 
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
-  !missingFromOutput.length && !arityMismatch.length && !strippedLeaked.length && stripped === STRIPPED.size &&
+  !missingFromOutput.length && !arityMismatch.length && !strippedLeaked.length &&
+  !humanCliStripped && stripped === STRIPPED.size &&
   output.size === neutralRequired.length && crlf === 0;
 const ok = structuralOk && !untranslated.length;
 console.log(ok ? '\nGENERATION OK' : '\nGENERATION HAS ISSUES (see above)');

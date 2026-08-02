@@ -646,6 +646,12 @@ const cliStrayMap = cliKeys.filter((k) => !neutral.has(k) || isMachineCli(k));
 const cliMissingFromMap = neutralHumanCli.filter((k) => !(k in CLI));
 const cliMissingFromOutput = neutralHumanCli.filter((k) => !output.has(k));
 const cliMachineLeaked = [...output.keys()].filter(isMachineCli);
+
+// The one human-facing Cli.EventLog* key, asserted present rather than left to
+// the counts: a predicate that stopped discriminating it takes it out of the
+// output AND out of the required set, so every figure above still agrees. The
+// MAP substitution notices today only through the order the two run in.
+const humanCliStripped = !output.has('Cli.EventLogUnavailable');
 const cliArityMismatch = cliKeys.filter((k) => {
   if (!output.has(k) || !neutral.has(k)) return false; // counted by the stray/missing checks
   const a = placeholders(neutral.get(k)), b = placeholders(output.get(k));
@@ -678,6 +684,7 @@ if (cliStrayMap.length) console.log('!! CLI map key not a human neutral key:', c
 if (cliMissingFromMap.length) console.log('!! human Cli key missing from CLI map:', cliMissingFromMap);
 if (cliMissingFromOutput.length) console.log('!! human Cli key missing from output:', cliMissingFromOutput);
 if (cliMachineLeaked.length) console.log('!! machine Cli.EventLog* key leaked into output:', cliMachineLeaked);
+if (humanCliStripped) console.log('!! Cli.EventLogUnavailable stripped: that key is human-facing and must stay');
 if (cliArityMismatch.length) console.log('!! Cli placeholder arity differs from neutral:', cliArityMismatch);
 if (cliUntranslated.length) console.log('!! Cli key still English (untranslated):', cliUntranslated);
 if (untranslated.length) {
@@ -692,7 +699,8 @@ const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKe
   !missingFromOutput.length && !arityMismatch.length &&
   !overrideMissing.length && !overrideArityMismatch.length &&
   !cliStrayMap.length && !cliMissingFromMap.length && !cliMissingFromOutput.length &&
-  !cliMachineLeaked.length && !cliArityMismatch.length && !cliUntranslated.length &&
+  !cliMachineLeaked.length && !humanCliStripped &&
+  !cliArityMismatch.length && !cliUntranslated.length &&
   output.size === neutralNonCli.length + overrideKeys.length + cliKeys.length &&
   cliRemoved === cliExpected && crlf === 0;
 const ok = structuralOk && !untranslated.length;

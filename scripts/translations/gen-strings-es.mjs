@@ -477,6 +477,12 @@ const overrideArityMismatch = overrideKeys.filter((k) => {
 const missingFromMap = neutralRequired.filter((k) => !(k in MAP));
 const strayMapKeys = Object.keys(MAP).filter((k) => !neutral.has(k));
 const machineLeaked = [...output.keys()].filter(isMachineCliKey);
+
+// The one human-facing Cli.EventLog* key, asserted present rather than left to
+// the counts: a predicate that stopped discriminating it takes it out of the
+// output AND out of the required set, so every figure above still agrees. The
+// MAP substitution notices today only through the order the two run in.
+const humanCliStripped = !output.has('Cli.EventLogUnavailable');
 const missingFromOutput = neutralRequired.filter((k) => !output.has(k));
 const arityMismatch = neutralRequired.filter((k) => {
   if (!output.has(k)) return false; // already counted by missingFromOutput
@@ -519,6 +525,7 @@ if (strayMapKeys.length) console.log('!! in MAP but not in neutral:', strayMapKe
 if (missingFromOutput.length) console.log('!! required key missing from output:', missingFromOutput);
 if (arityMismatch.length) console.log('!! placeholder arity differs from neutral:', arityMismatch);
 if (machineLeaked.length) console.log('!! machine Cli keys leaked into output:', machineLeaked);
+if (humanCliStripped) console.log('!! Cli.EventLogUnavailable stripped: that key is human-facing and must stay');
 if (overrideMissing.length) console.log('!! override key missing from output:', overrideMissing);
 if (overrideArityMismatch.length) console.log('!! override arity differs from its base key:', overrideArityMismatch);
 if (untranslated.length) {
@@ -531,6 +538,7 @@ if (untranslated.length) {
 
 const structuralOk = !notApplied.length && !missingFromMap.length && !strayMapKeys.length &&
   !missingFromOutput.length && !arityMismatch.length && !machineLeaked.length &&
+  !humanCliStripped &&
   !overrideMissing.length && !overrideArityMismatch.length &&
   output.size === neutralRequired.length + overrideKeys.length && cliMachineRemoved === cliMachineExpected && crlf === 0;
 const ok = structuralOk && !untranslated.length;
