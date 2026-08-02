@@ -108,8 +108,28 @@ const NO_VISIBLE_LABEL = new Set([
 // comment tells the translator to use whatever Action.Rescan says in their
 // language. Reword the button in one language without the sentence and that
 // language names a button it does not have.
+//
+// Membership is every neutral sentence naming a button whose label the language
+// can quote uninflected. Not every sentence that mentions one: the
+// pending-reboot family says "Move and Delete are paused", which several
+// languages have to inflect, so a rule there would fault a correct translation.
+// And four that do belong (Automation.ConfirmDelete,
+// Confirm.DeletePermanently.*, Summary.ProgramsUnreadable.* and
+// Error.DestinationChangedMidBatch) are out only while their satellites hold
+// English for the coming translation round: added now they would fault fifteen
+// languages for the one thing the still-English gate already reports.
 const QUOTES_A_LABEL = [
   { sentence: 'Body.NotScanned.Why', label: 'Action.Rescan' },
+  // "Open Details for what to do", against the registered files row's button.
+  { sentence: 'Summary.MissingFromDisk.Singular', label: 'Action.Details' },
+  { sentence: 'Summary.MissingFromDisk.Plural', label: 'Action.Details' },
+  // The two confirmation dialogs' spoken help names both of their own buttons,
+  // which is the whole of what it says: "Move puts the files in the chosen
+  // folder. Cancel leaves them where they are."
+  { sentence: 'Automation.ConfirmMove', label: 'Action.Move' },
+  { sentence: 'Automation.ConfirmMove', label: 'Action.Cancel' },
+  { sentence: 'Automation.ConfirmSendResultLog', label: 'Action.SendResultLogConfirm' },
+  { sentence: 'Automation.ConfirmSendResultLog', label: 'Action.Cancel' },
 ];
 
 // ---------------------------------------------------------------------------
