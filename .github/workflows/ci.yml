@@ -311,9 +311,6 @@ jobs:
         with:
           global-json-file: global.json
 
-      # EnableWindowsTargeting is what lets a Linux SDK resolve the Windows
-      # Desktop targeting packs the GUI needs; RestoreLockedMode is what makes
-      # the restore read the committed locks rather than rewrite them.
       - name: Restore in locked mode
         run: dotnet restore src/InstallerClean.sln -p:EnableWindowsTargeting=true -p:RestoreLockedMode=true
 
