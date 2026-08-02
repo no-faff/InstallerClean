@@ -115,13 +115,22 @@ jobs:
         if: success() || failure()
         run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/self-contained
 
+      # PublishSelfContained=false is what actually disables the .NET 8+ rule
+      # "PublishSingleFile=true implies SelfContained=true"; --self-contained
+      # false sets the other property and .NET 10 no longer takes it, so these
+      # two steps built the self-contained shape under a framework-dependent
+      # name. Measured on the CLI, same source, same SDK: 76,226,775 bytes with
+      # --self-contained false alone, 2,881,723 with the two properties. The GUI
+      # goes 134,373,581 to 3,889,065. The flags below are the release script's
+      # own (dotnet/sdk#52070), which is what makes this a smoke test of the
+      # shape that ships rather than a second copy of the step above it.
       - name: Smoke-publish framework-dependent
         if: success() || failure()
-        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained false -p:RestoreLockedMode=true -p:PublishSingleFile=true -o publish/framework-dependent
+        run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 -p:RestoreLockedMode=true -p:PublishSelfContained=false -p:SelfContained=false -p:PublishSingleFile=true -o publish/framework-dependent
 
       - name: Smoke-publish CLI framework-dependent
         if: success() || failure()
-        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained false -p:RestoreLockedMode=true -p:PublishSingleFile=true -o publish/cli-framework-dependent
+        run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 -p:RestoreLockedMode=true -p:PublishSelfContained=false -p:SelfContained=false -p:PublishSingleFile=true -o publish/cli-framework-dependent
 
       # publish/cli is where installer/InstallerClean.iss reads the CLI from, so
       # it holds the self-contained single-file build: that is the shape the
