@@ -41,7 +41,16 @@ public class MoveSpaceCheckIntegrationTests
     {
         // No ancestor exists, up to and including the root, so there is nothing
         // to measure and the caller makes no claim in either direction.
-        Assert.Null(MoveSpaceCheck.AvailableFreeSpaceForDestination(@"Q:\nope\never"));
+        //
+        // The letter is found rather than named. A hardcoded one passes on a
+        // runner that does not have that drive and fails on the machine of
+        // anybody who does, for a reason with nothing to do with this code, and
+        // the runners have C: and D: only.
+        var unmounted = TestHost.FirstUnmountedDriveLetter();
+        if (unmounted is null)
+            return; // every letter is in use on this host
+
+        Assert.Null(MoveSpaceCheck.AvailableFreeSpaceForDestination($@"{unmounted}:\nope\never"));
     }
 
     [Fact]
