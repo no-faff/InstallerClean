@@ -221,7 +221,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Setting not saved | Paramètre non enregistré |
 | The change could not be saved. InstallerClean will go back to the previous setting next time it starts. | La modification n'a pas pu être enregistrée. Au prochain démarrage, InstallerClean reviendra au paramètre précédent. |
 | The destination cannot be inside the Windows Installer folder. | La destination ne peut pas se trouver dans le dossier Windows Installer. |
-| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | La destination {0} se trouve dans un dossier système de Windows. Choisissez un chemin en dehors de %SystemRoot%, %ProgramFiles% et %ProgramData%. |
+| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. |
 | Not enough space | Espace insuffisant |
 | Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | Espace insuffisant dans {0}<br><br>Nécessaire : {1}<br>Disponible : {2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | Vous n'avez pas l'autorisation d'écrire dans {0}.<br>Essayez un dossier dans votre profil utilisateur ou sur un lecteur qui vous appartient. |
@@ -411,34 +411,39 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Français |
 | --- | --- |
-| Unknown argument: '{0}' | Argument inconnu : « {0} » |
+| Error: unknown argument '{0}' | Error: unknown argument '{0}' |
 | Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | Erreur : argument supplémentaire inattendu « {0} ». Si votre dossier de déplacement contient un espace, mettez le chemin entier entre guillemets : /m "D:\My Backup" |
 | Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. | Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. |
 | Cancelling... | Annulation... |
 | Cancelled. | Annulé. |
-| Error: {0}. Details written to {1}. | Erreur : {0}. Détails écrits dans {1}. |
-| Error: {0}. The crash log could not be written. | Erreur : {0}. Le crash.log n'a pas pu être écrit. |
+| Error: unexpected failure ({0}). Details written to {1}. | Error: unexpected failure ({0}). Details written to {1}. |
+| Error: unexpected failure ({0}). The crash log could not be written. | Error: unexpected failure ({0}). The crash log could not be written. |
 | Scanning {InstallerFolder}... | Analyse de {InstallerFolder}... |
-| Found {0} {1} to clean up ({2}). | Trouvé {0} {1} à nettoyer ({2}). |
-| Nothing to do. | Rien à faire. |
+| Found {0} unneeded {1} to clean up ({2}). | Found {0} unneeded {1} to clean up ({2}). |
+| Found no unneeded files. | Found no unneeded files. |
 | {0} registered file is missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, the same version, usually restores it. | {0} registered file is missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, the same version, usually restores it. |
 | {0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them. | {0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them. |
-| Deleting {0} {1}... | Suppression de {0} {1}... |
+| Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up. | Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up. |
+| Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up. | Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up. |
+| Deleting {0} unneeded {1}... | Deleting {0} unneeded {1}... |
 | Permanently deleted {0} unneeded {1}. | Permanently deleted {0} unneeded {1}. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Erreur : aucune destination de déplacement spécifiée. Utilisez /m CHEMIN. (Une valeur par défaut définie dans l'interface est propre à chaque utilisateur et ne s'applique pas aux exécutions planifiées ou par compte de service.) |
 | Error: destination cannot be inside the Windows Installer folder. | Erreur : la destination ne peut pas se trouver dans le dossier Windows Installer. |
 | Error: destination must be a fully qualified path. Got: {0} | Erreur : la destination doit être un chemin entièrement qualifié. Reçu : {0} |
-| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Erreur : la destination {0} se trouve dans un dossier système de Windows. Choisissez un chemin en dehors de %SystemRoot%, %ProgramFiles% et %ProgramData%. |
+| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. |
 | Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved. | Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved. |
 | Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. | Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. |
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. |
 | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. |
 | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. |
-| Moving {0} {1} to {2}... | Déplacement de {0} {1} vers {2}... |
-| Moved {0} {1}. | Déplacé {0} {1}. |
+| Moving {0} unneeded {1} to {2}... | Moving {0} unneeded {1} to {2}... |
+| Moved {0} unneeded {1}. | Moved {0} unneeded {1}. |
+| The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again. | The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Un autre processus InstallerClean détient le verrou d'instance unique (l'interface ou une autre exécution de la CLI). Code de sortie 75 (transitoire) ; vous pouvez réessayer plus tard sans risque. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Remarque : l'écriture dans le journal des événements a échoué. Vérifiez les autorisations du journal Application ou la stratégie de groupe. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - nettoyage de {InstallerFolder} |
+| Removes cached .msi and .msp files that no installed program still needs. | Removes cached .msi and .msp files that no installed program still needs. |
+| Needs an elevated (administrator) prompt; Windows will not start it. | Needs an elevated (administrator) prompt; Windows will not start it. |
 | Usage: | Utilisation : |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Affiche cette aide (accepte aussi /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Affiche la version (accepte aussi -v) |
@@ -446,13 +451,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         Delete unneeded files permanently |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         Move to the saved backup folder |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m CHEMIN  Déplace vers le chemin spécifié |
-| installerclean-cli is a real console process and blocks the prompt | installerclean-cli est un vrai processus de console et bloque l'invite |
-| until it finishes; redirect or pipe its output as you would any | jusqu'à la fin ; redirigez ou acheminez sa sortie comme vous le feriez |
-| other console exe. The GUI lives in InstallerClean.exe alongside it. | pour tout autre exécutable de console. L'interface est InstallerClean.exe. |
+| installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. |
 | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
 | Exit codes: | Codes de sortie : |
-|   0   success: every flagged file was processed |   0   succès : tous les fichiers signalés ont été traités |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   échec : rien de traité (arguments, analyse ou fichiers en échec) |
-|   2   partial: some files processed, some failed |   2   partiel : certains fichiers traités, d'autres ont échoué |
+|   0   success: the run finished with nothing left to do |   0   success: the run finished with nothing left to do |
+|   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |
+|   2   partial: some processed, some not (a failure or a Ctrl+C part way) |   2   partial: some processed, some not (a failure or a Ctrl+C part way) |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  transitoire : quelque chose a bloqué l'exécution (voir le message) |
 |   130 cancelled (Ctrl+C) |   130 annulé (Ctrl+C) |

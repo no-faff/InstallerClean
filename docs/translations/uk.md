@@ -221,7 +221,7 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 | Setting not saved | Налаштування не збережено |
 | The change could not be saved. InstallerClean will go back to the previous setting next time it starts. | Не вдалося зберегти зміну. Під час наступного запуску InstallerClean повернеться до попереднього налаштування. |
 | The destination cannot be inside the Windows Installer folder. | Призначення не може бути всередині папки Windows Installer. |
-| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Призначення {0} вказує всередину системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles% та %ProgramData%. |
+| The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. |
 | Not enough space | Недостатньо місця |
 | Not enough space at {0}<br><br>Required: {1}<br>Available: {2} | Недостатньо місця в {0}<br><br>Потрібно: {1}<br>Доступно: {2} |
 | You don't have permission to write to {0}.<br>Try a folder in your user profile or on a drive you own. | У вас немає дозволу на запис у {0}.<br>Спробуйте папку у вашому профілі користувача або на диску, який вам належить. |
@@ -411,34 +411,39 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 
 | English | Українська |
 | --- | --- |
-| Unknown argument: '{0}' | Невідомий аргумент: «{0}» |
+| Error: unknown argument '{0}' | Error: unknown argument '{0}' |
 | Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\My Backup" | Помилка: неочікуваний зайвий аргумент «{0}». Якщо в назві папки для переміщення є пробіл, візьміть увесь шлях у лапки: /m "D:\My Backup" |
 | Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. | Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run. |
 | Cancelling... | Скасування... |
 | Cancelled. | Скасовано. |
-| Error: {0}. Details written to {1}. | Помилка: {0}. Деталі записано до {1}. |
-| Error: {0}. The crash log could not be written. | Помилка: {0}. Не вдалося записати журнал збоїв. |
+| Error: unexpected failure ({0}). Details written to {1}. | Error: unexpected failure ({0}). Details written to {1}. |
+| Error: unexpected failure ({0}). The crash log could not be written. | Error: unexpected failure ({0}). The crash log could not be written. |
 | Scanning {InstallerFolder}... | Сканування {InstallerFolder}... |
-| Found {0} {1} to clean up ({2}). | Знайдено {0} {1} для очищення ({2}). |
-| Nothing to do. | Немає чого робити. |
+| Found {0} unneeded {1} to clean up ({2}). | Found {0} unneeded {1} to clean up ({2}). |
+| Found no unneeded files. | Found no unneeded files. |
 | {0} registered file is missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, the same version, usually restores it. | {0} registered file is missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, the same version, usually restores it. |
 | {0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them. | {0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them. |
-| Deleting {0} {1}... | Видалення: {0} {1}... |
+| Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up. | Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up. |
+| Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up. | Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up. |
+| Deleting {0} unneeded {1}... | Deleting {0} unneeded {1}... |
 | Permanently deleted {0} unneeded {1}. | Permanently deleted {0} unneeded {1}. |
 | Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.) | Помилка: не вказано розташування для переміщення. Скористайтеся /m ШЛЯХ. (Типове значення, задане в графічному інтерфейсі, діє лише для поточного користувача і не застосовується до запусків за розкладом чи від імені службового облікового запису.) |
 | Error: destination cannot be inside the Windows Installer folder. | Помилка: призначення не може бути всередині папки Windows Installer. |
 | Error: destination must be a fully qualified path. Got: {0} | Помилка: призначення має бути повним шляхом. Отримано: {0} |
-| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%. | Помилка: призначення {0} вказує всередину системної папки Windows. Виберіть шлях поза %SystemRoot%, %ProgramFiles% та %ProgramData%. |
+| Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. | Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%. |
 | Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved. | Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved. |
 | Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. | Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes. |
 | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. | Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}. |
 | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. | Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning. |
 | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. | Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes. |
-| Moving {0} {1} to {2}... | Переміщення: {0} {1} до {2}... |
-| Moved {0} {1}. | Переміщено {0} {1}. |
+| Moving {0} unneeded {1} to {2}... | Moving {0} unneeded {1} to {2}... |
+| Moved {0} unneeded {1}. | Moved {0} unneeded {1}. |
+| The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again. | The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again. |
 | Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later. | Інший процес InstallerClean утримує блокування єдиного екземпляра (графічний інтерфейс чи інший запуск CLI). Вихід 75 (тимчасовий); можна безпечно повторити пізніше. |
 | Note: Event Log writing failed. Check Application log permissions or Group Policy. | Примітка: не вдалося записати до журналу подій. Перевірте дозволи журналу «Програма» чи групову політику. |
 | InstallerClean - clean up {InstallerFolder} | InstallerClean - очищення {InstallerFolder} |
+| Removes cached .msi and .msp files that no installed program still needs. | Removes cached .msi and .msp files that no installed program still needs. |
+| Needs an elevated (administrator) prompt; Windows will not start it. | Needs an elevated (administrator) prompt; Windows will not start it. |
 | Usage: | Використання: |
 |   installerclean-cli --help     Show this help (also accepts /?, -h) |   installerclean-cli --help     Показати цю довідку (також приймає /?, -h) |
 |   installerclean-cli --version  Print the version (also accepts -v) |   installerclean-cli --version  Вивести версію (також приймає -v) |
@@ -446,13 +451,11 @@ A few lines (the app name, version, file-size formats, and the command-line tool
 |   installerclean-cli /d         Delete unneeded files permanently |   installerclean-cli /d         Delete unneeded files permanently |
 |   installerclean-cli /m         Move to the saved backup folder |   installerclean-cli /m         Move to the saved backup folder |
 |   installerclean-cli /m PATH    Move to specified path |   installerclean-cli /m ШЛЯХ    Перемістити за вказаним шляхом |
-| installerclean-cli is a real console process and blocks the prompt | installerclean-cli — це консольний процес, що блокує командний рядок до |
-| until it finishes; redirect or pipe its output as you would any | завершення; перенаправляйте чи передавайте його вивід, як у будь-якого |
-| other console exe. The GUI lives in InstallerClean.exe alongside it. | іншого консольного exe. Графічний інтерфейс у InstallerClean.exe. |
+| installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. | installerclean-cli blocks the prompt until it finishes, so a script or<br>scheduled task can wait on it. |
 | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. | That folder is saved per-user; scheduled or SYSTEM runs need /m PATH. |
 | Exit codes: | Коди виходу: |
-|   0   success: every flagged file was processed |   0   успіх: оброблено кожен позначений файл |
-|   1   failure: nothing processed (bad args, scan failed, all files failed) |   1   невдача: нічого не оброблено (аргументи, сканування або файли) |
-|   2   partial: some files processed, some failed |   2   частково: частину файлів оброблено, частину ні |
+|   0   success: the run finished with nothing left to do |   0   success: the run finished with nothing left to do |
+|   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |   1   failure: nothing processed (bad arguments, a bad destination, a<br>       failed scan or every file failed) |
+|   2   partial: some processed, some not (a failure or a Ctrl+C part way) |   2   partial: some processed, some not (a failure or a Ctrl+C part way) |
 |   75  transient: a temporary condition blocked the run (see the message) |   75  тимчасова: запуск заблокувала тимчасова умова (див. повідомлення) |
 |   130 cancelled (Ctrl+C) |   130 скасовано (Ctrl+C) |

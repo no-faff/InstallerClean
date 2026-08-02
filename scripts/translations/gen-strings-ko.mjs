@@ -284,7 +284,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `대상은 Windows Installer 폴더 안에 있을 수 없습니다.`,
 
   // 0 = the destination path the user typed
-  'Error.DestinationInSystemFolder': `지정한 대상이 Windows 시스템 폴더 아래로 해석됩니다 ({0}). %SystemRoot%, %ProgramFiles%, %ProgramData% 밖의 경로를 선택하세요.`,
+  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `공간 부족`,
 
   // 0 = destination, 1 = required size, 2 = available size
@@ -398,25 +398,24 @@ const MAP = {
   // Descriptions translated; command tokens, flags, the {InstallerFolder} token
   // and the exit-code numbers verbatim; leading spaces kept (the screen is
   // column-aligned for a monospace terminal); PATH metavariable -> 경로.
-  'Cli.UnknownArgument': `알 수 없는 인수: '{0}'`,
+  'Cli.UnknownArgument': `Error: unknown argument '{0}'`,
   'Cli.Cancelling': `취소 중...`,
   'Cli.Cancelled': `취소되었습니다.`,
-  'Cli.GenericError': `오류: {0}. 자세한 내용을 {1}에 기록했습니다.`,
-  'Cli.GenericError.NoLog': `오류: {0}. 크래시 로그를 기록할 수 없었습니다.`,
+  'Cli.GenericError': `Error: unexpected failure ({0}). Details written to {1}.`,
+  'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
   'Cli.ScanningInstaller': `{InstallerFolder} 검사 중...`,
-  'Cli.FoundOrphans': `정리할 {1} {0}개를 찾았습니다 ({2}).`,
-  'Cli.NothingToDo': `수행할 작업이 없습니다.`,
-  'Cli.DeletingFiles': `{1} {0}개를 삭제하는 중...`,
+  'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
+  'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
   'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `오류: 이동 대상이 지정되지 않았습니다. /m 경로를 사용하세요. (GUI에서 설정한 기본값은 사용자별로 저장되므로, 예약된 작업이나 서비스 계정 실행에는 적용되지 않습니다.)`,
   'Cli.MoveDestinationInsideInstaller': `오류: 대상은 Windows Installer 폴더 안에 있을 수 없습니다.`,
   'Cli.MoveDestinationRelative': `오류: 대상은 정규화된 전체 경로여야 합니다. 입력값: {0}`,
-  'Cli.MoveDestinationInSystemFolder': `오류: 지정한 대상이 Windows 시스템 폴더 아래로 해석됩니다 ({0}). %SystemRoot%, %ProgramFiles%, %ProgramData% 밖의 경로를 선택하세요.`,
+  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
-  'Cli.MovingFiles': `{1} {0}개를 {2}(으)로 이동하는 중...`,
-  'Cli.MovedFiles': `{1} {0}개를 이동했습니다.`,
+  'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
+  'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
   'Cli.MutexBlocked': `다른 InstallerClean 프로세스가 단일 인스턴스 잠금을 보유하고 있습니다(GUI 또는 다른 CLI 실행). 종료 코드 75(일시적); 나중에 다시 시도해도 안전합니다.`,
   'Cli.EventLogUnavailable': `참고: 이벤트 로그 쓰기에 실패했습니다. 응용 프로그램 로그 권한 또는 그룹 정책을 확인하세요.`,
   'Cli.Help.Header': `InstallerClean - {InstallerFolder} 정리`,
@@ -427,13 +426,11 @@ const MAP = {
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m 경로    지정한 경로로 이동`,
-  'Cli.Help.NoteLine1': `installerclean-cli는 실제 콘솔 프로세스로, 명령 프롬프트를 점유하며,`,
-  'Cli.Help.NoteLine2': `실행이 끝날 때까지 기다립니다. 다른 콘솔 앱처럼 출력을 리디렉션하거나`,
-  'Cli.Help.NoteLine3': `파이프로 넘길 수 있습니다. GUI는 옆의 InstallerClean.exe입니다.`,
+  'Cli.Help.NoteLine1': `installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.`,
   'Cli.Help.ExitCodesHeader': `종료 코드:`,
-  'Cli.Help.ExitCodeOk': `  0   성공: 표시된 모든 파일을 처리함`,
-  'Cli.Help.ExitCodeError': `  1   실패: 처리된 파일 없음 (잘못된 인수, 검사 실패, 모든 파일 실패)`,
-  'Cli.Help.ExitCodePartial': `  2   부분 처리: 일부 파일은 처리됨, 일부는 실패`,
+  'Cli.Help.ExitCodeOk': `  0   success: the run finished with nothing left to do`,
+  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)`,
+  'Cli.Help.ExitCodePartial': `  2   partial: some processed, some not (a failure or a Ctrl+C part way)`,
   'Cli.Help.ExitCodeTransient': `  75  일시적: 일시적인 상황으로 실행이 차단됨 (메시지 참고)`,
   'Cli.Help.ExitCodeCancelled': `  130 취소됨 (Ctrl+C)`,
   'Body.NotScanned.Lead': `아직 검사하지 않았습니다.`,
@@ -476,6 +473,12 @@ const MAP = {
   'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.`,
   'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
+  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again.`,
+  'Cli.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
+  'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

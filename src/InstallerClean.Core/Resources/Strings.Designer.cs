@@ -154,6 +154,7 @@ public static class Strings
     public static string Cli_Cancelling => Get("Cli.Cancelling");
     public static string Cli_DeletedFiles => Get("Cli.DeletedFiles");
     public static string Cli_DeletingFiles => Get("Cli.DeletingFiles");
+    public static string Cli_DestinationChangedMidBatch => Get("Cli.DestinationChangedMidBatch");
     public static string Cli_EventLogBadArguments => Get("Cli.EventLogBadArguments");
     public static string Cli_EventLogCancelledNoWork => Get("Cli.EventLogCancelledNoWork");
     public static string Cli_EventLogCancelledPartial => Get("Cli.EventLogCancelledPartial");
@@ -179,10 +180,12 @@ public static class Strings
     public static string Cli_EventLogScanWithheld => Get("Cli.EventLogScanWithheld");
     public static string Cli_EventLogUnavailable => Get("Cli.EventLogUnavailable");
     public static string Cli_EventLogValidationFailed => Get("Cli.EventLogValidationFailed");
+    public static string Cli_FoundNoOrphans => Get("Cli.FoundNoOrphans");
     public static string Cli_FoundOrphans => Get("Cli.FoundOrphans");
     public static string Cli_GenericError => Get("Cli.GenericError");
     public static string Cli_GenericError_NoLog => Get("Cli.GenericError.NoLog");
     public static string Cli_Help_Delete => Get("Cli.Help.Delete");
+    public static string Cli_Help_Elevation => Get("Cli.Help.Elevation");
     public static string Cli_Help_ExitCodeCancelled => Get("Cli.Help.ExitCodeCancelled");
     public static string Cli_Help_ExitCodeError => Get("Cli.Help.ExitCodeError");
     public static string Cli_Help_ExitCodeOk => Get("Cli.Help.ExitCodeOk");
@@ -195,9 +198,8 @@ public static class Strings
     public static string Cli_Help_MovePath => Get("Cli.Help.MovePath");
     public static string Cli_Help_MoveScheduledNote => Get("Cli.Help.MoveScheduledNote");
     public static string Cli_Help_NoteLine1 => Get("Cli.Help.NoteLine1");
-    public static string Cli_Help_NoteLine2 => Get("Cli.Help.NoteLine2");
-    public static string Cli_Help_NoteLine3 => Get("Cli.Help.NoteLine3");
     public static string Cli_Help_ScanOnly => Get("Cli.Help.ScanOnly");
+    public static string Cli_Help_Summary => Get("Cli.Help.Summary");
     public static string Cli_Help_Usage => Get("Cli.Help.Usage");
     public static string Cli_Help_Version => Get("Cli.Help.Version");
     public static string Cli_MissingFromDisk_Plural => Get("Cli.MissingFromDisk.Plural");
@@ -210,11 +212,12 @@ public static class Strings
     public static string Cli_MovingFiles => Get("Cli.MovingFiles");
     public static string Cli_MutexBlocked => Get("Cli.MutexBlocked");
     public static string Cli_NoMoveDestination => Get("Cli.NoMoveDestination");
-    public static string Cli_NothingToDo => Get("Cli.NothingToDo");
     public static string Cli_PendingRebootBlocked_InstallerInProgress => Get("Cli.PendingRebootBlocked.InstallerInProgress");
     public static string Cli_PendingRebootBlocked_MsiExecuteMutex => Get("Cli.PendingRebootBlocked.MsiExecuteMutex");
     public static string Cli_PendingRebootBlocked_Other => Get("Cli.PendingRebootBlocked.Other");
     public static string Cli_PendingRebootBlocked_PendingRenameInCache => Get("Cli.PendingRebootBlocked.PendingRenameInCache");
+    public static string Cli_ProgramsUnreadable_Plural => Get("Cli.ProgramsUnreadable.Plural");
+    public static string Cli_ProgramsUnreadable_Singular => Get("Cli.ProgramsUnreadable.Singular");
     public static string Cli_ScanningInstaller => Get("Cli.ScanningInstaller");
     public static string Cli_TooManyArguments => Get("Cli.TooManyArguments");
     public static string Cli_TooManyArgumentsNoPath => Get("Cli.TooManyArgumentsNoPath");

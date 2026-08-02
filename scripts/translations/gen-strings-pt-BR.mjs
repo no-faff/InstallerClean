@@ -291,7 +291,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `O destino não pode estar dentro da pasta do Windows Installer.`,
 
   // 0 = the destination path the user typed
-  'Error.DestinationInSystemFolder': `O destino {0} fica dentro de uma pasta de sistema do Windows. Escolha um caminho fora de %SystemRoot%, %ProgramFiles% e %ProgramData%.`,
+  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `Espaço insuficiente`,
 
   // 0 = destination, 1 = required size, 2 = available size
@@ -404,25 +404,24 @@ const MAP = {
   // Command-line tool (installerclean-cli): the HUMAN-facing Cli.* keys.
   // The machine-contract Cli.EventLog* keys (bar EventLogUnavailable) are
   // stripped and stay English at the emit site; they are not in this MAP.
-  'Cli.UnknownArgument': `Argumento desconhecido: '{0}'`,
+  'Cli.UnknownArgument': `Error: unknown argument '{0}'`,
   'Cli.Cancelling': `Cancelando...`,
   'Cli.Cancelled': `Cancelado.`,
-  'Cli.GenericError': `Erro: {0}. Detalhes gravados em {1}.`,
-  'Cli.GenericError.NoLog': `Erro: {0}. Não foi possível gravar o crash.log.`,
+  'Cli.GenericError': `Error: unexpected failure ({0}). Details written to {1}.`,
+  'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
   'Cli.ScanningInstaller': `Analisando {InstallerFolder}...`,
-  'Cli.FoundOrphans': `Encontrados {0} {1} para limpar ({2}).`,
-  'Cli.NothingToDo': `Nada a fazer.`,
-  'Cli.DeletingFiles': `Excluindo {0} {1}...`,
+  'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
+  'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
   'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `Erro: nenhum destino de movimentação especificado. Use /m CAMINHO. (Um padrão definido na GUI é por usuário e não se aplica a execuções agendadas ou em contas de serviço.)`,
   'Cli.MoveDestinationInsideInstaller': `Erro: o destino não pode estar dentro da pasta do Windows Installer.`,
   'Cli.MoveDestinationRelative': `Erro: o destino deve ser um caminho totalmente qualificado. Recebido: {0}`,
-  'Cli.MoveDestinationInSystemFolder': `Erro: o destino {0} fica dentro de uma pasta de sistema do Windows. Escolha um caminho fora de %SystemRoot%, %ProgramFiles% e %ProgramData%.`,
+  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
-  'Cli.MovingFiles': `Movendo {0} {1} para {2}...`,
-  'Cli.MovedFiles': `Movidos {0} {1}.`,
+  'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
+  'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
   'Cli.MutexBlocked': `Outro processo do InstallerClean mantém o bloqueio de instância única (a GUI ou outra execução da CLI). Código de saída 75 (transitório); seguro tentar novamente mais tarde.`,
   'Cli.EventLogUnavailable': `Observação: falha ao gravar no Log de Eventos. Verifique as permissões do log de Aplicativo ou a Diretiva de Grupo.`,
   'Cli.Help.Header': `InstallerClean - limpeza de {InstallerFolder}`,
@@ -433,13 +432,11 @@ const MAP = {
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m CAMINHO  Move para o caminho especificado`,
-  'Cli.Help.NoteLine1': `installerclean-cli é um processo de console real e bloqueia o prompt`,
-  'Cli.Help.NoteLine2': `até terminar; redirecione ou encaminhe a saída por pipe como faria`,
-  'Cli.Help.NoteLine3': `com qualquer outro executável de console. A GUI é InstallerClean.exe.`,
+  'Cli.Help.NoteLine1': `installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.`,
   'Cli.Help.ExitCodesHeader': `Códigos de saída:`,
-  'Cli.Help.ExitCodeOk': `  0   sucesso: todos os arquivos sinalizados foram processados`,
-  'Cli.Help.ExitCodeError': `  1   falha: nada processado (argumentos, análise ou todos os arquivos)`,
-  'Cli.Help.ExitCodePartial': `  2   parcial: alguns arquivos processados, outros falharam`,
+  'Cli.Help.ExitCodeOk': `  0   success: the run finished with nothing left to do`,
+  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)`,
+  'Cli.Help.ExitCodePartial': `  2   partial: some processed, some not (a failure or a Ctrl+C part way)`,
   'Cli.Help.ExitCodeTransient': `  75  transitório: algo temporário bloqueou a execução (veja a mensagem)`,
   'Cli.Help.ExitCodeCancelled': `  130 cancelado (Ctrl+C)`,
   'Body.NotScanned.Lead': `Nada foi analisado ainda.`,
@@ -482,6 +479,12 @@ const MAP = {
   'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.`,
   'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
+  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again.`,
+  'Cli.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
+  'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
 };
 
 // Satellite-only .One override(s). NOT in the neutral; appended before </root>.
@@ -498,9 +501,9 @@ const MAP = {
 // {0} de {1} {2}" that reads correctly at every count.
 const OVERRIDES = {
   'Status.RegisteredPackagesFound.One': `Foi encontrado {0} {1} registrado.`,
-  'Cli.FoundOrphans.One': `Encontrado {0} {1} para limpar ({2}).`,
+  'Cli.FoundOrphans.One': `Found {0} unneeded {1} to clean up ({2}).`,
   'Cli.DeletedFiles.One': `Permanently deleted {0} unneeded {1}.`,
-  'Cli.MovedFiles.One': `Movido {0} {1}.`,
+  'Cli.MovedFiles.One': `Moved {0} unneeded {1}.`,
   'Completion.ReverifySkipped.One': `{0} {1} mantido no lugar: um programa voltou a precisar dele depois da análise.`,
   // Participle agreement only: "mantido" for a single file.
   'Completion.ReverifyIncomplete.One': `{0} {1} mantido no lugar: não foi possível ler por completo os registros do Windows Installer quando a verificação foi repetida.`,

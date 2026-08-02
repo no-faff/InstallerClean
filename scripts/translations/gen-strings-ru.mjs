@@ -287,7 +287,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `Папка назначения не может находиться внутри папки Windows Installer.`,
 
   // 0 = the destination path the user typed
-  'Error.DestinationInSystemFolder': `Папка назначения {0} ведёт в системную папку Windows. Выберите путь за пределами %SystemRoot%, %ProgramFiles% и %ProgramData%.`,
+  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `Недостаточно места`,
 
   // 0 = destination, 1 = required size, 2 = available size
@@ -494,25 +494,24 @@ const OVERRIDES = {
 // descriptions are translated; columns are space-aligned for a monospace terminal
 // (PATH -> ПУТЬ keeps the same width).
 const CLI = {
-  'Cli.UnknownArgument': `Неизвестный аргумент: «{0}»`,
+  'Cli.UnknownArgument': `Error: unknown argument '{0}'`,
   'Cli.Cancelling': `Отмена...`,
   'Cli.Cancelled': `Отменено.`,
-  'Cli.GenericError': `Ошибка: {0}. Подробности записаны в {1}.`,
-  'Cli.GenericError.NoLog': `Ошибка: {0}. Не удалось записать журнал сбоев.`,
+  'Cli.GenericError': `Error: unexpected failure ({0}). Details written to {1}.`,
+  'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
   'Cli.ScanningInstaller': `Сканирование {InstallerFolder}...`,
-  'Cli.FoundOrphans': `Найдено {0} {1} для очистки ({2}).`,
-  'Cli.NothingToDo': `Делать нечего.`,
-  'Cli.DeletingFiles': `Удаление: {0} {1}...`,
+  'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
+  'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
   'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `Ошибка: не указана папка назначения для перемещения. Используйте /m ПУТЬ. (Значение по умолчанию, заданное в графическом интерфейсе, действует только для текущего пользователя и не применяется при запуске по расписанию или от имени служебной учётной записи.)`,
   'Cli.MoveDestinationInsideInstaller': `Ошибка: папка назначения не может находиться внутри папки Windows Installer.`,
   'Cli.MoveDestinationRelative': `Ошибка: папка назначения должна быть полным путём. Получено: {0}`,
-  'Cli.MoveDestinationInSystemFolder': `Ошибка: папка назначения {0} ведёт в системную папку Windows. Выберите путь за пределами %SystemRoot%, %ProgramFiles% и %ProgramData%.`,
+  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
-  'Cli.MovingFiles': `Перемещение: {0} {1} в {2}...`,
-  'Cli.MovedFiles': `Перемещено {0} {1}.`,
+  'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
+  'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
   'Cli.MutexBlocked': `Другой процесс InstallerClean удерживает блокировку единственного экземпляра (GUI или другой запуск CLI). Код выхода 75 (временное состояние); можно повторить попытку позже.`,
   'Cli.EventLogUnavailable': `Примечание: не удалось выполнить запись в журнал событий. Проверьте разрешения журнала «Приложение» или групповую политику.`,
   // Help screen (column-aligned for a monospace terminal; tokens/flags/paths verbatim)
@@ -524,13 +523,11 @@ const CLI = {
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m ПУТЬ      Переместить в указанный путь`,
-  'Cli.Help.NoteLine1': `installerclean-cli — это настоящий консольный процесс, он блокирует`,
-  'Cli.Help.NoteLine2': `командную строку до завершения; перенаправляйте или передавайте его вывод`,
-  'Cli.Help.NoteLine3': `по конвейеру, как у любого консольного exe. GUI в InstallerClean.exe.`,
+  'Cli.Help.NoteLine1': `installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.`,
   'Cli.Help.ExitCodesHeader': `Коды выхода:`,
-  'Cli.Help.ExitCodeOk': `  0   успех: обработаны все отмеченные файлы`,
-  'Cli.Help.ExitCodeError': `  1   ошибка: ничего не обработано (аргументы, сканирование или файлы)`,
-  'Cli.Help.ExitCodePartial': `  2   частично: часть файлов обработана, часть с ошибкой`,
+  'Cli.Help.ExitCodeOk': `  0   success: the run finished with nothing left to do`,
+  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)`,
+  'Cli.Help.ExitCodePartial': `  2   partial: some processed, some not (a failure or a Ctrl+C part way)`,
   'Cli.Help.ExitCodeTransient': `  75  временно: запуск заблокирован временным состоянием (см. сообщение)`,
   'Cli.Help.ExitCodeCancelled': `  130 отменено (Ctrl+C)`,
   'Cli.TooManyArguments': `Ошибка: неожиданный лишний аргумент «{0}». Если в пути к папке для перемещения есть пробел, возьмите весь путь в кавычки: /m "D:\\My Backup"`,
@@ -540,6 +537,12 @@ const CLI = {
   'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.`,
   'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
+  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again.`,
+  'Cli.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
+  'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

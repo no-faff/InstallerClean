@@ -293,7 +293,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `Tujuan tidak boleh berada di dalam folder Windows Installer.`,
 
   // 0 = the destination path the user typed
-  'Error.DestinationInSystemFolder': `Tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, dan %ProgramData%.`,
+  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `Ruang tidak cukup`,
 
   // 0 = destination, 1 = required size, 2 = available size
@@ -407,25 +407,24 @@ const MAP = {
   // Descriptions translated; command tokens, flags, the {InstallerFolder} token
   // and the exit-code numbers verbatim; leading spaces kept (the screen is
   // column-aligned for a monospace terminal); PATH metavariable -> JALUR.
-  'Cli.UnknownArgument': `Argumen tidak dikenal: '{0}'`,
+  'Cli.UnknownArgument': `Error: unknown argument '{0}'`,
   'Cli.Cancelling': `Membatalkan...`,
   'Cli.Cancelled': `Dibatalkan.`,
-  'Cli.GenericError': `Kesalahan: {0}. Detail ditulis ke {1}.`,
-  'Cli.GenericError.NoLog': `Kesalahan: {0}. Log kerusakan tidak bisa ditulis.`,
+  'Cli.GenericError': `Error: unexpected failure ({0}). Details written to {1}.`,
+  'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
   'Cli.ScanningInstaller': `Memindai {InstallerFolder}...`,
-  'Cli.FoundOrphans': `Ditemukan {0} {1} untuk dibersihkan ({2}).`,
-  'Cli.NothingToDo': `Tidak ada yang perlu dilakukan.`,
-  'Cli.DeletingFiles': `Menghapus {0} {1}...`,
+  'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
+  'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
   'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `Kesalahan: tujuan pemindahan tidak ditentukan. Gunakan /m JALUR. (Default yang diatur di GUI bersifat per-pengguna dan tidak berlaku untuk tugas terjadwal atau proses akun layanan.)`,
   'Cli.MoveDestinationInsideInstaller': `Kesalahan: tujuan tidak boleh berada di dalam folder Windows Installer.`,
   'Cli.MoveDestinationRelative': `Kesalahan: tujuan harus berupa jalur absolut lengkap. Diterima: {0}`,
-  'Cli.MoveDestinationInSystemFolder': `Kesalahan: tujuan {0} mengarah ke dalam folder sistem Windows. Pilih jalur di luar %SystemRoot%, %ProgramFiles%, dan %ProgramData%.`,
+  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
-  'Cli.MovingFiles': `Memindahkan {0} {1} ke {2}...`,
-  'Cli.MovedFiles': `{0} {1} dipindahkan.`,
+  'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
+  'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
   'Cli.MutexBlocked': `Proses InstallerClean lain memegang kunci instans-tunggal (GUI atau proses CLI lain). Kode keluar 75 (sementara); aman untuk dicoba lagi nanti.`,
   'Cli.EventLogUnavailable': `Catatan: penulisan ke Log Peristiwa gagal. Periksa izin log Aplikasi atau Kebijakan Grup.`,
   'Cli.Help.Header': `InstallerClean - pembersihan {InstallerFolder}`,
@@ -436,13 +435,11 @@ const MAP = {
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m JALUR   Pindahkan ke jalur yang ditentukan`,
-  'Cli.Help.NoteLine1': `installerclean-cli adalah proses konsol sungguhan dan memblokir prompt`,
-  'Cli.Help.NoteLine2': `sampai selesai; alihkan atau salurkan keluarannya seperti`,
-  'Cli.Help.NoteLine3': `file exe konsol lainnya. GUI ada di InstallerClean.exe di sebelahnya.`,
+  'Cli.Help.NoteLine1': `installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.`,
   'Cli.Help.ExitCodesHeader': `Kode keluar:`,
-  'Cli.Help.ExitCodeOk': `  0   berhasil: setiap file yang ditandai telah diproses`,
-  'Cli.Help.ExitCodeError': `  1   gagal: tidak ada yang diproses (argumen, pemindaian, semua file)`,
-  'Cli.Help.ExitCodePartial': `  2   sebagian: sebagian file diproses, sebagian gagal`,
+  'Cli.Help.ExitCodeOk': `  0   success: the run finished with nothing left to do`,
+  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)`,
+  'Cli.Help.ExitCodePartial': `  2   partial: some processed, some not (a failure or a Ctrl+C part way)`,
   'Cli.Help.ExitCodeTransient': `  75  sementara: kondisi sementara memblokir proses (lihat pesannya)`,
   'Cli.Help.ExitCodeCancelled': `  130 dibatalkan (Ctrl+C)`,
   'Body.NotScanned.Lead': `Belum ada yang dipindai.`,
@@ -485,6 +482,12 @@ const MAP = {
   'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.`,
   'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
+  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again.`,
+  'Cli.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
+  'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

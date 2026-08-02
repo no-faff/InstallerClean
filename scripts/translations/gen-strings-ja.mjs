@@ -15,15 +15,18 @@
 // are no satellite-only overrides.
 //
 // The file is a MIXTURE on purpose and must not be harmonised in either
-// direction: nineteen machine keys stay because they are a contributor's
-// translation, five are stripped because they are not his and never were. Two
-// ways a key earns the strip. Cli.EventLogDeleteSummary outlived its English
-// when the Recycle Bin went and sat here saying the files had been sent to it,
-// which is a fossil no user can reach and no gate can measure, the still-English
-// gate skipping machine keys by contract and nothing else comparing them. The
-// other four arrived after his PR and sit in English inside a Japanese file;
-// translating them would buy correct Japanese that can never be read, and any
-// machine key that outlives its English or postdates his work joins them.
+// direction: most machine keys stay because they are a contributor's
+// translation, and the named few in STRIPPED below go because they are not.
+// Count that set there rather than trusting a figure here, which goes stale the
+// next time one earns its place. Two ways a key earns it. Some outlived their
+// English: Cli.EventLogDeleteSummary sat here saying the files had been sent to
+// the Recycle Bin after the bin went, and Cli.EventLogScanNoOrphans said
+// "Scan mode" after the entry stopped calling every run a scan. Both are
+// fossils no user can reach and no gate can measure, the still-English gate
+// skipping machine keys by contract and nothing else comparing them. The rest
+// arrived after his PR and sit in English inside a Japanese file; translating
+// them would buy correct Japanese that can never be read. Any machine key that
+// outlives its English or postdates his work joins them.
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = 'src/InstallerClean.Core/Resources';
@@ -235,7 +238,7 @@ const MAP = {
   'Error.SettingNotSavedTitle': `設定の保存に失敗しました`,
   'Error.SettingNotSavedBody': `変更を保存できませんでした。次回の起動時に、InstallerClean は以前の設定に戻ります。`,
   'Error.DestinationInsideInstaller': `移動先を Windows Installer フォルダー内にすることはできません。`,
-  'Error.DestinationInSystemFolder': `移動先 {0} は Windows システムフォルダー下に解決されます。%SystemRoot%、%ProgramFiles%、%ProgramData% 以外のパスを選択してください。`,
+  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `空き容量が不足しています`,
   'Error.NotEnoughSpaceBody': `{0} の空き容量が不足しています\n\n必要：{1}\n利用可能：{2}`,
   'Error.AccessDeniedDestination': `{0} に書き込む権限がありません。\nユーザープロファイル内または自分が所有するドライブ上のフォルダーを試してください。`,
@@ -310,23 +313,21 @@ const MAP = {
   'Display.Elapsed.S': `{0:F1}s`,
   'Display.ElapsedLong.LessThanASecond': `1秒未満`,
   'Display.ElapsedLong.Seconds': `{0:F1}秒`,
-  'Cli.UnknownArgument': `不明な引数：'{0}'`,
+  'Cli.UnknownArgument': `Error: unknown argument '{0}'`,
   'Cli.Cancelling': `キャンセル中...`,
   'Cli.Cancelled': `キャンセルされました。`,
-  'Cli.GenericError': `エラー：{0}。詳細は {1} に書き込まれました。`,
-  'Cli.GenericError.NoLog': `エラー：{0}。クラッシュログを書き込めませんでした。`,
+  'Cli.GenericError': `Error: unexpected failure ({0}). Details written to {1}.`,
+  'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
   'Cli.ScanningInstaller': `{InstallerFolder} をスキャン中...`,
-  'Cli.FoundOrphans': `クリーンアップ対象の {0} 個の {1} が見つかりました ({2})。`,
-  'Cli.NothingToDo': `実行するものはありません。`,
-  'Cli.EventLogScanNoOrphans': `スキャンモード ({0})：不要ファイルなし。インストーラーデータベースには {1} 個の登録済み {2} があります。`,
+  'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
   'Cli.EventLogScanFound': `スキャンモード ({0})：{1} 個の不要な {2} が見つかりました ({3})。アクションは実行されていません。`,
-  'Cli.DeletingFiles': `{0} 個の {1} を削除中...`,
+  'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
   'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `エラー：移動先が指定されていません。/m PATH を使用してください (GUI で設定したデフォルトはユーザーごとのもので、スケジュール実行やサービスアカウントでの実行には適用されません)。`,
   'Cli.EventLogMoveNoDestination': `{0}モードは中止されました：移動先が指定されていません。`,
   'Cli.MoveDestinationInsideInstaller': `エラー：移動先を Windows Installer フォルダー内にすることはできません。`,
   'Cli.MoveDestinationRelative': `エラー：移動先は完全修飾パスである必要があります。指定されたもの：{0}`,
-  'Cli.MoveDestinationInSystemFolder': `エラー：移動先 {0} は Windows システムフォルダー下に解決されます。%SystemRoot%、%ProgramFiles%、%ProgramData%以外のパスを選択してください。`,
+  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Cli.EventLogMoveDestinationInsideInstaller': `{0}モードは中止されました：移動先 {1} はC:\\Windows\\Installer 内にあります。`,
   'Cli.EventLogMoveDestinationRelative': `{0}モードは中止されました：移動先 {1} は完全修飾パスではありません。`,
   'Cli.EventLogMoveDestinationInSystemFolder': `{0}モードは中止されました：移動先 {1} は Windows システムフォルダー内に解決されます。`,
@@ -337,8 +338,8 @@ const MAP = {
   'Cli.EventLogReason.InstallerInProgress': `インストーラートランザクションが進行中`,
   'Cli.EventLogReason.PendingRenameInCache': `キューに入れられた再起動後のファイル名変更がインストーラーキャッシュを対象としています`,
   'Cli.EventLogPendingRebootBlocked': `{0}モードは中止されました：保留中の再起動が検出されました。理由：{1}。{2}`,
-  'Cli.MovingFiles': `{0} 個の {1} を {2} に移動中...`,
-  'Cli.MovedFiles': `{0} 個の {1} を移動しました。`,
+  'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
+  'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
   'Cli.EventLogMoveSummary': `{0}モード：{2} 個中 {1} 個の {3} を {4} に移動、{5} を移動、{6} 個の {7}。`,
   'Cli.EventLogCancelledPartial': `{0}モードが Ctrl+C で中断されました：キャンセル前に {2} 個中 {1} 個の {3} を処理しました。ファイルごとの詳細は進捗出力を参照してください。`,
   'Cli.EventLogCancelledNoWork': `{0}モードが作業実行前に Ctrl+C で中断されました。アクションは実行されていません。`,
@@ -359,13 +360,11 @@ const MAP = {
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m PATH    指定されたパスに移動`,
-  'Cli.Help.NoteLine1': `installerclean-cliは実際のコンソールプロセスであり、完了するまで`,
-  'Cli.Help.NoteLine2': `プロンプトをブロックします。他のコンソール exe と同様に出力をリダイレクト`,
-  'Cli.Help.NoteLine3': `またはパイプできます。GUI は同じ場所にある InstallerClean.exe にあります。`,
+  'Cli.Help.NoteLine1': `installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.`,
   'Cli.Help.ExitCodesHeader': `終了コード：`,
-  'Cli.Help.ExitCodeOk': `  0   成功：フラグが立てられたすべてのファイルが処理されました`,
-  'Cli.Help.ExitCodeError': `  1   失敗：処理なし (不正な引数、スキャン失敗、全ファイル失敗)`,
-  'Cli.Help.ExitCodePartial': `  2   部分完了：一部のファイルは処理され、一部は失敗しました`,
+  'Cli.Help.ExitCodeOk': `  0   success: the run finished with nothing left to do`,
+  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)`,
+  'Cli.Help.ExitCodePartial': `  2   partial: some processed, some not (a failure or a Ctrl+C part way)`,
   'Cli.Help.ExitCodeTransient': `  75  一時的：一時的な状態が実行をブロックしました (メッセージを参照)`,
   'Cli.Help.ExitCodeCancelled': `  130 キャンセル (Ctrl+C)`,
   'Tooltip.ChangeLanguage': `言語を変更します。プログラムが再起動します。`,
@@ -411,6 +410,12 @@ const MAP = {
   'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.`,
   'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
+  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again.`,
+  'Cli.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
+  'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
 };
 
 let text = readFileSync(BASE, 'utf8');
@@ -422,6 +427,7 @@ let text = readFileSync(BASE, 'utf8');
 // of the key.
 const STRIPPED = new Set([
   'Cli.EventLogDeleteSummary',
+  'Cli.EventLogScanNoOrphans',
   'Cli.EventLogScanWithheld',
   'Cli.EventLogMissingFromDisk',
   'Cli.EventLogMoveNotEnoughSpace',

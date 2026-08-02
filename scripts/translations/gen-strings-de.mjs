@@ -59,8 +59,8 @@ const ALSO_KEEP = [
 // the neutral. The value's {N} set matches the base key's set.
 const OVERRIDES = {
   'Status.RegisteredPackagesFound.One': `{0} registriertes {1} gefunden.`,
-  'Cli.DeletingFiles.One': `{0} {1} wird gelöscht...`,
-  'Cli.MovingFiles.One': `{0} {1} wird nach {2} verschoben...`,
+  'Cli.DeletingFiles.One': `Deleting {0} unneeded {1}...`,
+  'Cli.MovingFiles.One': `Moving {0} unneeded {1} to {2}...`,
 };
 
 const MAP = {
@@ -306,7 +306,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `Das Ziel darf nicht im Windows-Installer-Ordner liegen.`,
 
   // 0 = the destination path the user typed
-  'Error.DestinationInSystemFolder': `Das Ziel {0} liegt unter einem Windows-Systemordner. Wähle einen Pfad außerhalb von %SystemRoot%, %ProgramFiles% und %ProgramData%.`,
+  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `Nicht genügend Speicherplatz`,
 
   // 0 = destination, 1 = required size, 2 = available size
@@ -417,25 +417,24 @@ const MAP = {
   'Automation.ChangeLanguage.HelpText': `Das Programm wird neu gestartet.`,
 
   // Command-line tool (installerclean-cli): the HUMAN-facing Cli.* keys.
-  'Cli.UnknownArgument': `Unbekanntes Argument: '{0}'`,
+  'Cli.UnknownArgument': `Error: unknown argument '{0}'`,
   'Cli.Cancelling': `Wird abgebrochen...`,
   'Cli.Cancelled': `Abgebrochen.`,
-  'Cli.GenericError': `Fehler: {0}. Details gespeichert in {1}.`,
-  'Cli.GenericError.NoLog': `Fehler: {0}. Das Absturzprotokoll konnte nicht geschrieben werden.`,
+  'Cli.GenericError': `Error: unexpected failure ({0}). Details written to {1}.`,
+  'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
   'Cli.ScanningInstaller': `{InstallerFolder} wird gescannt...`,
-  'Cli.FoundOrphans': `{0} {1} zum Aufräumen gefunden ({2}).`,
-  'Cli.NothingToDo': `Nichts zu tun.`,
-  'Cli.DeletingFiles': `{0} {1} werden gelöscht...`,
+  'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
+  'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
   'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `Fehler: Kein Zielordner zum Verschieben angegeben. Nutze /m PFAD. (Ein in der GUI gesetztes Standardziel gilt pro Benutzer und greift nicht bei geplanten oder Dienstkonto-Läufen.)`,
   'Cli.MoveDestinationInsideInstaller': `Fehler: Das Ziel darf nicht im Windows-Installer-Ordner liegen.`,
   'Cli.MoveDestinationRelative': `Fehler: Das Ziel muss ein vollständig qualifizierter Pfad sein. Erhalten: {0}`,
-  'Cli.MoveDestinationInSystemFolder': `Fehler: Das Ziel {0} liegt unter einem Windows-Systemordner. Wähle einen Pfad außerhalb von %SystemRoot%, %ProgramFiles% und %ProgramData%.`,
+  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
-  'Cli.MovingFiles': `{0} {1} werden nach {2} verschoben...`,
-  'Cli.MovedFiles': `{0} {1} verschoben.`,
+  'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
+  'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
   'Cli.MutexBlocked': `Ein anderer InstallerClean-Prozess hält die Einzelinstanz-Sperre (die GUI oder ein anderer CLI-Lauf). Exit-Code 75 (vorübergehend); ein späterer Wiederholungsversuch ist sicher.`,
   'Cli.EventLogUnavailable': `Hinweis: Das Schreiben in das Ereignisprotokoll ist fehlgeschlagen. Prüfe die Berechtigungen des Anwendungsprotokolls oder die Gruppenrichtlinie.`,
   'Cli.Help.Header': `InstallerClean - {InstallerFolder} aufräumen`,
@@ -446,13 +445,11 @@ const MAP = {
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m PFAD    An den angegebenen Pfad`,
-  'Cli.Help.NoteLine1': `installerclean-cli ist ein echter Konsolenprozess und blockiert die`,
-  'Cli.Help.NoteLine2': `Eingabeaufforderung, bis er fertig ist; leite die Ausgabe um oder per`,
-  'Cli.Help.NoteLine3': `Pipe weiter, wie bei jeder Konsolen-EXE. Die GUI ist InstallerClean.exe.`,
+  'Cli.Help.NoteLine1': `installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.`,
   'Cli.Help.ExitCodesHeader': `Exit-Codes:`,
-  'Cli.Help.ExitCodeOk': `  0   Erfolg: jede markierte Datei wurde verarbeitet`,
-  'Cli.Help.ExitCodeError': `  1   Fehler: nichts verarbeitet (Argumentfehler, Scan- oder Dateifehler)`,
-  'Cli.Help.ExitCodePartial': `  2   teilweise: einige Dateien verarbeitet, einige fehlgeschlagen`,
+  'Cli.Help.ExitCodeOk': `  0   success: the run finished with nothing left to do`,
+  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)`,
+  'Cli.Help.ExitCodePartial': `  2   partial: some processed, some not (a failure or a Ctrl+C part way)`,
   'Cli.Help.ExitCodeTransient': `  75  vorübergehend: etwas hat den Lauf blockiert (siehe Meldung)`,
   'Cli.Help.ExitCodeCancelled': `  130 abgebrochen (Strg+C)`,
   'Body.NotScanned.Lead': `Noch nichts gescannt.`,
@@ -495,6 +492,12 @@ const MAP = {
   'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.`,
   'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
+  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again.`,
+  'Cli.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
+  'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
 };
 
 let text = readFileSync(BASE, 'utf8');

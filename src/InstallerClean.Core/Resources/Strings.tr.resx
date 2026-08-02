@@ -751,7 +751,7 @@ InstallerClean zaten yönetici olarak çalışıyordu, dolayısıyla onu yeniden
   <data name="Error.SettingNotSavedBody" xml:space="preserve"><value>Değişiklik kaydedilemedi. Bir sonraki açılışta InstallerClean önceki ayara dönecek.</value></data>
   <data name="Error.DestinationInsideInstaller" xml:space="preserve"><value>Hedef, Windows Installer klasörünün içinde olamaz.</value></data>
   <!-- 0 = the destination path the user typed -->
-  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>{0} hedefi bir Windows sistem klasörünün altına çözümleniyor. %SystemRoot%, %ProgramFiles% ve %ProgramData% dışında bir yol seçin.</value></data>
+  <data name="Error.DestinationInSystemFolder" xml:space="preserve"><value>The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.</value></data>
   <data name="Error.NotEnoughSpaceTitle" xml:space="preserve"><value>Yetersiz alan</value></data>
   <!-- 0 = destination, 1 = required size, 2 = available size -->
   <data name="Error.NotEnoughSpaceBody" xml:space="preserve"><value>{0} konumunda yeterli alan yok
@@ -947,7 +947,10 @@ Ayrıntılar şuraya yazıldı:
        exception: Cli.EventLogUnavailable is a stdout warning (it tells the
        operator that an event-log write failed), so it is localised like the
        rest of stdout despite the EventLog prefix. -->
-  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Bilinmeyen argüman: '{0}'</value></data>
+  <!-- 0 = the offending token (original case). Carries the "Error:" prefix every
+       other message that ends the run in failure carries; the one message with no
+       prefix is Cli.MutexBlocked, which ends it on the transient code instead. -->
+  <data name="Cli.UnknownArgument" xml:space="preserve"><value>Error: unknown argument '{0}'</value></data>
   <!-- 0 = the extra (unexpected) token. Shown for /m only, where the extra
        token is most often an unquoted move path with a space, so the message
        names the quoting fix. The literal " quotes and the \ in the example are
@@ -963,14 +966,27 @@ Ayrıntılar şuraya yazıldı:
   <!-- 0 = exception type name (full message + stack trace go to the
        crash log; the CLI runs elevated so .Message could include paths
        from another user's profile if logged to a shared file).
-       1 = crash log path. -->
-  <data name="Cli.GenericError" xml:space="preserve"><value>Hata: {0}. Ayrıntılar {1} içine yazıldı.</value></data>
-  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Hata: {0}. Çökme günlüğü yazılamadı.</value></data>
+       1 = crash log path. The type name is the whole of what may be said, so
+       the words around it are what make it a sentence rather than an artefact
+       of the runtime; both forms carry them, the pair being chosen by nothing
+       but whether the crash log got written. -->
+  <data name="Cli.GenericError" xml:space="preserve"><value>Error: unexpected failure ({0}). Details written to {1}.</value></data>
+  <data name="Cli.GenericError.NoLog" xml:space="preserve"><value>Error: unexpected failure ({0}). The crash log could not be written.</value></data>
   <data name="Cli.ScanningInstaller" xml:space="preserve"><value>{InstallerFolder} taranıyor...</value></data>
-  <!-- 0 = file count, 1 = pluralised noun, 2 = size display -->
-  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Temizlenecek {0} {1} bulundu ({2}).</value></data>
-  <data name="Cli.NothingToDo" xml:space="preserve"><value>Yapılacak bir şey yok.</value></data>
-  <!-- 0 = mode arg ("/s"), 1 = registered package count, 2 = pluralised "package"/"packages" -->
+  <!-- 0 = file count, 1 = pluralised noun, 2 = size display. Never reached with
+       a count of zero: that run prints Cli.FoundNoOrphans instead, so this one
+       does not have to read sensibly at "0 ... (0 B)". -->
+  <data name="Cli.FoundOrphans" xml:space="preserve"><value>Found {0} unneeded {1} to clean up ({2}).</value></data>
+  <!-- The whole of what a clean machine prints after the scanning line, and the
+       commonest output this tool produces. It states what was found rather than
+       what the tool intends to do about it, which is the question somebody
+       reading a scheduled task's log ran the scan to ask. -->
+  <data name="Cli.FoundNoOrphans" xml:space="preserve"><value>Found no unneeded files.</value></data>
+  <!-- 0 = mode arg, whichever of /s, /d and /m was run: the no-files branch this
+       is written from is common to all three, so a fixed mode word here names
+       the wrong flag on two runs in three. Every other entry on this channel
+       opens "{0} mode:", and a filter for delete runs has to find this one.
+       1 = registered package count, 2 = pluralised "package"/"packages". -->
   <!-- 0 = mode arg ("/s"), 1 = file count, 2 = pluralised noun, 3 = size display -->
   <!-- 0 = count of registered files missing from disk, and this is the
        non-removable count only: a superseded patch whose file has already gone
@@ -981,6 +997,16 @@ Ayrıntılar şuraya yazıldı:
        positions and neither may harden: Microsoft guarantees nothing here. -->
   <data name="Cli.MissingFromDisk.Singular" xml:space="preserve"><value>{0} registered file is missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, the same version, usually restores it.</value></data>
   <data name="Cli.MissingFromDisk.Plural" xml:space="preserve"><value>{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.</value></data>
+  <!-- The command line's own wording of Summary.ProgramsUnreadable.*, which the
+       window keeps: that one closes on Re-scan and opens its second sentence on
+       "Everything listed", and there is no Re-scan on a command line and nothing
+       listed at all on a /d or an /m. The singular deliberately spells out "one
+       installed program" and so carries NO placeholder where the plural takes
+       {0}; the window's pair is built the same way and neither is to be
+       "corrected" into symmetry. "Running it again" keeps its pronoun because
+       the tool is already established as "it" in the sentence before. -->
+  <data name="Cli.ProgramsUnreadable.Singular" xml:space="preserve"><value>Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.</value></data>
+  <data name="Cli.ProgramsUnreadable.Plural" xml:space="preserve"><value>Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.</value></data>
   <!-- 0 = mode arg, 1 = files the scan held back, 2 = installed products it
        could not read. A notice beside the run's summary, not a summary itself
        (Event ID 3000; see MachineContract). Deliberately unpluralised, matching
@@ -990,8 +1016,12 @@ Ayrıntılar şuraya yazıldı:
        (Event ID 3001), and the actionable one: it says outright that this tool
        did not cause it, because the entry sits in a log beside that tool's name
        and nothing else there would. Unpluralised, as above. -->
-  <!-- 0 = file count, 1 = pluralised noun "file"/"files" -->
-  <data name="Cli.DeletingFiles" xml:space="preserve"><value>{0} {1} siliniyor...</value></data>
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files". Never printed at a
+       count of zero (see Program.cs), so it does not have to read sensibly
+       there. It says "unneeded" for the same reason Cli.DeletedFiles below
+       does: it is the last thing printed before a permanent delete that
+       nothing confirms and nobody is watching. -->
+  <data name="Cli.DeletingFiles" xml:space="preserve"><value>Deleting {0} unneeded {1}...</value></data>
   <!-- 0 = deleted count, 1 = pluralised noun. It says "permanently" because
        an operator who upgraded without reading the release notes gets no other
        warning that /d stopped using the Recycle Bin, and because the GUI's
@@ -1005,7 +1035,13 @@ Ayrıntılar şuraya yazıldı:
   <data name="Cli.MoveDestinationInsideInstaller" xml:space="preserve"><value>Hata: hedef, Windows Installer klasörünün içinde olamaz.</value></data>
   <!-- 0 = the relative or otherwise unsafe path -->
   <data name="Cli.MoveDestinationRelative" xml:space="preserve"><value>Hata: hedef, tam nitelenmiş bir yol olmalıdır. Alınan: {0}</value></data>
-  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Hata: {0} hedefi bir Windows sistem klasörünün altına çözümleniyor. %SystemRoot%, %ProgramFiles% ve %ProgramData% dışında bir yol seçin.</value></data>
+  <!-- 0 = the destination. The four names are the four roots
+       InstallerCacheHelpers.IsSystemFolderOrChild resolves and refuses, and
+       listing three of them sent anyone who read the list to a Program Files
+       (x86) path that is refused again. Error.DestinationInSystemFolder is the
+       window's copy of the same list and moves with it. "and", not "or": outside
+       A, B, C and D means outside all four, where "or" offers a choice. -->
+  <data name="Cli.MoveDestinationInSystemFolder" xml:space="preserve"><value>Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.</value></data>
   <!-- 0 = destination, 1 = size the move needs, 2 = size free there. The window
        refuses the same move with Error.NotEnoughSpaceBody; this says it in one
        sentence because a command line has no dialog to lay out. The last clause
@@ -1036,10 +1072,21 @@ Ayrıntılar şuraya yazıldı:
        grep can match a known string regardless of OS UI culture. -->
   <!-- 0 = arg ("/d" or "/m"), 1 = short reason label from Cli.EventLogReason.*,
        2 = detail (matched path for PendingRenameInCache, otherwise empty) -->
-  <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination -->
-  <data name="Cli.MovingFiles" xml:space="preserve"><value>{0} {1}, {2} konumuna taşınıyor...</value></data>
-  <!-- 0 = moved count, 1 = pluralised noun -->
-  <data name="Cli.MovedFiles" xml:space="preserve"><value>{0} {1} taşındı.</value></data>
+  <!-- 0 = file count, 1 = pluralised noun "file"/"files", 2 = destination.
+       Never printed at a count of zero; see Cli.DeletingFiles. -->
+  <data name="Cli.MovingFiles" xml:space="preserve"><value>Moving {0} unneeded {1} to {2}...</value></data>
+  <!-- 0 = moved count, 1 = pluralised noun. "Unneeded" describes the files, not
+       the operation, so it does not depend on which of Move and Delete was run:
+       making it would imply the word meant something about deleting. All four
+       run lines carry it. -->
+  <data name="Cli.MovedFiles" xml:space="preserve"><value>Moved {0} unneeded {1}.</value></data>
+  <!-- 0 = the destination folder whose canonical path changed mid-batch. The
+       command line's own wording of Error.DestinationChangedMidBatch, which the
+       window keeps: that one closes on Re-scan, and there is no Re-scan here.
+       It names the folder immediately before, so this one cannot close on "run
+       it again" the way Cli.ProgramsUnreadable.* does; "it" would reach back
+       past the folder and take that instead of the tool. -->
+  <data name="Cli.DestinationChangedMidBatch" xml:space="preserve"><value>The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again.</value></data>
   <!-- 0 = mode arg ("/m"), 1 = moved count, 2 = total count, 3 = pluralised noun,
        4 = destination, 5 = size display, 6 = error count, 7 = pluralised "error"/"errors" -->
   <!-- Same eight slots as Cli.EventLogMoveSummary, for a batch one of the
@@ -1109,6 +1156,17 @@ Ayrıntılar şuraya yazıldı:
 
   <!-- CLI help text (printed by /?, -h and the long help flag) -->
   <data name="Cli.Help.Header" xml:space="preserve"><value>InstallerClean - {InstallerFolder} temizliği</value></data>
+  <!-- The claim the whole app rests on, on the screen a sysadmin who has never
+       heard of it reads first. The header says something is about to clean a
+       Windows system folder; without this line the only statement that it
+       touches nothing anything needs is an adjective inside two of the six
+       usage rows, which is not the same as saying it. -->
+  <data name="Cli.Help.Summary" xml:space="preserve"><value>Removes cached .msi and .msp files that no installed program still needs.</value></data>
+  <!-- Running it from an ordinary prompt is the commonest way to get this wrong,
+       and the tool cannot say so at the time: Windows refuses to start a process
+       that requires administrator, so nothing of this program runs. The help is
+       the only place it can be said. -->
+  <data name="Cli.Help.Elevation" xml:space="preserve"><value>Needs an elevated (administrator) prompt; Windows will not start it.</value></data>
   <data name="Cli.Help.Usage" xml:space="preserve"><value>Kullanım:</value></data>
   <data name="Cli.Help.Help" xml:space="preserve"><value>  installerclean-cli --help     Bu yardımı göster (/?, -h de kabul edilir)</value></data>
   <data name="Cli.Help.Version" xml:space="preserve"><value>  installerclean-cli --version  Sürümü yazdır (-v de kabul edilir)</value></data>
@@ -1116,14 +1174,29 @@ Ayrıntılar şuraya yazıldı:
   <data name="Cli.Help.Delete" xml:space="preserve"><value>  installerclean-cli /d         Delete unneeded files permanently</value></data>
   <data name="Cli.Help.MoveDefault" xml:space="preserve"><value>  installerclean-cli /m         Move to the saved backup folder</value></data>
   <data name="Cli.Help.MovePath" xml:space="preserve"><value>  installerclean-cli /m YOL     Belirtilen yola taşı</value></data>
-  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli gerçek bir konsol işlemidir ve bitene kadar istemi</value></data>
-  <data name="Cli.Help.NoteLine2" xml:space="preserve"><value>bloke eder; çıktısını başka herhangi bir konsol exe'sinde olduğu gibi</value></data>
-  <data name="Cli.Help.NoteLine3" xml:space="preserve"><value>yönlendirin ya da boruya verin. GUI, yanındaki InstallerClean.exe'dedir.</value></data>
+  <!-- ONE value carrying TWO printed lines, and the &#10; is where the English
+       breaks rather than where every language must. It was three keys
+       hard-wrapped at English word boundaries, which forced each language to
+       break its own sentence at the same three points and left this note and
+       the exit-1 entry the two worst column-budget overflows of the sixteen.
+       A translation may break anywhere, or not at all if it fits.
+       What went with the other two lines: how to redirect and pipe, which this
+       reader has been doing for twenty years, and that the GUI sits alongside
+       in InstallerClean.exe, which is untrue of the command-line download. -->
+  <data name="Cli.Help.NoteLine1" xml:space="preserve"><value>installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.</value></data>
   <data name="Cli.Help.MoveScheduledNote" xml:space="preserve"><value>That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.</value></data>
   <data name="Cli.Help.ExitCodesHeader" xml:space="preserve"><value>Çıkış kodları:</value></data>
-  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   başarılı: işaretlenen her dosya işlendi</value></data>
-  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   hata: hiçbir şey işlenmedi (argümanlar, tarama ya da tüm dosyalar)</value></data>
-  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   kısmi: bazı dosyalar işlendi, bazıları başarısız</value></data>
+  <!-- 0 is not a statement that work happened: a /s scan processes nothing and
+       exits 0, and so does a run that finds nothing to clean. -->
+  <data name="Cli.Help.ExitCodeOk" xml:space="preserve"><value>  0   success: the run finished with nothing left to do</value></data>
+  <!-- Two printed lines from one value; see Cli.Help.NoteLine1 for why the break
+       is inside the value. The destination causes are named because they are
+       what a scheduled /m actually hits (none given, relative, inside a system
+       folder, not enough room) and all four exit 1. -->
+  <data name="Cli.Help.ExitCodeError" xml:space="preserve"><value>  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)</value></data>
+  <!-- A Ctrl+C part way through exits 2 with nothing failed at all, so this
+       cannot say that some files failed. -->
+  <data name="Cli.Help.ExitCodePartial" xml:space="preserve"><value>  2   partial: some processed, some not (a failure or a Ctrl+C part way)</value></data>
   <data name="Cli.Help.ExitCodeTransient" xml:space="preserve"><value>  75  geçici: geçici bir durum çalıştırmayı engelledi (iletiye bakın)</value></data>
   <data name="Cli.Help.ExitCodeCancelled" xml:space="preserve"><value>  130 iptal edildi (Ctrl+C)</value></data>
   <data name="Tooltip.ChangeLanguage" xml:space="preserve"><value>Dili değiştir. Program yeniden başlatılacak.</value></data>

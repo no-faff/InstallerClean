@@ -7,11 +7,15 @@
 //
 // HOW IT WORKS
 //   - Structural base: the English neutral `Strings.resx`. Of the `Cli.*`
-//     <data> elements only the 21 MACHINE-contract keys are removed BY NAME (the
+//     <data> elements only the MACHINE-contract keys are removed BY NAME (the
 //     `Cli.EventLog*` set bar `Cli.EventLogUnavailable`): those are Application-
 //     channel event-log lines an RMM tool greps for fixed English phrases, forced
 //     English at runtime, so a satellite must not carry them. The HUMAN-facing
-//     `Cli.*` keys stay and ARE translated, alongside the non-`Cli.` keys.
+//     `Cli.*` keys stay and ARE translated, alongside the non-`Cli.` keys. How
+//     many that is, this file does not say: the set grows whenever the command
+//     line gains an event-log line, and the self-check below derives the figure
+//     from the neutral for exactly that reason. A number written here goes stale
+//     silently while the checked one beside it stays right, and had.
 //   - The `MAP` is seeded with the ENGLISH values, every translatable key (the
 //     non-`Cli.` set plus the human `Cli.` set). You replace each English value with its
 //     translation. A value you leave
@@ -368,7 +372,7 @@ const MAP = {
   'Error.DestinationInsideInstaller': `The destination cannot be inside the Windows Installer folder.`,
 
   // 0 = the destination path the user typed
-  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%.`,
+  'Error.DestinationInSystemFolder': `The destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Error.NotEnoughSpaceTitle': `Not enough space`,
 
   // 0 = destination, 1 = required size, 2 = available size
@@ -484,30 +488,33 @@ const MAP = {
   // the {InstallerFolder} token and the exit-code numbers verbatim, keep the
   // leading spaces (the screen is column-aligned for a monospace terminal), and
   // translate the PATH metavariable (it names the argument, as es/pt-BR/it did).
-  'Cli.UnknownArgument': `Unknown argument: '{0}'`,
+  'Cli.UnknownArgument': `Error: unknown argument '{0}'`,
   'Cli.TooManyArguments': `Error: unexpected extra argument '{0}'. If your move folder has a space in it, put quotes around the whole path: /m "D:\\My Backup"`,
   'Cli.Cancelling': `Cancelling...`,
   'Cli.Cancelled': `Cancelled.`,
-  'Cli.GenericError': `Error: {0}. Details written to {1}.`,
-  'Cli.GenericError.NoLog': `Error: {0}. The crash log could not be written.`,
+  'Cli.GenericError': `Error: unexpected failure ({0}). Details written to {1}.`,
+  'Cli.GenericError.NoLog': `Error: unexpected failure ({0}). The crash log could not be written.`,
   'Cli.ScanningInstaller': `Scanning {InstallerFolder}...`,
-  'Cli.FoundOrphans': `Found {0} {1} to clean up ({2}).`,
-  'Cli.NothingToDo': `Nothing to do.`,
-  'Cli.DeletingFiles': `Deleting {0} {1}...`,
+  'Cli.FoundOrphans': `Found {0} unneeded {1} to clean up ({2}).`,
+  'Cli.FoundNoOrphans': `Found no unneeded files.`,
+  'Cli.DeletingFiles': `Deleting {0} unneeded {1}...`,
   'Cli.DeletedFiles': `Permanently deleted {0} unneeded {1}.`,
   'Cli.NoMoveDestination': `Error: no move destination specified. Use /m PATH. (A default set in the GUI is per-user and does not apply to scheduled or service-account runs.)`,
   'Cli.MoveDestinationInsideInstaller': `Error: destination cannot be inside the Windows Installer folder.`,
   'Cli.MoveDestinationRelative': `Error: destination must be a fully qualified path. Got: {0}`,
-  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles% and %ProgramData%.`,
+  'Cli.MoveDestinationInSystemFolder': `Error: destination {0} resolves under a Windows system folder. Pick a path outside %SystemRoot%, %ProgramFiles%, %ProgramFiles(x86)% and %ProgramData%.`,
   'Cli.PendingRebootBlocked.MsiExecuteMutex': `Error: something is using Windows Installer right now, usually a Windows Update or a program installing in the background. /m and /d are blocked while that runs. Try again once it finishes.`,
   'Cli.PendingRebootBlocked.InstallerInProgress': `Error: a previous Windows Installer transaction is suspended on this machine. Resume or roll back that install (or restart Windows) before cleaning {InstallerFolder}.`,
   'Cli.PendingRebootBlocked.PendingRenameInCache': `Error: a queued post-reboot file operation targets {InstallerFolder} ({0}). Restart Windows to complete that operation before cleaning.`,
-  'Cli.MovingFiles': `Moving {0} {1} to {2}...`,
-  'Cli.MovedFiles': `Moved {0} {1}.`,
+  'Cli.MovingFiles': `Moving {0} unneeded {1} to {2}...`,
+  'Cli.MovedFiles': `Moved {0} unneeded {1}.`,
+  'Cli.DestinationChangedMidBatch': `The backup folder changed while the files were being moved (something replaced or redirected the folder), so InstallerClean stopped rather than write into the wrong place. Check {0}, then run the command again.`,
   'Cli.MutexBlocked': `Another InstallerClean process holds the single-instance lock (GUI or another CLI run). Exit 75 (transient); safe to retry later.`,
   'Cli.EventLogUnavailable': `Note: Event Log writing failed. Check Application log permissions or Group Policy.`,
   'CrashLog.PrivacyHeader': `# crash.log captures unhandled exceptions from InstallerClean.\n# Under elevation the framework's exception messages can include\n# file paths from the running session (including other users'\n# profiles enumerated by Windows Installer queries). Network-\n# failure messages from the update check or result-log POST can\n# include the destination URL and the resolved IP / proxy address.\n# Entries about unreadable Windows Installer records can include a\n# Windows account SID (S-1-5-21-...) and the product codes of\n# installed software.\n# Redact all three classes of detail before attaching this file to\n# a public bug report.\n`,
   'Cli.Help.Header': `InstallerClean - clean up {InstallerFolder}`,
+  'Cli.Help.Summary': `Removes cached .msi and .msp files that no installed program still needs.`,
+  'Cli.Help.Elevation': `Needs an elevated (administrator) prompt; Windows will not start it.`,
   'Cli.Help.Usage': `Usage:`,
   'Cli.Help.Help': `  installerclean-cli --help     Show this help (also accepts /?, -h)`,
   'Cli.Help.Version': `  installerclean-cli --version  Print the version (also accepts -v)`,
@@ -515,14 +522,12 @@ const MAP = {
   'Cli.Help.Delete': `  installerclean-cli /d         Delete unneeded files permanently`,
   'Cli.Help.MoveDefault': `  installerclean-cli /m         Move to the saved backup folder`,
   'Cli.Help.MovePath': `  installerclean-cli /m PATH    Move to specified path`,
-  'Cli.Help.NoteLine1': `installerclean-cli is a real console process and blocks the prompt`,
-  'Cli.Help.NoteLine2': `until it finishes; redirect or pipe its output as you would any`,
-  'Cli.Help.NoteLine3': `other console exe. The GUI lives in InstallerClean.exe alongside it.`,
+  'Cli.Help.NoteLine1': `installerclean-cli blocks the prompt until it finishes, so a script or&#10;scheduled task can wait on it.`,
   'Cli.Help.MoveScheduledNote': `That folder is saved per-user; scheduled or SYSTEM runs need /m PATH.`,
   'Cli.Help.ExitCodesHeader': `Exit codes:`,
-  'Cli.Help.ExitCodeOk': `  0   success: every flagged file was processed`,
-  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad args, scan failed, all files failed)`,
-  'Cli.Help.ExitCodePartial': `  2   partial: some files processed, some failed`,
+  'Cli.Help.ExitCodeOk': `  0   success: the run finished with nothing left to do`,
+  'Cli.Help.ExitCodeError': `  1   failure: nothing processed (bad arguments, a bad destination, a&#10;       failed scan or every file failed)`,
+  'Cli.Help.ExitCodePartial': `  2   partial: some processed, some not (a failure or a Ctrl+C part way)`,
   'Cli.Help.ExitCodeTransient': `  75  transient: a temporary condition blocked the run (see the message)`,
   'Cli.Help.ExitCodeCancelled': `  130 cancelled (Ctrl+C)`,
   'Tooltip.ChangeLanguage': `Change language. The program will restart.`,
@@ -538,6 +543,8 @@ const MAP = {
   'Cli.TooManyArgumentsNoPath': `Error: unexpected extra argument '{0}'. /s and /d take no further arguments, and only one flag can be used per run.`,
   'Cli.MissingFromDisk.Singular': `{0} registered file is missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of that program could fail. Running that program's installer again, the same version, usually restores it.`,
   'Cli.MissingFromDisk.Plural': `{0} registered files are missing from {InstallerFolder} (not removed by InstallerClean). No trouble now, but a future repair, update or uninstall of those programs could fail. Running each program's installer again, the same version, usually restores them.`,
+  'Cli.ProgramsUnreadable.Singular': `Windows couldn't fully read the records for one installed program, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
+  'Cli.ProgramsUnreadable.Plural': `Windows couldn't fully read the records for {0} installed programs, so this scan left out the superseded and obsoleted patches. What it did find is still safe to remove, but there may be more that aren't shown. Running it again may pick them up.`,
   'Cli.MoveNotEnoughSpace': `Error: not enough space at {0}. Moving these files needs {1} and {2} is free. Nothing has been moved.`,
   'Cli.PendingRebootBlocked.Other': `Error: Windows Installer has something in progress, so /m and /d are blocked. InstallerClean won't touch {InstallerFolder} while it's changing. Try again once it finishes.`,
 };

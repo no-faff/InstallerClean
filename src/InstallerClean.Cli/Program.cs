@@ -363,15 +363,21 @@ internal static class Program
             var count = scanResult.RemovableFiles.Count;
             var totalBytes = scanResult.RemovableFiles.Sum(f => f.SizeBytes);
             var size = DisplayHelpers.FormatSize(totalBytes);
-            Console.WriteLine(string.Format(
-                DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
-                count, DisplayHelpers.PluraliseFile(count), size));
+            // A clean machine gets one line, not a count of zero and a size of
+            // zero followed by a second line saying the same thing. It is the
+            // commonest output this tool produces, and somebody reading a
+            // scheduled task's log wants the state of the machine rather than
+            // the tool's intention towards it.
+            Console.WriteLine(count == 0
+                ? Strings.Cli_FoundNoOrphans
+                : string.Format(
+                    DisplayHelpers.Pluralise(count, Strings.Cli_FoundOrphans, "Cli.FoundOrphans"),
+                    count, DisplayHelpers.PluraliseFile(count), size));
 
             ReportScanSignals(arg, scanResult);
 
             if (count == 0)
             {
-                Console.WriteLine(Strings.Cli_NothingToDo);
                 MachineContract.WriteEventLog(CliEventClass.Ok,
                     () => string.Format(Strings.Cli_EventLogScanNoOrphans,
                         arg, scanResult.RegisteredPackages.Count,
@@ -381,9 +387,21 @@ internal static class Program
 
             if (arg == "/s")
             {
+                // The name column is measured off this run's own longest name
+                // rather than fixed, because the cache's names are derived from
+                // package identity and vary in length from machine to machine: a
+                // constant is padding every row of one list out and too narrow
+                // for another, and one name past it puts the wandering size and
+                // reason straight back. Only the name is padded and nothing is
+                // right-aligned. Plus two, with the two spaces in the format,
+                // leaves four columns before the bracket: two separates a pair of
+                // words, and reading down sixty-odd rows wants the bracket column
+                // standing clear of the ragged name ends above it. This is the
+                // output most likely to be pasted into a ticket.
+                var nameColumn = scanResult.RemovableFiles.Max(f => f.FileName.Length) + 2;
                 Console.WriteLine(string.Join(Environment.NewLine,
                     scanResult.RemovableFiles.Select(f =>
-                        $"  {f.FileName}  ({f.SizeDisplay}, {f.Reason})")));
+                        $"  {f.FileName.PadRight(nameColumn)}  ({f.SizeDisplay}, {f.Reason})")));
                 // The noun and size are recomputed inside the en-GB scope rather
                 // than reusing the human-facing `size` (which is in the OS
                 // region), so this audit line reads fully English.
@@ -458,9 +476,14 @@ internal static class Program
             if (arg == "/d")
             {
                 var deleteService = services.GetRequiredService<IDeleteFilesService>();
-                Console.WriteLine(string.Format(
-                    DisplayHelpers.Pluralise(count, Strings.Cli_DeletingFiles, "Cli.DeletingFiles"),
-                    count, DisplayHelpers.PluraliseFile(count)));
+                // Silent when the re-verify just above took every file back. The
+                // line it printed has already said so, with the reason; announcing
+                // a batch of none and then reporting that none of it happened
+                // reads as a fault twice over on a run where nothing went wrong.
+                if (count > 0)
+                    Console.WriteLine(string.Format(
+                        DisplayHelpers.Pluralise(count, Strings.Cli_DeletingFiles, "Cli.DeletingFiles"),
+                        count, DisplayHelpers.PluraliseFile(count)));
                 // Skip the service when the re-verify left nothing to act on:
                 // DeleteFilesService returns 0/0 for an empty list anyway, but
                 // synthesizing it keeps the /d and /m branches symmetric (Move
@@ -554,9 +577,11 @@ internal static class Program
                 return ExitError;
             }
 
-            Console.WriteLine(string.Format(
-                DisplayHelpers.Pluralise(count, Strings.Cli_MovingFiles, "Cli.MovingFiles"),
-                count, DisplayHelpers.PluraliseFile(count), moveDest));
+            // Silent at zero; see the /d branch.
+            if (count > 0)
+                Console.WriteLine(string.Format(
+                    DisplayHelpers.Pluralise(count, Strings.Cli_MovingFiles, "Cli.MovingFiles"),
+                    count, DisplayHelpers.PluraliseFile(count), moveDest));
             // See the /d branch: skip the service (and MoveFilesService's
             // destination-folder create + probe) when nothing survived the
             // re-verify; synthesize the empty result so the summary path still fires
@@ -705,11 +730,15 @@ internal static class Program
     {
         if (scanResult.UnreadableProductCount > 0)
         {
+            // The command line's own pair, not the window's Summary.* one. That
+            // closes on Re-scan, which is a button this surface has not got, and
+            // opens its second sentence on "Everything listed", which is true
+            // only of /s: a /d or an /m lists nothing at all.
             Console.WriteLine(string.Format(
                 DisplayHelpers.Pluralise(scanResult.UnreadableProductCount,
-                    Strings.Summary_ProgramsUnreadable_Singular,
-                    Strings.Summary_ProgramsUnreadable_Plural,
-                    "Summary.ProgramsUnreadable"),
+                    Strings.Cli_ProgramsUnreadable_Singular,
+                    Strings.Cli_ProgramsUnreadable_Plural,
+                    "Cli.ProgramsUnreadable"),
                 scanResult.UnreadableProductCount));
             MachineContract.WriteEventLog(CliEventClass.ScanWithheldNotice,
                 () => string.Format(Strings.Cli_EventLogScanWithheld,
@@ -858,10 +887,15 @@ internal static class Program
             foreach (var err in partial.Errors)
                 Console.WriteLine($"  {Path.GetFileName(err.FilePath)}: {err.LocalisedMessage}");
         }
-        // The guard's own resx sentence, built in the OS language and safe to
-        // echo under elevation: that is what deriving from
-        // LocalisedInvalidOperationException asserts.
-        Console.WriteLine(ex.Message);
+        // The command line's wording of the guard's sentence rather than
+        // ex.Message, which is the window's: that one closes on Re-scan, a button
+        // this surface has not got. Substituting it is sound because
+        // MoveAbortedException is raised from exactly one place, always built
+        // from Error.DestinationChangedMidBatch over the destination this method
+        // was handed, so the two sentences can only ever describe the same fault
+        // about the same folder. Should a second guard ever raise it, this line
+        // is what has to move with it.
+        Console.WriteLine(string.Format(Strings.Cli_DestinationChangedMidBatch, moveDest));
 
         var outcome = CliContract.ClassifyAbortedMove(partial.MovedCount);
         // Sizes and nouns recomputed inside the en-GB scope; see the /d summary
@@ -1009,32 +1043,53 @@ internal static class Program
 
     private static void PrintUsage()
     {
-        Console.WriteLine(Strings.Cli_Help_Header);
+        WriteHelp(Strings.Cli_Help_Header);
+        WriteHelp(Strings.Cli_Help_Summary);
+        WriteHelp(Strings.Cli_Help_Elevation);
         Console.WriteLine();
-        Console.WriteLine(Strings.Cli_Help_Usage);
-        Console.WriteLine(Strings.Cli_Help_Help);
-        Console.WriteLine(Strings.Cli_Help_Version);
-        Console.WriteLine(Strings.Cli_Help_ScanOnly);
-        Console.WriteLine(Strings.Cli_Help_Delete);
-        Console.WriteLine(Strings.Cli_Help_MoveDefault);
-        Console.WriteLine(Strings.Cli_Help_MovePath);
-        Console.WriteLine();
-        Console.WriteLine(Strings.Cli_Help_ExitCodesHeader);
-        Console.WriteLine(Strings.Cli_Help_ExitCodeOk);
-        Console.WriteLine(Strings.Cli_Help_ExitCodeError);
-        Console.WriteLine(Strings.Cli_Help_ExitCodePartial);
-        Console.WriteLine(Strings.Cli_Help_ExitCodeTransient);
-        Console.WriteLine(Strings.Cli_Help_ExitCodeCancelled);
-        Console.WriteLine();
-        Console.WriteLine(Strings.Cli_Help_NoteLine1);
-        Console.WriteLine(Strings.Cli_Help_NoteLine2);
-        Console.WriteLine(Strings.Cli_Help_NoteLine3);
+        WriteHelp(Strings.Cli_Help_Usage);
+        WriteHelp(Strings.Cli_Help_Help);
+        WriteHelp(Strings.Cli_Help_Version);
+        WriteHelp(Strings.Cli_Help_ScanOnly);
+        WriteHelp(Strings.Cli_Help_Delete);
+        WriteHelp(Strings.Cli_Help_MoveDefault);
+        WriteHelp(Strings.Cli_Help_MovePath);
         Console.WriteLine();
         // The saved /m default lives under %LOCALAPPDATA%, which a scheduled task
         // or service account (SYSTEM) does not share with the interactive user, so
         // a no-path /m there exits 1 every run: say so where /m is documented.
-        Console.WriteLine(Strings.Cli_Help_MoveScheduledNote);
+        WriteHelp(Strings.Cli_Help_MoveScheduledNote);
         Console.WriteLine();
+        WriteHelp(Strings.Cli_Help_ExitCodesHeader);
+        WriteHelp(Strings.Cli_Help_ExitCodeOk);
+        WriteHelp(Strings.Cli_Help_ExitCodeError);
+        WriteHelp(Strings.Cli_Help_ExitCodePartial);
+        WriteHelp(Strings.Cli_Help_ExitCodeTransient);
+        WriteHelp(Strings.Cli_Help_ExitCodeCancelled);
+        Console.WriteLine();
+        WriteHelp(Strings.Cli_Help_NoteLine1);
+        Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Writes one help value, a console line per line break inside it.
+    /// </summary>
+    /// <remarks>
+    /// A help value may carry more than one printed line, and the break is an
+    /// <c>&amp;#10;</c> in the resx, so the string arrives holding a bare LF where
+    /// every other line in the block ends in whatever the host calls a newline.
+    /// Splitting first means the console is handed the same sequence for every
+    /// break on the screen instead of two kinds. Every value goes through it,
+    /// single-line ones included, because which of them breaks is a translation's
+    /// choice rather than this method's: cutting one sentence into a string per
+    /// printed line forces every language to break where English happens to, and
+    /// the two entries carrying a break here were the worst column-budget
+    /// overflows of the sixteen languages for as long as they were shaped that way.
+    /// </remarks>
+    private static void WriteHelp(string value)
+    {
+        foreach (var line in value.Split('\n'))
+            Console.WriteLine(line);
     }
 
     /// <summary>
