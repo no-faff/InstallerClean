@@ -2,9 +2,14 @@
 // Fails (exit 1) when any line of any Cli.Help.* value, in the neutral resx or a
 // satellite, is wider than the help screen's column budget.
 //
-// The budget is 74 and it is the English text's own: every Cli.Help.* line in
-// Strings.resx fits 74 and the longest (Cli.Help.ExitCodeError) is exactly 74,
-// which is what makes it the measured budget rather than a number picked here.
+// The budget is 74 and it is the English text's own: it was the width of the
+// longest Cli.Help.* line in Strings.resx when this was written, which is what
+// made it a measured budget rather than a number picked here. Reworded English
+// has since come in under it and the ceiling has deliberately not followed,
+// because a budget that tracks the longest line is not a budget: it would move
+// every time the English was edited and no translation could be written against
+// it. Which line is currently longest is not the point and is not recorded here;
+// what 74 has to stay is comfortably inside an 80-column console.
 // Program.cs prints each value with Console.WriteLine and wraps nothing, so a
 // value the console cannot fit is broken across two rows by the terminal, the
 // second row starting hard against the left margin under a two-column layout.
