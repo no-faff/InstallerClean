@@ -6,6 +6,16 @@
          to the Inno Setup compiler, so the installer never drifts from
          the assembly. -->
     <Version>2.3.0</Version>
+    <!-- Right-click, Properties, Details is a surface cautious Windows users
+         actually open on an unsigned binary, and a blank Copyright beside a
+         populated Company is the shape of a repacked one. Company comes free
+         from <Authors>; this is the field that was empty on both exes people
+         run. No year, deliberately: an assembly attribute is baked at build
+         time, where the setup's own AppCopyright is a compile-time expression
+         (installer/InstallerClean.iss reads the clock), so a year here would
+         freeze at whenever the release happened to be cut and then go stale
+         wherever the exe is inspected. -->
+    <Copyright>(c) No Faff</Copyright>
     <Deterministic>true</Deterministic>
     <!-- Declaring the RID makes every restore compute the same graph,
          so packages.lock.json holds one shape regardless of which
