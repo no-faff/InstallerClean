@@ -11,6 +11,15 @@ on:
   # exception. Also usable as a manual re-run from the Actions tab.
   workflow_dispatch:
 
+# Read-only, declared rather than inherited from the repository default. Every
+# step below only reads: two pinned actions, the node guards, dotnet, a
+# Chocolatey install and ISCC. Nothing here pushes, comments or uploads an
+# artefact, and a job that restores from nuget.org and installs a package from
+# the Chocolatey community feed is the one place a build-time dependency could
+# reach for whatever token the run is holding.
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     # Pinned rather than windows-latest so a GitHub image roll cannot redden an
