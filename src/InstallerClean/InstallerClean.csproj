@@ -21,7 +21,14 @@
     <AssemblyName>InstallerClean</AssemblyName>
     <!-- Version comes from Directory.Build.props -->
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
-    <Description>Safely clean up unused Windows Installer files</Description>
+    <!-- Description is what Windows shows as Comments, further down the same
+         Details tab as File description below. It said "unused", which reads as
+         "not run recently": a weaker and different claim from the one the app
+         makes, and one it cannot support, since nothing here looks at when a
+         program last ran. The command line carries the same sentence; File
+         description sits directly above this field and already marks which
+         binary is which. -->
+    <Description>Finds the MSI and MSP files in C:\Windows\Installer that no installed program still needs, and moves or deletes them.</Description>
     <!-- AssemblyTitle is what Windows shows as File description: Explorer's
          Details tab and Description column, and Task Manager's process list.
          Left unset it defaults to the assembly name, so the field repeated

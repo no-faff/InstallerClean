@@ -20,7 +20,11 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- Shares the GUI's app.ico; the two exes ship in the same install directory. -->
     <ApplicationIcon>..\InstallerClean\Assets\app.ico</ApplicationIcon>
-    <Description>Command-line front-end for InstallerClean.</Description>
+    <!-- Comments, and deliberately the same sentence as the GUI: it says what
+         the tool does, which is the same job by another face. Naming the face
+         here too would repeat the "(command line)" that File description
+         carries one line above it in the same panel. See the GUI csproj. -->
+    <Description>Finds the MSI and MSP files in C:\Windows\Installer that no installed program still needs, and moves or deletes them.</Description>
     <!-- See the GUI csproj for why this is set: unset, Windows shows the
          assembly name as the File description, which repeats the filename. -->
     <AssemblyTitle>Cleans up unneeded files in C:\Windows\Installer (command line)</AssemblyTitle>
