@@ -124,6 +124,13 @@ Source: "{#PublishDir}\cli\installerclean-cli.exe"; DestDir: "{app}"; Flags: ign
 ; in Notepad; a bare "LICENSE" with no extension makes Windows show the "how do
 ; you want to open this file?" picker instead.
 Source: "..\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion
+; Same argument, for what is redistributed rather than what is licensed: the GUI
+; embeds four Poppins faces under the SIL Open Font License, and this setup
+; compiles in four community Inno Setup translations. The DestName trick is the
+; LICENSE one and is needed for the same reason; the repository file carries no
+; extension because .git/info/exclude ignores *.txt at every level, so a tracked
+; THIRD-PARTY-NOTICES.txt cannot exist here.
+Source: "..\THIRD-PARTY-NOTICES"; DestDir: "{app}"; DestName: "THIRD-PARTY-NOTICES.txt"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\InstallerClean"; Filename: "{app}\InstallerClean.exe"; IconFilename: "{app}\InstallerClean.exe"
