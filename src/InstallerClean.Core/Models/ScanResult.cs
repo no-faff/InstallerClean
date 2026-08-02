@@ -59,11 +59,13 @@ namespace InstallerClean.Models;
 /// <see cref="UnreadableProductCount"/> is the reason, this is the price, and
 /// both are zero on a scan that read every product's records.
 ///
-/// Its consumer is the schema 4 result-log payload, where it sits beside the
-/// act-time re-verify's own held-back count, which is a different number: this
-/// one is what never reached the user, that one is what stopped qualifying
-/// between the list and the button. If schema 4 does not land in 2.4.0 this
-/// field comes out with it rather than shipping with no reader.
+/// Two consumers. The command line reads it now, into the 3000 notice's
+/// <c>Cli.EventLogScanWithheld</c> line, so an operator watching a fleet learns
+/// what a withheld run cost and not merely that one happened. The schema 4
+/// result-log payload takes it as well, where it sits beside the act-time
+/// re-verify's own held-back count, a different number: this one is what never
+/// reached the user, that one is what stopped qualifying between the list and
+/// the button.
 /// </param>
 public record ScanResult(
     IReadOnlyList<OrphanedFile> RemovableFiles,
