@@ -30,10 +30,11 @@ const LANGS = ['en-GB', 'zh-Hans', 'ru', 'es', 'ja', 'pt-BR', 'pl', 'tr',
 //
 // Membership is declared, never inferred, because most label/name pairs here are
 // SUPPOSED to disagree: a name that tells several identical controls apart has to
-// elaborate ("Cancel scan" over a bare "Cancel"), and a rule clever enough to
-// admit those by containment fails in six languages. The members are the names
-// that RESTATE their label rather than disambiguate it. Rule 2 is what stops a
-// new control joining neither list.
+// elaborate ("Cancel scan" over a bare "Cancel"), and nothing in the two strings
+// tells that apart from a name that has drifted. The members are the names that
+// RESTATE their label rather than disambiguate it; the ones that elaborate have
+// their own set below and a weaker rule. Rule 2 is what stops a new control
+// joining neither list.
 const MUST_AGREE = [
   // Content is a StackPanel (icon + AccessText), so there is no string for WPF
   // to derive a name from and the override IS the label.
@@ -62,18 +63,12 @@ const MUST_AGREE = [
 // that looks like a label/name split and is not is the splash window's Cancel,
 // whose Content is set to the same string on the line above.
 
-// Named to say something the visible text does not, deliberately.
-const DIFFERS_ON_PURPOSE = new Set([
-  // One label, several controls: three Cancels and two Details buttons that
-  // read identically until the name says which is which.
-  'Automation.CancelScan',
-  'Automation.CancelOperation',
-  'Automation.CancelStartupScan',
-  'Automation.ViewOrphanedFiles',
-  'Automation.ViewRegisteredFiles',
-  // A field whose visible text is a value, named for the field it holds. The
-  // Field.* keys label the details panes' values; Window.Main.Title names the
-  // About window's version box, whose text is the version.
+// A field whose visible text is a VALUE, named for the field it holds. There is
+// no rule to write: a path, a count and a version have nothing in common with
+// the words that name them. The Field.* keys label the details panes' values;
+// Window.Main.Title names the About window's version box, whose text is the
+// version.
+const LABELS_A_VALUE = new Set([
   'Automation.BackupFolder',
   'Automation.CompletionErrors',
   'Window.Main.Title',
@@ -81,6 +76,23 @@ const DIFFERS_ON_PURPOSE = new Set([
   'Field.Keywords', 'Field.Reason', 'Field.SigningCertificate',
   'Field.Subject', 'Field.Title',
 ]);
+
+// One label, several controls: three Cancels and two Details buttons that read
+// identically until the name says which is which. These DO label text, so
+// equality is the wrong rule and no rule is the wrong answer. The rule they owe
+// is containment: WCAG 2.5.3 Label in Name asks that the accessible name
+// contain the visible label, so speech input reaches the control by the word
+// the user can see. Both sets used to be one list called DIFFERS_ON_PURPOSE,
+// read once to satisfy rule 2 and never measured, and the merge is what hid the
+// missing rule: rule 2 stops a control being unclassified, not a control being
+// classified into the list that measures nothing.
+const ELABORATES_A_LABEL = [
+  { label: 'Action.Cancel', name: 'Automation.CancelScan' },
+  { label: 'Action.Cancel', name: 'Automation.CancelOperation' },
+  { label: 'Action.Cancel', name: 'Automation.CancelStartupScan' },
+  { label: 'Action.Details', name: 'Automation.ViewOrphanedFiles' },
+  { label: 'Action.Details', name: 'Automation.ViewRegisteredFiles' },
+];
 
 // Nothing visible to agree with: an icon-only button, a scroll region, a
 // progress bar. The name is the control's only text.
@@ -396,14 +408,15 @@ for (const file of xamlFiles) {
     namedInXaml.add(m[1]);
 }
 const classified = new Set([
-  ...MUST_AGREE.map((p) => p.name), ...DIFFERS_ON_PURPOSE, ...NO_VISIBLE_LABEL,
+  ...MUST_AGREE.map((p) => p.name), ...ELABORATES_A_LABEL.map((p) => p.name),
+  ...LABELS_A_VALUE, ...NO_VISIBLE_LABEL,
 ]);
 for (const key of [...namedInXaml].sort())
   if (!classified.has(key))
-    stale.push(`${key} names a control in the XAML and is in none of this file's three lists. `
-      + 'Decide whether its name restates a visible label (MUST_AGREE), says something the '
-      + 'visible text does not (DIFFERS_ON_PURPOSE), or labels a control with no visible text '
-      + '(NO_VISIBLE_LABEL).');
+    stale.push(`${key} names a control in the XAML and is in none of this file's four lists. `
+      + 'Decide whether its name restates a visible label (MUST_AGREE), elaborates one to tell '
+      + 'identical controls apart (ELABORATES_A_LABEL), names the field behind a value '
+      + '(LABELS_A_VALUE), or labels a control with no visible text (NO_VISIBLE_LABEL).');
 for (const key of [...classified].sort())
   if (!namedInXaml.has(key))
     stale.push(`${key} is classified in this file but names no control in the XAML. `
@@ -450,6 +463,7 @@ const sourceShapeProblems = problems.length;
 const neutral = values(readFileSync(`${RESX_DIR}/Strings.resx`, 'utf8'));
 const declaredKeys = [
   ...MUST_AGREE.flatMap((p) => [p.label, p.name]),
+  ...ELABORATES_A_LABEL.flatMap((p) => [p.label, p.name]),
   ...QUOTES_A_LABEL.flatMap((p) => [p.sentence, p.label]),
   ...MUST_NOT_NAME.map((p) => p.key),
   ...GITHUB_SPOKEN, ...GITHUB_DRAWN,
@@ -497,6 +511,15 @@ for (const lang of LANGS) {
     if (drawn === null || spoken === null) continue;
     if (compare(drawn, lang) !== compare(spoken, lang))
       failures.push(`${label} shows "${drawn}" but ${name} speaks "${spoken}"`);
+  }
+
+  for (const { label, name } of ELABORATES_A_LABEL) {
+    const drawn = read(label), spoken = read(name);
+    if (drawn === null || spoken === null) continue;
+    if (!compare(spoken, lang).includes(compare(drawn, lang)))
+      failures.push(`${label} shows "${wording(drawn)}" and ${name} speaks "${wording(spoken)}", `
+        + 'which does not contain it, so speech input cannot reach the control by the word on it '
+        + '(WCAG 2.5.3)');
   }
 
   for (const { sentence, label } of QUOTES_A_LABEL) {
@@ -565,7 +588,8 @@ if (problems.length) {
   process.exit(1);
 }
 
-console.log(`\nCross-key rules OK: ${LANGS.length} languages, ${MUST_AGREE.length} label/name pairs, `
+console.log(`\nCross-key rules OK: ${LANGS.length} languages, ${MUST_AGREE.length} label/name pairs `
+  + `and ${ELABORATES_A_LABEL.length} measured by containment, `
   + `${tokenKeys.length} keys carrying ${FOLDER_TOKEN}, ${linkKeys.size} carrying a [link phrase], `
   + `${namedInXaml.size} automation names classified, `
   + `${csFiles.length} C# files read through Strings bar ${rawAllowed.size} allowed direct.`);
