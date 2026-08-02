@@ -68,6 +68,16 @@ jobs:
       - name: Lint French spacing
         run: node scripts/check-french-spacing.mjs
 
+      # Program.cs prints each Cli.Help.* value with Console.WriteLine and wraps
+      # nothing, so a translated line over the console's column budget is torn
+      # across two rows with the second hard against the left margin. Twelve of
+      # the sixteen languages had drifted past it before the guard was written,
+      # Russian to 149 columns. Here with the source guards rather than with the
+      # gates at the end because it is not one: it passes today, and a language
+      # going over is a mistake rather than a translation window.
+      - name: Check CLI help fits its column budget
+        run: node scripts/check-cli-help-width.mjs
+
       # The only mechanical check on XAML resource keys. A {StaticResource} whose
       # key nothing defines compiles clean and throws a XamlParseException when
       # the window is first opened, so neither the build nor the test run below
