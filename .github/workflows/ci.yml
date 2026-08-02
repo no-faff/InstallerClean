@@ -96,13 +96,22 @@ jobs:
       - name: Test
         run: dotnet test src/InstallerClean.Tests/ -p:RestoreLockedMode=true
 
+      # Everything from here to the setup compile depends on the BUILD having
+      # succeeded, not on the tests having passed, and a red test run is precisely
+      # when somebody wants to know that the downloads still publish and that the
+      # .iss still compiles. Carrying no condition, all of them were skipped by a
+      # red Test, which is how a reorder that put the language gates last still left
+      # the .iss having never been compiled anywhere.
       - name: Smoke-publish self-contained
+        if: success() || failure()
         run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/self-contained
 
       - name: Smoke-publish framework-dependent
+        if: success() || failure()
         run: dotnet publish src/InstallerClean/InstallerClean.csproj -c Release -r win-x64 --self-contained false -p:RestoreLockedMode=true -p:PublishSingleFile=true -o publish/framework-dependent
 
       - name: Smoke-publish CLI framework-dependent
+        if: success() || failure()
         run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained false -p:RestoreLockedMode=true -p:PublishSingleFile=true -o publish/cli-framework-dependent
 
       # publish/cli is where installer/InstallerClean.iss reads the CLI from, so
@@ -123,6 +132,7 @@ jobs:
       # they can rebuild a tag and compare hashes and this file is the only
       # public statement of how.
       - name: Smoke-publish CLI self-contained
+        if: success() || failure()
         run: dotnet publish src/InstallerClean.Cli/InstallerClean.Cli.csproj -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/cli
 
       # The setup is the artefact CI could not build: ISCC is the only thing
@@ -139,10 +149,16 @@ jobs:
       # must not redden an unrelated push. 6.7.1 is the compiler that built the
       # shipped 2.0.x setups, and it is the one the bundled "Inno Setup 6.5.0+"
       # community .isl files are known to compile against. Bump it deliberately.
+      # Conditioned with the compile below rather than left to the default: ISCC
+      # is not on the runner image, so a compile step that runs past a red Test
+      # while its installer step did not fails on a missing ISCC.exe and reports
+      # nothing about the .iss.
       - name: Install Inno Setup
+        if: success() || failure()
         run: choco install innosetup --version=6.7.1 --no-progress -y
 
       - name: Compile the installer
+        if: success() || failure()
         run: |
           $iscc = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter ISCC.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
                   Select-Object -First 1 -ExpandProperty FullName
@@ -153,16 +169,20 @@ jobs:
           & $iscc "/DAppVersion=$version" installer\InstallerClean.iss
 
       # The four language gates run last, and each runs even when one before it
-      # has failed. All four are red BY DESIGN for the window between a string
-      # landing in English and its translation round, and from their old position
-      # ahead of the build one deliberate red took everything after it down: the
-      # whole 2.4.0 line of work was written against a suite that had not run
-      # anywhere, and ISCC is the only mechanical check the .iss ever gets.
-      # always() is what stops the same thing happening inside this block, one
-      # red gate hiding the three behind it. Nothing is softened by the move:
-      # a failure here fails the job exactly as it did from the top.
+      # has failed. TWO of them are red BY DESIGN for the window between a string
+      # landing in English and its translation round, check-accelerators and
+      # check-still-english. The other two are regeneration and rule guards whose
+      # red always means a mistake, and they sit here for the same reason rather
+      # than for one of their own: from the old position ahead of the build, one
+      # deliberate red took everything after it down, and the whole 2.4.0 line of
+      # work was written against a suite that had not run anywhere.
+      # !cancelled() is what stops that happening inside this block, one red gate
+      # hiding the three behind it, and unlike always() it stands down on a
+      # cancelled job instead of posting four more failures over the cancellation.
+      # Nothing is softened by the move: a failure here fails the job exactly as
+      # it did from the top.
       - name: Check access keys do not clash
-        if: always()
+        if: '!cancelled()'
         # Two controls live on one window at one moment must not share an Alt
         # access key: WPF answers a duplicate by cycling focus between the
         # matches instead of invoking either, so a clash silently retires BOTH,
@@ -180,7 +200,7 @@ jobs:
       # showed one phrase and spoke another in two languages across four
       # releases.
       - name: Check cross-key rules
-        if: always()
+        if: '!cancelled()'
         run: node scripts/check-cross-key-rules.mjs
 
       # A required gate: a satellite shipping the English neutral for a
@@ -188,7 +208,7 @@ jobs:
       # string's English landing and its translation round running, rather than
       # only on a mistake.
       - name: Check every satellite is translated
-        if: always()
+        if: '!cancelled()'
         run: node scripts/check-still-english.mjs
 
       # docs/translations/*.md carry the same "generated, never hand-edited"
@@ -198,6 +218,6 @@ jobs:
       # Contributing section points native speakers at, so a stale one asks for
       # corrections to text that no longer exists.
       - name: Check translation review tables are in step
-        if: always()
+        if: '!cancelled()'
         run: node scripts/gen-translation-table.mjs --check
 
