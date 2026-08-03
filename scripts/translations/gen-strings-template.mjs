@@ -51,18 +51,25 @@
 // mean nothing. The self-check inverts instead: every value must still BE the
 // neutral's, and one that is not is a neutral edit this file never took, which the
 // next language would then be translated from. A copy that points OUT at a satellite
-// is a normal generator again, gate and all. No CI job runs the generators, so this
-// check is met only by whoever regenerates the satellites after editing the neutral.
+// is a normal generator again, gate and all. CI runs every generator on every push
+// and reads this file's verdict line, so a neutral edit that never reached the MAP is
+// caught there as well as by whoever regenerates the satellites.
 import { readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const dir = 'src/InstallerClean.Core/Resources';
 const BASE = `${dir}/Strings.resx`;            // English source (the "neutral")
 // A new language MUST point OUT at its own file, e.g. `${dir}/Strings.de.resx`.
-// The /tmp default means running this template UNCHANGED can never overwrite a
-// shipped resx (it writes a throwaway), and it is also what selects template mode
-// in the self-check, so a copy that forgets step 2 fails on its first real
-// translation instead of quietly writing to /tmp.
-const TEMPLATE_OUT = '/tmp/Strings.template-output.resx';
+// The temp-directory default means running this template UNCHANGED can never
+// overwrite a shipped resx (it writes a throwaway), and it is also what selects
+// template mode in the self-check, so a copy that forgets step 2 fails on its first
+// real translation instead of quietly writing somewhere harmless.
+// tmpdir() rather than a literal /tmp, because this is run on Windows as well as on
+// Linux: Git Bash resolves a bare /tmp against the drive it is started from, giving a
+// D:\tmp that exists on no CI runner, and the write then threw before the verdict
+// line, taking down the gate that reads it and everything that gate stands in front of.
+const TEMPLATE_OUT = join(tmpdir(), 'Strings.template-output.resx');
 const OUT = TEMPLATE_OUT;
 const IS_TEMPLATE = OUT === TEMPLATE_OUT;
 
