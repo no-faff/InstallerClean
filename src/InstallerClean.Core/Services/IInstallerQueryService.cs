@@ -10,9 +10,13 @@ namespace InstallerClean.Services;
 /// window.
 /// </summary>
 /// <remarks>
-/// This service does not touch the filesystem. The on-disk
-/// orphan-vs-registered cross-reference is performed by
-/// <see cref="IFileSystemScanService"/>. Callers must be elevated:
+/// This service asks the filesystem exactly one question, whether a cached
+/// file only the registry fallback claimed is really on disk, because a
+/// claim the product enumeration never made is evidence of a lost
+/// registration only if the file it names is there to be lost. Nothing else
+/// here reads the disk, and the on-disk orphan-vs-registered
+/// cross-reference belongs to <see cref="IFileSystemScanService"/>.
+/// Callers must be elevated:
 /// <c>MsiEnumProductsExW</c> with the all-users SID returns
 /// <c>ERROR_ACCESS_DENIED</c> for non-admin tokens.
 /// </remarks>
