@@ -53,14 +53,25 @@ public interface IMoveFilesService
 /// <summary>
 /// Outcome of a Move. When <see cref="Cancelled"/> and
 /// <see cref="InstallerBusy"/> are both <c>false</c>, <see cref="MovedCount"/> +
-/// <see cref="Errors"/>.Count sum to the input count: every file is either moved
-/// or recorded as a failure (never silently dropped). When <see cref="Cancelled"/>
-/// is <c>true</c> the batch was stopped mid-way, so the two sum to the number of
-/// files reached before the cancel and the rest of the input was never touched.
+/// <see cref="Errors"/>.Count + <see cref="HeldBack"/>.Count sum to the input
+/// count: every file is either moved, recorded as a failure, or kept back by the
+/// under-lease re-read (never silently dropped). <see cref="HeldBack"/> is in
+/// that sum rather than a footnote to it, because it is the term a caller is most
+/// likely to forget and the one that makes the other two describe a smaller batch
+/// than the caller handed in. When <see cref="Cancelled"/> is <c>true</c> the
+/// batch was stopped mid-way, so the three account for the files reached before
+/// the cancel and the rest of the input was never touched.
 /// When <see cref="InstallerBusy"/> is <c>true</c> the batch was refused before it
 /// started because a Windows Installer transaction held <c>Global\_MSIExecute</c>:
 /// nothing was touched, so <see cref="MovedCount"/> is 0 and <see cref="Errors"/>
 /// is empty. The caller re-checks the pending-reboot gate and shows its banner.
+///
+/// One outcome is NOT in this record, and a caller reading only the record would
+/// miss it: a destination guard tripping mid-batch throws
+/// <see cref="MoveAbortedException"/>, which carries a result of exactly this
+/// shape covering the files the batch reached before it stopped. The sums above
+/// hold of that partial result too; what does not hold is the assumption that a
+/// returned result is the only way this method reports.
 /// </summary>
 /// <param name="HeldBack">
 /// Paths dropped from the batch by the re-read taken under the installer mutex,

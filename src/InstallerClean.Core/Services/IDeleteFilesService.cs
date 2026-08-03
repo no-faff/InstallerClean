@@ -45,11 +45,14 @@ public interface IDeleteFilesService
 /// <summary>
 /// Outcome of a Delete. When <see cref="Cancelled"/>, <see cref="InstallerBusy"/>
 /// and <see cref="InstallerLockUnavailable"/> are all <c>false</c>,
-/// <see cref="DeletedCount"/> + <see cref="Errors"/>.Count sum to the input
-/// count: every file was deleted or recorded as an error. When
-/// <see cref="Cancelled"/> is <c>true</c> the batch was stopped mid-way, so the
-/// count and errors reflect the files reached before the cancel and the rest of
-/// the input was never touched.
+/// <see cref="DeletedCount"/> + <see cref="Errors"/>.Count + <see cref="HeldBack"/>.Count
+/// sum to the input count: every file was deleted, recorded as an error, or kept
+/// back by the under-lease re-read. <see cref="HeldBack"/> is in that sum rather
+/// than a footnote to it, because it is the term a caller is most likely to
+/// forget and the one that makes the other two describe a smaller batch than the
+/// caller handed in. When <see cref="Cancelled"/> is <c>true</c> the batch was
+/// stopped mid-way, so the three account for the files reached before the cancel
+/// and the rest of the input was never touched.
 /// </summary>
 /// <param name="InstallerBusy">
 /// The batch was refused before it started because a Windows Installer
